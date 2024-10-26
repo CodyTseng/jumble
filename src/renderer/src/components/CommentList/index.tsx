@@ -18,7 +18,9 @@ export default function CommentList({ event, className }: { event: Event; classN
       ],
       {
         next: (event) => {
-          setComments((comments) => [...comments, event])
+          setComments(
+            (comments) => [...comments, event].sort((a, b) => a.created_at - b.created_at) // TODO:
+          )
         }
       }
     )

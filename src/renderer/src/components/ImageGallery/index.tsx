@@ -29,7 +29,7 @@ export default function ImageGallery({
             return (
               <img
                 className="rounded-lg max-w-full max-h-[30vh]"
-                key={src}
+                key={index}
                 src={src}
                 onClick={(e) => handlePhotoClick(e, index)}
               />
