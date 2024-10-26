@@ -18,7 +18,7 @@ export default function ShortTextNoteCard({
       className={className}
       onClick={(e) => {
         e.stopPropagation()
-        push(toNote(event.id))
+        push(toNote(event))
       }}
     >
       <Card className="p-4 hover:bg-muted/50 text-left cursor-pointer">

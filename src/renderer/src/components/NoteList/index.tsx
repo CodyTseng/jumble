@@ -1,7 +1,7 @@
-import { Event, Filter } from 'nostr-tools'
 import { now } from '@renderer/lib/timestamp'
 import { cn } from '@renderer/lib/utils'
-import { kinds } from 'nostr-tools'
+import client from '@renderer/services/client.service'
+import { Event, Filter, kinds } from 'nostr-tools'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
 
@@ -23,19 +23,30 @@ export default function NoteList({
   const observer = useRef<IntersectionObserver | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
-  const loadMore = useCallback(async () => {
-    const newEvents = await window.api.relay.fetchEvents([noteFilter])
-    if (newEvents.length === 0) {
-      setHasMore(false)
-      return
-    }
-    setEvents((oldEvents) => [
-      ...oldEvents,
-      ...newEvents.filter(
-        (e) => !(e.kind === kinds.ShortTextNote && e.tags.some(([tagName]) => tagName === 'e'))
-      )
-    ])
-    setNoteFilter({ ...noteFilter, until: newEvents[newEvents.length - 1].created_at - 1 })
+  const loadMore = useCallback(() => {
+    let count = 0
+    let until = noteFilter.until
+    client.fetchEvents([noteFilter], {
+      next: (newEvent) => {
+        count++
+        if (
+          newEvent.kind === kinds.ShortTextNote &&
+          newEvent.tags.some(([tagName]) => tagName === 'e')
+        ) {
+          return
+        }
+        setEvents((oldEvents) => [...oldEvents, newEvent])
+        if (!until || newEvent.created_at < until) {
+          until = newEvent.created_at
+        }
+      },
+      complete: () => {
+        if (count === 0) {
+          setHasMore(false)
+        }
+        setNoteFilter({ ...noteFilter, until })
+      }
+    })
   }, [noteFilter])
 
   useEffect(() => {

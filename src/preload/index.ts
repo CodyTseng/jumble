@@ -1,6 +1,5 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
-import { Filter } from 'nostr-tools'
 
 // Custom APIs for renderer
 const api = {
@@ -11,9 +10,6 @@ const api = {
       })
     },
     current: () => ipcRenderer.invoke('theme:current')
-  },
-  relay: {
-    fetchEvents: (filters: Filter[]) => ipcRenderer.invoke('relay:fetchEvents', filters)
   }
 }
 

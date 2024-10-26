@@ -1,23 +1,18 @@
+import { verifyNip05 } from '@renderer/lib/nip05'
 import { useEffect, useState } from 'react'
 
 export function useFetchNip05(nip05?: string, pubkey?: string) {
   const [nip05IsVerified, setNip05IsVerified] = useState(false)
-  const [nip05Name, nip05Domain] = nip05?.split('@') || [undefined, undefined]
+  const [nip05Name, setNip05Name] = useState<string>('')
+  const [nip05Domain, setNip05Domain] = useState<string>('')
 
   useEffect(() => {
-    const verifyNip05 = async () => {
-      if (!nip05Name || !nip05Domain || !pubkey) return
-      try {
-        const res = await fetch(`https://${nip05Domain}/.well-known/nostr.json?name=${nip05Name}`)
-        const json = await res.json()
-        if (json.names?.[nip05Name] === pubkey) {
-          setNip05IsVerified(true)
-        }
-      } catch {
-        // ignore
-      }
-    }
-    verifyNip05()
+    if (!nip05 || !pubkey) return
+    verifyNip05(nip05, pubkey).then(({ isVerified, nip05Name, nip05Domain }) => {
+      setNip05IsVerified(isVerified)
+      setNip05Name(nip05Name)
+      setNip05Domain(nip05Domain)
+    })
   }, [nip05, pubkey])
 
   return { nip05IsVerified, nip05Name, nip05Domain }

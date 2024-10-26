@@ -1,5 +1,6 @@
-import { Event } from 'nostr-tools'
 import { cn } from '@renderer/lib/utils'
+import client from '@renderer/services/client.service'
+import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import Comment from '../Comment'
 
@@ -7,29 +8,36 @@ export default function CommentList({ event, className }: { event: Event; classN
   const [comments, setComments] = useState<Event[]>([])
 
   const init = async () => {
-    const comments = await window.api.relay.fetchEvents([
+    client.fetchEvents(
+      [
+        {
+          '#e': [event.id],
+          kinds: [1],
+          limit: 1000
+        }
+      ],
       {
-        '#e': [event.id],
-        kinds: [1],
-        limit: 1000
+        next: (event) => {
+          setComments((comments) => [...comments, event])
+        }
       }
-    ])
-    setComments(comments.reverse())
+    )
   }
+
   useEffect(() => {
     init()
   }, [])
 
   return (
     <div className={cn('space-y-4', className)}>
-      {comments.map((comment) => {
+      {comments.map((comment, index) => {
         const parentCommentId = comment.tags.find(
           ([tagName, , , type]) => tagName === 'e' && type === 'reply'
         )?.[1]
         const parentComment = parentCommentId
           ? comments.find((c) => c.id === parentCommentId)
           : undefined
-        return <Comment key={comment.id} comment={comment} parentComment={parentComment} />
+        return <Comment key={index} comment={comment} parentComment={parentComment} />
       })}
     </div>
   )

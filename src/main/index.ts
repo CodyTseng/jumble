@@ -4,7 +4,6 @@ import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { ThemeService } from './services/theme.service'
 import { TSendToRenderer } from './types'
-import { RelayService } from './services/relay.service'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -39,6 +38,10 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  if (is.dev) {
+    mainWindow.webContents.openDevTools()
+  }
 }
 
 // This method will be called when Electron has finished
@@ -61,9 +64,6 @@ app.whenReady().then(async () => {
 
   const themeService = new ThemeService(sendToRenderer)
   themeService.init()
-
-  const relayService = new RelayService()
-  await relayService.init()
 
   createWindow()
 

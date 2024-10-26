@@ -26,7 +26,6 @@
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
-    "@codytseng/simple-nostr": "^0.0.2",
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -38,10 +37,13 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "lru-cache": "^11.0.1",
     "lucide-react": "^0.453.0",
     "nostr-tools": "^2.9.1",
     "react-resizable-panels": "^2.1.5",
     "react-string-replace": "^1.1.1",
+    "rx-nostr": "^3.4.0",
+    "rx-nostr-crypto": "^3.1.2",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "yet-another-react-lightbox": "^3.21.6"

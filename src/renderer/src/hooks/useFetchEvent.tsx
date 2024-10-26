@@ -1,5 +1,5 @@
-import { Event, Filter } from 'nostr-tools'
-import { nip19 } from 'nostr-tools'
+import client from '@renderer/services/client.service'
+import { Event, Filter, nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchEventById(id: string) {
@@ -28,9 +28,9 @@ export function useFetchEventById(id: string) {
       }
       if (!filter) return
 
-      const events = await window.api.relay.fetchEvents([{ ...filter, limit: 1 }])
-      if (events.length) {
-        setEvent(events[0])
+      const event = await client.fetchEventWithCache(filter)
+      if (event) {
+        setEvent(event)
       } else {
         setEvent(null)
       }

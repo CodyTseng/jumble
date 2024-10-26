@@ -1,6 +1,5 @@
 import { useFetchEventById } from '@renderer/hooks'
 import { toNoStrudelNote } from '@renderer/lib/url'
-import { Link } from 'react-router-dom'
 import NoteCard from '../NoteCard'
 
 export function EmbeddedNote({ noteId }: { noteId: string }) {

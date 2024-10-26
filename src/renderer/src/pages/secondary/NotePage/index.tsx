@@ -1,12 +1,10 @@
-import { Separator } from '@renderer/components/ui/separator'
 import CommentList from '@renderer/components/CommentList'
 import Note from '@renderer/components/Note'
-import { useFetchEventById } from '@renderer/hooks'
+import { Separator } from '@renderer/components/ui/separator'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
+import { Event } from 'nostr-tools'
 
-export default function NotePage({ eventId }: { eventId?: string }) {
-  const event = eventId ? useFetchEventById(eventId) : null
-
+export default function NotePage({ event }: { event?: Event }) {
   return (
     <SecondaryPageLayout>
       {event && (

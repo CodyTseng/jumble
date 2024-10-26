@@ -1,3 +1,4 @@
+import { LRUCache } from 'lru-cache'
 import { nip19 } from 'nostr-tools'
 
 export function formatPubkey(pubkey: string) {
@@ -38,7 +39,12 @@ export function userIdToPubkey(userId: string) {
   return userId
 }
 
+const pubkeyImageCache = new LRUCache<string, string>({ max: 1000 })
 export function generateImageByPubkey(pubkey: string): string {
+  if (pubkeyImageCache.has(pubkey)) {
+    return pubkeyImageCache.get(pubkey)!
+  }
+
   const paddedPubkey = pubkey.padEnd(2, '0')
 
   // Split into 3 parts for colors and the rest for control points
@@ -77,5 +83,9 @@ export function generateImageByPubkey(pubkey: string): string {
       ${gradients}
     </svg>
   `
-  return `data:image/svg+xml;base64,${btoa(image)}`
+  const imageData = `data:image/svg+xml;base64,${btoa(image)}`
+
+  pubkeyImageCache.set(pubkey, imageData)
+
+  return imageData
 }

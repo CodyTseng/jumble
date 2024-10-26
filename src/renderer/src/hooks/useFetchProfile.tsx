@@ -1,6 +1,7 @@
 import { formatNpub } from '@renderer/lib/pubkey'
 import { nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
+import client from '@renderer/services/client.service'
 
 type TProfile =
   | {
@@ -55,13 +56,10 @@ export function useFetchProfile(id?: string) {
         if (!pubkey || !npub) return
 
         profile.username = formatNpub(npub)
-        const [profileEvent] = await window.api.relay.fetchEvents([
-          {
-            authors: [pubkey],
-            kinds: [0],
-            limit: 1
-          }
-        ])
+        const profileEvent = await client.fetchEventWithCache({
+          authors: [pubkey],
+          kinds: [0]
+        })
         if (!profileEvent) {
           setProfile({ ...profile, pubkey, npub })
           return

@@ -1,6 +1,3 @@
-import { Event } from 'nostr-tools'
-import { isNsfwEvent } from '@renderer/lib/event'
-import { cn } from '@renderer/lib/utils'
 import {
   embedded,
   embeddedHashtagRenderer,
@@ -8,43 +5,54 @@ import {
   embeddedNostrNpubRenderer,
   embeddedNostrProfileRenderer
 } from '@renderer/embedded'
+import { isNsfwEvent } from '@renderer/lib/event'
+import { cn } from '@renderer/lib/utils'
+import { Event } from 'nostr-tools'
+import { useMemo } from 'react'
 import { EmbeddedNote } from '../Embedded'
 import ImageGallery from '../ImageGallery'
 import VideoPlayer from '../VideoPlayer'
 
 export default function Content({ event, className }: { event: Event; className?: string }) {
-  const { content, images, videos, embeddedNotes } = preprocess(event.content)
-  const isNsfw = isNsfwEvent(event)
+  const nodes = useMemo(() => {
+    const { content, images, videos, embeddedNotes } = preprocess(event.content)
+    const isNsfw = isNsfwEvent(event)
+    const nodes = embedded(
+      [content],
+      [
+        embeddedNormalUrlRenderer,
+        embeddedHashtagRenderer,
+        embeddedNostrNpubRenderer,
+        embeddedNostrProfileRenderer
+      ]
+    )
 
-  const nodes = embedded(
-    [content],
-    [
-      embeddedNormalUrlRenderer,
-      embeddedHashtagRenderer,
-      embeddedNostrNpubRenderer,
-      embeddedNostrProfileRenderer
-    ]
-  )
+    // Add images
+    if (images.length) {
+      nodes.push(
+        <ImageGallery className="mt-2 w-fit" key="images" images={images} isNsfw={isNsfw} />
+      )
+    }
 
-  // Add images
-  if (images.length) {
-    nodes.push(<ImageGallery className="mt-2 w-fit" key="images" images={images} isNsfw={isNsfw} />)
-  }
+    // Add videos
+    if (videos.length) {
+      videos.forEach((src, index) => {
+        nodes.push(
+          <VideoPlayer className="mt-2" key={`video-${index}`} src={src} isNsfw={isNsfw} />
+        )
+      })
+    }
 
-  // Add videos
-  if (videos.length) {
-    videos.forEach((src, index) => {
-      nodes.push(<VideoPlayer className="mt-2" key={`video-${index}`} src={src} isNsfw={isNsfw} />)
-    })
-  }
+    // Add embedded notes
+    if (embeddedNotes.length) {
+      embeddedNotes.forEach((note, index) => {
+        const id = note.split(':')[1]
+        nodes.push(<EmbeddedNote key={`embedded-event-${index}`} noteId={id} />)
+      })
+    }
 
-  // Add embedded notes
-  if (embeddedNotes.length) {
-    embeddedNotes.forEach((note, index) => {
-      const id = note.split(':')[1]
-      nodes.push(<EmbeddedNote key={`embedded-event-${index}`} noteId={id} />)
-    })
-  }
+    return nodes
+  }, [event.id])
 
   return (
     <div className={cn('text-sm text-wrap break-words whitespace-pre-wrap', className)}>
