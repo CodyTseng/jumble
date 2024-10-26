@@ -16,8 +16,9 @@ class ClientService {
   constructor() {
     if (!ClientService.instance) {
       this.rxNostr.setDefaultRelays([
-        'wss://relay.damus.io'
+        // 'wss://relay.damus.io'
         // 'wss://nostr-relay.app'
+        'ws://localhost:4869'
       ])
       ClientService.instance = this
     }

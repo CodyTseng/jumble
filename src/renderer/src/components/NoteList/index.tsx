@@ -1,6 +1,6 @@
-import { now } from '@renderer/lib/timestamp'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
+import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
@@ -20,7 +20,7 @@ const NoteList = forwardRef(
     const [noteFilter, setNoteFilter] = useState<Filter>({
       kinds: [kinds.ShortTextNote, kinds.Repost],
       limit: 50,
-      until: now(),
+      until: dayjs().unix(),
       ...filter
     })
     const [hasMore, setHasMore] = useState<boolean>(true)
@@ -60,7 +60,7 @@ const NoteList = forwardRef(
       refresh: () => {
         setEvents([])
         setHasMore(true)
-        setNoteFilter({ ...noteFilter, until: now() })
+        setNoteFilter({ ...noteFilter, until: dayjs().unix() })
       }
     }))
 
@@ -87,10 +87,6 @@ const NoteList = forwardRef(
         }
       }
     }, [noteFilter])
-
-    useEffect(() => {
-      loadMore()
-    }, [])
 
     return (
       <div className={cn('flex flex-col gap-4', className)}>

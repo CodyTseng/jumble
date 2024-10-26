@@ -8,12 +8,12 @@ import {
 import { isNsfwEvent } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import { Event } from 'nostr-tools'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { EmbeddedNote } from '../Embedded'
 import ImageGallery from '../ImageGallery'
 import VideoPlayer from '../VideoPlayer'
 
-export default function Content({ event, className }: { event: Event; className?: string }) {
+const Content = memo(({ event, className }: { event: Event; className?: string }) => {
   const nodes = useMemo(() => {
     const { content, images, videos, embeddedNotes } = preprocess(event.content)
     const isNsfw = isNsfwEvent(event)
@@ -59,7 +59,9 @@ export default function Content({ event, className }: { event: Event; className?
       {nodes}
     </div>
   )
-}
+})
+Content.displayName = 'Content'
+export default Content
 
 function preprocess(content: string) {
   const urlRegex = /(https?:\/\/[^\s"']+)/g

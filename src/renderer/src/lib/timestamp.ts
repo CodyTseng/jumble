@@ -26,7 +26,3 @@ export function formatTimestamp(timestamp: number) {
 
   return 'just now'
 }
-
-export function now() {
-  return Math.ceil(Date.now() / 1000)
-}
