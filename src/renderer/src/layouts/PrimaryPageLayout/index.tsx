@@ -1,7 +1,8 @@
+import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isMacOS } from '@renderer/lib/platform'
-import { Titlebar } from '../../components/Titlebar'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { Titlebar } from '../../components/Titlebar'
 
 const PrimaryPageLayout = forwardRef(
   (
@@ -12,9 +13,7 @@ const PrimaryPageLayout = forwardRef(
 
     useImperativeHandle(ref, () => ({
       scrollToTop: () => {
-        if (scrollAreaRef.current) {
-          scrollAreaRef.current.scrollTo({ top: 0, behavior: 'smooth' })
-        }
+        scrollAreaRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
       }
     }))
 
@@ -26,6 +25,7 @@ const PrimaryPageLayout = forwardRef(
       >
         <PrimaryPageTitlebar content={titlebarContent} />
         <div className="px-4 pb-4 pt-[52px]">{children}</div>
+        <ScrollToTopButton scrollAreaRef={scrollAreaRef} />
       </ScrollArea>
     )
   }
