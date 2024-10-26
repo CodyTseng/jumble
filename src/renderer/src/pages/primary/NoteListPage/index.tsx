@@ -43,11 +43,7 @@ export default function NoteListPage() {
   return (
     <PrimaryPageLayout
       ref={layoutRef}
-      titlebarContent={
-        <>
-          <Titlebar onRefresh={handleRefresh} hasNewNotes={!!newEvents.length} />
-        </>
-      }
+      titlebarContent={<Titlebar onRefresh={handleRefresh} hasNewNotes={!!newEvents.length} />}
     >
       <NoteList ref={noteListRef} />
     </PrimaryPageLayout>
@@ -66,11 +62,8 @@ function Titlebar({ onRefresh, hasNewNotes }: { onRefresh: () => void; hasNewNot
   }
 
   return (
-    <TitlebarButton disabled={loading} onClick={handleClick}>
-      <RefreshCcw
-        className={`${hasNewNotes ? 'text-highlight' : 'text-foreground'} ${loading ? 'animate-spin' : ''}`}
-        size={18}
-      />
+    <TitlebarButton disabled={!hasNewNotes || loading} onClick={handleClick}>
+      <RefreshCcw className={`text-foreground ${loading ? 'animate-spin' : ''}`} size={18} />
     </TitlebarButton>
   )
 }

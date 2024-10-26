@@ -31,7 +31,7 @@ export default function CommentList({ event, className }: { event: Event; classN
   }, [])
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('space-y-8', className)}>
       {comments.map((comment, index) => {
         const parentCommentId = comment.tags.find(
           ([tagName, , , type]) => tagName === 'e' && type === 'reply'

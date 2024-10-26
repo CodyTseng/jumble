@@ -6,10 +6,12 @@ import Note from '../Note'
 
 export default function ShortTextNoteCard({
   event,
-  className
+  className,
+  size
 }: {
   event: Event
   className?: string
+  size?: 'normal' | 'small'
 }) {
   const { push } = useSecondaryPage()
 
@@ -22,7 +24,7 @@ export default function ShortTextNoteCard({
       }}
     >
       <Card className="p-4 hover:bg-muted/50 text-left cursor-pointer">
-        <Note event={event} />
+        <Note size={size} event={event} />
       </Card>
     </div>
   )

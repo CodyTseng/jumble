@@ -1,12 +1,13 @@
 import { useFetchEventById } from '@renderer/hooks'
 import { toNoStrudelNote } from '@renderer/lib/url'
-import NoteCard from '../NoteCard'
+import { kinds } from 'nostr-tools'
+import ShortTextNoteCard from '../NoteCard/ShortTextNoteCard'
 
 export function EmbeddedNote({ noteId }: { noteId: string }) {
   const event = useFetchEventById(noteId)
 
-  return event ? (
-    <NoteCard className="mt-2 w-full" event={event} />
+  return event && event.kind === kinds.ShortTextNote ? (
+    <ShortTextNoteCard size="small" className="mt-2 w-full" event={event} />
   ) : (
     <a
       href={toNoStrudelNote(noteId)}

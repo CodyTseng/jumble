@@ -32,7 +32,8 @@ export default function ProfilePage({ pubkey }: { pubkey?: string }) {
         />
         <UserAvatar
           userId={pubkey}
-          className="absolute bottom-0 left-4 translate-y-1/2 w-24 h-24 border-4 border-background"
+          size="large"
+          className="absolute bottom-0 left-4 translate-y-1/2 border-4 border-background"
         />
       </div>
       <div className="px-4 space-y-1">

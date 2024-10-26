@@ -11,11 +11,15 @@ const PrimaryPageLayout = forwardRef(
   ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-    useImperativeHandle(ref, () => ({
-      scrollToTop: () => {
-        scrollAreaRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-    }))
+    useImperativeHandle(
+      ref,
+      () => ({
+        scrollToTop: () => {
+          scrollAreaRef.current?.scrollTo({ top: 0 })
+        }
+      }),
+      []
+    )
 
     return (
       <ScrollArea

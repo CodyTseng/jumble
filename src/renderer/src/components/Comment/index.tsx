@@ -13,10 +13,13 @@ export default function Comment({
 }) {
   return (
     <div className="flex space-x-2 items-start">
-      <UserAvatar userId={comment.pubkey} />
+      <UserAvatar userId={comment.pubkey} size="small" />
       <div className="w-full overflow-hidden">
-        <div className="flex space-x-2 items-center">
-          <Username userId={comment.pubkey} className="text-sm font-semibold" />
+        <div className="flex space-x-2 items-end">
+          <Username
+            userId={comment.pubkey}
+            className="text-sm font-semibold text-muted-foreground hover:text-foreground"
+          />
           <div className="text-xs text-muted-foreground">{formatTimestamp(comment.created_at)}</div>
         </div>
         {parentComment && (
@@ -24,7 +27,7 @@ export default function Comment({
             <ParentComment comment={parentComment} />
           </div>
         )}
-        <Content event={comment} />
+        <Content event={comment} size="small" />
       </div>
     </div>
   )
@@ -34,7 +37,7 @@ function ParentComment({ comment }: { comment: Event }) {
   return (
     <div className="flex space-x-1 items-center text-xs">
       <div>reply to</div>
-      <UserAvatar userId={comment.pubkey} className="w-3 h-3" />
+      <UserAvatar userId={comment.pubkey} size="tiny" />
       <div className="truncate">{comment.content}</div>
     </div>
   )
