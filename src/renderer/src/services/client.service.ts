@@ -1,7 +1,8 @@
 import { LRUCache } from 'lru-cache'
 import { Event, Filter } from 'nostr-tools'
-import { createRxBackwardReq, createRxNostr } from 'rx-nostr'
+import { createRxBackwardReq, createRxForwardReq, createRxNostr } from 'rx-nostr'
 import { verifier } from 'rx-nostr-crypto'
+import { take } from 'rxjs/operators'
 
 class ClientService {
   static instance: ClientService
@@ -14,7 +15,10 @@ class ClientService {
 
   constructor() {
     if (!ClientService.instance) {
-      this.rxNostr.setDefaultRelays(['wss://relay.damus.io'])
+      this.rxNostr.setDefaultRelays([
+        'wss://relay.damus.io'
+        // 'wss://nostr-relay.app'
+      ])
       ClientService.instance = this
     }
     return ClientService.instance
@@ -54,6 +58,17 @@ class ClientService {
         error: (err) => reject(err)
       })
     })
+  }
+
+  listenNewEvents(filter: Filter, next: (event: Event) => void, limit?: number) {
+    const rxReq = createRxForwardReq()
+    const observable = this.rxNostr.use(rxReq)
+    if (limit !== undefined) {
+      observable.pipe(take(limit))
+    }
+    const subscription = observable.subscribe((packet) => next(packet.event))
+    rxReq.emit(filter)
+    return subscription
   }
 }
 
