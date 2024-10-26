@@ -1,8 +1,21 @@
-import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
+import { Filter } from 'nostr-tools'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  theme: {
+    onChange: (cb: (theme: 'dark' | 'light') => void) => {
+      ipcRenderer.on('theme:change', (_, theme) => {
+        cb(theme)
+      })
+    },
+    current: () => ipcRenderer.invoke('theme:current')
+  },
+  relay: {
+    fetchEvents: (filters: Filter[]) => ipcRenderer.invoke('relay:fetchEvents', filters)
+  }
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
