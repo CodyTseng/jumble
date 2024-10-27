@@ -35,40 +35,58 @@ const NoteList = forwardRef(
       if (events.length === 0) {
         setHasMore(false)
       }
-      const processedEvents = preprocessEvents(events)
-      if (processedEvents.length === 0) {
-        return
+
+      const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
+      const processedEvents = sortedEvents.filter((e) => !isCommentEvent(e))
+      if (processedEvents.length > 0) {
+        setEvents((oldEvents) => [...oldEvents, ...processedEvents])
       }
 
-      setEvents((oldEvents) => [...oldEvents, ...processedEvents])
-      setLatestCreatedAt(processedEvents[0].created_at)
+      setLatestCreatedAt(sortedEvents[0].created_at)
       setNoteFilter({
         ...noteFilter,
-        until: processedEvents[processedEvents.length - 1].created_at - 1
+        until: sortedEvents[sortedEvents.length - 1].created_at - 1
       })
     }
 
     useImperativeHandle(ref, () => ({
       addNewNotes: (newNotes: Event[]) => {
-        const processedEvents = preprocessEvents(newNotes).filter(
-          (e) => e.created_at > latestCreatedAt
+        const sortedEvents = newNotes.sort((a, b) => b.created_at - a.created_at)
+        const processedEvents = sortedEvents.filter(
+          (e) => e.created_at > latestCreatedAt && !isCommentEvent(e)
         )
         setEvents((oldEvents) => [...processedEvents, ...oldEvents])
-        setLatestCreatedAt(newNotes[0].created_at)
+        setLatestCreatedAt(sortedEvents[0].created_at)
       },
       refresh: async () => {
         setRefreshing(true)
         const events = await client.fetchEvents([{ ...noteFilter, until: dayjs().unix() }])
         if (events.length === 0) {
           setHasMore(false)
+          setLatestCreatedAt(dayjs().unix())
+          setNoteFilter({
+            ...noteFilter,
+            until: dayjs().unix()
+          })
+          return
         }
-        const processedEvents = preprocessEvents(events)
+
+        const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
+        const processedEvents = sortedEvents.filter((e) => !isCommentEvent(e))
         setEvents(processedEvents)
-        setLatestCreatedAt(processedEvents[0].created_at)
-        setNoteFilter({
-          ...noteFilter,
-          until: processedEvents[processedEvents.length - 1].created_at - 1
-        })
+        if (processedEvents.length > 0) {
+          setLatestCreatedAt(processedEvents[0].created_at)
+          setNoteFilter({
+            ...noteFilter,
+            until: processedEvents[processedEvents.length - 1].created_at - 1
+          })
+        } else {
+          setLatestCreatedAt(dayjs().unix())
+          setNoteFilter({
+            ...noteFilter,
+            until: dayjs().unix()
+          })
+        }
         setRefreshing(false)
       }
     }))
@@ -122,8 +140,4 @@ export default NoteList
 export type TNoteListRef = {
   addNewNotes: (newNotes: Event[]) => void
   refresh: () => void
-}
-
-function preprocessEvents(events: Event[]) {
-  return events.filter((e) => !isCommentEvent(e)).sort((a, b) => b.created_at - a.created_at)
 }
