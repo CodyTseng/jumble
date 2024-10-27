@@ -4,7 +4,7 @@ import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReplyNote from '../ReplyNote'
 
 export default function ReplyNoteList({ event, className }: { event: Event; className?: string }) {
@@ -12,6 +12,8 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
   const [eventMap, setEventMap] = useState<Record<string, Event>>({})
   const [until, setUntil] = useState<number>(() => dayjs().unix())
   const [hasMore, setHasMore] = useState<boolean>(false)
+  const [highlightReplyId, setHighlightReplyId] = useState<string | undefined>(undefined)
+  const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   const loadMore = async () => {
     const events = await client.fetchEvents([
@@ -38,6 +40,17 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
     loadMore()
   }, [])
 
+  const onClickParent = (eventId: string) => {
+    const ref = replyRefs.current[eventId]
+    if (ref) {
+      ref.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
+    }
+    setHighlightReplyId(eventId)
+    setTimeout(() => {
+      setHighlightReplyId((pre) => (pre === eventId ? undefined : pre))
+    }, 1500)
+  }
+
   return (
     <>
       {hasMore && (
@@ -52,13 +65,16 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
           <Separator className="mt-1" />
         </>
       )}
-      <div className={cn('space-y-6 mt-4', className)}>
+      <div className={cn('mt-2', className)}>
         {eventsWithParentIds.map(([event, parentEventId], index) => (
-          <ReplyNote
-            key={index}
-            event={event}
-            parentEvent={parentEventId ? eventMap[parentEventId] : undefined}
-          />
+          <div ref={(el) => (replyRefs.current[event.id] = el)} key={index}>
+            <ReplyNote
+              event={event}
+              parentEvent={parentEventId ? eventMap[parentEventId] : undefined}
+              onClickParent={onClickParent}
+              highlight={highlightReplyId === event.id}
+            />
+          </div>
         ))}
       </div>
     </>

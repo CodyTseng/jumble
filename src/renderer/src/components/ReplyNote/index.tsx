@@ -4,9 +4,21 @@ import Content from '../Content'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
-export default function ReplyNote({ event, parentEvent }: { event: Event; parentEvent?: Event }) {
+export default function ReplyNote({
+  event,
+  parentEvent,
+  onClickParent = () => {},
+  highlight = false
+}: {
+  event: Event
+  parentEvent?: Event
+  onClickParent?: (eventId: string) => void
+  highlight?: boolean
+}) {
   return (
-    <div className="flex space-x-2 items-start">
+    <div
+      className={`flex space-x-2 items-start rounded-lg p-2 transition-colors duration-500 ${highlight ? 'bg-highlight/50' : ''}`}
+    >
       <UserAvatar userId={event.pubkey} size="small" />
       <div className="w-full overflow-hidden">
         <div className="flex space-x-2 items-end">
@@ -17,7 +29,10 @@ export default function ReplyNote({ event, parentEvent }: { event: Event; parent
           <div className="text-xs text-muted-foreground">{formatTimestamp(event.created_at)}</div>
         </div>
         {parentEvent && (
-          <div className="text-xs text-muted-foreground truncate">
+          <div
+            className="text-xs text-muted-foreground truncate hover:text-foreground cursor-pointer"
+            onClick={() => onClickParent(parentEvent.id)}
+          >
             <ParentReplyNote event={parentEvent} />
           </div>
         )}
