@@ -1,4 +1,4 @@
-import CommentList from '@renderer/components/CommentList'
+import ReplyNoteList from '@renderer/components/ReplyNoteList'
 import Note from '@renderer/components/Note'
 import { Separator } from '@renderer/components/ui/separator'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
@@ -11,7 +11,7 @@ export default function NotePage({ event }: { event?: Event }) {
         <>
           <Note event={event} />
           <Separator className="my-4" />
-          <CommentList key={event.id} event={event} />
+          <ReplyNoteList key={event.id} event={event} />
         </>
       )}
     </SecondaryPageLayout>

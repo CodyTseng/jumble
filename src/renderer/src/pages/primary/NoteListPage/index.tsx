@@ -1,7 +1,7 @@
 import NoteList, { TNoteListRef } from '@renderer/components/NoteList'
 import { TitlebarButton } from '@renderer/components/Titlebar'
 import PrimaryPageLayout, { TPrimaryPageLayoutRef } from '@renderer/layouts/PrimaryPageLayout'
-import { isCommentEvent } from '@renderer/lib/event'
+import { isReplyNoteEvent } from '@renderer/lib/event'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { RefreshCcw } from 'lucide-react'
@@ -21,7 +21,7 @@ export default function NoteListPage() {
       (event) => {
         if (
           newEvents.length <= 50 &&
-          !isCommentEvent(event) &&
+          !isReplyNoteEvent(event) &&
           event.created_at > refreshAt &&
           !newEventIdSet.has(event.id)
         ) {

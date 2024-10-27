@@ -7,6 +7,6 @@ export function isNsfwEvent(event: Event) {
   )
 }
 
-export function isCommentEvent(event: Event) {
+export function isReplyNoteEvent(event: Event) {
   return event.kind === kinds.ShortTextNote && event.tags.some(([tagName]) => tagName === 'e')
 }

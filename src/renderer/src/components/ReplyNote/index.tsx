@@ -4,41 +4,35 @@ import Content from '../Content'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
-export default function Comment({
-  comment,
-  parentComment
-}: {
-  comment: Event
-  parentComment?: Event
-}) {
+export default function ReplyNote({ event, parentEvent }: { event: Event; parentEvent?: Event }) {
   return (
     <div className="flex space-x-2 items-start">
-      <UserAvatar userId={comment.pubkey} size="small" />
+      <UserAvatar userId={event.pubkey} size="small" />
       <div className="w-full overflow-hidden">
         <div className="flex space-x-2 items-end">
           <Username
-            userId={comment.pubkey}
+            userId={event.pubkey}
             className="text-sm font-semibold text-muted-foreground hover:text-foreground"
           />
-          <div className="text-xs text-muted-foreground">{formatTimestamp(comment.created_at)}</div>
+          <div className="text-xs text-muted-foreground">{formatTimestamp(event.created_at)}</div>
         </div>
-        {parentComment && (
+        {parentEvent && (
           <div className="text-xs text-muted-foreground truncate">
-            <ParentComment comment={parentComment} />
+            <ParentReplyNote event={parentEvent} />
           </div>
         )}
-        <Content event={comment} size="small" />
+        <Content event={event} size="small" />
       </div>
     </div>
   )
 }
 
-function ParentComment({ comment }: { comment: Event }) {
+function ParentReplyNote({ event }: { event: Event }) {
   return (
     <div className="flex space-x-1 items-center text-xs">
       <div>reply to</div>
-      <UserAvatar userId={comment.pubkey} size="tiny" />
-      <div className="truncate">{comment.content}</div>
+      <UserAvatar userId={event.pubkey} size="tiny" />
+      <div className="truncate">{event.content}</div>
     </div>
   )
 }

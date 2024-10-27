@@ -1,4 +1,4 @@
-import { isCommentEvent } from '@renderer/lib/event'
+import { isReplyNoteEvent } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
@@ -37,7 +37,7 @@ const NoteList = forwardRef(
       }
 
       const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
-      const processedEvents = sortedEvents.filter((e) => !isCommentEvent(e))
+      const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))
       if (processedEvents.length > 0) {
         setEvents((oldEvents) => [...oldEvents, ...processedEvents])
       }
@@ -53,7 +53,7 @@ const NoteList = forwardRef(
       addNewNotes: (newNotes: Event[]) => {
         const sortedEvents = newNotes.sort((a, b) => b.created_at - a.created_at)
         const processedEvents = sortedEvents.filter(
-          (e) => e.created_at > latestCreatedAt && !isCommentEvent(e)
+          (e) => e.created_at > latestCreatedAt && !isReplyNoteEvent(e)
         )
         setEvents((oldEvents) => [...processedEvents, ...oldEvents])
         setLatestCreatedAt(sortedEvents[0].created_at)
@@ -72,7 +72,7 @@ const NoteList = forwardRef(
         }
 
         const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
-        const processedEvents = sortedEvents.filter((e) => !isCommentEvent(e))
+        const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))
         setEvents(processedEvents)
         if (processedEvents.length > 0) {
           setLatestCreatedAt(processedEvents[0].created_at)
