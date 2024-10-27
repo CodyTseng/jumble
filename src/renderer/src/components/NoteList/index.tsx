@@ -3,7 +3,7 @@ import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
 
 const NoteList = forwardRef(
@@ -18,20 +18,23 @@ const NoteList = forwardRef(
     ref
   ) => {
     const [events, setEvents] = useState<Event[]>([])
-    const [noteFilter, setNoteFilter] = useState<Filter>({
-      kinds: [kinds.ShortTextNote, kinds.Repost],
-      limit: 50,
-      until: dayjs().unix(),
-      ...filter
-    })
+    const [until, setUntil] = useState<number>(() => dayjs().unix())
     const [hasMore, setHasMore] = useState<boolean>(true)
     const [refreshing, setRefreshing] = useState<boolean>(false)
     const [latestCreatedAt, setLatestCreatedAt] = useState<number>(0)
     const observer = useRef<IntersectionObserver | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
 
+    const noteFilter = useMemo(() => {
+      return {
+        kinds: [kinds.ShortTextNote, kinds.Repost],
+        limit: 50,
+        ...filter
+      }
+    }, [filter])
+
     const loadMore = async () => {
-      const events = await client.fetchEvents([noteFilter])
+      const events = await client.fetchEvents([{ ...noteFilter, until }])
       if (events.length === 0) {
         setHasMore(false)
       }
@@ -43,10 +46,7 @@ const NoteList = forwardRef(
       }
 
       setLatestCreatedAt(sortedEvents[0].created_at)
-      setNoteFilter({
-        ...noteFilter,
-        until: sortedEvents[sortedEvents.length - 1].created_at - 1
-      })
+      setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
     }
 
     useImperativeHandle(ref, () => ({
@@ -60,14 +60,12 @@ const NoteList = forwardRef(
       },
       refresh: async () => {
         setRefreshing(true)
-        const events = await client.fetchEvents([{ ...noteFilter, until: dayjs().unix() }])
+        const now = dayjs().unix()
+        const events = await client.fetchEvents([{ ...noteFilter, until: now }])
         if (events.length === 0) {
           setHasMore(false)
-          setLatestCreatedAt(dayjs().unix())
-          setNoteFilter({
-            ...noteFilter,
-            until: dayjs().unix()
-          })
+          setLatestCreatedAt(now)
+          setUntil(now)
           return
         }
 
@@ -76,16 +74,10 @@ const NoteList = forwardRef(
         setEvents(processedEvents)
         if (processedEvents.length > 0) {
           setLatestCreatedAt(processedEvents[0].created_at)
-          setNoteFilter({
-            ...noteFilter,
-            until: processedEvents[processedEvents.length - 1].created_at - 1
-          })
+          setUntil(processedEvents[processedEvents.length - 1].created_at - 1)
         } else {
-          setLatestCreatedAt(dayjs().unix())
-          setNoteFilter({
-            ...noteFilter,
-            until: dayjs().unix()
-          })
+          setLatestCreatedAt(now)
+          setUntil(now)
         }
         setRefreshing(false)
       }
@@ -113,7 +105,7 @@ const NoteList = forwardRef(
           observer.current.unobserve(bottomRef.current)
         }
       }
-    }, [noteFilter])
+    }, [until])
 
     return (
       <div className={cn('flex flex-col gap-4', className)}>

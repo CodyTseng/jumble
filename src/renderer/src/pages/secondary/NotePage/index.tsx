@@ -10,7 +10,7 @@ export default function NotePage({ event }: { event?: Event }) {
       {event && (
         <>
           <Note event={event} />
-          <Separator className="my-4" />
+          <Separator className="mt-4" />
           <ReplyNoteList key={event.id} event={event} />
         </>
       )}
