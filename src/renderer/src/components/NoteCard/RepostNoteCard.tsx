@@ -6,7 +6,7 @@ import ShortTextNoteCard from './ShortTextNoteCard'
 
 export default function RepostNoteCard({ event, className }: { event: Event; className?: string }) {
   const targetEventId = event.tags.find(([tagName]) => tagName === 'e')?.[1]
-  const targetEvent = targetEventId ? useFetchEventById(targetEventId) : null
+  const targetEvent = useFetchEventById(targetEventId)
   if (!targetEvent) return null
 
   return (

@@ -2,11 +2,13 @@ import client from '@renderer/services/client.service'
 import { Event, Filter, nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
-export function useFetchEventById(id: string) {
+export function useFetchEventById(id?: string) {
   const [event, setEvent] = useState<Event | null>(null)
 
   useEffect(() => {
     const fetchEvent = async () => {
+      if (!id) return
+
       let filter: Filter | undefined
       if (/^[0-9a-f]{64}$/.test(id)) {
         filter = { ids: [id] }

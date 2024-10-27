@@ -83,9 +83,11 @@ export function PageManager({
   return (
     <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel minSize={30}>{children}</ResizablePanel>
+        <ResizablePanel defaultSize={60} minSize={30}>
+          {children}
+        </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel minSize={30} className="relative">
+        <ResizablePanel defaultSize={40} minSize={30} className="relative">
           {secondaryStack.length ? (
             secondaryStack.map((item, index) => (
               <div

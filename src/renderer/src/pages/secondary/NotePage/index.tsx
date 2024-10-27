@@ -11,7 +11,7 @@ export default function NotePage({ event }: { event?: Event }) {
         <>
           <Note event={event} />
           <Separator className="my-4" />
-          <CommentList key={event.id} className="pl-4" event={event} />
+          <CommentList key={event.id} event={event} />
         </>
       )}
     </SecondaryPageLayout>
