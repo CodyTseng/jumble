@@ -7,18 +7,23 @@ import Username from '../Username'
 export default function Note({
   event,
   parentEvent,
-  size = 'normal'
+  size = 'normal',
+  className
 }: {
   event: Event
   parentEvent?: Event
   size?: 'normal' | 'small'
+  className?: string
 }) {
   return (
-    <div>
+    <div className={className}>
       <div className="flex items-center space-x-2">
         <UserAvatar userId={event.pubkey} size={size === 'small' ? 'small' : 'normal'} />
         <div className="flex-1 w-0">
-          <Username userId={event.pubkey} className="text-sm font-semibold max-w-fit flex" />
+          <Username
+            userId={event.pubkey}
+            className={`font-semibold max-w-fit flex ${size === 'small' ? 'text-xs' : 'text-sm'}`}
+          />
           <div className="text-xs text-muted-foreground">{formatTimestamp(event.created_at)}</div>
         </div>
       </div>

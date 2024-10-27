@@ -15,7 +15,7 @@ export default function CommentList({ event, className }: { event: Event; classN
         limit: 1000
       }
     ])
-    setComments(comments)
+    setComments(comments.sort((a, b) => a.created_at - b.created_at))
   }
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function CommentList({ event, className }: { event: Event; classN
   }, [])
 
   return (
-    <div className={cn('space-y-8', className)}>
+    <div className={cn('space-y-6', className)}>
       {comments.map((comment, index) => {
         const parentCommentId = comment.tags.find(
           ([tagName, , , type]) => tagName === 'e' && type === 'reply'
