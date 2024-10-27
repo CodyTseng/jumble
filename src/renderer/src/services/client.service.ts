@@ -16,35 +16,34 @@ class ClientService {
   constructor() {
     if (!ClientService.instance) {
       this.rxNostr.setDefaultRelays([
-        // 'wss://relay.damus.io'
+        'wss://relay.damus.io'
         // 'wss://nostr-relay.app'
-        'ws://localhost:4869'
+        // 'ws://localhost:4869'
       ])
       ClientService.instance = this
     }
     return ClientService.instance
   }
 
-  fetchEvents(
-    filters: Filter[],
-    {
-      next,
-      complete,
-      error
-    }: {
-      next: (event: Event) => void
-      complete?: () => void
-      error?: (err: Error) => void
-    }
-  ) {
-    const rxReq = createRxBackwardReq()
-    this.rxNostr.use(rxReq).subscribe({
-      next: (packet) => next(packet.event),
-      complete,
-      error
+  fetchEvents(filters: Filter[]) {
+    return new Promise<Event[]>((resolver, reject) => {
+      const rxReq = createRxBackwardReq()
+      const events: Event[] = []
+      const eventIdSet = new Set<string>()
+      this.rxNostr.use(rxReq).subscribe({
+        next: (packet) => {
+          const event = packet.event
+          if (!eventIdSet.has(event.id)) {
+            eventIdSet.add(event.id)
+            events.push(event)
+          }
+        },
+        complete: () => resolver(events),
+        error: (err) => reject(err)
+      })
+      filters.forEach((filter) => rxReq.emit(filter))
+      rxReq.over()
     })
-    filters.forEach((filter) => rxReq.emit(filter))
-    rxReq.over()
   }
 
   async fetchEventWithCache(filter: Filter) {
@@ -52,13 +51,8 @@ class ClientService {
   }
 
   async fetchEvent(filter: Filter) {
-    return new Promise<Event | undefined>((resolver, reject) => {
-      this.fetchEvents([{ ...filter, limit: 1 }], {
-        next: (event) => resolver(event),
-        complete: () => resolver(undefined),
-        error: (err) => reject(err)
-      })
-    })
+    const events = await this.fetchEvents([{ ...filter, limit: 1 }])
+    return events.length ? events[0] : undefined
   }
 
   listenNewEvents(filter: Filter, next: (event: Event) => void, limit?: number) {

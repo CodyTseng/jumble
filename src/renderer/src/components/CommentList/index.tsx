@@ -8,22 +8,14 @@ export default function CommentList({ event, className }: { event: Event; classN
   const [comments, setComments] = useState<Event[]>([])
 
   const init = async () => {
-    client.fetchEvents(
-      [
-        {
-          '#e': [event.id],
-          kinds: [1],
-          limit: 1000
-        }
-      ],
+    const comments = await client.fetchEvents([
       {
-        next: (event) => {
-          setComments(
-            (comments) => [...comments, event].sort((a, b) => a.created_at - b.created_at) // TODO:
-          )
-        }
+        '#e': [event.id],
+        kinds: [1],
+        limit: 1000
       }
-    )
+    ])
+    setComments(comments)
   }
 
   useEffect(() => {
