@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
+import { RefreshCcw } from 'lucide-react'
 
 export default function NoteList({
   filter = {},
@@ -16,6 +17,8 @@ export default function NoteList({
   const [events, setEvents] = useState<Event[]>([])
   const [until, setUntil] = useState<number>(() => dayjs().unix())
   const [hasMore, setHasMore] = useState<boolean>(true)
+  const [refreshedAt, setRefreshedAt] = useState<number>(() => dayjs().unix())
+  const [refreshing, setRefreshing] = useState<boolean>(false)
   const observer = useRef<IntersectionObserver | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
@@ -41,6 +44,26 @@ export default function NoteList({
     }
 
     setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
+  }
+
+  const refresh = async () => {
+    const now = dayjs().unix()
+    setRefreshing(true)
+    setRefreshedAt(now)
+    const events = await client.fetchEvents({ ...noteFilter, until: now })
+    if (events.length === 0) {
+      setHasMore(false)
+      return
+    }
+
+    const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
+    const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))
+    if (processedEvents.length > 0) {
+      setEvents(processedEvents)
+    }
+
+    setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
+    setRefreshing(false)
   }
 
   useEffect(() => {
@@ -69,6 +92,13 @@ export default function NoteList({
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
+      <div
+        className={`flex justify-end gap-2 items-center text-muted-foreground ${!refreshing ? 'hover:text-foreground cursor-pointer' : ''}`}
+        onClick={refresh}
+      >
+        <div className="text-sm">refreshed at {dayjs(refreshedAt * 1000).format('HH:mm:ss')}</div>
+        <RefreshCcw size={14} className={`${refreshing ? 'animate-spin' : ''}`} />
+      </div>
       {events.map((event, i) => (
         <NoteCard key={i} className="w-full" event={event} />
       ))}
