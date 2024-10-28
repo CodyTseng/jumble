@@ -30,7 +30,12 @@ export function useFetchEventById(id?: string) {
       }
       if (!filter) return
 
-      const event = await client.fetchEventWithCache(filter)
+      let event: Event | undefined
+      if (filter.ids) {
+        event = await client.fetchEventById(filter.ids[0])
+      } else {
+        event = await client.fetchEventWithCache(filter)
+      }
       if (event) {
         setEvent(event)
       } else {

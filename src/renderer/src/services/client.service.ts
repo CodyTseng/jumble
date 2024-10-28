@@ -6,14 +6,42 @@ class ClientService {
 
   private pool = new SimplePool()
   private relayUrls = [
-    // 'wss://relay.damus.io'
+    'wss://relay.damus.io'
     // 'wss://nostr-relay.app'
-    'ws://localhost:4869'
+    // 'ws://localhost:4869'
   ]
   private cache = new LRUCache<string, Event>({
     max: 10000,
     fetchMethod: async (filter) => this.fetchEvent(JSON.parse(filter))
   })
+
+  // Event cache
+  private eventsCache = new LRUCache<string, Promise<Event | undefined>>({
+    max: 10000,
+    ttl: 1000 * 60 * 10 // 10 minutes
+  })
+  private fetchEventQueue = new Map<
+    string,
+    {
+      resolve: (value: Event | undefined) => void
+      reject: (reason: any) => void
+    }
+  >()
+  private fetchEventTimer: NodeJS.Timeout | null = null
+
+  // Profile cache
+  private profilesCache = new LRUCache<string, Promise<Event | undefined>>({
+    max: 10000,
+    ttl: 1000 * 60 * 10 // 10 minutes
+  })
+  private fetchProfileQueue = new Map<
+    string,
+    {
+      resolve: (value: Event | undefined) => void
+      reject: (reason: any) => void
+    }
+  >()
+  private fetchProfileTimer: NodeJS.Timeout | null = null
 
   constructor() {
     if (!ClientService.instance) {
@@ -34,9 +62,104 @@ class ClientService {
     const events = await this.fetchEvents({ ...filter, limit: 1 })
     return events.length ? events[0] : undefined
   }
+
+  async fetchEventById(id: string): Promise<Event | undefined> {
+    const cache = this.eventsCache.get(id)
+    if (cache) {
+      return cache
+    }
+
+    const promise = new Promise<Event | undefined>((resolve, reject) => {
+      this.fetchEventQueue.set(id, { resolve, reject })
+      if (this.fetchEventTimer) {
+        return
+      }
+
+      this.fetchEventTimer = setTimeout(async () => {
+        this.fetchEventTimer = null
+        const queue = new Map(this.fetchEventQueue)
+        this.fetchEventQueue.clear()
+
+        try {
+          const ids = Array.from(queue.keys())
+          const events = await this.fetchEvents({ ids })
+          for (const event of events) {
+            queue.get(event.id)?.resolve(event)
+            queue.delete(event.id)
+          }
+
+          for (const [, job] of queue) {
+            job.resolve(undefined)
+          }
+          queue.clear()
+        } catch (err) {
+          for (const [id, job] of queue) {
+            this.eventsCache.delete(id)
+            job.reject(err)
+          }
+        }
+      }, 20)
+    })
+
+    this.eventsCache.set(id, promise)
+    return promise
+  }
+
+  async fetchProfile(pubkey: string): Promise<Event | undefined> {
+    const cache = this.profilesCache.get(pubkey)
+    if (cache) {
+      return cache
+    }
+
+    const promise = new Promise<Event | undefined>((resolve, reject) => {
+      this.fetchProfileQueue.set(pubkey, { resolve, reject })
+      if (this.fetchProfileTimer) {
+        return
+      }
+
+      this.fetchProfileTimer = setTimeout(async () => {
+        this.fetchProfileTimer = null
+        const queue = new Map(this.fetchProfileQueue)
+        this.fetchProfileQueue.clear()
+
+        try {
+          const pubkeys = Array.from(queue.keys())
+          const events = await this.fetchEvents({
+            authors: pubkeys,
+            kinds: [0]
+          })
+          const eventsMap = new Map<string, Event>()
+          for (const event of events) {
+            const pubkey = event.pubkey
+            const existing = eventsMap.get(pubkey)
+            if (!existing || existing.created_at < event.created_at) {
+              eventsMap.set(pubkey, event)
+            }
+          }
+
+          for (const [pubkey, job] of queue) {
+            const event = eventsMap.get(pubkey)
+            if (event) {
+              job.resolve(event)
+            } else {
+              job.resolve(undefined)
+            }
+            queue.delete(pubkey)
+          }
+        } catch (err) {
+          for (const [pubkey, job] of queue) {
+            this.profilesCache.delete(pubkey)
+            job.reject(err)
+          }
+        }
+      }, 20)
+    })
+
+    this.profilesCache.set(pubkey, promise)
+    return promise
+  }
 }
 
 const instance = new ClientService()
-Object.freeze(instance)
 
 export default instance

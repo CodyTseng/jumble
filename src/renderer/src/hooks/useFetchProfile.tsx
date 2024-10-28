@@ -39,10 +39,7 @@ export function useFetchProfile(id?: string) {
       const { pubkey, npub } = decodeUserId(id)
       if (!pubkey || !npub) return
 
-      const profileEvent = await client.fetchEventWithCache({
-        authors: [pubkey],
-        kinds: [0]
-      })
+      const profileEvent = await client.fetchProfile(pubkey)
       const username = npub ? formatNpub(npub) : initialProfile.username
       setProfile({ pubkey, npub, username })
       if (!profileEvent) return
