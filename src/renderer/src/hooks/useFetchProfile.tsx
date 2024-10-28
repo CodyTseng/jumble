@@ -68,7 +68,8 @@ export function useFetchProfile(id?: string) {
         npub,
         banner: profileObj.banner,
         avatar: profileObj.picture,
-        username: profileObj.display_name || profileObj.name || profile.username,
+        username:
+          profileObj.display_name.trim() || profileObj.name.trim() || initialProfile.username,
         nip05: profileObj.nip05,
         about: profileObj.about
       })
