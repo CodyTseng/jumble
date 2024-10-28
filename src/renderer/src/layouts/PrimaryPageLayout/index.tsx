@@ -28,7 +28,7 @@ const PrimaryPageLayout = forwardRef(
         scrollBarClassName={isMacOS() ? 'pt-9' : 'pt-4'}
       >
         <PrimaryPageTitlebar content={titlebarContent} />
-        <div className="px-4 pb-4 pt-[52px]">{children}</div>
+        <div className="px-4 pb-4 pt-11">{children}</div>
         <ScrollToTopButton scrollAreaRef={scrollAreaRef} />
       </ScrollArea>
     )

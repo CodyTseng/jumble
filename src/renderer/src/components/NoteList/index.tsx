@@ -74,7 +74,7 @@ export default function NoteList({
     }
 
     observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && hasMore) {
         loadMore()
       }
     }, options)
@@ -91,24 +91,26 @@ export default function NoteList({
   }, [until])
 
   return (
-    <div className={cn('flex flex-col gap-4', className)}>
+    <>
       <div
-        className={`flex justify-end gap-2 items-center text-muted-foreground ${!refreshing ? 'hover:text-foreground cursor-pointer' : ''}`}
+        className={`flex justify-end items-center gap-2 mb-1 text-muted-foreground ${!refreshing ? 'hover:text-foreground cursor-pointer' : ''}`}
         onClick={refresh}
       >
         <div className="text-sm">refreshed at {dayjs(refreshedAt * 1000).format('HH:mm:ss')}</div>
         <RefreshCcw size={14} className={`${refreshing ? 'animate-spin' : ''}`} />
       </div>
-      {events.map((event, i) => (
-        <NoteCard key={i} className="w-full" event={event} />
-      ))}
-      {hasMore ? (
-        <div ref={bottomRef} className="text-center text-sm text-muted-foreground">
-          loading...
-        </div>
-      ) : (
-        <div className="text-center text-sm text-muted-foreground">no more notes</div>
-      )}
-    </div>
+      <div className={cn('flex flex-col gap-4', className)}>
+        {events.map((event, i) => (
+          <NoteCard key={i} className="w-full" event={event} />
+        ))}
+        {hasMore ? (
+          <div ref={bottomRef} className="text-center text-sm text-muted-foreground">
+            loading...
+          </div>
+        ) : (
+          <div className="text-center text-sm text-muted-foreground">no more notes</div>
+        )}
+      </div>
+    </>
   )
 }
