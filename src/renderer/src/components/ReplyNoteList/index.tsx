@@ -25,15 +25,20 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
       }
     ])
     const sortedEvents = events.sort((a, b) => a.created_at - b.created_at)
+    if (sortedEvents.length === 0) {
+      setHasMore(false)
+      return
+    }
+
     const eventMap: Record<string, Event> = {}
     const eventsWithParentIds = sortedEvents.map((event) => {
       eventMap[event.id] = event
       return [event, getParentEventId(event)] as [Event, string | undefined]
     })
     setEventsWithParentId((pre) => [...eventsWithParentIds, ...pre])
-    setEventMap(eventMap)
-    setUntil(sortedEvents[0].created_at - 1)
+    setEventMap((pre) => ({ ...pre, ...eventMap }))
     setHasMore(sortedEvents.length >= 100)
+    setUntil(sortedEvents[0].created_at - 1)
   }
 
   useEffect(() => {
