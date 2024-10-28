@@ -6,7 +6,7 @@ import { Titlebar } from '../../components/Titlebar'
 
 const PrimaryPageLayout = forwardRef(
   (
-    { children, titlebarContent }: { children: React.ReactNode; titlebarContent: React.ReactNode },
+    { children, titlebarContent }: { children: React.ReactNode; titlebarContent?: React.ReactNode },
     ref
   ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)

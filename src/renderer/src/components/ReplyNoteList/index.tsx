@@ -16,14 +16,12 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
   const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   const loadMore = async () => {
-    const events = await client.fetchEvents([
-      {
-        '#e': [event.id],
-        kinds: [1],
-        limit: 100,
-        until
-      }
-    ])
+    const events = await client.fetchEvents({
+      '#e': [event.id],
+      kinds: [1],
+      limit: 100,
+      until
+    })
     const sortedEvents = events.sort((a, b) => a.created_at - b.created_at)
     if (sortedEvents.length === 0) {
       setHasMore(false)

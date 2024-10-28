@@ -1,13 +1,15 @@
 import { LRUCache } from 'lru-cache'
-import { Event, Filter } from 'nostr-tools'
-import { createRxBackwardReq, createRxForwardReq, createRxNostr } from 'rx-nostr'
-import { verifier } from 'rx-nostr-crypto'
-import { take } from 'rxjs/operators'
+import { Event, Filter, SimplePool } from 'nostr-tools'
 
 class ClientService {
   static instance: ClientService
 
-  private rxNostr = createRxNostr({ verifier })
+  private pool = new SimplePool()
+  private relayUrls = [
+    // 'wss://relay.damus.io'
+    // 'wss://nostr-relay.app'
+    'ws://localhost:4869'
+  ]
   private cache = new LRUCache<string, Event>({
     max: 10000,
     fetchMethod: async (filter) => this.fetchEvent(JSON.parse(filter))
@@ -15,35 +17,13 @@ class ClientService {
 
   constructor() {
     if (!ClientService.instance) {
-      this.rxNostr.setDefaultRelays([
-        'wss://relay.damus.io'
-        // 'wss://nostr-relay.app'
-        // 'ws://localhost:4869'
-      ])
       ClientService.instance = this
     }
     return ClientService.instance
   }
 
-  fetchEvents(filters: Filter[]) {
-    return new Promise<Event[]>((resolver, reject) => {
-      const rxReq = createRxBackwardReq()
-      const events: Event[] = []
-      const eventIdSet = new Set<string>()
-      this.rxNostr.use(rxReq).subscribe({
-        next: (packet) => {
-          const event = packet.event
-          if (!eventIdSet.has(event.id)) {
-            eventIdSet.add(event.id)
-            events.push(event)
-          }
-        },
-        complete: () => resolver(events),
-        error: (err) => reject(err)
-      })
-      filters.forEach((filter) => rxReq.emit(filter))
-      rxReq.over()
-    })
+  async fetchEvents(filter: Filter) {
+    return await this.pool.querySync(this.relayUrls, filter)
   }
 
   async fetchEventWithCache(filter: Filter) {
@@ -51,19 +31,8 @@ class ClientService {
   }
 
   async fetchEvent(filter: Filter) {
-    const events = await this.fetchEvents([{ ...filter, limit: 1 }])
+    const events = await this.fetchEvents({ ...filter, limit: 1 })
     return events.length ? events[0] : undefined
-  }
-
-  listenNewEvents(filter: Filter, next: (event: Event) => void, limit?: number) {
-    const rxReq = createRxForwardReq()
-    const observable = this.rxNostr.use(rxReq)
-    if (limit !== undefined) {
-      observable.pipe(take(limit))
-    }
-    const subscription = observable.subscribe((packet) => next(packet.event))
-    rxReq.emit(filter)
-    return subscription
   }
 }
 
