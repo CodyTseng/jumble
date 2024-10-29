@@ -116,13 +116,9 @@ export default function NoteList({
         {events.map((event, i) => (
           <NoteCard key={i} className="w-full" event={event} />
         ))}
-        {hasMore ? (
-          <div ref={bottomRef} className="text-center text-xs text-muted-foreground">
-            loading...
-          </div>
-        ) : (
-          <div className="text-center text-xs text-muted-foreground">no more notes</div>
-        )}
+      </div>
+      <div className="text-center text-xs text-muted-foreground mt-2">
+        {hasMore ? <div>loading...</div> : 'no more notes'}
       </div>
     </>
   )
