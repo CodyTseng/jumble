@@ -118,7 +118,7 @@ export default function NoteList({
         ))}
       </div>
       <div className="text-center text-xs text-muted-foreground mt-2">
-        {hasMore ? <div>loading...</div> : 'no more notes'}
+        {hasMore ? <div ref={bottomRef}>loading...</div> : 'no more notes'}
       </div>
     </>
   )
