@@ -35,7 +35,7 @@ export default function UserAvatar({
       <HoverCardTrigger>
         <SecondaryPageLink to={toProfile(pubkey)} onClick={(e) => e.stopPropagation()}>
           <Avatar className={cn(UserAvatarSizeCnMap[size], className)}>
-            <AvatarImage src={avatar} />
+            <AvatarImage src={avatar} className="object-cover object-center" />
             <AvatarFallback>
               <img src={defaultAvatar} alt={pubkey} />
             </AvatarFallback>
