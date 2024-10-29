@@ -2,10 +2,12 @@ import { isReplyNoteEvent } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
+import { RefreshCcw } from 'lucide-react'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
-import { RefreshCcw } from 'lucide-react'
+
+const PAGE_SIZE = 50
 
 export default function NoteList({
   filter = {},
@@ -15,6 +17,7 @@ export default function NoteList({
   className?: string
 }) {
   const [events, setEvents] = useState<Event[]>([])
+  const [since, setSince] = useState<number>(() => dayjs().unix() + 1)
   const [until, setUntil] = useState<number>(() => dayjs().unix())
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [refreshedAt, setRefreshedAt] = useState<number>(() => dayjs().unix())
@@ -25,7 +28,7 @@ export default function NoteList({
   const noteFilter = useMemo(() => {
     return {
       kinds: [kinds.ShortTextNote, kinds.Repost],
-      limit: 50,
+      limit: PAGE_SIZE,
       ...filter
     }
   }, [filter])
@@ -49,20 +52,24 @@ export default function NoteList({
   const refresh = async () => {
     const now = dayjs().unix()
     setRefreshing(true)
-    setRefreshedAt(now)
-    const events = await client.fetchEvents({ ...noteFilter, until: now })
-    if (events.length === 0) {
-      setHasMore(false)
-      return
-    }
+    const events = await client.fetchEvents({ ...noteFilter, until: now, since })
 
     const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
     const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))
-    if (processedEvents.length > 0) {
+    if (sortedEvents.length >= PAGE_SIZE) {
+      // reset
       setEvents(processedEvents)
+      setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
+    } else if (processedEvents.length > 0) {
+      // append
+      setEvents((oldEvents) => [...processedEvents, ...oldEvents])
     }
 
-    setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
+    if (sortedEvents.length > 0) {
+      setSince(sortedEvents[0].created_at + 1)
+    }
+
+    setRefreshedAt(now)
     setRefreshing(false)
   }
 
@@ -92,23 +99,29 @@ export default function NoteList({
 
   return (
     <>
-      <div
-        className={`flex justify-end items-center gap-2 mb-1 text-muted-foreground ${!refreshing ? 'hover:text-foreground cursor-pointer' : ''}`}
-        onClick={refresh}
-      >
-        <div className="text-sm">refreshed at {dayjs(refreshedAt * 1000).format('HH:mm:ss')}</div>
-        <RefreshCcw size={14} className={`${refreshing ? 'animate-spin' : ''}`} />
-      </div>
+      {events.length > 0 && (
+        <div
+          className={`flex justify-center items-center gap-1 mb-2 text-muted-foreground ${!refreshing ? 'hover:text-foreground cursor-pointer' : ''}`}
+          onClick={refresh}
+        >
+          <RefreshCcw size={12} className={`${refreshing ? 'animate-spin' : ''}`} />
+          <div className="text-xs">
+            {refreshing
+              ? 'refreshing...'
+              : `last refreshed at ${dayjs(refreshedAt * 1000).format('HH:mm:ss')}`}
+          </div>
+        </div>
+      )}
       <div className={cn('flex flex-col gap-4', className)}>
         {events.map((event, i) => (
           <NoteCard key={i} className="w-full" event={event} />
         ))}
         {hasMore ? (
-          <div ref={bottomRef} className="text-center text-sm text-muted-foreground">
+          <div ref={bottomRef} className="text-center text-xs text-muted-foreground">
             loading...
           </div>
         ) : (
-          <div className="text-center text-sm text-muted-foreground">no more notes</div>
+          <div className="text-center text-xs text-muted-foreground">no more notes</div>
         )}
       </div>
     </>

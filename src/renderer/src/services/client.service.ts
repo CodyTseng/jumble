@@ -6,7 +6,8 @@ class ClientService {
 
   private pool = new SimplePool()
   private relayUrls = [
-    'wss://relay.damus.io'
+    'wss://nos.lol'
+    // 'wss://relay.damus.io'
     // 'wss://nostr-relay.app'
     // 'ws://localhost:4869'
   ]

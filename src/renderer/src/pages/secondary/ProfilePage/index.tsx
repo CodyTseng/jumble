@@ -56,7 +56,7 @@ export default function ProfilePage({ pubkey }: { pubkey?: string }) {
           <ProfileAbout about={about} />
         </div>
       </div>
-      <Separator className="my-4" />
+      <Separator className="my-2" />
       <NoteList key={pubkey} filter={{ authors: [pubkey] }} />
     </SecondaryPageLayout>
   )

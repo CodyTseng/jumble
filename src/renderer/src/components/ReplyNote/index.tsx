@@ -24,9 +24,11 @@ export default function ReplyNote({
         <div className="flex space-x-2 items-end">
           <Username
             userId={event.pubkey}
-            className="text-sm font-semibold text-muted-foreground hover:text-foreground"
+            className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
           />
-          <div className="text-xs text-muted-foreground">{formatTimestamp(event.created_at)}</div>
+          <div className="text-xs text-muted-foreground shrink-0">
+            {formatTimestamp(event.created_at)}
+          </div>
         </div>
         {parentEvent && (
           <div

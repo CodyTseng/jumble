@@ -12,7 +12,7 @@ export default function RepostNoteCard({ event, className }: { event: Event; cla
   return (
     <div className={className}>
       <div className="flex gap-1 mb-1 pl-4 text-xs items-center text-muted-foreground">
-        <Repeat2 size={16} />
+        <Repeat2 size={12} />
         <Username userId={event.pubkey} className="font-semibold" />
         <div>reposted</div>
       </div>
