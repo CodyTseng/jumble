@@ -1,11 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@renderer/components/ui/avatar'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
+import { Skeleton } from '@renderer/components/ui/skeleton'
+import { useFetchProfile } from '@renderer/hooks'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
 import { toProfile } from '@renderer/lib/url'
-import { SecondaryPageLink } from '@renderer/PageManager'
-import { useFetchProfile } from '@renderer/hooks'
-import ProfileCard from '../ProfileCard'
 import { cn } from '@renderer/lib/utils'
+import { SecondaryPageLink } from '@renderer/PageManager'
+import ProfileCard from '../ProfileCard'
 
 const UserAvatarSizeCnMap = {
   large: 'w-24 h-24',
@@ -24,7 +25,8 @@ export default function UserAvatar({
   size?: 'large' | 'normal' | 'small' | 'tiny'
 }) {
   const { avatar, pubkey } = useFetchProfile(userId)
-  if (!pubkey) return null
+  if (!pubkey)
+    return <Skeleton className={cn(UserAvatarSizeCnMap[size], 'rounded-full', className)} />
 
   const defaultAvatar = generateImageByPubkey(pubkey)
 

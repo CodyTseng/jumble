@@ -1,8 +1,8 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
+import { useFetchProfile } from '@renderer/hooks'
 import { toProfile } from '@renderer/lib/url'
 import { cn } from '@renderer/lib/utils'
 import { SecondaryPageLink } from '@renderer/PageManager'
-import { useFetchProfile } from '@renderer/hooks'
 import ProfileCard from '../ProfileCard'
 
 export default function Username({
