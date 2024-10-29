@@ -1,3 +1,4 @@
+import { TRelayGroup } from '@common/types'
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 
@@ -10,6 +11,11 @@ const api = {
       })
     },
     current: () => ipcRenderer.invoke('theme:current')
+  },
+  storage: {
+    getRelayGroups: () => ipcRenderer.invoke('storage:getRelayGroups'),
+    setRelayGroups: (relayGroups: TRelayGroup[]) =>
+      ipcRenderer.invoke('storage:setRelayGroups', relayGroups)
   }
 }
 

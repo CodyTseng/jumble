@@ -1,44 +1,42 @@
 import { LRUCache } from 'lru-cache'
-import { Event, Filter, SimplePool } from 'nostr-tools'
+import { Event as NEvent, Filter, SimplePool } from 'nostr-tools'
+import storage from './storage.service'
+import { TRelayGroup } from '@common/types'
 
 class ClientService {
   static instance: ClientService
 
   private pool = new SimplePool()
-  private relayUrls = [
-    'wss://nos.lol'
-    // 'wss://relay.damus.io'
-    // 'wss://nostr-relay.app'
-    // 'ws://localhost:4869'
-  ]
-  private cache = new LRUCache<string, Event>({
+  private initPromise!: Promise<void>
+  private relayUrls: string[] = []
+  private cache = new LRUCache<string, NEvent>({
     max: 10000,
     fetchMethod: async (filter) => this.fetchEvent(JSON.parse(filter))
   })
 
   // Event cache
-  private eventsCache = new LRUCache<string, Promise<Event | undefined>>({
+  private eventsCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     ttl: 1000 * 60 * 10 // 10 minutes
   })
   private fetchEventQueue = new Map<
     string,
     {
-      resolve: (value: Event | undefined) => void
+      resolve: (value: NEvent | undefined) => void
       reject: (reason: any) => void
     }
   >()
   private fetchEventTimer: NodeJS.Timeout | null = null
 
   // Profile cache
-  private profilesCache = new LRUCache<string, Promise<Event | undefined>>({
+  private profilesCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     ttl: 1000 * 60 * 10 // 10 minutes
   })
   private fetchProfileQueue = new Map<
     string,
     {
-      resolve: (value: Event | undefined) => void
+      resolve: (value: NEvent | undefined) => void
       reject: (reason: any) => void
     }
   >()
@@ -46,12 +44,33 @@ class ClientService {
 
   constructor() {
     if (!ClientService.instance) {
+      this.initPromise = this.init()
       ClientService.instance = this
     }
     return ClientService.instance
   }
 
+  async init() {
+    const relayGroups = await storage.getRelayGroups()
+    this.relayUrls = relayGroups.find((group) => group.isActive)?.relayUrls ?? []
+    storage.on('relayGroupsChanged', (event: { detail: TRelayGroup[] }) => {
+      this.onRelayGroupsChange(event.detail)
+    })
+  }
+
+  onRelayGroupsChange(relayGroups: TRelayGroup[]) {
+    const newRelayUrls = relayGroups.find((group) => group.isActive)?.relayUrls ?? []
+    if (
+      newRelayUrls.length === this.relayUrls.length &&
+      newRelayUrls.every((url) => this.relayUrls.includes(url))
+    ) {
+      return
+    }
+    this.relayUrls = newRelayUrls
+  }
+
   async fetchEvents(filter: Filter) {
+    await this.initPromise
     return await this.pool.querySync(this.relayUrls, filter)
   }
 
@@ -64,13 +83,13 @@ class ClientService {
     return events.length ? events[0] : undefined
   }
 
-  async fetchEventById(id: string): Promise<Event | undefined> {
+  async fetchEventById(id: string): Promise<NEvent | undefined> {
     const cache = this.eventsCache.get(id)
     if (cache) {
       return cache
     }
 
-    const promise = new Promise<Event | undefined>((resolve, reject) => {
+    const promise = new Promise<NEvent | undefined>((resolve, reject) => {
       this.fetchEventQueue.set(id, { resolve, reject })
       if (this.fetchEventTimer) {
         return
@@ -106,13 +125,13 @@ class ClientService {
     return promise
   }
 
-  async fetchProfile(pubkey: string): Promise<Event | undefined> {
+  async fetchProfile(pubkey: string): Promise<NEvent | undefined> {
     const cache = this.profilesCache.get(pubkey)
     if (cache) {
       return cache
     }
 
-    const promise = new Promise<Event | undefined>((resolve, reject) => {
+    const promise = new Promise<NEvent | undefined>((resolve, reject) => {
       this.fetchProfileQueue.set(pubkey, { resolve, reject })
       if (this.fetchProfileTimer) {
         return
@@ -129,7 +148,7 @@ class ClientService {
             authors: pubkeys,
             kinds: [0]
           })
-          const eventsMap = new Map<string, Event>()
+          const eventsMap = new Map<string, NEvent>()
           for (const event of events) {
             const pubkey = event.pubkey
             const existing = eventsMap.get(pubkey)

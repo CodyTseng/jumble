@@ -1,31 +1,33 @@
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Separator } from '@renderer/components/ui/separator'
-import { useState } from 'react'
+import storage from '@renderer/services/storage.service'
+import { useEffect, useState } from 'react'
 import RelayGroup from './RelayGroup'
 import { TRelayGroup } from './types'
 
-const relayGroups: TRelayGroup[] = [
-  {
-    groupName: 'Default',
-    relayUrls: ['wss://relay.zksync.io', 'wss://relay.zkscan.io'],
-    isActive: true
-  },
-  {
-    groupName: 'Test',
-    relayUrls: ['wss://relay.zksync.io', 'wss://relay.zkscan.io'],
-    isActive: false
-  }
-]
-
 export default function RelaySettings() {
-  const [groups, setGroups] = useState<TRelayGroup[]>(relayGroups)
+  const [groups, setGroups] = useState<TRelayGroup[]>([])
   const [newGroupName, setNewGroupName] = useState('')
   const [newNameError, setNewNameError] = useState<string | null>(null)
 
+  useEffect(() => {
+    const init = async () => {
+      const storedGroups = await storage.getRelayGroups()
+      setGroups(storedGroups)
+    }
+
+    init()
+  }, [])
+
+  const updateGroups = async (newGroups: TRelayGroup[]) => {
+    setGroups(newGroups)
+    await storage.setRelayGroups(newGroups)
+  }
+
   const switchRelayGroup = (groupName: string) => {
-    setGroups((prev) =>
-      prev.map((group) => ({
+    updateGroups(
+      groups.map((group) => ({
         ...group,
         isActive: group.groupName === groupName
       }))
@@ -37,8 +39,8 @@ export default function RelaySettings() {
   }
 
   const updateRelayGroupRelayUrls = (groupName: string, relayUrls: string[]) => {
-    setGroups((prev) =>
-      prev.map((group) => ({
+    updateGroups(
+      groups.map((group) => ({
         ...group,
         relayUrls: group.groupName === groupName ? relayUrls : group.relayUrls
       }))
@@ -55,8 +57,8 @@ export default function RelaySettings() {
     if (groups.some((group) => group.groupName === newGroupName)) {
       return 'already exists'
     }
-    setGroups((prev) =>
-      prev.map((group) => ({
+    updateGroups(
+      groups.map((group) => ({
         ...group,
         groupName: group.groupName === oldGroupName ? newGroupName : group.groupName
       }))
@@ -71,15 +73,15 @@ export default function RelaySettings() {
     if (groups.some((group) => group.groupName === newGroupName)) {
       return setNewNameError('already exists')
     }
-    setGroups((prev) => [
-      ...prev,
+    setNewGroupName('')
+    updateGroups([
+      ...groups,
       {
         groupName: newGroupName,
         relayUrls: [],
         isActive: false
       }
     ])
-    setNewGroupName('')
   }
 
   const handleNewGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

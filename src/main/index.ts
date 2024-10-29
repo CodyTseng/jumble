@@ -4,6 +4,7 @@ import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { ThemeService } from './services/theme.service'
 import { TSendToRenderer } from './types'
+import { StorageService } from './services/storage.service'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -68,6 +69,9 @@ app.whenReady().then(async () => {
 
   const themeService = new ThemeService(sendToRenderer)
   themeService.init()
+
+  const storageService = new StorageService()
+  storageService.init()
 
   createWindow()
 
