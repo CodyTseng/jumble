@@ -3,6 +3,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isMacOS } from '@renderer/lib/platform'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { Titlebar } from '../../components/Titlebar'
+import RelaySettingsPopover from './RelaySettingsPopover'
 
 const PrimaryPageLayout = forwardRef(
   (
@@ -42,5 +43,10 @@ export type TPrimaryPageLayoutRef = {
 }
 
 export function PrimaryPageTitlebar({ content }: { content?: React.ReactNode }) {
-  return <Titlebar className={isMacOS() ? 'pl-20' : ''}>{content}</Titlebar>
+  return (
+    <Titlebar className={`justify-between pr-1 ${isMacOS() ? 'pl-20' : ''}`}>
+      <div>{content}</div>
+      <RelaySettingsPopover />
+    </Titlebar>
+  )
 }
