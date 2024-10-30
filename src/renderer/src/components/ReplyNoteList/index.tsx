@@ -2,6 +2,7 @@ import { Separator } from '@renderer/components/ui/separator'
 import { getParentEventId } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
+import { createReplyCountChangedEvent, eventBus } from '@renderer/services/event-bus.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
@@ -42,6 +43,10 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
   useEffect(() => {
     loadMore()
   }, [])
+
+  useEffect(() => {
+    eventBus.emit(createReplyCountChangedEvent(event.id, eventsWithParentIds.length))
+  }, [eventsWithParentIds])
 
   const onClickParent = (eventId: string) => {
     const ref = replyRefs.current[eventId]

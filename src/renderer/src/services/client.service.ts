@@ -1,6 +1,7 @@
 import { TRelayGroup } from '@common/types'
+import { TEventStats } from '@renderer/types'
 import { LRUCache } from 'lru-cache'
-import { Filter, Event as NEvent, SimplePool } from 'nostr-tools'
+import { Filter, kinds, Event as NEvent, SimplePool } from 'nostr-tools'
 import { EVENT_TYPES, eventBus } from './event-bus.service'
 import storage from './storage.service'
 
@@ -28,6 +29,13 @@ class ClientService {
     }
   >()
   private fetchEventTimer: NodeJS.Timeout | null = null
+
+  // Event stats cache
+  private eventStatsCache = new LRUCache<string, Promise<TEventStats>>({
+    max: 10000,
+    ttl: 1000 * 60 * 10, // 10 minutes
+    fetchMethod: async (id) => this._fetchEventStatsById(id)
+  })
 
   // Profile cache
   private profilesCache = new LRUCache<string, Promise<NEvent | undefined>>({
@@ -128,6 +136,20 @@ class ClientService {
 
     this.eventsCache.set(id, promise)
     return promise
+  }
+
+  async fetchEventStatsById(id: string): Promise<TEventStats> {
+    const stats = await this.eventStatsCache.fetch(id)
+    return stats ?? { reactionCount: 0, repostCount: 0 }
+  }
+
+  private async _fetchEventStatsById(id: string) {
+    const [reactionEvents, repostEvents] = await Promise.all([
+      this.fetchEvents({ '#e': [id], kinds: [kinds.Reaction] }),
+      this.fetchEvents({ '#e': [id], kinds: [kinds.Repost] })
+    ])
+
+    return { reactionCount: reactionEvents.length, repostCount: repostEvents.length }
   }
 
   async fetchProfile(pubkey: string): Promise<NEvent | undefined> {
