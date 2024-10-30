@@ -28,7 +28,7 @@ export default function Note({
         </div>
       </div>
       {parentEvent && (
-        <div className="text-xs text-muted-foreground truncate">
+        <div className="text-xs text-muted-foreground truncate mt-2">
           <ParentNote event={parentEvent} />
         </div>
       )}
@@ -39,7 +39,7 @@ export default function Note({
 
 function ParentNote({ event }: { event: Event }) {
   return (
-    <div className="flex space-x-1 items-center text-xs">
+    <div className="flex space-x-1 items-center text-xs rounded-lg border px-1 bg-muted w-fit max-w-full">
       <div>reply to</div>
       <UserAvatar userId={event.pubkey} size="tiny" />
       <div className="truncate">{event.content}</div>

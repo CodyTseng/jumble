@@ -1,4 +1,5 @@
 import { Separator } from '@renderer/components/ui/separator'
+import { getParentEventId } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
@@ -79,8 +80,4 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
       )}
     </>
   )
-}
-
-function getParentEventId(event: Event) {
-  return event.tags.find(([tagName, , , type]) => tagName === 'e' && type === 'reply')?.[1]
 }

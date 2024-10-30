@@ -3,7 +3,7 @@ import { Event, Filter, nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchEventById(id?: string) {
-  const [event, setEvent] = useState<Event | null>(null)
+  const [event, setEvent] = useState<Event | undefined>(undefined)
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -39,7 +39,7 @@ export function useFetchEventById(id?: string) {
       if (event) {
         setEvent(event)
       } else {
-        setEvent(null)
+        setEvent(undefined)
       }
     }
 

@@ -149,7 +149,6 @@ class ClientService {
 
         try {
           const pubkeys = Array.from(queue.keys())
-          console.log('fetching profiles', pubkeys.length)
           const events = await this.fetchEvents({
             authors: pubkeys,
             kinds: [0]

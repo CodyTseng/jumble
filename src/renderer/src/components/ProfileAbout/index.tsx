@@ -10,15 +10,12 @@ import { useMemo } from 'react'
 export default function ProfileAbout({ about }: { about?: string }) {
   const nodes = useMemo(() => {
     return about
-      ? embedded(
-          [about],
-          [
-            embeddedNormalUrlRenderer,
-            embeddedHashtagRenderer,
-            embeddedNostrNpubRenderer,
-            embeddedNpubRenderer
-          ]
-        )
+      ? embedded(about, [
+          embeddedNormalUrlRenderer,
+          embeddedHashtagRenderer,
+          embeddedNostrNpubRenderer,
+          embeddedNpubRenderer
+        ])
       : null
   }, [about])
 
