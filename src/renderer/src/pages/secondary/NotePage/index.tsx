@@ -6,7 +6,7 @@ import { Event } from 'nostr-tools'
 
 export default function NotePage({ event }: { event?: Event }) {
   return (
-    <SecondaryPageLayout>
+    <SecondaryPageLayout titlebarContent="note">
       {event && (
         <>
           <Note event={event} />

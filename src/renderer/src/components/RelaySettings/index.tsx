@@ -35,7 +35,7 @@ export default function RelaySettings() {
   }
 
   const deleteRelayGroup = (groupName: string) => {
-    setGroups((prev) => prev.filter((group) => group.groupName !== groupName || group.isActive))
+    updateGroups(groups.filter((group) => group.groupName !== groupName || group.isActive))
   }
 
   const updateRelayGroupRelayUrls = (groupName: string, relayUrls: string[]) => {
