@@ -67,11 +67,11 @@ app.whenReady().then(async () => {
     mainWindow?.webContents.send(channel, ...args)
   }
 
-  const themeService = new ThemeService(sendToRenderer)
-  themeService.init()
-
   const storageService = new StorageService()
   storageService.init()
+
+  const themeService = new ThemeService(storageService, sendToRenderer)
+  themeService.init()
 
   createWindow()
 

@@ -1,4 +1,4 @@
-import { TConfig, TRelayGroup } from '@common/types'
+import { TConfig, TRelayGroup, TThemeSetting } from '@common/types'
 import { app, ipcMain } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
@@ -32,6 +32,14 @@ export class StorageService {
   setRelayGroups(relayGroups: TRelayGroup[]) {
     this.storage.set('relayGroups', relayGroups)
   }
+
+  getTheme() {
+    return this.storage.get('theme') ?? 'system'
+  }
+
+  setTheme(theme: TThemeSetting) {
+    this.storage.set('theme', theme)
+  }
 }
 
 class Storage {
@@ -46,8 +54,8 @@ class Storage {
     this.config = JSON.parse(json)
   }
 
-  get<K extends keyof TConfig>(key: string): TConfig[K] | undefined {
-    return this.config[key]
+  get<K extends keyof TConfig, V extends TConfig[K]>(key: K): V | undefined {
+    return this.config[key] as V
   }
 
   set<K extends keyof TConfig>(key: K, value: TConfig[K]) {

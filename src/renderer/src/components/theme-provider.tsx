@@ -1,33 +1,32 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-
-type Theme = 'dark' | 'light'
+import { TTheme, TThemeSetting } from '@common/types'
 
 type ThemeProviderProps = {
   children: React.ReactNode
-  defaultTheme?: Theme
+  defaultTheme?: TTheme
 }
 
 type ThemeProviderState = {
-  theme: Theme
-  setTheme: (theme: Theme) => void
+  themeSetting: TThemeSetting
+  setThemeSetting: (themeSetting: TThemeSetting) => void
 }
 
-const initialState: ThemeProviderState = {
-  theme: 'light',
-  setTheme: () => null
-}
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<'light' | 'dark'>(
-    (localStorage.getItem('theme') as Theme) ?? 'light'
+  const [themeSetting, setThemeSetting] = useState<TThemeSetting>(
+    (localStorage.getItem('themeSetting') as TTheme) ?? 'system'
   )
+  const [theme, setTheme] = useState<TTheme>('light')
 
   const init = async () => {
-    const theme = await window.api.theme.current()
+    const [themeSetting, theme] = await Promise.all([
+      window.api.theme.themeSetting(),
+      window.api.theme.current()
+    ])
     localStorage.setItem('theme', theme)
     setTheme(theme)
+    setThemeSetting(themeSetting)
 
     window.api.theme.onChange((theme) => {
       localStorage.setItem('theme', theme)
@@ -40,16 +39,19 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   }, [])
 
   useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
-    root.classList.add(theme)
+    const updateTheme = async () => {
+      const root = window.document.documentElement
+      root.classList.remove('light', 'dark')
+      root.classList.add(theme)
+      localStorage.setItem('theme', theme)
+    }
+    updateTheme()
   }, [theme])
 
   const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem('theme', theme)
-      setTheme(theme)
+    themeSetting: themeSetting,
+    setThemeSetting: (themeSetting: TThemeSetting) => {
+      window.api.theme.set(themeSetting).then(() => setThemeSetting(themeSetting))
     }
   }
 

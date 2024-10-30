@@ -6,4 +6,8 @@ export type TRelayGroup = {
 
 export type TConfig = {
   relayGroups: TRelayGroup[]
+  theme: TThemeSetting
 }
+
+export type TThemeSetting = 'light' | 'dark' | 'system'
+export type TTheme = 'light' | 'dark'

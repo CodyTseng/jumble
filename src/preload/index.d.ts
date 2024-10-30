@@ -1,4 +1,4 @@
-import { TRelayGroup } from '@common/types'
+import { TRelayGroup, TTheme, TThemeSetting } from '@common/types'
 import { ElectronAPI } from '@electron-toolkit/preload'
 
 declare global {
@@ -6,8 +6,10 @@ declare global {
     electron: ElectronAPI
     api: {
       theme: {
-        onChange: (cb: (theme: 'dark' | 'light') => void) => void
-        current: () => Promise<'dark' | 'light'>
+        onChange: (cb: (theme: TTheme) => void) => void
+        current: () => Promise<TTheme>
+        themeSetting: () => Promise<TThemeSetting>
+        set: (themeSetting: TThemeSetting) => Promise<void>
       }
       storage: {
         getRelayGroups: () => Promise<TRelayGroup[]>

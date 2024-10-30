@@ -1,18 +1,22 @@
 import { useTheme } from '@renderer/components/theme-provider'
 import { TitlebarButton } from '@renderer/components/Titlebar'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, SunMoon } from 'lucide-react'
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { themeSetting, setThemeSetting } = useTheme()
 
   return (
     <>
-      {theme === 'light' ? (
-        <TitlebarButton onClick={() => setTheme('dark')} title="Switch to dark theme">
+      {themeSetting === 'system' ? (
+        <TitlebarButton onClick={() => setThemeSetting('light')} title="switch to light theme">
+          <SunMoon />
+        </TitlebarButton>
+      ) : themeSetting === 'light' ? (
+        <TitlebarButton onClick={() => setThemeSetting('dark')} title="switch to dark theme">
           <Sun />
         </TitlebarButton>
       ) : (
-        <TitlebarButton onClick={() => setTheme('light')} title="Switch to light theme">
+        <TitlebarButton onClick={() => setThemeSetting('system')} title="switch to system theme">
           <Moon />
         </TitlebarButton>
       )}

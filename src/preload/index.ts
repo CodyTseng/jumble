@@ -1,4 +1,4 @@
-import { TRelayGroup } from '@common/types'
+import { TRelayGroup, TThemeSetting } from '@common/types'
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 
@@ -10,7 +10,9 @@ const api = {
         cb(theme)
       })
     },
-    current: () => ipcRenderer.invoke('theme:current')
+    current: () => ipcRenderer.invoke('theme:current'),
+    themeSetting: () => ipcRenderer.invoke('theme:themeSetting'),
+    set: (themeSetting: TThemeSetting) => ipcRenderer.invoke('theme:set', themeSetting)
   },
   storage: {
     getRelayGroups: () => ipcRenderer.invoke('storage:getRelayGroups'),
