@@ -2,7 +2,7 @@ import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Separator } from '@renderer/components/ui/separator'
 import storage from '@renderer/services/storage.service'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RelayGroup from './RelayGroup'
 import { TRelayGroup } from './types'
 
@@ -10,6 +10,7 @@ export default function RelaySettings() {
   const [groups, setGroups] = useState<TRelayGroup[]>([])
   const [newGroupName, setNewGroupName] = useState('')
   const [newNameError, setNewNameError] = useState<string | null>(null)
+  const dummyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const init = async () => {
@@ -17,6 +18,9 @@ export default function RelaySettings() {
       setGroups(storedGroups)
     }
 
+    if (dummyRef.current) {
+      dummyRef.current.focus()
+    }
     init()
   }, [])
 
@@ -98,6 +102,7 @@ export default function RelaySettings() {
 
   return (
     <div>
+      <div ref={dummyRef} tabIndex={-1} style={{ position: 'absolute', opacity: 0 }}></div>
       <div className="text-lg font-semibold mb-4">Relay Settings</div>
       <div className="space-y-2">
         {groups.map((group, index) => (

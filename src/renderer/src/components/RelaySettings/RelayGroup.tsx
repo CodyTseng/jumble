@@ -216,9 +216,10 @@ function RelayGroupOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <div className="h-7 w-7 p-0 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center justify-center">
-          <EllipsisVertical size={16} />
-        </div>
+        <EllipsisVertical
+          size={16}
+          className="text-muted-foreground hover:text-accent-foreground cursor-pointer"
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => setRenaming(true)}>Rename</DropdownMenuItem>

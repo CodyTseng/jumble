@@ -70,6 +70,10 @@ class ClientService {
     this.relayUrls = newRelayUrls
   }
 
+  listConnectionStatus() {
+    return this.pool.listConnectionStatus()
+  }
+
   async fetchEvents(filter: Filter) {
     await this.initPromise
     return await this.pool.querySync(this.relayUrls, filter)

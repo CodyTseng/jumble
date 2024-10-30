@@ -1,11 +1,12 @@
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
-import { X } from 'lucide-react'
-import { useState } from 'react'
+import client from '@renderer/services/client.service'
+import { CircleX } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export default function RelayUrls({
   isActive,
-  relayUrls,
+  relayUrls: rawRelayUrls,
   update
 }: {
   isActive: boolean
@@ -14,20 +15,42 @@ export default function RelayUrls({
 }) {
   const [newRelayUrl, setNewRelayUrl] = useState('')
   const [newRelayUrlError, setNewRelayUrlError] = useState<string | null>(null)
+  const [relays, setRelays] = useState<
+    {
+      url: string
+      isConnected: boolean
+    }[]
+  >(rawRelayUrls.map((url) => ({ url, isConnected: false })))
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const connectionStatusMap = client.listConnectionStatus()
+      setRelays((pre) => {
+        return pre.map((relay) => {
+          const isConnected = connectionStatusMap.get(relay.url) || false
+          return { ...relay, isConnected }
+        })
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const removeRelayUrl = (url: string) => {
-    update(relayUrls.filter((u) => u !== url))
+    setRelays((relays) => relays.filter((relay) => relay.url !== url))
+    update(relays.map(({ url }) => url).filter((u) => u !== url))
   }
 
   const saveNewRelayUrl = () => {
-    const newRelayUrls = Array.from(
-      new Set([...relayUrls, newRelayUrl].map((url) => url.trim()).filter((url) => url !== ''))
-    )
-    for (const url of newRelayUrls) {
-      if (/^wss?:\/\/.+$/.test(url) === false) {
-        return setNewRelayUrlError('invalid URL')
-      }
+    const normalizedUrl = normalizeURL(newRelayUrl)
+    if (relays.some(({ url }) => url === normalizedUrl)) {
+      return setNewRelayUrlError('already exists')
     }
+    if (/^wss?:\/\/.+$/.test(normalizedUrl) === false) {
+      return setNewRelayUrlError('invalid URL')
+    }
+    setRelays((pre) => [...pre, { url: normalizedUrl, isConnected: false }])
+    const newRelayUrls = [...relays.map(({ url }) => url), normalizedUrl]
     update(newRelayUrls)
     setNewRelayUrl('')
   }
@@ -47,8 +70,14 @@ export default function RelayUrls({
   return (
     <>
       <div className="mt-1">
-        {relayUrls.map((url) => (
-          <RelayUrl key={url} url={url} onRemove={() => removeRelayUrl(url)} />
+        {relays.map(({ url, isConnected: isConnected }, index) => (
+          <RelayUrl
+            key={index}
+            isActive={isActive}
+            url={url}
+            isConnected={isConnected}
+            onRemove={() => removeRelayUrl(url)}
+          />
         ))}
       </div>
       <div className="mt-2 flex gap-2">
@@ -72,20 +101,49 @@ export default function RelayUrls({
   )
 }
 
-function RelayUrl({ url, onRemove }: { url: string; onRemove: () => void }) {
+function RelayUrl({
+  isActive,
+  url,
+  isConnected,
+  onRemove
+}: {
+  isActive: boolean
+  url: string
+  isConnected: boolean
+  onRemove: () => void
+}) {
   return (
     <div className="flex items-center justify-between">
-      <div className="text-muted-foreground text-sm">{url}</div>
+      <div className="flex gap-2 items-center">
+        {!isActive ? (
+          <div className="text-muted-foreground">●</div>
+        ) : isConnected ? (
+          <div className="text-green-500">●</div>
+        ) : (
+          <div className="text-red-500">●</div>
+        )}
+        <div className="text-muted-foreground text-sm">{url}</div>
+      </div>
       <div>
-        <Button
-          size="xs"
-          variant="ghost"
-          className="text-xs text-destructive hover:bg-destructive/90 hover:text-background"
+        <CircleX
+          size={16}
           onClick={onRemove}
-        >
-          <X size={12} />
-        </Button>
+          className="text-muted-foreground hover:text-destructive cursor-pointer"
+        />
       </div>
     </div>
   )
+}
+
+// copy from nostr-tools/utils
+function normalizeURL(url: string): string {
+  if (url.indexOf('://') === -1) url = 'wss://' + url
+  const p = new URL(url)
+  p.pathname = p.pathname.replace(/\/+/g, '/')
+  if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
+  if ((p.port === '80' && p.protocol === 'ws:') || (p.port === '443' && p.protocol === 'wss:'))
+    p.port = ''
+  p.searchParams.sort()
+  p.hash = ''
+  return p.toString()
 }
