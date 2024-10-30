@@ -4,7 +4,7 @@ import PrimaryPageLayout from '@renderer/layouts/PrimaryPageLayout'
 export default function NoteListPage() {
   return (
     <PrimaryPageLayout>
-      <NoteList />
+      <NoteList isHomeTimeline />
     </PrimaryPageLayout>
   )
 }

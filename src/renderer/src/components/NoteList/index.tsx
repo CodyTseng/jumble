@@ -1,6 +1,7 @@
 import { isReplyNoteEvent } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
 import client from '@renderer/services/client.service'
+import { EVENT_TYPES, eventBus } from '@renderer/services/event-bus.service'
 import dayjs from 'dayjs'
 import { RefreshCcw } from 'lucide-react'
 import { Event, Filter, kinds } from 'nostr-tools'
@@ -11,10 +12,12 @@ const PAGE_SIZE = 50
 
 export default function NoteList({
   filter = {},
-  className
+  className,
+  isHomeTimeline = false
 }: {
   filter?: Filter
   className?: string
+  isHomeTimeline?: boolean
 }) {
   const [events, setEvents] = useState<Event[]>([])
   const [since, setSince] = useState<number>(() => dayjs().unix() + 1)
@@ -32,6 +35,25 @@ export default function NoteList({
       ...filter
     }
   }, [filter])
+
+  useEffect(() => {
+    if (!isHomeTimeline) return
+
+    const handleClearList = () => {
+      setEvents([])
+      setSince(dayjs().unix() + 1)
+      setUntil(dayjs().unix())
+      setHasMore(true)
+      setRefreshedAt(dayjs().unix())
+      setRefreshing(false)
+    }
+
+    eventBus.on(EVENT_TYPES.RELOAD_TIMELINE, handleClearList)
+
+    return () => {
+      eventBus.remove(EVENT_TYPES.RELOAD_TIMELINE, handleClearList)
+    }
+  }, [])
 
   const loadMore = async () => {
     const events = await client.fetchEvents({ ...noteFilter, until })

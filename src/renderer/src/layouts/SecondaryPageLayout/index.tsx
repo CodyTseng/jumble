@@ -39,13 +39,13 @@ export function SecondaryPageTitlebar({
   const { pop } = useSecondaryPage()
 
   return (
-    <Titlebar className="pl-1">
+    <Titlebar>
       {!hideBackButton && (
         <TitlebarButton onClick={() => pop()}>
           <ChevronLeft className="text-foreground" size={18} />
         </TitlebarButton>
       )}
-      <div>{content}</div>
+      <div className="truncate">{content}</div>
     </Titlebar>
   )
 }

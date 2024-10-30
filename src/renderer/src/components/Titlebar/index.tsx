@@ -11,7 +11,7 @@ export function Titlebar({
   return (
     <div
       className={cn(
-        'draggable absolute top-0 w-full h-9 z-50 bg-background/80 backdrop-blur-xl flex items-center  font-semibold space-x-1',
+        'draggable absolute top-0 w-full h-9 z-50 bg-background/80 backdrop-blur-xl flex items-center font-semibold space-x-1 px-1',
         className
       )}
     >
@@ -23,18 +23,22 @@ export function Titlebar({
 export function TitlebarButton({
   onClick,
   disabled,
-  children
+  children,
+  title
 }: {
   onClick?: () => void
   disabled?: boolean
   children: React.ReactNode
+  title?: string
 }) {
   return (
     <Button
+      className="non-draggable"
       variant="ghost"
-      className="non-draggable h-7 w-7 p-0 rounded-full"
+      size="xs"
       onClick={onClick}
       disabled={disabled}
+      title={title}
     >
       {children}
     </Button>

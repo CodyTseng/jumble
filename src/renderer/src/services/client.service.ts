@@ -1,7 +1,8 @@
-import { LRUCache } from 'lru-cache'
-import { Event as NEvent, Filter, SimplePool } from 'nostr-tools'
-import storage from './storage.service'
 import { TRelayGroup } from '@common/types'
+import { LRUCache } from 'lru-cache'
+import { Filter, Event as NEvent, SimplePool } from 'nostr-tools'
+import { EVENT_TYPES, eventBus } from './event-bus.service'
+import storage from './storage.service'
 
 class ClientService {
   static instance: ClientService
@@ -53,7 +54,7 @@ class ClientService {
   async init() {
     const relayGroups = await storage.getRelayGroups()
     this.relayUrls = relayGroups.find((group) => group.isActive)?.relayUrls ?? []
-    storage.on('relayGroupsChanged', (event: { detail: TRelayGroup[] }) => {
+    eventBus.on(EVENT_TYPES.RELAY_GROUPS_CHANGED, (event) => {
       this.onRelayGroupsChange(event.detail)
     })
   }

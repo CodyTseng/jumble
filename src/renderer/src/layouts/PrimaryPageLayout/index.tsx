@@ -1,8 +1,9 @@
 import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
+import { Titlebar } from '@renderer/components/Titlebar'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isMacOS } from '@renderer/lib/platform'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
-import { Titlebar } from '../../components/Titlebar'
+import ReloadTimelineButton from './ReloadTimelineButton'
 import RelaySettingsPopover from './RelaySettingsPopover'
 
 const PrimaryPageLayout = forwardRef(
@@ -44,9 +45,12 @@ export type TPrimaryPageLayoutRef = {
 
 export function PrimaryPageTitlebar({ content }: { content?: React.ReactNode }) {
   return (
-    <Titlebar className={`justify-between pr-1 ${isMacOS() ? 'pl-20' : ''}`}>
+    <Titlebar className={`justify-between ${isMacOS() ? 'pl-20' : ''}`}>
       <div>{content}</div>
-      <RelaySettingsPopover />
+      <div className="flex gap-1">
+        <ReloadTimelineButton />
+        <RelaySettingsPopover />
+      </div>
     </Titlebar>
   )
 }
