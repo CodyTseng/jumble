@@ -8,7 +8,7 @@ export default function ReloadTimelineButton() {
       onClick={() => eventBus.emit(createReloadTimelineEvent())}
       title="reload timeline"
     >
-      <Eraser size={18} className="text-foreground" />
+      <Eraser />
     </TitlebarButton>
   )
 }

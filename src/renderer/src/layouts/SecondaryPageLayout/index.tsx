@@ -1,10 +1,10 @@
 import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isMacOS } from '@renderer/lib/platform'
-import { useSecondaryPage } from '@renderer/PageManager'
-import { ChevronLeft } from 'lucide-react'
 import { useRef } from 'react'
-import { Titlebar, TitlebarButton } from '../../components/Titlebar'
+import { Titlebar } from '../../components/Titlebar'
+import BackButton from './BackButton'
+import ThemeToggle from './ThemeToggle'
 
 export default function SecondaryPageLayout({
   children,
@@ -36,16 +36,15 @@ export function SecondaryPageTitlebar({
   content?: React.ReactNode
   hideBackButton?: boolean
 }): JSX.Element {
-  const { pop } = useSecondaryPage()
-
   return (
-    <Titlebar>
-      {!hideBackButton && (
-        <TitlebarButton onClick={() => pop()}>
-          <ChevronLeft className="text-foreground" size={18} />
-        </TitlebarButton>
-      )}
-      <div className="truncate">{content}</div>
+    <Titlebar className="justify-between">
+      <div className="flex items-center gap-1 flex-1 w-0">
+        <BackButton hide={hideBackButton} />
+        <div className="truncate">{content}</div>
+      </div>
+      <div className="flex-shrink-0">
+        <ThemeToggle />
+      </div>
     </Titlebar>
   )
 }
