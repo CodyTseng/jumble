@@ -8,8 +8,6 @@ import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
 
-const PAGE_SIZE = 50
-
 export default function NoteList({
   filter = {},
   className,
@@ -31,7 +29,7 @@ export default function NoteList({
   const noteFilter = useMemo(() => {
     return {
       kinds: [kinds.ShortTextNote, kinds.Repost],
-      limit: PAGE_SIZE,
+      limit: 50,
       ...filter
     }
   }, [filter])
@@ -78,7 +76,7 @@ export default function NoteList({
 
     const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
     const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))
-    if (sortedEvents.length >= PAGE_SIZE) {
+    if (sortedEvents.length >= noteFilter.limit) {
       // reset
       setEvents(processedEvents)
       setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
