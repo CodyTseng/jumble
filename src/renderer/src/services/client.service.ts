@@ -82,9 +82,19 @@ class ClientService {
     return this.pool.listConnectionStatus()
   }
 
-  async fetchEvents(filter: Filter) {
+  async fetchEvents(filters: Filter[]) {
     await this.initPromise
-    return await this.pool.querySync(this.relayUrls, filter)
+    return new Promise<NEvent[]>((resolve) => {
+      const events: NEvent[] = []
+      this.pool.subscribeManyEose(this.relayUrls, filters, {
+        onevent(event) {
+          events.push(event)
+        },
+        onclose() {
+          resolve(events)
+        }
+      })
+    })
   }
 
   async fetchEventWithCache(filter: Filter) {
@@ -92,7 +102,7 @@ class ClientService {
   }
 
   async fetchEvent(filter: Filter) {
-    const events = await this.fetchEvents({ ...filter, limit: 1 })
+    const events = await this.fetchEvents([{ ...filter, limit: 1 }])
     return events.length ? events[0] : undefined
   }
 
@@ -115,7 +125,7 @@ class ClientService {
 
         try {
           const ids = Array.from(queue.keys())
-          const events = await this.fetchEvents({ ids })
+          const events = await this.fetchEvents([{ ids }])
           for (const event of events) {
             queue.get(event.id)?.resolve(event)
             queue.delete(event.id)
@@ -145,8 +155,8 @@ class ClientService {
 
   private async _fetchEventStatsById(id: string) {
     const [reactionEvents, repostEvents] = await Promise.all([
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Reaction] }),
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Repost] })
+      this.fetchEvents([{ '#e': [id], kinds: [kinds.Reaction] }]),
+      this.fetchEvents([{ '#e': [id], kinds: [kinds.Repost] }])
     ])
 
     return { reactionCount: reactionEvents.length, repostCount: repostEvents.length }
@@ -171,10 +181,12 @@ class ClientService {
 
         try {
           const pubkeys = Array.from(queue.keys())
-          const events = await this.fetchEvents({
-            authors: pubkeys,
-            kinds: [0]
-          })
+          const events = await this.fetchEvents([
+            {
+              authors: pubkeys,
+              kinds: [0]
+            }
+          ])
           const eventsMap = new Map<string, NEvent>()
           for (const event of events) {
             const pubkey = event.pubkey

@@ -54,7 +54,7 @@ export default function NoteList({
   }, [])
 
   const loadMore = async () => {
-    const events = await client.fetchEvents({ ...noteFilter, until })
+    const events = await client.fetchEvents([{ ...noteFilter, until }])
     if (events.length === 0) {
       setHasMore(false)
       return
@@ -72,7 +72,7 @@ export default function NoteList({
   const refresh = async () => {
     const now = dayjs().unix()
     setRefreshing(true)
-    const events = await client.fetchEvents({ ...noteFilter, until: now, since })
+    const events = await client.fetchEvents([{ ...noteFilter, until: now, since }])
 
     const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
     const processedEvents = sortedEvents.filter((e) => !isReplyNoteEvent(e))

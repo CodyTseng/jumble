@@ -19,12 +19,14 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
 
   const loadMore = async () => {
     setLoading(true)
-    const events = await client.fetchEvents({
-      '#e': [event.id],
-      kinds: [1],
-      limit: 200,
-      until
-    })
+    const events = await client.fetchEvents([
+      {
+        '#e': [event.id],
+        kinds: [1],
+        limit: 200,
+        until
+      }
+    ])
     const sortedEvents = events.sort((a, b) => a.created_at - b.created_at)
     if (sortedEvents.length > 0) {
       const eventMap: Record<string, Event> = {}
