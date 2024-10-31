@@ -1,0 +1,57 @@
+name: Build/release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: build-linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build:linux
+
+      - name: build-mac
+        if: matrix.os == 'macos-13'
+        run: npm run build:mac
+
+      - name: build-win
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
+
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            dist/*.exe
+            dist/*.zip
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.snap
+            dist/*.deb
+            dist/*.rpm
+            dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
