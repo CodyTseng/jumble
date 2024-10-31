@@ -36,7 +36,7 @@ export default function Note({
         </div>
       )}
       <Content className="mt-2" event={event} />
-      {displayStats && <NoteStats className="mt-4" event={event} />}
+      {displayStats && <NoteStats className="mt-2" event={event} />}
     </div>
   )
 }

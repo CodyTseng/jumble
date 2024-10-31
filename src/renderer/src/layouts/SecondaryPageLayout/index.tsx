@@ -23,7 +23,7 @@ export default function SecondaryPageLayout({
       scrollBarClassName={isMacOS() ? 'pt-9' : 'pt-4'}
     >
       <SecondaryPageTitlebar content={titlebarContent} hideBackButton={hideBackButton} />
-      <div className="px-4 pb-4 pt-11">{children}</div>
+      <div className="px-4 pb-4 pt-11 w-full h-full">{children}</div>
       <ScrollToTopButton scrollAreaRef={scrollAreaRef} />
     </ScrollArea>
   )

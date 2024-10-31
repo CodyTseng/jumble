@@ -125,7 +125,7 @@ class ClientService {
 
         try {
           const ids = Array.from(queue.keys())
-          const events = await this.fetchEvents([{ ids }])
+          const events = await this.fetchEvents([{ ids, limit: ids.length }])
           for (const event of events) {
             queue.get(event.id)?.resolve(event)
             queue.delete(event.id)
@@ -184,7 +184,8 @@ class ClientService {
           const events = await this.fetchEvents([
             {
               authors: pubkeys,
-              kinds: [0]
+              kinds: [0],
+              limit: pubkeys.length
             }
           ])
           const eventsMap = new Map<string, NEvent>()

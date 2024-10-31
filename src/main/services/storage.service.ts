@@ -22,7 +22,12 @@ export class StorageService {
       this.storage.get('relayGroups') ?? [
         {
           groupName: 'Global',
-          relayUrls: ['wss://relay.damus.io/', 'wss://nos.lol/'],
+          relayUrls: [
+            'wss://relay.damus.io/',
+            'wss://nos.lol/',
+            'wss://nostr.mom/',
+            'wss://relay.primal.net/'
+          ],
           isActive: true
         }
       ]

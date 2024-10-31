@@ -27,15 +27,15 @@ export default function NoteStats({ event, className }: { event: Event; classNam
   return (
     <div className={cn('flex justify-between', className)}>
       <div className="flex gap-1 items-center text-muted-foreground">
-        <MessageCircle size={16} />
+        <MessageCircle size={14} />
         <div className="text-xs">{formatCount(replyCount)}</div>
       </div>
       <div className="flex gap-1 items-center text-muted-foreground">
-        <Repeat size={16} />
+        <Repeat size={14} />
         <div className="text-xs">{formatCount(stats.repostCount)}</div>
       </div>
       <div className="flex gap-1 items-center text-muted-foreground">
-        <Heart size={16} />
+        <Heart size={14} />
         <div className="text-xs">{formatCount(stats.reactionCount)}</div>
       </div>
       <NoteOptionsTrigger event={event} />

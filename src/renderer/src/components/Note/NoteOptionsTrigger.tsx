@@ -6,8 +6,8 @@ import {
 } from '@renderer/components/ui/dropdown-menu'
 import { Ellipsis } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import RawEventDialog from './RawEventDialog'
 import { useState } from 'react'
+import RawEventDialog from './RawEventDialog'
 
 export default function NoteOptionsTrigger({ event }: { event: Event }) {
   const [isRawEventDialogOpen, setIsRawEventDialogOpen] = useState(false)
@@ -17,7 +17,7 @@ export default function NoteOptionsTrigger({ event }: { event: Event }) {
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Ellipsis
-            size={16}
+            size={14}
             className="text-muted-foreground hover:text-foreground cursor-pointer"
           />
         </DropdownMenuTrigger>
