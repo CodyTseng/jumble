@@ -42,7 +42,6 @@ export default function RelayGroup({
             hasRelayUrls={relayUrls.length > 0}
           />
           <RelayGroupName
-            isActive={isActive}
             groupName={groupName}
             renaming={renaming}
             hasRelayUrls={relayUrls.length > 0}
@@ -103,7 +102,6 @@ function RelayGroupActiveToggle({
 }
 
 function RelayGroupName({
-  isActive,
   groupName,
   renaming,
   hasRelayUrls,
@@ -111,7 +109,6 @@ function RelayGroupName({
   save,
   onToggle
 }: {
-  isActive: boolean
   groupName: string
   renaming: boolean
   hasRelayUrls: boolean
@@ -152,14 +149,10 @@ function RelayGroupName({
             onChange={handleRenameInputChange}
             onBlur={saveNewGroupName}
             onKeyDown={handleRenameInputKeyDown}
-            className={`font-semibold w-24 h-8 ${isActive ? 'focus-visible:ring-highlight' : ''} ${newNameError ? 'border-destructive' : ''}`}
+            className={`font-semibold w-24 h-8 ${newNameError ? 'border-destructive' : ''}`}
           />
-          <Button
-            variant="ghost"
-            className={`h-8 w-8 ${isActive ? 'hover:bg-highlight/20' : ''}`}
-            onClick={saveNewGroupName}
-          >
-            <Check size={18} />
+          <Button variant="ghost" className="h-8 w-8" onClick={saveNewGroupName}>
+            <Check size={18} className="text-green-500" />
           </Button>
           {newNameError && <div className="text-xs text-destructive">{newNameError}</div>}
         </div>

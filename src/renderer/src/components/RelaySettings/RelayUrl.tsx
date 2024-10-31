@@ -82,17 +82,14 @@ export default function RelayUrls({
       </div>
       <div className="mt-2 flex gap-2">
         <Input
-          className={`h-8 ${isActive ? 'focus-visible:ring-highlight' : ''} ${newRelayUrlError ? 'border-destructive' : ''}`}
+          className={`h-8 ${newRelayUrlError ? 'border-destructive' : ''}`}
           placeholder="Add new relay URL"
           value={newRelayUrl}
           onKeyDown={handleRelayUrlInputKeyDown}
           onChange={handleRelayUrlInputChange}
           onBlur={saveNewRelayUrl}
         />
-        <Button
-          className={`h-8 w-12 ${isActive ? 'bg-highlight hover:bg-highlight/90' : ''}`}
-          onClick={saveNewRelayUrl}
-        >
+        <Button className="h-8 w-12" onClick={saveNewRelayUrl}>
           Add
         </Button>
       </div>
