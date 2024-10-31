@@ -8,7 +8,7 @@ type TVerifyNip05Result = {
 
 const verifyNip05ResultCache = new LRUCache<string, TVerifyNip05Result>({
   max: 1000,
-  fetch: (key) => {
+  fetchMethod: (key) => {
     const { nip05, pubkey } = JSON.parse(key)
     return _verifyNip05(nip05, pubkey)
   }
