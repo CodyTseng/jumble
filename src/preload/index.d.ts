@@ -1,4 +1,4 @@
-import { TRelayGroup, TTheme, TThemeSetting } from '@common/types'
+import { TDraftEvent, TRelayGroup, TTheme, TThemeSetting } from '@common/types'
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { Event } from 'nostr-tools'
 
@@ -6,6 +6,9 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
+      system: {
+        isEncryptionAvailable: () => Promise<boolean>
+      }
       theme: {
         onChange: (cb: (theme: TTheme) => void) => void
         current: () => Promise<TTheme>
@@ -17,10 +20,13 @@ declare global {
         setRelayGroups: (relayGroups: TRelayGroup[]) => Promise<void>
       }
       nostr: {
-        login: (nsec: string) => Promise<string | void>
+        login: (nsec: string) => Promise<{
+          pubkey?: string
+          reason?: string
+        }>
         logout: () => Promise<void>
         getPublicKey: () => Promise<string | null>
-        signEvent: (event: Omit<Event, 'id' | 'pubkey' | 'sig'>) => Promise<Event | null>
+        signEvent: (draftEvent: TDraftEvent) => Promise<Event | null>
       }
     }
   }

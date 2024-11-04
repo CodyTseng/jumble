@@ -1,5 +1,5 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, safeStorage, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 import { NostrService } from './services/nostr.service'
@@ -76,6 +76,8 @@ app.whenReady().then(async () => {
 
   const nostrService = new NostrService()
   nostrService.init()
+
+  ipcMain.handle('system:isEncryptionAvailable', () => safeStorage.isEncryptionAvailable())
 
   createWindow()
 

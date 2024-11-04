@@ -19,12 +19,12 @@ import { useFetchProfile } from '@renderer/hooks'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
 import { toProfile } from '@renderer/lib/url'
 import { useSecondaryPage } from '@renderer/PageManager'
-import { useAccount } from '@renderer/providers/AccountProvider'
+import { useNostr } from '@renderer/providers/NostrProvider'
 import { LogIn } from 'lucide-react'
 import { useState } from 'react'
 
 export default function AccountButton() {
-  const { pubkey } = useAccount()
+  const { pubkey } = useNostr()
 
   if (pubkey) {
     return <ProfileButton pubkey={pubkey} />
@@ -34,7 +34,7 @@ export default function AccountButton() {
 }
 
 function ProfileButton({ pubkey }: { pubkey: string }) {
-  const { logout } = useAccount()
+  const { logout } = useNostr()
   const { avatar } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
   const defaultAvatar = generateImageByPubkey(pubkey)
@@ -61,7 +61,7 @@ function ProfileButton({ pubkey }: { pubkey: string }) {
 }
 
 function LoginButton() {
-  const { login } = useAccount()
+  const { canLogin, login } = useNostr()
   const [open, setOpen] = useState(false)
   const [nsec, setNsec] = useState('')
   const [errMsg, setErrMsg] = useState<string | null>(null)
@@ -71,42 +71,44 @@ function LoginButton() {
     setErrMsg(null)
   }
 
-  const handleLogin = async () => {
-    const errMsg = await login(nsec)
-    if (!errMsg) {
-      return setOpen(false)
-    }
-    setErrMsg(errMsg)
+  const handleLogin = () => {
+    if (nsec === '') return
+
+    login(nsec).catch((err) => {
+      setErrMsg(err.message)
+    })
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        className="non-draggable h-7 w-7 p-0 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
-        title="login"
-      >
-        <LogIn size={16} />
+      <DialogTrigger>
+        <Button variant="titlebar" size="titlebar">
+          <LogIn />
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-80">
         <DialogHeader>
           <DialogTitle>Sign in</DialogTitle>
-          <DialogDescription>
-            Your private key will be encrypted and stored in your device.
-          </DialogDescription>
+          {!canLogin && (
+            <DialogDescription className="text-destructive">
+              Encryption is not available in your device.
+            </DialogDescription>
+          )}
         </DialogHeader>
         <div className="space-y-1">
-          <div className="flex gap-2">
-            <Input
-              type="password"
-              placeholder="nsec1.."
-              value={nsec}
-              onChange={handleInputChange}
-              className={errMsg ? 'border-destructive' : ''}
-            />
-            <Button onClick={handleLogin}>Login</Button>
-          </div>
+          <Input
+            type="password"
+            placeholder="nsec1.."
+            value={nsec}
+            onChange={handleInputChange}
+            className={errMsg ? 'border-destructive' : ''}
+            disabled={!canLogin}
+          />
           {errMsg && <div className="text-xs text-destructive pl-3">{errMsg}</div>}
         </div>
+        <Button onClick={handleLogin} disabled={!canLogin}>
+          Login
+        </Button>
       </DialogContent>
     </Dialog>
   )

@@ -1,10 +1,12 @@
-import { TRelayGroup, TThemeSetting } from '@common/types'
+import { TDraftEvent, TRelayGroup, TThemeSetting } from '@common/types'
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
-import { Event } from 'nostr-tools'
 
 // Custom APIs for renderer
 const api = {
+  system: {
+    isEncryptionAvailable: () => ipcRenderer.invoke('system:isEncryptionAvailable')
+  },
   theme: {
     onChange: (cb: (theme: 'dark' | 'light') => void) => {
       ipcRenderer.on('theme:change', (_, theme) => {
@@ -24,8 +26,7 @@ const api = {
     login: (nsec: string) => ipcRenderer.invoke('nostr:login', nsec),
     logout: () => ipcRenderer.invoke('nostr:logout'),
     getPublicKey: () => ipcRenderer.invoke('nostr:getPublicKey'),
-    signEvent: (event: Omit<Event, 'id' | 'pubkey' | 'sig'>) =>
-      ipcRenderer.invoke('nostr:signEvent', event)
+    signEvent: (draftEvent: TDraftEvent) => ipcRenderer.invoke('nostr:signEvent', draftEvent)
   }
 }
 

@@ -1,3 +1,5 @@
+import { Event } from 'nostr-tools'
+
 export type TRelayGroup = {
   groupName: string
   relayUrls: string[]
@@ -11,3 +13,5 @@ export type TConfig = {
 
 export type TThemeSetting = 'light' | 'dark' | 'system'
 export type TTheme = 'light' | 'dark'
+
+export type TDraftEvent = Pick<Event, 'content' | 'created_at' | 'kind' | 'tags'>

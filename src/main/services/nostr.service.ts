@@ -1,7 +1,8 @@
+import { TDraftEvent } from '@common/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { app, ipcMain, safeStorage } from 'electron'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs'
-import { getPublicKey, nip19, Event, finalizeEvent } from 'nostr-tools'
+import { Event, finalizeEvent, getPublicKey, nip19 } from 'nostr-tools'
 import { join } from 'path'
 
 export class NostrService {
@@ -29,14 +30,16 @@ export class NostrService {
     )
   }
 
-  private async login(nsec: string) {
-    if (!safeStorage.isEncryptionAvailable()) {
-      return
-    }
+  private async login(nsec: string): Promise<{
+    pubkey?: string
+    reason?: string
+  }> {
     try {
       const { type, data } = nip19.decode(nsec)
       if (type !== 'nsec') {
-        return
+        return {
+          reason: 'invalid nsec'
+        }
       }
 
       this.privkey = data
@@ -45,10 +48,14 @@ export class NostrService {
 
       this.pubkey = getPublicKey(data)
 
-      return this.pubkey
+      return {
+        pubkey: this.pubkey
+      }
     } catch (error) {
       console.error(error)
-      return
+      return {
+        reason: error instanceof Error ? error.message : 'invalid nesc'
+      }
     }
   }
 
@@ -58,13 +65,13 @@ export class NostrService {
     this.pubkey = null
   }
 
-  private signEvent(rawEvent: Omit<Event, 'id' | 'pubkey' | 'sig'>) {
+  private signEvent(draftEvent: TDraftEvent) {
     if (!this.privkey) {
       return null
     }
 
     try {
-      return finalizeEvent(rawEvent, this.privkey)
+      return finalizeEvent(draftEvent, this.privkey)
     } catch (error) {
       console.error(error)
       return null
