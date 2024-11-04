@@ -56,14 +56,14 @@ export default function RelaySettings() {
             </div>
             <div className="mt-2 flex gap-2">
               <Input
-                className={`h-8 ${newNameError ? 'border-destructive' : ''}`}
+                className={newNameError ? 'border-destructive' : ''}
                 placeholder="Group name"
                 value={newGroupName}
                 onChange={handleNewGroupNameChange}
                 onKeyDown={handleNewGroupNameKeyDown}
                 onBlur={saveRelayGroup}
               />
-              <Button className="h-8 w-12">Add</Button>
+              <Button>Add</Button>
             </div>
             {newNameError && <div className="text-xs text-destructive mt-1">{newNameError}</div>}
           </div>

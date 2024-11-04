@@ -1,5 +1,5 @@
+import { Button } from '@renderer/components/ui/button'
 import { useTheme } from '@renderer/providers/ThemeProvider'
-import { TitlebarButton } from '@renderer/components/Titlebar'
 import { Moon, Sun, SunMoon } from 'lucide-react'
 
 export default function ThemeToggle() {
@@ -8,17 +8,32 @@ export default function ThemeToggle() {
   return (
     <>
       {themeSetting === 'system' ? (
-        <TitlebarButton onClick={() => setThemeSetting('light')} title="switch to light theme">
+        <Button
+          variant="titlebar"
+          size="titlebar"
+          onClick={() => setThemeSetting('light')}
+          title="switch to light theme"
+        >
           <SunMoon />
-        </TitlebarButton>
+        </Button>
       ) : themeSetting === 'light' ? (
-        <TitlebarButton onClick={() => setThemeSetting('dark')} title="switch to dark theme">
+        <Button
+          variant="titlebar"
+          size="titlebar"
+          onClick={() => setThemeSetting('dark')}
+          title="switch to dark theme"
+        >
           <Sun />
-        </TitlebarButton>
+        </Button>
       ) : (
-        <TitlebarButton onClick={() => setThemeSetting('system')} title="switch to system theme">
+        <Button
+          variant="titlebar"
+          size="titlebar"
+          onClick={() => setThemeSetting('system')}
+          title="switch to system theme"
+        >
           <Moon />
-        </TitlebarButton>
+        </Button>
       )}
     </>
   )

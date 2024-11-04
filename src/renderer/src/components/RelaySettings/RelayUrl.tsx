@@ -42,6 +42,7 @@ export default function RelayUrls({ groupName }: { groupName: string }) {
   }
 
   const saveNewRelayUrl = () => {
+    if (newRelayUrl === '') return
     const normalizedUrl = normalizeURL(newRelayUrl)
     if (relays.some(({ url }) => url === normalizedUrl)) {
       return setNewRelayUrlError('already exists')
@@ -82,16 +83,14 @@ export default function RelayUrls({ groupName }: { groupName: string }) {
       </div>
       <div className="mt-2 flex gap-2">
         <Input
-          className={`h-8 ${newRelayUrlError ? 'border-destructive' : ''}`}
+          className={newRelayUrlError ? 'border-destructive' : ''}
           placeholder="Add new relay URL"
           value={newRelayUrl}
           onKeyDown={handleRelayUrlInputKeyDown}
           onChange={handleRelayUrlInputChange}
           onBlur={saveNewRelayUrl}
         />
-        <Button className="h-8 w-12" onClick={saveNewRelayUrl}>
-          Add
-        </Button>
+        <Button onClick={saveNewRelayUrl}>Add</Button>
       </div>
       {newRelayUrlError && <div className="text-xs text-destructive mt-1">{newRelayUrlError}</div>}
     </>

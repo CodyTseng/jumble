@@ -95,9 +95,9 @@ function RelayGroupName({ groupName }: { groupName: string }) {
         onChange={handleRenameInputChange}
         onBlur={saveNewGroupName}
         onKeyDown={handleRenameInputKeyDown}
-        className={`font-semibold w-24 h-8 ${newNameError ? 'border-destructive' : ''}`}
+        className={`font-semibold w-28 ${newNameError ? 'border-destructive' : ''}`}
       />
-      <Button variant="ghost" className="h-8 w-8" onClick={saveNewGroupName}>
+      <Button variant="ghost" size="icon" onClick={saveNewGroupName}>
         <Check size={18} className="text-green-500" />
       </Button>
       {newNameError && <div className="text-xs text-destructive">{newNameError}</div>}
@@ -145,11 +145,10 @@ function RelayGroupOptions({ groupName }: { groupName: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <EllipsisVertical
-          size={16}
-          className="text-muted-foreground hover:text-accent-foreground cursor-pointer"
-        />
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <EllipsisVertical />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => setRenamingGroup(groupName)}>Rename</DropdownMenuItem>

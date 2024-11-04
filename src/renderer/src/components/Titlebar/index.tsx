@@ -1,4 +1,3 @@
-import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 
 export function Titlebar({
@@ -17,30 +16,5 @@ export function Titlebar({
     >
       {children}
     </div>
-  )
-}
-
-export function TitlebarButton({
-  onClick,
-  disabled,
-  children,
-  title
-}: {
-  onClick?: () => void
-  disabled?: boolean
-  children: React.ReactNode
-  title?: string
-}) {
-  return (
-    <Button
-      className="non-draggable"
-      variant="ghost"
-      size="xs"
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-    >
-      {children}
-    </Button>
   )
 }

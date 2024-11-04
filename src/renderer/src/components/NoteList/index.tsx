@@ -111,7 +111,9 @@ export default function NoteList({
     <>
       {newEvents.length > 0 && (
         <div className="flex justify-center w-full mb-4">
-          <Button onClick={showNewEvents}>show new notes</Button>
+          <Button size="lg" onClick={showNewEvents}>
+            show new notes
+          </Button>
         </div>
       )}
       <div className={cn('flex flex-col gap-4', className)}>

@@ -48,7 +48,7 @@ function ProfileButton({ pubkey }: { pubkey: string }) {
             <img src={defaultAvatar} />
           </AvatarFallback>
         </Avatar>
-        <div className="absolute inset-0 hover:bg-background opacity-0 hover:opacity-20 transition-opacity" />
+        <div className="absolute inset-0 hover:bg-black opacity-0 hover:opacity-20 transition-opacity rounded-full" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>Profile</DropdownMenuItem>
@@ -97,6 +97,7 @@ function LoginButton() {
         <div className="space-y-1">
           <div className="flex gap-2">
             <Input
+              type="password"
               placeholder="nsec1.."
               value={nsec}
               onChange={handleInputChange}

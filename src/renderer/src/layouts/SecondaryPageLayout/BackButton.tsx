@@ -1,4 +1,4 @@
-import { TitlebarButton } from '@renderer/components/Titlebar'
+import { Button } from '@renderer/components/ui/button'
 import { useSecondaryPage } from '@renderer/PageManager'
 import { ChevronLeft } from 'lucide-react'
 
@@ -8,9 +8,9 @@ export default function BackButton({ hide = false }: { hide?: boolean }) {
   return (
     <>
       {!hide && (
-        <TitlebarButton onClick={() => pop()}>
+        <Button variant="titlebar" size="titlebar" title="back" onClick={() => pop()}>
           <ChevronLeft />
-        </TitlebarButton>
+        </Button>
       )}
     </>
   )
