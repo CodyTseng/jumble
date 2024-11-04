@@ -8,6 +8,7 @@ import NoteListPage from './pages/primary/NoteListPage'
 import HashtagPage from './pages/secondary/HashtagPage'
 import NotePage from './pages/secondary/NotePage'
 import ProfilePage from './pages/secondary/ProfilePage'
+import { AccountProvider } from './providers/AccountProvider'
 import { RelaySettingsProvider } from './providers/RelaySettingsProvider'
 
 const routes = [
@@ -20,12 +21,14 @@ export default function App(): JSX.Element {
   return (
     <div className="h-screen">
       <ThemeProvider>
-        <RelaySettingsProvider>
-          <PageManager routes={routes}>
-            <NoteListPage />
-          </PageManager>
-          <Toaster />
-        </RelaySettingsProvider>
+        <AccountProvider>
+          <RelaySettingsProvider>
+            <PageManager routes={routes}>
+              <NoteListPage />
+            </PageManager>
+            <Toaster />
+          </RelaySettingsProvider>
+        </AccountProvider>
       </ThemeProvider>
     </div>
   )

@@ -10,7 +10,7 @@ export default function RelaySettingsPopover() {
         className="non-draggable h-7 w-7 p-0 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
         title="relay settings"
       >
-        <Server size={16} className="text-foreground" />
+        <Server size={16} />
       </PopoverTrigger>
       <PopoverContent className="w-96 h-[450px] p-0">
         <ScrollArea className="h-full">
