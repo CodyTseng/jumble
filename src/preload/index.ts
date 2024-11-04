@@ -1,6 +1,7 @@
 import { TRelayGroup, TThemeSetting } from '@common/types'
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
+import { Event } from 'nostr-tools'
 
 // Custom APIs for renderer
 const api = {
@@ -18,6 +19,13 @@ const api = {
     getRelayGroups: () => ipcRenderer.invoke('storage:getRelayGroups'),
     setRelayGroups: (relayGroups: TRelayGroup[]) =>
       ipcRenderer.invoke('storage:setRelayGroups', relayGroups)
+  },
+  nostr: {
+    login: (nsec: string) => ipcRenderer.invoke('nostr:login', nsec),
+    logout: () => ipcRenderer.invoke('nostr:logout'),
+    getPublicKey: () => ipcRenderer.invoke('nostr:getPublicKey'),
+    signEvent: (event: Omit<Event, 'id' | 'pubkey' | 'sig'>) =>
+      ipcRenderer.invoke('nostr:signEvent', event)
   }
 }
 

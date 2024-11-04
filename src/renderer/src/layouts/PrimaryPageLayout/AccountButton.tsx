@@ -94,11 +94,18 @@ function LoginButton() {
             Your private key will be encrypted and stored in your device.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex gap-2">
-          <Input placeholder="nsec1.." value={nsec} onChange={handleInputChange} />
-          <Button onClick={handleLogin}>Login</Button>
+        <div className="space-y-1">
+          <div className="flex gap-2">
+            <Input
+              placeholder="nsec1.."
+              value={nsec}
+              onChange={handleInputChange}
+              className={errMsg ? 'border-destructive' : ''}
+            />
+            <Button onClick={handleLogin}>Login</Button>
+          </div>
+          {errMsg && <div className="text-xs text-destructive pl-3">{errMsg}</div>}
         </div>
-        {errMsg && <div className="text-xs text-destructive">{errMsg}</div>}
       </DialogContent>
     </Dialog>
   )

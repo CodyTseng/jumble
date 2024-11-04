@@ -82,7 +82,6 @@ class ClientService {
       onNew: (evt: NEvent) => void
     }
   ) {
-    console.log('subscribeEvents', urls, filter)
     const events: NEvent[] = []
     let eose = false
     return this.pool.subscribeMany(urls, [filter], {

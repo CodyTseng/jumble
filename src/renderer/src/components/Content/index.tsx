@@ -37,7 +37,7 @@ const Content = memo(
       nodes.push(
         <ImageGallery
           className="mt-2 w-fit"
-          key="images"
+          key={`image-gallery-${event.id}`}
           images={images}
           isNsfw={isNsfw}
           size={size}
@@ -51,7 +51,7 @@ const Content = memo(
         nodes.push(
           <VideoPlayer
             className="mt-2"
-            key={`video-${index}`}
+            key={`video-${index}-${src}`}
             src={src}
             isNsfw={isNsfw}
             size={size}
