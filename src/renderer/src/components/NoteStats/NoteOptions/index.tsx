@@ -9,7 +9,7 @@ import { Event } from 'nostr-tools'
 import { useState } from 'react'
 import RawEventDialog from './RawEventDialog'
 
-export default function NoteOptionsTrigger({ event }: { event: Event }) {
+export default function NoteOptions({ event }: { event: Event }) {
   const [isRawEventDialogOpen, setIsRawEventDialogOpen] = useState(false)
 
   return (

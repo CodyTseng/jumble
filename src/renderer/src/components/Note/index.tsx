@@ -3,7 +3,7 @@ import { Event } from 'nostr-tools'
 import Content from '../Content'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import NoteStats from './NoteStats'
+import NoteStats from '../NoteStats'
 
 export default function Note({
   event,

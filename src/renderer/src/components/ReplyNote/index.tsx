@@ -3,6 +3,7 @@ import { formatTimestamp } from '@renderer/lib/timestamp'
 import Content from '../Content'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import LikeButton from '../NoteStats/LikeButton'
 
 export default function ReplyNote({
   event,
@@ -40,6 +41,7 @@ export default function ReplyNote({
         )}
         <Content event={event} size="small" />
       </div>
+      <LikeButton event={event} variant="reply" />
     </div>
   )
 }

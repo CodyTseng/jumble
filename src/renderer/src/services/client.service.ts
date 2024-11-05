@@ -1,5 +1,4 @@
 import { TRelayGroup } from '@common/types'
-import { isReactionTo } from '@renderer/lib/event'
 import { formatPubkey } from '@renderer/lib/pubkey'
 import { TProfile } from '@renderer/types'
 import DataLoader from 'dataloader'
@@ -107,31 +106,6 @@ class ClientService {
   async fetchEvents(filter: Filter, relayUrls: string[] = this.relayUrls) {
     await this.initPromise
     return await this.pool.querySync(relayUrls, filter)
-  }
-
-  async fetchNoteLikeAndRepostStats(id: string) {
-    const [reactionEvents, repostEvents] = await Promise.all([
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Reaction] }),
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Repost] })
-    ])
-
-    return {
-      reactionCount: reactionEvents.length,
-      repostCount: repostEvents.length
-    }
-  }
-
-  async fetchHasLikedOrReposted(id: string, pubkey: string) {
-    const userEvents = await this.fetchEvents({
-      '#e': [id],
-      authors: [pubkey],
-      kinds: [kinds.Reaction, kinds.Repost]
-    })
-
-    return {
-      hasLiked: userEvents.some((event) => isReactionTo(event, id)),
-      hasReposted: userEvents.some((event) => event.kind === kinds.Repost)
-    }
   }
 
   async fetchEventByFilter(filter: Filter) {
