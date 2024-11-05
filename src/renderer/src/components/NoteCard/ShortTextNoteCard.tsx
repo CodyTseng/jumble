@@ -9,11 +9,13 @@ import { getParentEventId, getRootEventId } from '@renderer/lib/event'
 export default function ShortTextNoteCard({
   event,
   className,
-  size
+  size,
+  hideStats = false
 }: {
   event: Event
   className?: string
   size?: 'normal' | 'small'
+  hideStats?: boolean
 }) {
   const { push } = useSecondaryPage()
   const rootEvent = useFetchEventById(getRootEventId(event))
@@ -28,7 +30,12 @@ export default function ShortTextNoteCard({
       }}
     >
       <Card className="p-4 hover:bg-muted/50 text-left cursor-pointer">
-        <Note size={size} event={event} parentEvent={parentEvent ?? rootEvent} />
+        <Note
+          size={size}
+          event={event}
+          parentEvent={parentEvent ?? rootEvent}
+          hideStats={hideStats}
+        />
       </Card>
     </div>
   )

@@ -1,8 +1,8 @@
 import { Separator } from '@renderer/components/ui/separator'
 import { getParentEventId } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
+import { useNoteStats } from '@renderer/providers/NoteStatsProvider'
 import client from '@renderer/services/client.service'
-import { createReplyCountChangedEvent, eventBus } from '@renderer/services/event-bus.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
@@ -15,6 +15,7 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
   const [loading, setLoading] = useState<boolean>(false)
   const [hasMore, setHasMore] = useState<boolean>(false)
   const [highlightReplyId, setHighlightReplyId] = useState<string | undefined>(undefined)
+  const { updateNoteReplyCount } = useNoteStats()
   const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   const loadMore = async () => {
@@ -45,7 +46,7 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
   }, [])
 
   useEffect(() => {
-    eventBus.emit(createReplyCountChangedEvent(event.id, eventsWithParentIds.length))
+    updateNoteReplyCount(event.id, eventsWithParentIds.length)
   }, [eventsWithParentIds])
 
   const onClickParent = (eventId: string) => {

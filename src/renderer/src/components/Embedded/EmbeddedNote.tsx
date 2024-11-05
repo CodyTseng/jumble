@@ -7,7 +7,7 @@ export function EmbeddedNote({ noteId }: { noteId: string }) {
   const event = useFetchEventById(noteId)
 
   return event && event.kind === kinds.ShortTextNote ? (
-    <ShortTextNoteCard size="small" className="mt-2 w-full" event={event} />
+    <ShortTextNoteCard size="small" className="mt-2 w-full" event={event} hideStats />
   ) : (
     <a
       href={toNoStrudelNote(noteId)}

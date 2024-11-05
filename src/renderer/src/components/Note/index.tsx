@@ -10,13 +10,15 @@ export default function Note({
   parentEvent,
   size = 'normal',
   className,
-  displayStats = false
+  hideStats = false,
+  fetchNoteStats = false
 }: {
   event: Event
   parentEvent?: Event
   size?: 'normal' | 'small'
   className?: string
-  displayStats?: boolean
+  hideStats?: boolean
+  fetchNoteStats?: boolean
 }) {
   return (
     <div className={className}>
@@ -36,7 +38,9 @@ export default function Note({
         </div>
       )}
       <Content className="mt-2" event={event} />
-      {displayStats && <NoteStats className="mt-2" event={event} />}
+      {!hideStats && (
+        <NoteStats className="mt-2" event={event} fetchIfNotExisting={fetchNoteStats} />
+      )}
     </div>
   )
 }

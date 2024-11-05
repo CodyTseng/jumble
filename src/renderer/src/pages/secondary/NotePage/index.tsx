@@ -9,7 +9,7 @@ export default function NotePage({ event }: { event?: Event }) {
     <SecondaryPageLayout titlebarContent="note">
       {event && (
         <>
-          <Note key={`note-${event.id}`} event={event} displayStats />
+          <Note key={`note-${event.id}`} event={event} fetchNoteStats />
           <Separator className="mt-2" />
           <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} />
         </>

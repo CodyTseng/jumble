@@ -1,6 +1,7 @@
 import { TRelayGroup } from '@common/types'
+import { isReactionTo } from '@renderer/lib/event'
 import { formatPubkey } from '@renderer/lib/pubkey'
-import { TEventStats, TProfile } from '@renderer/types'
+import { TProfile } from '@renderer/types'
 import DataLoader from 'dataloader'
 import { LRUCache } from 'lru-cache'
 import { Filter, kinds, Event as NEvent, SimplePool } from 'nostr-tools'
@@ -20,12 +21,6 @@ class ClientService {
   private pool = new SimplePool()
   private relayUrls: string[] = BIG_RELAY_URLS
   private initPromise!: Promise<void>
-
-  private eventStatsCache = new LRUCache<string, Promise<TEventStats>>({
-    max: 10000,
-    ttl: 1000 * 60 * 10, // 10 minutes
-    fetchMethod: async (id) => this._fetchEventStatsById(id)
-  })
 
   private eventCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
@@ -114,9 +109,29 @@ class ClientService {
     return await this.pool.querySync(relayUrls, filter)
   }
 
-  async fetchEventStatsById(id: string): Promise<TEventStats> {
-    const stats = await this.eventStatsCache.fetch(id)
-    return stats ?? { reactionCount: 0, repostCount: 0 }
+  async fetchNoteLikeAndRepostStats(id: string) {
+    const [reactionEvents, repostEvents] = await Promise.all([
+      this.fetchEvents({ '#e': [id], kinds: [kinds.Reaction] }),
+      this.fetchEvents({ '#e': [id], kinds: [kinds.Repost] })
+    ])
+
+    return {
+      reactionCount: reactionEvents.length,
+      repostCount: repostEvents.length
+    }
+  }
+
+  async fetchHasLikedOrReposted(id: string, pubkey: string) {
+    const userEvents = await this.fetchEvents({
+      '#e': [id],
+      authors: [pubkey],
+      kinds: [kinds.Reaction, kinds.Repost]
+    })
+
+    return {
+      hasLiked: userEvents.some((event) => isReactionTo(event, id)),
+      hasReposted: userEvents.some((event) => event.kind === kinds.Repost)
+    }
   }
 
   async fetchEventByFilter(filter: Filter) {
@@ -129,15 +144,6 @@ class ClientService {
 
   async fetchProfile(pubkey: string): Promise<TProfile | undefined> {
     return this.profileDataloader.load(pubkey)
-  }
-
-  private async _fetchEventStatsById(id: string) {
-    const [reactionEvents, repostEvents] = await Promise.all([
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Reaction] }),
-      this.fetchEvents({ '#e': [id], kinds: [kinds.Repost] })
-    ])
-
-    return { reactionCount: reactionEvents.length, repostCount: repostEvents.length }
   }
 
   private async eventBatchLoadFn(ids: readonly string[]) {

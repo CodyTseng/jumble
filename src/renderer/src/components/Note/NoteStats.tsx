@@ -1,48 +1,78 @@
-import useFetchEventStats from '@renderer/hooks/useFetchEventStats'
 import { cn } from '@renderer/lib/utils'
-import { EVENT_TYPES, eventBus } from '@renderer/services/event-bus.service'
+import { useNoteStats } from '@renderer/providers/NoteStatsProvider'
 import { Heart, MessageCircle, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import NoteOptionsTrigger from './NoteOptionsTrigger'
 
-export default function NoteStats({ event, className }: { event: Event; className?: string }) {
-  const [replyCount, setReplyCount] = useState(0)
-  const { stats } = useFetchEventStats(event.id)
+export default function NoteStats({
+  event,
+  className,
+  fetchIfNotExisting = false
+}: {
+  event: Event
+  className?: string
+  fetchIfNotExisting?: boolean
+}) {
+  const { noteStatsMap, loadNoteLikeAndRepostStats, loadHasLikedOrReposted } = useNoteStats()
+  const stats = useMemo(() => noteStatsMap.get(event.id) ?? {}, [noteStatsMap, event.id])
 
   useEffect(() => {
-    const handler = (e: CustomEvent<{ eventId: string; replyCount: number }>) => {
-      const { eventId, replyCount } = e.detail
-      if (eventId === event.id) {
-        setReplyCount(replyCount)
-      }
+    if (
+      fetchIfNotExisting &&
+      (stats.reactionCount === undefined || stats.repostCount === undefined)
+    ) {
+      loadNoteLikeAndRepostStats(event.id)
     }
-    eventBus.on(EVENT_TYPES.REPLY_COUNT_CHANGED, handler)
-
-    return () => {
-      eventBus.remove(EVENT_TYPES.REPLY_COUNT_CHANGED, handler)
+    if (fetchIfNotExisting && (stats.hasLiked === undefined || stats.hasReposted === undefined)) {
+      loadHasLikedOrReposted(event.id)
     }
   }, [])
 
   return (
     <div className={cn('flex justify-between', className)}>
-      <div className="flex gap-1 items-center text-muted-foreground">
-        <MessageCircle size={14} />
-        <div className="text-xs">{formatCount(replyCount)}</div>
-      </div>
-      <div className="flex gap-1 items-center text-muted-foreground">
-        <Repeat size={14} />
-        <div className="text-xs">{formatCount(stats.repostCount)}</div>
-      </div>
-      <div className="flex gap-1 items-center text-muted-foreground">
-        <Heart size={14} />
-        <div className="text-xs">{formatCount(stats.reactionCount)}</div>
+      <div className="flex gap-4 h-4 items-center">
+        <div className="flex gap-1 items-center text-muted-foreground">
+          <MessageCircle size={14} />
+          <div className="text-xs">{formatCount(stats.replyCount)}</div>
+        </div>
+        <RepostButton hasReposted={stats.hasReposted} repostCount={stats.repostCount} />
+        <LikeButton hasLiked={stats.hasLiked} reactionCount={stats.reactionCount} />
       </div>
       <NoteOptionsTrigger event={event} />
     </div>
   )
 }
 
-function formatCount(count: number) {
+function RepostButton({ hasReposted = false, repostCount = 0 }) {
+  return (
+    <div
+      className={`flex gap-1 items-center text-muted-foreground ${hasReposted ? 'text-lime-500' : ''}`}
+    >
+      <Repeat size={14} />
+      <div className="text-xs">{formatCount(repostCount)}</div>
+    </div>
+  )
+}
+
+function LikeButton({
+  hasLiked = false,
+  reactionCount = 0
+}: {
+  hasLiked?: boolean
+  reactionCount?: number
+}) {
+  return (
+    <div
+      className={`flex gap-1 items-center text-muted-foreground ${hasLiked ? 'text-red-400' : ''}`}
+    >
+      <Heart size={14} className={hasLiked ? 'fill-red-400' : ''} />
+      <div className="text-xs">{formatCount(reactionCount)}</div>
+    </div>
+  )
+}
+
+function formatCount(count?: number) {
+  if (count === undefined || count <= 0) return ''
   return count >= 100 ? '99+' : count
 }

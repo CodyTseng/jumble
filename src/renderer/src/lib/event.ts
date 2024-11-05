@@ -14,6 +14,16 @@ export function isReplyNoteEvent(event: Event) {
   )
 }
 
+export function isReactionTo(reactionEvent: Event, targetId: string) {
+  return (
+    reactionEvent.kind === kinds.Reaction &&
+    reactionEvent.tags.some(
+      ([tagName, tagValue, , type]) =>
+        tagName === 'e' && tagValue === targetId && type === undefined
+    )
+  )
+}
+
 export function getParentEventId(event: Event) {
   return event.tags.find(([tagName, , , type]) => tagName === 'e' && type === 'reply')?.[1]
 }

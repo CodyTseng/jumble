@@ -1,13 +1,11 @@
 import { TRelayGroup } from '@common/types'
 
 export const EVENT_TYPES = {
-  RELAY_GROUPS_CHANGED: 'relay-groups-changed',
-  REPLY_COUNT_CHANGED: 'reply-count-changed'
+  RELAY_GROUPS_CHANGED: 'relay-groups-changed'
 } as const
 
 type TEventMap = {
   [EVENT_TYPES.RELAY_GROUPS_CHANGED]: TRelayGroup[]
-  [EVENT_TYPES.REPLY_COUNT_CHANGED]: { eventId: string; replyCount: number }
 }
 
 type TCustomEventMap = {
@@ -16,9 +14,6 @@ type TCustomEventMap = {
 
 export const createRelayGroupsChangedEvent = (relayGroups: TRelayGroup[]) => {
   return new CustomEvent(EVENT_TYPES.RELAY_GROUPS_CHANGED, { detail: relayGroups })
-}
-export const createReplyCountChangedEvent = (eventId: string, replyCount: number) => {
-  return new CustomEvent(EVENT_TYPES.REPLY_COUNT_CHANGED, { detail: { eventId, replyCount } })
 }
 
 class EventBus extends EventTarget {
