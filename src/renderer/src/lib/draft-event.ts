@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import { getEventCoordinate, isReplaceable } from './event'
 
+// https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event): TDraftEvent {
   const tags = event.tags.filter((tag) => tag.length >= 2 && ['e', 'p'].includes(tag[0]))
   tags.push(['e', event.id])
@@ -21,6 +22,7 @@ export function createReactionDraftEvent(event: Event): TDraftEvent {
   }
 }
 
+// https://github.com/nostr-protocol/nips/blob/master/18.md
 export function createRepostDraftEvent(event: Event): TDraftEvent {
   const tags = [
     ['e', event.id], // TODO: url
