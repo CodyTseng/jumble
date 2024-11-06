@@ -1,4 +1,5 @@
 import { Event, kinds } from 'nostr-tools'
+import { replyETag, rootETag, tagNameEquals } from './tag'
 
 export function isNsfwEvent(event: Event) {
   return event.tags.some(
@@ -8,26 +9,22 @@ export function isNsfwEvent(event: Event) {
 }
 
 export function isReplyNoteEvent(event: Event) {
-  return (
-    event.kind === kinds.ShortTextNote &&
-    event.tags.some(([tagName, , , type]) => tagName === 'e' && ['root', 'reply'].includes(type))
-  )
-}
-
-export function isReactionTo(reactionEvent: Event, targetId: string) {
-  return (
-    reactionEvent.kind === kinds.Reaction &&
-    reactionEvent.tags.some(
-      ([tagName, tagValue, , type]) =>
-        tagName === 'e' && tagValue === targetId && type === undefined
-    )
-  )
+  return event.kind === kinds.ShortTextNote && event.tags.some(tagNameEquals('e'))
 }
 
 export function getParentEventId(event: Event) {
-  return event.tags.find(([tagName, , , type]) => tagName === 'e' && type === 'reply')?.[1]
+  return event.tags.find(replyETag)?.[1]
 }
 
 export function getRootEventId(event: Event) {
-  return event.tags.find(([tagName, , , type]) => tagName === 'e' && type === 'root')?.[1]
+  return event.tags.find(rootETag)?.[1]
+}
+
+export function isReplaceable(kind: number) {
+  return kinds.isReplaceableKind(kind) || kinds.isParameterizedReplaceableKind(kind)
+}
+
+export function getEventCoordinate(event: Event) {
+  const d = event.tags.find(tagNameEquals('d'))?.[1]
+  return d ? `${event.kind}:${event.pubkey}:${d}` : `${event.kind}:${event.pubkey}`
 }

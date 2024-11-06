@@ -19,8 +19,8 @@ const buttonVariants = cva(
         titlebar: 'non-draggable hover:bg-accent hover:text-accent-foreground'
       },
       size: {
-        default: 'h-8 rounded-md px-2',
-        sm: 'h-8 rounded-md px-2',
+        default: 'h-8 rounded-lg px-2',
+        sm: 'h-8 rounded-lg px-2',
         lg: 'h-10 px-4 py-2',
         icon: 'h-8 w-8 rounded-full',
         titlebar: 'h-7 w-7 rounded-full'

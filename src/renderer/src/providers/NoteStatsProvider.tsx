@@ -1,7 +1,8 @@
+import { tagNameEquals } from '@renderer/lib/tag'
 import client from '@renderer/services/client.service'
+import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNostr } from './NostrProvider'
-import { Event, kinds } from 'nostr-tools'
 
 export type TNoteStats = {
   likeCount: number
@@ -14,6 +15,8 @@ export type TNoteStats = {
 type TNoteStatsContext = {
   noteStatsMap: Map<string, Partial<TNoteStats>>
   updateNoteReplyCount: (noteId: string, replyCount: number) => void
+  markNoteAsLiked: (noteId: string) => void
+  markNoteAsReposted: (noteId: string) => void
   fetchNoteLikeCount: (event: Event) => Promise<void>
   fetchNoteRepostCount: (event: Event) => Promise<void>
   fetchNoteLikedStatus: (event: Event) => Promise<void>
@@ -52,9 +55,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     })
     const countMap = new Map<string, number>()
     for (const e of events) {
-      const targetEventId = e.tags.find(
-        ([tagName, , , type]) => tagName === 'e' && type === undefined
-      )?.[1]
+      const targetEventId = e.tags.findLast(tagNameEquals('e'))?.[1]
       if (targetEventId) {
         countMap.set(targetEventId, (countMap.get(targetEventId) || 0) + 1)
       }
@@ -95,7 +96,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       kinds: [kinds.Reaction]
     })
     const likedEventIds = events
-      .map((e) => e.tags.find(([tagName, , , type]) => tagName === 'e' && type === undefined)?.[1])
+      .map((e) => e.tags.findLast(tagNameEquals('e'))?.[1])
       .filter(Boolean) as string[]
 
     setNoteStatsMap((prev) => {
@@ -142,6 +143,30 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  const markNoteAsLiked = (noteId: string) => {
+    setNoteStatsMap((prev) => {
+      const old = prev.get(noteId)
+      return new Map(prev).set(
+        noteId,
+        old
+          ? { ...old, hasLiked: true, likeCount: (old.likeCount ?? 0) + 1 }
+          : { hasLiked: true, likeCount: 1 }
+      )
+    })
+  }
+
+  const markNoteAsReposted = (noteId: string) => {
+    setNoteStatsMap((prev) => {
+      const old = prev.get(noteId)
+      return new Map(prev).set(
+        noteId,
+        old
+          ? { ...old, hasReposted: true, repostCount: (old.repostCount ?? 0) + 1 }
+          : { hasReposted: true, repostCount: 1 }
+      )
+    })
+  }
+
   return (
     <NoteStatsContext.Provider
       value={{
@@ -150,7 +175,9 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         fetchNoteLikedStatus,
         fetchNoteRepostCount,
         fetchNoteRepostedStatus,
-        updateNoteReplyCount
+        updateNoteReplyCount,
+        markNoteAsLiked,
+        markNoteAsReposted
       }}
     >
       {children}
