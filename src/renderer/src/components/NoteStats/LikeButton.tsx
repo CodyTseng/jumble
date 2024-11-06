@@ -44,6 +44,12 @@ export default function LikeButton({
     const timer = setTimeout(() => setLiking(false), 5000)
 
     try {
+      const [liked] = await Promise.all([
+        hasLiked === undefined ? fetchNoteLikedStatus(event) : hasLiked,
+        likeCount === undefined ? fetchNoteLikeCount(event) : likeCount
+      ])
+      if (liked) return
+
       const reaction = createReactionDraftEvent(event)
       await publish(reaction)
       markNoteAsLiked(event.id)

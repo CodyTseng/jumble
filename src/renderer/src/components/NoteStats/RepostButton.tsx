@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@renderer/components/ui/alert-dialog'
 import { createRepostDraftEvent } from '@renderer/lib/draft-event'
 import { cn } from '@renderer/lib/utils'
 import { useNostr } from '@renderer/providers/NostrProvider'
@@ -43,6 +54,12 @@ export default function RepostButton({
     const timer = setTimeout(() => setReposting(false), 5000)
 
     try {
+      const [reposted] = await Promise.all([
+        hasReposted === undefined ? fetchNoteRepostedStatus(event) : hasReposted,
+        repostCount === undefined ? fetchNoteRepostCount(event) : repostCount
+      ])
+      if (reposted) return
+
       const repost = createRepostDraftEvent(event)
       await publish(repost)
       markNoteAsReposted(event.id)
@@ -55,17 +72,33 @@ export default function RepostButton({
   }
 
   return (
-    <button
-      className={cn(
-        'flex gap-1 items-center enabled:hover:text-lime-500',
-        hasReposted ? 'text-lime-500' : 'text-muted-foreground'
-      )}
-      onClick={repost}
-      disabled={!canRepost}
-      title="repost"
-    >
-      <Repeat size={16} />
-      <div className="text-xs">{formatCount(repostCount)}</div>
-    </button>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          className={cn(
+            'flex gap-1 items-center enabled:hover:text-lime-500',
+            hasReposted ? 'text-lime-500' : 'text-muted-foreground'
+          )}
+          onClick={(e) => e.stopPropagation()}
+          disabled={!canRepost}
+          title="repost"
+        >
+          <Repeat size={16} />
+          <div className="text-xs">{formatCount(repostCount)}</div>
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Repost Note</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to repost this note?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={repost}>Repost</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

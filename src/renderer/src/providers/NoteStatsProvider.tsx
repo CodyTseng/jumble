@@ -17,10 +17,10 @@ type TNoteStatsContext = {
   updateNoteReplyCount: (noteId: string, replyCount: number) => void
   markNoteAsLiked: (noteId: string) => void
   markNoteAsReposted: (noteId: string) => void
-  fetchNoteLikeCount: (event: Event) => Promise<void>
-  fetchNoteRepostCount: (event: Event) => Promise<void>
-  fetchNoteLikedStatus: (event: Event) => Promise<void>
-  fetchNoteRepostedStatus: (event: Event) => Promise<void>
+  fetchNoteLikeCount: (event: Event) => Promise<number>
+  fetchNoteRepostCount: (event: Event) => Promise<number>
+  fetchNoteLikedStatus: (event: Event) => Promise<boolean>
+  fetchNoteRepostedStatus: (event: Event) => Promise<boolean>
 }
 
 const NoteStatsContext = createContext<TNoteStatsContext | undefined>(undefined)
@@ -68,6 +68,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       }
       return newMap
     })
+    return countMap.get(event.id) || 0
   }
 
   const fetchNoteRepostCount = async (event: Event) => {
@@ -85,10 +86,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       )
       return newMap
     })
+    return events.length
   }
 
   const fetchNoteLikedStatus = async (event: Event) => {
-    if (!pubkey) return
+    if (!pubkey) return false
 
     const events = await client.fetchEvents({
       '#e': [event.id],
@@ -111,10 +113,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       }
       return newMap
     })
+    return likedEventIds.includes(event.id)
   }
 
   const fetchNoteRepostedStatus = async (event: Event) => {
-    if (!pubkey) return
+    if (!pubkey) return false
 
     const events = await client.fetchEvents({
       '#e': [event.id],
@@ -129,6 +132,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       newMap.set(event.id, old ? { ...old, hasReposted } : { hasReposted })
       return newMap
     })
+    return events.length > 0
   }
 
   const updateNoteReplyCount = (noteId: string, replyCount: number) => {
