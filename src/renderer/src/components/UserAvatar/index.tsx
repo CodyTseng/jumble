@@ -3,7 +3,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/compone
 import { Skeleton } from '@renderer/components/ui/skeleton'
 import { useFetchProfile } from '@renderer/hooks'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
-import { toProfile } from '@renderer/lib/url'
+import { toProfile } from '@renderer/lib/link'
 import { cn } from '@renderer/lib/utils'
 import { SecondaryPageLink } from '@renderer/PageManager'
 import ProfileCard from '../ProfileCard'

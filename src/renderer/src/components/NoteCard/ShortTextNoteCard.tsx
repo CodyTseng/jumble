@@ -1,6 +1,6 @@
 import { Event } from 'nostr-tools'
 import { Card } from '@renderer/components/ui/card'
-import { toNote } from '@renderer/lib/url'
+import { toNote } from '@renderer/lib/link'
 import { useSecondaryPage } from '@renderer/PageManager'
 import Note from '../Note'
 import { useFetchEventById } from '@renderer/hooks'

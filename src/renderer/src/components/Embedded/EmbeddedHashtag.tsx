@@ -1,4 +1,4 @@
-import { toHashtag } from '@renderer/lib/url'
+import { toHashtag } from '@renderer/lib/link'
 import { SecondaryPageLink } from '@renderer/PageManager'
 
 export function EmbeddedHashtag({ hashtag }: { hashtag: string }) {

@@ -1,5 +1,5 @@
 import { useFetchEventById } from '@renderer/hooks'
-import { toNoStrudelNote } from '@renderer/lib/url'
+import { toNoStrudelNote } from '@renderer/lib/link'
 import { kinds } from 'nostr-tools'
 import ShortTextNoteCard from '../NoteCard/ShortTextNoteCard'
 

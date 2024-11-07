@@ -1,13 +1,17 @@
 import { TDraftEvent } from '@common/types'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
 import client from '@renderer/services/client.service'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 type TNostrContext = {
   pubkey: string | null
   canLogin: boolean
   login: (nsec: string) => Promise<string>
   logout: () => Promise<void>
-  publish: (draftEvent: TDraftEvent) => Promise<void>
+  /**
+   * Default publish the event to current relays, user's write relays and additional relays
+   */
+  publish: (draftEvent: TDraftEvent, additionalRelayUrls?: string[]) => Promise<void>
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -23,6 +27,7 @@ export const useNostr = () => {
 export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [pubkey, setPubkey] = useState<string | null>(null)
   const [canLogin, setCanLogin] = useState(false)
+  const relayList = useFetchRelayList(pubkey)
 
   useEffect(() => {
     window.api.nostr.getPublicKey().then((pubkey) => {
@@ -52,12 +57,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setPubkey(null)
   }
 
-  const publish = async (draftEvent: TDraftEvent) => {
+  const publish = async (draftEvent: TDraftEvent, additionalRelayUrls: string[] = []) => {
     const event = await window.api.nostr.signEvent(draftEvent)
     if (!event) {
       throw new Error('sign event failed')
     }
-    await client.publishEvent(event)
+    await client.publishEvent(relayList.write.concat(additionalRelayUrls), event)
   }
 
   return (

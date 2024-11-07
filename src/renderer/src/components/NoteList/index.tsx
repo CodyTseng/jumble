@@ -1,7 +1,6 @@
 import { Button } from '@renderer/components/ui/button'
 import { isReplyNoteEvent } from '@renderer/lib/event'
 import { cn } from '@renderer/lib/utils'
-import { useRelaySettings } from '@renderer/providers/RelaySettingsProvider'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
@@ -9,9 +8,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import NoteCard from '../NoteCard'
 
 export default function NoteList({
+  relayUrls,
   filter = {},
   className
 }: {
+  relayUrls: string[]
   filter?: Filter
   className?: string
 }) {
@@ -22,7 +23,6 @@ export default function NoteList({
   const [initialized, setInitialized] = useState(false)
   const observer = useRef<IntersectionObserver | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
-  const { relayUrls } = useRelaySettings()
   const noteFilter = useMemo(() => {
     return {
       kinds: [kinds.ShortTextNote, kinds.Repost],
@@ -87,7 +87,7 @@ export default function NoteList({
   }, [until, initialized])
 
   const loadMore = async () => {
-    const events = await client.fetchEvents({ ...noteFilter, until })
+    const events = await client.fetchEvents(relayUrls, { ...noteFilter, until })
     const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
     if (sortedEvents.length === 0) {
       setHasMore(false)

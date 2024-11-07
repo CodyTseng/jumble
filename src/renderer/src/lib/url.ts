@@ -1,7 +1,16 @@
-import { Event } from 'nostr-tools'
+export function isWebsocketUrl(url: string): boolean {
+  return /^wss?:\/\/.+$/.test(url)
+}
 
-export const toProfile = (pubkey: string) => ({ pageName: 'profile', props: { pubkey } })
-export const toNoStrudelProfile = (id: string) => `https://nostrudel.ninja/#/u/${id}`
-export const toNote = (event: Event) => ({ pageName: 'note', props: { event } })
-export const toNoStrudelNote = (id: string) => `https://nostrudel.ninja/#/n/${id}`
-export const toHashtag = (hashtag: string) => ({ pageName: 'hashtag', props: { hashtag } })
+// copy from nostr-tools/utils
+export function normalizeUrl(url: string): string {
+  if (url.indexOf('://') === -1) url = 'wss://' + url
+  const p = new URL(url)
+  p.pathname = p.pathname.replace(/\/+/g, '/')
+  if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
+  if ((p.port === '80' && p.protocol === 'ws:') || (p.port === '443' && p.protocol === 'wss:'))
+    p.port = ''
+  p.searchParams.sort()
+  p.hash = ''
+  return p.toString()
+}

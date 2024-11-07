@@ -13,6 +13,7 @@ import { createRepostDraftEvent } from '@renderer/lib/draft-event'
 import { cn } from '@renderer/lib/utils'
 import { useNostr } from '@renderer/providers/NostrProvider'
 import { useNoteStats } from '@renderer/providers/NoteStatsProvider'
+import client from '@renderer/services/client.service'
 import { Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
@@ -60,8 +61,9 @@ export default function RepostButton({
       ])
       if (reposted) return
 
+      const targetRelayList = await client.fetchRelayList(event.pubkey)
       const repost = createRepostDraftEvent(event)
-      await publish(repost)
+      await publish(repost, targetRelayList.read)
       markNoteAsReposted(event.id)
     } catch (error) {
       console.error('repost failed', error)

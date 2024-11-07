@@ -4,6 +4,7 @@ import ProfileAbout from '@renderer/components/ProfileAbout'
 import { Avatar, AvatarFallback, AvatarImage } from '@renderer/components/ui/avatar'
 import { Separator } from '@renderer/components/ui/separator'
 import { useFetchProfile } from '@renderer/hooks'
+import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { formatNpub, generateImageByPubkey } from '@renderer/lib/pubkey'
 import { Copy } from 'lucide-react'
@@ -12,6 +13,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 export default function ProfilePage({ pubkey }: { pubkey?: string }) {
   const { banner, username, nip05, about, avatar } = useFetchProfile(pubkey)
+  const relayList = useFetchRelayList(pubkey)
   const [copied, setCopied] = useState(false)
   const npub = useMemo(() => (pubkey ? nip19.npubEncode(pubkey) : undefined), [pubkey])
   const defaultImage = useMemo(() => (pubkey ? generateImageByPubkey(pubkey) : ''), [pubkey])
@@ -61,7 +63,7 @@ export default function ProfilePage({ pubkey }: { pubkey?: string }) {
         </div>
       </div>
       <Separator className="my-4" />
-      <NoteList key={pubkey} filter={{ authors: [pubkey] }} />
+      <NoteList key={pubkey} filter={{ authors: [pubkey] }} relayUrls={relayList.write} />
     </SecondaryPageLayout>
   )
 }

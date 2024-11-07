@@ -20,7 +20,8 @@ export default function ReplyNoteList({ event, className }: { event: Event; clas
 
   const loadMore = async () => {
     setLoading(true)
-    const events = await client.fetchEvents({
+    const relayList = await client.fetchRelayList(event.pubkey)
+    const events = await client.fetchEvents(relayList.read, {
       '#e': [event.id],
       kinds: [1],
       limit: 100,

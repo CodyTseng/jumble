@@ -48,7 +48,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   }, [pubkey])
 
   const fetchNoteLikeCount = async (event: Event) => {
-    const events = await client.fetchEvents({
+    const relayList = await client.fetchRelayList(event.pubkey)
+    const events = await client.fetchEvents(relayList.read, {
       '#e': [event.id],
       kinds: [kinds.Reaction],
       limit: 500
@@ -72,7 +73,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   }
 
   const fetchNoteRepostCount = async (event: Event) => {
-    const events = await client.fetchEvents({
+    const relayList = await client.fetchRelayList(event.pubkey)
+    const events = await client.fetchEvents(relayList.read, {
       '#e': [event.id],
       kinds: [kinds.Repost],
       limit: 100
@@ -92,7 +94,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const fetchNoteLikedStatus = async (event: Event) => {
     if (!pubkey) return false
 
-    const events = await client.fetchEvents({
+    const relayList = await client.fetchRelayList(pubkey)
+    const events = await client.fetchEvents(relayList.write, {
       '#e': [event.id],
       authors: [pubkey],
       kinds: [kinds.Reaction]
@@ -119,7 +122,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const fetchNoteRepostedStatus = async (event: Event) => {
     if (!pubkey) return false
 
-    const events = await client.fetchEvents({
+    const relayList = await client.fetchRelayList(pubkey)
+    const events = await client.fetchEvents(relayList.write, {
       '#e': [event.id],
       authors: [pubkey],
       kinds: [kinds.Repost]

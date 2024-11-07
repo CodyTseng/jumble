@@ -2,6 +2,7 @@ import { createReactionDraftEvent } from '@renderer/lib/draft-event'
 import { cn } from '@renderer/lib/utils'
 import { useNostr } from '@renderer/providers/NostrProvider'
 import { useNoteStats } from '@renderer/providers/NoteStatsProvider'
+import client from '@renderer/services/client.service'
 import { Heart } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
@@ -50,8 +51,9 @@ export default function LikeButton({
       ])
       if (liked) return
 
+      const targetRelayList = await client.fetchRelayList(event.pubkey)
       const reaction = createReactionDraftEvent(event)
-      await publish(reaction)
+      await publish(reaction, targetRelayList.read)
       markNoteAsLiked(event.id)
     } catch (error) {
       console.error('like failed', error)

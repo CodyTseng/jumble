@@ -1,5 +1,6 @@
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
+import { isWebsocketUrl, normalizeUrl } from '@renderer/lib/url'
 import { useRelaySettings } from '@renderer/providers/RelaySettingsProvider'
 import client from '@renderer/services/client.service'
 import { CircleX } from 'lucide-react'
@@ -43,11 +44,11 @@ export default function RelayUrls({ groupName }: { groupName: string }) {
 
   const saveNewRelayUrl = () => {
     if (newRelayUrl === '') return
-    const normalizedUrl = normalizeURL(newRelayUrl)
+    const normalizedUrl = normalizeUrl(newRelayUrl)
     if (relays.some(({ url }) => url === normalizedUrl)) {
       return setNewRelayUrlError('already exists')
     }
-    if (/^wss?:\/\/.+$/.test(normalizedUrl) === false) {
+    if (!isWebsocketUrl(normalizedUrl)) {
       return setNewRelayUrlError('invalid URL')
     }
     setRelays((pre) => [...pre, { url: normalizedUrl, isConnected: false }])
@@ -129,17 +130,4 @@ function RelayUrl({
       </div>
     </div>
   )
-}
-
-// copy from nostr-tools/utils
-function normalizeURL(url: string): string {
-  if (url.indexOf('://') === -1) url = 'wss://' + url
-  const p = new URL(url)
-  p.pathname = p.pathname.replace(/\/+/g, '/')
-  if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
-  if ((p.port === '80' && p.protocol === 'ws:') || (p.port === '443' && p.protocol === 'wss:'))
-    p.port = ''
-  p.searchParams.sort()
-  p.hash = ''
-  return p.toString()
 }

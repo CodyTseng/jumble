@@ -6,3 +6,8 @@ export type TProfile = {
   nip05?: string
   about?: string
 }
+
+export type TRelayList = {
+  write: string[]
+  read: string[]
+}
