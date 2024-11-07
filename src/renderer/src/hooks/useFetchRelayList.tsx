@@ -10,7 +10,6 @@ export function useFetchRelayList(pubkey?: string | null) {
       if (!pubkey) return
       try {
         const relayList = await client.fetchRelayList(pubkey)
-        console.log(pubkey, relayList)
         setRelayList(relayList)
       } catch (err) {
         console.error(err)
