@@ -30,6 +30,14 @@ export function getEventCoordinate(event: Event) {
   return d ? `${event.kind}:${event.pubkey}:${d}` : `${event.kind}:${event.pubkey}`
 }
 
+export function getSharableEventId(event: Event) {
+  if (isReplaceable(event.kind)) {
+    const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
+    return nip19.naddrEncode({ pubkey: event.pubkey, kind: event.kind, identifier })
+  }
+  return nip19.neventEncode({ id: event.id, author: event.pubkey, kind: event.kind })
+}
+
 export async function extractMentions(content: string, parentEvent?: Event) {
   const pubkeySet = new Set<string>()
   const eventIdSet = new Set<string>()
