@@ -63,7 +63,11 @@ export default function ProfilePage({ pubkey }: { pubkey?: string }) {
         </div>
       </div>
       <Separator className="my-4" />
-      <NoteList key={pubkey} filter={{ authors: [pubkey] }} relayUrls={relayList.write} />
+      <NoteList
+        key={pubkey}
+        filter={{ authors: [pubkey] }}
+        relayUrls={relayList.write.slice(0, 5)}
+      />
     </SecondaryPageLayout>
   )
 }

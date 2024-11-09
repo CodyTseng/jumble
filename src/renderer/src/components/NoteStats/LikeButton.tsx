@@ -53,7 +53,7 @@ export default function LikeButton({
 
       const targetRelayList = await client.fetchRelayList(event.pubkey)
       const reaction = createReactionDraftEvent(event)
-      await publish(reaction, targetRelayList.read)
+      await publish(reaction, targetRelayList.read.slice(0, 3))
       markNoteAsLiked(event.id)
     } catch (error) {
       console.error('like failed', error)

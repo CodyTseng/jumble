@@ -4,6 +4,7 @@ import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isMacOS } from '@renderer/lib/platform'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import AccountButton from './AccountButton'
+import PostButton from './PostButton'
 import RefreshButton from './RefreshButton'
 import RelaySettingsPopover from './RelaySettingsPopover'
 
@@ -47,11 +48,12 @@ export type TPrimaryPageLayoutRef = {
 export function PrimaryPageTitlebar({ content }: { content?: React.ReactNode }) {
   return (
     <Titlebar className={`justify-between ${isMacOS() ? 'pl-20' : ''}`}>
-      <div className="flex gap-1">
+      <div className="flex gap-2 items-center">
         <AccountButton />
+        <PostButton />
         {content}
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-2 items-center">
         <RefreshButton />
         <RelaySettingsPopover />
       </div>

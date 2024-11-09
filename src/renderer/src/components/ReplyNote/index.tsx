@@ -4,6 +4,7 @@ import Content from '../Content'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import LikeButton from '../NoteStats/LikeButton'
+import PostDialog from '../PostDialog'
 
 export default function ReplyNote({
   event,
@@ -22,15 +23,10 @@ export default function ReplyNote({
     >
       <UserAvatar userId={event.pubkey} size="small" className="shrink-0" />
       <div className="w-full overflow-hidden">
-        <div className="flex items-end gap-2">
-          <Username
-            userId={event.pubkey}
-            className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
-          />
-          <div className="text-xs text-muted-foreground shrink-0 -top-[1px] relative">
-            {formatTimestamp(event.created_at)}
-          </div>
-        </div>
+        <Username
+          userId={event.pubkey}
+          className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
+        />
         {parentEvent && (
           <div
             className="text-xs text-muted-foreground truncate hover:text-foreground cursor-pointer"
@@ -40,6 +36,12 @@ export default function ReplyNote({
           </div>
         )}
         <Content event={event} size="small" />
+        <div className="flex gap-2 text-xs">
+          <div className="text-muted-foreground/60">{formatTimestamp(event.created_at)}</div>
+          <PostDialog parentEvent={event}>
+            <div className="text-muted-foreground hover:text-primary cursor-pointer">reply</div>
+          </PostDialog>
+        </div>
       </div>
       <LikeButton event={event} variant="reply" />
     </div>
@@ -49,7 +51,7 @@ export default function ReplyNote({
 function ParentReplyNote({ event }: { event: Event }) {
   return (
     <div className="flex space-x-1 items-center text-xs rounded-lg w-fit px-2 bg-muted max-w-full">
-      <div>reply to</div>
+      <div className="shrink-0">reply to</div>
       <UserAvatar userId={event.pubkey} size="tiny" />
       <div className="truncate">{event.content}</div>
     </div>

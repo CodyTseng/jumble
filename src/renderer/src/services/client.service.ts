@@ -237,8 +237,8 @@ class ClientService {
         }
       })
       return {
-        write: relayList.write.slice(0, 3),
-        read: relayList.read.slice(0, 3)
+        write: relayList.write.slice(0, 10),
+        read: relayList.read.slice(0, 10)
       }
     })
   }

@@ -63,7 +63,7 @@ export default function RepostButton({
 
       const targetRelayList = await client.fetchRelayList(event.pubkey)
       const repost = createRepostDraftEvent(event)
-      await publish(repost, targetRelayList.read)
+      await publish(repost, targetRelayList.read.slice(0, 3))
       markNoteAsReposted(event.id)
     } catch (error) {
       console.error('repost failed', error)
@@ -97,7 +97,7 @@ export default function RepostButton({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={repost}>Repost</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -41,14 +41,13 @@ function ProfileButton({ pubkey }: { pubkey: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="relative non-draggable">
-        <Avatar className="w-6 h-6">
+      <DropdownMenuTrigger className="non-draggable">
+        <Avatar className="w-6 h-6 hover:opacity-90">
           <AvatarImage src={avatar} />
           <AvatarFallback>
             <img src={defaultAvatar} />
           </AvatarFallback>
         </Avatar>
-        <div className="absolute inset-0 hover:bg-black opacity-0 hover:opacity-20 transition-opacity rounded-full" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>Profile</DropdownMenuItem>

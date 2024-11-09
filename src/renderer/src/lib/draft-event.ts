@@ -1,7 +1,7 @@
 import { TDraftEvent } from '@common/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
-import { getEventCoordinate, isReplaceable } from './event'
+import { extractHashtags, extractMentions, getEventCoordinate, isReplaceable } from './event'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event): TDraftEvent {
@@ -32,6 +32,38 @@ export function createRepostDraftEvent(event: Event): TDraftEvent {
   return {
     kind: kinds.Repost,
     content: JSON.stringify(event),
+    tags,
+    created_at: dayjs().unix()
+  }
+}
+
+export async function createShortTextNoteDraftEvent(
+  content: string,
+  parentEvent?: Event
+): Promise<TDraftEvent> {
+  const { pubkeys, eventIds, rootEventId, parentEventId } = await extractMentions(
+    content,
+    parentEvent
+  )
+  const hashtags = extractHashtags(content)
+
+  const tags = pubkeys
+    .map((pubkey) => ['p', pubkey])
+    .concat(eventIds.map((eventId) => ['q', eventId])) // TODO: ["q", <event-id>, <relay-url>, <pubkey>]
+    .concat(hashtags.map((hashtag) => ['t', hashtag]))
+    .concat([['client', 'jumble']])
+
+  if (rootEventId) {
+    tags.push(['e', rootEventId, '', 'root'])
+  }
+
+  if (parentEventId) {
+    tags.push(['e', parentEventId, '', 'reply'])
+  }
+
+  return {
+    kind: kinds.ShortTextNote,
+    content,
     tags,
     created_at: dayjs().unix()
   }
