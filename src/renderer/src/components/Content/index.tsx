@@ -97,7 +97,7 @@ function preprocess(content: string) {
   })
 
   const embeddedNotes: string[] = []
-  const embeddedNoteRegex = /(nostr:note1[a-z0-9]{58}|nostr:nevent1[a-z0-9]+)/g
+  const embeddedNoteRegex = /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
   ;(c.match(embeddedNoteRegex) || []).forEach((note) => {
     c = c.replace(note, '').trim()
     embeddedNotes.push(note)
