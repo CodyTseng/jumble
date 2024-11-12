@@ -17,21 +17,8 @@ export class StorageService {
     )
   }
 
-  getRelayGroups(): TRelayGroup[] {
-    return (
-      this.storage.get('relayGroups') ?? [
-        {
-          groupName: 'Global',
-          relayUrls: [
-            'wss://relay.damus.io/',
-            'wss://nos.lol/',
-            'wss://nostr.mom/',
-            'wss://relay.primal.net/'
-          ],
-          isActive: true
-        }
-      ]
-    )
+  getRelayGroups(): TRelayGroup[] | null {
+    return this.storage.get('relayGroups') ?? null
   }
 
   setRelayGroups(relayGroups: TRelayGroup[]) {

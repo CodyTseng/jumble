@@ -24,10 +24,14 @@ const api = {
   },
   nostr: {
     login: (nsec: string) => ipcRenderer.invoke('nostr:login', nsec),
-    logout: () => ipcRenderer.invoke('nostr:logout'),
-    getPublicKey: () => ipcRenderer.invoke('nostr:getPublicKey'),
-    signEvent: (draftEvent: TDraftEvent) => ipcRenderer.invoke('nostr:signEvent', draftEvent)
+    logout: () => ipcRenderer.invoke('nostr:logout')
   }
+}
+
+// NIP-07
+const nostr = {
+  getPublicKey: () => ipcRenderer.invoke('nostr:getPublicKey'),
+  signEvent: (draftEvent: TDraftEvent) => ipcRenderer.invoke('nostr:signEvent', draftEvent)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -37,6 +41,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('nostr', nostr)
   } catch (error) {
     console.error(error)
   }
@@ -45,4 +50,6 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   // @ts-ignore (define in dts)
   window.api = api
+  // @ts-ignore (define in dts)
+  window.nostr = nostr
 }

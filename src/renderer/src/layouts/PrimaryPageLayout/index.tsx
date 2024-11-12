@@ -1,7 +1,7 @@
 import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
 import { Titlebar } from '@renderer/components/Titlebar'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { isMacOS } from '@renderer/lib/platform'
+import { isMacOS } from '@renderer/lib/env'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import AccountButton from './AccountButton'
 import PostButton from './PostButton'
@@ -26,11 +26,7 @@ const PrimaryPageLayout = forwardRef(
     )
 
     return (
-      <ScrollArea
-        ref={scrollAreaRef}
-        className="h-full"
-        scrollBarClassName={isMacOS() ? 'pt-9' : 'pt-4'}
-      >
+      <ScrollArea ref={scrollAreaRef} className="h-full" scrollBarClassName="pt-9">
         <PrimaryPageTitlebar content={titlebarContent} />
         <div className="px-4 pb-4 pt-11">{children}</div>
         <ScrollToTopButton scrollAreaRef={scrollAreaRef} />

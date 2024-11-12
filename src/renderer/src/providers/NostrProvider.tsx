@@ -1,5 +1,6 @@
 import { TDraftEvent } from '@common/types'
 import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
+import { isElectron } from '@renderer/lib/env'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
@@ -33,19 +34,24 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const relayList = useFetchRelayList(pubkey)
 
   useEffect(() => {
-    window.api.nostr.getPublicKey().then((pubkey) => {
+    window.nostr?.getPublicKey().then((pubkey) => {
       if (pubkey) {
         setPubkey(pubkey)
       }
     })
-    window.api.system.isEncryptionAvailable().then((isEncryptionAvailable) => {
-      setCanLogin(isEncryptionAvailable)
-    })
+    if (isElectron(window)) {
+      window.api?.system.isEncryptionAvailable().then((isEncryptionAvailable) => {
+        setCanLogin(isEncryptionAvailable)
+      })
+    }
   }, [])
 
   const login = async (nsec: string) => {
     if (!canLogin) {
       throw new Error('encryption is not available')
+    }
+    if (!isElectron(window)) {
+      throw new Error('login is not available')
     }
     const { pubkey, reason } = await window.api.nostr.login(nsec)
     if (!pubkey) {
@@ -56,12 +62,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    await window.api.nostr.logout()
+    if (isElectron(window)) {
+      await window.api.nostr.logout()
+    }
     setPubkey(null)
   }
 
   const publish = async (draftEvent: TDraftEvent, additionalRelayUrls: string[] = []) => {
-    const event = await window.api.nostr.signEvent(draftEvent)
+    const event = await window.nostr?.signEvent(draftEvent)
     if (!event) {
       throw new Error('sign event failed')
     }
@@ -70,7 +78,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signHttpAuth = async (url: string, method: string) => {
-    const event = await window.api.nostr.signEvent({
+    const event = await window.nostr?.signEvent({
       content: '',
       kind: kinds.HTTPAuth,
       created_at: dayjs().unix(),
