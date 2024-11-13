@@ -9,7 +9,7 @@ export function useFetchEventById(id?: string) {
     const fetchEvent = async () => {
       if (!id) return
 
-      let filter: Filter = {}
+      let filter: Filter | undefined
       if (/^[0-9a-f]{64}$/.test(id)) {
         filter = { ids: [id] }
       } else {
@@ -19,9 +19,7 @@ export function useFetchEventById(id?: string) {
             filter = { ids: [data] }
             break
           case 'nevent':
-            if (data.id) {
-              filter.ids = [data.id]
-            }
+            filter = { ids: [data.id] }
             break
           case 'naddr':
             filter = {
@@ -34,7 +32,6 @@ export function useFetchEventById(id?: string) {
             }
         }
       }
-
       if (!filter) return
 
       let event: Event | undefined

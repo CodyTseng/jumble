@@ -26,7 +26,7 @@ export default function ShortTextNoteCard({
       className={className}
       onClick={(e) => {
         e.stopPropagation()
-        push(toNote(event))
+        push(toNote(event.id))
       }}
     >
       <Card

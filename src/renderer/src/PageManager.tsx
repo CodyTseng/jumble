@@ -3,33 +3,26 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from '@renderer/components/ui/resizable'
-import { cloneElement, createContext, isValidElement, useContext, useState } from 'react'
-import BlankPage from './pages/secondary/BlankPage'
 import { cn } from '@renderer/lib/utils'
-
-type TRoute = {
-  pageName: string
-  element: React.ReactNode
-}
-
-type TPushParams = {
-  pageName: string
-  props: any
-}
+import { match } from 'path-to-regexp'
+import { cloneElement, createContext, isValidElement, useContext, useState } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { ROUTES } from './routes'
+import { IS_ELECTRON } from './lib/env'
+import BlankPage from './pages/secondary/BlankPage'
 
 type TPrimaryPageContext = {
   refresh: () => void
 }
 
 type TSecondaryPageContext = {
-  push: (params: TPushParams) => void
+  push: (url: string) => void
   pop: () => void
 }
 
 type TStackItem = {
   index: number
-  pageName: string
-  props: any
+  url: string
   component: React.ReactNode
 }
 
@@ -54,52 +47,61 @@ export function useSecondaryPage() {
 }
 
 export function PageManager({
-  routes,
   children,
   maxStackSize = 5
 }: {
-  routes: TRoute[]
   children: React.ReactNode
   maxStackSize?: number
 }) {
   const [primaryPageKey, setPrimaryPageKey] = useState<number>(0)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
+  const navigate = IS_ELECTRON ? () => {} : useNavigate()
 
-  const routeMap = routes.reduce((acc, route) => {
-    acc[route.pageName] = route.element
-    return acc
-  }, {}) as Record<string, React.ReactNode>
+  const routes = ROUTES.map(({ path, element }) => ({
+    path,
+    element: isValidElement(element) ? element : null,
+    matcher: match(path)
+  }))
 
-  const isCurrentPage = (stack: TStackItem[], { pageName, props }: TPushParams) => {
+  const isCurrentPage = (stack: TStackItem[], url: string) => {
     const currentPage = stack[stack.length - 1]
     if (!currentPage) return false
 
-    return (
-      currentPage.pageName === pageName &&
-      JSON.stringify(currentPage.props) === JSON.stringify(props) // TODO: deep compare
-    )
+    return currentPage.url === url
   }
 
   const refreshPrimary = () => setPrimaryPageKey((prevKey) => prevKey + 1)
 
-  const pushSecondary = ({ pageName, props }: TPushParams) => {
-    if (isCurrentPage(secondaryStack, { pageName, props })) return
+  const pushSecondary = (url: string) => {
+    if (!IS_ELECTRON) {
+      return navigate(url)
+    }
 
-    const element = routeMap[pageName]
-    if (!element) return
-    if (!isValidElement(element)) return
+    if (isCurrentPage(secondaryStack, url)) return
 
-    setSecondaryStack((prevStack) => {
-      const currentStack = prevStack[prevStack.length - 1]
-      const index = currentStack ? currentStack.index + 1 : 0
-      const component = cloneElement(element, props)
-      const newStack = [...prevStack, { index, pageName, props, component }]
-      if (newStack.length > maxStackSize) newStack.shift()
-      return newStack
-    })
+    for (const { matcher, element } of routes) {
+      const match = matcher(url)
+      if (!match) continue
+
+      if (!element) return
+      const component = cloneElement(element, match.params)
+      setSecondaryStack((prevStack) => {
+        const currentStack = prevStack[prevStack.length - 1]
+        const index = currentStack ? currentStack.index + 1 : 0
+        const newStack = [...prevStack, { index, url, component }]
+        if (newStack.length > maxStackSize) newStack.shift()
+        return newStack
+      })
+    }
   }
 
-  const popSecondary = () => setSecondaryStack((prevStack) => prevStack.slice(0, -1))
+  const popSecondary = () => {
+    if (IS_ELECTRON) {
+      setSecondaryStack((prevStack) => prevStack.slice(0, -1))
+    } else {
+      navigate(-1)
+    }
+  }
 
   return (
     <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
@@ -112,18 +114,22 @@ export function PageManager({
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel defaultSize={45} minSize={30} className="relative">
-            {secondaryStack.length ? (
-              secondaryStack.map((item, index) => (
-                <div
-                  key={item.index}
-                  className="absolute top-0 left-0 w-full h-full bg-background"
-                  style={{ zIndex: index }}
-                >
-                  {item.component}
-                </div>
-              ))
+            {IS_ELECTRON ? (
+              secondaryStack.length ? (
+                secondaryStack.map((item, index) => (
+                  <div
+                    key={item.index}
+                    className="absolute top-0 left-0 w-full h-full bg-background"
+                    style={{ zIndex: index }}
+                  >
+                    {item.component}
+                  </div>
+                ))
+              ) : (
+                <BlankPage />
+              )
             ) : (
-              <BlankPage />
+              <Outlet />
             )}
           </ResizablePanel>
         </ResizablePanelGroup>
@@ -138,7 +144,7 @@ export function SecondaryPageLink({
   className,
   onClick
 }: {
-  to: TPushParams
+  to: string
   children: React.ReactNode
   className?: string
   onClick?: (e: React.MouseEvent) => void

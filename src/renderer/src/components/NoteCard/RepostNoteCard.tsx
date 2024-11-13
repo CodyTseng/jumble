@@ -1,3 +1,4 @@
+import client from '@renderer/services/client.service'
 import { Repeat2 } from 'lucide-react'
 import { Event, kinds, verifyEvent } from 'nostr-tools'
 import Username from '../Username'
@@ -8,6 +9,8 @@ export default function RepostNoteCard({ event, className }: { event: Event; cla
   if (!targetEvent || !verifyEvent(targetEvent) || targetEvent.kind !== kinds.ShortTextNote) {
     return null
   }
+
+  client.addEventToCache(targetEvent)
 
   return (
     <div className={className}>

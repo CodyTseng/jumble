@@ -7,3 +7,5 @@ export function isElectron(w: any): w is TElectronWindow {
 export function isMacOS() {
   return isElectron(window) && window.electron.process.platform === 'darwin'
 }
+
+export const IS_ELECTRON = isElectron(window)

@@ -23,7 +23,7 @@ class ClientService {
   private relayUrls: string[] = BIG_RELAY_URLS
   private initPromise!: Promise<void>
 
-  private eventCache = new LRUCache<string, Promise<NEvent | undefined>>({
+  private eventByFilterCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     fetchMethod: async (filterStr) => {
       const events = await this.fetchEvents(
@@ -33,11 +33,10 @@ class ClientService {
       return events.sort((a, b) => b.created_at - a.created_at)[0]
     }
   })
+  private eventByIdCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private eventDataloader = new DataLoader<string, NEvent | undefined>(
     this.eventBatchLoadFn.bind(this),
-    {
-      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
-    }
+    { cacheMap: this.eventByIdCache }
   )
   private profileDataloader = new DataLoader<string, TProfile | undefined>(
     this.profileBatchLoadFn.bind(this),
@@ -126,11 +125,15 @@ class ClientService {
   }
 
   async fetchEventByFilter(filter: Filter) {
-    return this.eventCache.fetch(JSON.stringify({ ...filter, limit: 1 }))
+    return this.eventByFilterCache.fetch(JSON.stringify({ ...filter, limit: 1 }))
   }
 
   async fetchEventById(id: string): Promise<NEvent | undefined> {
     return this.eventDataloader.load(id)
+  }
+
+  addEventToCache(event: NEvent) {
+    this.eventByIdCache.set(event.id, Promise.resolve(event))
   }
 
   async fetchProfile(pubkey: string): Promise<TProfile | undefined> {

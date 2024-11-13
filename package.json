@@ -24,7 +24,8 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win -p never",
     "build:mac": "electron-vite build && electron-builder --mac -p never",
-    "build:linux": "electron-vite build && electron-builder --linux -p never"
+    "build:linux": "electron-vite build && electron-builder --linux -p never",
+    "build:web": "vite build --config web.vite.config.ts"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -48,6 +49,7 @@
     "lru-cache": "^11.0.1",
     "lucide-react": "^0.453.0",
     "nostr-tools": "^2.9.1",
+    "path-to-regexp": "^8.2.0",
     "qrcode.react": "^4.1.0",
     "react-resizable-panels": "^2.1.5",
     "react-router-dom": "^6.28.0",

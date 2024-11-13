@@ -47,7 +47,7 @@ export default function Note({
           className="mt-2"
           onClick={(e) => {
             e.stopPropagation()
-            push(toNote(parentEvent))
+            push(toNote(parentEvent.id))
           }}
         />
       )}

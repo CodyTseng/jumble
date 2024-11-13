@@ -1,11 +1,7 @@
-import { Event } from 'nostr-tools'
+export const toProfile = (pubkey: string) => `user/${pubkey}`
+export const toNote = (eventId: string) => `note/${eventId}`
+export const toHashtag = (hashtag: string) => `hashtag/${hashtag}`
+export const toFollowingList = (pubkey: string) => `user/${pubkey}/following`
 
-export const toProfile = (pubkey: string) => ({ pageName: 'profile', props: { pubkey } })
 export const toNoStrudelProfile = (id: string) => `https://nostrudel.ninja/#/u/${id}`
-export const toNote = (event: Event) => ({ pageName: 'note', props: { event } })
 export const toNoStrudelNote = (id: string) => `https://nostrudel.ninja/#/n/${id}`
-export const toHashtag = (hashtag: string) => ({ pageName: 'hashtag', props: { hashtag } })
-export const toFollowingList = (pubkey: string) => ({
-  pageName: 'followingList',
-  props: { pubkey }
-})
