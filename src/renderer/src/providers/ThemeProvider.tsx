@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react'
 import { TTheme, TThemeSetting } from '@common/types'
+import { isElectron } from '@renderer/lib/env'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -25,7 +26,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   useEffect(() => {
     const init = async () => {
       // electron
-      if (window.api) {
+      if (isElectron(window)) {
         const [themeSetting, theme] = await Promise.all([
           window.api.theme.themeSetting(),
           window.api.theme.current()
@@ -53,7 +54,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   }, [])
 
   useEffect(() => {
-    if (themeSetting !== 'system' || window.api) return
+    if (themeSetting !== 'system' || isElectron(window)) return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = (e: MediaQueryListEvent) => {
@@ -80,7 +81,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const value = {
     themeSetting: themeSetting,
     setThemeSetting: async (themeSetting: TThemeSetting) => {
-      if (window.api) {
+      if (isElectron(window)) {
         await window.api.theme.set(themeSetting)
       } else {
         localStorage.setItem('themeSetting', themeSetting)

@@ -50,6 +50,7 @@
     "nostr-tools": "^2.9.1",
     "qrcode.react": "^4.1.0",
     "react-resizable-panels": "^2.1.5",
+    "react-router-dom": "^6.28.0",
     "react-string-replace": "^1.1.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
