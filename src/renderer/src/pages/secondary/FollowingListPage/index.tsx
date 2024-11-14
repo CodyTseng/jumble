@@ -4,11 +4,9 @@ import UserAvatar from '@renderer/components/UserAvatar'
 import Username from '@renderer/components/Username'
 import { useFetchFollowings, useFetchProfile } from '@renderer/hooks'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
-import { getParams } from '@renderer/lib/utils'
 import { useEffect, useRef, useState } from 'react'
 
-export default function FollowingListPage(props) {
-  const { pubkey } = getParams<{ pubkey: string }>(props)
+export default function FollowingListPage({ pubkey }: { pubkey?: string }) {
   const { username } = useFetchProfile(pubkey)
   const { followings } = useFetchFollowings(pubkey)
   const [visibleFollowings, setVisibleFollowings] = useState<string[]>([])

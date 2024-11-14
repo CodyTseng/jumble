@@ -9,11 +9,9 @@ import { useFetchEventById } from '@renderer/hooks'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId } from '@renderer/lib/event'
 import { toNote } from '@renderer/lib/link'
-import { getParams } from '@renderer/lib/utils'
 import { useMemo } from 'react'
 
-export default function NotePage(props) {
-  const { eventId } = getParams<{ eventId: string }>(props)
+export default function NotePage({ eventId }: { eventId?: string }) {
   const event = useFetchEventById(eventId)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
   const rootEventId = useMemo(() => getRootEventId(event), [event])

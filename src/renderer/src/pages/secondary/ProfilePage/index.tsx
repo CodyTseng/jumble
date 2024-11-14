@@ -10,7 +10,6 @@ import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { toFollowingList } from '@renderer/lib/link'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
-import { getParams } from '@renderer/lib/utils'
 import { SecondaryPageLink } from '@renderer/PageManager'
 import { useFollowList } from '@renderer/providers/FollowListProvider'
 import { useNostr } from '@renderer/providers/NostrProvider'
@@ -18,8 +17,7 @@ import { useMemo } from 'react'
 import PubkeyCopy from './PubkeyCopy'
 import QrCodePopover from './QrCodePopover'
 
-export default function ProfilePage(props) {
-  const { pubkey } = getParams<{ pubkey: string }>(props)
+export default function ProfilePage({ pubkey }: { pubkey?: string }) {
   const { banner, username, nip05, about, avatar } = useFetchProfile(pubkey)
   const relayList = useFetchRelayList(pubkey)
   const { pubkey: accountPubkey } = useNostr()

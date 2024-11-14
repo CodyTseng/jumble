@@ -30,6 +30,7 @@ class ClientService {
         BIG_RELAY_URLS.concat(this.relayUrls),
         JSON.parse(filterStr)
       )
+      events.forEach((event) => this.addEventToCache(event))
       return events.sort((a, b) => b.created_at - a.created_at)[0]
     }
   })

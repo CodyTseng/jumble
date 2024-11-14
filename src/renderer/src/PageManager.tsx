@@ -7,10 +7,7 @@ import {
 import { cn } from '@renderer/lib/utils'
 import BlankPage from '@renderer/pages/secondary/BlankPage'
 import { match } from 'path-to-regexp'
-import { cloneElement, createContext, isValidElement, useContext, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-import { IS_ELECTRON } from './lib/env'
-import { ROUTES } from './routes'
+import { cloneElement, createContext, isValidElement, useContext, useMemo, useState } from 'react'
 
 type TPrimaryPageContext = {
   refresh: () => void
@@ -49,20 +46,24 @@ export function useSecondaryPage() {
 
 export function PageManager({
   children,
+  routes,
   maxStackSize = 5
 }: {
   children: React.ReactNode
+  routes: { path: string; element: React.ReactNode }[]
   maxStackSize?: number
 }) {
   const [primaryPageKey, setPrimaryPageKey] = useState<number>(0)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
-  const navigate = IS_ELECTRON ? () => {} : useNavigate()
-
-  const routes = ROUTES.map(({ path, element }) => ({
-    path,
-    element: isValidElement(element) ? element : null,
-    matcher: match(path)
-  }))
+  const processedRoutes = useMemo(
+    () =>
+      routes.map(({ path, element }) => ({
+        path,
+        element: isValidElement(element) ? element : null,
+        matcher: match(path)
+      })),
+    []
+  )
 
   const isCurrentPage = (stack: TStackItem[], url: string) => {
     const currentPage = stack[stack.length - 1]
@@ -74,13 +75,9 @@ export function PageManager({
   const refreshPrimary = () => setPrimaryPageKey((prevKey) => prevKey + 1)
 
   const pushSecondary = (url: string) => {
-    if (!IS_ELECTRON) {
-      return navigate(url)
-    }
-
     if (isCurrentPage(secondaryStack, url)) return
 
-    for (const { matcher, element } of routes) {
+    for (const { matcher, element } of processedRoutes) {
       const match = matcher(url)
       if (!match) continue
 
@@ -97,11 +94,7 @@ export function PageManager({
   }
 
   const popSecondary = () => {
-    if (IS_ELECTRON) {
-      setSecondaryStack((prevStack) => prevStack.slice(0, -1))
-    } else {
-      navigate(-1)
-    }
+    setSecondaryStack((prevStack) => prevStack.slice(0, -1))
   }
 
   return (
@@ -117,22 +110,18 @@ export function PageManager({
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={45} minSize={30} className="relative">
-              {IS_ELECTRON ? (
-                secondaryStack.length ? (
-                  secondaryStack.map((item, index) => (
-                    <div
-                      key={item.index}
-                      className="absolute top-0 left-0 w-full h-full bg-background"
-                      style={{ zIndex: index }}
-                    >
-                      {item.component}
-                    </div>
-                  ))
-                ) : (
-                  <BlankPage />
-                )
+              {secondaryStack.length ? (
+                secondaryStack.map((item, index) => (
+                  <div
+                    key={item.index}
+                    className="absolute top-0 left-0 w-full h-full bg-background"
+                    style={{ zIndex: index }}
+                  >
+                    {item.component}
+                  </div>
+                ))
               ) : (
-                <Outlet />
+                <BlankPage />
               )}
             </ResizablePanel>
           </ResizablePanelGroup>
