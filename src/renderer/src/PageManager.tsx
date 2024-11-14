@@ -6,8 +6,8 @@ import {
 } from '@renderer/components/ui/resizable'
 import { cn } from '@renderer/lib/utils'
 import BlankPage from '@renderer/pages/secondary/BlankPage'
-import { match } from 'path-to-regexp'
-import { cloneElement, createContext, isValidElement, useContext, useMemo, useState } from 'react'
+import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
+import { routes } from './routes'
 
 type TPrimaryPageContext = {
   refresh: () => void
@@ -21,7 +21,7 @@ type TSecondaryPageContext = {
 type TStackItem = {
   index: number
   url: string
-  component: React.ReactNode
+  component: React.ReactNode | null
 }
 
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)
@@ -46,55 +46,64 @@ export function useSecondaryPage() {
 
 export function PageManager({
   children,
-  routes,
   maxStackSize = 5
 }: {
   children: React.ReactNode
-  routes: { path: string; element: React.ReactNode }[]
   maxStackSize?: number
 }) {
   const [primaryPageKey, setPrimaryPageKey] = useState<number>(0)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
-  const processedRoutes = useMemo(
-    () =>
-      routes.map(({ path, element }) => ({
-        path,
-        element: isValidElement(element) ? element : null,
-        matcher: match(path)
-      })),
-    []
-  )
 
-  const isCurrentPage = (stack: TStackItem[], url: string) => {
-    const currentPage = stack[stack.length - 1]
-    if (!currentPage) return false
+  useEffect(() => {
+    const url = window.location.pathname
+    if (url !== '/') {
+      pushSecondary(url)
+    }
 
-    return currentPage.url === url
-  }
+    const onPopState = (e: PopStateEvent) => {
+      const state = e.state ?? { index: -1, url: '/' }
+      setSecondaryStack((pre) => {
+        const currentItem = pre[pre.length - 1]
+        const currentIndex = currentItem ? currentItem.index : -1
+        if (state.index === currentIndex) {
+          return pre
+        }
+        if (state.index < currentIndex) {
+          const newStack = pre.filter((item) => item.index <= state.index)
+          const topItem = newStack[newStack.length - 1]
+          if (topItem && !topItem.component) {
+            topItem.component = findAndCreateComponent(topItem.url)
+          }
+          return newStack
+        }
+
+        const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
+        return newStack
+      })
+    }
+
+    window.addEventListener('popstate', onPopState)
+    return () => {
+      window.removeEventListener('popstate', onPopState)
+    }
+  }, [])
 
   const refreshPrimary = () => setPrimaryPageKey((prevKey) => prevKey + 1)
 
   const pushSecondary = (url: string) => {
-    if (isCurrentPage(secondaryStack, url)) return
+    setSecondaryStack((prevStack) => {
+      if (isCurrentPage(prevStack, url)) return prevStack
 
-    for (const { matcher, element } of processedRoutes) {
-      const match = matcher(url)
-      if (!match) continue
-
-      if (!element) return
-      const component = cloneElement(element, match.params)
-      setSecondaryStack((prevStack) => {
-        const currentStack = prevStack[prevStack.length - 1]
-        const index = currentStack ? currentStack.index + 1 : 0
-        const newStack = [...prevStack, { index, url, component }]
-        if (newStack.length > maxStackSize) newStack.shift()
-        return newStack
-      })
-    }
+      const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize)
+      if (newItem) {
+        window.history.pushState({ index: newItem.index, url }, '', url)
+      }
+      return newStack
+    })
   }
 
   const popSecondary = () => {
-    setSecondaryStack((prevStack) => prevStack.slice(0, -1))
+    window.history.back()
   }
 
   return (
@@ -155,4 +164,36 @@ export function SecondaryPageLink({
       {children}
     </span>
   )
+}
+
+function isCurrentPage(stack: TStackItem[], url: string) {
+  const currentPage = stack[stack.length - 1]
+  if (!currentPage) return false
+
+  return currentPage.url === url
+}
+
+function findAndCreateComponent(url: string) {
+  for (const { matcher, element } of routes) {
+    const match = matcher(url)
+    if (!match) continue
+
+    if (!element) return null
+    return cloneElement(element, match.params)
+  }
+  return null
+}
+
+function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) {
+  const component = findAndCreateComponent(url)
+  if (!component) return { newStack: stack }
+
+  const currentStack = stack[stack.length - 1]
+  const newItem = { component, url, index: currentStack ? currentStack.index + 1 : 0 }
+  const newStack = [...stack, newItem]
+  const lastCachedIndex = newStack.findIndex((stack) => stack.component)
+  if (newStack.length - lastCachedIndex > maxStackSize) {
+    newStack[lastCachedIndex].component = null
+  }
+  return { newStack, newItem }
 }
