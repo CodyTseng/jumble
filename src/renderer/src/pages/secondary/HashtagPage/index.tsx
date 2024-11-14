@@ -2,20 +2,16 @@ import NoteList from '@renderer/components/NoteList'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { useRelaySettings } from '@renderer/providers/RelaySettingsProvider'
 
-export default function HashtagPage({ hashtag }: { hashtag?: string }) {
+export default function HashtagPage({ id }: { id?: string }) {
   const { relayUrls } = useRelaySettings()
-  if (!hashtag) {
+  if (!id) {
     return null
   }
-  const normalizedHashtag = hashtag.toLowerCase()
+  const hashtag = id.toLowerCase()
 
   return (
-    <SecondaryPageLayout titlebarContent={`# ${normalizedHashtag}`}>
-      <NoteList
-        key={normalizedHashtag}
-        filter={{ '#t': [normalizedHashtag] }}
-        relayUrls={relayUrls}
-      />
+    <SecondaryPageLayout titlebarContent={`# ${hashtag}`}>
+      <NoteList key={hashtag} filter={{ '#t': [hashtag] }} relayUrls={relayUrls} />
     </SecondaryPageLayout>
   )
 }

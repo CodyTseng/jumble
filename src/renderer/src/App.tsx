@@ -15,10 +15,10 @@ import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { RelaySettingsProvider } from './providers/RelaySettingsProvider'
 
 export const routes = [
-  { path: 'note/:eventId', element: <NotePage /> },
-  { path: 'user/:pubkey', element: <ProfilePage /> },
-  { path: 'user/:pubkey/following', element: <FollowingListPage /> },
-  { path: 'hashtag/:hashtag', element: <HashtagPage /> }
+  { path: '/note/:id', element: <NotePage /> },
+  { path: '/user/:id', element: <ProfilePage /> },
+  { path: '/user/:id/following', element: <FollowingListPage /> },
+  { path: '/hashtag/:id', element: <HashtagPage /> }
 ]
 
 export default function App(): JSX.Element {

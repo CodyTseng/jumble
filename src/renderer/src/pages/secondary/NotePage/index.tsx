@@ -11,8 +11,8 @@ import { getParentEventId, getRootEventId } from '@renderer/lib/event'
 import { toNote } from '@renderer/lib/link'
 import { useMemo } from 'react'
 
-export default function NotePage({ eventId }: { eventId?: string }) {
-  const event = useFetchEventById(eventId)
+export default function NotePage({ id }: { id?: string }) {
+  const event = useFetchEventById(id)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
   const rootEventId = useMemo(() => getRootEventId(event), [event])
   if (!event) return null

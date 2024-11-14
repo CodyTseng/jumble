@@ -6,8 +6,8 @@ import { useFetchFollowings, useFetchProfile } from '@renderer/hooks'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { useEffect, useRef, useState } from 'react'
 
-export default function FollowingListPage({ pubkey }: { pubkey?: string }) {
-  const { username } = useFetchProfile(pubkey)
+export default function FollowingListPage({ id }: { id?: string }) {
+  const { username, pubkey } = useFetchProfile(id)
   const { followings } = useFetchFollowings(pubkey)
   const [visibleFollowings, setVisibleFollowings] = useState<string[]>([])
   const observer = useRef<IntersectionObserver | null>(null)

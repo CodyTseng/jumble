@@ -17,8 +17,8 @@ import { useMemo } from 'react'
 import PubkeyCopy from './PubkeyCopy'
 import QrCodePopover from './QrCodePopover'
 
-export default function ProfilePage({ pubkey }: { pubkey?: string }) {
-  const { banner, username, nip05, about, avatar } = useFetchProfile(pubkey)
+export default function ProfilePage({ id }: { id?: string }) {
+  const { banner, username, nip05, about, avatar, pubkey } = useFetchProfile(id)
   const relayList = useFetchRelayList(pubkey)
   const { pubkey: accountPubkey } = useNostr()
   const { followings: selfFollowings } = useFollowList()
