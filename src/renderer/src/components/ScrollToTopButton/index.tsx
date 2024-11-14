@@ -30,7 +30,7 @@ export default function ScrollToTopButton({
   return (
     <Button
       variant="secondary-2"
-      className={`absolute bottom-4 right-2 rounded-full w-10 h-10 p-0 hover:text-background transition-transform ${showScrollToTop ? '' : 'translate-y-14'}`}
+      className={`absolute bottom-8 right-2 rounded-full w-10 h-10 p-0 hover:text-background transition-transform ${showScrollToTop ? '' : 'translate-y-20'}`}
       onClick={handleScrollToTop}
     >
       <ChevronUp />

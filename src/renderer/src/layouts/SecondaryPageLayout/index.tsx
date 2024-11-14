@@ -1,9 +1,9 @@
+import BackButton from '@renderer/components/BackButton'
 import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
+import ThemeToggle from '@renderer/components/ThemeToggle'
+import { Titlebar } from '@renderer/components/Titlebar'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRef } from 'react'
-import { Titlebar } from '../../components/Titlebar'
-import BackButton from './BackButton'
-import ThemeToggle from './ThemeToggle'
 
 export default function SecondaryPageLayout({
   children,

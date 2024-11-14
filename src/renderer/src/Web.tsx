@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './App'
-import { ROUTES } from './routes'
 import BlankPage from './pages/secondary/BlankPage'
+import { ROUTES } from './routes'
 
 const router = createBrowserRouter([
   {

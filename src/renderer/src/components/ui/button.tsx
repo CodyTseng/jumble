@@ -16,14 +16,16 @@ const buttonVariants = cva(
         'secondary-2': 'bg-secondary text-secondary-foreground hover:bg-highlight',
         ghost: 'text-muted-foreground hover:bg-accent hover:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        titlebar: 'non-draggable hover:bg-accent hover:text-accent-foreground'
+        titlebar: 'non-draggable hover:bg-accent hover:text-accent-foreground',
+        sidebar: 'non-draggable hover:bg-accent hover:text-accent-foreground'
       },
       size: {
         default: 'h-8 rounded-lg px-3',
         sm: 'h-8 rounded-lg px-2',
         lg: 'h-10 px-4 py-2',
         icon: 'h-8 w-8 rounded-full',
-        titlebar: 'h-7 w-7 rounded-full'
+        titlebar: 'h-7 w-7 rounded-full',
+        sidebar: 'w-full flex py-2 px-4 rounded-full justify-start gap-4 text-lg font-semibold'
       }
     },
     defaultVariants: {

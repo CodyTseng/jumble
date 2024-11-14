@@ -1,15 +1,16 @@
+import Sidebar from '@renderer/components/Sidebar'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup
 } from '@renderer/components/ui/resizable'
 import { cn } from '@renderer/lib/utils'
+import BlankPage from '@renderer/pages/secondary/BlankPage'
 import { match } from 'path-to-regexp'
 import { cloneElement, createContext, isValidElement, useContext, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { ROUTES } from './routes'
 import { IS_ELECTRON } from './lib/env'
-import BlankPage from './pages/secondary/BlankPage'
+import { ROUTES } from './routes'
 
 type TPrimaryPageContext = {
   refresh: () => void
@@ -106,33 +107,36 @@ export function PageManager({
   return (
     <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
       <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={55} minSize={30}>
-            <div key={primaryPageKey} className="h-full">
-              {children}
-            </div>
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel defaultSize={45} minSize={30} className="relative">
-            {IS_ELECTRON ? (
-              secondaryStack.length ? (
-                secondaryStack.map((item, index) => (
-                  <div
-                    key={item.index}
-                    className="absolute top-0 left-0 w-full h-full bg-background"
-                    style={{ zIndex: index }}
-                  >
-                    {item.component}
-                  </div>
-                ))
+        <div className="flex h-full">
+          <Sidebar />
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={55} minSize={30}>
+              <div key={primaryPageKey} className="h-full">
+                {children}
+              </div>
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={45} minSize={30} className="relative">
+              {IS_ELECTRON ? (
+                secondaryStack.length ? (
+                  secondaryStack.map((item, index) => (
+                    <div
+                      key={item.index}
+                      className="absolute top-0 left-0 w-full h-full bg-background"
+                      style={{ zIndex: index }}
+                    >
+                      {item.component}
+                    </div>
+                  ))
+                ) : (
+                  <BlankPage />
+                )
               ) : (
-                <BlankPage />
-              )
-            ) : (
-              <Outlet />
-            )}
-          </ResizablePanel>
-        </ResizablePanelGroup>
+                <Outlet />
+              )}
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
       </SecondaryPageContext.Provider>
     </PrimaryPageContext.Provider>
   )

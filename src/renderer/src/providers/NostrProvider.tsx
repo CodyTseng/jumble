@@ -1,6 +1,6 @@
 import { TDraftEvent } from '@common/types'
 import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
-import { isElectron } from '@renderer/lib/env'
+import { IS_ELECTRON, isElectron } from '@renderer/lib/env'
 import client from '@renderer/services/client.service'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
@@ -11,6 +11,7 @@ type TNostrContext = {
   canLogin: boolean
   login: (nsec: string) => Promise<string>
   logout: () => Promise<void>
+  nip07Login: () => Promise<string>
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
@@ -43,6 +44,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       window.api?.system.isEncryptionAvailable().then((isEncryptionAvailable) => {
         setCanLogin(isEncryptionAvailable)
       })
+    } else {
+      setCanLogin(!!window.nostr)
     }
   }, [])
 
@@ -56,6 +59,25 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const { pubkey, reason } = await window.api.nostr.login(nsec)
     if (!pubkey) {
       throw new Error(reason ?? 'invalid nsec')
+    }
+    setPubkey(pubkey)
+    return pubkey
+  }
+
+  const nip07Login = async () => {
+    if (IS_ELECTRON) {
+      throw new Error('electron app should not use nip07 login')
+    }
+
+    if (!window.nostr) {
+      throw new Error(
+        'You need to install a nostr signer extension to login. Such as Alby or nos2x'
+      )
+    }
+
+    const pubkey = await window.nostr.getPublicKey()
+    if (!pubkey) {
+      throw new Error('You did not allow to access your pubkey')
     }
     setPubkey(pubkey)
     return pubkey
@@ -94,7 +116,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <NostrContext.Provider value={{ pubkey, canLogin, login, logout, publish, signHttpAuth }}>
+    <NostrContext.Provider
+      value={{ pubkey, canLogin, login, nip07Login, logout, publish, signHttpAuth }}
+    >
       {children}
     </NostrContext.Provider>
   )

@@ -4,15 +4,23 @@ import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { Server } from 'lucide-react'
 
-export default function RelaySettingsPopover() {
+export default function RelaySettingsPopover({
+  variant = 'titlebar'
+}: {
+  variant?: 'titlebar' | 'sidebar'
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="titlebar" size="titlebar" title="relay settings">
+        <Button variant={variant} size={variant} title="relay settings">
           <Server />
+          {variant === 'sidebar' && <div>Relays</div>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 h-[450px] p-0">
+      <PopoverContent
+        className="w-96 h-[450px] p-0"
+        side={variant === 'titlebar' ? 'bottom' : 'right'}
+      >
         <ScrollArea className="h-full">
           <div className="p-4">
             <RelaySettings />

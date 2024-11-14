@@ -47,6 +47,9 @@ export default function NoteList({
           setUntil(events[events.length - 1].created_at - 1)
         }
         setInitialized(true)
+        processedEvents.forEach((e) => {
+          client.addEventToCache(e)
+        })
       },
       onNew: (event) => {
         if (!isReplyNoteEvent(event)) {
@@ -100,6 +103,9 @@ export default function NoteList({
     }
 
     setUntil(sortedEvents[sortedEvents.length - 1].created_at - 1)
+    processedEvents.forEach((e) => {
+      client.addEventToCache(e)
+    })
   }
 
   const showNewEvents = () => {

@@ -20,7 +20,9 @@ function getSystemTheme() {
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  const [themeSetting, setThemeSetting] = useState<TThemeSetting>('system')
+  const [themeSetting, setThemeSetting] = useState<TThemeSetting>(
+    (localStorage.getItem('themeSetting') as TThemeSetting | null) ?? 'system'
+  )
   const [theme, setTheme] = useState<TTheme>('light')
 
   useEffect(() => {
@@ -39,9 +41,6 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
         })
       } else {
         // web
-        const themeSetting =
-          (localStorage.getItem('themeSetting') as TThemeSetting | null) ?? 'system'
-        setThemeSetting(themeSetting)
         if (themeSetting === 'system') {
           setTheme(getSystemTheme())
           return

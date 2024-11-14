@@ -10,7 +10,7 @@ export function Titlebar({
   return (
     <div
       className={cn(
-        'draggable absolute top-0 w-full h-9 z-50 bg-background/80 backdrop-blur-xl flex items-center font-semibold space-x-1 px-2',
+        'draggable absolute top-0 w-full h-9 z-50 bg-background/80 backdrop-blur-md flex items-center font-semibold space-x-1 px-2',
         className
       )}
     >
