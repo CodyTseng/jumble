@@ -11,7 +11,6 @@ import { toProfile } from '@renderer/lib/link'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
 import { useSecondaryPage } from '@renderer/PageManager'
 import { useNostr } from '@renderer/providers/NostrProvider'
-import { EllipsisVertical } from 'lucide-react'
 
 export default function ProfileButton({
   pubkey,
@@ -39,9 +38,9 @@ export default function ProfileButton({
     )
   } else {
     triggerComponent = (
-      <Button variant="sidebar" size="sidebar" className="bg-muted/70 hover:bg-muted px-2 gap-2">
+      <Button variant="sidebar" size="sidebar" className="border hover:bg-muted px-2">
         <div className="flex gap-2 items-center flex-1 w-0">
-          <Avatar className="w-7 h-7">
+          <Avatar className="w-10 h-10">
             <AvatarImage src={avatar} />
             <AvatarFallback>
               <img src={defaultAvatar} />
@@ -49,7 +48,6 @@ export default function ProfileButton({
           </Avatar>
           <div className="truncate font-semibold text-lg">{username}</div>
         </div>
-        <EllipsisVertical size={16} className="mr-2" />
       </Button>
     )
   }
