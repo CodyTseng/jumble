@@ -5,7 +5,8 @@ import {
   ResizablePanelGroup
 } from '@renderer/components/ui/resizable'
 import { cn } from '@renderer/lib/utils'
-import BlankPage from '@renderer/pages/secondary/BlankPage'
+import HomePage from '@renderer/pages/secondary/HomePage'
+import NotFoundPage from '@renderer/pages/secondary/NotFoundPage'
 import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
 import { routes } from './routes'
 
@@ -130,7 +131,7 @@ export function PageManager({
                   </div>
                 ))
               ) : (
-                <BlankPage />
+                <HomePage />
               )}
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -178,16 +179,14 @@ function findAndCreateComponent(url: string) {
     const match = matcher(url)
     if (!match) continue
 
-    if (!element) return null
+    if (!element) return <NotFoundPage />
     return cloneElement(element, match.params)
   }
-  return null
+  return <NotFoundPage />
 }
 
 function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) {
   const component = findAndCreateComponent(url)
-  if (!component) return { newStack: stack }
-
   const currentStack = stack[stack.length - 1]
   const newItem = { component, url, index: currentStack ? currentStack.index + 1 : 0 }
   const newStack = [...stack, newItem]

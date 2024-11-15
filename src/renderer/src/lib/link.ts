@@ -1,3 +1,4 @@
+export const toHome = () => '/'
 export const toProfile = (pubkey: string) => `/user/${pubkey}`
 export const toNote = (eventId: string) => `/note/${eventId}`
 export const toHashtag = (hashtag: string) => `/hashtag/${hashtag}`
