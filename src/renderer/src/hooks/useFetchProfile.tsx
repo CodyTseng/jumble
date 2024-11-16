@@ -5,6 +5,8 @@ import { nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchProfile(id?: string) {
+  const [isFetching, setIsFetching] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [profile, setProfile] = useState<TProfile>({
     username: id ? (id.length > 9 ? id.slice(0, 4) + '...' + id.slice(-4) : id) : 'username'
   })
@@ -12,7 +14,11 @@ export function useFetchProfile(id?: string) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (!id) return
+        if (!id) {
+          setIsFetching(false)
+          setError(new Error('No id provided'))
+          return
+        }
 
         let pubkey: string | undefined
 
@@ -30,7 +36,11 @@ export function useFetchProfile(id?: string) {
           }
         }
 
-        if (!pubkey) return
+        if (!pubkey) {
+          setIsFetching(false)
+          setError(new Error('Invalid id'))
+          return
+        }
         setProfile({ pubkey, username: formatPubkey(pubkey) })
 
         const profile = await client.fetchProfile(pubkey)
@@ -38,12 +48,14 @@ export function useFetchProfile(id?: string) {
           setProfile(profile)
         }
       } catch (err) {
-        console.error(err)
+        setError(err as Error)
+      } finally {
+        setIsFetching(false)
       }
     }
 
     fetchProfile()
   }, [id])
 
-  return profile
+  return { isFetching, error, profile }
 }

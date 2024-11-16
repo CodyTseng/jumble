@@ -7,7 +7,9 @@ import Nip05 from '../Nip05'
 import ProfileAbout from '../ProfileAbout'
 
 export default function ProfileCard({ pubkey }: { pubkey: string }) {
-  const { avatar = '', username, nip05, about } = useFetchProfile(pubkey)
+  const {
+    profile: { avatar = '', username, nip05, about }
+  } = useFetchProfile(pubkey)
   const defaultImage = useMemo(() => generateImageByPubkey(pubkey), [pubkey])
 
   return (

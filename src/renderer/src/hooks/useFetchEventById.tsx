@@ -3,11 +3,17 @@ import { Event, Filter, nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchEventById(id?: string) {
+  const [isFetching, setIsFetching] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [event, setEvent] = useState<Event | undefined>(undefined)
 
   useEffect(() => {
     const fetchEvent = async () => {
-      if (!id) return
+      if (!id) {
+        setIsFetching(false)
+        setError(new Error('No id provided'))
+        return
+      }
 
       let filter: Filter | undefined
       if (/^[0-9a-f]{64}$/.test(id)) {
@@ -32,7 +38,11 @@ export function useFetchEventById(id?: string) {
             }
         }
       }
-      if (!filter) return
+      if (!filter) {
+        setIsFetching(false)
+        setError(new Error('Invalid id'))
+        return
+      }
 
       let event: Event | undefined
       if (filter.ids) {
@@ -42,13 +52,15 @@ export function useFetchEventById(id?: string) {
       }
       if (event) {
         setEvent(event)
-      } else {
-        setEvent(undefined)
       }
+      setIsFetching(false)
     }
 
-    fetchEvent()
+    fetchEvent().catch((err) => {
+      setError(err as Error)
+      setIsFetching(false)
+    })
   }, [id])
 
-  return event
+  return { isFetching, error, event }
 }

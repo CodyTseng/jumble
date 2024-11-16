@@ -25,7 +25,9 @@ export default function UserAvatar({
   className?: string
   size?: 'large' | 'normal' | 'small' | 'tiny'
 }) {
-  const { avatar, pubkey } = useFetchProfile(userId)
+  const {
+    profile: { avatar, pubkey }
+  } = useFetchProfile(userId)
   const defaultAvatar = useMemo(() => (pubkey ? generateImageByPubkey(pubkey) : ''), [pubkey])
 
   if (!pubkey) {

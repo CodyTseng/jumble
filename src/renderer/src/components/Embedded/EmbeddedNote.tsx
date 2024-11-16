@@ -4,7 +4,7 @@ import { kinds } from 'nostr-tools'
 import ShortTextNoteCard from '../NoteCard/ShortTextNoteCard'
 
 export function EmbeddedNote({ noteId }: { noteId: string }) {
-  const event = useFetchEventById(noteId)
+  const { event } = useFetchEventById(noteId)
 
   return event && event.kind === kinds.ShortTextNote ? (
     <ShortTextNoteCard size="small" className="mt-2 w-full" event={event} hideStats />

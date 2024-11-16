@@ -14,7 +14,9 @@ export default function Username({
   showAt?: boolean
   className?: string
 }) {
-  const { username, pubkey } = useFetchProfile(userId)
+  const {
+    profile: { username, pubkey }
+  } = useFetchProfile(userId)
   if (!pubkey) return null
 
   return (

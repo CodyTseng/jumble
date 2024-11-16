@@ -7,7 +7,9 @@ import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { useEffect, useRef, useState } from 'react'
 
 export default function FollowingListPage({ id }: { id?: string }) {
-  const { username, pubkey } = useFetchProfile(id)
+  const {
+    profile: { username, pubkey }
+  } = useFetchProfile(id)
   const { followings } = useFetchFollowings(pubkey)
   const [visibleFollowings, setVisibleFollowings] = useState<string[]>([])
   const observer = useRef<IntersectionObserver | null>(null)
@@ -57,7 +59,9 @@ export default function FollowingListPage({ id }: { id?: string }) {
 }
 
 function FollowingItem({ pubkey }: { pubkey: string }) {
-  const { about, nip05 } = useFetchProfile(pubkey)
+  const {
+    profile: { about, nip05 }
+  } = useFetchProfile(pubkey)
 
   return (
     <div className="flex gap-2 items-start">

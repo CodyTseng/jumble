@@ -10,12 +10,16 @@ import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId } from '@renderer/lib/event'
 import { toNote } from '@renderer/lib/link'
 import { useMemo } from 'react'
+import LoadingPage from '../LoadingPage'
+import NotFoundPage from '../NotFoundPage'
 
 export default function NotePage({ id }: { id?: string }) {
-  const event = useFetchEventById(id)
+  const { event, isFetching } = useFetchEventById(id)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
   const rootEventId = useMemo(() => getRootEventId(event), [event])
-  if (!event) return null
+
+  if (!event && isFetching) return <LoadingPage title="note" />
+  if (!event) return <NotFoundPage />
 
   return (
     <SecondaryPageLayout titlebarContent="note">
@@ -30,7 +34,7 @@ export default function NotePage({ id }: { id?: string }) {
 
 function ParentNote({ eventId }: { eventId?: string }) {
   const { push } = useSecondaryPage()
-  const event = useFetchEventById(eventId)
+  const { event } = useFetchEventById(eventId)
   if (!event) return null
 
   return (

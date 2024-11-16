@@ -10,7 +10,7 @@ export default function SecondaryPageLayout({
   titlebarContent,
   hideBackButton = false
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   titlebarContent?: React.ReactNode
   hideBackButton?: boolean
 }): JSX.Element {

@@ -20,7 +20,9 @@ export default function ProfileButton({
   variant?: 'titlebar' | 'sidebar'
 }) {
   const { logout } = useNostr()
-  const { avatar, username } = useFetchProfile(pubkey)
+  const {
+    profile: { avatar, username }
+  } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
   const defaultAvatar = generateImageByPubkey(pubkey)
 
