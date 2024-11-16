@@ -1,8 +1,6 @@
 # jumble
 
-Yet another Nostr desktop client
-
-> NOTE: Currently, only browsing is supported. Posting, liking, and reposting will be available soon.
+Yet another Nostr client
 
 ## Features
 
@@ -10,6 +8,7 @@ Yet another Nostr desktop client
 - **Relay-Friendly Design:** Minimized and simplified requests ensure efficient communication with relays
 - **Relay Groups:** Easily manage and switch between relay groups
 - **Clean Interface:** Enjoy a minimalist design and intuitive interactions
+- **Cross-Platform:** Available on macOS, Windows, Linux, and web browsers
 
 ## Download
 
