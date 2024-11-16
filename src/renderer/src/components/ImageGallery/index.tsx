@@ -1,5 +1,4 @@
 import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area'
-import { cn } from '@renderer/lib/utils'
 import { useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
@@ -24,13 +23,13 @@ export default function ImageGallery({
   }
 
   return (
-    <div className={cn('relative', className)} onClick={(e) => e.stopPropagation()}>
+    <div className={className} onClick={(e) => e.stopPropagation()}>
       <ScrollArea className="w-full">
         <div className="flex space-x-2">
           {images.map((src, index) => {
             return (
               <img
-                className={`rounded-lg h-fit w-fit cursor-pointer ${size === 'small' ? 'max-h-[15vh]' : 'max-h-[30vh]'}`}
+                className={`rounded-lg object-cover h-fit cursor-pointer ${size === 'small' ? 'max-h-[15vh]' : 'max-h-[30vh]'}`}
                 key={index}
                 src={src}
                 onClick={(e) => handlePhotoClick(e, index)}
