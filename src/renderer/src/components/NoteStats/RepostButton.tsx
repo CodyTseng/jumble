@@ -26,7 +26,7 @@ export default function RepostButton({
   event: Event
   canFetch?: boolean
 }) {
-  const { pubkey, publish } = useNostr()
+  const { publish, checkLogin } = useNostr()
   const { noteStatsMap, fetchNoteRepostCount, fetchNoteRepostedStatus, markNoteAsReposted } =
     useNoteStats()
   const [reposting, setReposting] = useState(false)
@@ -34,7 +34,7 @@ export default function RepostButton({
     () => noteStatsMap.get(event.id) ?? {},
     [noteStatsMap, event.id]
   )
-  const canRepost = pubkey && !hasReposted && !reposting
+  const canRepost = !hasReposted && !reposting
 
   useEffect(() => {
     if (!canFetch) return
@@ -49,28 +49,30 @@ export default function RepostButton({
 
   const repost = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!canRepost) return
+    checkLogin(async () => {
+      if (!canRepost) return
 
-    setReposting(true)
-    const timer = setTimeout(() => setReposting(false), 5000)
+      setReposting(true)
+      const timer = setTimeout(() => setReposting(false), 5000)
 
-    try {
-      const [reposted] = await Promise.all([
-        hasReposted === undefined ? fetchNoteRepostedStatus(event) : hasReposted,
-        repostCount === undefined ? fetchNoteRepostCount(event) : repostCount
-      ])
-      if (reposted) return
+      try {
+        const [reposted] = await Promise.all([
+          hasReposted === undefined ? fetchNoteRepostedStatus(event) : hasReposted,
+          repostCount === undefined ? fetchNoteRepostCount(event) : repostCount
+        ])
+        if (reposted) return
 
-      const targetRelayList = await client.fetchRelayList(event.pubkey)
-      const repost = createRepostDraftEvent(event)
-      await publish(repost, targetRelayList.read.slice(0, 3))
-      markNoteAsReposted(event.id)
-    } catch (error) {
-      console.error('repost failed', error)
-    } finally {
-      setReposting(false)
-      clearTimeout(timer)
-    }
+        const targetRelayList = await client.fetchRelayList(event.pubkey)
+        const repost = createRepostDraftEvent(event)
+        await publish(repost, targetRelayList.read.slice(0, 3))
+        markNoteAsReposted(event.id)
+      } catch (error) {
+        console.error('repost failed', error)
+      } finally {
+        setReposting(false)
+        clearTimeout(timer)
+      }
+    })
   }
 
   return (

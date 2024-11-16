@@ -17,14 +17,14 @@ export default function LikeButton({
   variant?: 'normal' | 'reply'
   canFetch?: boolean
 }) {
-  const { pubkey, publish } = useNostr()
+  const { publish, checkLogin } = useNostr()
   const { noteStatsMap, fetchNoteLikedStatus, fetchNoteLikeCount, markNoteAsLiked } = useNoteStats()
   const [liking, setLiking] = useState(false)
   const { likeCount, hasLiked } = useMemo(
     () => noteStatsMap.get(event.id) ?? {},
     [noteStatsMap, event.id]
   )
-  const canLike = pubkey && !hasLiked && !liking
+  const canLike = !hasLiked && !liking
 
   useEffect(() => {
     if (!canFetch) return
@@ -39,28 +39,30 @@ export default function LikeButton({
 
   const like = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!canLike) return
+    checkLogin(async () => {
+      if (!canLike) return
 
-    setLiking(true)
-    const timer = setTimeout(() => setLiking(false), 5000)
+      setLiking(true)
+      const timer = setTimeout(() => setLiking(false), 5000)
 
-    try {
-      const [liked] = await Promise.all([
-        hasLiked === undefined ? fetchNoteLikedStatus(event) : hasLiked,
-        likeCount === undefined ? fetchNoteLikeCount(event) : likeCount
-      ])
-      if (liked) return
+      try {
+        const [liked] = await Promise.all([
+          hasLiked === undefined ? fetchNoteLikedStatus(event) : hasLiked,
+          likeCount === undefined ? fetchNoteLikeCount(event) : likeCount
+        ])
+        if (liked) return
 
-      const targetRelayList = await client.fetchRelayList(event.pubkey)
-      const reaction = createReactionDraftEvent(event)
-      await publish(reaction, targetRelayList.read.slice(0, 3))
-      markNoteAsLiked(event.id)
-    } catch (error) {
-      console.error('like failed', error)
-    } finally {
-      setLiking(false)
-      clearTimeout(timer)
-    }
+        const targetRelayList = await client.fetchRelayList(event.pubkey)
+        const reaction = createReactionDraftEvent(event)
+        await publish(reaction, targetRelayList.read.slice(0, 3))
+        markNoteAsLiked(event.id)
+      } catch (error) {
+        console.error('like failed', error)
+      } finally {
+        setLiking(false)
+        clearTimeout(timer)
+      }
+    })
   }
 
   return (

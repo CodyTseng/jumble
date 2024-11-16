@@ -1,4 +1,6 @@
 import { TDraftEvent } from '@common/types'
+import LoginDialog from '@renderer/components/LoginDialog'
+import { useToast } from '@renderer/hooks'
 import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
 import { IS_ELECTRON, isElectron } from '@renderer/lib/env'
 import client from '@renderer/services/client.service'
@@ -17,6 +19,7 @@ type TNostrContext = {
    */
   publish: (draftEvent: TDraftEvent, additionalRelayUrls?: string[]) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
+  checkLogin: (cb?: () => void | Promise<void>) => void
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -30,8 +33,10 @@ export const useNostr = () => {
 }
 
 export function NostrProvider({ children }: { children: React.ReactNode }) {
+  const { toast } = useToast()
   const [pubkey, setPubkey] = useState<string | null>(null)
   const [canLogin, setCanLogin] = useState(false)
+  const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const relayList = useFetchRelayList(pubkey)
 
   useEffect(() => {
@@ -115,11 +120,32 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return 'Nostr ' + btoa(JSON.stringify(event))
   }
 
+  const checkLogin = async (cb?: () => void) => {
+    if (pubkey) {
+      return cb && cb()
+    }
+    if (IS_ELECTRON) {
+      return setOpenLoginDialog(true)
+    }
+    try {
+      await nip07Login()
+    } catch (err) {
+      toast({
+        title: 'Login failed',
+        description: (err as Error).message,
+        variant: 'destructive'
+      })
+      return
+    }
+    return cb && cb()
+  }
+
   return (
     <NostrContext.Provider
-      value={{ pubkey, canLogin, login, nip07Login, logout, publish, signHttpAuth }}
+      value={{ pubkey, canLogin, login, nip07Login, logout, publish, signHttpAuth, checkLogin }}
     >
       {children}
+      <LoginDialog open={openLoginDialog} setOpen={setOpenLoginDialog} />
     </NostrContext.Provider>
   )
 }

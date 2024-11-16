@@ -29,10 +29,11 @@ export default function PostDialog({
   parentEvent?: Event
 }) {
   const { toast } = useToast()
-  const { pubkey, publish } = useNostr()
+  const { publish, checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
   const [content, setContent] = useState('')
   const [posting, setPosting] = useState(false)
+  const canPost = !!content && !posting
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value)
@@ -40,46 +41,48 @@ export default function PostDialog({
 
   const post = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!content || !pubkey || posting) {
-      setOpen(false)
-      return
-    }
-
-    setPosting(true)
-    try {
-      const additionalRelayUrls: string[] = []
-      if (parentEvent) {
-        const relayList = await client.fetchRelayList(parentEvent.pubkey)
-        additionalRelayUrls.push(...relayList.read.slice(0, 5))
+    checkLogin(async () => {
+      if (!canPost) {
+        setOpen(false)
+        return
       }
-      const draftEvent = await createShortTextNoteDraftEvent(content, parentEvent)
-      await publish(draftEvent, additionalRelayUrls)
-      setContent('')
-      setOpen(false)
-    } catch (error) {
-      if (error instanceof AggregateError) {
-        error.errors.forEach((e) =>
+
+      setPosting(true)
+      try {
+        const additionalRelayUrls: string[] = []
+        if (parentEvent) {
+          const relayList = await client.fetchRelayList(parentEvent.pubkey)
+          additionalRelayUrls.push(...relayList.read.slice(0, 5))
+        }
+        const draftEvent = await createShortTextNoteDraftEvent(content, parentEvent)
+        await publish(draftEvent, additionalRelayUrls)
+        setContent('')
+        setOpen(false)
+      } catch (error) {
+        if (error instanceof AggregateError) {
+          error.errors.forEach((e) =>
+            toast({
+              variant: 'destructive',
+              title: 'Failed to post',
+              description: e.message
+            })
+          )
+        } else if (error instanceof Error) {
           toast({
             variant: 'destructive',
             title: 'Failed to post',
-            description: e.message
+            description: error.message
           })
-        )
-      } else if (error instanceof Error) {
-        toast({
-          variant: 'destructive',
-          title: 'Failed to post',
-          description: error.message
-        })
+        }
+        console.error(error)
+        return
+      } finally {
+        setPosting(false)
       }
-      console.error(error)
-      return
-    } finally {
-      setPosting(false)
-    }
-    toast({
-      title: 'Post successful',
-      description: 'Your post has been published'
+      toast({
+        title: 'Post successful',
+        description: 'Your post has been published'
+      })
     })
   }
 
@@ -122,7 +125,7 @@ export default function PostDialog({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={!pubkey || posting} onClick={post}>
+                <Button type="submit" disabled={!canPost} onClick={post}>
                   {posting && <LoaderCircle className="animate-spin" />}
                   Post
                 </Button>
