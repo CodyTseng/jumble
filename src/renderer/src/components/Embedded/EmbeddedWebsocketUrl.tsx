@@ -1,14 +1,15 @@
-import { useRelaySettings } from '@renderer/providers/RelaySettingsProvider'
+import { useSecondaryPage } from '@renderer/PageManager'
+import { toNoteList } from '@renderer/lib/link'
 import { TEmbeddedRenderer } from './types'
 
 export function EmbeddedWebsocketUrl({ url }: { url: string }) {
-  const { setTemporaryRelayUrls } = useRelaySettings()
+  const { push } = useSecondaryPage()
   return (
     <span
       className="cursor-pointer px-1 rounded-md text-highlight border border-highlight/60 hover:border-highlight hover:bg-muted/60"
       onClick={(e) => {
         e.stopPropagation()
-        setTemporaryRelayUrls([url])
+        push(toNoteList({ relay: url }))
       }}
     >
       {url}

@@ -1,7 +1,7 @@
 import AccountButton from '@renderer/components/AccountButton'
 import PostButton from '@renderer/components/PostButton'
 import RefreshButton from '@renderer/components/RefreshButton'
-import RelaySettingsPopover from '@renderer/components/RelaySettingsPopover'
+import RelaySettingsButton from '@renderer/components/RelaySettingsButton'
 import ScrollToTopButton from '@renderer/components/ScrollToTopButton'
 import SearchButton from '@renderer/components/SearchButton'
 import { Titlebar } from '@renderer/components/Titlebar'
@@ -23,9 +23,13 @@ const PrimaryPageLayout = forwardRef(({ children }: { children?: React.ReactNode
   )
 
   return (
-    <ScrollArea ref={scrollAreaRef} className="h-full w-full" scrollBarClassName="pt-9 xl:pt-0">
+    <ScrollArea
+      ref={scrollAreaRef}
+      className="h-full w-full"
+      scrollBarClassName="pt-9 max-sm:pt-0 xl:pt-0"
+    >
       <PrimaryPageTitlebar />
-      <div className="px-4 pb-4 pt-11 xl:pt-4">{children}</div>
+      <div className="sm:px-4 pb-4 pt-11 max-sm:pt-9 xl:pt-4">{children}</div>
       <ScrollToTopButton scrollAreaRef={scrollAreaRef} />
     </ScrollArea>
   )
@@ -37,7 +41,7 @@ export type TPrimaryPageLayoutRef = {
   scrollToTop: () => void
 }
 
-export function PrimaryPageTitlebar() {
+function PrimaryPageTitlebar() {
   return (
     <Titlebar className={`justify-between xl:hidden ${isMacOS() ? 'pl-20' : ''}`}>
       <div className="flex gap-2 items-center">
@@ -47,7 +51,7 @@ export function PrimaryPageTitlebar() {
       </div>
       <div className="flex gap-2 items-center">
         <RefreshButton />
-        <RelaySettingsPopover />
+        <RelaySettingsButton />
       </div>
     </Titlebar>
   )

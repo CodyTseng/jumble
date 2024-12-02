@@ -8,7 +8,7 @@ import RelayGroup from './RelayGroup'
 import TemporaryRelayGroup from './TemporaryRelayGroup'
 import { useTranslation } from 'react-i18next'
 
-export default function RelaySettings() {
+export default function RelaySettings({ hideTitle = false }: { hideTitle?: boolean }) {
   const { t } = useTranslation()
   const { relayGroups, addRelayGroup } = useRelaySettings()
   const [newGroupName, setNewGroupName] = useState('')
@@ -47,7 +47,7 @@ export default function RelaySettings() {
   return (
     <RelaySettingsComponentProvider>
       <div ref={dummyRef} tabIndex={-1} style={{ position: 'absolute', opacity: 0 }}></div>
-      <div className="text-lg font-semibold mb-4">{t('Relay Settings')}</div>
+      {!hideTitle && <div className="text-lg font-semibold mb-4">{t('Relay Settings')}</div>}
       <div className="space-y-2">
         <TemporaryRelayGroup />
         {relayGroups.map((group, index) => (

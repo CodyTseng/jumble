@@ -8,7 +8,7 @@ import AboutInfoDialog from '../AboutInfoDialog'
 import AccountButton from '../AccountButton'
 import PostButton from '../PostButton'
 import RefreshButton from '../RefreshButton'
-import RelaySettingsPopover from '../RelaySettingsPopover'
+import RelaySettingsButton from '../RelaySettingsButton'
 import SearchButton from '../SearchButton'
 
 export default function PrimaryPageSidebar() {
@@ -20,7 +20,7 @@ export default function PrimaryPageSidebar() {
           <SecondaryPageLink to={toHome()}>Jumble</SecondaryPageLink>
         </div>
         <PostButton variant="sidebar" />
-        <RelaySettingsPopover variant="sidebar" />
+        <RelaySettingsButton variant="sidebar" />
         <SearchButton variant="sidebar" />
         <RefreshButton variant="sidebar" />
         {!IS_ELECTRON && (

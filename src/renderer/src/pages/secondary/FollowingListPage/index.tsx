@@ -51,7 +51,7 @@ export default function FollowingListPage({ id }: { id?: string }) {
           : t('following')
       }
     >
-      <div className="space-y-2">
+      <div className="space-y-2 max-sm:px-4">
         {visibleFollowings.map((pubkey, index) => (
           <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
         ))}

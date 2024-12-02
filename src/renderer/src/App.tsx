@@ -9,23 +9,26 @@ import { FollowListProvider } from './providers/FollowListProvider'
 import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { RelaySettingsProvider } from './providers/RelaySettingsProvider'
+import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
 
 export default function App(): JSX.Element {
   return (
     <div className="h-screen">
       <ThemeProvider>
-        <RelaySettingsProvider>
-          <NostrProvider>
-            <FollowListProvider>
-              <NoteStatsProvider>
-                <PageManager>
-                  <NoteListPage />
-                </PageManager>
-                <Toaster />
-              </NoteStatsProvider>
-            </FollowListProvider>
-          </NostrProvider>
-        </RelaySettingsProvider>
+        <ScreenSizeProvider>
+          <RelaySettingsProvider>
+            <NostrProvider>
+              <FollowListProvider>
+                <NoteStatsProvider>
+                  <PageManager>
+                    <NoteListPage />
+                  </PageManager>
+                  <Toaster />
+                </NoteStatsProvider>
+              </FollowListProvider>
+            </NostrProvider>
+          </RelaySettingsProvider>
+        </ScreenSizeProvider>
       </ThemeProvider>
     </div>
   )

@@ -127,7 +127,7 @@ export default function NoteList({
           </Button>
         </div>
       )}
-      <div className={cn('flex flex-col gap-4', className)}>
+      <div className={cn('flex flex-col sm:gap-4', className)}>
         {events.map((event, i) => (
           <NoteCard key={`${i}-${event.id}`} className="w-full" event={event} />
         ))}

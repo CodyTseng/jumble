@@ -9,6 +9,7 @@ import HomePage from '@renderer/pages/secondary/HomePage'
 import NotFoundPage from '@renderer/pages/secondary/NotFoundPage'
 import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
 import { routes } from './routes'
+import { useScreenSize } from './providers/ScreenSizeProvider'
 
 type TPrimaryPageContext = {
   refresh: () => void
@@ -54,6 +55,7 @@ export function PageManager({
 }) {
   const [primaryPageKey, setPrimaryPageKey] = useState<number>(0)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
+  const { isSmallScreen } = useScreenSize()
 
   useEffect(() => {
     if (window.location.pathname !== '/') {
@@ -83,6 +85,7 @@ export function PageManager({
     }
 
     window.addEventListener('popstate', onPopState)
+
     return () => {
       window.removeEventListener('popstate', onPopState)
     }
@@ -106,6 +109,34 @@ export function PageManager({
     window.history.back()
   }
 
+  if (isSmallScreen) {
+    return (
+      <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
+        <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
+          <div className="h-full">
+            {!!secondaryStack.length &&
+              secondaryStack.map((item, index) => (
+                <div
+                  key={item.index}
+                  className="absolute top-0 left-0 w-full h-full bg-background"
+                  style={{ zIndex: index + 1 }}
+                >
+                  {item.component}
+                </div>
+              ))}
+            <div
+              key={primaryPageKey}
+              className="absolute top-0 left-0 w-full h-full bg-background"
+              style={{ zIndex: 0 }}
+            >
+              {children}
+            </div>
+          </div>
+        </SecondaryPageContext.Provider>
+      </PrimaryPageContext.Provider>
+    )
+  }
+
   return (
     <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
       <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
@@ -124,7 +155,7 @@ export function PageManager({
                   <div
                     key={item.index}
                     className="absolute top-0 left-0 w-full h-full bg-background"
-                    style={{ zIndex: index }}
+                    style={{ zIndex: index + 1 }}
                   >
                     {item.component}
                   </div>

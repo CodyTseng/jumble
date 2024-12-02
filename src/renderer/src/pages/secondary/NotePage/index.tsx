@@ -31,11 +31,13 @@ export default function NotePage({ id }: { id?: string }) {
 
   return (
     <SecondaryPageLayout titlebarContent={t('note')}>
-      <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
-      <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
-      <Note key={`note-${event.id}`} event={event} fetchNoteStats />
+      <div className="max-sm:px-4">
+        <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
+        <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
+        <Note key={`note-${event.id}`} event={event} fetchNoteStats />
+      </div>
       <Separator className="my-4" />
-      <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} />
+      <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="max-sm:px-2" />
     </SecondaryPageLayout>
   )
 }

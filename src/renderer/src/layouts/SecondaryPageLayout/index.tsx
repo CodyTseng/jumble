@@ -18,7 +18,7 @@ export default function SecondaryPageLayout({
   return (
     <ScrollArea ref={scrollAreaRef} className="h-full" scrollBarClassName="pt-9">
       <SecondaryPageTitlebar content={titlebarContent} hideBackButton={hideBackButton} />
-      <div className="px-4 pb-4 pt-11 w-full h-full">{children}</div>
+      <div className="sm:px-4 pb-4 pt-11 w-full h-full">{children}</div>
       <ScrollToTopButton scrollAreaRef={scrollAreaRef} />
     </ScrollArea>
   )
