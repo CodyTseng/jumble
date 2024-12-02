@@ -11,7 +11,11 @@ export default function NoteListPage() {
   const { t } = useTranslation()
   const { relayUrls, searchableRelayUrls } = useRelaySettings()
   const { searchParams } = useSearchParams()
-  const { title, filter, specificRelayUrl } = useMemo<{
+  const {
+    title = '',
+    filter,
+    specificRelayUrl
+  } = useMemo<{
     title?: string
     filter?: Filter
     specificRelayUrl?: string

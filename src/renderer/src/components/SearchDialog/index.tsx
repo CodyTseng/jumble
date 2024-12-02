@@ -7,6 +7,7 @@ import {
   CommandList
 } from '@renderer/components/ui/command'
 import { useSearchProfiles } from '@renderer/hooks'
+import { isMacOS } from '@renderer/lib/env'
 import { toNote, toNoteList, toProfile, toProfileList } from '@renderer/lib/link'
 import { generateImageByPubkey } from '@renderer/lib/pubkey'
 import { useRelaySettings } from '@renderer/providers/RelaySettingsProvider'
@@ -80,7 +81,11 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
   }, [input])
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      open={open}
+      onOpenChange={setOpen}
+      classNames={{ content: isMacOS() ? 'max-sm:top-9' : 'max-sm:top-0' }}
+    >
       <CommandInput value={input} onValueChange={setInput} />
       <CommandList>{list}</CommandList>
     </CommandDialog>

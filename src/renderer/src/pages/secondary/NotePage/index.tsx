@@ -22,8 +22,10 @@ export default function NotePage({ id }: { id?: string }) {
 
   if (!event && isFetching) {
     return (
-      <SecondaryPageLayout titlebarContent="note">
-        <Skeleton className="w-10 h-10 rounded-full" />
+      <SecondaryPageLayout titlebarContent={t('note')}>
+        <div className="max-sm:px-4">
+          <Skeleton className="w-10 h-10 rounded-full" />
+        </div>
       </SecondaryPageLayout>
     )
   }

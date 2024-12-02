@@ -1,11 +1,14 @@
 import { Button } from '@renderer/components/ui/button'
+import { cn } from '@renderer/lib/utils'
 import { ChevronUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ScrollToTopButton({
-  scrollAreaRef
+  scrollAreaRef,
+  className
 }: {
   scrollAreaRef: React.RefObject<HTMLDivElement>
+  className?: string
 }) {
   const [showScrollToTop, setShowScrollToTop] = useState(false)
 
@@ -15,7 +18,7 @@ export default function ScrollToTopButton({
 
   const handleScroll = () => {
     if (scrollAreaRef.current) {
-      setShowScrollToTop(scrollAreaRef.current.scrollTop > 1000)
+      setShowScrollToTop(scrollAreaRef.current.scrollTop > 600)
     }
   }
 
@@ -30,7 +33,10 @@ export default function ScrollToTopButton({
   return (
     <Button
       variant="secondary-2"
-      className={`absolute bottom-8 right-2 rounded-full w-10 h-10 p-0 hover:text-background transition-transform ${showScrollToTop ? '' : 'translate-y-20'}`}
+      className={cn(
+        `absolute bottom-8 right-2 rounded-full w-10 h-10 p-0 hover:text-background transition-transform ${showScrollToTop ? '' : 'translate-y-20'}`,
+        className
+      )}
       onClick={handleScrollToTop}
     >
       <ChevronUp />
