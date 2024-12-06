@@ -1,6 +1,8 @@
-<p>
-  <img src="./resources/logo.svg" alt="Jumble Logo" width="200" />
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.png">
+  <img src="./resources/logo-light.svg" alt="Jumble Logo" width="200" />
+</picture>
 
 Yet another Nostr client
 
