@@ -1,10 +1,12 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.svg">
-  <img src="./resources/logo-light.svg" alt="Jumble Logo" width="200" />
-</picture>
-
-Yet another Nostr client
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.svg">
+    <img src="./resources/logo-light.svg" alt="Jumble Logo" width="400" />
+  </picture>
+  <p style="color: #666; font-size: 0.9em;">logo designed by <a href="http://wolfertdan.com/">Daniel David</a></p>
+  <p>Yet another Nostr client</p>
+</div>
 
 ## Features
 
