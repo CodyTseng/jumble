@@ -1,3 +1,4 @@
+import Logo from '@renderer/assets/Logo'
 import AccountButton from '@renderer/components/AccountButton'
 import PostButton from '@renderer/components/PostButton'
 import RefreshButton from '@renderer/components/RefreshButton'
@@ -79,7 +80,9 @@ function PrimaryPageTitlebar({ visible = true }: { visible?: boolean }) {
         visible={visible}
       >
         <div className="flex gap-1 items-center">
-          <div className="text-2xl font-extrabold font-mono">Jumble</div>
+          <div className="-translate-y-0.5">
+            <Logo className="h-8" />
+          </div>
           <ThemeToggle variant="small-screen-titlebar" />
         </div>
         <div className="flex gap-1 items-center">

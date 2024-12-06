@@ -1,4 +1,6 @@
-# jumble
+<p>
+  <img src="./resources/logo.svg" alt="Jumble Logo" width="200" />
+</p>
 
 Yet another Nostr client
 
