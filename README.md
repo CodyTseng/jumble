@@ -4,9 +4,14 @@
     <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.svg">
     <img src="./resources/logo-light.svg" alt="Jumble Logo" width="400" />
   </picture>
-  <p style="color: #666; font-size: 0.9em;">logo designed by <a href="http://wolfertdan.com/">Daniel David</a></p>
-  <p>Yet another Nostr client</p>
+  <p>logo designed by <a href="http://wolfertdan.com/">Daniel David</a></p>
 </div>
+
+---
+
+# Jumble
+
+Yet another Nostr client
 
 ## Features
 
