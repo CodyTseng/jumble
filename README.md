@@ -9,7 +9,7 @@
 
 # Jumble
 
-Yet another Nostr client
+A beautiful nostr client focused on browsing relay feeds
 
 ## Features
 
