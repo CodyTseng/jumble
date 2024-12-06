@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.svg">
   <img src="./resources/logo-light.svg" alt="Jumble Logo" width="200" />
 </picture>
 
