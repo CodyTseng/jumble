@@ -6,10 +6,9 @@ import {
 } from '@renderer/components/ui/resizable'
 import { cn } from '@renderer/lib/utils'
 import HomePage from '@renderer/pages/secondary/HomePage'
-import NotFoundPage from '@renderer/pages/secondary/NotFoundPage'
 import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
-import { routes } from './routes'
 import { useScreenSize } from './providers/ScreenSizeProvider'
+import { routes } from './routes'
 
 type TPrimaryPageContext = {
   refresh: () => void
@@ -210,14 +209,16 @@ function findAndCreateComponent(url: string) {
     const match = matcher(path)
     if (!match) continue
 
-    if (!element) return <NotFoundPage />
+    if (!element) return null
     return cloneElement(element, match.params)
   }
-  return <NotFoundPage />
+  return null
 }
 
 function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) {
   const component = findAndCreateComponent(url)
+  if (!component) return { newStack: stack, newItem: null }
+
   const currentStack = stack[stack.length - 1]
   const newItem = { component, url, index: currentStack ? currentStack.index + 1 : 0 }
   const newStack = [...stack, newItem]

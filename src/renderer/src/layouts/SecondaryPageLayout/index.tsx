@@ -11,11 +11,13 @@ import { useEffect, useRef, useState } from 'react'
 export default function SecondaryPageLayout({
   children,
   titlebarContent,
-  hideBackButton = false
+  hideBackButton = false,
+  hideScrollToTopButton = false
 }: {
   children?: React.ReactNode
   titlebarContent?: React.ReactNode
   hideBackButton?: boolean
+  hideScrollToTopButton?: boolean
 }): JSX.Element {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(true)
@@ -50,7 +52,10 @@ export default function SecondaryPageLayout({
       <div className={cn('sm:px-4 pb-4 pt-11 w-full h-full', isMacOS() ? 'max-sm:pt-20' : '')}>
         {children}
       </div>
-      <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible} />
+      <ScrollToTopButton
+        scrollAreaRef={scrollAreaRef}
+        visible={!hideScrollToTopButton && visible}
+      />
     </ScrollArea>
   )
 }
