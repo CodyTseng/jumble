@@ -7,7 +7,7 @@
   <p>logo designed by <a href="http://wolfertdan.com/">Daniel David</a></p>
 </div>
 
----
+<hr style="border: 0; height: 1px; background: #333; margin: 20px 0;" />
 
 # Jumble
 
