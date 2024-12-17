@@ -1,3 +1,4 @@
+import Hat from '@renderer/assets/christmas/hat.png'
 import FollowButton from '@renderer/components/FollowButton'
 import Nip05 from '@renderer/components/Nip05'
 import NoteList from '@renderer/components/NoteList'
@@ -72,6 +73,7 @@ export default function ProfilePage({ id }: { id?: string }) {
               <img src={defaultImage} />
             </AvatarFallback>
           </Avatar>
+          <img src={Hat} alt="Hat" className="absolute bottom-4 left-6 w-20 h-16" />
         </div>
         <div className="flex justify-end h-8 gap-2 items-center">
           {isFollowingYou && (

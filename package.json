@@ -61,6 +61,7 @@
     "qrcode.react": "^4.1.0",
     "react-i18next": "^15.1.1",
     "react-resizable-panels": "^2.1.5",
+    "react-snowfall": "^2.2.0",
     "react-string-replace": "^1.1.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",

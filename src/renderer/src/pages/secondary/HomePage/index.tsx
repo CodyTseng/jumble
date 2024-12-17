@@ -1,12 +1,11 @@
+import Tree from '@renderer/assets/christmas/tree.png'
 import SecondaryPageLayout from '@renderer/layouts/SecondaryPageLayout'
-import { useTranslation } from 'react-i18next'
 
 export default function HomePage() {
-  const { t } = useTranslation()
   return (
     <SecondaryPageLayout hideBackButton hideScrollToTopButton>
-      <div className="text-muted-foreground w-full h-full flex items-center justify-center">
-        {t('Welcome! 🥳')}
+      <div className="h-full flex flex-col justify-center items-center">
+        <img src={Tree} alt="Wreath" className="w-36 h-36" />
       </div>
     </SecondaryPageLayout>
   )

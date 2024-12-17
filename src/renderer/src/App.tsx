@@ -10,10 +10,17 @@ import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { RelaySettingsProvider } from './providers/RelaySettingsProvider'
 import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
+import Snowfall from 'react-snowfall'
 
 export default function App(): JSX.Element {
   return (
     <div className="h-screen">
+      <Snowfall
+        style={{ zIndex: 1000, background: 'transparent' }}
+        snowflakeCount={50}
+        wind={[-1, 2]}
+        radius={[0.5, 2]}
+      />
       <ThemeProvider>
         <ScreenSizeProvider>
           <RelaySettingsProvider>
