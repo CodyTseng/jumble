@@ -23,7 +23,7 @@ export default function PrimaryPageSidebar() {
           <img
             src={Wreath}
             alt="Wreath"
-            className="absolute -translate-y-20 left-6 w-28 h-28 -z-10"
+            className="absolute -translate-y-[75px] left-14 w-12 h-12 -z-10"
           />
         </div>
         <PostButton variant="sidebar" />
