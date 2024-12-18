@@ -8,6 +8,7 @@
     "src/common/**/*"
   ],
   "compilerOptions": {
+    "moduleResolution": "bundler",
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",

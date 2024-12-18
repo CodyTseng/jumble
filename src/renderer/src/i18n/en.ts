@@ -84,6 +84,9 @@ export default {
     'Your nsec will be encrypted using the {{backend}}.':
       'Your nsec will be encrypted using the {{backend}}.',
     'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':
-      'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.'
+      'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.',
+    'Login with Browser Extension': 'Login with Browser Extension',
+    'Login with Bunker': 'Login with Bunker',
+    'Login with Private Key': 'Login with Private Key'
   }
 }

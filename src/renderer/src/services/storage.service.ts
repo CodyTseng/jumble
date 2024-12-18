@@ -42,7 +42,7 @@ class StorageService {
   private initPromise!: Promise<void>
   private relayGroups: TRelayGroup[] = []
   private themeSetting: TThemeSetting = 'system'
-  private account: TAccount | null = null
+  private accounts: TAccount[] = []
   private storage: Storage = new Storage()
 
   constructor() {
@@ -58,8 +58,8 @@ class StorageService {
     this.relayGroups = relayGroupsStr ? JSON.parse(relayGroupsStr) : DEFAULT_RELAY_GROUPS
     this.themeSetting =
       ((await this.storage.getItem(StorageKey.THEME_SETTING)) as TThemeSetting) ?? 'system'
-    const accountStr = await this.storage.getItem(StorageKey.ACCOUNT)
-    this.account = accountStr ? JSON.parse(accountStr) : null
+    const accountsStr = await this.storage.getItem(StorageKey.ACCOUNTS)
+    this.accounts = accountsStr ? JSON.parse(accountsStr) : []
   }
 
   async getRelayGroups() {
@@ -84,19 +84,19 @@ class StorageService {
     this.themeSetting = themeSetting
   }
 
-  async getAccountInfo() {
+  async getAccounts() {
     await this.initPromise
-    return this.account
+    return this.accounts
   }
 
-  async setAccountInfo(account: TAccount | null) {
+  async setAccounts(accounts: TAccount[]) {
     await this.initPromise
-    if (account === null) {
-      await this.storage.removeItem(StorageKey.ACCOUNT)
+    if (accounts === null) {
+      await this.storage.removeItem(StorageKey.ACCOUNTS)
     } else {
-      await this.storage.setItem(StorageKey.ACCOUNT, JSON.stringify(account))
+      await this.storage.setItem(StorageKey.ACCOUNTS, JSON.stringify(accounts))
     }
-    this.account = account
+    this.accounts = accounts
   }
 }
 

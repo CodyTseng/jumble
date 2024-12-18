@@ -39,9 +39,11 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   )
 
   useEffect(() => {
-    if (isReady || !accountPubkey) return
+    if (!accountPubkey) return
 
     const init = async () => {
+      setIsReady(false)
+      setFollowListEvent(undefined)
       const event = await client.fetchFollowListEvent(accountPubkey)
       setFollowListEvent(event)
       setIsReady(true)

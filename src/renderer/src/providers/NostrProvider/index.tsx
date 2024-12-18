@@ -1,4 +1,5 @@
 import { ISigner, TDraftEvent } from '@common/types'
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import LoginDialog from '@renderer/components/LoginDialog'
 import { useToast } from '@renderer/hooks'
 import { useFetchRelayList } from '@renderer/hooks/useFetchRelayList'
@@ -10,6 +11,7 @@ import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRelaySettings } from '../RelaySettingsProvider'
 import { BrowserNsecSigner } from './browser-nsec.signer'
+import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
 import { NsecSigner } from './nsec.signer'
 
@@ -18,8 +20,9 @@ type TNostrContext = {
   pubkey: string | null
   setPubkey: (pubkey: string) => void
   nsecLogin: (nsec: string) => Promise<string>
-  logout: () => Promise<void>
   nip07Login: () => Promise<void>
+  bunkerLogin: (bunker: string) => Promise<string>
+  logout: () => Promise<void>
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
@@ -50,7 +53,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
-      const account = await storage.getAccountInfo()
+      const [account] = await storage.getAccounts()
       if (!account) {
         if (isElectron(window) || !window.nostr) {
           return setIsReady(true)
@@ -64,14 +67,20 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         }
         setPubkey(pubkey)
         setSigner(nip07Signer)
-        return setIsReady(true)
+        setIsReady(true)
+        return await storage.setAccounts([{ pubkey, signerType: 'nip-07' }])
+      }
+
+      if (account.pubkey) {
+        setPubkey(account.pubkey)
       }
 
       if (account.signerType === 'nsec') {
         const nsecSigner = new NsecSigner()
         const pubkey = await nsecSigner.getPublicKey()
         if (!pubkey) {
-          await storage.setAccountInfo(null)
+          setPubkey(null)
+          await storage.setAccounts([])
           return setIsReady(true)
         }
         setPubkey(pubkey)
@@ -81,7 +90,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
       if (account.signerType === 'browser-nsec') {
         if (!account.nsec) {
-          await storage.setAccountInfo(null)
+          setPubkey(null)
+          await storage.setAccounts([])
           return setIsReady(true)
         }
         const browserNsecSigner = new BrowserNsecSigner()
@@ -95,7 +105,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         const nip07Signer = new Nip07Signer()
         const pubkey = await nip07Signer.getPublicKey()
         if (!pubkey) {
-          await storage.setAccountInfo(null)
+          setPubkey(null)
+          await storage.setAccounts([])
           return setIsReady(true)
         }
         setPubkey(pubkey)
@@ -103,11 +114,25 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
 
-      await storage.setAccountInfo(null)
+      if (account.signerType === 'bunker') {
+        if (!account.bunker || !account.bunkerClientSecretKey) {
+          setPubkey(null)
+          await storage.setAccounts([])
+          return setIsReady(true)
+        }
+        const bunkerSigner = new BunkerSigner(hexToBytes(account.bunkerClientSecretKey))
+        const pubkey = await bunkerSigner.login(account.bunker)
+        setPubkey(pubkey)
+        setSigner(bunkerSigner)
+        return setIsReady(true)
+      }
+
+      await storage.setAccounts([])
       return setIsReady(true)
     }
     init().catch(() => {
-      storage.setAccountInfo(null)
+      setPubkey(null)
+      storage.setAccounts([])
       setIsReady(true)
     })
   }, [])
@@ -119,14 +144,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!pubkey) {
         throw new Error(reason ?? 'invalid nsec')
       }
-      await storage.setAccountInfo({ signerType: 'nsec' })
+      await storage.setAccounts([{ pubkey, signerType: 'nsec' }])
       setPubkey(pubkey)
       setSigner(nsecSigner)
       return pubkey
     }
     const browserNsecSigner = new BrowserNsecSigner()
     const pubkey = browserNsecSigner.login(nsec)
-    await storage.setAccountInfo({ signerType: 'browser-nsec', nsec })
+    await storage.setAccounts([{ pubkey, signerType: 'browser-nsec', nsec }])
     setPubkey(pubkey)
     setSigner(browserNsecSigner)
     return pubkey
@@ -139,7 +164,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!pubkey) {
         throw new Error('You did not allow to access your pubkey')
       }
-      await storage.setAccountInfo({ signerType: 'nip-07' })
+      await storage.setAccounts([{ pubkey, signerType: 'nip-07' }])
       setPubkey(pubkey)
       setSigner(nip07Signer)
     } catch (err) {
@@ -152,6 +177,27 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const bunkerLogin = async (bunker: string) => {
+    const bunkerSigner = new BunkerSigner()
+    const pubkey = await bunkerSigner.login(bunker)
+    if (!pubkey) {
+      throw new Error('Invalid bunker')
+    }
+    const bunkerUrl = new URL(bunker)
+    bunkerUrl.searchParams.delete('secret')
+    await storage.setAccounts([
+      {
+        pubkey,
+        signerType: 'bunker',
+        bunker: bunkerUrl.toString(),
+        bunkerClientSecretKey: bytesToHex(bunkerSigner.clientSecretKey)
+      }
+    ])
+    setPubkey(pubkey)
+    setSigner(bunkerSigner)
+    return pubkey
+  }
+
   const logout = async () => {
     if (signer instanceof NsecSigner) {
       await signer.logout()
@@ -159,7 +205,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       signer.logout()
     }
     setPubkey(null)
-    await storage.setAccountInfo(null)
+    await storage.setAccounts([])
   }
 
   const signEvent = async (draftEvent: TDraftEvent) => {
@@ -207,6 +253,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         setPubkey,
         nsecLogin,
         nip07Login,
+        bunkerLogin,
         logout,
         publish,
         signHttpAuth,

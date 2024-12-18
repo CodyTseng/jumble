@@ -82,6 +82,9 @@ export default {
       '此设备上没有可用的密码管理工具。您的密钥将不受保护',
     'Your nsec will be encrypted using the {{backend}}.': '您的密钥将使用 {{backend}} 加密',
     'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':
-      '使用私钥登录是不安全的。建议使用浏览器插件进行登录，例如 alby、nostr-keyx 或 nos2x'
+      '使用私钥登录是不安全的。建议使用浏览器插件进行登录，例如 alby、nostr-keyx 或 nos2x',
+    'Login with Browser Extension': '浏览器插件登录',
+    'Login with Bunker': 'Bunker 登录',
+    'Login with Private Key': '私钥登录'
   }
 }
