@@ -51,6 +51,7 @@ export type TElectronWindow = {
 }
 
 export type TAccount = {
-  signerType: 'nsec' | 'browser-nsec' | 'nip-07'
+  signerType: 'nsec' | 'browser-nsec' | 'nip-07' | 'bunker'
   nsec?: string
+  bunker?: string
 }

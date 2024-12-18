@@ -10,6 +10,7 @@ import { IS_ELECTRON } from '@renderer/lib/env'
 import { useNostr } from '@renderer/providers/NostrProvider'
 import { ArrowLeft } from 'lucide-react'
 import { Dispatch, useState } from 'react'
+import BunkerLogin from './BunkerLogin'
 import PrivateKeyLogin from './NsecLogin'
 
 export default function LoginDialog({
@@ -19,7 +20,7 @@ export default function LoginDialog({
   open: boolean
   setOpen: Dispatch<boolean>
 }) {
-  const [loginMethod, setLoginMethod] = useState<'nsec' | 'nip07' | null>(null)
+  const [loginMethod, setLoginMethod] = useState<'nsec' | 'nip07' | 'bunker' | null>(null)
   const { nip07Login } = useNostr()
 
   return (
@@ -39,6 +40,16 @@ export default function LoginDialog({
             </div>
             <PrivateKeyLogin onLoginSuccess={() => setOpen(false)} />
           </>
+        ) : loginMethod === 'bunker' ? (
+          <>
+            <div
+              className="absolute left-4 top-4 opacity-70 hover:opacity-100 cursor-pointer"
+              onClick={() => setLoginMethod(null)}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </div>
+            <BunkerLogin onLoginSuccess={() => setOpen(false)} />
+          </>
         ) : (
           <>
             {!IS_ELECTRON && !!window.nostr && (
@@ -46,6 +57,9 @@ export default function LoginDialog({
                 Login with NIP-07
               </Button>
             )}
+            <Button variant="secondary" onClick={() => setLoginMethod('bunker')} className="w-full">
+              Login with Bunker
+            </Button>
             <Button variant="secondary" onClick={() => setLoginMethod('nsec')} className="w-full">
               Login with Private Key
             </Button>

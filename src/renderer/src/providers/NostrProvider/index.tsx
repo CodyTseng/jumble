@@ -10,6 +10,7 @@ import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRelaySettings } from '../RelaySettingsProvider'
 import { BrowserNsecSigner } from './browser-nsec.signer'
+import { BunkerSigner } from './bunkker.signer'
 import { Nip07Signer } from './nip-07.signer'
 import { NsecSigner } from './nsec.signer'
 
@@ -18,8 +19,9 @@ type TNostrContext = {
   pubkey: string | null
   setPubkey: (pubkey: string) => void
   nsecLogin: (nsec: string) => Promise<string>
-  logout: () => Promise<void>
   nip07Login: () => Promise<void>
+  bunkerLogin: (bunker: string) => Promise<string>
+  logout: () => Promise<void>
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
@@ -103,6 +105,18 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
 
+      if (account.signerType === 'bunker') {
+        if (!account.bunker) {
+          await storage.setAccountInfo(null)
+          return setIsReady(true)
+        }
+        const bunkerSigner = new BunkerSigner()
+        const pubkey = await bunkerSigner.login(account.bunker)
+        setPubkey(pubkey)
+        setSigner(bunkerSigner)
+        return setIsReady(true)
+      }
+
       await storage.setAccountInfo(null)
       return setIsReady(true)
     }
@@ -150,6 +164,18 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       })
       throw err
     }
+  }
+
+  const bunkerLogin = async (bunker: string) => {
+    const bunkerSigner = new BunkerSigner()
+    const pubkey = await bunkerSigner.login(bunker)
+    if (!pubkey) {
+      throw new Error('Invalid bunker')
+    }
+    await storage.setAccountInfo({ signerType: 'bunker', bunker })
+    setPubkey(pubkey)
+    setSigner(bunkerSigner)
+    return pubkey
   }
 
   const logout = async () => {
@@ -207,6 +233,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         setPubkey,
         nsecLogin,
         nip07Login,
+        bunkerLogin,
         logout,
         publish,
         signHttpAuth,
