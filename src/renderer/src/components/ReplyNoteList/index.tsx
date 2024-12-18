@@ -139,8 +139,10 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
   }
 
   const onNewReply = (evt: NEvent) => {
-    if (replies.some((reply) => reply.id === evt.id)) return
-    setReplies((pre) => [...pre, evt])
+    setReplies((pre) => {
+      if (pre.some((reply) => reply.id === evt.id)) return pre
+      return [...pre, evt]
+    })
     if (evt.pubkey === pubkey) {
       setTimeout(() => {
         highlightReply(evt.id)
