@@ -152,8 +152,8 @@ export default function NoteList({
       <div className="flex flex-col sm:gap-4">
         {events
           .filter((event) => displayReplies || !isReplyNoteEvent(event))
-          .map((event, i) => (
-            <NoteCard key={`${i}-${event.id}`} className="w-full" event={event} />
+          .map((event) => (
+            <NoteCard key={event.id} className="w-full" event={event} />
           ))}
       </div>
       <div className="text-center text-sm text-muted-foreground">
