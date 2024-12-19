@@ -131,7 +131,7 @@ class ClientService extends EventTarget {
       signer,
       needSort = true
     }: {
-      signer?: (evt: TDraftEvent) => Promise<NEvent>
+      signer?: (evt: TDraftEvent) => Promise<NEvent | null>
       needSort?: boolean
     } = {}
   ) {
@@ -221,12 +221,21 @@ class ClientService extends EventTarget {
             if (reason.startsWith('auth-required:')) {
               if (!hasAuthed && signer) {
                 relay
-                  .auth((authEvt: EventTemplate) => {
-                    return signer(authEvt) as Promise<VerifiedEvent>
+                  .auth(async (authEvt: EventTemplate) => {
+                    const evt = await signer(authEvt)
+                    if (!evt) {
+                      throw new Error('sign event failed')
+                    }
+                    return evt as VerifiedEvent
                   })
                   .then(() => {
                     hasAuthed = true
-                    startSub()
+                    if (!eosed) {
+                      startSub()
+                    }
+                  })
+                  .catch(() => {
+                    // ignore
                   })
               }
             }

@@ -87,6 +87,7 @@ export default {
       'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.',
     'Login with Browser Extension': 'Login with Browser Extension',
     'Login with Bunker': 'Login with Bunker',
-    'Login with Private Key': 'Login with Private Key'
+    'Login with Private Key': 'Login with Private Key',
+    'reload notes': 'reload notes'
   }
 }

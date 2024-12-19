@@ -142,13 +142,13 @@ export function PageManager({
         <div className="flex h-full">
           <Sidebar />
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={55} minSize={30}>
+            <ResizablePanel minSize={30}>
               <div key={primaryPageKey} className="h-full">
                 {children}
               </div>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={45} minSize={30} className="relative">
+            <ResizablePanel minSize={30} className="relative">
               {secondaryStack.length ? (
                 secondaryStack.map((item, index) => (
                   <div

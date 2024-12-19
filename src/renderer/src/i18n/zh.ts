@@ -85,6 +85,7 @@ export default {
       '使用私钥登录是不安全的。建议使用浏览器插件进行登录，例如 alby、nostr-keyx 或 nos2x',
     'Login with Browser Extension': '浏览器插件登录',
     'Login with Bunker': 'Bunker 登录',
-    'Login with Private Key': '私钥登录'
+    'Login with Private Key': '私钥登录',
+    'reload notes': '重新加载笔记'
   }
 }

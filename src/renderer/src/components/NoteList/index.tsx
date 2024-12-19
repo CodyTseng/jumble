@@ -25,8 +25,9 @@ export default function NoteList({
   className?: string
 }) {
   const { t } = useTranslation()
-  const { isReady, signEvent } = useNostr()
+  const { signEvent, checkLogin } = useNostr()
   const { isFetching: isFetchingRelayInfo, areAlgoRelays } = useFetchRelayInfos(relayUrls)
+  const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [events, setEvents] = useState<Event[]>([])
   const [newEvents, setNewEvents] = useState<Event[]>([])
@@ -44,7 +45,7 @@ export default function NoteList({
   }, [JSON.stringify(filter), areAlgoRelays])
 
   useEffect(() => {
-    if (!isReady || isFetchingRelayInfo) return
+    if (isFetchingRelayInfo) return
 
     async function init() {
       setInitialized(false)
@@ -75,7 +76,13 @@ export default function NoteList({
             )
           }
         },
-        { signer: signEvent, needSort: !areAlgoRelays }
+        {
+          signer: async (evt) => {
+            const signedEvt = await checkLogin(() => signEvent(evt))
+            return signedEvt ?? null
+          },
+          needSort: !areAlgoRelays
+        }
       )
       setTimelineKey(timelineKey)
       return closer
@@ -88,9 +95,9 @@ export default function NoteList({
   }, [
     JSON.stringify(relayUrls),
     JSON.stringify(noteFilter),
-    isReady,
     isFetchingRelayInfo,
-    areAlgoRelays
+    areAlgoRelays,
+    refreshCount
   ])
 
   useEffect(() => {
@@ -157,7 +164,17 @@ export default function NoteList({
           ))}
       </div>
       <div className="text-center text-sm text-muted-foreground">
-        {hasMore ? <div ref={bottomRef}>{t('loading...')}</div> : t('no more notes')}
+        {hasMore ? (
+          <div ref={bottomRef}>{t('loading...')}</div>
+        ) : events.length ? (
+          t('no more notes')
+        ) : (
+          <div className="flex justify-center w-full max-sm:mt-2">
+            <Button size="lg" onClick={() => setRefreshCount((pre) => pre + 1)}>
+              {t('reload notes')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

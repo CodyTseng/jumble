@@ -15,7 +15,7 @@ const LIMIT = 100
 
 export default function ReplyNoteList({ event, className }: { event: NEvent; className?: string }) {
   const { t } = useTranslation()
-  const { isReady, pubkey } = useNostr()
+  const { pubkey } = useNostr()
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [until, setUntil] = useState<number | undefined>(() => dayjs().unix())
   const [replies, setReplies] = useState<NEvent[]>([])
@@ -46,7 +46,7 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
   }, [])
 
   useEffect(() => {
-    if (!isReady || loading) return
+    if (loading) return
 
     const init = async () => {
       setLoading(true)
@@ -87,7 +87,7 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
     return () => {
       promise.then((closer) => closer?.())
     }
-  }, [isReady])
+  }, [])
 
   useEffect(() => {
     updateNoteReplyCount(event.id, replies.length)

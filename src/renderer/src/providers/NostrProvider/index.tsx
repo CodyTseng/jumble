@@ -16,7 +16,6 @@ import { Nip07Signer } from './nip-07.signer'
 import { NsecSigner } from './nsec.signer'
 
 type TNostrContext = {
-  isReady: boolean
   pubkey: string | null
   setPubkey: (pubkey: string) => void
   nsecLogin: (nsec: string) => Promise<string>
@@ -29,7 +28,7 @@ type TNostrContext = {
   publish: (draftEvent: TDraftEvent, additionalRelayUrls?: string[]) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
   signEvent: (draftEvent: TDraftEvent) => Promise<Event>
-  checkLogin: (cb?: () => void | Promise<void>) => void
+  checkLogin: <T>(cb?: () => T) => Promise<T | void>
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -44,7 +43,6 @@ export const useNostr = () => {
 
 export function NostrProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast()
-  const [isReady, setIsReady] = useState(false)
   const [pubkey, setPubkey] = useState<string | null>(null)
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
@@ -56,18 +54,17 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const [account] = await storage.getAccounts()
       if (!account) {
         if (isElectron(window) || !window.nostr) {
-          return setIsReady(true)
+          return
         }
 
         // For browser env, attempt to login with nip-07
         const nip07Signer = new Nip07Signer()
         const pubkey = await nip07Signer.getPublicKey()
         if (!pubkey) {
-          return setIsReady(true)
+          return
         }
         setPubkey(pubkey)
         setSigner(nip07Signer)
-        setIsReady(true)
         return await storage.setAccounts([{ pubkey, signerType: 'nip-07' }])
       }
 
@@ -81,24 +78,24 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         if (!pubkey) {
           setPubkey(null)
           await storage.setAccounts([])
-          return setIsReady(true)
+          return
         }
         setPubkey(pubkey)
         setSigner(nsecSigner)
-        return setIsReady(true)
+        return
       }
 
       if (account.signerType === 'browser-nsec') {
         if (!account.nsec) {
           setPubkey(null)
           await storage.setAccounts([])
-          return setIsReady(true)
+          return
         }
         const browserNsecSigner = new BrowserNsecSigner()
         const pubkey = browserNsecSigner.login(account.nsec)
         setPubkey(pubkey)
         setSigner(browserNsecSigner)
-        return setIsReady(true)
+        return
       }
 
       if (account.signerType === 'nip-07') {
@@ -107,33 +104,32 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         if (!pubkey) {
           setPubkey(null)
           await storage.setAccounts([])
-          return setIsReady(true)
+          return
         }
         setPubkey(pubkey)
         setSigner(nip07Signer)
-        return setIsReady(true)
+        return
       }
 
       if (account.signerType === 'bunker') {
         if (!account.bunker || !account.bunkerClientSecretKey) {
           setPubkey(null)
           await storage.setAccounts([])
-          return setIsReady(true)
+          return
         }
         const bunkerSigner = new BunkerSigner(hexToBytes(account.bunkerClientSecretKey))
         const pubkey = await bunkerSigner.login(account.bunker)
         setPubkey(pubkey)
         setSigner(bunkerSigner)
-        return setIsReady(true)
+        return
       }
 
       await storage.setAccounts([])
-      return setIsReady(true)
+      return
     }
     init().catch(() => {
       setPubkey(null)
       storage.setAccounts([])
-      setIsReady(true)
     })
   }, [])
 
@@ -238,8 +234,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return 'Nostr ' + btoa(JSON.stringify(event))
   }
 
-  const checkLogin = async (cb?: () => void) => {
-    if (pubkey) {
+  const checkLogin = async <T,>(cb?: () => T): Promise<T | void> => {
+    if (signer) {
       return cb && cb()
     }
     return setOpenLoginDialog(true)
@@ -248,7 +244,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   return (
     <NostrContext.Provider
       value={{
-        isReady,
         pubkey,
         setPubkey,
         nsecLogin,
