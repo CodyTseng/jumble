@@ -16,7 +16,7 @@ export default function App(): JSX.Element {
   return (
     <div className="h-screen">
       <Snowfall
-        style={{ zIndex: 1000, background: 'transparent' }}
+        style={{ zIndex: 99999, background: 'transparent' }}
         snowflakeCount={50}
         wind={[-1, 2]}
         radius={[0.5, 2]}
