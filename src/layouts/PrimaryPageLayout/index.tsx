@@ -9,6 +9,7 @@ import SearchButton from '@/components/SearchButton'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useChristmas } from '@/providers/ChristmasProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
@@ -74,6 +75,7 @@ export type TPrimaryPageLayoutRef = {
 }
 
 function PrimaryPageTitlebar({ visible = true }: { visible?: boolean }) {
+  const { toggle } = useChristmas()
   const { isSmallScreen } = useScreenSize()
 
   if (isSmallScreen) {
@@ -83,7 +85,7 @@ function PrimaryPageTitlebar({ visible = true }: { visible?: boolean }) {
         visible={visible}
       >
         <div className="flex gap-1 items-center">
-          <div className="-translate-y-0.5">
+          <div className="-translate-y-0.5 cursor-pointer" onClick={toggle}>
             <Logo className="h-8" />
           </div>
           <ThemeToggle variant="small-screen-titlebar" />
