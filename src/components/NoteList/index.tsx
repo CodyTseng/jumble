@@ -45,7 +45,7 @@ export default function NoteList({
   }, [JSON.stringify(filter), areAlgoRelays])
 
   useEffect(() => {
-    if (isFetchingRelayInfo) return
+    if (isFetchingRelayInfo || relayUrls.length === 0) return
 
     async function init() {
       setInitialized(false)

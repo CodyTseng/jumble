@@ -27,7 +27,7 @@ export default function NoteListPage() {
     }
     const search = searchParams.get('s')
     if (search) {
-      return { title: `${t('search')}: ${search}`, filter: { search }, urls: relayUrls }
+      return { title: `${t('search')}: ${search}`, filter: { search }, urls: searchableRelayUrls }
     }
     const relayUrl = searchParams.get('relay')
     if (relayUrl && isWebsocketUrl(relayUrl)) {
