@@ -10,6 +10,7 @@ import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
 
 const NORMAL_RELAY_LIMIT = 100
@@ -150,20 +151,32 @@ export default function NoteList({
   return (
     <div className={cn('space-y-2 sm:space-y-4', className)}>
       <DisplayRepliesSwitch displayReplies={displayReplies} setDisplayReplies={setDisplayReplies} />
-      {newEvents.length > 0 && (
-        <div className="flex justify-center w-full max-sm:mt-2">
-          <Button size="lg" onClick={showNewEvents}>
-            {t('show new notes')}
-          </Button>
-        </div>
-      )}
-      <div className="flex flex-col sm:gap-4">
-        {events
-          .filter((event) => displayReplies || !isReplyNoteEvent(event))
-          .map((event) => (
-            <NoteCard key={event.id} className="w-full" event={event} />
-          ))}
-      </div>
+      <PullToRefresh
+        onRefresh={async () =>
+          new Promise((resolve) => {
+            setRefreshCount((pre) => pre + 1)
+            setTimeout(resolve, 1000)
+          })
+        }
+        pullingContent=""
+      >
+        <>
+          {newEvents.filter((event) => displayReplies || !isReplyNoteEvent(event)).length > 0 && (
+            <div className="flex justify-center w-full max-sm:mt-2">
+              <Button size="lg" onClick={showNewEvents}>
+                {t('show new notes')}
+              </Button>
+            </div>
+          )}
+          <div className="flex flex-col sm:gap-4">
+            {events
+              .filter((event) => displayReplies || !isReplyNoteEvent(event))
+              .map((event) => (
+                <NoteCard key={event.id} className="w-full" event={event} />
+              ))}
+          </div>
+        </>
+      </PullToRefresh>
       <div className="text-center text-sm text-muted-foreground">
         {hasMore ? (
           <div ref={bottomRef}>{t('loading...')}</div>
