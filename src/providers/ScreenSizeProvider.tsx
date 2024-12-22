@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 type TScreenSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
@@ -18,8 +18,8 @@ export const useScreenSize = () => {
 }
 
 export function ScreenSizeProvider({ children }: { children: React.ReactNode }) {
-  const [screenSize, setScreenSize] = useState<TScreenSize>('xl')
-  const isSmallScreen = screenSize === 'sm'
+  const [screenSize, setScreenSize] = useState<TScreenSize>('sm')
+  const isSmallScreen = useMemo(() => screenSize === 'sm', [screenSize])
 
   useEffect(() => {
     const handleResize = () => {

@@ -2,7 +2,6 @@ import Logo from '@/assets/Logo'
 import AccountButton from '@/components/AccountButton'
 import NotificationButton from '@/components/NotificationButton'
 import PostButton from '@/components/PostButton'
-import RefreshButton from '@/components/RefreshButton'
 import RelaySettingsButton from '@/components/RelaySettingsButton'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import SearchButton from '@/components/SearchButton'
@@ -63,7 +62,7 @@ const PrimaryPageLayout = forwardRef(({ children }: { children?: React.ReactNode
     >
       <PrimaryPageTitlebar visible={visible} />
       <div className="sm:px-4 pb-4 pt-11 xl:pt-4">{children}</div>
-      <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible} />
+      <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
     </ScrollArea>
   )
 })
@@ -109,7 +108,6 @@ function PrimaryPageTitlebar({ visible = true }: { visible?: boolean }) {
         <SearchButton />
       </div>
       <div className="flex gap-2 items-center">
-        <RefreshButton />
         <RelaySettingsButton />
         <NotificationButton />
       </div>

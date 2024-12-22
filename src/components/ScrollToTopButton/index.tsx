@@ -19,7 +19,7 @@ export default function ScrollToTopButton({
     <Button
       variant="secondary-2"
       className={cn(
-        `absolute bottom-2 right-2 rounded-full w-11 h-11 p-0 hover:text-background transition-transform ${visible ? '' : 'translate-y-14'}`,
+        `absolute bottom-6 right-6 rounded-full w-12 h-12 p-0 hover:text-background transition-transform ${visible ? '' : 'translate-y-20'}`,
         className
       )}
       onClick={handleScrollToTop}

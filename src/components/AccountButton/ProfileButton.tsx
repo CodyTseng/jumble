@@ -32,7 +32,7 @@ export default function ProfileButton({
   if (variant === 'titlebar') {
     triggerComponent = (
       <button>
-        <Avatar className="w-7 h-7 hover:opacity-90">
+        <Avatar className="ml-2 w-6 h-6 hover:opacity-90">
           <AvatarImage src={avatar} />
           <AvatarFallback>
             <img src={defaultAvatar} />

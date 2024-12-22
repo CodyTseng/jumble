@@ -19,8 +19,6 @@
 
   body {
     font-family: 'Inter', sans-serif;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
     text-size-adjust: 100%;

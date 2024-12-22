@@ -41,20 +41,16 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
   const [areAlgoRelays, setAreAlgoRelays] = useState(false)
 
   useEffect(() => {
-    const init = async () => {
-      const searchParams = new URLSearchParams(window.location.search)
-      const tempRelays = searchParams
-        .getAll('r')
-        .filter((url) => isWebsocketUrl(url))
-        .map((url) => normalizeUrl(url))
-      if (tempRelays.length) {
-        setTemporaryRelayUrls(tempRelays)
-      }
-      const storedGroups = await storage.getRelayGroups()
-      setRelayGroups(storedGroups)
+    const searchParams = new URLSearchParams(window.location.search)
+    const tempRelays = searchParams
+      .getAll('r')
+      .filter((url) => isWebsocketUrl(url))
+      .map((url) => normalizeUrl(url))
+    if (tempRelays.length) {
+      setTemporaryRelayUrls(tempRelays)
     }
-
-    init()
+    const storedGroups = storage.getRelayGroups()
+    setRelayGroups(storedGroups)
   }, [])
 
   useEffect(() => {
@@ -63,25 +59,25 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
         ? temporaryRelayUrls
         : (relayGroups.find((group) => group.isActive)?.relayUrls ?? [])
 
+      if (JSON.stringify(relayUrls) !== JSON.stringify(newRelayUrls)) {
+        setRelayUrls(newRelayUrls)
+      }
       const relayInfos = await client.fetchRelayInfos(newRelayUrls)
       setSearchableRelayUrls(newRelayUrls.filter((_, index) => checkSearchRelay(relayInfos[index])))
       const nonAlgoRelayUrls = newRelayUrls.filter((_, index) => !checkAlgoRelay(relayInfos[index]))
       setAreAlgoRelays(newRelayUrls.length > 0 && nonAlgoRelayUrls.length === 0)
       client.setCurrentRelayUrls(nonAlgoRelayUrls)
-      if (JSON.stringify(relayUrls) !== JSON.stringify(newRelayUrls)) {
-        setRelayUrls(newRelayUrls)
-      }
     }
     handler()
   }, [relayGroups, temporaryRelayUrls, relayUrls])
 
-  const updateGroups = async (fn: (pre: TRelayGroup[]) => TRelayGroup[]) => {
+  const updateGroups = (fn: (pre: TRelayGroup[]) => TRelayGroup[]) => {
     let newGroups = relayGroups
     setRelayGroups((pre) => {
       newGroups = fn(pre)
       return newGroups
     })
-    await storage.setRelayGroups(newGroups)
+    storage.setRelayGroups(newGroups)
   }
 
   const switchRelayGroup = (groupName: string) => {

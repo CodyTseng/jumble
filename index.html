@@ -2,19 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      href="/favicon-light.svg"
-      media="(prefers-color-scheme: light)"
-      type="image/svg+xml"
-    />
-    <link
-      rel="icon"
-      href="/favicon-dark.svg"
-      media="(prefers-color-scheme: dark)"
-      type="image/svg+xml"
-    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="apple-mobile-web-app-title" content="Jumble" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml"> 
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 
     <meta property="og:url" content="https://jumble.social" />
     <meta property="og:type" content="website" />
@@ -28,6 +23,16 @@
       content="https://github.com/CodyTseng/jumble/blob/master/resources/og-image.png?raw=true"
     />
     <title>Jumble</title>
+    <style>
+      body {
+        background-color: #FFFFFF;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #000000;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
