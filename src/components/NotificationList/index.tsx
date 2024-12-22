@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import UserAvatar from '../UserAvatar'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 
 const LIMIT = 50
 
@@ -18,6 +19,7 @@ export default function NotificationList() {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
+  const [refreshCount, setRefreshCount] = useState(0)
   const [initialized, setInitialized] = useState(false)
   const [notifications, setNotifications] = useState<Event[]>([])
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
@@ -62,7 +64,7 @@ export default function NotificationList() {
     return () => {
       promise.then((closer) => closer?.())
     }
-  }, [pubkey])
+  }, [pubkey, refreshCount])
 
   useEffect(() => {
     if (!initialized) return
@@ -108,14 +110,24 @@ export default function NotificationList() {
   }
 
   return (
-    <div>
-      {notifications.map((notification) => (
-        <NotificationItem key={notification.id} notification={notification} />
-      ))}
-      <div className="text-center text-sm text-muted-foreground">
-        {until ? <div ref={bottomRef}>{t('loading...')}</div> : t('no more notifications')}
+    <PullToRefresh
+      onRefresh={async () =>
+        new Promise((resolve) => {
+          setRefreshCount((pre) => pre + 1)
+          setTimeout(resolve, 1000)
+        })
+      }
+      pullingContent=""
+    >
+      <div>
+        {notifications.map((notification) => (
+          <NotificationItem key={notification.id} notification={notification} />
+        ))}
+        <div className="text-center text-sm text-muted-foreground">
+          {until ? <div ref={bottomRef}>{t('loading...')}</div> : t('no more notifications')}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   )
 }
 

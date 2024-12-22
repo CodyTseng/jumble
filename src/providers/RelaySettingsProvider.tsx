@@ -1,8 +1,9 @@
-import { TRelayGroup } from '@/types'
+import { SEARCHABLE_RELAY_URLS } from '@/constants'
 import { checkAlgoRelay, checkSearchRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
+import { TRelayGroup } from '@/types'
 import { createContext, Dispatch, useContext, useEffect, useState } from 'react'
 
 type TRelaySettingsContext = {
@@ -37,7 +38,7 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
       ? temporaryRelayUrls
       : (relayGroups.find((group) => group.isActive)?.relayUrls ?? [])
   )
-  const [searchableRelayUrls, setSearchableRelayUrls] = useState<string[]>([])
+  const [searchableRelayUrls, setSearchableRelayUrls] = useState<string[]>(SEARCHABLE_RELAY_URLS)
   const [areAlgoRelays, setAreAlgoRelays] = useState(false)
 
   useEffect(() => {
@@ -63,7 +64,12 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
         setRelayUrls(newRelayUrls)
       }
       const relayInfos = await client.fetchRelayInfos(newRelayUrls)
-      setSearchableRelayUrls(newRelayUrls.filter((_, index) => checkSearchRelay(relayInfos[index])))
+      const searchableRelayUrls = newRelayUrls.filter((_, index) =>
+        checkSearchRelay(relayInfos[index])
+      )
+      setSearchableRelayUrls(
+        searchableRelayUrls.length ? searchableRelayUrls : SEARCHABLE_RELAY_URLS
+      )
       const nonAlgoRelayUrls = newRelayUrls.filter((_, index) => !checkAlgoRelay(relayInfos[index]))
       setAreAlgoRelays(newRelayUrls.length > 0 && nonAlgoRelayUrls.length === 0)
       client.setCurrentRelayUrls(nonAlgoRelayUrls)

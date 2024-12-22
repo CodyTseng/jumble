@@ -1,3 +1,4 @@
+import { BIG_RELAY_URLS } from '@/constants'
 import { formatPubkey } from '@/lib/pubkey'
 import { tagNameEquals } from '@/lib/tag'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
@@ -14,13 +15,6 @@ import {
   SimplePool,
   VerifiedEvent
 } from 'nostr-tools'
-
-const BIG_RELAY_URLS = [
-  'wss://relay.damus.io/',
-  'wss://nos.lol/',
-  'wss://relay.nostr.band/',
-  'wss://relay.noswhere.com/'
-]
 
 type TTimelineRef = [string, number]
 

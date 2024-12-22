@@ -160,7 +160,7 @@ export default function NoteList({
         }
         pullingContent=""
       >
-        <>
+        <div className="space-y-2 sm:space-y-4">
           {newEvents.filter((event) => displayReplies || !isReplyNoteEvent(event)).length > 0 && (
             <div className="flex justify-center w-full max-sm:mt-2">
               <Button size="lg" onClick={showNewEvents}>
@@ -175,7 +175,7 @@ export default function NoteList({
                 <NoteCard key={event.id} className="w-full" event={event} />
               ))}
           </div>
-        </>
+        </div>
       </PullToRefresh>
       <div className="text-center text-sm text-muted-foreground">
         {hasMore ? (
