@@ -87,6 +87,6 @@ export default {
     'reload notes': 'reload notes',
     'Logged in Accounts': 'Logged in Accounts',
     'Add an Account': 'Add an Account',
-    'Manage accounts': 'Manage accounts'
+    Accounts: 'Accounts'
   }
 }

@@ -76,7 +76,7 @@ export default function ProfileButton({
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>{t('Profile')}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
-          {t('Manage accounts')}
+          {t('Accounts')}
         </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"

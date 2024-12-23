@@ -86,6 +86,6 @@ export default {
     'reload notes': '重新加载笔记',
     'Logged in Accounts': '已登录账户',
     'Add an Account': '添加账户',
-    'Manage accounts': '多帐户管理'
+    Accounts: '多帐户'
   }
 }
