@@ -54,3 +54,35 @@ export default function UserAvatar({
     </HoverCard>
   )
 }
+
+export function SimpleUserAvatar({
+  userId,
+  size = 'normal',
+  className,
+  onClick
+}: {
+  userId: string
+  size?: 'large' | 'normal' | 'small' | 'tiny'
+  className?: string
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+}) {
+  const { profile } = useFetchProfile(userId)
+  const defaultAvatar = useMemo(
+    () => (profile?.pubkey ? generateImageByPubkey(profile.pubkey) : ''),
+    [profile]
+  )
+
+  if (!profile) {
+    return <Skeleton className={cn(UserAvatarSizeCnMap[size], 'rounded-full', className)} />
+  }
+  const { avatar, pubkey } = profile
+
+  return (
+    <Avatar className={cn(UserAvatarSizeCnMap[size], className)} onClick={onClick}>
+      <AvatarImage src={avatar} className="object-cover object-center" />
+      <AvatarFallback>
+        <img src={defaultAvatar} alt={pubkey} />
+      </AvatarFallback>
+    </Avatar>
+  )
+}

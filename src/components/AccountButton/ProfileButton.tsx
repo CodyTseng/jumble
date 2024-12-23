@@ -11,19 +11,24 @@ import { toProfile } from '@/lib/link'
 import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import AccountsDialog from '../AccountsDialog'
+import LoginDialog from '../LoginDialog'
 
 export default function ProfileButton({
-  pubkey,
   variant = 'titlebar'
 }: {
-  pubkey: string
   variant?: 'titlebar' | 'sidebar' | 'small-screen-titlebar'
 }) {
   const { t } = useTranslation()
-  const { logout } = useNostr()
+  const { removeAccount, account } = useNostr()
+  const pubkey = account?.pubkey
   const { profile } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
+  const [accountsDialogOpen, setAccountsDialogOpen] = useState(false)
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  if (!pubkey) return null
 
   const defaultAvatar = generateImageByPubkey(pubkey)
   const { username, avatar } = profile || { username: formatPubkey(pubkey), avatar: defaultAvatar }
@@ -72,10 +77,21 @@ export default function ProfileButton({
       <DropdownMenuTrigger asChild>{triggerComponent}</DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>{t('Profile')}</DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={logout}>
+        <DropdownMenuItem onClick={() => setAccountsDialogOpen(true)}>
+          {t('Switch account')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
+          {t('Add a new account')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="text-destructive focus:text-destructive"
+          onClick={() => removeAccount(account)}
+        >
           {t('Logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <AccountsDialog open={accountsDialogOpen} setOpen={setAccountsDialogOpen} />
+      <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />
     </DropdownMenu>
   )
 }
