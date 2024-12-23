@@ -10,7 +10,7 @@ export default function AccountButton({
   const { pubkey } = useNostr()
 
   if (pubkey) {
-    return <ProfileButton variant={variant} pubkey={pubkey} />
+    return <ProfileButton variant={variant} />
   } else {
     return <LoginButton variant={variant} />
   }

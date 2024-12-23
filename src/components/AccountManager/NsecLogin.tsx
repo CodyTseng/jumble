@@ -4,7 +4,13 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function PrivateKeyLogin({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+export default function PrivateKeyLogin({
+  back,
+  onLoginSuccess
+}: {
+  back: () => void
+  onLoginSuccess: () => void
+}) {
   const { t } = useTranslation()
   const { nsecLogin } = useNostr()
   const [nsec, setNsec] = useState('')
@@ -43,6 +49,9 @@ export default function PrivateKeyLogin({ onLoginSuccess }: { onLoginSuccess: ()
         {errMsg && <div className="text-xs text-destructive pl-3">{errMsg}</div>}
       </div>
       <Button onClick={handleLogin}>{t('Login')}</Button>
+      <Button variant="secondary" onClick={back}>
+        {t('Back')}
+      </Button>
     </>
   )
 }

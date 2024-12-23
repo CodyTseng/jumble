@@ -5,7 +5,13 @@ import { Loader } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function BunkerLogin({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+export default function BunkerLogin({
+  back,
+  onLoginSuccess
+}: {
+  back: () => void
+  onLoginSuccess: () => void
+}) {
   const { t } = useTranslation()
   const { bunkerLogin } = useNostr()
   const [pending, setPending] = useState(false)
@@ -41,6 +47,9 @@ export default function BunkerLogin({ onLoginSuccess }: { onLoginSuccess: () => 
       <Button onClick={handleLogin} disabled={pending}>
         <Loader className={pending ? 'animate-spin' : 'hidden'} />
         {t('Login')}
+      </Button>
+      <Button variant="secondary" onClick={back}>
+        {t('Back')}
       </Button>
     </>
   )

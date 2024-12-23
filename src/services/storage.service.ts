@@ -1,5 +1,6 @@
 import { StorageKey } from '@/constants'
-import { TAccount, TRelayGroup, TThemeSetting } from '@/types'
+import { isSameAccount } from '@/lib/account'
+import { TAccount, TRelayGroup, TAccountPointer, TThemeSetting } from '@/types'
 
 const DEFAULT_RELAY_GROUPS: TRelayGroup[] = [
   {
@@ -15,6 +16,7 @@ class StorageService {
   private relayGroups: TRelayGroup[] = []
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
+  private currentAccount: TAccount | null = null
 
   constructor() {
     if (!StorageService.instance) {
@@ -31,6 +33,8 @@ class StorageService {
       (window.localStorage.getItem(StorageKey.THEME_SETTING) as TThemeSetting) ?? 'system'
     const accountsStr = window.localStorage.getItem(StorageKey.ACCOUNTS)
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
+    const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
+    this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
   }
 
   getRelayGroups() {
@@ -55,13 +59,38 @@ class StorageService {
     return this.accounts
   }
 
-  setAccounts(accounts: TAccount[]) {
-    if (accounts === null) {
-      window.localStorage.removeItem(StorageKey.ACCOUNTS)
-    } else {
-      window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(accounts))
+  findAccount(account: TAccountPointer) {
+    return this.accounts.find((act) => isSameAccount(act, account))
+  }
+
+  getCurrentAccount() {
+    return this.currentAccount
+  }
+
+  addAccount(account: TAccount) {
+    if (this.accounts.find((act) => isSameAccount(act, account))) {
+      return
     }
-    this.accounts = accounts
+    this.accounts.push(account)
+    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
+    return account
+  }
+
+  removeAccount(account: TAccount) {
+    this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
+    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
+  }
+
+  switchAccount(account: TAccount | null) {
+    if (isSameAccount(this.currentAccount, account)) {
+      return
+    }
+    const act = this.accounts.find((act) => isSameAccount(act, account))
+    if (!act) {
+      return
+    }
+    this.currentAccount = act
+    window.localStorage.setItem(StorageKey.CURRENT_ACCOUNT, JSON.stringify(act))
   }
 }
 

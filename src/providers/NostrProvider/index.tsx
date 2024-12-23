@@ -3,22 +3,24 @@ import { useToast } from '@/hooks'
 import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
-import { ISigner, TDraftEvent } from '@/types'
+import { ISigner, TAccount, TAccountPointer, TDraftEvent } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRelaySettings } from '../RelaySettingsProvider'
-import { NsecSigner } from './nsec.signer'
 import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
+import { NsecSigner } from './nsec.signer'
 
 type TNostrContext = {
   pubkey: string | null
-  setPubkey: (pubkey: string) => void
+  account: TAccountPointer | null
+  accounts: TAccountPointer[]
+  switchAccount: (account: TAccountPointer | null) => Promise<void>
   nsecLogin: (nsec: string) => Promise<string>
   nip07Login: () => Promise<string>
   bunkerLogin: (bunker: string) => Promise<string>
-  logout: () => void
+  removeAccount: (account: TAccountPointer) => void
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
@@ -40,83 +42,61 @@ export const useNostr = () => {
 
 export function NostrProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast()
-  const [pubkey, setPubkey] = useState<string | null>(null)
+  const [account, setAccount] = useState<TAccountPointer | null>(null)
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const { relayUrls: currentRelayUrls } = useRelaySettings()
-  const relayList = useFetchRelayList(pubkey)
+  const relayList = useFetchRelayList(account?.pubkey)
 
   useEffect(() => {
     const init = async () => {
-      const [account] = storage.getAccounts()
-      if (!account) {
-        if (!window.nostr) {
-          return
-        }
+      const accounts = storage.getAccounts()
+      const act = storage.getCurrentAccount() ?? accounts[0] // auto login the first account
+      if (!act) return
 
-        // For browser env, attempt to login with nip-07
-        const nip07Signer = new Nip07Signer()
-        const pubkey = await nip07Signer.getPublicKey()
-        if (!pubkey) {
-          return
-        }
-        storage.setAccounts([{ pubkey, signerType: 'nip-07' }])
-        return login(nip07Signer, pubkey)
+      setAccount({ pubkey: act.pubkey, signerType: act.signerType })
+
+      const pubkey = await loginWithAccountPointer(act)
+      // login failed, set account to null
+      if (!pubkey) {
+        setAccount(null)
+        return
       }
-
-      if (account.pubkey) {
-        setPubkey(account.pubkey)
-      }
-
-      // browser-nsec is deprecated
-      if (account.signerType === 'browser-nsec') {
-        if (account.nsec) {
-          const browserNsecSigner = new NsecSigner()
-          const pubkey = browserNsecSigner.login(account.nsec)
-          storage.setAccounts([{ pubkey, signerType: 'nsec', nsec: account.nsec }])
-          return login(browserNsecSigner, pubkey)
-        }
-      } else if (account.signerType === 'nsec') {
-        if (account.nsec) {
-          const browserNsecSigner = new NsecSigner()
-          const pubkey = browserNsecSigner.login(account.nsec)
-          return login(browserNsecSigner, pubkey)
-        }
-      } else if (account.signerType === 'nip-07') {
-        const nip07Signer = new Nip07Signer()
-        return login(nip07Signer, account.pubkey)
-      } else if (account.signerType === 'bunker') {
-        if (account.bunker && account.bunkerClientSecretKey) {
-          const bunkerSigner = new BunkerSigner(account.bunkerClientSecretKey)
-          const pubkey = await bunkerSigner.login(account.bunker)
-          return login(bunkerSigner, pubkey)
-        }
-      }
-
-      return logout()
     }
     init().catch(() => {
-      logout()
+      setAccount(null)
     })
   }, [])
 
-  const login = (signer: ISigner, pubkey: string) => {
-    setPubkey(pubkey)
+  const login = (signer: ISigner, act: TAccount) => {
+    storage.addAccount(act)
+    storage.switchAccount(act)
+    setAccount({ pubkey: act.pubkey, signerType: act.signerType })
     setSigner(signer)
-    return pubkey
+    return act.pubkey
   }
 
-  const logout = () => {
-    setPubkey(null)
-    setSigner(null)
-    storage.setAccounts([])
+  const removeAccount = (act: TAccountPointer) => {
+    storage.removeAccount(act)
+    if (account?.pubkey === act.pubkey) {
+      setAccount(null)
+      setSigner(null)
+    }
+  }
+
+  const switchAccount = async (act: TAccountPointer | null) => {
+    if (!act) {
+      storage.switchAccount(null)
+      setAccount(null)
+      return
+    }
+    await loginWithAccountPointer(act)
   }
 
   const nsecLogin = async (nsec: string) => {
     const browserNsecSigner = new NsecSigner()
     const pubkey = browserNsecSigner.login(nsec)
-    storage.setAccounts([{ pubkey, signerType: 'nsec', nsec }])
-    return login(browserNsecSigner, pubkey)
+    return login(browserNsecSigner, { pubkey, signerType: 'nsec', nsec })
   }
 
   const nip07Login = async () => {
@@ -126,8 +106,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!pubkey) {
         throw new Error('You did not allow to access your pubkey')
       }
-      storage.setAccounts([{ pubkey, signerType: 'nip-07' }])
-      return login(nip07Signer, pubkey)
+      return login(nip07Signer, { pubkey, signerType: 'nip-07' })
     } catch (err) {
       toast({
         title: 'Login failed',
@@ -146,15 +125,62 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
     const bunkerUrl = new URL(bunker)
     bunkerUrl.searchParams.delete('secret')
-    storage.setAccounts([
-      {
-        pubkey,
-        signerType: 'bunker',
-        bunker: bunkerUrl.toString(),
-        bunkerClientSecretKey: bunkerSigner.getClientSecretKey()
+    return login(bunkerSigner, {
+      pubkey,
+      signerType: 'bunker',
+      bunker: bunkerUrl.toString(),
+      bunkerClientSecretKey: bunkerSigner.getClientSecretKey()
+    })
+  }
+
+  const loginWithAccountPointer = async (act: TAccountPointer): Promise<string | null> => {
+    let account = storage.findAccount(act)
+    if (!account) {
+      return null
+    }
+    if (account.signerType === 'nsec' || account.signerType === 'browser-nsec') {
+      if (account.nsec) {
+        const browserNsecSigner = new NsecSigner()
+        browserNsecSigner.login(account.nsec)
+        // Migrate to nsec
+        if (account.signerType === 'browser-nsec') {
+          storage.removeAccount(account)
+          account = { ...account, signerType: 'nsec' }
+          storage.addAccount(account)
+        }
+        return login(browserNsecSigner, account)
       }
-    ])
-    return login(bunkerSigner, pubkey)
+    } else if (account.signerType === 'nip-07') {
+      const nip07Signer = new Nip07Signer()
+      const pubkey = await nip07Signer.getPublicKey()
+      if (!pubkey) {
+        storage.removeAccount(account)
+        return null
+      }
+      if (pubkey !== account.pubkey) {
+        storage.removeAccount(account)
+        account = { ...account, pubkey }
+        storage.addAccount(account)
+      }
+      return login(nip07Signer, account)
+    } else if (account.signerType === 'bunker') {
+      if (account.bunker && account.bunkerClientSecretKey) {
+        const bunkerSigner = new BunkerSigner(account.bunkerClientSecretKey)
+        const pubkey = await bunkerSigner.login(account.bunker)
+        if (!pubkey) {
+          storage.removeAccount(account)
+          return null
+        }
+        if (pubkey !== account.pubkey) {
+          storage.removeAccount(account)
+          account = { ...account, pubkey }
+          storage.addAccount(account)
+        }
+        return login(bunkerSigner, account)
+      }
+    }
+    storage.removeAccount(account)
+    return null
   }
 
   const signEvent = async (draftEvent: TDraftEvent) => {
@@ -197,12 +223,16 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   return (
     <NostrContext.Provider
       value={{
-        pubkey,
-        setPubkey,
+        pubkey: account?.pubkey ?? null,
+        account,
+        accounts: storage
+          .getAccounts()
+          .map((act) => ({ pubkey: act.pubkey, signerType: act.signerType })),
+        switchAccount,
         nsecLogin,
         nip07Login,
         bunkerLogin,
-        logout,
+        removeAccount,
         publish,
         signHttpAuth,
         checkLogin,

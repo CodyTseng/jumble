@@ -42,3 +42,27 @@ export default function Username({
     </HoverCard>
   )
 }
+
+export function SimpleUsername({
+  userId,
+  showAt = false,
+  className,
+  skeletonClassName
+}: {
+  userId: string
+  showAt?: boolean
+  className?: string
+  skeletonClassName?: string
+}) {
+  const { profile } = useFetchProfile(userId)
+  if (!profile) return <Skeleton className={cn('w-16 my-1', skeletonClassName)} />
+
+  const { username } = profile
+
+  return (
+    <div className={cn('max-w-fit', className)}>
+      {showAt && '@'}
+      {username}
+    </div>
+  )
+}

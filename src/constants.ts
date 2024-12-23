@@ -1,7 +1,8 @@
 export const StorageKey = {
   THEME_SETTING: 'themeSetting',
   RELAY_GROUPS: 'relayGroups',
-  ACCOUNTS: 'accounts'
+  ACCOUNTS: 'accounts',
+  CURRENT_ACCOUNT: 'currentAccount'
 }
 
 export const BIG_RELAY_URLS = [
