@@ -26,6 +26,7 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
   const [highlightReplyId, setHighlightReplyId] = useState<string | undefined>(undefined)
   const { updateNoteReplyCount } = useNoteStats()
   const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const handleEventPublished = (data: Event) => {
@@ -145,15 +146,20 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
     })
     if (evt.pubkey === pubkey) {
       setTimeout(() => {
-        highlightReply(evt.id)
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }
+        highlightReply(evt.id, false)
       }, 100)
     }
   }
 
-  const highlightReply = (eventId: string) => {
-    const ref = replyRefs.current[eventId]
-    if (ref) {
-      ref.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  const highlightReply = (eventId: string, scrollTo = true) => {
+    if (scrollTo) {
+      const ref = replyRefs.current[eventId]
+      if (ref) {
+        ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
     }
     setHighlightReplyId(eventId)
     setTimeout(() => {
@@ -188,6 +194,7 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
       {replies.length === 0 && !loading && !until && (
         <div className="text-sm text-center text-muted-foreground">{t('no replies')}</div>
       )}
+      <div ref={bottomRef} />
     </>
   )
 }
