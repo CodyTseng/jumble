@@ -292,9 +292,13 @@ class ClientService extends EventTarget {
         onEvents = () => {}
         onNew = () => {}
         subPromises.forEach((subPromise) => {
-          subPromise.then((sub) => {
-            sub.close()
-          })
+          subPromise
+            .then((sub) => {
+              sub.close()
+            })
+            .catch((err) => {
+              console.error(err)
+            })
         })
       }
     }

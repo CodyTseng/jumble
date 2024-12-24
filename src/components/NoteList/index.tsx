@@ -60,14 +60,13 @@ export default function NoteList({
           onEvents: (events, eosed) => {
             if (events.length > 0) {
               setEvents(events)
-            } else {
-              setHasMore(false)
             }
             if (areAlgoRelays) {
               setHasMore(false)
             }
             if (eosed) {
               setInitialized(true)
+              setHasMore(events.length > 0)
             }
           },
           onNew: (event) => {
