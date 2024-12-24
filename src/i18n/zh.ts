@@ -86,6 +86,9 @@ export default {
     'reload notes': '重新加载笔记',
     'Logged in Accounts': '已登录账户',
     'Add an Account': '添加账户',
-    Accounts: '多帐户'
+    Accounts: '多帐户',
+    'More options': '更多选项',
+    'Add client tag': '添加客户端标签',
+    'Show others this was sent via Jumble': '告诉别人这是通过 Jumble 发送的'
   }
 }

@@ -6,20 +6,23 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createShortTextNoteDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { LoaderCircle } from 'lucide-react'
+import { ChevronDown, LoaderCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { Dispatch, useState } from 'react'
+import { Dispatch, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 import Mentions from './Metions'
 import Preview from './Preview'
 import Uploader from './Uploader'
-import { useTranslation } from 'react-i18next'
 
 export default function PostDialog({
   defaultContent = '',
@@ -37,7 +40,13 @@ export default function PostDialog({
   const { publish, checkLogin } = useNostr()
   const [content, setContent] = useState(defaultContent)
   const [posting, setPosting] = useState(false)
+  const [showMoreOptions, setShowMoreOptions] = useState(false)
+  const [addClientTag, setAddClientTag] = useState(false)
   const canPost = !!content && !posting
+
+  useEffect(() => {
+    setAddClientTag(window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true')
+  }, [])
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value)
@@ -58,7 +67,10 @@ export default function PostDialog({
           const relayList = await client.fetchRelayList(parentEvent.pubkey)
           additionalRelayUrls.push(...relayList.read.slice(0, 5))
         }
-        const draftEvent = await createShortTextNoteDraftEvent(content, parentEvent)
+        const draftEvent = await createShortTextNoteDraftEvent(content, {
+          parentEvent,
+          addClientTag
+        })
         await publish(draftEvent, additionalRelayUrls)
         setContent('')
         setOpen(false)
@@ -90,6 +102,11 @@ export default function PostDialog({
     })
   }
 
+  const onAddClientTagChange = (checked: boolean) => {
+    setAddClientTag(checked)
+    window.localStorage.setItem(StorageKey.ADD_CLIENT_TAG, checked.toString())
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0" withoutClose>
@@ -117,8 +134,20 @@ export default function PostDialog({
             />
             {content && <Preview content={content} />}
             <div className="flex items-center justify-between">
-              <Uploader setContent={setContent} />
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                <Uploader setContent={setContent} />
+                <Button
+                  variant="link"
+                  className="text-foreground gap-0 px-0"
+                  onClick={() => setShowMoreOptions((pre) => !pre)}
+                >
+                  {t('More options')}
+                  <ChevronDown
+                    className={`transition-transform ${showMoreOptions ? 'rotate-180' : ''}`}
+                  />
+                </Button>
+              </div>
+              <div className="flex gap-2 items-center">
                 <Mentions content={content} parentEvent={parentEvent} />
                 <Button
                   variant="secondary"
@@ -135,6 +164,21 @@ export default function PostDialog({
                 </Button>
               </div>
             </div>
+            {showMoreOptions && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="add-client-tag">{t('Add client tag')}</Label>
+                  <Switch
+                    id="add-client-tag"
+                    checked={addClientTag}
+                    onCheckedChange={onAddClientTagChange}
+                  />
+                </div>
+                <div className="text-muted-foreground text-xs">
+                  {t('Show others this was sent via Jumble')}
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
       </DialogContent>

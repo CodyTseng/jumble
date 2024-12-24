@@ -87,6 +87,9 @@ export default {
     'reload notes': 'reload notes',
     'Logged in Accounts': 'Logged in Accounts',
     'Add an Account': 'Add an Account',
-    Accounts: 'Accounts'
+    Accounts: 'Accounts',
+    'More options': 'More options',
+    'Add client tag': 'Add client tag',
+    'Show others this was sent via Jumble': 'Show others this was sent via Jumble'
   }
 }

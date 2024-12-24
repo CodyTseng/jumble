@@ -39,10 +39,13 @@ export function createRepostDraftEvent(event: Event): TDraftEvent {
 
 export async function createShortTextNoteDraftEvent(
   content: string,
-  parentEvent?: Event
+  options: {
+    parentEvent?: Event
+    addClientTag?: boolean
+  } = {}
 ): Promise<TDraftEvent> {
   const { pubkeys, otherRelatedEventIds, quoteEventIds, rootEventId, parentEventId } =
-    await extractMentions(content, parentEvent)
+    await extractMentions(content, options.parentEvent)
   const hashtags = extractHashtags(content)
 
   const tags = pubkeys
@@ -50,7 +53,6 @@ export async function createShortTextNoteDraftEvent(
     .concat(otherRelatedEventIds.map((eventId) => ['e', eventId]))
     .concat(quoteEventIds.map((eventId) => ['q', eventId]))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
-    .concat([['client', 'jumble']])
 
   if (rootEventId) {
     tags.push(['e', rootEventId, '', 'root'])
@@ -58,6 +60,10 @@ export async function createShortTextNoteDraftEvent(
 
   if (parentEventId) {
     tags.push(['e', parentEventId, '', 'reply'])
+  }
+
+  if (options.addClientTag) {
+    tags.push(['client', 'jumble'])
   }
 
   return {
