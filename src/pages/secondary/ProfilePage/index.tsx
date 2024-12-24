@@ -24,7 +24,7 @@ import QrCodePopover from './QrCodePopover'
 export default function ProfilePage({ id }: { id?: string }) {
   const { t } = useTranslation()
   const { profile, isFetching } = useFetchProfile(id)
-  const relayList = useFetchRelayList(profile?.pubkey)
+  const { relayList, isFetching: isFetchingRelayInfo } = useFetchRelayList(profile?.pubkey)
   const { relayUrls: currentRelayUrls } = useRelaySettings()
   const { pubkey: accountPubkey } = useNostr()
   const { followings: selfFollowings } = useFollowList()
@@ -99,12 +99,13 @@ export default function ProfilePage({ id }: { id?: string }) {
         </div>
       </div>
       <Separator className="hidden sm:block mt-4 sm:my-4" />
-      <NoteList
-        key={pubkey}
-        filter={{ authors: [pubkey] }}
-        relayUrls={relayList.write.slice(0, 5).concat(currentRelayUrls)}
-        className="max-sm:mt-2"
-      />
+      {!isFetchingRelayInfo && (
+        <NoteList
+          filter={{ authors: [pubkey] }}
+          relayUrls={relayList.write.slice(0, 5).concat(currentRelayUrls)}
+          className="max-sm:mt-2"
+        />
+      )}
     </SecondaryPageLayout>
   )
 }

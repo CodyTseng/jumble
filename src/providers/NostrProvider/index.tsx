@@ -46,7 +46,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const { relayUrls: currentRelayUrls } = useRelaySettings()
-  const relayList = useFetchRelayList(account?.pubkey)
+  const { relayList } = useFetchRelayList(account?.pubkey)
 
   useEffect(() => {
     const init = async () => {

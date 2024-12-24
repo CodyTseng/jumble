@@ -11,8 +11,8 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useMemo } from 'react'
-import NotFoundPage from '../NotFoundPage'
 import { useTranslation } from 'react-i18next'
+import NotFoundPage from '../NotFoundPage'
 
 export default function NotePage({ id }: { id?: string }) {
   const { t } = useTranslation()
