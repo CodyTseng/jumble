@@ -51,6 +51,10 @@ export function getSharableEventId(event: Event) {
   return nip19.neventEncode({ id: event.id, author: event.pubkey, kind: event.kind })
 }
 
+export function getUsingClient(event: Event) {
+  return event.tags.find(tagNameEquals('client'))?.[1]
+}
+
 export async function extractMentions(content: string, parentEvent?: Event) {
   const pubkeySet = new Set<string>()
   const relatedEventIdSet = new Set<string>()
