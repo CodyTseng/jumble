@@ -26,6 +26,10 @@ export default function ProfilePage({ id }: { id?: string }) {
   const { profile, isFetching } = useFetchProfile(id)
   const { relayList, isFetching: isFetchingRelayInfo } = useFetchRelayList(profile?.pubkey)
   const { relayUrls: currentRelayUrls } = useRelaySettings()
+  const relayUrls = useMemo(
+    () => relayList.write.slice(0, 4).concat(currentRelayUrls.slice(0, 1)),
+    [relayList, currentRelayUrls]
+  )
   const { pubkey: accountPubkey } = useNostr()
   const { followings: selfFollowings } = useFollowList()
   const { followings } = useFetchFollowings(profile?.pubkey)
@@ -100,11 +104,7 @@ export default function ProfilePage({ id }: { id?: string }) {
       </div>
       <Separator className="hidden sm:block mt-4 sm:my-4" />
       {!isFetchingRelayInfo && (
-        <NoteList
-          filter={{ authors: [pubkey] }}
-          relayUrls={relayList.write.slice(0, 5).concat(currentRelayUrls)}
-          className="max-sm:mt-2"
-        />
+        <NoteList filter={{ authors: [pubkey] }} relayUrls={relayUrls} className="max-sm:mt-2" />
       )}
     </SecondaryPageLayout>
   )

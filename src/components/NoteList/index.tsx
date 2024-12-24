@@ -27,7 +27,7 @@ export default function NoteList({
 }) {
   const { t } = useTranslation()
   const { signEvent, checkLogin } = useNostr()
-  const { isFetching: isFetchingRelayInfo, areAlgoRelays } = useFetchRelayInfos(relayUrls)
+  const { isFetching: isFetchingRelayInfo, areAlgoRelays } = useFetchRelayInfos([...relayUrls])
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [events, setEvents] = useState<Event[]>([])
@@ -54,7 +54,7 @@ export default function NoteList({
       setHasMore(true)
 
       const { closer, timelineKey } = await client.subscribeTimeline(
-        relayUrls,
+        [...relayUrls],
         noteFilter,
         {
           onEvents: (events, eosed) => {
