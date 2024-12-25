@@ -114,7 +114,9 @@ export function PageManager({
                 <div
                   key={item.index}
                   className="absolute top-0 left-0 w-full h-full bg-background"
-                  style={{ zIndex: index + 1 }}
+                  style={{
+                    display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                  }}
                 >
                   {item.component}
                 </div>
@@ -122,7 +124,7 @@ export function PageManager({
             <div
               key={primaryPageKey}
               className="absolute top-0 left-0 w-full h-full bg-background"
-              style={{ zIndex: 0 }}
+              style={{ display: !secondaryStack.length ? 'block' : 'none' }}
             >
               {children}
             </div>
@@ -150,7 +152,10 @@ export function PageManager({
                   <div
                     key={item.index}
                     className="absolute top-0 left-0 w-full h-full bg-background"
-                    style={{ zIndex: index + 1 }}
+                    style={{
+                      zIndex: index + 1,
+                      display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                    }}
                   >
                     {item.component}
                   </div>
