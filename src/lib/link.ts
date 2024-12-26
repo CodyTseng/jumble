@@ -22,8 +22,9 @@ export const toNoteList = ({
   if (relay) query.set('relay', relay)
   return `${path}?${query.toString()}`
 }
-export const toProfile = (pubkey: string) => {
-  const npub = nip19.npubEncode(pubkey)
+export const toProfile = (pubkeyOrNpub: string) => {
+  if (pubkeyOrNpub.startsWith('npub')) return `/users/${pubkeyOrNpub}`
+  const npub = nip19.npubEncode(pubkeyOrNpub)
   return `/users/${npub}`
 }
 export const toProfileList = ({ search }: { search?: string }) => {
