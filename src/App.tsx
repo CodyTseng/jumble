@@ -13,23 +13,21 @@ import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
 
 export default function App(): JSX.Element {
   return (
-    <div className="h-screen">
-      <ThemeProvider>
-        <ScreenSizeProvider>
-          <RelaySettingsProvider>
-            <NostrProvider>
-              <FollowListProvider>
-                <NoteStatsProvider>
-                  <PageManager>
-                    <NoteListPage />
-                  </PageManager>
-                  <Toaster />
-                </NoteStatsProvider>
-              </FollowListProvider>
-            </NostrProvider>
-          </RelaySettingsProvider>
-        </ScreenSizeProvider>
-      </ThemeProvider>
-    </div>
+    <ThemeProvider>
+      <ScreenSizeProvider>
+        <RelaySettingsProvider>
+          <NostrProvider>
+            <FollowListProvider>
+              <NoteStatsProvider>
+                <PageManager>
+                  <NoteListPage />
+                </PageManager>
+                <Toaster />
+              </NoteStatsProvider>
+            </FollowListProvider>
+          </NostrProvider>
+        </RelaySettingsProvider>
+      </ScreenSizeProvider>
+    </ThemeProvider>
   )
 }

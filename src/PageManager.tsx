@@ -108,12 +108,11 @@ export function PageManager({
     return (
       <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
         <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
-          <div className="h-full">
+          <div>
             {!!secondaryStack.length &&
               secondaryStack.map((item, index) => (
                 <div
                   key={item.index}
-                  className="absolute top-0 left-0 w-full h-full bg-background"
                   style={{
                     display: index === secondaryStack.length - 1 ? 'block' : 'none'
                   }}
@@ -123,7 +122,6 @@ export function PageManager({
               ))}
             <div
               key={primaryPageKey}
-              className="absolute top-0 left-0 w-full h-full bg-background"
               style={{ display: !secondaryStack.length ? 'block' : 'none' }}
             >
               {children}
@@ -137,25 +135,19 @@ export function PageManager({
   return (
     <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
       <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
-        <div className="flex h-full">
+        <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel minSize={30}>
-              <div key={primaryPageKey} className="h-full">
-                {children}
-              </div>
+              <div key={primaryPageKey}>{children}</div>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel minSize={30} className="relative">
+            <ResizablePanel minSize={30}>
               {secondaryStack.length ? (
                 secondaryStack.map((item, index) => (
                   <div
                     key={item.index}
-                    className="absolute top-0 left-0 w-full h-full bg-background"
-                    style={{
-                      zIndex: index + 1,
-                      display: index === secondaryStack.length - 1 ? 'block' : 'none'
-                    }}
+                    style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
                   >
                     {item.component}
                   </div>
