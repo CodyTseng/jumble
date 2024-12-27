@@ -61,19 +61,25 @@ export function PageManager({
       const state = e.state ?? { index: -1, url: '/' }
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1]
-        const currentIndex = currentItem ? currentItem.index : -1
+        const currentIndex = currentItem ? currentItem.index : 0
         if (state.index === currentIndex) {
-          return pre
+          if (currentIndex !== 0) return pre
+
+          window.history.replaceState(null, '', '/')
+          return []
         }
+        // Go back
         if (state.index < currentIndex) {
           const newStack = pre.filter((item) => item.index <= state.index)
           const topItem = newStack[newStack.length - 1]
+          // Load the component if it's not cached
           if (topItem && !topItem.component) {
             topItem.component = findAndCreateComponent(topItem.url)
           }
           return newStack
         }
 
+        // Go forward
         const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
         return newStack
       })
@@ -214,10 +220,11 @@ function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) 
   const component = findAndCreateComponent(url)
   if (!component) return { newStack: stack, newItem: null }
 
-  const currentStack = stack[stack.length - 1]
-  const newItem = { component, url, index: currentStack ? currentStack.index + 1 : 0 }
+  const currentItem = stack[stack.length - 1]
+  const newItem = { component, url, index: currentItem ? currentItem.index + 1 : 0 }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.component)
+  // Clear the oldest cached component if there are too many cached components
   if (newStack.length - lastCachedIndex > maxStackSize) {
     newStack[lastCachedIndex].component = null
   }
