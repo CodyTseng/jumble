@@ -2,11 +2,11 @@ import RelaySettings from '@/components/RelaySettings'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useTranslation } from 'react-i18next'
 
-export default function RelaySettingsPage() {
+export default function RelaySettingsPage({ index }: { index?: number }) {
   const { t } = useTranslation()
 
   return (
-    <SecondaryPageLayout titlebarContent={t('Relay settings')}>
+    <SecondaryPageLayout index={index} titlebarContent={t('Relay settings')}>
       <div className="max-sm:px-4">
         <RelaySettings hideTitle />
       </div>

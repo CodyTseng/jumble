@@ -21,7 +21,7 @@ import NotFoundPage from '../NotFoundPage'
 import PubkeyCopy from './PubkeyCopy'
 import QrCodePopover from './QrCodePopover'
 
-export default function ProfilePage({ id }: { id?: string }) {
+export default function ProfilePage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()
   const { profile, isFetching } = useFetchProfile(id)
   const { relayList, isFetching: isFetchingRelayInfo } = useFetchRelayList(profile?.pubkey)
@@ -46,7 +46,7 @@ export default function ProfilePage({ id }: { id?: string }) {
 
   if (!profile && isFetching) {
     return (
-      <SecondaryPageLayout>
+      <SecondaryPageLayout index={index}>
         <div className="max-sm:px-4">
           <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
             <Skeleton className="w-full h-full object-cover rounded-lg" />
@@ -62,7 +62,7 @@ export default function ProfilePage({ id }: { id?: string }) {
 
   const { banner, username, nip05, about, avatar, pubkey } = profile
   return (
-    <SecondaryPageLayout titlebarContent={username}>
+    <SecondaryPageLayout index={index} titlebarContent={username}>
       <div className="max-sm:px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <ProfileBanner

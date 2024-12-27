@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 const LIMIT = 50
 
-export default function ProfileListPage() {
+export default function ProfileListPage({ index }: { index?: number }) {
   const { t } = useTranslation()
   const { searchParams } = useSearchParams()
   const { relayUrls, searchableRelayUrls } = useRelaySettings()
@@ -78,7 +78,7 @@ export default function ProfileListPage() {
   }
 
   return (
-    <SecondaryPageLayout titlebarContent={title}>
+    <SecondaryPageLayout index={index} titlebarContent={title}>
       <div className="space-y-2 max-sm:px-4">
         {Array.from(pubkeySet).map((pubkey, index) => (
           <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />

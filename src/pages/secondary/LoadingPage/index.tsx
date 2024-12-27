@@ -1,8 +1,8 @@
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 
-export default function LoadingPage({ title }: { title?: string }) {
+export default function LoadingPage({ title, index }: { title?: string; index?: number }) {
   return (
-    <SecondaryPageLayout titlebarContent={title}>
+    <SecondaryPageLayout index={index} titlebarContent={title}>
       <div className="text-muted-foreground text-center">
         <div>Loading...</div>
       </div>

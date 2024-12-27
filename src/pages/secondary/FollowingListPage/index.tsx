@@ -4,7 +4,7 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function FollowingListPage({ id }: { id?: string }) {
+export default function FollowingListPage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()
   const { profile } = useFetchProfile(id)
   const { followings } = useFetchFollowings(profile?.pubkey)
@@ -45,6 +45,7 @@ export default function FollowingListPage({ id }: { id?: string }) {
 
   return (
     <SecondaryPageLayout
+      index={index}
       titlebarContent={
         profile?.username
           ? t("username's following", { username: profile.username })

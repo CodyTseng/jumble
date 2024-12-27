@@ -2,16 +2,19 @@ import BackButton from '@/components/BackButton'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Titlebar } from '@/components/Titlebar'
+import { useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useEffect, useRef, useState } from 'react'
 
 export default function SecondaryPageLayout({
   children,
+  index,
   titlebarContent,
   hideBackButton = false,
   hideScrollToTopButton = false
 }: {
   children?: React.ReactNode
+  index?: number
   titlebarContent?: React.ReactNode
   hideBackButton?: boolean
   hideScrollToTopButton?: boolean
@@ -20,8 +23,11 @@ export default function SecondaryPageLayout({
   const [visible, setVisible] = useState(true)
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const { isSmallScreen } = useScreenSize()
+  const { currentIndex } = useSecondaryPage()
 
   useEffect(() => {
+    if (currentIndex !== index) return
+
     const handleScroll = () => {
       const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
       const diff = scrollTop - lastScrollTop
@@ -51,7 +57,7 @@ export default function SecondaryPageLayout({
     return () => {
       scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
     }
-  }, [lastScrollTop, isSmallScreen])
+  }, [lastScrollTop, isSmallScreen, currentIndex])
 
   return (
     <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>

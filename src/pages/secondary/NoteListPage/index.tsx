@@ -7,7 +7,7 @@ import { Filter } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function NoteListPage() {
+export default function NoteListPage({ index }: { index?: number }) {
   const { t } = useTranslation()
   const { relayUrls, searchableRelayUrls } = useRelaySettings()
   const { searchParams } = useSearchParams()
@@ -38,7 +38,7 @@ export default function NoteListPage() {
 
   if (filter?.search && searchableRelayUrls.length === 0) {
     return (
-      <SecondaryPageLayout titlebarContent={title}>
+      <SecondaryPageLayout index={index} titlebarContent={title}>
         <div className="text-center text-sm text-muted-foreground">
           {t('The relays you are connected to do not support search')}
         </div>
@@ -47,7 +47,7 @@ export default function NoteListPage() {
   }
 
   return (
-    <SecondaryPageLayout titlebarContent={title}>
+    <SecondaryPageLayout index={index} titlebarContent={title}>
       <NoteList key={title} filter={filter} relayUrls={urls} />
     </SecondaryPageLayout>
   )

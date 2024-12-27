@@ -14,7 +14,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
 
-export default function NotePage({ id }: { id?: string }) {
+export default function NotePage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(id)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
@@ -22,7 +22,7 @@ export default function NotePage({ id }: { id?: string }) {
 
   if (!event && isFetching) {
     return (
-      <SecondaryPageLayout titlebarContent={t('note')}>
+      <SecondaryPageLayout index={index} titlebarContent={t('note')}>
         <div className="max-sm:px-4">
           <Skeleton className="w-10 h-10 rounded-full" />
         </div>
@@ -32,7 +32,7 @@ export default function NotePage({ id }: { id?: string }) {
   if (!event) return <NotFoundPage />
 
   return (
-    <SecondaryPageLayout titlebarContent={t('note')}>
+    <SecondaryPageLayout index={index} titlebarContent={t('note')}>
       <div className="max-sm:px-4">
         <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
         <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />

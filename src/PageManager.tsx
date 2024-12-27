@@ -8,11 +8,13 @@ import { routes } from './routes'
 
 type TPrimaryPageContext = {
   refresh: () => void
+  active: boolean
 }
 
 type TSecondaryPageContext = {
   push: (url: string) => void
   pop: () => void
+  currentIndex: number
 }
 
 type TStackItem = {
@@ -74,7 +76,7 @@ export function PageManager({
           const topItem = newStack[newStack.length - 1]
           // Load the component if it's not cached
           if (topItem && !topItem.component) {
-            topItem.component = findAndCreateComponent(topItem.url)
+            topItem.component = findAndCreateComponent(topItem.url, state.index)
           }
           return newStack
         }
@@ -112,8 +114,18 @@ export function PageManager({
 
   if (isSmallScreen) {
     return (
-      <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
-        <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
+      <PrimaryPageContext.Provider
+        value={{ refresh: refreshPrimary, active: secondaryStack.length === 0 }}
+      >
+        <SecondaryPageContext.Provider
+          value={{
+            push: pushSecondary,
+            pop: popSecondary,
+            currentIndex: secondaryStack.length
+              ? secondaryStack[secondaryStack.length - 1].index
+              : 0
+          }}
+        >
           <div>
             {!!secondaryStack.length &&
               secondaryStack.map((item, index) => (
@@ -139,8 +151,14 @@ export function PageManager({
   }
 
   return (
-    <PrimaryPageContext.Provider value={{ refresh: refreshPrimary }}>
-      <SecondaryPageContext.Provider value={{ push: pushSecondary, pop: popSecondary }}>
+    <PrimaryPageContext.Provider value={{ refresh: refreshPrimary, active: true }}>
+      <SecondaryPageContext.Provider
+        value={{
+          push: pushSecondary,
+          pop: popSecondary,
+          currentIndex: secondaryStack.length ? secondaryStack[secondaryStack.length - 1].index : 0
+        }}
+      >
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <ResizablePanelGroup direction="horizontal">
@@ -204,23 +222,25 @@ function isCurrentPage(stack: TStackItem[], url: string) {
   return currentPage.url === url
 }
 
-function findAndCreateComponent(url: string) {
+function findAndCreateComponent(url: string, index: number) {
   const path = url.split('?')[0]
   for (const { matcher, element } of routes) {
     const match = matcher(path)
     if (!match) continue
 
     if (!element) return null
-    return cloneElement(element, match.params)
+    return cloneElement(element, { ...match.params, index } as any)
   }
   return null
 }
 
 function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) {
-  const component = findAndCreateComponent(url)
+  const currentItem = stack[stack.length - 1]
+  const currentIndex = currentItem ? currentItem.index + 1 : 0
+
+  const component = findAndCreateComponent(url, currentIndex)
   if (!component) return { newStack: stack, newItem: null }
 
-  const currentItem = stack[stack.length - 1]
   const newItem = { component, url, index: currentItem ? currentItem.index + 1 : 0 }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.component)
