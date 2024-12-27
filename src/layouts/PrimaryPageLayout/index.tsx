@@ -69,7 +69,7 @@ const PrimaryPageLayout = forwardRef(({ children }: { children?: React.ReactNode
   return (
     <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>
       <PrimaryPageTitlebar visible={visible} />
-      <div className="sm:px-4 pb-4 sm:pt-4">{children}</div>
+      <div className="pb-4 xl:pt-4">{children}</div>
       <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
     </div>
   )

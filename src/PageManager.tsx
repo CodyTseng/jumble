@@ -1,6 +1,8 @@
 import Sidebar from '@/components/Sidebar'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import NoteListPage from '@/pages/primary/NoteListPage'
 import HomePage from '@/pages/secondary/HomePage'
 import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
 import { useScreenSize } from './providers/ScreenSizeProvider'
@@ -43,13 +45,7 @@ export function useSecondaryPage() {
   return context
 }
 
-export function PageManager({
-  children,
-  maxStackSize = 5
-}: {
-  children: React.ReactNode
-  maxStackSize?: number
-}) {
+export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const [primaryPageKey, setPrimaryPageKey] = useState<number>(0)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
@@ -142,7 +138,7 @@ export function PageManager({
               key={primaryPageKey}
               style={{ display: !secondaryStack.length ? 'block' : 'none' }}
             >
-              {children}
+              <NoteListPage />
             </div>
           </div>
         </SecondaryPageContext.Provider>
@@ -161,9 +157,12 @@ export function PageManager({
       >
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
+          <Separator orientation="vertical" />
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel minSize={30}>
-              <div key={primaryPageKey}>{children}</div>
+              <div key={primaryPageKey}>
+                <NoteListPage />
+              </div>
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel minSize={30}>

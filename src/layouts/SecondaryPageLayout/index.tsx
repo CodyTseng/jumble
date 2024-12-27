@@ -66,7 +66,7 @@ export default function SecondaryPageLayout({
         hideBackButton={hideBackButton}
         visible={visible}
       />
-      <div className="sm:px-4 pb-4 sm:pt-4">{children}</div>
+      <div className="pb-4">{children}</div>
       <ScrollToTopButton
         scrollAreaRef={scrollAreaRef}
         visible={!hideScrollToTopButton && visible && lastScrollTop > 500}

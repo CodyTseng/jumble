@@ -19,9 +19,7 @@ export default function App(): JSX.Element {
           <NostrProvider>
             <FollowListProvider>
               <NoteStatsProvider>
-                <PageManager>
-                  <NoteListPage />
-                </PageManager>
+                <PageManager />
                 <Toaster />
               </NoteStatsProvider>
             </FollowListProvider>

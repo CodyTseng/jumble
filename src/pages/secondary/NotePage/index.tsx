@@ -23,7 +23,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
   if (!event && isFetching) {
     return (
       <SecondaryPageLayout index={index} titlebarContent={t('note')}>
-        <div className="max-sm:px-4">
+        <div className="px-4">
           <Skeleton className="w-10 h-10 rounded-full" />
         </div>
       </SecondaryPageLayout>
@@ -33,13 +33,13 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   return (
     <SecondaryPageLayout index={index} titlebarContent={t('note')}>
-      <div className="max-sm:px-4">
+      <div className="px-4">
         <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
         <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
         <Note key={`note-${event.id}`} event={event} fetchNoteStats />
       </div>
       <Separator className="mb-2 mt-4" />
-      <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="max-sm:px-2" />
+      <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="px-2" />
     </SecondaryPageLayout>
   )
 }

@@ -1,3 +1,4 @@
+import { Separator } from '@/components/ui/separator'
 import { useFetchEvent } from '@/hooks'
 import { getParentEventId, getRootEventId } from '@/lib/event'
 import { toNote } from '@/lib/link'
@@ -32,11 +33,10 @@ export default function ShortTextNoteCard({
         push(toNote(event))
       }}
     >
-      <RepostDescription reposter={reposter} className="max-sm:hidden pl-4" />
       <div
-        className={`hover:bg-muted/50 text-left cursor-pointer ${embedded ? 'p-2 sm:p-3 border rounded-lg' : 'px-4 py-3 sm:py-4 sm:border sm:rounded-lg max-sm:border-b'}`}
+        className={`hover:bg-muted/50 text-left cursor-pointer ${embedded ? 'p-2 sm:p-3 border rounded-lg' : 'px-4 py-3'}`}
       >
-        <RepostDescription reposter={reposter} className="sm:hidden" />
+        <RepostDescription reposter={reposter} />
         <Note
           size={embedded ? 'small' : 'normal'}
           event={event}
@@ -44,6 +44,7 @@ export default function ShortTextNoteCard({
           hideStats={embedded}
         />
       </div>
+      {!embedded && <Separator />}
     </div>
   )
 }

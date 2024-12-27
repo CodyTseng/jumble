@@ -1,6 +1,7 @@
-import { Image } from '@nextui-org/image'
 import { useFetchWebMetadata } from '@/hooks/useFetchWebMetadata'
 import { cn } from '@/lib/utils'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { Image } from '@nextui-org/image'
 import { useMemo } from 'react'
 
 export default function WebPreview({
@@ -12,6 +13,7 @@ export default function WebPreview({
   className?: string
   size?: 'normal' | 'small'
 }) {
+  const { isSmallScreen } = useScreenSize()
   const { title, description, image } = useFetchWebMetadata(url)
   const hostname = useMemo(() => {
     try {
@@ -25,9 +27,24 @@ export default function WebPreview({
     return null
   }
 
+  if (isSmallScreen && image) {
+    return (
+      <div className="relative border rounded-lg w-full h-44">
+        <Image src={image} className="rounded-lg object-cover w-full h-full" removeWrapper />
+        <div className="absolute bottom-0 z-10 bg-muted/70 px-2 py-1 w-full rounded-b-lg">
+          <div className="text-xs text-muted-foreground">{hostname}</div>
+          <div className="font-semibold line-clamp-1">{title}</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
-      className={cn('p-0 hover:bg-muted/50 cursor-pointer flex w-full', className)}
+      className={cn(
+        'p-0 hover:bg-muted/50 cursor-pointer flex w-full border rounded-lg',
+        className
+      )}
       onClick={(e) => {
         e.stopPropagation()
         window.open(url, '_blank')
@@ -36,11 +53,11 @@ export default function WebPreview({
       {image && (
         <Image
           src={image}
-          className={`rounded-l-lg object-cover w-2/5 ${size === 'normal' ? 'h-44' : 'h-24'}`}
+          className={`rounded-l-lg object-cover ${size === 'normal' ? 'h-44' : 'h-24'}`}
           removeWrapper
         />
       )}
-      <div className={`flex-1 w-0 p-2 border ${image ? 'rounded-r-lg' : 'rounded-lg'}`}>
+      <div className="flex-1 w-0 p-2">
         <div className="text-xs text-muted-foreground">{hostname}</div>
         <div className={`font-semibold ${size === 'normal' ? 'line-clamp-2' : 'line-clamp-1'}`}>
           {title}

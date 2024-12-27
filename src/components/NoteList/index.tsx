@@ -148,7 +148,7 @@ export default function NoteList({
   }
 
   return (
-    <div className={cn('space-y-2 sm:space-y-4', className)}>
+    <div className={cn('space-y-2 sm:space-y-2', className)}>
       <DisplayRepliesSwitch displayReplies={displayReplies} setDisplayReplies={setDisplayReplies} />
       <PullToRefresh
         onRefresh={async () =>
@@ -159,7 +159,7 @@ export default function NoteList({
         }
         pullingContent=""
       >
-        <div className="space-y-2 sm:space-y-4">
+        <div className="space-y-2 sm:space-y-2">
           {newEvents.filter((event) => displayReplies || !isReplyNoteEvent(event)).length > 0 && (
             <div className="flex justify-center w-full max-sm:mt-2">
               <Button size="lg" onClick={showNewEvents}>
@@ -167,7 +167,7 @@ export default function NoteList({
               </Button>
             </div>
           )}
-          <div className="flex flex-col sm:gap-4">
+          <div className="flex flex-col">
             {events
               .filter((event) => displayReplies || !isReplyNoteEvent(event))
               .map((event) => (
@@ -230,7 +230,7 @@ function DisplayRepliesSwitch({
   }
 
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex justify-end gap-2 px-4">
       <div>{t('Display replies')}</div>
       <Switch checked={displayReplies} onCheckedChange={setDisplayReplies} />
     </div>

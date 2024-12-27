@@ -47,7 +47,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
   if (!profile && isFetching) {
     return (
       <SecondaryPageLayout index={index}>
-        <div className="max-sm:px-4">
+        <div className="px-4">
           <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
             <Skeleton className="w-full h-full object-cover rounded-lg" />
             <Skeleton className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background rounded-full" />
@@ -63,7 +63,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
   const { banner, username, nip05, about, avatar, pubkey } = profile
   return (
     <SecondaryPageLayout index={index} titlebarContent={username}>
-      <div className="max-sm:px-4">
+      <div className="px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <ProfileBanner
             banner={banner}

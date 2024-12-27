@@ -12,10 +12,9 @@ import SearchButton from '../SearchButton'
 export default function PrimaryPageSidebar() {
   const { t } = useTranslation()
   return (
-    <div className="w-52 h-full shrink-0 hidden xl:flex flex-col pb-8 pt-10 pl-4 justify-between relative">
-      <div className="absolute top-0 left-0 h-11 w-full" />
+    <div className="w-52 h-full shrink-0 hidden xl:flex flex-col pb-2 pt-4 px-2 justify-between">
       <div className="space-y-2">
-        <div className="ml-4 mb-8 w-40">
+        <div className="px-2 mb-8 w-full">
           <Logo />
         </div>
         <PostButton variant="sidebar" />

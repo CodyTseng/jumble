@@ -7,7 +7,7 @@ export default function NotificationListPage({ index }: { index?: number }) {
 
   return (
     <SecondaryPageLayout index={index} titlebarContent={t('notifications')}>
-      <div className="max-sm:px-4">
+      <div className="px-4">
         <NotificationList />
       </div>
     </SecondaryPageLayout>
