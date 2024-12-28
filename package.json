@@ -53,6 +53,7 @@
     "react-string-replace": "^1.1.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.1.2",
     "yet-another-react-lightbox": "^3.21.7",
     "zod": "^3.24.1"
   },

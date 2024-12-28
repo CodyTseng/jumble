@@ -1,11 +1,9 @@
 import NoteList from '@/components/NoteList'
-import RelaySettings from '@/components/RelaySettings'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useEffect, useRef } from 'react'
+import RelaySettingsButton from './RelaySettingsButton'
+import SearchButton from './SearchButton'
 
 export default function NoteListPage() {
   const layoutRef = useRef<{ scrollToTop: () => void }>(null)
@@ -18,31 +16,21 @@ export default function NoteListPage() {
   }, [relayUrlsString])
 
   if (!relayUrls.length) {
-    return (
-      <PrimaryPageLayout>
-        <div className="w-full text-center">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button title="relay settings" size="lg">
-                Choose a relay group
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-96 h-[450px] p-0">
-              <ScrollArea className="h-full">
-                <div className="p-4">
-                  <RelaySettings />
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </PrimaryPageLayout>
-    )
+    return <PrimaryPageLayout ref={layoutRef} titlebar={<NoteListPageTitlebar />} />
   }
 
   return (
-    <PrimaryPageLayout ref={layoutRef}>
+    <PrimaryPageLayout ref={layoutRef} titlebar={<NoteListPageTitlebar />}>
       <NoteList relayUrls={relayUrls} />
     </PrimaryPageLayout>
+  )
+}
+
+function NoteListPageTitlebar() {
+  return (
+    <div className="flex gap-1 items-center h-full justify-between">
+      <RelaySettingsButton />
+      <SearchButton />
+    </div>
   )
 }

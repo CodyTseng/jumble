@@ -66,7 +66,7 @@ export default function SecondaryPageLayout({
         hideBackButton={hideBackButton}
         visible={visible}
       />
-      <div className="pb-4">{children}</div>
+      <div className="pb-4 mt-2">{children}</div>
       <ScrollToTopButton
         scrollAreaRef={scrollAreaRef}
         visible={!hideScrollToTopButton && visible && lastScrollTop > 500}
@@ -88,18 +88,16 @@ export function SecondaryPageTitlebar({
 
   if (isSmallScreen) {
     return (
-      <Titlebar className="h-11 flex gap-1 pl-2 items-center font-semibold" visible={visible}>
-        <BackButton hide={hideBackButton} variant="small-screen-titlebar" />
-        <div className="truncate text-lg">{content}</div>
+      <Titlebar className="h-12 flex gap-1 items-center font-semibold" visible={visible}>
+        <BackButton hide={hideBackButton}>{content}</BackButton>
       </Titlebar>
     )
   }
 
   return (
-    <Titlebar className="h-9 flex gap-1 px-2 justify-between items-center font-semibold">
+    <Titlebar className="h-12 flex gap-1 justify-between items-center font-semibold">
       <div className="flex items-center gap-1 flex-1 w-0">
-        <BackButton hide={hideBackButton} />
-        <div className="truncate text-lg">{content}</div>
+        <BackButton hide={hideBackButton}>{content}</BackButton>
       </div>
       <div className="flex-shrink-0 flex items-center">
         <ThemeToggle />

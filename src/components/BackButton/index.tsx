@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 
 export default function BackButton({
   hide = false,
-  variant = 'titlebar'
+  children
 }: {
   hide?: boolean
-  variant?: 'titlebar' | 'small-screen-titlebar'
+  children?: React.ReactNode
 }) {
   const { t } = useTranslation()
   const { pop } = useSecondaryPage()
@@ -16,8 +16,15 @@ export default function BackButton({
   return (
     <>
       {!hide && (
-        <Button variant={variant} size={variant} title={t('back')} onClick={() => pop()}>
+        <Button
+          className="flex gap-1 items-center w-fit max-w-full justify-start px-4"
+          variant="ghost"
+          size="titlebar-icon"
+          title={t('back')}
+          onClick={() => pop()}
+        >
           <ChevronLeft />
+          <div className="truncate text-lg">{children}</div>
         </Button>
       )}
     </>

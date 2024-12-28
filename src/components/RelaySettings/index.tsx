@@ -54,7 +54,7 @@ export default function RelaySettings({ hideTitle = false }: { hideTitle?: boole
           <RelayGroup key={index} group={group} />
         ))}
       </div>
-      {relayGroups.length < 5 && (
+      {relayGroups.length < 10 && (
         <>
           <Separator className="my-4" />
           <div className="w-full border rounded-lg p-4">

@@ -1,11 +1,9 @@
-import Logo from '@/assets/Logo'
 import Icon from '@/assets/Icon'
-import AccountButton from './AccountButton'
+import Logo from '@/assets/Logo'
 import AboutInfoButton from './AboutInfoButton'
+import AccountButton from './AccountButton'
 import NotificationButton from './NotificationButton'
 import PostButton from './PostButton'
-import RelaySettingsButton from './RelaySettingsButton'
-import SearchButton from './SearchButton'
 
 export default function PrimaryPageSidebar() {
   return (
@@ -16,9 +14,7 @@ export default function PrimaryPageSidebar() {
           <Logo className="max-xl:hidden" />
         </div>
         <PostButton />
-        <RelaySettingsButton />
         <NotificationButton />
-        <SearchButton />
         <AboutInfoButton />
       </div>
       <AccountButton />
