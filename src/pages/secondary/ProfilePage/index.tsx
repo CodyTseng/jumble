@@ -102,9 +102,8 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
           </SecondaryPageLink>
         </div>
       </div>
-      <Separator className="hidden sm:block mt-4 sm:my-4" />
       {!isFetchingRelayInfo && (
-        <NoteList filter={{ authors: [pubkey] }} relayUrls={relayUrls} className="max-sm:mt-2" />
+        <NoteList filter={{ authors: [pubkey] }} relayUrls={relayUrls} className="mt-2" />
       )}
     </SecondaryPageLayout>
   )

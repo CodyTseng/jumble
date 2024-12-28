@@ -201,38 +201,28 @@ function DisplayRepliesSwitch({
   setDisplayReplies: (value: boolean) => void
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-
-  if (isSmallScreen) {
-    return (
-      <div>
-        <div className="flex">
-          <div
-            className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? 'text-muted-foreground' : ''}`}
-            onClick={() => setDisplayReplies(false)}
-          >
-            {t('Notes')}
-          </div>
-          <div
-            className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? '' : 'text-muted-foreground'}`}
-            onClick={() => setDisplayReplies(true)}
-          >
-            {t('Notes & Replies')}
-          </div>
-        </div>
-        <div
-          className={`w-1/2 px-4 transition-transform duration-500 ${displayReplies ? 'translate-x-full' : ''}`}
-        >
-          <div className="w-full h-1 bg-primary rounded-full" />
-        </div>
-      </div>
-    )
-  }
 
   return (
-    <div className="flex justify-end gap-2 px-4">
-      <div>{t('Display replies')}</div>
-      <Switch checked={displayReplies} onCheckedChange={setDisplayReplies} />
+    <div>
+      <div className="flex">
+        <div
+          className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? 'text-muted-foreground' : ''}`}
+          onClick={() => setDisplayReplies(false)}
+        >
+          {t('Notes')}
+        </div>
+        <div
+          className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? '' : 'text-muted-foreground'}`}
+          onClick={() => setDisplayReplies(true)}
+        >
+          {t('Notes & Replies')}
+        </div>
+      </div>
+      <div
+        className={`w-1/2 px-4 sm:px-6 transition-transform duration-500 ${displayReplies ? 'translate-x-full' : ''}`}
+      >
+        <div className="w-full h-1 bg-primary rounded-full" />
+      </div>
     </div>
   )
 }
