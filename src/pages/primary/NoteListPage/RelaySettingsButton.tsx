@@ -16,7 +16,7 @@ export default function RelaySettingsButton() {
 
   const trigger = (
     <div
-      className="flex items-center gap-1 hover:bg-muted/80 px-4 h-full cursor-pointer rounded-lg"
+      className="flex items-center gap-1 clickable px-4 h-full crounded-lg"
       onClick={() => setOpen(true)}
     >
       <Server size={16} />

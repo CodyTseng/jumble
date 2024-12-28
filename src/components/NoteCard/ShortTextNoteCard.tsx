@@ -34,7 +34,7 @@ export default function ShortTextNoteCard({
       }}
     >
       <div
-        className={`hover:bg-muted/50 text-left cursor-pointer ${embedded ? 'p-2 sm:p-3 border rounded-lg' : 'px-4 py-3'}`}
+        className={`clickable text-left ${embedded ? 'p-2 sm:p-3 border rounded-lg' : 'px-4 py-3'}`}
       >
         <RepostDescription reposter={reposter} />
         <Note

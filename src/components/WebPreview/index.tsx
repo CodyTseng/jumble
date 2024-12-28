@@ -41,10 +41,7 @@ export default function WebPreview({
 
   return (
     <div
-      className={cn(
-        'p-0 hover:bg-muted/50 cursor-pointer flex w-full border rounded-lg',
-        className
-      )}
+      className={cn('p-0 clickable flex w-full border rounded-lg', className)}
       onClick={(e) => {
         e.stopPropagation()
         window.open(url, '_blank')

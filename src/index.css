@@ -24,6 +24,21 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  .clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:active {
+      background-color: hsl(var(--muted) / 0.6);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .clickable:hover {
+      background-color: hsl(var(--muted) / 0.6);
+    }
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;

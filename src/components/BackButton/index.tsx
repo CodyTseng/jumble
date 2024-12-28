@@ -24,7 +24,7 @@ export default function BackButton({
           onClick={() => pop()}
         >
           <ChevronLeft />
-          <div className="truncate text-lg">{children}</div>
+          <div className="truncate text-lg font-semibold">{children}</div>
         </Button>
       )}
     </>

@@ -1,16 +1,13 @@
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
 import { useFetchRelayInfos } from '@/hooks'
 import { isReplyNoteEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
 
 const NORMAL_RELAY_LIMIT = 100
@@ -150,32 +147,22 @@ export default function NoteList({
   return (
     <div className={cn('space-y-2 sm:space-y-2', className)}>
       <DisplayRepliesSwitch displayReplies={displayReplies} setDisplayReplies={setDisplayReplies} />
-      <PullToRefresh
-        onRefresh={async () =>
-          new Promise((resolve) => {
-            setRefreshCount((pre) => pre + 1)
-            setTimeout(resolve, 1000)
-          })
-        }
-        pullingContent=""
-      >
-        <div className="space-y-2 sm:space-y-2">
-          {newEvents.filter((event) => displayReplies || !isReplyNoteEvent(event)).length > 0 && (
-            <div className="flex justify-center w-full max-sm:mt-2">
-              <Button size="lg" onClick={showNewEvents}>
-                {t('show new notes')}
-              </Button>
-            </div>
-          )}
-          <div className="flex flex-col">
-            {events
-              .filter((event) => displayReplies || !isReplyNoteEvent(event))
-              .map((event) => (
-                <NoteCard key={event.id} className="w-full" event={event} />
-              ))}
+      <div className="space-y-2 sm:space-y-2">
+        {newEvents.filter((event) => displayReplies || !isReplyNoteEvent(event)).length > 0 && (
+          <div className="flex justify-center w-full max-sm:mt-2">
+            <Button size="lg" onClick={showNewEvents}>
+              {t('show new notes')}
+            </Button>
           </div>
+        )}
+        <div className="flex flex-col">
+          {events
+            .filter((event) => displayReplies || !isReplyNoteEvent(event))
+            .map((event) => (
+              <NoteCard key={event.id} className="w-full" event={event} />
+            ))}
         </div>
-      </PullToRefresh>
+      </div>
       <div className="text-center text-sm text-muted-foreground">
         {hasMore ? (
           <div ref={bottomRef}>{t('loading...')}</div>
@@ -206,13 +193,13 @@ function DisplayRepliesSwitch({
     <div>
       <div className="flex">
         <div
-          className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? 'text-muted-foreground' : ''}`}
+          className={`w-1/2 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${displayReplies ? 'text-muted-foreground' : ''}`}
           onClick={() => setDisplayReplies(false)}
         >
           {t('Notes')}
         </div>
         <div
-          className={`w-1/2 text-center py-2 font-semibold hover:bg-muted cursor-pointer rounded-lg ${displayReplies ? '' : 'text-muted-foreground'}`}
+          className={`w-1/2 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${displayReplies ? '' : 'text-muted-foreground'}`}
           onClick={() => setDisplayReplies(true)}
         >
           {t('Notes & Replies')}

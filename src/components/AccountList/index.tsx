@@ -20,9 +20,7 @@ export default function AccountList({ afterSwitch }: { afterSwitch: () => void }
           key={`${act.pubkey}-${act.signerType}`}
           className={cn(
             'relative rounded-lg',
-            isSameAccount(act, account)
-              ? 'border border-primary'
-              : 'cursor-pointer hover:bg-muted/60'
+            isSameAccount(act, account) ? 'border border-primary' : 'clickable'
           )}
           onClick={() => {
             if (isSameAccount(act, account)) return
