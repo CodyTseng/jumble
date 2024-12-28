@@ -84,7 +84,7 @@ function PrimaryPageTitlebar({
   visible?: boolean
 }) {
   return (
-    <Titlebar className="h-12" visible={visible}>
+    <Titlebar className="h-12 p-1" visible={visible}>
       {children}
     </Titlebar>
   )

@@ -42,7 +42,10 @@ function ProfileButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="clickable shadow-none p-2 xl:px-2 xl:py-2 w-12 h-12 xl:w-full xl:h-auto flex items-center bg-transparent text-foreground hover:text-accent-foreground rounded-lg justify-start gap-4 text-lg font-semibold">
+        <Button
+          variant="ghost"
+          className="clickable shadow-none p-2 xl:px-2 xl:py-2 w-12 h-12 xl:w-full xl:h-auto flex items-center bg-transparent text-foreground hover:text-accent-foreground rounded-lg justify-start gap-4 text-lg font-semibold"
+        >
           <div className="flex gap-2 items-center flex-1 w-0">
             <Avatar className="w-8 h-8">
               <AvatarImage src={avatar} />

@@ -16,10 +16,10 @@ export default function RelaySettingsButton() {
 
   const trigger = (
     <div
-      className="flex items-center gap-1 clickable px-4 h-full crounded-lg"
+      className="flex items-center gap-1 clickable px-3 h-full rounded-lg [&_svg]:size-4 [&_svg]:shrink-0"
       onClick={() => setOpen(true)}
     >
-      <Server size={16} />
+      <Server />
       <div className="ml-2 text-lg font-semibold">{title}</div>
       <ChevronDown />
     </div>
