@@ -2,8 +2,9 @@ import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import AboutInfoButton from './AboutInfoButton'
 import AccountButton from './AccountButton'
-import NotificationButton from './NotificationButton'
+import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
+import HomeButton from './HomeButton'
 
 export default function PrimaryPageSidebar() {
   return (
@@ -13,8 +14,9 @@ export default function PrimaryPageSidebar() {
           <Icon className="xl:hidden" />
           <Logo className="max-xl:hidden" />
         </div>
+        <HomeButton />
+        <NotificationsButton />
         <PostButton />
-        <NotificationButton />
         <AboutInfoButton />
       </div>
       <AccountButton />

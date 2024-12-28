@@ -16,11 +16,11 @@ export default function NoteListPage() {
   }, [relayUrlsString])
 
   if (!relayUrls.length) {
-    return <PrimaryPageLayout ref={layoutRef} titlebar={<NoteListPageTitlebar />} />
+    return <PrimaryPageLayout pageName="home" ref={layoutRef} titlebar={<NoteListPageTitlebar />} />
   }
 
   return (
-    <PrimaryPageLayout ref={layoutRef} titlebar={<NoteListPageTitlebar />}>
+    <PrimaryPageLayout pageName="home" ref={layoutRef} titlebar={<NoteListPageTitlebar />}>
       <NoteList relayUrls={relayUrls} />
     </PrimaryPageLayout>
   )

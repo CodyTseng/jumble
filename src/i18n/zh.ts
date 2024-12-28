@@ -4,6 +4,7 @@ export default {
     About: '关于',
     'New post': '发布新笔记',
     Post: '发布笔记',
+    Home: '主页',
     'Relay settings': '服务器设置',
     SidebarRelays: '服务器',
     Refresh: '刷新列表',

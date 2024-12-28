@@ -2,15 +2,23 @@ import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { usePrimaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { TPrimaryPageName } from '@/types'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 const PrimaryPageLayout = forwardRef(
-  ({ children, titlebar }: { children?: React.ReactNode; titlebar?: React.ReactNode }, ref) => {
+  (
+    {
+      children,
+      titlebar,
+      pageName
+    }: { children?: React.ReactNode; titlebar?: React.ReactNode; pageName: TPrimaryPageName },
+    ref
+  ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const [visible, setVisible] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const { isSmallScreen } = useScreenSize()
-    const { active } = usePrimaryPage()
+    const { current } = usePrimaryPage()
 
     useImperativeHandle(
       ref,
@@ -27,7 +35,7 @@ const PrimaryPageLayout = forwardRef(
     )
 
     useEffect(() => {
-      if (!active) return
+      if (current !== pageName) return
 
       const handleScroll = () => {
         const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
@@ -58,7 +66,7 @@ const PrimaryPageLayout = forwardRef(
       return () => {
         scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
       }
-    }, [lastScrollTop, isSmallScreen, active])
+    }, [lastScrollTop, isSmallScreen, current])
 
     return (
       <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>

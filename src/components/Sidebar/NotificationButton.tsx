@@ -1,16 +1,15 @@
-import { toNotifications } from '@/lib/link'
-import { useSecondaryPage } from '@/PageManager'
+import { usePrimaryPage } from '@/PageManager'
 import { Bell } from 'lucide-react'
 import SidebarItem from './SidebarItem'
 
-export default function NotificationButton() {
-  const { push } = useSecondaryPage()
+export default function NotificationsButton() {
+  const { navigate, current } = usePrimaryPage()
 
   return (
     <SidebarItem
-      title="notifications"
-      description="Notifications"
-      onClick={() => push(toNotifications())}
+      title="Notifications"
+      onClick={() => navigate('notifications')}
+      active={current === 'notifications'}
     >
       <Bell />
     </SidebarItem>

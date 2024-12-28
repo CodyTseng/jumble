@@ -11,7 +11,6 @@ export default function PostButton() {
       <SidebarItem
         title="New post"
         description="Post"
-        className="bg-primary text-primary-foreground hover:text-primary-foreground hover:bg-primary/90"
         onClick={(e) => {
           e.stopPropagation()
           setOpen(true)

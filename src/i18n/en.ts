@@ -4,6 +4,7 @@ export default {
     About: 'About',
     'New post': 'New post',
     Post: 'Post',
+    Home: 'Home',
     'Relay settings': 'Relay settings',
     SidebarRelays: 'Relays',
     Refresh: 'Refresh',
