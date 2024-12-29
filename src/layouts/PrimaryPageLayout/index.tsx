@@ -49,7 +49,7 @@ const PrimaryPageLayout = forwardRef(
       const handleScroll = () => {
         const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
         const diff = scrollTop - lastScrollTop
-        if (scrollTop <= 100) {
+        if (scrollTop <= 800) {
           setVisible(true)
           setLastScrollTop(scrollTop)
           return

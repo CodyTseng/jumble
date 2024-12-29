@@ -68,6 +68,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           if (currentIndex !== 0) return pre
 
           window.history.replaceState(null, '', '/')
+          setDisplayPrimaryPage(true)
           return []
         }
         // Go back
@@ -77,6 +78,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           // Load the component if it's not cached
           if (topItem && !topItem.component) {
             topItem.component = findAndCreateComponent(topItem.url, state.index)
+          }
+          if (newStack.length === 0) {
+            setDisplayPrimaryPage(true)
           }
           return newStack
         }
@@ -93,12 +97,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       window.removeEventListener('popstate', onPopState)
     }
   }, [])
-
-  useEffect(() => {
-    if (secondaryStack.length === 0) {
-      setDisplayPrimaryPage(true)
-    }
-  }, [secondaryStack])
 
   const navigatePrimaryPage = (page: TPrimaryPageName) => {
     setDisplayPrimaryPage(true)
@@ -142,36 +140,34 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               : 0
           }}
         >
-          <div>
-            {!!secondaryStack.length &&
-              secondaryStack.map((item, index) => (
-                <div
-                  key={item.index}
-                  style={{
-                    display:
-                      !displayPrimaryPage && index === secondaryStack.length - 1 ? 'block' : 'none'
-                  }}
-                >
-                  {item.component}
-                </div>
-              ))}
-            <div
-              key="home-page"
-              style={{
-                display: displayPrimaryPage && currentPrimaryPage === 'home' ? 'block' : 'none'
-              }}
-            >
-              <NoteListPage />
-            </div>
-            <div
-              key="notifications-page"
-              style={{
-                display:
-                  displayPrimaryPage && currentPrimaryPage === 'notifications' ? 'block' : 'none'
-              }}
-            >
-              <NotificationListPage />
-            </div>
+          {!!secondaryStack.length &&
+            secondaryStack.map((item, index) => (
+              <div
+                key={item.index}
+                style={{
+                  display:
+                    !displayPrimaryPage && index === secondaryStack.length - 1 ? 'block' : 'none'
+                }}
+              >
+                {item.component}
+              </div>
+            ))}
+          <div
+            key="home-page"
+            style={{
+              display: displayPrimaryPage && currentPrimaryPage === 'home' ? 'block' : 'none'
+            }}
+          >
+            <NoteListPage />
+          </div>
+          <div
+            key="notifications-page"
+            style={{
+              display:
+                displayPrimaryPage && currentPrimaryPage === 'notifications' ? 'block' : 'none'
+            }}
+          >
+            <NotificationListPage />
           </div>
         </SecondaryPageContext.Provider>
       </PrimaryPageContext.Provider>
