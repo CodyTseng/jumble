@@ -8,12 +8,11 @@ import SearchButton from './SearchButton'
 export default function NoteListPage() {
   const layoutRef = useRef<{ scrollToTop: () => void }>(null)
   const { relayUrls } = useRelaySettings()
-  const relayUrlsString = JSON.stringify(relayUrls)
   useEffect(() => {
     if (layoutRef.current) {
       layoutRef.current.scrollToTop()
     }
-  }, [relayUrlsString])
+  }, [JSON.stringify(relayUrls)])
 
   return (
     <PrimaryPageLayout pageName="home" ref={layoutRef} titlebar={<NoteListPageTitlebar />}>

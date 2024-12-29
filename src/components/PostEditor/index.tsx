@@ -42,7 +42,7 @@ export default function PostEditor({
             </DrawerTitle>
             <DrawerDescription className="hidden" />
           </DrawerHeader>
-          <div className="overflow-auto px-4">
+          <div className="overflow-auto py-2 px-4">
             <PostContent
               defaultContent={defaultContent}
               parentEvent={parentEvent}
