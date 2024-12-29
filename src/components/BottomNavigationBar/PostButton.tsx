@@ -1,4 +1,4 @@
-import PostDialog from '@/components/PostDialog'
+import PostEditor from '@/components/PostEditor'
 import { PencilLine } from 'lucide-react'
 import { useState } from 'react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
@@ -16,7 +16,7 @@ export default function PostButton() {
       >
         <PencilLine />
       </BottomNavigationBarItem>
-      <PostDialog open={open} setOpen={setOpen} />
+      <PostEditor open={open} setOpen={setOpen} />
     </>
   )
 }

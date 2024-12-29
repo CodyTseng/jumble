@@ -1,4 +1,4 @@
-import PostDialog from '@/components/PostDialog'
+import PostEditor from '@/components/PostEditor'
 import { PencilLine } from 'lucide-react'
 import { useState } from 'react'
 import SidebarItem from './SidebarItem'
@@ -18,7 +18,7 @@ export default function PostButton() {
       >
         <PencilLine />
       </SidebarItem>
-      <PostDialog open={open} setOpen={setOpen} />
+      <PostEditor open={open} setOpen={setOpen} />
     </>
   )
 }

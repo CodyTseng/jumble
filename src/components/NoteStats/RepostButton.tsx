@@ -13,7 +13,7 @@ import client from '@/services/client.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
-import PostDialog from '../PostDialog'
+import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 import { useTranslation } from 'react-i18next'
 
@@ -111,7 +111,7 @@ export default function RepostButton({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <PostDialog
+      <PostEditor
         open={isPostDialogOpen}
         setOpen={setIsPostDialogOpen}
         defaultContent={'\nnostr:' + getSharableEventId(event)}

@@ -8,7 +8,7 @@ export default function BottomNavigationBar({ visible = true }: { visible?: bool
   return (
     <div
       className={cn(
-        'fixed bottom-0 w-full pb-4 h-16 z-20 bg-background/80 backdrop-blur-md duration-700 transition-transform flex items-center justify-around [&_svg]:size-4 [&_svg]:shrink-0',
+        'fixed bottom-0 w-full pb-4 h-16 z-20 bg-background/90 backdrop-blur-xl duration-700 transition-transform flex items-center justify-around [&_svg]:size-4 [&_svg]:shrink-0',
         visible ? '' : 'translate-y-full'
       )}
     >

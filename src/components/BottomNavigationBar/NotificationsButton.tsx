@@ -3,8 +3,8 @@ import { Bell } from 'lucide-react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function NotificationsButton() {
-  const { navigate, current } = usePrimaryPage()
-  const active = current === 'notifications'
+  const { navigate, current, display } = usePrimaryPage()
+  const active = display && current === 'notifications'
 
   return (
     <BottomNavigationBarItem active={active} onClick={() => navigate('notifications')}>

@@ -16,7 +16,7 @@ export default function NoteStats({
 }) {
   return (
     <div className={cn('flex justify-between', className)}>
-      <div className="flex gap-4 h-4 items-center">
+      <div className="flex gap-4 h-4 items-center" onClick={(e) => e.stopPropagation()}>
         <ReplyButton event={event} />
         <RepostButton event={event} canFetch={fetchIfNotExisting} />
         <LikeButton event={event} canFetch={fetchIfNotExisting} />

@@ -5,7 +5,7 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import LikeButton from '../NoteStats/LikeButton'
 import ParentNotePreview from '../ParentNotePreview'
-import PostDialog from '../PostDialog'
+import PostEditor from '../PostEditor'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
@@ -51,7 +51,7 @@ export default function ReplyNote({
         </div>
       </div>
       <LikeButton event={event} variant="reply" />
-      <PostDialog parentEvent={event} open={isPostDialogOpen} setOpen={setIsPostDialogOpen} />
+      <PostEditor parentEvent={event} open={isPostDialogOpen} setOpen={setIsPostDialogOpen} />
     </div>
   )
 }
