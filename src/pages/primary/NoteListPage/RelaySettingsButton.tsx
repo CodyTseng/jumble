@@ -2,6 +2,7 @@ import RelaySettings from '@/components/RelaySettings'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { simplifyUrl } from '@/lib/url'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { ChevronDown, Server } from 'lucide-react'
@@ -12,7 +13,11 @@ export default function RelaySettingsButton() {
   const [open, setOpen] = useState(false)
   const { relayGroups } = useRelaySettings()
   const activeGroup = relayGroups.find((group) => group.isActive)
-  const title = activeGroup ? activeGroup.groupName : 'Choose a relay collection'
+  const title = activeGroup
+    ? activeGroup.relayUrls.length === 1
+      ? simplifyUrl(activeGroup.relayUrls[0])
+      : activeGroup.groupName
+    : 'Choose a relay collection'
 
   const trigger = (
     <div

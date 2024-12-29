@@ -14,3 +14,7 @@ export function normalizeUrl(url: string): string {
   p.hash = ''
   return p.toString()
 }
+
+export function simplifyUrl(url: string): string {
+  return url.replace('wss://', '').replace('ws://', '').replace(/\/$/, '')
+}
