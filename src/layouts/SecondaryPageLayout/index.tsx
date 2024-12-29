@@ -1,4 +1,5 @@
 import BackButton from '@/components/BackButton'
+import BottomNavigationBar from '@/components/BottomNavigationBar'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Titlebar } from '@/components/Titlebar'
@@ -24,6 +25,14 @@ export default function SecondaryPageLayout({
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const { isSmallScreen } = useScreenSize()
   const { currentIndex } = useSecondaryPage()
+
+  useEffect(() => {
+    if (isSmallScreen) {
+      window.scrollTo({ top: 0 })
+      setVisible(true)
+      return
+    }
+  }, [])
 
   useEffect(() => {
     if (currentIndex !== index) return
@@ -71,6 +80,7 @@ export default function SecondaryPageLayout({
         scrollAreaRef={scrollAreaRef}
         visible={!hideScrollToTopButton && visible && lastScrollTop > 500}
       />
+      {isSmallScreen && <BottomNavigationBar visible={visible} />}
     </div>
   )
 }

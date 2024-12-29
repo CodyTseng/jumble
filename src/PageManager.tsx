@@ -12,7 +12,8 @@ import { TPrimaryPageName } from './types'
 
 type TPrimaryPageContext = {
   navigate: (page: TPrimaryPageName) => void
-  current: TPrimaryPageName | null
+  current: TPrimaryPageName
+  display: boolean
 }
 
 type TSecondaryPageContext = {
@@ -48,7 +49,8 @@ export function useSecondaryPage() {
 }
 
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
-  const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName | null>('home')
+  const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
+  const [displayPrimaryPage, setDisplayPrimaryPage] = useState(true)
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
 
@@ -92,14 +94,21 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (secondaryStack.length === 0) {
+      setDisplayPrimaryPage(true)
+    }
+  }, [secondaryStack])
+
   const navigatePrimaryPage = (page: TPrimaryPageName) => {
+    setDisplayPrimaryPage(true)
     setCurrentPrimaryPage(page)
   }
 
   const pushSecondaryPage = (url: string) => {
     setSecondaryStack((prevStack) => {
       if (isSmallScreen) {
-        setCurrentPrimaryPage(null)
+        setDisplayPrimaryPage(false)
       }
       if (isCurrentPage(prevStack, url)) return prevStack
 
@@ -118,7 +127,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   if (isSmallScreen) {
     return (
       <PrimaryPageContext.Provider
-        value={{ navigate: navigatePrimaryPage, current: currentPrimaryPage }}
+        value={{
+          navigate: navigatePrimaryPage,
+          current: currentPrimaryPage,
+          display: displayPrimaryPage
+        }}
       >
         <SecondaryPageContext.Provider
           value={{
@@ -134,15 +147,29 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               secondaryStack.map((item, index) => (
                 <div
                   key={item.index}
-                  style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
+                  style={{
+                    display:
+                      !displayPrimaryPage && index === secondaryStack.length - 1 ? 'block' : 'none'
+                  }}
                 >
                   {item.component}
                 </div>
               ))}
-            <div style={{ display: currentPrimaryPage === 'home' ? 'block' : 'none' }}>
+            <div
+              key="home-page"
+              style={{
+                display: displayPrimaryPage && currentPrimaryPage === 'home' ? 'block' : 'none'
+              }}
+            >
               <NoteListPage />
             </div>
-            <div style={{ display: currentPrimaryPage === 'notifications' ? 'block' : 'none' }}>
+            <div
+              key="notifications-page"
+              style={{
+                display:
+                  displayPrimaryPage && currentPrimaryPage === 'notifications' ? 'block' : 'none'
+              }}
+            >
               <NotificationListPage />
             </div>
           </div>
@@ -153,7 +180,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
   return (
     <PrimaryPageContext.Provider
-      value={{ navigate: navigatePrimaryPage, current: currentPrimaryPage }}
+      value={{
+        navigate: navigatePrimaryPage,
+        current: currentPrimaryPage,
+        display: displayPrimaryPage
+      }}
     >
       <SecondaryPageContext.Provider
         value={{

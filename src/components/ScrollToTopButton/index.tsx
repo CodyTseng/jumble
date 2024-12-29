@@ -25,7 +25,7 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        `sticky bottom-6 z-20 flex justify-end pr-6 transition-opacity ${visible ? '' : 'opacity-0'}`,
+        `sticky z-20 flex justify-end pr-6 transition-opacity duration-700 ${visible ? '' : 'opacity-0'} ${isSmallScreen ? 'bottom-20' : 'bottom-6'}`,
         className
       )}
     >

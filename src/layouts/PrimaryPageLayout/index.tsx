@@ -1,3 +1,4 @@
+import BottomNavigationBar from '@/components/BottomNavigationBar'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { usePrimaryPage } from '@/PageManager'
@@ -18,7 +19,7 @@ const PrimaryPageLayout = forwardRef(
     const [visible, setVisible] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const { isSmallScreen } = useScreenSize()
-    const { current } = usePrimaryPage()
+    const { current, display } = usePrimaryPage()
 
     useImperativeHandle(
       ref,
@@ -35,7 +36,15 @@ const PrimaryPageLayout = forwardRef(
     )
 
     useEffect(() => {
-      if (current !== pageName) return
+      if (isSmallScreen) {
+        window.scrollTo({ top: 0 })
+        setVisible(true)
+        return
+      }
+    }, [current])
+
+    useEffect(() => {
+      if (current !== pageName || !display) return
 
       const handleScroll = () => {
         const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
@@ -66,13 +75,14 @@ const PrimaryPageLayout = forwardRef(
       return () => {
         scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
       }
-    }, [lastScrollTop, isSmallScreen, current])
+    }, [lastScrollTop, isSmallScreen, current, display])
 
     return (
       <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>
         <PrimaryPageTitlebar visible={visible}>{titlebar}</PrimaryPageTitlebar>
-        <div className="pb-4">{children}</div>
+        <div className="pb-4 overflow-x-hidden">{children}</div>
         <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
+        {isSmallScreen && <BottomNavigationBar visible={visible} />}
       </div>
     )
   }
