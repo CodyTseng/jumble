@@ -5,6 +5,7 @@ import { simplifyUrl } from '@/lib/url'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { ChevronDown, Server } from 'lucide-react'
+import { forwardRef } from 'react'
 
 export default function RelaySettingsButton() {
   const { isSmallScreen } = useScreenSize()
@@ -12,10 +13,10 @@ export default function RelaySettingsButton() {
   if (isSmallScreen) {
     return (
       <Sheet>
-        <SheetTrigger>
+        <SheetTrigger asChild>
           <RelaySettingsTrigger />
         </SheetTrigger>
-        <SheetContent side="top">
+        <SheetContent side="top" className="max-h-full overflow-auto">
           <RelaySettings />
         </SheetContent>
       </Sheet>
@@ -24,17 +25,17 @@ export default function RelaySettingsButton() {
 
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         <RelaySettingsTrigger />
       </PopoverTrigger>
-      <PopoverContent className="w-96 h-[450px] p-4" side="bottom">
+      <PopoverContent side="bottom" className="w-96 p-4 max-h-[80vh] overflow-auto">
         <RelaySettings />
       </PopoverContent>
     </Popover>
   )
 }
 
-function RelaySettingsTrigger({ onClick }: { onClick?: () => void }) {
+const RelaySettingsTrigger = forwardRef<HTMLDivElement>((props, ref) => {
   const { relayGroups } = useRelaySettings()
   const activeGroup = relayGroups.find((group) => group.isActive)
   const title = activeGroup
@@ -44,10 +45,10 @@ function RelaySettingsTrigger({ onClick }: { onClick?: () => void }) {
     : 'Choose a relay collection'
 
   return (
-    <div className="flex items-center gap-2 clickable px-3 h-full rounded-lg" onClick={onClick}>
+    <div className="flex items-center gap-2 clickable px-3 h-full rounded-lg" ref={ref} {...props}>
       <Server />
       <div className="text-lg font-semibold">{title}</div>
       <ChevronDown />
     </div>
   )
-}
+})

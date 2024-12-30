@@ -25,9 +25,14 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        `sticky z-20 flex justify-end pr-6 transition-opacity duration-700 ${visible ? '' : 'opacity-0'} ${isSmallScreen ? 'bottom-20' : 'bottom-6'}`,
+        `sticky z-20 flex justify-end pr-3 transition-opacity duration-700 ${visible ? '' : 'opacity-0'}`,
         className
       )}
+      style={{
+        bottom: isSmallScreen
+          ? 'calc(env(safe-area-inset-bottom) + 3.75rem)'
+          : 'calc(env(safe-area-inset-bottom) + 0.75rem)'
+      }}
     >
       <Button
         variant="secondary-2"

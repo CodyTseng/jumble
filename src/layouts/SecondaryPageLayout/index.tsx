@@ -98,14 +98,14 @@ export function SecondaryPageTitlebar({
 
   if (isSmallScreen) {
     return (
-      <Titlebar className="h-12 flex gap-1 items-center font-semibold" visible={visible}>
+      <Titlebar className="h-12 flex gap-1 p-1 items-center font-semibold" visible={visible}>
         <BackButton hide={hideBackButton}>{content}</BackButton>
       </Titlebar>
     )
   }
 
   return (
-    <Titlebar className="h-12 flex gap-1 justify-between items-center font-semibold">
+    <Titlebar className="h-12 flex gap-1 p-1 justify-between items-center font-semibold">
       <div className="flex items-center gap-1 flex-1 w-0">
         <BackButton hide={hideBackButton}>{content}</BackButton>
       </div>

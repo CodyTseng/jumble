@@ -17,7 +17,7 @@ export default function BackButton({
     <>
       {!hide && (
         <Button
-          className="flex gap-1 items-center w-fit max-w-full justify-start px-4"
+          className="flex gap-1 items-center w-fit max-w-full justify-start pl-2 pr-3"
           variant="ghost"
           size="titlebar-icon"
           title={t('back')}
