@@ -16,7 +16,7 @@ export default function PostButton() {
           setOpen(true)
         }}
       >
-        <PencilLine />
+        <PencilLine strokeWidth={3} />
       </SidebarItem>
       <PostEditor open={open} setOpen={setOpen} />
     </>

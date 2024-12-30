@@ -3,10 +3,13 @@
 @tailwind utilities;
 @layer base {
   * {
+    @apply border-border;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-tap-highlight-color: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
   }
 
   input,
@@ -18,6 +21,7 @@
   }
 
   body {
+    @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     -webkit-overflow-scrolling: touch;
     text-size-adjust: 100%;
@@ -37,6 +41,23 @@
     .clickable:hover {
       background-color: hsl(var(--muted) / 0.5);
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 
   :root {
@@ -93,13 +114,5 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --highlight: 259 43% 56%;
-  }
-}
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

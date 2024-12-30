@@ -6,7 +6,7 @@ export default function AboutInfoButton() {
   return (
     <AboutInfoDialog>
       <SidebarItem title="About">
-        <Info />
+        <Info strokeWidth={3} />
       </SidebarItem>
     </AboutInfoDialog>
   )

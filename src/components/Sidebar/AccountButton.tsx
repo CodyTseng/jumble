@@ -79,7 +79,7 @@ function LoginButton() {
 
   return (
     <SidebarItem onClick={() => checkLogin()} title="Login">
-      <LogIn />
+      <LogIn strokeWidth={3} />
     </SidebarItem>
   )
 }

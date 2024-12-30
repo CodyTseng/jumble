@@ -11,7 +11,7 @@ export default function NotificationsButton() {
       onClick={() => navigate('notifications')}
       active={current === 'notifications'}
     >
-      <Bell />
+      <Bell strokeWidth={3} />
     </SidebarItem>
   )
 }
