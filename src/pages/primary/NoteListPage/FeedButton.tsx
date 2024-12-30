@@ -1,5 +1,5 @@
 import FeedSwitcher from '@/components/FeedSwitcher'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { simplifyUrl } from '@/lib/url'
 import { useFeed } from '@/providers/FeedProvider'
