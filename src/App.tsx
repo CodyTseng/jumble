@@ -4,7 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { PageManager } from './PageManager'
-import NoteListPage from './pages/primary/NoteListPage'
+import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
 import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
@@ -15,16 +15,18 @@ export default function App(): JSX.Element {
   return (
     <ThemeProvider>
       <ScreenSizeProvider>
-        <RelaySettingsProvider>
-          <NostrProvider>
-            <FollowListProvider>
-              <NoteStatsProvider>
-                <PageManager />
-                <Toaster />
-              </NoteStatsProvider>
-            </FollowListProvider>
-          </NostrProvider>
-        </RelaySettingsProvider>
+        <FeedProvider>
+          <RelaySettingsProvider>
+            <NostrProvider>
+              <FollowListProvider>
+                <NoteStatsProvider>
+                  <PageManager />
+                  <Toaster />
+                </NoteStatsProvider>
+              </FollowListProvider>
+            </NostrProvider>
+          </RelaySettingsProvider>
+        </FeedProvider>
       </ScreenSizeProvider>
     </ThemeProvider>
   )

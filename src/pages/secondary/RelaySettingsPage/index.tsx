@@ -7,7 +7,7 @@ export default function RelaySettingsPage({ index }: { index?: number }) {
 
   return (
     <SecondaryPageLayout index={index} titlebarContent={t('Relay settings')}>
-      <div className="max-sm:px-4">
+      <div className="px-4">
         <RelaySettings hideTitle />
       </div>
     </SecondaryPageLayout>

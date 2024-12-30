@@ -19,7 +19,7 @@ function NotificationListPageTitlebar() {
   return (
     <div className="flex gap-2 items-center h-full pl-3">
       <Bell />
-      <div className="text-lg font-semibold">{t('notifications')}</div>
+      <div className="text-lg font-semibold">{t('Notifications')}</div>
     </div>
   )
 }

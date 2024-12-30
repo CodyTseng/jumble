@@ -28,6 +28,11 @@ type TStackItem = {
   component: React.ReactNode | null
 }
 
+const PRIMARY_PAGE_MAP = {
+  home: <NoteListPage />,
+  notifications: <NotificationListPage />
+}
+
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)
 
 const SecondaryPageContext = createContext<TSecondaryPageContext | undefined>(undefined)
@@ -152,23 +157,16 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 {item.component}
               </div>
             ))}
-          <div
-            key="home-page"
-            style={{
-              display: displayPrimaryPage && currentPrimaryPage === 'home' ? 'block' : 'none'
-            }}
-          >
-            <NoteListPage />
-          </div>
-          <div
-            key="notifications-page"
-            style={{
-              display:
-                displayPrimaryPage && currentPrimaryPage === 'notifications' ? 'block' : 'none'
-            }}
-          >
-            <NotificationListPage />
-          </div>
+          {Object.entries(PRIMARY_PAGE_MAP).map(([pageName, page]) => (
+            <div
+              key={pageName}
+              style={{
+                display: displayPrimaryPage && currentPrimaryPage === pageName ? 'block' : 'none'
+              }}
+            >
+              {page}
+            </div>
+          ))}
         </SecondaryPageContext.Provider>
       </PrimaryPageContext.Provider>
     )

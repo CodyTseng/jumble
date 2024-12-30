@@ -65,3 +65,5 @@ export type TAccount = {
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
 export type TPrimaryPageName = 'home' | 'notifications'
+
+export type TFeedType = 'following' | 'relays'

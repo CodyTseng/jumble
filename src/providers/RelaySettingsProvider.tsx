@@ -5,6 +5,7 @@ import client from '@/services/client.service'
 import storage from '@/services/storage.service'
 import { TRelayGroup } from '@/types'
 import { createContext, Dispatch, useContext, useEffect, useState } from 'react'
+import { useFeed } from './FeedProvider'
 
 type TRelaySettingsContext = {
   relayGroups: TRelayGroup[]
@@ -31,6 +32,7 @@ export const useRelaySettings = () => {
 }
 
 export function RelaySettingsProvider({ children }: { children: React.ReactNode }) {
+  const { setFeedType } = useFeed()
   const [relayGroups, setRelayGroups] = useState<TRelayGroup[]>([])
   const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
   const [relayUrls, setRelayUrls] = useState<string[]>(
@@ -49,6 +51,7 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
       .map((url) => normalizeUrl(url))
     if (tempRelays.length) {
       setTemporaryRelayUrls(tempRelays)
+      setFeedType('relays')
     }
     const storedGroups = storage.getRelayGroups()
     setRelayGroups(storedGroups)
@@ -93,6 +96,7 @@ export function RelaySettingsProvider({ children }: { children: React.ReactNode 
         isActive: group.groupName === groupName
       }))
     )
+    setFeedType('relays')
     setTemporaryRelayUrls([])
   }
 

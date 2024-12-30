@@ -41,6 +41,9 @@ const DrawerContent = React.forwardRef<
         'fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] sm:border bg-background',
         className
       )}
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
       {...props}
     >
       <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
