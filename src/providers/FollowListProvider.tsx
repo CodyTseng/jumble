@@ -28,15 +28,17 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   const { pubkey: accountPubkey, publish } = useNostr()
   const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
   const [isReady, setIsReady] = useState(false)
-  const followings = useMemo(
-    () =>
-      followListEvent?.tags
-        .filter(tagNameEquals('p'))
-        .map(([, pubkey]) => pubkey)
-        .filter(Boolean)
-        .reverse() ?? [],
-    [followListEvent]
-  )
+  const followings = useMemo(() => {
+    return Array.from(
+      new Set(
+        followListEvent?.tags
+          .filter(tagNameEquals('p'))
+          .map(([, pubkey]) => pubkey)
+          .filter(Boolean)
+          .reverse() ?? []
+      )
+    )
+  }, [followListEvent])
 
   useEffect(() => {
     if (!accountPubkey) return

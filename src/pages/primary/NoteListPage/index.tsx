@@ -40,7 +40,14 @@ export default function NoteListPage() {
       {!!urls.length && (feedType === 'relays' || (isFollowingsReady && !isRelayListFetching)) ? (
         <NoteList
           relayUrls={urls}
-          filter={feedType === 'following' ? { authors: followings } : {}}
+          filter={
+            feedType === 'following'
+              ? {
+                  authors:
+                    pubkey && !followings.includes(pubkey) ? [...followings, pubkey] : followings
+                }
+              : {}
+          }
         />
       ) : (
         <div className="text-center text-sm text-muted-foreground">{t('loading...')}</div>
