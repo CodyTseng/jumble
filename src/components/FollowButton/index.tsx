@@ -10,11 +10,11 @@ export default function FollowButton({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation()
   const { toast } = useToast()
   const { pubkey: accountPubkey, checkLogin } = useNostr()
-  const { followListEvent, followings, isReady, follow, unfollow } = useFollowList()
+  const { followListEvent, followings, isFetching, follow, unfollow } = useFollowList()
   const [updating, setUpdating] = useState(false)
   const isFollowing = useMemo(() => followings.includes(pubkey), [followings, pubkey])
 
-  if (!accountPubkey || !isReady || (pubkey && pubkey === accountPubkey)) return null
+  if (!accountPubkey || isFetching || (pubkey && pubkey === accountPubkey)) return null
 
   const handleFollow = async (e: React.MouseEvent) => {
     e.stopPropagation()

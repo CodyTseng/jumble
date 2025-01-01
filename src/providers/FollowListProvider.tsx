@@ -9,7 +9,7 @@ import { useNostr } from './NostrProvider'
 type TFollowListContext = {
   followListEvent: Event | undefined
   followings: string[]
-  isReady: boolean
+  isFetching: boolean
   follow: (pubkey: string) => Promise<void>
   unfollow: (pubkey: string) => Promise<void>
 }
@@ -27,7 +27,7 @@ export const useFollowList = () => {
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
   const { pubkey: accountPubkey, publish } = useNostr()
   const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
-  const [isReady, setIsReady] = useState(false)
+  const [isFetching, setIsFetching] = useState(true)
   const followings = useMemo(() => {
     return Array.from(
       new Set(
@@ -44,18 +44,18 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     if (!accountPubkey) return
 
     const init = async () => {
-      setIsReady(false)
+      setIsFetching(true)
       setFollowListEvent(undefined)
       const event = await client.fetchFollowListEvent(accountPubkey)
       setFollowListEvent(event)
-      setIsReady(true)
+      setIsFetching(false)
     }
 
     init()
   }, [accountPubkey])
 
   const follow = async (pubkey: string) => {
-    if (!isReady || !accountPubkey) return
+    if (isFetching || !accountPubkey) return
 
     const newFollowListDraftEvent: TDraftEvent = {
       kind: kinds.Contacts,
@@ -69,7 +69,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   }
 
   const unfollow = async (pubkey: string) => {
-    if (!isReady || !accountPubkey || !followListEvent) return
+    if (isFetching || !accountPubkey || !followListEvent) return
 
     const newFollowListDraftEvent: TDraftEvent = {
       kind: kinds.Contacts,
@@ -89,7 +89,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
       value={{
         followListEvent,
         followings,
-        isReady,
+        isFetching,
         follow,
         unfollow
       }}

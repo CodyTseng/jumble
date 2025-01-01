@@ -1,9 +1,7 @@
 import NoteList from '@/components/NoteList'
 import { BIG_RELAY_URLS } from '@/constants'
-import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
-import { useFollowList } from '@/providers/FollowListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useEffect, useMemo, useRef } from 'react'
@@ -16,12 +14,10 @@ export default function NoteListPage() {
   const layoutRef = useRef<{ scrollToTop: () => void }>(null)
   const { feedType } = useFeed()
   const { relayUrls, temporaryRelayUrls } = useRelaySettings()
-  const { pubkey } = useNostr()
-  const { relayList, isFetching: isRelayListFetching } = useFetchRelayList(pubkey)
-  const { followings, isReady: isFollowingsReady } = useFollowList()
+  const { pubkey, relayList, followings } = useNostr()
   const urls = useMemo(() => {
     return feedType === 'following'
-      ? relayList.read.length
+      ? relayList?.read.length
         ? relayList.read.slice(0, 4)
         : BIG_RELAY_URLS
       : temporaryRelayUrls.length > 0
@@ -37,14 +33,16 @@ export default function NoteListPage() {
 
   return (
     <PrimaryPageLayout pageName="home" ref={layoutRef} titlebar={<NoteListPageTitlebar />}>
-      {!!urls.length && (feedType === 'relays' || (isFollowingsReady && !isRelayListFetching)) ? (
+      {!!urls.length && (feedType === 'relays' || (relayList && followings)) ? (
         <NoteList
           relayUrls={urls}
           filter={
             feedType === 'following'
               ? {
                   authors:
-                    pubkey && !followings.includes(pubkey) ? [...followings, pubkey] : followings
+                    pubkey && !followings?.includes(pubkey)
+                      ? [...(followings ?? []), pubkey]
+                      : (followings ?? [])
                 }
               : {}
           }

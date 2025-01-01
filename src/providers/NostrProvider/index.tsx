@@ -1,9 +1,9 @@
 import LoginDialog from '@/components/LoginDialog'
-import { useToast } from '@/hooks'
+import { useFetchFollowings, useToast } from '@/hooks'
 import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
-import { ISigner, TAccount, TAccountPointer, TDraftEvent } from '@/types'
+import { ISigner, TAccount, TAccountPointer, TDraftEvent, TRelayList } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -14,6 +14,8 @@ import { NsecSigner } from './nsec.signer'
 
 type TNostrContext = {
   pubkey: string | null
+  relayList: TRelayList | null
+  followings: string[] | null
   account: TAccountPointer | null
   accounts: TAccountPointer[]
   switchAccount: (account: TAccountPointer | null) => Promise<void>
@@ -46,7 +48,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const { relayUrls: currentRelayUrls } = useRelaySettings()
-  const { relayList } = useFetchRelayList(account?.pubkey)
+  const { relayList, isFetching: isFetchingRelayList } = useFetchRelayList(account?.pubkey)
+  const { followings, isFetching: isFetchingFollowings } = useFetchFollowings(account?.pubkey)
 
   useEffect(() => {
     const init = async () => {
@@ -224,6 +227,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     <NostrContext.Provider
       value={{
         pubkey: account?.pubkey ?? null,
+        relayList: isFetchingRelayList ? null : relayList,
+        followings: isFetchingFollowings ? null : followings,
         account,
         accounts: storage
           .getAccounts()
