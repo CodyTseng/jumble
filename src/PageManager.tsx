@@ -5,10 +5,12 @@ import { cn } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
 import HomePage from '@/pages/secondary/HomePage'
 import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
+import MePage from './pages/primary/MePage'
 import NotificationListPage from './pages/primary/NotificationListPage'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { routes } from './routes'
-import { TPrimaryPageName } from './types'
+
+export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
 type TPrimaryPageContext = {
   navigate: (page: TPrimaryPageName) => void
@@ -30,7 +32,8 @@ type TStackItem = {
 
 const PRIMARY_PAGE_MAP = {
   home: <NoteListPage />,
-  notifications: <NotificationListPage />
+  notifications: <NotificationListPage />,
+  me: <MePage />
 }
 
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)

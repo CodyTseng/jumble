@@ -1,0 +1,101 @@
+import AccountManager from '@/components/AccountManager'
+import LoginDialog from '@/components/LoginDialog'
+import LogoutDialog from '@/components/LogoutDialog'
+import PubkeyCopy from '@/components/PubkeyCopy'
+import QrCodePopover from '@/components/QrCodePopover'
+import { SimpleUserAvatar } from '@/components/UserAvatar'
+import { SimpleUsername } from '@/components/Username'
+import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
+import { toProfile } from '@/lib/link'
+import { cn } from '@/lib/utils'
+import { useSecondaryPage } from '@/PageManager'
+import { useNostr } from '@/providers/NostrProvider'
+import { ArrowDownUp, ChevronRight, LogOut, UserRound } from 'lucide-react'
+import { HTMLProps, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+export default function MePage() {
+  const { t } = useTranslation()
+  const { push } = useSecondaryPage()
+  const { pubkey } = useNostr()
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
+
+  useEffect(() => {
+    console.log('logoutDialogOpen', logoutDialogOpen)
+  }, [logoutDialogOpen])
+
+  if (!pubkey) {
+    return (
+      <PrimaryPageLayout pageName="home">
+        <div className="p-4">
+          <AccountManager />
+        </div>
+      </PrimaryPageLayout>
+    )
+  }
+
+  return (
+    <PrimaryPageLayout pageName="home">
+      <div className="flex gap-4 items-center p-4">
+        <SimpleUserAvatar userId={pubkey} size="big" />
+        <div className="space-y-1">
+          <SimpleUsername
+            className="text-xl font-semibold truncate"
+            userId={pubkey}
+            skeletonClassName="h-6 w-32"
+          />
+          <div className="flex gap-1 mt-1">
+            <PubkeyCopy pubkey={pubkey} />
+            <QrCodePopover pubkey={pubkey} />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2 mt-4">
+        <Item onClick={() => push(toProfile(pubkey))}>
+          <UserRound />
+          {t('Profile')}
+        </Item>
+        <ItemGroup>
+          <Item onClick={() => setLoginDialogOpen(true)}>
+            <ArrowDownUp /> {t('Accounts')}
+          </Item>
+          <Item
+            className="text-destructive focus:text-destructive"
+            onClick={() => setLogoutDialogOpen(true)}
+            hideChevron
+          >
+            <LogOut />
+            {t('Logout')}
+          </Item>
+        </ItemGroup>
+      </div>
+      <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />
+      <LogoutDialog open={logoutDialogOpen} setOpen={setLogoutDialogOpen} />
+    </PrimaryPageLayout>
+  )
+}
+
+function Item({
+  children,
+  className,
+  hideChevron = false,
+  ...props
+}: HTMLProps<HTMLDivElement> & { hideChevron?: boolean }) {
+  return (
+    <div
+      className={cn(
+        'flex items-center justify-between px-4 py-2 w-full bg-muted/30 clickable [&_svg]:size-4 [&_svg]:shrink-0',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-4">{children}</div>
+      {!hideChevron && <ChevronRight />}
+    </div>
+  )
+}
+
+function ItemGroup({ children }: { children: React.ReactNode }) {
+  return <div>{children}</div>
+}

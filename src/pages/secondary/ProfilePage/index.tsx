@@ -3,6 +3,8 @@ import Nip05 from '@/components/Nip05'
 import NoteList from '@/components/NoteList'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
+import PubkeyCopy from '@/components/PubkeyCopy'
+import QrCodePopover from '@/components/QrCodePopover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
@@ -17,8 +19,6 @@ import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
-import PubkeyCopy from './PubkeyCopy'
-import QrCodePopover from './QrCodePopover'
 
 export default function ProfilePage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()

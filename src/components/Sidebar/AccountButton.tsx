@@ -1,4 +1,3 @@
-import { useNostr } from '@/providers/NostrProvider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,11 +10,13 @@ import { useFetchProfile } from '@/hooks'
 import { toProfile } from '@/lib/link'
 import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
+import { useNostr } from '@/providers/NostrProvider'
+import { LogIn } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LoginDialog from '../LoginDialog'
+import LogoutDialog from '../LogoutDialog'
 import SidebarItem from './SidebarItem'
-import { LogIn } from 'lucide-react'
 
 export default function AccountButton() {
   const { pubkey } = useNostr()
@@ -29,11 +30,12 @@ export default function AccountButton() {
 
 function ProfileButton() {
   const { t } = useTranslation()
-  const { removeAccount, account } = useNostr()
+  const { account } = useNostr()
   const pubkey = account?.pubkey
   const { profile } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   if (!pubkey) return null
 
   const defaultAvatar = generateImageByPubkey(pubkey)
@@ -64,12 +66,13 @@ function ProfileButton() {
         </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
-          onClick={() => removeAccount(account)}
+          onClick={() => setLogoutDialogOpen(true)}
         >
           {t('Logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
       <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />
+      <LogoutDialog open={logoutDialogOpen} setOpen={setLogoutDialogOpen} />
     </DropdownMenu>
   )
 }

@@ -1,9 +1,8 @@
 import BottomNavigationBar from '@/components/BottomNavigationBar'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
-import { usePrimaryPage } from '@/PageManager'
+import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { TPrimaryPageName } from '@/types'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 const PrimaryPageLayout = forwardRef(
@@ -85,7 +84,9 @@ const PrimaryPageLayout = forwardRef(
           paddingBottom: 'env(safe-area-inset-bottom)'
         }}
       >
-        <PrimaryPageTitlebar visible={!isSmallScreen || visible}>{titlebar}</PrimaryPageTitlebar>
+        {titlebar && (
+          <PrimaryPageTitlebar visible={!isSmallScreen || visible}>{titlebar}</PrimaryPageTitlebar>
+        )}
         <div className="overflow-x-hidden">{children}</div>
         <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
         {isSmallScreen && <BottomNavigationBar visible={visible} />}

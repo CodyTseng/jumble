@@ -90,6 +90,9 @@ export default {
     Accounts: '多帐户',
     'More options': '更多选项',
     'Add client tag': '添加客户端标签',
-    'Show others this was sent via Jumble': '告诉别人这是通过 Jumble 发送的'
+    'Show others this was sent via Jumble': '告诉别人这是通过 Jumble 发送的',
+    'Are you sure you want to logout?': '确定要退出登录吗？',
+    'relay feeds': '服务器信息流',
+    edit: '编辑'
   }
 }

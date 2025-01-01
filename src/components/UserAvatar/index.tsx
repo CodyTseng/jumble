@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 
 const UserAvatarSizeCnMap = {
   large: 'w-24 h-24',
+  big: 'w-16 h-16',
   normal: 'w-10 h-10',
   small: 'w-7 h-7',
   tiny: 'w-4 h-4'
@@ -23,7 +24,7 @@ export default function UserAvatar({
 }: {
   userId: string
   className?: string
-  size?: 'large' | 'normal' | 'small' | 'tiny'
+  size?: 'large' | 'big' | 'normal' | 'small' | 'tiny'
 }) {
   const { profile } = useFetchProfile(userId)
   const defaultAvatar = useMemo(
@@ -62,7 +63,7 @@ export function SimpleUserAvatar({
   onClick
 }: {
   userId: string
-  size?: 'large' | 'normal' | 'small' | 'tiny'
+  size?: 'large' | 'big' | 'normal' | 'small' | 'tiny'
   className?: string
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {

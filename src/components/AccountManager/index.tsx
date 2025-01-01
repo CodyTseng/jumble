@@ -8,15 +8,15 @@ import AccountList from '../AccountList'
 import BunkerLogin from './BunkerLogin'
 import PrivateKeyLogin from './NsecLogin'
 
-export default function AccountManager({ close }: { close: () => void }) {
+export default function AccountManager({ close }: { close?: () => void }) {
   const [loginMethod, setLoginMethod] = useState<TSignerType | null>(null)
 
   return (
     <>
       {loginMethod === 'nsec' ? (
-        <PrivateKeyLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close()} />
+        <PrivateKeyLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close?.()} />
       ) : loginMethod === 'bunker' ? (
-        <BunkerLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close()} />
+        <BunkerLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close?.()} />
       ) : (
         <AccountManagerNav setLoginMethod={setLoginMethod} close={close} />
       )}
@@ -29,18 +29,18 @@ function AccountManagerNav({
   close
 }: {
   setLoginMethod: (method: TSignerType) => void
-  close: () => void
+  close?: () => void
 }) {
   const { t } = useTranslation()
   const { nip07Login, accounts } = useNostr()
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()} className="flex flex-col gap-4">
       <div className="text-center text-muted-foreground text-sm font-semibold">
         {t('Add an Account')}
       </div>
       {!!window.nostr && (
-        <Button onClick={() => nip07Login().then(() => close())} className="w-full">
+        <Button onClick={() => nip07Login().then(() => close?.())} className="w-full">
           {t('Login with Browser Extension')}
         </Button>
       )}
@@ -56,9 +56,9 @@ function AccountManagerNav({
           <div className="text-center text-muted-foreground text-sm font-semibold">
             {t('Logged in Accounts')}
           </div>
-          <AccountList afterSwitch={() => close()} />
+          <AccountList afterSwitch={() => close?.()} />
         </>
       )}
-    </>
+    </div>
   )
 }

@@ -5,8 +5,10 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { Circle, CircleCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
+  const { t } = useTranslation()
   const { feedType, setFeedType } = useFeed()
   const { pubkey } = useNostr()
   const { relayGroups, temporaryRelayUrls, switchRelayGroup } = useRelaySettings()
@@ -25,13 +27,13 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
       )}
       <div className="space-y-2">
         <div className="flex justify-between px-2">
-          <div className="text-muted-foreground text-sm font-semibold">relay feeds</div>
+          <div className="text-muted-foreground text-sm font-semibold">{t('relay feeds')}</div>
           <SecondaryPageLink
             to={toRelaySettings()}
             className="text-highlight text-sm font-semibold"
             onClick={() => close?.()}
           >
-            edit
+            {t('edit')}
           </SecondaryPageLink>
         </div>
         {temporaryRelayUrls.length > 0 && (
