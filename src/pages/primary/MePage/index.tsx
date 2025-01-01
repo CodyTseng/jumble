@@ -6,11 +6,11 @@ import QrCodePopover from '@/components/QrCodePopover'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toProfile } from '@/lib/link'
+import { toProfile, toSettings } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { ArrowDownUp, ChevronRight, LogOut, UserRound } from 'lucide-react'
+import { ArrowDownUp, ChevronRight, LogOut, Settings, UserRound } from 'lucide-react'
 import { HTMLProps, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -55,6 +55,10 @@ export default function MePage() {
         <Item onClick={() => push(toProfile(pubkey))}>
           <UserRound />
           {t('Profile')}
+        </Item>
+        <Item onClick={() => push(toSettings())}>
+          <Settings />
+          {t('Settings')}
         </Item>
         <ItemGroup>
           <Item onClick={() => setLoginDialogOpen(true)}>

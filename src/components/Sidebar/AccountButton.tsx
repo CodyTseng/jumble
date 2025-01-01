@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useFetchProfile } from '@/hooks'
-import { toProfile } from '@/lib/link'
+import { toProfile, toSettings } from '@/lib/link'
 import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -61,6 +61,7 @@ function ProfileButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>{t('Profile')}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => push(toSettings())}>{t('Settings')}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
           {t('Accounts')}
         </DropdownMenuItem>

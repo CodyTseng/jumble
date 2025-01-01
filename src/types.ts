@@ -65,3 +65,5 @@ export type TAccount = {
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
 export type TFeedType = 'following' | 'relays'
+
+export type TLanguage = 'en' | 'zh'

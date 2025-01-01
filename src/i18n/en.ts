@@ -6,6 +6,9 @@ export default {
     Post: 'Post',
     Home: 'Home',
     'Relay settings': 'Relay settings',
+    'relay settings': 'relay settings',
+    settings: 'settings',
+    Settings: 'Settings',
     SidebarRelays: 'Relays',
     Refresh: 'Refresh',
     Profile: 'Profile',
@@ -94,6 +97,13 @@ export default {
     'Show others this was sent via Jumble': 'Show others this was sent via Jumble',
     'Are you sure you want to logout?': 'Are you sure you want to logout?',
     'relay feeds': 'relay feeds',
-    edit: 'edit'
+    edit: 'edit',
+    Languages: 'Languages',
+    English: 'English',
+    Chinese: 'Chinese',
+    Theme: 'Theme',
+    System: 'System',
+    Light: 'Light',
+    Dark: 'Dark'
   }
 }

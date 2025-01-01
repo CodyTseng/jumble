@@ -1,9 +1,8 @@
+import dayjs from 'dayjs'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
 import en from './en'
 import zh from './zh'
-import dayjs from 'dayjs'
 
 const resources = {
   en,
@@ -11,7 +10,21 @@ const resources = {
 }
 
 i18n
-  .use(LanguageDetector)
+  .use({
+    type: 'languageDetector',
+    detect: function () {
+      const lng = localStorage.getItem('i18nextLng')
+      if (lng === 'zh' || lng === 'en') {
+        return lng
+      }
+      return undefined
+    },
+    cacheUserLanguage: function (lng: string) {
+      if (lng === 'zh' || lng === 'en') {
+        localStorage.setItem('i18nextLng', lng)
+      }
+    }
+  })
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',

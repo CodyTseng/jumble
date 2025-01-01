@@ -6,7 +6,7 @@ export default function RelaySettingsPage({ index }: { index?: number }) {
   const { t } = useTranslation()
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Relay settings')}>
+    <SecondaryPageLayout index={index} titlebarContent={t('relay settings')}>
       <div className="px-4">
         <RelaySettings hideTitle />
       </div>

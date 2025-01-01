@@ -7,6 +7,7 @@ import NotePage from './pages/secondary/NotePage'
 import ProfileListPage from './pages/secondary/ProfileListPage'
 import ProfilePage from './pages/secondary/ProfilePage'
 import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
+import SettingsPage from './pages/secondary/SettingsPage'
 
 const ROUTES = [
   { path: '/', element: <HomePage /> },
@@ -15,7 +16,8 @@ const ROUTES = [
   { path: '/users', element: <ProfileListPage /> },
   { path: '/users/:id', element: <ProfilePage /> },
   { path: '/users/:id/following', element: <FollowingListPage /> },
-  { path: '/relay-settings', element: <RelaySettingsPage /> }
+  { path: '/relay-settings', element: <RelaySettingsPage /> },
+  { path: '/settings', element: <SettingsPage /> }
 ]
 
 export const routes = ROUTES.map(({ path, element }) => ({

@@ -38,6 +38,7 @@ export const toFollowingList = (pubkey: string) => {
   return `/users/${npub}/following`
 }
 export const toRelaySettings = () => '/relay-settings'
+export const toSettings = () => '/settings'
 
 export const toNoStrudelProfile = (id: string) => `https://nostrudel.ninja/#/u/${id}`
 export const toNoStrudelNote = (id: string) => `https://nostrudel.ninja/#/n/${id}`

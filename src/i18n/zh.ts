@@ -6,6 +6,9 @@ export default {
     Post: '发布笔记',
     Home: '主页',
     'Relay settings': '服务器设置',
+    'relay settings': '服务器设置',
+    settings: '设置',
+    Settings: '设置',
     SidebarRelays: '服务器',
     Refresh: '刷新列表',
     Profile: '个人资料',
@@ -93,6 +96,13 @@ export default {
     'Show others this was sent via Jumble': '告诉别人这是通过 Jumble 发送的',
     'Are you sure you want to logout?': '确定要退出登录吗？',
     'relay feeds': '服务器信息流',
-    edit: '编辑'
+    edit: '编辑',
+    Languages: '语言',
+    English: '英语',
+    Chinese: '中文',
+    Theme: '主题',
+    System: '系统',
+    Light: '浅色',
+    Dark: '深色'
   }
 }

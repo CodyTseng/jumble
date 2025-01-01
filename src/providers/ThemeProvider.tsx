@@ -12,7 +12,7 @@ type ThemeProviderState = {
   setThemeSetting: (themeSetting: TThemeSetting) => Promise<void>
 }
 
-async function getSystemTheme() {
+function getSystemTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
@@ -26,9 +26,9 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 
   useEffect(() => {
     const init = async () => {
-      const themeSetting = await storage.getThemeSetting()
+      const themeSetting = storage.getThemeSetting()
       if (themeSetting === 'system') {
-        setTheme(await getSystemTheme())
+        setTheme(getSystemTheme())
         return
       }
       setTheme(themeSetting)
@@ -65,10 +65,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const value = {
     themeSetting: themeSetting,
     setThemeSetting: async (themeSetting: TThemeSetting) => {
-      await storage.setThemeSetting(themeSetting)
+      storage.setThemeSetting(themeSetting)
       setThemeSetting(themeSetting)
       if (themeSetting === 'system') {
-        setTheme(await getSystemTheme())
+        setTheme(getSystemTheme())
         return
       }
       setTheme(themeSetting)
