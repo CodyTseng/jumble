@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
 
 const NORMAL_RELAY_LIMIT = 100
@@ -30,7 +31,7 @@ export default function NoteList({
   const [events, setEvents] = useState<Event[]>([])
   const [newEvents, setNewEvents] = useState<Event[]>([])
   const [hasMore, setHasMore] = useState<boolean>(true)
-  const [initialized, setInitialized] = useState(false)
+  const [refreshing, setRefreshing] = useState(true)
   const [displayReplies, setDisplayReplies] = useState(false)
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const noteFilter = useMemo(() => {
@@ -45,16 +46,20 @@ export default function NoteList({
     if (isFetchingRelayInfo || relayUrls.length === 0) return
 
     async function init() {
-      setInitialized(false)
+      setRefreshing(true)
       setEvents([])
       setNewEvents([])
       setHasMore(true)
 
+      let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
         [...relayUrls],
         noteFilter,
         {
           onEvents: (events, eosed) => {
+            if (eventCount > events.length) return
+            eventCount = events.length
+
             if (events.length > 0) {
               setEvents(events)
             }
@@ -62,7 +67,7 @@ export default function NoteList({
               setHasMore(false)
             }
             if (eosed) {
-              setInitialized(true)
+              setRefreshing(false)
               setHasMore(events.length > 0)
             }
           },
@@ -97,7 +102,7 @@ export default function NoteList({
   ])
 
   useEffect(() => {
-    if (!initialized) return
+    if (refreshing) return
 
     const options = {
       root: null,
@@ -122,10 +127,10 @@ export default function NoteList({
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [initialized, hasMore, events, timelineKey])
+  }, [refreshing, hasMore, events, timelineKey])
 
   const loadMore = async () => {
-    if (!timelineKey) return
+    if (!timelineKey || refreshing) return
 
     const newEvents = await client.loadMoreTimeline(
       timelineKey,
@@ -155,16 +160,25 @@ export default function NoteList({
             </Button>
           </div>
         )}
-        <div className="flex flex-col">
-          {events
-            .filter((event) => displayReplies || !isReplyNoteEvent(event))
-            .map((event) => (
-              <NoteCard key={event.id} className="w-full" event={event} />
-            ))}
-        </div>
+
+        <PullToRefresh
+          onRefresh={async () => {
+            setRefreshCount((count) => count + 1)
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+          }}
+          pullingContent=""
+        >
+          <div>
+            {events
+              .filter((event) => displayReplies || !isReplyNoteEvent(event))
+              .map((event) => (
+                <NoteCard key={event.id} className="w-full" event={event} />
+              ))}
+          </div>
+        </PullToRefresh>
       </div>
       <div className="text-center text-sm text-muted-foreground">
-        {hasMore ? (
+        {hasMore || refreshing ? (
           <div ref={bottomRef}>{t('loading...')}</div>
         ) : events.length ? (
           t('no more notes')
