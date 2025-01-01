@@ -69,7 +69,13 @@ export default function SecondaryPageLayout({
   }, [lastScrollTop, isSmallScreen, currentIndex])
 
   return (
-    <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>
+    <div
+      className="sm:h-screen sm:overflow-auto"
+      ref={scrollAreaRef}
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
+    >
       <SecondaryPageTitlebar
         content={titlebarContent}
         hideBackButton={hideBackButton}

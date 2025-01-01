@@ -78,7 +78,13 @@ const PrimaryPageLayout = forwardRef(
     }, [lastScrollTop, isSmallScreen, current, display])
 
     return (
-      <div className="sm:h-screen sm:overflow-auto" ref={scrollAreaRef}>
+      <div
+        className="sm:h-screen sm:overflow-auto"
+        ref={scrollAreaRef}
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom)'
+        }}
+      >
         <PrimaryPageTitlebar visible={!isSmallScreen || visible}>{titlebar}</PrimaryPageTitlebar>
         <div className="overflow-x-hidden">{children}</div>
         <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
