@@ -12,13 +12,13 @@ export default function SecondaryPageLayout({
   index,
   titlebarContent,
   hideBackButton = false,
-  hideScrollToTopButton = false
+  displayScrollToTopButton = false
 }: {
   children?: React.ReactNode
   index?: number
   titlebarContent?: React.ReactNode
   hideBackButton?: boolean
-  hideScrollToTopButton?: boolean
+  displayScrollToTopButton?: boolean
 }): JSX.Element {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(true)
@@ -82,10 +82,9 @@ export default function SecondaryPageLayout({
         visible={visible}
       />
       <div className="pb-4 mt-2">{children}</div>
-      <ScrollToTopButton
-        scrollAreaRef={scrollAreaRef}
-        visible={!hideScrollToTopButton && visible && lastScrollTop > 500}
-      />
+      {displayScrollToTopButton && (
+        <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
+      )}
       {isSmallScreen && <BottomNavigationBar visible={visible} />}
     </div>
   )

@@ -78,7 +78,7 @@ export default function ProfileListPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={title}>
+    <SecondaryPageLayout index={index} titlebarContent={title} displayScrollToTopButton>
       <div className="space-y-2 px-4">
         {Array.from(pubkeySet).map((pubkey, index) => (
           <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />

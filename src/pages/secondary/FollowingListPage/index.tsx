@@ -51,6 +51,7 @@ export default function FollowingListPage({ id, index }: { id?: string; index?: 
           ? t("username's following", { username: profile.username })
           : t('Following')
       }
+      displayScrollToTopButton
     >
       <div className="space-y-2 px-4">
         {visibleFollowings.map((pubkey, index) => (

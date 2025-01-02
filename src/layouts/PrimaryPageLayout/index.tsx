@@ -10,8 +10,14 @@ const PrimaryPageLayout = forwardRef(
     {
       children,
       titlebar,
-      pageName
-    }: { children?: React.ReactNode; titlebar?: React.ReactNode; pageName: TPrimaryPageName },
+      pageName,
+      displayScrollToTopButton = false
+    }: {
+      children?: React.ReactNode
+      titlebar?: React.ReactNode
+      pageName: TPrimaryPageName
+      displayScrollToTopButton?: boolean
+    },
     ref
   ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -88,7 +94,12 @@ const PrimaryPageLayout = forwardRef(
           <PrimaryPageTitlebar visible={!isSmallScreen || visible}>{titlebar}</PrimaryPageTitlebar>
         )}
         <div className="overflow-x-hidden">{children}</div>
-        <ScrollToTopButton scrollAreaRef={scrollAreaRef} visible={visible && lastScrollTop > 500} />
+        {displayScrollToTopButton && (
+          <ScrollToTopButton
+            scrollAreaRef={scrollAreaRef}
+            visible={visible && lastScrollTop > 500}
+          />
+        )}
         {isSmallScreen && <BottomNavigationBar visible={visible} />}
       </div>
     )

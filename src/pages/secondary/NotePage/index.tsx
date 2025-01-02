@@ -22,7 +22,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   if (!event && isFetching) {
     return (
-      <SecondaryPageLayout index={index} titlebarContent={t('Note')}>
+      <SecondaryPageLayout index={index} titlebarContent={t('Note')} displayScrollToTopButton>
         <div className="px-4">
           <Skeleton className="w-10 h-10 rounded-full" />
         </div>

@@ -38,7 +38,7 @@ export default function NoteListPage({ index }: { index?: number }) {
 
   if (filter?.search && searchableRelayUrls.length === 0) {
     return (
-      <SecondaryPageLayout index={index} titlebarContent={title}>
+      <SecondaryPageLayout index={index} titlebarContent={title} displayScrollToTopButton>
         <div className="text-center text-sm text-muted-foreground">
           {t('The relays you are connected to do not support search')}
         </div>

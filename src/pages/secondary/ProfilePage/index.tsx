@@ -61,7 +61,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
 
   const { banner, username, nip05, about, avatar, pubkey } = profile
   return (
-    <SecondaryPageLayout index={index} titlebarContent={username}>
+    <SecondaryPageLayout index={index} titlebarContent={username} displayScrollToTopButton>
       <div className="px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <ProfileBanner

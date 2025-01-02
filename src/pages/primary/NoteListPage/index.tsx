@@ -32,7 +32,12 @@ export default function NoteListPage() {
   }, [JSON.stringify(relayUrls), feedType])
 
   return (
-    <PrimaryPageLayout pageName="home" ref={layoutRef} titlebar={<NoteListPageTitlebar />}>
+    <PrimaryPageLayout
+      pageName="home"
+      ref={layoutRef}
+      titlebar={<NoteListPageTitlebar />}
+      displayScrollToTopButton
+    >
       {!!urls.length && (feedType === 'relays' || (relayList && followings)) ? (
         <NoteList
           relayUrls={urls}

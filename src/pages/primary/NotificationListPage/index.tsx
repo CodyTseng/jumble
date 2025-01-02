@@ -5,7 +5,11 @@ import { useTranslation } from 'react-i18next'
 
 export default function NotificationListPage() {
   return (
-    <PrimaryPageLayout pageName="notifications" titlebar={<NotificationListPageTitlebar />}>
+    <PrimaryPageLayout
+      pageName="notifications"
+      titlebar={<NotificationListPageTitlebar />}
+      displayScrollToTopButton
+    >
       <div className="px-4">
         <NotificationList />
       </div>
