@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const getGitInfo = () => {
-  const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+  const branch = execSync('git branch --show-current').toString().trim()
   const commit = execSync('git rev-parse --short HEAD').toString().trim()
   return {
     branch,
