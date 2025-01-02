@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { ArrowDownUp, ChevronRight, LogOut, Settings, UserRound } from 'lucide-react'
-import { HTMLProps, useEffect, useState } from 'react'
+import { HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function MePage() {
@@ -20,10 +20,6 @@ export default function MePage() {
   const { pubkey } = useNostr()
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
-
-  useEffect(() => {
-    console.log('logoutDialogOpen', logoutDialogOpen)
-  }, [logoutDialogOpen])
 
   if (!pubkey) {
     return (

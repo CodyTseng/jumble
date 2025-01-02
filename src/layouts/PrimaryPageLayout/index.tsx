@@ -18,7 +18,7 @@ const PrimaryPageLayout = forwardRef(
     const [visible, setVisible] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const { isSmallScreen } = useScreenSize()
-    const { current, display } = usePrimaryPage()
+    const { current } = usePrimaryPage()
 
     useImperativeHandle(
       ref,
@@ -43,7 +43,7 @@ const PrimaryPageLayout = forwardRef(
     }, [current])
 
     useEffect(() => {
-      if (current !== pageName || !display) return
+      if (current !== pageName) return
 
       const handleScroll = () => {
         const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
@@ -74,7 +74,7 @@ const PrimaryPageLayout = forwardRef(
       return () => {
         scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
       }
-    }, [lastScrollTop, isSmallScreen, current, display])
+    }, [lastScrollTop, isSmallScreen, current])
 
     return (
       <div

@@ -5,22 +5,21 @@ import { SimpleUserAvatar } from '../UserAvatar'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function AccountButton() {
-  const { navigate, current, display } = usePrimaryPage()
+  const { navigate, current } = usePrimaryPage()
   const { pubkey } = useNostr()
-  const active = display && current === 'me'
 
   return (
     <BottomNavigationBarItem
       onClick={() => {
         navigate('me')
       }}
-      active={active}
+      active={current === 'me'}
     >
       {pubkey ? (
         <SimpleUserAvatar
           userId={pubkey}
           size="small"
-          className={active ? 'ring-primary ring-1' : ''}
+          className={current === 'me' ? 'ring-primary ring-1' : ''}
         />
       ) : (
         <UserRound />
