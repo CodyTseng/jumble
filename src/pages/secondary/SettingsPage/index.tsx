@@ -60,7 +60,7 @@ export default function SettingsPage({ index }: { index?: number }) {
             </div>
             <div className="flex gap-2 items-center">
               <div className="text-muted-foreground">
-                {__GIT_INFO__.branch} - {__GIT_INFO__.commit}
+                v{__APP_VERSION__} ({__GIT_COMMIT__})
               </div>
               <ChevronRight />
             </div>

@@ -36,7 +36,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
         <div className="font-semibold">⚡️ codytseng@getalby.com ⚡️</div>
       </div>
       <div className="text-muted-foreground">
-        {__GIT_INFO__.branch} - {__GIT_INFO__.commit}
+        Version: v{__APP_VERSION__} ({__GIT_COMMIT__})
       </div>
     </>
   )

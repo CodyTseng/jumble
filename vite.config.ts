@@ -4,19 +4,11 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const getGitInfo = () => {
-  const branch = execSync('git branch --show-current').toString().trim()
-  const commit = execSync('git rev-parse --short HEAD').toString().trim()
-  return {
-    branch,
-    commit
-  }
-}
-
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    __GIT_INFO__: JSON.stringify(getGitInfo())
+    __GIT_COMMIT__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
+    __APP_VERSION__: JSON.stringify(require('./package.json').version)
   },
   resolve: {
     alias: {
