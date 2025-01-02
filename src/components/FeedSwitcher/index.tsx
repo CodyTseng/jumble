@@ -17,7 +17,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
     <div className="space-y-4">
       {pubkey && (
         <FeedSwitcherItem
-          itemName="Following"
+          itemName={t('Following')}
           isActive={feedType === 'following'}
           onClick={() => {
             setFeedType('following')
@@ -40,7 +40,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
           <FeedSwitcherItem
             key="temporary"
             itemName={
-              temporaryRelayUrls.length === 1 ? simplifyUrl(temporaryRelayUrls[0]) : 'Temporary'
+              temporaryRelayUrls.length === 1 ? simplifyUrl(temporaryRelayUrls[0]) : t('Temporary')
             }
             isActive={feedType === 'relays'}
             temporary

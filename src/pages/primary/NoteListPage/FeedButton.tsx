@@ -7,6 +7,7 @@ import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { ChevronDown, Server, UsersRound } from 'lucide-react'
 import { forwardRef, HTMLAttributes, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function FeedButton() {
   const { isSmallScreen } = useScreenSize()
@@ -41,21 +42,22 @@ export default function FeedButton() {
 
 const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   (props, ref) => {
+    const { t } = useTranslation()
     const { feedType } = useFeed()
     const { relayGroups, temporaryRelayUrls } = useRelaySettings()
     const activeGroup = relayGroups.find((group) => group.isActive)
     const title =
       feedType === 'following'
-        ? 'Following'
+        ? t('Following')
         : temporaryRelayUrls.length > 0
           ? temporaryRelayUrls.length === 1
             ? simplifyUrl(temporaryRelayUrls[0])
-            : 'Temporary'
+            : t('Temporary')
           : activeGroup
             ? activeGroup.relayUrls.length === 1
               ? simplifyUrl(activeGroup.relayUrls[0])
               : activeGroup.groupName
-            : 'Choose a relay collection'
+            : t('Choose a relay collection')
 
     return (
       <div

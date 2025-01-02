@@ -1,10 +1,23 @@
 import react from '@vitejs/plugin-react'
+import { execSync } from 'child_process'
 import path from 'path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const getGitInfo = () => {
+  const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+  const commit = execSync('git rev-parse --short HEAD').toString().trim()
+  return {
+    branch,
+    commit
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __GIT_INFO__: JSON.stringify(getGitInfo())
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')

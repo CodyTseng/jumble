@@ -1,9 +1,10 @@
+import AboutInfoDialog from '@/components/AboutInfoDialog'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useTheme } from '@/providers/ThemeProvider'
 import { TLanguage } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
-import { Languages, SunMoon } from 'lucide-react'
+import { ChevronRight, Info, Languages, SunMoon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -19,8 +20,8 @@ export default function SettingsPage({ index }: { index?: number }) {
 
   return (
     <SecondaryPageLayout index={index} titlebarContent={t('Settings')} hideScrollToTopButton>
-      <div className="px-4 flex flex-col gap-4">
-        <div className="flex justify-between items-center [&_svg]:size-4 [&_svg]:shrink-0">
+      <div className="flex flex-col">
+        <div className="flex justify-between items-center p-4 [&_svg]:size-4 [&_svg]:shrink-0">
           <div className="flex items-center gap-4">
             <Languages />
             <div>{t('Languages')}</div>
@@ -35,7 +36,7 @@ export default function SettingsPage({ index }: { index?: number }) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex justify-between items-center [&_svg]:size-4 [&_svg]:shrink-0">
+        <div className="flex justify-between items-center p-4 [&_svg]:size-4 [&_svg]:shrink-0">
           <div className="flex items-center gap-4">
             <SunMoon />
             <div>{t('Theme')}</div>
@@ -51,6 +52,20 @@ export default function SettingsPage({ index }: { index?: number }) {
             </SelectContent>
           </Select>
         </div>
+        <AboutInfoDialog>
+          <div className="flex clickable justify-between items-center p-4 rounded-lg [&_svg]:size-4 [&_svg]:shrink-0">
+            <div className="flex items-center gap-4">
+              <Info />
+              <div>{t('About')}</div>
+            </div>
+            <div className="flex gap-2 items-center">
+              <div className="text-muted-foreground">
+                {__GIT_INFO__.branch} - {__GIT_INFO__.commit}
+              </div>
+              <ChevronRight />
+            </div>
+          </div>
+        </AboutInfoDialog>
       </div>
     </SecondaryPageLayout>
   )

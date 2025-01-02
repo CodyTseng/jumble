@@ -24,7 +24,7 @@ export default function MePage() {
   if (!pubkey) {
     return (
       <PrimaryPageLayout pageName="home">
-        <div className="p-4">
+        <div className="flex flex-col p-4 gap-4 overflow-auto">
           <AccountManager />
         </div>
       </PrimaryPageLayout>
@@ -47,15 +47,19 @@ export default function MePage() {
           </div>
         </div>
       </div>
-      <div className="space-y-2 mt-4">
-        <Item onClick={() => push(toProfile(pubkey))}>
-          <UserRound />
-          {t('Profile')}
-        </Item>
-        <Item onClick={() => push(toSettings())}>
-          <Settings />
-          {t('Settings')}
-        </Item>
+      <div className="mt-4">
+        <ItemGroup>
+          <Item onClick={() => push(toProfile(pubkey))}>
+            <UserRound />
+            {t('Profile')}
+          </Item>
+        </ItemGroup>
+        <ItemGroup>
+          <Item onClick={() => push(toSettings())}>
+            <Settings />
+            {t('Settings')}
+          </Item>
+        </ItemGroup>
         <ItemGroup>
           <Item onClick={() => setLoginDialogOpen(true)}>
             <ArrowDownUp /> {t('Accounts')}
@@ -85,7 +89,7 @@ function Item({
   return (
     <div
       className={cn(
-        'flex items-center justify-between px-4 py-2 w-full bg-muted/30 clickable [&_svg]:size-4 [&_svg]:shrink-0',
+        'flex items-center justify-between p-4 w-full clickable rounded-lg [&_svg]:size-4 [&_svg]:shrink-0',
         className
       )}
       {...props}
@@ -97,5 +101,5 @@ function Item({
 }
 
 function ItemGroup({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>
+  return <div className="rounded-lg m-4 bg-muted/30">{children}</div>
 }

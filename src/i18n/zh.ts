@@ -98,6 +98,8 @@ export default {
     Theme: '主题',
     System: '系统',
     Light: '浅色',
-    Dark: '深色'
+    Dark: '深色',
+    Temporary: '临时',
+    'Choose a relay collection': '选择一个服务器组'
   }
 }

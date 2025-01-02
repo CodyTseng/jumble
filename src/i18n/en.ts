@@ -99,6 +99,8 @@ export default {
     Theme: 'Theme',
     System: 'System',
     Light: 'Light',
-    Dark: 'Dark'
+    Dark: 'Dark',
+    Temporary: 'Temporary',
+    'Choose a relay collection': 'Choose a relay collection'
   }
 }

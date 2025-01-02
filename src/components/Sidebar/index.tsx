@@ -1,6 +1,5 @@
 import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
-import AboutInfoButton from './AboutInfoButton'
 import AccountButton from './AccountButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationButton'
@@ -19,7 +18,6 @@ export default function PrimaryPageSidebar() {
         <NotificationsButton />
         <SearchButton />
         <PostButton />
-        <AboutInfoButton />
       </div>
       <AccountButton />
     </div>
