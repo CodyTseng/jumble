@@ -18,7 +18,7 @@ export default function SettingsPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Settings')}>
+    <SecondaryPageLayout index={index} titlebarContent={t('Settings')} hideScrollToTopButton>
       <div className="px-4 flex flex-col gap-4">
         <div className="flex justify-between items-center [&_svg]:size-4 [&_svg]:shrink-0">
           <div className="flex items-center gap-4">
