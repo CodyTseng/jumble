@@ -2,9 +2,10 @@ import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import AboutInfoButton from './AboutInfoButton'
 import AccountButton from './AccountButton'
+import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
-import HomeButton from './HomeButton'
+import SearchButton from './SearchButton'
 
 export default function PrimaryPageSidebar() {
   return (
@@ -16,6 +17,7 @@ export default function PrimaryPageSidebar() {
         </div>
         <HomeButton />
         <NotificationsButton />
+        <SearchButton />
         <PostButton />
         <AboutInfoButton />
       </div>

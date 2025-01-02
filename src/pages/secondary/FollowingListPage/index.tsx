@@ -49,7 +49,7 @@ export default function FollowingListPage({ id, index }: { id?: string; index?: 
       titlebarContent={
         profile?.username
           ? t("username's following", { username: profile.username })
-          : t('following')
+          : t('Following')
       }
     >
       <div className="space-y-2 px-4">

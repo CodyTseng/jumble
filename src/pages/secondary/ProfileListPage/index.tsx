@@ -30,7 +30,7 @@ export default function ProfileListPage({ index }: { index?: number }) {
     return filter.search ? searchableRelayUrls : relayUrls
   }, [relayUrls, searchableRelayUrls, filter])
   const title = useMemo(() => {
-    return filter.search ? `${t('search')}: ${filter.search}` : t('all users')
+    return filter.search ? `${t('Search')}: ${filter.search}` : t('All users')
   }, [filter])
 
   useEffect(() => {

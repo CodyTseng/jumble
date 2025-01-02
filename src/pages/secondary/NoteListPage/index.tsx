@@ -1,7 +1,7 @@
 import NoteList from '@/components/NoteList'
 import { useSearchParams } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { isWebsocketUrl } from '@/lib/url'
+import { isWebsocketUrl, simplifyUrl } from '@/lib/url'
 import { useRelaySettings } from '@/providers/RelaySettingsProvider'
 import { Filter } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -27,11 +27,11 @@ export default function NoteListPage({ index }: { index?: number }) {
     }
     const search = searchParams.get('s')
     if (search) {
-      return { title: `${t('search')}: ${search}`, filter: { search }, urls: searchableRelayUrls }
+      return { title: `${t('Search')}: ${search}`, filter: { search }, urls: searchableRelayUrls }
     }
     const relayUrl = searchParams.get('relay')
     if (relayUrl && isWebsocketUrl(relayUrl)) {
-      return { title: relayUrl, urls: [relayUrl] }
+      return { title: simplifyUrl(relayUrl), urls: [relayUrl] }
     }
     return { urls: relayUrls }
   }, [searchParams, relayUrlsString])

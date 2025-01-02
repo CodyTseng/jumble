@@ -70,7 +70,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1]
         const currentIndex = currentItem ? currentItem.index : 0
-        console.log('pop', state.index, currentIndex)
         if (state.index === currentIndex) {
           if (currentIndex !== 0) return pre
 
