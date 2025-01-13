@@ -8,7 +8,7 @@ import { useTheme } from '@/providers/ThemeProvider'
 import { TLanguage } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
 import { ChevronRight, Info, Languages, Server, SunMoon } from 'lucide-react'
-import { HTMLProps, useState } from 'react'
+import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function SettingsPage({ index }: { index?: number }) {
@@ -24,7 +24,7 @@ export default function SettingsPage({ index }: { index?: number }) {
 
   return (
     <SecondaryPageLayout index={index} titlebarContent={t('Settings')}>
-      <Item>
+      <SettingItem>
         <div className="flex items-center gap-4">
           <Languages />
           <div>{t('Languages')}</div>
@@ -38,8 +38,8 @@ export default function SettingsPage({ index }: { index?: number }) {
             <SelectItem value="zh">简体中文</SelectItem>
           </SelectContent>
         </Select>
-      </Item>
-      <Item>
+      </SettingItem>
+      <SettingItem>
         <div className="flex items-center gap-4">
           <SunMoon />
           <div>{t('Theme')}</div>
@@ -54,16 +54,16 @@ export default function SettingsPage({ index }: { index?: number }) {
             <SelectItem value="dark">{t('Dark')}</SelectItem>
           </SelectContent>
         </Select>
-      </Item>
-      <Item onClick={() => push(toRelaySettings())}>
+      </SettingItem>
+      <SettingItem onClick={() => push(toRelaySettings())}>
         <div className="flex items-center gap-4">
           <Server />
           <div>{t('Relays')}</div>
         </div>
         <ChevronRight />
-      </Item>
+      </SettingItem>
       <AboutInfoDialog>
-        <Item>
+        <SettingItem>
           <div className="flex items-center gap-4">
             <Info />
             <div>{t('About')}</div>
@@ -74,22 +74,25 @@ export default function SettingsPage({ index }: { index?: number }) {
             </div>
             <ChevronRight />
           </div>
-        </Item>
+        </SettingItem>
       </AboutInfoDialog>
     </SecondaryPageLayout>
   )
 }
 
-function Item({ children, className, ...props }: HTMLProps<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        'flex clickable justify-between items-center px-4 py-2 h-[52px] rounded-lg [&_svg]:size-4 [&_svg]:shrink-0',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-}
+const SettingItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
+  ({ children, className, ...props }) => {
+    return (
+      <div
+        className={cn(
+          'flex clickable justify-between items-center px-4 py-2 h-[52px] rounded-lg [&_svg]:size-4 [&_svg]:shrink-0',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+SettingItem.displayName = 'SettingItem'
