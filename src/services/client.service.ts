@@ -48,11 +48,11 @@ class ClientService extends EventTarget {
   private profileEventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private profileEventDataloader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
-    { cacheMap: this.profileEventCache }
+    { cacheMap: this.profileEventCache, maxBatchSize: 10 }
   )
   private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
-    { cache: false }
+    { cache: false, maxBatchSize: 10 }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),

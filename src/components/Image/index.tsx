@@ -8,14 +8,10 @@ export default function Image({
   image: { url, blurHash },
   alt,
   className = '',
-  classNames = {},
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   image: TImageInfo
   alt?: string
-  classNames?: {
-    wrapper?: string
-  }
 }) {
   const [isLoading, setIsLoading] = useState(true)
   const [displayBlurHash, setDisplayBlurHash] = useState(true)
@@ -24,8 +20,8 @@ export default function Image({
   useEffect(() => {
     if (blurHash) {
       const { numX, numY } = decodeBlurHashSize(blurHash)
-      const width = numX * 5
-      const height = numY * 5
+      const width = numX * 3
+      const height = numY * 3
       const pixels = decode(blurHash, width, height)
       const canvas = document.createElement('canvas')
       canvas.width = width
@@ -41,7 +37,7 @@ export default function Image({
   }, [blurHash])
 
   return (
-    <div className={cn('relative', classNames.wrapper ?? '')} {...props}>
+    <div className={cn('relative', className)} {...props}>
       {isLoading && <Skeleton className={cn('absolute inset-0', className)} />}
       <img
         src={url}

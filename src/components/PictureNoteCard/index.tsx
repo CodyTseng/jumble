@@ -35,12 +35,14 @@ export default function PictureNoteCard({
   if (!firstImage) return null
 
   return (
-    <div className={cn('space-y-1 cursor-pointer', className)} onClick={() => push(toNote(event))}>
+    <div className={cn('cursor-pointer', className)} onClick={() => push(toNote(event))}>
       <Image className="rounded-lg w-full aspect-[6/8]" image={firstImage} />
-      <div className="line-clamp-2 px-2 font-semibold">{title}</div>
-      <div className="flex items-center gap-2 px-2">
-        <UserAvatar userId={event.pubkey} size="xSmall" />
-        <Username userId={event.pubkey} className="text-sm text-muted-foreground truncate" />
+      <div className="p-2 space-y-1">
+        <div className="line-clamp-2 font-semibold">{title}</div>
+        <div className="flex items-center gap-2">
+          <UserAvatar userId={event.pubkey} size="xSmall" />
+          <Username userId={event.pubkey} className="text-sm text-muted-foreground truncate" />
+        </div>
       </div>
     </div>
   )
