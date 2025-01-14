@@ -1,8 +1,7 @@
+import { createFollowListDraftEvent } from '@/lib/draft-event'
 import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
-import { TDraftEvent } from '@/types'
-import dayjs from 'dayjs'
-import { Event, kinds } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
@@ -57,12 +56,10 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   const follow = async (pubkey: string) => {
     if (isFetching || !accountPubkey) return
 
-    const newFollowListDraftEvent: TDraftEvent = {
-      kind: kinds.Contacts,
-      content: followListEvent?.content ?? '',
-      created_at: dayjs().unix(),
-      tags: (followListEvent?.tags ?? []).concat([['p', pubkey]])
-    }
+    const newFollowListDraftEvent = createFollowListDraftEvent(
+      (followListEvent?.tags ?? []).concat([['p', pubkey]]),
+      followListEvent?.content
+    )
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
     updateFollowListEvent(newFollowListEvent)
@@ -72,14 +69,10 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   const unfollow = async (pubkey: string) => {
     if (isFetching || !accountPubkey || !followListEvent) return
 
-    const newFollowListDraftEvent: TDraftEvent = {
-      kind: kinds.Contacts,
-      content: followListEvent.content ?? '',
-      created_at: dayjs().unix(),
-      tags: followListEvent.tags.filter(
-        ([tagName, tagValue]) => tagName !== 'p' || tagValue !== pubkey
-      )
-    }
+    const newFollowListDraftEvent = createFollowListDraftEvent(
+      followListEvent.tags.filter(([tagName, tagValue]) => tagName !== 'p' || tagValue !== pubkey),
+      followListEvent.content
+    )
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
     updateFollowListEvent(newFollowListEvent)

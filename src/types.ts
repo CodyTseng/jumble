@@ -3,6 +3,7 @@ import { Event } from 'nostr-tools'
 export type TProfile = {
   username: string
   pubkey: string
+  original_username?: string
   banner?: string
   avatar?: string
   nip05?: string
@@ -69,3 +70,9 @@ export type TFeedType = 'following' | 'relays' | 'temporary'
 export type TLanguage = 'en' | 'zh'
 
 export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number; height: number } }
+
+export type TMailboxRelayScope = 'read' | 'write' | 'both'
+export type TMailboxRelay = {
+  url: string
+  scope: TMailboxRelayScope
+}

@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { ChevronDown, LoaderCircle } from 'lucide-react'
+import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -32,6 +32,7 @@ export default function NormalPostContent({
   const [posting, setPosting] = useState(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [addClientTag, setAddClientTag] = useState(false)
+  const [uploadingPicture, setUploadingPicture] = useState(false)
   const canPost = !!content && !posting
 
   useEffect(() => {
@@ -116,7 +117,13 @@ export default function NormalPostContent({
               setPictureInfos((prev) => [...prev, { url, tags }])
               setContent((prev) => `${prev}\n${url}`)
             }}
-          />
+            onUploadingChange={setUploadingPicture}
+            accept="image/*,video/*,audio/*"
+          >
+            <Button variant="secondary" disabled={uploadingPicture}>
+              {uploadingPicture ? <LoaderCircle className="animate-spin" /> : <ImageUp />}
+            </Button>
+          </Uploader>
           <Button
             variant="link"
             className="text-foreground gap-0 px-0"

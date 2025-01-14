@@ -43,7 +43,7 @@ export default function NoteListPage({ index }: { index?: number }) {
   }, [searchParams, relayUrlsString])
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={title} displayScrollToTopButton>
+    <SecondaryPageLayout index={index} title={title} displayScrollToTopButton>
       <NoteList key={title} filter={filter} relayUrls={urls} />
     </SecondaryPageLayout>
   )

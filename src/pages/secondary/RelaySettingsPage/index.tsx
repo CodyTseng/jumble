@@ -8,7 +8,7 @@ export default function RelaySettingsPage({ index }: { index?: number }) {
   const { t } = useTranslation()
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Relay settings')}>
+    <SecondaryPageLayout index={index} title={t('Relay settings')}>
       <Tabs defaultValue="relay-sets" className="px-4 space-y-4">
         <TabsList>
           <TabsTrigger value="relay-sets">{t('Relay Sets')}</TabsTrigger>

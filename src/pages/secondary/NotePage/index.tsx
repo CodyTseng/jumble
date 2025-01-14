@@ -26,7 +26,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   if (!event && isFetching) {
     return (
-      <SecondaryPageLayout index={index} titlebarContent={t('Note')}>
+      <SecondaryPageLayout index={index} title={t('Note')}>
         <div className="px-4">
           <Skeleton className="w-10 h-10 rounded-full" />
         </div>
@@ -37,7 +37,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   if (isPictureEvent(event) && isSmallScreen) {
     return (
-      <SecondaryPageLayout index={index} titlebarContent={t('Note')} displayScrollToTopButton>
+      <SecondaryPageLayout index={index} title={t('Note')} displayScrollToTopButton>
         <PictureNote key={`note-${event.id}`} event={event} fetchNoteStats />
         <Separator className="mb-2 mt-4" />
         <Nip22ReplyNoteList
@@ -50,7 +50,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
   }
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Note')} displayScrollToTopButton>
+    <SecondaryPageLayout index={index} title={t('Note')} displayScrollToTopButton>
       <div className="px-4">
         {rootEventId !== parentEventId && (
           <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />

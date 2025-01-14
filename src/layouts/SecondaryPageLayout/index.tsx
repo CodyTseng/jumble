@@ -1,7 +1,6 @@
 import BackButton from '@/components/BackButton'
 import BottomNavigationBar from '@/components/BottomNavigationBar'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
-import ThemeToggle from '@/components/ThemeToggle'
 import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSecondaryPage } from '@/PageManager'
@@ -11,13 +10,15 @@ import { useEffect, useRef, useState } from 'react'
 export default function SecondaryPageLayout({
   children,
   index,
-  titlebarContent,
+  title,
+  controls,
   hideBackButton = false,
   displayScrollToTopButton = false
 }: {
   children?: React.ReactNode
   index?: number
-  titlebarContent?: React.ReactNode
+  title?: React.ReactNode
+  controls?: React.ReactNode
   hideBackButton?: boolean
   displayScrollToTopButton?: boolean
 }): JSX.Element {
@@ -90,7 +91,8 @@ export default function SecondaryPageLayout({
       }}
     >
       <SecondaryPageTitlebar
-        content={titlebarContent}
+        title={title}
+        controls={controls}
         hideBackButton={hideBackButton}
         visible={visible}
       />
@@ -104,11 +106,13 @@ export default function SecondaryPageLayout({
 }
 
 export function SecondaryPageTitlebar({
-  content,
+  title,
+  controls,
   hideBackButton = false,
   visible = true
 }: {
-  content?: React.ReactNode
+  title?: React.ReactNode
+  controls?: React.ReactNode
   hideBackButton?: boolean
   visible?: boolean
 }): JSX.Element {
@@ -116,8 +120,12 @@ export function SecondaryPageTitlebar({
 
   if (isSmallScreen) {
     return (
-      <Titlebar className="h-12 flex gap-1 p-1 items-center font-semibold" visible={visible}>
-        <BackButton hide={hideBackButton}>{content}</BackButton>
+      <Titlebar
+        className="h-12 flex gap-1 p-1 items-center justify-between font-semibold"
+        visible={visible}
+      >
+        <BackButton hide={hideBackButton}>{title}</BackButton>
+        <div className="flex-shrink-0">{controls}</div>
       </Titlebar>
     )
   }
@@ -125,11 +133,9 @@ export function SecondaryPageTitlebar({
   return (
     <Titlebar className="h-12 flex gap-1 p-1 justify-between items-center font-semibold">
       <div className="flex items-center gap-1 flex-1 w-0">
-        <BackButton hide={hideBackButton}>{content}</BackButton>
+        <BackButton hide={hideBackButton}>{title}</BackButton>
       </div>
-      <div className="flex-shrink-0 flex items-center">
-        <ThemeToggle />
-      </div>
+      <div className="flex-shrink-0">{controls}</div>
     </Titlebar>
   )
 }

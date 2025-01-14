@@ -399,6 +399,11 @@ class ClientService extends EventTarget {
     }
   }
 
+  updateProfileCache(event: NEvent) {
+    this.profileEventDataloader.clear(event.pubkey)
+    this.profileEventDataloader.prime(event.pubkey, Promise.resolve(event))
+  }
+
   async fetchProfiles(relayUrls: string[], filter: Filter): Promise<TProfile[]> {
     const events = await this.pool.querySync(relayUrls, {
       ...filter,

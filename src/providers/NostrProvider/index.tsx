@@ -1,10 +1,12 @@
 import LoginDialog from '@/components/LoginDialog'
+import { BIG_RELAY_URLS } from '@/constants'
 import { useToast } from '@/hooks'
 import {
   getFollowingsFromFollowListEvent,
   getProfileFromProfileEvent,
   getRelayListFromRelayListEvent
 } from '@/lib/event'
+import { formatPubkey } from '@/lib/pubkey'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
 import { ISigner, TAccount, TAccountPointer, TDraftEvent, TProfile, TRelayList } from '@/types'
@@ -18,10 +20,12 @@ import { NsecSigner } from './nsec.signer'
 type TNostrContext = {
   pubkey: string | null
   profile: TProfile | null
+  profileEvent: Event | null
   relayList: TRelayList | null
   followings: string[] | null
   account: TAccountPointer | null
   accounts: TAccountPointer[]
+  nsec: string | null
   switchAccount: (account: TAccountPointer | null) => Promise<void>
   nsecLogin: (nsec: string) => Promise<string>
   nip07Login: () => Promise<string>
@@ -38,6 +42,7 @@ type TNostrContext = {
   updateRelayListEvent: (relayListEvent: Event) => void
   getFollowings: (pubkey: string) => Promise<string[]>
   updateFollowListEvent: (followListEvent: Event) => void
+  updateProfileEvent: (profileEvent: Event) => void
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -53,9 +58,11 @@ export const useNostr = () => {
 export function NostrProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast()
   const [account, setAccount] = useState<TAccountPointer | null>(null)
+  const [nsec, setNsec] = useState<string | null>(null)
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const [profile, setProfile] = useState<TProfile | null>(null)
+  const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followings, setFollowings] = useState<string[] | null>(null)
 
@@ -71,43 +78,69 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    setRelayList(null)
+    setFollowings(null)
+    setProfile(null)
+    setProfileEvent(null)
+    setNsec(null)
     if (!account) {
-      setRelayList(null)
-      setFollowings(null)
-      setProfile(null)
       return
     }
 
+    const storedNsec = storage.getAccountNsec(account.pubkey)
+    if (storedNsec) {
+      setNsec(storedNsec)
+    }
     const storedRelayListEvent = storage.getAccountRelayListEvent(account.pubkey)
     if (storedRelayListEvent) {
       setRelayList(
         storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
       )
     }
-    const followListEvent = storage.getAccountFollowListEvent(account.pubkey)
-    if (followListEvent) {
-      setFollowings(getFollowingsFromFollowListEvent(followListEvent))
+    const storedFollowListEvent = storage.getAccountFollowListEvent(account.pubkey)
+    if (storedFollowListEvent) {
+      setFollowings(getFollowingsFromFollowListEvent(storedFollowListEvent))
     }
-    const profileEvent = storage.getAccountProfileEvent(account.pubkey)
-    if (profileEvent) {
-      setProfile(getProfileFromProfileEvent(profileEvent))
+    const storedProfileEvent = storage.getAccountProfileEvent(account.pubkey)
+    if (storedProfileEvent) {
+      setProfileEvent(storedProfileEvent)
+      setProfile(getProfileFromProfileEvent(storedProfileEvent))
     }
-    client.fetchRelayListEvent(account.pubkey).then((relayListEvent) => {
-      if (!relayListEvent) return
+    client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
+      if (!relayListEvent) {
+        if (storedRelayListEvent) return
+
+        setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS })
+        return
+      }
       const isNew = storage.setAccountRelayListEvent(relayListEvent)
       if (!isNew) return
       setRelayList(getRelayListFromRelayListEvent(relayListEvent))
     })
-    client.fetchFollowListEvent(account.pubkey).then((followListEvent) => {
-      if (!followListEvent) return
+    client.fetchFollowListEvent(account.pubkey).then(async (followListEvent) => {
+      if (!followListEvent) {
+        if (storedFollowListEvent) return
+
+        setFollowings([])
+        return
+      }
       const isNew = storage.setAccountFollowListEvent(followListEvent)
       if (!isNew) return
       setFollowings(getFollowingsFromFollowListEvent(followListEvent))
     })
-    client.fetchProfileEvent(account.pubkey).then((profileEvent) => {
-      if (!profileEvent) return
+    client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
+      if (!profileEvent) {
+        if (storedProfileEvent) return
+
+        setProfile({
+          pubkey: account.pubkey,
+          username: formatPubkey(account.pubkey)
+        })
+        return
+      }
       const isNew = storage.setAccountProfileEvent(profileEvent)
       if (!isNew) return
+      setProfileEvent(profileEvent)
       setProfile(getProfileFromProfileEvent(profileEvent))
     })
   }, [account])
@@ -280,17 +313,27 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setFollowings(getFollowingsFromFollowListEvent(followListEvent))
   }
 
+  const updateProfileEvent = (profileEvent: Event) => {
+    const isNew = storage.setAccountProfileEvent(profileEvent)
+    if (!isNew) return
+    setProfileEvent(profileEvent)
+    setProfile(getProfileFromProfileEvent(profileEvent))
+    client.updateProfileCache(profileEvent)
+  }
+
   return (
     <NostrContext.Provider
       value={{
         pubkey: account?.pubkey ?? null,
         profile,
+        profileEvent,
         relayList,
         followings,
         account,
         accounts: storage
           .getAccounts()
           .map((act) => ({ pubkey: act.pubkey, signerType: act.signerType })),
+        nsec,
         switchAccount,
         nsecLogin,
         nip07Login,
@@ -303,7 +346,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         getRelayList,
         updateRelayListEvent,
         getFollowings,
-        updateFollowListEvent
+        updateFollowListEvent,
+        updateProfileEvent
       }}
     >
       {children}

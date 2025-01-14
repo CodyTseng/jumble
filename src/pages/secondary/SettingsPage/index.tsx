@@ -4,18 +4,21 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toRelaySettings } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
+import { useNostr } from '@/providers/NostrProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { TLanguage } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
-import { ChevronRight, Info, Languages, Server, SunMoon } from 'lucide-react'
+import { Check, ChevronRight, Copy, Info, KeyRound, Languages, Server, SunMoon } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function SettingsPage({ index }: { index?: number }) {
   const { t, i18n } = useTranslation()
+  const { nsec } = useNostr()
   const { push } = useSecondaryPage()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
+  const [copiedNsec, setCopiedNsec] = useState(false)
 
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -23,7 +26,7 @@ export default function SettingsPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Settings')}>
+    <SecondaryPageLayout index={index} title={t('Settings')}>
       <SettingItem>
         <div className="flex items-center gap-4">
           <Languages />
@@ -62,6 +65,21 @@ export default function SettingsPage({ index }: { index?: number }) {
         </div>
         <ChevronRight />
       </SettingItem>
+      {!!nsec && (
+        <SettingItem
+          onClick={() => {
+            navigator.clipboard.writeText(nsec)
+            setCopiedNsec(true)
+            setTimeout(() => setCopiedNsec(false), 2000)
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <KeyRound />
+            <div>{t('Copy private key (nsec)')}</div>
+          </div>
+          {copiedNsec ? <Check /> : <Copy />}
+        </SettingItem>
+      )}
       <AboutInfoDialog>
         <SettingItem>
           <div className="flex items-center gap-4">

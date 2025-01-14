@@ -151,6 +151,11 @@ class StorageService {
     return this.currentAccount
   }
 
+  getAccountNsec(pubkey: string) {
+    const account = this.accounts.find((act) => act.pubkey === pubkey && act.signerType === 'nsec')
+    return account?.nsec
+  }
+
   addAccount(account: TAccount) {
     if (this.accounts.find((act) => isSameAccount(act, account))) {
       return

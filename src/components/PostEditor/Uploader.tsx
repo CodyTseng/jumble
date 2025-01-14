@@ -1,19 +1,21 @@
-import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { ImageUp, Loader, LoaderCircle, Plus } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { z } from 'zod'
 
 export default function Uploader({
+  children,
   onUploadSuccess,
-  variant = 'button'
+  onUploadingChange,
+  className,
+  accept = 'image/*'
 }: {
+  children: React.ReactNode
   onUploadSuccess: ({ url, tags }: { url: string; tags: string[][] }) => void
-  variant?: 'button' | 'big'
+  onUploadingChange?: (uploading: boolean) => void
+  className?: string
+  accept?: string
 }) {
-  const [uploading, setUploading] = useState(false)
   const { signHttpAuth } = useNostr()
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -26,7 +28,7 @@ export default function Uploader({
     formData.append('file', file)
 
     try {
-      setUploading(true)
+      onUploadingChange?.(true)
       const url = 'https://nostr.build/api/v2/nip96/upload'
       const auth = await signHttpAuth(url, 'POST')
       const response = await fetch(url, {
@@ -60,7 +62,7 @@ export default function Uploader({
         fileInputRef.current.value = ''
       }
     } finally {
-      setUploading(false)
+      onUploadingChange?.(false)
     }
   }
 
@@ -71,41 +73,16 @@ export default function Uploader({
     }
   }
 
-  if (variant === 'button') {
-    return (
-      <>
-        <Button variant="secondary" onClick={handleUploadClick} disabled={uploading}>
-          {uploading ? <LoaderCircle className="animate-spin" /> : <ImageUp />}
-        </Button>
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-          accept="image/*,video/*,audio/*"
-        />
-      </>
-    )
-  }
-
   return (
-    <>
-      <div
-        className={cn(
-          'flex flex-col gap-2 items-center justify-center aspect-square w-full rounded-lg border border-dashed',
-          uploading ? 'cursor-not-allowed text-muted-foreground' : 'clickable'
-        )}
-        onClick={handleUploadClick}
-      >
-        {uploading ? <Loader size={36} className="animate-spin" /> : <Plus size={36} />}
-      </div>
+    <div onClick={handleUploadClick} className={className}>
+      {children}
       <input
         type="file"
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={handleFileChange}
-        accept="image/*"
+        accept={accept}
       />
-    </>
+    </div>
   )
 }

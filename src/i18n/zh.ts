@@ -127,6 +127,17 @@ export default {
       '读服务器用于寻找与您有关的事件。其他用户会将想要你看到的事件发布到您的读服务器。',
     'write relays description':
       '写服务器用于发布您的事件。其他用户会从您的写服务器寻找您发布的事件。',
-    'read & write relays notice': '读服务器和写服务器的数量都应尽量保持在 2 到 4 个之间。'
+    'read & write relays notice': '读服务器和写服务器的数量都应尽量保持在 2 到 4 个之间。',
+    "Don't have an account yet?": '还没有账户？',
+    'Generate New Account': '生成新账户',
+    'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
+      '这是私钥，请勿与他人分享。请妥善保管，否则将无法找回。',
+    Edit: '编辑',
+    Save: '保存',
+    'Display Name': '昵称',
+    Bio: '简介',
+    'Nostr Address (NIP-05)': 'Nostr 地址 (NIP-05)',
+    'Invalid NIP-05 address': '无效的 NIP-05 地址',
+    'Copy private key (nsec)': '复制私钥 (nsec)'
   }
 }

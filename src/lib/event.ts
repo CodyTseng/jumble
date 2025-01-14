@@ -110,15 +110,16 @@ export function getRelayListFromRelayListEvent(event?: Event) {
 export function getProfileFromProfileEvent(event: Event) {
   try {
     const profileObj = JSON.parse(event.content)
+    const username =
+      profileObj.display_name?.trim() ||
+      profileObj.name?.trim() ||
+      profileObj.nip05?.split('@')[0]?.trim()
     return {
       pubkey: event.pubkey,
       banner: profileObj.banner,
       avatar: profileObj.picture,
-      username:
-        profileObj.display_name?.trim() ||
-        profileObj.name?.trim() ||
-        profileObj.nip05?.split('@')[0]?.trim() ||
-        formatPubkey(event.pubkey),
+      username: username || formatPubkey(event.pubkey),
+      original_username: username,
       nip05: profileObj.nip05,
       about: profileObj.about,
       created_at: event.created_at

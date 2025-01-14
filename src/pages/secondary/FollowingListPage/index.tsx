@@ -46,7 +46,7 @@ export default function FollowingListPage({ id, index }: { id?: string; index?: 
   return (
     <SecondaryPageLayout
       index={index}
-      titlebarContent={
+      title={
         profile?.username
           ? t("username's following", { username: profile.username })
           : t('Following')
