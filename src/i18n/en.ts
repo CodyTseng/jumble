@@ -137,6 +137,7 @@ export default {
     'Display Name': 'Display Name',
     Bio: 'Bio',
     'Nostr Address (NIP-05)': 'Nostr Address (NIP-05)',
-    'Invalid NIP-05 address': 'Invalid NIP-05 address'
+    'Invalid NIP-05 address': 'Invalid NIP-05 address',
+    'Copy private key (nsec)': 'Copy private key (nsec)'
   }
 }

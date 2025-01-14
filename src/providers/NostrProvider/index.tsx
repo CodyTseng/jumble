@@ -25,6 +25,7 @@ type TNostrContext = {
   followings: string[] | null
   account: TAccountPointer | null
   accounts: TAccountPointer[]
+  nsec: string | null
   switchAccount: (account: TAccountPointer | null) => Promise<void>
   nsecLogin: (nsec: string) => Promise<string>
   nip07Login: () => Promise<string>
@@ -57,6 +58,7 @@ export const useNostr = () => {
 export function NostrProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast()
   const [account, setAccount] = useState<TAccountPointer | null>(null)
+  const [nsec, setNsec] = useState<string | null>(null)
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const [profile, setProfile] = useState<TProfile | null>(null)
@@ -80,10 +82,15 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setFollowings(null)
     setProfile(null)
     setProfileEvent(null)
+    setNsec(null)
     if (!account) {
       return
     }
 
+    const storedNsec = storage.getAccountNsec(account.pubkey)
+    if (storedNsec) {
+      setNsec(storedNsec)
+    }
     const storedRelayListEvent = storage.getAccountRelayListEvent(account.pubkey)
     if (storedRelayListEvent) {
       setRelayList(
@@ -326,6 +333,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         accounts: storage
           .getAccounts()
           .map((act) => ({ pubkey: act.pubkey, signerType: act.signerType })),
+        nsec,
         switchAccount,
         nsecLogin,
         nip07Login,

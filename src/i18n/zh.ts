@@ -137,6 +137,7 @@ export default {
     'Display Name': '昵称',
     Bio: '简介',
     'Nostr Address (NIP-05)': 'Nostr 地址 (NIP-05)',
-    'Invalid NIP-05 address': '无效的 NIP-05 地址'
+    'Invalid NIP-05 address': '无效的 NIP-05 地址',
+    'Copy private key (nsec)': '复制私钥 (nsec)'
   }
 }
