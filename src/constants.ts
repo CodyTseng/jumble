@@ -5,9 +5,9 @@ export const StorageKey = {
   FEED_TYPE: 'feedType',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',
-  ACCOUNT_RELAY_LIST_MAP: 'accountRelayListMap',
-  ACCOUNT_FOLLOWINGS_MAP: 'accountFollowingsMap',
-  ACCOUNT_PROFILE_MAP: 'accountProfileMap',
+  ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap',
+  ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap',
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap',
   ADD_CLIENT_TAG: 'addClientTag'
 }
 

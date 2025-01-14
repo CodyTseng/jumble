@@ -21,7 +21,8 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
           itemName={t('Following')}
           isActive={feedType === 'following'}
           onClick={() => {
-            switchFeed('following')
+            if (!pubkey) return
+            switchFeed('following', { pubkey })
             close?.()
           }}
         />

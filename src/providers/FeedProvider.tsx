@@ -14,7 +14,10 @@ type TFeedContext = {
   filter: Filter
   isReady: boolean
   activeRelaySetId: string | null
-  switchFeed: (feedType: TFeedType, options?: { activeRelaySetId?: string }) => Promise<void>
+  switchFeed: (
+    feedType: TFeedType,
+    options?: { activeRelaySetId?: string; pubkey?: string }
+  ) => Promise<void>
 }
 
 const FeedContext = createContext<TFeedContext | undefined>(undefined)
@@ -52,32 +55,23 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (feedType === 'following') {
-        return await switchFeed('following')
+        if (!pubkey) return
+        return await switchFeed('following', { pubkey })
+      } else {
+        await switchFeed('relays', { activeRelaySetId })
       }
-      await switchFeed('relays', { activeRelaySetId })
     }
 
     init()
-  }, [])
-
-  useEffect(() => {
-    if (!isReady || feedType !== 'following') return
-
-    switchFeed('following')
-  }, [pubkey, feedType, isReady])
-
-  useEffect(() => {
-    if (feedType !== 'relays') return
-
-    const relaySet = relaySets.find((set) => set.id === activeRelaySetId)
-    if (!relaySet) return
-
-    setRelayUrls(relaySet.relayUrls)
-  }, [relaySets])
+  }, [pubkey])
 
   const switchFeed = async (
     feedType: TFeedType,
-    options: { activeRelaySetId?: string | null; temporaryRelayUrls?: string[] | null } = {}
+    options: {
+      activeRelaySetId?: string | null
+      temporaryRelayUrls?: string[] | null
+      pubkey?: string | null
+    } = {}
   ) => {
     setIsReady(false)
     if (feedType === 'relays') {
@@ -100,14 +94,19 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       return setIsReady(true)
     }
     if (feedType === 'following') {
-      if (!pubkey) {
+      if (!options.pubkey) {
         return setIsReady(true)
       }
       setFeedType(feedType)
       setActiveRelaySetId(null)
-      const [relayList, followings] = await Promise.all([getRelayList(), getFollowings()])
+      const [relayList, followings] = await Promise.all([
+        getRelayList(options.pubkey),
+        getFollowings(options.pubkey)
+      ])
       setRelayUrls(relayList.read.concat(BIG_RELAY_URLS).slice(0, 4))
-      setFilter({ authors: followings.includes(pubkey) ? followings : [...followings, pubkey] })
+      setFilter({
+        authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
+      })
       storage.setFeedType(feedType)
       return setIsReady(true)
     }

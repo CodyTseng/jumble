@@ -1,6 +1,6 @@
-import { TDraftEvent } from '@/types'
 import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
+import { TDraftEvent } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
@@ -25,7 +25,7 @@ export const useFollowList = () => {
 }
 
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey: accountPubkey, publish, updateFollowings } = useNostr()
+  const { pubkey: accountPubkey, publish, updateFollowListEvent } = useNostr()
   const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
   const [isFetching, setIsFetching] = useState(true)
   const followings = useMemo(() => {
@@ -65,7 +65,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     }
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
-    updateFollowings([...followings, pubkey])
+    updateFollowListEvent(newFollowListEvent)
     setFollowListEvent(newFollowListEvent)
   }
 
@@ -82,7 +82,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     }
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
-    updateFollowings(followings.filter((followPubkey) => followPubkey !== pubkey))
+    updateFollowListEvent(newFollowListEvent)
     setFollowListEvent(newFollowListEvent)
   }
 

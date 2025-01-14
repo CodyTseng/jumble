@@ -1,8 +1,10 @@
 import { BIG_RELAY_URLS } from '@/constants'
-import { getFollowingsFromFollowListEvent } from '@/lib/event'
-import { formatPubkey } from '@/lib/pubkey'
-import { tagNameEquals } from '@/lib/tag'
-import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
+import {
+  getFollowingsFromFollowListEvent,
+  getProfileFromProfileEvent,
+  getRelayListFromRelayListEvent
+} from '@/lib/event'
+import { formatPubkey, userIdToPubkey } from '@/lib/pubkey'
 import { TDraftEvent, TProfile, TRelayInfo, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
@@ -43,19 +45,19 @@ class ClientService extends EventTarget {
     this.eventBatchLoadFn.bind(this),
     { cache: false }
   )
-  private profileCache = new LRUCache<string, Promise<TProfile>>({ max: 10000 })
-  private profileDataloader = new DataLoader<string, TProfile>(
-    (ids) => Promise.all(ids.map((id) => this._fetchProfile(id))),
-    { cacheMap: this.profileCache }
+  private profileEventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
+  private profileEventDataloader = new DataLoader<string, NEvent | undefined>(
+    (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
+    { cacheMap: this.profileEventCache }
   )
-  private fetchProfileFromDefaultRelaysDataloader = new DataLoader<string, TProfile | undefined>(
-    this.profileBatchLoadFn.bind(this),
+  private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
+    this.profileEventBatchLoadFn.bind(this),
     { cache: false }
   )
-  private relayListDataLoader = new DataLoader<string, TRelayList>(
-    this.relayListBatchLoadFn.bind(this),
+  private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
+    this.relayListEventBatchLoadFn.bind(this),
     {
-      cacheMap: new LRUCache<string, Promise<TRelayList>>({ max: 10000 })
+      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
     }
   )
   private relayInfoDataLoader = new DataLoader<string, TRelayInfo | undefined>(async (urls) => {
@@ -373,30 +375,28 @@ class ClientService extends EventTarget {
     this.eventDataLoader.prime(event.id, Promise.resolve(event))
   }
 
-  async fetchProfile(id: string): Promise<TProfile | undefined> {
-    if (!/^[0-9a-f]{64}$/.test(id)) {
-      let pubkey: string | undefined
-      const { data, type } = nip19.decode(id)
-      switch (type) {
-        case 'npub':
-          pubkey = data
-          break
-        case 'nprofile':
-          pubkey = data.pubkey
-          break
-      }
-
-      if (!pubkey) {
-        throw new Error('Invalid id')
-      }
-
-      const cache = await this.profileCache.get(pubkey)
-      if (cache) {
-        return cache
-      }
+  async fetchProfileEvent(id: string): Promise<NEvent | undefined> {
+    const pubkey = userIdToPubkey(id)
+    const cache = await this.profileEventCache.get(pubkey)
+    if (cache) {
+      return cache
     }
 
-    return this.profileDataloader.load(id)
+    return await this.profileEventDataloader.load(id)
+  }
+
+  async fetchProfile(id: string): Promise<TProfile | undefined> {
+    const profileEvent = await this.fetchProfileEvent(id)
+    if (profileEvent) {
+      return getProfileFromProfileEvent(profileEvent)
+    }
+
+    try {
+      const pubkey = userIdToPubkey(id)
+      return { pubkey, username: formatPubkey(pubkey) }
+    } catch {
+      return undefined
+    }
   }
 
   async fetchProfiles(relayUrls: string[], filter: Filter): Promise<TProfile[]> {
@@ -405,15 +405,21 @@ class ClientService extends EventTarget {
       kinds: [kinds.Metadata]
     })
 
-    const profiles = events
-      .sort((a, b) => b.created_at - a.created_at)
-      .map((event) => this.parseProfileFromEvent(event))
-    profiles.forEach((profile) => this.profileDataloader.prime(profile.pubkey, profile))
-    return profiles
+    const profileEvents = events.sort((a, b) => b.created_at - a.created_at)
+    profileEvents.forEach((profile) => this.profileEventDataloader.prime(profile.pubkey, profile))
+    return profileEvents.map((profileEvent) => getProfileFromProfileEvent(profileEvent))
+  }
+
+  async fetchRelayListEvent(pubkey: string) {
+    return this.relayListEventDataLoader.load(pubkey)
   }
 
   async fetchRelayList(pubkey: string): Promise<TRelayList> {
-    return this.relayListDataLoader.load(pubkey)
+    const event = await this.relayListEventDataLoader.load(pubkey)
+    if (!event) {
+      return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS }
+    }
+    return getRelayListFromRelayListEvent(event)
   }
 
   async fetchFollowListEvent(pubkey: string) {
@@ -488,7 +494,7 @@ class ClientService extends EventTarget {
     return event
   }
 
-  private async _fetchProfile(id: string): Promise<TProfile> {
+  private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
     let pubkey: string | undefined
     let relays: string[] = []
     if (/^[0-9a-f]{64}$/.test(id)) {
@@ -509,8 +515,8 @@ class ClientService extends EventTarget {
     if (!pubkey) {
       throw new Error('Invalid id')
     }
-
-    const profileFromDefaultRelays = await this.fetchProfileFromDefaultRelaysDataloader.load(pubkey)
+    const profileFromDefaultRelays =
+      await this.fetchProfileEventFromDefaultRelaysDataloader.load(pubkey)
     if (profileFromDefaultRelays) {
       return profileFromDefaultRelays
     }
@@ -524,15 +530,11 @@ class ClientService extends EventTarget {
       },
       true
     )
-    const profile = profileEvent
-      ? this.parseProfileFromEvent(profileEvent)
-      : { pubkey, username: formatPubkey(pubkey) }
-
     if (pubkey !== id) {
-      this.profileDataloader.prime(pubkey, Promise.resolve(profile))
+      this.profileEventDataloader.prime(pubkey, Promise.resolve(profileEvent))
     }
 
-    return profile
+    return profileEvent
   }
 
   private async tryHarderToFetchEvent(
@@ -567,7 +569,7 @@ class ClientService extends EventTarget {
     return ids.map((id) => eventsMap.get(id))
   }
 
-  private async profileBatchLoadFn(pubkeys: readonly string[]) {
+  private async profileEventBatchLoadFn(pubkeys: readonly string[]) {
     const events = await this.pool.querySync(this.defaultRelayUrls, {
       authors: Array.from(new Set(pubkeys)),
       kinds: [kinds.Metadata],
@@ -583,12 +585,11 @@ class ClientService extends EventTarget {
     }
 
     return pubkeys.map((pubkey) => {
-      const event = eventsMap.get(pubkey)
-      return event ? this.parseProfileFromEvent(event) : undefined
+      return eventsMap.get(pubkey)
     })
   }
 
-  private async relayListBatchLoadFn(pubkeys: readonly string[]) {
+  private async relayListEventBatchLoadFn(pubkeys: readonly string[]) {
     const events = await this.pool.querySync(this.defaultRelayUrls, {
       authors: pubkeys as string[],
       kinds: [kinds.RelayList],
@@ -603,34 +604,7 @@ class ClientService extends EventTarget {
       }
     }
 
-    return pubkeys.map((pubkey) => {
-      const event = eventsMap.get(pubkey)
-      const relayList = { write: [], read: [] } as TRelayList
-      if (!event) {
-        return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS }
-      }
-
-      event.tags.filter(tagNameEquals('r')).forEach(([, url, type]) => {
-        if (!url || !isWebsocketUrl(url)) return
-
-        const normalizedUrl = normalizeUrl(url)
-        switch (type) {
-          case 'w':
-            relayList.write.push(normalizedUrl)
-            break
-          case 'r':
-            relayList.read.push(normalizedUrl)
-            break
-          default:
-            relayList.write.push(normalizedUrl)
-            relayList.read.push(normalizedUrl)
-        }
-      })
-      return {
-        write: relayList.write.length ? relayList.write.slice(0, 10) : BIG_RELAY_URLS,
-        read: relayList.read.length ? relayList.read.slice(0, 10) : BIG_RELAY_URLS
-      }
-    })
+    return pubkeys.map((pubkey) => eventsMap.get(pubkey))
   }
 
   private async _fetchFollowListEvent(pubkey: string) {
@@ -644,31 +618,6 @@ class ClientService extends EventTarget {
     )
 
     return followListEvents.sort((a, b) => b.created_at - a.created_at)[0]
-  }
-
-  private parseProfileFromEvent(event: NEvent): TProfile {
-    try {
-      const profileObj = JSON.parse(event.content)
-      return {
-        pubkey: event.pubkey,
-        banner: profileObj.banner,
-        avatar: profileObj.picture,
-        username:
-          profileObj.display_name?.trim() ||
-          profileObj.name?.trim() ||
-          profileObj.nip05?.split('@')[0]?.trim() ||
-          formatPubkey(event.pubkey),
-        nip05: profileObj.nip05,
-        about: profileObj.about,
-        created_at: event.created_at
-      }
-    } catch (err) {
-      console.error(err)
-      return {
-        pubkey: event.pubkey,
-        username: formatPubkey(event.pubkey)
-      }
-    }
   }
 }
 

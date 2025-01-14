@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
 import HomePage from '@/pages/secondary/HomePage'
-import { cloneElement, createContext, useContext, useEffect, useState } from 'react'
+import { cloneElement, createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import MePage from './pages/primary/MePage'
 import NotificationListPage from './pages/primary/NotificationListPage'
 import { useScreenSize } from './providers/ScreenSizeProvider'
@@ -57,6 +57,14 @@ export function useSecondaryPage() {
 
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
+  const [primaryPages, setPrimaryPages] = useState<
+    { name: TPrimaryPageName; element: ReactNode }[]
+  >([
+    {
+      name: 'home',
+      element: PRIMARY_PAGE_MAP.home
+    }
+  ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
 
@@ -104,6 +112,10 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   }, [])
 
   const navigatePrimaryPage = (page: TPrimaryPageName) => {
+    const exists = primaryPages.find((p) => p.name === page)
+    if (!exists) {
+      setPrimaryPages((prev) => [...prev, { name: page, element: PRIMARY_PAGE_MAP[page] }])
+    }
     setCurrentPrimaryPage(page)
     if (isSmallScreen) {
       clearSecondaryPages()
@@ -159,15 +171,15 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 {item.component}
               </div>
             ))}
-          {Object.entries(PRIMARY_PAGE_MAP).map(([pageName, page]) => (
+          {primaryPages.map(({ name, element }) => (
             <div
-              key={pageName}
+              key={name}
               style={{
                 display:
-                  secondaryStack.length === 0 && currentPrimaryPage === pageName ? 'block' : 'none'
+                  secondaryStack.length === 0 && currentPrimaryPage === name ? 'block' : 'none'
               }}
             >
-              {page}
+              {element}
             </div>
           ))}
         </SecondaryPageContext.Provider>
@@ -194,16 +206,16 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <Separator orientation="vertical" />
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel minSize={30}>
-              <div
-                style={{
-                  display: !currentPrimaryPage || currentPrimaryPage === 'home' ? 'block' : 'none'
-                }}
-              >
-                <NoteListPage />
-              </div>
-              <div style={{ display: currentPrimaryPage === 'notifications' ? 'block' : 'none' }}>
-                <NotificationListPage />
-              </div>
+              {primaryPages.map(({ name, element }) => (
+                <div
+                  key={name}
+                  style={{
+                    display: currentPrimaryPage === name ? 'block' : 'none'
+                  }}
+                >
+                  {element}
+                </div>
+              ))}
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel minSize={30}>

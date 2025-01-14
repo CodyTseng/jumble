@@ -17,10 +17,12 @@ export default function SaveButton({
   setHasChange: (hasChange: boolean) => void
 }) {
   const { toast } = useToast()
-  const { pubkey, publish, updateRelayList } = useNostr()
+  const { pubkey, publish, updateRelayListEvent } = useNostr()
   const [pushing, setPushing] = useState(false)
 
   const save = async () => {
+    if (!pubkey) return
+
     setPushing(true)
     const event = {
       kind: kinds.RelayList,
@@ -30,11 +32,8 @@ export default function SaveButton({
       ),
       created_at: dayjs().unix()
     }
-    await publish(event)
-    updateRelayList({
-      write: mailboxRelays.filter(({ scope }) => scope !== 'read').map(({ url }) => url),
-      read: mailboxRelays.filter(({ scope }) => scope !== 'write').map(({ url }) => url)
-    })
+    const relayListEvent = await publish(event)
+    updateRelayListEvent(relayListEvent)
     toast({
       title: 'Save Successful',
       description: 'Successfully saved mailbox relays'

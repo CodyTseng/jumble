@@ -1,15 +1,8 @@
 import { StorageKey } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
-import {
-  TAccount,
-  TAccountPointer,
-  TFeedType,
-  TProfile,
-  TRelayList,
-  TRelaySet,
-  TThemeSetting
-} from '@/types'
+import { TAccount, TAccountPointer, TFeedType, TRelaySet, TThemeSetting } from '@/types'
+import { Event } from 'nostr-tools'
 
 const DEFAULT_RELAY_SETS: TRelaySet[] = [
   {
@@ -33,9 +26,9 @@ class StorageService {
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
-  private accountRelayListMap: Record<string, TRelayList | undefined> = {} // pubkey -> relayList
-  private accountFollowingsMap: Record<string, string[] | undefined> = {} // pubkey -> followings
-  private accountProfileMap: Record<string, TProfile> = {} // pubkey -> profile
+  private accountRelayListEventMap: Record<string, Event | undefined> = {} // pubkey -> relayListEvent
+  private accountFollowListEventMap: Record<string, Event | undefined> = {} // pubkey -> followListEvent
+  private accountProfileEventMap: Record<string, Event> = {} // pubkey -> profileEvent
 
   constructor() {
     if (!StorageService.instance) {
@@ -54,12 +47,25 @@ class StorageService {
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const feedTypeStr = window.localStorage.getItem(StorageKey.FEED_TYPE)
     this.feedType = feedTypeStr ? JSON.parse(feedTypeStr) : 'relays'
-    const accountRelayListMapStr = window.localStorage.getItem(StorageKey.ACCOUNT_RELAY_LIST_MAP)
-    this.accountRelayListMap = accountRelayListMapStr ? JSON.parse(accountRelayListMapStr) : {}
-    const accountFollowingsMapStr = window.localStorage.getItem(StorageKey.ACCOUNT_FOLLOWINGS_MAP)
-    this.accountFollowingsMap = accountFollowingsMapStr ? JSON.parse(accountFollowingsMapStr) : {}
-    const accountProfileMapStr = window.localStorage.getItem(StorageKey.ACCOUNT_PROFILE_MAP)
-    this.accountProfileMap = accountProfileMapStr ? JSON.parse(accountProfileMapStr) : {}
+
+    const accountRelayListEventMapStr = window.localStorage.getItem(
+      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP
+    )
+    this.accountRelayListEventMap = accountRelayListEventMapStr
+      ? JSON.parse(accountRelayListEventMapStr)
+      : {}
+    const accountFollowListEventMapStr = window.localStorage.getItem(
+      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP
+    )
+    this.accountFollowListEventMap = accountFollowListEventMapStr
+      ? JSON.parse(accountFollowListEventMapStr)
+      : {}
+    const accountProfileEventMapStr = window.localStorage.getItem(
+      StorageKey.ACCOUNT_PROFILE_EVENT_MAP
+    )
+    this.accountProfileEventMap = accountProfileEventMapStr
+      ? JSON.parse(accountProfileEventMapStr)
+      : {}
 
     const relaySetsStr = window.localStorage.getItem(StorageKey.RELAY_SETS)
     if (!relaySetsStr) {
@@ -85,7 +91,8 @@ class StorageService {
       this.activeRelaySetId = activeRelaySetId
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
-      this.activeRelaySetId = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID) ?? null
+      const activeRelaySetIdStr = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID)
+      this.activeRelaySetId = activeRelaySetIdStr ? JSON.parse(activeRelaySetIdStr) : null
     }
   }
 
@@ -155,21 +162,21 @@ class StorageService {
 
   removeAccount(account: TAccount) {
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
-    delete this.accountFollowingsMap[account.pubkey]
-    delete this.accountRelayListMap[account.pubkey]
-    delete this.accountProfileMap[account.pubkey]
+    delete this.accountFollowListEventMap[account.pubkey]
+    delete this.accountRelayListEventMap[account.pubkey]
+    delete this.accountProfileEventMap[account.pubkey]
     window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_FOLLOWINGS_MAP,
-      JSON.stringify(this.accountFollowingsMap)
+      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP,
+      JSON.stringify(this.accountFollowListEventMap)
     )
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_RELAY_LIST_MAP,
-      JSON.stringify(this.accountRelayListMap)
+      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP,
+      JSON.stringify(this.accountRelayListEventMap)
     )
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_PROFILE_MAP,
-      JSON.stringify(this.accountProfileMap)
+      StorageKey.ACCOUNT_PROFILE_EVENT_MAP,
+      JSON.stringify(this.accountProfileEventMap)
     )
   }
 
@@ -185,40 +192,64 @@ class StorageService {
     window.localStorage.setItem(StorageKey.CURRENT_ACCOUNT, JSON.stringify(act))
   }
 
-  getAccountRelayList(pubkey: string) {
-    return this.accountRelayListMap[pubkey]
+  getAccountRelayListEvent(pubkey: string) {
+    return this.accountRelayListEventMap[pubkey]
   }
 
-  setAccountRelayList(pubkey: string, relayList: TRelayList) {
-    this.accountRelayListMap[pubkey] = relayList
+  setAccountRelayListEvent(relayListEvent: Event) {
+    const pubkey = relayListEvent.pubkey
+    if (
+      this.accountRelayListEventMap[pubkey] &&
+      this.accountRelayListEventMap[pubkey].created_at > relayListEvent.created_at
+    ) {
+      return false
+    }
+    this.accountRelayListEventMap[pubkey] = relayListEvent
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_RELAY_LIST_MAP,
-      JSON.stringify(this.accountRelayListMap)
+      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP,
+      JSON.stringify(this.accountRelayListEventMap)
     )
+    return true
   }
 
-  getAccountFollowings(pubkey: string) {
-    return this.accountFollowingsMap[pubkey]
+  getAccountFollowListEvent(pubkey: string) {
+    return this.accountFollowListEventMap[pubkey]
   }
 
-  setAccountFollowings(pubkey: string, followings: string[]) {
-    this.accountFollowingsMap[pubkey] = followings
+  setAccountFollowListEvent(followListEvent: Event) {
+    const pubkey = followListEvent.pubkey
+    if (
+      this.accountFollowListEventMap[pubkey] &&
+      this.accountFollowListEventMap[pubkey].created_at > followListEvent.created_at
+    ) {
+      return false
+    }
+    this.accountFollowListEventMap[pubkey] = followListEvent
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_FOLLOWINGS_MAP,
-      JSON.stringify(this.accountFollowingsMap)
+      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP,
+      JSON.stringify(this.accountFollowListEventMap)
     )
+    return true
   }
 
-  getAccountProfile(pubkey: string) {
-    return this.accountProfileMap[pubkey]
+  getAccountProfileEvent(pubkey: string) {
+    return this.accountProfileEventMap[pubkey]
   }
 
-  setAccountProfile(pubkey: string, profile: TProfile) {
-    this.accountProfileMap[pubkey] = profile
+  setAccountProfileEvent(profileEvent: Event) {
+    const pubkey = profileEvent.pubkey
+    if (
+      this.accountProfileEventMap[pubkey] &&
+      this.accountProfileEventMap[pubkey].created_at > profileEvent.created_at
+    ) {
+      return false
+    }
+    this.accountProfileEventMap[pubkey] = profileEvent
     window.localStorage.setItem(
-      StorageKey.ACCOUNT_PROFILE_MAP,
-      JSON.stringify(this.accountProfileMap)
+      StorageKey.ACCOUNT_PROFILE_EVENT_MAP,
+      JSON.stringify(this.accountProfileEventMap)
     )
+    return true
   }
 }
 

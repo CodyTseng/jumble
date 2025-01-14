@@ -1,7 +1,10 @@
-import { COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
 import client from '@/services/client.service'
+import { TRelayList } from '@/types'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
+import { isWebsocketUrl, normalizeUrl } from './url'
+import { formatPubkey } from './pubkey'
 
 export function isNsfwEvent(event: Event) {
   return event.tags.some(
@@ -74,6 +77,59 @@ export function getFollowingsFromFollowListEvent(event: Event) {
         .reverse()
     )
   )
+}
+
+export function getRelayListFromRelayListEvent(event?: Event) {
+  if (!event) {
+    return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS }
+  }
+
+  const relayList = { write: [], read: [] } as TRelayList
+  event.tags.filter(tagNameEquals('r')).forEach(([, url, type]) => {
+    if (!url || !isWebsocketUrl(url)) return
+
+    const normalizedUrl = normalizeUrl(url)
+    switch (type) {
+      case 'w':
+        relayList.write.push(normalizedUrl)
+        break
+      case 'r':
+        relayList.read.push(normalizedUrl)
+        break
+      default:
+        relayList.write.push(normalizedUrl)
+        relayList.read.push(normalizedUrl)
+    }
+  })
+  return {
+    write: relayList.write.length ? relayList.write.slice(0, 10) : BIG_RELAY_URLS,
+    read: relayList.read.length ? relayList.read.slice(0, 10) : BIG_RELAY_URLS
+  }
+}
+
+export function getProfileFromProfileEvent(event: Event) {
+  try {
+    const profileObj = JSON.parse(event.content)
+    return {
+      pubkey: event.pubkey,
+      banner: profileObj.banner,
+      avatar: profileObj.picture,
+      username:
+        profileObj.display_name?.trim() ||
+        profileObj.name?.trim() ||
+        profileObj.nip05?.split('@')[0]?.trim() ||
+        formatPubkey(event.pubkey),
+      nip05: profileObj.nip05,
+      about: profileObj.about,
+      created_at: event.created_at
+    }
+  } catch (err) {
+    console.error(err)
+    return {
+      pubkey: event.pubkey,
+      username: formatPubkey(event.pubkey)
+    }
+  }
 }
 
 export async function extractMentions(content: string, parentEvent?: Event) {

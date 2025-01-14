@@ -35,6 +35,9 @@ export function userIdToPubkey(userId: string) {
   if (userId.startsWith('npub1')) {
     const { data } = nip19.decode(userId as `npub1${string}`)
     return data
+  } else if (userId.startsWith('nprofile1')) {
+    const { data } = nip19.decode(userId as `nprofile1${string}`)
+    return data.pubkey
   }
   return userId
 }
