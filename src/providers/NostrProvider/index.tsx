@@ -1,10 +1,12 @@
 import LoginDialog from '@/components/LoginDialog'
+import { BIG_RELAY_URLS } from '@/constants'
 import { useToast } from '@/hooks'
 import {
   getFollowingsFromFollowListEvent,
   getProfileFromProfileEvent,
   getRelayListFromRelayListEvent
 } from '@/lib/event'
+import { formatPubkey } from '@/lib/pubkey'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
 import { ISigner, TAccount, TAccountPointer, TDraftEvent, TProfile, TRelayList } from '@/types'
@@ -71,10 +73,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    setRelayList(null)
+    setFollowings(null)
+    setProfile(null)
     if (!account) {
-      setRelayList(null)
-      setFollowings(null)
-      setProfile(null)
       return
     }
 
@@ -84,28 +86,46 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
       )
     }
-    const followListEvent = storage.getAccountFollowListEvent(account.pubkey)
-    if (followListEvent) {
-      setFollowings(getFollowingsFromFollowListEvent(followListEvent))
+    const storedFollowListEvent = storage.getAccountFollowListEvent(account.pubkey)
+    if (storedFollowListEvent) {
+      setFollowings(getFollowingsFromFollowListEvent(storedFollowListEvent))
     }
-    const profileEvent = storage.getAccountProfileEvent(account.pubkey)
-    if (profileEvent) {
-      setProfile(getProfileFromProfileEvent(profileEvent))
+    const storedProfileEvent = storage.getAccountProfileEvent(account.pubkey)
+    if (storedProfileEvent) {
+      setProfile(getProfileFromProfileEvent(storedProfileEvent))
     }
-    client.fetchRelayListEvent(account.pubkey).then((relayListEvent) => {
-      if (!relayListEvent) return
+    client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
+      if (!relayListEvent) {
+        if (storedRelayListEvent) return
+
+        setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS })
+        return
+      }
       const isNew = storage.setAccountRelayListEvent(relayListEvent)
       if (!isNew) return
       setRelayList(getRelayListFromRelayListEvent(relayListEvent))
     })
-    client.fetchFollowListEvent(account.pubkey).then((followListEvent) => {
-      if (!followListEvent) return
+    client.fetchFollowListEvent(account.pubkey).then(async (followListEvent) => {
+      if (!followListEvent) {
+        if (storedFollowListEvent) return
+
+        setFollowings([])
+        return
+      }
       const isNew = storage.setAccountFollowListEvent(followListEvent)
       if (!isNew) return
       setFollowings(getFollowingsFromFollowListEvent(followListEvent))
     })
-    client.fetchProfileEvent(account.pubkey).then((profileEvent) => {
-      if (!profileEvent) return
+    client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
+      if (!profileEvent) {
+        if (storedProfileEvent) return
+
+        setProfile({
+          pubkey: account.pubkey,
+          username: formatPubkey(account.pubkey)
+        })
+        return
+      }
       const isNew = storage.setAccountProfileEvent(profileEvent)
       if (!isNew) return
       setProfile(getProfileFromProfileEvent(profileEvent))

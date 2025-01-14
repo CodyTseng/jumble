@@ -1,5 +1,5 @@
 import { COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
-import { TDraftEvent, TRelaySet } from '@/types'
+import { TDraftEvent, TMailboxRelay, TRelaySet } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import {
@@ -178,6 +178,35 @@ export async function createCommentDraftEvent(
     kind: COMMENT_EVENT_KIND,
     content,
     tags,
+    created_at: dayjs().unix()
+  }
+}
+
+export function createRelayListDraftEvent(mailboxRelays: TMailboxRelay[]): TDraftEvent {
+  return {
+    kind: kinds.RelayList,
+    content: '',
+    tags: mailboxRelays.map(({ url, scope }) =>
+      scope === 'both' ? ['r', url] : ['r', url, scope]
+    ),
+    created_at: dayjs().unix()
+  }
+}
+
+export function createFollowListDraftEvent(tags: string[][], content?: string): TDraftEvent {
+  return {
+    kind: kinds.Contacts,
+    content: content ?? '',
+    created_at: dayjs().unix(),
+    tags
+  }
+}
+
+export function createProfileDraftEvent(content: string): TDraftEvent {
+  return {
+    kind: kinds.Metadata,
+    content,
+    tags: [],
     created_at: dayjs().unix()
   }
 }

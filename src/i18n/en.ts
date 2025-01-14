@@ -127,6 +127,10 @@ export default {
     'write relays description':
       'Write relays are used to publish your events. Other users will seek your events from your write relays.',
     'read & write relays notice':
-      'The number of read and write servers should ideally be kept between 2 and 4.'
+      'The number of read and write servers should ideally be kept between 2 and 4.',
+    "Don't have an account yet?": "Don't have an account yet?",
+    'Generate New Account': 'Generate New Account',
+    'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
+      'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.'
   }
 }

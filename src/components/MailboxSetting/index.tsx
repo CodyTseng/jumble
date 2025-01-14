@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { normalizeUrl } from '@/lib/url'
 import { useNostr } from '@/providers/NostrProvider'
+import { TMailboxRelay, TMailboxRelayScope } from '@/types'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import MailboxRelay from './MailboxRelay'
 import NewMailboxRelayInput from './NewMailboxRelayInput'
 import SaveButton from './SaveButton'
-import { TMailboxRelay, TMailboxRelayScope } from './types'
 
 export default function MailboxSetting() {
   const { t } = useTranslation()

@@ -69,3 +69,9 @@ export type TFeedType = 'following' | 'relays' | 'temporary'
 export type TLanguage = 'en' | 'zh'
 
 export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number; height: number } }
+
+export type TMailboxRelayScope = 'read' | 'write' | 'both'
+export type TMailboxRelay = {
+  url: string
+  scope: TMailboxRelayScope
+}

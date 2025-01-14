@@ -6,10 +6,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { TMailboxRelay, TMailboxRelayScope } from '@/types'
 import { CircleX, Server } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TMailboxRelay, TMailboxRelayScope } from './types'
 
 export default function MailboxRelay({
   mailboxRelay,

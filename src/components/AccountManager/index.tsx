@@ -1,34 +1,38 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useNostr } from '@/providers/NostrProvider'
-import { TSignerType } from '@/types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
 import BunkerLogin from './BunkerLogin'
 import PrivateKeyLogin from './NsecLogin'
+import GenerateNewAccount from './GenerateNewAccount'
+
+type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | null
 
 export default function AccountManager({ close }: { close?: () => void }) {
-  const [loginMethod, setLoginMethod] = useState<TSignerType | null>(null)
+  const [page, setPage] = useState<TAccountManagerPage>(null)
 
   return (
     <>
-      {loginMethod === 'nsec' ? (
-        <PrivateKeyLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close?.()} />
-      ) : loginMethod === 'bunker' ? (
-        <BunkerLogin back={() => setLoginMethod(null)} onLoginSuccess={() => close?.()} />
+      {page === 'nsec' ? (
+        <PrivateKeyLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
+      ) : page === 'bunker' ? (
+        <BunkerLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
+      ) : page === 'generate' ? (
+        <GenerateNewAccount back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : (
-        <AccountManagerNav setLoginMethod={setLoginMethod} close={close} />
+        <AccountManagerNav setPage={setPage} close={close} />
       )}
     </>
   )
 }
 
 function AccountManagerNav({
-  setLoginMethod,
+  setPage,
   close
 }: {
-  setLoginMethod: (method: TSignerType) => void
+  setPage: (page: TAccountManagerPage) => void
   close?: () => void
 }) {
   const { t } = useTranslation()
@@ -44,11 +48,18 @@ function AccountManagerNav({
           {t('Login with Browser Extension')}
         </Button>
       )}
-      <Button variant="secondary" onClick={() => setLoginMethod('bunker')} className="w-full">
+      <Button variant="secondary" onClick={() => setPage('bunker')} className="w-full">
         {t('Login with Bunker')}
       </Button>
-      <Button variant="secondary" onClick={() => setLoginMethod('nsec')} className="w-full">
+      <Button variant="secondary" onClick={() => setPage('nsec')} className="w-full">
         {t('Login with Private Key')}
+      </Button>
+      <Separator />
+      <div className="text-center text-muted-foreground text-sm font-semibold">
+        {t("Don't have an account yet?")}
+      </div>
+      <Button variant="secondary" onClick={() => setPage('generate')} className="w-full">
+        {t('Generate New Account')}
       </Button>
       {accounts.length > 0 && (
         <>

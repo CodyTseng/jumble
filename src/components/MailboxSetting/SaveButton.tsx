@@ -1,11 +1,10 @@
 import { useToast } from '@/hooks'
+import { createRelayListDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
-import dayjs from 'dayjs'
+import { TMailboxRelay } from '@/types'
 import { CloudUpload, Loader } from 'lucide-react'
-import { kinds } from 'nostr-tools'
 import { useState } from 'react'
 import { Button } from '../ui/button'
-import { TMailboxRelay } from './types'
 
 export default function SaveButton({
   mailboxRelays,
@@ -24,14 +23,7 @@ export default function SaveButton({
     if (!pubkey) return
 
     setPushing(true)
-    const event = {
-      kind: kinds.RelayList,
-      content: '',
-      tags: mailboxRelays.map(({ url, scope }) =>
-        scope === 'both' ? ['r', url] : ['r', url, scope]
-      ),
-      created_at: dayjs().unix()
-    }
+    const event = createRelayListDraftEvent(mailboxRelays)
     const relayListEvent = await publish(event)
     updateRelayListEvent(relayListEvent)
     toast({
