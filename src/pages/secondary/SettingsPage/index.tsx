@@ -23,7 +23,7 @@ export default function SettingsPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} titlebarContent={t('Settings')}>
+    <SecondaryPageLayout index={index} title={t('Settings')}>
       <SettingItem>
         <div className="flex items-center gap-4">
           <Languages />

@@ -24,3 +24,4 @@ export const PICTURE_EVENT_KIND = 20
 export const COMMENT_EVENT_KIND = 1111
 
 export const URL_REGEX = /(https?:\/\/[^\s"']+)/g
+export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

@@ -6,13 +6,14 @@ import ProfileBanner from '@/components/ProfileBanner'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import QrCodePopover from '@/components/QrCodePopover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
 import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toFollowingList } from '@/lib/link'
+import { toFollowingList, toProfileEditor } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
-import { SecondaryPageLink } from '@/PageManager'
+import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useFeed } from '@/providers/FeedProvider'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -22,6 +23,7 @@ import NotFoundPage from '../NotFoundPage'
 
 export default function ProfilePage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const { profile, isFetching } = useFetchProfile(id)
   const { relayList, isFetching: isFetchingRelayInfo } = useFetchRelayList(profile?.pubkey)
   const { relayUrls: currentRelayUrls } = useFeed()
@@ -64,7 +66,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
 
   const { banner, username, nip05, about, avatar, pubkey } = profile
   return (
-    <SecondaryPageLayout index={index} titlebarContent={username} displayScrollToTopButton>
+    <SecondaryPageLayout index={index} title={username} displayScrollToTopButton>
       <div className="px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <ProfileBanner
@@ -85,7 +87,17 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
               {t('Follows you')}
             </div>
           )}
-          <FollowButton pubkey={pubkey} />
+          {isSelf ? (
+            <Button
+              className="w-20 min-w-20 rounded-full"
+              variant="secondary"
+              onClick={() => push(toProfileEditor())}
+            >
+              {t('Edit')}
+            </Button>
+          ) : (
+            <FollowButton pubkey={pubkey} />
+          )}
         </div>
         <div className="pt-2">
           <div className="text-xl font-semibold">{username}</div>

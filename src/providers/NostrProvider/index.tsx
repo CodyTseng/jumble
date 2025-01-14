@@ -20,6 +20,7 @@ import { NsecSigner } from './nsec.signer'
 type TNostrContext = {
   pubkey: string | null
   profile: TProfile | null
+  profileEvent: Event | null
   relayList: TRelayList | null
   followings: string[] | null
   account: TAccountPointer | null
@@ -40,6 +41,7 @@ type TNostrContext = {
   updateRelayListEvent: (relayListEvent: Event) => void
   getFollowings: (pubkey: string) => Promise<string[]>
   updateFollowListEvent: (followListEvent: Event) => void
+  updateProfileEvent: (profileEvent: Event) => void
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -58,6 +60,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [signer, setSigner] = useState<ISigner | null>(null)
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const [profile, setProfile] = useState<TProfile | null>(null)
+  const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followings, setFollowings] = useState<string[] | null>(null)
 
@@ -76,6 +79,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setRelayList(null)
     setFollowings(null)
     setProfile(null)
+    setProfileEvent(null)
     if (!account) {
       return
     }
@@ -92,6 +96,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
     const storedProfileEvent = storage.getAccountProfileEvent(account.pubkey)
     if (storedProfileEvent) {
+      setProfileEvent(storedProfileEvent)
       setProfile(getProfileFromProfileEvent(storedProfileEvent))
     }
     client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
@@ -128,6 +133,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
       const isNew = storage.setAccountProfileEvent(profileEvent)
       if (!isNew) return
+      setProfileEvent(profileEvent)
       setProfile(getProfileFromProfileEvent(profileEvent))
     })
   }, [account])
@@ -300,11 +306,20 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setFollowings(getFollowingsFromFollowListEvent(followListEvent))
   }
 
+  const updateProfileEvent = (profileEvent: Event) => {
+    const isNew = storage.setAccountProfileEvent(profileEvent)
+    if (!isNew) return
+    setProfileEvent(profileEvent)
+    setProfile(getProfileFromProfileEvent(profileEvent))
+    client.updateProfileCache(profileEvent)
+  }
+
   return (
     <NostrContext.Provider
       value={{
         pubkey: account?.pubkey ?? null,
         profile,
+        profileEvent,
         relayList,
         followings,
         account,
@@ -323,7 +338,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         getRelayList,
         updateRelayListEvent,
         getFollowings,
-        updateFollowListEvent
+        updateFollowListEvent,
+        updateProfileEvent
       }}
     >
       {children}

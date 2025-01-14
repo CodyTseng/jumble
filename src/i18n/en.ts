@@ -131,6 +131,12 @@ export default {
     "Don't have an account yet?": "Don't have an account yet?",
     'Generate New Account': 'Generate New Account',
     'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
-      'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.'
+      'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.',
+    Edit: 'Edit',
+    Save: 'Save',
+    'Display Name': 'Display Name',
+    Bio: 'Bio',
+    'Nostr Address (NIP-05)': 'Nostr Address (NIP-05)',
+    'Invalid NIP-05 address': 'Invalid NIP-05 address'
   }
 }

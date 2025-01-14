@@ -202,11 +202,11 @@ export function createFollowListDraftEvent(tags: string[][], content?: string): 
   }
 }
 
-export function createProfileDraftEvent(content: string): TDraftEvent {
+export function createProfileDraftEvent(content: string, tags: string[][] = []): TDraftEvent {
   return {
     kind: kinds.Metadata,
     content,
-    tags: [],
+    tags,
     created_at: dayjs().unix()
   }
 }

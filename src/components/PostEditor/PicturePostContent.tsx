@@ -5,8 +5,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createPictureNoteDraftEvent } from '@/lib/draft-event'
+import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { ChevronDown, LoaderCircle, X } from 'lucide-react'
+import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
@@ -177,6 +178,7 @@ function PictureUploader({
   >
 }) {
   const [index, setIndex] = useState(-1)
+  const [uploading, setUploading] = useState(false)
 
   return (
     <>
@@ -203,11 +205,20 @@ function PictureUploader({
           </div>
         ))}
         <Uploader
-          variant="big"
           onUploadSuccess={({ url, tags }) => {
             setPictureInfos((prev) => [...prev, { url, tags }])
           }}
-        />
+          onUploadingChange={setUploading}
+        >
+          <div
+            className={cn(
+              'flex flex-col gap-2 items-center justify-center aspect-square w-full rounded-lg border border-dashed',
+              uploading ? 'cursor-not-allowed text-muted-foreground' : 'clickable'
+            )}
+          >
+            {uploading ? <Loader size={36} className="animate-spin" /> : <Plus size={36} />}
+          </div>
+        </Uploader>
       </div>
       {index >= 0 &&
         createPortal(
