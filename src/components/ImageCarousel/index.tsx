@@ -1,5 +1,7 @@
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import { isTouchDevice } from '@/lib/common'
 import { TImageInfo } from '@/types'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
@@ -40,16 +42,23 @@ export function ImageCarousel({
   }
 
   return (
-    <>
+    <div className="relative space-y-2">
       <Carousel className="w-full" setApi={setApi}>
-        <CarouselContent>
+        <CarouselContent className="xl:px-4">
           {images.map((image, index) => (
-            <CarouselItem key={index}>
-              <Image image={image} onClick={(e) => handlePhotoClick(e, index)} />
+            <CarouselItem key={index} className="xl:basis-2/3 cursor-zoom-in">
+              <Image
+                className="xl:rounded-lg"
+                image={image}
+                onClick={(e) => handlePhotoClick(e, index)}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
       </Carousel>
+      {!isTouchDevice() && (
+        <ArrowButton total={images.length} currentIndex={currentIndex} onClick={onDotClick} />
+      )}
       {images.length > 1 && (
         <CarouselDot total={images.length} currentIndex={currentIndex} onClick={onDotClick} />
       )}
@@ -67,7 +76,7 @@ export function ImageCarousel({
         styles={{ toolbar: { paddingTop: '2.25rem' } }}
       />
       {isNsfw && <NsfwOverlay className="rounded-lg" />}
-    </>
+    </div>
   )
 }
 
@@ -85,10 +94,41 @@ function CarouselDot({
       {Array.from({ length: total }).map((_, index) => (
         <div
           key={index}
-          className={`w-2 h-2 rounded-full ${index === currentIndex ? 'bg-foreground/40' : 'bg-muted'}`}
+          className={`w-2 h-2 rounded-full cursor-pointer ${index === currentIndex ? 'bg-foreground/40' : 'bg-muted'}`}
           onClick={() => onClick(index)}
         />
       ))}
+    </div>
+  )
+}
+
+function ArrowButton({
+  total,
+  currentIndex,
+  onClick
+}: {
+  total: number
+  currentIndex: number
+  onClick: (index: number) => void
+}) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity">
+      <div className="w-full flex justify-between px-2 xl:px-4">
+        <button
+          onClick={() => onClick(currentIndex - 1)}
+          className="w-8 h-8 rounded-full bg-background/50 flex justify-center items-center pointer-events-auto disabled:pointer-events-none disabled:opacity-0"
+          disabled={currentIndex === 0}
+        >
+          <ChevronLeftIcon className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onClick(currentIndex + 1)}
+          className="w-8 h-8 rounded-full bg-background/50 flex justify-center items-center pointer-events-auto disabled:pointer-events-none disabled:opacity-0"
+          disabled={currentIndex === total - 1}
+        >
+          <ChevronRightIcon className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   )
 }

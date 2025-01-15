@@ -12,14 +12,12 @@ import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId, isPictureEvent } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
 
 export default function NotePage({ id, index }: { id?: string; index?: number }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
   const { event, isFetching } = useFetchEvent(id)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
   const rootEventId = useMemo(() => getRootEventId(event), [event])
@@ -35,7 +33,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
   }
   if (!event) return <NotFoundPage />
 
-  if (isPictureEvent(event) && isSmallScreen) {
+  if (isPictureEvent(event)) {
     return (
       <SecondaryPageLayout index={index} title={t('Note')} displayScrollToTopButton>
         <PictureNote key={`note-${event.id}`} event={event} fetchNoteStats />

@@ -30,7 +30,7 @@ export default function NoteList({
   className?: string
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
+  const { isLargeScreen } = useScreenSize()
   const { signEvent, checkLogin } = useNostr()
   const { areAlgoRelays } = useFetchRelayInfos([...relayUrls])
   const [refreshCount, setRefreshCount] = useState(0)
@@ -180,7 +180,7 @@ export default function NoteList({
           {isPictures ? (
             <PictureNoteCardMasonry
               className="px-2 sm:px-4"
-              columnCount={isSmallScreen ? 2 : 3}
+              columnCount={isLargeScreen ? 3 : 2}
               events={events}
             />
           ) : (
@@ -268,7 +268,7 @@ function PictureNoteCardMasonry({
       )
     })
     return newColumns
-  }, [events])
+  }, [events, columnCount])
 
   return (
     <div
