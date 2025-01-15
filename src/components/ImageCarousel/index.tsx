@@ -1,6 +1,6 @@
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { TImageInfo } from '@/types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import Image from '../Image'
@@ -13,16 +13,35 @@ export function ImageCarousel({
   images: TImageInfo[]
   isNsfw?: boolean
 }) {
-  const [index, setIndex] = useState(-1)
+  const [api, setApi] = useState<CarouselApi>()
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [lightboxIndex, setLightboxIndex] = useState(-1)
+
+  useEffect(() => {
+    if (!api) {
+      return
+    }
+
+    setCurrentIndex(api.selectedScrollSnap())
+
+    api.on('select', () => {
+      setCurrentIndex(api.selectedScrollSnap())
+    })
+  }, [api])
 
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
     event.preventDefault()
-    setIndex(current)
+    setLightboxIndex(current)
+  }
+
+  const onDotClick = (index: number) => {
+    api?.scrollTo(index)
+    setCurrentIndex(index)
   }
 
   return (
     <>
-      <Carousel className="w-full">
+      <Carousel className="w-full" setApi={setApi}>
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={index}>
@@ -31,12 +50,15 @@ export function ImageCarousel({
           ))}
         </CarouselContent>
       </Carousel>
+      {images.length > 1 && (
+        <CarouselDot total={images.length} currentIndex={currentIndex} onClick={onDotClick} />
+      )}
       <Lightbox
-        index={index}
+        index={lightboxIndex}
         slides={images.map(({ url }) => ({ src: url }))}
         plugins={[Zoom]}
-        open={index >= 0}
-        close={() => setIndex(-1)}
+        open={lightboxIndex >= 0}
+        close={() => setLightboxIndex(-1)}
         controller={{
           closeOnBackdropClick: true,
           closeOnPullUp: true,
@@ -46,5 +68,27 @@ export function ImageCarousel({
       />
       {isNsfw && <NsfwOverlay className="rounded-lg" />}
     </>
+  )
+}
+
+function CarouselDot({
+  total,
+  currentIndex,
+  onClick
+}: {
+  total: number
+  currentIndex: number
+  onClick: (index: number) => void
+}) {
+  return (
+    <div className="w-full flex gap-1 justify-center">
+      {Array.from({ length: total }).map((_, index) => (
+        <div
+          key={index}
+          className={`w-2 h-2 rounded-full ${index === currentIndex ? 'bg-foreground/40' : 'bg-muted'}`}
+          onClick={() => onClick(index)}
+        />
+      ))}
+    </div>
   )
 }

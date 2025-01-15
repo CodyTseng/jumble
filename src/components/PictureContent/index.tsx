@@ -1,9 +1,7 @@
-import { isNsfwEvent } from '@/lib/event'
-import { extractImageInfoFromTag } from '@/lib/tag'
+import { extractImageInfosFromEventTags, isNsfwEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
-import { TImageInfo } from '@/types'
 import { Event } from 'nostr-tools'
-import { memo, ReactNode } from 'react'
+import { memo, ReactNode, useMemo } from 'react'
 import {
   embedded,
   embeddedHashtagRenderer,
@@ -15,13 +13,7 @@ import {
 import { ImageCarousel } from '../ImageCarousel'
 
 const PictureContent = memo(({ event, className }: { event: Event; className?: string }) => {
-  const images: TImageInfo[] = []
-  event.tags.forEach((tag) => {
-    const imageInfo = extractImageInfoFromTag(tag)
-    if (imageInfo) {
-      images.push(imageInfo)
-    }
-  })
+  const images = useMemo(() => extractImageInfosFromEventTags(event), [event])
   const isNsfw = isNsfwEvent(event)
 
   const nodes: ReactNode[] = [

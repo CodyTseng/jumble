@@ -1,8 +1,9 @@
-import { extractFirstPictureFromPictureEvent } from '@/lib/event'
+import { extractImageInfosFromEventTags } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
+import { Images } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import {
@@ -23,7 +24,7 @@ export default function PictureNoteCard({
   className?: string
 }) {
   const { push } = useSecondaryPage()
-  const firstImage = extractFirstPictureFromPictureEvent(event)
+  const images = useMemo(() => extractImageInfosFromEventTags(event), [event])
   const title = useMemo(() => {
     const title = event.tags.find(tagNameEquals('title'))?.[1] ?? event.content
     return embedded(title, [
@@ -32,11 +33,16 @@ export default function PictureNoteCard({
       embeddedHashtagRenderer
     ])
   }, [event])
-  if (!firstImage) return null
+  if (!images.length) return null
 
   return (
-    <div className={cn('cursor-pointer', className)} onClick={() => push(toNote(event))}>
-      <Image className="rounded-lg w-full aspect-[6/8]" image={firstImage} />
+    <div className={cn('cursor-pointer relative', className)} onClick={() => push(toNote(event))}>
+      <Image className="rounded-lg w-full aspect-[6/8]" image={images[0]} />
+      {images.length > 1 && (
+        <div className="absolute top-2 right-2 bg-background/50 rounded-full p-2">
+          <Images size={16} />
+        </div>
+      )}
       <div className="p-2 space-y-1">
         <div className="line-clamp-2 font-semibold">{title}</div>
         <div className="flex items-center gap-2">

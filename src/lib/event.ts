@@ -1,6 +1,6 @@
 import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
 import client from '@/services/client.service'
-import { TRelayList } from '@/types'
+import { TImageInfo, TRelayList } from '@/types'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeUrl } from './url'
@@ -254,13 +254,15 @@ export function extractHashtags(content: string) {
   return hashtags
 }
 
-export function extractFirstPictureFromPictureEvent(event: Event) {
-  if (!isPictureEvent(event)) return null
-  for (const tag of event.tags) {
-    const url = extractImageInfoFromTag(tag)
-    if (url) return url
-  }
-  return null
+export function extractImageInfosFromEventTags(event: Event) {
+  const images: TImageInfo[] = []
+  event.tags.forEach((tag) => {
+    const imageInfo = extractImageInfoFromTag(tag)
+    if (imageInfo) {
+      images.push(imageInfo)
+    }
+  })
+  return images
 }
 
 export function extractImagesFromContent(content: string) {
