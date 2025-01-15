@@ -58,6 +58,17 @@ function AccountManagerNav({
       <div className="text-center text-muted-foreground text-sm font-semibold">
         {t("Don't have an account yet?")}
       </div>
+      <Button
+        onClick={() =>
+          window.open(
+            `https://start.njump.me?an=Jumble&at=web&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
+            '_blank'
+          )
+        }
+        className="w-full"
+      >
+        {t('Sign up with nstart')}
+      </Button>
       <Button variant="secondary" onClick={() => setPage('generate')} className="w-full">
         {t('Generate New Account')}
       </Button>

@@ -143,6 +143,7 @@ export default {
     Back: '返回',
     'password (optional): encrypt nsec': '密码 (可选): 加密 nsec',
     'optional: encrypt nsec': '可选: 加密 nsec',
-    password: '密码'
+    password: '密码',
+    'Sign up with nstart': '使用 nstart 注册'
   }
 }

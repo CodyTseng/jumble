@@ -9,3 +9,11 @@ declare global {
   const __GIT_COMMIT__: string
   const __APP_VERSION__: string
 }
+
+interface ImportMetaEnv {
+  readonly VITE_DOMAIN_NAME: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

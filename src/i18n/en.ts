@@ -142,6 +142,7 @@ export default {
     'Enter the password to decrypt your ncryptsec': 'Enter the password to decrypt your ncryptsec',
     Back: 'Back',
     'optional: encrypt nsec': 'optional: encrypt nsec',
-    password: 'password'
+    password: 'password',
+    'Sign up with nstart': 'Sign up with nstart'
   }
 }
