@@ -25,7 +25,7 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        `fixed sm:sticky z-20 flex justify-end w-full pr-3 transition-opacity duration-700 ${visible ? '' : 'opacity-0'}`,
+        `fixed sm:sticky z-20 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700 ${visible ? '' : 'opacity-0'}`,
         className
       )}
       style={{
@@ -36,8 +36,9 @@ export default function ScrollToTopButton({
     >
       <Button
         variant="secondary-2"
-        className="rounded-full w-12 h-12 p-0 hover:text-background"
+        className="rounded-full w-12 h-12 p-0 hover:text-background pointer-events-auto disabled:pointer-events-none"
         onClick={handleScrollToTop}
+        disabled={!visible}
       >
         <ChevronUp />
       </Button>
