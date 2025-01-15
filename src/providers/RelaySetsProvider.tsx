@@ -67,7 +67,7 @@ export function RelaySetsProvider({ children }: { children: React.ReactNode }) {
   return (
     <RelaySetsContext.Provider
       value={{
-        relaySets: relaySets,
+        relaySets,
         addRelaySet,
         deleteRelaySet,
         updateRelaySet,

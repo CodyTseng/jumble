@@ -94,26 +94,29 @@ function RemoteRelaySets({ close }: { close?: () => void }) {
           limit: 50
         }
       )
-      setRelaySets(
-        events
-          .map((evt) => {
-            const id = evt.tags.find(tagNameEquals('d'))?.[1]
-            if (!id) return null
+      events.sort((a, b) => b.created_at - a.created_at)
 
-            const relayUrls = evt.tags
-              .filter(tagNameEquals('relay'))
-              .map((tag) => tag[1])
-              .filter((url) => url && isWebsocketUrl(url))
-            if (!relayUrls.length) return null
+      const relaySetIds = new Set<string>()
+      const relaySets: TRelaySet[] = []
+      events.forEach((evt) => {
+        const id = evt.tags.find(tagNameEquals('d'))?.[1]
+        if (!id || relaySetIds.has(id)) return
 
-            let title = evt.tags.find(tagNameEquals('title'))?.[1]
-            if (!title) {
-              title = relayUrls.length === 1 ? simplifyUrl(relayUrls[0]) : id
-            }
-            return { id, name: title, relayUrls }
-          })
-          .filter(Boolean) as TRelaySet[]
-      )
+        relaySetIds.add(id)
+        const relayUrls = evt.tags
+          .filter(tagNameEquals('relay'))
+          .map((tag) => tag[1])
+          .filter((url) => url && isWebsocketUrl(url))
+        if (!relayUrls.length) return
+
+        let title = evt.tags.find(tagNameEquals('title'))?.[1]
+        if (!title) {
+          title = relayUrls.length === 1 ? simplifyUrl(relayUrls[0]) : id
+        }
+        relaySets.push({ id, name: title, relayUrls })
+      })
+
+      setRelaySets(relaySets)
       setInitialed(true)
     }
     init()
