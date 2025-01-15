@@ -15,6 +15,7 @@ import {
 import Image from '../Image'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import LikeButton from '../NoteStats/LikeButton'
 
 export default function PictureNoteCard({
   event,
@@ -45,9 +46,12 @@ export default function PictureNoteCard({
       )}
       <div className="p-2 space-y-1">
         <div className="line-clamp-2 font-semibold">{title}</div>
-        <div className="flex items-center gap-2">
-          <UserAvatar userId={event.pubkey} size="xSmall" />
-          <Username userId={event.pubkey} className="text-sm text-muted-foreground truncate" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 w-0">
+            <UserAvatar userId={event.pubkey} size="xSmall" />
+            <Username userId={event.pubkey} className="text-sm text-muted-foreground truncate" />
+          </div>
+          <LikeButton event={event} />
         </div>
       </div>
     </div>

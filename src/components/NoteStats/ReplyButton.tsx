@@ -23,7 +23,7 @@ export default function ReplyButton({ event }: { event: Event }) {
         title={t('Reply')}
       >
         <MessageCircle size={16} />
-        <div className="text-sm">{formatCount(replyCount)}</div>
+        {!!replyCount && <div className="text-sm">{formatCount(replyCount)}</div>}
       </button>
       <PostEditor parentEvent={event} open={open} setOpen={setOpen} />
     </>

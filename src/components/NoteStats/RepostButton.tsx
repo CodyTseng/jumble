@@ -89,7 +89,7 @@ export default function RepostButton({
             title={t('Repost')}
           >
             {reposting ? <Loader className="animate-spin" size={16} /> : <Repeat size={16} />}
-            <div className="text-sm">{formatCount(repostCount)}</div>
+            {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
