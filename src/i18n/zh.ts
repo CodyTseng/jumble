@@ -129,7 +129,7 @@ export default {
       '写服务器用于发布您的事件。其他用户会从您的写服务器寻找您发布的事件。',
     'read & write relays notice': '读服务器和写服务器的数量都应尽量保持在 2 到 4 个之间。',
     "Don't have an account yet?": '还没有账户？',
-    'Generate New Account': '生成新账户',
+    'or generate your private key here': '或者直接生成私钥',
     'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
       '这是私钥，请勿与他人分享。请妥善保管，否则将无法找回。',
     Edit: '编辑',
@@ -144,6 +144,6 @@ export default {
     'password (optional): encrypt nsec': '密码 (可选): 加密 nsec',
     'optional: encrypt nsec': '可选: 加密 nsec',
     password: '密码',
-    'Sign up with nstart': '使用 nstart 注册'
+    'Signup with Nstart wizard': '使用 Nstart 向导注册'
   }
 }

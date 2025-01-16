@@ -9,12 +9,18 @@ import { useState } from 'react'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
 
-export default function AccountList({ afterSwitch }: { afterSwitch: () => void }) {
+export default function AccountList({
+  className,
+  afterSwitch
+}: {
+  className?: string
+  afterSwitch: () => void
+}) {
   const { accounts, account, switchAccount } = useNostr()
   const [switchingAccount, setSwitchingAccount] = useState<TAccountPointer | null>(null)
 
   return (
-    <div className="space-y-2">
+    <div className={cn('space-y-2', className)}>
       {accounts.map((act) => (
         <div
           key={`${act.pubkey}-${act.signerType}`}

@@ -39,46 +39,58 @@ function AccountManagerNav({
   const { nip07Login, accounts } = useNostr()
 
   return (
-    <div onClick={(e) => e.stopPropagation()} className="flex flex-col gap-4">
-      <div className="text-center text-muted-foreground text-sm font-semibold">
-        {t('Add an Account')}
+    <div onClick={(e) => e.stopPropagation()} className="flex flex-col gap-8">
+      <div>
+        <div className="text-center text-muted-foreground text-sm font-semibold">
+          {t('Add an Account')}
+        </div>
+        <div className="space-y-2 mt-4">
+          {!!window.nostr && (
+            <Button onClick={() => nip07Login().then(() => close?.())} className="w-full">
+              {t('Login with Browser Extension')}
+            </Button>
+          )}
+          <Button variant="secondary" onClick={() => setPage('bunker')} className="w-full">
+            {t('Login with Bunker')}
+          </Button>
+          <Button variant="secondary" onClick={() => setPage('nsec')} className="w-full">
+            {t('Login with Private Key')}
+          </Button>
+        </div>
       </div>
-      {!!window.nostr && (
-        <Button onClick={() => nip07Login().then(() => close?.())} className="w-full">
-          {t('Login with Browser Extension')}
-        </Button>
-      )}
-      <Button variant="secondary" onClick={() => setPage('bunker')} className="w-full">
-        {t('Login with Bunker')}
-      </Button>
-      <Button variant="secondary" onClick={() => setPage('nsec')} className="w-full">
-        {t('Login with Private Key')}
-      </Button>
       <Separator />
-      <div className="text-center text-muted-foreground text-sm font-semibold">
-        {t("Don't have an account yet?")}
+      <div>
+        <div className="text-center text-muted-foreground text-sm font-semibold">
+          {t("Don't have an account yet?")}
+        </div>
+        <Button
+          onClick={() =>
+            window.open(
+              `https://start.njump.me?an=Jumble&at=web&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
+              '_blank'
+            )
+          }
+          className="w-full mt-4"
+        >
+          {t('Signup with Nstart wizard')}
+        </Button>
+        <Button
+          variant="link"
+          onClick={() => setPage('generate')}
+          className="w-full text-muted-foreground py-0 h-fit mt-1"
+        >
+          {t('or generate your private key here')}
+        </Button>
       </div>
-      <Button
-        onClick={() =>
-          window.open(
-            `https://start.njump.me?an=Jumble&at=web&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
-            '_blank'
-          )
-        }
-        className="w-full"
-      >
-        {t('Sign up with nstart')}
-      </Button>
-      <Button variant="secondary" onClick={() => setPage('generate')} className="w-full">
-        {t('Generate New Account')}
-      </Button>
       {accounts.length > 0 && (
         <>
           <Separator />
-          <div className="text-center text-muted-foreground text-sm font-semibold">
-            {t('Logged in Accounts')}
+          <div>
+            <div className="text-center text-muted-foreground text-sm font-semibold">
+              {t('Logged in Accounts')}
+            </div>
+            <AccountList className="mt-4" afterSwitch={() => close?.()} />
           </div>
-          <AccountList afterSwitch={() => close?.()} />
         </>
       )}
     </div>

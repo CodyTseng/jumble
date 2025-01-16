@@ -129,7 +129,7 @@ export default {
     'read & write relays notice':
       'The number of read and write servers should ideally be kept between 2 and 4.',
     "Don't have an account yet?": "Don't have an account yet?",
-    'Generate New Account': 'Generate New Account',
+    'or generate your private key here': 'or generate your private key here',
     'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
       'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.',
     Edit: 'Edit',
@@ -143,6 +143,6 @@ export default {
     Back: 'Back',
     'optional: encrypt nsec': 'optional: encrypt nsec',
     password: 'password',
-    'Sign up with nstart': 'Sign up with nstart'
+    'Signup with Nstart wizard': 'Signup with Nstart wizard'
   }
 }

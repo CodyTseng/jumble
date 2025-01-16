@@ -1,10 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Dispatch } from 'react'
@@ -33,11 +27,7 @@ export default function LoginDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-[520px] max-h-[90vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle className="hidden" />
-          <DialogDescription className="hidden" />
-        </DialogHeader>
+      <DialogContent className="w-[520px] max-h-[90vh] py-8 overflow-auto">
         <AccountManager close={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
