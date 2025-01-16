@@ -66,8 +66,9 @@ function AccountManagerNav({
         <Button
           onClick={() =>
             window.open(
-              `https://start.njump.me?an=Jumble&at=web&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
-              '_blank'
+              `https://start.njump.me?an=Jumble&at=popup&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
+              'popup',
+              'width=600,height=800'
             )
           }
           className="w-full mt-4"
