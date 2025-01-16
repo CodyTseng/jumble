@@ -75,18 +75,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
-      if (window.location.hash && window.location.hash.startsWith('#nostr-login')) {
-        const credential = window.location.hash.replace('#nostr-login=', '')
-        const urlWithoutHash = window.location.href.split('#')[0]
-        history.replaceState(null, '', urlWithoutHash)
-
-        if (credential.startsWith('bunker://')) {
-          return await bunkerLogin(credential)
-        } else if (credential.startsWith('ncryptsec')) {
-          return await ncryptsecLogin(credential)
-        } else if (credential.startsWith('nsec')) {
-          return await nsecLogin(credential)
-        }
+      if (hasNostrLoginHash()) {
+        return
       }
 
       const accounts = storage.getAccounts()
@@ -97,6 +87,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
     init()
   }, [])
+
+  useEffect(() => {
+    if (hasNostrLoginHash()) {
+      loginByNostrLoginHash()
+    }
+  }, [window.location.hash])
 
   useEffect(() => {
     setRelayList(null)
@@ -173,6 +169,24 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       setProfile(getProfileFromProfileEvent(profileEvent))
     })
   }, [account])
+
+  const hasNostrLoginHash = () => {
+    return window.location.hash && window.location.hash.startsWith('#nostr-login')
+  }
+
+  const loginByNostrLoginHash = async () => {
+    const credential = window.location.hash.replace('#nostr-login=', '')
+    const urlWithoutHash = window.location.href.split('#')[0]
+    history.replaceState(null, '', urlWithoutHash)
+
+    if (credential.startsWith('bunker://')) {
+      return await bunkerLogin(credential)
+    } else if (credential.startsWith('ncryptsec')) {
+      return await ncryptsecLogin(credential)
+    } else if (credential.startsWith('nsec')) {
+      return await nsecLogin(credential)
+    }
+  }
 
   const login = (signer: ISigner, act: TAccount) => {
     storage.addAccount(act)
