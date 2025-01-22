@@ -15,7 +15,7 @@ const DEFAULT_RELAY_SETS: TRelaySet[] = [
   {
     id: randomString(),
     name: 'Global',
-    relayUrls: ['wss://relay.damus.io/', 'wss://nos.lol/']
+    relayUrls: ['wss://relay.damus.io/', 'wss://nos.lol/', 'wss://jellyfish.land']
   },
   {
     id: randomString(),
