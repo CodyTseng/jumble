@@ -31,7 +31,7 @@ export default function PostEditor({
   const { isSmallScreen } = useScreenSize()
 
   const content = useMemo(() => {
-    return parentEvent ? (
+    return parentEvent || defaultContent ? (
       <NormalPostContent
         defaultContent={defaultContent}
         parentEvent={parentEvent}
@@ -59,7 +59,7 @@ export default function PostEditor({
 
   if (isSmallScreen) {
     return (
-      <Sheet open={open} onOpenChange={setOpen} modal={false}>
+      <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="h-full w-full p-0 border-none" side="bottom" hideClose>
           <ScrollArea className="px-4 h-full max-h-screen">
             <div className="space-y-4 px-2 py-6">
@@ -78,7 +78,7 @@ export default function PostEditor({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} modal={false}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0" withoutClose>
         <ScrollArea className="px-4 h-full max-h-screen">
           <div className="space-y-4 px-2 py-6">

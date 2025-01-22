@@ -9,10 +9,7 @@ import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import Lightbox from 'yet-another-react-lightbox'
-import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import Image from '../Image'
 import Mentions from './Mentions'
 import Uploader from './Uploader'
@@ -177,68 +174,39 @@ function PictureUploader({
     >
   >
 }) {
-  const [index, setIndex] = useState(-1)
   const [uploading, setUploading] = useState(false)
 
   return (
-    <>
-      <div className="grid grid-cols-3 gap-4">
-        {pictureInfos.map(({ url }, index) => (
-          <div className="relative" key={`${index}-${url}`}>
-            <Image
-              image={{ url }}
-              className="aspect-square w-full rounded-lg"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIndex(index)
-              }}
-            />
-            <Button
-              variant="destructive"
-              className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 rounded-full w-6 h-6 p-0"
-              onClick={() => {
-                setPictureInfos((prev) => prev.filter((_, i) => i !== index))
-              }}
-            >
-              <X />
-            </Button>
-          </div>
-        ))}
-        <Uploader
-          onUploadSuccess={({ url, tags }) => {
-            setPictureInfos((prev) => [...prev, { url, tags }])
-          }}
-          onUploadingChange={setUploading}
-        >
-          <div
-            className={cn(
-              'flex flex-col gap-2 items-center justify-center aspect-square w-full rounded-lg border border-dashed',
-              uploading ? 'cursor-not-allowed text-muted-foreground' : 'clickable'
-            )}
+    <div className="grid grid-cols-3 gap-4">
+      {pictureInfos.map(({ url }, index) => (
+        <div className="relative" key={`${index}-${url}`}>
+          <Image image={{ url }} className="aspect-square w-full rounded-lg" />
+          <Button
+            variant="destructive"
+            className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 rounded-full w-6 h-6 p-0"
+            onClick={() => {
+              setPictureInfos((prev) => prev.filter((_, i) => i !== index))
+            }}
           >
-            {uploading ? <Loader size={36} className="animate-spin" /> : <Plus size={36} />}
-          </div>
-        </Uploader>
-      </div>
-      {index >= 0 &&
-        createPortal(
-          <div onClick={(e) => e.stopPropagation()}>
-            <Lightbox
-              index={index}
-              slides={pictureInfos.map(({ url }) => ({ src: url }))}
-              plugins={[Zoom]}
-              open={index >= 0}
-              close={() => setIndex(-1)}
-              controller={{
-                closeOnBackdropClick: true,
-                closeOnPullUp: true,
-                closeOnPullDown: true
-              }}
-              styles={{ toolbar: { paddingTop: '2.25rem' } }}
-            />
-          </div>,
-          document.body
-        )}
-    </>
+            <X />
+          </Button>
+        </div>
+      ))}
+      <Uploader
+        onUploadSuccess={({ url, tags }) => {
+          setPictureInfos((prev) => [...prev, { url, tags }])
+        }}
+        onUploadingChange={setUploading}
+      >
+        <div
+          className={cn(
+            'flex flex-col gap-2 items-center justify-center aspect-square w-full rounded-lg border border-dashed',
+            uploading ? 'cursor-not-allowed text-muted-foreground' : 'clickable'
+          )}
+        >
+          {uploading ? <Loader size={36} className="animate-spin" /> : <Plus size={36} />}
+        </div>
+      </Uploader>
+    </div>
   )
 }

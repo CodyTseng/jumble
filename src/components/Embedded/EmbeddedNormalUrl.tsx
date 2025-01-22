@@ -15,7 +15,7 @@ export function EmbeddedNormalUrl({ url }: { url: string }) {
 }
 
 export const embeddedNormalUrlRenderer: TEmbeddedRenderer = {
-  regex: /(https?:\/\/[^\s]+)/g,
+  regex: /(https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_,:!~*]+)/gu,
   render: (url: string, index: number) => {
     return <EmbeddedNormalUrl key={`normal-url-${index}-${url}`} url={url} />
   }

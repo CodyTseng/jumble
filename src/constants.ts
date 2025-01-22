@@ -5,17 +5,20 @@ export const StorageKey = {
   FEED_TYPE: 'feedType',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',
+  ADD_CLIENT_TAG: 'addClientTag',
+  NOTE_LIST_MODE: 'noteListMode',
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap',
   ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap',
-  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap',
-  ADD_CLIENT_TAG: 'addClientTag'
+  ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap',
+  ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap',
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap'
 }
 
 export const BIG_RELAY_URLS = [
   'wss://relay.damus.io/',
   'wss://nos.lol/',
   'wss://relay.nostr.band/',
-  'wss://relay.noswhere.com/'
+  'wss://nostr.mom/'
 ]
 
 export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.nos.today/']
@@ -23,5 +26,5 @@ export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.n
 export const PICTURE_EVENT_KIND = 20
 export const COMMENT_EVENT_KIND = 1111
 
-export const URL_REGEX = /(https?:\/\/[^\s"']+)/g
+export const URL_REGEX = /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_,:!~*]+/gu
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

@@ -3,7 +3,11 @@ import { TRelayList } from '@/types'
 import { useEffect, useState } from 'react'
 
 export function useFetchRelayList(pubkey?: string | null) {
-  const [relayList, setRelayList] = useState<TRelayList>({ write: [], read: [] })
+  const [relayList, setRelayList] = useState<TRelayList>({
+    write: [],
+    read: [],
+    originalRelays: []
+  })
   const [isFetching, setIsFetching] = useState(true)
 
   useEffect(() => {

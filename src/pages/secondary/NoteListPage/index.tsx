@@ -2,7 +2,6 @@ import NoteList from '@/components/NoteList'
 import { SEARCHABLE_RELAY_URLS } from '@/constants'
 import { useFetchRelayInfos, useSearchParams } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { isWebsocketUrl, simplifyUrl } from '@/lib/url'
 import { useFeed } from '@/providers/FeedProvider'
 import { Filter } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -13,7 +12,6 @@ export default function NoteListPage({ index }: { index?: number }) {
   const { relayUrls } = useFeed()
   const { searchableRelayUrls } = useFetchRelayInfos(relayUrls)
   const { searchParams } = useSearchParams()
-  const relayUrlsString = JSON.stringify(relayUrls)
   const {
     title = '',
     filter,
@@ -25,22 +23,24 @@ export default function NoteListPage({ index }: { index?: number }) {
   }>(() => {
     const hashtag = searchParams.get('t')
     if (hashtag) {
-      return { title: `# ${hashtag}`, filter: { '#t': [hashtag] }, urls: relayUrls }
+      return {
+        title: `# ${hashtag}`,
+        filter: { '#t': [hashtag] },
+        urls: relayUrls,
+        type: 'hashtag'
+      }
     }
     const search = searchParams.get('s')
     if (search) {
       return {
         title: `${t('Search')}: ${search}`,
         filter: { search },
-        urls: searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4)
+        urls: searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4),
+        type: 'search'
       }
     }
-    const relayUrl = searchParams.get('relay')
-    if (relayUrl && isWebsocketUrl(relayUrl)) {
-      return { title: simplifyUrl(relayUrl), urls: [relayUrl] }
-    }
     return { urls: relayUrls }
-  }, [searchParams, relayUrlsString])
+  }, [searchParams, JSON.stringify(relayUrls)])
 
   return (
     <SecondaryPageLayout index={index} title={title} displayScrollToTopButton>

@@ -1,4 +1,5 @@
 import NoteList from '@/components/NoteList'
+import SaveRelayDropdownMenu from '@/components/SaveRelayDropdownMenu'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
 import { useEffect, useRef } from 'react'
@@ -21,7 +22,9 @@ export default function NoteListPage() {
     <PrimaryPageLayout
       pageName="home"
       ref={layoutRef}
-      titlebar={<NoteListPageTitlebar />}
+      titlebar={
+        <NoteListPageTitlebar temporaryRelayUrls={feedType === 'temporary' ? relayUrls : []} />
+      }
       displayScrollToTopButton
     >
       {isReady ? (
@@ -33,11 +36,16 @@ export default function NoteListPage() {
   )
 }
 
-function NoteListPageTitlebar() {
+function NoteListPageTitlebar({ temporaryRelayUrls = [] }: { temporaryRelayUrls?: string[] }) {
   return (
     <div className="flex gap-1 items-center h-full justify-between">
       <FeedButton />
-      <SearchButton />
+      <div>
+        <SearchButton />
+        {temporaryRelayUrls.length > 0 && (
+          <SaveRelayDropdownMenu urls={temporaryRelayUrls} atTitlebar />
+        )}
+      </div>
     </div>
   )
 }

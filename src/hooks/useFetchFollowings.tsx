@@ -1,4 +1,4 @@
-import { getFollowingsFromFollowListEvent } from '@/lib/event'
+import { extractPubkeysFromEventTags } from '@/lib/tag'
 import client from '@/services/client.service'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
@@ -18,7 +18,7 @@ export function useFetchFollowings(pubkey?: string | null) {
         if (!event) return
 
         setFollowListEvent(event)
-        setFollowings(getFollowingsFromFollowListEvent(event))
+        setFollowings(extractPubkeysFromEventTags(event.tags))
       } finally {
         setIsFetching(false)
       }

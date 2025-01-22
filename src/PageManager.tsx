@@ -70,14 +70,25 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
   useEffect(() => {
     if (window.location.pathname !== '/') {
-      pushSecondaryPage(window.location.pathname + window.location.search)
+      const url = window.location.pathname + window.location.search + window.location.hash
+      setSecondaryStack((prevStack) => {
+        if (isCurrentPage(prevStack, url)) return prevStack
+
+        const { newStack } = pushNewPageToStack(
+          prevStack,
+          url,
+          maxStackSize,
+          window.history.state?.index
+        )
+        return newStack
+      })
     }
 
     const onPopState = (e: PopStateEvent) => {
       let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
-        const currentItem = pre[pre.length - 1]
-        const currentIndex = currentItem ? currentItem.index : 0
+        const currentItem = pre[pre.length - 1] as TStackItem | undefined
+        const currentIndex = currentItem?.index
         if (!state) {
           if (window.location.pathname + window.location.search + window.location.hash !== '/') {
             // Just change the URL
@@ -87,28 +98,36 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
             state = { index: -1, url: '/' }
           }
         }
+
+        // Go forward
+        if (currentIndex === undefined || state.index > currentIndex) {
+          const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
+          return newStack
+        }
+
         if (state.index === currentIndex) {
           if (currentIndex !== 0) return pre
 
           window.history.replaceState(null, '', '/')
           return []
         }
-        // Go back
-        if (state.index < currentIndex) {
-          const newStack = pre.filter((item) => item.index <= state!.index)
-          const topItem = newStack[newStack.length - 1]
-          // Load the component if it's not cached
-          if (topItem && !topItem.component) {
-            topItem.component = findAndCreateComponent(topItem.url, state.index)
-          }
-          if (newStack.length === 0) {
-            window.history.replaceState(null, '', '/')
-          }
-          return newStack
-        }
 
-        // Go forward
-        const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
+        // Go back
+        const newStack = pre.filter((item) => item.index <= state!.index)
+        const topItem = newStack[newStack.length - 1] as TStackItem | undefined
+        if (!topItem) {
+          // Create a new stack item if it's not exist (e.g. when the user refreshes the page, the stack will be empty)
+          const newComponent = findAndCreateComponent(state.url, state.index)
+          if (newComponent) {
+            newStack.push({ index: state.index, url: state.url, component: newComponent })
+          }
+        } else if (!topItem.component) {
+          // Load the component if it's not cached
+          topItem.component = findAndCreateComponent(topItem.url, state.index)
+        }
+        if (newStack.length === 0) {
+          window.history.replaceState(null, '', '/')
+        }
         return newStack
       })
     }
@@ -131,11 +150,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   }
 
-  const pushSecondaryPage = (url: string) => {
+  const pushSecondaryPage = (url: string, index?: number) => {
     setSecondaryStack((prevStack) => {
       if (isCurrentPage(prevStack, url)) return prevStack
 
-      const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize)
+      const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize, index)
       if (newItem) {
         window.history.pushState({ index: newItem.index, url }, '', url)
       }
@@ -284,7 +303,7 @@ function isCurrentPage(stack: TStackItem[], url: string) {
 }
 
 function findAndCreateComponent(url: string, index: number) {
-  const path = url.split('?')[0]
+  const path = url.split('?')[0].split('#')[0]
   for (const { matcher, element } of routes) {
     const match = matcher(path)
     if (!match) continue
@@ -295,14 +314,19 @@ function findAndCreateComponent(url: string, index: number) {
   return null
 }
 
-function pushNewPageToStack(stack: TStackItem[], url: string, maxStackSize = 5) {
+function pushNewPageToStack(
+  stack: TStackItem[],
+  url: string,
+  maxStackSize = 5,
+  specificIndex?: number
+) {
   const currentItem = stack[stack.length - 1]
-  const currentIndex = currentItem ? currentItem.index + 1 : 0
+  const currentIndex = specificIndex ?? (currentItem ? currentItem.index + 1 : 0)
 
   const component = findAndCreateComponent(url, currentIndex)
   if (!component) return { newStack: stack, newItem: null }
 
-  const newItem = { component, url, index: currentItem ? currentItem.index + 1 : 0 }
+  const newItem = { component, url, index: currentIndex }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.component)
   // Clear the oldest cached component if there are too many cached components

@@ -13,9 +13,9 @@ import client from '@/services/client.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
-import { useTranslation } from 'react-i18next'
 
 export default function RepostButton({
   event,
@@ -84,21 +84,14 @@ export default function RepostButton({
               'flex gap-1 items-center enabled:hover:text-lime-500',
               hasReposted ? 'text-lime-500' : 'text-muted-foreground'
             )}
-            onClick={(e) => e.stopPropagation()}
-            disabled={!canRepost}
             title={t('Repost')}
           >
             {reposting ? <Loader className="animate-spin" size={16} /> : <Repeat size={16} />}
             {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          onClick={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-          }}
-        >
-          <DropdownMenuItem onClick={repost}>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={repost} disabled={!canRepost}>
             <Repeat /> {t('Repost')}
           </DropdownMenuItem>
           <DropdownMenuItem

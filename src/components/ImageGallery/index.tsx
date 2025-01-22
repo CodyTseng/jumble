@@ -12,12 +12,14 @@ export default function ImageGallery({
   className,
   images,
   isNsfw = false,
-  size = 'normal'
+  size = 'normal',
+  disableLightbox = false
 }: {
   className?: string
   images: TImageInfo[]
   isNsfw?: boolean
   size?: 'normal' | 'small'
+  disableLightbox?: boolean
 }) {
   const { isSmallScreen } = useScreenSize()
   const [index, setIndex] = useState(-1)
@@ -33,7 +35,11 @@ export default function ImageGallery({
     imageContent = (
       <Image
         key={0}
-        className={cn('rounded-lg cursor-pointer', size === 'small' ? 'h-[15vh]' : 'h-[30vh]')}
+        className={cn(
+          'rounded-lg',
+          !disableLightbox ? 'cursor-auto' : '',
+          size === 'small' ? 'h-[15vh]' : 'h-[30vh]'
+        )}
         image={images[0]}
         onClick={(e) => handlePhotoClick(e, 0)}
       />
@@ -44,7 +50,7 @@ export default function ImageGallery({
         {images.map((image, i) => (
           <Image
             key={i}
-            className="rounded-lg cursor-pointer aspect-square w-full"
+            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -57,7 +63,7 @@ export default function ImageGallery({
         {images.map((image, i) => (
           <Image
             key={i}
-            className="rounded-lg cursor-pointer aspect-square w-full"
+            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -70,7 +76,7 @@ export default function ImageGallery({
         {images.map((image, i) => (
           <Image
             key={i}
-            className="rounded-lg cursor-pointer aspect-square w-full"
+            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -83,6 +89,7 @@ export default function ImageGallery({
     <div className={cn('relative w-fit max-w-full', className)}>
       {imageContent}
       {index >= 0 &&
+        !disableLightbox &&
         createPortal(
           <div onClick={(e) => e.stopPropagation()}>
             <Lightbox

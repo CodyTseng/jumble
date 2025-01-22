@@ -17,17 +17,20 @@ export function isReplyNoteEvent(event: Event) {
   if (event.kind !== kinds.ShortTextNote) return false
 
   let hasETag = false
-  let hasMarker = false
+  let hasMentionMarker = false
   for (const [tagName, , , marker] of event.tags) {
     if (tagName !== 'e') continue
     hasETag = true
 
     if (!marker) continue
-    hasMarker = true
+    if (marker === 'mention') {
+      hasMentionMarker = true
+      continue
+    }
 
     if (['root', 'reply'].includes(marker)) return true
   }
-  return hasETag && !hasMarker
+  return hasETag && !hasMentionMarker
 }
 
 export function isCommentEvent(event: Event) {
@@ -39,11 +42,13 @@ export function isPictureEvent(event: Event) {
 }
 
 export function getParentEventId(event?: Event) {
-  return event?.tags.find(isReplyETag)?.[1]
+  if (!event || !isReplyNoteEvent(event)) return undefined
+  return event.tags.find(isReplyETag)?.[1] ?? event.tags.find(tagNameEquals('e'))?.[1]
 }
 
 export function getRootEventId(event?: Event) {
-  return event?.tags.find(isRootETag)?.[1]
+  if (!event || !isReplyNoteEvent(event)) return undefined
+  return event.tags.find(isRootETag)?.[1]
 }
 
 export function isReplaceable(kind: number) {
@@ -67,43 +72,35 @@ export function getUsingClient(event: Event) {
   return event.tags.find(tagNameEquals('client'))?.[1]
 }
 
-export function getFollowingsFromFollowListEvent(event: Event) {
-  return Array.from(
-    new Set(
-      event.tags
-        .filter(tagNameEquals('p'))
-        .map(([, pubkey]) => pubkey)
-        .filter(Boolean)
-        .reverse()
-    )
-  )
-}
-
 export function getRelayListFromRelayListEvent(event?: Event) {
   if (!event) {
-    return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS }
+    return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] }
   }
 
-  const relayList = { write: [], read: [] } as TRelayList
+  const relayList = { write: [], read: [], originalRelays: [] } as TRelayList
   event.tags.filter(tagNameEquals('r')).forEach(([, url, type]) => {
     if (!url || !isWebsocketUrl(url)) return
 
     const normalizedUrl = normalizeUrl(url)
     switch (type) {
-      case 'w':
+      case 'write':
         relayList.write.push(normalizedUrl)
+        relayList.originalRelays.push({ url: normalizedUrl, scope: 'write' })
         break
-      case 'r':
+      case 'read':
         relayList.read.push(normalizedUrl)
+        relayList.originalRelays.push({ url: normalizedUrl, scope: 'read' })
         break
       default:
         relayList.write.push(normalizedUrl)
         relayList.read.push(normalizedUrl)
+        relayList.originalRelays.push({ url: normalizedUrl, scope: 'both' })
     }
   })
   return {
-    write: relayList.write.length ? relayList.write.slice(0, 10) : BIG_RELAY_URLS,
-    read: relayList.read.length ? relayList.read.slice(0, 10) : BIG_RELAY_URLS
+    write: relayList.write.length ? relayList.write : BIG_RELAY_URLS,
+    read: relayList.read.length ? relayList.read : BIG_RELAY_URLS,
+    originalRelays: relayList.originalRelays
   }
 }
 
@@ -287,4 +284,8 @@ export function extractEmbeddedNotesFromContent(content: string) {
   c = c.replace(/\n{3,}/g, '\n\n').trim()
 
   return { embeddedNotes, contentWithoutEmbeddedNotes: c }
+}
+
+export function getLatestEvent(events: Event[]) {
+  return events.sort((a, b) => b.created_at - a.created_at)[0]
 }

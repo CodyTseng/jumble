@@ -4,6 +4,7 @@ import storage from '@/services/storage.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useFollowList } from './FollowListProvider'
 import { useNostr } from './NostrProvider'
 import { useRelaySets } from './RelaySetsProvider'
 
@@ -31,7 +32,8 @@ export const useFeed = () => {
 }
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey, getRelayList, getFollowings } = useNostr()
+  const { pubkey, getRelayList } = useNostr()
+  const { getFollowings } = useFollowList()
   const { relaySets } = useRelaySets()
   const [feedType, setFeedType] = useState<TFeedType>(storage.getFeedType())
   const [relayUrls, setRelayUrls] = useState<string[]>([])

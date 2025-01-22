@@ -4,33 +4,31 @@ import { useNostr } from '@/providers/NostrProvider'
 import { TMailboxRelay, TMailboxRelayScope } from '@/types'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import CalculateOptimalReadRelaysButton from './CalculateOptimalReadRelaysButton'
 import MailboxRelay from './MailboxRelay'
 import NewMailboxRelayInput from './NewMailboxRelayInput'
 import SaveButton from './SaveButton'
 
 export default function MailboxSetting() {
   const { t } = useTranslation()
-  const { pubkey, relayList } = useNostr()
+  const { pubkey, relayList, checkLogin } = useNostr()
   const [relays, setRelays] = useState<TMailboxRelay[]>([])
   const [hasChange, setHasChange] = useState(false)
 
   useEffect(() => {
     if (!relayList) return
 
-    const mailboxRelays: TMailboxRelay[] = relayList.read.map((url) => ({ url, scope: 'read' }))
-    relayList.write.forEach((url) => {
-      const item = mailboxRelays.find((r) => r.url === url)
-      if (item) {
-        item.scope = 'both'
-      } else {
-        mailboxRelays.push({ url, scope: 'write' })
-      }
-    })
-    setRelays(mailboxRelays)
+    setRelays(relayList.originalRelays)
   }, [relayList])
 
   if (!pubkey) {
-    return <Button size="lg">Login to set</Button>
+    return (
+      <div className="flex flex-col w-full items-center">
+        <Button size="lg" onClick={() => checkLogin()}>
+          {t('Login to set')}
+        </Button>
+      </div>
+    )
   }
 
   if (!relayList) {
@@ -58,6 +56,13 @@ export default function MailboxSetting() {
     return null
   }
 
+  const mergeRelays = (newRelays: TMailboxRelay[]) => {
+    setRelays((pre) => {
+      return [...pre, ...newRelays.filter((r) => !pre.some((pr) => pr.url === r.url))]
+    })
+    setHasChange(true)
+  }
+
   return (
     <div className="space-y-4">
       <div className="text-xs text-muted-foreground space-y-1">
@@ -65,6 +70,7 @@ export default function MailboxSetting() {
         <div>{t('write relays description')}</div>
         <div>{t('read & write relays notice')}</div>
       </div>
+      <CalculateOptimalReadRelaysButton mergeRelays={mergeRelays} />
       <SaveButton mailboxRelays={relays} hasChange={hasChange} setHasChange={setHasChange} />
       <div className="space-y-2">
         {relays.map((relay) => (

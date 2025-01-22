@@ -1,6 +1,7 @@
 import { createFollowListDraftEvent } from '@/lib/draft-event'
-import { tagNameEquals } from '@/lib/tag'
+import { extractPubkeysFromEventTags } from '@/lib/tag'
 import client from '@/services/client.service'
+import storage from '@/services/storage.service'
 import { Event } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useNostr } from './NostrProvider'
@@ -9,6 +10,7 @@ type TFollowListContext = {
   followListEvent: Event | undefined
   followings: string[]
   isFetching: boolean
+  getFollowings: (pubkey: string) => Promise<string[]>
   follow: (pubkey: string) => Promise<void>
   unfollow: (pubkey: string) => Promise<void>
 }
@@ -24,20 +26,13 @@ export const useFollowList = () => {
 }
 
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey: accountPubkey, publish, updateFollowListEvent } = useNostr()
+  const { pubkey: accountPubkey, publish } = useNostr()
   const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
   const [isFetching, setIsFetching] = useState(true)
-  const followings = useMemo(() => {
-    return Array.from(
-      new Set(
-        followListEvent?.tags
-          .filter(tagNameEquals('p'))
-          .map(([, pubkey]) => pubkey)
-          .filter(Boolean)
-          .reverse() ?? []
-      )
-    )
-  }, [followListEvent])
+  const followings = useMemo(
+    () => (followListEvent ? extractPubkeysFromEventTags(followListEvent.tags) : []),
+    [followListEvent]
+  )
 
   useEffect(() => {
     if (!accountPubkey) return
@@ -45,13 +40,25 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     const init = async () => {
       setIsFetching(true)
       setFollowListEvent(undefined)
+      const storedFollowListEvent = storage.getAccountFollowListEvent(accountPubkey)
+      if (storedFollowListEvent) {
+        setFollowListEvent(storedFollowListEvent)
+      }
       const event = await client.fetchFollowListEvent(accountPubkey)
-      setFollowListEvent(event)
+      if (event) {
+        updateFollowListEvent(event)
+      }
       setIsFetching(false)
     }
 
     init()
   }, [accountPubkey])
+
+  const updateFollowListEvent = (event: Event) => {
+    const isNew = storage.setAccountFollowListEvent(event)
+    if (!isNew) return
+    setFollowListEvent(event)
+  }
 
   const follow = async (pubkey: string) => {
     if (isFetching || !accountPubkey) return
@@ -63,7 +70,6 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
     updateFollowListEvent(newFollowListEvent)
-    setFollowListEvent(newFollowListEvent)
   }
 
   const unfollow = async (pubkey: string) => {
@@ -76,7 +82,14 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
     updateFollowListEvent(newFollowListEvent)
-    setFollowListEvent(newFollowListEvent)
+  }
+
+  const getFollowings = async (pubkey: string) => {
+    const followListEvent = storage.getAccountFollowListEvent(pubkey)
+    if (followListEvent) {
+      return extractPubkeysFromEventTags(followListEvent.tags)
+    }
+    return await client.fetchFollowings(pubkey)
   }
 
   return (
@@ -85,6 +98,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
         followListEvent,
         followings,
         isFetching,
+        getFollowings,
         follow,
         unfollow
       }}

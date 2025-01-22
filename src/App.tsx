@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/providers/ThemeProvider'
 import { PageManager } from './PageManager'
 import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
+import { MuteListProvider } from './providers/MuteListProvider'
 import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { RelaySetsProvider } from './providers/RelaySetsProvider'
@@ -17,14 +18,16 @@ export default function App(): JSX.Element {
       <ScreenSizeProvider>
         <NostrProvider>
           <RelaySetsProvider>
-            <FeedProvider>
-              <FollowListProvider>
-                <NoteStatsProvider>
-                  <PageManager />
-                  <Toaster />
-                </NoteStatsProvider>
-              </FollowListProvider>
-            </FeedProvider>
+            <FollowListProvider>
+              <MuteListProvider>
+                <FeedProvider>
+                  <NoteStatsProvider>
+                    <PageManager />
+                    <Toaster />
+                  </NoteStatsProvider>
+                </FeedProvider>
+              </MuteListProvider>
+            </FollowListProvider>
           </RelaySetsProvider>
         </NostrProvider>
       </ScreenSizeProvider>

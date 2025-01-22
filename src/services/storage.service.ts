@@ -1,7 +1,14 @@
 import { StorageKey } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
-import { TAccount, TAccountPointer, TFeedType, TRelaySet, TThemeSetting } from '@/types'
+import {
+  TAccount,
+  TAccountPointer,
+  TFeedType,
+  TNoteListMode,
+  TRelaySet,
+  TThemeSetting
+} from '@/types'
 import { Event } from 'nostr-tools'
 
 const DEFAULT_RELAY_SETS: TRelaySet[] = [
@@ -9,6 +16,21 @@ const DEFAULT_RELAY_SETS: TRelaySet[] = [
     id: randomString(),
     name: 'Global',
     relayUrls: ['wss://relay.damus.io/', 'wss://nos.lol/']
+  },
+  {
+    id: randomString(),
+    name: 'Safer Global',
+    relayUrls: ['wss://nostr.wine/', 'wss://pyramid.fiatjaf.com/']
+  },
+  {
+    id: randomString(),
+    name: 'Short Notes',
+    relayUrls: ['wss://140.f7z.io/']
+  },
+  {
+    id: randomString(),
+    name: 'News',
+    relayUrls: ['wss://news.utxo.one/']
   },
   {
     id: randomString(),
@@ -26,9 +48,15 @@ class StorageService {
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
+  private noteListMode: TNoteListMode = 'posts'
   private accountRelayListEventMap: Record<string, Event | undefined> = {} // pubkey -> relayListEvent
   private accountFollowListEventMap: Record<string, Event | undefined> = {} // pubkey -> followListEvent
-  private accountProfileEventMap: Record<string, Event> = {} // pubkey -> profileEvent
+  private accountMuteListEventMap: Record<string, Event | undefined> = {} // pubkey -> muteListEvent
+  private accountMuteDecryptedTagsMap: Record<
+    string,
+    { id: string; tags: string[][] } | undefined
+  > = {} // pubkey -> { id, tags }
+  private accountProfileEventMap: Record<string, Event | undefined> = {} // pubkey -> profileEvent
 
   constructor() {
     if (!StorageService.instance) {
@@ -47,6 +75,11 @@ class StorageService {
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const feedTypeStr = window.localStorage.getItem(StorageKey.FEED_TYPE)
     this.feedType = feedTypeStr ? JSON.parse(feedTypeStr) : 'relays'
+    const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
+    this.noteListMode =
+      noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
+        ? (noteListModeStr as TNoteListMode)
+        : 'posts'
 
     const accountRelayListEventMapStr = window.localStorage.getItem(
       StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP
@@ -59,6 +92,18 @@ class StorageService {
     )
     this.accountFollowListEventMap = accountFollowListEventMapStr
       ? JSON.parse(accountFollowListEventMapStr)
+      : {}
+    const accountMuteListEventMapStr = window.localStorage.getItem(
+      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP
+    )
+    this.accountMuteListEventMap = accountMuteListEventMapStr
+      ? JSON.parse(accountMuteListEventMapStr)
+      : {}
+    const accountMuteDecryptedTagsMapStr = window.localStorage.getItem(
+      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP
+    )
+    this.accountMuteDecryptedTagsMap = accountMuteDecryptedTagsMapStr
+      ? JSON.parse(accountMuteDecryptedTagsMapStr)
       : {}
     const accountProfileEventMapStr = window.localStorage.getItem(
       StorageKey.ACCOUNT_PROFILE_EVENT_MAP
@@ -139,6 +184,15 @@ class StorageService {
     this.themeSetting = themeSetting
   }
 
+  getNoteListMode() {
+    return this.noteListMode
+  }
+
+  setNoteListMode(mode: TNoteListMode) {
+    window.localStorage.setItem(StorageKey.NOTE_LIST_MODE, mode)
+    this.noteListMode = mode
+  }
+
   getAccounts() {
     return this.accounts
   }
@@ -176,11 +230,21 @@ class StorageService {
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
     delete this.accountFollowListEventMap[account.pubkey]
     delete this.accountRelayListEventMap[account.pubkey]
+    delete this.accountMuteListEventMap[account.pubkey]
+    delete this.accountMuteDecryptedTagsMap[account.pubkey]
     delete this.accountProfileEventMap[account.pubkey]
     window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
     window.localStorage.setItem(
       StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP,
       JSON.stringify(this.accountFollowListEventMap)
+    )
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP,
+      JSON.stringify(this.accountMuteListEventMap)
+    )
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP,
+      JSON.stringify(this.accountMuteDecryptedTagsMap)
     )
     window.localStorage.setItem(
       StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP,
@@ -242,6 +306,42 @@ class StorageService {
       JSON.stringify(this.accountFollowListEventMap)
     )
     return true
+  }
+
+  getAccountMuteListEvent(pubkey: string) {
+    return this.accountMuteListEventMap[pubkey]
+  }
+
+  setAccountMuteListEvent(muteListEvent: Event) {
+    const pubkey = muteListEvent.pubkey
+    if (
+      this.accountMuteListEventMap[pubkey] &&
+      this.accountMuteListEventMap[pubkey].created_at > muteListEvent.created_at
+    ) {
+      return false
+    }
+    this.accountMuteListEventMap[pubkey] = muteListEvent
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP,
+      JSON.stringify(this.accountMuteListEventMap)
+    )
+    return true
+  }
+
+  getAccountMuteDecryptedTags(muteListEvent: Event) {
+    const stored = this.accountMuteDecryptedTagsMap[muteListEvent.pubkey]
+    if (stored && stored.id === muteListEvent.id) {
+      return stored.tags
+    }
+    return null
+  }
+
+  setAccountMuteDecryptedTags(muteListEvent: Event, tags: string[][]) {
+    this.accountMuteDecryptedTagsMap[muteListEvent.pubkey] = { id: muteListEvent.id, tags }
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP,
+      JSON.stringify(this.accountMuteDecryptedTagsMap)
+    )
   }
 
   getAccountProfileEvent(pubkey: string) {

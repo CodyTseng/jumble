@@ -60,7 +60,7 @@ export async function createShortTextNoteDraftEvent(
   const tags = pubkeys
     .map((pubkey) => ['p', pubkey])
     .concat(otherRelatedEventIds.map((eventId) => ['e', eventId]))
-    .concat(quoteEventIds.map((eventId) => ['q', eventId]))
+    .concat(quoteEventIds.map((eventId) => ['q', eventId, '', 'mention']))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
 
   if (rootEventId) {
@@ -196,6 +196,15 @@ export function createRelayListDraftEvent(mailboxRelays: TMailboxRelay[]): TDraf
 export function createFollowListDraftEvent(tags: string[][], content?: string): TDraftEvent {
   return {
     kind: kinds.Contacts,
+    content: content ?? '',
+    created_at: dayjs().unix(),
+    tags
+  }
+}
+
+export function createMuteListDraftEvent(tags: string[][], content?: string): TDraftEvent {
+  return {
+    kind: kinds.Mutelist,
     content: content ?? '',
     created_at: dayjs().unix(),
     tags

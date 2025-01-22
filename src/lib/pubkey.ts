@@ -42,6 +42,10 @@ export function userIdToPubkey(userId: string) {
   return userId
 }
 
+export function isValidPubkey(pubkey: string) {
+  return /^[0-9a-f]{64}$/.test(pubkey)
+}
+
 const pubkeyImageCache = new LRUCache<string, string>({ max: 1000 })
 export function generateImageByPubkey(pubkey: string): string {
   if (pubkeyImageCache.has(pubkey)) {

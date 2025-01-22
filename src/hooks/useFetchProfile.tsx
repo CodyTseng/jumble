@@ -1,23 +1,37 @@
+import { getProfileFromProfileEvent } from '@/lib/event'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import storage from '@/services/storage.service'
 import { TProfile } from '@/types'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function useFetchProfile(id?: string) {
   const { profile: currentAccountProfile } = useNostr()
   const [isFetching, setIsFetching] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const [profile, setProfile] = useState<TProfile | null>(null)
-  const pubkey = useMemo(() => (id ? userIdToPubkey(id) : undefined), [id])
+  const [pubkey, setPubkey] = useState<string | null>(null)
 
   useEffect(() => {
+    setProfile(null)
+    setPubkey(null)
     const fetchProfile = async () => {
       setIsFetching(true)
       try {
         if (!id) {
           setIsFetching(false)
           setError(new Error('No id provided'))
+          return
+        }
+
+        const pubkey = userIdToPubkey(id)
+        setPubkey(pubkey)
+        const storedProfileEvent = storage.getAccountProfileEvent(pubkey)
+        if (storedProfileEvent) {
+          const profile = getProfileFromProfileEvent(storedProfileEvent)
+          setProfile(profile)
+          setIsFetching(false)
           return
         }
 

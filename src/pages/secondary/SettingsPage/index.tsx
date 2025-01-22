@@ -115,7 +115,7 @@ export default function SettingsPage({ index }: { index?: number }) {
 }
 
 const SettingItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
-  ({ children, className, ...props }) => {
+  ({ children, className, ...props }, ref) => {
     return (
       <div
         className={cn(
@@ -123,6 +123,7 @@ const SettingItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
           className
         )}
         {...props}
+        ref={ref}
       >
         {children}
       </div>

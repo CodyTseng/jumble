@@ -1,11 +1,7 @@
 import LoginDialog from '@/components/LoginDialog'
 import { BIG_RELAY_URLS } from '@/constants'
 import { useToast } from '@/hooks'
-import {
-  getFollowingsFromFollowListEvent,
-  getProfileFromProfileEvent,
-  getRelayListFromRelayListEvent
-} from '@/lib/event'
+import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
 import { formatPubkey } from '@/lib/pubkey'
 import client from '@/services/client.service'
 import storage from '@/services/storage.service'
@@ -15,17 +11,16 @@ import { Event, kinds } from 'nostr-tools'
 import * as nip19 from 'nostr-tools/nip19'
 import * as nip49 from 'nostr-tools/nip49'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
 import { NsecSigner } from './nsec.signer'
-import { useTranslation } from 'react-i18next'
 
 type TNostrContext = {
   pubkey: string | null
   profile: TProfile | null
   profileEvent: Event | null
   relayList: TRelayList | null
-  followings: string[] | null
   account: TAccountPointer | null
   accounts: TAccountPointer[]
   nsec: string | null
@@ -42,11 +37,11 @@ type TNostrContext = {
   publish: (draftEvent: TDraftEvent, additionalRelayUrls?: string[]) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
   signEvent: (draftEvent: TDraftEvent) => Promise<Event>
+  nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
+  nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
   getRelayList: (pubkey: string) => Promise<TRelayList>
   updateRelayListEvent: (relayListEvent: Event) => void
-  getFollowings: (pubkey: string) => Promise<string[]>
-  updateFollowListEvent: (followListEvent: Event) => void
   updateProfileEvent: (profileEvent: Event) => void
 }
 
@@ -71,7 +66,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<TProfile | null>(null)
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
-  const [followings, setFollowings] = useState<string[] | null>(null)
 
   useEffect(() => {
     const init = async () => {
@@ -102,7 +96,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setRelayList(null)
-    setFollowings(null)
     setProfile(null)
     setProfileEvent(null)
     setNsec(null)
@@ -128,10 +121,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
       )
     }
-    const storedFollowListEvent = storage.getAccountFollowListEvent(account.pubkey)
-    if (storedFollowListEvent) {
-      setFollowings(getFollowingsFromFollowListEvent(storedFollowListEvent))
-    }
     const storedProfileEvent = storage.getAccountProfileEvent(account.pubkey)
     if (storedProfileEvent) {
       setProfileEvent(storedProfileEvent)
@@ -141,23 +130,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!relayListEvent) {
         if (storedRelayListEvent) return
 
-        setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS })
+        setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] })
         return
       }
       const isNew = storage.setAccountRelayListEvent(relayListEvent)
       if (!isNew) return
       setRelayList(getRelayListFromRelayListEvent(relayListEvent))
-    })
-    client.fetchFollowListEvent(account.pubkey).then(async (followListEvent) => {
-      if (!followListEvent) {
-        if (storedFollowListEvent) return
-
-        setFollowings([])
-        return
-      }
-      const isNew = storage.setAccountFollowListEvent(followListEvent)
-      if (!isNew) return
-      setFollowings(getFollowingsFromFollowListEvent(followListEvent))
     })
     client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
       if (!profileEvent) {
@@ -248,6 +226,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const nip07Login = async () => {
     try {
       const nip07Signer = new Nip07Signer()
+      await nip07Signer.init()
       const pubkey = await nip07Signer.getPublicKey()
       if (!pubkey) {
         throw new Error('You did not allow to access your pubkey')
@@ -309,6 +288,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
+      await nip07Signer.init()
       return login(nip07Signer, account)
     } else if (account.signerType === 'bunker') {
       if (account.bunker && account.bunkerClientSecretKey) {
@@ -357,6 +337,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return 'Nostr ' + btoa(JSON.stringify(event))
   }
 
+  const nip04Encrypt = async (pubkey: string, plainText: string) => {
+    return signer?.nip04Encrypt(pubkey, plainText) ?? ''
+  }
+
+  const nip04Decrypt = async (pubkey: string, cipherText: string) => {
+    return signer?.nip04Decrypt(pubkey, cipherText) ?? ''
+  }
+
   const checkLogin = async <T,>(cb?: () => T): Promise<T | void> => {
     if (signer) {
       return cb && cb()
@@ -378,20 +366,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setRelayList(getRelayListFromRelayListEvent(relayListEvent))
   }
 
-  const getFollowings = async (pubkey: string) => {
-    const followListEvent = storage.getAccountFollowListEvent(pubkey)
-    if (followListEvent) {
-      return getFollowingsFromFollowListEvent(followListEvent)
-    }
-    return await client.fetchFollowings(pubkey)
-  }
-
-  const updateFollowListEvent = (followListEvent: Event) => {
-    const isNew = storage.setAccountFollowListEvent(followListEvent)
-    if (!isNew) return
-    setFollowings(getFollowingsFromFollowListEvent(followListEvent))
-  }
-
   const updateProfileEvent = (profileEvent: Event) => {
     const isNew = storage.setAccountProfileEvent(profileEvent)
     if (!isNew) return
@@ -407,7 +381,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         profile,
         profileEvent,
         relayList,
-        followings,
         account,
         accounts: storage
           .getAccounts()
@@ -422,12 +395,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         removeAccount,
         publish,
         signHttpAuth,
+        nip04Encrypt,
+        nip04Decrypt,
         checkLogin,
         signEvent,
         getRelayList,
         updateRelayListEvent,
-        getFollowings,
-        updateFollowListEvent,
         updateProfileEvent
       }}
     >

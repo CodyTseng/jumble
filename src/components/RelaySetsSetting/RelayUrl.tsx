@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useFetchRelayInfos } from '@/hooks'
+import { useFetchRelayInfo } from '@/hooks'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { useRelaySets } from '@/providers/RelaySetsProvider'
 import { CircleX, SearchCheck } from 'lucide-react'
@@ -77,9 +77,7 @@ export default function RelayUrls({ relaySetId }: { relaySetId: string }) {
 
 function RelayUrl({ url, onRemove }: { url: string; onRemove: () => void }) {
   const { t } = useTranslation()
-  const {
-    relayInfos: [relayInfo]
-  } = useFetchRelayInfos([url])
+  const { relayInfo } = useFetchRelayInfo(url)
 
   return (
     <div className="flex items-center justify-between">

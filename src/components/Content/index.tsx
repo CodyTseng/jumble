@@ -23,11 +23,13 @@ const Content = memo(
   ({
     event,
     className,
-    size = 'normal'
+    size = 'normal',
+    disableLightbox = false
   }: {
     event: Event
     className?: string
     size?: 'normal' | 'small'
+    disableLightbox?: boolean
   }) => {
     const { content, images, videos, embeddedNotes, lastNonMediaUrl } = preprocess(event)
     const isNsfw = isNsfwEvent(event)
@@ -48,6 +50,7 @@ const Content = memo(
           images={images}
           isNsfw={isNsfw}
           size={size}
+          disableLightbox={disableLightbox}
         />
       )
     }
