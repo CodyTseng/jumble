@@ -66,7 +66,7 @@ function AccountManagerNav({
         <Button
           onClick={() =>
             window.open(
-              `https://start.njump.me?an=Jumble&at=popup&ac=${import.meta.env.VITE_DOMAIN_NAME}`,
+              `https://start.njump.me?an=Jumble&at=popup&ac=${window.location.href}`,
               'popup',
               'width=600,height=800'
             )
