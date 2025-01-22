@@ -76,7 +76,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const init = async () => {
       if (hasNostrLoginHash()) {
-        return
+        return await loginByNostrLoginHash()
       }
 
       const accounts = storage.getAccounts()
@@ -86,13 +86,19 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       await loginWithAccountPointer(act)
     }
     init()
-  }, [])
 
-  useEffect(() => {
-    if (hasNostrLoginHash()) {
-      loginByNostrLoginHash()
+    const handleHashChange = () => {
+      if (hasNostrLoginHash()) {
+        loginByNostrLoginHash()
+      }
     }
-  }, [window.location.hash])
+
+    window.addEventListener('hashchange', handleHashChange)
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [])
 
   useEffect(() => {
     setRelayList(null)

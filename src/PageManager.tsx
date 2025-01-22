@@ -74,10 +74,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     const onPopState = (e: PopStateEvent) => {
-      const state = e.state ?? { index: -1, url: '/' }
+      let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1]
         const currentIndex = currentItem ? currentItem.index : 0
+        if (!state) {
+          if (window.location.pathname + window.location.search + window.location.hash !== '/') {
+            // Just change the URL
+            return pre
+          } else {
+            // Back to root
+            state = { index: -1, url: '/' }
+          }
+        }
         if (state.index === currentIndex) {
           if (currentIndex !== 0) return pre
 
@@ -86,7 +95,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         }
         // Go back
         if (state.index < currentIndex) {
-          const newStack = pre.filter((item) => item.index <= state.index)
+          const newStack = pre.filter((item) => item.index <= state!.index)
           const topItem = newStack[newStack.length - 1]
           // Load the component if it's not cached
           if (topItem && !topItem.component) {
