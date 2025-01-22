@@ -1,3 +1,4 @@
+import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { MessageCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -8,6 +9,7 @@ import { formatCount } from './utils'
 
 export default function ReplyButton({ event }: { event: Event }) {
   const { t } = useTranslation()
+  const { checkLogin } = useNostr()
   const { noteStatsMap } = useNoteStats()
   const { replyCount } = useMemo(() => noteStatsMap.get(event.id) ?? {}, [noteStatsMap, event.id])
   const [open, setOpen] = useState(false)
@@ -18,7 +20,9 @@ export default function ReplyButton({ event }: { event: Event }) {
         className="flex gap-1 items-center text-muted-foreground enabled:hover:text-blue-400"
         onClick={(e) => {
           e.stopPropagation()
-          setOpen(true)
+          checkLogin(() => {
+            setOpen(true)
+          })
         }}
         title={t('Reply')}
       >

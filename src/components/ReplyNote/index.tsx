@@ -1,3 +1,4 @@
+import { useNostr } from '@/providers/NostrProvider'
 import { Event } from 'nostr-tools'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +22,7 @@ export default function ReplyNote({
   highlight?: boolean
 }) {
   const { t } = useTranslation()
+  const { checkLogin } = useNostr()
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
 
   return (
@@ -44,7 +46,7 @@ export default function ReplyNote({
           </div>
           <div
             className="text-muted-foreground hover:text-primary cursor-pointer"
-            onClick={() => setIsPostDialogOpen(true)}
+            onClick={() => checkLogin(() => setIsPostDialogOpen(true))}
           >
             {t('reply')}
           </div>

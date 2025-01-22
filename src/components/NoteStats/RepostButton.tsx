@@ -104,7 +104,9 @@ export default function RepostButton({
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation()
-              setIsPostDialogOpen(true)
+              checkLogin(() => {
+                setIsPostDialogOpen(true)
+              })
             }}
           >
             <PencilLine /> {t('Quote')}
