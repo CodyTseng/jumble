@@ -5,26 +5,30 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
 import BunkerLogin from './BunkerLogin'
-import PrivateKeyLogin from './PrivateKeyLogin'
 import GenerateNewAccount from './GenerateNewAccount'
+import { PopupProvider, usePopup } from './PopupProvider'
+import PrivateKeyLogin from './PrivateKeyLogin'
+import SignupWithNstart from './SignupWithNstart'
 
-type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | null
+type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'nstart' | null
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
 
   return (
-    <>
+    <PopupProvider>
       {page === 'nsec' ? (
         <PrivateKeyLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'bunker' ? (
         <BunkerLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'generate' ? (
         <GenerateNewAccount back={() => setPage(null)} onLoginSuccess={() => close?.()} />
+      ) : page === 'nstart' ? (
+        <SignupWithNstart back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : (
         <AccountManagerNav setPage={setPage} close={close} />
       )}
-    </>
+    </PopupProvider>
   )
 }
 
@@ -36,6 +40,7 @@ function AccountManagerNav({
   close?: () => void
 }) {
   const { t } = useTranslation()
+  const { setPopupWindow } = usePopup()
   const { nip07Login, accounts } = useNostr()
 
   return (
@@ -64,13 +69,15 @@ function AccountManagerNav({
           {t("Don't have an account yet?")}
         </div>
         <Button
-          onClick={() =>
-            window.open(
+          onClick={() => {
+            const popupWindow = window.open(
               `https://start.njump.me?an=Jumble&at=popup&ac=${window.location.href}`,
               'popup',
               'width=600,height=800'
             )
-          }
+            setPopupWindow(popupWindow)
+            setPage('nstart')
+          }}
           className="w-full mt-4"
         >
           {t('Signup with Nstart wizard')}
