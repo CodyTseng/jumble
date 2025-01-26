@@ -6,29 +6,25 @@ import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
 import BunkerLogin from './BunkerLogin'
 import GenerateNewAccount from './GenerateNewAccount'
-import { PopupProvider } from './PopupProvider'
 import PrivateKeyLogin from './PrivateKeyLogin'
-import SignupWithNstart from './SignupWithNstart'
 
-type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'nstart' | null
+type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | null
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
 
   return (
-    <PopupProvider>
+    <>
       {page === 'nsec' ? (
         <PrivateKeyLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'bunker' ? (
         <BunkerLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'generate' ? (
         <GenerateNewAccount back={() => setPage(null)} onLoginSuccess={() => close?.()} />
-      ) : page === 'nstart' ? (
-        <SignupWithNstart back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : (
         <AccountManagerNav setPage={setPage} close={close} />
       )}
-    </PopupProvider>
+    </>
   )
 }
 
@@ -69,31 +65,32 @@ function AccountManagerNav({
         </div>
         <Button
           onClick={() => {
-            // const popupWindow = window.open(
-            //   `https://start.njump.me?an=Jumble&at=popup&ac=${window.location.href}`,
-            //   'popup',
-            //   'width=600,height=800'
-            // )
-            // setPopupWindow(popupWindow)
-            // setPage('nstart')
-            const wizard = new window.NstartModal({
-              baseUrl: 'https://start.njump.me',
-              an: 'Jumble',
-              onComplete: ({ nostrLogin }) => {
-                if (!nostrLogin) return
+            if (!window.NstartModal) {
+              window.open(
+                `https://start.njump.me?an=Jumble&at=popup&ac=${window.location.href}`,
+                'popup',
+                'width=600,height=800'
+              )
+            } else {
+              const wizard = new window.NstartModal({
+                baseUrl: 'https://start.njump.me',
+                an: 'Jumble',
+                onComplete: ({ nostrLogin }) => {
+                  if (!nostrLogin) return
 
-                if (nostrLogin.startsWith('bunker://')) {
-                  bunkerLogin(nostrLogin)
-                } else if (nostrLogin.startsWith('ncryptsec')) {
-                  ncryptsecLogin(nostrLogin)
-                } else if (nostrLogin.startsWith('nsec')) {
-                  nsecLogin(nostrLogin)
-                }
-              },
-              onCancel: () => {}
-            })
-            close?.()
-            wizard.open()
+                  if (nostrLogin.startsWith('bunker://')) {
+                    bunkerLogin(nostrLogin)
+                  } else if (nostrLogin.startsWith('ncryptsec')) {
+                    ncryptsecLogin(nostrLogin)
+                  } else if (nostrLogin.startsWith('nsec')) {
+                    nsecLogin(nostrLogin)
+                  }
+                },
+                onCancel: () => {}
+              })
+              close?.()
+              wizard.open()
+            }
           }}
           className="w-full mt-4"
         >
