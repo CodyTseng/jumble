@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useNostr } from '@/providers/NostrProvider'
+import { NstartModal } from 'nstart-modal'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
@@ -65,32 +66,26 @@ function AccountManagerNav({
         </div>
         <Button
           onClick={() => {
-            if (!window.NstartModal) {
-              window.open(
-                `https://start.njump.me?an=Jumble&at=popup&ac=${window.location.href}`,
-                'popup',
-                'width=600,height=800'
-              )
-            } else {
-              const wizard = new window.NstartModal({
-                baseUrl: 'https://start.njump.me',
-                an: 'Jumble',
-                onComplete: ({ nostrLogin }) => {
-                  if (!nostrLogin) return
+            const wizard = new NstartModal({
+              baseUrl: 'https://start.njump.me',
+              an: 'Jumble',
+              ac: '',
+              at: '',
+              onComplete: ({ nostrLogin }) => {
+                if (!nostrLogin) return
 
-                  if (nostrLogin.startsWith('bunker://')) {
-                    bunkerLogin(nostrLogin)
-                  } else if (nostrLogin.startsWith('ncryptsec')) {
-                    ncryptsecLogin(nostrLogin)
-                  } else if (nostrLogin.startsWith('nsec')) {
-                    nsecLogin(nostrLogin)
-                  }
-                },
-                onCancel: () => {}
-              })
-              close?.()
-              wizard.open()
-            }
+                if (nostrLogin.startsWith('bunker://')) {
+                  bunkerLogin(nostrLogin)
+                } else if (nostrLogin.startsWith('ncryptsec')) {
+                  ncryptsecLogin(nostrLogin)
+                } else if (nostrLogin.startsWith('nsec')) {
+                  nsecLogin(nostrLogin)
+                }
+              },
+              onCancel: () => {}
+            })
+            close?.()
+            wizard.open()
           }}
           className="w-full mt-4"
         >
