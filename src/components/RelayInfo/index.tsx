@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { useFetchRelayInfo } from '@/hooks'
-import { TRelayInfo } from '@/types'
 import { GitBranch, Mail, SquareCode } from 'lucide-react'
+import RelayBadges from '../RelayBadges'
 import RelayIcon from '../RelayIcon'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -78,23 +78,4 @@ export default function RelayInfo({ url }: { url: string }) {
 function formatSoftware(software: string) {
   const parts = software.split('/')
   return parts[parts.length - 1]
-}
-
-export function RelayBadges({ relayInfo }: { relayInfo: TRelayInfo }) {
-  return (
-    <div className="flex gap-2">
-      {relayInfo.supported_nips?.includes(42) && (
-        <Badge className="bg-green-400 hover:bg-green-400/80">Auth</Badge>
-      )}
-      {relayInfo.supported_nips?.includes(50) && (
-        <Badge className="bg-pink-400 hover:bg-pink-400/80">Search</Badge>
-      )}
-      {relayInfo.limitation?.payment_required && (
-        <Badge className="bg-orange-400 hover:bg-orange-400/80">Payment</Badge>
-      )}
-      {relayInfo.supported_nips?.includes(29) && (
-        <Badge className="bg-blue-400 hover:bg-blue-400/80">Groups</Badge>
-      )}
-    </div>
-  )
 }

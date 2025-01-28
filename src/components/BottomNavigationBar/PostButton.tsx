@@ -1,21 +1,25 @@
 import PostEditor from '@/components/PostEditor'
-import { PencilLine } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import BottomNavigationBarItem from './BottomNavigationBarItem'
+import { Button } from '../ui/button'
 
 export default function PostButton() {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <BottomNavigationBarItem
+      <Button
+        className={cn(
+          'flex shadow-none items-center w-fit m-1 rounded-xl font-semibold [&_svg]:size-6'
+        )}
         onClick={(e) => {
           e.stopPropagation()
           setOpen(true)
         }}
       >
-        <PencilLine />
-      </BottomNavigationBarItem>
+        <Plus />
+      </Button>
       <PostEditor open={open} setOpen={setOpen} />
     </>
   )

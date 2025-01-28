@@ -97,3 +97,10 @@ export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'pictures'
 
 export type TPageRef = { scrollToTop: () => void }
+
+export type TNip66RelayInfo = TRelayInfo & {
+  url: string
+  shortUrl: string
+  relayType?: string
+  countryCode?: string
+}

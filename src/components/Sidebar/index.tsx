@@ -4,6 +4,7 @@ import AccountButton from './AccountButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
+import RelaysButton from './ExploreButton'
 import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
 
@@ -16,6 +17,7 @@ export default function PrimaryPageSidebar() {
           <Logo className="max-xl:hidden" />
         </div>
         <HomeButton />
+        <RelaysButton />
         <NotificationsButton />
         <SearchButton />
         <SettingsButton />

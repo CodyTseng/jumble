@@ -16,7 +16,7 @@ const PrimaryPageLayout = forwardRef(
       displayScrollToTopButton = false
     }: {
       children?: React.ReactNode
-      titlebar?: React.ReactNode
+      titlebar: React.ReactNode
       pageName: TPrimaryPageName
       displayScrollToTopButton?: boolean
     },
@@ -54,9 +54,8 @@ const PrimaryPageLayout = forwardRef(
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
             }}
           >
-            {titlebar && <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>}
+            <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>
             {children}
-            {displayScrollToTopButton && <ScrollToTopButton />}
             <BottomNavigationBar />
           </div>
         </DeepBrowsingProvider>
@@ -70,7 +69,7 @@ const PrimaryPageLayout = forwardRef(
           scrollBarClassName="z-50"
           ref={scrollAreaRef}
         >
-          {titlebar && <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>}
+          <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>
           {children}
         </ScrollArea>
         {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
