@@ -12,7 +12,7 @@ import { Check, ChevronRight, Copy, Info, KeyRound, Languages, Server, SunMoon }
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function SettingsPage({ index }: { index?: number }) {
+const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const { nsec, ncryptsec } = useNostr()
   const { push } = useSecondaryPage()
@@ -27,7 +27,7 @@ export default function SettingsPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} title={t('Settings')}>
+    <SecondaryPageLayout ref={ref} index={index} title={t('Settings')}>
       <SettingItem>
         <div className="flex items-center gap-4">
           <Languages />
@@ -112,7 +112,9 @@ export default function SettingsPage({ index }: { index?: number }) {
       </AboutInfoDialog>
     </SecondaryPageLayout>
   )
-}
+})
+SettingsPage.displayName = 'SettingsPage'
+export default SettingsPage
 
 const SettingItem = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
   ({ children, className, ...props }, ref) => {

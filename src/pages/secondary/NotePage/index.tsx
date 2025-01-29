@@ -12,11 +12,11 @@ import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId, isPictureEvent } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
 
-export default function NotePage({ id, index }: { id?: string; index?: number }) {
+const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(id)
   const parentEventId = useMemo(() => getParentEventId(event), [event])
@@ -24,7 +24,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   if (!event && isFetching) {
     return (
-      <SecondaryPageLayout index={index} title={t('Note')}>
+      <SecondaryPageLayout ref={ref} index={index} title={t('Note')}>
         <div className="px-4">
           <Skeleton className="w-10 h-10 rounded-full" />
         </div>
@@ -35,7 +35,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
 
   if (isPictureEvent(event)) {
     return (
-      <SecondaryPageLayout index={index} title={t('Note')} displayScrollToTopButton>
+      <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
         <PictureNote key={`note-${event.id}`} event={event} fetchNoteStats />
         <Separator className="mb-2 mt-4" />
         <Nip22ReplyNoteList
@@ -48,7 +48,7 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
   }
 
   return (
-    <SecondaryPageLayout index={index} title={t('Note')} displayScrollToTopButton>
+    <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
       <div className="px-4">
         {rootEventId !== parentEventId && (
           <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
@@ -68,7 +68,9 @@ export default function NotePage({ id, index }: { id?: string; index?: number })
       )}
     </SecondaryPageLayout>
   )
-}
+})
+NotePage.displayName = 'NotePage'
+export default NotePage
 
 function ParentNote({ eventId }: { eventId?: string }) {
   const { push } = useSecondaryPage()
@@ -81,8 +83,12 @@ function ParentNote({ eventId }: { eventId?: string }) {
         className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
         onClick={() => push(toNote(event))}
       >
-        <UserAvatar userId={event.pubkey} size="tiny" />
-        <Username userId={event.pubkey} className="font-semibold" skeletonClassName="h-4" />
+        <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
+        <Username
+          userId={event.pubkey}
+          className="font-semibold"
+          skeletonClassName="h-4 shrink-0"
+        />
         <div className="truncate">{event.content}</div>
       </Card>
       <div className="ml-5 w-px h-2 bg-border" />

@@ -6,7 +6,7 @@ import { SimpleUserAvatar } from '../UserAvatar'
 
 export default function ProfileCard({ pubkey }: { pubkey: string }) {
   const { profile } = useFetchProfile(pubkey)
-  const { username, nip05, about } = profile || {}
+  const { username, about } = profile || {}
 
   return (
     <div className="w-full flex flex-col gap-2">
@@ -16,7 +16,7 @@ export default function ProfileCard({ pubkey }: { pubkey: string }) {
       </div>
       <div>
         <div className="text-lg font-semibold truncate">{username}</div>
-        {nip05 && <Nip05 nip05={nip05} pubkey={pubkey} />}
+        <Nip05 pubkey={pubkey} />
       </div>
       {about && (
         <div

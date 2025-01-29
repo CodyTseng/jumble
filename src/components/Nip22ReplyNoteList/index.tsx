@@ -7,7 +7,7 @@ import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event as NEvent } from 'nostr-tools'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReplyNote from '../ReplyNote'
 import { isCommentEvent } from '@/lib/event'
@@ -116,7 +116,7 @@ export default function Nip22ReplyNoteList({
     setReplyMap(replyMap)
   }, [replies, event.id, updateNoteReplyCount])
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (loading || !until || !timelineKey) return
 
     setLoading(true)
@@ -127,24 +127,27 @@ export default function Nip22ReplyNoteList({
     }
     setUntil(events.length ? events[events.length - 1].created_at - 1 : undefined)
     setLoading(false)
-  }
+  }, [loading, until, timelineKey])
 
-  const onNewReply = (evt: NEvent) => {
-    setReplies((pre) => {
-      if (pre.some((reply) => reply.id === evt.id)) return pre
-      return [...pre, evt]
-    })
-    if (evt.pubkey === pubkey) {
-      setTimeout(() => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        }
-        highlightReply(evt.id, false)
-      }, 100)
-    }
-  }
+  const onNewReply = useCallback(
+    (evt: NEvent) => {
+      setReplies((pre) => {
+        if (pre.some((reply) => reply.id === evt.id)) return pre
+        return [...pre, evt]
+      })
+      if (evt.pubkey === pubkey) {
+        setTimeout(() => {
+          if (bottomRef.current) {
+            bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          }
+          highlightReply(evt.id, false)
+        }, 100)
+      }
+    },
+    [pubkey]
+  )
 
-  const highlightReply = (eventId: string, scrollTo = true) => {
+  const highlightReply = useCallback((eventId: string, scrollTo = true) => {
     if (scrollTo) {
       const ref = replyRefs.current[eventId]
       if (ref) {
@@ -155,7 +158,7 @@ export default function Nip22ReplyNoteList({
     setTimeout(() => {
       setHighlightReplyId((pre) => (pre === eventId ? undefined : pre))
     }, 1500)
-  }
+  }, [])
 
   return (
     <>

@@ -13,10 +13,10 @@ import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { ArrowDownUp, ChevronRight, LogOut, Settings, UserRound } from 'lucide-react'
-import { HTMLProps, useState } from 'react'
+import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function MePage() {
+const MePage = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
@@ -25,7 +25,7 @@ export default function MePage() {
 
   if (!pubkey) {
     return (
-      <PrimaryPageLayout pageName="home" titlebar={<MePageTitlebar />}>
+      <PrimaryPageLayout ref={ref} pageName="home" titlebar={<MePageTitlebar />}>
         <div className="flex flex-col p-4 gap-4 overflow-auto">
           <AccountManager />
         </div>
@@ -34,7 +34,7 @@ export default function MePage() {
   }
 
   return (
-    <PrimaryPageLayout pageName="home" titlebar={<MePageTitlebar />}>
+    <PrimaryPageLayout ref={ref} pageName="home" titlebar={<MePageTitlebar />}>
       <div className="flex gap-4 items-center p-4">
         <SimpleUserAvatar userId={pubkey} size="big" />
         <div className="space-y-1">
@@ -71,7 +71,9 @@ export default function MePage() {
       <LogoutDialog open={logoutDialogOpen} setOpen={setLogoutDialogOpen} />
     </PrimaryPageLayout>
   )
-}
+})
+MePage.displayName = 'MePage'
+export default MePage
 
 function MePageTitlebar() {
   const { push } = useSecondaryPage()

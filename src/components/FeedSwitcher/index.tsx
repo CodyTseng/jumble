@@ -7,6 +7,7 @@ import { useRelaySets } from '@/providers/RelaySetsProvider'
 import { Circle, CircleCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import RelaySetCard from '../RelaySetCard'
+import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { t } = useTranslation()
@@ -50,6 +51,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
               switchFeed('temporary')
               close?.()
             }}
+            controls={<SaveRelayDropdownMenu urls={temporaryRelayUrls} />}
           />
         )}
         {relaySets
@@ -76,21 +78,26 @@ function FeedSwitcherItem({
   itemName,
   isActive,
   temporary = false,
-  onClick
+  onClick,
+  controls
 }: {
   itemName: string
   isActive: boolean
   temporary?: boolean
   onClick: () => void
+  controls?: React.ReactNode
 }) {
   return (
     <div
       className={`w-full border rounded-lg p-4 ${isActive ? 'border-highlight bg-highlight/5' : 'clickable'} ${temporary ? 'border-dashed' : ''}`}
       onClick={onClick}
     >
-      <div className="flex space-x-2 items-center">
-        <FeedToggle isActive={isActive} />
-        <div className="font-semibold">{itemName}</div>
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2 items-center">
+          <FeedToggle isActive={isActive} />
+          <div className="font-semibold">{itemName}</div>
+        </div>
+        {controls}
       </div>
     </div>
   )

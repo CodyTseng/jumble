@@ -5,19 +5,20 @@ import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { normalizeUrl, simplifyUrl } from '@/lib/url'
 import { Check, Copy } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { forwardRef, useMemo, useState } from 'react'
 import NotFoundPage from '../NotFoundPage'
 
-export default function RelayPage({ url, index }: { url?: string; index?: number }) {
+const RelayPage = forwardRef(({ url, index }: { url?: string; index?: number }, ref) => {
   const normalizedUrl = useMemo(() => (url ? normalizeUrl(url) : undefined), [url])
   const title = useMemo(() => (url ? simplifyUrl(url) : undefined), [url])
 
   if (!normalizedUrl) {
-    return <NotFoundPage />
+    return <NotFoundPage ref={ref} />
   }
 
   return (
     <SecondaryPageLayout
+      ref={ref}
       index={index}
       title={title}
       controls={<RelayPageControls url={normalizedUrl} />}
@@ -27,7 +28,9 @@ export default function RelayPage({ url, index }: { url?: string; index?: number
       <NoteList relayUrls={[normalizedUrl]} />
     </SecondaryPageLayout>
   )
-}
+})
+RelayPage.displayName = 'RelayPage'
+export default RelayPage
 
 function RelayPageControls({ url }: { url: string }) {
   const [copied, setCopied] = useState(false)

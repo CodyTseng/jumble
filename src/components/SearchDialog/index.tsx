@@ -2,10 +2,11 @@ import { SecondaryPageLink } from '@/PageManager'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CommandDialog, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { useSearchProfiles } from '@/hooks'
-import { toNote, toNoteList, toProfile, toProfileList } from '@/lib/link'
+import { toNote, toNoteList, toProfile, toProfileList, toRelay } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
+import { normalizeUrl } from '@/lib/url'
 import { TProfile } from '@/types'
-import { Hash, Notebook, UserRound } from 'lucide-react'
+import { Hash, Notebook, Server, UserRound } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import { Dispatch, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +16,16 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
   const [input, setInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(input)
   const { profiles } = useSearchProfiles(debouncedInput, 10)
+  const normalizedUrl = useMemo(() => {
+    if (['w', 'ws', 'ws:', 'ws:/', 'wss', 'wss:', 'wss:/'].includes(input)) {
+      return undefined
+    }
+    try {
+      return normalizeUrl(input)
+    } catch {
+      return undefined
+    }
+  }, [input])
 
   const list = useMemo(() => {
     const search = input.trim()
@@ -49,6 +60,7 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
       <>
         <NormalItem search={search} onClick={() => setOpen(false)} />
         <HashtagItem search={search} onClick={() => setOpen(false)} />
+        {!!normalizedUrl && <RelayItem url={normalizedUrl} onClick={() => setOpen(false)} />}
         {profiles.map((profile) => (
           <ProfileItem key={profile.pubkey} profile={profile} onClick={() => setOpen(false)} />
         ))}
@@ -61,7 +73,7 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
         )}
       </>
     )
-  }, [input, profiles, setOpen])
+  }, [input, debouncedInput, profiles, setOpen])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -76,7 +88,7 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
   return (
     <CommandDialog open={open} onOpenChange={setOpen} classNames={{ content: 'max-sm:top-0' }}>
       <CommandInput value={input} onValueChange={setInput} />
-      <CommandList>{list}</CommandList>
+      <CommandList scrollAreaClassName="max-h-[80vh]">{list}</CommandList>
     </CommandDialog>
   )
 }
@@ -142,6 +154,17 @@ function ProfileItem({ profile, onClick }: { profile: TProfile; onClick?: () => 
             <div className="line-clamp-1 text-muted-foreground">{profile.about}</div>
           </div>
         </div>
+      </CommandItem>
+    </SecondaryPageLink>
+  )
+}
+
+function RelayItem({ url, onClick }: { url: string; onClick?: () => void }) {
+  return (
+    <SecondaryPageLink to={toRelay(url)} onClick={onClick}>
+      <CommandItem>
+        <Server className="text-muted-foreground" />
+        <div className="font-semibold truncate">{url}</div>
       </CommandItem>
     </SecondaryPageLink>
   )

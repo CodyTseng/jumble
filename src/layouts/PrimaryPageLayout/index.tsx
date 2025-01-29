@@ -3,8 +3,9 @@ import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
+import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
 const PrimaryPageLayout = forwardRef(
   (
@@ -22,8 +23,6 @@ const PrimaryPageLayout = forwardRef(
     ref
   ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)
-    const [visible, setVisible] = useState(true)
-    const [lastScrollTop, setLastScrollTop] = useState(0)
     const { isSmallScreen } = useScreenSize()
     const { current } = usePrimaryPage()
 
@@ -31,11 +30,10 @@ const PrimaryPageLayout = forwardRef(
       ref,
       () => ({
         scrollToTop: () => {
-          if (isSmallScreen) {
-            window.scrollTo({ top: 0 })
-            return
+          if (scrollAreaRef.current) {
+            return scrollAreaRef.current.scrollTo({ top: 0, behavior: 'smooth' })
           }
-          scrollAreaRef.current?.scrollTo({ top: 0 })
+          window.scrollTo({ top: 0, behavior: 'smooth' })
         }
       }),
       []
@@ -44,77 +42,39 @@ const PrimaryPageLayout = forwardRef(
     useEffect(() => {
       if (isSmallScreen) {
         window.scrollTo({ top: 0 })
-        setVisible(true)
         return
       }
     }, [current])
 
-    useEffect(() => {
-      if (current !== pageName) return
-
-      const handleScroll = () => {
-        const atBottom = isSmallScreen
-          ? window.innerHeight + window.scrollY >= document.body.offsetHeight - 20
-          : scrollAreaRef.current
-            ? scrollAreaRef.current?.clientHeight + scrollAreaRef.current?.scrollTop >=
-              scrollAreaRef.current?.scrollHeight - 20
-            : false
-        if (atBottom) {
-          setVisible(true)
-          return
-        }
-
-        const scrollTop = (isSmallScreen ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
-        const diff = scrollTop - lastScrollTop
-        if (scrollTop <= 800) {
-          setVisible(true)
-          setLastScrollTop(scrollTop)
-          return
-        }
-
-        if (diff > 20) {
-          setVisible(false)
-          setLastScrollTop(scrollTop)
-        } else if (diff < -20) {
-          setVisible(true)
-          setLastScrollTop(scrollTop)
-        }
-      }
-
-      if (isSmallScreen) {
-        window.addEventListener('scroll', handleScroll)
-        return () => {
-          window.removeEventListener('scroll', handleScroll)
-        }
-      }
-
-      scrollAreaRef.current?.addEventListener('scroll', handleScroll)
-      return () => {
-        scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
-      }
-    }, [lastScrollTop, isSmallScreen, current])
+    if (isSmallScreen) {
+      return (
+        <DeepBrowsingProvider active={current === pageName}>
+          <div
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+            }}
+          >
+            {titlebar && <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>}
+            {children}
+            {displayScrollToTopButton && <ScrollToTopButton />}
+            <BottomNavigationBar />
+          </div>
+        </DeepBrowsingProvider>
+      )
+    }
 
     return (
-      <ScrollArea
-        className="sm:h-screen sm:overflow-auto pt-12 sm:pt-0"
-        scrollBarClassName="sm:z-50"
-        ref={scrollAreaRef}
-        style={{
-          paddingBottom: isSmallScreen ? 'calc(env(safe-area-inset-bottom) + 3rem)' : ''
-        }}
-      >
-        {titlebar && (
-          <PrimaryPageTitlebar visible={!isSmallScreen || visible}>{titlebar}</PrimaryPageTitlebar>
-        )}
-        <div className="overflow-x-hidden">{children}</div>
-        {displayScrollToTopButton && (
-          <ScrollToTopButton
-            scrollAreaRef={scrollAreaRef}
-            visible={visible && lastScrollTop > 800}
-          />
-        )}
-        {isSmallScreen && <BottomNavigationBar visible={visible} />}
-      </ScrollArea>
+      <DeepBrowsingProvider active={current === pageName} scrollAreaRef={scrollAreaRef}>
+        <ScrollArea
+          className="h-screen overflow-auto"
+          scrollBarClassName="z-50"
+          ref={scrollAreaRef}
+        >
+          {titlebar && <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>}
+          {children}
+        </ScrollArea>
+        {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
+      </DeepBrowsingProvider>
     )
   }
 )
@@ -125,16 +85,6 @@ export type TPrimaryPageLayoutRef = {
   scrollToTop: () => void
 }
 
-function PrimaryPageTitlebar({
-  children,
-  visible = true
-}: {
-  children?: React.ReactNode
-  visible?: boolean
-}) {
-  return (
-    <Titlebar className="h-12 p-1" visible={visible}>
-      {children}
-    </Titlebar>
-  )
+function PrimaryPageTitlebar({ children }: { children?: React.ReactNode }) {
+  return <Titlebar className="h-12 p-1">{children}</Titlebar>
 }

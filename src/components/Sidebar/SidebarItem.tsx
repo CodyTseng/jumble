@@ -13,10 +13,9 @@ const SidebarItem = forwardRef<
     <Button
       className={cn(
         'flex shadow-none items-center bg-transparent w-12 h-12 xl:w-full xl:h-auto p-3 m-0 xl:py-2 xl:px-4 rounded-lg xl:justify-start gap-4 text-lg font-semibold [&_svg]:size-full xl:[&_svg]:size-4',
-        active && 'text-primary disabled:opacity-100',
+        active && 'text-primary hover:text-primary',
         className
       )}
-      disabled={active}
       variant="ghost"
       title={t(title)}
       ref={ref}

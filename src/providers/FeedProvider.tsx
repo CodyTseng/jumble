@@ -3,7 +3,7 @@ import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import storage from '@/services/storage.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useFollowList } from './FollowListProvider'
 import { useNostr } from './NostrProvider'
 import { useRelaySets } from './RelaySetsProvider'
@@ -32,10 +32,11 @@ export const useFeed = () => {
 }
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
+  const isFirstRenderRef = useRef(true)
   const { pubkey, getRelayList } = useNostr()
   const { getFollowings } = useFollowList()
   const { relaySets } = useRelaySets()
-  const [feedType, setFeedType] = useState<TFeedType>(storage.getFeedType())
+  const feedTypeRef = useRef<TFeedType>(storage.getFeedType())
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
   const [filter, setFilter] = useState<Filter>({})
@@ -46,26 +47,31 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
-      // temporary relay urls from query params
-      const searchParams = new URLSearchParams(window.location.search)
-      const temporaryRelayUrls = searchParams
-        .getAll('r')
-        .map((url) => normalizeUrl(url))
-        .filter((url) => isWebsocketUrl(url))
-      if (temporaryRelayUrls.length) {
-        return await switchFeed('temporary', { temporaryRelayUrls })
+      const isFirstRender = isFirstRenderRef.current
+      isFirstRenderRef.current = false
+      if (isFirstRender) {
+        // temporary relay urls from query params
+        const searchParams = new URLSearchParams(window.location.search)
+        const temporaryRelayUrls = searchParams
+          .getAll('r')
+          .map((url) => normalizeUrl(url))
+          .filter((url) => isWebsocketUrl(url))
+        if (temporaryRelayUrls.length) {
+          return await switchFeed('temporary', { temporaryRelayUrls })
+        }
+
+        if (feedTypeRef.current === 'relays') {
+          return await switchFeed('relays', { activeRelaySetId })
+        }
       }
 
-      if (feedType === 'following') {
-        if (!pubkey) return
+      if (feedTypeRef.current === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
-      } else {
-        await switchFeed('relays', { activeRelaySetId })
       }
     }
 
     init()
-  }, [pubkey])
+  }, [pubkey, feedTypeRef])
 
   const switchFeed = async (
     feedType: TFeedType,
@@ -86,7 +92,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         relaySets.find((set) => set.id === options.activeRelaySetId) ??
         (relaySets.length > 0 ? relaySets[0] : null)
       if (relaySet) {
-        setFeedType(feedType)
+        feedTypeRef.current = feedType
         setRelayUrls(relaySet.relayUrls)
         setActiveRelaySetId(relaySet.id)
         setFilter({})
@@ -99,7 +105,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       if (!options.pubkey) {
         return setIsReady(true)
       }
-      setFeedType(feedType)
+      feedTypeRef.current = feedType
       setActiveRelaySetId(null)
       const [relayList, followings] = await Promise.all([
         getRelayList(options.pubkey),
@@ -118,7 +124,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
 
-      setFeedType(feedType)
+      feedTypeRef.current = feedType
       setTemporaryRelayUrls(urls)
       setRelayUrls(urls)
       setActiveRelaySetId(null)
@@ -131,7 +137,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   return (
     <FeedContext.Provider
       value={{
-        feedType,
+        feedType: feedTypeRef.current,
         relayUrls,
         temporaryRelayUrls,
         filter,

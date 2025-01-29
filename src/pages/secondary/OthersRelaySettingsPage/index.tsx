@@ -1,9 +1,10 @@
 import OthersRelayList from '@/components/OthersRelayList'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function RelaySettingsPage({ id, index }: { id?: string; index?: number }) {
+const RelaySettingsPage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { profile } = useFetchProfile(id)
 
@@ -13,6 +14,7 @@ export default function RelaySettingsPage({ id, index }: { id?: string; index?: 
 
   return (
     <SecondaryPageLayout
+      ref={ref}
       index={index}
       title={t("username's used relays", { username: profile.username })}
     >
@@ -21,4 +23,6 @@ export default function RelaySettingsPage({ id, index }: { id?: string; index?: 
       </div>
     </SecondaryPageLayout>
   )
-}
+})
+RelaySettingsPage.displayName = 'RelaySettingsPage'
+export default RelaySettingsPage

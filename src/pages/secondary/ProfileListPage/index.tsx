@@ -6,12 +6,12 @@ import { useFeed } from '@/providers/FeedProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Filter } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const LIMIT = 50
 
-export default function ProfileListPage({ index }: { index?: number }) {
+const ProfileListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { searchParams } = useSearchParams()
   const { relayUrls } = useFeed()
@@ -80,7 +80,7 @@ export default function ProfileListPage({ index }: { index?: number }) {
   }
 
   return (
-    <SecondaryPageLayout index={index} title={title} displayScrollToTopButton>
+    <SecondaryPageLayout ref={ref} index={index} title={title} displayScrollToTopButton>
       <div className="space-y-2 px-4">
         {Array.from(pubkeySet).map((pubkey, index) => (
           <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
@@ -89,4 +89,6 @@ export default function ProfileListPage({ index }: { index?: number }) {
       </div>
     </SecondaryPageLayout>
   )
-}
+})
+ProfileListPage.displayName = 'ProfileListPage'
+export default ProfileListPage

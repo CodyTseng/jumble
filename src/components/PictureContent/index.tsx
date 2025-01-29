@@ -17,10 +17,10 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
   const isNsfw = isNsfwEvent(event)
 
   const nodes: ReactNode[] = [
-    <ImageCarousel key={`image-gallery-${event.id}`} images={images} isNsfw={isNsfw} />
+    <ImageCarousel key={`${event.id}-image-gallery`} images={images} isNsfw={isNsfw} />
   ]
   nodes.push(
-    <div className="px-4">
+    <div key={`${event.id}-content`} className="px-4">
       {embedded(event.content, [
         embeddedNormalUrlRenderer,
         embeddedWebsocketUrlRenderer,

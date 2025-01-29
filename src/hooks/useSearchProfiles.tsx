@@ -23,7 +23,7 @@ export function useSearchProfiles(search: string, limit: number) {
       setProfiles([])
       try {
         const profiles = await client.fetchProfiles(
-          searchableRelayUrls.length > 0 ? searchableRelayUrls : SEARCHABLE_RELAY_URLS,
+          searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4),
           {
             search,
             limit

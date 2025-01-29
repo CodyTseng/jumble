@@ -2,11 +2,12 @@ import client from '@/services/client.service'
 import { TRelayInfo } from '@/types'
 import { useEffect, useState } from 'react'
 
-export function useFetchRelayInfo(url: string) {
+export function useFetchRelayInfo(url?: string) {
   const [isFetching, setIsFetching] = useState(true)
   const [relayInfo, setRelayInfo] = useState<TRelayInfo | undefined>(undefined)
 
   useEffect(() => {
+    if (!url) return
     const fetchRelayInfos = async () => {
       setIsFetching(true)
       const timer = setTimeout(() => {

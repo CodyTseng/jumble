@@ -4,10 +4,10 @@ import { useFetchRelayInfos, useSearchParams } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
 import { Filter } from 'nostr-tools'
-import { useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function NoteListPage({ index }: { index?: number }) {
+const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { relayUrls } = useFeed()
   const { searchableRelayUrls } = useFetchRelayInfos(relayUrls)
@@ -43,8 +43,10 @@ export default function NoteListPage({ index }: { index?: number }) {
   }, [searchParams, JSON.stringify(relayUrls)])
 
   return (
-    <SecondaryPageLayout index={index} title={title} displayScrollToTopButton>
+    <SecondaryPageLayout ref={ref} index={index} title={title} displayScrollToTopButton>
       <NoteList key={title} filter={filter} relayUrls={urls} />
     </SecondaryPageLayout>
   )
-}
+})
+NoteListPage.displayName = 'NoteListPage'
+export default NoteListPage

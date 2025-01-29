@@ -139,7 +139,7 @@ class ClientService extends EventTarget {
     const timeline = this.timelines[key]
     let cachedEvents: NEvent[] = []
     let since: number | undefined
-    if (timeline && timeline.refs.length) {
+    if (timeline && timeline.refs.length && needSort) {
       cachedEvents = (
         await Promise.all(
           timeline.refs.slice(0, filter.limit).map(([id]) => this.eventCache.get(id))

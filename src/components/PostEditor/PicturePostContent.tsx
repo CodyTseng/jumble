@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createPictureNoteDraftEvent } from '@/lib/draft-event'
@@ -11,6 +10,7 @@ import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
+import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
 import Uploader from './Uploader'
 
@@ -28,10 +28,6 @@ export default function PicturePostContent({ close }: { close: () => void }) {
   useEffect(() => {
     setAddClientTag(window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true')
   }, [])
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value)
-  }
 
   const post = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -91,10 +87,10 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         {t('A special note for picture-first clients like Olas')}
       </div>
       <PictureUploader pictureInfos={pictureInfos} setPictureInfos={setPictureInfos} />
-      <Textarea
+      <TextareaWithMentions
         className="h-32"
-        onChange={handleTextareaChange}
-        value={content}
+        setTextValue={setContent}
+        textValue={content}
         placeholder={t('Write something...')}
       />
       <div className="flex items-center justify-between">

@@ -2,7 +2,14 @@ import Username from '../Username'
 import { TEmbeddedRenderer } from './types'
 
 export function EmbeddedMention({ userId }: { userId: string }) {
-  return <Username userId={userId} showAt className="text-highlight font-normal inline-block" />
+  return (
+    <Username
+      userId={userId}
+      showAt
+      className="text-highlight font-normal inline-block"
+      withoutSkeleton
+    />
+  )
 }
 
 export const embeddedNostrNpubRenderer: TEmbeddedRenderer = {

@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
@@ -11,6 +10,7 @@ import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
 import Preview from './Preview'
 import Uploader from './Uploader'
@@ -38,10 +38,6 @@ export default function NormalPostContent({
   useEffect(() => {
     setAddClientTag(window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true')
   }, [])
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value)
-  }
 
   const post = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -103,10 +99,10 @@ export default function NormalPostContent({
 
   return (
     <div className="space-y-4">
-      <Textarea
+      <TextareaWithMentions
         className="h-32"
-        onChange={handleTextareaChange}
-        value={content}
+        setTextValue={setContent}
+        textValue={content}
         placeholder={t('Write something...')}
       />
       {content && <Preview content={content} />}

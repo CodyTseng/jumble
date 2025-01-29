@@ -2,10 +2,10 @@ import MailboxSetting from '@/components/MailboxSetting'
 import RelaySetsSetting from '@/components/RelaySetsSetting'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function RelaySettingsPage({ index }: { index?: number }) {
+const RelaySettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const [tabValue, setTabValue] = useState('relay-sets')
 
@@ -21,7 +21,7 @@ export default function RelaySettingsPage({ index }: { index?: number }) {
   }, [])
 
   return (
-    <SecondaryPageLayout index={index} title={t('Relay settings')}>
+    <SecondaryPageLayout ref={ref} index={index} title={t('Relay settings')}>
       <Tabs value={tabValue} onValueChange={setTabValue} className="px-4 space-y-4">
         <TabsList>
           <TabsTrigger value="relay-sets">{t('Relay Sets')}</TabsTrigger>
@@ -36,4 +36,6 @@ export default function RelaySettingsPage({ index }: { index?: number }) {
       </Tabs>
     </SecondaryPageLayout>
   )
-}
+})
+RelaySettingsPage.displayName = 'RelaySettingsPage'
+export default RelaySettingsPage

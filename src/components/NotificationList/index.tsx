@@ -9,7 +9,7 @@ import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Heart, MessageCircle, Repeat, ThumbsUp } from 'lucide-react'
 import { Event, kinds, nip19, validateEvent } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { embedded, embeddedNostrNpubRenderer, embeddedNostrProfileRenderer } from '../Embedded'
@@ -20,7 +20,7 @@ const LIMIT = 100
 
 export default function NotificationList() {
   const { t } = useTranslation()
-  const { pubkey, relayList } = useNostr()
+  const { pubkey } = useNostr()
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(true)
@@ -29,13 +29,14 @@ export default function NotificationList() {
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (!pubkey || !relayList) {
+    if (!pubkey) {
       setUntil(undefined)
       return
     }
 
     const init = async () => {
       setRefreshing(true)
+      const relayList = await client.fetchRelayList(pubkey)
       let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
         relayList.read.length >= 4
@@ -70,7 +71,25 @@ export default function NotificationList() {
     return () => {
       promise.then((closer) => closer?.())
     }
-  }, [pubkey, refreshCount, relayList])
+  }, [pubkey, refreshCount])
+
+  const loadMore = useCallback(async () => {
+    if (!pubkey || !timelineKey || !until || refreshing) return
+    const notifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
+    if (notifications.length === 0) {
+      setUntil(undefined)
+      return
+    }
+
+    if (notifications.length > 0) {
+      setNotifications((oldNotifications) => [
+        ...oldNotifications,
+        ...notifications.filter((event) => event.pubkey !== pubkey)
+      ])
+    }
+
+    setUntil(notifications[notifications.length - 1].created_at - 1)
+  }, [pubkey, timelineKey, until, refreshing])
 
   useEffect(() => {
     if (refreshing) return
@@ -98,25 +117,7 @@ export default function NotificationList() {
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [until, refreshing, timelineKey])
-
-  const loadMore = async () => {
-    if (!pubkey || !timelineKey || !until || refreshing) return
-    const notifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
-    if (notifications.length === 0) {
-      setUntil(undefined)
-      return
-    }
-
-    if (notifications.length > 0) {
-      setNotifications((oldNotifications) => [
-        ...oldNotifications,
-        ...notifications.filter((event) => event.pubkey !== pubkey)
-      ])
-    }
-
-    setUntil(notifications[notifications.length - 1].created_at - 1)
-  }
+  }, [refreshing, loadMore])
 
   return (
     <PullToRefresh

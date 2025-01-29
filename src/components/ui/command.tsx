@@ -77,9 +77,9 @@ CommandInput.displayName = CommandPrimitive.Input.displayName
 
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
-  <ScrollArea className="max-h-[80vh]">
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List> & { scrollAreaClassName?: string }
+>(({ className, scrollAreaClassName, ...props }, ref) => (
+  <ScrollArea className={scrollAreaClassName}>
     <CommandPrimitive.List ref={ref} className={cn('overflow-x-hidden', className)} {...props} />
   </ScrollArea>
 ))

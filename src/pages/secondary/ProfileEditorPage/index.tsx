@@ -11,10 +11,10 @@ import { generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { Loader, Upload } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function ProfileEditorPage({ index }: { index?: number }) {
+const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { pop } = useSecondaryPage()
   const { account, profile, profileEvent, publish, updateProfileEvent } = useNostr()
@@ -98,7 +98,7 @@ export default function ProfileEditorPage({ index }: { index?: number }) {
   )
 
   return (
-    <SecondaryPageLayout index={index} title={profile.username} controls={controls}>
+    <SecondaryPageLayout ref={ref} index={index} title={profile.username} controls={controls}>
       <div className="px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <Uploader
@@ -174,7 +174,9 @@ export default function ProfileEditorPage({ index }: { index?: number }) {
       </div>
     </SecondaryPageLayout>
   )
-}
+})
+ProfileEditorPage.displayName = 'ProfileEditorPage'
+export default ProfileEditorPage
 
 function ItemTitle({ children }: { children: React.ReactNode }) {
   return <div className="text-sm font-semibold text-muted-foreground pl-3">{children}</div>

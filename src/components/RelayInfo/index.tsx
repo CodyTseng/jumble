@@ -80,7 +80,7 @@ function formatSoftware(software: string) {
   return parts[parts.length - 1]
 }
 
-function RelayBadges({ relayInfo }: { relayInfo: TRelayInfo }) {
+export function RelayBadges({ relayInfo }: { relayInfo: TRelayInfo }) {
   return (
     <div className="flex gap-2">
       {relayInfo.supported_nips?.includes(42) && (

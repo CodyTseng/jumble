@@ -1,11 +1,13 @@
 import NotificationList from '@/components/NotificationList'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { Bell } from 'lucide-react'
+import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function NotificationListPage() {
+const NotificationListPage = forwardRef((_, ref) => {
   return (
     <PrimaryPageLayout
+      ref={ref}
       pageName="notifications"
       titlebar={<NotificationListPageTitlebar />}
       displayScrollToTopButton
@@ -15,7 +17,9 @@ export default function NotificationListPage() {
       </div>
     </PrimaryPageLayout>
   )
-}
+})
+NotificationListPage.displayName = 'NotificationListPage'
+export default NotificationListPage
 
 function NotificationListPageTitlebar() {
   const { t } = useTranslation()

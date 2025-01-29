@@ -10,15 +10,20 @@ export default function Username({
   userId,
   showAt = false,
   className,
-  skeletonClassName
+  skeletonClassName,
+  withoutSkeleton = false
 }: {
   userId: string
   showAt?: boolean
   className?: string
   skeletonClassName?: string
+  withoutSkeleton?: boolean
 }) {
   const { profile } = useFetchProfile(userId)
-  if (!profile) return <Skeleton className={cn('w-16 my-1', skeletonClassName)} />
+  if (!profile && !withoutSkeleton) {
+    return <Skeleton className={cn('w-16 my-1', skeletonClassName)} />
+  }
+  if (!profile) return null
 
   const { username, pubkey } = profile
 

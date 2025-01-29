@@ -3,6 +3,7 @@ import Nip05 from '@/components/Nip05'
 import NoteList from '@/components/NoteList'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
+import ProfileOptions from '@/components/ProfileOptions'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import QrCodePopover from '@/components/QrCodePopover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -24,12 +25,11 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
-import ProfileOptions from '@/components/ProfileOptions'
 
-export default function ProfilePage({ id, index }: { id?: string; index?: number }) {
+const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { profile, isFetching } = useFetchProfile(id)
@@ -39,7 +39,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
     () =>
       relayList.write.length < 4
         ? relayList.write.concat(currentRelayUrls).slice(0, 4)
-        : relayList.write.slice(0, 4),
+        : relayList.write.slice(0, 8),
     [relayList, currentRelayUrls]
   )
   const { pubkey: accountPubkey } = useNostr()
@@ -59,7 +59,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
 
   if (!profile && isFetching) {
     return (
-      <SecondaryPageLayout index={index}>
+      <SecondaryPageLayout index={index} ref={ref}>
         <div className="px-4">
           <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
             <Skeleton className="w-full h-full object-cover rounded-lg" />
@@ -73,9 +73,9 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
   }
   if (!profile) return <NotFoundPage />
 
-  const { banner, username, nip05, about, avatar, pubkey } = profile
+  const { banner, username, about, avatar, pubkey } = profile
   return (
-    <SecondaryPageLayout index={index} title={username} displayScrollToTopButton>
+    <SecondaryPageLayout index={index} title={username} displayScrollToTopButton ref={ref}>
       <div className="px-4">
         <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
           <ProfileBanner
@@ -111,7 +111,7 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
         </div>
         <div className="pt-2">
           <div className="text-xl font-semibold">{username}</div>
-          {nip05 && <Nip05 nip05={nip05} pubkey={pubkey} />}
+          <Nip05 pubkey={pubkey} />
           <div className="flex gap-1 mt-1">
             <PubkeyCopy pubkey={pubkey} />
             <QrCodePopover pubkey={pubkey} />
@@ -151,4 +151,6 @@ export default function ProfilePage({ id, index }: { id?: string; index?: number
       )}
     </SecondaryPageLayout>
   )
-}
+})
+ProfilePage.displayName = 'ProfilePage'
+export default ProfilePage

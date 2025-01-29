@@ -1,21 +1,22 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { ChevronUp } from 'lucide-react'
 
 export default function ScrollToTopButton({
   scrollAreaRef,
-  className,
-  visible = true
+  className
 }: {
-  scrollAreaRef: React.RefObject<HTMLDivElement>
+  scrollAreaRef?: React.RefObject<HTMLDivElement>
   className?: string
-  visible?: boolean
 }) {
   const { isSmallScreen } = useScreenSize()
+  const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
+  const visible = !deepBrowsing && lastScrollTop > 800
 
   const handleScrollToTop = () => {
-    if (isSmallScreen) {
+    if (!scrollAreaRef) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }

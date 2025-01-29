@@ -1,10 +1,10 @@
 import UserItem from '@/components/UserItem'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function FollowingListPage({ id, index }: { id?: string; index?: number }) {
+const FollowingListPage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { profile } = useFetchProfile(id)
   const { followings } = useFetchFollowings(profile?.pubkey)
@@ -45,6 +45,7 @@ export default function FollowingListPage({ id, index }: { id?: string; index?: 
 
   return (
     <SecondaryPageLayout
+      ref={ref}
       index={index}
       title={
         profile?.username
@@ -61,4 +62,6 @@ export default function FollowingListPage({ id, index }: { id?: string; index?: 
       </div>
     </SecondaryPageLayout>
   )
-}
+})
+FollowingListPage.displayName = 'FollowingListPage'
+export default FollowingListPage
