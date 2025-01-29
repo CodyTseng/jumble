@@ -69,8 +69,6 @@ function AccountManagerNav({
             const wizard = new NstartModal({
               baseUrl: 'https://start.njump.me',
               an: 'Jumble',
-              ac: '',
-              at: '',
               onComplete: ({ nostrLogin }) => {
                 if (!nostrLogin) return
 
@@ -81,8 +79,7 @@ function AccountManagerNav({
                 } else if (nostrLogin.startsWith('nsec')) {
                   nsecLogin(nostrLogin)
                 }
-              },
-              onCancel: () => {}
+              }
             })
             close?.()
             wizard.open()
