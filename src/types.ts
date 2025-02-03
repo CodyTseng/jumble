@@ -8,6 +8,7 @@ export type TProfile = {
   avatar?: string
   nip05?: string
   about?: string
+  website?: string
   created_at?: number
 }
 export type TMailboxRelayScope = 'read' | 'write' | 'both'

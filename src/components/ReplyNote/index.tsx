@@ -1,5 +1,6 @@
 import { useSecondaryPage } from '@/PageManager'
 import { toNote } from '@/lib/link'
+import { useNostr } from '@/providers/NostrProvider'
 import { Event } from 'nostr-tools'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,6 +24,7 @@ export default function ReplyNote({
   highlight?: boolean
 }) {
   const { t } = useTranslation()
+  const { checkLogin } = useNostr()
   const { push } = useSecondaryPage()
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
 
@@ -56,7 +58,7 @@ export default function ReplyNote({
             className="text-muted-foreground hover:text-primary cursor-pointer"
             onClick={(e) => {
               e.stopPropagation()
-              setIsPostDialogOpen(true)
+              checkLogin(() => setIsPostDialogOpen(true))
             }}
           >
             {t('reply')}

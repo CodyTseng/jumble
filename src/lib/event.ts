@@ -119,6 +119,7 @@ export function getProfileFromProfileEvent(event: Event) {
       original_username: username,
       nip05: profileObj.nip05,
       about: profileObj.about,
+      website: profileObj.website,
       created_at: event.created_at
     }
   } catch (err) {

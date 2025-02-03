@@ -94,7 +94,14 @@ export default function RepostButton({
           <DropdownMenuItem onClick={repost} disabled={!canRepost}>
             <Repeat /> {t('Repost')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsPostDialogOpen(true)}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation()
+              checkLogin(() => {
+                setIsPostDialogOpen(true)
+              })
+            }}
+          >
             <PencilLine /> {t('Quote')}
           </DropdownMenuItem>
         </DropdownMenuContent>

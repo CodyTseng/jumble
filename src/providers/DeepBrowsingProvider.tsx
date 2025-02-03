@@ -28,6 +28,7 @@ export function DeepBrowsingProvider({
   const lastScrollTopRef = useRef(
     (!scrollAreaRef ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
   )
+  const [lastScrollTop, setLastScrollTop] = useState(lastScrollTopRef.current)
 
   useEffect(() => {
     setDeepBrowsing(false)
@@ -48,6 +49,7 @@ export function DeepBrowsingProvider({
       const scrollTop = (!scrollAreaRef ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
       const diff = scrollTop - lastScrollTopRef.current
       lastScrollTopRef.current = scrollTop
+      setLastScrollTop(scrollTop)
       if (scrollTop <= 800) {
         setDeepBrowsing(false)
         return
@@ -74,7 +76,7 @@ export function DeepBrowsingProvider({
   }, [active])
 
   return (
-    <DeepBrowsingContext.Provider value={{ deepBrowsing, lastScrollTop: lastScrollTopRef.current }}>
+    <DeepBrowsingContext.Provider value={{ deepBrowsing, lastScrollTop }}>
       {children}
     </DeepBrowsingContext.Provider>
   )

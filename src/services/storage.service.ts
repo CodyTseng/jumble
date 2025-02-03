@@ -73,8 +73,12 @@ class StorageService {
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
-    const feedTypeStr = window.localStorage.getItem(StorageKey.FEED_TYPE)
-    this.feedType = feedTypeStr ? JSON.parse(feedTypeStr) : 'relays'
+    const feedType = window.localStorage.getItem(StorageKey.FEED_TYPE)
+    if (feedType && ['following', 'relays'].includes(feedType)) {
+      this.feedType = feedType as 'following' | 'relays'
+    } else {
+      this.feedType = 'relays'
+    }
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
     this.noteListMode =
       noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
@@ -136,8 +140,7 @@ class StorageService {
       this.activeRelaySetId = activeRelaySetId
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
-      const activeRelaySetIdStr = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID)
-      this.activeRelaySetId = activeRelaySetIdStr ? JSON.parse(activeRelaySetIdStr) : null
+      this.activeRelaySetId = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID) ?? null
     }
   }
 
@@ -157,10 +160,7 @@ class StorageService {
   setActiveRelaySetId(id: string | null) {
     this.activeRelaySetId = id
     if (id) {
-      window.localStorage.setItem(
-        StorageKey.ACTIVE_RELAY_SET_ID,
-        JSON.stringify(this.activeRelaySetId)
-      )
+      window.localStorage.setItem(StorageKey.ACTIVE_RELAY_SET_ID, id)
     } else {
       window.localStorage.removeItem(StorageKey.ACTIVE_RELAY_SET_ID)
     }
@@ -172,7 +172,7 @@ class StorageService {
 
   setFeedType(feedType: TFeedType) {
     this.feedType = feedType
-    window.localStorage.setItem(StorageKey.FEED_TYPE, JSON.stringify(this.feedType))
+    window.localStorage.setItem(StorageKey.FEED_TYPE, this.feedType)
   }
 
   getThemeSetting() {

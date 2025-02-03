@@ -1,5 +1,4 @@
 import Sidebar from '@/components/Sidebar'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
@@ -108,10 +107,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     const onPopState = (e: PopStateEvent) => {
-      const state = e.state ?? { index: -1, url: '/' }
+      let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
         const currentIndex = currentItem?.index
+        if (!state) {
+          if (window.location.pathname + window.location.search + window.location.hash !== '/') {
+            // Just change the URL
+            return pre
+          } else {
+            // Back to root
+            state = { index: -1, url: '/' }
+          }
+        }
 
         // Go forward
         if (currentIndex === undefined || state.index > currentIndex) {
@@ -127,7 +135,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         }
 
         // Go back
-        const newStack = pre.filter((item) => item.index <= state.index)
+        const newStack = pre.filter((item) => item.index <= state!.index)
         const topItem = newStack[newStack.length - 1] as TStackItem | undefined
         if (!topItem) {
           // Create a new stack item if it's not exist (e.g. when the user refreshes the page, the stack will be empty)
@@ -262,11 +270,12 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <Separator orientation="vertical" />
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel minSize={30}>
+          <div className="grid grid-cols-2 w-full">
+            <div className="flex">
               {primaryPages.map(({ name, element }) => (
                 <div
                   key={name}
+                  className="w-full"
                   style={{
                     display: currentPrimaryPage === name ? 'block' : 'none'
                   }}
@@ -274,9 +283,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   {element}
                 </div>
               ))}
-            </ResizablePanel>
-            <ResizableHandle />
-            <ResizablePanel minSize={30}>
+              <Separator orientation="vertical" className="z-50" />
+            </div>
+            <div>
               {secondaryStack.length ? (
                 secondaryStack.map((item, index) => (
                   <div
@@ -289,8 +298,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ) : (
                 <HomePage />
               )}
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            </div>
+          </div>
         </div>
       </SecondaryPageContext.Provider>
     </PrimaryPageContext.Provider>

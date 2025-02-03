@@ -1,9 +1,11 @@
 import PostEditor from '@/components/PostEditor'
+import { useNostr } from '@/providers/NostrProvider'
 import { PencilLine } from 'lucide-react'
 import { useState } from 'react'
 import SidebarItem from './SidebarItem'
 
 export default function PostButton() {
+  const { checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
 
   return (
@@ -13,7 +15,9 @@ export default function PostButton() {
         description="Post"
         onClick={(e) => {
           e.stopPropagation()
-          setOpen(true)
+          checkLogin(() => {
+            setOpen(true)
+          })
         }}
         variant="default"
         className="bg-primary xl:justify-center gap-2"

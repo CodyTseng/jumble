@@ -1,10 +1,12 @@
 import PostEditor from '@/components/PostEditor'
 import { cn } from '@/lib/utils'
+import { useNostr } from '@/providers/NostrProvider'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 
 export default function PostButton() {
+  const { checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
 
   return (
@@ -15,7 +17,9 @@ export default function PostButton() {
         )}
         onClick={(e) => {
           e.stopPropagation()
-          setOpen(true)
+          checkLogin(() => {
+            setOpen(true)
+          })
         }}
       >
         <Plus />

@@ -5,6 +5,7 @@ import { extractPubkeysFromEventTags } from '@/lib/tag'
 import { TDraftEvent, TProfile, TRelayInfo, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
+import FlexSearch from 'flexsearch'
 import { LRUCache } from 'lru-cache'
 import {
   EventTemplate,
@@ -75,6 +76,10 @@ class ClientService extends EventTarget {
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     fetchMethod: this._fetchFollowListEvent.bind(this)
+  })
+
+  private userIndex = new FlexSearch.Index({
+    tokenize: 'full'
   })
 
   constructor() {
@@ -499,6 +504,18 @@ class ClientService extends EventTarget {
     return readRelays
   }
 
+  async searchProfilesFromIndex(query: string) {
+    const result = await this.userIndex.searchAsync(query, { limit: 10 })
+    return Promise.all(result.map((pubkey) => this.fetchProfile(pubkey as string))).then(
+      (profiles) => profiles.filter(Boolean) as TProfile[]
+    )
+  }
+
+  async initUserIndexFromFollowings(pubkey: string) {
+    const followings = await this.fetchFollowings(pubkey)
+    await this.profileEventDataloader.loadMany(followings)
+  }
+
   private async fetchEventById(relayUrls: string[], id: string): Promise<NEvent | undefined> {
     const event = await this.fetchEventFromDefaultRelaysDataloader.load(id)
     if (event) {
@@ -577,6 +594,7 @@ class ClientService extends EventTarget {
     const profileFromDefaultRelays =
       await this.fetchProfileEventFromDefaultRelaysDataloader.load(pubkey)
     if (profileFromDefaultRelays) {
+      this.addUsernameToIndex(profileFromDefaultRelays)
       return profileFromDefaultRelays
     }
 
@@ -593,7 +611,27 @@ class ClientService extends EventTarget {
       this.profileEventDataloader.prime(pubkey, Promise.resolve(profileEvent))
     }
 
+    if (profileEvent) {
+      this.addUsernameToIndex(profileEvent)
+    }
+
     return profileEvent
+  }
+
+  private addUsernameToIndex(profileEvent: NEvent) {
+    try {
+      const profileObj = JSON.parse(profileEvent.content)
+      const text = [
+        profileObj.display_name?.trim() ?? '',
+        profileObj.name?.trim() ?? '',
+        profileObj.nip05?.split('@')[0]?.trim() ?? ''
+      ].join(' ')
+      if (!text) return
+
+      this.userIndex.add(profileEvent.pubkey, text)
+    } catch {
+      return
+    }
   }
 
   private async tryHarderToFetchEvent(

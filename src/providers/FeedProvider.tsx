@@ -1,5 +1,6 @@
 import { BIG_RELAY_URLS } from '@/constants'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
+import client from '@/services/client.service'
 import storage from '@/services/storage.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
@@ -37,6 +38,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   const { getFollowings } = useFollowList()
   const { relaySets } = useRelaySets()
   const feedTypeRef = useRef<TFeedType>(storage.getFeedType())
+  const [feedType, setFeedType] = useState<TFeedType>(feedTypeRef.current)
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
   const [filter, setFilter] = useState<Filter>({})
@@ -93,11 +95,13 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         (relaySets.length > 0 ? relaySets[0] : null)
       if (relaySet) {
         feedTypeRef.current = feedType
+        setFeedType(feedType)
         setRelayUrls(relaySet.relayUrls)
         setActiveRelaySetId(relaySet.id)
         setFilter({})
         storage.setActiveRelaySetId(relaySet.id)
         storage.setFeedType(feedType)
+        client.setCurrentRelayUrls(relaySet.relayUrls)
       }
       return setIsReady(true)
     }
@@ -106,6 +110,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
       feedTypeRef.current = feedType
+      setFeedType(feedType)
       setActiveRelaySetId(null)
       const [relayList, followings] = await Promise.all([
         getRelayList(options.pubkey),
@@ -125,10 +130,12 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       }
 
       feedTypeRef.current = feedType
+      setFeedType(feedType)
       setTemporaryRelayUrls(urls)
       setRelayUrls(urls)
       setActiveRelaySetId(null)
       setFilter({})
+      client.setCurrentRelayUrls(urls)
       return setIsReady(true)
     }
     setIsReady(true)
@@ -137,7 +144,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   return (
     <FeedContext.Provider
       value={{
-        feedType: feedTypeRef.current,
+        feedType,
         relayUrls,
         temporaryRelayUrls,
         filter,

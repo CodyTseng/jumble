@@ -66,7 +66,7 @@ const PrimaryPageLayout = forwardRef(
       <DeepBrowsingProvider active={current === pageName} scrollAreaRef={scrollAreaRef}>
         <ScrollArea
           className="h-screen overflow-auto"
-          scrollBarClassName="z-50"
+          scrollBarClassName="z-20 pt-12"
           ref={scrollAreaRef}
         >
           <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>

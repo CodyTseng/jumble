@@ -132,7 +132,7 @@ export default {
     'read & write relays notice':
       'The number of read and write servers should ideally be kept between 2 and 4.',
     "Don't have an account yet?": "Don't have an account yet?",
-    'Generate New Account': 'Generate New Account',
+    'or simply generate a private key': 'or simply generate a private key',
     'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
       'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.',
     Edit: 'Edit',
@@ -146,6 +146,7 @@ export default {
     Back: 'Back',
     'optional: encrypt nsec': 'optional: encrypt nsec',
     password: 'password',
+    'Sign up': 'Sign up',
     'Save to': 'Save to',
     'Enter a name for the new relay set': 'Enter a name for the new relay set',
     'Save to a new relay set': 'Save to a new relay set',
