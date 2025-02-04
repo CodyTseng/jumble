@@ -2,7 +2,7 @@ import { BIG_RELAY_URLS } from '@/constants'
 import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
 import { formatPubkey, userIdToPubkey } from '@/lib/pubkey'
 import { extractPubkeysFromEventTags } from '@/lib/tag'
-import { TDraftEvent, TProfile, TRelayInfo, TRelayList } from '@/types'
+import { TDraftEvent, TProfile, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import FlexSearch from 'flexsearch'
@@ -59,20 +59,6 @@ class ClientService extends EventTarget {
       maxBatchSize: 10
     }
   )
-  private relayInfoDataLoader = new DataLoader<string, TRelayInfo | undefined>(async (urls) => {
-    return await Promise.all(
-      urls.map(async (url) => {
-        try {
-          const res = await fetch(url.replace('ws://', 'http://').replace('wss://', 'https://'), {
-            headers: { Accept: 'application/nostr+json' }
-          })
-          return res.json() as TRelayInfo
-        } catch {
-          return undefined
-        }
-      })
-    )
-  })
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     fetchMethod: this._fetchFollowListEvent.bind(this)
@@ -445,11 +431,6 @@ class ClientService extends EventTarget {
 
   updateFollowListCache(pubkey: string, event: NEvent) {
     this.followListCache.set(pubkey, Promise.resolve(event))
-  }
-
-  async fetchRelayInfos(urls: string[]) {
-    const infos = await this.relayInfoDataLoader.loadMany(urls)
-    return infos.map((info) => (info ? (info instanceof Error ? undefined : info) : undefined))
   }
 
   async calculateOptimalReadRelays(pubkey: string) {

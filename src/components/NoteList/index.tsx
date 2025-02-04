@@ -8,6 +8,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import storage from '@/services/storage.service'
 import { TNoteListMode } from '@/types'
 import dayjs from 'dayjs'
@@ -71,7 +72,7 @@ export default function NoteList({
       setNewEvents([])
       setHasMore(true)
 
-      const relayInfos = await client.fetchRelayInfos(relayUrls)
+      const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
       const areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
       const filter = areAlgoRelays ? { ...noteFilter, limit: ALGO_RELAY_LIMIT } : noteFilter
 

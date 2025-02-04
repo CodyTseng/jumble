@@ -1,4 +1,4 @@
-import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import { TRelayInfo } from '@/types'
 import { useEffect, useState } from 'react'
 
@@ -14,7 +14,7 @@ export function useFetchRelayInfo(url?: string) {
         setIsFetching(false)
       }, 5000)
       try {
-        const [relayInfo] = await client.fetchRelayInfos([url])
+        const relayInfo = await relayInfoService.getRelayInfo(url)
         setRelayInfo(relayInfo)
       } catch (err) {
         console.error(err)

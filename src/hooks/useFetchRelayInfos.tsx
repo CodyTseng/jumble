@@ -1,5 +1,5 @@
 import { checkAlgoRelay } from '@/lib/relay'
-import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import { TRelayInfo } from '@/types'
 import { useEffect, useState } from 'react'
 
@@ -20,7 +20,7 @@ export function useFetchRelayInfos(urls: string[]) {
         setIsFetching(false)
       }, 5000)
       try {
-        const relayInfos = await client.fetchRelayInfos(urls)
+        const relayInfos = await relayInfoService.getRelayInfos(urls)
         setRelayInfos(relayInfos)
         setAreAlgoRelays(relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo)))
         setSearchableRelayUrls(
