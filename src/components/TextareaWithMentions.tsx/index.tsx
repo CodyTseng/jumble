@@ -1,8 +1,9 @@
 import { Command, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Textarea } from '@/components/ui/textarea'
-import { useSearchProfiles } from '@/hooks'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
+import client from '@/services/client.service'
+import { TProfile } from '@/types'
 import React, {
   ComponentProps,
   Dispatch,
@@ -30,7 +31,7 @@ export default function TextareaWithMentions({
   const inputRef = useRef<HTMLInputElement>(null)
   const [commandValue, setCommandValue] = useState('')
   const [debouncedCommandValue, setDebouncedCommandValue] = useState(commandValue)
-  const { profiles, isFetching } = useSearchProfiles(debouncedCommandValue, 10)
+  const [profiles, setProfiles] = useState<TProfile[]>([])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -43,15 +44,26 @@ export default function TextareaWithMentions({
   }, [commandValue])
 
   useEffect(() => {
+    setProfiles([])
+    if (debouncedCommandValue) {
+      const fetchProfiles = async () => {
+        const newProfiles = await client.searchProfilesFromIndex(debouncedCommandValue, 100)
+        setProfiles(newProfiles)
+      }
+      fetchProfiles()
+    }
+  }, [debouncedCommandValue])
+
+  useEffect(() => {
     const dropdown = dropdownRef.current
     if (!dropdown) return
 
-    if (profiles.length > 0 && !isFetching) {
+    if (profiles.length > 0) {
       dropdown.classList.remove('hidden')
     } else {
       dropdown.classList.add('hidden')
     }
-  }, [profiles, isFetching])
+  }, [profiles])
 
   const handleBlur = useCallback(() => {
     const dropdown = dropdownRef.current

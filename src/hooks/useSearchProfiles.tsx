@@ -1,3 +1,4 @@
+import { SEARCHABLE_RELAY_URLS } from '@/constants'
 import { useFeed } from '@/providers/FeedProvider'
 import client from '@/services/client.service'
 import { TProfile } from '@/types'
@@ -21,7 +22,13 @@ export function useSearchProfiles(search: string, limit: number) {
       setIsFetching(true)
       setProfiles([])
       try {
-        const profiles = await client.searchProfilesFromIndex(search)
+        const profiles = await client.fetchProfiles(
+          searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4),
+          {
+            search,
+            limit
+          }
+        )
         if (profiles) {
           setProfiles(profiles)
         }
