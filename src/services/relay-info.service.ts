@@ -71,16 +71,34 @@ class RelayInfoService {
 
   private async _getRelayInfo(url: string) {
     const exist = this.relayInfoMap.get(url)
-    if (exist) {
+    if (exist && (exist.hasNip11 || exist.triedNip11)) {
       return exist
     }
 
+    const nip11 = await this.fetchRelayInfoByNip11(url)
+    const relayInfo = nip11
+      ? {
+          ...nip11,
+          url,
+          shortUrl: simplifyUrl(url),
+          hasNip11: Object.keys(nip11).length > 0,
+          triedNip11: true
+        }
+      : {
+          url,
+          shortUrl: simplifyUrl(url),
+          hasNip11: false,
+          triedNip11: true
+        }
+    return await this.addRelayInfo(relayInfo)
+  }
+
+  private async fetchRelayInfoByNip11(url: string) {
     try {
       const res = await fetch(url.replace('ws://', 'http://').replace('wss://', 'https://'), {
         headers: { Accept: 'application/nostr+json' }
       })
-      const relayInfo = res.json() as TRelayInfo
-      await this.addRelayInfo({ ...relayInfo, url, shortUrl: simplifyUrl(url) })
+      return res.json() as TRelayInfo
     } catch {
       return undefined
     }
@@ -111,11 +129,21 @@ class RelayInfoService {
   }
 
   private async addRelayInfo(relayInfo: TNip66RelayInfo) {
-    this.relayInfoMap.set(relayInfo.url, relayInfo)
+    const oldRelayInfo = this.relayInfoMap.get(relayInfo.url)
+    const newRelayInfo = oldRelayInfo
+      ? {
+          ...oldRelayInfo,
+          ...relayInfo,
+          hasNip11: oldRelayInfo.hasNip11 || relayInfo.hasNip11,
+          triedNip11: oldRelayInfo.triedNip11 || relayInfo.triedNip11
+        }
+      : relayInfo
+    this.relayInfoMap.set(newRelayInfo.url, newRelayInfo)
     await this.relayInfoIndex.addAsync(
-      relayInfo.url,
-      [relayInfo.shortUrl, relayInfo.name ?? '', relayInfo.description ?? ''].join(' ')
+      newRelayInfo.url,
+      [newRelayInfo.shortUrl, newRelayInfo.name ?? '', newRelayInfo.description ?? ''].join(' ')
     )
+    return newRelayInfo
   }
 }
 
@@ -126,27 +154,34 @@ function formatRelayInfoEvents(relayInfoEvents: Event[]) {
   const urlSet = new Set<string>()
   const relayInfos: TNip66RelayInfo[] = []
   relayInfoEvents.forEach((event) => {
-    const url = event.tags.find(tagNameEquals('d'))?.[1]
-    if (!url || urlSet.has(url) || !isWebsocketUrl(url)) {
-      return
-    }
-
-    urlSet.add(url)
-    const basicInfo = event.content ? (JSON.parse(event.content) as TRelayInfo) : {}
-    const tagInfo: Omit<TNip66RelayInfo, 'url' | 'shortUrl'> = {}
-    event.tags.forEach((tag) => {
-      if (tag[0] === 'T') {
-        tagInfo.relayType = tag[1]
-      } else if (tag[0] === 'g' && tag[2] === 'countryCode') {
-        tagInfo.countryCode = tag[1]
+    try {
+      const url = event.tags.find(tagNameEquals('d'))?.[1]
+      if (!url || urlSet.has(url) || !isWebsocketUrl(url)) {
+        return
       }
-    })
-    relayInfos.push({
-      ...basicInfo,
-      ...tagInfo,
-      url,
-      shortUrl: simplifyUrl(url)
-    })
+
+      urlSet.add(url)
+      const basicInfo = event.content ? (JSON.parse(event.content) as TRelayInfo) : {}
+      const tagInfo: Omit<TNip66RelayInfo, 'url' | 'shortUrl'> = {
+        hasNip11: Object.keys(basicInfo).length > 0,
+        triedNip11: false
+      }
+      event.tags.forEach((tag) => {
+        if (tag[0] === 'T') {
+          tagInfo.relayType = tag[1]
+        } else if (tag[0] === 'g' && tag[2] === 'countryCode') {
+          tagInfo.countryCode = tag[1]
+        }
+      })
+      relayInfos.push({
+        ...basicInfo,
+        ...tagInfo,
+        url,
+        shortUrl: simplifyUrl(url)
+      })
+    } catch (error) {
+      console.error(error)
+    }
   })
   return relayInfos
 }

@@ -102,6 +102,8 @@ export type TPageRef = { scrollToTop: () => void }
 export type TNip66RelayInfo = TRelayInfo & {
   url: string
   shortUrl: string
+  hasNip11: boolean
+  triedNip11: boolean
   relayType?: string
   countryCode?: string
 }

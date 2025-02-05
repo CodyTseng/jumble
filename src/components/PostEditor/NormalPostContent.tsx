@@ -4,6 +4,7 @@ import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/dr
 import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useState } from 'react'
@@ -53,7 +54,7 @@ export default function NormalPostContent({
         }
         let protectedEvent = false
         if (postOptions.sendOnlyToCurrentRelays) {
-          const relayInfos = await client.fetchRelayInfos(relayUrls)
+          const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
           protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
         }
         const draftEvent =
