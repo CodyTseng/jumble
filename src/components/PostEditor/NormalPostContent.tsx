@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
+import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
+import PostOptions from './PostOptions.tsx'
 import Preview from './Preview'
+import { TPostOptions } from './types.ts'
 import Uploader from './Uploader'
 
 export default function NormalPostContent({
@@ -27,17 +27,14 @@ export default function NormalPostContent({
   const { t } = useTranslation()
   const { toast } = useToast()
   const { publish, checkLogin } = useNostr()
+  const { relayUrls } = useFeed()
   const [content, setContent] = useState(defaultContent)
   const [pictureInfos, setPictureInfos] = useState<{ url: string; tags: string[][] }[]>([])
   const [posting, setPosting] = useState(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
-  const [addClientTag, setAddClientTag] = useState(false)
+  const [postOptions, setPostOptions] = useState<TPostOptions>({})
   const [uploadingPicture, setUploadingPicture] = useState(false)
   const canPost = !!content && !posting
-
-  useEffect(() => {
-    setAddClientTag(window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true')
-  }, [])
 
   const post = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -54,14 +51,26 @@ export default function NormalPostContent({
           const relayList = await client.fetchRelayList(parentEvent.pubkey)
           additionalRelayUrls.push(...relayList.read.slice(0, 5))
         }
+        let protectedEvent = false
+        if (postOptions.sendOnlyToCurrentRelays) {
+          const relayInfos = await client.fetchRelayInfos(relayUrls)
+          protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
+        }
         const draftEvent =
           parentEvent && parentEvent.kind !== kinds.ShortTextNote
-            ? await createCommentDraftEvent(content, parentEvent, pictureInfos, { addClientTag })
+            ? await createCommentDraftEvent(content, parentEvent, pictureInfos, {
+                addClientTag: postOptions.addClientTag,
+                protectedEvent
+              })
             : await createShortTextNoteDraftEvent(content, pictureInfos, {
                 parentEvent,
-                addClientTag
+                addClientTag: postOptions.addClientTag,
+                protectedEvent
               })
-        await publish(draftEvent, additionalRelayUrls)
+        await publish(draftEvent, {
+          additionalRelayUrls,
+          specifiedRelayUrls: postOptions.sendOnlyToCurrentRelays ? relayUrls : undefined
+        })
         setContent('')
         close()
       } catch (error) {
@@ -90,11 +99,6 @@ export default function NormalPostContent({
         description: t('Your post has been published')
       })
     })
-  }
-
-  const onAddClientTagChange = (checked: boolean) => {
-    setAddClientTag(checked)
-    window.localStorage.setItem(StorageKey.ADD_CLIENT_TAG, checked.toString())
   }
 
   return (
@@ -150,21 +154,11 @@ export default function NormalPostContent({
           </div>
         </div>
       </div>
-      {showMoreOptions && (
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="add-client-tag">{t('Add client tag')}</Label>
-            <Switch
-              id="add-client-tag"
-              checked={addClientTag}
-              onCheckedChange={onAddClientTagChange}
-            />
-          </div>
-          <div className="text-muted-foreground text-xs">
-            {t('Show others this was sent via Jumble')}
-          </div>
-        </div>
-      )}
+      <PostOptions
+        show={showMoreOptions}
+        postOptions={postOptions}
+        setPostOptions={setPostOptions}
+      />
       <div className="flex gap-2 items-center justify-around sm:hidden">
         <Button
           className="w-full"

@@ -51,6 +51,7 @@ export async function createShortTextNoteDraftEvent(
   options: {
     parentEvent?: Event
     addClientTag?: boolean
+    protectedEvent?: boolean
   } = {}
 ): Promise<TDraftEvent> {
   const { pubkeys, otherRelatedEventIds, quoteEventIds, rootEventId, parentEventId } =
@@ -80,6 +81,10 @@ export async function createShortTextNoteDraftEvent(
     tags.push(['client', 'jumble'])
   }
 
+  if (options.protectedEvent) {
+    tags.push(['-'])
+  }
+
   return {
     kind: kinds.ShortTextNote,
     content,
@@ -107,6 +112,7 @@ export async function createPictureNoteDraftEvent(
   pictureInfos: { url: string; tags: string[][] }[],
   options: {
     addClientTag?: boolean
+    protectedEvent?: boolean
   } = {}
 ): Promise<TDraftEvent> {
   const { pubkeys, quoteEventIds } = await extractMentions(content)
@@ -125,6 +131,10 @@ export async function createPictureNoteDraftEvent(
     tags.push(['client', 'jumble'])
   }
 
+  if (options.protectedEvent) {
+    tags.push(['-'])
+  }
+
   return {
     kind: PICTURE_EVENT_KIND,
     content,
@@ -139,6 +149,7 @@ export async function createCommentDraftEvent(
   pictureInfos: { url: string; tags: string[][] }[],
   options: {
     addClientTag?: boolean
+    protectedEvent?: boolean
   } = {}
 ): Promise<TDraftEvent> {
   const {
@@ -172,6 +183,10 @@ export async function createCommentDraftEvent(
 
   if (options.addClientTag) {
     tags.push(['client', 'jumble'])
+  }
+
+  if (options.protectedEvent) {
+    tags.push(['-'])
   }
 
   return {

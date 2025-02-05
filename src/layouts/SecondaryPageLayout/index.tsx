@@ -84,6 +84,7 @@ const SecondaryPageLayout = forwardRef(
             hideBackButton={hideBackButton}
           />
           {children}
+          <div className="h-4" />
         </ScrollArea>
         {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
       </DeepBrowsingProvider>

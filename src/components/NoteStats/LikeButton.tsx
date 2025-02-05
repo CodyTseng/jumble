@@ -6,8 +6,8 @@ import client from '@/services/client.service'
 import { Heart, Loader } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
-import { formatCount } from './utils'
 import { useTranslation } from 'react-i18next'
+import { formatCount } from './utils'
 
 export default function LikeButton({
   event,
@@ -56,7 +56,7 @@ export default function LikeButton({
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const reaction = createReactionDraftEvent(event)
-        await publish(reaction, targetRelayList.read.slice(0, 3))
+        await publish(reaction, { additionalRelayUrls: targetRelayList.read.slice(0, 3) })
         markNoteAsLiked(event.id)
       } catch (error) {
         console.error('like failed', error)

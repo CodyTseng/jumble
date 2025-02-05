@@ -182,8 +182,10 @@ export default function TextareaWithMentions({
               >
                 <div className="flex gap-2 items-center pointer-events-none truncate">
                   <SimpleUserAvatar userId={p.pubkey} />
-                  <SimpleUsername userId={p.pubkey} className="font-semibold truncate" />
-                  <Nip05 pubkey={p.pubkey} />
+                  <div>
+                    <SimpleUsername userId={p.pubkey} className="font-semibold truncate" />
+                    <Nip05 pubkey={p.pubkey} />
+                  </div>
                 </div>
               </CommandItem>
             )

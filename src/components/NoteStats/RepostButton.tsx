@@ -64,7 +64,7 @@ export default function RepostButton({
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const repost = createRepostDraftEvent(event)
-        await publish(repost, targetRelayList.read.slice(0, 5))
+        await publish(repost, { additionalRelayUrls: targetRelayList.read.slice(0, 5) })
         markNoteAsReposted(event.id)
       } catch (error) {
         console.error('repost failed', error)

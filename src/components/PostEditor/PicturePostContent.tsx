@@ -1,33 +1,31 @@
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { StorageKey } from '@/constants'
 import { useToast } from '@/hooks/use-toast'
 import { createPictureNoteDraftEvent } from '@/lib/draft-event'
 import { cn } from '@/lib/utils'
+import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
+import client from '@/services/client.service'
 import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
 import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
+import PostOptions from './PostOptions.tsx'
+import { TPostOptions } from './types.ts'
 import Uploader from './Uploader'
 
 export default function PicturePostContent({ close }: { close: () => void }) {
   const { t } = useTranslation()
   const { toast } = useToast()
   const { publish, checkLogin } = useNostr()
+  const { relayUrls } = useFeed()
   const [content, setContent] = useState('')
   const [pictureInfos, setPictureInfos] = useState<{ url: string; tags: string[][] }[]>([])
   const [posting, setPosting] = useState(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
-  const [addClientTag, setAddClientTag] = useState(false)
+  const [postOptions, setPostOptions] = useState<TPostOptions>({})
   const canPost = !!content && !posting && pictureInfos.length > 0
-
-  useEffect(() => {
-    setAddClientTag(window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true')
-  }, [])
 
   const post = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -42,10 +40,18 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         if (!pictureInfos.length) {
           throw new Error(t('Picture note requires images'))
         }
+        let protectedEvent = false
+        if (postOptions.sendOnlyToCurrentRelays) {
+          const relayInfos = await client.fetchRelayInfos(relayUrls)
+          protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
+        }
         const draftEvent = await createPictureNoteDraftEvent(content, pictureInfos, {
-          addClientTag
+          addClientTag: postOptions.addClientTag,
+          protectedEvent
         })
-        await publish(draftEvent)
+        await publish(draftEvent, {
+          specifiedRelayUrls: postOptions.sendOnlyToCurrentRelays ? relayUrls : undefined
+        })
         setContent('')
         close()
       } catch (error) {
@@ -74,11 +80,6 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         description: t('Your post has been published')
       })
     })
-  }
-
-  const onAddClientTagChange = (checked: boolean) => {
-    setAddClientTag(checked)
-    window.localStorage.setItem(StorageKey.ADD_CLIENT_TAG, checked.toString())
   }
 
   return (
@@ -121,21 +122,11 @@ export default function PicturePostContent({ close }: { close: () => void }) {
           </div>
         </div>
       </div>
-      {showMoreOptions && (
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="add-client-tag">{t('Add client tag')}</Label>
-            <Switch
-              id="add-client-tag"
-              checked={addClientTag}
-              onCheckedChange={onAddClientTagChange}
-            />
-          </div>
-          <div className="text-muted-foreground text-xs">
-            {t('Show others this was sent via Jumble')}
-          </div>
-        </div>
-      )}
+      <PostOptions
+        show={showMoreOptions}
+        postOptions={postOptions}
+        setPostOptions={setPostOptions}
+      />
       <div className="flex gap-2 items-center justify-around sm:hidden">
         <Button
           className="w-full"

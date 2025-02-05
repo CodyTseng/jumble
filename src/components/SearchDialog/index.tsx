@@ -27,6 +27,12 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
     }
   }, [input])
 
+  useEffect(() => {
+    profiles.forEach((profile) => {
+      console.log(profile.pubkey)
+    })
+  }, [profiles])
+
   const list = useMemo(() => {
     const search = input.trim()
     if (!search) return
@@ -66,7 +72,7 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
         ))}
         {profiles.length >= 10 && (
           <SecondaryPageLink to={toProfileList({ search })} onClick={() => setOpen(false)}>
-            <CommandItem onClick={() => setOpen(false)} className="text-center">
+            <CommandItem value="show-more" onClick={() => setOpen(false)} className="text-center">
               <div className="font-semibold">{t('Show more...')}</div>
             </CommandItem>
           </SecondaryPageLink>
@@ -96,7 +102,7 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
 function NormalItem({ search, onClick }: { search: string; onClick?: () => void }) {
   return (
     <SecondaryPageLink to={toNoteList({ search })} onClick={onClick}>
-      <CommandItem>
+      <CommandItem value={`search-${search}`}>
         <Notebook className="text-muted-foreground" />
         <div className="font-semibold">{search}</div>
       </CommandItem>
@@ -119,7 +125,7 @@ function HashtagItem({ search, onClick }: { search: string; onClick?: () => void
 function NoteItem({ id, onClick }: { id: string; onClick?: () => void }) {
   return (
     <SecondaryPageLink to={toNote(id)} onClick={onClick}>
-      <CommandItem>
+      <CommandItem value={`note-id-${id}`}>
         <Notebook className="text-muted-foreground" />
         <div className="font-semibold truncate">{id}</div>
       </CommandItem>
@@ -130,7 +136,7 @@ function NoteItem({ id, onClick }: { id: string; onClick?: () => void }) {
 function ProfileIdItem({ id, onClick }: { id: string; onClick?: () => void }) {
   return (
     <SecondaryPageLink to={toProfile(id)} onClick={onClick}>
-      <CommandItem>
+      <CommandItem value={`profile-id-${id}`}>
         <UserRound className="text-muted-foreground" />
         <div className="font-semibold truncate">{id}</div>
       </CommandItem>
@@ -141,7 +147,7 @@ function ProfileIdItem({ id, onClick }: { id: string; onClick?: () => void }) {
 function ProfileItem({ profile, onClick }: { profile: TProfile; onClick?: () => void }) {
   return (
     <SecondaryPageLink to={toProfile(profile.pubkey)} onClick={onClick}>
-      <CommandItem>
+      <CommandItem value={`profile-${profile.pubkey}`}>
         <div className="flex gap-2">
           <Avatar>
             <AvatarImage src={profile.avatar} alt={profile.username} />
@@ -162,7 +168,7 @@ function ProfileItem({ profile, onClick }: { profile: TProfile; onClick?: () => 
 function RelayItem({ url, onClick }: { url: string; onClick?: () => void }) {
   return (
     <SecondaryPageLink to={toRelay(url)} onClick={onClick}>
-      <CommandItem>
+      <CommandItem value={`relay-${url}`}>
         <Server className="text-muted-foreground" />
         <div className="font-semibold truncate">{url}</div>
       </CommandItem>

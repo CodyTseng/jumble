@@ -46,17 +46,17 @@ class ClientService extends EventTarget {
   private profileEventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private profileEventDataloader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
-    { cacheMap: this.profileEventCache, maxBatchSize: 10 }
+    { cacheMap: this.profileEventCache, maxBatchSize: 20 }
   )
   private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
-    { cache: false, maxBatchSize: 10 }
+    { cache: false, maxBatchSize: 20 }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 }),
-      maxBatchSize: 10
+      maxBatchSize: 20
     }
   )
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
@@ -91,9 +91,26 @@ class ClientService extends EventTarget {
     return this.defaultRelayUrls
   }
 
-  async publishEvent(relayUrls: string[], event: NEvent) {
+  async publishEvent(
+    relayUrls: string[],
+    event: NEvent,
+    {
+      signer
+    }: {
+      signer?: (evt: TDraftEvent) => Promise<VerifiedEvent>
+    } = {}
+  ) {
     const result = await Promise.any(
-      this.pool.publish(relayUrls.concat(this.defaultRelayUrls), event)
+      relayUrls.map(async (url) => {
+        const relay = await this.pool.ensureRelay(url)
+        return relay.publish(event).catch((error) => {
+          if (error instanceof Error && error.message.startsWith('auth-required:') && signer) {
+            relay.auth((authEvt: EventTemplate) => signer(authEvt)).then(() => relay.publish(event))
+          } else {
+            throw error
+          }
+        })
+      })
     )
     this.dispatchEvent(new CustomEvent('eventPublished', { detail: event }))
     return result
@@ -401,6 +418,7 @@ class ClientService extends EventTarget {
 
     const profileEvents = events.sort((a, b) => b.created_at - a.created_at)
     profileEvents.forEach((profile) => this.profileEventDataloader.prime(profile.pubkey, profile))
+    await Promise.all(profileEvents.map((profile) => this.addUsernameToIndex(profile)))
     return profileEvents.map((profileEvent) => getProfileFromProfileEvent(profileEvent))
   }
 
@@ -494,7 +512,10 @@ class ClientService extends EventTarget {
 
   async initUserIndexFromFollowings(pubkey: string) {
     const followings = await this.fetchFollowings(pubkey)
-    await this.profileEventDataloader.loadMany(followings)
+    for (let i = 0; i * 20 < followings.length; i++) {
+      await this.profileEventDataloader.loadMany(followings.slice(i * 20, (i + 1) * 20))
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    }
   }
 
   private async fetchEventById(relayUrls: string[], id: string): Promise<NEvent | undefined> {
@@ -593,23 +614,26 @@ class ClientService extends EventTarget {
     }
 
     if (profileEvent) {
-      this.addUsernameToIndex(profileEvent)
+      await this.addUsernameToIndex(profileEvent)
     }
 
     return profileEvent
   }
 
-  private addUsernameToIndex(profileEvent: NEvent) {
+  private async addUsernameToIndex(profileEvent: NEvent) {
     try {
       const profileObj = JSON.parse(profileEvent.content)
       const text = [
         profileObj.display_name?.trim() ?? '',
         profileObj.name?.trim() ?? '',
-        profileObj.nip05?.split('@')[0]?.trim() ?? ''
+        profileObj.nip05
+          ?.split('@')
+          .map((s: string) => s.trim())
+          .join(' ') ?? ''
       ].join(' ')
       if (!text) return
 
-      this.userIndex.add(profileEvent.pubkey, text)
+      await this.userIndex.addAsync(profileEvent.pubkey, text)
     } catch {
       return
     }

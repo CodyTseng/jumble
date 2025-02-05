@@ -163,6 +163,8 @@ export default {
     'calculating...': '计算中...',
     'Calculate optimal read relays': '计算最佳读服务器',
     'Login to set': '登录后设置',
-    'Please login to view following feed': '请登录以查看关注动态'
+    'Please login to view following feed': '请登录以查看关注动态',
+    'Send only to r': '只发送到 {{r}}',
+    'Send only to current relays': '只发送到当前服务器'
   }
 }

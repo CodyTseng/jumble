@@ -71,6 +71,7 @@ const PrimaryPageLayout = forwardRef(
         >
           <PrimaryPageTitlebar>{titlebar}</PrimaryPageTitlebar>
           {children}
+          <div className="h-4" />
         </ScrollArea>
         {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
       </DeepBrowsingProvider>

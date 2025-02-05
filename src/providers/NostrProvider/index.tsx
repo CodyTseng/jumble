@@ -7,7 +7,7 @@ import client from '@/services/client.service'
 import storage from '@/services/storage.service'
 import { ISigner, TAccount, TAccountPointer, TDraftEvent, TProfile, TRelayList } from '@/types'
 import dayjs from 'dayjs'
-import { Event, kinds } from 'nostr-tools'
+import { Event, kinds, VerifiedEvent } from 'nostr-tools'
 import * as nip19 from 'nostr-tools/nip19'
 import * as nip49 from 'nostr-tools/nip49'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -34,7 +34,10 @@ type TNostrContext = {
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
-  publish: (draftEvent: TDraftEvent, additionalRelayUrls?: string[]) => Promise<Event>
+  publish: (
+    draftEvent: TDraftEvent,
+    options?: { additionalRelayUrls?: string[]; specifiedRelayUrls?: string[] }
+  ) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
   signEvent: (draftEvent: TDraftEvent) => Promise<Event>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
@@ -316,12 +319,26 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     if (!event) {
       throw new Error('sign event failed')
     }
-    return event
+    return event as VerifiedEvent
   }
 
-  const publish = async (draftEvent: TDraftEvent, additionalRelayUrls: string[] = []) => {
+  const publish = async (
+    draftEvent: TDraftEvent,
+    {
+      additionalRelayUrls,
+      specifiedRelayUrls
+    }: { additionalRelayUrls?: string[]; specifiedRelayUrls?: string[] } = {}
+  ) => {
     const event = await signEvent(draftEvent)
-    await client.publishEvent((relayList?.write ?? []).concat(additionalRelayUrls), event)
+    await client.publishEvent(
+      specifiedRelayUrls?.length
+        ? specifiedRelayUrls
+        : (relayList?.write ?? [])
+            .concat(additionalRelayUrls ?? [])
+            .concat(client.getDefaultRelayUrls()),
+      event,
+      { signer: signEvent }
+    )
     return event
   }
 
