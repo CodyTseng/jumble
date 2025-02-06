@@ -1,12 +1,13 @@
-import { Input } from '@/components/ui/input'
 import relayInfoService from '@/services/relay-info.service'
 import { TNip66RelayInfo } from '@/types'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayCard from './RelayCard'
+import SearchInput from './SearchInput'
 
 export default function RelayList() {
   const { t } = useTranslation()
+  const [loading, setLoading] = useState(true)
   const [relays, setRelays] = useState<TNip66RelayInfo[]>([])
   const [showCount, setShowCount] = useState(20)
   const [input, setInput] = useState('')
@@ -14,12 +15,13 @@ export default function RelayList() {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const init = async () => {
+    const search = async () => {
       const relayInfos = await relayInfoService.search(debouncedInput)
       setShowCount(20)
       setRelays(relayInfos)
+      setLoading(false)
     }
-    init()
+    search()
   }, [debouncedInput])
 
   useEffect(() => {
@@ -64,12 +66,18 @@ export default function RelayList() {
   return (
     <div>
       <div className="px-4 pb-2 sticky top-12 bg-background z-40">
-        <Input placeholder={t('Search relays')} value={input} onChange={handleInputChange} />
+        <SearchInput placeholder={t('Search relays')} value={input} onChange={handleInputChange} />
       </div>
       {relays.slice(0, showCount).map((relay) => (
         <RelayCard key={relay.url} relayInfo={relay} />
       ))}
       {showCount < relays.length && <div ref={bottomRef} />}
+      {loading && (
+        <div className="text-center text-muted-foreground text-sm">{t('loading...')}</div>
+      )}
+      {!loading && relays.length === 0 && (
+        <div className="text-center text-muted-foreground text-sm">{t('no relays found')}</div>
+      )}
     </div>
   )
 }
