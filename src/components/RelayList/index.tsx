@@ -65,7 +65,7 @@ export default function RelayList() {
 
   return (
     <div>
-      <div className="px-4 pb-2 sticky top-12 bg-background z-30">
+      <div className="px-4 py-2 sticky top-12 bg-background z-30">
         <SearchInput placeholder={t('Search relays')} value={input} onChange={handleInputChange} />
       </div>
       {relays.slice(0, showCount).map((relay) => (

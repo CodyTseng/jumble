@@ -3,7 +3,6 @@ import AccountButton from './AccountButton'
 import ExploreButton from './ExploreButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationsButton'
-import PostButton from './PostButton'
 
 export default function BottomNavigationBar() {
   return (
@@ -18,7 +17,6 @@ export default function BottomNavigationBar() {
     >
       <HomeButton />
       <ExploreButton />
-      <PostButton />
       <NotificationsButton />
       <AccountButton />
     </div>
