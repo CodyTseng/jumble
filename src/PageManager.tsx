@@ -286,18 +286,17 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               <Separator orientation="vertical" className="z-50" />
             </div>
             <div>
-              {secondaryStack.length ? (
-                secondaryStack.map((item, index) => (
-                  <div
-                    key={item.index}
-                    style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
-                  >
-                    {item.component}
-                  </div>
-                ))
-              ) : (
+              {secondaryStack.map((item, index) => (
+                <div
+                  key={item.index}
+                  style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
+                >
+                  {item.component}
+                </div>
+              ))}
+              <div key="home" style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}>
                 <HomePage />
-              )}
+              </div>
             </div>
           </div>
         </div>

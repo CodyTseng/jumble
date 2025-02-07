@@ -105,7 +105,11 @@ export function SecondaryPageTitlebar({
 }): JSX.Element {
   return (
     <Titlebar className="h-12 flex gap-1 p-1 items-center justify-between font-semibold">
-      <BackButton hide={hideBackButton}>{title}</BackButton>
+      {hideBackButton ? (
+        <div className="pl-4 truncate text-lg font-semibold">{title}</div>
+      ) : (
+        <BackButton>{title}</BackButton>
+      )}
       <div className="flex-shrink-0">{controls}</div>
     </Titlebar>
   )

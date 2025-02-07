@@ -37,6 +37,7 @@ class RelayInfoService {
       cache: false
     }
   )
+  private relayUrlsForRandom: string[] = []
 
   async init() {
     if (!this.initPromise) {
@@ -67,6 +68,28 @@ class RelayInfoService {
 
   async getRelayInfo(url: string) {
     return this.fetchDataloader.load(url)
+  }
+
+  async getRandomRelayInfos(count: number) {
+    if (this.initPromise) {
+      await this.initPromise
+    }
+
+    const relayInfos: TNip66RelayInfo[] = []
+    while (relayInfos.length < count) {
+      const randomIndex = Math.floor(Math.random() * this.relayUrlsForRandom.length)
+      const url = this.relayUrlsForRandom[randomIndex]
+      this.relayUrlsForRandom.splice(randomIndex, 1)
+      if (this.relayUrlsForRandom.length === 0) {
+        this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
+      }
+
+      const relayInfo = this.relayInfoMap.get(url)
+      if (relayInfo) {
+        relayInfos.push(relayInfo)
+      }
+    }
+    return relayInfos
   }
 
   private async _getRelayInfo(url: string) {
@@ -126,6 +149,7 @@ class RelayInfoService {
         await this.addRelayInfo(relayInfo)
       }
     }
+    this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
   }
 
   private async addRelayInfo(relayInfo: TNip66RelayInfo) {
