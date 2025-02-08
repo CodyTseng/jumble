@@ -20,7 +20,7 @@ export default function RelaySimpleInfo({
         <div className="flex flex-1 w-0 items-center gap-2">
           <RelayIcon url={relayInfo?.url} className="h-9 w-9" />
           <div className="flex-1 w-0">
-            <div className="truncate font-semibold">{relayInfo?.name ?? relayInfo?.shortUrl}</div>
+            <div className="truncate font-semibold">{relayInfo?.name || relayInfo?.shortUrl}</div>
             {relayInfo?.name && (
               <div className="text-xs text-muted-foreground truncate">{relayInfo?.shortUrl}</div>
             )}
