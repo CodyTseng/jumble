@@ -1,5 +1,6 @@
 import { Separator } from '@/components/ui/separator'
-import { isReplyNoteEvent } from '@/lib/event'
+import { BIG_RELAY_URLS } from '@/constants'
+import { isProtectedEvent, isReplyNoteEvent } from '@/lib/event'
 import { isReplyETag, isRootETag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
@@ -10,7 +11,6 @@ import { Event as NEvent, kinds } from 'nostr-tools'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReplyNote from '../ReplyNote'
-import { BIG_RELAY_URLS } from '@/constants'
 
 const LIMIT = 100
 
@@ -56,8 +56,13 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
 
       try {
         const relayList = await client.fetchRelayList(event.pubkey)
+        const relayUrls = relayList.read.concat(BIG_RELAY_URLS)
+        if (isProtectedEvent(event)) {
+          const seenOn = client.getSeenEventRelayUrls(event.id)
+          relayUrls.unshift(...seenOn)
+        }
         const { closer, timelineKey } = await client.subscribeTimeline(
-          relayList.read.concat(BIG_RELAY_URLS).slice(0, 4),
+          relayUrls.slice(0, 4),
           {
             '#e': [event.id],
             kinds: [kinds.ShortTextNote],
@@ -179,6 +184,9 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
       >
         {loading ? t('loading...') : until ? t('load more older replies') : null}
       </div>
+      {replies.length === 0 && !loading && !until && (
+        <div className="text-sm text-center text-muted-foreground">{t('no replies')}</div>
+      )}
       {replies.length > 0 && (loading || until) && <Separator className="my-2" />}
       <div className={cn('mb-4', className)}>
         {replies.map((reply) => {
@@ -195,9 +203,6 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
           )
         })}
       </div>
-      {replies.length === 0 && !loading && !until && (
-        <div className="text-sm text-center text-muted-foreground">{t('no replies')}</div>
-      )}
       <div ref={bottomRef} />
     </>
   )

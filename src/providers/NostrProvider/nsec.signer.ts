@@ -23,20 +23,18 @@ export class NsecSigner implements ISigner {
   }
 
   async getPublicKey() {
+    if (!this.pubkey) {
+      throw new Error('Not logged in')
+    }
     return this.pubkey
   }
 
   async signEvent(draftEvent: TDraftEvent) {
     if (!this.privkey) {
-      return null
+      throw new Error('Not logged in')
     }
 
-    try {
-      return finalizeEvent(draftEvent, this.privkey)
-    } catch (error) {
-      console.error(error)
-      return null
-    }
+    return finalizeEvent(draftEvent, this.privkey)
   }
 
   async nip04Encrypt(pubkey: string, plainText: string) {

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import Note from '../Note'
 import Username from '../Username'
 
-export default function ShortTextNoteCard({
+export default function NormalNoteCard({
   event,
   className,
   reposter,

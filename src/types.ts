@@ -1,4 +1,4 @@
-import { Event } from 'nostr-tools'
+import { Event, VerifiedEvent } from 'nostr-tools'
 
 export type TProfile = {
   username: string
@@ -61,8 +61,8 @@ export type TTheme = 'light' | 'dark'
 export type TDraftEvent = Pick<Event, 'content' | 'created_at' | 'kind' | 'tags'>
 
 export type TNip07 = {
-  getPublicKey: () => Promise<string | null>
-  signEvent: (draftEvent: TDraftEvent) => Promise<Event | null>
+  getPublicKey: () => Promise<string>
+  signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04?: {
     encrypt?: (pubkey: string, plainText: string) => Promise<string>
     decrypt?: (pubkey: string, cipherText: string) => Promise<string>
@@ -70,8 +70,8 @@ export type TNip07 = {
 }
 
 export interface ISigner {
-  getPublicKey: () => Promise<string | null>
-  signEvent: (draftEvent: TDraftEvent) => Promise<Event | null>
+  getPublicKey: () => Promise<string>
+  signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
 }

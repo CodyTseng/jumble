@@ -36,7 +36,7 @@ export default function NoteList({
 }) {
   const { t } = useTranslation()
   const { isLargeScreen } = useScreenSize()
-  const { signEvent, checkLogin } = useNostr()
+  const { startLogin } = useNostr()
   const { mutePubkeys } = useMuteList()
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
@@ -103,10 +103,7 @@ export default function NoteList({
           }
         },
         {
-          signer: async (evt) => {
-            const signedEvt = await checkLogin(() => signEvent(evt))
-            return signedEvt ?? null
-          },
+          startLogin,
           needSort: !areAlgoRelays
         }
       )
@@ -168,13 +165,6 @@ export default function NoteList({
     setNewEvents([])
   }
 
-  const eventFilter = (event: Event) => {
-    return (
-      (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-      (listMode !== 'posts' || !isReplyNoteEvent(event))
-    )
-  }
-
   return (
     <div className={className}>
       <ListModeSwitch
@@ -194,7 +184,12 @@ export default function NoteList({
         pullingContent=""
       >
         <div className="space-y-2 sm:space-y-2">
-          {newEvents.filter(eventFilter).length > 0 && (
+          {newEvents.filter((event: Event) => {
+            return (
+              (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
+              (listMode !== 'posts' || !isReplyNoteEvent(event))
+            )
+          }).length > 0 && (
             <div className="flex justify-center w-full mt-2">
               <Button size="lg" onClick={showNewEvents}>
                 {t('show new notes')}
@@ -203,15 +198,22 @@ export default function NoteList({
           )}
           {isPictures ? (
             <PictureNoteCardMasonry
-              className="px-2 sm:px-4"
+              className="px-2 sm:px-4 pt-2"
               columnCount={isLargeScreen ? 3 : 2}
               events={events}
             />
           ) : (
             <div>
-              {events.filter(eventFilter).map((event) => (
-                <NoteCard key={event.id} className="w-full" event={event} />
-              ))}
+              {events
+                .filter((event: Event) => listMode !== 'posts' || !isReplyNoteEvent(event))
+                .map((event) => (
+                  <NoteCard
+                    key={event.id}
+                    className="w-full"
+                    event={event}
+                    filterMutedNotes={filterMutedNotes}
+                  />
+                ))}
             </div>
           )}
           <div className="text-center text-sm text-muted-foreground">

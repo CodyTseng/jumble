@@ -2,9 +2,9 @@ import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/consta
 import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
 import { Event, kinds, nip19 } from 'nostr-tools'
-import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
-import { isWebsocketUrl, normalizeUrl } from './url'
 import { formatPubkey } from './pubkey'
+import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
+import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 
 export function isNsfwEvent(event: Event) {
   return event.tags.some(
@@ -41,6 +41,10 @@ export function isPictureEvent(event: Event) {
   return event.kind === PICTURE_EVENT_KIND
 }
 
+export function isProtectedEvent(event: Event) {
+  return event.tags.some(([tagName]) => tagName === '-')
+}
+
 export function getParentEventId(event?: Event) {
   if (!event || !isReplyNoteEvent(event)) return undefined
   return event.tags.find(isReplyETag)?.[1] ?? event.tags.find(tagNameEquals('e'))?.[1]
@@ -61,11 +65,12 @@ export function getEventCoordinate(event: Event) {
 }
 
 export function getSharableEventId(event: Event) {
+  const hints = client.getEventHints(event.id).slice(0, 3)
   if (isReplaceable(event.kind)) {
     const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
-    return nip19.naddrEncode({ pubkey: event.pubkey, kind: event.kind, identifier })
+    return nip19.naddrEncode({ pubkey: event.pubkey, kind: event.kind, identifier, relays: hints })
   }
-  return nip19.neventEncode({ id: event.id, author: event.pubkey, kind: event.kind })
+  return nip19.neventEncode({ id: event.id, author: event.pubkey, kind: event.kind, relays: hints })
 }
 
 export function getUsingClient(event: Event) {
@@ -119,7 +124,7 @@ export function getProfileFromProfileEvent(event: Event) {
       original_username: username,
       nip05: profileObj.nip05,
       about: profileObj.about,
-      website: profileObj.website,
+      website: profileObj.website ? normalizeHttpUrl(profileObj.website) : undefined,
       created_at: event.created_at
     }
   } catch (err) {

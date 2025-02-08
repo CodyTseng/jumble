@@ -39,9 +39,10 @@ type TNostrContext = {
     options?: { additionalRelayUrls?: string[]; specifiedRelayUrls?: string[] }
   ) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
-  signEvent: (draftEvent: TDraftEvent) => Promise<Event>
+  signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
+  startLogin: () => void
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
   getRelayList: (pubkey: string) => Promise<TRelayList>
   updateRelayListEvent: (relayListEvent: Event) => void
@@ -157,6 +158,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     })
     client.initUserIndexFromFollowings(account.pubkey)
   }, [account])
+
+  useEffect(() => {
+    if (signer) {
+      client.signer = signer.signEvent.bind(signer)
+    } else {
+      client.signer = undefined
+    }
+  }, [signer])
 
   const hasNostrLoginHash = () => {
     return window.location.hash && window.location.hash.startsWith('#nostr-login')
@@ -336,8 +345,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         : (relayList?.write ?? [])
             .concat(additionalRelayUrls ?? [])
             .concat(client.getDefaultRelayUrls()),
-      event,
-      { signer: signEvent }
+      event
     )
     return event
   }
@@ -415,6 +423,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         signHttpAuth,
         nip04Encrypt,
         nip04Decrypt,
+        startLogin: () => setOpenLoginDialog(true),
         checkLogin,
         signEvent,
         getRelayList,

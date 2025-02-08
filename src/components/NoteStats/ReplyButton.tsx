@@ -7,11 +7,20 @@ import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 
-export default function ReplyButton({ event }: { event: Event }) {
+export default function ReplyButton({
+  event,
+  variant = 'note'
+}: {
+  event: Event
+  variant?: 'note' | 'reply'
+}) {
   const { t } = useTranslation()
   const { checkLogin } = useNostr()
   const { noteStatsMap } = useNoteStats()
-  const { replyCount } = useMemo(() => noteStatsMap.get(event.id) ?? {}, [noteStatsMap, event.id])
+  const { replyCount } = useMemo(
+    () => (variant === 'reply' ? {} : (noteStatsMap.get(event.id) ?? {})),
+    [noteStatsMap, event.id, variant]
+  )
   const [open, setOpen] = useState(false)
 
   return (
@@ -27,7 +36,9 @@ export default function ReplyButton({ event }: { event: Event }) {
         title={t('Reply')}
       >
         <MessageCircle size={16} />
-        {!!replyCount && <div className="text-sm">{formatCount(replyCount)}</div>}
+        {variant !== 'reply' && !!replyCount && (
+          <div className="text-sm">{formatCount(replyCount)}</div>
+        )}
       </button>
       <PostEditor parentEvent={event} open={open} setOpen={setOpen} />
     </>

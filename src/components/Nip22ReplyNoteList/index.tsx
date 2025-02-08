@@ -1,5 +1,6 @@
 import { Separator } from '@/components/ui/separator'
 import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
+import { isCommentEvent, isProtectedEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
@@ -10,7 +11,6 @@ import { Event as NEvent } from 'nostr-tools'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReplyNote from '../ReplyNote'
-import { isCommentEvent } from '@/lib/event'
 
 const LIMIT = 100
 
@@ -62,8 +62,13 @@ export default function Nip22ReplyNoteList({
 
       try {
         const relayList = await client.fetchRelayList(event.pubkey)
+        const relayUrls = relayList.read.concat(BIG_RELAY_URLS)
+        if (isProtectedEvent(event)) {
+          const seenOn = client.getSeenEventRelayUrls(event.id)
+          relayUrls.unshift(...seenOn)
+        }
         const { closer, timelineKey } = await client.subscribeTimeline(
-          relayList.read.concat(BIG_RELAY_URLS).slice(0, 4),
+          relayUrls.slice(0, 4),
           {
             '#E': [event.id],
             kinds: [COMMENT_EVENT_KIND],

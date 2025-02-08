@@ -11,11 +11,9 @@ import { formatCount } from './utils'
 
 export default function LikeButton({
   event,
-  variant = 'normal',
   canFetch = false
 }: {
   event: Event
-  variant?: 'normal' | 'reply'
   canFetch?: boolean
 }) {
   const { t } = useTranslation()
@@ -70,8 +68,7 @@ export default function LikeButton({
   return (
     <button
       className={cn(
-        'flex items-center enabled:hover:text-red-400',
-        variant === 'normal' ? 'gap-1' : 'flex-col',
+        'flex items-center enabled:hover:text-red-400 gap-1',
         hasLiked ? 'text-red-400' : 'text-muted-foreground'
       )}
       onClick={like}

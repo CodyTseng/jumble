@@ -1,4 +1,5 @@
 import { COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
+import client from '@/services/client.service'
 import { TDraftEvent, TMailboxRelay, TRelaySet } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
@@ -14,12 +15,14 @@ import {
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event): TDraftEvent {
   const tags = event.tags.filter((tag) => tag.length >= 2 && ['e', 'p'].includes(tag[0]))
-  tags.push(['e', event.id])
+
+  const hint = client.getEventHint(event.id)
+  tags.push(['e', event.id, hint, event.pubkey])
   tags.push(['p', event.pubkey])
   tags.push(['k', event.kind.toString()])
 
   if (isReplaceable(event.kind)) {
-    tags.push(['a', getEventCoordinate(event)])
+    tags.push(hint ? ['a', getEventCoordinate(event), hint] : ['a', getEventCoordinate(event)])
   }
 
   return {
@@ -33,7 +36,7 @@ export function createReactionDraftEvent(event: Event): TDraftEvent {
 // https://github.com/nostr-protocol/nips/blob/master/18.md
 export function createRepostDraftEvent(event: Event): TDraftEvent {
   const tags = [
-    ['e', event.id], // TODO: url
+    ['e', event.id, client.getEventHint(event.id), event.pubkey],
     ['p', event.pubkey]
   ]
 
@@ -60,16 +63,16 @@ export async function createShortTextNoteDraftEvent(
 
   const tags = pubkeys
     .map((pubkey) => ['p', pubkey])
-    .concat(otherRelatedEventIds.map((eventId) => ['e', eventId]))
-    .concat(quoteEventIds.map((eventId) => ['q', eventId, '', 'mention']))
+    .concat(otherRelatedEventIds.map((eventId) => ['e', eventId, client.getEventHint(eventId)]))
+    .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
 
   if (rootEventId) {
-    tags.push(['e', rootEventId, '', 'root'])
+    tags.push(['e', rootEventId, client.getEventHint(rootEventId), 'root'])
   }
 
   if (parentEventId) {
-    tags.push(['e', parentEventId, '', 'reply'])
+    tags.push(['e', parentEventId, client.getEventHint(parentEventId), 'reply'])
   }
 
   const { images } = extractImagesFromContent(content)
@@ -124,7 +127,7 @@ export async function createPictureNoteDraftEvent(
   const tags = pictureInfos
     .map((info) => ['imeta', ...info.tags.map(([n, v]) => `${n} ${v}`)])
     .concat(pubkeys.map((pubkey) => ['p', pubkey]))
-    .concat(quoteEventIds.map((eventId) => ['q', eventId]))
+    .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
 
   if (options.addClientTag) {
@@ -165,15 +168,15 @@ export async function createCommentDraftEvent(
   const hashtags = extractHashtags(content)
 
   const tags = [
-    ['E', rootEventId],
+    ['E', rootEventId, client.getEventHint(rootEventId), rootEventPubkey],
     ['K', rootEventKind.toString()],
     ['P', rootEventPubkey],
-    ['e', parentEventId],
+    ['e', parentEventId, client.getEventHint(parentEventId), parentEventPubkey],
     ['k', parentEventKind.toString()],
     ['p', parentEventPubkey]
   ]
     .concat(pubkeys.map((pubkey) => ['p', pubkey]))
-    .concat(quoteEventIds.map((eventId) => ['q', eventId]))
+    .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
 
   const { images } = extractImagesFromContent(content)
