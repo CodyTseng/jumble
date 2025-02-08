@@ -1,10 +1,10 @@
 import relayInfoService from '@/services/relay-info.service'
-import { TRelayInfo } from '@/types'
+import { TNip66RelayInfo } from '@/types'
 import { useEffect, useState } from 'react'
 
 export function useFetchRelayInfo(url?: string) {
   const [isFetching, setIsFetching] = useState(true)
-  const [relayInfo, setRelayInfo] = useState<TRelayInfo | undefined>(undefined)
+  const [relayInfo, setRelayInfo] = useState<TNip66RelayInfo | undefined>(undefined)
 
   useEffect(() => {
     if (!url) return

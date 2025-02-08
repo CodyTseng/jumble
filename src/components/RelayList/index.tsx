@@ -1,12 +1,15 @@
+import { toRelay } from '@/lib/link'
+import { useSecondaryPage } from '@/PageManager'
 import relayInfoService from '@/services/relay-info.service'
 import { TNip66RelayInfo } from '@/types'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import RelayCard from './RelayCard'
+import RelaySimpleInfo from '../RelaySimpleInfo'
 import SearchInput from './SearchInput'
 
 export default function RelayList() {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const [loading, setLoading] = useState(true)
   const [relays, setRelays] = useState<TNip66RelayInfo[]>([])
   const [showCount, setShowCount] = useState(20)
@@ -69,7 +72,15 @@ export default function RelayList() {
         <SearchInput placeholder={t('Search relays')} value={input} onChange={handleInputChange} />
       </div>
       {relays.slice(0, showCount).map((relay) => (
-        <RelayCard key={relay.url} relayInfo={relay} />
+        <RelaySimpleInfo
+          key={relay.url}
+          relayInfo={relay}
+          className="clickable p-4 border-b"
+          onClick={(e) => {
+            e.stopPropagation()
+            push(toRelay(relay.url))
+          }}
+        />
       ))}
       {showCount < relays.length && <div ref={bottomRef} />}
       {loading && (

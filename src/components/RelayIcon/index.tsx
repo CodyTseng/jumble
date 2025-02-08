@@ -8,7 +8,7 @@ export default function RelayIcon({
   className = 'w-6 h-6',
   iconSize = 14
 }: {
-  url: string
+  url?: string
   className?: string
   iconSize?: number
 }) {
@@ -17,6 +17,7 @@ export default function RelayIcon({
     if (relayInfo?.icon) {
       return relayInfo.icon
     }
+    if (!url) return
     const u = new URL(url)
     return `${u.protocol === 'wss:' ? 'https:' : 'http:'}//${u.host}/favicon.ico`
   }, [url, relayInfo])
