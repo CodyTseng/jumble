@@ -106,7 +106,9 @@ export function SecondaryPageTitlebar({
   return (
     <Titlebar className="h-12 flex gap-1 p-1 items-center justify-between font-semibold">
       {hideBackButton ? (
-        <div className="pl-4 truncate text-lg font-semibold">{title}</div>
+        <div className="flex gap-2 items-center pl-4 w-fit truncate text-lg font-semibold">
+          {title}
+        </div>
       ) : (
         <BackButton>{title}</BackButton>
       )}

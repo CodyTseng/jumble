@@ -7,7 +7,7 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toRelay } from '@/lib/link'
 import relayInfoService from '@/services/relay-info.service'
 import { TNip66RelayInfo } from '@/types'
-import { ArrowRight, RefreshCcw } from 'lucide-react'
+import { ArrowRight, RefreshCcw, Server } from 'lucide-react'
 import { forwardRef, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -36,15 +36,25 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title="Random Relays" hideBackButton>
+    <SecondaryPageLayout
+      ref={ref}
+      index={index}
+      title={
+        <>
+          <Server />
+          {'Random Relays'}
+        </>
+      }
+      controls={
+        <Button variant="ghost" className="h-10 [&_svg]:size-3" onClick={() => refresh()}>
+          <RefreshCcw />
+          <div>{t('Refresh')}</div>
+        </Button>
+      }
+      hideBackButton
+    >
       <div className="px-4">
-        <div className="flex justify-end">
-          <Button variant="ghost" onClick={() => refresh()}>
-            <RefreshCcw />
-            <div>{t('Refresh')}</div>
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-3 mt-2">
+        <div className="grid grid-cols-2 gap-3">
           {randomRelayInfos.map((relayInfo) => (
             <RelayCard key={relayInfo.url} relayInfo={relayInfo} />
           ))}
