@@ -4,6 +4,7 @@ import NoteList from '@/components/NoteList'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
+import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import QrCodePopover from '@/components/QrCodePopover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -97,6 +98,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
               {t('Follows you')}
             </div>
           )}
+          <ProfileOptions pubkey={pubkey} />
           {isSelf ? (
             <Button
               className="w-20 min-w-20 rounded-full"
@@ -106,9 +108,11 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
               {t('Edit')}
             </Button>
           ) : (
-            <FollowButton pubkey={pubkey} />
+            <>
+              {!!(profile.lud06 || profile.lud16) && <ProfileZapButton pubkey={pubkey} />}
+              <FollowButton pubkey={pubkey} />
+            </>
           )}
-          <ProfileOptions pubkey={pubkey} />
         </div>
         <div className="pt-2">
           <div className="text-xl font-semibold">{username}</div>

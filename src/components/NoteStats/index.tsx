@@ -5,6 +5,7 @@ import NoteOptions from './NoteOptions'
 import ReplyButton from './ReplyButton'
 import RepostButton from './RepostButton'
 import SeenOnButton from './SeenOnButton'
+import ZapButton from './ZapButton'
 
 export default function NoteStats({
   event,
@@ -23,6 +24,7 @@ export default function NoteStats({
         <ReplyButton event={event} variant={variant} />
         <RepostButton event={event} canFetch={fetchIfNotExisting} />
         <LikeButton event={event} canFetch={fetchIfNotExisting} />
+        <ZapButton event={event} />
       </div>
       <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
         <SeenOnButton event={event} />

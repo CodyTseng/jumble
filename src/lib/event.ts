@@ -125,6 +125,8 @@ export function getProfileFromProfileEvent(event: Event) {
       nip05: profileObj.nip05,
       about: profileObj.about,
       website: profileObj.website ? normalizeHttpUrl(profileObj.website) : undefined,
+      lud06: profileObj.lud06,
+      lud16: profileObj.lud16,
       created_at: event.created_at
     }
   } catch (err) {
