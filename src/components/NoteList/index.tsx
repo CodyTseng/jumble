@@ -72,8 +72,12 @@ export default function NoteList({
       setNewEvents([])
       setHasMore(true)
 
-      const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
-      const areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
+      let areAlgoRelays = false
+      // if no authors, check if all relays are algo relays
+      if (!noteFilter.authors?.length) {
+        const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
+        areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
+      }
       const filter = areAlgoRelays ? { ...noteFilter, limit: ALGO_RELAY_LIMIT } : noteFilter
 
       let eventCount = 0

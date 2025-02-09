@@ -73,7 +73,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     }
 
     init()
-  }, [pubkey, feedTypeRef])
+  }, [pubkey])
 
   const switchFeed = async (
     feedType: TFeedType,
