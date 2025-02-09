@@ -10,6 +10,7 @@ import ZapDialog from '../ZapDialog'
 export default function AboutInfoDialog({ children }: { children: React.ReactNode }) {
   const { isSmallScreen } = useScreenSize()
   const { checkLogin } = useNostr()
+  const [open, setOpen] = useState(false)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const pubkey = '8125b911ed0e94dbe3008a0be48cfe5cd0c0b05923cfff917ae7e87da8400883'
 
@@ -45,13 +46,20 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
       <div className="text-muted-foreground">
         Version: v{__APP_VERSION__} ({__GIT_COMMIT__})
       </div>
-      <ZapDialog open={openZapDialog} setOpen={setOpenZapDialog} pubkey={pubkey} />
+      <ZapDialog
+        open={openZapDialog}
+        setOpen={(value) => {
+          setOpenZapDialog(value)
+          setOpen(value)
+        }}
+        pubkey={pubkey}
+      />
     </>
   )
 
   if (isSmallScreen) {
     return (
-      <Drawer>
+      <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
         <DrawerContent>
           <div className="p-4">{content}</div>
@@ -61,7 +69,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>{content}</DialogContent>
     </Dialog>
