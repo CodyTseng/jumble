@@ -11,24 +11,27 @@ import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { RelaySetsProvider } from './providers/RelaySetsProvider'
 import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
+import { ZapProvider } from './providers/ZapProvider'
 
 export default function App(): JSX.Element {
   return (
     <ThemeProvider>
       <ScreenSizeProvider>
         <NostrProvider>
-          <RelaySetsProvider>
-            <FollowListProvider>
-              <MuteListProvider>
-                <FeedProvider>
-                  <NoteStatsProvider>
-                    <PageManager />
-                    <Toaster />
-                  </NoteStatsProvider>
-                </FeedProvider>
-              </MuteListProvider>
-            </FollowListProvider>
-          </RelaySetsProvider>
+          <ZapProvider>
+            <RelaySetsProvider>
+              <FollowListProvider>
+                <MuteListProvider>
+                  <FeedProvider>
+                    <NoteStatsProvider>
+                      <PageManager />
+                      <Toaster />
+                    </NoteStatsProvider>
+                  </FeedProvider>
+                </MuteListProvider>
+              </FollowListProvider>
+            </RelaySetsProvider>
+          </ZapProvider>
         </NostrProvider>
       </ScreenSizeProvider>
     </ThemeProvider>

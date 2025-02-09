@@ -11,6 +11,7 @@ import ProfilePage from './pages/secondary/ProfilePage'
 import RelayPage from './pages/secondary/RelayPage'
 import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import SettingsPage from './pages/secondary/SettingsPage'
+import WalletPage from './pages/secondary/WalletPage'
 
 const ROUTES = [
   { path: '/notes', element: <NoteListPage /> },
@@ -21,6 +22,7 @@ const ROUTES = [
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
   { path: '/relay-settings', element: <RelaySettingsPage /> },
   { path: '/settings', element: <SettingsPage /> },
+  { path: '/wallet', element: <WalletPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/mutes', element: <MuteListPage /> }

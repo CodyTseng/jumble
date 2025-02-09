@@ -57,6 +57,7 @@ class StorageService {
     { id: string; tags: string[][] } | undefined
   > = {} // pubkey -> { id, tags }
   private accountProfileEventMap: Record<string, Event | undefined> = {} // pubkey -> profileEvent
+  private defaultZapSats: number = 21
 
   constructor() {
     if (!StorageService.instance) {
@@ -141,6 +142,14 @@ class StorageService {
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
       this.activeRelaySetId = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID) ?? null
+    }
+
+    const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
+    if (defaultZapSatsStr) {
+      const num = parseInt(defaultZapSatsStr)
+      if (!isNaN(num)) {
+        this.defaultZapSats = num
+      }
     }
   }
 
@@ -362,6 +371,15 @@ class StorageService {
       JSON.stringify(this.accountProfileEventMap)
     )
     return true
+  }
+
+  getDefaultZapSats() {
+    return this.defaultZapSats
+  }
+
+  setDefaultZapSats(sats: number) {
+    this.defaultZapSats = sats
+    window.localStorage.setItem(StorageKey.DEFAULT_ZAP_SATS, sats.toString())
   }
 }
 

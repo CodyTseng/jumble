@@ -11,7 +11,8 @@ export const StorageKey = {
   ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap',
   ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap',
   ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap',
-  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap'
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap',
+  DEFAULT_ZAP_SATS: 'defaultZapSats'
 }
 
 export const BIG_RELAY_URLS = [

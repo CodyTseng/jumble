@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks'
+import { useZap } from '@/providers/ZapProvider'
 import lightning from '@/services/lightning.service'
 import { Loader } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
@@ -59,7 +60,8 @@ function ZapDialogContent({
 }) {
   const { t } = useTranslation()
   const { toast } = useToast()
-  const [sats, setSats] = useState(21)
+  const { defaultZapSats } = useZap()
+  const [sats, setSats] = useState(defaultZapSats)
   const [comment, setComment] = useState('Zap!')
   const [zapping, setZapping] = useState(false)
 
