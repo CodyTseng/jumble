@@ -17,7 +17,15 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
 
   const refresh = useCallback(async () => {
     const relayInfos = await relayInfoService.getRandomRelayInfos(10)
-    setRandomRelayInfos(relayInfos)
+    const relayUrls = new Set<string>()
+    const uniqueRelayInfos = relayInfos.filter((relayInfo) => {
+      if (relayUrls.has(relayInfo.url)) {
+        return false
+      }
+      relayUrls.add(relayInfo.url)
+      return true
+    })
+    setRandomRelayInfos(uniqueRelayInfos)
   }, [])
 
   useEffect(() => {
