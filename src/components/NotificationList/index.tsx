@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton'
 import { COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import { extractEmbeddedNotesFromContent, extractImagesFromContent } from '@/lib/event'
@@ -9,7 +10,15 @@ import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Heart, MessageCircle, Repeat, ThumbsUp } from 'lucide-react'
 import { Event, kinds, nip19, validateEvent } from 'nostr-tools'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { embedded, embeddedNostrNpubRenderer, embeddedNostrProfileRenderer } from '../Embedded'
@@ -18,7 +27,7 @@ import UserAvatar from '../UserAvatar'
 
 const LIMIT = 100
 
-export default function NotificationList() {
+const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [refreshCount, setRefreshCount] = useState(0)
@@ -27,6 +36,16 @@ export default function NotificationList() {
   const [notifications, setNotifications] = useState<Event[]>([])
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  useImperativeHandle(
+    ref,
+    () => ({
+      refresh: () => {
+        if (refreshing) return
+        setRefreshCount((count) => count + 1)
+      }
+    }),
+    [refreshing]
+  )
 
   useEffect(() => {
     if (!pubkey) {
@@ -133,7 +152,33 @@ export default function NotificationList() {
         ))}
         <div className="text-center text-sm text-muted-foreground">
           {until || refreshing ? (
-            <div ref={bottomRef}>{t('loading...')}</div>
+            <div ref={bottomRef}>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
+              </div>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
+              </div>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
+              </div>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
+              </div>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
+              </div>
+            </div>
           ) : (
             t('no more notifications')
           )}
@@ -141,7 +186,9 @@ export default function NotificationList() {
       </div>
     </PullToRefresh>
   )
-}
+})
+NotificationList.displayName = 'NotificationList'
+export default NotificationList
 
 function NotificationItem({ notification }: { notification: Event }) {
   if (notification.kind === kinds.Reaction) {

@@ -25,7 +25,7 @@ const RelayPage = forwardRef(({ url, index }: { url?: string; index?: number }, 
       displayScrollToTopButton
     >
       <RelayInfo url={normalizedUrl} />
-      <NoteList relayUrls={[normalizedUrl]} />
+      <NoteList relayUrls={[normalizedUrl]} needCheckAlgoRelay />
     </SecondaryPageLayout>
   )
 })
