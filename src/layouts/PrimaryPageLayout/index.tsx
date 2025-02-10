@@ -58,6 +58,7 @@ const PrimaryPageLayout = forwardRef(
             {children}
             <BottomNavigationBar />
           </div>
+          {displayScrollToTopButton && <ScrollToTopButton />}
         </DeepBrowsingProvider>
       )
     }
