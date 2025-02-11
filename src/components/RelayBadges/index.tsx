@@ -17,9 +17,6 @@ export default function RelayBadges({ relayInfo }: { relayInfo: TRelayInfo }) {
     if (relayInfo.limitation?.payment_required) {
       b.push('Payment')
     }
-    if (relayInfo.supported_nips?.includes(29)) {
-      b.push('Groups')
-    }
     return b
   }, [relayInfo])
 
@@ -37,9 +34,6 @@ export default function RelayBadges({ relayInfo }: { relayInfo: TRelayInfo }) {
       )}
       {badges.includes('Payment') && (
         <Badge className="bg-orange-400 hover:bg-orange-400/80">{t('relayInfoBadgePayment')}</Badge>
-      )}
-      {badges.includes('Groups') && (
-        <Badge className="bg-blue-400 hover:bg-blue-400/80">{t('relayInfoBadgeGroups')}</Badge>
       )}
     </div>
   )

@@ -170,10 +170,14 @@ export default {
     relayInfoBadgeAuth: 'Auth',
     relayInfoBadgeSearch: 'Search',
     relayInfoBadgePayment: 'Payment',
-    relayInfoBadgeGroups: 'Groups',
     Operator: 'Operator',
     Contact: 'Contact',
     Software: 'Software',
-    Version: 'Version'
+    Version: 'Version',
+    'Random Relays': 'Random Relays',
+    randomRelaysRefresh: 'Refresh',
+    'Explore more': 'Explore more',
+    'Payment page': 'Payment page',
+    'Supported NIPs': 'Supported NIPs'
   }
 }

@@ -165,7 +165,12 @@ class RelayInfoService {
     this.relayInfoMap.set(newRelayInfo.url, newRelayInfo)
     await this.relayInfoIndex.addAsync(
       newRelayInfo.url,
-      [newRelayInfo.shortUrl, newRelayInfo.name ?? '', newRelayInfo.description ?? ''].join(' ')
+      [
+        newRelayInfo.shortUrl,
+        ...newRelayInfo.shortUrl.split('.'),
+        newRelayInfo.name ?? '',
+        newRelayInfo.description ?? ''
+      ].join(' ')
     )
     return newRelayInfo
   }

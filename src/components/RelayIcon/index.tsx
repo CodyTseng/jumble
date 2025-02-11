@@ -24,7 +24,7 @@ export default function RelayIcon({
 
   return (
     <Avatar className={className}>
-      <AvatarImage src={iconUrl} />
+      <AvatarImage src={iconUrl} className="object-cover object-center" />
       <AvatarFallback>
         <Server size={iconSize} />
       </AvatarFallback>

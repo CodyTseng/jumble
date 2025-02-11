@@ -32,6 +32,7 @@ export type TRelayInfo = {
   software?: string
   version?: string
   tags?: string[]
+  payments_url?: string
   limitation?: {
     auth_required?: boolean
     payment_required?: boolean

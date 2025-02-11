@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { useFetchRelayInfo } from '@/hooks'
+import { normalizeHttpUrl } from '@/lib/url'
 import { GitBranch, Mail, SquareCode } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import RelayBadges from '../RelayBadges'
@@ -35,6 +36,41 @@ export default function RelayInfo({ url }: { url: string }) {
           </div>
         )}
       </div>
+      {!!relayInfo.supported_nips?.length && (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold text-muted-foreground">{t('Supported NIPs')}</div>
+          <div className="flex flex-wrap gap-2">
+            {relayInfo.supported_nips
+              .sort((a, b) => a - b)
+              .map((nip) => (
+                <Badge
+                  key={nip}
+                  variant="secondary"
+                  className="clickable"
+                  onClick={() =>
+                    window.open(
+                      `https://github.com/nostr-protocol/nips/blob/master/${formatNip(nip)}.md`
+                    )
+                  }
+                >
+                  {formatNip(nip)}
+                </Badge>
+              ))}
+          </div>
+        </div>
+      )}
+      {relayInfo.payments_url && (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold text-muted-foreground">{t('Payment page')}:</div>
+          <a
+            href={normalizeHttpUrl(relayInfo.payments_url)}
+            target="_blank"
+            className="hover:underline text-primary"
+          >
+            {relayInfo.payments_url}
+          </a>
+        </div>
+      )}
       <div className="flex flex-wrap gap-4">
         {relayInfo.pubkey && (
           <div className="space-y-2 flex-1">
@@ -80,4 +116,11 @@ export default function RelayInfo({ url }: { url: string }) {
 function formatSoftware(software: string) {
   const parts = software.split('/')
   return parts[parts.length - 1]
+}
+
+function formatNip(nip: number) {
+  if (nip < 10) {
+    return `0${nip}`
+  }
+  return `${nip}`
 }

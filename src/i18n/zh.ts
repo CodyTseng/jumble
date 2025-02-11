@@ -171,10 +171,14 @@ export default {
     relayInfoBadgeAuth: '需登陆',
     relayInfoBadgeSearch: '支持搜索',
     relayInfoBadgePayment: '需付费',
-    relayInfoBadgeGroups: '群组聊天',
     Operator: '管理员',
     Contact: '联系方式',
     Software: '软件',
-    Version: '版本'
+    Version: '版本',
+    'Random Relays': '随机服务器',
+    randomRelaysRefresh: '换一批',
+    'Explore more': '探索更多',
+    'Payment page': '付款页面',
+    'Supported NIPs': '支持的 NIP'
   }
 }

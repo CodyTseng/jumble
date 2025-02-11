@@ -49,13 +49,13 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
       title={
         <>
           <Server />
-          {'Random Relays'}
+          <div>{t('Random Relays')}</div>
         </>
       }
       controls={
         <Button variant="ghost" className="h-10 [&_svg]:size-3" onClick={() => refresh()}>
           <RefreshCcw />
-          <div>{t('Refresh')}</div>
+          <div>{t('randomRelaysRefresh')}</div>
         </Button>
       }
       hideBackButton
