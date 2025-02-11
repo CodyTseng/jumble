@@ -165,6 +165,20 @@ export default {
     'Login to set': '登录后设置',
     'Please login to view following feed': '请登录以查看关注动态',
     'Send only to r': '只发送到 {{r}}',
-    'Send only to current relays': '只发送到当前服务器'
+    'Send only to current relays': '只发送到当前服务器',
+    Explore: '探索',
+    'Search relays': '搜索服务器',
+    relayInfoBadgeAuth: '需登陆',
+    relayInfoBadgeSearch: '支持搜索',
+    relayInfoBadgePayment: '需付费',
+    Operator: '管理员',
+    Contact: '联系方式',
+    Software: '软件',
+    Version: '版本',
+    'Random Relays': '随机服务器',
+    randomRelaysRefresh: '换一批',
+    'Explore more': '探索更多',
+    'Payment page': '付款页面',
+    'Supported NIPs': '支持的 NIP'
   }
 }

@@ -3,7 +3,7 @@ import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/li
 import { formatPubkey, userIdToPubkey } from '@/lib/pubkey'
 import { extractPubkeysFromEventTags } from '@/lib/tag'
 import { isLocalNetworkUrl } from '@/lib/url'
-import { TDraftEvent, TProfile, TRelayInfo, TRelayList } from '@/types'
+import { TDraftEvent, TProfile, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import FlexSearch from 'flexsearch'
@@ -49,33 +49,19 @@ class ClientService extends EventTarget {
   private profileEventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private profileEventDataloader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
-    { cacheMap: this.profileEventCache, maxBatchSize: 10 }
+    { cacheMap: this.profileEventCache, maxBatchSize: 20 }
   )
   private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
-    { cache: false, maxBatchSize: 10 }
+    { cache: false, maxBatchSize: 20 }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 }),
-      maxBatchSize: 10
+      maxBatchSize: 20
     }
   )
-  private relayInfoDataLoader = new DataLoader<string, TRelayInfo | undefined>(async (urls) => {
-    return await Promise.all(
-      urls.map(async (url) => {
-        try {
-          const res = await fetch(url.replace('ws://', 'http://').replace('wss://', 'https://'), {
-            headers: { Accept: 'application/nostr+json' }
-          })
-          return res.json() as TRelayInfo
-        } catch {
-          return undefined
-        }
-      })
-    )
-  })
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
     max: 10000,
     fetchMethod: this._fetchFollowListEvent.bind(this)
@@ -531,11 +517,6 @@ class ClientService extends EventTarget {
     this.followListCache.set(pubkey, Promise.resolve(event))
   }
 
-  async fetchRelayInfos(urls: string[]) {
-    const infos = await this.relayInfoDataLoader.loadMany(urls)
-    return infos.map((info) => (info ? (info instanceof Error ? undefined : info) : undefined))
-  }
-
   async calculateOptimalReadRelays(pubkey: string) {
     const followings = await this.fetchFollowings(pubkey)
     const [selfRelayListEvent, ...relayListEvents] = await this.relayListEventDataLoader.loadMany([
@@ -597,9 +578,9 @@ class ClientService extends EventTarget {
 
   async initUserIndexFromFollowings(pubkey: string) {
     const followings = await this.fetchFollowings(pubkey)
-    for (let i = 0; i * 10 < followings.length; i++) {
-      await this.profileEventDataloader.loadMany(followings.slice(i * 10, (i + 1) * 10))
-      await new Promise((resolve) => setTimeout(resolve, 100))
+    for (let i = 0; i * 20 < followings.length; i++) {
+      await this.profileEventDataloader.loadMany(followings.slice(i * 20, (i + 1) * 20))
+      await new Promise((resolve) => setTimeout(resolve, 200))
     }
   }
 

@@ -10,7 +10,7 @@ export function Titlebar({
   return (
     <div
       className={cn(
-        'sticky top-0 w-full z-20 bg-background [&_svg]:size-4 [&_svg]:shrink-0',
+        'sticky top-0 w-full z-40 bg-background [&_svg]:size-4 [&_svg]:shrink-0',
         className
       )}
     >

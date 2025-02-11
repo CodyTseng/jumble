@@ -35,17 +35,6 @@ export function DeepBrowsingProvider({
     if (!active) return
 
     const handleScroll = () => {
-      const atBottom = !scrollAreaRef
-        ? window.innerHeight + window.scrollY >= document.body.offsetHeight - 20
-        : scrollAreaRef.current
-          ? scrollAreaRef.current?.clientHeight + scrollAreaRef.current?.scrollTop >=
-            scrollAreaRef.current?.scrollHeight - 20
-          : false
-      if (atBottom) {
-        setDeepBrowsing(false)
-        return
-      }
-
       const scrollTop = (!scrollAreaRef ? window.scrollY : scrollAreaRef.current?.scrollTop) || 0
       const diff = scrollTop - lastScrollTopRef.current
       lastScrollTopRef.current = scrollTop

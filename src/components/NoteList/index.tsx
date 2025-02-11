@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { PICTURE_EVENT_KIND } from '@/constants'
 import { isReplyNoteEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
@@ -8,6 +9,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import storage from '@/services/storage.service'
 import { TNoteListMode } from '@/types'
 import dayjs from 'dayjs'
@@ -26,12 +28,14 @@ export default function NoteList({
   relayUrls,
   filter = {},
   className,
-  filterMutedNotes = true
+  filterMutedNotes = true,
+  needCheckAlgoRelay = false
 }: {
   relayUrls: string[]
   filter?: Filter
   className?: string
   filterMutedNotes?: boolean
+  needCheckAlgoRelay?: boolean
 }) {
   const { t } = useTranslation()
   const { isLargeScreen } = useScreenSize()
@@ -71,8 +75,11 @@ export default function NoteList({
       setNewEvents([])
       setHasMore(true)
 
-      const relayInfos = await client.fetchRelayInfos(relayUrls)
-      const areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
+      let areAlgoRelays = false
+      if (needCheckAlgoRelay) {
+        const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
+        areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
+      }
       const filter = areAlgoRelays ? { ...noteFilter, limit: ALGO_RELAY_LIMIT } : noteFilter
 
       let eventCount = 0
@@ -182,14 +189,14 @@ export default function NoteList({
         }}
         pullingContent=""
       >
-        <div className="space-y-2 sm:space-y-2">
+        <div>
           {newEvents.filter((event: Event) => {
             return (
               (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
               (listMode !== 'posts' || !isReplyNoteEvent(event))
             )
           }).length > 0 && (
-            <div className="flex justify-center w-full mt-2">
+            <div className="flex justify-center w-full my-2">
               <Button size="lg" onClick={showNewEvents}>
                 {t('show new notes')}
               </Button>
@@ -197,7 +204,7 @@ export default function NoteList({
           )}
           {isPictures ? (
             <PictureNoteCardMasonry
-              className="px-2 sm:px-4 pt-2"
+              className="px-2 sm:px-4 mt-2"
               columnCount={isLargeScreen ? 3 : 2}
               events={events}
             />
@@ -215,19 +222,21 @@ export default function NoteList({
                 ))}
             </div>
           )}
-          <div className="text-center text-sm text-muted-foreground">
-            {hasMore || refreshing ? (
-              <div ref={bottomRef}>{t('loading...')}</div>
-            ) : events.length ? (
-              t('no more notes')
-            ) : (
-              <div className="flex justify-center w-full mt-2">
-                <Button size="lg" onClick={() => setRefreshCount((pre) => pre + 1)}>
-                  {t('reload notes')}
-                </Button>
-              </div>
-            )}
-          </div>
+          {hasMore || refreshing ? (
+            <div ref={bottomRef}>
+              <LoadingSkeleton isPictures={isPictures} />
+            </div>
+          ) : events.length ? (
+            <div className="text-center text-sm text-muted-foreground mt-2">
+              {t('no more notes')}
+            </div>
+          ) : (
+            <div className="flex justify-center w-full mt-2">
+              <Button size="lg" onClick={() => setRefreshCount((pre) => pre + 1)}>
+                {t('reload notes')}
+              </Button>
+            </div>
+          )}
         </div>
       </PullToRefresh>
     </div>
@@ -247,7 +256,7 @@ function ListModeSwitch({
   return (
     <div
       className={cn(
-        'sticky top-12 bg-background z-10 duration-700 transition-transform',
+        'sticky top-12 bg-background z-30 duration-700 transition-transform',
         deepBrowsing && lastScrollTop > 800 ? '-translate-y-[calc(100%+12rem)]' : ''
       )}
     >
@@ -312,6 +321,48 @@ function PictureNoteCardMasonry({
           {column}
         </div>
       ))}
+    </div>
+  )
+}
+
+function LoadingSkeleton({ isPictures }: { isPictures: boolean }) {
+  const { isLargeScreen } = useScreenSize()
+
+  if (isPictures) {
+    return (
+      <div
+        className={cn(
+          'px-2 sm:px-4 grid',
+          isLargeScreen ? 'grid-cols-3 gap-4' : 'grid-cols-2 gap-2'
+        )}
+      >
+        {[...Array(isLargeScreen ? 3 : 2)].map((_, i) => (
+          <div key={i}>
+            <Skeleton className="rounded-lg w-full aspect-[6/8]" />
+            <div className="p-2">
+              <Skeleton className="w-32 h-5" />
+              <div className="flex items-center gap-2 mt-2">
+                <Skeleton className="w-5 h-5 rounded-full" />
+                <Skeleton className="w-16 h-3" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="px-4 py-3">
+      <div className="flex items-center space-x-2">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="space-y-1">
+          <Skeleton className="w-10 h-4" />
+          <Skeleton className="w-20 h-3" />
+        </div>
+      </div>
+      <Skeleton className="w-full h-5 mt-2" />
+      <Skeleton className="w-2/3 h-5 mt-2" />
     </div>
   )
 }

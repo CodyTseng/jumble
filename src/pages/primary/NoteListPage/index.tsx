@@ -1,11 +1,14 @@
 import NoteList from '@/components/NoteList'
+import PostEditor from '@/components/PostEditor'
 import SaveRelayDropdownMenu from '@/components/SaveRelayDropdownMenu'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { PencilLine } from 'lucide-react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import SearchButton from './SearchButton'
@@ -33,7 +36,13 @@ const NoteListPage = forwardRef((_, ref) => {
       </div>
     )
   } else if (isReady) {
-    content = <NoteList relayUrls={relayUrls} filter={filter} />
+    content = (
+      <NoteList
+        relayUrls={relayUrls}
+        filter={filter}
+        needCheckAlgoRelay={feedType !== 'following'}
+      />
+    )
   }
 
   return (
@@ -53,15 +62,41 @@ NoteListPage.displayName = 'NoteListPage'
 export default NoteListPage
 
 function NoteListPageTitlebar({ temporaryRelayUrls = [] }: { temporaryRelayUrls?: string[] }) {
+  const { isSmallScreen } = useScreenSize()
+
   return (
     <div className="flex gap-1 items-center h-full justify-between">
       <FeedButton />
       <div>
-        <SearchButton />
         {temporaryRelayUrls.length > 0 && (
           <SaveRelayDropdownMenu urls={temporaryRelayUrls} atTitlebar />
         )}
+        <SearchButton />
+        {isSmallScreen && <PostButton />}
       </div>
     </div>
+  )
+}
+
+function PostButton() {
+  const { checkLogin } = useNostr()
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="titlebar-icon"
+        onClick={(e) => {
+          e.stopPropagation()
+          checkLogin(() => {
+            setOpen(true)
+          })
+        }}
+      >
+        <PencilLine />
+      </Button>
+      <PostEditor open={open} setOpen={setOpen} />
+    </>
   )
 }

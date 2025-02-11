@@ -4,7 +4,7 @@ import { createPictureNoteDraftEvent } from '@/lib/draft-event'
 import { cn } from '@/lib/utils'
 import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
-import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +12,7 @@ import Image from '../Image'
 import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions.tsx'
+import SendOnlyToSwitch from './SendOnlyToSwitch.tsx'
 import { TPostOptions } from './types.ts'
 import Uploader from './Uploader'
 
@@ -42,7 +43,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         }
         let protectedEvent = false
         if (postOptions.sendOnlyToCurrentRelays) {
-          const relayInfos = await client.fetchRelayInfos(relayUrls)
+          const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
           protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
         }
         const draftEvent = await createPictureNoteDraftEvent(content, pictureInfos, {
@@ -94,6 +95,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         textValue={content}
         placeholder={t('Write something...')}
       />
+      <SendOnlyToSwitch postOptions={postOptions} setPostOptions={setPostOptions} />
       <div className="flex items-center justify-between">
         <Button
           variant="link"

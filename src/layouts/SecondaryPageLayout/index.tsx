@@ -65,9 +65,9 @@ const SecondaryPageLayout = forwardRef(
               hideBackButton={hideBackButton}
             />
             {children}
-            {displayScrollToTopButton && <ScrollToTopButton />}
             <BottomNavigationBar />
           </div>
+          {displayScrollToTopButton && <ScrollToTopButton />}
         </DeepBrowsingProvider>
       )
     }
@@ -76,7 +76,7 @@ const SecondaryPageLayout = forwardRef(
       <DeepBrowsingProvider active={currentIndex === index} scrollAreaRef={scrollAreaRef}>
         <ScrollArea
           className="h-screen overflow-auto"
-          scrollBarClassName="z-20 pt-12"
+          scrollBarClassName="z-50 pt-12"
           ref={scrollAreaRef}
         >
           <SecondaryPageTitlebar
@@ -106,7 +106,13 @@ export function SecondaryPageTitlebar({
 }): JSX.Element {
   return (
     <Titlebar className="h-12 flex gap-1 p-1 items-center justify-between font-semibold">
-      <BackButton hide={hideBackButton}>{title}</BackButton>
+      {hideBackButton ? (
+        <div className="flex gap-2 items-center pl-3 w-fit truncate text-lg font-semibold">
+          {title}
+        </div>
+      ) : (
+        <BackButton>{title}</BackButton>
+      )}
       <div className="flex-shrink-0">{controls}</div>
     </Titlebar>
   )

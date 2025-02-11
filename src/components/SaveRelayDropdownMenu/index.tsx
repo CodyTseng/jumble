@@ -32,9 +32,15 @@ export default function SaveRelayDropdownMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={atTitlebar ? 'titlebar-icon' : 'icon'}>
-          <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
-        </Button>
+        {atTitlebar ? (
+          <Button variant="ghost" size="titlebar-icon">
+            <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
+          </Button>
+        ) : (
+          <button className="enabled:hover:text-primary [&_svg]:size-5">
+            <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
+          </button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>{t('Save to')} ...</DropdownMenuLabel>

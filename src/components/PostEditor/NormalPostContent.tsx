@@ -4,6 +4,7 @@ import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/dr
 import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import relayInfoService from '@/services/relay-info.service'
 import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useState } from 'react'
@@ -12,6 +13,7 @@ import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions.tsx'
 import Preview from './Preview'
+import SendOnlyToSwitch from './SendOnlyToSwitch.tsx'
 import { TPostOptions } from './types.ts'
 import Uploader from './Uploader'
 
@@ -53,7 +55,7 @@ export default function NormalPostContent({
         }
         let protectedEvent = false
         if (postOptions.sendOnlyToCurrentRelays) {
-          const relayInfos = await client.fetchRelayInfos(relayUrls)
+          const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
           protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
         }
         const draftEvent =
@@ -110,6 +112,11 @@ export default function NormalPostContent({
         placeholder={t('Write something...')}
       />
       {content && <Preview content={content} />}
+      <SendOnlyToSwitch
+        parentEvent={parentEvent}
+        postOptions={postOptions}
+        setPostOptions={setPostOptions}
+      />
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <Uploader

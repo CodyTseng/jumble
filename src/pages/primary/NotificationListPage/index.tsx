@@ -1,10 +1,22 @@
 import NotificationList from '@/components/NotificationList'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
+import { usePrimaryPage } from '@/PageManager'
 import { Bell } from 'lucide-react'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NotificationListPage = forwardRef((_, ref) => {
+  const { current } = usePrimaryPage()
+  const firstRenderRef = useRef(true)
+  const notificationListRef = useRef<{ refresh: () => void }>(null)
+
+  useEffect(() => {
+    if (current === 'notifications' && !firstRenderRef.current) {
+      notificationListRef.current?.refresh()
+    }
+    firstRenderRef.current = false
+  }, [current])
+
   return (
     <PrimaryPageLayout
       ref={ref}
@@ -13,7 +25,7 @@ const NotificationListPage = forwardRef((_, ref) => {
       displayScrollToTopButton
     >
       <div className="px-4">
-        <NotificationList />
+        <NotificationList ref={notificationListRef} />
       </div>
     </PrimaryPageLayout>
   )
