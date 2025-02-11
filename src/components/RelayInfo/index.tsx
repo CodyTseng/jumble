@@ -1,12 +1,14 @@
 import { Badge } from '@/components/ui/badge'
 import { useFetchRelayInfo } from '@/hooks'
 import { GitBranch, Mail, SquareCode } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import RelayBadges from '../RelayBadges'
 import RelayIcon from '../RelayIcon'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
 export default function RelayInfo({ url }: { url: string }) {
+  const { t } = useTranslation()
   const { relayInfo, isFetching } = useFetchRelayInfo(url)
   if (isFetching || !relayInfo) {
     return null
@@ -36,7 +38,7 @@ export default function RelayInfo({ url }: { url: string }) {
       <div className="flex flex-wrap gap-4">
         {relayInfo.pubkey && (
           <div className="space-y-2 flex-1">
-            <div className="text-sm font-semibold text-muted-foreground">Operator</div>
+            <div className="text-sm font-semibold text-muted-foreground">{t('Operator')}</div>
             <div className="flex gap-2 items-center">
               <UserAvatar userId={relayInfo.pubkey} size="small" />
               <Username userId={relayInfo.pubkey} className="font-semibold" />
@@ -45,7 +47,7 @@ export default function RelayInfo({ url }: { url: string }) {
         )}
         {relayInfo.contact && (
           <div className="space-y-2 flex-1">
-            <div className="text-sm font-semibold text-muted-foreground">Contact</div>
+            <div className="text-sm font-semibold text-muted-foreground">{t('Contact')}</div>
             <div className="flex gap-2 items-center font-semibold">
               <Mail />
               {relayInfo.contact}
@@ -54,7 +56,7 @@ export default function RelayInfo({ url }: { url: string }) {
         )}
         {relayInfo.software && (
           <div className="space-y-2 flex-1">
-            <div className="text-sm font-semibold text-muted-foreground">Software</div>
+            <div className="text-sm font-semibold text-muted-foreground">{t('Software')}</div>
             <div className="flex gap-2 items-center font-semibold">
               <SquareCode />
               {formatSoftware(relayInfo.software)}
@@ -63,7 +65,7 @@ export default function RelayInfo({ url }: { url: string }) {
         )}
         {relayInfo.version && (
           <div className="space-y-2 flex-1">
-            <div className="text-sm font-semibold text-muted-foreground">Version</div>
+            <div className="text-sm font-semibold text-muted-foreground">{t('Version')}</div>
             <div className="flex gap-2 items-center font-semibold">
               <GitBranch />
               {relayInfo.version}

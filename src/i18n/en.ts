@@ -164,6 +164,16 @@ export default {
     'Login to set': 'Login to set',
     'Please login to view following feed': 'Please login to view following feed',
     'Send only to r': 'Send only to {{r}}',
-    'Send only to current relays': 'Send only to current relays'
+    'Send only to current relays': 'Send only to current relays',
+    Explore: 'Explore',
+    'Search relays': 'Search relays',
+    relayInfoBadgeAuth: 'Auth',
+    relayInfoBadgeSearch: 'Search',
+    relayInfoBadgePayment: 'Payment',
+    relayInfoBadgeGroups: 'Groups',
+    Operator: 'Operator',
+    Contact: 'Contact',
+    Software: 'Software',
+    Version: 'Version'
   }
 }
