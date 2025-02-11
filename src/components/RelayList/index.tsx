@@ -6,7 +6,7 @@ import { TNip66RelayInfo } from '@/types'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelaySimpleInfo from '../RelaySimpleInfo'
-import SearchInput from './SearchInput'
+import SearchInput from '../SearchInput'
 
 export default function RelayList() {
   const { t } = useTranslation()

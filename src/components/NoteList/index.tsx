@@ -227,7 +227,9 @@ export default function NoteList({
               <LoadingSkeleton isPictures={isPictures} />
             </div>
           ) : events.length ? (
-            <div className="text-center text-sm text-muted-foreground mt-2">t('no more notes')</div>
+            <div className="text-center text-sm text-muted-foreground mt-2">
+              {t('no more notes')}
+            </div>
           ) : (
             <div className="flex justify-center w-full mt-2">
               <Button size="lg" onClick={() => setRefreshCount((pre) => pre + 1)}>
