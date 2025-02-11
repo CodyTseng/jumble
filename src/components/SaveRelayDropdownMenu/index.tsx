@@ -33,7 +33,7 @@ export default function SaveRelayDropdownMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {atTitlebar ? (
-          <Button variant="ghost" size={atTitlebar ? 'titlebar-icon' : 'icon'}>
+          <Button variant="ghost" size="titlebar-icon">
             <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
           </Button>
         ) : (

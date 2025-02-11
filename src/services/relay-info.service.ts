@@ -129,7 +129,7 @@ class RelayInfoService {
 
   private async loadRelayInfos() {
     let until: number = Math.round(Date.now() / 1000)
-    const since = until - 60 * 60 * 24
+    const since = until - 60 * 60 * 48
 
     while (until) {
       const relayInfoEvents = await client.fetchEvents(MONITOR_RELAYS, {

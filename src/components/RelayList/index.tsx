@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton'
 import { toRelay } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import relayInfoService from '@/services/relay-info.service'
@@ -84,7 +85,20 @@ export default function RelayList() {
       ))}
       {showCount < relays.length && <div ref={bottomRef} />}
       {loading && (
-        <div className="text-center text-muted-foreground text-sm">{t('loading...')}</div>
+        <div className="p-4 space-y-2">
+          <div className="flex items-start justify-between gap-2 w-full">
+            <div className="flex flex-1 w-0 items-center gap-2">
+              <Skeleton className="h-9 w-9 rounded-full" />
+              <div className="flex-1 w-0 space-y-1">
+                <Skeleton className="w-40 h-5" />
+                <Skeleton className="w-20 h-4" />
+              </div>
+            </div>
+            <Skeleton className="w-5 h-5 rounded-lg" />
+          </div>
+          <Skeleton className="w-full h-4" />
+          <Skeleton className="w-2/3 h-4" />
+        </div>
       )}
       {!loading && relays.length === 0 && (
         <div className="text-center text-muted-foreground text-sm">{t('no relays found')}</div>
