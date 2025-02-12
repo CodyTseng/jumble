@@ -7,12 +7,12 @@ export const StorageKey = {
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',
   NOTE_LIST_MODE: 'noteListMode',
-  ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap',
-  ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap',
-  ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap',
-  ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap',
-  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap',
-  DEFAULT_ZAP_SATS: 'defaultZapSats'
+  DEFAULT_ZAP_SATS: 'defaultZapSats',
+  ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
+  ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap', // deprecated
+  ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap', // deprecated
+  ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap', // deprecated
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap' // deprecated
 }
 
 export const BIG_RELAY_URLS = [
@@ -31,4 +31,4 @@ export const URL_REGEX = /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_,:!~*]+/gu
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 export const MONITOR = '9bbbb845e5b6c831c29789900769843ab43bb5047abe697870cb50b6fc9bf923'
-export const MONITOR_RELAYS = ['wss://history.nostr.watch/']
+export const MONITOR_RELAYS = ['wss://relay.nostr.watch/']

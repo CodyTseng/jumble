@@ -1,4 +1,4 @@
-import storage from '@/services/storage.service'
+import storage from '@/services/local-storage.service'
 import { TTheme, TThemeSetting } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
 

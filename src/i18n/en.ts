@@ -164,7 +164,7 @@ export default {
     'Login to set': 'Login to set',
     'Please login to view following feed': 'Please login to view following feed',
     'Send only to r': 'Send only to {{r}}',
-    'Send only to current relays': 'Send only to current relays',
+    'Send only to these relays': 'Send only to these relays',
     Explore: 'Explore',
     'Search relays': 'Search relays',
     relayInfoBadgeAuth: 'Auth',

@@ -2,7 +2,7 @@ import client from '@/services/client.service'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
-export function useFetchEvent(id?: string) {
+export function useFetchEvent(eventId?: string) {
   const [isFetching, setIsFetching] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const [event, setEvent] = useState<Event | undefined>(undefined)
@@ -10,14 +10,14 @@ export function useFetchEvent(id?: string) {
   useEffect(() => {
     const fetchEvent = async () => {
       setIsFetching(true)
-      if (!id) {
+      if (!eventId) {
         setIsFetching(false)
         setError(new Error('No id provided'))
         return
       }
 
       try {
-        const event = await client.fetchEvent(id)
+        const event = await client.fetchEvent(eventId)
         if (event) {
           setEvent(event)
         }
@@ -32,7 +32,7 @@ export function useFetchEvent(id?: string) {
       setError(err as Error)
       setIsFetching(false)
     })
-  }, [id])
+  }, [eventId])
 
   return { isFetching, error, event }
 }

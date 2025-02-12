@@ -6,6 +6,7 @@ import DataLoader from 'dataloader'
 import FlexSearch from 'flexsearch'
 import { Event } from 'nostr-tools'
 import client from './client.service'
+import indexedDb from './indexed-db.service'
 
 class RelayInfoService {
   static instance: RelayInfoService
@@ -52,7 +53,12 @@ class RelayInfoService {
     }
 
     if (!query) {
-      return Array.from(this.relayInfoMap.values())
+      const arr = Array.from(this.relayInfoMap.values())
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+      return arr
     }
 
     const result = await this.relayInfoIndex.searchAsync(query)
@@ -128,28 +134,39 @@ class RelayInfoService {
   }
 
   private async loadRelayInfos() {
-    let until: number = Math.round(Date.now() / 1000)
-    const since = until - 60 * 60 * 48
-
-    while (until) {
-      const relayInfoEvents = await client.fetchEvents(MONITOR_RELAYS, {
-        authors: [MONITOR],
-        kinds: [30166],
-        since,
-        until,
-        limit: 1000
-      })
-      const events = relayInfoEvents.sort((a, b) => b.created_at - a.created_at)
-      if (events.length === 0) {
-        break
-      }
-      until = events[events.length - 1].created_at - 1
-      const relayInfos = formatRelayInfoEvents(events)
-      for (const relayInfo of relayInfos) {
-        await this.addRelayInfo(relayInfo)
-      }
-    }
+    const localRelayInfos = await indexedDb.getAllRelayInfoEvents()
+    const relayInfos = formatRelayInfoEvents(localRelayInfos)
+    relayInfos.forEach((relayInfo) => this.addRelayInfo(relayInfo))
     this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
+
+    const loadFromInternet = async () => {
+      let until: number = Math.round(Date.now() / 1000)
+      const since = until - 60 * 60 * 48
+
+      while (until) {
+        const relayInfoEvents = await client.fetchEvents(MONITOR_RELAYS, {
+          authors: [MONITOR],
+          kinds: [30166],
+          since,
+          until,
+          limit: 1000
+        })
+        const events = relayInfoEvents.sort((a, b) => b.created_at - a.created_at)
+        if (events.length === 0) {
+          break
+        }
+        await Promise.allSettled(events.map((event) => indexedDb.putRelayInfoEvent(event)))
+        until = events[events.length - 1].created_at - 1
+        const relayInfos = formatRelayInfoEvents(events)
+        relayInfos.forEach((relayInfo) => this.addRelayInfo(relayInfo))
+      }
+      this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
+    }
+    if (localRelayInfos.length === 0) {
+      await loadFromInternet()
+    } else {
+      loadFromInternet()
+    }
   }
 
   private async addRelayInfo(relayInfo: TNip66RelayInfo) {

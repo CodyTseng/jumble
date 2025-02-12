@@ -111,7 +111,9 @@ export function SecondaryPageTitlebar({
           {title}
         </div>
       ) : (
-        <BackButton>{title}</BackButton>
+        <div className="flex items-center flex-1 w-0">
+          <BackButton>{title}</BackButton>
+        </div>
       )}
       <div className="flex-shrink-0">{controls}</div>
     </Titlebar>

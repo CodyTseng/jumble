@@ -2,9 +2,7 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { createPictureNoteDraftEvent } from '@/lib/draft-event'
 import { cn } from '@/lib/utils'
-import { useFeed } from '@/providers/FeedProvider.tsx'
 import { useNostr } from '@/providers/NostrProvider'
-import relayInfoService from '@/services/relay-info.service'
 import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,19 +11,18 @@ import TextareaWithMentions from '../TextareaWithMentions.tsx'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions.tsx'
 import SendOnlyToSwitch from './SendOnlyToSwitch.tsx'
-import { TPostOptions } from './types.ts'
 import Uploader from './Uploader'
 
 export default function PicturePostContent({ close }: { close: () => void }) {
   const { t } = useTranslation()
   const { toast } = useToast()
   const { publish, checkLogin } = useNostr()
-  const { relayUrls } = useFeed()
   const [content, setContent] = useState('')
   const [pictureInfos, setPictureInfos] = useState<{ url: string; tags: string[][] }[]>([])
   const [posting, setPosting] = useState(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
-  const [postOptions, setPostOptions] = useState<TPostOptions>({})
+  const [addClientTag, setAddClientTag] = useState(false)
+  const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const canPost = !!content && !posting && pictureInfos.length > 0
 
   const post = async (e: React.MouseEvent) => {
@@ -41,18 +38,11 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         if (!pictureInfos.length) {
           throw new Error(t('Picture note requires images'))
         }
-        let protectedEvent = false
-        if (postOptions.sendOnlyToCurrentRelays) {
-          const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
-          protectedEvent = relayInfos.every((info) => info?.supported_nips?.includes(70))
-        }
         const draftEvent = await createPictureNoteDraftEvent(content, pictureInfos, {
-          addClientTag: postOptions.addClientTag,
-          protectedEvent
+          addClientTag,
+          protectedEvent: !!specifiedRelayUrls
         })
-        await publish(draftEvent, {
-          specifiedRelayUrls: postOptions.sendOnlyToCurrentRelays ? relayUrls : undefined
-        })
+        await publish(draftEvent, { specifiedRelayUrls })
         setContent('')
         close()
       } catch (error) {
@@ -95,7 +85,10 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         textValue={content}
         placeholder={t('Write something...')}
       />
-      <SendOnlyToSwitch postOptions={postOptions} setPostOptions={setPostOptions} />
+      <SendOnlyToSwitch
+        specifiedRelayUrls={specifiedRelayUrls}
+        setSpecifiedRelayUrls={setSpecifiedRelayUrls}
+      />
       <div className="flex items-center justify-between">
         <Button
           variant="link"
@@ -126,8 +119,8 @@ export default function PicturePostContent({ close }: { close: () => void }) {
       </div>
       <PostOptions
         show={showMoreOptions}
-        postOptions={postOptions}
-        setPostOptions={setPostOptions}
+        addClientTag={addClientTag}
+        setAddClientTag={setAddClientTag}
       />
       <div className="flex gap-2 items-center justify-around sm:hidden">
         <Button

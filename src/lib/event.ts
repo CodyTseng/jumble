@@ -47,12 +47,28 @@ export function isProtectedEvent(event: Event) {
 
 export function getParentEventId(event?: Event) {
   if (!event || !isReplyNoteEvent(event)) return undefined
-  return event.tags.find(isReplyETag)?.[1] ?? event.tags.find(tagNameEquals('e'))?.[1]
+  const tag = event.tags.find(isReplyETag) ?? event.tags.find(tagNameEquals('e'))
+  if (!tag) return undefined
+
+  try {
+    const [, id, relay, , author] = tag
+    return nip19.neventEncode({ id, relays: relay ? [relay] : undefined, author })
+  } catch {
+    return undefined
+  }
 }
 
 export function getRootEventId(event?: Event) {
   if (!event || !isReplyNoteEvent(event)) return undefined
-  return event.tags.find(isRootETag)?.[1]
+  const tag = event.tags.find(isRootETag)
+  if (!tag) return undefined
+
+  try {
+    const [, id, relay, , author] = tag
+    return nip19.neventEncode({ id, relays: relay ? [relay] : undefined, author })
+  } catch {
+    return undefined
+  }
 }
 
 export function isReplaceable(kind: number) {

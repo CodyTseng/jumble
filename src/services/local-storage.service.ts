@@ -9,7 +9,6 @@ import {
   TRelaySet,
   TThemeSetting
 } from '@/types'
-import { Event } from 'nostr-tools'
 
 const DEFAULT_RELAY_SETS: TRelaySet[] = [
   {
@@ -39,8 +38,8 @@ const DEFAULT_RELAY_SETS: TRelaySet[] = [
   }
 ]
 
-class StorageService {
-  static instance: StorageService
+class LocalStorageService {
+  static instance: LocalStorageService
 
   private relaySets: TRelaySet[] = []
   private activeRelaySetId: string | null = null
@@ -49,22 +48,14 @@ class StorageService {
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
   private noteListMode: TNoteListMode = 'posts'
-  private accountRelayListEventMap: Record<string, Event | undefined> = {} // pubkey -> relayListEvent
-  private accountFollowListEventMap: Record<string, Event | undefined> = {} // pubkey -> followListEvent
-  private accountMuteListEventMap: Record<string, Event | undefined> = {} // pubkey -> muteListEvent
-  private accountMuteDecryptedTagsMap: Record<
-    string,
-    { id: string; tags: string[][] } | undefined
-  > = {} // pubkey -> { id, tags }
-  private accountProfileEventMap: Record<string, Event | undefined> = {} // pubkey -> profileEvent
   private defaultZapSats: number = 21
 
   constructor() {
-    if (!StorageService.instance) {
+    if (!LocalStorageService.instance) {
       this.init()
-      StorageService.instance = this
+      LocalStorageService.instance = this
     }
-    return StorageService.instance
+    return LocalStorageService.instance
   }
 
   init() {
@@ -85,37 +76,6 @@ class StorageService {
       noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
-
-    const accountRelayListEventMapStr = window.localStorage.getItem(
-      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP
-    )
-    this.accountRelayListEventMap = accountRelayListEventMapStr
-      ? JSON.parse(accountRelayListEventMapStr)
-      : {}
-    const accountFollowListEventMapStr = window.localStorage.getItem(
-      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP
-    )
-    this.accountFollowListEventMap = accountFollowListEventMapStr
-      ? JSON.parse(accountFollowListEventMapStr)
-      : {}
-    const accountMuteListEventMapStr = window.localStorage.getItem(
-      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP
-    )
-    this.accountMuteListEventMap = accountMuteListEventMapStr
-      ? JSON.parse(accountMuteListEventMapStr)
-      : {}
-    const accountMuteDecryptedTagsMapStr = window.localStorage.getItem(
-      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP
-    )
-    this.accountMuteDecryptedTagsMap = accountMuteDecryptedTagsMapStr
-      ? JSON.parse(accountMuteDecryptedTagsMapStr)
-      : {}
-    const accountProfileEventMapStr = window.localStorage.getItem(
-      StorageKey.ACCOUNT_PROFILE_EVENT_MAP
-    )
-    this.accountProfileEventMap = accountProfileEventMapStr
-      ? JSON.parse(accountProfileEventMapStr)
-      : {}
 
     const relaySetsStr = window.localStorage.getItem(StorageKey.RELAY_SETS)
     if (!relaySetsStr) {
@@ -151,6 +111,13 @@ class StorageService {
         this.defaultZapSats = num
       }
     }
+
+    // Clean up deprecated data
+    window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
+    window.localStorage.removeItem(StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP)
+    window.localStorage.removeItem(StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP)
+    window.localStorage.removeItem(StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP)
+    window.localStorage.removeItem(StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP)
   }
 
   getRelaySets() {
@@ -237,32 +204,7 @@ class StorageService {
 
   removeAccount(account: TAccount) {
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
-    delete this.accountFollowListEventMap[account.pubkey]
-    delete this.accountRelayListEventMap[account.pubkey]
-    delete this.accountMuteListEventMap[account.pubkey]
-    delete this.accountMuteDecryptedTagsMap[account.pubkey]
-    delete this.accountProfileEventMap[account.pubkey]
     window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP,
-      JSON.stringify(this.accountFollowListEventMap)
-    )
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP,
-      JSON.stringify(this.accountMuteListEventMap)
-    )
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP,
-      JSON.stringify(this.accountMuteDecryptedTagsMap)
-    )
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP,
-      JSON.stringify(this.accountRelayListEventMap)
-    )
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_PROFILE_EVENT_MAP,
-      JSON.stringify(this.accountProfileEventMap)
-    )
   }
 
   switchAccount(account: TAccount | null) {
@@ -277,102 +219,6 @@ class StorageService {
     window.localStorage.setItem(StorageKey.CURRENT_ACCOUNT, JSON.stringify(act))
   }
 
-  getAccountRelayListEvent(pubkey: string) {
-    return this.accountRelayListEventMap[pubkey]
-  }
-
-  setAccountRelayListEvent(relayListEvent: Event) {
-    const pubkey = relayListEvent.pubkey
-    if (
-      this.accountRelayListEventMap[pubkey] &&
-      this.accountRelayListEventMap[pubkey].created_at > relayListEvent.created_at
-    ) {
-      return false
-    }
-    this.accountRelayListEventMap[pubkey] = relayListEvent
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP,
-      JSON.stringify(this.accountRelayListEventMap)
-    )
-    return true
-  }
-
-  getAccountFollowListEvent(pubkey: string) {
-    return this.accountFollowListEventMap[pubkey]
-  }
-
-  setAccountFollowListEvent(followListEvent: Event) {
-    const pubkey = followListEvent.pubkey
-    if (
-      this.accountFollowListEventMap[pubkey] &&
-      this.accountFollowListEventMap[pubkey].created_at > followListEvent.created_at
-    ) {
-      return false
-    }
-    this.accountFollowListEventMap[pubkey] = followListEvent
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP,
-      JSON.stringify(this.accountFollowListEventMap)
-    )
-    return true
-  }
-
-  getAccountMuteListEvent(pubkey: string) {
-    return this.accountMuteListEventMap[pubkey]
-  }
-
-  setAccountMuteListEvent(muteListEvent: Event) {
-    const pubkey = muteListEvent.pubkey
-    if (
-      this.accountMuteListEventMap[pubkey] &&
-      this.accountMuteListEventMap[pubkey].created_at > muteListEvent.created_at
-    ) {
-      return false
-    }
-    this.accountMuteListEventMap[pubkey] = muteListEvent
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP,
-      JSON.stringify(this.accountMuteListEventMap)
-    )
-    return true
-  }
-
-  getAccountMuteDecryptedTags(muteListEvent: Event) {
-    const stored = this.accountMuteDecryptedTagsMap[muteListEvent.pubkey]
-    if (stored && stored.id === muteListEvent.id) {
-      return stored.tags
-    }
-    return null
-  }
-
-  setAccountMuteDecryptedTags(muteListEvent: Event, tags: string[][]) {
-    this.accountMuteDecryptedTagsMap[muteListEvent.pubkey] = { id: muteListEvent.id, tags }
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP,
-      JSON.stringify(this.accountMuteDecryptedTagsMap)
-    )
-  }
-
-  getAccountProfileEvent(pubkey: string) {
-    return this.accountProfileEventMap[pubkey]
-  }
-
-  setAccountProfileEvent(profileEvent: Event) {
-    const pubkey = profileEvent.pubkey
-    if (
-      this.accountProfileEventMap[pubkey] &&
-      this.accountProfileEventMap[pubkey].created_at > profileEvent.created_at
-    ) {
-      return false
-    }
-    this.accountProfileEventMap[pubkey] = profileEvent
-    window.localStorage.setItem(
-      StorageKey.ACCOUNT_PROFILE_EVENT_MAP,
-      JSON.stringify(this.accountProfileEventMap)
-    )
-    return true
-  }
-
   getDefaultZapSats() {
     return this.defaultZapSats
   }
@@ -383,6 +229,5 @@ class StorageService {
   }
 }
 
-const instance = new StorageService()
-
+const instance = new LocalStorageService()
 export default instance
