@@ -1,8 +1,8 @@
 import { createFollowListDraftEvent } from '@/lib/draft-event'
 import { extractPubkeysFromEventTags } from '@/lib/tag'
 import client from '@/services/client.service'
-import storage from '@/services/storage.service'
-import { Event } from 'nostr-tools'
+import indexedDb from '@/services/indexed-db.service'
+import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
@@ -40,13 +40,16 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     const init = async () => {
       setIsFetching(true)
       setFollowListEvent(undefined)
-      const storedFollowListEvent = storage.getAccountFollowListEvent(accountPubkey)
+      const storedFollowListEvent = await indexedDb.getReplaceableEvent(
+        accountPubkey,
+        kinds.Contacts
+      )
       if (storedFollowListEvent) {
         setFollowListEvent(storedFollowListEvent)
       }
-      const event = await client.fetchFollowListEvent(accountPubkey)
+      const event = await client.fetchFollowListEvent(accountPubkey, true)
       if (event) {
-        updateFollowListEvent(event)
+        await updateFollowListEvent(event)
       }
       setIsFetching(false)
     }
@@ -54,8 +57,8 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     init()
   }, [accountPubkey])
 
-  const updateFollowListEvent = (event: Event) => {
-    const isNew = storage.setAccountFollowListEvent(event)
+  const updateFollowListEvent = async (event: Event) => {
+    const isNew = await indexedDb.putReplaceableEvent(event)
     if (!isNew) return
     setFollowListEvent(event)
   }
@@ -69,7 +72,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     )
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
-    updateFollowListEvent(newFollowListEvent)
+    await updateFollowListEvent(newFollowListEvent)
   }
 
   const unfollow = async (pubkey: string) => {
@@ -81,11 +84,11 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     )
     const newFollowListEvent = await publish(newFollowListDraftEvent)
     client.updateFollowListCache(accountPubkey, newFollowListEvent)
-    updateFollowListEvent(newFollowListEvent)
+    await updateFollowListEvent(newFollowListEvent)
   }
 
   const getFollowings = async (pubkey: string) => {
-    const followListEvent = storage.getAccountFollowListEvent(pubkey)
+    const followListEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.Contacts)
     if (followListEvent) {
       return extractPubkeysFromEventTags(followListEvent.tags)
     }

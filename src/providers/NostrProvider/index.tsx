@@ -4,7 +4,8 @@ import { useToast } from '@/hooks'
 import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
 import { formatPubkey } from '@/lib/pubkey'
 import client from '@/services/client.service'
-import storage from '@/services/storage.service'
+import storage from '@/services/local-storage.service'
+import indexedDb from '@/services/indexed-db.service'
 import { ISigner, TAccount, TAccountPointer, TDraftEvent, TProfile, TRelayList } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds, VerifiedEvent } from 'nostr-tools'
@@ -45,8 +46,8 @@ type TNostrContext = {
   startLogin: () => void
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
   getRelayList: (pubkey: string) => Promise<TRelayList>
-  updateRelayListEvent: (relayListEvent: Event) => void
-  updateProfileEvent: (profileEvent: Event) => void
+  updateRelayListEvent: (relayListEvent: Event) => Promise<void>
+  updateProfileEvent: (profileEvent: Event) => Promise<void>
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -99,64 +100,79 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    setRelayList(null)
-    setProfile(null)
-    setProfileEvent(null)
-    setNsec(null)
-    if (!account) {
-      return
-    }
-
-    const storedNsec = storage.getAccountNsec(account.pubkey)
-    if (storedNsec) {
-      setNsec(storedNsec)
-    } else {
+    const init = async () => {
+      setRelayList(null)
+      setProfile(null)
+      setProfileEvent(null)
       setNsec(null)
-    }
-    const storedNcryptsec = storage.getAccountNcryptsec(account.pubkey)
-    if (storedNcryptsec) {
-      setNcryptsec(storedNcryptsec)
-    } else {
-      setNcryptsec(null)
-    }
-    const storedRelayListEvent = storage.getAccountRelayListEvent(account.pubkey)
-    if (storedRelayListEvent) {
-      setRelayList(
-        storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
-      )
-    }
-    const storedProfileEvent = storage.getAccountProfileEvent(account.pubkey)
-    if (storedProfileEvent) {
-      setProfileEvent(storedProfileEvent)
-      setProfile(getProfileFromProfileEvent(storedProfileEvent))
-    }
-    client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
-      if (!relayListEvent) {
-        if (storedRelayListEvent) return
-
-        setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] })
+      if (!account) {
         return
       }
-      const isNew = storage.setAccountRelayListEvent(relayListEvent)
-      if (!isNew) return
-      setRelayList(getRelayListFromRelayListEvent(relayListEvent))
-    })
-    client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
-      if (!profileEvent) {
-        if (storedProfileEvent) return
 
-        setProfile({
-          pubkey: account.pubkey,
-          username: formatPubkey(account.pubkey)
-        })
-        return
+      const controller = new AbortController()
+      const storedNsec = storage.getAccountNsec(account.pubkey)
+      if (storedNsec) {
+        setNsec(storedNsec)
+      } else {
+        setNsec(null)
       }
-      const isNew = storage.setAccountProfileEvent(profileEvent)
-      if (!isNew) return
-      setProfileEvent(profileEvent)
-      setProfile(getProfileFromProfileEvent(profileEvent))
-    })
-    client.initUserIndexFromFollowings(account.pubkey)
+      const storedNcryptsec = storage.getAccountNcryptsec(account.pubkey)
+      if (storedNcryptsec) {
+        setNcryptsec(storedNcryptsec)
+      } else {
+        setNcryptsec(null)
+      }
+      const [storedRelayListEvent, storedProfileEvent] = await Promise.all([
+        indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
+        indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata)
+      ])
+      if (storedRelayListEvent) {
+        setRelayList(
+          storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
+        )
+      }
+      if (storedProfileEvent) {
+        setProfileEvent(storedProfileEvent)
+        setProfile(getProfileFromProfileEvent(storedProfileEvent))
+      }
+
+      client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
+        if (!relayListEvent) {
+          if (storedRelayListEvent) return
+
+          setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] })
+          return
+        }
+        const event = await indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList)
+        if (event) {
+          setRelayList(getRelayListFromRelayListEvent(event))
+        }
+      })
+      client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
+        if (!profileEvent) {
+          if (storedProfileEvent) return
+
+          setProfile({
+            pubkey: account.pubkey,
+            username: formatPubkey(account.pubkey)
+          })
+          return
+        }
+        const event = await indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata)
+        if (event) {
+          setProfileEvent(event)
+          setProfile(getProfileFromProfileEvent(event))
+        }
+      })
+      client.initUserIndexFromFollowings(account.pubkey, controller.signal)
+      return controller
+    }
+    const promise = init()
+    return () => {
+      promise.then((controller) => {
+        controller?.abort()
+      })
+    }
   }, [account])
 
   useEffect(() => {
@@ -379,21 +395,21 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const getRelayList = async (pubkey: string) => {
-    const storedRelayListEvent = storage.getAccountRelayListEvent(pubkey)
+    const storedRelayListEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.RelayList)
     if (storedRelayListEvent) {
       return getRelayListFromRelayListEvent(storedRelayListEvent)
     }
     return await client.fetchRelayList(pubkey)
   }
 
-  const updateRelayListEvent = (relayListEvent: Event) => {
-    const isNew = storage.setAccountRelayListEvent(relayListEvent)
+  const updateRelayListEvent = async (relayListEvent: Event) => {
+    const isNew = await indexedDb.putReplaceableEvent(relayListEvent)
     if (!isNew) return
     setRelayList(getRelayListFromRelayListEvent(relayListEvent))
   }
 
-  const updateProfileEvent = (profileEvent: Event) => {
-    const isNew = storage.setAccountProfileEvent(profileEvent)
+  const updateProfileEvent = async (profileEvent: Event) => {
+    const isNew = await indexedDb.putReplaceableEvent(profileEvent)
     if (!isNew) return
     setProfileEvent(profileEvent)
     setProfile(getProfileFromProfileEvent(profileEvent))

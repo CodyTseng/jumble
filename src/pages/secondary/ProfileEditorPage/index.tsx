@@ -74,7 +74,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       profileEvent?.tags
     )
     const newProfileEvent = await publish(profileDraftEvent)
-    updateProfileEvent(newProfileEvent)
+    await updateProfileEvent(newProfileEvent)
     setSaving(false)
     pop()
   }

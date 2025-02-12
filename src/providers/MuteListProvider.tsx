@@ -2,7 +2,7 @@ import { createMuteListDraftEvent } from '@/lib/draft-event'
 import { getLatestEvent } from '@/lib/event'
 import { extractPubkeysFromEventTags, isSameTag } from '@/lib/tag'
 import client from '@/services/client.service'
-import storage from '@/services/storage.service'
+import indexedDb from '@/services/indexed-db.service'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
@@ -35,7 +35,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     const init = async () => {
       setMuteListEvent(undefined)
-      const storedMuteListEvent = storage.getAccountMuteListEvent(accountPubkey)
+      const storedMuteListEvent = await indexedDb.getReplaceableEvent(accountPubkey, kinds.Mutelist)
       if (storedMuteListEvent) {
         setMuteListEvent(storedMuteListEvent)
         const tags = await extractMuteTags(storedMuteListEvent)
@@ -47,6 +47,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       })
       const muteEvent = getLatestEvent(events) as Event | undefined
       if (muteEvent) {
+        await indexedDb.putReplaceableEvent(muteEvent)
         setMuteListEvent(muteEvent)
         const tags = await extractMuteTags(muteEvent)
         setTags(tags)
@@ -59,7 +60,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   const extractMuteTags = async (muteListEvent: Event) => {
     const tags = [...muteListEvent.tags]
     if (muteListEvent.content) {
-      const storedDecryptedTags = storage.getAccountMuteDecryptedTags(muteListEvent)
+      const storedDecryptedTags = await indexedDb.getMuteDecryptedTags(muteListEvent.id)
 
       if (storedDecryptedTags) {
         tags.push(...storedDecryptedTags)
@@ -67,7 +68,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         try {
           const plainText = await nip04Decrypt(muteListEvent.pubkey, muteListEvent.content)
           const contentTags = z.array(z.array(z.string())).parse(JSON.parse(plainText))
-          storage.setAccountMuteDecryptedTags(muteListEvent, contentTags)
+          await indexedDb.putMuteDecryptedTags(muteListEvent.id, contentTags)
           tags.push(...contentTags.filter((tag) => tags.every((t) => !isSameTag(t, tag))))
         } catch (error) {
           console.error('Failed to decrypt mute list content', error)
@@ -77,10 +78,10 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     return tags
   }
 
-  const update = (event: Event, tags: string[][]) => {
-    const isNew = storage.setAccountMuteListEvent(event)
+  const update = async (event: Event, tags: string[][]) => {
+    const isNew = await indexedDb.putReplaceableEvent(event)
     if (!isNew) return
-    storage.setAccountMuteDecryptedTags(event, tags)
+    await indexedDb.putMuteDecryptedTags(event.id, tags)
     setMuteListEvent(event)
     setTags(tags)
   }
@@ -92,7 +93,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     const cipherText = await nip04Encrypt(accountPubkey, JSON.stringify(newTags))
     const newMuteListDraftEvent = createMuteListDraftEvent(muteListEvent?.tags ?? [], cipherText)
     const newMuteListEvent = await publish(newMuteListDraftEvent)
-    update(newMuteListEvent, newTags)
+    await update(newMuteListEvent, newTags)
   }
 
   const unmutePubkey = async (pubkey: string) => {
@@ -105,7 +106,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       cipherText
     )
     const newMuteListEvent = await publish(newMuteListDraftEvent)
-    update(newMuteListEvent, newTags)
+    await update(newMuteListEvent, newTags)
   }
 
   return (

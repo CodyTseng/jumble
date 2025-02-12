@@ -18,6 +18,7 @@ import {
   VerifiedEvent
 } from 'nostr-tools'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
+import indexedDb from './indexed-db.service'
 
 type TTimelineRef = [string, number]
 
@@ -46,24 +47,29 @@ class ClientService extends EventTarget {
     this.eventBatchLoadFn.bind(this),
     { cache: false }
   )
-  private profileEventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private profileEventDataloader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
-    { cacheMap: this.profileEventCache, maxBatchSize: 50 }
+    {
+      cache: false,
+      maxBatchSize: 50
+    }
   )
   private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
-    { cache: false, maxBatchSize: 50 }
+    {
+      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
+      maxBatchSize: 50
+    }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),
     {
-      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 }),
+      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
       maxBatchSize: 50
     }
   )
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
-    max: 10000,
+    max: 2000,
     fetchMethod: this._fetchFollowListEvent.bind(this)
   })
 
@@ -448,12 +454,6 @@ class ClientService extends EventTarget {
   }
 
   async fetchProfileEvent(id: string): Promise<NEvent | undefined> {
-    const pubkey = userIdToPubkey(id)
-    const cache = await this.profileEventCache.get(pubkey)
-    if (cache) {
-      return cache
-    }
-
     return await this.profileEventDataloader.load(id)
   }
 
@@ -504,8 +504,12 @@ class ClientService extends EventTarget {
     return getRelayListFromRelayListEvent(event)
   }
 
-  async fetchFollowListEvent(pubkey: string) {
-    return this.followListCache.fetch(pubkey)
+  async fetchFollowListEvent(pubkey: string, storeToIndexedDb = false) {
+    const event = await this.followListCache.fetch(pubkey)
+    if (storeToIndexedDb && event) {
+      await indexedDb.putReplaceableEvent(event)
+    }
+    return event
   }
 
   async fetchFollowings(pubkey: string) {
@@ -576,9 +580,11 @@ class ClientService extends EventTarget {
     )
   }
 
-  async initUserIndexFromFollowings(pubkey: string) {
+  async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
     const followings = await this.fetchFollowings(pubkey)
     for (let i = 0; i * 50 < followings.length; i++) {
+      if (signal.aborted) return
+
       await this.profileEventDataloader.loadMany(followings.slice(i * 50, (i + 1) * 50))
       await new Promise((resolve) => setTimeout(resolve, 30000))
     }
@@ -686,10 +692,16 @@ class ClientService extends EventTarget {
     if (!pubkey) {
       throw new Error('Invalid id')
     }
+    const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
+    if (localProfile) {
+      this.addUsernameToIndex(localProfile)
+      return localProfile
+    }
     const profileFromDefaultRelays =
       await this.fetchProfileEventFromDefaultRelaysDataloader.load(pubkey)
     if (profileFromDefaultRelays) {
       this.addUsernameToIndex(profileFromDefaultRelays)
+      await indexedDb.putReplaceableEvent(profileFromDefaultRelays)
       return profileFromDefaultRelays
     }
 
@@ -707,7 +719,10 @@ class ClientService extends EventTarget {
     }
 
     if (profileEvent) {
-      await this.addUsernameToIndex(profileEvent)
+      await Promise.allSettled([
+        this.addUsernameToIndex(profileEvent),
+        indexedDb.putReplaceableEvent(profileEvent)
+      ])
     }
 
     return profileEvent
@@ -778,28 +793,50 @@ class ClientService extends EventTarget {
         eventsMap.set(pubkey, event)
       }
     }
-
-    return pubkeys.map((pubkey) => {
+    const profileEvents = pubkeys.map((pubkey) => {
       return eventsMap.get(pubkey)
     })
+
+    await Promise.allSettled(
+      profileEvents.map(
+        (profileEvent) => profileEvent && indexedDb.putReplaceableEvent(profileEvent)
+      )
+    )
+    return profileEvents
   }
 
   private async relayListEventBatchLoadFn(pubkeys: readonly string[]) {
-    const events = await this.query(this.defaultRelayUrls, {
-      authors: pubkeys as string[],
-      kinds: [kinds.RelayList],
-      limit: pubkeys.length
-    })
-    const eventsMap = new Map<string, NEvent>()
-    for (const event of events) {
-      const pubkey = event.pubkey
-      const existing = eventsMap.get(pubkey)
-      if (!existing || existing.created_at < event.created_at) {
-        eventsMap.set(pubkey, event)
+    const relayEvents = await Promise.all(
+      pubkeys.map((pubkey) => indexedDb.getReplaceableEvent(pubkey, kinds.RelayList))
+    )
+    const nonExistingPubkeys = pubkeys.filter((_, i) => !relayEvents[i])
+    if (nonExistingPubkeys.length) {
+      const events = await this.query(this.defaultRelayUrls, {
+        authors: pubkeys as string[],
+        kinds: [kinds.RelayList],
+        limit: pubkeys.length
+      })
+      const eventsMap = new Map<string, NEvent>()
+      for (const event of events) {
+        const pubkey = event.pubkey
+        const existing = eventsMap.get(pubkey)
+        if (!existing || existing.created_at < event.created_at) {
+          eventsMap.set(pubkey, event)
+        }
       }
+      await Promise.allSettled(
+        Array.from(eventsMap.values()).map((evt) => indexedDb.putReplaceableEvent(evt))
+      )
+      nonExistingPubkeys.forEach((pubkey) => {
+        const event = eventsMap.get(pubkey)
+        if (event) {
+          const index = pubkeys.indexOf(pubkey)
+          relayEvents[index] = event
+        }
+      })
     }
 
-    return pubkeys.map((pubkey) => eventsMap.get(pubkey))
+    return relayEvents
   }
 
   private async _fetchFollowListEvent(pubkey: string) {

@@ -1,7 +1,7 @@
 import { BIG_RELAY_URLS } from '@/constants'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
-import storage from '@/services/storage.service'
+import storage from '@/services/local-storage.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'

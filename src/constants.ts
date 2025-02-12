@@ -7,11 +7,11 @@ export const StorageKey = {
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',
   NOTE_LIST_MODE: 'noteListMode',
-  ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap',
-  ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap',
-  ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap',
-  ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap',
-  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap'
+  ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
+  ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap', // deprecated
+  ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap', // deprecated
+  ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap', // deprecated
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap' // deprecated
 }
 
 export const BIG_RELAY_URLS = [
