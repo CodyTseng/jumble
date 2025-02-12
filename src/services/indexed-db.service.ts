@@ -1,3 +1,4 @@
+import { tagNameEquals } from '@/lib/tag'
 import { Event, kinds } from 'nostr-tools'
 
 type TValue<T = any> = {
@@ -11,7 +12,8 @@ const StoreNames = {
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
-  MUTE_DECRYPTED_TAGS: 'muteDecryptedTags'
+  MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
+  RELAY_INFO_EVENTS: 'relayInfoEvents'
 }
 
 class IndexedDbService {
@@ -30,7 +32,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 1)
+        const request = window.indexedDB.open('jumble', 2)
 
         request.onerror = (event) => {
           reject(event)
@@ -57,6 +59,9 @@ class IndexedDbService {
           }
           if (!this.db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
             this.db.createObjectStore(StoreNames.MUTE_DECRYPTED_TAGS, { keyPath: 'key' })
+          }
+          if (!this.db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
+            this.db.createObjectStore(StoreNames.RELAY_INFO_EVENTS, { keyPath: 'key' })
           }
         }
       })
@@ -150,6 +155,50 @@ class IndexedDbService {
       const store = transaction.objectStore(StoreNames.MUTE_DECRYPTED_TAGS)
 
       const putRequest = store.put(this.formatValue(id, tags))
+      putRequest.onsuccess = () => {
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        reject(event)
+      }
+    })
+  }
+
+  async getAllRelayInfoEvents(): Promise<Event[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.RELAY_INFO_EVENTS, 'readonly')
+      const store = transaction.objectStore(StoreNames.RELAY_INFO_EVENTS)
+      const request = store.getAll()
+
+      request.onsuccess = () => {
+        resolve((request.result as TValue<Event>[])?.map((item) => item.value))
+      }
+
+      request.onerror = (event) => {
+        reject(event)
+      }
+    })
+  }
+
+  async putRelayInfoEvent(event: Event): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const dValue = event.tags.find(tagNameEquals('d'))?.[1]
+      if (!dValue) {
+        return resolve()
+      }
+      const transaction = this.db.transaction(StoreNames.RELAY_INFO_EVENTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.RELAY_INFO_EVENTS)
+
+      const putRequest = store.put(this.formatValue(dValue, event))
       putRequest.onsuccess = () => {
         resolve()
       }
