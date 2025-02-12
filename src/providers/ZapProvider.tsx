@@ -1,4 +1,4 @@
-import storage from '@/services/storage.service'
+import storage from '@/services/local-storage.service'
 import { createContext, useContext, useState } from 'react'
 
 type TZapContext = {
