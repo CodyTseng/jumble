@@ -1,7 +1,9 @@
 import { BIG_RELAY_URLS } from '@/constants'
+import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
+import relayInfoService from '@/services/relay-info.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
@@ -101,7 +103,12 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         setFilter({})
         storage.setActiveRelaySetId(relaySet.id)
         storage.setFeedType(feedType)
-        client.setCurrentRelayUrls(relaySet.relayUrls)
+        setIsReady(true)
+
+        const relayInfos = await relayInfoService.getRelayInfos(relaySet.relayUrls)
+        client.setCurrentRelayUrls(
+          relaySet.relayUrls.filter((_, i) => !relayInfos[i] || !checkAlgoRelay(relayInfos[i]))
+        )
       }
       return setIsReady(true)
     }
@@ -135,8 +142,13 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setRelayUrls(urls)
       setActiveRelaySetId(null)
       setFilter({})
-      client.setCurrentRelayUrls(urls)
-      return setIsReady(true)
+      setIsReady(true)
+
+      const relayInfos = await relayInfoService.getRelayInfos(urls)
+      client.setCurrentRelayUrls(
+        urls.filter((_, i) => !relayInfos[i] || !checkAlgoRelay(relayInfos[i]))
+      )
+      return
     }
     setIsReady(true)
   }
