@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 import { toHablaLongFormArticle } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -8,12 +9,14 @@ import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import Image from '../Image'
 
-export default function LongFormArticleNote({
+export default function LongFormArticleCard({
   event,
-  className
+  className,
+  embedded = false
 }: {
   event: Event
   className?: string
+  embedded?: boolean
 }) {
   const { isSmallScreen } = useScreenSize()
   const metadata = useMemo(() => {
@@ -53,46 +56,51 @@ export default function LongFormArticleNote({
 
   if (isSmallScreen) {
     return (
-      <div
-        className={cn('flex flex-col gap-2', className)}
-        onClick={(e) => {
-          e.stopPropagation()
-          window.open(toHablaLongFormArticle(event), '_blank')
-        }}
-      >
-        {metadata.image && (
-          <Image
-            image={{ url: metadata.image }}
-            className="w-full aspect-video object-cover rounded-lg"
-          />
-        )}
-        <div>
-          <div className="text-xl font-semibold line-clamp-1">{metadata.title}</div>
-          {metadata.publishDateString && (
-            <div className="text-xs text-muted-foreground mt-1">{metadata.publishDateString}</div>
+      <div className={className}>
+        <div
+          className={cn('flex flex-col gap-2', embedded ? 'p-2 border rounded-lg' : 'px-4 py-3')}
+          onClick={(e) => {
+            e.stopPropagation()
+            window.open(toHablaLongFormArticle(event), '_blank')
+          }}
+        >
+          {metadata.image && (
+            <Image
+              image={{ url: metadata.image }}
+              className="w-full aspect-video object-cover rounded-lg"
+            />
           )}
-          {metadata.summary && (
-            <div className="text-sm text-muted-foreground line-clamp-4 mt-1">
-              {metadata.summary}
-            </div>
-          )}
-          {metadata.tags.length > 0 && (
-            <div className="mt-2 flex gap-1 flex-wrap">
-              {metadata.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
+          <div>
+            <div className="text-xl font-semibold line-clamp-1">{metadata.title}</div>
+            {metadata.publishDateString && (
+              <div className="text-xs text-muted-foreground mt-1">{metadata.publishDateString}</div>
+            )}
+            {metadata.summary && (
+              <div className="text-sm text-muted-foreground line-clamp-4 mt-1">
+                {metadata.summary}
+              </div>
+            )}
+            {metadata.tags.length > 0 && (
+              <div className="mt-2 flex gap-1 flex-wrap">
+                {metadata.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+        {!embedded && <Separator />}
       </div>
     )
   }
 
   return (
-    <div className={cn('relative border rounded-lg', className)}>
-      <div className="p-3 flex gap-2 items-start">
+    <div className={cn('relative', className)}>
+      <div
+        className={cn('flex gap-2 items-start', embedded ? 'p-3 border rounded-lg' : 'px-4 py-3')}
+      >
         <div className="flex-1 w-0">
           <div className="text-xl font-semibold line-clamp-1">{metadata.title}</div>
           {metadata.publishDateString && (
@@ -117,8 +125,12 @@ export default function LongFormArticleNote({
           <Image image={{ url: metadata.image }} className="h-32 max-w-44 rounded-lg" />
         )}
       </div>
+      {!embedded && <Separator />}
       <div
-        className="absolute top-0 w-full h-full bg-muted/80 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100"
+        className={cn(
+          'absolute top-0 w-full h-full bg-muted/80 backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100',
+          embedded ? 'rounded-lg' : ''
+        )}
         onClick={(e) => {
           e.stopPropagation()
           window.open(toHablaLongFormArticle(event), '_blank')

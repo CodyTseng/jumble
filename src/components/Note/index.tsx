@@ -1,8 +1,7 @@
 import { useSecondaryPage } from '@/PageManager'
-import { GROUP_METADATA_EVENT_KIND } from '@/constants'
-import { getUsingClient, isSupportedKind } from '@/lib/event'
+import { getUsingClient } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { Event, kinds } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
@@ -10,10 +9,6 @@ import NoteStats from '../NoteStats'
 import ParentNotePreview from '../ParentNotePreview'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import GroupMetadataNote from './GroupMetadataNote'
-import LiveEventNote from './LiveEventNote'
-import LongFormArticleNote from './LongFormArticleNote'
-import UnknownKindNote from './UnknownKindNote'
 
 export default function Note({
   event,
@@ -21,8 +16,7 @@ export default function Note({
   size = 'normal',
   className,
   hideStats = false,
-  fetchNoteStats = false,
-  originalNoteId
+  fetchNoteStats = false
 }: {
   event: Event
   parentEvent?: Event
@@ -30,23 +24,9 @@ export default function Note({
   className?: string
   hideStats?: boolean
   fetchNoteStats?: boolean
-  originalNoteId?: string
 }) {
   const { push } = useSecondaryPage()
   const usingClient = useMemo(() => getUsingClient(event), [event])
-  const supported = useMemo(() => isSupportedKind(event.kind), [event])
-
-  let content = <UnknownKindNote className="mt-2" event={event} />
-  if (supported) {
-    content = <Content className="mt-2" event={event} />
-  } else if (event.kind === kinds.LongFormArticle) {
-    content = <LongFormArticleNote className="mt-2" event={event} />
-  } else if (event.kind === kinds.LiveEvent) {
-    content = <LiveEventNote className="mt-2" event={event} />
-  } else if (event.kind === GROUP_METADATA_EVENT_KIND) {
-    content = <GroupMetadataNote className="mt-2" event={event} originalNoteId={originalNoteId} />
-  }
-
   return (
     <div className={className}>
       <div className="flex items-center space-x-2">
@@ -79,7 +59,7 @@ export default function Note({
           }}
         />
       )}
-      {content}
+      <Content className="mt-2" event={event} />
       {!hideStats && (
         <NoteStats className="mt-3" event={event} fetchIfNotExisting={fetchNoteStats} />
       )}

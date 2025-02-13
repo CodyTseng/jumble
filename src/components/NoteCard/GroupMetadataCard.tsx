@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import { getSharableEventId } from '@/lib/event'
 import { toChachiChat } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
@@ -11,14 +12,16 @@ import { Event, nip19 } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import Image from '../Image'
 
-export default function GroupMetadataNote({
+export default function GroupMetadataCard({
   event,
   className,
-  originalNoteId
+  originalNoteId,
+  embedded = false
 }: {
   event: Event
   className?: string
   originalNoteId?: string
+  embedded?: boolean
 }) {
   const { isSmallScreen } = useScreenSize()
   const [isCopied, setIsCopied] = useState(false)
@@ -62,8 +65,13 @@ export default function GroupMetadataNote({
   }, [event, originalNoteId])
 
   return (
-    <div className={cn('relative border rounded-lg', className)}>
-      <div className="p-3 flex gap-2 items-start">
+    <div className={cn('relative', className)}>
+      <div
+        className={cn(
+          'p-3 flex gap-2 items-start',
+          embedded ? 'p-2 sm:p-3 border rounded-lg' : 'px-4 py-3'
+        )}
+      >
         {metadata.picture && (
           <Image image={{ url: metadata.picture }} className="h-32 aspect-square rounded-lg" />
         )}
@@ -96,9 +104,13 @@ export default function GroupMetadataNote({
           )}
         </div>
       </div>
+      {!embedded && <Separator />}
       {!isSmallScreen && metadata.relay && metadata.d && (
         <div
-          className="absolute top-0 w-full h-full bg-muted/80 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100"
+          className={cn(
+            'absolute top-0 w-full h-full bg-muted/80 backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer transition-opacity opacity-0 hover:opacity-100',
+            embedded ? 'rounded-lg' : ''
+          )}
           onClick={(e) => {
             e.stopPropagation()
             window.open(toChachiChat(simplifyUrl(metadata.relay), metadata.d!), '_blank')
