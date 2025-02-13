@@ -86,8 +86,13 @@ class ClientService extends EventTarget {
   public static getInstance(): ClientService {
     if (!ClientService.instance) {
       ClientService.instance = new ClientService()
+      ClientService.instance.init()
     }
     return ClientService.instance
+  }
+
+  async init() {
+    await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
   }
 
   listConnectionStatus() {
@@ -851,5 +856,4 @@ class ClientService extends EventTarget {
 }
 
 const instance = ClientService.getInstance()
-
 export default instance
