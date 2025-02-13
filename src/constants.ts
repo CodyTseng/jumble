@@ -25,6 +25,7 @@ export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.n
 
 export const PICTURE_EVENT_KIND = 20
 export const COMMENT_EVENT_KIND = 1111
+export const GROUP_METADATA_EVENT_KIND = 39000
 
 export const URL_REGEX = /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_,:!~*]+/gu
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

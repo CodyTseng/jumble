@@ -17,7 +17,7 @@ export default function RepostNoteCard({
   const targetEvent = useMemo(() => {
     try {
       const targetEvent = event.content ? (JSON.parse(event.content) as Event) : null
-      if (!targetEvent || !verifyEvent(targetEvent) || targetEvent.kind !== kinds.ShortTextNote) {
+      if (!targetEvent || !verifyEvent(targetEvent) || targetEvent.kind === kinds.Repost) {
         return null
       }
       client.addEventToCache(targetEvent)

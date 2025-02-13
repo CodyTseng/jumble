@@ -1,9 +1,12 @@
+import client from '@/services/client.service'
 import { Event, nip19 } from 'nostr-tools'
+import { getSharableEventId } from './event'
 
 export const toHome = () => '/'
 export const toNote = (eventOrId: Pick<Event, 'id' | 'pubkey'> | string) => {
   if (typeof eventOrId === 'string') return `/notes/${eventOrId}`
-  const nevent = nip19.neventEncode({ id: eventOrId.id, author: eventOrId.pubkey })
+  const relay = client.getEventHint(eventOrId.id)
+  const nevent = nip19.neventEncode({ id: eventOrId.id, author: eventOrId.pubkey, relays: [relay] })
   return `/notes/${nevent}`
 }
 export const toNoteList = ({ hashtag, search }: { hashtag?: string; search?: string }) => {
@@ -40,7 +43,10 @@ export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toMuteList = () => '/mutes'
 
-export const toNoStrudelProfile = (id: string) => `https://nostrudel.ninja/#/u/${id}`
-export const toNoStrudelNote = (id: string) => `https://nostrudel.ninja/#/n/${id}`
-export const toNoStrudelArticle = (id: string) => `https://nostrudel.ninja/#/articles/${id}`
-export const toNoStrudelStream = (id: string) => `https://nostrudel.ninja/#/streams/${id}`
+export const toHablaLongFormArticle = (event: Event) => {
+  return `https://habla.news/a/${getSharableEventId(event)}`
+}
+export const toZapStreamLiveEvent = (event: Event) => {
+  return `https://zap.stream/${getSharableEventId(event)}`
+}
+export const toChachiChat = (relay: string, d: string) => `https://chachi.chat/${relay}/${d}`
