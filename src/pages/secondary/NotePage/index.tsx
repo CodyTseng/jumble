@@ -12,6 +12,7 @@ import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { getParentEventId, getRootEventId, isPictureEvent } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { kinds } from 'nostr-tools'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
@@ -57,15 +58,15 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
         <Note key={`note-${event.id}`} event={event} fetchNoteStats />
       </div>
       <Separator className="mb-2 mt-4" />
-      {isPictureEvent(event) ? (
+      {event.kind === kinds.ShortTextNote ? (
+        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="px-2" />
+      ) : isPictureEvent(event) ? (
         <Nip22ReplyNoteList
           key={`nip22-reply-note-list-${event.id}`}
           event={event}
           className="px-2"
         />
-      ) : (
-        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="px-2" />
-      )}
+      ) : null}
     </SecondaryPageLayout>
   )
 })

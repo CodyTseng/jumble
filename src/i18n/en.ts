@@ -178,6 +178,9 @@ export default {
     randomRelaysRefresh: 'Refresh',
     'Explore more': 'Explore more',
     'Payment page': 'Payment page',
-    'Supported NIPs': 'Supported NIPs'
+    'Supported NIPs': 'Supported NIPs',
+    'Open in a': 'Open in {{a}}',
+    'Cannot handle event of kind k': 'Cannot handle event of kind {{k}}',
+    'Sorry! The note cannot be found 😔': 'Sorry! The note cannot be found 😔'
   }
 }

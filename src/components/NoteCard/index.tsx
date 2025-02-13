@@ -1,6 +1,6 @@
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
-import NormalNoteCard from './NormalNoteCard'
+import GenericNoteCard from './GenericNoteCard'
 import RepostNoteCard from './RepostNoteCard'
 
 export default function NoteCard({
@@ -22,5 +22,5 @@ export default function NoteCard({
       <RepostNoteCard event={event} className={className} filterMutedNotes={filterMutedNotes} />
     )
   }
-  return <NormalNoteCard event={event} className={className} />
+  return <GenericNoteCard event={event} className={className} />
 }

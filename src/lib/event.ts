@@ -45,6 +45,10 @@ export function isProtectedEvent(event: Event) {
   return event.tags.some(([tagName]) => tagName === '-')
 }
 
+export function isSupportedKind(kind: number) {
+  return [kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(kind)
+}
+
 export function getParentEventId(event?: Event) {
   if (!event || !isReplyNoteEvent(event)) return undefined
   const tag = event.tags.find(isReplyETag) ?? event.tags.find(tagNameEquals('e'))
@@ -81,7 +85,7 @@ export function getEventCoordinate(event: Event) {
 }
 
 export function getSharableEventId(event: Event) {
-  const hints = client.getEventHints(event.id).slice(0, 3)
+  const hints = client.getEventHints(event.id).slice(0, 2)
   if (isReplaceable(event.kind)) {
     const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
     return nip19.naddrEncode({ pubkey: event.pubkey, kind: event.kind, identifier, relays: hints })

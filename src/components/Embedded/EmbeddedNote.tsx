@@ -1,30 +1,69 @@
-import { PICTURE_EVENT_KIND } from '@/constants'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchEvent } from '@/hooks'
-import { toNoStrudelArticle, toNoStrudelNote, toNoStrudelStream } from '@/lib/link'
 import { cn } from '@/lib/utils'
-import { kinds } from 'nostr-tools'
-import NormalNoteCard from '../NoteCard/NormalNoteCard'
+import { Check, Copy } from 'lucide-react'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import GenericNoteCard from '../NoteCard/GenericNoteCard'
 
 export function EmbeddedNote({ noteId, className }: { noteId: string; className?: string }) {
-  const { event } = useFetchEvent(noteId)
+  const { event, isFetching } = useFetchEvent(noteId)
 
-  return event && [kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(event.kind) ? (
-    <NormalNoteCard className={cn('w-full', className)} event={event} embedded />
-  ) : (
-    <a
-      href={
-        event?.kind === kinds.LongFormArticle
-          ? toNoStrudelArticle(noteId)
-          : event?.kind === kinds.LiveEvent
-            ? toNoStrudelStream(noteId)
-            : toNoStrudelNote(noteId)
-      }
-      target="_blank"
-      className="text-highlight hover:underline"
+  if (isFetching) {
+    return <EmbeddedNoteSkeleton className={className} />
+  }
+
+  if (!event) {
+    return <EmbeddedNoteNotFound className={className} noteId={noteId} />
+  }
+
+  return (
+    <GenericNoteCard
+      className={cn('w-full', className)}
+      event={event}
+      embedded
+      originalNoteId={noteId}
+    />
+  )
+}
+
+function EmbeddedNoteSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn('text-left p-2 sm:p-3 border rounded-lg', className)}
       onClick={(e) => e.stopPropagation()}
-      rel="noreferrer"
     >
-      {noteId}
-    </a>
+      <div className="flex items-center space-x-2">
+        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="h-3 w-16 my-1" />
+      </div>
+      <Skeleton className="w-full h-4 my-1 mt-2" />
+      <Skeleton className="w-2/3 h-4 my-1" />
+    </div>
+  )
+}
+
+function EmbeddedNoteNotFound({ noteId, className }: { noteId: string; className?: string }) {
+  const { t } = useTranslation()
+  const [isCopied, setIsCopied] = useState(false)
+
+  return (
+    <div className={cn('text-left p-2 sm:p-3 border rounded-lg', className)}>
+      <div className="flex flex-col items-center text-muted-foreground font-medium gap-2">
+        <div>{t('Sorry! The note cannot be found 😔')}</div>
+        <Button
+          onClick={(e) => {
+            e.stopPropagation()
+            navigator.clipboard.writeText(noteId)
+            setIsCopied(true)
+            setTimeout(() => setIsCopied(false), 2000)
+          }}
+          variant="ghost"
+        >
+          {isCopied ? <Check /> : <Copy />} Copy note ID
+        </Button>
+      </div>
+    </div>
   )
 }

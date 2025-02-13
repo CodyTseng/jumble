@@ -27,7 +27,6 @@ export default function Note({
 }) {
   const { push } = useSecondaryPage()
   const usingClient = useMemo(() => getUsingClient(event), [event])
-
   return (
     <div className={className}>
       <div className="flex items-center space-x-2">

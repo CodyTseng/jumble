@@ -179,6 +179,9 @@ export default {
     randomRelaysRefresh: '换一批',
     'Explore more': '探索更多',
     'Payment page': '付款页面',
-    'Supported NIPs': '支持的 NIP'
+    'Supported NIPs': '支持的 NIP',
+    'Open in a': '在 {{a}} 中打开',
+    'Cannot handle event of kind k': '无法处理类型为 {{k}} 的事件',
+    'Sorry! The note cannot be found 😔': '抱歉！找不到该笔记 😔'
   }
 }

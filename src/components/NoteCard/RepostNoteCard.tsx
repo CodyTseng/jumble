@@ -2,7 +2,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import client from '@/services/client.service'
 import { Event, kinds, verifyEvent } from 'nostr-tools'
 import { useMemo } from 'react'
-import NormalNoteCard from './NormalNoteCard'
+import GenericNoteCard from './GenericNoteCard'
 
 export default function RepostNoteCard({
   event,
@@ -17,7 +17,7 @@ export default function RepostNoteCard({
   const targetEvent = useMemo(() => {
     try {
       const targetEvent = event.content ? (JSON.parse(event.content) as Event) : null
-      if (!targetEvent || !verifyEvent(targetEvent) || targetEvent.kind !== kinds.ShortTextNote) {
+      if (!targetEvent || !verifyEvent(targetEvent) || targetEvent.kind === kinds.Repost) {
         return null
       }
       client.addEventToCache(targetEvent)
@@ -38,5 +38,5 @@ export default function RepostNoteCard({
     return null
   }
 
-  return <NormalNoteCard className={className} reposter={event.pubkey} event={targetEvent} />
+  return <GenericNoteCard className={className} reposter={event.pubkey} event={targetEvent} />
 }
