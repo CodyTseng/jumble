@@ -9,6 +9,8 @@ export type TProfile = {
   nip05?: string
   about?: string
   website?: string
+  lud06?: string
+  lud16?: string
   created_at?: number
 }
 export type TMailboxRelayScope = 'read' | 'write' | 'both'

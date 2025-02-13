@@ -48,6 +48,7 @@ class LocalStorageService {
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
   private noteListMode: TNoteListMode = 'posts'
+  private defaultZapSats: number = 21
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -101,6 +102,14 @@ class LocalStorageService {
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
       this.activeRelaySetId = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID) ?? null
+    }
+
+    const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
+    if (defaultZapSatsStr) {
+      const num = parseInt(defaultZapSatsStr)
+      if (!isNaN(num)) {
+        this.defaultZapSats = num
+      }
     }
 
     // Clean up deprecated data
@@ -208,6 +217,15 @@ class LocalStorageService {
     }
     this.currentAccount = act
     window.localStorage.setItem(StorageKey.CURRENT_ACCOUNT, JSON.stringify(act))
+  }
+
+  getDefaultZapSats() {
+    return this.defaultZapSats
+  }
+
+  setDefaultZapSats(sats: number) {
+    this.defaultZapSats = sats
+    window.localStorage.setItem(StorageKey.DEFAULT_ZAP_SATS, sats.toString())
   }
 }
 

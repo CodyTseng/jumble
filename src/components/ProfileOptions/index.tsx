@@ -22,7 +22,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" size="icon" className="rounded-full">
-          <Ellipsis className="text-muted-foreground hover:text-foreground cursor-pointer" />
+          <Ellipsis />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent collisionPadding={8}>

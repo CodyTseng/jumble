@@ -1,14 +1,24 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toRelaySettings } from '@/lib/link'
+import { toRelaySettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { TLanguage } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
-import { Check, ChevronRight, Copy, Info, KeyRound, Languages, Server, SunMoon } from 'lucide-react'
+import {
+  Check,
+  ChevronRight,
+  Copy,
+  Info,
+  KeyRound,
+  Languages,
+  Server,
+  SunMoon,
+  Wallet
+} from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -63,6 +73,13 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="flex items-center gap-4">
           <Server />
           <div>{t('Relays')}</div>
+        </div>
+        <ChevronRight />
+      </SettingItem>
+      <SettingItem onClick={() => push(toWallet())}>
+        <div className="flex items-center gap-4">
+          <Wallet />
+          <div>{t('Wallet')}</div>
         </div>
         <ChevronRight />
       </SettingItem>
