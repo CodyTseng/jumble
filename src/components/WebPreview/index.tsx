@@ -30,7 +30,7 @@ export default function WebPreview({
   if (isSmallScreen && image) {
     return (
       <div className="rounded-lg border mt-2">
-        <Image image={{ url: image }} className="rounded-t-lg w-full h-44" />
+        <Image image={{ url: image }} className="w-full h-44 rounded-t-lg" hideIfError />
         <div className="bg-muted p-2 w-full rounded-b-lg">
           <div className="text-xs text-muted-foreground">{hostname}</div>
           <div className="font-semibold line-clamp-1">{title}</div>
@@ -50,7 +50,8 @@ export default function WebPreview({
       {image && (
         <Image
           image={{ url: image }}
-          className={`rounded-l-lg ${size === 'normal' ? 'h-44' : 'h-24'}`}
+          className={`rounded-lg ${size === 'normal' ? 'h-44' : 'h-24'}`}
+          hideIfError
         />
       )}
       <div className="flex-1 w-0 p-2">

@@ -9,8 +9,8 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
-import relayInfoService from '@/services/relay-info.service'
 import storage from '@/services/local-storage.service'
+import relayInfoService from '@/services/relay-info.service'
 import { TNoteListMode } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
@@ -326,30 +326,10 @@ function PictureNoteCardMasonry({
 }
 
 function LoadingSkeleton({ isPictures }: { isPictures: boolean }) {
-  const { isLargeScreen } = useScreenSize()
+  const { t } = useTranslation()
 
   if (isPictures) {
-    return (
-      <div
-        className={cn(
-          'px-2 sm:px-4 grid',
-          isLargeScreen ? 'grid-cols-3 gap-4' : 'grid-cols-2 gap-2'
-        )}
-      >
-        {[...Array(isLargeScreen ? 3 : 2)].map((_, i) => (
-          <div key={i}>
-            <Skeleton className="rounded-lg w-full aspect-[6/8]" />
-            <div className="p-2">
-              <Skeleton className="w-32 h-5" />
-              <div className="flex items-center gap-2 mt-2">
-                <Skeleton className="w-5 h-5 rounded-full" />
-                <Skeleton className="w-16 h-3" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <div className="text-center text-sm text-muted-foreground">{t('loading...')}</div>
   }
 
   return (

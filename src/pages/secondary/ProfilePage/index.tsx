@@ -83,7 +83,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
           <ProfileBanner
             banner={banner}
             pubkey={pubkey}
-            className="w-full aspect-video object-cover rounded-lg"
+            className="w-full aspect-video object-cover"
           />
           <Avatar className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background">
             <AvatarImage src={avatar} className="object-cover object-center" />

@@ -38,7 +38,7 @@ export default function PictureNoteCard({
 
   return (
     <div className={cn('cursor-pointer relative', className)} onClick={() => push(toNote(event))}>
-      <Image className="rounded-lg w-full aspect-[6/8]" image={images[0]} />
+      <Image className="w-full aspect-[6/8] rounded-lg" image={images[0]} />
       {images.length > 1 && (
         <div className="absolute top-2 right-2 bg-background/50 rounded-full p-2">
           <Images size={16} />
