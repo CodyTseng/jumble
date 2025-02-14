@@ -20,7 +20,8 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
 import PictureNoteCard from '../PictureNoteCard'
 
-const LIMIT = 500
+const LIMIT = 100
+const ALGO_LIMIT = 500
 const SHOW_COUNT = 20
 
 export default function NoteList({
@@ -55,7 +56,6 @@ export default function NoteList({
       kinds: isPictures
         ? [PICTURE_EVENT_KIND]
         : [kinds.ShortTextNote, kinds.Repost, PICTURE_EVENT_KIND],
-      limit: LIMIT,
       ...filter
     }
   }, [JSON.stringify(filter), isPictures])
@@ -79,7 +79,7 @@ export default function NoteList({
       let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
         [...relayUrls],
-        noteFilter,
+        { ...noteFilter, limit: areAlgoRelays ? ALGO_LIMIT : LIMIT },
         {
           onEvents: (events, eosed) => {
             if (eventCount > events.length) return
@@ -127,7 +127,7 @@ export default function NoteList({
     const newEvents = await client.loadMoreTimeline(
       timelineKey,
       events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
-      noteFilter.limit
+      LIMIT
     )
     if (newEvents.length === 0) {
       setHasMore(false)
