@@ -20,9 +20,8 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
 import PictureNoteCard from '../PictureNoteCard'
 
-const NORMAL_RELAY_LIMIT = 100
-const ALGO_RELAY_LIMIT = 500
-const PICTURE_NOTE_LIMIT = 30
+const LIMIT = 500
+const SHOW_COUNT = 20
 
 export default function NoteList({
   relayUrls,
@@ -45,22 +44,18 @@ export default function NoteList({
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [events, setEvents] = useState<Event[]>([])
   const [newEvents, setNewEvents] = useState<Event[]>([])
+  const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [refreshing, setRefreshing] = useState(true)
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const isPictures = useMemo(() => listMode === 'pictures', [listMode])
   const noteFilter = useMemo(() => {
-    if (isPictures) {
-      return {
-        kinds: [PICTURE_EVENT_KIND],
-        limit: PICTURE_NOTE_LIMIT,
-        ...filter
-      }
-    }
     return {
-      kinds: [kinds.ShortTextNote, kinds.Repost, PICTURE_EVENT_KIND],
-      limit: NORMAL_RELAY_LIMIT,
+      kinds: isPictures
+        ? [PICTURE_EVENT_KIND]
+        : [kinds.ShortTextNote, kinds.Repost, PICTURE_EVENT_KIND],
+      limit: LIMIT,
       ...filter
     }
   }, [JSON.stringify(filter), isPictures])
@@ -80,12 +75,11 @@ export default function NoteList({
         const relayInfos = await relayInfoService.getRelayInfos(relayUrls)
         areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
       }
-      const filter = areAlgoRelays ? { ...noteFilter, limit: ALGO_RELAY_LIMIT } : noteFilter
 
       let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
         [...relayUrls],
-        filter,
+        noteFilter,
         {
           onEvents: (events, eosed) => {
             if (eventCount > events.length) return
@@ -124,8 +118,12 @@ export default function NoteList({
   }, [JSON.stringify(relayUrls), noteFilter, refreshCount])
 
   const loadMore = useCallback(async () => {
-    if (!timelineKey || refreshing || !hasMore) return
+    if (showCount < events.length) {
+      setShowCount((prev) => prev + SHOW_COUNT)
+      return
+    }
 
+    if (!timelineKey || refreshing || !hasMore) return
     const newEvents = await client.loadMoreTimeline(
       timelineKey,
       events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
@@ -136,11 +134,9 @@ export default function NoteList({
       return
     }
     setEvents((oldEvents) => [...oldEvents, ...newEvents])
-  }, [timelineKey, refreshing, hasMore, events, noteFilter])
+  }, [timelineKey, refreshing, hasMore, events, noteFilter, showCount])
 
   useEffect(() => {
-    if (refreshing) return
-
     const options = {
       root: null,
       rootMargin: '10px',
@@ -164,7 +160,7 @@ export default function NoteList({
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [refreshing, loadMore])
+  }, [loadMore])
 
   const showNewEvents = () => {
     setEvents((oldEvents) => [...newEvents, ...oldEvents])
@@ -177,6 +173,7 @@ export default function NoteList({
         listMode={listMode}
         setListMode={(listMode) => {
           setListMode(listMode)
+          setShowCount(SHOW_COUNT)
           topRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' })
           storage.setNoteListMode(listMode)
         }}
@@ -190,27 +187,29 @@ export default function NoteList({
         pullingContent=""
       >
         <div>
-          {newEvents.filter((event: Event) => {
-            return (
-              (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-              (listMode !== 'posts' || !isReplyNoteEvent(event))
-            )
-          }).length > 0 && (
-            <div className="flex justify-center w-full my-2">
-              <Button size="lg" onClick={showNewEvents}>
-                {t('show new notes')}
-              </Button>
-            </div>
-          )}
+          {events.length > 0 &&
+            newEvents.filter((event: Event) => {
+              return (
+                (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
+                (listMode !== 'posts' || !isReplyNoteEvent(event))
+              )
+            }).length > 0 && (
+              <div className="flex justify-center w-full my-2">
+                <Button size="lg" onClick={showNewEvents}>
+                  {t('show new notes')}
+                </Button>
+              </div>
+            )}
           {isPictures ? (
             <PictureNoteCardMasonry
               className="px-2 sm:px-4 mt-2"
               columnCount={isLargeScreen ? 3 : 2}
-              events={events}
+              events={events.slice(0, showCount)}
             />
           ) : (
             <div>
               {events
+                .slice(0, showCount)
                 .filter((event: Event) => listMode !== 'posts' || !isReplyNoteEvent(event))
                 .map((event) => (
                   <NoteCard
