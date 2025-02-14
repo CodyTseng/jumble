@@ -320,7 +320,8 @@ class ClientService extends EventTarget {
               timeline.refs = newRefs.concat(timeline.refs)
               onEvents(newEvents.concat(cachedEvents), true)
             }
-          }
+          },
+          eoseTimeout: 10000 // 10s
         })
       }
     })
