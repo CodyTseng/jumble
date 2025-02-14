@@ -25,7 +25,7 @@ import { embedded, embeddedNostrNpubRenderer, embeddedNostrProfileRenderer } fro
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import UserAvatar from '../UserAvatar'
 
-const LIMIT = 500
+const LIMIT = 100
 const SHOW_COUNT = 50
 
 const NotificationList = forwardRef((_, ref) => {
