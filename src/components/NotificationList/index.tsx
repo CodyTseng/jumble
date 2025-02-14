@@ -26,7 +26,7 @@ import { FormattedTimestamp } from '../FormattedTimestamp'
 import UserAvatar from '../UserAvatar'
 
 const LIMIT = 100
-const SHOW_COUNT = 50
+const SHOW_COUNT = 30
 
 const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
