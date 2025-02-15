@@ -6,7 +6,7 @@ export function EmbeddedMention({ userId }: { userId: string }) {
     <Username
       userId={userId}
       showAt
-      className="text-highlight font-normal inline-block"
+      className="text-highlight font-normal inline"
       withoutSkeleton
     />
   )

@@ -30,7 +30,7 @@ export default function Username({
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <div className={cn('max-w-fit', className)}>
+        <div className={className}>
           <SecondaryPageLink
             to={toProfile(pubkey)}
             className="truncate hover:underline"
@@ -65,7 +65,7 @@ export function SimpleUsername({
   const { username } = profile
 
   return (
-    <div className={cn('max-w-fit', className)}>
+    <div className={className}>
       {showAt && '@'}
       {username}
     </div>

@@ -29,7 +29,7 @@ export default function ReplyNote({
             className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
             skeletonClassName="h-3"
           />
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground shrink-0">
             <FormattedTimestamp timestamp={event.created_at} />
           </div>
         </div>

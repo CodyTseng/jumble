@@ -37,14 +37,14 @@ export default function Note({
           <div className="flex gap-2 items-center">
             <Username
               userId={event.pubkey}
-              className={`font-semibold flex ${size === 'small' ? 'text-sm' : ''}`}
+              className={`font-semibold flex truncate ${size === 'small' ? 'text-sm' : ''}`}
               skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
             />
             {usingClient && size === 'normal' && (
-              <div className="text-xs text-muted-foreground truncate">using {usingClient}</div>
+              <div className="text-xs text-muted-foreground shrink-0">using {usingClient}</div>
             )}
           </div>
-          <div className="text-xs text-muted-foreground line-clamp-1">
+          <div className="text-xs text-muted-foreground shrink-0">
             <FormattedTimestamp timestamp={event.created_at} />
           </div>
         </div>
