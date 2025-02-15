@@ -1,6 +1,7 @@
+import { getAmountFromInvoice } from '@/lib/lightning'
 import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
-import { Invoice } from '@getalby/lightning-tools'
+import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { createContext, useContext, useState } from 'react'
 import { useNostr } from './NostrProvider'
@@ -10,6 +11,7 @@ export type TNoteStats = {
   reposts: Set<string>
   zaps: { pr: string; pubkey: string; amount: number }[]
   replyCount: number
+  updatedAt?: number
 }
 
 type TNoteStatsContext = {
@@ -36,6 +38,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const { pubkey } = useNostr()
 
   const fetchNoteStats = async (event: Event) => {
+    const oldStats = noteStatsMap.get(event.id)
+    let since: number | undefined
+    if (oldStats?.updatedAt) {
+      since = oldStats.updatedAt
+    }
     const relayList = await client.fetchRelayList(event.pubkey)
     const filters: Filter[] = [
       {
@@ -72,6 +79,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       )
     }
 
+    if (since) {
+      filters.forEach((filter) => {
+        filter.since = since
+      })
+    }
     const events = await client.fetchEvents(relayList.read.slice(0, 3), filters)
     const likesMap = new Map<string, Set<string>>()
     const reposts = new Set<string>()
@@ -96,8 +108,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         if (!sender) return
         const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
         if (!pr) return
-        const invoice = new Invoice({ pr }) // TODO: need to validate
-        const amount = invoice.satoshi
+        const amount = getAmountFromInvoice(pr)
         zaps.push({ pr, pubkey: sender, amount })
       }
     })
@@ -119,7 +130,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
           oldZaps.push(zap)
         }
       })
-      newMap.set(event.id, { ...old, reposts, zaps })
+      newMap.set(event.id, { ...old, reposts, zaps, updatedAt: dayjs().unix() })
       stats = newMap.get(event.id)
       return newMap
     })
