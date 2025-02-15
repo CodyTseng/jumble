@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks'
+import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useZap } from '@/providers/ZapProvider'
 import lightning from '@/services/lightning.service'
 import { Loader } from 'lucide-react'
@@ -14,13 +15,11 @@ import Username from '../Username'
 export default function ZapDialog({
   open,
   setOpen,
-  setZapped,
   pubkey,
   eventId
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setZapped?: Dispatch<SetStateAction<boolean>>
   pubkey: string
   eventId?: string
 }) {
@@ -34,13 +33,7 @@ export default function ZapDialog({
             <Username userId={pubkey} className="truncate flex-1 w-0" />
           </DialogTitle>
         </DialogHeader>
-        <ZapDialogContent
-          open={open}
-          setOpen={setOpen}
-          setZapped={setZapped}
-          pubkey={pubkey}
-          eventId={eventId}
-        />
+        <ZapDialogContent open={open} setOpen={setOpen} pubkey={pubkey} eventId={eventId} />
       </DialogContent>
     </Dialog>
   )
@@ -61,6 +54,7 @@ function ZapDialogContent({
   const { t } = useTranslation()
   const { toast } = useToast()
   const { defaultZapSats } = useZap()
+  const { addZap } = useNoteStats()
   const [sats, setSats] = useState(defaultZapSats)
   const [comment, setComment] = useState('Zap!')
   const [zapping, setZapping] = useState(false)
@@ -72,6 +66,9 @@ function ZapDialogContent({
       setOpen(false)
       await lightning.zap(invoice)
       setZapped?.(true)
+      if (eventId) {
+        addZap(eventId, invoice, sats)
+      }
     } catch (error) {
       toast({
         title: t('Zap failed'),

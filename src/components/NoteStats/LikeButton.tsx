@@ -17,7 +17,7 @@ export default function LikeButton({ event }: { event: Event }) {
   const { likeCount, hasLiked } = useMemo(() => {
     const stats = noteStatsMap.get(event.id) || {}
     return { likeCount: stats.likes?.size, hasLiked: pubkey ? stats.likes?.has(pubkey) : false }
-  }, [noteStatsMap, event.id, pubkey])
+  }, [noteStatsMap, event, pubkey])
   const canLike = !hasLiked && !liking
 
   const like = async (e: React.MouseEvent) => {
