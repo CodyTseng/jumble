@@ -1,12 +1,20 @@
 import { TProfile } from '@/types'
-import { init, requestProvider } from '@getalby/bitcoin-connect-react'
+import {
+  init,
+  launchPaymentModal,
+  onConnected,
+  onDisconnected
+} from '@getalby/bitcoin-connect-react'
+import { Invoice } from '@getalby/lightning-tools'
 import { bech32 } from '@scure/base'
+import { WebLNProvider } from '@webbtc/webln-types'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
 import client from './client.service'
 
 class LightningService {
   static instance: LightningService
+  private provider: WebLNProvider | null = null
 
   constructor() {
     if (!LightningService.instance) {
@@ -15,11 +23,23 @@ class LightningService {
         appName: 'Jumble',
         showBalance: false
       })
+      onConnected((provider) => {
+        this.provider = provider
+      })
+      onDisconnected(() => {
+        this.provider = null
+      })
     }
     return LightningService.instance
   }
 
-  async makeInvoice(pubkey: string, sats: number, comment: string, eventId?: string) {
+  async zap(
+    pubkey: string,
+    sats: number,
+    comment: string,
+    eventId?: string,
+    closeOuterModel?: () => void
+  ): Promise<{ preimage: string; invoice: string }> {
     if (!client.signer) {
       throw new Error('You need to be logged in to zap')
     }
@@ -52,17 +72,44 @@ class LightningService {
     if (zapRequestResBody.error) {
       throw new Error(zapRequestResBody.error)
     }
-    const invoice = zapRequestResBody.pr
-    if (!invoice) {
+    const { pr, verify } = zapRequestResBody
+    if (!pr) {
       throw new Error('Failed to create invoice')
     }
-    return invoice
-  }
 
-  async zap(invoice: string) {
-    const provider = await requestProvider()
-    const { preimage } = await provider.sendPayment(invoice)
-    return preimage
+    if (this.provider) {
+      const { preimage } = await this.provider.sendPayment(pr)
+      closeOuterModel?.()
+      return { preimage, invoice: pr }
+    }
+
+    return new Promise((resolve) => {
+      closeOuterModel?.()
+      const { setPaid } = launchPaymentModal({
+        invoice: pr,
+        onPaid: (response) => {
+          clearInterval(checkPaymentInterval)
+          resolve({ preimage: response.preimage, invoice: pr })
+        },
+        onCancelled: () => {
+          clearInterval(checkPaymentInterval)
+        }
+      })
+
+      if (!verify) {
+        setPaid({ preimage: '' })
+      }
+      const checkPaymentInterval = setInterval(async () => {
+        const invoice = new Invoice({ pr, verify })
+        const paid = await invoice.verifyPayment()
+
+        if (paid && invoice.preimage) {
+          setPaid({
+            preimage: invoice.preimage
+          })
+        }
+      }, 1000)
+    })
   }
 
   private async getZapEndpoint(profile: TProfile): Promise<null | {
