@@ -4,19 +4,10 @@ import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { NotificationItem } from './NotificationItem'
-import { NotificationToggleGroup } from './NotificationTogleGroup'
 
 const LIMIT = 100
 const SHOW_COUNT = 30
@@ -24,15 +15,6 @@ const SHOW_COUNT = 30
 const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
-  const [displayTypes, setDisplayTypes] = useState<string[]>(['like', 'repost', 'comment', 'zap'])
-  const displayKinds = useMemo(() => {
-    const _kinds = []
-    if (displayTypes.includes('like')) _kinds.push(kinds.Reaction)
-    if (displayTypes.includes('repost')) _kinds.push(kinds.Repost)
-    if (displayTypes.includes('comment')) _kinds.push(kinds.ShortTextNote, COMMENT_EVENT_KIND)
-    if (displayTypes.includes('zap')) _kinds.push(kinds.Zap)
-    return _kinds
-  }, [])
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(true)
@@ -155,38 +137,32 @@ const NotificationList = forwardRef((_, ref) => {
   }, [loadMore])
 
   return (
-    <>
-      <NotificationToggleGroup displayTypes={displayTypes} setDisplayTypes={setDisplayTypes} />
-      <PullToRefresh
-        onRefresh={async () => {
-          setRefreshCount((count) => count + 1)
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-        }}
-        pullingContent=""
-      >
-        <div>
-          {notifications
-            .filter((notification) => displayKinds.includes(notification.kind))
-            .slice(0, showCount)
-            .map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
-          <div className="text-center text-sm text-muted-foreground">
-            {until || refreshing ? (
-              <div ref={bottomRef}>
-                <div className="flex gap-2 items-center h-11 py-2">
-                  <Skeleton className="w-7 h-7 rounded-full" />
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                  <Skeleton className="h-6 flex-1 w-0" />
-                </div>
+    <PullToRefresh
+      onRefresh={async () => {
+        setRefreshCount((count) => count + 1)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }}
+      pullingContent=""
+    >
+      <div>
+        {notifications.slice(0, showCount).map((notification) => (
+          <NotificationItem key={notification.id} notification={notification} />
+        ))}
+        <div className="text-center text-sm text-muted-foreground">
+          {until || refreshing ? (
+            <div ref={bottomRef}>
+              <div className="flex gap-2 items-center h-11 py-2">
+                <Skeleton className="w-7 h-7 rounded-full" />
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-6 flex-1 w-0" />
               </div>
-            ) : (
-              t('no more notifications')
-            )}
-          </div>
+            </div>
+          ) : (
+            t('no more notifications')
+          )}
         </div>
-      </PullToRefresh>
-    </>
+      </div>
+    </PullToRefresh>
   )
 })
 NotificationList.displayName = 'NotificationList'
