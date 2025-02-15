@@ -70,8 +70,8 @@ function ZapDialogContent({
       setZapping(true)
       const invoice = await lightning.makeInvoice(pubkey, sats, comment, eventId)
       setOpen(false)
-      const zapped = await lightning.zap(invoice)
-      setZapped?.(zapped)
+      await lightning.zap(invoice)
+      setZapped?.(true)
     } catch (error) {
       toast({
         title: t('Zap failed'),

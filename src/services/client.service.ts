@@ -338,7 +338,8 @@ class ClientService extends EventTarget {
     }
   }
 
-  async query(urls: string[], filter: Filter) {
+  private async query(urls: string[], filter: Filter | Filter[]) {
+    const filters = Array.isArray(filter) ? filter : [filter]
     const _knownIds = new Set<string>()
     const events: NEvent[] = []
     await Promise.allSettled(
@@ -350,7 +351,7 @@ class ClientService extends EventTarget {
 
         return new Promise<void>((resolve, reject) => {
           const startQuery = () => {
-            relay.subscribe([filter], {
+            relay.subscribe(filters, {
               receivedEvent(relay, id) {
                 that.trackEventSeenOn(id, relay)
               },
@@ -414,7 +415,7 @@ class ClientService extends EventTarget {
     return events
   }
 
-  async fetchEvents(relayUrls: string[], filter: Filter, cache = false) {
+  async fetchEvents(relayUrls: string[], filter: Filter | Filter[], cache = false) {
     const events = await this.query(
       relayUrls.length > 0 ? relayUrls : this.defaultRelayUrls,
       filter

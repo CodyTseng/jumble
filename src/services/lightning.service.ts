@@ -1,5 +1,5 @@
 import { TProfile } from '@/types'
-import { init, launchPaymentModal } from '@getalby/bitcoin-connect'
+import { init, requestProvider } from '@getalby/bitcoin-connect-react'
 import { bech32 } from '@scure/base'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
@@ -60,13 +60,9 @@ class LightningService {
   }
 
   async zap(invoice: string) {
-    return new Promise<boolean>((resolve) => {
-      launchPaymentModal({
-        invoice,
-        onPaid: () => resolve(true),
-        onCancelled: () => resolve(false)
-      })
-    })
+    const provider = await requestProvider()
+    const { preimage } = await provider.sendPayment(invoice)
+    return preimage
   }
 
   private async getZapEndpoint(profile: TProfile): Promise<null | {

@@ -1,26 +1,21 @@
 import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
-import { Event, kinds } from 'nostr-tools'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { Event, Filter, kinds } from 'nostr-tools'
+import { createContext, useContext, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
 export type TNoteStats = {
-  likeCount: number
-  repostCount: number
+  likes: Set<string>
+  reposts: Set<string>
   replyCount: number
-  hasLiked: boolean
-  hasReposted: boolean
 }
 
 type TNoteStatsContext = {
   noteStatsMap: Map<string, Partial<TNoteStats>>
   updateNoteReplyCount: (noteId: string, replyCount: number) => void
-  markNoteAsLiked: (noteId: string) => void
-  markNoteAsReposted: (noteId: string) => void
-  fetchNoteLikeCount: (event: Event) => Promise<number>
-  fetchNoteRepostCount: (event: Event) => Promise<number>
-  fetchNoteLikedStatus: (event: Event) => Promise<boolean>
-  fetchNoteRepostedStatus: (event: Event) => Promise<boolean>
+  addLike: (eventId: string) => void
+  addRepost: (eventId: string) => void
+  fetchNoteStats: (event: Event) => Promise<Partial<TNoteStats> | undefined>
 }
 
 const NoteStatsContext = createContext<TNoteStatsContext | undefined>(undefined)
@@ -37,111 +32,62 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const [noteStatsMap, setNoteStatsMap] = useState<Map<string, Partial<TNoteStats>>>(new Map())
   const { pubkey } = useNostr()
 
-  useEffect(() => {
-    setNoteStatsMap((prev) => {
-      const newMap = new Map()
-      for (const [noteId, stats] of prev) {
-        newMap.set(noteId, { ...stats, hasLiked: undefined, hasReposted: undefined })
-      }
-      return newMap
-    })
-  }, [pubkey])
-
-  const fetchNoteLikeCount = async (event: Event) => {
+  const fetchNoteStats = async (event: Event) => {
     const relayList = await client.fetchRelayList(event.pubkey)
-    const events = await client.fetchEvents(relayList.read.slice(0, 3), {
-      '#e': [event.id],
-      kinds: [kinds.Reaction],
-      limit: 500
-    })
-    const countMap = new Map<string, number>()
-    for (const e of events) {
-      const targetEventId = e.tags.findLast(tagNameEquals('e'))?.[1]
-      if (targetEventId) {
-        countMap.set(targetEventId, (countMap.get(targetEventId) || 0) + 1)
+    const filters: Filter[] = [
+      {
+        '#e': [event.id],
+        kinds: [kinds.Reaction],
+        limit: 500
+      },
+      {
+        '#e': [event.id],
+        kinds: [kinds.Repost],
+        limit: 100
       }
-    }
-    setNoteStatsMap((prev) => {
-      const newMap = new Map(prev)
-      for (const [eventId, count] of countMap) {
-        const old = prev.get(eventId)
-        newMap.set(
-          eventId,
-          old ? { ...old, likeCount: Math.max(count, old.likeCount ?? 0) } : { likeCount: count }
-        )
-      }
-      return newMap
-    })
-    return countMap.get(event.id) || 0
-  }
+    ]
 
-  const fetchNoteRepostCount = async (event: Event) => {
-    const relayList = await client.fetchRelayList(event.pubkey)
-    const events = await client.fetchEvents(relayList.read.slice(0, 3), {
-      '#e': [event.id],
-      kinds: [kinds.Repost],
-      limit: 100
-    })
-    setNoteStatsMap((prev) => {
-      const newMap = new Map(prev)
-      const old = prev.get(event.id)
-      newMap.set(
-        event.id,
-        old
-          ? { ...old, repostCount: Math.max(events.length, old.repostCount ?? 0) }
-          : { repostCount: events.length }
-      )
-      return newMap
-    })
-    return events.length
-  }
-
-  const fetchNoteLikedStatus = async (event: Event) => {
-    if (!pubkey) return false
-
-    const relayList = await client.fetchRelayList(pubkey)
-    const events = await client.fetchEvents(relayList.write, {
-      '#e': [event.id],
-      authors: [pubkey],
-      kinds: [kinds.Reaction]
-    })
-    const likedEventIds = events
-      .map((e) => e.tags.findLast(tagNameEquals('e'))?.[1])
-      .filter(Boolean) as string[]
-
-    setNoteStatsMap((prev) => {
-      const newMap = new Map(prev)
-      likedEventIds.forEach((eventId) => {
-        const old = newMap.get(eventId)
-        newMap.set(eventId, old ? { ...old, hasLiked: true } : { hasLiked: true })
+    if (pubkey) {
+      filters.push({
+        '#e': [event.id],
+        authors: [pubkey],
+        kinds: [kinds.Reaction, kinds.Repost]
       })
-      if (!likedEventIds.includes(event.id)) {
-        const old = newMap.get(event.id)
-        newMap.set(event.id, old ? { ...old, hasLiked: false } : { hasLiked: false })
+    }
+
+    const events = await client.fetchEvents(relayList.read.slice(0, 3), filters)
+    const likesMap = new Map<string, Set<string>>()
+    const reposts = new Set<string>()
+    events.forEach((evt) => {
+      if (evt.kind === kinds.Repost) {
+        reposts.add(evt.pubkey)
+        return
       }
-      return newMap
+
+      const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
+      if (targetEventId) {
+        const likes = likesMap.get(targetEventId) || new Set()
+        likes.add(evt.pubkey)
+        likesMap.set(targetEventId, likes)
+      }
     })
-    return likedEventIds.includes(event.id)
-  }
-
-  const fetchNoteRepostedStatus = async (event: Event) => {
-    if (!pubkey) return false
-
-    const relayList = await client.fetchRelayList(pubkey)
-    const events = await client.fetchEvents(relayList.write, {
-      '#e': [event.id],
-      authors: [pubkey],
-      kinds: [kinds.Repost]
-    })
-
+    let stats: Partial<TNoteStats> | undefined
     setNoteStatsMap((prev) => {
-      const hasReposted = events.length > 0
       const newMap = new Map(prev)
-      const old = prev.get(event.id)
-      newMap.set(event.id, old ? { ...old, hasReposted } : { hasReposted })
+      for (const [eventId, newLikes] of likesMap) {
+        const old = newMap.get(eventId) || {}
+        const oldLikes = old.likes || new Set()
+        oldLikes.forEach((like) => newLikes.add(like))
+        newMap.set(eventId, { ...old, likes: newLikes })
+      }
+      const old = newMap.get(event.id) || {}
+      const oldReposts = old.reposts || new Set()
+      reposts.forEach((repost) => oldReposts.add(repost))
+      newMap.set(event.id, { ...old, reposts })
+      stats = newMap.get(event.id)
       return newMap
     })
-    return events.length > 0
+    return stats
   }
 
   const updateNoteReplyCount = (noteId: string, replyCount: number) => {
@@ -156,27 +102,23 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  const markNoteAsLiked = (noteId: string) => {
+  const addLike = (eventId: string) => {
+    if (!pubkey) return
     setNoteStatsMap((prev) => {
-      const old = prev.get(noteId)
-      return new Map(prev).set(
-        noteId,
-        old
-          ? { ...old, hasLiked: true, likeCount: (old.likeCount ?? 0) + 1 }
-          : { hasLiked: true, likeCount: 1 }
-      )
+      const old = prev.get(eventId)
+      const likes = new Set(old?.likes ?? [])
+      likes.add(pubkey)
+      return new Map(prev).set(eventId, { ...old, likes })
     })
   }
 
-  const markNoteAsReposted = (noteId: string) => {
+  const addRepost = (eventId: string) => {
+    if (!pubkey) return
     setNoteStatsMap((prev) => {
-      const old = prev.get(noteId)
-      return new Map(prev).set(
-        noteId,
-        old
-          ? { ...old, hasReposted: true, repostCount: (old.repostCount ?? 0) + 1 }
-          : { hasReposted: true, repostCount: 1 }
-      )
+      const old = prev.get(eventId)
+      const reposts = new Set(old?.reposts ?? [])
+      reposts.add(pubkey)
+      return new Map(prev).set(eventId, { ...old, reposts })
     })
   }
 
@@ -184,13 +126,10 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     <NoteStatsContext.Provider
       value={{
         noteStatsMap,
-        fetchNoteLikeCount,
-        fetchNoteLikedStatus,
-        fetchNoteRepostCount,
-        fetchNoteRepostedStatus,
+        fetchNoteStats,
         updateNoteReplyCount,
-        markNoteAsLiked,
-        markNoteAsReposted
+        addLike,
+        addRepost
       }}
     >
       {children}

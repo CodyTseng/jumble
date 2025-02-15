@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
+import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { Event } from 'nostr-tools'
+import { useEffect } from 'react'
 import LikeButton from './LikeButton'
 import NoteOptions from './NoteOptions'
 import ReplyButton from './ReplyButton'
@@ -18,12 +20,19 @@ export default function NoteStats({
   fetchIfNotExisting?: boolean
   variant?: 'note' | 'reply'
 }) {
+  const { fetchNoteStats } = useNoteStats()
+
+  useEffect(() => {
+    if (!fetchIfNotExisting) return
+    fetchNoteStats(event)
+  }, [event, fetchIfNotExisting])
+
   return (
     <div className={cn('flex justify-between', className)}>
       <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
         <ReplyButton event={event} variant={variant} />
-        <RepostButton event={event} canFetch={fetchIfNotExisting} />
-        <LikeButton event={event} canFetch={fetchIfNotExisting} />
+        <RepostButton event={event} />
+        <LikeButton event={event} />
         <ZapButton event={event} />
       </div>
       <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
