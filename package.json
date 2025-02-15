@@ -35,6 +35,8 @@
     "@radix-ui/react-switch": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
+    "@radix-ui/react-toggle": "^1.1.2",
+    "@radix-ui/react-toggle-group": "^1.1.2",
     "@webbtc/webln-types": "^3.0.0",
     "blurhash": "^2.0.5",
     "class-variance-authority": "^0.7.1",
