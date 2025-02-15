@@ -113,6 +113,7 @@ export default function LongFormArticleCard({
             <Image
               image={{ url: metadata.image }}
               className="w-full aspect-video object-cover rounded-lg"
+              hideIfError
             />
           )}
           <div className="space-y-1">
@@ -141,7 +142,7 @@ export default function LongFormArticleCard({
           </div>
         </div>
         {metadata.image && (
-          <Image image={{ url: metadata.image }} className="h-36 max-w-48 rounded-lg" />
+          <Image image={{ url: metadata.image }} className="rounded-lg h-36 max-w-48" hideIfError />
         )}
       </div>
       {!embedded && <Separator />}

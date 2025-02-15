@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useNostr } from '@/providers/NostrProvider'
+import { useTheme } from '@/providers/ThemeProvider'
 import { NstartModal } from 'nstart-modal'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -37,6 +38,7 @@ function AccountManagerNav({
   close?: () => void
 }) {
   const { t } = useTranslation()
+  const { themeSetting } = useTheme()
   const { nip07Login, bunkerLogin, nsecLogin, ncryptsecLogin, accounts } = useNostr()
 
   return (
@@ -69,6 +71,7 @@ function AccountManagerNav({
             const wizard = new NstartModal({
               baseUrl: 'https://start.njump.me',
               an: 'Jumble',
+              am: themeSetting,
               onComplete: ({ nostrLogin }) => {
                 if (!nostrLogin) return
 

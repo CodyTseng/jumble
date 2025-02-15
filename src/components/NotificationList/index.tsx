@@ -26,6 +26,7 @@ import { FormattedTimestamp } from '../FormattedTimestamp'
 import UserAvatar from '../UserAvatar'
 
 const LIMIT = 100
+const SHOW_COUNT = 30
 
 const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
@@ -34,6 +35,7 @@ const NotificationList = forwardRef((_, ref) => {
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(true)
   const [notifications, setNotifications] = useState<Event[]>([])
+  const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
   const bottomRef = useRef<HTMLDivElement | null>(null)
   useImperativeHandle(
@@ -70,15 +72,23 @@ const NotificationList = forwardRef((_, ref) => {
           onEvents: (events, eosed) => {
             if (eventCount > events.length) return
             eventCount = events.length
-            setUntil(events.length >= LIMIT ? events[events.length - 1].created_at - 1 : undefined)
             setNotifications(events.filter((event) => event.pubkey !== pubkey))
             if (eosed) {
               setRefreshing(false)
+              setUntil(events.length >= 0 ? events[events.length - 1].created_at - 1 : undefined)
             }
           },
           onNew: (event) => {
             if (event.pubkey === pubkey) return
-            setNotifications((oldEvents) => [event, ...oldEvents])
+            setNotifications((oldEvents) => {
+              const index = oldEvents.findIndex(
+                (oldEvent) => oldEvent.created_at < event.created_at
+              )
+              if (index === -1) {
+                return [...oldEvents, event]
+              }
+              return [...oldEvents.slice(0, index), event, ...oldEvents.slice(index)]
+            })
           }
         }
       )
@@ -93,26 +103,30 @@ const NotificationList = forwardRef((_, ref) => {
   }, [pubkey, refreshCount])
 
   const loadMore = useCallback(async () => {
+    if (showCount < notifications.length) {
+      setShowCount((count) => count + SHOW_COUNT)
+      return
+    }
+
     if (!pubkey || !timelineKey || !until || refreshing) return
-    const notifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
-    if (notifications.length === 0) {
+
+    const newNotifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
+    if (newNotifications.length === 0) {
       setUntil(undefined)
       return
     }
 
-    if (notifications.length > 0) {
+    if (newNotifications.length > 0) {
       setNotifications((oldNotifications) => [
         ...oldNotifications,
-        ...notifications.filter((event) => event.pubkey !== pubkey)
+        ...newNotifications.filter((event) => event.pubkey !== pubkey)
       ])
     }
 
-    setUntil(notifications[notifications.length - 1].created_at - 1)
-  }, [pubkey, timelineKey, until, refreshing])
+    setUntil(newNotifications[newNotifications.length - 1].created_at - 1)
+  }, [pubkey, timelineKey, until, refreshing, showCount, notifications])
 
   useEffect(() => {
-    if (refreshing) return
-
     const options = {
       root: null,
       rootMargin: '10px',
@@ -136,7 +150,7 @@ const NotificationList = forwardRef((_, ref) => {
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [refreshing, loadMore])
+  }, [loadMore])
 
   return (
     <PullToRefresh
@@ -147,7 +161,7 @@ const NotificationList = forwardRef((_, ref) => {
       pullingContent=""
     >
       <div>
-        {notifications.map((notification) => (
+        {notifications.slice(0, showCount).map((notification) => (
           <NotificationItem key={notification.id} notification={notification} />
         ))}
         <div className="text-center text-sm text-muted-foreground">

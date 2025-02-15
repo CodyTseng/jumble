@@ -48,7 +48,10 @@ export function ImageCarousel({
           {images.map((image, index) => (
             <CarouselItem key={index} className="xl:basis-2/3 cursor-zoom-in">
               <Image
-                className="xl:rounded-lg"
+                className="xl:rounded-lg max-h-[75vh]"
+                classNames={{
+                  errorPlaceholder: 'aspect-square'
+                }}
                 image={image}
                 onClick={(e) => handlePhotoClick(e, index)}
               />

@@ -271,7 +271,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <Sidebar />
           <Separator orientation="vertical" />
           <div className="grid grid-cols-2 w-full">
-            <div className="flex">
+            <div className="flex border-r">
               {primaryPages.map(({ name, element }) => (
                 <div
                   key={name}
@@ -283,7 +283,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   {element}
                 </div>
               ))}
-              <Separator orientation="vertical" className="z-50" />
             </div>
             <div>
               {secondaryStack.map((item, index) => (

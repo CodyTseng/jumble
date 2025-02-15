@@ -1,4 +1,5 @@
 import { generateImageByPubkey } from '@/lib/pubkey'
+import { cn } from '@/lib/utils'
 import { useEffect, useMemo, useState } from 'react'
 import Image from '../Image'
 
@@ -26,7 +27,7 @@ export default function ProfileBanner({
     <Image
       image={{ url: bannerUrl }}
       alt={`${pubkey} banner`}
-      className={className}
+      className={cn('rounded-lg', className)}
       onError={() => setBannerUrl(defaultBanner)}
     />
   )

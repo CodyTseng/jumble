@@ -209,6 +209,32 @@ class IndexedDbService {
     })
   }
 
+  async iterateProfileEvents(callback: (event: Event) => Promise<void>): Promise<void> {
+    await this.initPromise
+    if (!this.db) {
+      return
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(StoreNames.PROFILE_EVENTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.PROFILE_EVENTS)
+      const request = store.openCursor()
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          callback((cursor.value as TValue<Event>).value)
+          cursor.continue()
+        } else {
+          resolve()
+        }
+      }
+
+      request.onerror = (event) => {
+        reject(event)
+      }
+    })
+  }
+
   private getStoreNameByKind(kind: number): string | undefined {
     switch (kind) {
       case kinds.Metadata:

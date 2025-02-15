@@ -93,7 +93,11 @@ export default function GroupMetadataCard({
         </div>
         <div className="flex gap-2 items-start mt-2">
           {metadata.picture && (
-            <Image image={{ url: metadata.picture }} className="h-32 aspect-square rounded-lg" />
+            <Image
+              image={{ url: metadata.picture }}
+              className="h-32 aspect-square rounded-lg"
+              hideIfError
+            />
           )}
           <div className="flex-1 w-0 space-y-1">
             <div className="text-xl font-semibold line-clamp-1">{metadata.name}</div>

@@ -38,8 +38,11 @@ export default function ImageGallery({
         className={cn(
           'rounded-lg',
           !disableLightbox ? 'cursor-auto' : '',
-          size === 'small' ? 'h-[15vh]' : 'h-[30vh]'
+          size === 'small' ? 'max-h-[15vh]' : 'max-h-[30vh]'
         )}
+        classNames={{
+          errorPlaceholder: cn('aspect-square', size === 'small' ? 'h-[15vh]' : 'h-[30vh]')
+        }}
         image={images[0]}
         onClick={(e) => handlePhotoClick(e, 0)}
       />
@@ -50,7 +53,7 @@ export default function ImageGallery({
         {images.map((image, i) => (
           <Image
             key={i}
-            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
+            className={cn('aspect-square w-full rounded-lg', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -63,7 +66,7 @@ export default function ImageGallery({
         {images.map((image, i) => (
           <Image
             key={i}
-            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
+            className={cn('aspect-square w-full rounded-lg', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -72,11 +75,11 @@ export default function ImageGallery({
     )
   } else {
     imageContent = (
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 w-full">
         {images.map((image, i) => (
           <Image
             key={i}
-            className={cn('rounded-lg aspect-square w-full', !disableLightbox ? 'cursor-auto' : '')}
+            className={cn('aspect-square w-full rounded-lg', !disableLightbox ? 'cursor-auto' : '')}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -86,7 +89,7 @@ export default function ImageGallery({
   }
 
   return (
-    <div className={cn('relative w-fit max-w-full', className)}>
+    <div className={cn('relative', images.length === 1 ? 'w-fit max-w-full' : 'w-full', className)}>
       {imageContent}
       {index >= 0 &&
         !disableLightbox &&
