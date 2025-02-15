@@ -62,9 +62,7 @@ function ZapDialogContent({
   const handleZap = async () => {
     try {
       setZapping(true)
-      const invoice = await lightning.makeInvoice(pubkey, sats, comment, eventId)
-      setOpen(false)
-      await lightning.zap(invoice)
+      const { invoice } = await lightning.zap(pubkey, sats, comment, eventId, () => setOpen(false))
       setZapped?.(true)
       if (eventId) {
         addZap(eventId, invoice, sats)
