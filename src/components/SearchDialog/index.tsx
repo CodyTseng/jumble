@@ -27,12 +27,6 @@ export function SearchDialog({ open, setOpen }: { open: boolean; setOpen: Dispat
     }
   }, [input])
 
-  useEffect(() => {
-    profiles.forEach((profile) => {
-      console.log(profile.pubkey)
-    })
-  }, [profiles])
-
   const list = useMemo(() => {
     const search = input.trim()
     if (!search) return
