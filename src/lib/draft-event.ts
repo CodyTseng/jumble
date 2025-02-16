@@ -9,6 +9,7 @@ import {
   extractImagesFromContent,
   extractMentions,
   getEventCoordinate,
+  isProtectedEvent,
   isReplaceable
 } from './event'
 
@@ -35,14 +36,15 @@ export function createReactionDraftEvent(event: Event): TDraftEvent {
 
 // https://github.com/nostr-protocol/nips/blob/master/18.md
 export function createRepostDraftEvent(event: Event): TDraftEvent {
+  const isProtected = isProtectedEvent(event)
   const tags = [
-    ['e', event.id, client.getEventHint(event.id), event.pubkey],
+    ['e', event.id, client.getEventHint(event.id), 'mentions', event.pubkey],
     ['p', event.pubkey]
   ]
 
   return {
     kind: kinds.Repost,
-    content: JSON.stringify(event),
+    content: isProtected ? '' : JSON.stringify(event),
     tags,
     created_at: dayjs().unix()
   }
@@ -63,13 +65,14 @@ export async function createShortTextNoteDraftEvent(
 
   const tags = pubkeys
     .map((pubkey) => ['p', pubkey])
-    .concat(otherRelatedEventIds.map((eventId) => ['e', eventId, client.getEventHint(eventId)]))
     .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
     .concat(hashtags.map((hashtag) => ['t', hashtag]))
 
   if (rootEventId) {
     tags.push(['e', rootEventId, client.getEventHint(rootEventId), 'root'])
   }
+
+  tags.push(...otherRelatedEventIds.map((eventId) => ['e', eventId, client.getEventHint(eventId)]))
 
   if (parentEventId) {
     tags.push(['e', parentEventId, client.getEventHint(parentEventId), 'reply'])
