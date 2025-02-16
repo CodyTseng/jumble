@@ -84,55 +84,53 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         filter.since = since
       })
     }
-    const events = await client.fetchEvents(relayList.read.slice(0, 3), filters)
-    const likesMap = new Map<string, Set<string>>()
-    const reposts = new Set<string>()
-    const zaps: { pr: string; pubkey: string; amount: number }[] = []
-    events.forEach((evt) => {
-      if (evt.kind === kinds.Repost) {
-        reposts.add(evt.pubkey)
-        return
-      }
-
-      if (evt.kind === kinds.Reaction) {
-        const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-        if (targetEventId) {
-          const likes = likesMap.get(targetEventId) || new Set()
-          likes.add(evt.pubkey)
-          likesMap.set(targetEventId, likes)
+    await client.fetchEvents(relayList.read.slice(0, 3), filters, {
+      onevent: (evt) => {
+        if (evt.kind === kinds.Repost) {
+          return setNoteStatsMap((prev) => {
+            const old = prev.get(event.id) || {}
+            const reposts = old?.reposts ?? new Set()
+            reposts.add(evt.pubkey)
+            prev.set(event.id, { ...old, reposts })
+            return new Map(prev)
+          })
         }
-      }
 
-      if (evt.kind === kinds.Zap) {
-        const sender = evt.tags.find(tagNameEquals('P'))?.[1]
-        if (!sender) return
-        const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
-        if (!pr) return
-        const amount = getAmountFromInvoice(pr)
-        zaps.push({ pr, pubkey: sender, amount })
+        if (evt.kind === kinds.Reaction) {
+          const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
+          if (targetEventId) {
+            return setNoteStatsMap((prev) => {
+              const old = prev.get(targetEventId) || {}
+              const likes = old?.likes ?? new Set()
+              likes.add(evt.pubkey)
+              prev.set(targetEventId, { ...old, likes })
+              return new Map(prev)
+            })
+          }
+        }
+
+        if (evt.kind === kinds.Zap) {
+          const sender = evt.tags.find(tagNameEquals('P'))?.[1]
+          if (!sender) return
+          const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
+          if (!pr) return
+          const amount = getAmountFromInvoice(pr)
+          return setNoteStatsMap((prev) => {
+            const old = prev.get(event.id) || {}
+            const zaps = old?.zaps ?? []
+            zaps.push({ pr, pubkey: sender, amount })
+            prev.set(event.id, { ...old, zaps })
+            return new Map(prev)
+          })
+        }
       }
     })
     let stats: Partial<TNoteStats> | undefined
     setNoteStatsMap((prev) => {
-      const newMap = new Map(prev)
-      for (const [eventId, newLikes] of likesMap) {
-        const old = newMap.get(eventId) || {}
-        const oldLikes = old.likes || new Set()
-        oldLikes.forEach((like) => newLikes.add(like))
-        newMap.set(eventId, { ...old, likes: newLikes })
-      }
-      const old = newMap.get(event.id) || {}
-      const oldReposts = old.reposts || new Set()
-      const oldZaps = old.zaps || []
-      reposts.forEach((repost) => oldReposts.add(repost))
-      zaps.forEach((zap) => {
-        if (!oldZaps.find((oldZap) => oldZap.pr === zap.pr)) {
-          oldZaps.push(zap)
-        }
-      })
-      newMap.set(event.id, { ...old, reposts, zaps, updatedAt: dayjs().unix() })
-      stats = newMap.get(event.id)
-      return newMap
+      const old = prev.get(event.id) || {}
+      prev.set(event.id, { ...old, updatedAt: dayjs().unix() })
+      stats = prev.get(event.id)
+      return new Map(prev)
     })
     return stats
   }
@@ -141,9 +139,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     setNoteStatsMap((prev) => {
       const old = prev.get(noteId)
       if (!old) {
-        return new Map(prev).set(noteId, { replyCount })
+        prev.set(noteId, { replyCount })
+        return new Map(prev)
       } else if (old.replyCount === undefined || old.replyCount < replyCount) {
-        return new Map(prev).set(noteId, { ...old, replyCount })
+        prev.set(noteId, { ...old, replyCount })
+        return new Map(prev)
       }
       return prev
     })
@@ -155,7 +155,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       const old = prev.get(eventId)
       const likes = new Set(old?.likes ?? [])
       likes.add(pubkey)
-      return new Map(prev).set(eventId, { ...old, likes })
+      prev.set(eventId, { ...old, likes })
+      return new Map(prev)
     })
   }
 
@@ -165,7 +166,8 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       const old = prev.get(eventId)
       const reposts = new Set(old?.reposts ?? [])
       reposts.add(pubkey)
-      return new Map(prev).set(eventId, { ...old, reposts })
+      prev.set(eventId, { ...old, reposts })
+      return new Map(prev)
     })
   }
 
@@ -174,10 +176,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     setNoteStatsMap((prev) => {
       const old = prev.get(eventId)
       const zaps = old?.zaps || []
-      return new Map(prev).set(eventId, {
+      prev.set(eventId, {
         ...old,
         zaps: [...zaps, { pr, pubkey, amount }]
       })
+      return new Map(prev)
     })
   }
 

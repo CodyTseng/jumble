@@ -344,7 +344,7 @@ class ClientService extends EventTarget {
     }
   }
 
-  private async query(urls: string[], filter: Filter | Filter[]) {
+  private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {
     const filters = Array.isArray(filter) ? filter : [filter]
     const _knownIds = new Set<string>()
     const events: NEvent[] = []
@@ -384,6 +384,7 @@ class ClientService extends EventTarget {
                 if (_knownIds.has(evt.id)) return
                 _knownIds.add(evt.id)
                 events.push(evt)
+                onevent?.(evt)
               }
             })
           }
@@ -421,10 +422,21 @@ class ClientService extends EventTarget {
     return events
   }
 
-  async fetchEvents(relayUrls: string[], filter: Filter | Filter[], cache = false) {
+  async fetchEvents(
+    relayUrls: string[],
+    filter: Filter | Filter[],
+    {
+      onevent,
+      cache = false
+    }: {
+      onevent?: (evt: NEvent) => void
+      cache?: boolean
+    } = {}
+  ) {
     const events = await this.query(
       relayUrls.length > 0 ? relayUrls : this.defaultRelayUrls,
-      filter
+      filter,
+      onevent
     )
     if (cache) {
       events.forEach((evt) => {
