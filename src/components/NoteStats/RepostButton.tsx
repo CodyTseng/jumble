@@ -20,7 +20,7 @@ import { formatCount } from './utils'
 export default function RepostButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { publish, checkLogin, pubkey } = useNostr()
-  const { noteStatsMap, addRepost, fetchNoteStats } = useNoteStats()
+  const { noteStatsMap, updateNoteStatsByEvent, fetchNoteStats } = useNoteStats()
   const [reposting, setReposting] = useState(false)
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
   const { repostCount, hasReposted } = useMemo(() => {
@@ -50,8 +50,8 @@ export default function RepostButton({ event }: { event: Event }) {
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const repost = createRepostDraftEvent(event)
-        await publish(repost, { additionalRelayUrls: targetRelayList.read.slice(0, 5) })
-        addRepost(event.id)
+        const evt = await publish(repost, { additionalRelayUrls: targetRelayList.read.slice(0, 5) })
+        updateNoteStatsByEvent(evt)
       } catch (error) {
         console.error('repost failed', error)
       } finally {

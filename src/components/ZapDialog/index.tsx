@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks'
+import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useZap } from '@/providers/ZapProvider'
 import lightning from '@/services/lightning.service'
@@ -33,7 +34,7 @@ export default function ZapDialog({
             <Username userId={pubkey} className="truncate flex-1 w-0" />
           </DialogTitle>
         </DialogHeader>
-        <ZapDialogContent open={open} setOpen={setOpen} pubkey={pubkey} eventId={eventId} />
+        <ZapDialogContent open={open} setOpen={setOpen} receipt={pubkey} eventId={eventId} />
       </DialogContent>
     </Dialog>
   )
@@ -42,17 +43,18 @@ export default function ZapDialog({
 function ZapDialogContent({
   setOpen,
   setZapped,
-  pubkey,
+  receipt,
   eventId
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   setZapped?: Dispatch<SetStateAction<boolean>>
-  pubkey: string
+  receipt: string
   eventId?: string
 }) {
   const { t } = useTranslation()
   const { toast } = useToast()
+  const { pubkey } = useNostr()
   const { defaultZapSats } = useZap()
   const { addZap } = useNoteStats()
   const [sats, setSats] = useState(defaultZapSats)
@@ -62,7 +64,9 @@ function ZapDialogContent({
   const handleZap = async () => {
     try {
       setZapping(true)
-      const { invoice } = await lightning.zap(pubkey, sats, comment, eventId, () => setOpen(false))
+      const { invoice } = await lightning.zap(receipt, sats, comment, eventId, pubkey, () =>
+        setOpen(false)
+      )
       setZapped?.(true)
       if (eventId) {
         addZap(eventId, invoice, sats)

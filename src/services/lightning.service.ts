@@ -34,19 +34,21 @@ class LightningService {
   }
 
   async zap(
-    pubkey: string,
+    receipt: string,
     sats: number,
     comment: string,
     eventId?: string,
+    sender?: string | null,
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string }> {
     if (!client.signer) {
       throw new Error('You need to be logged in to zap')
     }
 
-    const [profile, relayList] = await Promise.all([
-      client.fetchProfile(pubkey),
-      client.fetchRelayList(pubkey)
+    const [profile, receiptRelayList, senderRelayList] = await Promise.all([
+      client.fetchProfile(receipt),
+      client.fetchRelayList(receipt),
+      sender ? client.fetchRelayList(sender) : Promise.resolve({ read: [], write: [] })
     ])
     if (!profile) {
       throw new Error('Recipient not found')
@@ -58,10 +60,13 @@ class LightningService {
     const { callback, lnurl } = zapEndpoint
     const amount = sats * 1000
     const zapRequestDraft = makeZapRequest({
-      profile: pubkey,
+      profile: receipt,
       event: eventId ?? null,
       amount,
-      relays: relayList.read.concat(client.getDefaultRelayUrls()).slice(0, 5),
+      relays: receiptRelayList.read
+        .slice(0, 3)
+        .concat(senderRelayList.write.slice(0, 3))
+        .concat(client.getDefaultRelayUrls().slice(0, 2)),
       comment
     })
     const zapRequest = await client.signer(zapRequestDraft)

@@ -3,7 +3,7 @@ import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
 export type TNoteStats = {
@@ -17,9 +17,8 @@ export type TNoteStats = {
 type TNoteStatsContext = {
   noteStatsMap: Map<string, Partial<TNoteStats>>
   updateNoteReplyCount: (noteId: string, replyCount: number) => void
-  addLike: (eventId: string) => void
-  addRepost: (eventId: string) => void
   addZap: (eventId: string, pr: string, amount: number) => void
+  updateNoteStatsByEvent: (evt: Event) => void
   fetchNoteStats: (event: Event) => Promise<Partial<TNoteStats> | undefined>
 }
 
@@ -36,6 +35,30 @@ export const useNoteStats = () => {
 export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const [noteStatsMap, setNoteStatsMap] = useState<Map<string, Partial<TNoteStats>>>(new Map())
   const { pubkey } = useNostr()
+
+  useEffect(() => {
+    if (!pubkey) return
+    const init = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000)) // wait a bit to avoid concurrent too many requests
+      const relayList = await client.fetchRelayList(pubkey)
+      const filters: Filter[] = [
+        {
+          authors: [pubkey],
+          kinds: [kinds.Repost, kinds.Reaction],
+          limit: 1000
+        },
+        {
+          '#P': [pubkey],
+          kinds: [kinds.Zap],
+          limit: 500
+        }
+      ]
+      await client.fetchEvents(relayList.write.slice(0, 4), filters, {
+        onevent: updateNoteStatsByEvent
+      })
+    }
+    init()
+  }, [pubkey])
 
   const fetchNoteStats = async (event: Event) => {
     const oldStats = noteStatsMap.get(event.id)
@@ -85,45 +108,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       })
     }
     await client.fetchEvents(relayList.read.slice(0, 3), filters, {
-      onevent: (evt) => {
-        if (evt.kind === kinds.Repost) {
-          return setNoteStatsMap((prev) => {
-            const old = prev.get(event.id) || {}
-            const reposts = old?.reposts ?? new Set()
-            reposts.add(evt.pubkey)
-            prev.set(event.id, { ...old, reposts })
-            return new Map(prev)
-          })
-        }
-
-        if (evt.kind === kinds.Reaction) {
-          const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-          if (targetEventId) {
-            return setNoteStatsMap((prev) => {
-              const old = prev.get(targetEventId) || {}
-              const likes = old?.likes ?? new Set()
-              likes.add(evt.pubkey)
-              prev.set(targetEventId, { ...old, likes })
-              return new Map(prev)
-            })
-          }
-        }
-
-        if (evt.kind === kinds.Zap) {
-          const sender = evt.tags.find(tagNameEquals('P'))?.[1]
-          if (!sender) return
-          const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
-          if (!pr) return
-          const amount = getAmountFromInvoice(pr)
-          return setNoteStatsMap((prev) => {
-            const old = prev.get(event.id) || {}
-            const zaps = old?.zaps ?? []
-            zaps.push({ pr, pubkey: sender, amount })
-            prev.set(event.id, { ...old, zaps })
-            return new Map(prev)
-          })
-        }
-      }
+      onevent: updateNoteStatsByEvent
     })
     let stats: Partial<TNoteStats> | undefined
     setNoteStatsMap((prev) => {
@@ -149,28 +134,6 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  const addLike = (eventId: string) => {
-    if (!pubkey) return
-    setNoteStatsMap((prev) => {
-      const old = prev.get(eventId)
-      const likes = new Set(old?.likes ?? [])
-      likes.add(pubkey)
-      prev.set(eventId, { ...old, likes })
-      return new Map(prev)
-    })
-  }
-
-  const addRepost = (eventId: string) => {
-    if (!pubkey) return
-    setNoteStatsMap((prev) => {
-      const old = prev.get(eventId)
-      const reposts = new Set(old?.reposts ?? [])
-      reposts.add(pubkey)
-      prev.set(eventId, { ...old, reposts })
-      return new Map(prev)
-    })
-  }
-
   const addZap = (eventId: string, pr: string, amount: number) => {
     if (!pubkey) return
     setNoteStatsMap((prev) => {
@@ -184,15 +147,58 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  const updateNoteStatsByEvent = (evt: Event) => {
+    if (evt.kind === kinds.Repost) {
+      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
+      if (!eventId) return
+      return setNoteStatsMap((prev) => {
+        const old = prev.get(eventId) || {}
+        const reposts = old?.reposts ?? new Set()
+        reposts.add(evt.pubkey)
+        prev.set(eventId, { ...old, reposts })
+        return new Map(prev)
+      })
+    }
+
+    if (evt.kind === kinds.Reaction) {
+      const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
+      if (targetEventId) {
+        return setNoteStatsMap((prev) => {
+          const old = prev.get(targetEventId) || {}
+          const likes = old?.likes ?? new Set()
+          likes.add(evt.pubkey)
+          prev.set(targetEventId, { ...old, likes })
+          return new Map(prev)
+        })
+      }
+    }
+
+    if (evt.kind === kinds.Zap) {
+      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
+      if (!eventId) return
+      const senderPubkey = evt.tags.find(tagNameEquals('P'))?.[1]
+      if (!senderPubkey) return
+      const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
+      if (!pr) return
+      const amount = getAmountFromInvoice(pr)
+      return setNoteStatsMap((prev) => {
+        const old = prev.get(eventId) || {}
+        const zaps = old?.zaps ?? []
+        zaps.push({ pr, pubkey: senderPubkey, amount })
+        prev.set(eventId, { ...old, zaps })
+        return new Map(prev)
+      })
+    }
+  }
+
   return (
     <NoteStatsContext.Provider
       value={{
         noteStatsMap,
         fetchNoteStats,
         updateNoteReplyCount,
-        addLike,
-        addRepost,
-        addZap
+        addZap,
+        updateNoteStatsByEvent
       }}
     >
       {children}

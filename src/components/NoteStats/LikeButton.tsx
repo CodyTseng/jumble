@@ -12,7 +12,7 @@ import { formatCount } from './utils'
 export default function LikeButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { noteStatsMap, addLike, fetchNoteStats } = useNoteStats()
+  const { noteStatsMap, updateNoteStatsByEvent, fetchNoteStats } = useNoteStats()
   const [liking, setLiking] = useState(false)
   const { likeCount, hasLiked } = useMemo(() => {
     const stats = noteStatsMap.get(event.id) || {}
@@ -38,8 +38,10 @@ export default function LikeButton({ event }: { event: Event }) {
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const reaction = createReactionDraftEvent(event)
-        await publish(reaction, { additionalRelayUrls: targetRelayList.read.slice(0, 4) })
-        addLike(event.id)
+        const evt = await publish(reaction, {
+          additionalRelayUrls: targetRelayList.read.slice(0, 4)
+        })
+        updateNoteStatsByEvent(evt)
       } catch (error) {
         console.error('like failed', error)
       } finally {
