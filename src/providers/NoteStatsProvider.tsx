@@ -3,7 +3,7 @@ import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
 export type TNoteStats = {
@@ -36,9 +36,57 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const [noteStatsMap, setNoteStatsMap] = useState<Map<string, Partial<TNoteStats>>>(new Map())
   const { pubkey } = useNostr()
 
+  const updateNoteStatsByEvent = useCallback((evt: Event) => {
+    if (evt.kind === kinds.Repost) {
+      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
+      if (!eventId) return
+      setNoteStatsMap((prev) => {
+        const old = prev.get(eventId) || {}
+        const reposts = old?.reposts ?? new Set()
+        reposts.add(evt.pubkey)
+        prev.set(eventId, { ...old, reposts })
+        return new Map(prev)
+      })
+      return
+    }
+
+    if (evt.kind === kinds.Reaction) {
+      const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
+      if (targetEventId) {
+        setNoteStatsMap((prev) => {
+          const old = prev.get(targetEventId) || {}
+          const likes = old?.likes ?? new Set()
+          likes.add(evt.pubkey)
+          prev.set(targetEventId, { ...old, likes })
+          return new Map(prev)
+        })
+        return
+      }
+    }
+
+    if (evt.kind === kinds.Zap) {
+      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
+      if (!eventId) return
+      const senderPubkey = evt.tags.find(tagNameEquals('P'))?.[1]
+      if (!senderPubkey) return
+      const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
+      if (!pr) return
+      const amount = getAmountFromInvoice(pr)
+      setNoteStatsMap((prev) => {
+        const old = prev.get(eventId) || {}
+        const zaps = old?.zaps ?? []
+        zaps.push({ pr, pubkey: senderPubkey, amount })
+        prev.set(eventId, { ...old, zaps })
+        return new Map(prev)
+      })
+      return
+    }
+  }, [])
+
   useEffect(() => {
     if (!pubkey) return
     const init = async () => {
+      console.log('fetching note stats')
       await new Promise((resolve) => setTimeout(resolve, 2000)) // wait a bit to avoid concurrent too many requests
       const relayList = await client.fetchRelayList(pubkey)
       const filters: Filter[] = [
@@ -145,50 +193,6 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       })
       return new Map(prev)
     })
-  }
-
-  const updateNoteStatsByEvent = (evt: Event) => {
-    if (evt.kind === kinds.Repost) {
-      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
-      if (!eventId) return
-      return setNoteStatsMap((prev) => {
-        const old = prev.get(eventId) || {}
-        const reposts = old?.reposts ?? new Set()
-        reposts.add(evt.pubkey)
-        prev.set(eventId, { ...old, reposts })
-        return new Map(prev)
-      })
-    }
-
-    if (evt.kind === kinds.Reaction) {
-      const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-      if (targetEventId) {
-        return setNoteStatsMap((prev) => {
-          const old = prev.get(targetEventId) || {}
-          const likes = old?.likes ?? new Set()
-          likes.add(evt.pubkey)
-          prev.set(targetEventId, { ...old, likes })
-          return new Map(prev)
-        })
-      }
-    }
-
-    if (evt.kind === kinds.Zap) {
-      const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
-      if (!eventId) return
-      const senderPubkey = evt.tags.find(tagNameEquals('P'))?.[1]
-      if (!senderPubkey) return
-      const pr = evt.tags.find(tagNameEquals('bolt11'))?.[1]
-      if (!pr) return
-      const amount = getAmountFromInvoice(pr)
-      return setNoteStatsMap((prev) => {
-        const old = prev.get(eventId) || {}
-        const zaps = old?.zaps ?? []
-        zaps.push({ pr, pubkey: senderPubkey, amount })
-        prev.set(eventId, { ...old, zaps })
-        return new Map(prev)
-      })
-    }
   }
 
   return (
