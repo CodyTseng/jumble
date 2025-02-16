@@ -97,7 +97,6 @@ function OptimalReadRelays({
     const init = async () => {
       setIsCalculating(true)
       const relays = await client.calculateOptimalReadRelays(pubkey)
-      console.log(relays)
       setOptimalReadRelays(relays)
       setIsCalculating(false)
     }
