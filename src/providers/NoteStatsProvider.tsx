@@ -86,7 +86,6 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!pubkey) return
     const init = async () => {
-      console.log('fetching note stats')
       await new Promise((resolve) => setTimeout(resolve, 2000)) // wait a bit to avoid concurrent too many requests
       const relayList = await client.fetchRelayList(pubkey)
       const filters: Filter[] = [
