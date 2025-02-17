@@ -182,6 +182,14 @@ export default {
     'Supported NIPs': '支持的 NIP',
     'Open in a': '在 {{a}} 中打开',
     'Cannot handle event of kind k': '无法处理类型为 {{k}} 的事件',
-    'Sorry! The note cannot be found 😔': '抱歉！找不到该笔记 😔'
+    'Sorry! The note cannot be found 😔': '抱歉！找不到该笔记 😔',
+    Wallet: '钱包',
+    Sats: '聪',
+    sats: '聪',
+    'Zap to': '打闪给',
+    'Zap n sats': '打闪 {{n}} 聪',
+    zapComment: '附言',
+    'Default zap amount': '默认打闪金额',
+    'Default zap comment': '默认打闪附言'
   }
 }

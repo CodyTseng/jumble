@@ -7,20 +7,21 @@ import { useTranslation } from 'react-i18next'
 
 const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { defaultZapSats, updateDefaultSats } = useZap()
-  const [defaultZapAmount, setDefaultZapAmount] = useState(defaultZapSats)
+  const { defaultZapSats, updateDefaultSats, defaultZapComment, updateDefaultComment } = useZap()
+  const [defaultZapAmountInput, setDefaultZapAmountInput] = useState(defaultZapSats)
+  const [defaultZapCommentInput, setDefaultZapCommentInput] = useState(defaultZapComment)
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')} displayScrollToTopButton>
       <div className="px-4 pt-2 space-y-4">
         <BcButton />
         <div className="flex justify-between items-center">
-          <div>Default zap amount</div>
+          <div>{t('Default zap amount')}</div>
           <Input
             className="w-40"
-            value={defaultZapAmount}
+            value={defaultZapAmountInput}
             onChange={(e) => {
-              setDefaultZapAmount((pre) => {
+              setDefaultZapAmountInput((pre) => {
                 if (e.target.value === '') {
                   return 0
                 }
@@ -32,7 +33,18 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
               })
             }}
             onBlur={() => {
-              updateDefaultSats(defaultZapAmount)
+              updateDefaultSats(defaultZapAmountInput)
+            }}
+          />
+        </div>
+        <div className="flex justify-between items-center">
+          <div>{t('Default zap comment')}</div>
+          <Input
+            className="w-40"
+            value={defaultZapCommentInput}
+            onChange={(e) => setDefaultZapCommentInput(e.target.value)}
+            onBlur={() => {
+              updateDefaultComment(defaultZapCommentInput)
             }}
           />
         </div>
