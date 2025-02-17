@@ -59,7 +59,7 @@ const NotificationList = forwardRef((_, ref) => {
             setNotifications(events.filter((event) => event.pubkey !== pubkey))
             if (eosed) {
               setRefreshing(false)
-              setUntil(events.length >= 0 ? events[events.length - 1].created_at - 1 : undefined)
+              setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
             }
           },
           onNew: (event) => {

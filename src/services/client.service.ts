@@ -176,7 +176,7 @@ class ClientService extends EventTarget {
         )
       ).filter(Boolean) as NEvent[]
       if (cachedEvents.length) {
-        onEvents(cachedEvents, false)
+        onEvents([...cachedEvents], false)
         since = cachedEvents[0].created_at + 1
       }
     }
@@ -283,11 +283,11 @@ class ClientService extends EventTarget {
 
             // (algo feeds) no need to sort and cache
             if (!needSort) {
-              return onEvents(events, eosed)
+              return onEvents([...events], eosed)
             }
             if (!eosed) {
               events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
-              return onEvents(events.concat(cachedEvents), false)
+              return onEvents([...events.concat(cachedEvents)], false)
             }
 
             events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
@@ -299,7 +299,7 @@ class ClientService extends EventTarget {
                 filter,
                 urls
               }
-              return onEvents(events, true)
+              return onEvents([...events], true)
             }
 
             const newEvents = events.filter((evt) => {
@@ -314,11 +314,11 @@ class ClientService extends EventTarget {
             if (newRefs.length >= filter.limit) {
               // if new refs are more than limit, means old refs are too old, replace them
               timeline.refs = newRefs
-              onEvents(newEvents, true)
+              onEvents([...newEvents], true)
             } else {
               // merge new refs with old refs
               timeline.refs = newRefs.concat(timeline.refs)
-              onEvents(newEvents.concat(cachedEvents), true)
+              onEvents([...newEvents.concat(cachedEvents)], true)
             }
           },
           eoseTimeout: 10000 // 10s
