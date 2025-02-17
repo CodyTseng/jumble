@@ -181,6 +181,14 @@ export default {
     'Supported NIPs': 'Supported NIPs',
     'Open in a': 'Open in {{a}}',
     'Cannot handle event of kind k': 'Cannot handle event of kind {{k}}',
-    'Sorry! The note cannot be found 😔': 'Sorry! The note cannot be found 😔'
+    'Sorry! The note cannot be found 😔': 'Sorry! The note cannot be found 😔',
+    Wallet: 'Wallet',
+    Sats: 'Sats',
+    sats: 'sats',
+    'Zap to': 'Zap to',
+    'Zap n sats': 'Zap {{n}} sats',
+    zapComment: 'Comment',
+    'Default zap amount': 'Default zap amount',
+    'Default zap comment': 'Default zap comment'
   }
 }

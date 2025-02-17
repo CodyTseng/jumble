@@ -24,12 +24,14 @@ export default function ZapDialog({
   pubkey: string
   eventId?: string
 }) {
+  const { t } = useTranslation()
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex gap-2 items-center">
-            <div className="shrink-0">Zap to</div>
+            <div className="shrink-0">{t('Zap to')}</div>
             <UserAvatar size="small" userId={pubkey} />
             <Username userId={pubkey} className="truncate flex-1 w-0" />
           </DialogTitle>
@@ -55,10 +57,10 @@ function ZapDialogContent({
   const { t } = useTranslation()
   const { toast } = useToast()
   const { pubkey } = useNostr()
-  const { defaultZapSats } = useZap()
+  const { defaultZapSats, defaultZapComment } = useZap()
   const { addZap } = useNoteStats()
   const [sats, setSats] = useState(defaultZapSats)
-  const [comment, setComment] = useState('Zap!')
+  const [comment, setComment] = useState(defaultZapComment)
   const [zapping, setZapping] = useState(false)
 
   const handleZap = async () => {
@@ -111,7 +113,7 @@ function ZapDialogContent({
             className="bg-transparent text-center w-full p-0 focus-visible:outline-none text-6xl font-bold"
           />
         </div>
-        <Label htmlFor="sats">Sats</Label>
+        <Label htmlFor="sats">{t('Sats')}</Label>
       </div>
 
       {/* Preset sats buttons */}
@@ -138,12 +140,12 @@ function ZapDialogContent({
 
       {/* Comment input */}
       <div>
-        <Label htmlFor="comment">Comment</Label>
+        <Label htmlFor="comment">{t('zapComment')}</Label>
         <Input id="comment" value={comment} onChange={(e) => setComment(e.target.value)} />
       </div>
 
       <Button onClick={handleZap}>
-        {zapping && <Loader className="animate-spin" />} Zap {sats} sats
+        {zapping && <Loader className="animate-spin" />} {t('Zap n sats', { n: sats })}
       </Button>
     </>
   )

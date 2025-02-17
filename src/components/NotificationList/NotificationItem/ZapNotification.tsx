@@ -7,11 +7,13 @@ import { useNostr } from '@/providers/NostrProvider'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
 import { ContentPreview } from './ContentPreview'
 
 export function ZapNotification({ notification }: { notification: Event }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const { senderPubkey, eventId, amount, comment } = useMemo(() => {
@@ -44,7 +46,9 @@ export function ZapNotification({ notification }: { notification: Event }) {
       <div className="flex gap-2 items-center flex-1 w-0">
         <UserAvatar userId={senderPubkey} size="small" />
         <Zap size={24} className="text-yellow-400 shrink-0" />
-        <div className="font-semibold text-yellow-400 shrink-0">{formatAmount(amount)} stats</div>
+        <div className="font-semibold text-yellow-400 shrink-0">
+          {formatAmount(amount)} {t('sats')}
+        </div>
         {comment && <div className="text-yellow-400 truncate">{comment}</div>}
         <ContentPreview event={event} />
       </div>

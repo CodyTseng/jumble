@@ -8,11 +8,11 @@ import { Separator } from '@/components/ui/separator'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toProfile, toSettings } from '@/lib/link'
+import { toProfile, toSettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { ArrowDownUp, ChevronRight, LogOut, Settings, UserRound } from 'lucide-react'
+import { ArrowDownUp, ChevronRight, LogOut, Settings, UserRound, Wallet } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -53,6 +53,10 @@ const MePage = forwardRef((_, ref) => {
         <Item onClick={() => push(toProfile(pubkey))}>
           <UserRound />
           {t('Profile')}
+        </Item>
+        <Item onClick={() => push(toWallet())}>
+          <Wallet />
+          {t('Wallet')}
         </Item>
         <Item onClick={() => setLoginDialogOpen(true)}>
           <ArrowDownUp /> {t('Switch account')}
