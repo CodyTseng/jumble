@@ -30,7 +30,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
           onClick={() => navigator.clipboard.writeText('nostr:' + pubkeyToNpub(pubkey))}
         >
           <Copy />
-          {t('copy embedded code')}
+          {t('Copy user ID')}
         </DropdownMenuItem>
         {mutePubkeys.includes(pubkey) ? (
           <DropdownMenuItem
@@ -38,7 +38,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
             className="text-destructive focus:text-destructive"
           >
             <Bell />
-            {t('unmute user')}
+            {t('Unmute user')}
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem
@@ -46,7 +46,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
             className="text-destructive focus:text-destructive"
           >
             <BellOff />
-            {t('mute user')}
+            {t('Mute user')}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

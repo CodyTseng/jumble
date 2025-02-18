@@ -1,10 +1,13 @@
 import { GROUP_METADATA_EVENT_KIND } from '@/constants'
 import { isSupportedKind } from '@/lib/event'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
+import { useState } from 'react'
 import GroupMetadataCard from './GroupMetadataCard'
 import LiveEventCard from './LiveEventCard'
 import LongFormArticleCard from './LongFormArticleCard'
 import MainNoteCard from './MainNoteCard'
+import MutedNoteCard from './MutedNoteCard'
 import UnknownNoteCard from './UnknownNoteCard'
 
 export default function GenericNoteCard({
@@ -20,6 +23,21 @@ export default function GenericNoteCard({
   embedded?: boolean
   originalNoteId?: string
 }) {
+  const [showMuted, setShowMuted] = useState(false)
+  const { mutePubkeys } = useMuteList()
+
+  if (mutePubkeys.includes(event.pubkey) && !showMuted) {
+    return (
+      <MutedNoteCard
+        event={event}
+        className={className}
+        reposter={reposter}
+        embedded={embedded}
+        show={() => setShowMuted(true)}
+      />
+    )
+  }
+
   if (isSupportedKind(event.kind)) {
     return (
       <MainNoteCard event={event} className={className} reposter={reposter} embedded={embedded} />

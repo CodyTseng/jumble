@@ -5,11 +5,12 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { getSharableEventId } from '@/lib/event'
+import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { BellOff, Code, Copy, Ellipsis } from 'lucide-react'
+import { Bell, BellOff, Code, Copy, Ellipsis } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RawEventDialog from './RawEventDialog'
 
@@ -17,7 +18,8 @@ export default function NoteOptions({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [isRawEventDialogOpen, setIsRawEventDialogOpen] = useState(false)
-  const { mutePubkey } = useMuteList()
+  const { mutePubkey, unmutePubkey, mutePubkeys } = useMuteList()
+  const isMuted = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
 
   return (
     <div className="h-4" onClick={(e) => e.stopPropagation()}>
@@ -30,22 +32,28 @@ export default function NoteOptions({ event }: { event: Event }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent collisionPadding={8}>
           <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText('nostr:' + getSharableEventId(event))}
+            onClick={() => navigator.clipboard.writeText(getSharableEventId(event))}
           >
             <Copy />
-            {t('copy embedded code')}
+            {t('Copy event ID')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')}
+          >
+            <Copy />
+            {t('Copy user ID')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsRawEventDialogOpen(true)}>
             <Code />
-            {t('raw event')}
+            {t('View raw event')}
           </DropdownMenuItem>
           {pubkey && (
             <DropdownMenuItem
-              onClick={() => mutePubkey(event.pubkey)}
+              onClick={() => (isMuted ? unmutePubkey(event.pubkey) : mutePubkey(event.pubkey))}
               className="text-destructive focus:text-destructive"
             >
-              <BellOff />
-              {t('mute author')}
+              {isMuted ? <Bell /> : <BellOff />}
+              {isMuted ? t('Unmute user') : t('Mute user')}
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
