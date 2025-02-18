@@ -38,7 +38,7 @@ export function createReactionDraftEvent(event: Event): TDraftEvent {
 export function createRepostDraftEvent(event: Event): TDraftEvent {
   const isProtected = isProtectedEvent(event)
   const tags = [
-    ['e', event.id, client.getEventHint(event.id), 'mentions', event.pubkey],
+    ['e', event.id, client.getEventHint(event.id), '', event.pubkey],
     ['p', event.pubkey]
   ]
 

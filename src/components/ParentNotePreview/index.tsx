@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { Event } from 'nostr-tools'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 
@@ -13,6 +15,9 @@ export default function ParentNotePreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
+  const { mutePubkeys } = useMuteList()
+  const isMuted = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
+
   return (
     <div
       className={cn(
@@ -23,7 +28,11 @@ export default function ParentNotePreview({
     >
       <div className="shrink-0">{t('reply to')}</div>
       <UserAvatar className="shrink-0" userId={event.pubkey} size="tiny" />
-      <div className="truncate">{event.content}</div>
+      {isMuted ? (
+        <div className="truncate">{t('[muted]')}</div>
+      ) : (
+        <div className="truncate">{event.content}</div>
+      )}
     </div>
   )
 }

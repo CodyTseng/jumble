@@ -1,4 +1,8 @@
+import { Button } from '@/components/ui/button'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { Event } from 'nostr-tools'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import NoteStats from '../NoteStats'
@@ -17,6 +21,14 @@ export default function ReplyNote({
   onClickParent?: (eventId: string) => void
   highlight?: boolean
 }) {
+  const { t } = useTranslation()
+  const { mutePubkeys } = useMuteList()
+  const [showMuted, setShowMuted] = useState(false)
+  const show = useMemo(
+    () => showMuted || !mutePubkeys.includes(event.pubkey),
+    [showMuted, mutePubkeys, event]
+  )
+
   return (
     <div
       className={`flex space-x-2 items-start rounded-lg p-2 transition-colors duration-500 ${highlight ? 'bg-highlight/50' : ''}`}
@@ -43,8 +55,20 @@ export default function ReplyNote({
             }}
           />
         )}
-        <Content className="mt-1" event={event} size="small" />
-        <NoteStats className="mt-2" event={event} variant="reply" />
+        {show ? (
+          <>
+            <Content className="mt-1" event={event} size="small" />
+            <NoteStats className="mt-2" event={event} variant="reply" />
+          </>
+        ) : (
+          <Button
+            variant="outline"
+            className="text-muted-foreground font-medium mt-2"
+            onClick={() => setShowMuted(true)}
+          >
+            {t('Temporarily display this reply')}
+          </Button>
+        )}
       </div>
     </div>
   )

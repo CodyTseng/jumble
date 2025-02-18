@@ -1,4 +1,5 @@
 import { COMMENT_EVENT_KIND } from '@/constants'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { CommentNotification } from './CommentNotification'
 import { ReactionNotification } from './ReactionNotification'
@@ -7,6 +8,10 @@ import { RepostNotification } from './RepostNotification'
 import { ZapNotification } from './ZapNotification'
 
 export function NotificationItem({ notification }: { notification: Event }) {
+  const { mutePubkeys } = useMuteList()
+  if (mutePubkeys.includes(notification.pubkey)) {
+    return null
+  }
   if (notification.kind === kinds.Reaction) {
     return <ReactionNotification notification={notification} />
   }

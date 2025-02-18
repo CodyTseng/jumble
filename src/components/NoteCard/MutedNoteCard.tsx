@@ -1,29 +1,28 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { getSharableEventId } from '@/lib/event'
 import { cn } from '@/lib/utils'
-import { Check, Copy } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import RepostDescription from './RepostDescription'
 
-export default function UnknownNoteCard({
+export default function MutedNoteCard({
   event,
-  className,
-  embedded = false,
-  reposter
+  show,
+  reposter,
+  embedded,
+  className
 }: {
   event: Event
-  className?: string
-  embedded?: boolean
+  show: () => void
   reposter?: string
+  embedded?: boolean
+  className?: string
 }) {
   const { t } = useTranslation()
-  const [isCopied, setIsCopied] = useState(false)
 
   return (
     <div className={className}>
@@ -45,17 +44,16 @@ export default function UnknownNoteCard({
           </div>
         </div>
         <div className="flex flex-col gap-2 items-center text-muted-foreground font-medium my-4">
-          <div>{t('Cannot handle event of kind k', { k: event.kind })}</div>
+          <div>{t('This user is muted')}</div>
           <Button
             onClick={(e) => {
               e.stopPropagation()
-              navigator.clipboard.writeText(getSharableEventId(event))
-              setIsCopied(true)
-              setTimeout(() => setIsCopied(false), 2000)
+              show()
             }}
             variant="outline"
           >
-            {isCopied ? <Check /> : <Copy />} Copy event ID
+            <Eye />
+            {t('Temporarily display this note')}
           </Button>
         </div>
       </div>
