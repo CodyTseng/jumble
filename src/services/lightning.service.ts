@@ -124,13 +124,13 @@ class LightningService {
     try {
       let lnurl: string = ''
       const { lud06, lud16 } = profile
-      if (lud06) {
+      if (lud16) {
+        const [name, domain] = lud16.split('@')
+        lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString()
+      } else if (lud06) {
         const { words } = bech32.decode(lud06, 1000)
         const data = bech32.fromWords(words)
         lnurl = utf8Decoder.decode(data)
-      } else if (lud16) {
-        const [name, domain] = lud16.split('@')
-        lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString()
       } else {
         return null
       }
