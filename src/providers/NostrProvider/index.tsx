@@ -360,7 +360,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         ? specifiedRelayUrls
         : (relayList?.write ?? [])
             .concat(additionalRelayUrls ?? [])
-            .concat(client.getDefaultRelayUrls()),
+            .concat(client.getCurrentRelayUrls())
+            .concat(BIG_RELAY_URLS),
       event
     )
     return event

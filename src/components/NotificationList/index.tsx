@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { COMMENT_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
@@ -48,7 +48,7 @@ const NotificationList = forwardRef((_, ref) => {
       const { closer, timelineKey } = await client.subscribeTimeline(
         relayList.read.length >= 4
           ? relayList.read
-          : relayList.read.concat(client.getDefaultRelayUrls()).slice(0, 4),
+          : relayList.read.concat(BIG_RELAY_URLS).slice(0, 4),
         {
           '#p': [pubkey],
           kinds: [kinds.ShortTextNote, kinds.Repost, kinds.Reaction, kinds.Zap, COMMENT_EVENT_KIND],

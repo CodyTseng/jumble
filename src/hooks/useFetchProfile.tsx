@@ -1,10 +1,7 @@
-import { getProfileFromProfileEvent } from '@/lib/event'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import indexedDb from '@/services/indexed-db.service'
 import { TProfile } from '@/types'
-import { kinds } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchProfile(id?: string) {
@@ -28,14 +25,6 @@ export function useFetchProfile(id?: string) {
 
         const pubkey = userIdToPubkey(id)
         setPubkey(pubkey)
-        const storedProfileEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
-        if (storedProfileEvent) {
-          const profile = getProfileFromProfileEvent(storedProfileEvent)
-          setProfile(profile)
-          setIsFetching(false)
-          return
-        }
-
         const profile = await client.fetchProfile(id)
         if (profile) {
           setProfile(profile)
@@ -54,7 +43,7 @@ export function useFetchProfile(id?: string) {
     if (currentAccountProfile && pubkey === currentAccountProfile.pubkey) {
       setProfile(currentAccountProfile)
     }
-  }, [currentAccountProfile])
+  }, [currentAccountProfile, pubkey])
 
   return { isFetching, error, profile }
 }
