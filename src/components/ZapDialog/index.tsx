@@ -71,7 +71,7 @@ function ZapDialogContent({
       )
       setZapped?.(true)
       if (eventId) {
-        addZap(eventId, invoice, sats)
+        addZap(eventId, invoice, sats, comment)
       }
     } catch (error) {
       toast({

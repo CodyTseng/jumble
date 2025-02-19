@@ -66,7 +66,7 @@ export function SimpleUserAvatar({
   onClick
 }: {
   userId: string
-  size?: 'large' | 'big' | 'normal' | 'small' | 'tiny'
+  size?: 'large' | 'big' | 'normal' | 'small' | 'xSmall' | 'tiny'
   className?: string
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {

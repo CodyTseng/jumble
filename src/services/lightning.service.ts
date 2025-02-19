@@ -101,9 +101,6 @@ class LightningService {
         }
       })
 
-      if (!verify) {
-        setPaid({ preimage: '' })
-      }
       const checkPaymentInterval = setInterval(async () => {
         const invoice = new Invoice({ pr, verify })
         const paid = await invoice.verifyPayment()
@@ -114,6 +111,11 @@ class LightningService {
           })
         }
       }, 1000)
+
+      // TODO:
+      if (!verify) {
+        setPaid({ preimage: '' })
+      }
     })
   }
 
