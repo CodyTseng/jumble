@@ -18,7 +18,7 @@ type TNoteStatsContext = {
   noteStatsMap: Map<string, Partial<TNoteStats>>
   updateNoteReplyCount: (noteId: string, replyCount: number) => void
   addZap: (eventId: string, pr: string, amount: number, comment?: string) => void
-  updateNoteStatsByEvent: (evt: Event) => void
+  updateNoteStatsByEvents: (events: Event[]) => void
   fetchNoteStats: (event: Event) => Promise<Partial<TNoteStats> | undefined>
 }
 
@@ -186,10 +186,6 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     return
   }
 
-  const updateNoteStatsByEvent = (evt: Event) => {
-    updateNoteStatsByEvents([evt])
-  }
-
   const updateNoteReplyCount = (noteId: string, replyCount: number) => {
     setNoteStatsMap((prev) => {
       const old = prev.get(noteId)
@@ -224,7 +220,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         fetchNoteStats,
         updateNoteReplyCount,
         addZap,
-        updateNoteStatsByEvent
+        updateNoteStatsByEvents
       }}
     >
       {children}

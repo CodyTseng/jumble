@@ -1,6 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { COMMENT_EVENT_KIND } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
+import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
@@ -15,6 +16,7 @@ const SHOW_COUNT = 30
 const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
+  const { updateNoteStatsByEvents } = useNoteStats()
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(true)
@@ -60,6 +62,7 @@ const NotificationList = forwardRef((_, ref) => {
             if (eosed) {
               setRefreshing(false)
               setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
+              updateNoteStatsByEvents(events)
             }
           },
           onNew: (event) => {
@@ -73,6 +76,7 @@ const NotificationList = forwardRef((_, ref) => {
               }
               return [...oldEvents.slice(0, index), event, ...oldEvents.slice(index)]
             })
+            updateNoteStatsByEvents([event])
           }
         }
       )

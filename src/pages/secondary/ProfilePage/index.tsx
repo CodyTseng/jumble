@@ -62,11 +62,13 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   if (!profile && isFetching) {
     return (
       <SecondaryPageLayout index={index} ref={ref}>
-        <div className="px-4">
-          <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
-            <Skeleton className="w-full h-full object-cover rounded-lg" />
-            <Skeleton className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background rounded-full" />
+        <div className="sm:px-4">
+          <div className="relative bg-cover bg-center mb-2">
+            <Skeleton className="w-full aspect-video sm:rounded-lg" />
+            <Skeleton className="w-24 h-24 absolute bottom-0 left-3 translate-y-1/2 border-4 border-background rounded-full" />
           </div>
+        </div>
+        <div className="px-4">
           <Skeleton className="h-5 w-28 mt-14 mb-1" />
           <Skeleton className="h-5 w-56 mt-2 my-1 rounded-full" />
         </div>
@@ -78,20 +80,22 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   const { banner, username, about, avatar, pubkey, website } = profile
   return (
     <SecondaryPageLayout index={index} title={username} displayScrollToTopButton ref={ref}>
-      <div className="px-4">
-        <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
+      <div className="sm:px-4">
+        <div className="relative bg-cover bg-center mb-2">
           <ProfileBanner
             banner={banner}
             pubkey={pubkey}
-            className="w-full aspect-video object-cover"
+            className="w-full aspect-video sm:rounded-lg"
           />
-          <Avatar className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background">
+          <Avatar className="w-24 h-24 absolute left-3 bottom-0 translate-y-1/2 border-4 border-background">
             <AvatarImage src={avatar} className="object-cover object-center" />
             <AvatarFallback>
               <img src={defaultImage} />
             </AvatarFallback>
           </Avatar>
         </div>
+      </div>
+      <div className="px-4">
         <div className="flex justify-end h-8 gap-2 items-center">
           {isFollowingYou && (
             <div className="text-muted-foreground rounded-full bg-muted text-xs h-fit px-2">

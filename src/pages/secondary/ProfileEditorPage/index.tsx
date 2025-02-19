@@ -100,7 +100,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   return (
     <SecondaryPageLayout ref={ref} index={index} title={profile.username} controls={controls}>
       <div className="px-4">
-        <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
+        <div className="relative bg-cover bg-center rounded-lg mb-2">
           <Uploader
             onUploadSuccess={onBannerUploadSuccess}
             onUploadingChange={(uploading) => setTimeout(() => setUploadingBanner(uploading), 50)}
@@ -109,7 +109,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             <ProfileBanner
               banner={banner}
               pubkey={account.pubkey}
-              className="w-full aspect-video object-cover"
+              className="w-full aspect-video object-cover rounded-lg"
             />
             <div className="absolute top-0 bg-muted/30 w-full h-full rounded-lg flex flex-col justify-center items-center">
               {uploadingBanner ? (
