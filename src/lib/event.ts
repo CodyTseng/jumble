@@ -2,6 +2,7 @@ import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/consta
 import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
 import { Event, kinds, nip19 } from 'nostr-tools'
+import { getAmountFromInvoice } from './lightning'
 import { formatPubkey } from './pubkey'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
@@ -312,6 +313,54 @@ export function extractEmbeddedNotesFromContent(content: string) {
   c = c.replace(/\n{3,}/g, '\n\n').trim()
 
   return { embeddedNotes, contentWithoutEmbeddedNotes: c }
+}
+
+export function extractZapInfoFromReceipt(receiptEvent: Event) {
+  let senderPubkey: string | undefined
+  let recipientPubkey: string | undefined
+  let eventId: string | undefined
+  let invoice: string | undefined
+  let amount: number | undefined
+  let comment: string | undefined
+  let description: string | undefined
+  try {
+    receiptEvent.tags.forEach(([tagName, tagValue]) => {
+      switch (tagName) {
+        case 'P':
+          senderPubkey = tagValue
+          break
+        case 'p':
+          recipientPubkey = tagValue
+          break
+        case 'e':
+          eventId = tagValue
+          break
+        case 'bolt11':
+          invoice = tagValue
+          break
+        case 'description':
+          description = tagValue
+          break
+      }
+    })
+    if (!recipientPubkey || !invoice) return null
+    amount = invoice ? getAmountFromInvoice(invoice) : 0
+    if (description) {
+      const zapRequest = JSON.parse(description)
+      comment = zapRequest.content
+    }
+
+    return {
+      senderPubkey,
+      recipientPubkey,
+      eventId,
+      invoice,
+      amount,
+      comment
+    }
+  } catch {
+    return null
+  }
 }
 
 export function getLatestEvent(events: Event[]) {

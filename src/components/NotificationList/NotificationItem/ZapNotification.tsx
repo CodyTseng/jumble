@@ -1,7 +1,7 @@
 import { useFetchEvent } from '@/hooks'
-import { formatAmount, getAmountFromInvoice } from '@/lib/lightning'
+import { extractZapInfoFromReceipt } from '@/lib/event'
+import { formatAmount } from '@/lib/lightning'
 import { toNote, toProfile } from '@/lib/link'
-import { tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { Zap } from 'lucide-react'
@@ -16,24 +16,10 @@ export function ZapNotification({ notification }: { notification: Event }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
-  const { senderPubkey, eventId, amount, comment } = useMemo(() => {
-    const result: { senderPubkey?: string; eventId?: string; amount?: number; comment?: string } =
-      {}
-    try {
-      result.senderPubkey = notification.tags.find(tagNameEquals('P'))?.[1]
-      result.eventId = notification.tags.find(tagNameEquals('e'))?.[1]
-      const invoice = notification.tags.find(tagNameEquals('bolt11'))?.[1]
-      result.amount = invoice ? getAmountFromInvoice(invoice) : 0
-      const description = notification.tags.find(tagNameEquals('description'))?.[1]
-      if (description) {
-        const zapRequest = JSON.parse(description)
-        result.comment = zapRequest.content
-      }
-    } catch {
-      // ignore
-    }
-    return result
-  }, [notification])
+  const { senderPubkey, eventId, amount, comment } = useMemo(
+    () => extractZapInfoFromReceipt(notification) ?? ({} as any),
+    [notification]
+  )
   const { event } = useFetchEvent(eventId)
 
   if (!senderPubkey || !amount) return null
