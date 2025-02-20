@@ -2,7 +2,7 @@ import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/consta
 import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
 import { Event, kinds, nip19 } from 'nostr-tools'
-import { getAmountFromInvoice } from './lightning'
+import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey } from './pubkey'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
@@ -148,6 +148,7 @@ export function getProfileFromProfileEvent(event: Event) {
       website: profileObj.website ? normalizeHttpUrl(profileObj.website) : undefined,
       lud06: profileObj.lud06,
       lud16: profileObj.lud16,
+      lightningAddress: getLightningAddressFromProfile(profileObj),
       created_at: event.created_at
     }
   } catch (err) {

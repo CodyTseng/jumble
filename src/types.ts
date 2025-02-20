@@ -11,6 +11,7 @@ export type TProfile = {
   website?: string
   lud06?: string
   lud16?: string
+  lightningAddress?: string
   created_at?: number
 }
 export type TMailboxRelayScope = 'read' | 'write' | 'both'

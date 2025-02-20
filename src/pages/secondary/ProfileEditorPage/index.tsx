@@ -42,7 +42,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       setUsername(profile.original_username ?? '')
       setAbout(profile.about ?? '')
       setNip05(profile.nip05 ?? '')
-      setLightningAddress(profile.lud16 || profile.lud06 || '')
+      setLightningAddress(profile.lightningAddress || '')
     } else {
       setBanner('')
       setAvatar('')
