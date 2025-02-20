@@ -190,6 +190,7 @@ export default {
     'Zap n sats': '打闪 {{n}} 聪',
     zapComment: '附言',
     'Default zap amount': '默认打闪金额',
-    'Default zap comment': '默认打闪附言'
+    'Default zap comment': '默认打闪附言',
+    'Lightning Address (or LNURL)': '闪电地址 (或 LNURL)'
   }
 }

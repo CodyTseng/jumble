@@ -189,6 +189,7 @@ export default {
     'Zap n sats': 'Zap {{n}} sats',
     zapComment: 'Comment',
     'Default zap amount': 'Default zap amount',
-    'Default zap comment': 'Default zap comment'
+    'Default zap comment': 'Default zap comment',
+    'Lightning Address (or LNURL)': 'Lightning Address (or LNURL)'
   }
 }
