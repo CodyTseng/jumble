@@ -4,6 +4,7 @@ import { useZap } from '@/providers/ZapProvider'
 import { Button as BcButton } from '@getalby/bitcoin-connect-react'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import LightningAddressInput from './LightningAddressInput'
 
 const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
@@ -15,6 +16,7 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')}>
       <div className="px-4 pt-2 space-y-4">
         <BcButton />
+        <LightningAddressInput />
         <div className="flex justify-between items-center">
           <div>{t('Default zap amount')}</div>
           <Input
