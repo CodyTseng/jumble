@@ -23,6 +23,7 @@ export default function TopZaps({ event }: { event: Event }) {
       <div className="flex gap-1">
         {topZaps.map((zap) => (
           <div
+            key={zap.pr}
             className="flex gap-1 py-1 pl-1 pr-2 text-sm rounded-full bg-muted items-center text-yellow-400 clickable"
             onClick={(e) => {
               e.stopPropagation()
