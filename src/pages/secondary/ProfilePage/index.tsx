@@ -77,7 +77,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   }
   if (!profile) return <NotFoundPage />
 
-  const { banner, username, about, avatar, pubkey, website } = profile
+  const { banner, username, about, avatar, pubkey, website, lightningAddress } = profile
   return (
     <SecondaryPageLayout index={index} title={username} displayScrollToTopButton ref={ref}>
       <div className="sm:px-4">
@@ -113,7 +113,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
             </Button>
           ) : (
             <>
-              {!!(profile.lud06 || profile.lud16) && <ProfileZapButton pubkey={pubkey} />}
+              {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
               <FollowButton pubkey={pubkey} />
             </>
           )}

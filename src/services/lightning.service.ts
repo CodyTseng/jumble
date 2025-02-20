@@ -127,28 +127,17 @@ class LightningService {
       let lnurl: string = ''
 
       // Some clients have incorrectly filled in the positions for lud06 and lud16
-      const { lud06: a, lud16: b } = profile
-      let lud16: string | undefined
-      let lud06: string | undefined
-      if (b && b.includes('@')) {
-        lud16 = b
-      } else if (a && a.includes('@')) {
-        lud16 = a
-      } else if (a && a.startsWith('lnurl')) {
-        lud06 = a
-      } else if (b && b.startsWith('lnurl')) {
-        lud06 = b
+      if (!profile.lightningAddress) {
+        return null
       }
 
-      if (lud16) {
-        const [name, domain] = lud16.split('@')
+      if (profile.lightningAddress.includes('@')) {
+        const [name, domain] = profile.lightningAddress.split('@')
         lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString()
-      } else if (lud06) {
-        const { words } = bech32.decode(lud06, 1000)
+      } else {
+        const { words } = bech32.decode(profile.lightningAddress, 1000)
         const data = bech32.fromWords(words)
         lnurl = utf8Decoder.decode(data)
-      } else {
-        return null
       }
 
       const res = await fetch(lnurl)

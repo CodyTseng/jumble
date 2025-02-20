@@ -19,7 +19,7 @@ export default function LightningAddressInput() {
 
   useEffect(() => {
     if (profile) {
-      setLightningAddress(profile.lud16 || profile.lud06 || '')
+      setLightningAddress(profile.lightningAddress || '')
     }
   }, [profile])
 
