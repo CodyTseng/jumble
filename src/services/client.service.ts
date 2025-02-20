@@ -26,7 +26,7 @@ class ClientService extends EventTarget {
   static instance: ClientService
 
   signer?: (evt: TDraftEvent) => Promise<VerifiedEvent>
-  private defaultRelayUrls: string[] = BIG_RELAY_URLS
+  private currentRelayUrls: string[] = []
   private pool: SimplePool
 
   private timelines: Record<
@@ -43,7 +43,7 @@ class ClientService extends EventTarget {
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
     { cacheMap: this.eventCache }
   )
-  private fetchEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
+  private fetchEventFromBigRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.eventBatchLoadFn.bind(this),
     { cache: false }
   )
@@ -54,7 +54,7 @@ class ClientService extends EventTarget {
       maxBatchSize: 50
     }
   )
-  private fetchProfileEventFromDefaultRelaysDataloader = new DataLoader<string, NEvent | undefined>(
+  private fetchProfileEventFromBigRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
@@ -100,11 +100,11 @@ class ClientService extends EventTarget {
   }
 
   setCurrentRelayUrls(urls: string[]) {
-    this.defaultRelayUrls = Array.from(new Set(urls.concat(BIG_RELAY_URLS)))
+    this.currentRelayUrls = urls
   }
 
-  getDefaultRelayUrls() {
-    return this.defaultRelayUrls
+  getCurrentRelayUrls() {
+    return this.currentRelayUrls
   }
 
   async publishEvent(relayUrls: string[], event: NEvent) {
@@ -434,7 +434,7 @@ class ClientService extends EventTarget {
     } = {}
   ) {
     const events = await this.query(
-      relayUrls.length > 0 ? relayUrls : this.defaultRelayUrls,
+      relayUrls.length > 0 ? relayUrls : this.currentRelayUrls.concat(BIG_RELAY_URLS),
       filter,
       onevent
     )
@@ -635,7 +635,7 @@ class ClientService extends EventTarget {
   }
 
   private async fetchEventById(relayUrls: string[], id: string): Promise<NEvent | undefined> {
-    const event = await this.fetchEventFromDefaultRelaysDataloader.load(id)
+    const event = await this.fetchEventFromBigRelaysDataloader.load(id)
     if (event) {
       return event
     }
@@ -716,12 +716,11 @@ class ClientService extends EventTarget {
       this.addUsernameToIndex(localProfile)
       return localProfile
     }
-    const profileFromDefaultRelays =
-      await this.fetchProfileEventFromDefaultRelaysDataloader.load(pubkey)
-    if (profileFromDefaultRelays) {
-      this.addUsernameToIndex(profileFromDefaultRelays)
-      await indexedDb.putReplaceableEvent(profileFromDefaultRelays)
-      return profileFromDefaultRelays
+    const profileFromBigRelays = await this.fetchProfileEventFromBigRelaysDataloader.load(pubkey)
+    if (profileFromBigRelays) {
+      this.addUsernameToIndex(profileFromBigRelays)
+      await indexedDb.putReplaceableEvent(profileFromBigRelays)
+      return profileFromBigRelays
     }
 
     const profileEvent = await this.tryHarderToFetchEvent(
@@ -769,15 +768,15 @@ class ClientService extends EventTarget {
   private async tryHarderToFetchEvent(
     relayUrls: string[],
     filter: Filter,
-    alreadyFetchedFromDefaultRelays = false
+    alreadyFetchedFromBigRelays = false
   ) {
     if (!relayUrls.length && filter.authors?.length) {
       const relayList = await this.fetchRelayList(filter.authors[0])
-      relayUrls = alreadyFetchedFromDefaultRelays
-        ? relayList.write.filter((url) => !this.defaultRelayUrls.includes(url)).slice(0, 4)
+      relayUrls = alreadyFetchedFromBigRelays
+        ? relayList.write.filter((url) => !BIG_RELAY_URLS.includes(url)).slice(0, 4)
         : relayList.write.slice(0, 4)
-    } else if (!relayUrls.length && !alreadyFetchedFromDefaultRelays) {
-      relayUrls = this.defaultRelayUrls
+    } else if (!relayUrls.length && !alreadyFetchedFromBigRelays) {
+      relayUrls = BIG_RELAY_URLS
     }
     if (!relayUrls.length) return
 
@@ -786,7 +785,7 @@ class ClientService extends EventTarget {
   }
 
   private async eventBatchLoadFn(ids: readonly string[]) {
-    const events = await this.query(this.defaultRelayUrls, {
+    const events = await this.query(BIG_RELAY_URLS, {
       ids: Array.from(new Set(ids)),
       limit: ids.length
     })
@@ -799,7 +798,7 @@ class ClientService extends EventTarget {
   }
 
   private async profileEventBatchLoadFn(pubkeys: readonly string[]) {
-    const events = await this.query(this.defaultRelayUrls, {
+    const events = await this.query(BIG_RELAY_URLS, {
       authors: Array.from(new Set(pubkeys)),
       kinds: [kinds.Metadata],
       limit: pubkeys.length
@@ -830,7 +829,7 @@ class ClientService extends EventTarget {
     )
     const nonExistingPubkeys = pubkeys.filter((_, i) => !relayEvents[i])
     if (nonExistingPubkeys.length) {
-      const events = await this.query(this.defaultRelayUrls, {
+      const events = await this.query(BIG_RELAY_URLS, {
         authors: pubkeys as string[],
         kinds: [kinds.RelayList],
         limit: pubkeys.length
@@ -860,7 +859,7 @@ class ClientService extends EventTarget {
 
   private async _fetchFollowListEvent(pubkey: string) {
     const relayList = await this.fetchRelayList(pubkey)
-    const followListEvents = await this.query(relayList.write.concat(this.defaultRelayUrls), {
+    const followListEvents = await this.query(relayList.write.concat(BIG_RELAY_URLS), {
       authors: [pubkey],
       kinds: [kinds.Contacts]
     })

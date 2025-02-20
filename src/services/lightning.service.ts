@@ -66,7 +66,7 @@ class LightningService {
       relays: receiptRelayList.read
         .slice(0, 3)
         .concat(senderRelayList.write.slice(0, 3))
-        .concat(client.getDefaultRelayUrls().slice(0, 2)),
+        .concat(client.getCurrentRelayUrls().slice(0, 2)),
       comment
     })
     const zapRequest = await client.signer(zapRequestDraft)
@@ -125,7 +125,21 @@ class LightningService {
   }> {
     try {
       let lnurl: string = ''
-      const { lud06, lud16 } = profile
+
+      // Some clients have incorrectly filled in the positions for lud06 and lud16
+      const { lud06: a, lud16: b } = profile
+      let lud16: string | undefined
+      let lud06: string | undefined
+      if (b && b.includes('@')) {
+        lud16 = b
+      } else if (a && a.includes('@')) {
+        lud16 = a
+      } else if (a && a.startsWith('lnurl')) {
+        lud06 = a
+      } else if (b && b.startsWith('lnurl')) {
+        lud06 = b
+      }
+
       if (lud16) {
         const [name, domain] = lud16.split('@')
         lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString()

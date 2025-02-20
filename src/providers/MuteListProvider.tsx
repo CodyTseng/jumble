@@ -1,3 +1,4 @@
+import { BIG_RELAY_URLS } from '@/constants'
 import { createMuteListDraftEvent } from '@/lib/draft-event'
 import { getLatestEvent } from '@/lib/event'
 import { extractPubkeysFromEventTags, isSameTag } from '@/lib/tag'
@@ -41,7 +42,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         const tags = await extractMuteTags(storedMuteListEvent)
         setTags(tags)
       }
-      const events = await client.fetchEvents(relayList?.write ?? client.getDefaultRelayUrls(), {
+      const events = await client.fetchEvents(relayList?.write ?? BIG_RELAY_URLS, {
         kinds: [kinds.Mutelist],
         authors: [accountPubkey]
       })
