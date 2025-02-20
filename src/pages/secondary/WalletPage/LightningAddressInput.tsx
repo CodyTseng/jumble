@@ -7,8 +7,10 @@ import { createProfileDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import { Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function LightningAddressInput() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const { profile, profileEvent, publish, updateProfileEvent } = useNostr()
   const [lightningAddress, setLightningAddress] = useState('')
@@ -60,11 +62,11 @@ export default function LightningAddressInput() {
 
   return (
     <div className="w-full space-y-1">
-      <Label htmlFor="ln-address">Lightning Address (or LNURL)</Label>
+      <Label htmlFor="ln-address">{t('Lightning Address (or LNURL)')}</Label>
       <div className="flex w-full items-center gap-2">
         <Input
           id="ln-address"
-          placeholder="xxx@xxx.xx"
+          placeholder="xxxxxxxx@xxx.xxx"
           value={lightningAddress}
           onChange={(e) => {
             setLightningAddress(e.target.value)
