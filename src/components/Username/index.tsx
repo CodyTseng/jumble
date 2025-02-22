@@ -21,7 +21,11 @@ export default function Username({
 }) {
   const { profile } = useFetchProfile(userId)
   if (!profile && !withoutSkeleton) {
-    return <Skeleton className={cn('w-16 my-1', skeletonClassName)} />
+    return (
+      <div className="py-1">
+        <Skeleton className={cn('w-16', skeletonClassName)} />
+      </div>
+    )
   }
   if (!profile) return null
 
