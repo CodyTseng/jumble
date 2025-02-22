@@ -87,5 +87,5 @@ export type TPrimaryPageLayoutRef = {
 }
 
 function PrimaryPageTitlebar({ children }: { children?: React.ReactNode }) {
-  return <Titlebar className="h-12 p-1">{children}</Titlebar>
+  return <Titlebar className="p-1">{children}</Titlebar>
 }

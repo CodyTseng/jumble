@@ -105,7 +105,7 @@ export function SecondaryPageTitlebar({
   hideBackButton?: boolean
 }): JSX.Element {
   return (
-    <Titlebar className="h-12 flex gap-1 p-1 items-center justify-between font-semibold">
+    <Titlebar className="flex gap-1 p-1 items-center justify-between font-semibold">
       {hideBackButton ? (
         <div className="flex gap-2 items-center pl-3 w-fit truncate text-lg font-semibold">
           {title}

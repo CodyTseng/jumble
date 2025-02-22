@@ -44,25 +44,26 @@ class IndexedDbService {
         }
 
         request.onupgradeneeded = () => {
-          this.db = request.result
-          if (!this.db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
-            this.db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
+          const db = request.result
+          if (!db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
+            db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
           }
-          if (!this.db.objectStoreNames.contains(StoreNames.RELAY_LIST_EVENTS)) {
-            this.db.createObjectStore(StoreNames.RELAY_LIST_EVENTS, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.RELAY_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.RELAY_LIST_EVENTS, { keyPath: 'key' })
           }
-          if (!this.db.objectStoreNames.contains(StoreNames.FOLLOW_LIST_EVENTS)) {
-            this.db.createObjectStore(StoreNames.FOLLOW_LIST_EVENTS, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.FOLLOW_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.FOLLOW_LIST_EVENTS, { keyPath: 'key' })
           }
-          if (!this.db.objectStoreNames.contains(StoreNames.MUTE_LIST_EVENTS)) {
-            this.db.createObjectStore(StoreNames.MUTE_LIST_EVENTS, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.MUTE_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.MUTE_LIST_EVENTS, { keyPath: 'key' })
           }
-          if (!this.db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
-            this.db.createObjectStore(StoreNames.MUTE_DECRYPTED_TAGS, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
+            db.createObjectStore(StoreNames.MUTE_DECRYPTED_TAGS, { keyPath: 'key' })
           }
-          if (!this.db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
-            this.db.createObjectStore(StoreNames.RELAY_INFO_EVENTS, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
+            db.createObjectStore(StoreNames.RELAY_INFO_EVENTS, { keyPath: 'key' })
           }
+          this.db = db
         }
       })
       setTimeout(() => this.cleanUp(), 1000 * 60) // 1 minute
@@ -97,6 +98,10 @@ class IndexedDbService {
         putRequest.onerror = (event) => {
           reject(event)
         }
+      }
+
+      getRequest.onerror = (event) => {
+        reject(event)
       }
     })
   }

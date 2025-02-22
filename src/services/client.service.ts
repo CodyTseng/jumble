@@ -51,21 +51,21 @@ class ClientService extends EventTarget {
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
     {
       cache: false,
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private fetchProfileEventFromBigRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
@@ -92,7 +92,10 @@ class ClientService extends EventTarget {
   }
 
   async init() {
-    await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
+    await indexedDb.iterateProfileEvents(async (profileEvent) => {
+      this.addUsernameToIndex(profileEvent)
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    })
   }
 
   listConnectionStatus() {
@@ -601,11 +604,11 @@ class ClientService extends EventTarget {
 
   async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
     const followings = await this.fetchFollowings(pubkey)
-    for (let i = 0; i * 50 < followings.length; i++) {
+    for (let i = 0; i * 20 < followings.length; i++) {
       if (signal.aborted) return
 
-      await this.profileEventDataloader.loadMany(followings.slice(i * 50, (i + 1) * 50))
-      await new Promise((resolve) => setTimeout(resolve, 30000))
+      await this.profileEventDataloader.loadMany(followings.slice(i * 20, (i + 1) * 20))
+      await new Promise((resolve) => setTimeout(resolve, 10000))
     }
   }
 
@@ -721,6 +724,10 @@ class ClientService extends EventTarget {
       this.addUsernameToIndex(profileFromBigRelays)
       await indexedDb.putReplaceableEvent(profileFromBigRelays)
       return profileFromBigRelays
+    }
+
+    if (!relays.length) {
+      return undefined
     }
 
     const profileEvent = await this.tryHarderToFetchEvent(
