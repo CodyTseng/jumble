@@ -26,7 +26,7 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { Link } from 'lucide-react'
+import { Link, Zap } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
@@ -121,6 +121,12 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
         <div className="pt-2">
           <div className="text-xl font-semibold">{username}</div>
           <Nip05 pubkey={pubkey} />
+          {lightningAddress && (
+            <div className="text-sm text-yellow-400 flex gap-1 items-center">
+              <Zap className="size-4" />
+              {lightningAddress}
+            </div>
+          )}
           <div className="flex gap-1 mt-1">
             <PubkeyCopy pubkey={pubkey} />
             <QrCodePopover pubkey={pubkey} />
