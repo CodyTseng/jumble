@@ -1,9 +1,11 @@
+import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
+import client from '@/services/client.service'
 import { Loader, Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ZapDialog from '../ZapDialog'
 
@@ -19,6 +21,17 @@ export default function ZapButton({ event }: { event: Event }) {
       hasZapped: pubkey ? stats.zaps?.some((zap) => zap.pubkey === pubkey) : false
     }
   }, [noteStatsMap, event, pubkey])
+  const [showButton, setShowButton] = useState(false)
+
+  useEffect(() => {
+    client.fetchProfile(event.pubkey).then((profile) => {
+      if (!profile) return
+      const lightningAddress = getLightningAddressFromProfile(profile)
+      if (lightningAddress) setShowButton(true)
+    })
+  }, [event])
+
+  if (!showButton) return null
 
   return (
     <>

@@ -42,7 +42,10 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     if (oldStats?.updatedAt) {
       since = oldStats.updatedAt
     }
-    const relayList = await client.fetchRelayList(event.pubkey)
+    const [relayList, authorProfile] = await Promise.all([
+      client.fetchRelayList(event.pubkey),
+      client.fetchProfile(event.pubkey)
+    ])
     const filters: Filter[] = [
       {
         '#e': [event.id],
@@ -53,29 +56,31 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         '#e': [event.id],
         kinds: [kinds.Repost],
         limit: 100
-      },
-      {
-        '#e': [event.id],
-        kinds: [kinds.Zap],
-        limit: 500
       }
     ]
 
+    if (authorProfile?.lightningAddress) {
+      filters.push({
+        '#e': [event.id],
+        kinds: [kinds.Zap],
+        limit: 500
+      })
+    }
+
     if (pubkey) {
-      filters.push(
-        ...[
-          {
-            '#e': [event.id],
-            authors: [pubkey],
-            kinds: [kinds.Reaction, kinds.Repost]
-          },
-          {
-            '#e': [event.id],
-            '#P': [pubkey],
-            kinds: [kinds.Zap]
-          }
-        ]
-      )
+      filters.push({
+        '#e': [event.id],
+        authors: [pubkey],
+        kinds: [kinds.Reaction, kinds.Repost]
+      })
+
+      if (authorProfile?.lightningAddress) {
+        filters.push({
+          '#e': [event.id],
+          '#P': [pubkey],
+          kinds: [kinds.Zap]
+        })
+      }
     }
 
     if (since) {

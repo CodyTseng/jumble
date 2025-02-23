@@ -479,8 +479,16 @@ class ClientService extends EventTarget {
     return await this.profileEventDataloader.load(id)
   }
 
-  async fetchProfile(id: string): Promise<TProfile | undefined> {
-    const profileEvent = await this.fetchProfileEvent(id)
+  async fetchProfile(id: string, skipCache: boolean = false): Promise<TProfile | undefined> {
+    let profileEvent: NEvent | undefined
+    if (skipCache) {
+      profileEvent = await this._fetchProfileEvent(id, skipCache)
+      if (profileEvent) {
+        this.updateProfileCache(profileEvent)
+      }
+    } else {
+      profileEvent = await this.fetchProfileEvent(id)
+    }
     if (profileEvent) {
       return getProfileFromProfileEvent(profileEvent)
     }
@@ -544,6 +552,7 @@ class ClientService extends EventTarget {
   }
 
   updateRelayListCache(event: NEvent) {
+    this.relayListEventDataLoader.clear(event.pubkey)
     this.relayListEventDataLoader.prime(event.pubkey, Promise.resolve(event))
   }
 
@@ -697,7 +706,10 @@ class ClientService extends EventTarget {
     return event
   }
 
-  private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
+  private async _fetchProfileEvent(
+    id: string,
+    skipCache: boolean = false
+  ): Promise<NEvent | undefined> {
     let pubkey: string | undefined
     let relays: string[] = []
     if (/^[0-9a-f]{64}$/.test(id)) {
@@ -718,10 +730,12 @@ class ClientService extends EventTarget {
     if (!pubkey) {
       throw new Error('Invalid id')
     }
-    const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
-    if (localProfile) {
-      this.addUsernameToIndex(localProfile)
-      return localProfile
+    if (!skipCache) {
+      const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
+      if (localProfile) {
+        this.addUsernameToIndex(localProfile)
+        return localProfile
+      }
     }
     const profileFromBigRelays = await this.fetchProfileEventFromBigRelaysDataloader.load(pubkey)
     if (profileFromBigRelays) {
