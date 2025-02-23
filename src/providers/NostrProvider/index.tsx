@@ -378,15 +378,16 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }: { additionalRelayUrls?: string[]; specifiedRelayUrls?: string[] } = {}
   ) => {
     const event = await signEvent(draftEvent)
-    await client.publishEvent(
-      specifiedRelayUrls?.length
-        ? specifiedRelayUrls
-        : (relayList?.write ?? [])
-            .concat(additionalRelayUrls ?? [])
-            .concat(client.getCurrentRelayUrls())
-            .concat(BIG_RELAY_URLS),
-      event
-    )
+    const relays = specifiedRelayUrls?.length
+      ? specifiedRelayUrls
+      : (relayList?.write.slice(0, 5) ?? [])
+          .concat(additionalRelayUrls ?? [])
+          .concat(client.getCurrentRelayUrls())
+    if (!relays.length) {
+      relays.push(...BIG_RELAY_URLS)
+    }
+
+    await client.publishEvent(relays, event)
     return event
   }
 

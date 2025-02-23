@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
+import { getRootEventTag } from '@/lib/event.ts'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
-import { Event, kinds } from 'nostr-tools'
+import { Event, kinds, nip19 } from 'nostr-tools'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextareaWithMentions from '../TextareaWithMentions.tsx'
@@ -46,9 +47,35 @@ export default function NormalPostContent({
       setPosting(true)
       try {
         const additionalRelayUrls: string[] = []
-        if (parentEvent) {
+        if (parentEvent && !specifiedRelayUrls) {
           const relayList = await client.fetchRelayList(parentEvent.pubkey)
-          additionalRelayUrls.push(...relayList.read.slice(0, 5))
+          additionalRelayUrls.push(...relayList.read.slice(0, 3))
+          const rootEventTag = getRootEventTag(parentEvent)
+          if (rootEventTag) {
+            const [, rootEventId, rootEventRelay, , rootAuthor] = rootEventTag
+            if (rootAuthor) {
+              if (rootAuthor !== parentEvent.pubkey) {
+                const rootAuthorRelayList = await client.fetchRelayList(rootAuthor)
+                additionalRelayUrls.push(...rootAuthorRelayList.read.slice(0, 3))
+              }
+            } else {
+              try {
+                const rootEvent = await client.fetchEvent(
+                  nip19.neventEncode(
+                    rootEventRelay
+                      ? { id: rootEventId }
+                      : { id: rootEventId, relays: [rootEventRelay] }
+                  )
+                )
+                if (rootEvent && rootEvent.pubkey !== parentEvent.pubkey) {
+                  const rootAuthorRelayList = await client.fetchRelayList(rootEvent.pubkey)
+                  additionalRelayUrls.push(...rootAuthorRelayList.read.slice(0, 3))
+                }
+              } catch {
+                // ignore
+              }
+            }
+          }
         }
         const draftEvent =
           parentEvent && parentEvent.kind !== kinds.ShortTextNote

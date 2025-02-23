@@ -111,8 +111,9 @@ class ClientService extends EventTarget {
   }
 
   async publishEvent(relayUrls: string[], event: NEvent) {
+    const uniqueRelayUrls = Array.from(new Set(relayUrls))
     const result = await Promise.any(
-      relayUrls.map(async (url) => {
+      uniqueRelayUrls.map(async (url) => {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this
         const relay = await this.pool.ensureRelay(url)
