@@ -552,6 +552,7 @@ class ClientService extends EventTarget {
   }
 
   updateRelayListCache(event: NEvent) {
+    this.relayListEventDataLoader.clear(event.pubkey)
     this.relayListEventDataLoader.prime(event.pubkey, Promise.resolve(event))
   }
 
