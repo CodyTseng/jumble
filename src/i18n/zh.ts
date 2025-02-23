@@ -191,6 +191,8 @@ export default {
     zapComment: '附言',
     'Default zap amount': '默认打闪金额',
     'Default zap comment': '默认打闪附言',
-    'Lightning Address (or LNURL)': '闪电地址 (或 LNURL)'
+    'Lightning Address (or LNURL)': '闪电地址 (或 LNURL)',
+    'Quick zap': '快速打闪',
+    'If enabled, you can zap with a single click': '启用后，您可以单击打闪'
   }
 }

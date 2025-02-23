@@ -50,6 +50,7 @@ class LocalStorageService {
   private noteListMode: TNoteListMode = 'posts'
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
+  private quickZap: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -113,6 +114,7 @@ class LocalStorageService {
       }
     }
     this.defaultZapComment = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_COMMENT) ?? 'Zap!'
+    this.quickZap = window.localStorage.getItem(StorageKey.QUICK_ZAP) === 'true'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -237,6 +239,15 @@ class LocalStorageService {
   setDefaultZapComment(comment: string) {
     this.defaultZapComment = comment
     window.localStorage.setItem(StorageKey.DEFAULT_ZAP_COMMENT, comment)
+  }
+
+  getQuickZap() {
+    return this.quickZap
+  }
+
+  setQuickZap(quickZap: boolean) {
+    this.quickZap = quickZap
+    window.localStorage.setItem(StorageKey.QUICK_ZAP, quickZap.toString())
   }
 }
 

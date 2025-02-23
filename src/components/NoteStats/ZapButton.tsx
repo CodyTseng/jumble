@@ -1,18 +1,24 @@
+import { useToast } from '@/hooks'
 import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
+import { useZap } from '@/providers/ZapProvider'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import { Loader, Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { MouseEvent, TouchEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ZapDialog from '../ZapDialog'
 
 export default function ZapButton({ event }: { event: Event }) {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const { checkLogin, pubkey } = useNostr()
-  const { noteStatsMap } = useNoteStats()
+  const { noteStatsMap, addZap } = useNoteStats()
+  const { defaultZapSats, defaultZapComment, quickZap } = useZap()
+  const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
   const { zapAmount, hasZapped } = useMemo(() => {
     const stats = noteStatsMap.get(event.id) || {}
@@ -22,6 +28,8 @@ export default function ZapButton({ event }: { event: Event }) {
     }
   }, [noteStatsMap, event, pubkey])
   const [showButton, setShowButton] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isLongPressRef = useRef(false)
 
   useEffect(() => {
     client.fetchProfile(event.pubkey).then((profile) => {
@@ -33,15 +41,81 @@ export default function ZapButton({ event }: { event: Event }) {
 
   if (!showButton) return null
 
+  const handleZap = async () => {
+    try {
+      setZapping(true)
+      const { invoice } = await lightning.zap(
+        event.pubkey,
+        defaultZapSats,
+        defaultZapComment,
+        event.id,
+        pubkey
+      )
+      addZap(event.id, invoice, defaultZapSats, defaultZapComment)
+    } catch (error) {
+      toast({
+        title: t('Zap failed'),
+        description: (error as Error).message,
+        variant: 'destructive'
+      })
+    } finally {
+      setZapping(false)
+    }
+  }
+
+  const handleClickStart = (e: MouseEvent | TouchEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    isLongPressRef.current = false
+
+    if (quickZap) {
+      timerRef.current = setTimeout(() => {
+        isLongPressRef.current = true
+        checkLogin(() => {
+          setOpenZapDialog(true)
+          setZapping(true)
+        })
+      }, 500)
+    }
+  }
+
+  const handleClickEnd = (e: MouseEvent | TouchEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+
+    if (!quickZap) {
+      checkLogin(() => {
+        setOpenZapDialog(true)
+        setZapping(true)
+      })
+    } else if (!isLongPressRef.current) {
+      checkLogin(() => handleZap())
+    }
+    isLongPressRef.current = false
+  }
+
+  const handleMouseLeave = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+  }
+
   return (
     <>
       <button
         className={cn(
-          'flex items-center enabled:hover:text-yellow-400 gap-1',
+          'flex items-center enabled:hover:text-yellow-400 gap-1 select-none',
           hasZapped ? 'text-yellow-400' : 'text-muted-foreground'
         )}
-        onClick={() => checkLogin(() => setZapping(true))}
         title={t('Zap')}
+        onMouseDown={handleClickStart}
+        onMouseUp={handleClickEnd}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleClickStart}
+        onTouchEnd={handleClickEnd}
       >
         {zapping ? (
           <Loader className="animate-spin" size={16} />
@@ -50,7 +124,15 @@ export default function ZapButton({ event }: { event: Event }) {
         )}
         {!!zapAmount && <div className="text-sm">{formatAmount(zapAmount)}</div>}
       </button>
-      <ZapDialog open={zapping} setOpen={setZapping} pubkey={event.pubkey} eventId={event.id} />
+      <ZapDialog
+        open={openZapDialog}
+        setOpen={(open) => {
+          setOpenZapDialog(open)
+          setZapping(open)
+        }}
+        pubkey={event.pubkey}
+        eventId={event.id}
+      />
     </>
   )
 }
