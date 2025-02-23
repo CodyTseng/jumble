@@ -539,8 +539,12 @@ class ClientService extends EventTarget {
     return followListEvent ? extractPubkeysFromEventTags(followListEvent.tags) : []
   }
 
-  updateFollowListCache(pubkey: string, event: NEvent) {
-    this.followListCache.set(pubkey, Promise.resolve(event))
+  updateFollowListCache(event: NEvent) {
+    this.followListCache.set(event.pubkey, Promise.resolve(event))
+  }
+
+  updateRelayListCache(event: NEvent) {
+    this.relayListEventDataLoader.prime(event.pubkey, Promise.resolve(event))
   }
 
   async calculateOptimalReadRelays(pubkey: string) {
