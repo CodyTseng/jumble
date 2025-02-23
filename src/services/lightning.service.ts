@@ -1,3 +1,5 @@
+import { BIG_RELAY_URLS } from '@/constants'
+import { extractZapInfoFromReceipt } from '@/lib/event'
 import { TProfile } from '@/types'
 import {
   init,
@@ -8,6 +10,9 @@ import {
 import { Invoice } from '@getalby/lightning-tools'
 import { bech32 } from '@scure/base'
 import { WebLNProvider } from '@webbtc/webln-types'
+import dayjs from 'dayjs'
+import { Filter, kinds } from 'nostr-tools'
+import { SubCloser } from 'nostr-tools/abstract-pool'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
 import client from './client.service'
@@ -34,11 +39,11 @@ class LightningService {
   }
 
   async zap(
+    sender: string,
     receipt: string,
     sats: number,
     comment: string,
     eventId?: string,
-    sender?: string | null,
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string }> {
     if (!client.signer) {
@@ -48,7 +53,9 @@ class LightningService {
     const [profile, receiptRelayList, senderRelayList] = await Promise.all([
       client.fetchProfile(receipt, true),
       client.fetchRelayList(receipt),
-      sender ? client.fetchRelayList(sender) : Promise.resolve({ read: [], write: [] })
+      sender
+        ? client.fetchRelayList(sender)
+        : Promise.resolve({ read: BIG_RELAY_URLS, write: BIG_RELAY_URLS })
     ])
     if (!profile) {
       throw new Error('Recipient not found')
@@ -66,7 +73,7 @@ class LightningService {
       relays: receiptRelayList.read
         .slice(0, 3)
         .concat(senderRelayList.write.slice(0, 3))
-        .concat(client.getCurrentRelayUrls().slice(0, 2)),
+        .concat(BIG_RELAY_URLS),
       comment
     })
     const zapRequest = await client.signer(zapRequestDraft)
@@ -90,31 +97,53 @@ class LightningService {
 
     return new Promise((resolve) => {
       closeOuterModel?.()
+      let checkPaymentInterval: ReturnType<typeof setInterval> | undefined
+      let subCloser: SubCloser | undefined
       const { setPaid } = launchPaymentModal({
         invoice: pr,
         onPaid: (response) => {
           clearInterval(checkPaymentInterval)
+          subCloser?.close()
           resolve({ preimage: response.preimage, invoice: pr })
         },
         onCancelled: () => {
           clearInterval(checkPaymentInterval)
+          subCloser?.close()
         }
       })
 
-      const checkPaymentInterval = setInterval(async () => {
-        const invoice = new Invoice({ pr, verify })
-        const paid = await invoice.verifyPayment()
+      if (verify) {
+        checkPaymentInterval = setInterval(async () => {
+          const invoice = new Invoice({ pr, verify })
+          const paid = await invoice.verifyPayment()
 
-        if (paid && invoice.preimage) {
-          setPaid({
-            preimage: invoice.preimage
-          })
+          if (paid && invoice.preimage) {
+            setPaid({
+              preimage: invoice.preimage
+            })
+          }
+        }, 1000)
+      } else {
+        const filter: Filter = {
+          kinds: [kinds.Zap],
+          '#P': [sender],
+          since: dayjs().subtract(1, 'minute').unix()
         }
-      }, 1000)
+        if (eventId) {
+          filter['#e'] = [eventId]
+        }
+        subCloser = client.subscribe(
+          senderRelayList.write.concat(BIG_RELAY_URLS).slice(0, 4),
+          filter,
+          (evt) => {
+            const info = extractZapInfoFromReceipt(evt)
+            if (!info) return
 
-      // TODO:
-      if (!verify) {
-        setPaid({ preimage: '' })
+            if (info.invoice === pr) {
+              setPaid({ preimage: info.preimage ?? '' })
+            }
+          }
+        )
       }
     })
   }

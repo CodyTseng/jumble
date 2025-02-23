@@ -43,13 +43,16 @@ export default function ZapButton({ event }: { event: Event }) {
 
   const handleZap = async () => {
     try {
+      if (!pubkey) {
+        throw new Error('You need to be logged in to zap')
+      }
       setZapping(true)
       const { invoice } = await lightning.zap(
+        pubkey,
         event.pubkey,
         defaultZapSats,
         defaultZapComment,
-        event.id,
-        pubkey
+        event.id
       )
       addZap(event.id, invoice, defaultZapSats, defaultZapComment)
     } catch (error) {

@@ -326,6 +326,8 @@ export function extractEmbeddedNotesFromContent(content: string) {
 }
 
 export function extractZapInfoFromReceipt(receiptEvent: Event) {
+  if (receiptEvent.kind !== kinds.Zap) return null
+
   let senderPubkey: string | undefined
   let recipientPubkey: string | undefined
   let eventId: string | undefined
@@ -333,6 +335,7 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
   let amount: number | undefined
   let comment: string | undefined
   let description: string | undefined
+  let preimage: string | undefined
   try {
     receiptEvent.tags.forEach(([tagName, tagValue]) => {
       switch (tagName) {
@@ -351,6 +354,9 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
         case 'description':
           description = tagValue
           break
+        case 'preimage':
+          preimage = tagValue
+          break
       }
     })
     if (!recipientPubkey || !invoice) return null
@@ -366,7 +372,8 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
       eventId,
       invoice,
       amount,
-      comment
+      comment,
+      preimage
     }
   } catch {
     return null
