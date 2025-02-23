@@ -4,7 +4,7 @@ import Note from '@/components/Note'
 import PictureNote from '@/components/PictureNote'
 import ReplyNoteList from '@/components/ReplyNoteList'
 import UserAvatar from '@/components/UserAvatar'
-import Username from '@/components/Username'
+import { SimpleUsername } from '@/components/Username'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -74,21 +74,50 @@ NotePage.displayName = 'NotePage'
 export default NotePage
 
 function ParentNote({ eventId }: { eventId?: string }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { event } = useFetchEvent(eventId)
-  if (!event) return null
+  const { event, isFetching } = useFetchEvent(eventId)
+  if (!eventId) return null
+
+  if (isFetching) {
+    return (
+      <div>
+        <Card
+          className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => push(toNote(eventId))}
+        >
+          <Skeleton className="shrink w-4 h-4 rounded-full" />
+          <div className="py-1 flex-1">
+            <Skeleton className="h-3" />
+          </div>
+        </Card>
+        <div className="ml-5 w-px h-2 bg-border" />
+      </div>
+    )
+  }
+
+  if (!event) {
+    return (
+      <div>
+        <Card className="flex p-1 items-center justify-center text-sm text-muted-foreground">
+          {t('Not found')}
+        </Card>
+        <div className="ml-5 w-px h-2 bg-border" />
+      </div>
+    )
+  }
 
   return (
     <div>
       <Card
         className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-        onClick={() => push(toNote(event))}
+        onClick={() => push(toNote(eventId))}
       >
         <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
-        <Username
+        <SimpleUsername
           userId={event.pubkey}
-          className="font-semibold"
-          skeletonClassName="h-4 shrink-0"
+          className="font-semibold truncate shrink-0"
+          skeletonClassName="h-3 shrink-0"
         />
         <div className="truncate">{event.content}</div>
       </Card>
