@@ -63,8 +63,11 @@ function ZapDialogContent({
 
   const handleZap = async () => {
     try {
+      if (!pubkey) {
+        throw new Error('You need to be logged in to zap')
+      }
       setZapping(true)
-      const { invoice } = await lightning.zap(receipt, sats, comment, eventId, pubkey, () =>
+      const { invoice } = await lightning.zap(pubkey, receipt, sats, comment, eventId, () =>
         setOpen(false)
       )
       if (eventId) {

@@ -347,6 +347,13 @@ class ClientService extends EventTarget {
     }
   }
 
+  subscribe(urls: string[], filter: Filter | Filter[], onEvent: (evt: NEvent) => void) {
+    const filters = Array.isArray(filter) ? filter : [filter]
+    return this.pool.subscribeMany(urls, filters, {
+      onevent: onEvent
+    })
+  }
+
   private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {
     const filters = Array.isArray(filter) ? filter : [filter]
     const _knownIds = new Set<string>()
