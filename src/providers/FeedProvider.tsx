@@ -7,7 +7,6 @@ import relayInfoService from '@/services/relay-info.service'
 import { TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { useFollowList } from './FollowListProvider'
 import { useNostr } from './NostrProvider'
 import { useRelaySets } from './RelaySetsProvider'
 
@@ -36,8 +35,7 @@ export const useFeed = () => {
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
   const isFirstRenderRef = useRef(true)
-  const { pubkey, getRelayList } = useNostr()
-  const { getFollowings } = useFollowList()
+  const { pubkey } = useNostr()
   const { relaySets } = useRelaySets()
   const feedTypeRef = useRef<TFeedType>(storage.getFeedType())
   const [feedType, setFeedType] = useState<TFeedType>(feedTypeRef.current)
@@ -120,8 +118,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setFeedType(feedType)
       setActiveRelaySetId(null)
       const [relayList, followings] = await Promise.all([
-        getRelayList(options.pubkey),
-        getFollowings(options.pubkey)
+        client.fetchRelayList(options.pubkey),
+        client.fetchFollowings(options.pubkey)
       ])
       setRelayUrls(relayList.read.concat(BIG_RELAY_URLS).slice(0, 4))
       setFilter({

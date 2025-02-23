@@ -29,9 +29,10 @@ export default function LikeButton({ event }: { event: Event }) {
       const timer = setTimeout(() => setLiking(false), 5000)
 
       try {
-        const hasLiked = noteStatsMap.get(event.id)?.likes?.has(pubkey)
+        const noteStats = noteStatsMap.get(event.id)
+        const hasLiked = noteStats?.likes?.has(pubkey)
         if (hasLiked) return
-        if (hasLiked === undefined) {
+        if (!noteStats?.updatedAt) {
           const stats = await fetchNoteStats(event)
           if (stats?.likes?.has(pubkey)) return
         }

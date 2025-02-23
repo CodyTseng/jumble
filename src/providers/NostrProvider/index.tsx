@@ -1,11 +1,14 @@
 import LoginDialog from '@/components/LoginDialog'
 import { BIG_RELAY_URLS } from '@/constants'
 import { useToast } from '@/hooks'
-import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
-import { formatPubkey } from '@/lib/pubkey'
+import {
+  getLatestEvent,
+  getProfileFromProfileEvent,
+  getRelayListFromRelayListEvent
+} from '@/lib/event'
 import client from '@/services/client.service'
-import storage from '@/services/local-storage.service'
 import indexedDb from '@/services/indexed-db.service'
+import storage from '@/services/local-storage.service'
 import { ISigner, TAccount, TAccountPointer, TDraftEvent, TProfile, TRelayList } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds, VerifiedEvent } from 'nostr-tools'
@@ -22,6 +25,8 @@ type TNostrContext = {
   profile: TProfile | null
   profileEvent: Event | null
   relayList: TRelayList | null
+  followListEvent?: Event
+  muteListEvent?: Event
   account: TAccountPointer | null
   accounts: TAccountPointer[]
   nsec: string | null
@@ -45,9 +50,10 @@ type TNostrContext = {
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   startLogin: () => void
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
-  getRelayList: (pubkey: string) => Promise<TRelayList>
   updateRelayListEvent: (relayListEvent: Event) => Promise<void>
   updateProfileEvent: (profileEvent: Event) => Promise<void>
+  updateFollowListEvent: (followListEvent: Event) => Promise<void>
+  updateMuteListEvent: (muteListEvent: Event, tags: string[][]) => Promise<void>
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -71,6 +77,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<TProfile | null>(null)
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
+  const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
+  const [muteListEvent, setMuteListEvent] = useState<Event | undefined>(undefined)
 
   useEffect(() => {
     const init = async () => {
@@ -122,10 +130,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       } else {
         setNcryptsec(null)
       }
-      const [storedRelayListEvent, storedProfileEvent] = await Promise.all([
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata)
-      ])
+      const [storedRelayListEvent, storedProfileEvent, storedFollowListEvent, storedMuteListEvent] =
+        await Promise.all([
+          indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
+          indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
+          indexedDb.getReplaceableEvent(account.pubkey, kinds.Contacts),
+          indexedDb.getReplaceableEvent(account.pubkey, kinds.Mutelist)
+        ])
       if (storedRelayListEvent) {
         setRelayList(
           storedRelayListEvent ? getRelayListFromRelayListEvent(storedRelayListEvent) : null
@@ -135,35 +146,47 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         setProfileEvent(storedProfileEvent)
         setProfile(getProfileFromProfileEvent(storedProfileEvent))
       }
+      if (storedFollowListEvent) {
+        setFollowListEvent(storedFollowListEvent)
+      }
+      if (storedMuteListEvent) {
+        setMuteListEvent(storedMuteListEvent)
+      }
 
-      client.fetchRelayListEvent(account.pubkey).then(async (relayListEvent) => {
-        if (!relayListEvent) {
-          if (storedRelayListEvent) return
-
-          setRelayList({ write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] })
-          return
-        }
-        const event = await indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList)
-        if (event) {
-          setRelayList(getRelayListFromRelayListEvent(event))
-        }
+      const relayListEvents = await client.fetchEvents(BIG_RELAY_URLS, {
+        kinds: [kinds.RelayList],
+        authors: [account.pubkey]
       })
-      client.fetchProfileEvent(account.pubkey).then(async (profileEvent) => {
-        if (!profileEvent) {
-          if (storedProfileEvent) return
+      const relayListEvent = getLatestEvent(relayListEvents) ?? storedRelayListEvent
+      const relayList = getRelayListFromRelayListEvent(relayListEvent)
+      if (relayListEvent) {
+        client.updateRelayListCache(relayListEvent)
+        await indexedDb.putReplaceableEvent(relayListEvent)
+      }
+      setRelayList(relayList)
 
-          setProfile({
-            pubkey: account.pubkey,
-            username: formatPubkey(account.pubkey)
-          })
-          return
-        }
-        const event = await indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata)
-        if (event) {
-          setProfileEvent(event)
-          setProfile(getProfileFromProfileEvent(event))
-        }
+      const events = await client.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 4), {
+        kinds: [kinds.Metadata, kinds.Contacts, kinds.Mutelist],
+        authors: [account.pubkey]
       })
+      const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
+      const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
+      const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
+      const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
+      if (profileEvent) {
+        setProfileEvent(profileEvent)
+        setProfile(getProfileFromProfileEvent(profileEvent))
+        await indexedDb.putReplaceableEvent(profileEvent)
+      }
+      if (followListEvent) {
+        setFollowListEvent(followListEvent)
+        await indexedDb.putReplaceableEvent(followListEvent)
+      }
+      if (muteListEvent) {
+        setMuteListEvent(muteListEvent)
+        await indexedDb.putReplaceableEvent(muteListEvent)
+      }
+
       client.initUserIndexFromFollowings(account.pubkey, controller.signal)
       return controller
     }
@@ -395,14 +418,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return setOpenLoginDialog(true)
   }
 
-  const getRelayList = async (pubkey: string) => {
-    const storedRelayListEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.RelayList)
-    if (storedRelayListEvent) {
-      return getRelayListFromRelayListEvent(storedRelayListEvent)
-    }
-    return await client.fetchRelayList(pubkey)
-  }
-
   const updateRelayListEvent = async (relayListEvent: Event) => {
     const newRelayList = await indexedDb.putReplaceableEvent(relayListEvent)
     setRelayList(getRelayListFromRelayListEvent(newRelayList))
@@ -415,6 +430,22 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     client.updateProfileCache(newProfileEvent)
   }
 
+  const updateFollowListEvent = async (followListEvent: Event) => {
+    const newFollowListEvent = await indexedDb.putReplaceableEvent(followListEvent)
+    if (newFollowListEvent.id !== followListEvent.id) return
+
+    setFollowListEvent(newFollowListEvent)
+    client.updateFollowListCache(newFollowListEvent)
+  }
+
+  const updateMuteListEvent = async (muteListEvent: Event, tags: string[][]) => {
+    const newMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
+    if (newMuteListEvent.id !== muteListEvent.id) return
+
+    await indexedDb.putMuteDecryptedTags(muteListEvent.id, tags)
+    setMuteListEvent(muteListEvent)
+  }
+
   return (
     <NostrContext.Provider
       value={{
@@ -422,6 +453,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         profile,
         profileEvent,
         relayList,
+        followListEvent,
+        muteListEvent,
         account,
         accounts: storage
           .getAccounts()
@@ -441,9 +474,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         startLogin: () => setOpenLoginDialog(true),
         checkLogin,
         signEvent,
-        getRelayList,
         updateRelayListEvent,
-        updateProfileEvent
+        updateProfileEvent,
+        updateFollowListEvent,
+        updateMuteListEvent
       }}
     >
       {children}

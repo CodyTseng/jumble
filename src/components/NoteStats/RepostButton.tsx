@@ -41,9 +41,10 @@ export default function RepostButton({ event }: { event: Event }) {
       const timer = setTimeout(() => setReposting(false), 5000)
 
       try {
-        const hasReposted = noteStatsMap.get(event.id)?.reposts?.has(pubkey)
+        const noteStats = noteStatsMap.get(event.id)
+        const hasReposted = noteStats?.reposts?.has(pubkey)
         if (hasReposted) return
-        if (hasReposted === undefined) {
+        if (!noteStats?.updatedAt) {
           const stats = await fetchNoteStats(event)
           if (stats?.reposts?.has(pubkey)) return
         }
