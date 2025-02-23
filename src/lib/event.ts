@@ -1,11 +1,14 @@
 import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
 import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
+import { LRUCache } from 'lru-cache'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey } from './pubkey'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
+
+const EVENT_EMBEDDED_EVENT_IDS_CACHE = new LRUCache<string, string[]>({ max: 10000 })
 
 export function isNsfwEvent(event: Event) {
   return event.tags.some(
@@ -17,21 +20,15 @@ export function isNsfwEvent(event: Event) {
 export function isReplyNoteEvent(event: Event) {
   if (event.kind !== kinds.ShortTextNote) return false
 
-  let hasETag = false
-  let hasMentionMarker = false
-  for (const [tagName, , , marker] of event.tags) {
-    if (tagName !== 'e') continue
-    hasETag = true
+  const mentionsEventIds: string[] = []
+  for (const [tagName, eventId, , marker] of event.tags) {
+    if (tagName !== 'e' || !eventId) continue
 
-    if (!marker) continue
-    if (marker === 'mention') {
-      hasMentionMarker = true
-      continue
-    }
-
+    mentionsEventIds.push(eventId)
     if (['root', 'reply'].includes(marker)) return true
   }
-  return hasETag && !hasMentionMarker
+  const embeddedEventIds = extractEmbeddedEventIds(event)
+  return mentionsEventIds.some((id) => !embeddedEventIds.includes(id))
 }
 
 export function isCommentEvent(event: Event) {
@@ -51,8 +48,14 @@ export function isSupportedKind(kind: number) {
 }
 
 export function getParentEventId(event?: Event) {
-  if (!event || !isReplyNoteEvent(event)) return undefined
-  const tag = event.tags.find(isReplyETag) ?? event.tags.find(tagNameEquals('e'))
+  if (!event) return undefined
+  let tag = event.tags.find(isReplyETag)
+  if (!tag) {
+    const embeddedEventIds = extractEmbeddedEventIds(event)
+    tag = event.tags.findLast(
+      ([tagName, tagValue]) => tagName === 'e' && !embeddedEventIds.includes(tagValue)
+    )
+  }
   if (!tag) return undefined
 
   try {
@@ -64,8 +67,14 @@ export function getParentEventId(event?: Event) {
 }
 
 export function getRootEventId(event?: Event) {
-  if (!event || !isReplyNoteEvent(event)) return undefined
-  const tag = event.tags.find(isRootETag)
+  if (!event) return undefined
+  let tag = event.tags.find(isRootETag)
+  if (!tag) {
+    const embeddedEventIds = extractEmbeddedEventIds(event)
+    tag = event.tags.find(
+      ([tagName, tagValue]) => tagName === 'e' && !embeddedEventIds.includes(tagValue)
+    )
+  }
   if (!tag) return undefined
 
   try {
@@ -362,6 +371,24 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
   } catch {
     return null
   }
+}
+
+export function extractEmbeddedEventIds(event: Event) {
+  const cache = EVENT_EMBEDDED_EVENT_IDS_CACHE.get(event.id)
+  if (cache) return cache
+
+  const embeddedEventIds: string[] = []
+  const embeddedNoteRegex = /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
+  ;(event.content.match(embeddedNoteRegex) || []).forEach((note) => {
+    const { type, data } = nip19.decode(note.split(':')[1])
+    if (type === 'nevent') {
+      embeddedEventIds.push(data.id)
+    } else if (type === 'note') {
+      embeddedEventIds.push(data)
+    }
+  })
+  EVENT_EMBEDDED_EVENT_IDS_CACHE.set(event.id, embeddedEventIds)
+  return embeddedEventIds
 }
 
 export function getLatestEvent(events: Event[]) {
