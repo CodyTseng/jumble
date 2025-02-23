@@ -6,6 +6,8 @@ type TZapContext = {
   updateDefaultSats: (sats: number) => void
   defaultZapComment: string
   updateDefaultComment: (comment: string) => void
+  quickZap: boolean
+  updateQuickZap: (quickZap: boolean) => void
 }
 
 const ZapContext = createContext<TZapContext | undefined>(undefined)
@@ -21,6 +23,7 @@ export const useZap = () => {
 export function ZapProvider({ children }: { children: React.ReactNode }) {
   const [defaultZapSats, setDefaultZapSats] = useState<number>(storage.getDefaultZapSats())
   const [defaultZapComment, setDefaultZapComment] = useState<string>(storage.getDefaultZapComment())
+  const [quickZap, setQuickZap] = useState<boolean>(storage.getQuickZap())
 
   const updateDefaultSats = (sats: number) => {
     storage.setDefaultZapSats(sats)
@@ -32,9 +35,21 @@ export function ZapProvider({ children }: { children: React.ReactNode }) {
     setDefaultZapComment(comment)
   }
 
+  const updateQuickZap = (quickZap: boolean) => {
+    storage.setQuickZap(quickZap)
+    setQuickZap(quickZap)
+  }
+
   return (
     <ZapContext.Provider
-      value={{ defaultZapSats, updateDefaultSats, defaultZapComment, updateDefaultComment }}
+      value={{
+        defaultZapSats,
+        updateDefaultSats,
+        defaultZapComment,
+        updateDefaultComment,
+        quickZap,
+        updateQuickZap
+      }}
     >
       {children}
     </ZapContext.Provider>

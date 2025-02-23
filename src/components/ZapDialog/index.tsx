@@ -44,13 +44,11 @@ export default function ZapDialog({
 
 function ZapDialogContent({
   setOpen,
-  setZapped,
   receipt,
   eventId
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setZapped?: Dispatch<SetStateAction<boolean>>
   receipt: string
   eventId?: string
 }) {
@@ -69,7 +67,6 @@ function ZapDialogContent({
       const { invoice } = await lightning.zap(receipt, sats, comment, eventId, pubkey, () =>
         setOpen(false)
       )
-      setZapped?.(true)
       if (eventId) {
         addZap(eventId, invoice, sats, comment)
       }

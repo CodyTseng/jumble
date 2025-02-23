@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { Event } from 'nostr-tools'
 import { useEffect } from 'react'
@@ -28,7 +29,7 @@ export default function NoteStats({
   }, [event, fetchIfNotExisting])
 
   return (
-    <div className={className}>
+    <div className={cn('select-none', className)}>
       <TopZaps event={event} />
       <div className="flex justify-between">
         <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
