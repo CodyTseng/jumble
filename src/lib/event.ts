@@ -66,7 +66,7 @@ export function getParentEventId(event?: Event) {
   }
 }
 
-export function getRootEventId(event?: Event) {
+export function getRootEventTag(event?: Event) {
   if (!event) return undefined
   let tag = event.tags.find(isRootETag)
   if (!tag) {
@@ -75,6 +75,11 @@ export function getRootEventId(event?: Event) {
       ([tagName, tagValue]) => tagName === 'e' && !embeddedEventIds.includes(tagValue)
     )
   }
+  return tag
+}
+
+export function getRootEventId(event?: Event) {
+  const tag = getRootEventTag(event)
   if (!tag) return undefined
 
   try {
