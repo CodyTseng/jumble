@@ -46,7 +46,7 @@ class LightningService {
     }
 
     const [profile, receiptRelayList, senderRelayList] = await Promise.all([
-      client.fetchProfile(receipt),
+      client.fetchProfile(receipt, true),
       client.fetchRelayList(receipt),
       sender ? client.fetchRelayList(sender) : Promise.resolve({ read: [], write: [] })
     ])
