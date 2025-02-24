@@ -3,7 +3,11 @@ import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { embedded, embeddedNostrNpubRenderer, embeddedNostrProfileRenderer } from '../Embedded'
+import {
+  embedded,
+  embeddedNostrNpubTextRenderer,
+  embeddedNostrProfileTextRenderer
+} from '../Embedded'
 
 export default function ContentPreview({
   event,
@@ -26,7 +30,10 @@ export default function ContentPreview({
     if (embeddedNotes.length) {
       contents.push(`[${t('note')}]`)
     }
-    return embedded(contents.join(' '), [embeddedNostrProfileRenderer, embeddedNostrNpubRenderer])
+    return embedded(contents.join(' '), [
+      embeddedNostrProfileTextRenderer,
+      embeddedNostrNpubTextRenderer
+    ])
   }, [event])
   if (!event) return null
 
