@@ -8,7 +8,7 @@ export default function BottomNavigationBar() {
   return (
     <div
       className={cn(
-        'fixed bottom-0 w-full z-20 bg-background/80 backdrop-blur-xl flex items-center justify-around [&_svg]:size-4 [&_svg]:shrink-0'
+        'fixed bottom-0 w-full z-40 bg-background/80 backdrop-blur-xl flex items-center justify-around [&_svg]:size-4 [&_svg]:shrink-0'
       )}
       style={{
         height: 'calc(3rem + env(safe-area-inset-bottom))',
