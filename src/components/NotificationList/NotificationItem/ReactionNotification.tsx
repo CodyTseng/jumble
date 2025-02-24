@@ -6,9 +6,9 @@ import { useSecondaryPage } from '@/PageManager'
 import { Heart, ThumbsUp } from 'lucide-react'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { useMemo } from 'react'
+import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
-import { ContentPreview } from './ContentPreview'
 
 export function ReactionNotification({ notification }: { notification: Event }) {
   const { push } = useSecondaryPage()
@@ -35,7 +35,7 @@ export function ReactionNotification({ notification }: { notification: Event }) 
         <UserAvatar userId={notification.pubkey} size="small" />
         <Heart size={24} className="text-red-400" />
         <div>{notification.content === '+' ? <ThumbsUp size={14} /> : notification.content}</div>
-        <ContentPreview event={event} />
+        <ContentPreview className="truncate flex-1 w-0" event={event} />
       </div>
       <div className="text-muted-foreground">
         <FormattedTimestamp timestamp={notification.created_at} short />

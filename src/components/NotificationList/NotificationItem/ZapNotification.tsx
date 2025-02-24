@@ -8,9 +8,9 @@ import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
-import { ContentPreview } from './ContentPreview'
 
 export function ZapNotification({ notification }: { notification: Event }) {
   const { t } = useTranslation()
@@ -36,7 +36,7 @@ export function ZapNotification({ notification }: { notification: Event }) {
           {formatAmount(amount)} {t('sats')}
         </div>
         {comment && <div className="text-yellow-400 truncate">{comment}</div>}
-        <ContentPreview event={event} />
+        <ContentPreview className="truncate flex-1 w-0" event={event} />
       </div>
       <div className="text-muted-foreground shrink-0">
         <FormattedTimestamp timestamp={notification.created_at} short />

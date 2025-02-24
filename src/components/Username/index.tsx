@@ -64,7 +64,13 @@ export function SimpleUsername({
   skeletonClassName?: string
 }) {
   const { profile } = useFetchProfile(userId)
-  if (!profile) return <Skeleton className={cn('w-16 my-1', skeletonClassName)} />
+  if (!profile) {
+    return (
+      <div className="py-1">
+        <Skeleton className={cn('w-16', skeletonClassName)} />
+      </div>
+    )
+  }
 
   const { username } = profile
 

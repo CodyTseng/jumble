@@ -1,5 +1,6 @@
 import { useSecondaryPage } from '@/PageManager'
-import { getUsingClient } from '@/lib/event'
+import { useFetchEvent } from '@/hooks'
+import { getParentEventId, getUsingClient } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -12,21 +13,27 @@ import Username from '../Username'
 
 export default function Note({
   event,
-  parentEvent,
   size = 'normal',
   className,
+  hideParentNotePreview = false,
   hideStats = false,
   fetchNoteStats = false
 }: {
   event: Event
-  parentEvent?: Event
   size?: 'normal' | 'small'
   className?: string
+  hideParentNotePreview?: boolean
   hideStats?: boolean
   fetchNoteStats?: boolean
 }) {
   const { push } = useSecondaryPage()
+  const parentEventId = useMemo(
+    () => (hideParentNotePreview ? undefined : getParentEventId(event)),
+    [event, hideParentNotePreview]
+  )
+  const { event: parentEvent, isFetching } = useFetchEvent(parentEventId)
   const usingClient = useMemo(() => getUsingClient(event), [event])
+
   return (
     <div className={className}>
       <div className="flex items-center space-x-2">
@@ -49,13 +56,14 @@ export default function Note({
           </div>
         </div>
       </div>
-      {parentEvent && (
+      {parentEventId && (
         <ParentNotePreview
           event={parentEvent}
+          isFetching={isFetching}
           className="mt-2"
           onClick={(e) => {
             e.stopPropagation()
-            push(toNote(parentEvent))
+            push(toNote(parentEventId))
           }}
         />
       )}

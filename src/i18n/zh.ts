@@ -49,6 +49,7 @@ export default {
     'switch to dark theme': '切换到深色主题',
     'switch to system theme': '切换到系统主题',
     Note: '笔记',
+    note: '笔记',
     "username's following": '{{username}} 的关注',
     "username's used relays": '{{username}} 使用的服务器',
     "username's muted": '{{username}} 屏蔽的用户',

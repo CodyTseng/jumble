@@ -33,7 +33,7 @@ export default function ZapDialog({
           <DialogTitle className="flex gap-2 items-center">
             <div className="shrink-0">{t('Zap to')}</div>
             <UserAvatar size="small" userId={pubkey} />
-            <Username userId={pubkey} className="truncate flex-1 w-0" />
+            <Username userId={pubkey} className="truncate flex-1 w-0 text-start h-5" />
           </DialogTitle>
         </DialogHeader>
         <ZapDialogContent open={open} setOpen={setOpen} receipt={pubkey} eventId={eventId} />

@@ -49,6 +49,7 @@ export default {
     'switch to dark theme': 'switch to dark theme',
     'switch to system theme': 'switch to system theme',
     Note: 'Note',
+    note: 'note',
     "username's following": "{{username}}'s following",
     "username's used relays": "{{username}}'s used relays",
     "username's muted": "{{username}}'s muted",
