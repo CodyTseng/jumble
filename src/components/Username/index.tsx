@@ -56,21 +56,24 @@ export function SimpleUsername({
   userId,
   showAt = false,
   className,
-  skeletonClassName
+  skeletonClassName,
+  withoutSkeleton = false
 }: {
   userId: string
   showAt?: boolean
   className?: string
   skeletonClassName?: string
+  withoutSkeleton?: boolean
 }) {
   const { profile } = useFetchProfile(userId)
-  if (!profile) {
+  if (!profile && !withoutSkeleton) {
     return (
       <div className="py-1">
         <Skeleton className={cn('w-16', skeletonClassName)} />
       </div>
     )
   }
+  if (!profile) return null
 
   const { username } = profile
 
