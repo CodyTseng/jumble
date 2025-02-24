@@ -2,9 +2,9 @@ import { toNote } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { MessageCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
+import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
-import { ContentPreview } from './ContentPreview'
 
 export function ReplyNotification({ notification }: { notification: Event }) {
   const { push } = useSecondaryPage()
@@ -15,7 +15,7 @@ export function ReplyNotification({ notification }: { notification: Event }) {
     >
       <UserAvatar userId={notification.pubkey} size="small" />
       <MessageCircle size={24} className="text-blue-400" />
-      <ContentPreview event={notification} />
+      <ContentPreview className="truncate flex-1 w-0" event={notification} />
       <div className="text-muted-foreground">
         <FormattedTimestamp timestamp={notification.created_at} short />
       </div>

@@ -335,13 +335,23 @@ function LoadingSkeleton({ isPictures }: { isPictures: boolean }) {
     <div className="px-4 py-3">
       <div className="flex items-center space-x-2">
         <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="space-y-1">
-          <Skeleton className="w-10 h-4" />
-          <Skeleton className="w-20 h-3" />
+        <div className={`flex-1 w-0`}>
+          <div className="py-1">
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="py-0.5">
+            <Skeleton className="h-3 w-12" />
+          </div>
         </div>
       </div>
-      <Skeleton className="w-full h-5 mt-2" />
-      <Skeleton className="w-2/3 h-5 mt-2" />
+      <div className="pt-2">
+        <div className="my-1">
+          <Skeleton className="w-full h-4 my-1 mt-2" />
+        </div>
+        <div className="my-1">
+          <Skeleton className="w-2/3 h-4 my-1" />
+        </div>
+      </div>
     </div>
   )
 }

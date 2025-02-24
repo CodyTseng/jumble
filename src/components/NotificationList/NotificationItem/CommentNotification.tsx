@@ -4,9 +4,9 @@ import { tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { MessageCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
+import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
-import { ContentPreview } from './ContentPreview'
 
 export function CommentNotification({ notification }: { notification: Event }) {
   const { push } = useSecondaryPage()
@@ -29,7 +29,7 @@ export function CommentNotification({ notification }: { notification: Event }) {
     >
       <UserAvatar userId={notification.pubkey} size="small" />
       <MessageCircle size={24} className="text-blue-400" />
-      <ContentPreview event={notification} />
+      <ContentPreview className="truncate flex-1 w-0" event={notification} />
       <div className="text-muted-foreground">
         <FormattedTimestamp timestamp={notification.created_at} short />
       </div>

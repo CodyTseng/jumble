@@ -4,9 +4,9 @@ import client from '@/services/client.service'
 import { Repeat } from 'lucide-react'
 import { Event, validateEvent } from 'nostr-tools'
 import { useMemo } from 'react'
+import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
-import { ContentPreview } from './ContentPreview'
 
 export function RepostNotification({ notification }: { notification: Event }) {
   const { push } = useSecondaryPage()
@@ -30,7 +30,7 @@ export function RepostNotification({ notification }: { notification: Event }) {
     >
       <UserAvatar userId={notification.pubkey} size="small" />
       <Repeat size={24} className="text-green-400" />
-      <ContentPreview event={event} />
+      <ContentPreview className="truncate flex-1 w-0" event={event} />
       <div className="text-muted-foreground">
         <FormattedTimestamp timestamp={notification.created_at} short />
       </div>
