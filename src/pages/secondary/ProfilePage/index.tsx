@@ -13,23 +13,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
 import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import {
-  toFollowingList,
-  toMuteList,
-  toOthersRelaySettings,
-  toProfileEditor,
-  toRelaySettings
-} from '@/lib/link'
+import { toMuteList, toProfileEditor } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useFeed } from '@/providers/FeedProvider'
-import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { Link, Zap } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
+import Followings from './Followings'
+import Relays from './Relays'
 
 const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
@@ -45,7 +40,6 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
     [relayList, currentRelayUrls]
   )
   const { pubkey: accountPubkey } = useNostr()
-  const { followings: selfFollowings } = useFollowList()
   const { mutePubkeys } = useMuteList()
   const { followings } = useFetchFollowings(profile?.pubkey)
   const isFollowingYou = useMemo(() => {
@@ -141,20 +135,8 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
             </div>
           )}
           <div className="flex gap-4 items-center mt-2 text-sm">
-            <SecondaryPageLink
-              to={toFollowingList(pubkey)}
-              className="flex gap-1 hover:underline w-fit"
-            >
-              {isSelf ? selfFollowings.length : followings.length}
-              <div className="text-muted-foreground">{t('Following')}</div>
-            </SecondaryPageLink>
-            <SecondaryPageLink
-              to={isSelf ? toRelaySettings('mailbox') : toOthersRelaySettings(pubkey)}
-              className="flex gap-1 hover:underline w-fit"
-            >
-              {relayList.originalRelays.length}
-              <div className="text-muted-foreground">{t('Relays')}</div>
-            </SecondaryPageLink>
+            <Followings pubkey={pubkey} />
+            <Relays pubkey={pubkey} />
             {isSelf && (
               <SecondaryPageLink to={toMuteList()} className="flex gap-1 hover:underline w-fit">
                 {mutePubkeys.length}
