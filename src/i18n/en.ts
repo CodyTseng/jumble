@@ -183,6 +183,7 @@ export default {
     'Open in a': 'Open in {{a}}',
     'Cannot handle event of kind k': 'Cannot handle event of kind {{k}}',
     'Sorry! The note cannot be found 😔': 'Sorry! The note cannot be found 😔',
+    'This user has been muted': 'This user has been muted',
     Wallet: 'Wallet',
     Sats: 'Sats',
     sats: 'sats',
