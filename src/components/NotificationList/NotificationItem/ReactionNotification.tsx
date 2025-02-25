@@ -3,7 +3,7 @@ import { useFetchEvent } from '@/hooks'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
-import { Heart, ThumbsUp } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { useMemo } from 'react'
 import ContentPreview from '../../ContentPreview'
@@ -33,8 +33,13 @@ export function ReactionNotification({ notification }: { notification: Event }) 
     >
       <div className="flex gap-2 items-center flex-1">
         <UserAvatar userId={notification.pubkey} size="small" />
-        <Heart size={24} className="text-red-400" />
-        <div>{notification.content === '+' ? <ThumbsUp size={14} /> : notification.content}</div>
+        <div className="text-xl min-w-6 text-center">
+          {!notification.content || notification.content === '+' ? (
+            <Heart size={24} className="text-red-400" />
+          ) : (
+            notification.content
+          )}
+        </div>
         <ContentPreview className="truncate flex-1 w-0" event={event} />
       </div>
       <div className="text-muted-foreground">

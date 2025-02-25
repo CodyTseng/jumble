@@ -7,6 +7,7 @@ export const StorageKey = {
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',
   NOTE_LIST_MODE: 'noteListMode',
+  NOTIFICATION_TYPE: 'notificationType',
   DEFAULT_ZAP_SATS: 'defaultZapSats',
   DEFAULT_ZAP_COMMENT: 'defaultZapComment',
   QUICK_ZAP: 'quickZap',

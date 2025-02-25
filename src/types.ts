@@ -101,6 +101,8 @@ export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number
 
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'pictures'
 
+export type TNotificationType = 'all' | 'mentions' | 'reactions' | 'zaps'
+
 export type TPageRef = { scrollToTop: () => void }
 
 export type TNip66RelayInfo = TRelayInfo & {
