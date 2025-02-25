@@ -71,7 +71,7 @@ class LightningService {
       event: eventId ?? null,
       amount,
       relays: receiptRelayList.read
-        .slice(0, 3)
+        .slice(0, 4)
         .concat(senderRelayList.write.slice(0, 3))
         .concat(BIG_RELAY_URLS),
       comment
