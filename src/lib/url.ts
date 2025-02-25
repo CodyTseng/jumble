@@ -16,15 +16,23 @@ export function normalizeUrl(url: string): string {
 }
 
 export function normalizeHttpUrl(url: string): string {
-  if (url.indexOf('://') === -1) url = 'https://' + url
-  const p = new URL(url)
-  p.pathname = p.pathname.replace(/\/+/g, '/')
-  if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
-  if ((p.port === '80' && p.protocol === 'http:') || (p.port === '443' && p.protocol === 'https:'))
-    p.port = ''
-  p.searchParams.sort()
-  p.hash = ''
-  return p.toString()
+  try {
+    if (url.indexOf('://') === -1) url = 'https://' + url
+    const p = new URL(url)
+    p.pathname = p.pathname.replace(/\/+/g, '/')
+    if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
+    if (
+      (p.port === '80' && p.protocol === 'http:') ||
+      (p.port === '443' && p.protocol === 'https:')
+    )
+      p.port = ''
+    p.searchParams.sort()
+    p.hash = ''
+    return p.toString()
+  } catch {
+    console.error('Invalid URL:', url)
+    return url
+  }
 }
 
 export function simplifyUrl(url: string): string {

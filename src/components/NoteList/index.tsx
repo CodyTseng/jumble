@@ -53,9 +53,7 @@ export default function NoteList({
   const isPictures = useMemo(() => listMode === 'pictures', [listMode])
   const noteFilter = useMemo(() => {
     return {
-      kinds: isPictures
-        ? [PICTURE_EVENT_KIND]
-        : [kinds.ShortTextNote, kinds.Repost, PICTURE_EVENT_KIND],
+      kinds: isPictures ? [PICTURE_EVENT_KIND] : [kinds.ShortTextNote, kinds.Repost],
       ...filter
     }
   }, [JSON.stringify(filter), isPictures])

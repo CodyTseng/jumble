@@ -392,11 +392,15 @@ export function extractEmbeddedEventIds(event: Event) {
   const embeddedEventIds: string[] = []
   const embeddedNoteRegex = /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
   ;(event.content.match(embeddedNoteRegex) || []).forEach((note) => {
-    const { type, data } = nip19.decode(note.split(':')[1])
-    if (type === 'nevent') {
-      embeddedEventIds.push(data.id)
-    } else if (type === 'note') {
-      embeddedEventIds.push(data)
+    try {
+      const { type, data } = nip19.decode(note.split(':')[1])
+      if (type === 'nevent') {
+        embeddedEventIds.push(data.id)
+      } else if (type === 'note') {
+        embeddedEventIds.push(data)
+      }
+    } catch {
+      // ignore
     }
   })
   EVENT_EMBEDDED_EVENT_IDS_CACHE.set(event.id, embeddedEventIds)
