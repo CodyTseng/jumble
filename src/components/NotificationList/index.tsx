@@ -157,7 +157,6 @@ const NotificationList = forwardRef((_, ref) => {
             <div ref={bottomRef}>
               <div className="flex gap-2 items-center h-11 py-2">
                 <Skeleton className="w-7 h-7 rounded-full" />
-                <Skeleton className="w-6 h-6 rounded-full" />
                 <Skeleton className="h-6 flex-1 w-0" />
               </div>
             </div>
