@@ -17,6 +17,7 @@ import { kinds } from 'nostr-tools'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
+import { useMuteList } from '@/providers/MuteListProvider'
 
 const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
@@ -95,6 +96,7 @@ export default NotePage
 function ParentNote({ eventId }: { eventId?: string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
+  const { mutePubkeys } = useMuteList()
   const { event, isFetching } = useFetchEvent(eventId)
   if (!eventId) return null
 
@@ -120,6 +122,26 @@ function ParentNote({ eventId }: { eventId?: string }) {
       <div>
         <Card className="flex p-1 items-center justify-center text-sm text-muted-foreground">
           {t('Not found')}
+        </Card>
+        <div className="ml-5 w-px h-2 bg-border" />
+      </div>
+    )
+  }
+
+  if (mutePubkeys.includes(event.pubkey)) {
+    return (
+      <div>
+        <Card
+          className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => push(toNote(eventId))}
+        >
+          <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
+          <SimpleUsername
+            userId={event.pubkey}
+            className="font-semibold truncate shrink-0"
+            skeletonClassName="h-3 shrink-0"
+          />
+          <div>[{t('This user has been muted')}]</div>
         </Card>
         <div className="ml-5 w-px h-2 bg-border" />
       </div>

@@ -54,7 +54,7 @@ export default function ParentNotePreview({
       <div className="shrink-0">{t('reply to')}</div>
       {event && <UserAvatar className="shrink-0" userId={event.pubkey} size="tiny" />}
       {isMuted ? (
-        <div className="truncate">{t('[muted]')}</div>
+        <div className="truncate">[{t('This user has been muted')}]</div>
       ) : (
         <ContentPreview className="truncate" event={event} />
       )}
