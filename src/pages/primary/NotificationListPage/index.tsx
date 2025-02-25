@@ -24,9 +24,7 @@ const NotificationListPage = forwardRef((_, ref) => {
       titlebar={<NotificationListPageTitlebar />}
       displayScrollToTopButton
     >
-      <div className="px-4">
-        <NotificationList ref={notificationListRef} />
-      </div>
+      <NotificationList ref={notificationListRef} />
     </PrimaryPageLayout>
   )
 })

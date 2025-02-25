@@ -193,6 +193,9 @@ export default {
     'Default zap comment': 'Default zap comment',
     'Lightning Address (or LNURL)': 'Lightning Address (or LNURL)',
     'Quick zap': 'Quick zap',
-    'If enabled, you can zap with a single click': 'If enabled, you can zap with a single click'
+    'If enabled, you can zap with a single click': 'If enabled, you can zap with a single click',
+    All: 'All',
+    Reactions: 'Reactions',
+    Zaps: 'Zaps'
   }
 }

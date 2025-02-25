@@ -6,6 +6,7 @@ import {
   TAccountPointer,
   TFeedType,
   TNoteListMode,
+  TNotificationType,
   TRelaySet,
   TThemeSetting
 } from '@/types'
@@ -48,6 +49,7 @@ class LocalStorageService {
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
   private noteListMode: TNoteListMode = 'posts'
+  private notificationType: TNotificationType = 'all'
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
@@ -78,6 +80,11 @@ class LocalStorageService {
       noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
+    const notificationTypeStr = window.localStorage.getItem(StorageKey.NOTIFICATION_TYPE)
+    this.notificationType =
+      notificationTypeStr && ['all', 'mentions', 'reactions', 'zaps'].includes(notificationTypeStr)
+        ? (notificationTypeStr as TNotificationType)
+        : 'all'
 
     const relaySetsStr = window.localStorage.getItem(StorageKey.RELAY_SETS)
     if (!relaySetsStr) {
@@ -171,6 +178,15 @@ class LocalStorageService {
   setNoteListMode(mode: TNoteListMode) {
     window.localStorage.setItem(StorageKey.NOTE_LIST_MODE, mode)
     this.noteListMode = mode
+  }
+
+  getNotificationType() {
+    return this.notificationType
+  }
+
+  setNotificationType(type: TNotificationType) {
+    window.localStorage.setItem(StorageKey.NOTIFICATION_TYPE, type)
+    this.notificationType = type
   }
 
   getAccounts() {
