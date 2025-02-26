@@ -40,7 +40,7 @@ class LightningService {
 
   async zap(
     sender: string,
-    receipt: string,
+    recipient: string,
     sats: number,
     comment: string,
     eventId?: string,
@@ -51,8 +51,8 @@ class LightningService {
     }
 
     const [profile, receiptRelayList, senderRelayList] = await Promise.all([
-      client.fetchProfile(receipt, true),
-      client.fetchRelayList(receipt),
+      client.fetchProfile(recipient, true),
+      client.fetchRelayList(recipient),
       sender
         ? client.fetchRelayList(sender)
         : Promise.resolve({ read: BIG_RELAY_URLS, write: BIG_RELAY_URLS })
@@ -67,7 +67,7 @@ class LightningService {
     const { callback, lnurl } = zapEndpoint
     const amount = sats * 1000
     const zapRequestDraft = makeZapRequest({
-      profile: receipt,
+      profile: recipient,
       event: eventId ?? null,
       amount,
       relays: receiptRelayList.read
@@ -126,7 +126,7 @@ class LightningService {
       } else {
         const filter: Filter = {
           kinds: [kinds.Zap],
-          '#P': [sender],
+          '#p': [recipient],
           since: dayjs().subtract(1, 'minute').unix()
         }
         if (eventId) {
