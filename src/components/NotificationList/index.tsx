@@ -71,6 +71,8 @@ const NotificationList = forwardRef((_, ref) => {
 
     const init = async () => {
       setRefreshing(true)
+      setNotifications([])
+      setShowCount(SHOW_COUNT)
       const relayList = await client.fetchRelayList(pubkey)
       let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
