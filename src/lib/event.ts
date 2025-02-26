@@ -367,8 +367,15 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
     if (!recipientPubkey || !invoice) return null
     amount = invoice ? getAmountFromInvoice(invoice) : 0
     if (description) {
-      const zapRequest = JSON.parse(description)
-      comment = zapRequest.content
+      try {
+        const zapRequest = JSON.parse(description)
+        comment = zapRequest.content
+        if (!senderPubkey) {
+          senderPubkey = zapRequest.pubkey
+        }
+      } catch {
+        // ignore
+      }
     }
 
     return {

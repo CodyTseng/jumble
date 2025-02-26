@@ -36,7 +36,7 @@ export default function ZapDialog({
             <Username userId={pubkey} className="truncate flex-1 w-0 text-start h-5" />
           </DialogTitle>
         </DialogHeader>
-        <ZapDialogContent open={open} setOpen={setOpen} receipt={pubkey} eventId={eventId} />
+        <ZapDialogContent open={open} setOpen={setOpen} recipient={pubkey} eventId={eventId} />
       </DialogContent>
     </Dialog>
   )
@@ -44,12 +44,12 @@ export default function ZapDialog({
 
 function ZapDialogContent({
   setOpen,
-  receipt,
+  recipient,
   eventId
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  receipt: string
+  recipient: string
   eventId?: string
 }) {
   const { t } = useTranslation()
@@ -67,7 +67,7 @@ function ZapDialogContent({
         throw new Error('You need to be logged in to zap')
       }
       setZapping(true)
-      const { invoice } = await lightning.zap(pubkey, receipt, sats, comment, eventId, () =>
+      const { invoice } = await lightning.zap(pubkey, recipient, sats, comment, eventId, () =>
         setOpen(false)
       )
       if (eventId) {
