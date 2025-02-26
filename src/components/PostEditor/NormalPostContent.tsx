@@ -34,6 +34,7 @@ export default function NormalPostContent({
   const [addClientTag, setAddClientTag] = useState(false)
   const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const [uploadingPicture, setUploadingPicture] = useState(false)
+  const [mentions, setMentions] = useState<string[]>([])
   const canPost = !!content && !posting
 
   const post = async (e: React.MouseEvent) => {
@@ -79,11 +80,11 @@ export default function NormalPostContent({
         }
         const draftEvent =
           parentEvent && parentEvent.kind !== kinds.ShortTextNote
-            ? await createCommentDraftEvent(content, parentEvent, pictureInfos, {
+            ? await createCommentDraftEvent(content, parentEvent, pictureInfos, mentions, {
                 addClientTag,
                 protectedEvent: !!specifiedRelayUrls
               })
-            : await createShortTextNoteDraftEvent(content, pictureInfos, {
+            : await createShortTextNoteDraftEvent(content, pictureInfos, mentions, {
                 parentEvent,
                 addClientTag,
                 protectedEvent: !!specifiedRelayUrls
@@ -162,7 +163,12 @@ export default function NormalPostContent({
           </Button>
         </div>
         <div className="flex gap-2 items-center">
-          <Mentions content={content} parentEvent={parentEvent} />
+          <Mentions
+            content={content}
+            parentEvent={parentEvent}
+            mentions={mentions}
+            setMentions={setMentions}
+          />
           <div className="flex gap-2 items-center max-sm:hidden">
             <Button
               variant="secondary"

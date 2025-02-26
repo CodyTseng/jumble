@@ -22,6 +22,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
   const [posting, setPosting] = useState(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [addClientTag, setAddClientTag] = useState(false)
+  const [mentions, setMentions] = useState<string[]>([])
   const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const canPost = !!content && !posting && pictureInfos.length > 0
 
@@ -38,7 +39,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         if (!pictureInfos.length) {
           throw new Error(t('Picture note requires images'))
         }
-        const draftEvent = await createPictureNoteDraftEvent(content, pictureInfos, {
+        const draftEvent = await createPictureNoteDraftEvent(content, pictureInfos, mentions, {
           addClientTag,
           protectedEvent: !!specifiedRelayUrls
         })
@@ -99,7 +100,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
           <ChevronDown className={`transition-transform ${showMoreOptions ? 'rotate-180' : ''}`} />
         </Button>
         <div className="flex gap-2 items-center">
-          <Mentions content={content} />
+          <Mentions content={content} mentions={mentions} setMentions={setMentions} />
           <div className="flex gap-2 items-center max-sm:hidden">
             <Button
               variant="secondary"
