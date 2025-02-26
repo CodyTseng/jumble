@@ -88,7 +88,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         filter.since = since
       })
     }
-    const events = await client.fetchEvents(relayList.read.slice(0, 3), filters)
+    const events = await client.fetchEvents(relayList.read.slice(0, 4), filters)
     updateNoteStatsByEvents(events)
     let stats: Partial<TNoteStats> | undefined
     setNoteStatsMap((prev) => {
