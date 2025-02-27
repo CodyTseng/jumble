@@ -3,7 +3,7 @@ import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useNostr } from './NostrProvider'
 
 export type TNoteStats = {
@@ -35,6 +35,27 @@ export const useNoteStats = () => {
 export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
   const [noteStatsMap, setNoteStatsMap] = useState<Map<string, Partial<TNoteStats>>>(new Map())
   const { pubkey } = useNostr()
+
+  useEffect(() => {
+    const init = async () => {
+      if (!pubkey) return
+      const relayList = await client.fetchRelayList(pubkey)
+      const events = await client.fetchEvents(relayList.write.slice(0, 4), [
+        {
+          authors: [pubkey],
+          kinds: [kinds.Reaction, kinds.Repost],
+          limit: 100
+        },
+        {
+          '#P': [pubkey],
+          kinds: [kinds.Zap],
+          limit: 100
+        }
+      ])
+      updateNoteStatsByEvents(events)
+    }
+    init()
+  }, [pubkey])
 
   const fetchNoteStats = async (event: Event) => {
     const oldStats = noteStatsMap.get(event.id)
