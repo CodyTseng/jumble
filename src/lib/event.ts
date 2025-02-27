@@ -175,25 +175,30 @@ export function getProfileFromProfileEvent(event: Event) {
 }
 
 export async function extractMentions(content: string, parentEvent?: Event) {
-  let parentEventPubkey: string | undefined
-  const pubkeySet = new Set<string>()
-  const relatedPubkeySet = new Set<string>()
+  const parentEventPubkey = parentEvent ? parentEvent.pubkey : undefined
+  const pubkeys: string[] = []
+  const relatedPubkeys: string[] = []
   const matches = content.match(
     /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
   )
+
+  const addToSet = (arr: string[], pubkey: string) => {
+    if (pubkey === parentEventPubkey) return
+    if (!arr.includes(pubkey)) arr.push(pubkey)
+  }
 
   for (const m of matches || []) {
     try {
       const id = m.split(':')[1]
       const { type, data } = nip19.decode(id)
       if (type === 'nprofile') {
-        pubkeySet.add(data.pubkey)
+        addToSet(pubkeys, data.pubkey)
       } else if (type === 'npub') {
-        pubkeySet.add(data)
-      } else if (['nevent', 'note', 'naddr'].includes(type)) {
+        addToSet(pubkeys, data)
+      } else if (['nevent', 'note'].includes(type)) {
         const event = await client.fetchEvent(id)
         if (event) {
-          pubkeySet.add(event.pubkey)
+          addToSet(pubkeys, event.pubkey)
         }
       }
     } catch (e) {
@@ -202,41 +207,44 @@ export async function extractMentions(content: string, parentEvent?: Event) {
   }
 
   if (parentEvent) {
-    parentEventPubkey = parentEvent.pubkey
     parentEvent.tags.forEach(([tagName, tagValue]) => {
       if (['p', 'P'].includes(tagName) && !!tagValue) {
-        relatedPubkeySet.add(tagValue)
+        addToSet(relatedPubkeys, tagValue)
       }
     })
   }
 
-  if (parentEventPubkey) {
-    pubkeySet.delete(parentEventPubkey)
-    relatedPubkeySet.delete(parentEventPubkey)
-  }
-
   return {
-    pubkeys: Array.from(pubkeySet),
-    relatedPubkeys: Array.from(relatedPubkeySet).filter((p) => !pubkeySet.has(p)),
+    pubkeys,
+    relatedPubkeys: relatedPubkeys.filter((p) => !pubkeys.includes(p)),
     parentEventPubkey
   }
 }
 
 export async function extractRelatedEventIds(content: string, parentEvent?: Event) {
-  const relatedEventIdSet = new Set<string>()
-  const quoteEventIdSet = new Set<string>()
+  const relatedEventIds: string[] = []
+  const quoteEventIds: string[] = []
   let rootEventId: string | undefined
   let parentEventId: string | undefined
   const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+
+  const addToSet = (arr: string[], item: string) => {
+    if (!arr.includes(item)) arr.push(item)
+  }
+
+  const removeFromSet = (arr: string[], item: string) => {
+    const index = arr.indexOf(item)
+    if (index !== -1) arr.splice(index, 1)
+  }
 
   for (const m of matches || []) {
     try {
       const id = m.split(':')[1]
       const { type, data } = nip19.decode(id)
       if (type === 'nevent') {
-        quoteEventIdSet.add(data.id)
+        addToSet(quoteEventIds, data.id)
       } else if (type === 'note') {
-        quoteEventIdSet.add(data)
+        addToSet(quoteEventIds, data)
       }
     } catch (e) {
       console.error(e)
@@ -244,12 +252,12 @@ export async function extractRelatedEventIds(content: string, parentEvent?: Even
   }
 
   if (parentEvent) {
-    relatedEventIdSet.add(parentEvent.id)
+    addToSet(relatedEventIds, parentEvent.id)
     parentEvent.tags.forEach((tag) => {
       if (isRootETag(tag)) {
         rootEventId = tag[1]
       } else if (tagNameEquals('e')(tag)) {
-        relatedEventIdSet.add(tag[1])
+        addToSet(relatedEventIds, tag[1])
       }
     })
     if (rootEventId || isReplyNoteEvent(parentEvent)) {
@@ -259,19 +267,22 @@ export async function extractRelatedEventIds(content: string, parentEvent?: Even
     }
   }
 
-  if (rootEventId) relatedEventIdSet.delete(rootEventId)
-  if (parentEventId) relatedEventIdSet.delete(parentEventId)
-
+  if (rootEventId) {
+    removeFromSet(relatedEventIds, rootEventId)
+  }
+  if (parentEventId) {
+    removeFromSet(relatedEventIds, parentEventId)
+  }
   return {
-    otherRelatedEventIds: Array.from(relatedEventIdSet),
-    quoteEventIds: Array.from(quoteEventIdSet),
+    otherRelatedEventIds: relatedEventIds,
+    quoteEventIds,
     rootEventId,
     parentEventId
   }
 }
 
 export async function extractCommentMentions(content: string, parentEvent: Event) {
-  const quoteEventIdSet = new Set<string>()
+  const quoteEventIds: string[] = []
   const rootEventId = parentEvent.tags.find(tagNameEquals('E'))?.[1] ?? parentEvent.id
   const rootEventKind = parentEvent.tags.find(tagNameEquals('K'))?.[1] ?? parentEvent.kind
   const rootEventPubkey = parentEvent.tags.find(tagNameEquals('P'))?.[1] ?? parentEvent.pubkey
@@ -279,16 +290,19 @@ export async function extractCommentMentions(content: string, parentEvent: Event
   const parentEventKind = parentEvent.kind
   const parentEventPubkey = parentEvent.pubkey
 
-  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+  const addToSet = (arr: string[], item: string) => {
+    if (!arr.includes(item)) arr.push(item)
+  }
 
+  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
   for (const m of matches || []) {
     try {
       const id = m.split(':')[1]
       const { type, data } = nip19.decode(id)
       if (type === 'nevent') {
-        quoteEventIdSet.add(data.id)
+        addToSet(quoteEventIds, data.id)
       } else if (type === 'note') {
-        quoteEventIdSet.add(data)
+        addToSet(quoteEventIds, data)
       }
     } catch (e) {
       console.error(e)
@@ -296,7 +310,7 @@ export async function extractCommentMentions(content: string, parentEvent: Event
   }
 
   return {
-    quoteEventIds: Array.from(quoteEventIdSet),
+    quoteEventIds,
     rootEventId,
     rootEventKind,
     rootEventPubkey,
