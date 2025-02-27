@@ -10,6 +10,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  html {
+    --bc-color-brand: hsl(var(--primary));
+    --bc-color-brand-dark: hsl(var(--primary));
+    --bc-brand-mix: 100%;
+    --bc-color-brand-button-text: hsl(var(--primary-foreground));
+    --bc-color-brand-button-text-dark: hsl(var(--primary-foreground));
+  }
+
   input,
   textarea,
   button {
