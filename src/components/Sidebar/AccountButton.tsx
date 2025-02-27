@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toProfile, toWallet } from '@/lib/link'
@@ -57,15 +58,17 @@ function ProfileButton() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="w-56" side="top">
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>
           <UserRound />
           {t('Profile')}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => push(toWallet())}>
           <Wallet />
           {t('Wallet')}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
           <ArrowDownUp />
           {t('Switch account')}
