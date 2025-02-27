@@ -1,17 +1,10 @@
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { extractMentions } from '@/lib/event'
 import { useNostr } from '@/providers/NostrProvider'
+import { Check } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useState } from 'react'
+import { HTMLAttributes, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
@@ -70,8 +63,8 @@ export default function Mentions({
   }, [pubkeys, relatedPubkeys, parentEventPubkey, addedPubkeys, removedPubkeys])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <Button
           className="px-3"
           variant="ghost"
@@ -80,25 +73,22 @@ export default function Mentions({
         >
           {t('Mentions')} {mentions.length > 0 && `(${mentions.length})`}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48">
-        <div className="space-y-2">
-          <DropdownMenuLabel>{t('Mentions')}:</DropdownMenuLabel>
+      </PopoverTrigger>
+      <PopoverContent className="w-52 p-0 py-1">
+        <div className="space-y-1">
           {parentEventPubkey && (
-            <DropdownMenuCheckboxItem className="flex gap-1 items-center" checked disabled>
+            <PopoverCheckboxItem checked disabled>
               <SimpleUserAvatar userId={parentEventPubkey} size="small" />
               <SimpleUsername
                 userId={parentEventPubkey}
                 className="font-semibold text-sm truncate"
                 skeletonClassName="h-3"
               />
-            </DropdownMenuCheckboxItem>
+            </PopoverCheckboxItem>
           )}
-          {(pubkeys.length > 0 || relatedPubkeys.length > 0) && <DropdownMenuSeparator />}
           {pubkeys.concat(relatedPubkeys).map((pubkey, index) => (
-            <DropdownMenuCheckboxItem
+            <PopoverCheckboxItem
               key={`${pubkey}-${index}`}
-              className="flex gap-1 items-center cursor-pointer"
               checked={mentions.includes(pubkey)}
               onCheckedChange={(checked) => {
                 if (checked) {
@@ -116,23 +106,37 @@ export default function Mentions({
                 className="font-semibold text-sm truncate"
                 skeletonClassName="h-3"
               />
-            </DropdownMenuCheckboxItem>
+            </PopoverCheckboxItem>
           ))}
-          {(relatedPubkeys.length > 0 || pubkeys.length > 0) && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  setAddedPubkeys([...relatedPubkeys])
-                  setRemovedPubkeys([])
-                }}
-              >
-                {t('Select all')}
-              </DropdownMenuItem>
-            </>
-          )}
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function PopoverCheckboxItem({
+  children,
+  checked,
+  onCheckedChange,
+  disabled,
+  ...props
+}: HTMLAttributes<HTMLButtonElement> & {
+  disabled?: boolean
+  checked: boolean
+  onCheckedChange?: (checked: boolean) => void
+}) {
+  return (
+    <div className="px-1">
+      <Button
+        variant="ghost"
+        className="w-full rounded-md justify-start px-2"
+        onClick={() => onCheckedChange?.(!checked)}
+        disabled={disabled}
+        {...props}
+      >
+        {checked ? <Check className="shrink-0" /> : <div className="w-4 shrink-0" />}
+        {children}
+      </Button>
+    </div>
   )
 }
