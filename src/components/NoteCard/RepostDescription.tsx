@@ -17,7 +17,7 @@ export default function RepostDescription({
     <div className={cn('flex gap-1 text-sm items-center text-muted-foreground mb-1', className)}>
       <Repeat2 size={16} className="shrink-0" />
       <Username userId={reposter} className="font-semibold truncate" skeletonClassName="h-3" />
-      <div>{t('reposted')}</div>
+      <div className="shrink-0">{t('reposted')}</div>
     </div>
   )
 }

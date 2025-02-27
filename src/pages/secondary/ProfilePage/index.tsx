@@ -4,6 +4,7 @@ import NoteList from '@/components/NoteList'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
+import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import QrCodePopover from '@/components/QrCodePopover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -18,7 +19,7 @@ import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useFeed } from '@/providers/FeedProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { Link } from 'lucide-react'
+import { Link, Zap } from 'lucide-react'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
@@ -55,11 +56,13 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   if (!profile && isFetching) {
     return (
       <SecondaryPageLayout index={index} ref={ref}>
-        <div className="px-4">
-          <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
-            <Skeleton className="w-full h-full object-cover rounded-lg" />
-            <Skeleton className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background rounded-full" />
+        <div className="sm:px-4">
+          <div className="relative bg-cover bg-center mb-2">
+            <Skeleton className="w-full aspect-video sm:rounded-lg" />
+            <Skeleton className="w-24 h-24 absolute bottom-0 left-3 translate-y-1/2 border-4 border-background rounded-full" />
           </div>
+        </div>
+        <div className="px-4">
           <Skeleton className="h-5 w-28 mt-14 mb-1" />
           <Skeleton className="h-5 w-56 mt-2 my-1 rounded-full" />
         </div>
@@ -68,29 +71,32 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   }
   if (!profile) return <NotFoundPage />
 
-  const { banner, username, about, avatar, pubkey, website } = profile
+  const { banner, username, about, avatar, pubkey, website, lightningAddress } = profile
   return (
     <SecondaryPageLayout index={index} title={username} displayScrollToTopButton ref={ref}>
-      <div className="px-4">
-        <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
+      <div className="sm:px-4">
+        <div className="relative bg-cover bg-center mb-2">
           <ProfileBanner
             banner={banner}
             pubkey={pubkey}
-            className="w-full aspect-video object-cover"
+            className="w-full aspect-video sm:rounded-lg"
           />
-          <Avatar className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background">
+          <Avatar className="w-24 h-24 absolute left-3 bottom-0 translate-y-1/2 border-4 border-background">
             <AvatarImage src={avatar} className="object-cover object-center" />
             <AvatarFallback>
               <img src={defaultImage} />
             </AvatarFallback>
           </Avatar>
         </div>
+      </div>
+      <div className="px-4">
         <div className="flex justify-end h-8 gap-2 items-center">
           {isFollowingYou && (
             <div className="text-muted-foreground rounded-full bg-muted text-xs h-fit px-2">
               {t('Follows you')}
             </div>
           )}
+          <ProfileOptions pubkey={pubkey} />
           {isSelf ? (
             <Button
               className="w-20 min-w-20 rounded-full"
@@ -100,13 +106,21 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
               {t('Edit')}
             </Button>
           ) : (
-            <FollowButton pubkey={pubkey} />
+            <>
+              {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
+              <FollowButton pubkey={pubkey} />
+            </>
           )}
-          <ProfileOptions pubkey={pubkey} />
         </div>
         <div className="pt-2">
           <div className="text-xl font-semibold">{username}</div>
           <Nip05 pubkey={pubkey} />
+          {lightningAddress && (
+            <div className="text-sm text-yellow-400 flex gap-1 items-center">
+              <Zap className="size-4" />
+              {lightningAddress}
+            </div>
+          )}
           <div className="flex gap-1 mt-1">
             <PubkeyCopy pubkey={pubkey} />
             <QrCodePopover pubkey={pubkey} />

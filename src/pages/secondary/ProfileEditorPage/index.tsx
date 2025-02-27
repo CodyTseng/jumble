@@ -4,8 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { EMAIL_REGEX } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { isEmail } from '@/lib/common'
 import { createProfileDraftEvent } from '@/lib/draft-event'
 import { generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
@@ -24,6 +24,8 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [about, setAbout] = useState<string>('')
   const [nip05, setNip05] = useState<string>('')
   const [nip05Error, setNip05Error] = useState<string>('')
+  const [lightningAddress, setLightningAddress] = useState<string>('')
+  const [lightningAddressError, setLightningAddressError] = useState<string>('')
   const [hasChanged, setHasChanged] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
@@ -40,22 +42,38 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       setUsername(profile.original_username ?? '')
       setAbout(profile.about ?? '')
       setNip05(profile.nip05 ?? '')
+      setLightningAddress(profile.lightningAddress || '')
     } else {
       setBanner('')
       setAvatar('')
       setUsername('')
       setAbout('')
       setNip05('')
+      setLightningAddress('')
     }
   }, [profile])
 
   if (!account || !profile) return null
 
   const save = async () => {
-    if (nip05 && !EMAIL_REGEX.test(nip05)) {
+    if (nip05 && !isEmail(nip05)) {
       setNip05Error(t('Invalid NIP-05 address'))
       return
     }
+
+    let lud06 = profile.lud06
+    let lud16 = profile.lud16
+    if (lightningAddress) {
+      if (isEmail(lightningAddress)) {
+        lud16 = lightningAddress
+      } else if (lightningAddress.startsWith('lnurl')) {
+        lud06 = lightningAddress
+      } else {
+        setLightningAddressError(t('Invalid Lightning Address'))
+        return
+      }
+    }
+
     setSaving(true)
     setHasChanged(false)
     const oldProfileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
@@ -67,7 +85,9 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       about,
       nip05,
       banner,
-      picture: avatar
+      picture: avatar,
+      lud06,
+      lud16
     }
     const profileDraftEvent = createProfileDraftEvent(
       JSON.stringify(newProfileContent),
@@ -100,7 +120,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   return (
     <SecondaryPageLayout ref={ref} index={index} title={profile.username} controls={controls}>
       <div className="px-4">
-        <div className="relative bg-cover bg-center w-full aspect-[21/9] rounded-lg mb-2">
+        <div className="relative bg-cover bg-center rounded-lg mb-2">
           <Uploader
             onUploadSuccess={onBannerUploadSuccess}
             onUploadingChange={(uploading) => setTimeout(() => setUploadingBanner(uploading), 50)}
@@ -109,7 +129,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             <ProfileBanner
               banner={banner}
               pubkey={account.pubkey}
-              className="w-full aspect-video object-cover"
+              className="w-full aspect-video object-cover rounded-lg"
             />
             <div className="absolute top-0 bg-muted/30 w-full h-full rounded-lg flex flex-col justify-center items-center">
               {uploadingBanner ? (
@@ -170,6 +190,21 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             />
             {nip05Error && <div className="text-xs text-destructive pl-3">{nip05Error}</div>}
           </Item>
+          <Item>
+            <ItemTitle>{t('Lightning Address (or LNURL)')}</ItemTitle>
+            <Input
+              value={lightningAddress}
+              onChange={(e) => {
+                setLightningAddressError('')
+                setLightningAddress(e.target.value)
+                setHasChanged(true)
+              }}
+              className={lightningAddressError ? 'border-destructive' : ''}
+            />
+            {lightningAddressError && (
+              <div className="text-xs text-destructive pl-3">{lightningAddressError}</div>
+            )}
+          </Item>
         </div>
       </div>
     </SecondaryPageLayout>
@@ -179,7 +214,7 @@ ProfileEditorPage.displayName = 'ProfileEditorPage'
 export default ProfileEditorPage
 
 function ItemTitle({ children }: { children: React.ReactNode }) {
-  return <div className="text-sm font-semibold text-muted-foreground pl-3">{children}</div>
+  return <div className="text-sm font-semibold text-muted-foreground">{children}</div>
 }
 
 function Item({ children }: { children: React.ReactNode }) {

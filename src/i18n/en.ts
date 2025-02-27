@@ -183,6 +183,20 @@ export default {
     'Open in a': 'Open in {{a}}',
     'Cannot handle event of kind k': 'Cannot handle event of kind {{k}}',
     'Sorry! The note cannot be found 😔': 'Sorry! The note cannot be found 😔',
-    'This user has been muted': 'This user has been muted'
+    'This user has been muted': 'This user has been muted',
+    Wallet: 'Wallet',
+    Sats: 'Sats',
+    sats: 'sats',
+    'Zap to': 'Zap to',
+    'Zap n sats': 'Zap {{n}} sats',
+    zapComment: 'Comment',
+    'Default zap amount': 'Default zap amount',
+    'Default zap comment': 'Default zap comment',
+    'Lightning Address (or LNURL)': 'Lightning Address (or LNURL)',
+    'Quick zap': 'Quick zap',
+    'If enabled, you can zap with a single click': 'If enabled, you can zap with a single click',
+    All: 'All',
+    Reactions: 'Reactions',
+    Zaps: 'Zaps'
   }
 }

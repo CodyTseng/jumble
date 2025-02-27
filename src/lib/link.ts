@@ -39,6 +39,7 @@ export const toRelaySettings = (tag?: 'mailbox' | 'relay-sets') => {
   return '/relay-settings' + (tag ? '#' + tag : '')
 }
 export const toSettings = () => '/settings'
+export const toWallet = () => '/wallet'
 export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toMuteList = () => '/mutes'

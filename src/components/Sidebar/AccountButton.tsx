@@ -4,13 +4,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { toProfile } from '@/lib/link'
+import { toProfile, toWallet } from '@/lib/link'
 import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { LogIn } from 'lucide-react'
+import { ArrowDownUp, LogIn, LogOut, UserRound, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LoginDialog from '../LoginDialog'
@@ -57,15 +58,26 @@ function ProfileButton() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>{t('Profile')}</DropdownMenuItem>
+      <DropdownMenuContent className="w-56" side="top">
+        <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>
+          <UserRound />
+          {t('Profile')}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => push(toWallet())}>
+          <Wallet />
+          {t('Wallet')}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
+          <ArrowDownUp />
           {t('Switch account')}
         </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
           onClick={() => setLogoutDialogOpen(true)}
         >
+          <LogOut />
           {t('Logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>

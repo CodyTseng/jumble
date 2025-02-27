@@ -51,21 +51,21 @@ class ClientService extends EventTarget {
     (ids) => Promise.all(ids.map((id) => this._fetchProfileEvent(id))),
     {
       cache: false,
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private fetchProfileEventFromBigRelaysDataloader = new DataLoader<string, NEvent | undefined>(
     this.profileEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private relayListEventDataLoader = new DataLoader<string, NEvent | undefined>(
     this.relayListEventBatchLoadFn.bind(this),
     {
       cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 1000 }),
-      maxBatchSize: 50
+      maxBatchSize: 20
     }
   )
   private followListCache = new LRUCache<string, Promise<NEvent | undefined>>({
@@ -92,7 +92,10 @@ class ClientService extends EventTarget {
   }
 
   async init() {
-    await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
+    await indexedDb.iterateProfileEvents(async (profileEvent) => {
+      this.addUsernameToIndex(profileEvent)
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    })
   }
 
   listConnectionStatus() {
@@ -345,7 +348,15 @@ class ClientService extends EventTarget {
     }
   }
 
-  async query(urls: string[], filter: Filter) {
+  subscribe(urls: string[], filter: Filter | Filter[], onEvent: (evt: NEvent) => void) {
+    const filters = Array.isArray(filter) ? filter : [filter]
+    return this.pool.subscribeMany(urls, filters, {
+      onevent: onEvent
+    })
+  }
+
+  private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {
+    const filters = Array.isArray(filter) ? filter : [filter]
     const _knownIds = new Set<string>()
     const events: NEvent[] = []
     await Promise.allSettled(
@@ -357,7 +368,7 @@ class ClientService extends EventTarget {
 
         return new Promise<void>((resolve, reject) => {
           const startQuery = () => {
-            relay.subscribe([filter], {
+            relay.subscribe(filters, {
               receivedEvent(relay, id) {
                 that.trackEventSeenOn(id, relay)
               },
@@ -384,6 +395,7 @@ class ClientService extends EventTarget {
                 if (_knownIds.has(evt.id)) return
                 _knownIds.add(evt.id)
                 events.push(evt)
+                onevent?.(evt)
               }
             })
           }
@@ -421,10 +433,21 @@ class ClientService extends EventTarget {
     return events
   }
 
-  async fetchEvents(relayUrls: string[], filter: Filter, cache = false) {
+  async fetchEvents(
+    relayUrls: string[],
+    filter: Filter | Filter[],
+    {
+      onevent,
+      cache = false
+    }: {
+      onevent?: (evt: NEvent) => void
+      cache?: boolean
+    } = {}
+  ) {
     const events = await this.query(
       relayUrls.length > 0 ? relayUrls : this.currentRelayUrls.concat(BIG_RELAY_URLS),
-      filter
+      filter,
+      onevent
     )
     if (cache) {
       events.forEach((evt) => {
@@ -464,8 +487,16 @@ class ClientService extends EventTarget {
     return await this.profileEventDataloader.load(id)
   }
 
-  async fetchProfile(id: string): Promise<TProfile | undefined> {
-    const profileEvent = await this.fetchProfileEvent(id)
+  async fetchProfile(id: string, skipCache: boolean = false): Promise<TProfile | undefined> {
+    let profileEvent: NEvent | undefined
+    if (skipCache) {
+      profileEvent = await this._fetchProfileEvent(id, skipCache)
+      if (profileEvent) {
+        this.updateProfileCache(profileEvent)
+      }
+    } else {
+      profileEvent = await this.fetchProfileEvent(id)
+    }
     if (profileEvent) {
       return getProfileFromProfileEvent(profileEvent)
     }
@@ -524,8 +555,13 @@ class ClientService extends EventTarget {
     return followListEvent ? extractPubkeysFromEventTags(followListEvent.tags) : []
   }
 
-  updateFollowListCache(pubkey: string, event: NEvent) {
-    this.followListCache.set(pubkey, Promise.resolve(event))
+  updateFollowListCache(event: NEvent) {
+    this.followListCache.set(event.pubkey, Promise.resolve(event))
+  }
+
+  updateRelayListCache(event: NEvent) {
+    this.relayListEventDataLoader.clear(event.pubkey)
+    this.relayListEventDataLoader.prime(event.pubkey, Promise.resolve(event))
   }
 
   async calculateOptimalReadRelays(pubkey: string) {
@@ -589,11 +625,11 @@ class ClientService extends EventTarget {
 
   async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
     const followings = await this.fetchFollowings(pubkey)
-    for (let i = 0; i * 50 < followings.length; i++) {
+    for (let i = 0; i * 20 < followings.length; i++) {
       if (signal.aborted) return
 
-      await this.profileEventDataloader.loadMany(followings.slice(i * 50, (i + 1) * 50))
-      await new Promise((resolve) => setTimeout(resolve, 30000))
+      await this.profileEventDataloader.loadMany(followings.slice(i * 20, (i + 1) * 20))
+      await new Promise((resolve) => setTimeout(resolve, 10000))
     }
   }
 
@@ -678,7 +714,10 @@ class ClientService extends EventTarget {
     return event
   }
 
-  private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
+  private async _fetchProfileEvent(
+    id: string,
+    skipCache: boolean = false
+  ): Promise<NEvent | undefined> {
     let pubkey: string | undefined
     let relays: string[] = []
     if (/^[0-9a-f]{64}$/.test(id)) {
@@ -699,16 +738,22 @@ class ClientService extends EventTarget {
     if (!pubkey) {
       throw new Error('Invalid id')
     }
-    const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
-    if (localProfile) {
-      this.addUsernameToIndex(localProfile)
-      return localProfile
+    if (!skipCache) {
+      const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
+      if (localProfile) {
+        this.addUsernameToIndex(localProfile)
+        return localProfile
+      }
     }
     const profileFromBigRelays = await this.fetchProfileEventFromBigRelaysDataloader.load(pubkey)
     if (profileFromBigRelays) {
       this.addUsernameToIndex(profileFromBigRelays)
       await indexedDb.putReplaceableEvent(profileFromBigRelays)
       return profileFromBigRelays
+    }
+
+    if (!relays.length) {
+      return undefined
     }
 
     const profileEvent = await this.tryHarderToFetchEvent(

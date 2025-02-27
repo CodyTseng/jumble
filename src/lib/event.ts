@@ -3,6 +3,7 @@ import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
 import { LRUCache } from 'lru-cache'
 import { Event, kinds, nip19 } from 'nostr-tools'
+import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey } from './pubkey'
 import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
@@ -159,6 +160,9 @@ export function getProfileFromProfileEvent(event: Event) {
       nip05: profileObj.nip05,
       about: profileObj.about,
       website: profileObj.website ? normalizeHttpUrl(profileObj.website) : undefined,
+      lud06: profileObj.lud06,
+      lud16: profileObj.lud16,
+      lightningAddress: getLightningAddressFromProfile(profileObj),
       created_at: event.created_at
     }
   } catch (err) {
@@ -361,6 +365,68 @@ export function extractEmbeddedNotesFromContent(content: string) {
   c = c.replace(/\n{3,}/g, '\n\n').trim()
 
   return { embeddedNotes, contentWithoutEmbeddedNotes: c }
+}
+
+export function extractZapInfoFromReceipt(receiptEvent: Event) {
+  if (receiptEvent.kind !== kinds.Zap) return null
+
+  let senderPubkey: string | undefined
+  let recipientPubkey: string | undefined
+  let eventId: string | undefined
+  let invoice: string | undefined
+  let amount: number | undefined
+  let comment: string | undefined
+  let description: string | undefined
+  let preimage: string | undefined
+  try {
+    receiptEvent.tags.forEach(([tagName, tagValue]) => {
+      switch (tagName) {
+        case 'P':
+          senderPubkey = tagValue
+          break
+        case 'p':
+          recipientPubkey = tagValue
+          break
+        case 'e':
+          eventId = tagValue
+          break
+        case 'bolt11':
+          invoice = tagValue
+          break
+        case 'description':
+          description = tagValue
+          break
+        case 'preimage':
+          preimage = tagValue
+          break
+      }
+    })
+    if (!recipientPubkey || !invoice) return null
+    amount = invoice ? getAmountFromInvoice(invoice) : 0
+    if (description) {
+      try {
+        const zapRequest = JSON.parse(description)
+        comment = zapRequest.content
+        if (!senderPubkey) {
+          senderPubkey = zapRequest.pubkey
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    return {
+      senderPubkey,
+      recipientPubkey,
+      eventId,
+      invoice,
+      amount,
+      comment,
+      preimage
+    }
+  } catch {
+    return null
+  }
 }
 
 export function extractEmbeddedEventIds(event: Event) {

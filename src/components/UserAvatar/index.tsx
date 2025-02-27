@@ -34,7 +34,9 @@ export default function UserAvatar({
   )
 
   if (!profile) {
-    return <Skeleton className={cn(UserAvatarSizeCnMap[size], 'rounded-full', className)} />
+    return (
+      <Skeleton className={cn('shrink-0', UserAvatarSizeCnMap[size], 'rounded-full', className)} />
+    )
   }
   const { avatar, pubkey } = profile
 
@@ -42,7 +44,7 @@ export default function UserAvatar({
     <HoverCard>
       <HoverCardTrigger>
         <SecondaryPageLink to={toProfile(pubkey)} onClick={(e) => e.stopPropagation()}>
-          <Avatar className={cn(UserAvatarSizeCnMap[size], className)}>
+          <Avatar className={cn('shrink-0', UserAvatarSizeCnMap[size], className)}>
             <AvatarImage src={avatar} className="object-cover object-center" />
             <AvatarFallback>
               <img src={defaultAvatar} alt={pubkey} />
@@ -64,7 +66,7 @@ export function SimpleUserAvatar({
   onClick
 }: {
   userId: string
-  size?: 'large' | 'big' | 'normal' | 'small' | 'tiny'
+  size?: 'large' | 'big' | 'normal' | 'small' | 'xSmall' | 'tiny'
   className?: string
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {
@@ -75,12 +77,14 @@ export function SimpleUserAvatar({
   )
 
   if (!profile) {
-    return <Skeleton className={cn(UserAvatarSizeCnMap[size], 'rounded-full', className)} />
+    return (
+      <Skeleton className={cn('shrink-0', UserAvatarSizeCnMap[size], 'rounded-full', className)} />
+    )
   }
   const { avatar, pubkey } = profile
 
   return (
-    <Avatar className={cn(UserAvatarSizeCnMap[size], className)} onClick={onClick}>
+    <Avatar className={cn('shrink-0', UserAvatarSizeCnMap[size], className)} onClick={onClick}>
       <AvatarImage src={avatar} className="object-cover object-center" />
       <AvatarFallback>
         <img src={defaultAvatar} alt={pubkey} />

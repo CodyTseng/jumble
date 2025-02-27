@@ -12,60 +12,47 @@ import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 
-export default function RepostButton({
-  event,
-  canFetch = false
-}: {
-  event: Event
-  canFetch?: boolean
-}) {
+export default function RepostButton({ event }: { event: Event }) {
   const { t } = useTranslation()
-  const { publish, checkLogin } = useNostr()
-  const { noteStatsMap, fetchNoteRepostCount, fetchNoteRepostedStatus, markNoteAsReposted } =
-    useNoteStats()
+  const { publish, checkLogin, pubkey } = useNostr()
+  const { noteStatsMap, updateNoteStatsByEvents, fetchNoteStats } = useNoteStats()
   const [reposting, setReposting] = useState(false)
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
-  const { repostCount, hasReposted } = useMemo(
-    () => noteStatsMap.get(event.id) ?? {},
-    [noteStatsMap, event.id]
-  )
+  const { repostCount, hasReposted } = useMemo(() => {
+    const stats = noteStatsMap.get(event.id) || {}
+    return {
+      repostCount: stats.reposts?.size,
+      hasReposted: pubkey ? stats.reposts?.has(pubkey) : false
+    }
+  }, [noteStatsMap, event.id])
   const canRepost = !hasReposted && !reposting
-
-  useEffect(() => {
-    if (!canFetch) return
-
-    if (repostCount === undefined) {
-      fetchNoteRepostCount(event)
-    }
-    if (hasReposted === undefined) {
-      fetchNoteRepostedStatus(event)
-    }
-  }, [canFetch, event])
 
   const repost = async (e: React.MouseEvent) => {
     e.stopPropagation()
     checkLogin(async () => {
-      if (!canRepost) return
+      if (!canRepost || !pubkey) return
 
       setReposting(true)
       const timer = setTimeout(() => setReposting(false), 5000)
 
       try {
-        const [reposted] = await Promise.all([
-          hasReposted === undefined ? fetchNoteRepostedStatus(event) : hasReposted,
-          repostCount === undefined ? fetchNoteRepostCount(event) : repostCount
-        ])
-        if (reposted) return
+        const noteStats = noteStatsMap.get(event.id)
+        const hasReposted = noteStats?.reposts?.has(pubkey)
+        if (hasReposted) return
+        if (!noteStats?.updatedAt) {
+          const stats = await fetchNoteStats(event)
+          if (stats?.reposts?.has(pubkey)) return
+        }
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const repost = createRepostDraftEvent(event)
-        await publish(repost, { additionalRelayUrls: targetRelayList.read.slice(0, 5) })
-        markNoteAsReposted(event.id)
+        const evt = await publish(repost, { additionalRelayUrls: targetRelayList.read.slice(0, 5) })
+        updateNoteStatsByEvents([evt])
       } catch (error) {
         console.error('repost failed', error)
       } finally {

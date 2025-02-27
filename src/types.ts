@@ -9,6 +9,9 @@ export type TProfile = {
   nip05?: string
   about?: string
   website?: string
+  lud06?: string
+  lud16?: string
+  lightningAddress?: string
   created_at?: number
 }
 export type TMailboxRelayScope = 'read' | 'write' | 'both'
@@ -97,6 +100,8 @@ export type TLanguage = 'en' | 'zh'
 export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number; height: number } }
 
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'pictures'
+
+export type TNotificationType = 'all' | 'mentions' | 'reactions' | 'zaps'
 
 export type TPageRef = { scrollToTop: () => void }
 

@@ -5,57 +5,44 @@ import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
 import { Heart, Loader } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from './utils'
 
-export default function LikeButton({
-  event,
-  canFetch = false
-}: {
-  event: Event
-  canFetch?: boolean
-}) {
+export default function LikeButton({ event }: { event: Event }) {
   const { t } = useTranslation()
-  const { publish, checkLogin } = useNostr()
-  const { noteStatsMap, fetchNoteLikedStatus, fetchNoteLikeCount, markNoteAsLiked } = useNoteStats()
+  const { pubkey, publish, checkLogin } = useNostr()
+  const { noteStatsMap, updateNoteStatsByEvents, fetchNoteStats } = useNoteStats()
   const [liking, setLiking] = useState(false)
-  const { likeCount, hasLiked } = useMemo(
-    () => noteStatsMap.get(event.id) ?? {},
-    [noteStatsMap, event.id]
-  )
+  const { likeCount, hasLiked } = useMemo(() => {
+    const stats = noteStatsMap.get(event.id) || {}
+    return { likeCount: stats.likes?.size, hasLiked: pubkey ? stats.likes?.has(pubkey) : false }
+  }, [noteStatsMap, event, pubkey])
   const canLike = !hasLiked && !liking
-
-  useEffect(() => {
-    if (!canFetch) return
-
-    if (likeCount === undefined) {
-      fetchNoteLikeCount(event)
-    }
-    if (hasLiked === undefined) {
-      fetchNoteLikedStatus(event)
-    }
-  }, [canFetch, event])
 
   const like = async (e: React.MouseEvent) => {
     e.stopPropagation()
     checkLogin(async () => {
-      if (!canLike) return
+      if (!canLike || !pubkey) return
 
       setLiking(true)
       const timer = setTimeout(() => setLiking(false), 5000)
 
       try {
-        const [liked] = await Promise.all([
-          hasLiked === undefined ? fetchNoteLikedStatus(event) : hasLiked,
-          likeCount === undefined ? fetchNoteLikeCount(event) : likeCount
-        ])
-        if (liked) return
+        const noteStats = noteStatsMap.get(event.id)
+        const hasLiked = noteStats?.likes?.has(pubkey)
+        if (hasLiked) return
+        if (!noteStats?.updatedAt) {
+          const stats = await fetchNoteStats(event)
+          if (stats?.likes?.has(pubkey)) return
+        }
 
         const targetRelayList = await client.fetchRelayList(event.pubkey)
         const reaction = createReactionDraftEvent(event)
-        await publish(reaction, { additionalRelayUrls: targetRelayList.read.slice(0, 4) })
-        markNoteAsLiked(event.id)
+        const evt = await publish(reaction, {
+          additionalRelayUrls: targetRelayList.read.slice(0, 4)
+        })
+        updateNoteStatsByEvents([evt])
       } catch (error) {
         console.error('like failed', error)
       } finally {
