@@ -161,6 +161,7 @@ export default function NoteList({
   }, [loadMore])
 
   const showNewEvents = () => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     setEvents((oldEvents) => [...newEvents, ...oldEvents])
     setNewEvents([])
   }
@@ -177,6 +178,13 @@ export default function NoteList({
         }}
       />
       <div ref={topRef} />
+      {events.length > 0 &&
+        newEvents.filter((event: Event) => {
+          return (
+            (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
+            (listMode !== 'posts' || !isReplyNoteEvent(event))
+          )
+        }).length > 0 && <ShowNewButton onClick={showNewEvents} />}
       <PullToRefresh
         onRefresh={async () => {
           setRefreshCount((count) => count + 1)
@@ -185,19 +193,6 @@ export default function NoteList({
         pullingContent=""
       >
         <div>
-          {events.length > 0 &&
-            newEvents.filter((event: Event) => {
-              return (
-                (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-                (listMode !== 'posts' || !isReplyNoteEvent(event))
-              )
-            }).length > 0 && (
-              <div className="flex justify-center w-full my-2">
-                <Button size="lg" onClick={showNewEvents}>
-                  {t('show new notes')}
-                </Button>
-              </div>
-            )}
           {isPictures ? (
             <PictureNoteCardMasonry
               className="px-2 sm:px-4 mt-2"
@@ -236,6 +231,24 @@ export default function NoteList({
           )}
         </div>
       </PullToRefresh>
+    </div>
+  )
+}
+
+function ShowNewButton({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation()
+  const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
+
+  return (
+    <div
+      className={cn(
+        'sticky top-24 flex justify-center w-full mb-2 z-30 duration-700 transition-transform',
+        deepBrowsing && lastScrollTop > 800 ? '-translate-y-10' : ''
+      )}
+    >
+      <Button size="lg" onClick={onClick} className="drop-shadow-xl shadow-primary/50">
+        {t('show new notes')}
+      </Button>
     </div>
   )
 }
