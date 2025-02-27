@@ -24,8 +24,8 @@ export default function Mentions({
   const { pubkey } = useNostr()
   const [pubkeys, setPubkeys] = useState<string[]>([])
   const [relatedPubkeys, setRelatedPubkeys] = useState<string[]>([])
+  const [potentialMentions, setPotentialMentions] = useState<string[]>([])
   const [parentEventPubkey, setParentEventPubkey] = useState<string | undefined>()
-  const [addedPubkeys, setAddedPubkeys] = useState<string[]>([])
   const [removedPubkeys, setRemovedPubkeys] = useState<string[]>([])
 
   useEffect(() => {
@@ -34,9 +34,10 @@ export default function Mentions({
       setRelatedPubkeys(relatedPubkeys.filter((p) => p !== pubkey))
       setParentEventPubkey(parentEventPubkey !== pubkey ? parentEventPubkey : undefined)
       const potentialMentions = [...pubkeys, ...relatedPubkeys]
-      setAddedPubkeys((pubkeys) => {
-        return pubkeys.filter((p) => potentialMentions.includes(p))
-      })
+      if (parentEventPubkey) {
+        potentialMentions.push(parentEventPubkey)
+      }
+      setPotentialMentions(potentialMentions)
       setRemovedPubkeys((pubkeys) => {
         return pubkeys.filter((p) => potentialMentions.includes(p))
       })
@@ -44,23 +45,9 @@ export default function Mentions({
   }, [content, parentEvent, pubkey])
 
   useEffect(() => {
-    const newMentions = [...pubkeys]
-    addedPubkeys.forEach((pubkey) => {
-      if (!newMentions.includes(pubkey) && pubkey !== parentEventPubkey) {
-        newMentions.push(pubkey)
-      }
-    })
-    removedPubkeys.forEach((pubkey) => {
-      const index = newMentions.indexOf(pubkey)
-      if (index !== -1) {
-        newMentions.splice(index, 1)
-      }
-    })
-    if (parentEventPubkey) {
-      newMentions.push(parentEventPubkey)
-    }
+    const newMentions = potentialMentions.filter((pubkey) => !removedPubkeys.includes(pubkey))
     setMentions(newMentions)
-  }, [pubkeys, relatedPubkeys, parentEventPubkey, addedPubkeys, removedPubkeys])
+  }, [potentialMentions, removedPubkeys])
 
   return (
     <Popover>
@@ -71,43 +58,40 @@ export default function Mentions({
           disabled={pubkeys.length === 0 && relatedPubkeys.length === 0 && !parentEventPubkey}
           onClick={(e) => e.stopPropagation()}
         >
-          {t('Mentions')} {mentions.length > 0 && `(${mentions.length})`}
+          {t('Mentions')}{' '}
+          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-52 p-0 py-1">
         <div className="space-y-1">
-          {parentEventPubkey && (
-            <PopoverCheckboxItem checked disabled>
-              <SimpleUserAvatar userId={parentEventPubkey} size="small" />
-              <SimpleUsername
-                userId={parentEventPubkey}
-                className="font-semibold text-sm truncate"
-                skeletonClassName="h-3"
-              />
-            </PopoverCheckboxItem>
-          )}
-          {pubkeys.concat(relatedPubkeys).map((pubkey, index) => (
-            <PopoverCheckboxItem
-              key={`${pubkey}-${index}`}
-              checked={mentions.includes(pubkey)}
-              onCheckedChange={(checked) => {
-                if (checked) {
-                  setAddedPubkeys((pubkeys) => [...pubkeys, pubkey])
-                  setRemovedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
-                } else {
-                  setRemovedPubkeys((pubkeys) => [...pubkeys, pubkey])
-                  setAddedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
-                }
-              }}
-            >
-              <SimpleUserAvatar userId={pubkey} size="small" />
-              <SimpleUsername
-                userId={pubkey}
-                className="font-semibold text-sm truncate"
-                skeletonClassName="h-3"
-              />
-            </PopoverCheckboxItem>
-          ))}
+          {potentialMentions.map((_, index) => {
+            const pubkey = potentialMentions[potentialMentions.length - 1 - index]
+            const isParentPubkey = pubkey === parentEventPubkey
+            return (
+              <PopoverCheckboxItem
+                key={`${pubkey}-${index}`}
+                checked={isParentPubkey ? true : mentions.includes(pubkey)}
+                onCheckedChange={(checked) => {
+                  if (isParentPubkey) {
+                    return
+                  }
+                  if (checked) {
+                    setRemovedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
+                  } else {
+                    setRemovedPubkeys((pubkeys) => [...pubkeys, pubkey])
+                  }
+                }}
+                disabled={isParentPubkey}
+              >
+                <SimpleUserAvatar userId={pubkey} size="small" />
+                <SimpleUsername
+                  userId={pubkey}
+                  className="font-semibold text-sm truncate"
+                  skeletonClassName="h-3"
+                />
+              </PopoverCheckboxItem>
+            )
+          })}
         </div>
       </PopoverContent>
     </Popover>
