@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
+import { CODY_PUBKEY } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useState } from 'react'
@@ -12,7 +13,6 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
   const { checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
   const [openZapDialog, setOpenZapDialog] = useState(false)
-  const pubkey = '8125b911ed0e94dbe3008a0be48cfe5cd0c0b05923cfff917ae7e87da8400883'
 
   const content = (
     <>
@@ -21,7 +21,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
         A beautiful nostr client focused on browsing relay feeds
       </div>
       <div>
-        Made by <Username userId={pubkey} className="inline-block text-primary" showAt />
+        Made by <Username userId={CODY_PUBKEY} className="inline-block text-primary" showAt />
       </div>
       <div>
         Source code:{' '}
@@ -52,7 +52,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
           setOpenZapDialog(value)
           setOpen(value)
         }}
-        pubkey={pubkey}
+        pubkey={CODY_PUBKEY}
       />
     </>
   )

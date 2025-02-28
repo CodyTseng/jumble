@@ -198,6 +198,9 @@ export default {
     'If enabled, you can zap with a single click': '启用后，您可以单击打闪',
     All: '全部',
     Reactions: '互动',
-    Zaps: '打闪'
+    Zaps: '打闪',
+    'Enjoying Jumble?': '喜欢 Jumble 吗？',
+    'Your donation helps me maintain Jumble and make it better! 😊':
+      '您的捐赠帮助我维护 Jumble 并使其更好！😊'
   }
 }
