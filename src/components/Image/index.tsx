@@ -10,6 +10,7 @@ export default function Image({
   alt,
   className = '',
   classNames = {},
+  fallback,
   hideIfError = false,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
@@ -20,6 +21,7 @@ export default function Image({
   image: TImageInfo
   alt?: string
   hideIfError?: boolean
+  fallback?: React.ReactNode
 }) {
   const [isLoading, setIsLoading] = useState(true)
   const [displayBlurHash, setDisplayBlurHash] = useState(true)
@@ -68,6 +70,8 @@ export default function Image({
             setHasError(true)
           }}
         />
+      ) : fallback ? (
+        fallback
       ) : (
         <div
           className={cn(

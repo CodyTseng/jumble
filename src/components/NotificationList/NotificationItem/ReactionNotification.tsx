@@ -1,5 +1,7 @@
+import Image from '@/components/Image'
 import { PICTURE_EVENT_KIND } from '@/constants'
 import { useFetchEvent } from '@/hooks'
+import { getEmojiInfo } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
@@ -22,6 +24,27 @@ export function ReactionNotification({ notification }: { notification: Event }) 
     return eTag?.[1]
   }, [notification, pubkey])
   const { event } = useFetchEvent(eventId)
+  const reactionContent = useMemo(() => {
+    if (!notification.content || notification.content === '+') {
+      return <Heart size={24} className="text-red-400" />
+    }
+    const match = notification.content.match(/:(.*):/)
+    if (match) {
+      const emojiName = match[1]
+      const emojiUrl = getEmojiInfo(notification, emojiName)
+      if (emojiUrl) {
+        return (
+          <Image
+            image={{ url: emojiUrl }}
+            alt={emojiName}
+            className="w-6 h-6"
+            fallback={<Heart size={24} className="text-red-400" />}
+          />
+        )
+      }
+    }
+    return notification.content
+  }, [notification])
   if (!event || !eventId || ![kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(event.kind)) {
     return null
   }
@@ -33,13 +56,7 @@ export function ReactionNotification({ notification }: { notification: Event }) 
     >
       <div className="flex gap-2 items-center flex-1">
         <UserAvatar userId={notification.pubkey} size="small" />
-        <div className="text-xl min-w-6 text-center">
-          {!notification.content || notification.content === '+' ? (
-            <Heart size={24} className="text-red-400" />
-          ) : (
-            notification.content
-          )}
-        </div>
+        <div className="text-xl min-w-6 text-center">{reactionContent}</div>
         <ContentPreview className="truncate flex-1 w-0" event={event} />
       </div>
       <div className="text-muted-foreground">

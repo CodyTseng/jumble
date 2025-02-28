@@ -90,6 +90,12 @@ export function getRootEventId(event?: Event) {
   }
 }
 
+export function getEmojiInfo(event: Event, emojiName: string) {
+  return event.tags.find(
+    ([tagName, tagValue, emojiUrl]) => tagName === 'emoji' && tagValue === emojiName && emojiUrl
+  )?.[2]
+}
+
 export function isReplaceable(kind: number) {
   return kinds.isReplaceableKind(kind) || kinds.isParameterizedReplaceableKind(kind)
 }
