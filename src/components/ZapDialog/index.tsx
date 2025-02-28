@@ -17,12 +17,14 @@ export default function ZapDialog({
   open,
   setOpen,
   pubkey,
-  eventId
+  eventId,
+  defaultAmount
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   pubkey: string
   eventId?: string
+  defaultAmount?: number
 }) {
   const { t } = useTranslation()
 
@@ -36,7 +38,13 @@ export default function ZapDialog({
             <Username userId={pubkey} className="truncate flex-1 w-0 text-start h-5" />
           </DialogTitle>
         </DialogHeader>
-        <ZapDialogContent open={open} setOpen={setOpen} recipient={pubkey} eventId={eventId} />
+        <ZapDialogContent
+          open={open}
+          setOpen={setOpen}
+          recipient={pubkey}
+          eventId={eventId}
+          defaultAmount={defaultAmount}
+        />
       </DialogContent>
     </Dialog>
   )
@@ -45,19 +53,21 @@ export default function ZapDialog({
 function ZapDialogContent({
   setOpen,
   recipient,
-  eventId
+  eventId,
+  defaultAmount
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   recipient: string
   eventId?: string
+  defaultAmount?: number
 }) {
   const { t } = useTranslation()
   const { toast } = useToast()
   const { pubkey } = useNostr()
   const { defaultZapSats, defaultZapComment } = useZap()
   const { addZap } = useNoteStats()
-  const [sats, setSats] = useState(defaultZapSats)
+  const [sats, setSats] = useState(defaultAmount ?? defaultZapSats)
   const [comment, setComment] = useState(defaultZapComment)
   const [zapping, setZapping] = useState(false)
 

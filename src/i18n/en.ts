@@ -197,6 +197,9 @@ export default {
     'If enabled, you can zap with a single click': 'If enabled, you can zap with a single click',
     All: 'All',
     Reactions: 'Reactions',
-    Zaps: 'Zaps'
+    Zaps: 'Zaps',
+    'Enjoying Jumble?': 'Enjoying Jumble?',
+    'Your donation helps me maintain Jumble and make it better! 😊':
+      'Your donation helps me maintain Jumble and make it better! 😊'
   }
 }
