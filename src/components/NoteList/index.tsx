@@ -242,7 +242,7 @@ function ShowNewButton({ onClick }: { onClick: () => void }) {
   return (
     <div
       className={cn(
-        'sticky top-24 flex justify-center w-full mb-2 z-30 duration-700 transition-transform',
+        'sticky top-[6.25rem] flex justify-center w-full my-2 z-30 duration-700 transition-transform',
         deepBrowsing && lastScrollTop > 800 ? '-translate-y-10' : ''
       )}
     >
