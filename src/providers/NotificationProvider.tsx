@@ -53,9 +53,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [pubkey])
 
   useEffect(() => {
-    if (!pubkey || lastReadTime <= 0) return
+    if (!pubkey || lastReadTime < 0) return
 
-    console.log('useEffect', lastReadTime, current, pubkey)
     // Track if component is mounted
     const isMountedRef = { current: true }
     let currentSubCloser: SubCloser | null = null
