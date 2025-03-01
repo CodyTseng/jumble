@@ -428,7 +428,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const newProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
     setProfileEvent(newProfileEvent)
     setProfile(getProfileFromProfileEvent(newProfileEvent))
-    client.updateProfileCache(newProfileEvent)
   }
 
   const updateFollowListEvent = async (followListEvent: Event) => {

@@ -119,7 +119,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setActiveRelaySetId(null)
       const [relayList, followings] = await Promise.all([
         client.fetchRelayList(options.pubkey),
-        client.fetchFollowings(options.pubkey)
+        client.fetchFollowings(options.pubkey, true)
       ])
       setRelayUrls(relayList.read.concat(BIG_RELAY_URLS).slice(0, 4))
       setFilter({

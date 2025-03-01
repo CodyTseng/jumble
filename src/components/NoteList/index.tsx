@@ -22,7 +22,7 @@ import PictureNoteCard from '../PictureNoteCard'
 
 const LIMIT = 100
 const ALGO_LIMIT = 500
-const SHOW_COUNT = 20
+const SHOW_COUNT = 10
 
 export default function NoteList({
   relayUrls,

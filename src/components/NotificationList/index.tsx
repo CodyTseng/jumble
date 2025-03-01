@@ -172,7 +172,13 @@ const NotificationList = forwardRef((_, ref) => {
 
   return (
     <div>
-      <NotificationTypeSwitch type={notificationType} setType={setNotificationType} />
+      <NotificationTypeSwitch
+        type={notificationType}
+        setType={(type) => {
+          setShowCount(SHOW_COUNT)
+          setNotificationType(type)
+        }}
+      />
       <PullToRefresh
         onRefresh={async () => {
           setRefreshCount((count) => count + 1)

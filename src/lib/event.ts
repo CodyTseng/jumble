@@ -9,6 +9,7 @@ import { extractImageInfoFromTag, isReplyETag, isRootETag, tagNameEquals } from 
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 
 const EVENT_EMBEDDED_EVENT_IDS_CACHE = new LRUCache<string, string[]>({ max: 10000 })
+const EVENT_IS_REPLY_NOTE_CACHE = new LRUCache<string, boolean>({ max: 10000 })
 
 export function isNsfwEvent(event: Event) {
   return event.tags.some(
@@ -20,15 +21,23 @@ export function isNsfwEvent(event: Event) {
 export function isReplyNoteEvent(event: Event) {
   if (event.kind !== kinds.ShortTextNote) return false
 
+  const cache = EVENT_IS_REPLY_NOTE_CACHE.get(event.id)
+  if (cache !== undefined) return cache
+
   const mentionsEventIds: string[] = []
   for (const [tagName, eventId, , marker] of event.tags) {
     if (tagName !== 'e' || !eventId) continue
 
     mentionsEventIds.push(eventId)
-    if (['root', 'reply'].includes(marker)) return true
+    if (['root', 'reply'].includes(marker)) {
+      EVENT_IS_REPLY_NOTE_CACHE.set(event.id, true)
+      return true
+    }
   }
   const embeddedEventIds = extractEmbeddedEventIds(event)
-  return mentionsEventIds.some((id) => !embeddedEventIds.includes(id))
+  const result = mentionsEventIds.some((id) => !embeddedEventIds.includes(id))
+  EVENT_IS_REPLY_NOTE_CACHE.set(event.id, result)
+  return result
 }
 
 export function isCommentEvent(event: Event) {
