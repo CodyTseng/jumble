@@ -1,18 +1,13 @@
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { CODY_PUBKEY } from '@/constants'
-import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useState } from 'react'
 import Username from '../Username'
-import ZapDialog from '../ZapDialog'
 
 export default function AboutInfoDialog({ children }: { children: React.ReactNode }) {
   const { isSmallScreen } = useScreenSize()
-  const { checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
-  const [openZapDialog, setOpenZapDialog] = useState(false)
 
   const content = (
     <>
@@ -33,27 +28,10 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
         >
           GitHub
         </a>
+        <div className="text-sm text-muted-foreground">
+          If you like Jumble, please consider giving it a star ⭐
+        </div>
       </div>
-      <div>
-        If you like this project, you can buy me a coffee ☕️ <br />
-      </div>
-      <Button
-        className="bg-yellow-400 hover:bg-yellow-400/90"
-        onClick={() => checkLogin(() => setOpenZapDialog(true))}
-      >
-        ⚡️ codytseng@getalby.com ⚡️
-      </Button>
-      <div className="text-muted-foreground">
-        Version: v{__APP_VERSION__} ({__GIT_COMMIT__})
-      </div>
-      <ZapDialog
-        open={openZapDialog}
-        setOpen={(value) => {
-          setOpenZapDialog(value)
-          setOpen(value)
-        }}
-        pubkey={CODY_PUBKEY}
-      />
     </>
   )
 
@@ -62,7 +40,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
         <DrawerContent>
-          <div className="p-4">{content}</div>
+          <div className="p-4 space-y-4">{content}</div>
         </DrawerContent>
       </Drawer>
     )
