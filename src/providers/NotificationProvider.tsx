@@ -41,7 +41,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [current])
 
   useEffect(() => {
-    if (!pubkey || current === 'notifications' || !lastReadTime) return
+    if (!pubkey || current === 'notifications') return
 
     const init = async () => {
       const relayList = await client.fetchRelayList(pubkey)
@@ -87,6 +87,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!pubkey) return
     setLastReadTime(storage.getLastReadNotificationTime(pubkey))
+    setHasNewNotification(false)
   }, [pubkey])
 
   return (
