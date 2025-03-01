@@ -178,6 +178,7 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
         const exists = new Set(zaps.map((zap) => zap.pr))
         newZaps.forEach((zap) => {
           if (!exists.has(zap.pr)) {
+            exists.add(zap.pr)
             zaps.push(zap)
           }
         })
