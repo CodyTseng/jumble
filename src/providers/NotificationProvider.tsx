@@ -1,5 +1,5 @@
 import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
-import { usePrimaryPage } from '@/PageManager'
+import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import dayjs from 'dayjs'
@@ -9,7 +9,6 @@ import { useNostr } from './NostrProvider'
 
 type TNotificationContext = {
   hasNewNotification: boolean
-  updateLastReadTime: () => void
 }
 
 const NotificationContext = createContext<TNotificationContext | undefined>(undefined)
@@ -27,12 +26,15 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { current } = usePrimaryPage()
   const [hasNewNotification, setHasNewNotification] = useState(false)
   const [lastReadTime, setLastReadTime] = useState(0)
-  const previousPageRef = useRef(current)
+  const previousPageRef = useRef<TPrimaryPageName | null>(null)
 
   useEffect(() => {
     if (current !== 'notifications' && previousPageRef.current === 'notifications') {
-      updateLastReadTime()
-    } else if (current === 'notifications') {
+      // navigate from notifications to other pages
+      setLastReadTime(dayjs().unix())
+      setHasNewNotification(false)
+    } else if (current === 'notifications' && previousPageRef.current !== null) {
+      // navigate to notifications
       setHasNewNotification(false)
     }
     previousPageRef.current = current
@@ -87,13 +89,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setLastReadTime(storage.getLastReadNotificationTime(pubkey))
   }, [pubkey])
 
-  const updateLastReadTime = () => {
-    setLastReadTime(dayjs().unix())
-    setHasNewNotification(false)
-  }
-
   return (
-    <NotificationContext.Provider value={{ hasNewNotification, updateLastReadTime }}>
+    <NotificationContext.Provider value={{ hasNewNotification }}>
       {children}
     </NotificationContext.Provider>
   )
