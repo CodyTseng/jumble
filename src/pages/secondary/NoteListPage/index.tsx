@@ -1,6 +1,6 @@
 import NoteList from '@/components/NoteList'
 import { SEARCHABLE_RELAY_URLS } from '@/constants'
-import { useFetchRelayInfos, useSearchParams } from '@/hooks'
+import { useFetchRelayInfos } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
 import { Filter } from 'nostr-tools'
@@ -11,7 +11,6 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { relayUrls } = useFeed()
   const { searchableRelayUrls } = useFetchRelayInfos(relayUrls)
-  const { searchParams } = useSearchParams()
   const {
     title = '',
     filter,
@@ -21,6 +20,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     filter?: Filter
     urls: string[]
   }>(() => {
+    const searchParams = new URLSearchParams(window.location.search)
     const hashtag = searchParams.get('t')
     if (hashtag) {
       return {
@@ -40,7 +40,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
     }
     return { urls: relayUrls }
-  }, [searchParams, JSON.stringify(relayUrls)])
+  }, [JSON.stringify(relayUrls)])
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={title} displayScrollToTopButton>
