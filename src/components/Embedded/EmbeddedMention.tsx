@@ -13,14 +13,7 @@ export function EmbeddedMention({ userId }: { userId: string }) {
 }
 
 export function EmbeddedMentionText({ userId }: { userId: string }) {
-  return (
-    <SimpleUsername
-      userId={userId}
-      showAt
-      className="font-normal inline truncate"
-      withoutSkeleton
-    />
-  )
+  return <SimpleUsername userId={userId} showAt className="inline truncate" withoutSkeleton />
 }
 
 export const embeddedNostrNpubRenderer: TEmbeddedRenderer = {

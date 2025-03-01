@@ -11,6 +11,7 @@ export const StorageKey = {
   DEFAULT_ZAP_SATS: 'defaultZapSats',
   DEFAULT_ZAP_COMMENT: 'defaultZapComment',
   QUICK_ZAP: 'quickZap',
+  LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
   ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap', // deprecated
   ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap', // deprecated
