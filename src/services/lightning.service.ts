@@ -135,12 +135,14 @@ class LightningService {
         subCloser = client.subscribe(
           senderRelayList.write.concat(BIG_RELAY_URLS).slice(0, 4),
           filter,
-          (evt) => {
-            const info = extractZapInfoFromReceipt(evt)
-            if (!info) return
+          {
+            onevent: (evt) => {
+              const info = extractZapInfoFromReceipt(evt)
+              if (!info) return
 
-            if (info.invoice === pr) {
-              setPaid({ preimage: info.preimage ?? '' })
+              if (info.invoice === pr) {
+                setPaid({ preimage: info.preimage ?? '' })
+              }
             }
           }
         )

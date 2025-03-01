@@ -2,6 +2,7 @@ import { useFetchEvent } from '@/hooks'
 import { extractZapInfoFromReceipt } from '@/lib/event'
 import { formatAmount } from '@/lib/lightning'
 import { toNote, toProfile } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { Zap } from 'lucide-react'
@@ -12,7 +13,13 @@ import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
 import UserAvatar from '../../UserAvatar'
 
-export function ZapNotification({ notification }: { notification: Event }) {
+export function ZapNotification({
+  notification,
+  isNew = false
+}: {
+  notification: Event
+  isNew?: boolean
+}) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
@@ -36,7 +43,10 @@ export function ZapNotification({ notification }: { notification: Event }) {
           {formatAmount(amount)} {t('sats')}
         </div>
         {comment && <div className="text-yellow-400 truncate">{comment}</div>}
-        <ContentPreview className="truncate flex-1 w-0" event={event} />
+        <ContentPreview
+          className={cn('truncate flex-1 w-0', isNew ? 'font-semibold' : 'text-muted-foreground')}
+          event={event}
+        />
       </div>
       <div className="text-muted-foreground shrink-0">
         <FormattedTimestamp timestamp={notification.created_at} short />

@@ -17,6 +17,7 @@ import {
 import ExplorePage from './pages/primary/ExplorePage'
 import MePage from './pages/primary/MePage'
 import NotificationListPage from './pages/primary/NotificationListPage'
+import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { routes } from './routes'
 
@@ -226,28 +227,30 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               : 0
           }}
         >
-          {!!secondaryStack.length &&
-            secondaryStack.map((item, index) => (
+          <NotificationProvider>
+            {!!secondaryStack.length &&
+              secondaryStack.map((item, index) => (
+                <div
+                  key={item.index}
+                  style={{
+                    display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                  }}
+                >
+                  {item.component}
+                </div>
+              ))}
+            {primaryPages.map(({ name, element }) => (
               <div
-                key={item.index}
+                key={name}
                 style={{
-                  display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                  display:
+                    secondaryStack.length === 0 && currentPrimaryPage === name ? 'block' : 'none'
                 }}
               >
-                {item.component}
+                {element}
               </div>
             ))}
-          {primaryPages.map(({ name, element }) => (
-            <div
-              key={name}
-              style={{
-                display:
-                  secondaryStack.length === 0 && currentPrimaryPage === name ? 'block' : 'none'
-              }}
-            >
-              {element}
-            </div>
-          ))}
+          </NotificationProvider>
         </SecondaryPageContext.Provider>
       </PrimaryPageContext.Provider>
     )
@@ -267,38 +270,40 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           currentIndex: secondaryStack.length ? secondaryStack[secondaryStack.length - 1].index : 0
         }}
       >
-        <div className="flex h-screen overflow-hidden">
-          <Sidebar />
-          <Separator orientation="vertical" />
-          <div className="grid grid-cols-2 w-full">
-            <div className="flex border-r">
-              {primaryPages.map(({ name, element }) => (
-                <div
-                  key={name}
-                  className="w-full"
-                  style={{
-                    display: currentPrimaryPage === name ? 'block' : 'none'
-                  }}
-                >
-                  {element}
+        <NotificationProvider>
+          <div className="flex h-screen overflow-hidden">
+            <Sidebar />
+            <Separator orientation="vertical" />
+            <div className="grid grid-cols-2 w-full">
+              <div className="flex border-r">
+                {primaryPages.map(({ name, element }) => (
+                  <div
+                    key={name}
+                    className="w-full"
+                    style={{
+                      display: currentPrimaryPage === name ? 'block' : 'none'
+                    }}
+                  >
+                    {element}
+                  </div>
+                ))}
+              </div>
+              <div>
+                {secondaryStack.map((item, index) => (
+                  <div
+                    key={item.index}
+                    style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
+                  >
+                    {item.component}
+                  </div>
+                ))}
+                <div key="home" style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}>
+                  <HomePage />
                 </div>
-              ))}
-            </div>
-            <div>
-              {secondaryStack.map((item, index) => (
-                <div
-                  key={item.index}
-                  style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
-                >
-                  {item.component}
-                </div>
-              ))}
-              <div key="home" style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}>
-                <HomePage />
               </div>
             </div>
           </div>
-        </div>
+        </NotificationProvider>
       </SecondaryPageContext.Provider>
     </PrimaryPageContext.Provider>
   )

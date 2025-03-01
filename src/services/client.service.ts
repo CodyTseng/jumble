@@ -17,6 +17,7 @@ import {
   SimplePool,
   VerifiedEvent
 } from 'nostr-tools'
+import { SubscribeManyParams } from 'nostr-tools/abstract-pool'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import indexedDb from './indexed-db.service'
 
@@ -341,12 +342,10 @@ class ClientService extends EventTarget {
     }
   }
 
-  subscribe(urls: string[], filter: Filter | Filter[], onEvent: (evt: NEvent) => void) {
+  subscribe(urls: string[], filter: Filter | Filter[], params: SubscribeManyParams) {
     const relays = Array.from(new Set(urls))
     const filters = Array.isArray(filter) ? filter : [filter]
-    return this.pool.subscribeMany(relays, filters, {
-      onevent: onEvent
-    })
+    return this.pool.subscribeMany(relays, filters, params)
   }
 
   private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {

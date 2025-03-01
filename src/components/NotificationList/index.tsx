@@ -1,3 +1,4 @@
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
 import { cn } from '@/lib/utils'
@@ -29,18 +30,18 @@ const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const { updateNoteStatsByEvents } = useNoteStats()
-  const [notificationType, setNotificationType] = useState<TNotificationType>(() => {
-    return storage.getNotificationType()
-  })
+  const [notificationType, setNotificationType] = useState<TNotificationType>('all')
+  const [lastReadTime, setLastReadTime] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [refreshing, setRefreshing] = useState(true)
   const [notifications, setNotifications] = useState<Event[]>([])
+  const [newNotifications, setNewNotifications] = useState<Event[]>([])
+  const [oldNotifications, setOldNotifications] = useState<Event[]>([])
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const filterKinds = useMemo(() => {
-    storage.setNotificationType(notificationType)
     switch (notificationType) {
       case 'mentions':
         return [kinds.ShortTextNote, COMMENT_EVENT_KIND]
@@ -73,6 +74,7 @@ const NotificationList = forwardRef((_, ref) => {
       setRefreshing(true)
       setNotifications([])
       setShowCount(SHOW_COUNT)
+      setLastReadTime(storage.getLastReadNotificationTime(pubkey))
       const relayList = await client.fetchRelayList(pubkey)
       let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
@@ -119,6 +121,18 @@ const NotificationList = forwardRef((_, ref) => {
       promise.then((closer) => closer?.())
     }
   }, [pubkey, refreshCount, filterKinds])
+
+  useEffect(() => {
+    const visibleNotifications = notifications.slice(0, showCount)
+    const index = visibleNotifications.findIndex((event) => event.created_at <= lastReadTime)
+    if (index === -1) {
+      setNewNotifications(visibleNotifications)
+      setOldNotifications([])
+    } else {
+      setNewNotifications(visibleNotifications.slice(0, index))
+      setOldNotifications(visibleNotifications.slice(index))
+    }
+  }, [notifications, lastReadTime, showCount])
 
   const loadMore = useCallback(async () => {
     if (showCount < notifications.length) {
@@ -187,7 +201,18 @@ const NotificationList = forwardRef((_, ref) => {
         pullingContent=""
       >
         <div className="px-4 pt-2">
-          {notifications.slice(0, showCount).map((notification) => (
+          {newNotifications.map((notification) => (
+            <NotificationItem key={notification.id} notification={notification} isNew />
+          ))}
+          {!!newNotifications.length && (
+            <div className="relative my-2">
+              <Separator />
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
+                {t('Earlier notifications')}
+              </span>
+            </div>
+          )}
+          {oldNotifications.map((notification) => (
             <NotificationItem key={notification.id} notification={notification} />
           ))}
           <div className="text-center text-sm text-muted-foreground">

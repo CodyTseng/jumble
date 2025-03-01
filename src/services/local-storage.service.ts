@@ -6,7 +6,6 @@ import {
   TAccountPointer,
   TFeedType,
   TNoteListMode,
-  TNotificationType,
   TRelaySet,
   TThemeSetting
 } from '@/types'
@@ -49,7 +48,7 @@ class LocalStorageService {
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
   private noteListMode: TNoteListMode = 'posts'
-  private notificationType: TNotificationType = 'all'
+  private lastReadNotificationTimeMap: Record<string, number> = {}
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
@@ -80,11 +79,9 @@ class LocalStorageService {
       noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
-    const notificationTypeStr = window.localStorage.getItem(StorageKey.NOTIFICATION_TYPE)
-    this.notificationType =
-      notificationTypeStr && ['all', 'mentions', 'reactions', 'zaps'].includes(notificationTypeStr)
-        ? (notificationTypeStr as TNotificationType)
-        : 'all'
+    const lastReadNotificationTimeMapStr =
+      window.localStorage.getItem(StorageKey.LAST_READ_NOTIFICATION_TIME_MAP) ?? '{}'
+    this.lastReadNotificationTimeMap = JSON.parse(lastReadNotificationTimeMapStr)
 
     const relaySetsStr = window.localStorage.getItem(StorageKey.RELAY_SETS)
     if (!relaySetsStr) {
@@ -180,15 +177,6 @@ class LocalStorageService {
     this.noteListMode = mode
   }
 
-  getNotificationType() {
-    return this.notificationType
-  }
-
-  setNotificationType(type: TNotificationType) {
-    window.localStorage.setItem(StorageKey.NOTIFICATION_TYPE, type)
-    this.notificationType = type
-  }
-
   getAccounts() {
     return this.accounts
   }
@@ -264,6 +252,18 @@ class LocalStorageService {
   setQuickZap(quickZap: boolean) {
     this.quickZap = quickZap
     window.localStorage.setItem(StorageKey.QUICK_ZAP, quickZap.toString())
+  }
+
+  getLastReadNotificationTime(pubkey: string) {
+    return this.lastReadNotificationTimeMap[pubkey] ?? 0
+  }
+
+  setLastReadNotificationTime(pubkey: string, time: number) {
+    this.lastReadNotificationTimeMap[pubkey] = time
+    window.localStorage.setItem(
+      StorageKey.LAST_READ_NOTIFICATION_TIME_MAP,
+      JSON.stringify(this.lastReadNotificationTimeMap)
+    )
   }
 }
 
