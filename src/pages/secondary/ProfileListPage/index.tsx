@@ -1,6 +1,6 @@
 import UserItem from '@/components/UserItem'
 import { SEARCHABLE_RELAY_URLS } from '@/constants'
-import { useFetchRelayInfos, useSearchParams } from '@/hooks'
+import { useFetchRelayInfos } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useFeed } from '@/providers/FeedProvider'
 import client from '@/services/client.service'
@@ -13,7 +13,6 @@ const LIMIT = 50
 
 const ProfileListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { searchParams } = useSearchParams()
   const { relayUrls } = useFeed()
   const { searchableRelayUrls } = useFetchRelayInfos(relayUrls)
   const [until, setUntil] = useState<number>(() => dayjs().unix())
@@ -22,12 +21,13 @@ const ProfileListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const bottomRef = useRef<HTMLDivElement>(null)
   const filter = useMemo(() => {
     const f: Filter = { until }
+    const searchParams = new URLSearchParams(window.location.search)
     const search = searchParams.get('s')
     if (search) {
       f.search = search
     }
     return f
-  }, [searchParams, until])
+  }, [until])
   const urls = useMemo(() => {
     return filter.search ? searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4) : relayUrls
   }, [relayUrls, searchableRelayUrls, filter])
