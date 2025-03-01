@@ -253,7 +253,7 @@ function ListModeSwitch({
   return (
     <div
       className={cn(
-        'sticky top-12 bg-background z-30 duration-700 transition-transform',
+        'sticky top-12 bg-background z-30 duration-700 transition-transform select-none',
         deepBrowsing && lastScrollTop > 800 ? '-translate-y-[calc(100%+12rem)]' : ''
       )}
     >
