@@ -139,7 +139,7 @@ class RelayInfoService {
     relayInfos.forEach((relayInfo) => this.addRelayInfo(relayInfo))
     this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
 
-    const loadFromInternet = async () => {
+    const loadFromInternet = async (slowFetch: boolean = true) => {
       let until: number = Math.round(Date.now() / 1000)
       const since = until - 60 * 60 * 48
 
@@ -149,23 +149,28 @@ class RelayInfoService {
           kinds: [30166],
           since,
           until,
-          limit: 1000
+          limit: slowFetch ? 100 : 1000
         })
         const events = relayInfoEvents.sort((a, b) => b.created_at - a.created_at)
         if (events.length === 0) {
           break
         }
-        await Promise.allSettled(events.map((event) => indexedDb.putRelayInfoEvent(event)))
+        for (const event of events) {
+          await indexedDb.putRelayInfoEvent(event)
+          const relayInfo = formatRelayInfoEvents([event])[0]
+          await this.addRelayInfo(relayInfo)
+        }
         until = events[events.length - 1].created_at - 1
-        const relayInfos = formatRelayInfoEvents(events)
-        relayInfos.forEach((relayInfo) => this.addRelayInfo(relayInfo))
+        if (slowFetch) {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
       }
       this.relayUrlsForRandom = Array.from(this.relayInfoMap.keys())
     }
     if (localRelayInfos.length === 0) {
-      await loadFromInternet()
+      await loadFromInternet(false)
     } else {
-      loadFromInternet()
+      setTimeout(loadFromInternet, 1000 * 20) // 20 seconds
     }
   }
 

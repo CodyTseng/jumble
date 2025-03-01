@@ -269,12 +269,28 @@ class IndexedDbService {
       return
     }
 
-    const expirationTimestamp = Date.now() - 1000 * 60 * 60 * 24 // 1 day
-    const transaction = this.db!.transaction(Object.values(StoreNames), 'readwrite')
+    const stores = [
+      { name: StoreNames.PROFILE_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
+      { name: StoreNames.RELAY_LIST_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
+      {
+        name: StoreNames.FOLLOW_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24
+      }, // 1 day
+      { name: StoreNames.RELAY_INFO_EVENTS, expirationTimestamp: -1 },
+      { name: StoreNames.MUTE_LIST_EVENTS, expirationTimestamp: -1 },
+      { name: StoreNames.MUTE_DECRYPTED_TAGS, expirationTimestamp: -1 }
+    ]
+    const transaction = this.db!.transaction(
+      stores.map((store) => store.name),
+      'readwrite'
+    )
     await Promise.allSettled(
-      Object.values(StoreNames).map((storeName) => {
+      stores.map(({ name, expirationTimestamp }) => {
+        if (expirationTimestamp < 0) {
+          return Promise.resolve()
+        }
         return new Promise<void>((resolve, reject) => {
-          const store = transaction.objectStore(storeName)
+          const store = transaction.objectStore(name)
           const request = store.openCursor()
           request.onsuccess = (event) => {
             const cursor = (event.target as IDBRequest).result
