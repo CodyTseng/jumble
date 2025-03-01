@@ -87,10 +87,7 @@ class ClientService extends EventTarget {
   }
 
   async init() {
-    await indexedDb.iterateProfileEvents(async (profileEvent) => {
-      this.addUsernameToIndex(profileEvent)
-      await new Promise((resolve) => setTimeout(resolve, 20))
-    })
+    await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
   }
 
   listConnectionStatus() {
@@ -671,7 +668,7 @@ class ClientService extends EventTarget {
       await Promise.all(
         followings.slice(i * 20, (i + 1) * 20).map((pubkey) => this.fetchProfileEvent(pubkey))
       )
-      await new Promise((resolve) => setTimeout(resolve, 10000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   }
 

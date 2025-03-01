@@ -63,6 +63,7 @@ export default function Image({
           )}
           onLoad={() => {
             setIsLoading(false)
+            setHasError(false)
             setTimeout(() => setDisplayBlurHash(false), 500)
           }}
           onError={() => {
