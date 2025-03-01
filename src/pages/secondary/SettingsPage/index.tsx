@@ -51,6 +51,8 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <SelectContent>
             <SelectItem value="en">English</SelectItem>
             <SelectItem value="zh">简体中文</SelectItem>
+            <SelectItem value="pl">Polski</SelectItem>
+           
           </SelectContent>
         </Select>
       </SettingItem>
