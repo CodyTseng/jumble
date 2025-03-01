@@ -12,7 +12,7 @@ export default function PrimaryPageSidebar() {
   return (
     <div className="w-16 xl:w-52 hidden sm:flex flex-col pb-2 pt-4 px-2 justify-between h-full shrink-0">
       <div className="space-y-2">
-        <div className="px-4 mb-8 w-full">
+        <div className="px-3 xl:px-4 mb-6 w-full">
           <Icon className="xl:hidden" />
           <Logo className="max-xl:hidden" />
         </div>
