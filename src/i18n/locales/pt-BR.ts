@@ -180,7 +180,7 @@ export default {
     'Random Relays': 'Relés aleatórios',
     randomRelaysRefresh: 'Atualizar',
     'Explore more': 'Explorar mais',
-    'Payment page': 'Página de Pagamento',
+    'Payment page': 'Página de pagamento',
     'Supported NIPs': 'NIPs Suportados',
     'Open in a': 'Abrir em {{a}}',
     'Cannot handle event of kind k': 'Não é possível lidar com o evento do tipo {{k}}',
