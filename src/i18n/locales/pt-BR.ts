@@ -85,7 +85,7 @@ export default {
     'no more notifications': 'não há mais notificações',
     'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':
       'Usar login com chave privada é inseguro. Recomenda-se utilizar uma extensão do navegador, como alby, nostr-keyx ou nos2x.',
-    'Login with Browser Extension': 'Entrar com extensão do Navegador',
+    'Login with Browser Extension': 'Entrar com extensão do navegador',
     'Login with Bunker': 'Entrar com Bunker',
     'Login with Private Key': 'Entrar com Chave Privada',
     'reload notes': 'recarregar notas',
