@@ -281,7 +281,7 @@ function ListModeSwitch({
           className={`w-1/3 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${listMode === 'postsAndReplies' ? '' : 'text-muted-foreground'}`}
           onClick={() => setListMode('postsAndReplies')}
         >
-          {t('Notes & Replies')}
+          {t('Replies')}
         </div>
         <div
           className={`w-1/3 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${listMode === 'pictures' ? '' : 'text-muted-foreground'}`}

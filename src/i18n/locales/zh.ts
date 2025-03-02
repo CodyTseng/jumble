@@ -78,7 +78,7 @@ export default {
     'All users': '所有用户',
     'Display replies': '显示回复',
     Notes: '笔记',
-    'Notes & Replies': '笔记 & 回复',
+    Replies: '回复',
     Notifications: '通知',
     'no more notifications': '到底了',
     'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':

@@ -1,6 +1,7 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import { LocalizedLanguageNames } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toRelaySettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
@@ -49,9 +50,11 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="zh">简体中文</SelectItem>
-            <SelectItem value="pl">Polski</SelectItem>
+            {Object.entries(LocalizedLanguageNames).map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                {value}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </SettingItem>

@@ -79,7 +79,7 @@ export default {
     'All users': 'Wszyscy użytkownicy',
     'Display replies': 'Wyświetl komentarze',
     Notes: 'Wpisy',
-    'Notes & Replies': 'Wpisy & Komentarze',
+    Replies: 'Komentarze',
     Notifications: 'Powiadomienia',
     'no more notifications': 'Koniec powiadomień',
     'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':
