@@ -20,7 +20,7 @@ A beautiful nostr client focused on browsing relay feeds
 
 ## Screenshots
 
-<img src="./screenshots/01.png" alt="Jumble Screenshot 01" width="800" />
+<img src="./screenshots/01.png" alt="Jumble Screenshot 01" width="650" />
 <div> 
   <img src="./screenshots/02.png" alt="Jumble Screenshot 02" width="200" />
   <img src="./screenshots/03.png" alt="Jumble Screenshot 03" width="200" />
