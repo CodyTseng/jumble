@@ -201,6 +201,7 @@ export default {
     'Enjoying Jumble?': 'Enjoying Jumble?',
     'Your donation helps me maintain Jumble and make it better! 😊':
       'Your donation helps me maintain Jumble and make it better! 😊',
-    'Earlier notifications': 'Earlier notifications'
+    'Earlier notifications': 'Earlier notifications',
+    'Temporarily display this note': 'Temporarily display this note'
   }
 }

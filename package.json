@@ -45,6 +45,7 @@
     "embla-carousel-react": "^8.5.1",
     "flexsearch": "^0.7.43",
     "i18next": "^24.2.0",
+    "i18next-browser-languagedetector": "^8.0.4",
     "lru-cache": "^11.0.2",
     "lucide-react": "^0.469.0",
     "nostr-tools": "^2.10.4",

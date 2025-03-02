@@ -95,7 +95,7 @@ export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
 export type TFeedType = 'following' | 'relays' | 'temporary'
 
-export type TLanguage = 'en' | 'zh'
+export type TLanguage = 'en' | 'zh' | 'pl'
 
 export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number; height: number } }
 

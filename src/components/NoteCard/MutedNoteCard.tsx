@@ -44,7 +44,7 @@ export default function MutedNoteCard({
           </div>
         </div>
         <div className="flex flex-col gap-2 items-center text-muted-foreground font-medium my-4">
-          <div>{t('This user is muted')}</div>
+          <div>{t('This user has been muted')}</div>
           <Button
             onClick={(e) => {
               e.stopPropagation()

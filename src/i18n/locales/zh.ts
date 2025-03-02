@@ -202,6 +202,7 @@ export default {
     'Enjoying Jumble?': '喜欢 Jumble 吗？',
     'Your donation helps me maintain Jumble and make it better! 😊':
       '您的捐赠帮助我维护 Jumble 并使其更好！😊',
-    'Earlier notifications': '更早的通知'
+    'Earlier notifications': '更早的通知',
+    'Temporarily display this note': '临时显示此笔记'
   }
 }
