@@ -36,7 +36,7 @@ export default {
     'load more older replies': 'さらに古い返信を読み込む',
     'Write something...': '何か書いて...',
     Cancel: 'キャンセル',
-    Mentions: 'メンション',
+    Mentions: '@',
     'Failed to post': '投稿に失敗しました',
     'Post successful': '投稿に成功しました',
     'Your post has been published': '投稿が公開されました',
@@ -197,7 +197,7 @@ export default {
     'Quick zap': 'クイックZap',
     'If enabled, you can zap with a single click': '有効の場合、ワンクリックでZapできます',
     All: 'すべて',
-    Reactions: 'リアクション',
+    Reactions: '反応',
     Zaps: 'Zap',
     'Enjoying Jumble?': 'Jumbleをお楽しみですか？',
     'Your donation helps me maintain Jumble and make it better! 😊':

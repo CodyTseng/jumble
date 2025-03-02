@@ -7,7 +7,7 @@ export default {
     Post: 'Publicar',
     Home: 'Inicio',
     'Relay settings': 'Configuración de relés',
-    Settings: 'Configuraciones',
+    Settings: 'Ajustes',
     SidebarRelays: 'Relés',
     Refresh: 'Actualizar',
     Profile: 'Perfil',

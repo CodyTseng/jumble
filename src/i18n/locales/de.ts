@@ -36,7 +36,7 @@ export default {
     'load more older replies': 'ältere Antworten laden',
     'Write something...': 'Schreibe etwas...',
     Cancel: 'Abbrechen',
-    Mentions: 'Erwähnungen',
+    Mentions: '@',
     'Failed to post': 'Posten fehlgeschlagen',
     'Post successful': 'Beitrag erfolgreich',
     'Your post has been published': 'Dein Beitrag wurde veröffentlicht',
