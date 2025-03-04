@@ -29,11 +29,11 @@ export default function SeenOnButton({ event }: { event: Event }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex gap-1 items-center text-muted-foreground enabled:hover:text-primary"
+          className="flex gap-1 items-center text-muted-foreground enabled:hover:text-primary px-3 h-full"
           title={t('Seen on')}
           disabled={relays.length === 0}
         >
-          <Server size={16} />
+          <Server />
           {relays.length > 0 && <div className="text-sm">{relays.length}</div>}
         </button>
       </DropdownMenuTrigger>

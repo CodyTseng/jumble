@@ -68,12 +68,12 @@ export default function RepostButton({ event }: { event: Event }) {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex gap-1 items-center enabled:hover:text-lime-500',
+              'flex gap-1 items-center enabled:hover:text-lime-500 px-3 h-full',
               hasReposted ? 'text-lime-500' : 'text-muted-foreground'
             )}
             title={t('Repost')}
           >
-            {reposting ? <Loader className="animate-spin" size={16} /> : <Repeat size={16} />}
+            {reposting ? <Loader className="animate-spin" /> : <Repeat />}
             {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
           </button>
         </DropdownMenuTrigger>

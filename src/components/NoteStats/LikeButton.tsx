@@ -55,7 +55,7 @@ export default function LikeButton({ event }: { event: Event }) {
   return (
     <button
       className={cn(
-        'flex items-center enabled:hover:text-red-400 gap-1',
+        'flex items-center enabled:hover:text-red-400 gap-1 px-3 h-full',
         hasLiked ? 'text-red-400' : 'text-muted-foreground'
       )}
       onClick={like}
@@ -63,9 +63,9 @@ export default function LikeButton({ event }: { event: Event }) {
       title={t('Like')}
     >
       {liking ? (
-        <Loader className="animate-spin" size={16} />
+        <Loader className="animate-spin" />
       ) : (
-        <Heart size={16} className={hasLiked ? 'fill-red-400' : ''} />
+        <Heart className={hasLiked ? 'fill-red-400' : ''} />
       )}
       {!!likeCount && <div className="text-sm">{formatCount(likeCount)}</div>}
     </button>

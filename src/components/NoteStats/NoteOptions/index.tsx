@@ -22,13 +22,12 @@ export default function NoteOptions({ event }: { event: Event }) {
   const isMuted = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
 
   return (
-    <div className="h-4" onClick={(e) => e.stopPropagation()}>
+    <div onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Ellipsis
-            size={16}
-            className="text-muted-foreground hover:text-foreground cursor-pointer"
-          />
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center text-muted-foreground hover:text-foreground pl-3 h-full">
+            <Ellipsis />
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent collisionPadding={8}>
           <DropdownMenuItem

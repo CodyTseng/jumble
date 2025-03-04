@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useEffect } from 'react'
 import LikeButton from './LikeButton'
@@ -21,6 +22,7 @@ export default function NoteStats({
   fetchIfNotExisting?: boolean
   variant?: 'note' | 'reply'
 }) {
+  const { isSmallScreen } = useScreenSize()
   const { fetchNoteStats } = useNoteStats()
 
   useEffect(() => {
@@ -28,17 +30,36 @@ export default function NoteStats({
     fetchNoteStats(event)
   }, [event, fetchIfNotExisting])
 
+  if (isSmallScreen) {
+    return (
+      <div className={cn('select-none', className)}>
+        <TopZaps event={event} />
+        <div
+          className="flex justify-between items-center h-6 [&_svg]:size-5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ReplyButton event={event} variant={variant} />
+          <RepostButton event={event} />
+          <LikeButton event={event} />
+          <ZapButton event={event} />
+          <SeenOnButton event={event} />
+          <NoteOptions event={event} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={cn('select-none', className)}>
       <TopZaps event={event} />
-      <div className="flex justify-between">
-        <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
+      <div className="flex justify-between [&_svg]:size-5">
+        <div className="flex items-center h-6" onClick={(e) => e.stopPropagation()}>
           <ReplyButton event={event} variant={variant} />
           <RepostButton event={event} />
           <LikeButton event={event} />
           <ZapButton event={event} />
         </div>
-        <div className="flex gap-5 h-4 items-center" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center h-6" onClick={(e) => e.stopPropagation()}>
           <SeenOnButton event={event} />
           <NoteOptions event={event} />
         </div>
