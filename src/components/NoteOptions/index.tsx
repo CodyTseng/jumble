@@ -17,7 +17,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RawEventDialog from './RawEventDialog'
 
-export default function NoteOptions({ event }: { event: Event }) {
+export default function NoteOptions({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey } = useNostr()
@@ -45,7 +45,7 @@ export default function NoteOptions({ event }: { event: Event }) {
 
   if (isSmallScreen) {
     return (
-      <>
+      <div className={className} onClick={(e) => e.stopPropagation()}>
         {trigger}
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
@@ -105,12 +105,12 @@ export default function NoteOptions({ event }: { event: Event }) {
           </DrawerContent>
         </Drawer>
         {rawEventDialog}
-      </>
+      </div>
     )
   }
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div className={className} onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent collisionPadding={8}>

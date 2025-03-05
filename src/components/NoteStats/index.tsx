@@ -4,7 +4,6 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useEffect } from 'react'
 import LikeButton from './LikeButton'
-import NoteOptions from './NoteOptions'
 import ReplyButton from './ReplyButton'
 import RepostButton from './RepostButton'
 import SeenOnButton from './SeenOnButton'
@@ -43,7 +42,6 @@ export default function NoteStats({
           <LikeButton event={event} />
           <ZapButton event={event} />
           <SeenOnButton event={event} />
-          <NoteOptions event={event} />
         </div>
       </div>
     )
@@ -61,7 +59,6 @@ export default function NoteStats({
         </div>
         <div className="flex items-center h-5" onClick={(e) => e.stopPropagation()}>
           <SeenOnButton event={event} />
-          <NoteOptions event={event} />
         </div>
       </div>
     </div>
