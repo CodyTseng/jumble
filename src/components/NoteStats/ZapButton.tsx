@@ -18,6 +18,7 @@ export default function ZapButton({ event }: { event: Event }) {
   const { checkLogin, pubkey } = useNostr()
   const { noteStatsMap, addZap } = useNoteStats()
   const { defaultZapSats, defaultZapComment, quickZap } = useZap()
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
   const { zapAmount, hasZapped } = useMemo(() => {
@@ -71,6 +72,11 @@ export default function ZapButton({ event }: { event: Event }) {
     e.preventDefault()
     isLongPressRef.current = false
 
+    if ('touches' in e) {
+      const touch = e.touches[0]
+      setTouchStart({ x: touch.clientX, y: touch.clientY })
+    }
+
     if (quickZap) {
       timerRef.current = setTimeout(() => {
         isLongPressRef.current = true
@@ -87,6 +93,15 @@ export default function ZapButton({ event }: { event: Event }) {
     e.preventDefault()
     if (timerRef.current) {
       clearTimeout(timerRef.current)
+    }
+
+    if ('touches' in e) {
+      setTouchStart(null)
+      if (!touchStart) return
+      const touch = e.changedTouches[0]
+      const diffX = Math.abs(touch.clientX - touchStart.x)
+      const diffY = Math.abs(touch.clientY - touchStart.y)
+      if (diffX > 10 || diffY > 10) return
     }
 
     if (!quickZap) {
