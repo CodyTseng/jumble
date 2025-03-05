@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { getSharableEventId } from '@/lib/event'
@@ -113,7 +114,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
     <div className={className} onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-        <DropdownMenuContent collisionPadding={8}>
+        <DropdownMenuContent collisionPadding={8} className="min-w-52">
           <DropdownMenuItem
             onClick={() => navigator.clipboard.writeText(getSharableEventId(event))}
           >
@@ -126,18 +127,22 @@ export default function NoteOptions({ event, className }: { event: Event; classN
             <Copy />
             {t('Copy user ID')}
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setIsRawEventDialogOpen(true)}>
             <Code />
             {t('View raw event')}
           </DropdownMenuItem>
           {pubkey && (
-            <DropdownMenuItem
-              onClick={() => (isMuted ? unmutePubkey(event.pubkey) : mutePubkey(event.pubkey))}
-              className="text-destructive focus:text-destructive"
-            >
-              {isMuted ? <Bell /> : <BellOff />}
-              {isMuted ? t('Unmute user') : t('Mute user')}
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => (isMuted ? unmutePubkey(event.pubkey) : mutePubkey(event.pubkey))}
+                className="text-destructive focus:text-destructive"
+              >
+                {isMuted ? <Bell /> : <BellOff />}
+                {isMuted ? t('Unmute user') : t('Mute user')}
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

@@ -174,7 +174,7 @@ export default function Nip22ReplyNoteList({
         {loading ? t('loading...') : until ? t('load more older replies') : null}
       </div>
       {replies.length > 0 && (loading || until) && <Separator className="my-2" />}
-      <div className={cn('mb-4', className)}>
+      <div className={cn('mb-4 space-y-4', className)}>
         {replies.map((reply) => {
           const info = replyMap[reply.id]
           return (

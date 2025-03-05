@@ -13,11 +13,15 @@ import ZapButton from './ZapButton'
 export default function NoteStats({
   event,
   className,
+  classNames,
   fetchIfNotExisting = false,
   variant = 'note'
 }: {
   event: Event
   className?: string
+  classNames?: {
+    buttonBar?: string
+  }
   fetchIfNotExisting?: boolean
   variant?: 'note' | 'reply'
 }) {
@@ -34,7 +38,10 @@ export default function NoteStats({
       <div className={cn('select-none', className)}>
         <TopZaps event={event} />
         <div
-          className="flex justify-between items-center h-5 [&_svg]:size-5"
+          className={cn(
+            'flex justify-between items-center h-5 [&_svg]:size-5',
+            classNames?.buttonBar
+          )}
           onClick={(e) => e.stopPropagation()}
         >
           <ReplyButton event={event} variant={variant} />

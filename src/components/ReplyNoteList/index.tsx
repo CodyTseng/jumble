@@ -188,7 +188,7 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
         <div className="text-sm text-center text-muted-foreground">{t('no replies')}</div>
       )}
       {replies.length > 0 && (loading || until) && <Separator className="my-2" />}
-      <div className={cn('mb-4 space-y-2', className)}>
+      <div className={cn('mb-4 space-y-4', className)}>
         {replies.map((reply) => {
           const info = replyMap[reply.id]
           return (

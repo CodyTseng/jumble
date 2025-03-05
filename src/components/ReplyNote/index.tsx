@@ -62,7 +62,12 @@ export default function ReplyNote({
         {show ? (
           <>
             <Content className="mt-1" event={event} size="small" />
-            <NoteStats className="mt-2" event={event} variant="reply" />
+            <NoteStats
+              className="mt-2"
+              classNames={{ buttonBar: 'justify-start gap-1' }}
+              event={event}
+              variant="reply"
+            />
           </>
         ) : (
           <Button
