@@ -196,7 +196,7 @@ export default {
     'Lightning Address (or LNURL)': 'Endereço Lightning (ou LNURL)',
     'Quick zap': 'Zap rápido',
     'If enabled, you can zap with a single click. Click and hold for custom amounts':
-      'Se ativado, você pode zapar com um único clique. Clique e segure para quantias personalizadas',
+      'Se ativado, você pode zapear com um único clique. Clique e segure para quantias personalizadas',
     All: 'Tudo',
     Reactions: 'Reações',
     Zaps: 'Zaps',
