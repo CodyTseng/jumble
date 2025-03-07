@@ -58,12 +58,8 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
     return (
       <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
         <PictureNote key={`note-${event.id}`} event={event} fetchNoteStats />
-        <Separator className="mb-2 mt-4" />
-        <Nip22ReplyNoteList
-          key={`nip22-reply-note-list-${event.id}`}
-          event={event}
-          className="px-2"
-        />
+        <Separator className="mt-4" />
+        <Nip22ReplyNoteList key={`nip22-reply-note-list-${event.id}`} event={event} />
       </SecondaryPageLayout>
     )
   }
@@ -77,15 +73,11 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
         <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
         <Note key={`note-${event.id}`} event={event} fetchNoteStats hideParentNotePreview />
       </div>
-      <Separator className="mb-2 mt-4" />
+      <Separator className="mt-4" />
       {event.kind === kinds.ShortTextNote ? (
-        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="px-2" />
+        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} />
       ) : isPictureEvent(event) ? (
-        <Nip22ReplyNoteList
-          key={`nip22-reply-note-list-${event.id}`}
-          event={event}
-          className="px-2"
-        />
+        <Nip22ReplyNoteList key={`nip22-reply-note-list-${event.id}`} event={event} />
       ) : null}
     </SecondaryPageLayout>
   )

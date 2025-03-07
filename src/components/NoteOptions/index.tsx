@@ -57,7 +57,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
                   setIsDrawerOpen(false)
                   navigator.clipboard.writeText(getSharableEventId(event))
                 }}
-                className="w-full p-6 justify-start"
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"
               >
                 <Copy />
@@ -68,7 +68,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
                   navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')
                   setIsDrawerOpen(false)
                 }}
-                className="w-full p-6 justify-start"
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"
               >
                 <Copy />
@@ -79,7 +79,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
                   setIsDrawerOpen(false)
                   setIsRawEventDialogOpen(true)
                 }}
-                className="w-full p-6 justify-start"
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"
               >
                 <Code />
@@ -95,7 +95,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
                       mutePubkey(event.pubkey)
                     }
                   }}
-                  className="w-full p-6 justify-start text-destructive focus:text-destructive"
+                  className="w-full p-6 justify-start text-destructive text-lg gap-4 [&_svg]:size-5 focus:text-destructive"
                   variant="ghost"
                 >
                   {isMuted ? <Bell /> : <BellOff />}

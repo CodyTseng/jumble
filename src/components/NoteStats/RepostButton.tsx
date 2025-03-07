@@ -104,7 +104,7 @@ export default function RepostButton({ event }: { event: Event }) {
               <Button
                 onClick={repost}
                 disabled={!canRepost}
-                className="w-full p-6 justify-start"
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"
               >
                 <Repeat /> {t('Repost')}
@@ -117,7 +117,7 @@ export default function RepostButton({ event }: { event: Event }) {
                     setIsPostDialogOpen(true)
                   })
                 }}
-                className="w-full p-6 justify-start"
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"
               >
                 <PencilLine /> {t('Quote')}
@@ -134,7 +134,7 @@ export default function RepostButton({ event }: { event: Event }) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="min-w-44">
           <DropdownMenuItem onClick={repost} disabled={!canRepost}>
             <Repeat /> {t('Repost')}
           </DropdownMenuItem>

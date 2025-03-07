@@ -57,14 +57,14 @@ export default function NoteStats({
   return (
     <div className={cn('select-none', className)}>
       <TopZaps event={event} />
-      <div className="flex justify-between [&_svg]:size-4">
-        <div className="flex items-center h-5" onClick={(e) => e.stopPropagation()}>
+      <div className="flex justify-between h-5 [&_svg]:size-4">
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           <ReplyButton event={event} variant={variant} />
           <RepostButton event={event} />
           <LikeButton event={event} />
           <ZapButton event={event} />
         </div>
-        <div className="flex items-center h-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           <SeenOnButton event={event} />
         </div>
       </div>
