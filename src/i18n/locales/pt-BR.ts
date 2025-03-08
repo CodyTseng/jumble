@@ -196,7 +196,7 @@ export default {
     'Lightning Address (or LNURL)': 'Endereço Lightning (ou LNURL)',
     'Quick zap': 'Zap rápido',
     'If enabled, you can zap with a single click. Click and hold for custom amounts':
-      'Se ativado, você pode zapar com um único clique. Clique e segure para quantias personalizadas',
+      'Se ativado, você pode zapear com um único clique. Clique e segure para quantias personalizadas',
     All: 'Tudo',
     Reactions: 'Reações',
     Zaps: 'Zaps',
@@ -210,6 +210,7 @@ export default {
       'Tem certeza de que deseja deixar de seguir este usuário?',
     'Recent Supporters': 'Apoiadores recentes',
     'Seen on': 'Visto em',
-    'Temporarily display this reply': 'Exibir temporariamente esta resposta'
+    'Temporarily display this reply': 'Exibir temporariamente esta resposta',
+    'Not found the note': 'Nota não encontrada'
   }
 }

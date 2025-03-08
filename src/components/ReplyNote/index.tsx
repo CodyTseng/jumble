@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
+import NoteOptions from '../NoteOptions'
 import NoteStats from '../NoteStats'
 import ParentNotePreview from '../ParentNotePreview'
 import UserAvatar from '../UserAvatar'
@@ -31,19 +32,22 @@ export default function ReplyNote({
 
   return (
     <div
-      className={`flex space-x-2 items-start rounded-lg p-2 transition-colors duration-500 ${highlight ? 'bg-highlight/50' : ''}`}
+      className={`flex space-x-2 items-start px-4 py-3 border-b transition-colors duration-500 ${highlight ? 'bg-highlight/50' : ''}`}
     >
       <UserAvatar userId={event.pubkey} size="small" className="shrink-0" />
       <div className="w-full overflow-hidden">
-        <div className="flex gap-2 items-center">
-          <Username
-            userId={event.pubkey}
-            className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
-            skeletonClassName="h-3"
-          />
-          <div className="text-xs text-muted-foreground shrink-0">
-            <FormattedTimestamp timestamp={event.created_at} />
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex gap-2 items-center flex-1">
+            <Username
+              userId={event.pubkey}
+              className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
+              skeletonClassName="h-3"
+            />
+            <div className="text-xs text-muted-foreground shrink-0">
+              <FormattedTimestamp timestamp={event.created_at} />
+            </div>
           </div>
+          <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
         </div>
         {parentEvent && (
           <ParentNotePreview
@@ -58,7 +62,12 @@ export default function ReplyNote({
         {show ? (
           <>
             <Content className="mt-1" event={event} size="small" />
-            <NoteStats className="mt-2" event={event} variant="reply" />
+            <NoteStats
+              className="mt-2"
+              classNames={{ buttonBar: 'justify-start gap-1' }}
+              event={event}
+              variant="reply"
+            />
           </>
         ) : (
           <Button

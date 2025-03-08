@@ -209,6 +209,7 @@ export default {
     'Are you sure you want to unfollow this user?': '确定要取消关注此用户吗？',
     'Recent Supporters': '最近的支持者',
     'Seen on': '来自',
-    'Temporarily display this reply': '临时显示此回复'
+    'Temporarily display this reply': '临时显示此回复',
+    'Not found the note': '未找到该笔记'
   }
 }

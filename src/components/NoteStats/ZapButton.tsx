@@ -18,6 +18,7 @@ export default function ZapButton({ event }: { event: Event }) {
   const { checkLogin, pubkey } = useNostr()
   const { noteStatsMap, addZap } = useNoteStats()
   const { defaultZapSats, defaultZapComment, quickZap } = useZap()
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
   const { zapAmount, hasZapped } = useMemo(() => {
@@ -47,14 +48,18 @@ export default function ZapButton({ event }: { event: Event }) {
         throw new Error('You need to be logged in to zap')
       }
       setZapping(true)
-      const { invoice } = await lightning.zap(
+      const zapResult = await lightning.zap(
         pubkey,
         event.pubkey,
         defaultZapSats,
         defaultZapComment,
         event.id
       )
-      addZap(event.id, invoice, defaultZapSats, defaultZapComment)
+      // user canceled
+      if (!zapResult) {
+        return
+      }
+      addZap(event.id, zapResult.invoice, defaultZapSats, defaultZapComment)
     } catch (error) {
       toast({
         title: t('Zap failed'),
@@ -70,6 +75,11 @@ export default function ZapButton({ event }: { event: Event }) {
     e.stopPropagation()
     e.preventDefault()
     isLongPressRef.current = false
+
+    if ('touches' in e) {
+      const touch = e.touches[0]
+      setTouchStart({ x: touch.clientX, y: touch.clientY })
+    }
 
     if (quickZap) {
       timerRef.current = setTimeout(() => {
@@ -87,6 +97,15 @@ export default function ZapButton({ event }: { event: Event }) {
     e.preventDefault()
     if (timerRef.current) {
       clearTimeout(timerRef.current)
+    }
+
+    if ('touches' in e) {
+      setTouchStart(null)
+      if (!touchStart) return
+      const touch = e.changedTouches[0]
+      const diffX = Math.abs(touch.clientX - touchStart.x)
+      const diffY = Math.abs(touch.clientY - touchStart.y)
+      if (diffX > 10 || diffY > 10) return
     }
 
     if (!quickZap) {
@@ -110,7 +129,7 @@ export default function ZapButton({ event }: { event: Event }) {
     <>
       <button
         className={cn(
-          'flex items-center enabled:hover:text-yellow-400 gap-1 select-none',
+          'flex items-center enabled:hover:text-yellow-400 gap-1 select-none px-3 h-full',
           hasZapped ? 'text-yellow-400' : 'text-muted-foreground'
         )}
         title={t('Zap')}
@@ -121,9 +140,9 @@ export default function ZapButton({ event }: { event: Event }) {
         onTouchEnd={handleClickEnd}
       >
         {zapping ? (
-          <Loader className="animate-spin" size={16} />
+          <Loader className="animate-spin" />
         ) : (
-          <Zap size={16} className={hasZapped ? 'fill-yellow-400' : ''} />
+          <Zap className={hasZapped ? 'fill-yellow-400' : ''} />
         )}
         {!!zapAmount && <div className="text-sm">{formatAmount(zapAmount)}</div>}
       </button>

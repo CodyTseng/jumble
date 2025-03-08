@@ -77,11 +77,15 @@ function ZapDialogContent({
         throw new Error('You need to be logged in to zap')
       }
       setZapping(true)
-      const { invoice } = await lightning.zap(pubkey, recipient, sats, comment, eventId, () =>
+      const zapResult = await lightning.zap(pubkey, recipient, sats, comment, eventId, () =>
         setOpen(false)
       )
+      // user canceled
+      if (!zapResult) {
+        return
+      }
       if (eventId) {
-        addZap(eventId, invoice, sats, comment)
+        addZap(eventId, zapResult.invoice, sats, comment)
       }
     } catch (error) {
       toast({

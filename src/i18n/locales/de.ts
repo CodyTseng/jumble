@@ -212,6 +212,7 @@ export default {
       'Möchtest du diesem Benutzer wirklich nicht mehr folgen?',
     'Recent Supporters': 'Neueste Unterstützer',
     'Seen on': 'Gesehen auf',
-    'Temporarily display this reply': 'Antwort vorübergehend anzeigen'
+    'Temporarily display this reply': 'Antwort vorübergehend anzeigen',
+    'Not found the note': 'Die Notiz wurde nicht gefunden'
   }
 }

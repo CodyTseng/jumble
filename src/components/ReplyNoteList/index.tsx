@@ -178,17 +178,19 @@ export default function ReplyNoteList({ event, className }: { event: NEvent; cla
 
   return (
     <>
-      <div
-        className={`text-sm text-center text-muted-foreground ${!loading ? 'hover:text-foreground cursor-pointer' : ''}`}
-        onClick={loadMore}
-      >
-        {loading ? t('loading...') : until ? t('load more older replies') : null}
-      </div>
-      {replies.length === 0 && !loading && !until && (
-        <div className="text-sm text-center text-muted-foreground">{t('no replies')}</div>
+      {(loading || until) && (
+        <div
+          className={`text-sm text-center text-muted-foreground mt-2 ${!loading ? 'hover:text-foreground cursor-pointer' : ''}`}
+          onClick={loadMore}
+        >
+          {loading ? t('loading...') : t('load more older replies')}
+        </div>
       )}
-      {replies.length > 0 && (loading || until) && <Separator className="my-2" />}
-      <div className={cn('mb-4', className)}>
+      {replies.length === 0 && !loading && !until && (
+        <div className="text-sm mt-2 text-center text-muted-foreground">{t('no replies')}</div>
+      )}
+      {replies.length > 0 && (loading || until) && <Separator className="mt-2" />}
+      <div className={cn('mb-2', className)}>
         {replies.map((reply) => {
           const info = replyMap[reply.id]
           return (

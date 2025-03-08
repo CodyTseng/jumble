@@ -48,7 +48,7 @@ class LightningService {
     comment: string,
     eventId?: string,
     closeOuterModel?: () => void
-  ): Promise<{ preimage: string; invoice: string }> {
+  ): Promise<{ preimage: string; invoice: string } | null> {
     if (!client.signer) {
       throw new Error('You need to be logged in to zap')
     }
@@ -112,6 +112,7 @@ class LightningService {
         onCancelled: () => {
           clearInterval(checkPaymentInterval)
           subCloser?.close()
+          resolve(null)
         }
       })
 

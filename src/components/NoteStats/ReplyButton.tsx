@@ -26,7 +26,7 @@ export default function ReplyButton({
   return (
     <>
       <button
-        className="flex gap-1 items-center text-muted-foreground enabled:hover:text-blue-400"
+        className="flex gap-1 items-center text-muted-foreground enabled:hover:text-blue-400 pr-3 h-full"
         onClick={(e) => {
           e.stopPropagation()
           checkLogin(() => {
@@ -35,7 +35,7 @@ export default function ReplyButton({
         }}
         title={t('Reply')}
       >
-        <MessageCircle size={16} />
+        <MessageCircle />
         {variant !== 'reply' && !!replyCount && (
           <div className="text-sm">{formatCount(replyCount)}</div>
         )}

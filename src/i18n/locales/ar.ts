@@ -208,6 +208,7 @@ export default {
       'هل أنت متأكد أنك تريد إلغاء متابعة هذا المستخدم؟',
     'Recent Supporters': 'الداعمين الجدد',
     'Seen on': 'شوهد على',
-    'Temporarily display this reply': 'عرض هذا الرد مؤقتاً'
+    'Temporarily display this reply': 'عرض هذا الرد مؤقتاً',
+    'Not found the note': 'لم يتم العثور على الملاحظة'
   }
 }

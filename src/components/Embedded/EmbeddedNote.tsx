@@ -61,7 +61,7 @@ function EmbeddedNoteNotFound({ noteId, className }: { noteId: string; className
           }}
           variant="ghost"
         >
-          {isCopied ? <Check /> : <Copy />} Copy note ID
+          {isCopied ? <Check /> : <Copy />} {t('Copy event ID')}
         </Button>
       </div>
     </div>

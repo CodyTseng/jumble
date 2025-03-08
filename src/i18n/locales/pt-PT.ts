@@ -211,6 +211,7 @@ export default {
       'Tem certeza de que deseja deixar de seguir este usuário?',
     'Recent Supporters': 'Apoiadores Recentes',
     'Seen on': 'Visto em',
-    'Temporarily display this reply': 'Exibir temporariamente esta resposta'
+    'Temporarily display this reply': 'Exibir temporariamente esta resposta',
+    'Not found the note': 'Nota não encontrada'
   }
 }

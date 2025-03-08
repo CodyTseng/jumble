@@ -210,6 +210,7 @@ export default {
       'Czy na pewno chcesz przestać obserwować tego użytkownika?',
     'Recent Supporters': 'Ostatni wspierający',
     'Seen on': 'Widziany na',
-    'Temporarily display this reply': 'Tymczasowo wyświetl tę odpowiedź'
+    'Temporarily display this reply': 'Tymczasowo wyświetl tę odpowiedź',
+    'Not found the note': 'Nie znaleziono wpisu'
   }
 }

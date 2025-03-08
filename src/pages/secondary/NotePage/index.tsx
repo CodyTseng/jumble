@@ -58,12 +58,8 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
     return (
       <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
         <PictureNote key={`note-${event.id}`} event={event} fetchNoteStats />
-        <Separator className="mb-2 mt-4" />
-        <Nip22ReplyNoteList
-          key={`nip22-reply-note-list-${event.id}`}
-          event={event}
-          className="px-2"
-        />
+        <Separator className="mt-4" />
+        <Nip22ReplyNoteList key={`nip22-reply-note-list-${event.id}`} event={event} />
       </SecondaryPageLayout>
     )
   }
@@ -77,15 +73,11 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
         <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
         <Note key={`note-${event.id}`} event={event} fetchNoteStats hideParentNotePreview />
       </div>
-      <Separator className="mb-2 mt-4" />
+      <Separator className="mt-4" />
       {event.kind === kinds.ShortTextNote ? (
-        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} className="px-2" />
+        <ReplyNoteList key={`reply-note-list-${event.id}`} event={event} />
       ) : isPictureEvent(event) ? (
-        <Nip22ReplyNoteList
-          key={`nip22-reply-note-list-${event.id}`}
-          event={event}
-          className="px-2"
-        />
+        <Nip22ReplyNoteList key={`nip22-reply-note-list-${event.id}`} event={event} />
       ) : null}
     </SecondaryPageLayout>
   )
@@ -121,7 +113,7 @@ function ParentNote({ eventId }: { eventId?: string }) {
     return (
       <div>
         <Card className="flex p-1 items-center justify-center text-sm text-muted-foreground">
-          {t('Not found')}
+          [{t('Not found the note')}]
         </Card>
         <div className="ml-5 w-px h-2 bg-border" />
       </div>
@@ -138,10 +130,10 @@ function ParentNote({ eventId }: { eventId?: string }) {
           <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
           <SimpleUsername
             userId={event.pubkey}
-            className="font-semibold truncate shrink-0"
+            className="font-semibold truncate"
             skeletonClassName="h-3 shrink-0"
           />
-          <div>[{t('This user has been muted')}]</div>
+          <div className="shrink-0">[{t('This user has been muted')}]</div>
         </Card>
         <div className="ml-5 w-px h-2 bg-border" />
       </div>
@@ -157,7 +149,7 @@ function ParentNote({ eventId }: { eventId?: string }) {
         <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
         <SimpleUsername
           userId={event.pubkey}
-          className="font-semibold truncate shrink-0"
+          className="font-semibold truncate"
           skeletonClassName="h-3 shrink-0"
         />
         <ContentPreview className="truncate" event={event} />

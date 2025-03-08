@@ -209,6 +209,7 @@ export default {
     'Are you sure you want to unfollow this user?': 'このユーザーのフォローを解除しますか？',
     'Recent Supporters': '最近のサポーター',
     'Seen on': '見た',
-    'Temporarily display this reply': 'この返信を一時的に表示'
+    'Temporarily display this reply': 'この返信を一時的に表示',
+    'Not found the note': 'ノートが見つかりません'
   }
 }

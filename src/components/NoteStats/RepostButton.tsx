@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +11,7 @@ import { getSharableEventId } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -19,10 +22,12 @@ import { formatCount } from './utils'
 
 export default function RepostButton({ event }: { event: Event }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { publish, checkLogin, pubkey } = useNostr()
   const { noteStatsMap, updateNoteStatsByEvents, fetchNoteStats } = useNoteStats()
   const [reposting, setReposting] = useState(false)
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { repostCount, hasReposted } = useMemo(() => {
     const stats = noteStatsMap.get(event.id) || {}
     return {
@@ -62,22 +67,74 @@ export default function RepostButton({ event }: { event: Event }) {
     })
   }
 
+  const trigger = (
+    <button
+      className={cn(
+        'flex gap-1 items-center enabled:hover:text-lime-500 px-3 h-full',
+        hasReposted ? 'text-lime-500' : 'text-muted-foreground'
+      )}
+      title={t('Repost')}
+      onClick={() => {
+        if (isSmallScreen) {
+          setIsDrawerOpen(true)
+        }
+      }}
+    >
+      {reposting ? <Loader className="animate-spin" /> : <Repeat />}
+      {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
+    </button>
+  )
+
+  const postEditor = (
+    <PostEditor
+      open={isPostDialogOpen}
+      setOpen={setIsPostDialogOpen}
+      defaultContent={'\nnostr:' + getSharableEventId(event)}
+    />
+  )
+
+  if (isSmallScreen) {
+    return (
+      <>
+        {trigger}
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
+          <DrawerContent hideOverlay>
+            <div className="py-2">
+              <Button
+                onClick={repost}
+                disabled={!canRepost}
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
+                variant="ghost"
+              >
+                <Repeat /> {t('Repost')}
+              </Button>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  checkLogin(() => {
+                    setIsDrawerOpen(false)
+                    setIsPostDialogOpen(true)
+                  })
+                }}
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
+                variant="ghost"
+              >
+                <PencilLine /> {t('Quote')}
+              </Button>
+            </div>
+          </DrawerContent>
+        </Drawer>
+        {postEditor}
+      </>
+    )
+  }
+
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            className={cn(
-              'flex gap-1 items-center enabled:hover:text-lime-500',
-              hasReposted ? 'text-lime-500' : 'text-muted-foreground'
-            )}
-            title={t('Repost')}
-          >
-            {reposting ? <Loader className="animate-spin" size={16} /> : <Repeat size={16} />}
-            {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+        <DropdownMenuContent className="min-w-44">
           <DropdownMenuItem onClick={repost} disabled={!canRepost}>
             <Repeat /> {t('Repost')}
           </DropdownMenuItem>
@@ -93,11 +150,7 @@ export default function RepostButton({ event }: { event: Event }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <PostEditor
-        open={isPostDialogOpen}
-        setOpen={setIsPostDialogOpen}
-        defaultContent={'\nnostr:' + getSharableEventId(event)}
-      />
+      {postEditor}
     </>
   )
 }

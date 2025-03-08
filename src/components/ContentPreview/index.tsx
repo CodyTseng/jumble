@@ -18,7 +18,7 @@ export default function ContentPreview({
 }) {
   const { t } = useTranslation()
   const content = useMemo(() => {
-    if (!event) return t('Not found')
+    if (!event) return `[${t('Not found the note')}]`
     const { contentWithoutEmbeddedNotes, embeddedNotes } = extractEmbeddedNotesFromContent(
       event.content
     )
@@ -35,7 +35,6 @@ export default function ContentPreview({
       embeddedNostrNpubTextRenderer
     ])
   }, [event])
-  if (!event) return null
 
   return <div className={cn('pointer-events-none', className)}>{content}</div>
 }

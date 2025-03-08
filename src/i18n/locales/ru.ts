@@ -212,6 +212,7 @@ export default {
       'Вы уверены, что хотите отписаться от этого пользователя?',
     'Recent Supporters': 'Недавние спонсоры',
     'Seen on': 'Просмотрено на',
-    'Temporarily display this reply': 'Временно отобразить этот ответ'
+    'Temporarily display this reply': 'Временно отобразить этот ответ',
+    'Not found the note': 'Заметка не найдена'
   }
 }

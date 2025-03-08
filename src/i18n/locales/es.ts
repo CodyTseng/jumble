@@ -212,6 +212,7 @@ export default {
       '¿Estás seguro de que deseas dejar de seguir a este usuario?',
     'Recent Supporters': 'Últimos patrocinadores',
     'Seen on': 'Visto en',
-    'Temporarily display this reply': 'Mostrar temporalmente esta respuesta'
+    'Temporarily display this reply': 'Mostrar temporalmente esta respuesta',
+    'Not found the note': 'No se encontró la nota'
   }
 }
