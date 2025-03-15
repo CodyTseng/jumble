@@ -7,6 +7,7 @@ import de from './locales/de'
 import en from './locales/en'
 import es from './locales/es'
 import fr from './locales/fr'
+import it from './locales/it'
 import ja from './locales/ja'
 import pl from './locales/pl'
 import pt_BR from './locales/pt-BR'
@@ -20,6 +21,7 @@ const languages = {
   en: { resource: en, name: 'English' },
   es: { resource: es, name: 'Español' },
   fr: { resource: fr, name: 'Français' },
+  it: { resource: it, name: 'Italiano' },
   ja: { resource: ja, name: '日本語' },
   pl: { resource: pl, name: 'Polski' },
   'pt-BR': { resource: pt_BR, name: 'Português (Brasil)' },
@@ -65,6 +67,7 @@ i18n.services.formatter?.add('date', (timestamp, lng) => {
     case 'de':
     case 'ru':
       return dayjs(timestamp).format('DD.MM.YYYY')
+    case 'it':
     case 'es':
     case 'fr':
     case 'pt-BR':
