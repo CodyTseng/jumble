@@ -4,7 +4,6 @@ import { useNostr } from '@/providers/NostrProvider'
 import { TMailboxRelay, TMailboxRelayScope } from '@/types'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import CalculateOptimalReadRelaysButton from './CalculateOptimalReadRelaysButton'
 import MailboxRelay from './MailboxRelay'
 import NewMailboxRelayInput from './NewMailboxRelayInput'
 import SaveButton from './SaveButton'
@@ -56,13 +55,6 @@ export default function MailboxSetting() {
     return null
   }
 
-  const mergeRelays = (newRelays: TMailboxRelay[]) => {
-    setRelays((pre) => {
-      return [...pre, ...newRelays.filter((r) => !pre.some((pr) => pr.url === r.url))]
-    })
-    setHasChange(true)
-  }
-
   return (
     <div className="space-y-4">
       <div className="text-xs text-muted-foreground space-y-1">
@@ -70,7 +62,6 @@ export default function MailboxSetting() {
         <div>{t('write relays description')}</div>
         <div>{t('read & write relays notice')}</div>
       </div>
-      <CalculateOptimalReadRelaysButton mergeRelays={mergeRelays} />
       <SaveButton mailboxRelays={relays} hasChange={hasChange} setHasChange={setHasChange} />
       <div className="space-y-2">
         {relays.map((relay) => (

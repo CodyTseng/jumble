@@ -11,12 +11,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
-import { useFetchRelayList } from '@/hooks/useFetchRelayList'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toMuteList, toProfileEditor } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
-import { useFeed } from '@/providers/FeedProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { Link, Zap } from 'lucide-react'
@@ -30,15 +28,6 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { profile, isFetching } = useFetchProfile(id)
-  const { relayList, isFetching: isFetchingRelayInfo } = useFetchRelayList(profile?.pubkey)
-  const { relayUrls: currentRelayUrls } = useFeed()
-  const relayUrls = useMemo(
-    () =>
-      relayList.write.length < 4
-        ? relayList.write.concat(currentRelayUrls).slice(0, 4)
-        : relayList.write.slice(0, 8),
-    [relayList, currentRelayUrls]
-  )
   const { pubkey: accountPubkey } = useNostr()
   const { mutePubkeys } = useMuteList()
   const { followings } = useFetchFollowings(profile?.pubkey)
@@ -152,14 +141,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
           </div>
         </div>
       </div>
-      {!isFetchingRelayInfo && (
-        <NoteList
-          filter={{ authors: [pubkey] }}
-          relayUrls={relayUrls}
-          className="mt-2"
-          filterMutedNotes={false}
-        />
-      )}
+      <NoteList filter={{ authors: [pubkey] }} className="mt-2" filterMutedNotes={false} />
     </SecondaryPageLayout>
   )
 })

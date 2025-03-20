@@ -1,4 +1,3 @@
-import { BIG_RELAY_URLS } from '@/constants'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
@@ -117,11 +116,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       feedTypeRef.current = feedType
       setFeedType(feedType)
       setActiveRelaySetId(null)
-      const [relayList, followings] = await Promise.all([
-        client.fetchRelayList(options.pubkey),
-        client.fetchFollowings(options.pubkey, true)
-      ])
-      setRelayUrls(relayList.read.concat(BIG_RELAY_URLS).slice(0, 4))
+      const followings = await client.fetchFollowings(options.pubkey, true)
+      setRelayUrls([])
       setFilter({
         authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
       })

@@ -25,13 +25,13 @@ const ALGO_LIMIT = 500
 const SHOW_COUNT = 10
 
 export default function NoteList({
-  relayUrls,
+  relayUrls = [],
   filter = {},
   className,
   filterMutedNotes = true,
   needCheckAlgoRelay = false
 }: {
-  relayUrls: string[]
+  relayUrls?: string[]
   filter?: Filter
   className?: string
   filterMutedNotes?: boolean
@@ -60,7 +60,7 @@ export default function NoteList({
   const topRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (relayUrls.length === 0) return
+    if (relayUrls.length === 0 && !noteFilter.authors?.length) return
 
     async function init() {
       setRefreshing(true)
