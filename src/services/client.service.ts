@@ -388,7 +388,7 @@ class ClientService extends EventTarget {
               startLogin()
             }
           },
-          eoseTimeout: 5000 // 5s
+          eoseTimeout: 10_000 // 10s
         })
       }
     })
