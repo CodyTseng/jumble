@@ -4,13 +4,12 @@
 @layer base {
   * {
     @apply border-border;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-tap-highlight-color: transparent;
   }
 
   html {
+    @apply font-sans antialiased;
     --bc-color-brand: hsl(var(--primary));
     --bc-color-brand-dark: hsl(var(--primary));
     --bc-brand-mix: 100%;
@@ -28,7 +27,6 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
     -webkit-overflow-scrolling: touch;
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
