@@ -296,7 +296,8 @@ class IndexedDbService {
             const cursor = (event.target as IDBRequest).result
             if (cursor) {
               const value: TValue = cursor.value
-              if (value.addedAt < expirationTimestamp) {
+              // 25% chance to delete
+              if (value.addedAt < expirationTimestamp && Math.random() < 0.25) {
                 cursor.delete()
               }
               cursor.continue()
