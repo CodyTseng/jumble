@@ -403,6 +403,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         })
       }
     }
+    if (draftEvent.kind === kinds.RelayList) {
+      additionalRelayUrls.push(...BIG_RELAY_URLS)
+    }
 
     const event = await signEvent(draftEvent)
     const relays = specifiedRelayUrls?.length
