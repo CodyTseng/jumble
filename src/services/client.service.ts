@@ -52,7 +52,7 @@ class ClientService extends EventTarget {
     this.profileEventBatchLoadFn.bind(this),
     {
       batchScheduleFn: (callback) => setTimeout(callback, 100),
-      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 }),
+      cacheMap: new Map<string, Promise<NEvent | undefined>>(),
       maxBatchSize: 500
     }
   )
@@ -60,7 +60,7 @@ class ClientService extends EventTarget {
     this.relayListEventBatchLoadFn.bind(this),
     {
       batchScheduleFn: (callback) => setTimeout(callback, 100),
-      cacheMap: new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 }),
+      cacheMap: new Map<string, Promise<NEvent | undefined>>(),
       maxBatchSize: 500
     }
   )
@@ -248,7 +248,7 @@ class ClientService extends EventTarget {
       })
     )
 
-    const key = this.generateTimelineKey([], filter)
+    const key = this.generateTimelineKey([], { ...filter, authors })
     this.timelines[key] = subs.map((sub) => sub.timelineKey)
 
     return {
