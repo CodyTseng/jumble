@@ -1,4 +1,4 @@
-import { GROUP_METADATA_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { isSupportedKind } from '@/lib/event'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
@@ -58,7 +58,7 @@ export default function GenericNoteCard({
       <LiveEventCard event={event} className={className} reposter={reposter} embedded={embedded} />
     )
   }
-  if (event.kind === GROUP_METADATA_EVENT_KIND) {
+  if (event.kind === ExtendedKind.GROUP_METADATA) {
     return (
       <GroupMetadataCard
         className={className}

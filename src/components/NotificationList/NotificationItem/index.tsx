@@ -1,4 +1,4 @@
-import { COMMENT_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { CommentNotification } from './CommentNotification'
@@ -30,7 +30,7 @@ export function NotificationItem({
   if (notification.kind === kinds.Zap) {
     return <ZapNotification notification={notification} isNew={isNew} />
   }
-  if (notification.kind === COMMENT_EVENT_KIND) {
+  if (notification.kind === ExtendedKind.COMMENT) {
     return <CommentNotification notification={notification} isNew={isNew} />
   }
   return null

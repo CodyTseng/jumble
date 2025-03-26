@@ -1,6 +1,6 @@
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -44,13 +44,13 @@ const NotificationList = forwardRef((_, ref) => {
   const filterKinds = useMemo(() => {
     switch (notificationType) {
       case 'mentions':
-        return [kinds.ShortTextNote, COMMENT_EVENT_KIND]
+        return [kinds.ShortTextNote, ExtendedKind.COMMENT]
       case 'reactions':
         return [kinds.Reaction, kinds.Repost]
       case 'zaps':
         return [kinds.Zap]
       default:
-        return [kinds.ShortTextNote, kinds.Repost, kinds.Reaction, kinds.Zap, COMMENT_EVENT_KIND]
+        return [kinds.ShortTextNote, kinds.Repost, kinds.Reaction, kinds.Zap, ExtendedKind.COMMENT]
     }
   }, [notificationType])
   useImperativeHandle(

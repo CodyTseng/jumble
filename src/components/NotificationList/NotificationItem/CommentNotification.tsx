@@ -1,4 +1,4 @@
-import { PICTURE_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -24,7 +24,7 @@ export function CommentNotification({
     !rootEventId ||
     !rootPubkey ||
     !rootKind ||
-    ![kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(parseInt(rootKind))
+    ![kinds.ShortTextNote, ExtendedKind.PICTURE].includes(parseInt(rootKind))
   ) {
     return null
   }

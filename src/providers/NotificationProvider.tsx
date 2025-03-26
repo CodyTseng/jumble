@@ -1,4 +1,4 @@
-import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
@@ -73,7 +73,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             {
               kinds: [
                 kinds.ShortTextNote,
-                COMMENT_EVENT_KIND,
+                ExtendedKind.COMMENT,
                 kinds.Reaction,
                 kinds.Repost,
                 kinds.Zap

@@ -1,4 +1,4 @@
-import { BIG_RELAY_URLS, COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import client from '@/services/client.service'
 import { TImageInfo, TRelayList } from '@/types'
 import { LRUCache } from 'lru-cache'
@@ -47,11 +47,11 @@ export function isReplyNoteEvent(event: Event) {
 }
 
 export function isCommentEvent(event: Event) {
-  return event.kind === COMMENT_EVENT_KIND
+  return event.kind === ExtendedKind.COMMENT
 }
 
 export function isPictureEvent(event: Event) {
-  return event.kind === PICTURE_EVENT_KIND
+  return event.kind === ExtendedKind.PICTURE
 }
 
 export function isProtectedEvent(event: Event) {
@@ -59,7 +59,7 @@ export function isProtectedEvent(event: Event) {
 }
 
 export function isSupportedKind(kind: number) {
-  return [kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(kind)
+  return [kinds.ShortTextNote, ExtendedKind.PICTURE].includes(kind)
 }
 
 export function getParentEventTag(event?: Event) {

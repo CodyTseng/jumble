@@ -1,4 +1,4 @@
-import { COMMENT_EVENT_KIND, PICTURE_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import client from '@/services/client.service'
 import { TDraftEvent, TMailboxRelay, TRelaySet } from '@/types'
 import dayjs from 'dayjs'
@@ -150,7 +150,7 @@ export async function createPictureNoteDraftEvent(
   }
 
   return {
-    kind: PICTURE_EVENT_KIND,
+    kind: ExtendedKind.PICTURE,
     content,
     tags,
     created_at: dayjs().unix()
@@ -210,7 +210,7 @@ export async function createCommentDraftEvent(
   }
 
   return {
-    kind: COMMENT_EVENT_KIND,
+    kind: ExtendedKind.COMMENT,
     content,
     tags,
     created_at: dayjs().unix()

@@ -1,5 +1,5 @@
 import Image from '@/components/Image'
-import { PICTURE_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import { toNote } from '@/lib/link'
 import { extractEmojiFromEventTags, tagNameEquals } from '@/lib/tag'
@@ -53,7 +53,7 @@ export function ReactionNotification({
     return notification.content
   }, [notification])
 
-  if (!event || !eventId || ![kinds.ShortTextNote, PICTURE_EVENT_KIND].includes(event.kind)) {
+  if (!event || !eventId || ![kinds.ShortTextNote, ExtendedKind.PICTURE].includes(event.kind)) {
     return null
   }
 

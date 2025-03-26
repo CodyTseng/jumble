@@ -28,9 +28,14 @@ export const BIG_RELAY_URLS = [
 
 export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.nos.today/']
 
-export const PICTURE_EVENT_KIND = 20
-export const COMMENT_EVENT_KIND = 1111
 export const GROUP_METADATA_EVENT_KIND = 39000
+
+export const ExtendedKind = {
+  PICTURE: 20,
+  FAVORITE_RELAYS: 10012,
+  COMMENT: 1111,
+  GROUP_METADATA: 39000
+}
 
 export const URL_REGEX = /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_,:!~*]+/gu
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

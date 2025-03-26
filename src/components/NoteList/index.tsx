@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PICTURE_EVENT_KIND } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { isReplyNoteEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
 import { cn } from '@/lib/utils'
@@ -53,7 +53,7 @@ export default function NoteList({
   const isPictures = useMemo(() => listMode === 'pictures', [listMode])
   const noteFilter = useMemo(() => {
     return {
-      kinds: isPictures ? [PICTURE_EVENT_KIND] : [kinds.ShortTextNote, kinds.Repost],
+      kinds: isPictures ? [ExtendedKind.PICTURE] : [kinds.ShortTextNote, kinds.Repost],
       ...filter
     }
   }, [JSON.stringify(filter), isPictures])

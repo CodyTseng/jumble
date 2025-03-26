@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator'
-import { BIG_RELAY_URLS, COMMENT_EVENT_KIND } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { isCommentEvent, isProtectedEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -71,7 +71,7 @@ export default function Nip22ReplyNoteList({
           relayUrls.slice(0, 4),
           {
             '#E': [event.id],
-            kinds: [COMMENT_EVENT_KIND],
+            kinds: [ExtendedKind.COMMENT],
             limit: LIMIT
           },
           {
