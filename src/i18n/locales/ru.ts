@@ -214,6 +214,7 @@ export default {
     'Seen on': 'Просмотрено на',
     'Temporarily display this reply': 'Временно отобразить этот ответ',
     'Not found the note': 'Заметка не найдена',
-    'no more replies': 'больше нет ответов'
+    'no more replies': 'больше нет ответов',
+    Trending: 'Тренды'
   }
 }

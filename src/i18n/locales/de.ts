@@ -214,6 +214,7 @@ export default {
     'Seen on': 'Gesehen auf',
     'Temporarily display this reply': 'Antwort vorübergehend anzeigen',
     'Not found the note': 'Die Notiz wurde nicht gefunden',
-    'no more replies': 'keine weiteren Antworten'
+    'no more replies': 'keine weiteren Antworten',
+    Trending: 'Trendend'
   }
 }

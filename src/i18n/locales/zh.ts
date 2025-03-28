@@ -211,6 +211,7 @@ export default {
     'Seen on': '来自',
     'Temporarily display this reply': '临时显示此回复',
     'Not found the note': '未找到该笔记',
-    'no more replies': '没有更多回复了'
+    'no more replies': '没有更多回复了',
+    Trending: '热门'
   }
 }

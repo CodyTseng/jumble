@@ -214,6 +214,7 @@ export default {
     'Seen on': 'Visto en',
     'Temporarily display this reply': 'Mostrar temporalmente esta respuesta',
     'Not found the note': 'No se encontró la nota',
-    'no more replies': 'no hay más respuestas'
+    'no more replies': 'no hay más respuestas',
+    Trending: 'Tendencias'
   }
 }

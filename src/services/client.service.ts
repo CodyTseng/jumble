@@ -40,6 +40,7 @@ class ClientService extends EventTarget {
     | string[]
     | undefined
   > = {}
+  private trendingNotes: NEvent[] | undefined
   private eventCache = new LRUCache<string, Promise<NEvent | undefined>>({ max: 10000 })
   private eventDataLoader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
@@ -425,6 +426,33 @@ class ClientService extends EventTarget {
         })
       }
     }
+  }
+
+  async fetchTrendingNotes(skipCache: boolean = false) {
+    if (!skipCache && this.trendingNotes) {
+      return this.trendingNotes
+    }
+
+    const response = await fetch('https://api.nostr.band/v0/trending/notes')
+    if (!response.ok) {
+      return []
+    }
+
+    const data = (await response.json()) as { notes: { event: NEvent; author: NEvent }[] }
+    const noteIdSet = new Set<string>()
+    this.trendingNotes = []
+    for (const note of data.notes) {
+      if (noteIdSet.has(note.event.id)) continue
+      noteIdSet.add(note.event.id)
+
+      this.addEventToCache(note.event)
+      await indexedDb.putReplaceableEvent(note.author)
+      this.trendingNotes.push(note.event)
+    }
+
+    setTimeout(() => (this.trendingNotes = undefined), 1000 * 60 * 10)
+
+    return this.trendingNotes
   }
 
   private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {

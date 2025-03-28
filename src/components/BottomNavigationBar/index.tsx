@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils'
 import AccountButton from './AccountButton'
-import ExploreButton from './ExploreButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationsButton'
+import TrendingButton from './TrendingButton'
 
 export default function BottomNavigationBar() {
   return (
@@ -16,7 +16,7 @@ export default function BottomNavigationBar() {
       }}
     >
       <HomeButton />
-      <ExploreButton />
+      <TrendingButton />
       <NotificationsButton />
       <AccountButton />
     </div>

@@ -212,6 +212,7 @@ export default {
     'Seen on': 'Widziany na',
     'Temporarily display this reply': 'Tymczasowo wyświetl tę odpowiedź',
     'Not found the note': 'Nie znaleziono wpisu',
-    'no more replies': 'brak kolejnych odpowiedzi'
+    'no more replies': 'brak kolejnych odpowiedzi',
+    Trending: 'Trendy'
   }
 }

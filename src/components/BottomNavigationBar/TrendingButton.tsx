@@ -1,13 +1,13 @@
 import { usePrimaryPage } from '@/PageManager'
-import { Compass } from 'lucide-react'
+import { Flame } from 'lucide-react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
-export default function ExploreButton() {
+export default function TrendingButton() {
   const { navigate, current } = usePrimaryPage()
 
   return (
-    <BottomNavigationBarItem active={current === 'explore'} onClick={() => navigate('explore')}>
-      <Compass />
+    <BottomNavigationBarItem active={current === 'trending'} onClick={() => navigate('trending')}>
+      <Flame />
     </BottomNavigationBarItem>
   )
 }

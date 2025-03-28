@@ -4,9 +4,9 @@ import AccountButton from './AccountButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
-import RelaysButton from './ExploreButton'
 import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
+import TrendingButton from './TrendingButton'
 
 export default function PrimaryPageSidebar() {
   return (
@@ -17,7 +17,7 @@ export default function PrimaryPageSidebar() {
           <Logo className="max-xl:hidden" />
         </div>
         <HomeButton />
-        <RelaysButton />
+        <TrendingButton />
         <NotificationsButton />
         <SearchButton />
         <SettingsButton />
