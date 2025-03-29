@@ -1046,7 +1046,7 @@ class ClientService extends EventTarget {
     const nonExistingPubkeys = pubkeys.filter((_, i) => !relayEvents[i])
     if (nonExistingPubkeys.length) {
       const events = await this.query(BIG_RELAY_URLS, {
-        authors: pubkeys as string[],
+        authors: nonExistingPubkeys as string[],
         kinds: [kinds.RelayList],
         limit: pubkeys.length
       })
