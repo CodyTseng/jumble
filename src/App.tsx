@@ -4,6 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { PageManager } from './PageManager'
+import { FavoriteRelaysProvider } from './providers/FavoriteRelaysProvider'
 import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
 import { MuteListProvider } from './providers/MuteListProvider'
@@ -19,18 +20,20 @@ export default function App(): JSX.Element {
       <ScreenSizeProvider>
         <NostrProvider>
           <ZapProvider>
-            <RelaySetsProvider>
-              <FollowListProvider>
-                <MuteListProvider>
-                  <FeedProvider>
-                    <NoteStatsProvider>
-                      <PageManager />
-                      <Toaster />
-                    </NoteStatsProvider>
-                  </FeedProvider>
-                </MuteListProvider>
-              </FollowListProvider>
-            </RelaySetsProvider>
+            <FavoriteRelaysProvider>
+              <RelaySetsProvider>
+                <FollowListProvider>
+                  <MuteListProvider>
+                    <FeedProvider>
+                      <NoteStatsProvider>
+                        <PageManager />
+                        <Toaster />
+                      </NoteStatsProvider>
+                    </FeedProvider>
+                  </MuteListProvider>
+                </FollowListProvider>
+              </RelaySetsProvider>
+            </FavoriteRelaysProvider>
           </ZapProvider>
         </NostrProvider>
       </ScreenSizeProvider>

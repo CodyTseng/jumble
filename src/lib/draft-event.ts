@@ -255,6 +255,25 @@ export function createProfileDraftEvent(content: string, tags: string[][] = []):
   }
 }
 
+export function createFavoriteRelaysDraftEvent(
+  favoriteRelays: string[],
+  relaySetEvents: Event[]
+): TDraftEvent {
+  const tags: string[][] = []
+  favoriteRelays.forEach((url) => {
+    tags.push(['relay', url])
+  })
+  relaySetEvents.forEach((event) => {
+    tags.push(['a', getEventCoordinate(event)])
+  })
+  return {
+    kind: ExtendedKind.FAVORITE_RELAYS,
+    content: '',
+    tags,
+    created_at: dayjs().unix()
+  }
+}
+
 function generateImetaTags(imageUrls: string[], pictureInfos: { url: string; tags: string[][] }[]) {
   return imageUrls.map((imageUrl) => {
     const pictureInfo = pictureInfos.find((info) => info.url === imageUrl)
