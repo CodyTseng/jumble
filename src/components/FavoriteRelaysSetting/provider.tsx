@@ -5,8 +5,6 @@ type TRelaySetsSettingComponentContext = {
   setRenamingRelaySetId: React.Dispatch<React.SetStateAction<string | null>>
   expandedRelaySetId: string | null
   setExpandedRelaySetId: React.Dispatch<React.SetStateAction<string | null>>
-  selectedRelaySetIds: string[]
-  toggleSelectedRelaySetId: (relaySetId: string) => void
 }
 
 export const RelaySetsSettingComponentContext = createContext<
@@ -26,7 +24,6 @@ export const useRelaySetsSettingComponent = () => {
 export function RelaySetsSettingComponentProvider({ children }: { children: React.ReactNode }) {
   const [renamingRelaySetId, setRenamingRelaySetId] = useState<string | null>(null)
   const [expandedRelaySetId, setExpandedRelaySetId] = useState<string | null>(null)
-  const [selectedRelaySetIds, setSelectedRelaySetIds] = useState<string[]>([])
 
   return (
     <RelaySetsSettingComponentContext.Provider
@@ -34,16 +31,7 @@ export function RelaySetsSettingComponentProvider({ children }: { children: Reac
         renamingRelaySetId,
         setRenamingRelaySetId,
         expandedRelaySetId,
-        setExpandedRelaySetId,
-        selectedRelaySetIds,
-        toggleSelectedRelaySetId: (relaySetId) => {
-          setSelectedRelaySetIds((pre) => {
-            if (pre.includes(relaySetId)) {
-              return pre.filter((id) => id !== relaySetId)
-            }
-            return [...pre, relaySetId]
-          })
-        }
+        setExpandedRelaySetId
       }}
     >
       {children}

@@ -2,14 +2,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useFetchRelayInfo } from '@/hooks'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
-import { useRelaySets } from '@/providers/RelaySetsProvider'
+import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { CircleX, SearchCheck } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function RelayUrls({ relaySetId }: { relaySetId: string }) {
   const { t } = useTranslation()
-  const { relaySets, updateRelaySet } = useRelaySets()
+  const { relaySets, updateRelaySet } = useFavoriteRelays()
   const [newRelayUrl, setNewRelayUrl] = useState('')
   const [newRelayUrlError, setNewRelayUrlError] = useState<string | null>(null)
   const relaySet = useMemo(

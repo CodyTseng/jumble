@@ -1,5 +1,5 @@
 import MailboxSetting from '@/components/MailboxSetting'
-import RelaySetsSetting from '@/components/RelaySetsSetting'
+import FavoriteRelaysSetting from '@/components/FavoriteRelaysSetting'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { forwardRef, useEffect, useState } from 'react'
@@ -28,7 +28,7 @@ const RelaySettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <TabsTrigger value="mailbox">{t('Read & Write Relays')}</TabsTrigger>
         </TabsList>
         <TabsContent value="relay-sets">
-          <RelaySetsSetting />
+          <FavoriteRelaysSetting />
         </TabsContent>
         <TabsContent value="mailbox">
           <MailboxSetting />

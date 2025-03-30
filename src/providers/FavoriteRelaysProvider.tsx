@@ -1,10 +1,11 @@
-import { BIG_RELAY_URLS } from '@/constants'
+import { BIG_RELAY_URLS, DEFAULT_FAVORITE_RELAYS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { getRelaySetFromRelaySetEvent, getReplaceableEventIdentifier } from '@/lib/event'
 import { randomString } from '@/lib/random'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
+import storage from '@/services/local-storage.service'
 import { TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -12,8 +13,8 @@ import { useNostr } from './NostrProvider'
 
 type TFavoriteRelaysContext = {
   favoriteRelays: string[]
-  addFavoriteRelay: (relayUrl: string) => Promise<void>
-  deleteFavoriteRelay: (relayUrl: string) => Promise<void>
+  addFavoriteRelays: (relayUrls: string[]) => Promise<void>
+  deleteFavoriteRelays: (relayUrls: string[]) => Promise<void>
   relaySets: TRelaySet[]
   addRelaySet: (relaySetName: string, relayUrls?: string[]) => Promise<void>
   deleteRelaySet: (id: string) => Promise<void>
@@ -37,7 +38,21 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
   const [relaySets, setRelaySets] = useState<TRelaySet[]>([])
 
   useEffect(() => {
-    if (!favoriteRelaysEvent) return
+    if (!favoriteRelaysEvent) {
+      const favoriteRelays: string[] = DEFAULT_FAVORITE_RELAYS
+      const storedRelaySets = storage.getRelaySets()
+      storedRelaySets.forEach(({ relayUrls }) => {
+        relayUrls.forEach((url) => {
+          if (!favoriteRelays.includes(url)) {
+            favoriteRelays.push(url)
+          }
+        })
+      })
+
+      setFavoriteRelays(favoriteRelays)
+      setRelaySetEvents([])
+      return
+    }
 
     const init = async () => {
       const relays: string[] = []
@@ -118,24 +133,28 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
     )
   }, [relaySetEvents])
 
-  const addFavoriteRelay = async (relayUrl: string) => {
-    const normalizedUrl = normalizeUrl(relayUrl)
-    if (!normalizedUrl || favoriteRelays.includes(normalizedUrl)) return
+  const addFavoriteRelays = async (relayUrls: string[]) => {
+    const normalizedUrls = relayUrls
+      .map((relayUrl) => normalizeUrl(relayUrl))
+      .filter((url) => !!url && !favoriteRelays.includes(url))
+    if (!normalizedUrls.length) return
 
     const draftEvent = createFavoriteRelaysDraftEvent(
-      [...favoriteRelays, normalizedUrl],
+      [...favoriteRelays, ...normalizedUrls],
       relaySetEvents
     )
     const newFavoriteRelaysEvent = await publish(draftEvent)
     updateFavoriteRelaysEvent(newFavoriteRelaysEvent)
   }
 
-  const deleteFavoriteRelay = async (relayUrl: string) => {
-    const normalizedUrl = normalizeUrl(relayUrl)
-    if (!normalizedUrl || !favoriteRelays.includes(normalizedUrl)) return
+  const deleteFavoriteRelays = async (relayUrls: string[]) => {
+    const normalizedUrls = relayUrls
+      .map((relayUrl) => normalizeUrl(relayUrl))
+      .filter((url) => !!url && favoriteRelays.includes(url))
+    if (!normalizedUrls.length) return
 
     const draftEvent = createFavoriteRelaysDraftEvent(
-      favoriteRelays.filter((url) => url !== normalizedUrl),
+      favoriteRelays.filter((url) => !normalizedUrls.includes(url)),
       relaySetEvents
     )
     const newFavoriteRelaysEvent = await publish(draftEvent)
@@ -193,8 +212,8 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
     <FavoriteRelaysContext.Provider
       value={{
         favoriteRelays,
-        addFavoriteRelay,
-        deleteFavoriteRelay,
+        addFavoriteRelays,
+        deleteFavoriteRelays,
         relaySets,
         addRelaySet,
         deleteRelaySet,

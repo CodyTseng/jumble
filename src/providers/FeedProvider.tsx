@@ -1,24 +1,24 @@
+import { DEFAULT_FAVORITE_RELAYS } from '@/constants'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
-import { TFeedType } from '@/types'
+import { TFeedInfo, TFeedType } from '@/types'
 import { Filter } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { useFavoriteRelays } from './FavoriteRelaysProvider'
 import { useNostr } from './NostrProvider'
-import { useRelaySets } from './RelaySetsProvider'
 
 type TFeedContext = {
-  feedType: TFeedType
+  feedInfo: TFeedInfo
   relayUrls: string[]
   temporaryRelayUrls: string[]
   filter: Filter
   isReady: boolean
-  activeRelaySetId: string | null
   switchFeed: (
     feedType: TFeedType,
-    options?: { activeRelaySetId?: string; pubkey?: string }
+    options?: { activeRelaySetId?: string; pubkey?: string; relay?: string | null }
   ) => Promise<void>
 }
 
@@ -35,16 +35,15 @@ export const useFeed = () => {
 export function FeedProvider({ children }: { children: React.ReactNode }) {
   const isFirstRenderRef = useRef(true)
   const { pubkey } = useNostr()
-  const { relaySets } = useRelaySets()
-  const feedTypeRef = useRef<TFeedType>(storage.getFeedType())
-  const [feedType, setFeedType] = useState<TFeedType>(feedTypeRef.current)
+  const { relaySets, favoriteRelays } = useFavoriteRelays()
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
   const [filter, setFilter] = useState<Filter>({})
   const [isReady, setIsReady] = useState(false)
-  const [activeRelaySetId, setActiveRelaySetId] = useState<string | null>(
-    storage.getActiveRelaySetId()
-  )
+  const [feedInfo, setFeedInfo] = useState<TFeedInfo>({
+    feedType: 'relay',
+    id: DEFAULT_FAVORITE_RELAYS[0]
+  })
 
   useEffect(() => {
     const init = async () => {
@@ -60,13 +59,29 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         if (temporaryRelayUrls.length) {
           return await switchFeed('temporary', { temporaryRelayUrls })
         }
+      }
 
-        if (feedTypeRef.current === 'relays') {
-          return await switchFeed('relays', { activeRelaySetId })
+      let feedInfo: TFeedInfo = {
+        feedType: 'relay',
+        id: favoriteRelays[0] ?? DEFAULT_FAVORITE_RELAYS[0]
+      }
+      if (pubkey) {
+        const storedFeedInfo = storage.getFeedInfo(pubkey)
+        if (storedFeedInfo) {
+          feedInfo = storedFeedInfo
         }
       }
 
-      if (feedTypeRef.current === 'following' && pubkey) {
+      if (feedInfo.feedType === 'relays') {
+        return await switchFeed('relays', { activeRelaySetId: feedInfo.id })
+      }
+
+      if (feedInfo.feedType === 'relay') {
+        return await switchFeed('relay', { relay: feedInfo.id })
+      }
+
+      // update following feed if pubkey changes
+      if (feedInfo.feedType === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
       }
     }
@@ -80,26 +95,44 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       activeRelaySetId?: string | null
       temporaryRelayUrls?: string[] | null
       pubkey?: string | null
+      relay?: string | null
     } = {}
   ) => {
     setIsReady(false)
+    if (feedType === 'relay') {
+      const normalizedUrl = normalizeUrl(options.relay ?? '')
+      if (!normalizedUrl || !isWebsocketUrl(normalizedUrl)) {
+        setIsReady(true)
+        return
+      }
+
+      const newFeedInfo = { feedType, id: normalizedUrl }
+      setFeedInfo(newFeedInfo)
+      setRelayUrls([normalizedUrl])
+      setFilter({})
+      storage.setFeedInfo(newFeedInfo, pubkey)
+      setIsReady(true)
+
+      const relayInfo = await relayInfoService.getRelayInfo(normalizedUrl)
+      client.setCurrentRelayUrls(checkAlgoRelay(relayInfo) ? [] : [normalizedUrl])
+      return
+    }
     if (feedType === 'relays') {
       const relaySetId = options.activeRelaySetId ?? (relaySets.length > 0 ? relaySets[0].id : null)
       if (!relaySetId) {
-        return setIsReady(true)
+        setIsReady(true)
+        return
       }
 
       const relaySet =
         relaySets.find((set) => set.id === options.activeRelaySetId) ??
         (relaySets.length > 0 ? relaySets[0] : null)
       if (relaySet) {
-        feedTypeRef.current = feedType
-        setFeedType(feedType)
+        const newFeedInfo = { feedType, id: relaySet.id }
+        setFeedInfo(newFeedInfo)
         setRelayUrls(relaySet.relayUrls)
-        setActiveRelaySetId(relaySet.id)
         setFilter({})
-        storage.setActiveRelaySetId(relaySet.id)
-        storage.setFeedType(feedType)
+        storage.setFeedInfo(newFeedInfo, pubkey)
         setIsReady(true)
 
         const relayInfos = await relayInfoService.getRelayInfos(relaySet.relayUrls)
@@ -107,21 +140,22 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
           relaySet.relayUrls.filter((_, i) => !relayInfos[i] || !checkAlgoRelay(relayInfos[i]))
         )
       }
-      return setIsReady(true)
+      setIsReady(true)
+      return
     }
     if (feedType === 'following') {
       if (!options.pubkey) {
         return setIsReady(true)
       }
-      feedTypeRef.current = feedType
-      setFeedType(feedType)
-      setActiveRelaySetId(null)
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      storage.setFeedInfo(newFeedInfo, pubkey)
+
       const followings = await client.fetchFollowings(options.pubkey, true)
       setRelayUrls([])
       setFilter({
         authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
       })
-      storage.setFeedType(feedType)
       return setIsReady(true)
     }
     if (feedType === 'temporary') {
@@ -130,11 +164,9 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
 
-      feedTypeRef.current = feedType
-      setFeedType(feedType)
+      setFeedInfo({ feedType })
       setTemporaryRelayUrls(urls)
       setRelayUrls(urls)
-      setActiveRelaySetId(null)
       setFilter({})
       setIsReady(true)
 
@@ -150,12 +182,11 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   return (
     <FeedContext.Provider
       value={{
-        feedType,
+        feedInfo,
         relayUrls,
         temporaryRelayUrls,
         filter,
         isReady,
-        activeRelaySetId,
         switchFeed
       }}
     >

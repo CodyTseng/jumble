@@ -6,29 +6,23 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { useRelaySets } from '@/providers/RelaySetsProvider'
+import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { TRelaySet } from '@/types'
-import { Check, ChevronDown, Circle, CircleCheck, EllipsisVertical } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Check, ChevronDown, EllipsisVertical, FolderClosed } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayUrls from './RelayUrl'
 import { useRelaySetsSettingComponent } from './provider'
 
 export default function RelaySet({ relaySet }: { relaySet: TRelaySet }) {
   const { t } = useTranslation()
-  const { expandedRelaySetId, selectedRelaySetIds } = useRelaySetsSettingComponent()
-  const isSelected = useMemo(
-    () => selectedRelaySetIds.includes(relaySet.id),
-    [selectedRelaySetIds, relaySet.id]
-  )
+  const { expandedRelaySetId } = useRelaySetsSettingComponent()
 
   return (
-    <div
-      className={`w-full border rounded-lg p-4 ${isSelected ? 'border-highlight bg-highlight/5' : ''}`}
-    >
+    <div className="w-full border rounded-lg p-4">
       <div className="flex justify-between items-center">
-        <div className="flex space-x-2 items-center">
-          <RelaySetActiveToggle relaySetId={relaySet.id} />
+        <div className="flex gap-2 items-center">
+          <FolderClosed className="size-4 shrink-0" />
           <RelaySetName relaySet={relaySet} />
         </div>
         <div className="flex gap-1">
@@ -43,37 +37,10 @@ export default function RelaySet({ relaySet }: { relaySet: TRelaySet }) {
   )
 }
 
-function RelaySetActiveToggle({ relaySetId }: { relaySetId: string }) {
-  const { selectedRelaySetIds, toggleSelectedRelaySetId } = useRelaySetsSettingComponent()
-  const isSelected = useMemo(
-    () => selectedRelaySetIds.includes(relaySetId),
-    [selectedRelaySetIds, relaySetId]
-  )
-
-  const handleClick = () => {
-    toggleSelectedRelaySetId(relaySetId)
-  }
-
-  return isSelected ? (
-    <CircleCheck
-      size={18}
-      className="text-highlight shrink-0 cursor-pointer"
-      onClick={handleClick}
-    />
-  ) : (
-    <Circle
-      size={18}
-      className="text-muted-foreground shrink-0 cursor-pointer hover:text-foreground"
-      onClick={handleClick}
-    />
-  )
-}
-
 function RelaySetName({ relaySet }: { relaySet: TRelaySet }) {
   const [newSetName, setNewSetName] = useState(relaySet.name)
-  const { updateRelaySet } = useRelaySets()
-  const { renamingRelaySetId, setRenamingRelaySetId, toggleSelectedRelaySetId } =
-    useRelaySetsSettingComponent()
+  const { updateRelaySet } = useFavoriteRelays()
+  const { renamingRelaySetId, setRenamingRelaySetId } = useRelaySetsSettingComponent()
 
   const saveNewRelaySetName = () => {
     if (relaySet.name === newSetName) {
@@ -108,12 +75,7 @@ function RelaySetName({ relaySet }: { relaySet: TRelaySet }) {
       </Button>
     </div>
   ) : (
-    <div
-      className="h-8 font-semibold flex items-center cursor-pointer select-none"
-      onClick={() => toggleSelectedRelaySetId(relaySet.id)}
-    >
-      {relaySet.name}
-    </div>
+    <div className="h-8 font-semibold flex items-center select-none">{relaySet.name}</div>
   )
 }
 
@@ -141,7 +103,7 @@ function RelayUrlsExpandToggle({
 
 function RelaySetOptions({ relaySet }: { relaySet: TRelaySet }) {
   const { t } = useTranslation()
-  const { deleteRelaySet } = useRelaySets()
+  const { deleteRelaySet } = useFavoriteRelays()
   const { setRenamingRelaySetId } = useRelaySetsSettingComponent()
 
   return (

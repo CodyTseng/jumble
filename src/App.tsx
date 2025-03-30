@@ -10,7 +10,6 @@ import { FollowListProvider } from './providers/FollowListProvider'
 import { MuteListProvider } from './providers/MuteListProvider'
 import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
-import { RelaySetsProvider } from './providers/RelaySetsProvider'
 import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
 import { ZapProvider } from './providers/ZapProvider'
 
@@ -21,18 +20,16 @@ export default function App(): JSX.Element {
         <NostrProvider>
           <ZapProvider>
             <FavoriteRelaysProvider>
-              <RelaySetsProvider>
-                <FollowListProvider>
-                  <MuteListProvider>
-                    <FeedProvider>
-                      <NoteStatsProvider>
-                        <PageManager />
-                        <Toaster />
-                      </NoteStatsProvider>
-                    </FeedProvider>
-                  </MuteListProvider>
-                </FollowListProvider>
-              </RelaySetsProvider>
+              <FollowListProvider>
+                <MuteListProvider>
+                  <FeedProvider>
+                    <NoteStatsProvider>
+                      <PageManager />
+                      <Toaster />
+                    </NoteStatsProvider>
+                  </FeedProvider>
+                </MuteListProvider>
+              </FollowListProvider>
             </FavoriteRelaysProvider>
           </ZapProvider>
         </NostrProvider>

@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { normalizeUrl } from '@/lib/url'
-import { useRelaySets } from '@/providers/RelaySetsProvider'
+import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { TRelaySet } from '@/types'
 import { Check, FolderPlus, Plus, Star } from 'lucide-react'
 import { useMemo } from 'react'
@@ -22,12 +22,14 @@ export default function SaveRelayDropdownMenu({
   atTitlebar?: boolean
 }) {
   const { t } = useTranslation()
-  const { relaySets } = useRelaySets()
+  const { favoriteRelays, relaySets } = useFavoriteRelays()
   const normalizedUrls = useMemo(() => urls.map((url) => normalizeUrl(url)).filter(Boolean), [urls])
-  const alreadySaved = useMemo(
-    () => relaySets.some((set) => normalizedUrls.every((url) => set.relayUrls.includes(url))),
-    [relaySets, normalizedUrls]
-  )
+  const alreadySaved = useMemo(() => {
+    return (
+      normalizedUrls.every((url) => favoriteRelays.includes(url)) ||
+      relaySets.some((set) => normalizedUrls.every((url) => set.relayUrls.includes(url)))
+    )
+  }, [relaySets, normalizedUrls])
 
   return (
     <DropdownMenu>
@@ -42,9 +44,10 @@ export default function SaveRelayDropdownMenu({
           </button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
         <DropdownMenuLabel>{t('Save to')} ...</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <RelayItem urls={normalizedUrls} />
         {relaySets.map((set) => (
           <RelaySetItem key={set.id} set={set} urls={normalizedUrls} />
         ))}
@@ -55,8 +58,32 @@ export default function SaveRelayDropdownMenu({
   )
 }
 
+function RelayItem({ urls }: { urls: string[] }) {
+  const { t } = useTranslation()
+  const { favoriteRelays, addFavoriteRelays, deleteFavoriteRelays } = useFavoriteRelays()
+  const saved = useMemo(
+    () => urls.every((url) => favoriteRelays.includes(url)),
+    [favoriteRelays, urls]
+  )
+
+  const handleClick = async () => {
+    if (saved) {
+      await deleteFavoriteRelays(urls)
+    } else {
+      await addFavoriteRelays(urls)
+    }
+  }
+
+  return (
+    <DropdownMenuItem className="flex gap-2" onClick={handleClick}>
+      {saved ? <Check /> : <Plus />}
+      {t('Favorite')}
+    </DropdownMenuItem>
+  )
+}
+
 function RelaySetItem({ set, urls }: { set: TRelaySet; urls: string[] }) {
-  const { updateRelaySet } = useRelaySets()
+  const { updateRelaySet } = useFavoriteRelays()
   const saved = urls.every((url) => set.relayUrls.includes(url))
 
   const handleClick = () => {
@@ -83,7 +110,7 @@ function RelaySetItem({ set, urls }: { set: TRelaySet; urls: string[] }) {
 
 function SaveToNewSet({ urls }: { urls: string[] }) {
   const { t } = useTranslation()
-  const { addRelaySet } = useRelaySets()
+  const { addRelaySet } = useFavoriteRelays()
 
   const handleSave = () => {
     const newSetName = prompt(t('Enter a name for the new relay set'))

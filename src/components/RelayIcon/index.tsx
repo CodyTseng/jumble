@@ -1,11 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useFetchRelayInfo } from '@/hooks'
+import { cn } from '@/lib/utils'
 import { Server } from 'lucide-react'
 import { useMemo } from 'react'
 
 export default function RelayIcon({
   url,
-  className = 'w-6 h-6',
+  className,
   iconSize = 14
 }: {
   url?: string
@@ -23,7 +24,7 @@ export default function RelayIcon({
   }, [url, relayInfo])
 
   return (
-    <Avatar className={className}>
+    <Avatar className={cn('w-6 h-6', className)}>
       <AvatarImage src={iconUrl} className="object-cover object-center" />
       <AvatarFallback>
         <Server size={iconSize} />

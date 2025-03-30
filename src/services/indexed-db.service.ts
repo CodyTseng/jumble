@@ -35,7 +35,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 2)
+        const request = window.indexedDB.open('jumble', 3)
 
         request.onerror = (event) => {
           reject(event)
@@ -65,6 +65,12 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
             db.createObjectStore(StoreNames.RELAY_INFO_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.FAVORITE_RELAYS)) {
+            db.createObjectStore(StoreNames.FAVORITE_RELAYS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.RELAY_SETS)) {
+            db.createObjectStore(StoreNames.RELAY_SETS, { keyPath: 'key' })
           }
           this.db = db
         }

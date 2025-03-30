@@ -4,41 +4,16 @@ import { randomString } from '@/lib/random'
 import {
   TAccount,
   TAccountPointer,
-  TFeedType,
+  TFeedInfo,
   TNoteListMode,
   TRelaySet,
   TThemeSetting
 } from '@/types'
 
-const DEFAULT_RELAY_SETS: TRelaySet[] = [
-  {
-    id: randomString(),
-    name: 'Safer Global',
-    relayUrls: ['wss://nostr.wine/', 'wss://pyramid.fiatjaf.com/']
-  },
-  {
-    id: randomString(),
-    name: 'Short Notes',
-    relayUrls: ['wss://140.f7z.io/']
-  },
-  {
-    id: randomString(),
-    name: 'News',
-    relayUrls: ['wss://news.utxo.one/']
-  },
-  {
-    id: randomString(),
-    name: 'Algo',
-    relayUrls: ['wss://algo.utxo.one']
-  }
-]
-
 class LocalStorageService {
   static instance: LocalStorageService
 
   private relaySets: TRelaySet[] = []
-  private activeRelaySetId: string | null = null
-  private feedType: TFeedType = 'relays'
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
@@ -47,6 +22,7 @@ class LocalStorageService {
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
+  private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -63,12 +39,6 @@ class LocalStorageService {
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
-    const feedType = window.localStorage.getItem(StorageKey.FEED_TYPE)
-    if (feedType && ['following', 'relays'].includes(feedType)) {
-      this.feedType = feedType as 'following' | 'relays'
-    } else {
-      this.feedType = 'relays'
-    }
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
     this.noteListMode =
       noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
@@ -93,16 +63,12 @@ class LocalStorageService {
         })
       }
       if (!relaySets.length) {
-        relaySets = DEFAULT_RELAY_SETS
+        relaySets = []
       }
-      const activeRelaySetId = relaySets[0].id
       window.localStorage.setItem(StorageKey.RELAY_SETS, JSON.stringify(relaySets))
-      window.localStorage.setItem(StorageKey.ACTIVE_RELAY_SET_ID, activeRelaySetId)
       this.relaySets = relaySets
-      this.activeRelaySetId = activeRelaySetId
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
-      this.activeRelaySetId = window.localStorage.getItem(StorageKey.ACTIVE_RELAY_SET_ID) ?? null
     }
 
     const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
@@ -115,12 +81,18 @@ class LocalStorageService {
     this.defaultZapComment = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_COMMENT) ?? 'Zap!'
     this.quickZap = window.localStorage.getItem(StorageKey.QUICK_ZAP) === 'true'
 
+    const accountFeedInfoMapStr =
+      window.localStorage.getItem(StorageKey.ACCOUNT_FEED_INFO_MAP) ?? '{}'
+    this.accountFeedInfoMap = JSON.parse(accountFeedInfoMapStr)
+
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_MUTE_LIST_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP)
+    window.localStorage.removeItem(StorageKey.ACTIVE_RELAY_SET_ID)
+    window.localStorage.removeItem(StorageKey.FEED_TYPE)
   }
 
   getRelaySets() {
@@ -130,28 +102,6 @@ class LocalStorageService {
   setRelaySets(relaySets: TRelaySet[]) {
     this.relaySets = relaySets
     window.localStorage.setItem(StorageKey.RELAY_SETS, JSON.stringify(this.relaySets))
-  }
-
-  getActiveRelaySetId() {
-    return this.activeRelaySetId
-  }
-
-  setActiveRelaySetId(id: string | null) {
-    this.activeRelaySetId = id
-    if (id) {
-      window.localStorage.setItem(StorageKey.ACTIVE_RELAY_SET_ID, id)
-    } else {
-      window.localStorage.removeItem(StorageKey.ACTIVE_RELAY_SET_ID)
-    }
-  }
-
-  getFeedType() {
-    return this.feedType
-  }
-
-  setFeedType(feedType: TFeedType) {
-    this.feedType = feedType
-    window.localStorage.setItem(StorageKey.FEED_TYPE, this.feedType)
   }
 
   getThemeSetting() {
@@ -258,6 +208,18 @@ class LocalStorageService {
     window.localStorage.setItem(
       StorageKey.LAST_READ_NOTIFICATION_TIME_MAP,
       JSON.stringify(this.lastReadNotificationTimeMap)
+    )
+  }
+
+  getFeedInfo(pubkey: string) {
+    return this.accountFeedInfoMap[pubkey]
+  }
+
+  setFeedInfo(info: TFeedInfo, pubkey?: string | null) {
+    this.accountFeedInfoMap[pubkey ?? 'default'] = info
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_FEED_INFO_MAP,
+      JSON.stringify(this.accountFeedInfoMap)
     )
   }
 }

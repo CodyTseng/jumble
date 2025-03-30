@@ -1,8 +1,7 @@
 export const StorageKey = {
+  VERSION: 'version',
   THEME_SETTING: 'themeSetting',
   RELAY_SETS: 'relaySets',
-  ACTIVE_RELAY_SET_ID: 'activeRelaySetId',
-  FEED_TYPE: 'feedType',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',
@@ -12,11 +11,14 @@ export const StorageKey = {
   DEFAULT_ZAP_COMMENT: 'defaultZapComment',
   QUICK_ZAP: 'quickZap',
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
+  ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
   ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap', // deprecated
   ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap', // deprecated
   ACCOUNT_MUTE_DECRYPTED_TAGS_MAP: 'accountMuteDecryptedTagsMap', // deprecated
-  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap' // deprecated
+  ACCOUNT_PROFILE_EVENT_MAP: 'accountProfileEventMap', // deprecated
+  ACTIVE_RELAY_SET_ID: 'activeRelaySetId', // deprecated
+  FEED_TYPE: 'feedType' // deprecated
 }
 
 export const BIG_RELAY_URLS = [
@@ -44,3 +46,11 @@ export const MONITOR = '9bbbb845e5b6c831c29789900769843ab43bb5047abe697870cb50b6
 export const MONITOR_RELAYS = ['wss://relay.nostr.watch/']
 
 export const CODY_PUBKEY = '8125b911ed0e94dbe3008a0be48cfe5cd0c0b05923cfff917ae7e87da8400883'
+
+export const DEFAULT_FAVORITE_RELAYS = [
+  'wss://nostr.wine/',
+  'wss://pyramid.fiatjaf.com/',
+  'wss://140.f7z.io/',
+  'wss://news.utxo.one/',
+  'wss://algo.utxo.one'
+]

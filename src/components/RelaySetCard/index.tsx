@@ -1,6 +1,6 @@
 import client from '@/services/client.service'
 import { TRelaySet } from '@/types'
-import { ChevronDown, Circle, CircleCheck } from 'lucide-react'
+import { ChevronDown, Circle, CircleCheck, FolderClosed } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -20,14 +20,13 @@ export default function RelaySetCard({
 
   return (
     <div
-      className={`w-full border rounded-lg p-4 ${select ? 'border-highlight bg-highlight/5' : ''}`}
+      className={`w-full border rounded-lg p-4 ${select ? 'border-highlight bg-highlight/5' : 'clickable'}`}
+      onClick={() => onSelectChange(!select)}
     >
       <div className="flex justify-between items-center">
-        <div
-          className="flex space-x-2 items-center cursor-pointer"
-          onClick={() => onSelectChange(!select)}
-        >
+        <div className="flex space-x-2 items-center cursor-pointer">
           <RelaySetActiveToggle select={select} />
+          <FolderClosed className="size-4 shrink-0" />
           <div className="h-8 font-semibold flex items-center select-none">{relaySet.name}</div>
         </div>
         <div className="flex gap-1">
@@ -63,7 +62,10 @@ function RelayUrlsExpandToggle({
   return (
     <div
       className="text-sm text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-foreground"
-      onClick={() => onExpandChange(!expand)}
+      onClick={(e) => {
+        e.stopPropagation()
+        onExpandChange(!expand)
+      }}
     >
       <div className="select-none">{children}</div>
       <ChevronDown
