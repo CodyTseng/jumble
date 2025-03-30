@@ -9,7 +9,7 @@ export default function RelayItem({ relay }: { relay: string }) {
   const [copied, setCopied] = useState(false)
 
   return (
-    <div className="flex gap-2 border rounded-lg px-4 py-3">
+    <div className="flex gap-2 border rounded-lg pl-4 pr-2 py-3 items-center">
       <RelayIcon url={relay} />
       <div className="flex-1 w-0 truncate">{relay}</div>
       <Button
