@@ -44,6 +44,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     feedType: 'relay',
     id: DEFAULT_FAVORITE_RELAYS[0]
   })
+  const feedInfoRef = useRef<TFeedInfo>(feedInfo)
 
   useEffect(() => {
     const init = async () => {
@@ -59,6 +60,10 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         if (temporaryRelayUrls.length) {
           return await switchFeed('temporary', { temporaryRelayUrls })
         }
+      }
+
+      if (feedInfoRef.current.feedType === 'temporary') {
+        return
       }
 
       let feedInfo: TFeedInfo = {
@@ -108,6 +113,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
 
       const newFeedInfo = { feedType, id: normalizedUrl }
       setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
       setRelayUrls([normalizedUrl])
       setFilter({})
       storage.setFeedInfo(newFeedInfo, pubkey)
@@ -130,6 +136,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       if (relaySet) {
         const newFeedInfo = { feedType, id: relaySet.id }
         setFeedInfo(newFeedInfo)
+        feedInfoRef.current = newFeedInfo
         setRelayUrls(relaySet.relayUrls)
         setFilter({})
         storage.setFeedInfo(newFeedInfo, pubkey)
@@ -149,6 +156,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       }
       const newFeedInfo = { feedType }
       setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
       storage.setFeedInfo(newFeedInfo, pubkey)
 
       const followings = await client.fetchFollowings(options.pubkey, true)
@@ -164,7 +172,9 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return setIsReady(true)
       }
 
-      setFeedInfo({ feedType })
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
       setTemporaryRelayUrls(urls)
       setRelayUrls(urls)
       setFilter({})

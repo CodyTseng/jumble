@@ -1,4 +1,3 @@
-import { Separator } from '@/components/ui/separator'
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { SecondaryPageLink } from '@/PageManager'
@@ -45,17 +44,16 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
           {temporaryRelayUrls.length === 1 ? simplifyUrl(temporaryRelayUrls[0]) : t('Temporary')}
         </FeedSwitcherItem>
       )}
-
-      <div className="flex justify-end items-center px-2">
-        <SecondaryPageLink
-          to={toRelaySettings()}
-          className="text-highlight text-sm font-semibold"
-          onClick={() => close?.()}
-        >
-          {t('edit')}
-        </SecondaryPageLink>
-      </div>
       <div className="space-y-2">
+        <div className="flex justify-end items-center text-sm">
+          <SecondaryPageLink
+            to={toRelaySettings()}
+            className="text-highlight font-semibold"
+            onClick={() => close?.()}
+          >
+            {t('edit')}
+          </SecondaryPageLink>
+        </div>
         {relaySets
           .filter((set) => set.relayUrls.length > 0)
           .map((set) => (
@@ -71,10 +69,6 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
               }}
             />
           ))}
-      </div>
-      {relaySets.filter((set) => set.relayUrls.length > 0).length > 0 &&
-        favoriteRelays.length > 0 && <Separator className="my-4" />}
-      <div className="space-y-2">
         {favoriteRelays.map((relay) => (
           <FeedSwitcherItem
             key={relay}

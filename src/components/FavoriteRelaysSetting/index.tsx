@@ -1,29 +1,33 @@
-import { Separator } from '@/components/ui/separator'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
+import { useTranslation } from 'react-i18next'
+import AddNewRelay from './AddNewRelay'
 import AddNewRelaySet from './AddNewRelaySet'
 import { RelaySetsSettingComponentProvider } from './provider'
 import RelayItem from './RelayItem'
 import RelaySet from './RelaySet'
 import TemporaryRelaySet from './TemporaryRelaySet'
-import AddNewRelay from './AddNewRelay'
 
 export default function FavoriteRelaysSetting() {
+  const { t } = useTranslation()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
 
   return (
     <RelaySetsSettingComponentProvider>
-      <div className="space-y-2 mt-4">
+      <div className="space-y-4">
         <TemporaryRelaySet />
-        {relaySets.map((relaySet) => (
-          <RelaySet key={relaySet.id} relaySet={relaySet} />
-        ))}
+        <div className="space-y-2">
+          <div className="text-muted-foreground font-semibold select-none">{t('Relay sets')}</div>
+          {relaySets.map((relaySet) => (
+            <RelaySet key={relaySet.id} relaySet={relaySet} />
+          ))}
+        </div>
         <AddNewRelaySet />
-      </div>
-      <Separator className="my-4" />
-      <div className="space-y-2">
-        {favoriteRelays.map((relay) => (
-          <RelayItem key={relay} relay={relay} />
-        ))}
+        <div className="space-y-2">
+          <div className="text-muted-foreground font-semibold select-none">{t('Relays')}</div>
+          {favoriteRelays.map((relay) => (
+            <RelayItem key={relay} relay={relay} />
+          ))}
+        </div>
         <AddNewRelay />
       </div>
     </RelaySetsSettingComponentProvider>

@@ -26,12 +26,12 @@ export default function AddNewRelay() {
     setInput('')
   }
 
-  const handleNewRelaySetNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewRelayInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
     setErrorMsg('')
   }
 
-  const handleNewRelaySetNameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleNewRelayInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
       saveRelay()
@@ -39,24 +39,18 @@ export default function AddNewRelay() {
   }
 
   return (
-    <div className="w-full border rounded-lg p-4">
-      <div className="flex justify-between items-center">
-        <div className="font-semibold">{t('Add a new relay')}</div>
+    <div>
+      <div className="flex gap-2 items-center">
+        <Input
+          placeholder={t('Add a new relay')}
+          value={input}
+          onChange={handleNewRelayInputChange}
+          onKeyDown={handleNewRelayInputKeyDown}
+          className={errorMsg ? 'border-destructive' : ''}
+        />
+        <Button onClick={saveRelay}>{t('Add')}</Button>
       </div>
-      <div className="mt-2">
-        <div className="flex gap-2">
-          <Input
-            placeholder={t('Relay set name')}
-            value={input}
-            onChange={handleNewRelaySetNameChange}
-            onKeyDown={handleNewRelaySetNameKeyDown}
-            onBlur={saveRelay}
-            className={errorMsg ? 'border-destructive' : ''}
-          />
-          <Button onClick={saveRelay}>{t('Add')}</Button>
-        </div>
-        {errorMsg && <div className="text-destructive text-sm">{errorMsg}</div>}
-      </div>
+      {errorMsg && <div className="text-destructive text-sm pl-8">{errorMsg}</div>}
     </div>
   )
 }

@@ -35,7 +35,7 @@ export const toOthersRelaySettings = (pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/users/${npub}/relays`
 }
-export const toRelaySettings = (tag?: 'mailbox' | 'relay-sets') => {
+export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
   return '/relay-settings' + (tag ? '#' + tag : '')
 }
 export const toSettings = () => '/settings'

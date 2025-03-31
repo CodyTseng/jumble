@@ -27,20 +27,14 @@ export default function AddNewRelaySet() {
   }
 
   return (
-    <div className="w-full border rounded-lg p-4">
-      <div className="flex justify-between items-center">
-        <div className="font-semibold">{t('Add a new relay set')}</div>
-      </div>
-      <div className="mt-2 flex gap-2">
-        <Input
-          placeholder={t('Relay set name')}
-          value={newRelaySetName}
-          onChange={handleNewRelaySetNameChange}
-          onKeyDown={handleNewRelaySetNameKeyDown}
-          onBlur={saveRelaySet}
-        />
-        <Button onClick={saveRelaySet}>{t('Add')}</Button>
-      </div>
+    <div className="flex gap-2 items-center">
+      <Input
+        placeholder={t('Add a new relay set')}
+        value={newRelaySetName}
+        onChange={handleNewRelaySetNameChange}
+        onKeyDown={handleNewRelaySetNameKeyDown}
+      />
+      <Button onClick={saveRelaySet}>{t('Add')}</Button>
     </div>
   )
 }

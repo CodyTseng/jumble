@@ -1,5 +1,12 @@
 import { Button } from '@/components/ui/button'
 import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerTitle
+} from '@/components/ui/drawer'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -7,12 +14,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Separator } from '@/components/ui/separator'
 import { normalizeUrl } from '@/lib/url'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TRelaySet } from '@/types'
 import { Check, FolderPlus, Plus, Star } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import DrawerMenuItem from '../DrawerMenuItem'
 
 export default function SaveRelayDropdownMenu({
   urls,
@@ -22,6 +32,7 @@ export default function SaveRelayDropdownMenu({
   atTitlebar?: boolean
 }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { favoriteRelays, relaySets } = useFavoriteRelays()
   const normalizedUrls = useMemo(() => urls.map((url) => normalizeUrl(url)).filter(Boolean), [urls])
   const alreadySaved = useMemo(() => {
@@ -30,20 +41,48 @@ export default function SaveRelayDropdownMenu({
       relaySets.some((set) => normalizedUrls.every((url) => set.relayUrls.includes(url)))
     )
   }, [relaySets, normalizedUrls])
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+  const trigger = atTitlebar ? (
+    <Button variant="ghost" size="titlebar-icon" onClick={() => setIsDrawerOpen(true)}>
+      <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
+    </Button>
+  ) : (
+    <button
+      className="enabled:hover:text-primary [&_svg]:size-5"
+      onClick={() => setIsDrawerOpen(true)}
+    >
+      <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
+    </button>
+  )
+
+  if (isSmallScreen) {
+    return (
+      <div onClick={(e) => e.stopPropagation()}>
+        {trigger}
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
+          <DrawerContent hideOverlay>
+            <DrawerHeader>
+              <DrawerTitle>{t('Save to')} ...</DrawerTitle>
+            </DrawerHeader>
+            <div className="py-2">
+              <RelayItem urls={normalizedUrls} />
+              {relaySets.map((set) => (
+                <RelaySetItem key={set.id} set={set} urls={normalizedUrls} />
+              ))}
+              <Separator />
+              <SaveToNewSet urls={normalizedUrls} />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    )
+  }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {atTitlebar ? (
-          <Button variant="ghost" size="titlebar-icon">
-            <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
-          </Button>
-        ) : (
-          <button className="enabled:hover:text-primary [&_svg]:size-5">
-            <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
-          </button>
-        )}
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
         <DropdownMenuLabel>{t('Save to')} ...</DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -60,6 +99,7 @@ export default function SaveRelayDropdownMenu({
 
 function RelayItem({ urls }: { urls: string[] }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { favoriteRelays, addFavoriteRelays, deleteFavoriteRelays } = useFavoriteRelays()
   const saved = useMemo(
     () => urls.every((url) => favoriteRelays.includes(url)),
@@ -74,6 +114,15 @@ function RelayItem({ urls }: { urls: string[] }) {
     }
   }
 
+  if (isSmallScreen) {
+    return (
+      <DrawerMenuItem onClick={handleClick}>
+        {saved ? <Check /> : <Plus />}
+        {t('Favorite')}
+      </DrawerMenuItem>
+    )
+  }
+
   return (
     <DropdownMenuItem className="flex gap-2" onClick={handleClick}>
       {saved ? <Check /> : <Plus />}
@@ -83,6 +132,7 @@ function RelayItem({ urls }: { urls: string[] }) {
 }
 
 function RelaySetItem({ set, urls }: { set: TRelaySet; urls: string[] }) {
+  const { isSmallScreen } = useScreenSize()
   const { updateRelaySet } = useFavoriteRelays()
   const saved = urls.every((url) => set.relayUrls.includes(url))
 
@@ -100,6 +150,15 @@ function RelaySetItem({ set, urls }: { set: TRelaySet; urls: string[] }) {
     }
   }
 
+  if (isSmallScreen) {
+    return (
+      <DrawerMenuItem onClick={handleClick}>
+        {saved ? <Check /> : <Plus />}
+        {set.name}
+      </DrawerMenuItem>
+    )
+  }
+
   return (
     <DropdownMenuItem key={set.id} className="flex gap-2" onClick={handleClick}>
       {saved ? <Check /> : <Plus />}
@@ -110,6 +169,7 @@ function RelaySetItem({ set, urls }: { set: TRelaySet; urls: string[] }) {
 
 function SaveToNewSet({ urls }: { urls: string[] }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { addRelaySet } = useFavoriteRelays()
 
   const handleSave = () => {
@@ -117,6 +177,15 @@ function SaveToNewSet({ urls }: { urls: string[] }) {
     if (newSetName) {
       addRelaySet(newSetName, urls)
     }
+  }
+
+  if (isSmallScreen) {
+    return (
+      <DrawerMenuItem onClick={handleSave}>
+        <FolderPlus />
+        {t('Save to a new relay set')}
+      </DrawerMenuItem>
+    )
   }
 
   return (

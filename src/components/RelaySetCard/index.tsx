@@ -20,13 +20,15 @@ export default function RelaySetCard({
 
   return (
     <div
-      className={`w-full border rounded-lg p-4 ${select ? 'border-highlight bg-highlight/5' : 'clickable'}`}
+      className={`w-full border rounded-lg px-4 py-3 ${select ? 'border-highlight bg-highlight/5' : 'clickable'}`}
       onClick={() => onSelectChange(!select)}
     >
       <div className="flex justify-between items-center">
         <div className="flex space-x-2 items-center cursor-pointer">
           <RelaySetActiveToggle select={select} />
-          <FolderClosed className="size-4 shrink-0" />
+          <div className="flex justify-center items-center w-6 h-6 shrink-0">
+            <FolderClosed className="size-4" />
+          </div>
           <div className="h-8 font-semibold flex items-center select-none">{relaySet.name}</div>
         </div>
         <div className="flex gap-1">

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,10 +8,20 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TRelaySet } from '@/types'
-import { Check, ChevronDown, EllipsisVertical, FolderClosed } from 'lucide-react'
+import {
+  Check,
+  ChevronDown,
+  Edit,
+  EllipsisVertical,
+  FolderClosed,
+  Link,
+  Trash2
+} from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import DrawerMenuItem from '../DrawerMenuItem'
 import RelayUrls from './RelayUrl'
 import { useRelaySetsSettingComponent } from './provider'
 
@@ -19,10 +30,12 @@ export default function RelaySet({ relaySet }: { relaySet: TRelaySet }) {
   const { expandedRelaySetId } = useRelaySetsSettingComponent()
 
   return (
-    <div className="w-full border rounded-lg p-4">
+    <div className="w-full border rounded-lg pl-4 pr-2 py-4">
       <div className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
-          <FolderClosed className="size-4 shrink-0" />
+          <div className="flex justify-center items-center w-6 h-6 shrink-0">
+            <FolderClosed className="size-4" />
+          </div>
           <RelaySetName relaySet={relaySet} />
         </div>
         <div className="flex gap-1">
@@ -103,33 +116,70 @@ function RelayUrlsExpandToggle({
 
 function RelaySetOptions({ relaySet }: { relaySet: TRelaySet }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { deleteRelaySet } = useFavoriteRelays()
   const { setRenamingRelaySetId } = useRelaySetsSettingComponent()
 
+  const trigger = (
+    <Button variant="ghost" size="icon">
+      <EllipsisVertical />
+    </Button>
+  )
+
+  const rename = () => {
+    setRenamingRelaySetId(relaySet.id)
+  }
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(
+      `https://jumble.social/?${relaySet.relayUrls.map((url) => 'r=' + url).join('&')}`
+    )
+  }
+
+  if (isSmallScreen) {
+    return (
+      <Drawer>
+        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+        <DrawerContent>
+          <div className="py-2">
+            <DrawerMenuItem onClick={rename}>
+              <Edit />
+              {t('Rename')}
+            </DrawerMenuItem>
+            <DrawerMenuItem onClick={copyShareLink}>
+              <Link />
+              {t('Copy share link')}
+            </DrawerMenuItem>
+            <DrawerMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => deleteRelaySet(relaySet.id)}
+            >
+              <Trash2 />
+              {t('Delete')}
+            </DrawerMenuItem>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    )
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <EllipsisVertical />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setRenamingRelaySetId(relaySet.id)}>
+        <DropdownMenuItem onClick={rename}>
+          <Edit />
           {t('Rename')}
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            navigator.clipboard.writeText(
-              `https://jumble.social/?${relaySet.relayUrls.map((url) => 'r=' + url).join('&')}`
-            )
-          }}
-        >
+        <DropdownMenuItem onClick={copyShareLink}>
+          <Link />
           {t('Copy share link')}
         </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
           onClick={() => deleteRelaySet(relaySet.id)}
         >
+          <Trash2 />
           {t('Delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
