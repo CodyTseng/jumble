@@ -25,7 +25,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
           <Ellipsis />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent collisionPadding={8}>
+      <DropdownMenuContent>
         <DropdownMenuItem
           onClick={() => navigator.clipboard.writeText('nostr:' + pubkeyToNpub(pubkey))}
         >

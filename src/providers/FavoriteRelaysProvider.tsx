@@ -69,7 +69,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
         } else if (tagName === 'a') {
           const [kind, author, relaySetId] = tagValue.split(':')
           if (kind !== kinds.Relaysets.toString()) return
-          if (!pubkey || author !== pubkey) return
+          if (!pubkey || author !== pubkey) return // TODO: support others relay sets
           if (!relaySetId) return
 
           if (!relaySetIds.includes(relaySetId)) {
@@ -88,7 +88,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
         return !relaySetEvents[index]
       })
       if (nonExistingRelaySetIds.length) {
-        const relaySetEvents = await client.fetchEvents(
+        const newRelaySetEvents = await client.fetchEvents(
           (relayList?.write ?? []).concat(BIG_RELAY_URLS).slice(0, 5),
           {
             kinds: [kinds.Relaysets],
@@ -97,7 +97,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
           }
         )
         const relaySetEventMap = new Map<string, Event>()
-        relaySetEvents.forEach((event) => {
+        newRelaySetEvents.forEach((event) => {
           const d = getReplaceableEventIdentifier(event)
           if (!d) return
 

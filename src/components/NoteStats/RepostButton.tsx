@@ -135,7 +135,7 @@ export default function RepostButton({ event }: { event: Event }) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-44">
+        <DropdownMenuContent>
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation()

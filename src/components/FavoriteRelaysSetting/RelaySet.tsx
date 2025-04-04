@@ -30,7 +30,7 @@ export default function RelaySet({ relaySet }: { relaySet: TRelaySet }) {
   const { expandedRelaySetId } = useRelaySetsSettingComponent()
 
   return (
-    <div className="w-full border rounded-lg pl-4 pr-2 py-4">
+    <div className="w-full border rounded-lg pl-4 pr-2 py-3">
       <div className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
           <div className="flex justify-center items-center w-6 h-6 shrink-0">

@@ -58,7 +58,7 @@ function ProfileButton() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" side="top">
+      <DropdownMenuContent side="top">
         <DropdownMenuItem onClick={() => push(toProfile(pubkey))}>
           <UserRound />
           {t('Profile')}

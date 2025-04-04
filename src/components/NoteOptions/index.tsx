@@ -114,7 +114,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
     <div className={className} onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-        <DropdownMenuContent collisionPadding={8} className="min-w-52">
+        <DropdownMenuContent>
           <DropdownMenuItem
             onClick={() => navigator.clipboard.writeText(getSharableEventId(event))}
           >
