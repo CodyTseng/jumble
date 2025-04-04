@@ -61,7 +61,6 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
               key={set.id}
               relaySet={set}
               select={feedInfo.feedType === 'relays' && set.id === feedInfo.id}
-              showConnectionStatus={feedInfo.feedType === 'relays' && set.id === feedInfo.id}
               onSelectChange={(select) => {
                 if (!select) return
                 switchFeed('relays', { activeRelaySetId: set.id })
@@ -120,8 +119,8 @@ function FeedSwitcherItem({
 
 function FeedToggle({ isActive }: { isActive: boolean }) {
   return isActive ? (
-    <CircleCheck size={18} className="text-highlight shrink-0" />
+    <CircleCheck className="text-highlight shrink-0 size-4" />
   ) : (
-    <Circle size={18} className="text-muted-foreground shrink-0" />
+    <Circle className="text-muted-foreground shrink-0 size-4" />
   )
 }

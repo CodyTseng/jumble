@@ -1,19 +1,17 @@
-import client from '@/services/client.service'
 import { TRelaySet } from '@/types'
 import { ChevronDown, Circle, CircleCheck, FolderClosed } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import RelayIcon from '../RelayIcon'
 
 export default function RelaySetCard({
   relaySet,
   select,
-  onSelectChange,
-  showConnectionStatus = false
+  onSelectChange
 }: {
   relaySet: TRelaySet
   select: boolean
   onSelectChange: (select: boolean) => void
-  showConnectionStatus?: boolean
 }) {
   const { t } = useTranslation()
   const [expand, setExpand] = useState(false)
@@ -37,18 +35,16 @@ export default function RelaySetCard({
           </RelayUrlsExpandToggle>
         </div>
       </div>
-      {expand && (
-        <RelayUrls urls={relaySet.relayUrls} showConnectionStatus={showConnectionStatus} />
-      )}
+      {expand && <RelayUrls urls={relaySet.relayUrls} />}
     </div>
   )
 }
 
 function RelaySetActiveToggle({ select }: { select: boolean }) {
   return select ? (
-    <CircleCheck size={18} className="text-highlight shrink-0" />
+    <CircleCheck className="text-highlight shrink-0 size-4" />
   ) : (
-    <Circle size={18} className="shrink-0" />
+    <Circle className="shrink-0 size-4" />
   )
 }
 
@@ -78,49 +74,15 @@ function RelayUrlsExpandToggle({
   )
 }
 
-function RelayUrls({
-  showConnectionStatus = false,
-  urls
-}: {
-  showConnectionStatus?: boolean
-  urls: string[]
-}) {
-  const [relays, setRelays] = useState<
-    {
-      url: string
-      isConnected: boolean
-    }[]
-  >(urls.map((url) => ({ url, isConnected: false })) ?? [])
-
-  useEffect(() => {
-    if (!showConnectionStatus || urls.length === 0) return
-
-    const interval = setInterval(() => {
-      const connectionStatusMap = client.listConnectionStatus()
-      setRelays((pre) => {
-        return pre.map((relay) => {
-          const isConnected = connectionStatusMap.get(relay.url) || false
-          return { ...relay, isConnected }
-        })
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [showConnectionStatus, urls])
-
+function RelayUrls({ urls }: { urls: string[] }) {
   if (!urls) return null
 
   return (
-    <div>
-      {relays.map(({ url, isConnected: isConnected }, index) => (
-        <div key={index} className="flex items-center gap-2">
-          {showConnectionStatus &&
-            (isConnected ? (
-              <div className="text-green-500 text-xs">●</div>
-            ) : (
-              <div className="text-red-500 text-xs">●</div>
-            ))}
-          <div className="text-muted-foreground text-sm">{url}</div>
+    <div className="pl-7 space-y-1">
+      {urls.map((url) => (
+        <div key={url} className="flex items-center gap-2">
+          <RelayIcon url={url} className="w-4 h-4" iconSize={10} />
+          <div className="text-muted-foreground text-sm truncate">{url}</div>
         </div>
       ))}
     </div>

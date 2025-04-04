@@ -50,7 +50,10 @@ export default function SaveRelayDropdownMenu({
   ) : (
     <button
       className="enabled:hover:text-primary [&_svg]:size-5"
-      onClick={() => setIsDrawerOpen(true)}
+      onClick={(e) => {
+        e.stopPropagation()
+        setIsDrawerOpen(true)
+      }}
     >
       <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
     </button>
@@ -58,25 +61,27 @@ export default function SaveRelayDropdownMenu({
 
   if (isSmallScreen) {
     return (
-      <div onClick={(e) => e.stopPropagation()}>
+      <>
         {trigger}
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent hideOverlay>
-            <DrawerHeader>
-              <DrawerTitle>{t('Save to')} ...</DrawerTitle>
-            </DrawerHeader>
-            <div className="py-2">
-              <RelayItem urls={normalizedUrls} />
-              {relaySets.map((set) => (
-                <RelaySetItem key={set.id} set={set} urls={normalizedUrls} />
-              ))}
-              <Separator />
-              <SaveToNewSet urls={normalizedUrls} />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </div>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
+            <DrawerContent hideOverlay>
+              <DrawerHeader>
+                <DrawerTitle>{t('Save to')} ...</DrawerTitle>
+              </DrawerHeader>
+              <div className="py-2">
+                <RelayItem urls={normalizedUrls} />
+                {relaySets.map((set) => (
+                  <RelaySetItem key={set.id} set={set} urls={normalizedUrls} />
+                ))}
+                <Separator />
+                <SaveToNewSet urls={normalizedUrls} />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      </>
     )
   }
 

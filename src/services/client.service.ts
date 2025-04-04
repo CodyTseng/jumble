@@ -90,10 +90,6 @@ class ClientService extends EventTarget {
     await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
   }
 
-  listConnectionStatus() {
-    return this.pool.listConnectionStatus()
-  }
-
   setCurrentRelayUrls(urls: string[]) {
     this.currentRelayUrls = urls
   }

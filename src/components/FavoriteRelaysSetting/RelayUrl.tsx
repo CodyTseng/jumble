@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useFetchRelayInfo } from '@/hooks'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
-import { CircleX, SearchCheck } from 'lucide-react'
+import { CircleX } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import RelayIcon from '../RelayIcon'
 
 export default function RelayUrls({ relaySetId }: { relaySetId: string }) {
   const { t } = useTranslation()
@@ -79,20 +79,13 @@ export default function RelayUrls({ relaySetId }: { relaySetId: string }) {
 }
 
 function RelayUrl({ url, onRemove }: { url: string; onRemove: () => void }) {
-  const { t } = useTranslation()
-  const { relayInfo } = useFetchRelayInfo(url)
-
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex gap-2 items-center">
-        <div className="text-muted-foreground text-sm">{url}</div>
-        {relayInfo?.supported_nips?.includes(50) && (
-          <div title={t('supports search')} className="text-highlight">
-            <SearchCheck size={14} />
-          </div>
-        )}
+    <div className="flex items-center justify-between pl-1 pr-3">
+      <div className="flex gap-3 items-center flex-1 w-0">
+        <RelayIcon url={url} className="w-4 h-4" iconSize={10} />
+        <div className="text-muted-foreground text-sm truncate">{url}</div>
       </div>
-      <div>
+      <div className="shrink-0">
         <CircleX
           size={16}
           onClick={onRemove}

@@ -44,6 +44,7 @@ const DrawerContent = React.forwardRef<
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
+      onOpenAutoFocus={(e) => e.preventDefault()}
       {...props}
     >
       <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
