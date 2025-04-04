@@ -111,22 +111,22 @@ class ClientService extends EventTarget {
         const relay = await this.pool.ensureRelay(url)
         return relay
           .publish(event)
-          .then((reason) => {
-            this.trackEventSeenOn(event.id, relay)
-            return reason
-          })
           .catch((error) => {
             if (
               error instanceof Error &&
-              error.message.startsWith('auth-required:') &&
+              error.message.startsWith('auth-required') &&
               !!that.signer
             ) {
-              relay
+              return relay
                 .auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
                 .then(() => relay.publish(event))
             } else {
               throw error
             }
+          })
+          .then((reason) => {
+            this.trackEventSeenOn(event.id, relay)
+            return reason
           })
       })
     )
@@ -207,20 +207,21 @@ class ClientService extends EventTarget {
       })
 
       const relayCount = Object.keys(group).length
-      const coveredAuthorSet = new Set<string>()
+      const coveredCount = new Map<string, number>()
       Object.entries(group)
         .sort(([, a], [, b]) => b.size - a.size)
         .forEach(([url, pubkeys]) => {
           if (
             relayCount > 10 &&
             pubkeys.size < 10 &&
-            Array.from(pubkeys).every((pubkey) => coveredAuthorSet.has(pubkey))
+            Array.from(pubkeys).every((pubkey) => (coveredCount.get(pubkey) ?? 0) >= 2)
           ) {
             delete group[url]
+          } else {
+            pubkeys.forEach((pubkey) => {
+              coveredCount.set(pubkey, (coveredCount.get(pubkey) ?? 0) + 1)
+            })
           }
-          pubkeys.forEach((pubkey) => {
-            coveredAuthorSet.add(pubkey)
-          })
         })
 
       subRequests.push(
@@ -375,7 +376,7 @@ class ClientService extends EventTarget {
             oneose?.(eosed)
           },
           onclose: (reason: string) => {
-            if (!reason.startsWith('auth-required:')) {
+            if (!reason.startsWith('auth-required')) {
               closedCount++
               closeReasons.push(reason)
               if (closedCount >= startedCount) {
@@ -446,7 +447,7 @@ class ClientService extends EventTarget {
                 that.trackEventSeenOn(id, relay)
               },
               onclose(reason) {
-                if (!reason.startsWith('auth-required:') || hasAuthed) {
+                if (!reason.startsWith('auth-required') || hasAuthed) {
                   resolve()
                   return
                 }

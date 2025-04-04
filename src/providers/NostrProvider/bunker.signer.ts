@@ -41,11 +41,7 @@ export class BunkerSigner implements ISigner {
     if (!this.signer) {
       throw new Error('Not logged in')
     }
-    const pubkey = await this.getPublicKey()
-    return this.signer.signEvent({
-      ...draftEvent,
-      pubkey
-    })
+    return this.signer.signEvent(draftEvent)
   }
 
   async nip04Encrypt(pubkey: string, plainText: string) {

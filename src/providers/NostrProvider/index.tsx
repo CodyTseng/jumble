@@ -447,9 +447,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         }
       })
       if (mentions.length > 0) {
-        const relayLists = await Promise.all(
-          mentions.map((pubkey) => client.fetchRelayList(pubkey))
-        )
+        const relayLists = await client.fetchRelayLists(mentions)
         relayLists.forEach((relayList) => {
           additionalRelayUrls.push(...relayList.read.slice(0, 4))
         })
@@ -462,8 +460,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const event = await signEvent(draftEvent)
     const relays = specifiedRelayUrls?.length
       ? specifiedRelayUrls
-      : (relayList?.write.slice(0, 5) ?? [])
-          .concat(additionalRelayUrls ?? [])
+      : (relayList?.write.slice(0, 10) ?? [])
+          .concat(Array.from(new Set(additionalRelayUrls)) ?? [])
           .concat(client.getCurrentRelayUrls())
     if (!relays.length) {
       relays.push(...BIG_RELAY_URLS)
