@@ -14,6 +14,7 @@ import Preview from './Preview'
 import SendOnlyToSwitch from './SendOnlyToSwitch'
 import Uploader from './Uploader'
 import { preprocessContent } from './utils'
+import Username from '@/components/Username'
 
 export default function NormalPostContent({
   defaultContent = '',
@@ -26,7 +27,7 @@ export default function NormalPostContent({
 }) {
   const { t } = useTranslation()
   const { toast } = useToast()
-  const { publish, checkLogin } = useNostr()
+  const { publish, checkLogin} = useNostr()
   const [content, setContent] = useState('')
   const [processedContent, setProcessedContent] = useState('')
   const [pictureInfos, setPictureInfos] = useState<{ url: string; tags: string[][] }[]>([])
@@ -114,6 +115,14 @@ export default function NormalPostContent({
 
   return (
     <div className="space-y-4">
+      {parentEvent && (
+        <div className="bg-muted rounded-xl p-3 border border-border">
+          <p className="text-xs font-semibold text-muted-foreground mb-1">
+            {t('Replying to')} <Username userId={parentEvent.pubkey} showAt />
+          </p>
+          <Preview content={parentEvent.content} />
+        </div>
+      )}
       <TextareaWithMentions
         className="h-32"
         setTextValue={setContent}
