@@ -11,10 +11,10 @@ import TextareaWithMentions from '../TextareaWithMentions'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions'
 import Preview from './Preview'
-import SendOnlyToSwitch from './SendOnlyToSwitch'
 import Uploader from './Uploader'
 import { preprocessContent } from './utils'
 import Username from '@/components/Username'
+import Note from '@/components/Note'
 
 export default function NormalPostContent({
   defaultContent = '',
@@ -117,10 +117,20 @@ export default function NormalPostContent({
     <div className="space-y-4">
       {parentEvent && (
         <div className="bg-muted rounded-xl p-3 border border-border">
-          <p className="text-xs font-semibold text-muted-foreground mb-1">
-            {t('Replying to')} <Username userId={parentEvent.pubkey} showAt />
-          </p>
-          <Preview content={parentEvent.content} />
+          <div 
+            className="max-h-48 overflow-y-auto" 
+            style={{ 
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
+            }}
+          >
+            <Note
+              size="small"
+              event={parentEvent}
+              hideStats
+              hideParentNotePreview
+            />
+          </div>
         </div>
       )}
       <TextareaWithMentions
@@ -129,12 +139,6 @@ export default function NormalPostContent({
         textValue={content}
         placeholder={t('Write something...')}
         cursorOffset={cursorOffset}
-      />
-      {processedContent && <Preview content={processedContent} />}
-      <SendOnlyToSwitch
-        parentEvent={parentEvent}
-        specifiedRelayUrls={specifiedRelayUrls}
-        setSpecifiedRelayUrls={setSpecifiedRelayUrls}
       />
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
