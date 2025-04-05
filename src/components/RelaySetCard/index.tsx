@@ -1,5 +1,5 @@
 import { TRelaySet } from '@/types'
-import { ChevronDown, Circle, CircleCheck, FolderClosed } from 'lucide-react'
+import { ChevronDown, FolderClosed } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
@@ -18,12 +18,11 @@ export default function RelaySetCard({
 
   return (
     <div
-      className={`w-full border rounded-lg px-4 py-3 ${select ? 'border-highlight bg-highlight/5' : 'clickable'}`}
+      className={`w-full border rounded-lg p-4 ${select ? 'border-highlight bg-highlight/5' : 'clickable'}`}
       onClick={() => onSelectChange(!select)}
     >
       <div className="flex justify-between items-center">
         <div className="flex space-x-2 items-center cursor-pointer">
-          <RelaySetActiveToggle select={select} />
           <div className="flex justify-center items-center w-6 h-6 shrink-0">
             <FolderClosed className="size-4" />
           </div>
@@ -37,14 +36,6 @@ export default function RelaySetCard({
       </div>
       {expand && <RelayUrls urls={relaySet.relayUrls} />}
     </div>
-  )
-}
-
-function RelaySetActiveToggle({ select }: { select: boolean }) {
-  return select ? (
-    <CircleCheck className="text-highlight shrink-0 size-4" />
-  ) : (
-    <Circle className="shrink-0 size-4" />
   )
 }
 

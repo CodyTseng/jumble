@@ -4,11 +4,11 @@ import { SecondaryPageLink } from '@/PageManager'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { Circle, CircleCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 import RelaySetCard from '../RelaySetCard'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
+import { UsersRound } from 'lucide-react'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { t } = useTranslation()
@@ -27,7 +27,12 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
             close?.()
           }}
         >
-          {t('Following')}
+          <div className="flex gap-2 items-center">
+            <div className="flex justify-center items-center w-6 h-6 shrink-0">
+              <UsersRound className="size-4" />
+            </div>
+            <div>{t('Following')}</div>
+          </div>
         </FeedSwitcherItem>
       )}
       {temporaryRelayUrls.length > 0 && (
@@ -103,24 +108,13 @@ function FeedSwitcherItem({
 }) {
   return (
     <div
-      className={`w-full border rounded-lg px-4 py-3 ${isActive ? 'border-highlight bg-highlight/5' : 'clickable'} ${temporary ? 'border-dashed' : ''}`}
+      className={`w-full border rounded-lg p-4 ${isActive ? 'border-highlight bg-highlight/5' : 'clickable'} ${temporary ? 'border-dashed' : ''}`}
       onClick={onClick}
     >
       <div className="flex justify-between items-center">
-        <div className="flex gap-2 items-center flex-1">
-          <FeedToggle isActive={isActive} />
-          <div className="font-semibold flex-1">{children}</div>
-        </div>
+        <div className="font-semibold flex-1">{children}</div>
         {controls}
       </div>
     </div>
-  )
-}
-
-function FeedToggle({ isActive }: { isActive: boolean }) {
-  return isActive ? (
-    <CircleCheck className="text-highlight shrink-0 size-4" />
-  ) : (
-    <Circle className="text-muted-foreground shrink-0 size-4" />
   )
 }

@@ -22,7 +22,7 @@ const RelaySettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Relay settings')}>
-      <Tabs value={tabValue} onValueChange={setTabValue} className="px-4 space-y-4">
+      <Tabs value={tabValue} onValueChange={setTabValue} className="px-4 pb-4 space-y-4">
         <TabsList>
           <TabsTrigger value="favorite-relays">{t('Favorite Relays')}</TabsTrigger>
           <TabsTrigger value="mailbox">{t('Read & Write Relays')}</TabsTrigger>

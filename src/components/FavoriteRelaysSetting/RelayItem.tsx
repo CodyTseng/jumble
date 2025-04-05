@@ -8,7 +8,7 @@ export default function RelayItem({ relay }: { relay: string }) {
 
   return (
     <div
-      className="flex gap-2 border rounded-lg px-4 py-3 items-center clickable select-none"
+      className="flex gap-2 border rounded-lg p-4 items-center clickable select-none"
       onClick={() => push(toRelay(relay))}
     >
       <RelayIcon url={relay} />
