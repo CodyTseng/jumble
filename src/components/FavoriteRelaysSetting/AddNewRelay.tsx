@@ -40,10 +40,9 @@ export default function AddNewRelay() {
 
   return (
     <div className="space-y-1">
-      <div className="font-semibold text-sm text-muted-foreground">{t('Add a new relay')}</div>
       <div className="flex gap-2 items-center">
         <Input
-          placeholder="wss://"
+          placeholder={t('Add a new relay')}
           value={input}
           onChange={handleNewRelayInputChange}
           onKeyDown={handleNewRelayInputKeyDown}

@@ -28,10 +28,9 @@ export default function AddNewRelaySet() {
 
   return (
     <div className="space-y-1">
-      <div className="font-semibold text-sm text-muted-foreground">{t('Add a new relay set')}</div>
       <div className="flex gap-2 items-center">
         <Input
-          placeholder={t('Relay set name')}
+          placeholder={t('Add a new relay set')}
           value={newRelaySetName}
           onChange={handleNewRelaySetNameChange}
           onKeyDown={handleNewRelaySetNameKeyDown}
