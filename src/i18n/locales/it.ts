@@ -50,9 +50,9 @@ export default {
     'switch to system theme': 'passa al tema di sistema',
     Note: 'Nota',
     note: 'nota',
-    "username's following": "{{username}} seguiti",
-    "username's used relays": "{{username}} relays usati",
-    "username's muted": "{{username}} zittiti",
+    "username's following": '{{username}} seguiti',
+    "username's used relays": '{{username}} relays usati',
+    "username's muted": '{{username}} zittiti',
     Login: 'Accedi',
     'Follows you': 'Ti segue',
     'Relay Settings': 'Impostazioni Relay',
@@ -74,7 +74,6 @@ export default {
     Search: 'Ricerca',
     'The relays you are connected to do not support search':
       'I relays a cui siete collegati non supportano la ricerca.',
-    'supports search': 'ricerche supportate',
     'Show more...': 'Mostra di più...',
     'All users': 'Tutti gli utenti',
     'Display replies': 'Visualizza repliche',
@@ -92,7 +91,8 @@ export default {
     'Add an Account': 'Aggiungi un Account',
     'More options': 'Più opzioni',
     'Add client tag': 'Aggiungi etichetta del client',
-    'Show others this was sent via Jumble': 'Mostra agli altri che questo è stato inviato tramite Jumble',
+    'Show others this was sent via Jumble':
+      'Mostra agli altri che questo è stato inviato tramite Jumble',
     'Are you sure you want to logout?': 'Sei sicuro di volerti scollegare?',
     'relay sets': 'set di relay',
     edit: 'modifica',
@@ -116,14 +116,6 @@ export default {
     'R & W': 'L & S',
     Read: 'Leggi',
     Write: 'Scrivi',
-    'Push to relays': 'Invia ai relays',
-    'Push Successful': 'Invio riuscito',
-    'Successfully pushed relay sets to relays': 'Invio riuscito del set di relay ai relays',
-    'Pull from relays': 'Ottieni dai relays',
-    'Select the relay sets you want to pull': 'Selezionare i set di relay che si desidera ottenere',
-    'No relay sets found': 'Nessun set di relay trovato',
-    'Pull n relay sets': 'Ottieni {{n}} set di relay',
-    Pull: 'Ottieni',
     'Select all': 'Seleziona tutto',
     'Relay Sets': 'Set di Relay',
     'Read & Write Relays': 'Relay Leggi & Scrivi',
@@ -133,7 +125,7 @@ export default {
       'I relay di scrittura sono utilizzati per pubblicare i tuoi eventi. Gli altri utenti cercheranno i tuoi eventi dai vostri relay di scrittura.',
     'read & write relays notice':
       'Il numero di server di lettura e scrittura dovrebbe essere mantenuto idealmente tra 2 e 4.',
-    "Don't have an account yet?": "Non hai ancora un account?",
+    "Don't have an account yet?": 'Non hai ancora un account?',
     'or simply generate a private key': 'o semplicemente genera una chiave privata',
     'This is a private key. Do not share it with anyone. Keep it safe and secure. You will not be able to recover it if you lose it.':
       'Questa è una chiave privata. Non condividetela con nessuno. Conservatela al sicuro. Non sarà possibile recuperarla in caso di smarrimento.',
@@ -144,7 +136,8 @@ export default {
     'Nostr Address (NIP-05)': 'Indirizzo Nostr (NIP-05)',
     'Invalid NIP-05 address': 'Indirizzo NIP-05 non valido',
     'Copy private key': 'Copia la chiave privata',
-    'Enter the password to decrypt your ncryptsec': 'Inserisci la password per decriptare la tua ncryptsec',
+    'Enter the password to decrypt your ncryptsec':
+      'Inserisci la password per decriptare la tua ncryptsec',
     Back: 'Indietro',
     'optional: encrypt nsec': 'opzione: cripta nsec',
     password: 'password',
@@ -205,11 +198,14 @@ export default {
     'Earlier notifications': 'Notifiche precedenti',
     'Temporarily display this note': 'Visualizza temporaneamente questa nota',
     buttonFollowing: 'Seguendo',
-    'Are you sure you want to unfollow this user?': 'Sei sicuro di voler disiscrivere questo utente?',
+    'Are you sure you want to unfollow this user?':
+      'Sei sicuro di voler disiscrivere questo utente?',
     'Recent Supporters': 'Recenti Sostenitori',
     'Seen on': 'Visto su',
     'Temporarily display this reply': 'Mostra temporaneamente questa replica',
     'Not found the note': 'Non è stata trovata la nota',
-    'no more replies': 'niente più repliche'
+    'no more replies': 'niente più repliche',
+    'Relay sets': 'Set di Relay',
+    'Favorite Relays': 'Relay preferiti'
   }
 }

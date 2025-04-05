@@ -75,7 +75,6 @@ export default {
     Search: 'Suchen',
     'The relays you are connected to do not support search':
       'Die verbundenen Relays unterstützen keine Suche',
-    'supports search': 'unterstützt Suche',
     'Show more...': 'Mehr anzeigen...',
     'All users': 'Alle Benutzer',
     'Display replies': 'Antworten anzeigen',
@@ -117,14 +116,6 @@ export default {
     'R & W': 'R & W',
     Read: 'Lesen',
     Write: 'Schreiben',
-    'Push to relays': 'An Relays senden',
-    'Push Successful': 'Senden erfolgreich',
-    'Successfully pushed relay sets to relays': 'Relay-Sets erfolgreich an Relays gesendet',
-    'Pull from relays': 'Von Relays abrufen',
-    'Select the relay sets you want to pull': 'Wähle die Relay-Sets, die du abrufen möchtest',
-    'No relay sets found': 'Keine Relay-Sets gefunden',
-    'Pull n relay sets': 'Hole {{n}} Relay-Sets',
-    Pull: 'Abrufen',
     'Select all': 'Alle auswählen',
     'Relay Sets': 'Relay-Sets',
     'Read & Write Relays': 'Lese- & Schreib-Relays',
@@ -214,6 +205,8 @@ export default {
     'Seen on': 'Gesehen auf',
     'Temporarily display this reply': 'Antwort vorübergehend anzeigen',
     'Not found the note': 'Die Notiz wurde nicht gefunden',
-    'no more replies': 'keine weiteren Antworten'
+    'no more replies': 'keine weiteren Antworten',
+    'Relay sets': 'Relay-Sets',
+    'Favorite Relays': 'Lieblings-Relays'
   }
 }

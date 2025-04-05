@@ -74,7 +74,6 @@ export default {
     'Reply to': 'الرد على',
     Search: 'بحث',
     'The relays you are connected to do not support search': 'الريلايات المتصلة لا تدعم البحث',
-    'supports search': 'يدعم البحث',
     'Show more...': 'عرض المزيد...',
     'All users': 'جميع المستخدمين',
     'Display replies': 'عرض الردود',
@@ -116,14 +115,6 @@ export default {
     'R & W': 'قراءة وكتابة',
     Read: 'قراءة',
     Write: 'كتابة',
-    'Push to relays': 'إرسال إلى الريلايات',
-    'Push Successful': 'تم الإرسال بنجاح',
-    'Successfully pushed relay sets to relays': 'تم إرسال مجموعات الريلاي إلى الريلايات بنجاح',
-    'Pull from relays': 'استلام من الريلايات',
-    'Select the relay sets you want to pull': 'اختر مجموعات الريلاي التي تريد استلامها',
-    'No relay sets found': 'لم يتم العثور على مجموعات ريلاي',
-    'Pull n relay sets': 'سحب {{n}} مجموعات ريلاي',
-    Pull: 'سحب',
     'Select all': 'اختر الكل',
     'Relay Sets': 'مجموعات الريلاي',
     'Read & Write Relays': 'ريلايات القراءة والكتابة',
@@ -210,6 +201,8 @@ export default {
     'Seen on': 'شوهد على',
     'Temporarily display this reply': 'عرض هذا الرد مؤقتاً',
     'Not found the note': 'لم يتم العثور على الملاحظة',
-    'no more replies': 'لا توجد مزيد من الردود'
+    'no more replies': 'لا توجد مزيد من الردود',
+    'Relay sets': 'مجموعات الريلاي',
+    'Favorite Relays': 'الريلايات المفضلة'
   }
 }

@@ -74,7 +74,6 @@ export default {
     Search: 'Search',
     'The relays you are connected to do not support search':
       'The relays you are connected to do not support search',
-    'supports search': 'supports search',
     'Show more...': 'Show more...',
     'All users': 'All users',
     'Display replies': 'Display replies',
@@ -116,14 +115,6 @@ export default {
     'R & W': 'R & W',
     Read: 'Read',
     Write: 'Write',
-    'Push to relays': 'Push to relays',
-    'Push Successful': 'Push Successful',
-    'Successfully pushed relay sets to relays': 'Successfully pushed relay sets to relays',
-    'Pull from relays': 'Pull from relays',
-    'Select the relay sets you want to pull': 'Select the relay sets you want to pull',
-    'No relay sets found': 'No relay sets found',
-    'Pull n relay sets': 'Pull {{n}} relay sets',
-    Pull: 'Pull',
     'Select all': 'Select all',
     'Relay Sets': 'Relay Sets',
     'Read & Write Relays': 'Read & Write Relays',
@@ -210,6 +201,8 @@ export default {
     'Seen on': 'Seen on',
     'Temporarily display this reply': 'Temporarily display this reply',
     'Not found the note': 'Not found the note',
-    'no more replies': 'no more replies'
+    'no more replies': 'no more replies',
+    'Relay sets': 'Relay sets',
+    'Favorite Relays': 'Favorite Relays'
   }
 }

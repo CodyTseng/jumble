@@ -74,7 +74,6 @@ export default {
     Search: 'Pesquisar',
     'The relays you are connected to do not support search':
       'Os relés aos quais você está conectado não suportam pesquisa',
-    'supports search': 'suporta pesquisa',
     'Show more...': 'Mostrar mais...',
     'All users': 'Todos os usuários',
     'Display replies': 'Exibir respostas',
@@ -116,14 +115,6 @@ export default {
     'R & W': 'Leitura & Escrita',
     Read: 'Ler',
     Write: 'Escrever',
-    'Push to relays': 'Enviar para relés',
-    'Push Successful': 'Envio bem-sucedido',
-    'Successfully pushed relay sets to relays': 'Conjuntos de relé enviados com sucesso',
-    'Pull from relays': 'Receber de relés',
-    'Select the relay sets you want to pull': 'Selecione os conjuntos de relé que deseja receber',
-    'No relay sets found': 'Nenhum conjunto de relé encontrado',
-    'Pull n relay sets': 'Receber {{n}} conjuntos de relé',
-    Pull: 'Receber',
     'Select all': 'Selecionar todos',
     'Relay Sets': 'Conjuntos de relé',
     'Read & Write Relays': 'Relés de Leitura & Escrita',
@@ -212,6 +203,8 @@ export default {
     'Seen on': 'Visto em',
     'Temporarily display this reply': 'Exibir temporariamente esta resposta',
     'Not found the note': 'Nota não encontrada',
-    'no more replies': 'não há mais respostas'
+    'no more replies': 'não há mais respostas',
+    'Relay sets': 'Conjuntos de relé',
+    'Favorite Relays': 'Relés favoritos'
   }
 }
