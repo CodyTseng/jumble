@@ -118,16 +118,11 @@ export default function NormalPostContent({
   return (
     <div className="space-y-4">
     {parentEvent && (
-    <ScrollArea className="max-h-48 rounded-xl border border-border bg-muted overflow-y-auto">
-      <div className="p-3 pointer-events-auto">
-        <Note
-          size="small"
-          event={parentEvent}
-          hideStats
-          hideParentNotePreview
-        />
-      </div>
-    </ScrollArea>
+    <ScrollArea className="max-h-48 rounded-lg border bg-muted/40 overflow-y-auto">
+    <div className="p-2 sm:p-3 pointer-events-none">
+      <Note size="small" event={parentEvent} hideStats hideParentNotePreview />
+    </div>
+  </ScrollArea>
   )}
       <TextareaWithMentions
         className="h-32"
