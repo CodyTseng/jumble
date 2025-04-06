@@ -14,7 +14,6 @@ import Preview from './Preview'
 import SendOnlyToSwitch from './SendOnlyToSwitch'
 import Uploader from './Uploader'
 import { preprocessContent } from './utils'
-import Username from '@/components/Username'
 import Note from '@/components/Note'
 import { ScrollArea } from "@/components/ui/scroll-area"
 
