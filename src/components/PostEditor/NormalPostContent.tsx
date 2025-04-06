@@ -11,10 +11,13 @@ import TextareaWithMentions from '../TextareaWithMentions'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions'
 import Preview from './Preview'
+import SendOnlyToSwitch from './SendOnlyToSwitch'
 import Uploader from './Uploader'
 import { preprocessContent } from './utils'
 import Username from '@/components/Username'
 import Note from '@/components/Note'
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 
 export default function NormalPostContent({
   defaultContent = '',
@@ -27,7 +30,7 @@ export default function NormalPostContent({
 }) {
   const { t } = useTranslation()
   const { toast } = useToast()
-  const { publish, checkLogin} = useNostr()
+  const { publish, checkLogin } = useNostr()
   const [content, setContent] = useState('')
   const [processedContent, setProcessedContent] = useState('')
   const [pictureInfos, setPictureInfos] = useState<{ url: string; tags: string[][] }[]>([])
@@ -115,30 +118,30 @@ export default function NormalPostContent({
 
   return (
     <div className="space-y-4">
-      {parentEvent && (
-        <div className="bg-muted rounded-xl p-3 border border-border">
-          <div 
-            className="max-h-48 overflow-y-auto" 
-            style={{ 
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
-            }}
-          >
-            <Note
-              size="small"
-              event={parentEvent}
-              hideStats
-              hideParentNotePreview
-            />
-          </div>
-        </div>
-      )}
+    {parentEvent && (
+    <ScrollArea className="max-h-48 rounded-xl border border-border bg-muted overflow-y-auto">
+      <div className="p-3 pointer-events-auto">
+        <Note
+          size="small"
+          event={parentEvent}
+          hideStats
+          hideParentNotePreview
+        />
+      </div>
+    </ScrollArea>
+  )}
       <TextareaWithMentions
         className="h-32"
         setTextValue={setContent}
         textValue={content}
         placeholder={t('Write something...')}
         cursorOffset={cursorOffset}
+      />
+      {processedContent && <Preview content={processedContent} />}
+      <SendOnlyToSwitch
+        parentEvent={parentEvent}
+        specifiedRelayUrls={specifiedRelayUrls}
+        setSpecifiedRelayUrls={setSpecifiedRelayUrls}
       />
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
