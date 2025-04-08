@@ -216,6 +216,7 @@ export default {
     'Favorited by': 'Ulubione przez',
     'Post settings': 'Ustawienia publikacji',
     'Media upload service': 'Usługa przesyłania mediów',
-    'Choose a relay': 'Wybierz transmiter'
+    'Choose a relay': 'Wybierz transmiter',
+    'no relays found': 'Nie znaleziono transmiterów'
   }
 }
