@@ -15,79 +15,55 @@ export default function VideoPlayer({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [hasPlayed, setHasPlayed] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
-useEffect(() => {
-  const videoEl = videoRef.current
-  if (!videoEl) return
+  useEffect(() => {
+    const videoEl = videoRef.current
+    if (!videoEl) return
 
-  // Flag to determine if user has played the video and wants PiP
-  let wantsPiP = false
+    const handlePlay = () => {
+      setHasPlayed(true)
+    }
 
-  // Will hold our observer instance so we can disconnect later
-  let observer: IntersectionObserver | null = null
+    const handleLeavePiP = () => {
+      // Optional: do something after PiP exits
+    }
 
-  // When video is played manually by the user
-  const handlePlay = () => {
-    setHasPlayed(true)
-    wantsPiP = true 
-  }
+    videoEl.addEventListener('play', handlePlay)
+    videoEl.addEventListener('leavepictureinpicture', handleLeavePiP)
 
-  // When user exits native PiP manually
-  const handleLeavePiP = () => {
-    wantsPiP = false // Prevent re-entering PiP immediately
-  }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.5 }
+    )
 
-  // Add listeners to track user interaction and PiP exit
-  videoEl.addEventListener('play', handlePlay)
-  videoEl.addEventListener('leavepictureinpicture', handleLeavePiP)
+    observer.observe(videoEl)
 
-  // Observe whether the video is in view or not
-  observer = new IntersectionObserver(
-    async ([entry]) => {
-      if (!videoEl) return
+    return () => {
+      videoEl.removeEventListener('play', handlePlay)
+      videoEl.removeEventListener('leavepictureinpicture', handleLeavePiP)
+      observer.disconnect()
+    }
+  }, [])
 
-      const isVisible = entry.isIntersecting
+  useEffect(() => {
+    const videoEl = videoRef.current
+    if (!videoEl || !hasPlayed) return
 
-      // If video has been played, is out of view, and PiP is allowed
-      if (
-        !isVisible &&
-        hasPlayed &&
-        wantsPiP &&
-        document.pictureInPictureEnabled &&
-        !videoEl.disablePictureInPicture
-      ) {
-        try {
-          // Enter PiP if not already in PiP
-          if (document.pictureInPictureElement !== videoEl) {
-            await videoEl.requestPictureInPicture()
-          }
-        } catch (err) {
-          console.error('Failed to enter PiP:', err)
-        }
+    // Automatically enter PiP when out of view
+    if (!isVisible && document.pictureInPictureEnabled && !videoEl.disablePictureInPicture) {
+      if (document.pictureInPictureElement !== videoEl) {
+        videoEl.requestPictureInPicture().catch((err) => console.error('Failed to enter PiP:', err))
       }
+    }
 
-      // Exit PiP if video comes back into view and it's currently in PiP
-      if (isVisible && document.pictureInPictureElement === videoEl) {
-        try {
-          await document.exitPictureInPicture()
-        } catch (err) {
-          console.error('Failed to exit PiP:', err)
-        }
-      }
-    },
-    { threshold: 0.5 } // Trigger callback when 50% of video is visible/invisible
-  )
-
-  // Start observing the video element
-  observer.observe(videoEl)
-
-  // Cleanup on component unmount
-  return () => {
-    videoEl.removeEventListener('play', handlePlay)
-    videoEl.removeEventListener('leavepictureinpicture', handleLeavePiP)
-    observer?.disconnect()
-  }
-}, [hasPlayed])
+    // Automatically exit PiP when back in view
+    if (isVisible && document.pictureInPictureElement === videoEl) {
+      document.exitPictureInPicture().catch((err) => console.error('Failed to exit PiP:', err))
+    }
+  }, [isVisible, hasPlayed])
 
   return (
     <>
