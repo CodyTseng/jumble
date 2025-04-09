@@ -25,12 +25,7 @@ export default function VideoPlayer({
       setHasPlayed(true)
     }
 
-    const handleLeavePiP = () => {
-      // Optional: do something after PiP exits
-    }
-
     videoEl.addEventListener('play', handlePlay)
-    videoEl.addEventListener('leavepictureinpicture', handleLeavePiP)
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -43,7 +38,6 @@ export default function VideoPlayer({
 
     return () => {
       videoEl.removeEventListener('play', handlePlay)
-      videoEl.removeEventListener('leavepictureinpicture', handleLeavePiP)
       observer.disconnect()
     }
   }, [])
