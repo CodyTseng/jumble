@@ -15,49 +15,85 @@ export default function VideoPlayer({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [hasPlayed, setHasPlayed] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
+  const [isInPiP, setIsInPiP] = useState(false)
 
   useEffect(() => {
-    const videoEl = videoRef.current
-    if (!videoEl) return
+    const video = videoRef.current
+    if (!video) return
+
+    let observer: IntersectionObserver
 
     const handlePlay = () => {
       setHasPlayed(true)
     }
 
-    videoEl.addEventListener('play', handlePlay)
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting)
-      },
-      { threshold: 0.5 }
-    )
-
-    observer.observe(videoEl)
-
-    return () => {
-      videoEl.removeEventListener('play', handlePlay)
-      observer.disconnect()
+    const handleLeavePiP = () => {
+      setIsInPiP(false)
     }
-  }, [])
 
-  useEffect(() => {
-    const videoEl = videoRef.current
-    if (!videoEl || !hasPlayed) return
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 
-    // Automatically enter PiP when out of view
-    if (!isVisible && document.pictureInPictureEnabled && !videoEl.disablePictureInPicture) {
-      if (document.pictureInPictureElement !== videoEl) {
-        videoEl.requestPictureInPicture().catch((err) => console.error('Failed to enter PiP:', err))
+    const requestPiP = async () => {
+      if (isSafari && (video as any).webkitSupportsPresentationMode) {
+        ;(video as any).webkitSetPresentationMode('picture-in-picture')
+        setIsInPiP(true)
+      } else if (
+        document.pictureInPictureEnabled &&
+        !video.disablePictureInPicture &&
+        document.pictureInPictureElement !== video
+      ) {
+        try {
+          await video.requestPictureInPicture()
+          setIsInPiP(true)
+        } catch (err) {
+          console.error('Failed to enter PiP:', err)
+        }
       }
     }
 
-    // Automatically exit PiP when back in view
-    if (isVisible && document.pictureInPictureElement === videoEl) {
-      document.exitPictureInPicture().catch((err) => console.error('Failed to exit PiP:', err))
+    const exitPiP = async () => {
+      if (isSafari && (video as any).webkitPresentationMode === 'picture-in-picture') {
+        ;(video as any).webkitSetPresentationMode('inline')
+        setIsInPiP(false)
+        video.pause()
+      } else if (document.pictureInPictureElement === video) {
+        try {
+          await document.exitPictureInPicture()
+          setIsInPiP(false)
+          video.pause()
+        } catch (err) {
+          console.error('Failed to exit PiP:', err)
+        }
+      }
     }
-  }, [isVisible, hasPlayed])
+
+    const handleIntersection = ([entry]: IntersectionObserverEntry[]) => {
+      if (!hasPlayed || !video) return
+      const isVisible = entry.isIntersecting
+
+      if (!isVisible && !isInPiP && !video.paused) {
+        requestPiP()
+      }
+
+      if (isVisible && isInPiP) {
+        exitPiP()
+      }
+    }
+
+    video.addEventListener('play', handlePlay)
+    video.addEventListener('leavepictureinpicture', handleLeavePiP)
+
+    observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.5
+    })
+    observer.observe(video)
+
+    return () => {
+      video.removeEventListener('play', handlePlay)
+      video.removeEventListener('leavepictureinpicture', handleLeavePiP)
+      observer.disconnect()
+    }
+  }, [hasPlayed, isInPiP])
 
   return (
     <>
