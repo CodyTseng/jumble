@@ -1,9 +1,6 @@
 import { cn } from '@/lib/utils'
 import NsfwOverlay from '../NsfwOverlay'
 import { useEffect, useRef, useState } from 'react'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { X } from 'lucide-react'
-import VideoManager from '@/utils/VideoManager'
 
 export default function VideoPlayer({
   src,
@@ -17,90 +14,80 @@ export default function VideoPlayer({
   size?: 'normal' | 'small'
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const floatingVideoRef = useRef<HTMLVideoElement>(null)
-
-  const [showFloatingPlayer, setShowFloatingPlayer] = useState(false)
   const [hasPlayed, setHasPlayed] = useState(false)
-  const { isSmallScreen } = useScreenSize()
 
-  useEffect(() => {
-    const videoEl = videoRef.current
-    const floating = floatingVideoRef.current
-    if (!videoEl) return
+useEffect(() => {
+  const videoEl = videoRef.current
+  if (!videoEl) return
 
-    // Track if user started playing the video
-    const handlePlay = () => {
-      setHasPlayed(true)
-      VideoManager.setCurrent(videoEl)
+  // Flag to determine if user has played the video and wants PiP
+  let wantsPiP = false
 
-      // Clear existing PiP (other videos)
-      VideoManager.clearPiP()
-    }
+  // Will hold our observer instance so we can disconnect later
+  let observer: IntersectionObserver | null = null
 
-    videoEl.addEventListener('play', handlePlay)
+  // When video is played manually by the user
+  const handlePlay = () => {
+    setHasPlayed(true)
+    wantsPiP = true 
+  }
 
-    // Watch visibility of the main video
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const shouldFloat = !entry.isIntersecting && hasPlayed && !videoEl.paused
+  // When user exits native PiP manually
+  const handleLeavePiP = () => {
+    wantsPiP = false // Prevent re-entering PiP immediately
+  }
 
-        if (shouldFloat) {
-          setShowFloatingPlayer(true)
+  // Add listeners to track user interaction and PiP exit
+  videoEl.addEventListener('play', handlePlay)
+  videoEl.addEventListener('leavepictureinpicture', handleLeavePiP)
 
-          // Register PiP exit callback
-          VideoManager.setPiPCallback(() => {
-            setShowFloatingPlayer(false)
-            if (floating && !floating.paused) {
-              floating.pause()
-            }
-          })
-        } else {
-          setShowFloatingPlayer(false)
+  // Observe whether the video is in view or not
+  observer = new IntersectionObserver(
+    async ([entry]) => {
+      if (!videoEl) return
 
-          // If main video is back in view, sync and resume
-          if (entry.isIntersecting && floating && !floating.paused) {
-            videoEl.currentTime = floating.currentTime
-            floating.pause()
-            videoEl.play().catch(console.error)
+      const isVisible = entry.isIntersecting
+
+      // If video has been played, is out of view, and PiP is allowed
+      if (
+        !isVisible &&
+        hasPlayed &&
+        wantsPiP &&
+        document.pictureInPictureEnabled &&
+        !videoEl.disablePictureInPicture
+      ) {
+        try {
+          // Enter PiP if not already in PiP
+          if (document.pictureInPictureElement !== videoEl) {
+            await videoEl.requestPictureInPicture()
           }
+        } catch (err) {
+          console.error('Failed to enter PiP:', err)
         }
-      },
-      { threshold: 0.5 }
-    )
+      }
 
-    observer.observe(videoEl)
+      // Exit PiP if video comes back into view and it's currently in PiP
+      if (isVisible && document.pictureInPictureElement === videoEl) {
+        try {
+          await document.exitPictureInPicture()
+        } catch (err) {
+          console.error('Failed to exit PiP:', err)
+        }
+      }
+    },
+    { threshold: 0.5 } // Trigger callback when 50% of video is visible/invisible
+  )
 
-    return () => {
-      videoEl.removeEventListener('play', handlePlay)
-      VideoManager.clearCurrent(videoEl)
-      observer.disconnect()
-    }
-  }, [hasPlayed])
+  // Start observing the video element
+  observer.observe(videoEl)
 
-  // Sync time from main video to floating video
-  useEffect(() => {
-    const main = videoRef.current
-    const floating = floatingVideoRef.current
-    if (!main || !floating || !showFloatingPlayer) return
-
-    floating.currentTime = main.currentTime
-    main.pause()
-    floating.play().catch(console.error)
-  }, [showFloatingPlayer])
-
-  // 🎬 Sync floating video when PiP is triggered
-  useEffect(() => {
-    const mainVideo = videoRef.current
-    const floating = floatingVideoRef.current
-    if (!mainVideo || !floating) return
-
-    if (showFloatingPlayer) {
-      const time = mainVideo.currentTime
-      mainVideo.pause()
-      floating.currentTime = time
-      floating.play().catch(console.error)
-    }
-  }, [showFloatingPlayer])
+  // Cleanup on component unmount
+  return () => {
+    videoEl.removeEventListener('play', handlePlay)
+    videoEl.removeEventListener('leavepictureinpicture', handleLeavePiP)
+    observer?.disconnect()
+  }
+}, [hasPlayed])
 
   return (
     <>
@@ -114,32 +101,6 @@ export default function VideoPlayer({
         />
         {isNsfw && <NsfwOverlay className="rounded-lg" />}
       </div>
-
-      {/* ===>=== FLOATING PIP-STYLE PLAYER */}
-      {showFloatingPlayer && (
-        <div
-          className={cn(
-            'fixed z-20  bottom-4 right-4 shadow-xl rounded-md overflow-hidden w-[300px]',
-            !isSmallScreen ? 'bottom-2 right-2' : ''
-          )}
-        >
-          <div className="">
-            <video
-              ref={floatingVideoRef}
-              src={src}
-              autoPlay
-              controls
-              className="relative rounded-lg"
-            />
-          </div>
-          <button
-            onClick={() => setShowFloatingPlayer(false)}
-            className="absolute top-3 right-3 bg-black/50 z-50 text-white rounded-full w-[25px] h-[25px] flex items-center justify-center"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-      )}
     </>
   )
 }
