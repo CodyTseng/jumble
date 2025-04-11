@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { isDevEnv } from '@/lib/common'
 import { useNostr } from '@/providers/NostrProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { NstartModal } from 'nstart-modal'
@@ -10,7 +11,6 @@ import BunkerLogin from './BunkerLogin'
 import GenerateNewAccount from './GenerateNewAccount'
 import NpubLogin from './NpubLogin'
 import PrivateKeyLogin from './PrivateKeyLogin'
-import { isDevEnv } from '@/lib/common'
 
 type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'npub' | null
 
@@ -78,7 +78,7 @@ function AccountManagerNav({
         <Button
           onClick={() => {
             const wizard = new NstartModal({
-              baseUrl: 'https://start.njump.me',
+              baseUrl: 'https://nstart.me',
               an: 'Jumble',
               am: themeSetting,
               onComplete: ({ nostrLogin }) => {

@@ -92,7 +92,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   useEffect(() => {
     if (window.location.pathname !== '/') {
       if (
-        ['/users', '/notes', '/relays'].some((path) => window.location.pathname.startsWith(path))
+        ['/users', '/notes', '/relays'].some((path) => window.location.pathname.startsWith(path)) &&
+        !history.state
       ) {
         setIsShared(true)
       }
