@@ -10,15 +10,7 @@ import storage from '@/services/local-storage.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { NotificationItem } from './NotificationItem'
@@ -34,7 +26,7 @@ const NotificationList = forwardRef((_, ref) => {
   const [lastReadTime, setLastReadTime] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
-  const [refreshing, setRefreshing] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<Event[]>([])
   const [newNotifications, setNewNotifications] = useState<Event[]>([])
   const [oldNotifications, setOldNotifications] = useState<Event[]>([])
@@ -57,11 +49,11 @@ const NotificationList = forwardRef((_, ref) => {
     ref,
     () => ({
       refresh: () => {
-        if (refreshing) return
+        if (loading) return
         setRefreshCount((count) => count + 1)
       }
     }),
-    [refreshing]
+    [loading]
   )
 
   useEffect(() => {
@@ -71,12 +63,12 @@ const NotificationList = forwardRef((_, ref) => {
     }
 
     const init = async () => {
-      setRefreshing(true)
+      setLoading(true)
       setNotifications([])
       setShowCount(SHOW_COUNT)
       setLastReadTime(storage.getLastReadNotificationTime(pubkey))
       const relayList = await client.fetchRelayList(pubkey)
-      let eventCount = 0
+
       const { closer, timelineKey } = await client.subscribeTimeline(
         relayList.read.length > 0 ? relayList.read.slice(0, 5) : BIG_RELAY_URLS,
         {
@@ -86,11 +78,11 @@ const NotificationList = forwardRef((_, ref) => {
         },
         {
           onEvents: (events, eosed) => {
-            if (eventCount > events.length) return
-            eventCount = events.length
-            setNotifications(events.filter((event) => event.pubkey !== pubkey))
+            if (events.length > 0) {
+              setNotifications(events.filter((event) => event.pubkey !== pubkey))
+            }
             if (eosed) {
-              setRefreshing(false)
+              setLoading(false)
               setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
               updateNoteStatsByEvents(events)
             }
@@ -132,35 +124,39 @@ const NotificationList = forwardRef((_, ref) => {
     }
   }, [notifications, lastReadTime, showCount])
 
-  const loadMore = useCallback(async () => {
-    if (showCount < notifications.length) {
-      setShowCount((count) => count + SHOW_COUNT)
-      return
-    }
-
-    if (!pubkey || !timelineKey || !until || refreshing) return
-
-    const newNotifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
-    if (newNotifications.length === 0) {
-      setUntil(undefined)
-      return
-    }
-
-    if (newNotifications.length > 0) {
-      setNotifications((oldNotifications) => [
-        ...oldNotifications,
-        ...newNotifications.filter((event) => event.pubkey !== pubkey)
-      ])
-    }
-
-    setUntil(newNotifications[newNotifications.length - 1].created_at - 1)
-  }, [pubkey, timelineKey, until, refreshing, showCount, notifications])
-
   useEffect(() => {
     const options = {
       root: null,
       rootMargin: '10px',
       threshold: 1
+    }
+
+    const loadMore = async () => {
+      if (showCount < notifications.length) {
+        setShowCount((count) => count + SHOW_COUNT)
+        // preload more
+        if (notifications.length - showCount > LIMIT / 2) {
+          return
+        }
+      }
+
+      if (!pubkey || !timelineKey || !until || loading) return
+      setLoading(true)
+      const newNotifications = await client.loadMoreTimeline(timelineKey, until, LIMIT)
+      setLoading(false)
+      if (newNotifications.length === 0) {
+        setUntil(undefined)
+        return
+      }
+
+      if (newNotifications.length > 0) {
+        setNotifications((oldNotifications) => [
+          ...oldNotifications,
+          ...newNotifications.filter((event) => event.pubkey !== pubkey)
+        ])
+      }
+
+      setUntil(newNotifications[newNotifications.length - 1].created_at - 1)
     }
 
     const observerInstance = new IntersectionObserver((entries) => {
@@ -180,7 +176,7 @@ const NotificationList = forwardRef((_, ref) => {
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [loadMore])
+  }, [pubkey, timelineKey, until, loading, showCount, notifications])
 
   return (
     <div>
@@ -214,7 +210,7 @@ const NotificationList = forwardRef((_, ref) => {
             <NotificationItem key={notification.id} notification={notification} />
           ))}
           <div className="text-center text-sm text-muted-foreground">
-            {until || refreshing ? (
+            {until || loading ? (
               <div ref={bottomRef}>
                 <div className="flex gap-2 items-center h-11 py-2">
                   <Skeleton className="w-7 h-7 rounded-full" />

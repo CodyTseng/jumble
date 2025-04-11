@@ -105,7 +105,9 @@ export default function ReplyNoteList({
           },
           {
             onEvents: (evts, eosed) => {
-              setEvents(evts.filter((evt) => isReplyNoteEvent(evt)).reverse())
+              if (evts.length > 0) {
+                setEvents(evts.filter((evt) => isReplyNoteEvent(evt)).reverse())
+              }
               if (eosed) {
                 setUntil(evts.length >= LIMIT ? evts[evts.length - 1].created_at - 1 : undefined)
                 setLoading(false)

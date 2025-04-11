@@ -22,7 +22,7 @@ export default function Nip22ReplyNoteList({
   className?: string
 }) {
   const { t } = useTranslation()
-  const { pubkey } = useNostr()
+  const { pubkey, startLogin } = useNostr()
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [until, setUntil] = useState<number | undefined>(() => dayjs().unix())
   const [replies, setReplies] = useState<NEvent[]>([])
@@ -76,7 +76,9 @@ export default function Nip22ReplyNoteList({
           },
           {
             onEvents: (evts, eosed) => {
-              setReplies(evts.reverse())
+              if (evts.length > 0) {
+                setReplies(evts.reverse())
+              }
               if (eosed) {
                 setLoading(false)
                 setUntil(evts.length >= LIMIT ? evts[evts.length - 1].created_at - 1 : undefined)
@@ -85,6 +87,9 @@ export default function Nip22ReplyNoteList({
             onNew: (evt) => {
               onNewReply(evt)
             }
+          },
+          {
+            startLogin
           }
         )
         setTimelineKey(timelineKey)

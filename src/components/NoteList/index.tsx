@@ -14,7 +14,7 @@ import relayInfoService from '@/services/relay-info.service'
 import { TNoteListMode } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard from '../NoteCard'
@@ -47,7 +47,7 @@ export default function NoteList({
   const [newEvents, setNewEvents] = useState<Event[]>([])
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [hasMore, setHasMore] = useState<boolean>(true)
-  const [refreshing, setRefreshing] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const isPictures = useMemo(() => listMode === 'pictures', [listMode])
@@ -63,7 +63,7 @@ export default function NoteList({
     if (relayUrls.length === 0 && !noteFilter.authors?.length) return
 
     async function init() {
-      setRefreshing(true)
+      setLoading(true)
       setEvents([])
       setNewEvents([])
       setHasMore(true)
@@ -74,15 +74,11 @@ export default function NoteList({
         areAlgoRelays = relayInfos.every((relayInfo) => checkAlgoRelay(relayInfo))
       }
 
-      let eventCount = 0
       const { closer, timelineKey } = await client.subscribeTimeline(
         [...relayUrls],
         { ...noteFilter, limit: areAlgoRelays ? ALGO_LIMIT : LIMIT },
         {
           onEvents: (events, eosed) => {
-            if (eventCount > events.length) return
-            eventCount = events.length
-
             if (events.length > 0) {
               setEvents(events)
             }
@@ -90,7 +86,7 @@ export default function NoteList({
               setHasMore(false)
             }
             if (eosed) {
-              setRefreshing(false)
+              setLoading(false)
               setHasMore(events.length > 0)
             }
           },
@@ -115,30 +111,35 @@ export default function NoteList({
     }
   }, [JSON.stringify(relayUrls), noteFilter, refreshCount])
 
-  const loadMore = useCallback(async () => {
-    if (showCount < events.length) {
-      setShowCount((prev) => prev + SHOW_COUNT)
-      return
-    }
-
-    if (!timelineKey || refreshing || !hasMore) return
-    const newEvents = await client.loadMoreTimeline(
-      timelineKey,
-      events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
-      LIMIT
-    )
-    if (newEvents.length === 0) {
-      setHasMore(false)
-      return
-    }
-    setEvents((oldEvents) => [...oldEvents, ...newEvents])
-  }, [timelineKey, refreshing, hasMore, events, noteFilter, showCount])
-
   useEffect(() => {
     const options = {
       root: null,
       rootMargin: '10px',
       threshold: 0.1
+    }
+
+    const loadMore = async () => {
+      if (showCount < events.length) {
+        setShowCount((prev) => prev + SHOW_COUNT)
+        // preload more
+        if (events.length - showCount > LIMIT / 2) {
+          return
+        }
+      }
+
+      if (!timelineKey || loading || !hasMore) return
+      setLoading(true)
+      const newEvents = await client.loadMoreTimeline(
+        timelineKey,
+        events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
+        LIMIT
+      )
+      setLoading(false)
+      if (newEvents.length === 0) {
+        setHasMore(false)
+        return
+      }
+      setEvents((oldEvents) => [...oldEvents, ...newEvents])
     }
 
     const observerInstance = new IntersectionObserver((entries) => {
@@ -158,7 +159,7 @@ export default function NoteList({
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [loadMore])
+  }, [timelineKey, loading, hasMore, events, noteFilter, showCount])
 
   const showNewEvents = () => {
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -214,7 +215,7 @@ export default function NoteList({
                 ))}
             </div>
           )}
-          {hasMore || refreshing ? (
+          {hasMore || loading ? (
             <div ref={bottomRef}>
               <LoadingSkeleton isPictures={isPictures} />
             </div>
