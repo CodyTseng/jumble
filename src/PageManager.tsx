@@ -116,7 +116,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
     const onPopState = (e: PopStateEvent) => {
       let state = e.state as { index: number; url: string } | null
-      console.log('popstate', state)
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
         const currentIndex = currentItem?.index

@@ -5,7 +5,7 @@ export function EmbeddedHashtag({ hashtag }: { hashtag: string }) {
   return (
     <SecondaryPageLink
       className="text-primary hover:underline"
-      to={toNoteList({ hashtag })}
+      to={toNoteList({ hashtag: hashtag.replace('#', '') })}
       onClick={(e) => e.stopPropagation()}
     >
       {hashtag}
