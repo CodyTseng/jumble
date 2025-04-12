@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import NsfwOverlay from '../NsfwOverlay'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import VideoManager from '@/services/videomanager'
 
 export default function VideoPlayer({
@@ -15,97 +15,64 @@ export default function VideoPlayer({
   size?: 'normal' | 'small'
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [hasPlayed, setHasPlayed] = useState(false)
-  const [isInPiP, setIsInPiP] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    const container = containerRef.current
 
-    let observer: IntersectionObserver
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    if (!video || !container) return
 
-    const handlePlay = async () => {
-      setHasPlayed(true)
-      await VideoManager.setCurrent(video)
-    }
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        const isVisible = entry.isIntersecting
 
-    const handleLeavePiP = () => {
-      setIsInPiP(false)
-      VideoManager.setPiPCallback(null)
-    }
-
-    const requestPiP = async () => {
-      await VideoManager.setCurrent(video)
-
-      if (isSafari && (video as any).webkitSupportsPresentationMode) {
-        ;(video as any).webkitSetPresentationMode('picture-in-picture')
-        setIsInPiP(true)
-      } else if (
-        document.pictureInPictureEnabled &&
-        !video.disablePictureInPicture &&
-        document.pictureInPictureElement !== video
-      ) {
-        try {
-          await video.requestPictureInPicture()
-          setIsInPiP(true)
-        } catch (err) {
-          console.error('Failed to enter PiP:', err)
+        if (!isVisible && !video.paused) {
+          await VideoManager.enterPiP(video)
         }
+
+        if (isVisible) {
+          if (
+            document.pictureInPictureElement === video ||
+            (video as any).webkitPresentationMode === 'picture-in-picture'
+          ) {
+            await VideoManager.exitPiP(video)
+            video.pause()
+          }
+        }
+      },
+      {
+        threshold: 0.5
       }
+    )
 
-      VideoManager.setPiPCallback(() => {
-        setIsInPiP(false)
-      })
-    }
-
-    const exitPiP = async () => {
-      try {
-        await VideoManager.clearPiP()
-        setIsInPiP(false)
-        video.pause()
-      } catch (err) {
-        console.error('Failed to exit PiP:', err)
-      }
-    }
-
-    const handleIntersection = ([entry]: IntersectionObserverEntry[]) => {
-      const isVisible = entry.isIntersecting
-
-      if (hasPlayed && !isVisible && !isInPiP && !video.paused) {
-        requestPiP()
-      }
-
-      if (isVisible && isInPiP) {
-        exitPiP()
-      }
-    }
-
-    video.addEventListener('play', handlePlay)
-    video.addEventListener('leavepictureinpicture', handleLeavePiP)
-    video.addEventListener('webkitpresentationmodechanged', handleLeavePiP)
-
-    observer = new IntersectionObserver(handleIntersection, { threshold: 0.5 })
-    observer.observe(video)
+    observer.observe(container)
 
     return () => {
-      video.removeEventListener('play', handlePlay)
-      video.removeEventListener('leavepictureinpicture', handleLeavePiP)
-      video.removeEventListener('webkitpresentationmodechanged', handleLeavePiP)
-      observer.disconnect()
-      VideoManager.clearCurrent(video)
+      observer.unobserve(container)
     }
-  }, [hasPlayed, isInPiP])
+  }, [])
 
+  const handlePlay = async () => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (VideoManager.getCurrentVideo() && VideoManager.getCurrentVideo() !== video) {
+      await VideoManager.exitPiP(VideoManager.getCurrentVideo()!)
+    }
+
+    video.play()
+  }
   return (
     <>
-      <div className="relative">
+      <div ref={containerRef} className="relative">
         <video
           ref={videoRef}
           controls
           className={cn('rounded-lg', size === 'small' ? 'h-[15vh]' : 'h-[30vh]', className)}
           src={src}
           onClick={(e) => e.stopPropagation()}
+          onPlay={handlePlay}
         />
         {isNsfw && <NsfwOverlay className="rounded-lg" />}
       </div>

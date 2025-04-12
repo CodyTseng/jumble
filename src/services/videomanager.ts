@@ -1,58 +1,35 @@
-type PiPCallback = () => void
-
 class VideoManager {
-  private currentVideo: HTMLVideoElement | null = null
-  private onPiPExitCallback: PiPCallback | null = null
+  private static currentVideo: HTMLVideoElement | null = null
 
-  async setCurrent(video: HTMLVideoElement) {
-    if (this.currentVideo && this.currentVideo !== video) {
-      await this.exitPiPIfActive()
-      this.onPiPExitCallback?.()
+  static async enterPiP(video: HTMLVideoElement) {
+    if (VideoManager.currentVideo && VideoManager.currentVideo !== video) {
+      await VideoManager.exitPiP(VideoManager.currentVideo)
     }
 
-    this.currentVideo = video
+    VideoManager.currentVideo = video
+
+    if ('requestPictureInPicture' in video) {
+      await video.requestPictureInPicture()
+    } else if ('webkitSetPresentationMode' in video) {
+      ;(video as any).webkitSetPresentationMode('picture-in-picture')
+    }
   }
 
-  async exitPiPIfActive() {
-    const video = this.currentVideo
-    if (!video) return
-
+  static async exitPiP(video: HTMLVideoElement) {
     if (document.pictureInPictureElement === video) {
-      try {
-        await document.exitPictureInPicture()
-      } catch (err) {
-        console.error('Error exiting PiP:', err)
-      }
+      await document.exitPictureInPicture()
+    } else if ('webkitSetPresentationMode' in video) {
+      ;(video as any).webkitSetPresentationMode('inline')
     }
 
-    if ((video as any).webkitPresentationMode === 'picture-in-picture') {
-      try {
-        ;(video as any).webkitSetPresentationMode('inline')
-      } catch (err) {
-        console.error('Error exiting Safari PiP:', err)
-      }
-    }
-
-    this.currentVideo = null
-  }
-
-  async clearPiP() {
-    await this.exitPiPIfActive()
-    this.onPiPExitCallback?.()
-    this.onPiPExitCallback = null
-    this.currentVideo = null
-  }
-
-  clearCurrent(video: HTMLVideoElement) {
-    if (this.currentVideo === video) {
-      this.currentVideo = null
-      this.onPiPExitCallback = null
+    if (VideoManager.currentVideo === video) {
+      VideoManager.currentVideo = null
     }
   }
 
-  setPiPCallback(callback: PiPCallback | null) {
-    this.onPiPExitCallback = callback ?? null
+  static getCurrentVideo() {
+    return VideoManager.currentVideo
   }
 }
 
-export default new VideoManager()
+export default VideoManager
