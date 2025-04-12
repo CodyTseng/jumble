@@ -4,6 +4,7 @@ import { ExtendedKind } from '@/constants'
 import { isReplyNoteEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
 import { cn } from '@/lib/utils'
+import NewNotesButton from '@/components/NewNotesButton'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -167,6 +168,29 @@ export default function NoteList({
     setNewEvents([])
   }
 
+  const newUsers = useMemo(() => {
+    return newEvents
+      .filter((event: Event) => {
+        return (
+          (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
+          (listMode !== 'posts' || !isReplyNoteEvent(event))
+        )
+      })
+      .slice(0, 3)
+      .map((event) => {
+        return {
+          pubkey: event.pubkey
+        }
+      })
+  }, [newEvents, filterMutedNotes, mutePubkeys, listMode])
+
+  const filteredNewEventsCount = newEvents.filter((event: Event) => {
+    return (
+      (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
+      (listMode !== 'posts' || !isReplyNoteEvent(event))
+    )
+  }).length
+
   return (
     <div className={className}>
       <ListModeSwitch
@@ -179,13 +203,13 @@ export default function NoteList({
         }}
       />
       <div ref={topRef} />
-      {events.length > 0 &&
-        newEvents.filter((event: Event) => {
-          return (
-            (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-            (listMode !== 'posts' || !isReplyNoteEvent(event))
-          )
-        }).length > 0 && <ShowNewButton onClick={showNewEvents} />}
+      {filteredNewEventsCount > 0 && (
+        <NewNotesButton
+          users={newUsers}
+          eventCount={filteredNewEventsCount}
+          onShowEvents={showNewEvents}
+        />
+      )}
       <PullToRefresh
         onRefresh={async () => {
           setRefreshCount((count) => count + 1)
@@ -232,24 +256,6 @@ export default function NoteList({
           )}
         </div>
       </PullToRefresh>
-    </div>
-  )
-}
-
-function ShowNewButton({ onClick }: { onClick: () => void }) {
-  const { t } = useTranslation()
-  const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
-
-  return (
-    <div
-      className={cn(
-        'sticky top-[6.25rem] flex justify-center w-full my-2 z-30 duration-700 transition-transform',
-        deepBrowsing && lastScrollTop > 800 ? '-translate-y-10' : ''
-      )}
-    >
-      <Button size="lg" onClick={onClick} className="drop-shadow-xl shadow-primary/50">
-        {t('show new notes')}
-      </Button>
     </div>
   )
 }
