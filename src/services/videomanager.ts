@@ -6,8 +6,6 @@ class VideoManager {
       await VideoManager.exitPiP(VideoManager.currentVideo)
     }
 
-    VideoManager.currentVideo = video
-
     if ('requestPictureInPicture' in video) {
       await video.requestPictureInPicture()
     } else if ('webkitSetPresentationMode' in video) {
@@ -16,6 +14,7 @@ class VideoManager {
   }
 
   static async exitPiP(video: HTMLVideoElement) {
+    video.pause()
     if (document.pictureInPictureElement === video) {
       await document.exitPictureInPicture()
     } else if ('webkitSetPresentationMode' in video) {
@@ -27,8 +26,12 @@ class VideoManager {
     }
   }
 
-  static getCurrentVideo() {
-    return VideoManager.currentVideo
+  static async playVideo(video: HTMLVideoElement) {
+    if (VideoManager.currentVideo && VideoManager.currentVideo !== video) {
+      await VideoManager.exitPiP(VideoManager.currentVideo)
+    }
+    VideoManager.currentVideo = video
+    video.play()
   }
 }
 

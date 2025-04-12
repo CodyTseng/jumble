@@ -37,7 +37,6 @@ export default function VideoPlayer({
             (video as any).webkitPresentationMode === 'picture-in-picture'
           ) {
             await VideoManager.exitPiP(video)
-            video.pause()
           }
         }
       },
@@ -57,11 +56,7 @@ export default function VideoPlayer({
     const video = videoRef.current
     if (!video) return
 
-    if (VideoManager.getCurrentVideo() && VideoManager.getCurrentVideo() !== video) {
-      await VideoManager.exitPiP(VideoManager.getCurrentVideo()!)
-    }
-
-    video.play()
+    await VideoManager.playVideo(video)
   }
   return (
     <>
