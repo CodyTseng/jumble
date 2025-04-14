@@ -215,6 +215,9 @@ export default {
     'Favorite Relays': 'Избранные ретрансляторы',
     "Following's Favorites": 'Избранные ретрансляторы подписчиков',
     'no more relays': 'больше нет ретрансляторов',
-    'Favorited by': 'Избранные у'
+    'Favorited by': 'Избранные у',
+    'Post settings': 'Настройки публикации',
+    'Media upload service': 'Служба загрузки медиафайлов',
+    'Choose a relay': 'Выберите ретранслятор'
   }
 }

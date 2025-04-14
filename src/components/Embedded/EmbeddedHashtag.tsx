@@ -5,7 +5,7 @@ import { TEmbeddedRenderer } from './types'
 export function EmbeddedHashtag({ hashtag }: { hashtag: string }) {
   return (
     <SecondaryPageLink
-      className="text-highlight hover:underline"
+      className="text-primary hover:underline"
       to={toNoteList({ hashtag })}
       onClick={(e) => e.stopPropagation()}
     >

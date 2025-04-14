@@ -117,7 +117,7 @@ export default function NormalPostContent({
   return (
     <div className="space-y-4">
       {parentEvent && (
-        <ScrollArea className="max-h-48 rounded-lg border bg-muted/40 overflow-y-auto">
+        <ScrollArea className="flex max-h-48 flex-col overflow-y-auto rounded-lg border bg-muted/40">
           <div className="p-2 sm:p-3 pointer-events-none">
             <Note size="small" event={parentEvent} hideStats hideParentNotePreview />
           </div>

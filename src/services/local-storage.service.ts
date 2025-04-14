@@ -1,4 +1,4 @@
-import { StorageKey } from '@/constants'
+import { DEFAULT_NIP_96_SERVICE, StorageKey } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
 import {
@@ -23,6 +23,7 @@ class LocalStorageService {
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
+  private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -84,6 +85,9 @@ class LocalStorageService {
     const accountFeedInfoMapStr =
       window.localStorage.getItem(StorageKey.ACCOUNT_FEED_INFO_MAP) ?? '{}'
     this.accountFeedInfoMap = JSON.parse(accountFeedInfoMapStr)
+
+    this.mediaUploadService =
+      window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -221,6 +225,15 @@ class LocalStorageService {
       StorageKey.ACCOUNT_FEED_INFO_MAP,
       JSON.stringify(this.accountFeedInfoMap)
     )
+  }
+
+  getMediaUploadService() {
+    return this.mediaUploadService
+  }
+
+  setMediaUploadService(service: string) {
+    this.mediaUploadService = service
+    window.localStorage.setItem(StorageKey.MEDIA_UPLOAD_SERVICE, service)
   }
 }
 

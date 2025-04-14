@@ -7,6 +7,7 @@ import { PageManager } from './PageManager'
 import { FavoriteRelaysProvider } from './providers/FavoriteRelaysProvider'
 import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
+import { MediaUploadServiceProvider } from './providers/MediaUploadServiceProvider'
 import { MuteListProvider } from './providers/MuteListProvider'
 import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
@@ -24,8 +25,10 @@ export default function App(): JSX.Element {
                 <MuteListProvider>
                   <FeedProvider>
                     <NoteStatsProvider>
-                      <PageManager />
-                      <Toaster />
+                      <MediaUploadServiceProvider>
+                        <PageManager />
+                        <Toaster />
+                      </MediaUploadServiceProvider>
                     </NoteStatsProvider>
                   </FeedProvider>
                 </MuteListProvider>

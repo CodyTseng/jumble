@@ -211,6 +211,9 @@ export default {
     'Favorite Relays': 'الريلايات المفضلة',
     "Following's Favorites": 'المفضلات من المتابعين',
     'no more relays': 'لا توجد مزيد من الريلايات',
-    'Favorited by': 'المفضلة من قبل'
+    'Favorited by': 'المفضلة من قبل',
+    'Post settings': 'إعدادات النشر',
+    'Media upload service': 'خدمة تحميل الوسائط',
+    'Choose a relay': 'اختر ريلاي'
   }
 }

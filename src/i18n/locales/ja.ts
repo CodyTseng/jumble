@@ -212,6 +212,9 @@ export default {
     'Favorite Relays': 'お気に入りのリレイ',
     "Following's Favorites": 'フォロー中のお気に入り',
     'no more relays': 'これ以上のリレイはありません',
-    'Favorited by': 'お気に入り'
+    'Favorited by': 'お気に入り',
+    'Post settings': '投稿設定',
+    'Media upload service': 'メディアアップロードサービス',
+    'Choose a relay': 'リレイを選択'
   }
 }

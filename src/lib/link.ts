@@ -35,11 +35,12 @@ export const toOthersRelaySettings = (pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/users/${npub}/relays`
 }
-export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
-  return '/relay-settings' + (tag ? '#' + tag : '')
-}
 export const toSettings = () => '/settings'
-export const toWallet = () => '/wallet'
+export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
+  return '/settings/relays' + (tag ? '#' + tag : '')
+}
+export const toWallet = () => '/settings/wallet'
+export const toPostSettings = () => '/settings/posts'
 export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toMuteList = () => '/mutes'

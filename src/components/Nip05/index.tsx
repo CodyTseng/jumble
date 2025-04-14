@@ -30,7 +30,7 @@ export default function Nip05({ pubkey }: { pubkey: string }) {
         <a
           href={`https://${nip05Domain}`}
           target="_blank"
-          className={`flex items-center space-x-1 hover:underline truncate ${nip05IsVerified ? 'text-highlight' : 'text-muted-foreground'}`}
+          className={`flex items-center space-x-1 hover:underline truncate ${nip05IsVerified ? 'text-primary' : 'text-muted-foreground'}`}
           rel="noreferrer"
         >
           {nip05IsVerified ? <BadgeCheck className="size-4" /> : <BadgeAlert className="size-4" />}

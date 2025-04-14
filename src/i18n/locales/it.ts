@@ -214,6 +214,9 @@ export default {
     'Favorite Relays': 'Relay preferiti',
     "Following's Favorites": 'Preferiti dei seguiti',
     'no more relays': 'niente più relay',
-    'Favorited by': 'Preferito da'
+    'Favorited by': 'Preferito da',
+    'Post settings': 'Impostazioni post',
+    'Media upload service': 'Servizio di caricamento media',
+    'Choose a relay': 'Scegli un relay'
   }
 }

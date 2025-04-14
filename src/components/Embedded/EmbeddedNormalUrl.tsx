@@ -3,7 +3,7 @@ import { TEmbeddedRenderer } from './types'
 export function EmbeddedNormalUrl({ url }: { url: string }) {
   return (
     <a
-      className="text-highlight hover:underline"
+      className="text-primary hover:underline"
       href={url}
       target="_blank"
       onClick={(e) => e.stopPropagation()}

@@ -53,7 +53,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
         <div className="flex justify-end items-center text-sm">
           <SecondaryPageLink
             to={toRelaySettings()}
-            className="text-highlight font-semibold"
+            className="text-primary font-semibold"
             onClick={() => close?.()}
           >
             {t('edit')}
@@ -108,7 +108,7 @@ function FeedSwitcherItem({
 }) {
   return (
     <div
-      className={`w-full border rounded-lg p-4 ${isActive ? 'border-highlight bg-highlight/5' : 'clickable'} ${temporary ? 'border-dashed' : ''}`}
+      className={`w-full border rounded-lg p-4 ${isActive ? 'border-primary bg-primary/5' : 'clickable'} ${temporary ? 'border-dashed' : ''}`}
       onClick={onClick}
     >
       <div className="flex justify-between items-center">

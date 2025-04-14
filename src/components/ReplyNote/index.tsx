@@ -32,7 +32,7 @@ export default function ReplyNote({
 
   return (
     <div
-      className={`flex space-x-2 items-start px-4 py-3 border-b transition-colors duration-500 ${highlight ? 'bg-highlight/50' : ''}`}
+      className={`flex space-x-2 items-start px-4 py-3 border-b transition-colors duration-500 ${highlight ? 'bg-primary/50' : ''}`}
     >
       <UserAvatar userId={event.pubkey} size="small" className="shrink-0" />
       <div className="w-full overflow-hidden">

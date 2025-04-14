@@ -3,7 +3,7 @@ import Donation from '@/components/Donation'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toRelaySettings, toWallet } from '@/lib/link'
+import { toPostSettings, toRelaySettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -16,6 +16,7 @@ import {
   Info,
   KeyRound,
   Languages,
+  PencilLine,
   Server,
   SunMoon,
   Wallet
@@ -84,6 +85,13 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="flex items-center gap-4">
           <Wallet />
           <div>{t('Wallet')}</div>
+        </div>
+        <ChevronRight />
+      </SettingItem>
+      <SettingItem className="clickable" onClick={() => push(toPostSettings())}>
+        <div className="flex items-center gap-4">
+          <PencilLine />
+          <div>{t('Post settings')}</div>
         </div>
         <ChevronRight />
       </SettingItem>

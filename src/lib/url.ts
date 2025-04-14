@@ -41,7 +41,12 @@ export function normalizeHttpUrl(url: string): string {
 }
 
 export function simplifyUrl(url: string): string {
-  return url.replace('wss://', '').replace('ws://', '').replace(/\/$/, '')
+  return url
+    .replace('wss://', '')
+    .replace('ws://', '')
+    .replace('https://', '')
+    .replace('http://', '')
+    .replace(/\/$/, '')
 }
 
 export function isLocalNetworkUrl(urlString: string): boolean {

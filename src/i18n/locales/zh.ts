@@ -212,6 +212,9 @@ export default {
     'Favorite Relays': '收藏的服务器',
     "Following's Favorites": '关注人的收藏',
     'no more relays': '没有更多服务器了',
-    'Favorited by': '收藏自'
+    'Favorited by': '收藏自',
+    'Post settings': '发布设置',
+    'Media upload service': '媒体上传服务',
+    'Choose a relay': '选择一个服务器'
   }
 }

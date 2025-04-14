@@ -3,12 +3,7 @@ import { TEmbeddedRenderer } from './types'
 
 export function EmbeddedMention({ userId }: { userId: string }) {
   return (
-    <Username
-      userId={userId}
-      showAt
-      className="text-highlight font-normal inline"
-      withoutSkeleton
-    />
+    <Username userId={userId} showAt className="text-primary font-normal inline" withoutSkeleton />
   )
 }
 

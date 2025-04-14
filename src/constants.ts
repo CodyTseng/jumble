@@ -12,6 +12,7 @@ export const StorageKey = {
   QUICK_ZAP: 'quickZap',
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
+  MEDIA_UPLOAD_SERVICE: 'mediaUploadService',
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
   ACCOUNT_FOLLOW_LIST_EVENT_MAP: 'accountFollowListEventMap', // deprecated
   ACCOUNT_MUTE_LIST_EVENT_MAP: 'accountMuteListEventMap', // deprecated
@@ -54,3 +55,13 @@ export const DEFAULT_FAVORITE_RELAYS = [
   'wss://news.utxo.one/',
   'wss://algo.utxo.one'
 ]
+
+export const NIP_96_SERVICE = [
+  'https://mockingyou.com',
+  'https://nostpic.com',
+  'https://nostr.build', // default
+  'https://nostrcheck.me',
+  'https://nostrmedia.com',
+  'https://files.sovbit.host'
+]
+export const DEFAULT_NIP_96_SERVICE = 'https://nostr.build'

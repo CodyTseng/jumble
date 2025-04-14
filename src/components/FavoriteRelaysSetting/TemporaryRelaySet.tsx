@@ -10,7 +10,7 @@ export default function TemporaryRelaySet() {
   }
 
   return (
-    <div className="w-full border border-dashed rounded-lg p-4 border-highlight bg-highlight/5 flex gap-4 justify-between">
+    <div className="w-full border border-dashed rounded-lg p-4 border-primary bg-primary/5 flex gap-4 justify-between">
       <div className="flex-1 w-0">
         <div className="flex justify-between items-center">
           <div className="h-8 font-semibold">Temporary</div>

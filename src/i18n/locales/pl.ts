@@ -213,6 +213,9 @@ export default {
     'Favorite Relays': 'Ulubione transmitery',
     "Following's Favorites": 'Ulubione transmitery obserwowanych',
     'no more relays': 'brak kolejnych transmiterów',
-    'Favorited by': 'Ulubione przez'
+    'Favorited by': 'Ulubione przez',
+    'Post settings': 'Ustawienia publikacji',
+    'Media upload service': 'Usługa przesyłania mediów',
+    'Choose a relay': 'Wybierz transmiter'
   }
 }

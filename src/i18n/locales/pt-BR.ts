@@ -213,6 +213,9 @@ export default {
     'Favorite Relays': 'Relés favoritos',
     "Following's Favorites": 'Favoritos de quem você segue',
     'no more relays': 'não há mais relés',
-    'Favorited by': 'Favoritado por'
+    'Favorited by': 'Favoritado por',
+    'Post settings': 'Ajustes de publicação',
+    'Media upload service': 'Serviço de upload de mídia',
+    'Choose a relay': 'Escolher um relé'
   }
 }
