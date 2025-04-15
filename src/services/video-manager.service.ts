@@ -13,25 +13,30 @@ class VideoManagerService {
     return VideoManagerService.instance
   }
 
-  enterPiP(video: HTMLVideoElement) {
+  async enterPiP(video: HTMLVideoElement) {
     if (this.currentVideo && this.currentVideo !== video) {
       this.exitPiP(this.currentVideo)
     }
 
-    if (
-      (video as any).webkitSupportsPresentationMode &&
-      typeof (video as any).webkitSetPresentationMode === 'function'
-    ) {
-      ;(video as any).webkitSetPresentationMode('picture-in-picture')
-      setTimeout(() => {
+    try {
+      if (
+        (video as any).webkitSupportsPresentationMode &&
+        typeof (video as any).webkitSetPresentationMode === 'function'
+      ) {
+        ;(video as any).webkitSetPresentationMode('picture-in-picture')
+
+        // Check if Safari PiP succeeded
         if ((video as any).webkitPresentationMode !== 'picture-in-picture') {
-          video.pause()
+          throw new Error('Safari PiP failed to activate.')
         }
-      }, 10)
-    } else {
-      video.requestPictureInPicture().catch(() => {
-        video.pause()
-      })
+      } else {
+        await video.requestPictureInPicture()
+      }
+
+      this.currentVideo = video
+    } catch (error) {
+      console.error('Failed to enter Picture-in-Picture:', error)
+      video.pause()
     }
   }
 
