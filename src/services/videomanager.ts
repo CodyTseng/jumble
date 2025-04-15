@@ -6,10 +6,17 @@ class VideoManager {
       await VideoManager.exitPiP(VideoManager.currentVideo)
     }
 
-    if ('requestPictureInPicture' in video) {
-      await video.requestPictureInPicture()
-    } else if ('webkitSetPresentationMode' in video) {
-      ;(video as any).webkitSetPresentationMode('picture-in-picture')
+    try {
+      if ('requestPictureInPicture' in video) {
+        await video.requestPictureInPicture()
+      } else if ('webkitSetPresentationMode' in video) {
+        ;(video as any).webkitSetPresentationMode('picture-in-picture')
+      }
+
+      VideoManager.currentVideo = video
+    } catch (err) {
+      console.error('Failed to enter Picture-in-Picture:', err)
+      video.pause()
     }
   }
 
