@@ -5,7 +5,8 @@ class VideoManager {
     if (VideoManager.currentVideo && VideoManager.currentVideo !== video) {
       await VideoManager.exitPiP(VideoManager.currentVideo)
     }
-
+    
+    // cates error and pauses video if pip fails
     try {
       if ('requestPictureInPicture' in video) {
         await video.requestPictureInPicture()
