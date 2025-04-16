@@ -445,23 +445,23 @@ class ClientService extends EventTarget {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this
     let events: NEvent[] = []
-    let eosed = false
+    let eosedAt: number | null = null
     const subCloser = this.subscribe(relays, since ? { ...filter, since } : filter, {
       startLogin,
       onevent: (evt: NEvent) => {
         that.eventDataLoader.prime(evt.id, Promise.resolve(evt))
         // not eosed yet, push to events
-        if (!eosed) {
+        if (!eosedAt) {
           return events.push(evt)
         }
-        // eosed, (algo relay feeds) no need to sort and cache
-        if (!needSort) {
-          return onNew(evt)
+        // new event
+        if (evt.created_at > eosedAt) {
+          onNew(evt)
         }
 
         const timeline = that.timelines[key]
         if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
-          return onNew(evt)
+          return
         }
 
         // find the right position to insert
@@ -479,19 +479,16 @@ class ClientService extends EventTarget {
         // the event is too old, ignore it
         if (idx >= timeline.refs.length) return
 
-        // new event
-        if (idx === 0) {
-          onNew(evt)
-        }
-
         // insert the event to the right position
         timeline.refs.splice(idx, 0, [evt.id, evt.created_at])
       },
-      oneose: (_eosed) => {
-        eosed = _eosed
+      oneose: (eosed) => {
+        if (eosed && !eosedAt) {
+          eosedAt = dayjs().unix()
+        }
         // (algo feeds) no need to sort and cache
         if (!needSort) {
-          return onEvents([...events], eosed)
+          return onEvents([...events], !!eosedAt)
         }
         if (!eosed) {
           events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
