@@ -1,6 +1,7 @@
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { SecondaryPageLink } from '@/PageManager'
+import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -8,11 +9,12 @@ import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 import RelaySetCard from '../RelaySetCard'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
-import { UsersRound } from 'lucide-react'
+import { BookmarkIcon, UsersRound } from 'lucide-react'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
+  const { bookmarks } = useBookmarks()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const { feedInfo, switchFeed, temporaryRelayUrls } = useFeed()
 
@@ -35,6 +37,25 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
           </div>
         </FeedSwitcherItem>
       )}
+
+      {pubkey && bookmarks.length > 0 && (
+        <FeedSwitcherItem
+          isActive={feedInfo.feedType === 'bookmarks'}
+          onClick={() => {
+            if (!pubkey) return
+            switchFeed('bookmarks', { pubkey })
+            close?.()
+          }}
+        >
+          <div className="flex gap-2 items-center">
+            <div className="flex justify-center items-center w-6 h-6 shrink-0">
+              <BookmarkIcon className="size-4" />
+            </div>
+            <div>{t('Bookmarks')}</div>
+          </div>
+        </FeedSwitcherItem>
+      )}
+
       {temporaryRelayUrls.length > 0 && (
         <FeedSwitcherItem
           key="temporary"

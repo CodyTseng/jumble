@@ -3,6 +3,7 @@ import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useEffect } from 'react'
+import BookmarkButton from '../BookmarkButton'
 import LikeButton from './LikeButton'
 import ReplyButton from './ReplyButton'
 import RepostButton from './RepostButton'
@@ -48,6 +49,7 @@ export default function NoteStats({
           <RepostButton event={event} />
           <LikeButton event={event} />
           <ZapButton event={event} />
+          <BookmarkButton eventId={event.id} eventPubkey={event.pubkey} />
           <SeenOnButton event={event} />
         </div>
       </div>
@@ -63,6 +65,7 @@ export default function NoteStats({
           <RepostButton event={event} />
           <LikeButton event={event} />
           <ZapButton event={event} />
+          <BookmarkButton eventId={event.id} eventPubkey={event.pubkey} />
         </div>
         <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           <SeenOnButton event={event} />

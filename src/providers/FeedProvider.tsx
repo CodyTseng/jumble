@@ -1,7 +1,8 @@
-import { DEFAULT_FAVORITE_RELAYS } from '@/constants'
+import { DEFAULT_FAVORITE_RELAYS, ExtendedKind, BIG_RELAY_URLS } from '@/constants'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
+import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
 import { TFeedInfo, TFeedType } from '@/types'
@@ -167,6 +168,47 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setRelayUrls([])
       setFilter({
         authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
+      })
+      return setIsReady(true)
+    }
+    if (feedType === 'bookmarks') {
+      if (!options.pubkey) {
+        return setIsReady(true)
+      }
+
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
+      storage.setFeedInfo(newFeedInfo, pubkey)
+
+      const bookmarkEvent = await indexedDb.getReplaceableEvent(
+        options.pubkey,
+        ExtendedKind.BOOKMARK
+      )
+      if (!bookmarkEvent || !bookmarkEvent.tags.length) {
+        setRelayUrls([])
+        setFilter({})
+        return setIsReady(true)
+      }
+
+      const eventIds = bookmarkEvent.tags
+        .filter((tag: string[]) => tag[0] === 'e')
+        .map((tag: string[]) => tag[1])
+
+      if (eventIds.length === 0) {
+        setRelayUrls([])
+        setFilter({})
+        return setIsReady(true)
+      }
+
+      const relayHints = bookmarkEvent.tags
+        .filter((tag: string[]) => tag[0] === 'e' && tag.length > 2 && tag[2])
+        .map((tag: string[]) => tag[2])
+        .filter((url: string) => url && isWebsocketUrl(url))
+
+      setRelayUrls([...new Set([...relayHints, ...BIG_RELAY_URLS])])
+      setFilter({
+        ids: eventIds
       })
       return setIsReady(true)
     }

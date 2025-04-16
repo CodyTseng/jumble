@@ -283,6 +283,15 @@ export function createSeenNotificationsAtDraftEvent(): TDraftEvent {
   }
 }
 
+export function createBookmarkDraftEvent(tags: string[][]): TDraftEvent {
+  return {
+    kind: ExtendedKind.BOOKMARK,
+    content: '',
+    tags,
+    created_at: dayjs().unix()
+  }
+}
+
 function generateImetaTags(imageUrls: string[], pictureInfos: { url: string; tags: string[][] }[]) {
   return imageUrls.map((imageUrl) => {
     const pictureInfo = pictureInfos.find((info) => info.url === imageUrl)

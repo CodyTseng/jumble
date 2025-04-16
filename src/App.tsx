@@ -4,6 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { PageManager } from './PageManager'
+import { BookmarksProvider } from './providers/BookmarksProvider'
 import { FavoriteRelaysProvider } from './providers/FavoriteRelaysProvider'
 import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
@@ -23,14 +24,16 @@ export default function App(): JSX.Element {
             <FavoriteRelaysProvider>
               <FollowListProvider>
                 <MuteListProvider>
-                  <FeedProvider>
-                    <NoteStatsProvider>
-                      <MediaUploadServiceProvider>
-                        <PageManager />
-                        <Toaster />
-                      </MediaUploadServiceProvider>
-                    </NoteStatsProvider>
-                  </FeedProvider>
+                  <BookmarksProvider>
+                    <FeedProvider>
+                      <NoteStatsProvider>
+                        <MediaUploadServiceProvider>
+                          <PageManager />
+                          <Toaster />
+                        </MediaUploadServiceProvider>
+                      </NoteStatsProvider>
+                    </FeedProvider>
+                  </BookmarksProvider>
                 </MuteListProvider>
               </FollowListProvider>
             </FavoriteRelaysProvider>

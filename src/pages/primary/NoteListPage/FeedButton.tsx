@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { ChevronDown, Server, UsersRound } from 'lucide-react'
+import { BookmarkIcon, ChevronDown, Server, UsersRound } from 'lucide-react'
 import { forwardRef, HTMLAttributes, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -55,6 +55,9 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
       if (feedInfo.feedType === 'following') {
         return t('Following')
       }
+      if (feedInfo.feedType === 'bookmarks') {
+        return t('Bookmarks')
+      }
       if (relayUrls.length === 0) {
         return t('Choose a relay')
       }
@@ -77,7 +80,13 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
         ref={ref}
         {...props}
       >
-        {feedInfo.feedType === 'following' ? <UsersRound /> : <Server />}
+        {feedInfo.feedType === 'following' ? (
+          <UsersRound />
+        ) : feedInfo.feedType === 'bookmarks' ? (
+          <BookmarkIcon />
+        ) : (
+          <Server />
+        )}
         <div className="text-lg font-semibold truncate">{title}</div>
         <ChevronDown />
       </div>
