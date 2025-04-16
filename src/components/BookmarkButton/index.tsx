@@ -1,8 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks'
 import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { BookmarkIcon } from 'lucide-react'
+import { BookmarkIcon, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -77,15 +76,19 @@ export default function BookmarkButton({
   }
 
   return (
-    <Button
-      size="icon"
-      variant="ghost"
-      disabled={updating}
-      className={`size-8 ${isBookmarked ? 'text-primary' : ''}`}
+    <button
+      className={`flex items-center gap-1 ${
+        isBookmarked ? 'text-primary' : 'text-muted-foreground'
+      } enabled:hover:text-primary px-3 h-full`}
       onClick={isBookmarked ? handleRemoveBookmark : handleBookmark}
-      aria-label={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
+      disabled={updating}
+      title={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
     >
-      <BookmarkIcon className="size-4" />
-    </Button>
+      {updating ? (
+        <Loader className="animate-spin" />
+      ) : (
+        <BookmarkIcon className={isBookmarked ? 'fill-primary' : ''} />
+      )}
+    </button>
   )
 }
