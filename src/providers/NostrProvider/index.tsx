@@ -159,7 +159,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Contacts),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Mutelist),
-        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.BOOKMARK),
+        indexedDb.getReplaceableEvent(account.pubkey, kinds.BookmarkList),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS)
       ])
       if (storedRelayListEvent) {
@@ -202,7 +202,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             kinds.Metadata,
             kinds.Contacts,
             kinds.Mutelist,
-            ExtendedKind.BOOKMARK,
+            kinds.BookmarkList,
             ExtendedKind.FAVORITE_RELAYS
           ],
           authors: [account.pubkey]
@@ -217,7 +217,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
       const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
       const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
-      const bookmarkListEvent = sortedEvents.find((e) => e.kind === ExtendedKind.BOOKMARK)
+      const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
       const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
       const notificationsSeenAtEvent = sortedEvents.find(
         (e) =>

@@ -4,21 +4,17 @@ import { useNostr } from '@/providers/NostrProvider'
 import { BookmarkIcon, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Event } from 'nostr-tools'
 
-export default function BookmarkButton({
-  eventId,
-  eventPubkey,
-  relayHint
-}: {
-  eventId: string
-  eventPubkey: string
-  relayHint?: string
-}) {
+export default function BookmarkButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { toast } = useToast()
   const { pubkey: accountPubkey, checkLogin } = useNostr()
   const { bookmarks, addBookmark, removeBookmark } = useBookmarks()
   const [updating, setUpdating] = useState(false)
+
+  const eventId = event.id
+  const eventPubkey = event.pubkey
 
   const isBookmarked = useMemo(
     () => bookmarks.some((tag) => tag[0] === 'e' && tag[1] === eventId),
@@ -34,7 +30,7 @@ export default function BookmarkButton({
 
       setUpdating(true)
       try {
-        await addBookmark(eventId, eventPubkey, relayHint)
+        await addBookmark(eventId, eventPubkey)
         toast({
           title: t('Note bookmarked'),
           description: t('This note has been added to your bookmarks')

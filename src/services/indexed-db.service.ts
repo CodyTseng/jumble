@@ -339,7 +339,7 @@ class IndexedDbService {
         return StoreNames.RELAY_SETS
       case ExtendedKind.FAVORITE_RELAYS:
         return StoreNames.FAVORITE_RELAYS
-      case ExtendedKind.BOOKMARK:
+      case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
       default:
         return undefined

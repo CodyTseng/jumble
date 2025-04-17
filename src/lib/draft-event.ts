@@ -285,7 +285,7 @@ export function createSeenNotificationsAtDraftEvent(): TDraftEvent {
 
 export function createBookmarkDraftEvent(tags: string[][]): TDraftEvent {
   return {
-    kind: ExtendedKind.BOOKMARK,
+    kind: kinds.BookmarkList,
     content: '',
     tags,
     created_at: dayjs().unix()

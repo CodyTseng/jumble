@@ -1,6 +1,7 @@
 import { createBookmarkDraftEvent } from '@/lib/draft-event'
 import { createContext, useContext, useMemo } from 'react'
 import { useNostr } from './NostrProvider'
+import client from '@/services/client.service'
 
 type TBookmarksContext = {
   bookmarks: string[][]
@@ -38,9 +39,9 @@ export function BookmarksProvider({ children }: { children: React.ReactNode }) {
   ) => {
     if (!accountPubkey) return
 
-    const newTag = relayHint
-      ? ['e', eventId, relayHint, eventPubkey]
-      : ['e', eventId, '', eventPubkey]
+    const relayHintToUse = relayHint || client.getEventHint(eventId)
+
+    const newTag = ['e', eventId, relayHintToUse, eventPubkey]
 
     if (type === 'private') {
       newTag.push('private')
