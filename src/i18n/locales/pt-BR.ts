@@ -26,7 +26,7 @@ export default {
     Unfollow: 'Deixar de seguir',
     'Follow failed': 'Falha ao seguir',
     'Unfollow failed': 'Falha ao deixar de seguir',
-    'show new notes': 'Mostrar novas notas',
+    'show new notes': 'Ver novas notas',
     'loading...': 'Carregando...',
     'no more notes': 'Não há mais notas',
     'reply to': 'Respondendo a',
@@ -219,7 +219,7 @@ export default {
     'Choose a relay': 'Escolher um relé',
     'no relays found': 'nenhum relé encontrado',
     video: 'vídeo',
-    'Show n new notes': 'Mostrar {{n}} novas notas',
+    'Show n new notes': 'Ver {{n}} novas notas',
     YouTabName: 'Você'
   }
 }
