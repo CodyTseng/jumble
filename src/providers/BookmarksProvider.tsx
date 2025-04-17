@@ -5,12 +5,7 @@ import client from '@/services/client.service'
 
 type TBookmarksContext = {
   bookmarks: string[][]
-  addBookmark: (
-    eventId: string,
-    eventPubkey: string,
-    relayHint?: string,
-    type?: 'public' | 'private'
-  ) => Promise<void>
+  addBookmark: (eventId: string, eventPubkey: string, relayHint?: string) => Promise<void>
   removeBookmark: (eventId: string) => Promise<void>
 }
 
@@ -31,21 +26,12 @@ export function BookmarksProvider({ children }: { children: React.ReactNode }) {
     [bookmarkListEvent]
   )
 
-  const addBookmark = async (
-    eventId: string,
-    eventPubkey: string,
-    relayHint?: string,
-    type: 'public' | 'private' = 'public'
-  ) => {
+  const addBookmark = async (eventId: string, eventPubkey: string, relayHint?: string) => {
     if (!accountPubkey) return
 
     const relayHintToUse = relayHint || client.getEventHint(eventId)
 
     const newTag = ['e', eventId, relayHintToUse, eventPubkey]
-
-    if (type === 'private') {
-      newTag.push('private')
-    }
 
     const currentTags = bookmarkListEvent?.tags || []
 

@@ -2,12 +2,15 @@ import { useFetchEvent } from '@/hooks'
 import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { generateEventIdFromETag } from '@/lib/tag'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 
 export default function BookmarksList() {
   const { t } = useTranslation()
   const { bookmarks } = useBookmarks()
-  const [visibleBookmarks, setVisibleBookmarks] = useState<{ eventId: string }[]>([])
+  const [visibleBookmarks, setVisibleBookmarks] = useState<
+    { eventId: string; neventId?: string }[]
+  >([])
   const [loading, setLoading] = useState(true)
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const SHOW_COUNT = 10
@@ -16,7 +19,8 @@ export default function BookmarksList() {
     return bookmarks
       .filter((tag) => tag[0] === 'e')
       .map((tag) => ({
-        eventId: tag[1]
+        eventId: tag[1],
+        neventId: generateEventIdFromETag(tag)
       }))
       .reverse()
   }, [bookmarks])
