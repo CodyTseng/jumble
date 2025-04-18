@@ -80,7 +80,7 @@ export default function BookmarksList() {
   return (
     <div className="space-y-4">
       {visibleBookmarks.map((item) => (
-        <BookmarkedNote key={item.eventId} eventId={item.eventId} />
+        <BookmarkedNote key={item.eventId} eventId={item.eventId} neventId={item.neventId} />
       ))}
 
       {visibleBookmarks.length < bookmarkItems.length && (
@@ -92,8 +92,8 @@ export default function BookmarksList() {
   )
 }
 
-function BookmarkedNote({ eventId }: { eventId: string }) {
-  const { event, isFetching } = useFetchEvent(eventId)
+function BookmarkedNote({ eventId, neventId }: { eventId: string; neventId?: string }) {
+  const { event, isFetching } = useFetchEvent(neventId || eventId)
 
   if (isFetching) {
     return <NoteCardLoadingSkeleton isPictures={false} />
