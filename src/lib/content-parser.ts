@@ -9,6 +9,7 @@ export type TEmbeddedNodeType =
   | 'hashtag'
   | 'websocket-url'
   | 'url'
+  | 'emoji'
 
 export type TEmbeddedNode =
   | {
@@ -62,6 +63,11 @@ export const EmbeddedWebsocketUrlParser: TContentParser = {
 export const EmbeddedNormalUrlParser: TContentParser = {
   type: 'url',
   regex: /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+/gu
+}
+
+export const EmbeddedEmojiParser: TContentParser = {
+  type: 'emoji',
+  regex: /:[a-zA-Z0-9_]+:/g
 }
 
 export function parseContent(content: string, parsers: TContentParser[]) {

@@ -219,6 +219,12 @@ export default {
     'Choose a relay': 'Wybierz transmiter',
     'no relays found': 'Nie znaleziono transmiterów',
     video: 'wideo',
-    'Show n new notes': 'Pokaż {{n}} nowych wpisów'
+    'Show n new notes': 'Pokaż {{n}} nowych wpisów',
+    YouTabName: 'Ty',
+    Bookmark: 'Zakładka',
+    'Remove bookmark': 'Usuń zakładkę',
+    'no bookmarks found': 'Nie znaleziono zakładek',
+    'no more bookmarks': 'Brak więcej zakładek',
+    Bookmarks: 'Zakładki'
   }
 }

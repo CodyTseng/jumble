@@ -1,11 +1,12 @@
 import {
+  EmbeddedEmojiParser,
   EmbeddedHashtagParser,
   EmbeddedMentionParser,
   EmbeddedNormalUrlParser,
   EmbeddedWebsocketUrlParser,
   parseContent
 } from '@/lib/content-parser'
-import { extractImageInfosFromEventTags, isNsfwEvent } from '@/lib/event'
+import { extractEmojiInfosFromTags, extractImageInfosFromEventTags, isNsfwEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { memo, useMemo } from 'react'
@@ -16,6 +17,7 @@ import {
   EmbeddedWebsocketUrl
 } from '../Embedded'
 import { ImageCarousel } from '../ImageCarousel'
+import Emoji from '../Emoji'
 
 const PictureContent = memo(({ event, className }: { event: Event; className?: string }) => {
   const images = useMemo(() => extractImageInfosFromEventTags(event), [event])
@@ -25,8 +27,11 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
     EmbeddedNormalUrlParser,
     EmbeddedWebsocketUrlParser,
     EmbeddedHashtagParser,
-    EmbeddedMentionParser
+    EmbeddedMentionParser,
+    EmbeddedEmojiParser
   ])
+
+  const emojiInfos = extractEmojiInfosFromTags(event.tags)
 
   return (
     <div className={cn('text-wrap break-words whitespace-pre-wrap space-y-2', className)}>
@@ -47,6 +52,12 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
           }
           if (node.type === 'mention') {
             return <EmbeddedMention key={index} userId={node.data.split(':')[1]} />
+          }
+          if (node.type === 'emoji') {
+            const shortcode = node.data.split(':')[1]
+            const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+            if (!emoji) return node.data
+            return <Emoji key={index} emoji={emoji} />
           }
         })}
       </div>

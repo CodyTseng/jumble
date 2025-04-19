@@ -221,6 +221,12 @@ export default {
     'Choose a relay': 'Wähle ein Relay',
     'no relays found': 'Keine Relays gefunden',
     video: 'Video',
-    'Show n new notes': 'Zeige {{n}} neue Notizen'
+    'Show n new notes': 'Zeige {{n}} neue Notizen',
+    YouTabName: 'Du',
+    Bookmark: 'Lesezeichen',
+    'Remove bookmark': 'Lesezeichen entfernen',
+    'no bookmarks found': 'Keine Lesezeichen gefunden',
+    'no more bookmarks': 'Keine weiteren Lesezeichen',
+    Bookmarks: 'Lesezeichen'
   }
 }

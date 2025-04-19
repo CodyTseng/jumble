@@ -1,4 +1,5 @@
 import {
+  EmbeddedEmojiParser,
   EmbeddedEventParser,
   EmbeddedHashtagParser,
   EmbeddedImageParser,
@@ -8,7 +9,7 @@ import {
   EmbeddedWebsocketUrlParser,
   parseContent
 } from '@/lib/content-parser'
-import { isNsfwEvent } from '@/lib/event'
+import { extractEmojiInfosFromTags, isNsfwEvent } from '@/lib/event'
 import { extractImageInfoFromTag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { TImageInfo } from '@/types'
@@ -21,6 +22,7 @@ import {
   EmbeddedNote,
   EmbeddedWebsocketUrl
 } from '../Embedded'
+import Emoji from '../Emoji'
 import ImageGallery from '../ImageGallery'
 import VideoPlayer from '../VideoPlayer'
 import WebPreview from '../WebPreview'
@@ -42,12 +44,15 @@ const Content = memo(
       EmbeddedWebsocketUrlParser,
       EmbeddedEventParser,
       EmbeddedMentionParser,
-      EmbeddedHashtagParser
+      EmbeddedHashtagParser,
+      EmbeddedEmojiParser
     ])
 
     const imageInfos = event.tags
       .map((tag) => extractImageInfoFromTag(tag))
       .filter(Boolean) as TImageInfo[]
+
+    const emojiInfos = extractEmojiInfosFromTags(event.tags)
 
     const lastNormalUrlNode = nodes.findLast((node) => node.type === 'url')
     const lastNormalUrl =
@@ -106,6 +111,12 @@ const Content = memo(
           }
           if (node.type === 'hashtag') {
             return <EmbeddedHashtag hashtag={node.data} key={index} />
+          }
+          if (node.type === 'emoji') {
+            const shortcode = node.data.split(':')[1]
+            const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+            if (!emoji) return node.data
+            return <Emoji emoji={emoji} key={index} className="size-4" />
           }
           return null
         })}

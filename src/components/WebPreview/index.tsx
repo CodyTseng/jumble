@@ -56,7 +56,7 @@ export default function WebPreview({
       {image && (
         <Image
           image={{ url: image }}
-          className={`rounded-lg aspect-[4/3] object-cover bg-foreground ${size === 'normal' ? 'h-44' : 'h-24'}`}
+          className={`rounded-lg aspect-[4/3] xl:aspect-video object-cover bg-foreground ${size === 'normal' ? 'h-44' : 'h-24'}`}
           hideIfError
         />
       )}

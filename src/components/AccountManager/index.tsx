@@ -41,7 +41,7 @@ function AccountManagerNav({
   setPage: (page: TAccountManagerPage) => void
   close?: () => void
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { themeSetting } = useTheme()
   const { nip07Login, bunkerLogin, nsecLogin, ncryptsecLogin, accounts } = useNostr()
 
@@ -81,6 +81,7 @@ function AccountManagerNav({
               baseUrl: 'https://nstart.me',
               an: 'Jumble',
               am: themeSetting,
+              al: i18n.language.slice(0, 2),
               onComplete: ({ nostrLogin }) => {
                 if (!nostrLogin) return
 

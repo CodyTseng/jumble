@@ -33,6 +33,7 @@ type TNostrContext = {
   relayList: TRelayList | null
   followListEvent?: Event
   muteListEvent?: Event
+  bookmarkListEvent?: Event
   favoriteRelaysEvent: Event | null
   notificationsSeenAt: number
   account: TAccountPointer | null
@@ -60,6 +61,7 @@ type TNostrContext = {
   updateProfileEvent: (profileEvent: Event) => Promise<void>
   updateFollowListEvent: (followListEvent: Event) => Promise<void>
   updateMuteListEvent: (muteListEvent: Event, tags: string[][]) => Promise<void>
+  updateBookmarkListEvent: (bookmarkListEvent: Event) => Promise<void>
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
   updateNotificationsSeenAt: () => Promise<void>
 }
@@ -87,6 +89,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
   const [muteListEvent, setMuteListEvent] = useState<Event | undefined>(undefined)
+  const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | undefined>(undefined)
   const [favoriteRelaysEvent, setFavoriteRelaysEvent] = useState<Event | null>(null)
   const [notificationsSeenAt, setNotificationsSeenAt] = useState(-1)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -149,12 +152,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedProfileEvent,
         storedFollowListEvent,
         storedMuteListEvent,
+        storedBookmarkListEvent,
         storedFavoriteRelaysEvent
       ] = await Promise.all([
         indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Contacts),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Mutelist),
+        indexedDb.getReplaceableEvent(account.pubkey, kinds.BookmarkList),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS)
       ])
       if (storedRelayListEvent) {
@@ -171,6 +176,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
       if (storedMuteListEvent) {
         setMuteListEvent(storedMuteListEvent)
+      }
+      if (storedBookmarkListEvent) {
+        setBookmarkListEvent(storedBookmarkListEvent)
       }
       if (storedFavoriteRelaysEvent) {
         setFavoriteRelaysEvent(storedFavoriteRelaysEvent)
@@ -190,7 +198,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
       const events = await client.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 4), [
         {
-          kinds: [kinds.Metadata, kinds.Contacts, kinds.Mutelist, ExtendedKind.FAVORITE_RELAYS],
+          kinds: [
+            kinds.Metadata,
+            kinds.Contacts,
+            kinds.Mutelist,
+            kinds.BookmarkList,
+            ExtendedKind.FAVORITE_RELAYS
+          ],
           authors: [account.pubkey]
         },
         {
@@ -203,6 +217,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
       const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
       const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
+      const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
       const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
       const notificationsSeenAtEvent = sortedEvents.find(
         (e) =>
@@ -226,6 +241,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (muteListEvent) {
         setMuteListEvent(muteListEvent)
         await indexedDb.putReplaceableEvent(muteListEvent)
+      }
+      if (bookmarkListEvent) {
+        setBookmarkListEvent(bookmarkListEvent)
+        await indexedDb.putReplaceableEvent(bookmarkListEvent)
       }
       if (favoriteRelaysEvent) {
         setFavoriteRelaysEvent(favoriteRelaysEvent)
@@ -563,6 +582,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setMuteListEvent(muteListEvent)
   }
 
+  const updateBookmarkListEvent = async (bookmarkListEvent: Event) => {
+    const newBookmarkListEvent = await indexedDb.putReplaceableEvent(bookmarkListEvent)
+    if (newBookmarkListEvent.id !== bookmarkListEvent.id) return
+
+    setBookmarkListEvent(newBookmarkListEvent)
+  }
+
   const updateFavoriteRelaysEvent = async (favoriteRelaysEvent: Event) => {
     const newFavoriteRelaysEvent = await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
     if (newFavoriteRelaysEvent.id !== favoriteRelaysEvent.id) return
@@ -591,6 +617,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         relayList,
         followListEvent,
         muteListEvent,
+        bookmarkListEvent,
         favoriteRelaysEvent,
         notificationsSeenAt,
         account,
@@ -617,6 +644,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         updateProfileEvent,
         updateFollowListEvent,
         updateMuteListEvent,
+        updateBookmarkListEvent,
         updateFavoriteRelaysEvent,
         updateNotificationsSeenAt
       }}

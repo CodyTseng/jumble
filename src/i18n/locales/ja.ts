@@ -218,6 +218,12 @@ export default {
     'Choose a relay': 'リレイを選択',
     'no relays found': 'リレイが見つかりません',
     video: 'ビデオ',
-    'Show n new notes': '新しいノートを{{n}}件表示'
+    'Show n new notes': '新しいノートを{{n}}件表示',
+    YouTabName: 'あなた',
+    Bookmark: 'ブックマーク',
+    'Remove bookmark': 'ブックマークを削除',
+    'no bookmarks found': 'ブックマークが見つかりません',
+    'no more bookmarks': 'これ以上ブックマークはありません',
+    Bookmarks: 'ブックマーク一覧'
   }
 }

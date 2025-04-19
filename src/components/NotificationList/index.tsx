@@ -1,9 +1,7 @@
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { cn } from '@/lib/utils'
 import { usePrimaryPage } from '@/PageManager'
-import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useNotification } from '@/providers/NotificationProvider'
@@ -14,6 +12,7 @@ import { Event, kinds } from 'nostr-tools'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
+import TabSwitcher from '../TabSwitch'
 import { NotificationItem } from './NotificationItem'
 
 const LIMIT = 100
@@ -76,12 +75,16 @@ const NotificationList = forwardRef((_, ref) => {
       const relayList = await client.fetchRelayList(pubkey)
 
       const { closer, timelineKey } = await client.subscribeTimeline(
-        relayList.read.length > 0 ? relayList.read.slice(0, 5) : BIG_RELAY_URLS,
-        {
-          '#p': [pubkey],
-          kinds: filterKinds,
-          limit: LIMIT
-        },
+        [
+          {
+            urls: relayList.read.length > 0 ? relayList.read.slice(0, 5) : BIG_RELAY_URLS,
+            filter: {
+              '#p': [pubkey],
+              kinds: filterKinds,
+              limit: LIMIT
+            }
+          }
+        ],
         {
           onEvents: (events, eosed) => {
             if (events.length > 0) {
@@ -186,11 +189,17 @@ const NotificationList = forwardRef((_, ref) => {
 
   return (
     <div>
-      <NotificationTypeSwitch
-        type={notificationType}
-        setType={(type) => {
+      <TabSwitcher
+        value={notificationType}
+        tabs={[
+          { value: 'all', label: 'All' },
+          { value: 'mentions', label: 'Mentions' },
+          { value: 'reactions', label: 'Reactions' },
+          { value: 'zaps', label: 'Zaps' }
+        ]}
+        onTabChange={(type) => {
           setShowCount(SHOW_COUNT)
-          setNotificationType(type)
+          setNotificationType(type as TNotificationType)
         }}
       />
       <PullToRefresh
@@ -234,55 +243,3 @@ const NotificationList = forwardRef((_, ref) => {
 })
 NotificationList.displayName = 'NotificationList'
 export default NotificationList
-
-function NotificationTypeSwitch({
-  type,
-  setType
-}: {
-  type: TNotificationType
-  setType: (type: TNotificationType) => void
-}) {
-  const { t } = useTranslation()
-  const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
-
-  return (
-    <div
-      className={cn(
-        'sticky top-12 bg-background z-30 duration-700 transition-transform select-none',
-        deepBrowsing && lastScrollTop > 800 ? '-translate-y-[calc(100%+12rem)]' : ''
-      )}
-    >
-      <div className="flex">
-        <div
-          className={`w-1/4 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${type === 'all' ? '' : 'text-muted-foreground'}`}
-          onClick={() => setType('all')}
-        >
-          {t('All')}
-        </div>
-        <div
-          className={`w-1/4 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${type === 'mentions' ? '' : 'text-muted-foreground'}`}
-          onClick={() => setType('mentions')}
-        >
-          {t('Mentions')}
-        </div>
-        <div
-          className={`w-1/4 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${type === 'reactions' ? '' : 'text-muted-foreground'}`}
-          onClick={() => setType('reactions')}
-        >
-          {t('Reactions')}
-        </div>
-        <div
-          className={`w-1/4 text-center py-2 font-semibold clickable cursor-pointer rounded-lg ${type === 'zaps' ? '' : 'text-muted-foreground'}`}
-          onClick={() => setType('zaps')}
-        >
-          {t('Zaps')}
-        </div>
-      </div>
-      <div
-        className={`w-1/4 px-4 sm:px-6 transition-transform duration-500 ${type === 'mentions' ? 'translate-x-full' : type === 'reactions' ? 'translate-x-[200%]' : type === 'zaps' ? 'translate-x-[300%]' : ''} `}
-      >
-        <div className="w-full h-1 bg-primary rounded-full" />
-      </div>
-    </div>
-  )
-}

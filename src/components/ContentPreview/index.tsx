@@ -1,15 +1,18 @@
 import {
+  EmbeddedEmojiParser,
   EmbeddedEventParser,
   EmbeddedImageParser,
   EmbeddedMentionParser,
   EmbeddedVideoParser,
   parseContent
 } from '@/lib/content-parser'
+import { extractEmojiInfosFromTags } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmbeddedMentionText } from '../Embedded'
+import Emoji from '../Emoji'
 
 export default function ContentPreview({
   event,
@@ -26,9 +29,12 @@ export default function ContentPreview({
       EmbeddedImageParser,
       EmbeddedVideoParser,
       EmbeddedEventParser,
-      EmbeddedMentionParser
+      EmbeddedMentionParser,
+      EmbeddedEmojiParser
     ])
   }, [event])
+
+  const emojiInfos = extractEmojiInfosFromTags(event?.tags)
 
   return (
     <div className={cn('pointer-events-none', className)}>
@@ -47,6 +53,12 @@ export default function ContentPreview({
         }
         if (node.type === 'mention') {
           return <EmbeddedMentionText key={index} userId={node.data.split(':')[1]} />
+        }
+        if (node.type === 'emoji') {
+          const shortcode = node.data.split(':')[1]
+          const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+          if (!emoji) return node.data
+          return <Emoji key={index} emoji={emoji} />
         }
       })}
     </div>

@@ -1,3 +1,4 @@
+import BookmarkList from '@/components/BookmarkList'
 import NoteList from '@/components/NoteList'
 import PostEditor from '@/components/PostEditor'
 import SaveRelayDropdownMenu from '@/components/SaveRelayDropdownMenu'
@@ -35,12 +36,25 @@ const NoteListPage = forwardRef((_, ref) => {
         </Button>
       </div>
     )
+  } else if (feedInfo.feedType === 'bookmarks') {
+    if (!pubkey) {
+      content = (
+        <div className="flex justify-center w-full">
+          <Button size="lg" onClick={() => checkLogin()}>
+            {t('Please login to view bookmarks')}
+          </Button>
+        </div>
+      )
+    } else {
+      content = <BookmarkList />
+    }
   } else if (isReady) {
     content = (
       <NoteList
         relayUrls={relayUrls}
         filter={filter}
         needCheckAlgoRelay={feedInfo.feedType !== 'following'}
+        isMainFeed
       />
     )
   }

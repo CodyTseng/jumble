@@ -217,6 +217,12 @@ export default {
     'Choose a relay': 'اختر ريلاي',
     'no relays found': 'لم يتم العثور على ريلايات',
     video: 'فيديو',
-    'Show n new notes': 'عرض {{n}} ملاحظات جديدة'
+    'Show n new notes': 'عرض {{n}} ملاحظات جديدة',
+    YouTabName: 'أنت',
+    Bookmark: 'الإشارة المرجعية',
+    'Remove bookmark': 'إزالة الإشارة',
+    'no bookmarks found': 'لم يتم العثور على إشارات',
+    'no more bookmarks': 'لا مزيد من الإشارات',
+    Bookmarks: 'الإشارات المرجعية'
   }
 }

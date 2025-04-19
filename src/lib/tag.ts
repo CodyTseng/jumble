@@ -66,11 +66,6 @@ export function extractPubkeysFromEventTags(tags: string[][]) {
   )
 }
 
-export function extractEmojiFromEventTags(emojiName: string, tags: string[][]) {
-  const emojiTag = tags.find((tag) => tag[0] === 'emoji' && tag[1] === emojiName)
-  return emojiTag?.[2]
-}
-
 export function isSameTag(tag1: string[], tag2: string[]) {
   if (tag1.length !== tag2.length) return false
   for (let i = 0; i < tag1.length; i++) {

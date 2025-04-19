@@ -68,12 +68,16 @@ export default function Nip22ReplyNoteList({
           relayUrls.unshift(...seenOn)
         }
         const { closer, timelineKey } = await client.subscribeTimeline(
-          relayUrls.slice(0, 4),
-          {
-            '#E': [event.id],
-            kinds: [ExtendedKind.COMMENT],
-            limit: LIMIT
-          },
+          [
+            {
+              urls: relayUrls.slice(0, 4),
+              filter: {
+                '#E': [event.id],
+                kinds: [ExtendedKind.COMMENT],
+                limit: LIMIT
+              }
+            }
+          ],
           {
             onEvents: (evts, eosed) => {
               if (evts.length > 0) {

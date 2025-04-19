@@ -3,7 +3,6 @@ import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/li
 import { formatPubkey, userIdToPubkey } from '@/lib/pubkey'
 import { extractPubkeysFromEventTags } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
-import { isSafari } from '@/lib/utils'
 import { ISigner, TProfile, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
@@ -157,9 +156,17 @@ class ClientService extends EventTarget {
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }
 
+  private generateMultipleTimelinesKey(subRequests: { urls: string[]; filter: Filter }[]) {
+    const keys = subRequests.map(({ urls, filter }) => this.generateTimelineKey(urls, filter))
+    const encoder = new TextEncoder()
+    const data = encoder.encode(JSON.stringify(keys.sort()))
+    const hashBuffer = sha256(data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  }
+
   async subscribeTimeline(
-    urls: string[],
-    { authors, ...filter }: Omit<Filter, 'since' | 'until'> & { limit: number },
+    subRequests: { urls: string[]; filter: Omit<Filter, 'since' | 'until'> & { limit: number } }[],
     {
       onEvents,
       onNew
@@ -175,65 +182,6 @@ class ClientService extends EventTarget {
       needSort?: boolean
     } = {}
   ) {
-    if (urls.length || !authors?.length) {
-      return this._subscribeTimeline(
-        urls.length ? urls : BIG_RELAY_URLS,
-        filter,
-        { onEvents, onNew },
-        { startLogin, needSort }
-      )
-    }
-
-    const subRequests: { urls: string[]; authors: string[] }[] = []
-    // If many websocket connections are initiated simultaneously, it will be
-    // very slow on Safari (for unknown reason)
-    if (authors.length > 5 && isSafari()) {
-      const pubkey = await this.signer?.getPublicKey()
-      if (!pubkey) {
-        subRequests.push({ urls: BIG_RELAY_URLS, authors })
-      } else {
-        const relayList = await this.fetchRelayList(pubkey)
-        const urls = relayList.read.concat(BIG_RELAY_URLS).slice(0, 5)
-        subRequests.push({ urls, authors })
-      }
-    } else {
-      const relayLists = await this.fetchRelayLists(authors)
-      const group: Record<string, Set<string>> = {}
-      relayLists.forEach((relayList, index) => {
-        relayList.write.slice(0, 4).forEach((url) => {
-          if (!group[url]) {
-            group[url] = new Set()
-          }
-          group[url].add(authors[index])
-        })
-      })
-
-      const relayCount = Object.keys(group).length
-      const coveredCount = new Map<string, number>()
-      Object.entries(group)
-        .sort(([, a], [, b]) => b.size - a.size)
-        .forEach(([url, pubkeys]) => {
-          if (
-            relayCount > 10 &&
-            pubkeys.size < 10 &&
-            Array.from(pubkeys).every((pubkey) => (coveredCount.get(pubkey) ?? 0) >= 2)
-          ) {
-            delete group[url]
-          } else {
-            pubkeys.forEach((pubkey) => {
-              coveredCount.set(pubkey, (coveredCount.get(pubkey) ?? 0) + 1)
-            })
-          }
-        })
-
-      subRequests.push(
-        ...Object.entries(group).map(([url, authors]) => ({
-          urls: [url],
-          authors: Array.from(authors)
-        }))
-      )
-    }
-
     const newEventIdSet = new Set<string>()
     const requestCount = subRequests.length
     let eventIdSet = new Set<string>()
@@ -241,10 +189,10 @@ class ClientService extends EventTarget {
     let eosedCount = 0
 
     const subs = await Promise.all(
-      subRequests.map(({ urls, authors }) => {
+      subRequests.map(({ urls, filter }) => {
         return this._subscribeTimeline(
           urls,
-          { ...filter, authors },
+          filter,
           {
             onEvents: (_events, _eosed) => {
               if (_eosed) {
@@ -265,12 +213,12 @@ class ClientService extends EventTarget {
               onNew(evt)
             }
           },
-          { startLogin }
+          { startLogin, needSort }
         )
       })
     )
 
-    const key = this.generateTimelineKey([], { ...filter, authors })
+    const key = this.generateMultipleTimelinesKey(subRequests)
     this.timelines[key] = subs.map((sub) => sub.timelineKey)
 
     return {
@@ -497,23 +445,23 @@ class ClientService extends EventTarget {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this
     let events: NEvent[] = []
-    let eosed = false
+    let eosedAt: number | null = null
     const subCloser = this.subscribe(relays, since ? { ...filter, since } : filter, {
       startLogin,
       onevent: (evt: NEvent) => {
         that.eventDataLoader.prime(evt.id, Promise.resolve(evt))
         // not eosed yet, push to events
-        if (!eosed) {
+        if (!eosedAt) {
           return events.push(evt)
         }
-        // eosed, (algo relay feeds) no need to sort and cache
-        if (!needSort) {
-          return onNew(evt)
+        // new event
+        if (evt.created_at > eosedAt) {
+          onNew(evt)
         }
 
         const timeline = that.timelines[key]
         if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
-          return onNew(evt)
+          return
         }
 
         // find the right position to insert
@@ -531,19 +479,16 @@ class ClientService extends EventTarget {
         // the event is too old, ignore it
         if (idx >= timeline.refs.length) return
 
-        // new event
-        if (idx === 0) {
-          onNew(evt)
-        }
-
         // insert the event to the right position
         timeline.refs.splice(idx, 0, [evt.id, evt.created_at])
       },
-      oneose: (_eosed) => {
-        eosed = _eosed
+      oneose: (eosed) => {
+        if (eosed && !eosedAt) {
+          eosedAt = dayjs().unix()
+        }
         // (algo feeds) no need to sort and cache
         if (!needSort) {
-          return onEvents([...events], eosed)
+          return onEvents([...events], !!eosedAt)
         }
         if (!eosed) {
           events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
@@ -799,6 +744,21 @@ class ClientService extends EventTarget {
       await indexedDb.putReplaceableEvent(event)
     }
     return event
+  }
+
+  async fetchBookmarkListEvent(pubkey: string): Promise<NEvent | undefined> {
+    const storedBookmarkListEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.BookmarkList)
+    if (storedBookmarkListEvent) {
+      return storedBookmarkListEvent
+    }
+
+    const relayList = await this.fetchRelayList(pubkey)
+    const events = await this.query(relayList.write.concat(BIG_RELAY_URLS), {
+      authors: [pubkey],
+      kinds: [kinds.BookmarkList]
+    })
+
+    return events.sort((a, b) => b.created_at - a.created_at)[0]
   }
 
   async fetchFollowings(pubkey: string, storeToIndexedDb = false) {

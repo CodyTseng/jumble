@@ -1,6 +1,6 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import client from '@/services/client.service'
-import { TImageInfo, TRelayList, TRelaySet } from '@/types'
+import { TEmoji, TImageInfo, TRelayList, TRelaySet } from '@/types'
 import { LRUCache } from 'lru-cache'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
@@ -504,4 +504,13 @@ export function getLatestEvent(events: Event[]) {
 
 export function getReplaceableEventIdentifier(event: Event) {
   return event.tags.find(tagNameEquals('d'))?.[1] ?? ''
+}
+
+export function extractEmojiInfosFromTags(tags: string[][] = []) {
+  return tags
+    .map((tag) => {
+      if (tag.length < 3 || tag[0] !== 'emoji') return null
+      return { shortcode: tag[1], url: tag[2] }
+    })
+    .filter(Boolean) as TEmoji[]
 }

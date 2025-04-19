@@ -13,6 +13,7 @@ const StoreNames = {
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
+  BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
   RELAY_INFO_EVENTS: 'relayInfoEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
@@ -35,7 +36,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 3)
+        const request = window.indexedDB.open('jumble', 4)
 
         request.onerror = (event) => {
           reject(event)
@@ -59,6 +60,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.MUTE_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.MUTE_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.BOOKMARK_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.BOOKMARK_LIST_EVENTS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
             db.createObjectStore(StoreNames.MUTE_DECRYPTED_TAGS, { keyPath: 'key' })
@@ -335,6 +339,8 @@ class IndexedDbService {
         return StoreNames.RELAY_SETS
       case ExtendedKind.FAVORITE_RELAYS:
         return StoreNames.FAVORITE_RELAYS
+      case kinds.BookmarkList:
+        return StoreNames.BOOKMARK_LIST_EVENTS
       default:
         return undefined
     }
@@ -360,7 +366,7 @@ class IndexedDbService {
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24
-      } // 1 day
+      }
     ]
     const transaction = this.db!.transaction(
       stores.map((store) => store.name),

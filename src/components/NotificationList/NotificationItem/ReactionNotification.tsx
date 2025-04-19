@@ -2,7 +2,7 @@ import Image from '@/components/Image'
 import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import { toNote } from '@/lib/link'
-import { extractEmojiFromEventTags, tagNameEquals } from '@/lib/tag'
+import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -37,7 +37,8 @@ export function ReactionNotification({
 
     const emojiName = /^:([^:]+):$/.exec(notification.content)?.[1]
     if (emojiName) {
-      const emojiUrl = extractEmojiFromEventTags(emojiName, notification.tags)
+      const emojiTag = notification.tags.find((tag) => tag[0] === 'emoji' && tag[1] === emojiName)
+      const emojiUrl = emojiTag?.[2]
       if (emojiUrl) {
         return (
           <Image

@@ -93,6 +93,10 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       if (feedInfo.feedType === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
       }
+
+      if (feedInfo.feedType === 'bookmarks' && pubkey) {
+        return await switchFeed('bookmarks', { pubkey })
+      }
     }
 
     init()
@@ -168,6 +172,20 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setFilter({
         authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
       })
+      return setIsReady(true)
+    }
+    if (feedType === 'bookmarks') {
+      if (!options.pubkey) {
+        return setIsReady(true)
+      }
+
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
+      storage.setFeedInfo(newFeedInfo, pubkey)
+
+      setRelayUrls([])
+      setFilter({})
       return setIsReady(true)
     }
     if (feedType === 'temporary') {

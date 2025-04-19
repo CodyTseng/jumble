@@ -97,12 +97,16 @@ export default function ReplyNoteList({
         const seenOn = client.getSeenEventRelayUrls(rootInfo.id)
         relayUrls.unshift(...seenOn)
         const { closer, timelineKey } = await client.subscribeTimeline(
-          relayUrls.slice(0, 5),
-          {
-            '#e': [rootInfo.id],
-            kinds: [kinds.ShortTextNote],
-            limit: LIMIT
-          },
+          [
+            {
+              urls: relayUrls.slice(0, 5),
+              filter: {
+                '#e': [rootInfo.id],
+                kinds: [kinds.ShortTextNote],
+                limit: LIMIT
+              }
+            }
+          ],
           {
             onEvents: (evts, eosed) => {
               if (evts.length > 0) {

@@ -144,7 +144,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
           </div>
         </div>
       </div>
-      <NoteList filter={{ authors: [pubkey] }} className="mt-2" filterMutedNotes={false} />
+      <NoteList author={pubkey} className="mt-2" filterMutedNotes={false} />
     </SecondaryPageLayout>
   )
 })

@@ -221,6 +221,12 @@ export default {
     'Choose a relay': 'Selecciona un relé',
     'no relays found': 'no se encontraron relés',
     video: 'video',
-    'Show n new notes': 'Mostrar {{n}} nuevas notas'
+    'Show n new notes': 'Mostrar {{n}} nuevas notas',
+    YouTabName: 'You',
+    Bookmark: 'Marcador',
+    'Remove bookmark': 'Quitar marcador',
+    'no bookmarks found': 'No se encontraron marcadores',
+    'no more bookmarks': 'No hay más marcadores',
+    Bookmarks: 'Marcadores'
   }
 }
