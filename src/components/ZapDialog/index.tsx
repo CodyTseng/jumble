@@ -1,3 +1,4 @@
+// import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -75,6 +76,7 @@ export default function ZapDialog({
             <DialogDescription></DialogDescription>
           </DrawerHeader>
           <ZapDialogContent
+            open={open}
             setOpen={setOpen}
             recipient={pubkey}
             eventId={eventId}
@@ -97,6 +99,7 @@ export default function ZapDialog({
           </DialogTitle>
         </DialogHeader>
         <ZapDialogContent
+          open={open}
           setOpen={setOpen}
           recipient={pubkey}
           eventId={eventId}

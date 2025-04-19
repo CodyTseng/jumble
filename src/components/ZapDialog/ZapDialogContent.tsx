@@ -16,7 +16,7 @@ export default function ZapDialogContent({
   eventId,
   defaultAmount
 }: {
-  
+  open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   recipient: string
   eventId?: string
@@ -40,7 +40,10 @@ export default function ZapDialogContent({
       const zapResult = await lightning.zap(pubkey, recipient, sats, comment, eventId, () =>
         setOpen(false)
       )
-      if (!zapResult) return
+      // user canceled
+      if (!zapResult) {
+        return
+      }
       if (eventId) {
         addZap(eventId, zapResult.invoice, sats, comment)
       }
@@ -57,6 +60,7 @@ export default function ZapDialogContent({
 
   return (
     <>
+      {/* Sats slider or input */}
       <div className="flex flex-col items-center">
         <div className="flex justify-center w-full">
           <input
@@ -64,9 +68,13 @@ export default function ZapDialogContent({
             value={sats}
             onChange={(e) => {
               setSats((pre) => {
-                if (e.target.value === '') return 0
+                if (e.target.value === '') {
+                  return 0
+                }
                 let num = parseInt(e.target.value, 10)
-                if (isNaN(num) || num < 0) return pre
+                if (isNaN(num) || num < 0) {
+                  num = pre
+                }
                 return num
               })
             }}
@@ -82,6 +90,7 @@ export default function ZapDialogContent({
         <Label htmlFor="sats">{t('Sats')}</Label>
       </div>
 
+      {/* Preset sats buttons */}
       <div className="grid grid-cols-6 gap-2">
         {[
           { display: '21', val: 21 },
@@ -103,6 +112,7 @@ export default function ZapDialogContent({
         ))}
       </div>
 
+      {/* Comment input */}
       <div>
         <Label htmlFor="comment">{t('zapComment')}</Label>
         <Input id="comment" value={comment} onChange={(e) => setComment(e.target.value)} />
