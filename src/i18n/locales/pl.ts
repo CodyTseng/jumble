@@ -71,7 +71,7 @@ export default {
     'Carry me home': 'Na stronę główną',
     'no replies': 'Brak komentarzy',
     'Reply to': 'Odpowiedz do',
-    Search: 'Wyszukiwarka',
+    Search: 'Wyszukaj',
     'The relays you are connected to do not support search':
       'Podłączone transmitery nie obsługują wyszukiwania',
     'Show more...': 'Więcej...',
@@ -164,8 +164,8 @@ export default {
     Explore: 'Transmitery',
     'Search relays': 'Wyszukaj transmiter',
     relayInfoBadgeAuth: '✔️',
-    relayInfoBadgeSearch: 'Wyszukaj',
-    relayInfoBadgePayment: 'Płatność',
+    relayInfoBadgeSearch: 'Wyszukiwarka',
+    relayInfoBadgePayment: 'Płatności',
     Operator: 'Operator',
     Contact: 'Kontakt',
     Software: 'Software',
@@ -224,7 +224,7 @@ export default {
     Bookmark: 'Zakładka',
     'Remove bookmark': 'Usuń zakładkę',
     'no bookmarks found': 'Nie znaleziono zakładek',
-    'no more bookmarks': 'Brak więcej zakładek',
+    'no more bookmarks': 'Koniec zakładek',
     Bookmarks: 'Zakładki'
   }
 }
