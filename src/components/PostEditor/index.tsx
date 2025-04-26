@@ -89,7 +89,7 @@ export default function PostEditor({
           className="h-full w-full p-0 flex flex-col"
         >
           <ScrollArea className="px-4 h-full max-h-screen">
-            <div className="space-y-4 px-2 py-6">
+            <div className="px-2 pt-6">
               <DrawerHeader>
                 <DrawerTitle className="text-start">
                   <Title parentEvent={parentEvent} />
