@@ -3,15 +3,16 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogOverlay,
   DialogTitle
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
-import { Dispatch, useMemo } from 'react'
+import { Dispatch, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet'
+import { Drawer, DrawerContent, DrawerHeader, DrawerOverlay, DrawerTitle } from '../ui/drawer'
 import NormalPostContent from './NormalPostContent'
 import PicturePostContent from './PicturePostContent'
 import Title from './Title'
@@ -29,6 +30,7 @@ export default function PostEditor({
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const drawerContentRef = useRef<HTMLDivElement | null>(null)
 
   const content = useMemo(() => {
     return parentEvent || defaultContent ? (
@@ -57,29 +59,59 @@ export default function PostEditor({
     )
   }, [parentEvent, defaultContent])
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (drawerContentRef.current) {
+        drawerContentRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`)
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize)
+      handleResize()
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize)
+      }
+    }
+  }, [])
+
   if (isSmallScreen) {
     return (
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="h-full w-full p-0 border-none" side="bottom" hideClose>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerOverlay onClick={() => setOpen(false)} />
+        <DrawerContent
+          hideOverlay
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          ref={drawerContentRef}
+          className="h-full w-full p-0 flex flex-col"
+        >
           <ScrollArea className="px-4 h-full max-h-screen">
             <div className="space-y-4 px-2 py-6">
-              <SheetHeader>
-                <SheetTitle className="text-start">
+              <DrawerHeader>
+                <DrawerTitle className="text-start">
                   <Title parentEvent={parentEvent} />
-                </SheetTitle>
-                <SheetDescription className="hidden" />
-              </SheetHeader>
+                </DrawerTitle>
+                <DialogDescription className="hidden" />
+              </DrawerHeader>
               {content}
             </div>
           </ScrollArea>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     )
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="p-0 max-w-2xl" withoutClose>
+      <DialogOverlay onClick={() => setOpen(false)} />
+      <DialogContent
+        hideOverlay
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className="p-0 max-w-2xl"
+      >
         <ScrollArea className="px-4 h-full max-h-screen">
           <div className="space-y-4 px-2 py-6">
             <DialogHeader>
