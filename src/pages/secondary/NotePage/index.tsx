@@ -70,13 +70,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
         )}
         <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
-        <Note
-          key={`note-${event.id}`}
-          event={event}
-          className="select-text"
-          fetchNoteStats
-          hideParentNotePreview
-        />
+        <Note key={`note-${event.id}`} event={event} className="select-text" fetchNoteStats />
       </div>
       <Separator className="mt-4" />
       {event.kind === kinds.ShortTextNote ? (

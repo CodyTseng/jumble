@@ -10,6 +10,7 @@ export const StorageKey = {
   DEFAULT_ZAP_SATS: 'defaultZapSats',
   DEFAULT_ZAP_COMMENT: 'defaultZapComment',
   QUICK_ZAP: 'quickZap',
+  HIDE_MUTED_USER_NOTE_REPLIES_IN_FEED: 'hideMutedUserNoteRepliesInFeed',
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService',

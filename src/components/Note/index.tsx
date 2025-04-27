@@ -1,7 +1,6 @@
 import { useSecondaryPage } from '@/PageManager'
 import { ExtendedKind } from '@/constants'
-import { useFetchEvent } from '@/hooks'
-import { extractImageInfosFromEventTags, getParentEventId, getUsingClient } from '@/lib/event'
+import { extractImageInfosFromEventTags, getUsingClient } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -18,24 +17,21 @@ export default function Note({
   event,
   size = 'normal',
   className,
-  hideParentNotePreview = false,
+  parentEvent,
+  isFetchingParentEvent,
   hideStats = false,
   fetchNoteStats = false
 }: {
   event: Event
   size?: 'normal' | 'small'
   className?: string
-  hideParentNotePreview?: boolean
+  parentEvent?: Event
+  isFetchingParentEvent?: boolean
   hideStats?: boolean
   fetchNoteStats?: boolean
 }) {
   const { push } = useSecondaryPage()
-  const parentEventId = useMemo(
-    () => (hideParentNotePreview ? undefined : getParentEventId(event)),
-    [event, hideParentNotePreview]
-  )
   const imageInfos = useMemo(() => extractImageInfosFromEventTags(event), [event])
-  const { event: parentEvent, isFetching } = useFetchEvent(parentEventId)
   const usingClient = useMemo(() => getUsingClient(event), [event])
 
   return (
@@ -63,14 +59,14 @@ export default function Note({
         </div>
         {size === 'normal' && <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />}
       </div>
-      {parentEventId && (
+      {parentEvent && (
         <ParentNotePreview
           event={parentEvent}
-          isFetching={isFetching}
+          isFetching={isFetchingParentEvent}
           className="mt-2"
           onClick={(e) => {
             e.stopPropagation()
-            push(toNote(parentEventId))
+            push(toNote(parentEvent.id))
           }}
         />
       )}

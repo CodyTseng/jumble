@@ -20,6 +20,8 @@ type TFeedContext = {
     feedType: TFeedType,
     options?: { activeRelaySetId?: string; pubkey?: string; relay?: string | null }
   ) => Promise<void>
+  hideMutedUserNoteRepliesInFeed: boolean
+  updateHideMutedUserNoteRepliesInFeed: (hideMutedUserNoteRepliesInFeed: boolean) => void
 }
 
 const FeedContext = createContext<TFeedContext | undefined>(undefined)
@@ -211,6 +213,15 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     setIsReady(true)
   }
 
+  const [hideMutedUserNoteRepliesInFeed, setHideMutedUserNoteRepliesInFeed] = useState<boolean>(
+    storage.getHideMutedUserNoteRepliesInFeed()
+  )
+
+  const updateHideMutedUserNoteRepliesInFeed = (hideMutedUserNoteRepliesInFeed: boolean) => {
+    storage.setHideMutedUserNoteRepliesInFeed(hideMutedUserNoteRepliesInFeed)
+    setHideMutedUserNoteRepliesInFeed(hideMutedUserNoteRepliesInFeed)
+  }
+
   return (
     <FeedContext.Provider
       value={{
@@ -219,7 +230,9 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         temporaryRelayUrls,
         filter,
         isReady,
-        switchFeed
+        switchFeed,
+        hideMutedUserNoteRepliesInFeed,
+        updateHideMutedUserNoteRepliesInFeed
       }}
     >
       {children}

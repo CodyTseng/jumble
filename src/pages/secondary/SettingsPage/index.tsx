@@ -23,6 +23,9 @@ import {
 } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Label } from '@/components/ui/label.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
+import { useFeed } from '@/providers/FeedProvider.tsx'
 
 const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
@@ -37,6 +40,8 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     i18n.changeLanguage(value)
     setLanguage(value)
   }
+
+  const { hideMutedUserNoteRepliesInFeed, updateHideMutedUserNoteRepliesInFeed } = useFeed()
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Settings')}>
@@ -94,6 +99,23 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <div>{t('Post settings')}</div>
         </div>
         <ChevronRight />
+      </SettingItem>
+      <SettingItem
+        className="clickable"
+        onClick={() => updateHideMutedUserNoteRepliesInFeed(!hideMutedUserNoteRepliesInFeed)}
+      >
+        <div className="w-full flex justify-between items-center">
+          <Label htmlFor="hide-muted-user-note-replies-in-feed-switch">
+            <div className="text-base font-medium">
+              {t("Hide muted users' note replies in feed")}
+            </div>
+          </Label>
+          <Switch
+            id="hide-muted-user-note-replies-in-feed-switch"
+            checked={hideMutedUserNoteRepliesInFeed}
+            onCheckedChange={updateHideMutedUserNoteRepliesInFeed}
+          />
+        </div>
       </SettingItem>
       {!!nsec && (
         <SettingItem

@@ -22,6 +22,7 @@ class LocalStorageService {
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
+  private hideMutedUserNoteRepliesInFeed: boolean = false
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
   private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
 
@@ -81,6 +82,8 @@ class LocalStorageService {
     }
     this.defaultZapComment = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_COMMENT) ?? 'Zap!'
     this.quickZap = window.localStorage.getItem(StorageKey.QUICK_ZAP) === 'true'
+    this.hideMutedUserNoteRepliesInFeed =
+      window.localStorage.getItem(StorageKey.HIDE_MUTED_USER_NOTE_REPLIES_IN_FEED) === 'true'
 
     const accountFeedInfoMapStr =
       window.localStorage.getItem(StorageKey.ACCOUNT_FEED_INFO_MAP) ?? '{}'
@@ -201,6 +204,18 @@ class LocalStorageService {
   setQuickZap(quickZap: boolean) {
     this.quickZap = quickZap
     window.localStorage.setItem(StorageKey.QUICK_ZAP, quickZap.toString())
+  }
+
+  getHideMutedUserNoteRepliesInFeed() {
+    return this.hideMutedUserNoteRepliesInFeed
+  }
+
+  setHideMutedUserNoteRepliesInFeed(hideMutedUserNoteRepliesInFeed: boolean) {
+    this.hideMutedUserNoteRepliesInFeed = hideMutedUserNoteRepliesInFeed
+    window.localStorage.setItem(
+      StorageKey.HIDE_MUTED_USER_NOTE_REPLIES_IN_FEED,
+      hideMutedUserNoteRepliesInFeed.toString()
+    )
   }
 
   getLastReadNotificationTime(pubkey: string) {
