@@ -32,14 +32,35 @@ export default function PostEditor({
   const { isSmallScreen } = useScreenSize()
   const drawerContentRef = useRef<HTMLDivElement | null>(null)
 
+  useEffect(() => {
+    const onResize = () => {
+      if (drawerContentRef.current) {
+        drawerContentRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`)
+      }
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', onResize)
+      onResize()
+    }
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', onResize)
+      }
+    }
+  }, [])
+
   const content = useMemo(() => {
-    return parentEvent || defaultContent ? (
-      <NormalPostContent
-        defaultContent={defaultContent}
-        parentEvent={parentEvent}
-        close={() => setOpen(false)}
-      />
-    ) : (
+    // unchanged
+    if (parentEvent || defaultContent) {
+      return (
+        <NormalPostContent
+          defaultContent={defaultContent}
+          parentEvent={parentEvent}
+          close={() => setOpen(false)}
+        />
+      )
+    }
+    return (
       <Tabs defaultValue="normal" className="space-y-4">
         <TabsList>
           <TabsTrigger value="normal">{t('Normal Note')}</TabsTrigger>
@@ -59,45 +80,25 @@ export default function PostEditor({
     )
   }, [parentEvent, defaultContent])
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (drawerContentRef.current) {
-        drawerContentRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`)
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      handleResize()
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-      }
-    }
-  }, [])
-
   if (isSmallScreen) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerOverlay onClick={() => setOpen(false)} />
         <DrawerContent
+          ref={drawerContentRef}
           hideOverlay
           onOpenAutoFocus={(e) => e.preventDefault()}
-          ref={drawerContentRef}
-          className="h-full w-full p-0 flex flex-col"
+          className="flex flex-col h-full"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-          <ScrollArea className="px-4 h-full max-h-screen">
-            <div className="px-2 pt-6">
-              <DrawerHeader>
-                <DrawerTitle className="text-start">
-                  <Title parentEvent={parentEvent} />
-                </DrawerTitle>
-                <DialogDescription className="hidden" />
-              </DrawerHeader>
-              {content}
-            </div>
+          <DrawerHeader>
+            <DrawerTitle className="text-start">
+              <Title parentEvent={parentEvent} />
+            </DrawerTitle>
+            <DialogDescription className="hidden" />
+          </DrawerHeader>
+          <ScrollArea className="px-4 flex-1 overflow-auto">
+            <div className="px-2 py-0">{content}</div>
           </ScrollArea>
         </DrawerContent>
       </Drawer>
