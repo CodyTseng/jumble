@@ -1,10 +1,36 @@
-import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
+import { randomString } from '@/lib/random'
 
-const Dialog = DialogPrimitive.Root
+const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
+  const id = React.useMemo(() => `dialog-${randomString()}`, [])
+
+  React.useEffect(() => {
+    if (open) {
+      window.history.pushState(id, '', window.location.href)
+      const handlePopState = () => {
+        console.debug('close dialog by back button')
+        onOpenChange?.(false)
+      }
+      window.addEventListener('popstate', handlePopState)
+      return () => {
+        window.removeEventListener('popstate', handlePopState)
+      }
+    } else if (history.state === id) {
+      console.debug('close dialog manually')
+      window.history.back()
+    }
+  }, [open])
+
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} {...props}>
+      {children}
+    </DialogPrimitive.Root>
+  )
+}
 
 const DialogTrigger = DialogPrimitive.Trigger
 
@@ -31,11 +57,10 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     withoutClose?: boolean
-    hideOverlay?: boolean
   }
->(({ className, children, withoutClose, hideOverlay, ...props }, ref) => (
+>(({ className, children, withoutClose, ...props }, ref) => (
   <DialogPortal>
-    {!hideOverlay && <DialogOverlay />}
+    <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
@@ -95,13 +120,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogHeader,
+  DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
-  DialogDescription
+  DialogTrigger
 }

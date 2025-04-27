@@ -115,6 +115,10 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     const onPopState = (e: PopStateEvent) => {
+      if (typeof e.state === 'string') {
+        return window.history.back()
+      }
+
       let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
@@ -136,10 +140,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         }
 
         if (state.index === currentIndex) {
-          if (currentIndex !== 0) return pre
-
-          window.history.replaceState(null, '', '/')
-          return []
+          return pre
         }
 
         // Go back
