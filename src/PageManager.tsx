@@ -20,6 +20,7 @@ import NotificationListPage from './pages/primary/NotificationListPage'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { routes } from './routes'
+import modalManager from './services/modal-manager.service'
 
 export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
@@ -90,6 +91,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { isSmallScreen } = useScreenSize()
 
   useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
     if (window.location.pathname !== '/') {
       if (
         ['/users', '/notes', '/relays'].some((path) => window.location.pathname.startsWith(path)) &&
@@ -115,8 +117,10 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     const onPopState = (e: PopStateEvent) => {
-      if (typeof e.state === 'string') {
-        return window.history.back()
+      const closeModal = modalManager.pop()
+      if (closeModal) {
+        window.history.forward()
+        return
       }
 
       let state = e.state as { index: number; url: string } | null

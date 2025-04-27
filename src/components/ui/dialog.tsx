@@ -2,26 +2,20 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { randomString } from '@/lib/random'
+import { cn } from '@/lib/utils'
+import modalManager from '@/services/modal-manager.service'
 
 const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
   const id = React.useMemo(() => `dialog-${randomString()}`, [])
 
   React.useEffect(() => {
     if (open) {
-      window.history.pushState(id, '', window.location.href)
-      const handlePopState = () => {
-        console.debug('close dialog by back button')
+      modalManager.register(id, () => {
         onOpenChange?.(false)
-      }
-      window.addEventListener('popstate', handlePopState)
-      return () => {
-        window.removeEventListener('popstate', handlePopState)
-      }
-    } else if (history.state === id) {
-      console.debug('close dialog manually')
-      window.history.back()
+      })
+    } else {
+      modalManager.unregister(id)
     }
   }, [open])
 

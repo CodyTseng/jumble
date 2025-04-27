@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Drawer as DrawerPrimitive } from 'vaul'
 
-import { cn } from '@/lib/utils'
 import { randomString } from '@/lib/random'
+import { cn } from '@/lib/utils'
+import modalManager from '@/services/modal-manager.service'
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -14,18 +15,11 @@ const Drawer = ({
 
   React.useEffect(() => {
     if (open) {
-      window.history.pushState(id, '', window.location.href)
-      const handlePopState = () => {
-        console.debug('close drawer by back button')
+      modalManager.register(id, () => {
         onOpenChange?.(false)
-      }
-      window.addEventListener('popstate', handlePopState)
-      return () => {
-        window.removeEventListener('popstate', handlePopState)
-      }
-    } else if (history.state?.id === id) {
-      console.debug('close drawer manually')
-      window.history.back()
+      })
+    } else {
+      modalManager.unregister(id)
     }
   }, [open])
 
@@ -119,13 +113,13 @@ DrawerDescription.displayName = DrawerPrimitive.Description.displayName
 
 export {
   Drawer,
-  DrawerPortal,
-  DrawerOverlay,
-  DrawerTrigger,
   DrawerClose,
   DrawerContent,
-  DrawerHeader,
+  DrawerDescription,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
   DrawerTitle,
-  DrawerDescription
+  DrawerTrigger
 }
