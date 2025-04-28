@@ -26,17 +26,15 @@ export default function MainNoteCard({
   const [shouldCollapse, setShouldCollapse] = useState(false)
 
   useEffect(() => {
-    if (embedded) return
+    if (embedded || shouldCollapse) return
 
     const contentEl = containerRef.current
     if (!contentEl) return
 
     const checkHeight = () => {
       const fullHeight = contentEl.scrollHeight
-      if (fullHeight > 700) {
+      if (fullHeight > 900) {
         setShouldCollapse(true)
-      } else {
-        setShouldCollapse(false)
       }
     }
 
@@ -51,7 +49,7 @@ export default function MainNoteCard({
     return () => {
       observer.disconnect()
     }
-  }, [embedded])
+  }, [embedded, shouldCollapse])
 
   return (
     <div
@@ -66,7 +64,7 @@ export default function MainNoteCard({
         <div
           className="relative text-left overflow-hidden"
           style={{
-            maxHeight: !shouldCollapse || expanded ? 'none' : '700px'
+            maxHeight: !shouldCollapse || expanded ? 'none' : '600px'
           }}
         >
           <RepostDescription className={embedded ? '' : 'px-4'} reposter={reposter} />
