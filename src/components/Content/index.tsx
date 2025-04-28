@@ -51,6 +51,24 @@ const Content = memo(
     const imageInfos = event.tags
       .map((tag) => extractImageInfoFromTag(tag))
       .filter(Boolean) as TImageInfo[]
+    const allImages = nodes
+      .map((node) => {
+        if (node.type === 'image') {
+          const imageInfo = imageInfos.find((image) => image.url === node.data)
+          return imageInfo ?? { url: node.data }
+        }
+        if (node.type === 'images') {
+          const urls = Array.isArray(node.data) ? node.data : [node.data]
+          return urls.map((url) => {
+            const imageInfo = imageInfos.find((image) => image.url === url)
+            return imageInfo ?? { url }
+          })
+        }
+        return null
+      })
+      .filter(Boolean)
+      .flat() as TImageInfo[]
+    let imageIndex = 0
 
     const emojiInfos = extractEmojiInfosFromTags(event.tags)
 
@@ -65,17 +83,18 @@ const Content = memo(
             return node.data
           }
           if (node.type === 'image' || node.type === 'images') {
-            const imageUrls = Array.isArray(node.data) ? node.data : [node.data]
-            const images = imageUrls.map(
-              (url) => imageInfos.find((image) => image.url === url) ?? { url }
-            )
+            const start = imageIndex
+            const end = imageIndex + (Array.isArray(node.data) ? node.data.length : 1)
+            imageIndex = end
             return (
               <ImageGallery
                 className={`${size === 'small' ? 'mt-1' : 'mt-2'}`}
                 key={index}
-                images={images}
+                images={allImages}
                 isNsfw={isNsfwEvent(event)}
                 size={size}
+                start={start}
+                end={end}
               />
             )
           }

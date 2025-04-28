@@ -12,12 +12,16 @@ export default function ImageGallery({
   className,
   images,
   isNsfw = false,
-  size = 'normal'
+  size = 'normal',
+  start = 0,
+  end = images.length
 }: {
   className?: string
   images: TImageInfo[]
   isNsfw?: boolean
   size?: 'normal' | 'small'
+  start?: number
+  end?: number
 }) {
   const { isSmallScreen } = useScreenSize()
   const [index, setIndex] = useState(-1)
@@ -25,11 +29,12 @@ export default function ImageGallery({
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
     event.stopPropagation()
     event.preventDefault()
-    setIndex(current)
+    setIndex(start + current)
   }
 
+  const displayImages = images.slice(start, end)
   let imageContent: ReactNode | null = null
-  if (images.length === 1) {
+  if (displayImages.length === 1) {
     imageContent = (
       <Image
         key={0}
@@ -37,14 +42,14 @@ export default function ImageGallery({
         classNames={{
           errorPlaceholder: cn('aspect-square', size === 'small' ? 'h-[15vh]' : 'h-[30vh]')
         }}
-        image={images[0]}
+        image={displayImages[0]}
         onClick={(e) => handlePhotoClick(e, 0)}
       />
     )
   } else if (size === 'small') {
     imageContent = (
       <div className="grid grid-cols-4 gap-2">
-        {images.map((image, i) => (
+        {displayImages.map((image, i) => (
           <Image
             key={i}
             className={cn('aspect-square w-full rounded-lg')}
@@ -54,10 +59,10 @@ export default function ImageGallery({
         ))}
       </div>
     )
-  } else if (isSmallScreen && (images.length === 2 || images.length === 4)) {
+  } else if (isSmallScreen && (displayImages.length === 2 || displayImages.length === 4)) {
     imageContent = (
       <div className="grid grid-cols-2 gap-2">
-        {images.map((image, i) => (
+        {displayImages.map((image, i) => (
           <Image
             key={i}
             className={cn('aspect-square w-full rounded-lg')}
@@ -70,7 +75,7 @@ export default function ImageGallery({
   } else {
     imageContent = (
       <div className="grid grid-cols-3 gap-2 w-full">
-        {images.map((image, i) => (
+        {displayImages.map((image, i) => (
           <Image
             key={i}
             className={cn('aspect-square w-full rounded-lg')}
@@ -83,13 +88,19 @@ export default function ImageGallery({
   }
 
   return (
-    <div className={cn('relative', images.length === 1 ? 'w-fit max-w-full' : 'w-full', className)}>
+    <div
+      className={cn(
+        'relative',
+        displayImages.length === 1 ? 'w-fit max-w-full' : 'w-full',
+        className
+      )}
+    >
       {imageContent}
       {index >= 0 &&
         createPortal(
           <div onClick={(e) => e.stopPropagation()}>
             <Lightbox
-              index={index}
+              index={start + index}
               slides={images.map(({ url }) => ({ src: url }))}
               plugins={[Zoom]}
               open={index >= 0}
