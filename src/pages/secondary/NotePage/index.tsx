@@ -2,6 +2,7 @@ import { useSecondaryPage } from '@/PageManager'
 import ContentPreview from '@/components/ContentPreview'
 import Nip22ReplyNoteList from '@/components/Nip22ReplyNoteList'
 import Note from '@/components/Note'
+import NoteStats from '@/components/NoteStats'
 import PictureNote from '@/components/PictureNote'
 import ReplyNoteList from '@/components/ReplyNoteList'
 import UserAvatar from '@/components/UserAvatar'
@@ -74,9 +75,9 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           key={`note-${event.id}`}
           event={event}
           className="select-text"
-          fetchNoteStats
           hideParentNotePreview
         />
+        <NoteStats className="mt-3" event={event} fetchIfNotExisting />
       </div>
       <Separator className="mt-4" />
       {event.kind === kinds.ShortTextNote ? (
