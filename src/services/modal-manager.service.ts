@@ -11,6 +11,9 @@ class ModalManagerService {
   }
 
   register(id: string, cb: () => void) {
+    if (this.modals.find((m) => m.id === id)) {
+      return
+    }
     this.modals.push({ id, cb })
     console.debug('register modal', id, this.modals.length)
   }

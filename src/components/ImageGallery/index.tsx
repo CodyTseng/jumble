@@ -1,7 +1,9 @@
+import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import modalManager from '@/services/modal-manager.service'
 import { TImageInfo } from '@/types'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Lightbox from 'yet-another-react-lightbox'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
@@ -23,8 +25,18 @@ export default function ImageGallery({
   start?: number
   end?: number
 }) {
+  const id = useMemo(() => `image-gallery-${randomString()}`, [])
   const { isSmallScreen } = useScreenSize()
   const [index, setIndex] = useState(-1)
+  useEffect(() => {
+    if (index >= 0) {
+      modalManager.register(id, () => {
+        setIndex(-1)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [index])
 
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
     event.stopPropagation()
