@@ -227,6 +227,7 @@ export default {
     'Remove bookmark': 'Lesezeichen entfernen',
     'no bookmarks found': 'Keine Lesezeichen gefunden',
     'no more bookmarks': 'Keine weiteren Lesezeichen',
-    Bookmarks: 'Lesezeichen'
+    Bookmarks: 'Lesezeichen',
+    'Show more': 'Mehr anzeigen'
   }
 }

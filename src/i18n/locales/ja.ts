@@ -224,6 +224,7 @@ export default {
     'Remove bookmark': 'ブックマークを削除',
     'no bookmarks found': 'ブックマークが見つかりません',
     'no more bookmarks': 'これ以上ブックマークはありません',
-    Bookmarks: 'ブックマーク一覧'
+    Bookmarks: 'ブックマーク一覧',
+    'Show more': 'もっと見る'
   }
 }

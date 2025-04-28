@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { Event } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Note from '../Note'
 import NoteStats from '../NoteStats'
 import RepostDescription from './RepostDescription'
@@ -20,6 +21,7 @@ export default function MainNoteCard({
   reposter?: string
   embedded?: boolean
 }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const containerRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
@@ -83,7 +85,7 @@ export default function MainNoteCard({
                     setExpanded(!expanded)
                   }}
                 >
-                  Show more
+                  {t('Show more')}
                 </Button>
               </div>
             </div>

@@ -224,6 +224,7 @@ export default {
     'Remove bookmark': '取消收藏',
     'no bookmarks found': '暂无收藏',
     'no more bookmarks': '到底了',
-    Bookmarks: '收藏'
+    Bookmarks: '收藏',
+    'Show more': '显示更多'
   }
 }

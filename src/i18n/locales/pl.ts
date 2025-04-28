@@ -225,6 +225,7 @@ export default {
     'Remove bookmark': 'Usuń zakładkę',
     'no bookmarks found': 'Nie znaleziono zakładek',
     'no more bookmarks': 'Koniec zakładek',
-    Bookmarks: 'Zakładki'
+    Bookmarks: 'Zakładki',
+    'Show more': 'Pokaż więcej'
   }
 }

@@ -226,6 +226,7 @@ export default {
     'Remove bookmark': 'Rimuovi segnalibro',
     'no bookmarks found': 'Nessun segnalibro trovato',
     'no more bookmarks': 'Nessun altro segnalibro',
-    Bookmarks: 'Segnalibri'
+    Bookmarks: 'Segnalibri',
+    'Show more': 'Mostra di più'
   }
 }

@@ -226,6 +226,7 @@ export default {
     'Remove bookmark': 'Retirer le favori',
     'no bookmarks found': 'Aucun favori trouvé',
     'no more bookmarks': 'Plus de favoris',
-    Bookmarks: 'Favoris'
+    Bookmarks: 'Favoris',
+    'Show more': 'Afficher plus'
   }
 }

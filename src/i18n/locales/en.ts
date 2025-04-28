@@ -223,6 +223,7 @@ export default {
     'Remove bookmark': 'Remove bookmark',
     'no bookmarks found': 'no bookmarks found',
     'no more bookmarks': 'no more bookmarks',
-    Bookmarks: 'Bookmarks'
+    Bookmarks: 'Bookmarks',
+    'Show more': 'Show more'
   }
 }

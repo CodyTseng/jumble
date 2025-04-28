@@ -227,6 +227,7 @@ export default {
     'Remove bookmark': 'Удалить закладку',
     'no bookmarks found': 'Закладки не найдены',
     'no more bookmarks': 'Больше нет закладок',
-    Bookmarks: 'Закладки'
+    Bookmarks: 'Закладки',
+    'Show more': 'Показать больше'
   }
 }

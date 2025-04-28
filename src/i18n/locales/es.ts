@@ -227,6 +227,7 @@ export default {
     'Remove bookmark': 'Quitar marcador',
     'no bookmarks found': 'No se encontraron marcadores',
     'no more bookmarks': 'No hay más marcadores',
-    Bookmarks: 'Marcadores'
+    Bookmarks: 'Marcadores',
+    'Show more': 'Mostrar más'
   }
 }

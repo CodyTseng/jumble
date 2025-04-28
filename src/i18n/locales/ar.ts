@@ -223,6 +223,7 @@ export default {
     'Remove bookmark': 'إزالة الإشارة',
     'no bookmarks found': 'لم يتم العثور على إشارات',
     'no more bookmarks': 'لا مزيد من الإشارات',
-    Bookmarks: 'الإشارات المرجعية'
+    Bookmarks: 'الإشارات المرجعية',
+    'Show more': 'عرض المزيد'
   }
 }
