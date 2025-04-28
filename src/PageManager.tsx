@@ -178,10 +178,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       })
     }
 
+    const onLeave = (event: BeforeUnloadEvent) => {
+      // Cancel the event as stated by the standard.
+      event.preventDefault()
+      // Chrome requires returnValue to be set.
+      event.returnValue = ''
+    }
+
     window.addEventListener('popstate', onPopState)
+    window.addEventListener('beforeunload', onLeave)
 
     return () => {
       window.removeEventListener('popstate', onPopState)
+      window.removeEventListener('beforeunload', onLeave)
     }
   }, [])
 
