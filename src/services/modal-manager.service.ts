@@ -1,7 +1,7 @@
 class ModalManagerService {
   static instance: ModalManagerService
 
-  private stack: { id: string; cb: () => void }[] = []
+  private modals: { id: string; cb: () => void }[] = []
 
   constructor() {
     if (!ModalManagerService.instance) {
@@ -11,26 +11,24 @@ class ModalManagerService {
   }
 
   register(id: string, cb: () => void) {
-    this.stack.push({ id, cb })
-    console.debug('register modal', id, this.stack.length)
+    this.modals.push({ id, cb })
+    console.debug('register modal', id, this.modals.length)
   }
 
   unregister(id: string) {
-    const last = this.stack.pop()
-    if (!last) return
-    if (last.id !== id) {
-      this.stack.push(last)
-      return
-    }
-    last.cb()
-    console.debug('unregister modal', id, this.stack.length)
+    const index = this.modals.findIndex((m) => m.id === id)
+    if (index === -1) return
+
+    const modal = this.modals.splice(index, 1)[0]
+    modal.cb()
+    console.debug('unregister modal', id, this.modals.length)
   }
 
   pop() {
-    const last = this.stack.pop()
+    const last = this.modals.pop()
     if (!last) return false
     last.cb()
-    console.debug('pop modal', last.id, this.stack.length)
+    console.debug('pop modal', last.id, this.modals.length)
     return true
   }
 }

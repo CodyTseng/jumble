@@ -91,7 +91,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { isSmallScreen } = useScreenSize()
 
   useEffect(() => {
-    window.history.pushState(null, '', window.location.href)
+    const url = window.location.href
+    window.history.replaceState(null, '', '/')
+    window.history.pushState(null, '', url)
     if (window.location.pathname !== '/') {
       if (
         ['/users', '/notes', '/relays'].some((path) => window.location.pathname.startsWith(path)) &&

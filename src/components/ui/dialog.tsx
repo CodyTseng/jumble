@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import modalManager from '@/services/modal-manager.service'
 
 const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
+  const [innerOpen, setInnerOpen] = React.useState(open ?? false)
   const id = React.useMemo(() => `dialog-${randomString()}`, [])
 
   React.useEffect(() => {
@@ -19,8 +20,26 @@ const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.Dial
     }
   }, [open])
 
+  React.useEffect(() => {
+    if (open !== undefined) {
+      return
+    }
+
+    if (innerOpen) {
+      modalManager.register(id, () => {
+        setInnerOpen(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [innerOpen])
+
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} {...props}>
+    <DialogPrimitive.Root
+      open={open ?? innerOpen}
+      onOpenChange={onOpenChange ?? setInnerOpen}
+      {...props}
+    >
       {children}
     </DialogPrimitive.Root>
   )

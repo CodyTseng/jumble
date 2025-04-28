@@ -11,6 +11,7 @@ const Drawer = ({
   onOpenChange,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => {
+  const [innerOpen, setInnerOpen] = React.useState(open ?? false)
   const id = React.useMemo(() => `drawer-${randomString()}`, [])
 
   React.useEffect(() => {
@@ -23,11 +24,25 @@ const Drawer = ({
     }
   }, [open])
 
+  React.useEffect(() => {
+    if (open !== undefined) {
+      return
+    }
+
+    if (innerOpen) {
+      modalManager.register(id, () => {
+        setInnerOpen(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [innerOpen])
+
   return (
     <DrawerPrimitive.Root
       shouldScaleBackground={shouldScaleBackground}
-      open={open}
-      onOpenChange={onOpenChange}
+      open={open ?? innerOpen}
+      onOpenChange={onOpenChange ?? setInnerOpen}
       {...props}
     />
   )
