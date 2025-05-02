@@ -1,3 +1,4 @@
+import { Dispatch, useEffect, useMemo, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +18,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
-import { Dispatch, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import NormalPostContent from './NormalPostContent'
 import PicturePostContent from './PicturePostContent'
@@ -38,24 +38,42 @@ export default function PostEditor({
   const { isSmallScreen } = useScreenSize()
   const drawerContentRef = useRef<HTMLDivElement | null>(null)
 
+  // Detect iOS Safari
+  const isIOS = typeof navigator !== 'undefined' && /iP(ad|hone|od)/.test(navigator.userAgent)
+
+  // 1. --vh CSS variable to handle dynamic viewport height on iOS Safari only
   useEffect(() => {
-    const handleResize = () => {
+    if (!isIOS) return
+    const setVh = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+    }
+    window.addEventListener('resize', setVh)
+    setVh()
+    return () => window.removeEventListener('resize', setVh)
+  }, [isIOS])
+
+  // 2. visualViewport listener to adjust bottom offset when keyboard opens, only on iOS Safari
+  useEffect(() => {
+    if (!isIOS) return
+    const vv = window.visualViewport
+    if (!vv) return
+
+    const onViewportChange = () => {
       if (drawerContentRef.current) {
-        drawerContentRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`)
+        const bottomOffset = window.innerHeight - vv.height - vv.offsetTop
+        drawerContentRef.current.style.bottom = `calc(${bottomOffset}px + env(safe-area-inset-bottom))`
       }
     }
 
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      handleResize()
-    }
+    vv.addEventListener('resize', onViewportChange)
+    vv.addEventListener('scroll', onViewportChange)
+    onViewportChange()
 
     return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-      }
+      vv.removeEventListener('resize', onViewportChange)
+      vv.removeEventListener('scroll', onViewportChange)
     }
-  }, [])
+  }, [isIOS])
 
   const content = useMemo(() => {
     return parentEvent || defaultContent ? (
@@ -91,7 +109,12 @@ export default function PostEditor({
         <DrawerContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           ref={drawerContentRef}
-          className="flex flex-col h-full px-4 pt-4 pb-[env(safe-area-inset-bottom)]"
+          className="flex flex-col px-4 pt-10"
+          style={{
+            height: isIOS ? 'calc(var(--vh) * 100)' : '100vh',
+            bottom: '0',
+            paddingBottom: 'env(safe-area-inset-bottom)'
+          }}
         >
           <DrawerHeader>
             <DrawerTitle className="text-start">
