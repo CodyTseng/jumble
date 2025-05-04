@@ -59,10 +59,14 @@ export default function PostEditor({
     if (!vv) return
 
     const onViewportChange = () => {
-      if (drawerContentRef.current) {
-        const bottomOffset = window.innerHeight - vv.height - vv.offsetTop
-        drawerContentRef.current.style.bottom = `calc(${bottomOffset}px + env(safe-area-inset-bottom))`
-      }
+       if (drawerContentRef.current) {
+         const bottomOffset =
+           vv.height + vv.offsetTop < window.innerHeight
+             ? window.innerHeight - (vv.height + vv.offsetTop)
+             : 0
+
+         drawerContentRef.current.style.bottom = `${bottomOffset}px`
+       }
     }
 
     vv.addEventListener('resize', onViewportChange)
