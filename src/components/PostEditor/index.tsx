@@ -54,28 +54,24 @@ export default function PostEditor({
 
   // 2. visualViewport listener to adjust bottom offset when keyboard opens, only on iOS Safari
   useEffect(() => {
-    if (!isIOS) return
+    if (!isIOS || !window.visualViewport) return
+
     const vv = window.visualViewport
-    if (!vv) return
 
-    const onViewportChange = () => {
-       if (drawerContentRef.current) {
-         const bottomOffset =
-           vv.height + vv.offsetTop < window.innerHeight
-             ? window.innerHeight - (vv.height + vv.offsetTop)
-             : 0
-
-         drawerContentRef.current.style.bottom = `${bottomOffset}px`
-       }
+    const updateDrawerHeight = () => {
+      if (drawerContentRef.current) {
+        const height = vv.height
+        drawerContentRef.current.style.height = `${height}px`
+      }
     }
 
-    vv.addEventListener('resize', onViewportChange)
-    vv.addEventListener('scroll', onViewportChange)
-    onViewportChange()
+    vv.addEventListener('resize', updateDrawerHeight)
+    vv.addEventListener('scroll', updateDrawerHeight)
+    updateDrawerHeight()
 
     return () => {
-      vv.removeEventListener('resize', onViewportChange)
-      vv.removeEventListener('scroll', onViewportChange)
+      vv.removeEventListener('resize', updateDrawerHeight)
+      vv.removeEventListener('scroll', updateDrawerHeight)
     }
   }, [isIOS])
 
@@ -115,7 +111,7 @@ export default function PostEditor({
           ref={drawerContentRef}
           className="flex flex-col px-4 pt-10"
           style={{
-            height: isIOS ? 'calc(var(--vh) * 100)' : '100vh',
+            height: isIOS ? undefined : '100vh',
             bottom: '0',
             paddingBottom: 'env(safe-area-inset-bottom)'
           }}
