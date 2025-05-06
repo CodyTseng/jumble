@@ -63,7 +63,7 @@ export function MediaUploadServiceProvider({ children }: { children: React.React
     })
 
     if (!response.ok) {
-      throw new Error(response.status.toString())
+      throw new Error(response.status.toString() + ' ' + response.statusText)
     }
 
     const data = await response.json()

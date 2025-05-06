@@ -9,7 +9,7 @@ import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import TextareaWithMentions from '../TextareaWithMentions'
+import PostTextarea from '../PostTextarea'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions'
 import Preview from './Preview'
@@ -123,12 +123,15 @@ export default function NormalPostContent({
           </div>
         </ScrollArea>
       )}
-      <TextareaWithMentions
+      <PostTextarea
         className="h-32"
         setTextValue={setContent}
         textValue={content}
         placeholder={t('Write something...')}
         cursorOffset={cursorOffset}
+        onUploadImage={({ url, tags }) => {
+          setPictureInfos((prev) => [...prev, { url, tags }])
+        }}
       />
       {processedContent && <Preview content={processedContent} />}
       <SendOnlyToSwitch
