@@ -76,10 +76,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
               </Button>
               <Button
                 onClick={() => {
-                  setIsDrawerOpen(false)
-                  setTimeout(() => {
-                    setIsRawEventDialogOpen(true)
-                  }, 10)
+                  setIsRawEventDialogOpen(true)
                 }}
                 className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
                 variant="ghost"

@@ -11,3 +11,9 @@ export function isSafari() {
   const vendor = window.navigator.vendor
   return /Safari/.test(ua) && /Apple Computer/.test(vendor) && !/Chrome/.test(ua)
 }
+
+export function isAndroid() {
+  if (typeof window === 'undefined' || !window.navigator) return false
+  const ua = window.navigator.userAgent
+  return /android/i.test(ua)
+}

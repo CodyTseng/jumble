@@ -1,6 +1,6 @@
 import Sidebar from '@/components/Sidebar'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
+import { cn, isAndroid } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
 import HomePage from '@/pages/secondary/HomePage'
 import { TPageRef } from '@/types'
@@ -91,9 +91,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { isSmallScreen } = useScreenSize()
 
   useEffect(() => {
-    const url = window.location.href
-    window.history.replaceState(null, '', '/')
-    window.history.pushState(null, '', url)
     if (window.location.pathname !== '/') {
       if (
         ['/users', '/notes', '/relays'].some((path) => window.location.pathname.startsWith(path)) &&
@@ -120,10 +117,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
     const onPopState = (e: PopStateEvent) => {
       const closeModal = modalManager.pop()
-      if (closeModal) {
-        window.history.forward()
-        return
-      }
+      if (closeModal) return
 
       let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
@@ -186,11 +180,17 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     window.addEventListener('popstate', onPopState)
-    window.addEventListener('beforeunload', onLeave)
+
+    if (isAndroid()) {
+      window.addEventListener('beforeunload', onLeave)
+    }
 
     return () => {
       window.removeEventListener('popstate', onPopState)
-      window.removeEventListener('beforeunload', onLeave)
+
+      if (isAndroid()) {
+        window.removeEventListener('beforeunload', onLeave)
+      }
     }
   }, [])
 
