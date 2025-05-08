@@ -1,21 +1,19 @@
-# Etapa 1: Build da aplicação (somente a última versão da main)
+# Step 1: Build the application
 FROM node:20-alpine as builder
 
-# Instala git e clona apenas o último commit da branch main
 RUN apk add --no-cache git
-
 WORKDIR /app
-RUN git clone --depth=1 https://github.com/CodyTseng/jumble.git .
+COPY . .
 
 RUN npm install && npm run build
 
-# Etapa 2: Container final com Nginx e config embutida
+# Step 2: Final container with Nginx and embedded config
 FROM nginx:alpine
 
-# Copia apenas os arquivos estáticos gerados
+# Copy only the generated static files
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Embute a configuração do Nginx diretamente
+# Embed Nginx configuration directly
 RUN printf "server {\n\
     listen 80;\n\
     server_name localhost;\n\
@@ -38,7 +36,6 @@ RUN printf "server {\n\
     gzip_min_length 1024;\n\
     gzip_comp_level 6;\n\
 }\n" > /etc/nginx/conf.d/default.conf
-
 
 EXPOSE 80
 

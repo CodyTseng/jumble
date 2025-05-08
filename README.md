@@ -52,9 +52,8 @@ cd jumble
 
 # Run the docker compose
 docker compose up --build -d
-
 ```
-
+After finishing, access: http://localhost:8089
 
 ## Donate
 
