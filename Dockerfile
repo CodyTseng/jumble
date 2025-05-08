@@ -1,7 +1,6 @@
 # Step 1: Build the application
 FROM node:20-alpine as builder
 
-RUN apk add --no-cache git
 WORKDIR /app
 COPY . .
 
