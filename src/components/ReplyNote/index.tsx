@@ -54,14 +54,16 @@ export default function ReplyNote({
           <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
         </div>
         {parentEvent && (
-          <ParentNotePreview
-            className="mt-1"
-            event={parentEvent}
-            onClick={(e) => {
-              e.stopPropagation()
-              onClickParent(parentEvent.id)
-            }}
-          />
+          <>
+            <ParentNotePreview
+              className="mt-1"
+              event={parentEvent}
+              onClick={(e) => {
+                e.stopPropagation()
+                onClickParent(parentEvent.id)
+              }}
+            />
+          </>
         )}
         {show ? (
           <>
