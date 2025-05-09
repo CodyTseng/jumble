@@ -229,7 +229,7 @@ export default {
     Autoplay: 'Reprodução automática',
     'Enable video autoplay on this device':
       'Habilitar reprodução automática de vídeo neste dispositivo',
-    'Paste or drop media files to upload': 'Cole ou arraste e solte arquivos de mídia para fazer upload',
+    'Paste or drop media files to upload': 'Cole ou arraste arquivos de mídia para fazer o upload',
     Preview: 'Pré-visualização'
   }
 }
