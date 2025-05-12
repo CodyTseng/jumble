@@ -1,4 +1,4 @@
-import { Dispatch, useEffect, useMemo, useRef } from 'react'
+import { Dispatch, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -38,42 +38,19 @@ export default function PostEditor({
   const { isSmallScreen } = useScreenSize()
   const drawerContentRef = useRef<HTMLDivElement | null>(null)
 
-  // Detect iOS Safari
-  const isIOS = typeof navigator !== 'undefined' && /iP(ad|hone|od)/.test(navigator.userAgent)
+  const [viewportHeight, setViewportHeight] = useState('100vh')
 
-  // 1. --vh CSS variable to handle dynamic viewport height on iOS Safari only
   useEffect(() => {
-    if (!isIOS) return
-    const setVh = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
-    }
-    window.addEventListener('resize', setVh)
-    setVh()
-    return () => window.removeEventListener('resize', setVh)
-  }, [isIOS])
-
-  // 2. visualViewport listener to adjust bottom offset when keyboard opens, only on iOS Safari
-  useEffect(() => {
-    if (!isIOS || !window.visualViewport) return
-
-    const vv = window.visualViewport
-
-    const updateDrawerHeight = () => {
-      if (drawerContentRef.current) {
-        const height = vv.height
-        drawerContentRef.current.style.height = `${height}px`
-      }
+    const handleResize = () => {
+      const vh = window.innerHeight * 0.01
+      setViewportHeight(`${vh * 100}px`)
     }
 
-    vv.addEventListener('resize', updateDrawerHeight)
-    vv.addEventListener('scroll', updateDrawerHeight)
-    updateDrawerHeight()
+    handleResize() // initial run
+    window.addEventListener('resize', handleResize)
 
-    return () => {
-      vv.removeEventListener('resize', updateDrawerHeight)
-      vv.removeEventListener('scroll', updateDrawerHeight)
-    }
-  }, [isIOS])
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const content = useMemo(() => {
     return parentEvent || defaultContent ? (
@@ -109,12 +86,8 @@ export default function PostEditor({
         <DrawerContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           ref={drawerContentRef}
+          style={{ height: viewportHeight, paddingBottom: 'env(safe-area-inset-bottom)' }}
           className="flex flex-col px-4 pt-10"
-          style={{
-            height: isIOS ? undefined : '100vh',
-            bottom: '0',
-            paddingBottom: 'env(safe-area-inset-bottom)'
-          }}
         >
           <DrawerHeader>
             <DrawerTitle className="text-start">
@@ -146,3 +119,40 @@ export default function PostEditor({
     </Dialog>
   )
 }
+
+// Detect iOS Safari
+// const isIOS = typeof navigator !== 'undefined' && /iP(ad|hone|od)/.test(navigator.userAgent)
+
+// // 1. --vh CSS variable to handle dynamic viewport height on iOS Safari only
+// useEffect(() => {
+//   if (!isIOS) return
+//   const setVh = () => {
+//     document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+//   }
+//   window.addEventListener('resize', setVh)
+//   setVh()
+//   return () => window.removeEventListener('resize', setVh)
+// }, [isIOS])
+
+// // 2. visualViewport listener to adjust bottom offset when keyboard opens, only on iOS Safari
+// useEffect(() => {
+//   if (!isIOS || !window.visualViewport) return
+
+//   const vv = window.visualViewport
+
+//   const updateDrawerHeight = () => {
+//     if (drawerContentRef.current) {
+//       const height = vv.height
+//       drawerContentRef.current.style.height = `${height}px`
+//     }
+//   }
+
+//   vv.addEventListener('resize', updateDrawerHeight)
+//   vv.addEventListener('scroll', updateDrawerHeight)
+//   updateDrawerHeight()
+
+//   return () => {
+//     vv.removeEventListener('resize', updateDrawerHeight)
+//     vv.removeEventListener('scroll', updateDrawerHeight)
+//   }
+// }, [isIOS])
