@@ -419,6 +419,7 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
 
   let senderPubkey: string | undefined
   let recipientPubkey: string | undefined
+  let originalEventId: string | undefined
   let eventId: string | undefined
   let invoice: string | undefined
   let amount: number | undefined
@@ -436,6 +437,7 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
           recipientPubkey = tagValue
           break
         case 'e':
+          originalEventId = tag[1]
           eventId = generateEventIdFromETag(tag)
           break
         case 'bolt11':
@@ -467,6 +469,7 @@ export function extractZapInfoFromReceipt(receiptEvent: Event) {
       senderPubkey,
       recipientPubkey,
       eventId,
+      originalEventId,
       invoice,
       amount,
       comment,

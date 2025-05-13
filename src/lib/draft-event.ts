@@ -301,10 +301,10 @@ export function createBookmarkDraftEvent(tags: string[][], content = ''): TDraft
 }
 
 function generateImetaTags(imageUrls: string[], pictureInfos: { url: string; tags: string[][] }[]) {
-  return imageUrls.map((imageUrl) => {
-    const pictureInfo = pictureInfos.find((info) => info.url === imageUrl)
-    return pictureInfo
-      ? ['imeta', ...pictureInfo.tags.map(([n, v]) => `${n} ${v}`)]
-      : ['imeta', `url ${imageUrl}`]
-  })
+  return imageUrls
+    .map((imageUrl) => {
+      const pictureInfo = pictureInfos.find((info) => info.url === imageUrl)
+      return pictureInfo ? ['imeta', ...pictureInfo.tags.map(([n, v]) => `${n} ${v}`)] : null
+    })
+    .filter(Boolean) as string[][]
 }

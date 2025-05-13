@@ -1,4 +1,5 @@
-import { cn } from '@/lib/utils'
+import { cn, isInViewport } from '@/lib/utils'
+import { useAutoplay } from '@/providers/AutoplayProvider'
 import videoManager from '@/services/video-manager.service'
 import { useEffect, useRef } from 'react'
 import NsfwOverlay from '../NsfwOverlay'
@@ -6,18 +7,19 @@ import NsfwOverlay from '../NsfwOverlay'
 export default function VideoPlayer({
   src,
   className,
-  isNsfw = false,
-  size = 'normal'
+  isNsfw = false
 }: {
   src: string
   className?: string
   isNsfw?: boolean
-  size?: 'normal' | 'small'
 }) {
+  const { autoplay } = useAutoplay()
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!autoplay) return
+
     const video = videoRef.current
     const container = containerRef.current
 
@@ -25,11 +27,17 @@ export default function VideoPlayer({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting && !video.paused) {
-          videoManager.enterPiP(video)
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            if (isInViewport(container)) {
+              videoManager.autoPlay(video)
+            }
+          }, 200)
+        } else {
+          videoManager.pause(video)
         }
       },
-      { threshold: 0.5 }
+      { threshold: 1 }
     )
 
     observer.observe(container)
@@ -37,14 +45,7 @@ export default function VideoPlayer({
     return () => {
       observer.unobserve(container)
     }
-  }, [])
-
-  const handlePlay = async () => {
-    const video = videoRef.current
-    if (!video) return
-
-    await videoManager.playVideo(video)
-  }
+  }, [autoplay])
 
   return (
     <div ref={containerRef} className="relative">
@@ -52,10 +53,13 @@ export default function VideoPlayer({
         ref={videoRef}
         controls
         playsInline
-        className={cn('rounded-lg', size === 'small' ? 'max-h-[30vh]' : 'max-h-[50vh]', className)}
+        className={cn('rounded-lg max-h-[80vh] sm:max-h-[50vh] border', className)}
         src={src}
         onClick={(e) => e.stopPropagation()}
-        onPlay={handlePlay}
+        onPlay={(event) => {
+          videoManager.play(event.currentTarget)
+        }}
+        muted
       />
       {isNsfw && <NsfwOverlay className="rounded-lg" />}
     </div>

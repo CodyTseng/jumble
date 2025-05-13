@@ -1,78 +1,39 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
-import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toPostSettings, toRelaySettings, toWallet } from '@/lib/link'
+import { toGeneralSettings, toPostSettings, toRelaySettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { useTheme } from '@/providers/ThemeProvider'
-import { SelectValue } from '@radix-ui/react-select'
 import {
   Check,
   ChevronRight,
   Copy,
   Info,
   KeyRound,
-  Languages,
   PencilLine,
   Server,
-  SunMoon,
+  Settings2,
   Wallet
 } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { nsec, ncryptsec } = useNostr()
   const { push } = useSecondaryPage()
-  const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
-  const { themeSetting, setThemeSetting } = useTheme()
   const [copiedNsec, setCopiedNsec] = useState(false)
   const [copiedNcryptsec, setCopiedNcryptsec] = useState(false)
 
-  const handleLanguageChange = (value: TLanguage) => {
-    i18n.changeLanguage(value)
-    setLanguage(value)
-  }
-
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Settings')}>
-      <SettingItem>
+      <SettingItem className="clickable" onClick={() => push(toGeneralSettings())}>
         <div className="flex items-center gap-4">
-          <Languages />
-          <div>{t('Languages')}</div>
+          <Settings2 />
+          <div>{t('General')}</div>
         </div>
-        <Select defaultValue="en" value={language} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(LocalizedLanguageNames).map(([key, value]) => (
-              <SelectItem key={key} value={key}>
-                {value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </SettingItem>
-      <SettingItem>
-        <div className="flex items-center gap-4">
-          <SunMoon />
-          <div>{t('Theme')}</div>
-        </div>
-        <Select defaultValue="system" value={themeSetting} onValueChange={setThemeSetting}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="system">{t('System')}</SelectItem>
-            <SelectItem value="light">{t('Light')}</SelectItem>
-            <SelectItem value="dark">{t('Dark')}</SelectItem>
-          </SelectContent>
-        </Select>
+        <ChevronRight />
       </SettingItem>
       <SettingItem className="clickable" onClick={() => push(toRelaySettings())}>
         <div className="flex items-center gap-4">

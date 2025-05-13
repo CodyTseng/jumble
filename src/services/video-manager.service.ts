@@ -6,59 +6,59 @@ class VideoManagerService {
   constructor() {
     if (!VideoManagerService.instance) {
       VideoManagerService.instance = this
-      document.addEventListener('leavepictureinpicture', (e) => {
-        ;(e.target as HTMLVideoElement).pause()
-      })
     }
     return VideoManagerService.instance
   }
 
-  enterPiP(video: HTMLVideoElement) {
-    if (this.currentVideo && this.currentVideo !== video) {
-      this.exitPiP(this.currentVideo)
+  pause(video: HTMLVideoElement) {
+    if (isPipElement(video)) {
+      return
     }
-
-    if (
-      (video as any).webkitSupportsPresentationMode &&
-      typeof (video as any).webkitSetPresentationMode === 'function'
-    ) {
-      ;(video as any).webkitSetPresentationMode('picture-in-picture')
-      setTimeout(() => {
-        if ((video as any).webkitPresentationMode !== 'picture-in-picture') {
-          video.pause()
-        }
-      }, 10)
-    } else {
-      video.requestPictureInPicture().catch(() => {
-        video.pause()
-      })
-    }
-  }
-
-  private exitPiP(video: HTMLVideoElement) {
-    video.pause()
-    if (
-      (video as any).webkitSupportsPresentationMode &&
-      typeof (video as any).webkitSetPresentationMode === 'function'
-    ) {
-      ;(video as any).webkitSetPresentationMode('inline')
-    } else {
-      document.exitPictureInPicture()
-    }
-
     if (this.currentVideo === video) {
       this.currentVideo = null
     }
+    video.pause()
   }
 
-  async playVideo(video: HTMLVideoElement) {
+  autoPlay(video: HTMLVideoElement) {
+    if (
+      document.pictureInPictureElement &&
+      isVideoPlaying(document.pictureInPictureElement as HTMLVideoElement)
+    ) {
+      return
+    }
+    this.play(video)
+  }
+
+  play(video: HTMLVideoElement) {
+    if (document.pictureInPictureElement && document.pictureInPictureElement !== video) {
+      ;(document.pictureInPictureElement as HTMLVideoElement).pause()
+    }
     if (this.currentVideo && this.currentVideo !== video) {
-      this.exitPiP(this.currentVideo)
+      this.currentVideo.pause()
     }
     this.currentVideo = video
-    video.play()
+    if (isVideoPlaying(video)) {
+      return
+    }
+
+    this.currentVideo.play().catch((error) => {
+      console.error('Error playing video:', error)
+      this.currentVideo = null
+    })
   }
 }
 
 const instance = new VideoManagerService()
 export default instance
+
+function isVideoPlaying(video: HTMLVideoElement) {
+  return video.currentTime > 0 && !video.paused && !video.ended && video.readyState >= 2
+}
+
+function isPipElement(video: HTMLVideoElement) {
+  if (document.pictureInPictureElement === video) {
+    return true
+  }
+  return (video as any).webkitPresentationMode === 'picture-in-picture'
+}

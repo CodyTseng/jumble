@@ -8,7 +8,7 @@ import { ChevronDown, Loader, LoaderCircle, Plus, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
-import TextareaWithMentions from '../TextareaWithMentions'
+import PostTextarea from '../PostTextarea'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions'
 import SendOnlyToSwitch from './SendOnlyToSwitch'
@@ -105,7 +105,7 @@ export default function PicturePostContent({ close }: { close: () => void }) {
         {t('A special note for picture-first clients like Olas')}
       </div>
       <PictureUploader pictureInfos={pictureInfos} setPictureInfos={setPictureInfos} />
-      <TextareaWithMentions
+      <PostTextarea
         className="h-32"
         setTextValue={setContent}
         textValue={content}

@@ -110,8 +110,6 @@ export default {
     'Picture note requires images': 'ملاحظة الصورة تتطلب صور',
     Relays: 'الريلايات',
     image: 'صورة',
-    'Normal Note': 'ملاحظة عادية',
-    'Picture Note': 'ملاحظة الصورة',
     'R & W': 'قراءة وكتابة',
     Read: 'قراءة',
     Write: 'كتابة',
@@ -223,6 +221,14 @@ export default {
     'Remove bookmark': 'إزالة الإشارة',
     'no bookmarks found': 'لم يتم العثور على إشارات',
     'no more bookmarks': 'لا مزيد من الإشارات',
-    Bookmarks: 'الإشارات المرجعية'
+    Bookmarks: 'الإشارات المرجعية',
+    'Show more': 'عرض المزيد',
+    General: 'عام',
+    Autoplay: 'التشغيل التلقائي',
+    'Enable video autoplay on this device': 'تمكين التشغيل التلقائي للفيديو على هذا الجهاز',
+    'Paste or drop media files to upload': 'الصق أو اسحب ملفات الوسائط لتحميلها',
+    Preview: 'معاينة',
+    'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
+      'أنت على وشك نشر حدث موقع من قبل [{{eventAuthorName}}]. أنت حالياً مسجل الدخول كـ [{{currentUsername}}]. هل أنت متأكد؟'
   }
 }

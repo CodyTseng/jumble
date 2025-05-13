@@ -514,11 +514,30 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
 
     const event = await signEvent(draftEvent)
-    const relays = specifiedRelayUrls?.length
-      ? specifiedRelayUrls
-      : (relayList?.write.slice(0, 10) ?? [])
-          .concat(Array.from(new Set(additionalRelayUrls)) ?? [])
-          .concat(client.getCurrentRelayUrls())
+
+    if (event.pubkey !== account.pubkey) {
+      const eventAuthor = await client.fetchProfile(event.pubkey)
+      const result = confirm(
+        t(
+          'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?',
+          { eventAuthorName: eventAuthor?.username, currentUsername: profile?.username }
+        )
+      )
+      if (!result) {
+        throw new Error(t('Cancelled'))
+      }
+    }
+
+    let relays: string[]
+    if (specifiedRelayUrls?.length) {
+      relays = specifiedRelayUrls
+    } else {
+      const relayList = await client.fetchRelayList(event.pubkey)
+      relays = (relayList?.write.slice(0, 10) ?? [])
+        .concat(Array.from(new Set(additionalRelayUrls)) ?? [])
+        .concat(client.getCurrentRelayUrls())
+    }
+
     if (!relays.length) {
       relays.push(...BIG_RELAY_URLS)
     }

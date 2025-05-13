@@ -1,11 +1,11 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { generateImageByPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { UserRound } from 'lucide-react'
 import { useMemo } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { Skeleton } from '../ui/skeleton'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function AccountButton() {

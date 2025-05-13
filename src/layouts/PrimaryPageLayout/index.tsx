@@ -26,7 +26,7 @@ const PrimaryPageLayout = forwardRef(
     const smallScreenScrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenLastScrollTopRef = useRef(0)
     const { isSmallScreen } = useScreenSize()
-    const { current } = usePrimaryPage()
+    const { current, display } = usePrimaryPage()
 
     useImperativeHandle(
       ref,
@@ -44,7 +44,7 @@ const PrimaryPageLayout = forwardRef(
     useEffect(() => {
       if (isSmallScreen) {
         if (smallScreenScrollAreaRef.current?.checkVisibility()) {
-          window.scrollTo({ top: smallScreenLastScrollTopRef.current })
+          window.scrollTo({ top: smallScreenLastScrollTopRef.current, behavior: 'instant' })
         }
         const handleScroll = () => {
           if (smallScreenScrollAreaRef.current?.checkVisibility()) {
@@ -56,7 +56,7 @@ const PrimaryPageLayout = forwardRef(
           window.removeEventListener('scroll', handleScroll)
         }
       }
-    }, [current, isSmallScreen])
+    }, [current, isSmallScreen, display])
 
     if (isSmallScreen) {
       return (

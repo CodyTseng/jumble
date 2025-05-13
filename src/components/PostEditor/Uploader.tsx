@@ -20,14 +20,15 @@ export default function Uploader({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    if (!event.target.files) return
 
+    onUploadingChange?.(true)
     try {
-      onUploadingChange?.(true)
-      const result = await upload(file)
-      console.log('File uploaded successfully', result)
-      onUploadSuccess(result)
+      for (const file of event.target.files) {
+        const result = await upload(file)
+        console.log('File uploaded successfully', result)
+        onUploadSuccess(result)
+      }
     } catch (error) {
       console.error('Error uploading file', error)
       toast({
@@ -59,6 +60,7 @@ export default function Uploader({
         style={{ display: 'none' }}
         onChange={handleFileChange}
         accept={accept}
+        multiple
       />
     </div>
   )

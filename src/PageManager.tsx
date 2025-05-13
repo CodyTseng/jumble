@@ -1,6 +1,6 @@
 import Sidebar from '@/components/Sidebar'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
+import { cn, isAndroid } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
 import HomePage from '@/pages/secondary/HomePage'
 import { TPageRef } from '@/types'
@@ -20,12 +20,14 @@ import NotificationListPage from './pages/primary/NotificationListPage'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { routes } from './routes'
+import modalManager from './services/modal-manager.service'
 
 export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
 type TPrimaryPageContext = {
   navigate: (page: TPrimaryPageName) => void
   current: TPrimaryPageName | null
+  display: boolean
 }
 
 type TSecondaryPageContext = {
@@ -115,6 +117,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
 
     const onPopState = (e: PopStateEvent) => {
+      const closeModal = modalManager.pop()
+      if (closeModal) return
+
       let state = e.state as { index: number; url: string } | null
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
@@ -136,10 +141,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         }
 
         if (state.index === currentIndex) {
-          if (currentIndex !== 0) return pre
-
-          window.history.replaceState(null, '', '/')
-          return []
+          return pre
         }
 
         // Go back
@@ -171,41 +173,63 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       })
     }
 
+    const onLeave = (event: BeforeUnloadEvent) => {
+      // Cancel the event as stated by the standard.
+      event.preventDefault()
+      // Chrome requires returnValue to be set.
+      event.returnValue = ''
+    }
+
     window.addEventListener('popstate', onPopState)
+
+    if (isAndroid()) {
+      window.addEventListener('beforeunload', onLeave)
+    }
 
     return () => {
       window.removeEventListener('popstate', onPopState)
+
+      if (isAndroid()) {
+        window.removeEventListener('beforeunload', onLeave)
+      }
     }
   }, [])
 
   const navigatePrimaryPage = (page: TPrimaryPageName) => {
+    const needScrollToTop = page === currentPrimaryPage
     const exists = primaryPages.find((p) => p.name === page)
     if (!exists) {
       setPrimaryPages((prev) => [...prev, { name: page, element: PRIMARY_PAGE_MAP[page] }])
     }
     setCurrentPrimaryPage(page)
-    PRIMARY_PAGE_REF_MAP[page].current?.scrollToTop()
+    if (needScrollToTop) {
+      PRIMARY_PAGE_REF_MAP[page].current?.scrollToTop()
+    }
     if (isSmallScreen) {
       clearSecondaryPages()
     }
   }
 
   const pushSecondaryPage = (url: string, index?: number) => {
-    setSecondaryStack((prevStack) => {
-      if (isCurrentPage(prevStack, url)) {
-        const currentItem = prevStack[prevStack.length - 1]
-        if (currentItem?.ref?.current) {
-          currentItem.ref.current.scrollToTop()
+    // FIXME: Temporary solution to prevent the back action after closing
+    // the modal when navigating.
+    setTimeout(() => {
+      setSecondaryStack((prevStack) => {
+        if (isCurrentPage(prevStack, url)) {
+          const currentItem = prevStack[prevStack.length - 1]
+          if (currentItem?.ref?.current) {
+            currentItem.ref.current.scrollToTop()
+          }
+          return prevStack
         }
-        return prevStack
-      }
 
-      const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize, index)
-      if (newItem) {
-        window.history.pushState({ index: newItem.index, url }, '', url)
-      }
-      return newStack
-    })
+        const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize, index)
+        if (newItem) {
+          window.history.pushState({ index: newItem.index, url }, '', url)
+        }
+        return newStack
+      })
+    }, 10)
   }
 
   const popSecondaryPage = () => {
@@ -229,7 +253,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       <PrimaryPageContext.Provider
         value={{
           navigate: navigatePrimaryPage,
-          current: secondaryStack.length === 0 ? currentPrimaryPage : null
+          current: currentPrimaryPage,
+          display: secondaryStack.length === 0
         }}
       >
         <SecondaryPageContext.Provider
@@ -275,7 +300,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       <PrimaryPageContext.Provider
         value={{
           navigate: navigatePrimaryPage,
-          current: currentPrimaryPage
+          current: currentPrimaryPage,
+          display: false
         }}
       >
         <SecondaryPageContext.Provider
@@ -306,7 +332,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     <PrimaryPageContext.Provider
       value={{
         navigate: navigatePrimaryPage,
-        current: currentPrimaryPage
+        current: currentPrimaryPage,
+        display: true
       }}
     >
       <SecondaryPageContext.Provider

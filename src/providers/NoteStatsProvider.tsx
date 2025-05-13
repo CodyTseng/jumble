@@ -170,11 +170,11 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
       if (evt.kind === kinds.Zap) {
         const info = extractZapInfoFromReceipt(evt)
         if (!info) return
-        const { eventId, senderPubkey, invoice, amount, comment } = info
-        if (!eventId || !senderPubkey) return
-        const newZaps = newZapsMap.get(eventId) || []
+        const { originalEventId, senderPubkey, invoice, amount, comment } = info
+        if (!originalEventId || !senderPubkey) return
+        const newZaps = newZapsMap.get(originalEventId) || []
         newZaps.push({ pr: invoice, pubkey: senderPubkey, amount, comment })
-        newZapsMap.set(eventId, newZaps)
+        newZapsMap.set(originalEventId, newZaps)
         return
       }
     })

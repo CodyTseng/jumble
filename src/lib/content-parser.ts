@@ -1,3 +1,14 @@
+import {
+  EMBEDDED_EVENT_REGEX,
+  EMBEDDED_MENTION_REGEX,
+  EMOJI_SHORT_CODE_REGEX,
+  HASHTAG_REGEX,
+  IMAGE_REGEX,
+  URL_REGEX,
+  VIDEO_REGEX,
+  WS_URL_REGEX
+} from '@/constants'
+
 export type TEmbeddedNodeType =
   | 'text'
   | 'image'
@@ -25,12 +36,12 @@ type TContentParser = { type: Exclude<TEmbeddedNodeType, 'images'>; regex: RegEx
 
 export const EmbeddedHashtagParser: TContentParser = {
   type: 'hashtag',
-  regex: /#[\p{L}\p{N}\p{M}_]+/gu
+  regex: HASHTAG_REGEX
 }
 
 export const EmbeddedMentionParser: TContentParser = {
   type: 'mention',
-  regex: /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+)/g
+  regex: EMBEDDED_MENTION_REGEX
 }
 
 export const EmbeddedLegacyMentionParser: TContentParser = {
@@ -40,34 +51,32 @@ export const EmbeddedLegacyMentionParser: TContentParser = {
 
 export const EmbeddedEventParser: TContentParser = {
   type: 'event',
-  regex: /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
+  regex: EMBEDDED_EVENT_REGEX
 }
 
 export const EmbeddedImageParser: TContentParser = {
   type: 'image',
-  regex:
-    /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+\.(jpg|jpeg|png|gif|webp|bmp|tiff|heic|svg)(\?[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+)?/giu
+  regex: IMAGE_REGEX
 }
 
 export const EmbeddedVideoParser: TContentParser = {
   type: 'video',
-  regex:
-    /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+\.(mp4|webm|ogg|mov)(\?[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+)?/giu
+  regex: VIDEO_REGEX
 }
 
 export const EmbeddedWebsocketUrlParser: TContentParser = {
   type: 'websocket-url',
-  regex: /wss?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+/gu
+  regex: WS_URL_REGEX
 }
 
 export const EmbeddedNormalUrlParser: TContentParser = {
   type: 'url',
-  regex: /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+/gu
+  regex: URL_REGEX
 }
 
 export const EmbeddedEmojiParser: TContentParser = {
   type: 'emoji',
-  regex: /:[a-zA-Z0-9_-]+:/g
+  regex: EMOJI_SHORT_CODE_REGEX
 }
 
 export function parseContent(content: string, parsers: TContentParser[]) {

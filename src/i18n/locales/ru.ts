@@ -112,8 +112,6 @@ export default {
     'Picture note requires images': 'Заметка с изображением требует наличия изображений',
     Relays: 'Ретрансляторы',
     image: 'изображение',
-    'Normal Note': 'Обычная заметка',
-    'Picture Note': 'Заметка с изображением',
     'R & W': 'Чтение & Запись',
     Read: 'Читать',
     Write: 'Писать',
@@ -227,6 +225,14 @@ export default {
     'Remove bookmark': 'Удалить закладку',
     'no bookmarks found': 'Закладки не найдены',
     'no more bookmarks': 'Больше нет закладок',
-    Bookmarks: 'Закладки'
+    Bookmarks: 'Закладки',
+    'Show more': 'Показать больше',
+    General: 'Общие',
+    Autoplay: 'Автовоспроизведение',
+    'Enable video autoplay on this device': 'Включить автовоспроизведение видео на этом устройстве',
+    'Paste or drop media files to upload': 'Вставьте или перетащите медиафайлы для загрузки',
+    Preview: 'Предварительный просмотр',
+    'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
+      'Вы собираетесь опубликовать событие, подписанное [{{eventAuthorName}}]. Вы в данный момент вошли как [{{currentUsername}}]. Вы уверены?'
   }
 }

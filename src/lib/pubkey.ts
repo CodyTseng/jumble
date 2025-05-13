@@ -32,12 +32,17 @@ export function pubkeyToNpub(pubkey: string) {
 }
 
 export function userIdToPubkey(userId: string) {
-  if (userId.startsWith('npub1')) {
-    const { data } = nip19.decode(userId as `npub1${string}`)
-    return data
-  } else if (userId.startsWith('nprofile1')) {
-    const { data } = nip19.decode(userId as `nprofile1${string}`)
-    return data.pubkey
+  if (userId.startsWith('npub1') || userId.startsWith('nprofile1')) {
+    try {
+      const { type, data } = nip19.decode(userId)
+      if (type === 'npub') {
+        return data
+      } else if (type === 'nprofile') {
+        return data.pubkey
+      }
+    } catch (error) {
+      console.error('Error decoding userId:', userId, 'error:', error)
+    }
   }
   return userId
 }

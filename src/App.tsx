@@ -4,6 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { PageManager } from './PageManager'
+import { AutoplayProvider } from './providers/AutoplayProvider'
 import { BookmarksProvider } from './providers/BookmarksProvider'
 import { FavoriteRelaysProvider } from './providers/FavoriteRelaysProvider'
 import { FeedProvider } from './providers/FeedProvider'
@@ -18,28 +19,30 @@ import { ZapProvider } from './providers/ZapProvider'
 export default function App(): JSX.Element {
   return (
     <ThemeProvider>
-      <ScreenSizeProvider>
-        <NostrProvider>
-          <ZapProvider>
-            <FavoriteRelaysProvider>
-              <FollowListProvider>
-                <MuteListProvider>
-                  <BookmarksProvider>
-                    <FeedProvider>
-                      <NoteStatsProvider>
-                        <MediaUploadServiceProvider>
-                          <PageManager />
-                          <Toaster />
-                        </MediaUploadServiceProvider>
-                      </NoteStatsProvider>
-                    </FeedProvider>
-                  </BookmarksProvider>
-                </MuteListProvider>
-              </FollowListProvider>
-            </FavoriteRelaysProvider>
-          </ZapProvider>
-        </NostrProvider>
-      </ScreenSizeProvider>
+      <AutoplayProvider>
+        <ScreenSizeProvider>
+          <NostrProvider>
+            <ZapProvider>
+              <FavoriteRelaysProvider>
+                <FollowListProvider>
+                  <MuteListProvider>
+                    <BookmarksProvider>
+                      <FeedProvider>
+                        <NoteStatsProvider>
+                          <MediaUploadServiceProvider>
+                            <PageManager />
+                            <Toaster />
+                          </MediaUploadServiceProvider>
+                        </NoteStatsProvider>
+                      </FeedProvider>
+                    </BookmarksProvider>
+                  </MuteListProvider>
+                </FollowListProvider>
+              </FavoriteRelaysProvider>
+            </ZapProvider>
+          </NostrProvider>
+        </ScreenSizeProvider>
+      </AutoplayProvider>
     </ThemeProvider>
   )
 }

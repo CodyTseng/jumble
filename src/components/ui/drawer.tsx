@@ -1,14 +1,52 @@
 import * as React from 'react'
 import { Drawer as DrawerPrimitive } from 'vaul'
 
+import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
+import modalManager from '@/services/modal-manager.service'
 
 const Drawer = ({
   shouldScaleBackground = true,
+  open,
+  onOpenChange,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
-  <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
-)
+}: React.ComponentProps<typeof DrawerPrimitive.Root>) => {
+  const [innerOpen, setInnerOpen] = React.useState(open ?? false)
+  const id = React.useMemo(() => `drawer-${randomString()}`, [])
+
+  React.useEffect(() => {
+    if (open) {
+      modalManager.register(id, () => {
+        onOpenChange?.(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (open !== undefined) {
+      return
+    }
+
+    if (innerOpen) {
+      modalManager.register(id, () => {
+        setInnerOpen(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [innerOpen])
+
+  return (
+    <DrawerPrimitive.Root
+      shouldScaleBackground={shouldScaleBackground}
+      open={open ?? innerOpen}
+      onOpenChange={onOpenChange ?? setInnerOpen}
+      {...props}
+    />
+  )
+}
 Drawer.displayName = 'Drawer'
 
 const DrawerTrigger = DrawerPrimitive.Trigger
@@ -90,13 +128,13 @@ DrawerDescription.displayName = DrawerPrimitive.Description.displayName
 
 export {
   Drawer,
-  DrawerPortal,
-  DrawerOverlay,
-  DrawerTrigger,
   DrawerClose,
   DrawerContent,
-  DrawerHeader,
+  DrawerDescription,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
   DrawerTitle,
-  DrawerDescription
+  DrawerTrigger
 }

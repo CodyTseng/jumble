@@ -111,8 +111,6 @@ export default {
     'Picture note requires images': 'La nota illustrativa richiede immagini',
     Relays: 'Relays',
     image: 'immagine',
-    'Normal Note': 'Nota Normale',
-    'Picture Note': 'Nota Immagine',
     'R & W': 'L & S',
     Read: 'Leggi',
     Write: 'Scrivi',
@@ -226,6 +224,15 @@ export default {
     'Remove bookmark': 'Rimuovi segnalibro',
     'no bookmarks found': 'Nessun segnalibro trovato',
     'no more bookmarks': 'Nessun altro segnalibro',
-    Bookmarks: 'Segnalibri'
+    Bookmarks: 'Segnalibri',
+    'Show more': 'Mostra di più',
+    General: 'Generale',
+    Autoplay: 'Riproduzione automatica',
+    'Enable video autoplay on this device':
+      'Abilita riproduzione automatica video su questo dispositivo',
+    'Paste or drop media files to upload': 'Incolla o trascina i file multimediali per caricarli',
+    Preview: 'Anteprima',
+    'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
+      'Stai per pubblicare un evento firmato da [{{eventAuthorName}}]. Attualmente sei connesso come [{{currentUsername}}]. Sei sicuro?'
   }
 }

@@ -42,6 +42,18 @@ npm install
 # Run the app
 npm run dev
 ```
+## Run Docker
+```bash
+# Clone this repository
+git clone https://github.com/CodyTseng/jumble.git
+
+# Go into the repository
+cd jumble
+
+# Run the docker compose
+docker compose up --build -d
+```
+After finishing, access: http://localhost:8089
 
 ## Donate
 

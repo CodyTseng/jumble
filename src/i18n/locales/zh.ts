@@ -110,8 +110,6 @@ export default {
     Relays: '服务器',
     image: '图片',
     Normal: '普通',
-    'Normal Note': '普通笔记',
-    'Picture Note': '图片笔记',
     'R & W': '读写',
     Read: '只读',
     Write: '只写',
@@ -224,6 +222,14 @@ export default {
     'Remove bookmark': '取消收藏',
     'no bookmarks found': '暂无收藏',
     'no more bookmarks': '到底了',
-    Bookmarks: '收藏'
+    Bookmarks: '收藏',
+    'Show more': '显示更多',
+    General: '常规',
+    Autoplay: '自动播放',
+    'Enable video autoplay on this device': '在此设备上启用视频自动播放',
+    'Paste or drop media files to upload': '支持粘贴或拖放媒体文件进行上传',
+    Preview: '预览',
+    'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
+      '您即将发布一条由 [{{eventAuthorName}}] 签名的事件。您当前以 [{{currentUsername}}] 登录。确定吗？'
   }
 }

@@ -8,7 +8,6 @@ import {
 } from '@/lib/event'
 import { generateEventIdFromETag } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
-import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import client from '@/services/client.service'
 import { Event as NEvent, kinds } from 'nostr-tools'
@@ -29,7 +28,6 @@ export default function ReplyNoteList({
 }) {
   const { t } = useTranslation()
   const { currentIndex } = useSecondaryPage()
-  const { pubkey } = useNostr()
   const [rootInfo, setRootInfo] = useState<{ id: string; pubkey: string } | undefined>(undefined)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [until, setUntil] = useState<number | undefined>(undefined)
@@ -67,6 +65,13 @@ export default function ReplyNoteList({
     fetchRootEvent()
   }, [event])
 
+  const onNewReply = useCallback((evt: NEvent) => {
+    setEvents((pre) => {
+      if (pre.some((reply) => reply.id === evt.id)) return pre
+      return [...pre, evt]
+    })
+  }, [])
+
   useEffect(() => {
     if (!rootInfo) return
     const handleEventPublished = (data: Event) => {
@@ -82,7 +87,7 @@ export default function ReplyNoteList({
     return () => {
       client.removeEventListener('eventPublished', handleEventPublished)
     }
-  }, [rootInfo])
+  }, [rootInfo, onNewReply])
 
   useEffect(() => {
     if (loading || !rootInfo || currentIndex !== index) return
@@ -134,7 +139,7 @@ export default function ReplyNoteList({
     return () => {
       promise.then((closer) => closer?.())
     }
-  }, [rootInfo, currentIndex, index])
+  }, [rootInfo, currentIndex, index, onNewReply])
 
   useEffect(() => {
     const replies: NEvent[] = []
@@ -143,8 +148,6 @@ export default function ReplyNoteList({
     const rootEventId = getRootEventHexId(event) ?? event.id
     const isRootEvent = rootEventId === event.id
     for (const evt of events) {
-      if (evt.created_at < event.created_at) continue
-
       const parentEventId = getParentEventHexId(evt)
       if (parentEventId) {
         const parentReplyInfo = replyMap.get(parentEventId)
@@ -181,24 +184,6 @@ export default function ReplyNoteList({
     setUntil(events.length ? events[events.length - 1].created_at - 1 : undefined)
     setLoading(false)
   }, [loading, until, timelineKey])
-
-  const onNewReply = useCallback(
-    (evt: NEvent) => {
-      setEvents((pre) => {
-        if (pre.some((reply) => reply.id === evt.id)) return pre
-        return [...pre, evt]
-      })
-      if (evt.pubkey === pubkey) {
-        setTimeout(() => {
-          if (bottomRef.current) {
-            bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-          }
-          highlightReply(evt.id, false)
-        }, 100)
-      }
-    },
-    [pubkey]
-  )
 
   const highlightReply = useCallback((eventId: string, scrollTo = true) => {
     if (scrollTo) {

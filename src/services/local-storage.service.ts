@@ -24,6 +24,7 @@ class LocalStorageService {
   private quickZap: boolean = false
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
   private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
+  private autoplay: boolean = true
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -88,6 +89,8 @@ class LocalStorageService {
 
     this.mediaUploadService =
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
+
+    this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -234,6 +237,15 @@ class LocalStorageService {
   setMediaUploadService(service: string) {
     this.mediaUploadService = service
     window.localStorage.setItem(StorageKey.MEDIA_UPLOAD_SERVICE, service)
+  }
+
+  getAutoplay() {
+    return this.autoplay
+  }
+
+  setAutoplay(autoplay: boolean) {
+    this.autoplay = autoplay
+    window.localStorage.setItem(StorageKey.AUTOPLAY, autoplay.toString())
   }
 }
 

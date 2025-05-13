@@ -9,7 +9,6 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import ImageGallery from '../ImageGallery'
 import NoteOptions from '../NoteOptions'
-import NoteStats from '../NoteStats'
 import ParentNotePreview from '../ParentNotePreview'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -18,16 +17,12 @@ export default function Note({
   event,
   size = 'normal',
   className,
-  hideParentNotePreview = false,
-  hideStats = false,
-  fetchNoteStats = false
+  hideParentNotePreview = false
 }: {
   event: Event
   size?: 'normal' | 'small'
   className?: string
   hideParentNotePreview?: boolean
-  hideStats?: boolean
-  fetchNoteStats?: boolean
 }) {
   const { push } = useSecondaryPage()
   const parentEventId = useMemo(
@@ -77,9 +72,6 @@ export default function Note({
       <Content className="mt-2" event={event} />
       {event.kind === ExtendedKind.PICTURE && imageInfos.length > 0 && (
         <ImageGallery images={imageInfos} />
-      )}
-      {!hideStats && (
-        <NoteStats className="mt-3" event={event} fetchIfNotExisting={fetchNoteStats} />
       )}
     </div>
   )

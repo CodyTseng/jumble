@@ -4,11 +4,29 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const getGitHash = () => {
+  try {
+    return JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim())
+  } catch (error) {
+    console.warn('Failed to retrieve commit hash:', error)
+    return '"unknown"'
+  }
+}
+
+const getAppVersion = () => {
+  try {
+    return JSON.stringify(require('./package.json').version)
+  } catch (error) {
+    console.warn('Failed to retrieve app version:', error)
+    return '"unknown"'
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    __GIT_COMMIT__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
-    __APP_VERSION__: JSON.stringify(require('./package.json').version)
+    __GIT_COMMIT__: getGitHash(),
+    __APP_VERSION__: getAppVersion()
   },
   resolve: {
     alias: {

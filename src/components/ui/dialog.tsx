@@ -1,10 +1,49 @@
-import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
+import * as React from 'react'
 
+import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
+import modalManager from '@/services/modal-manager.service'
 
-const Dialog = DialogPrimitive.Root
+const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
+  const [innerOpen, setInnerOpen] = React.useState(open ?? false)
+  const id = React.useMemo(() => `dialog-${randomString()}`, [])
+
+  React.useEffect(() => {
+    if (open) {
+      modalManager.register(id, () => {
+        onOpenChange?.(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (open !== undefined) {
+      return
+    }
+
+    if (innerOpen) {
+      modalManager.register(id, () => {
+        setInnerOpen(false)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [innerOpen])
+
+  return (
+    <DialogPrimitive.Root
+      open={open ?? innerOpen}
+      onOpenChange={onOpenChange ?? setInnerOpen}
+      {...props}
+    >
+      {children}
+    </DialogPrimitive.Root>
+  )
+}
 
 const DialogTrigger = DialogPrimitive.Trigger
 
@@ -31,11 +70,10 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     withoutClose?: boolean
-    hideOverlay?: boolean
   }
->(({ className, children, withoutClose, hideOverlay, ...props }, ref) => (
+>(({ className, children, withoutClose, ...props }, ref) => (
   <DialogPortal>
-    {!hideOverlay && <DialogOverlay />}
+    <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
@@ -95,13 +133,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogHeader,
+  DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
-  DialogDescription
+  DialogTrigger
 }

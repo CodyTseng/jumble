@@ -4,7 +4,6 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogOverlay,
   DialogTitle
 } from '@/components/ui/dialog'
 import {
@@ -99,8 +98,7 @@ export default function ZapDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogOverlay onClick={() => setOpen(false)} />
-      <DialogContent hideOverlay onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex gap-2 items-center">
             <div className="shrink-0">{t('Zap to')}</div>

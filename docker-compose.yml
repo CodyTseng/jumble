@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  jumble:
+    container_name: jumble-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8089:80"
+    restart: unless-stopped

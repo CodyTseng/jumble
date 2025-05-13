@@ -1,6 +1,7 @@
 import Note from '@/components/Note'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
@@ -9,7 +10,7 @@ import { ChevronDown, ImageUp, LoaderCircle } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import TextareaWithMentions from '../TextareaWithMentions'
+import PostTextarea from '../PostTextarea'
 import Mentions from './Mentions'
 import PostOptions from './PostOptions'
 import Preview from './Preview'
@@ -119,18 +120,33 @@ export default function NormalPostContent({
       {parentEvent && (
         <ScrollArea className="flex max-h-48 flex-col overflow-y-auto rounded-lg border bg-muted/40">
           <div className="p-2 sm:p-3 pointer-events-none">
-            <Note size="small" event={parentEvent} hideStats hideParentNotePreview />
+            <Note size="small" event={parentEvent} hideParentNotePreview />
           </div>
         </ScrollArea>
       )}
-      <TextareaWithMentions
-        className="h-32"
-        setTextValue={setContent}
-        textValue={content}
-        placeholder={t('Write something...')}
-        cursorOffset={cursorOffset}
-      />
-      {processedContent && <Preview content={processedContent} />}
+      <Tabs defaultValue="edit" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="edit">{t('Edit')}</TabsTrigger>
+          <TabsTrigger value="preview">{t('Preview')}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="edit">
+          <PostTextarea
+            className="h-52"
+            setTextValue={setContent}
+            textValue={content}
+            placeholder={
+              t('Write something...') + ' (' + t('Paste or drop media files to upload') + ')'
+            }
+            cursorOffset={cursorOffset}
+            onUploadImage={({ url, tags }) => {
+              setPictureInfos((prev) => [...prev, { url, tags }])
+            }}
+          />
+        </TabsContent>
+        <TabsContent value="preview">
+          <Preview content={processedContent} />
+        </TabsContent>
+      </Tabs>
       <SendOnlyToSwitch
         parentEvent={parentEvent}
         specifiedRelayUrls={specifiedRelayUrls}
@@ -141,7 +157,7 @@ export default function NormalPostContent({
           <Uploader
             onUploadSuccess={({ url, tags }) => {
               setPictureInfos((prev) => [...prev, { url, tags }])
-              setContent((prev) => `${prev}\n${url}`)
+              setContent((prev) => (prev === '' ? url : `${prev}\n${url}`))
             }}
             onUploadingChange={setUploadingPicture}
             accept="image/*,video/*,audio/*"

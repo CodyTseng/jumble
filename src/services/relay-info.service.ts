@@ -185,6 +185,11 @@ class RelayInfoService {
           triedNip11: oldRelayInfo.triedNip11 || relayInfo.triedNip11
         }
       : relayInfo
+
+    if (!Array.isArray(newRelayInfo.supported_nips)) {
+      newRelayInfo.supported_nips = []
+    }
+
     this.relayInfoMap.set(newRelayInfo.url, newRelayInfo)
     await this.relayInfoIndex.addAsync(
       newRelayInfo.url,
