@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ZapDialog from '../ZapDialog'
 import RecentSupporters from './RecentSupporters'
+import PlatinumSponsors from './PlatinumSponsors'
 
 export default function Donation({ className }: { className?: string }) {
   const { t } = useTranslation()
@@ -39,6 +40,7 @@ export default function Donation({ className }: { className?: string }) {
           )
         })}
       </div>
+      <PlatinumSponsors />
       <RecentSupporters />
       <ZapDialog
         open={open}

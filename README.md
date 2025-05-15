@@ -42,7 +42,9 @@ npm install
 # Run the app
 npm run dev
 ```
+
 ## Run Docker
+
 ```bash
 # Clone this repository
 git clone https://github.com/CodyTseng/jumble.git
@@ -53,7 +55,15 @@ cd jumble
 # Run the docker compose
 docker compose up --build -d
 ```
+
 After finishing, access: http://localhost:8089
+
+## Sponsors
+
+<a target="_blank" href="https://opensats.org/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none; color: inherit; font-size: 1.5rem; font-weight: 600;">
+  <img alt="opensats" src="https://github.com/OpenSats/website/blob/master/public/static/images/projects/opensats_logo.png?raw=true" height="50">
+  OpenSats
+</a>
 
 ## Donate
 

@@ -1,9 +1,9 @@
 import { formatAmount } from '@/lib/lightning'
 import lightning, { TRecentSupporter } from '@/services/lightning.service'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import { useTranslation } from 'react-i18next'
 
 export default function RecentSupporters() {
   const { t } = useTranslation()
