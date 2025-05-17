@@ -60,9 +60,8 @@ After finishing, access: http://localhost:8089
 
 ## Sponsors
 
-<a target="_blank" href="https://opensats.org/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none; color: inherit;">
-  <img alt="open-sats-logo" src="./resources/open-sats-logo.svg" height="44">
-  <div style="font-size: 1.5rem; font-weight: 600;">OpenSats</div>
+<a target="_blank" href="https://opensats.org/">
+  <img alt="open-sats-logo" src="./resources/open-sats-logo.svg" height="44"> 
 </a>
 
 ## Donate

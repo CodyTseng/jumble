@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
-import OpenSatsLogo from '../../../resources/open-sats-logo.svg'
+import OpenSatsLogo from './open-sats-logo.svg'
 
 export default function PlatinumSponsors() {
   const { t } = useTranslation()
