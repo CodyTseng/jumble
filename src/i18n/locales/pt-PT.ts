@@ -233,6 +233,7 @@ export default {
     'Paste or drop media files to upload': 'Cole ou solte arquivos de mídia para fazer upload',
     Preview: 'Pré-visualização',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
-      'Você está prestes a publicar um evento assinado por [{{eventAuthorName}}]. Você está atualmente logado como [{{currentUsername}}]. Tem certeza?'
+      'Você está prestes a publicar um evento assinado por [{{eventAuthorName}}]. Você está atualmente logado como [{{currentUsername}}]. Tem certeza?',
+    'Platinum Sponsors': 'Patrocinadores Platinum'
   }
 }

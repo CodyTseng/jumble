@@ -32,7 +32,9 @@ export default function RecentSupporters() {
               <UserAvatar userId={item.pubkey} />
               <div className="flex-1 w-0">
                 <Username className="font-semibold w-fit" userId={item.pubkey} />
-                <div className="text-xs text-muted-foreground line-clamp-3">{item.comment}</div>
+                <div className="text-xs text-muted-foreground line-clamp-3 select-text">
+                  {item.comment}
+                </div>
               </div>
             </div>
             <div className="font-semibold text-yellow-400 shrink-0">

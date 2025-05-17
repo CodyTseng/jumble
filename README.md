@@ -61,7 +61,7 @@ After finishing, access: http://localhost:8089
 ## Sponsors
 
 <a target="_blank" href="https://opensats.org/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none; color: inherit; font-size: 1.5rem; font-weight: 600;">
-  <img alt="opensats" src="https://github.com/OpenSats/website/blob/master/public/static/images/projects/opensats_logo.png?raw=true" height="50">
+  <img alt="open-sats-logo" src="./resources/open-sats-logo.svg" height="44">
   OpenSats
 </a>
 

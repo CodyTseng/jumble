@@ -234,6 +234,7 @@ export default {
       'Coller ou déposer des fichiers multimédias à télécharger',
     Preview: 'Aperçu',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
-      'Vous êtes sur le point de publier un événement signé par [{{eventAuthorName}}]. Vous êtes actuellement connecté en tant que [{{currentUsername}}]. Êtes-vous sûr ?'
+      'Vous êtes sur le point de publier un événement signé par [{{eventAuthorName}}]. Vous êtes actuellement connecté en tant que [{{currentUsername}}]. Êtes-vous sûr ?',
+    'Platinum Sponsors': 'Sponsors Platine'
   }
 }

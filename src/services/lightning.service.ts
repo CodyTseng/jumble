@@ -180,7 +180,9 @@ class LightningService {
         if (!item.comment && comment) item.comment = comment
       }
     })
-    this.recentSupportersCache = Array.from(map.values()).sort((a, b) => b.amount - a.amount)
+    this.recentSupportersCache = Array.from(map.values())
+      .filter((item) => item.amount >= 1000)
+      .sort((a, b) => b.amount - a.amount)
     return this.recentSupportersCache
   }
 

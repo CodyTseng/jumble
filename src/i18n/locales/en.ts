@@ -229,6 +229,7 @@ export default {
     'Paste or drop media files to upload': 'Paste or drop media files to upload',
     Preview: 'Preview',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
-      'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?'
+      'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?',
+    'Platinum Sponsors': 'Platinum Sponsors'
   }
 }

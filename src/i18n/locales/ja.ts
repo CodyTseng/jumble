@@ -230,6 +230,7 @@ export default {
     'Paste or drop media files to upload': 'メディアファイルを貼り付けるかドロップしてアップロード',
     Preview: 'プレビュー',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
-      'あなたは[{{eventAuthorName}}]によって署名されたイベントを公開しようとしています。現在[{{currentUsername}}]としてログインしています。よろしいですか？'
+      'あなたは[{{eventAuthorName}}]によって署名されたイベントを公開しようとしています。現在[{{currentUsername}}]としてログインしています。よろしいですか？',
+    'Platinum Sponsors': 'プラチナスポンサー'
   }
 }

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
+import OpenSatsLogo from '../../../resources/open-sats-logo.svg'
 
 export default function PlatinumSponsors() {
   const { t } = useTranslation()
@@ -14,11 +15,11 @@ export default function PlatinumSponsors() {
         >
           <Image
             image={{
-              url: 'https://github.com/OpenSats/website/blob/master/public/static/images/projects/opensats_logo.png?raw=true'
+              url: OpenSatsLogo
             }}
-            className="h-14"
+            className="h-11"
           />
-          <div className="text-3xl font-bold">OpenSats</div>
+          <div className="text-2xl font-semibold">OpenSats</div>
         </div>
       </div>
     </div>

@@ -229,6 +229,7 @@ export default {
     'Paste or drop media files to upload': 'الصق أو اسحب ملفات الوسائط لتحميلها',
     Preview: 'معاينة',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
-      'أنت على وشك نشر حدث موقع من قبل [{{eventAuthorName}}]. أنت حالياً مسجل الدخول كـ [{{currentUsername}}]. هل أنت متأكد؟'
+      'أنت على وشك نشر حدث موقع من قبل [{{eventAuthorName}}]. أنت حالياً مسجل الدخول كـ [{{currentUsername}}]. هل أنت متأكد؟',
+    'Platinum Sponsors': 'الرعاة البلاتينيون'
   }
 }
