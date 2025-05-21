@@ -29,6 +29,21 @@ export function generateEventIdFromETag(tag: string[]) {
   }
 }
 
+export function generateEventIdFromATag(tag: string[]) {
+  try {
+    const [, coordinate, relay] = tag
+    const [kind, pubkey, identifier] = coordinate.split(':')
+    return nip19.naddrEncode({
+      kind: Number(kind),
+      pubkey,
+      identifier,
+      relays: relay ? [relay] : undefined
+    })
+  } catch {
+    return undefined
+  }
+}
+
 export function generateEventId(event: Pick<Event, 'id' | 'pubkey'>) {
   const relay = client.getEventHint(event.id)
   return nip19.neventEncode({ id: event.id, author: event.pubkey, relays: [relay] })

@@ -52,3 +52,4 @@ export const toZapStreamLiveEvent = (event: Event) => {
   return `https://zap.stream/${getSharableEventId(event)}`
 }
 export const toChachiChat = (relay: string, d: string) => `https://chachi.chat/${relay}/${d}`
+export const toNjump = (id: string) => `https://njump.me/${id}`
