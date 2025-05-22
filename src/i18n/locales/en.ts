@@ -42,6 +42,7 @@ export default {
     Repost: 'Repost',
     Quote: 'Quote',
     'Copy event ID': 'Copy event ID',
+    'Copy event link': 'Copy event link',
     'Copy user ID': 'Copy user ID',
     'View raw event': 'View raw event',
     Like: 'Like',

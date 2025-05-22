@@ -43,6 +43,7 @@ export default {
     Repost: 'リポスト',
     Quote: '引用',
     'Copy event ID': 'イベントIDをコピー',
+    'Copy event Link': 'イベントリンクのコピー',
     'Copy user ID': 'ユーザーIDをコピー',
     'View raw event': '生データを表示',
     Like: 'いいね',

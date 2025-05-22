@@ -42,6 +42,7 @@ export default {
     Repost: 'Repostar',
     Quote: 'Citar',
     'Copy event ID': 'Copiar ID do evento',
+    'Copy event link': 'Copiar link do evento',
     'Copy user ID': 'Copiar ID do usuário',
     'View raw event': 'Ver evento bruto',
     Like: 'Curtir',

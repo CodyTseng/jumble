@@ -43,6 +43,7 @@ export default {
     Repost: 'إعادة النشر',
     Quote: 'اقتباس',
     'Copy event ID': 'نسخ معرف الحدث',
+    'Copy event link': 'نسخ رابط الحدث',
     'Copy user ID': 'نسخ معرف المستخدم',
     'View raw event': 'عرض الحدث الخام',
     Like: 'أعجبني',

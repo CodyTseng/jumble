@@ -43,6 +43,7 @@ export default {
     Repost: 'Reenviar',
     Quote: 'Citar',
     'Copy event ID': 'Copiar ID del evento',
+    'Copy event link': 'Copiar link del evento',
     'Copy user ID': 'Copiar ID del usuario',
     'View raw event': 'Ver evento sin procesar',
     Like: 'Me gusta',

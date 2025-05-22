@@ -43,6 +43,7 @@ export default {
     Repost: 'Репост',
     Quote: 'Цитировать',
     'Copy event ID': 'Копировать ID события',
+    'Copy event link': 'Копировать ссылку на событие',
     'Copy user ID': 'Копировать ID пользователя',
     'View raw event': 'Посмотреть исходное событие',
     Like: 'Нравится',

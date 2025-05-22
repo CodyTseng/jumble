@@ -42,6 +42,7 @@ export default {
     Repost: '转发',
     Quote: '引用',
     'Copy event ID': '复制事件 ID',
+    'Copy event link': '复制活动链接',
     'Copy user ID': '复制用户 ID',
     'View raw event': '查看原始事件',
     Like: '点赞',

@@ -42,6 +42,7 @@ export default {
     Repost: 'Ripubblica',
     Quote: 'Quota',
     'Copy event ID': 'Copia ID evento',
+    'Copy event link': 'Copia link evento',
     'Copy user ID': 'Copia ID utente',
     'View raw event': 'Vedi evento grezzo',
     Like: 'Mi piace',
