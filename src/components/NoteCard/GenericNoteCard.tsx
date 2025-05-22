@@ -4,7 +4,6 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useState } from 'react'
 import GroupMetadataCard from './GroupMetadataCard'
-import HighlightCard from './HighlightCard'
 import LiveEventCard from './LiveEventCard'
 import LongFormArticleCard from './LongFormArticleCard'
 import MainNoteCard from './MainNoteCard'
@@ -42,11 +41,6 @@ export default function GenericNoteCard({
   if (isSupportedKind(event.kind)) {
     return (
       <MainNoteCard event={event} className={className} reposter={reposter} embedded={embedded} />
-    )
-  }
-  if (event.kind === kinds.Highlights) {
-    return (
-      <HighlightCard className={className} reposter={reposter} event={event} embedded={embedded} />
     )
   }
   if (event.kind === kinds.LongFormArticle) {

@@ -1,8 +1,12 @@
 import { useSecondaryPage } from '@/PageManager'
-import { ExtendedKind } from '@/constants'
-import { extractImageInfosFromEventTags, getParentEventId, getUsingClient } from '@/lib/event'
+import {
+  extractImageInfosFromEventTags,
+  getParentEventId,
+  getUsingClient,
+  isPictureEvent
+} from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
@@ -11,6 +15,7 @@ import NoteOptions from '../NoteOptions'
 import ParentNotePreview from '../ParentNotePreview'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import Highlight from './Highlight'
 
 export default function Note({
   event,
@@ -25,10 +30,16 @@ export default function Note({
 }) {
   const { push } = useSecondaryPage()
   const parentEventId = useMemo(
-    () => (hideParentNotePreview ? undefined : getParentEventId(event)),
+    () =>
+      !hideParentNotePreview && event.kind === kinds.ShortTextNote
+        ? getParentEventId(event)
+        : undefined,
     [event, hideParentNotePreview]
   )
-  const imageInfos = useMemo(() => extractImageInfosFromEventTags(event), [event])
+  const imageInfos = useMemo(
+    () => (isPictureEvent(event) ? extractImageInfosFromEventTags(event) : []),
+    [event]
+  )
   const usingClient = useMemo(() => getUsingClient(event), [event])
 
   return (
@@ -66,10 +77,12 @@ export default function Note({
           }}
         />
       )}
-      <Content className="mt-2" event={event} />
-      {event.kind === ExtendedKind.PICTURE && imageInfos.length > 0 && (
-        <ImageGallery images={imageInfos} />
+      {event.kind === kinds.Highlights ? (
+        <Highlight className="mt-2" event={event} />
+      ) : (
+        <Content className="mt-2" event={event} />
       )}
+      {imageInfos.length > 0 && <ImageGallery images={imageInfos} />}
     </div>
   )
 }

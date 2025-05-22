@@ -22,8 +22,14 @@ import NotFoundPage from '../NotFoundPage'
 const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(id)
-  const parentEventId = useMemo(() => getParentEventId(event), [event])
-  const rootEventId = useMemo(() => getRootEventId(event), [event])
+  const parentEventId = useMemo(
+    () => (event?.kind === kinds.ShortTextNote ? getParentEventId(event) : undefined),
+    [event]
+  )
+  const rootEventId = useMemo(
+    () => (event?.kind === kinds.ShortTextNote ? getRootEventId(event) : undefined),
+    [event]
+  )
 
   if (!event && isFetching) {
     return (
@@ -80,11 +86,11 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
         <NoteStats className="mt-3" event={event} fetchIfNotExisting displayTopZapsAndLikes />
       </div>
       <Separator className="mt-4" />
-      {event.kind === kinds.ShortTextNote ? (
+      {[kinds.ShortTextNote, kinds.Highlights].includes(event.kind) ? (
         <ReplyNoteList key={`reply-note-list-${event.id}`} index={index} event={event} />
-      ) : isPictureEvent(event) ? (
+      ) : (
         <Nip22ReplyNoteList key={`nip22-reply-note-list-${event.id}`} event={event} />
-      ) : null}
+      )}
     </SecondaryPageLayout>
   )
 })

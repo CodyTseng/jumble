@@ -60,7 +60,7 @@ export function isProtectedEvent(event: Event) {
 }
 
 export function isSupportedKind(kind: number) {
-  return [kinds.ShortTextNote, ExtendedKind.PICTURE].includes(kind)
+  return [kinds.ShortTextNote, kinds.Highlights, ExtendedKind.PICTURE].includes(kind)
 }
 
 export function getParentEventTag(event?: Event) {
@@ -523,4 +523,17 @@ export function extractEmojiInfosFromTags(tags: string[][] = []) {
       return { shortcode: tag[1], url: tag[2] }
     })
     .filter(Boolean) as TEmoji[]
+}
+
+export function createFakeEvent(event: Partial<Event>): Event {
+  return {
+    id: '',
+    kind: 1,
+    pubkey: '',
+    content: '',
+    created_at: 0,
+    tags: [],
+    sig: '',
+    ...event
+  }
 }

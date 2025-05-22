@@ -16,10 +16,12 @@ import Emoji from '../Emoji'
 
 export default function ContentPreview({
   event,
-  className
+  className,
+  onClick
 }: {
   event?: Event
   className?: string
+  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
   const nodes = useMemo(() => {
@@ -37,7 +39,7 @@ export default function ContentPreview({
   const emojiInfos = extractEmojiInfosFromTags(event?.tags)
 
   return (
-    <div className={cn('pointer-events-none', className)}>
+    <div className={cn('pointer-events-none', className)} onClick={onClick}>
       {nodes.map((node, index) => {
         if (node.type === 'text') {
           return node.data
