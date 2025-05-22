@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { getSharableEventId } from '@/lib/event'
+import { getSharableEventId, getSharableEventLink } from '@/lib/event'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -62,6 +62,17 @@ export default function NoteOptions({ event, className }: { event: Event; classN
               >
                 <Copy />
                 {t('Copy event ID')}
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDrawerOpen(false)
+                  navigator.clipboard.writeText(getSharableEventLink(event))
+                }}
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
+                variant="ghost"
+              >
+                <Copy />
+                {t('Copy event link')}
               </Button>
               <Button
                 onClick={() => {
@@ -121,12 +132,20 @@ export default function NoteOptions({ event, className }: { event: Event; classN
             {t('Copy event ID')}
           </DropdownMenuItem>
           <DropdownMenuItem
+            onClick={() => navigator.clipboard.writeText(getSharableEventLink(event))}
+          >
+            <Copy />
+            {t('Copy event link')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')}
           >
             <Copy />
             {t('Copy user ID')}
           </DropdownMenuItem>
+
           <DropdownMenuSeparator />
+
           <DropdownMenuItem onClick={() => setIsRawEventDialogOpen(true)}>
             <Code />
             {t('View raw event')}
