@@ -129,6 +129,10 @@ export function getSharableEventId(event: Event) {
   return nip19.neventEncode({ id: event.id, author: event.pubkey, kind: event.kind, relays: hints })
 }
 
+export function getSharableEventLink(event: Event) {
+  return `https://njump.me/${getSharableEventId(event)}`
+}
+
 export function getUsingClient(event: Event) {
   return event.tags.find(tagNameEquals('client'))?.[1]
 }
