@@ -12,7 +12,7 @@ import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { Bell, BellOff, Code, Copy, Ellipsis } from 'lucide-react'
+import { Bell, BellOff, Code, Copy, Ellipsis, Link } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -65,17 +65,6 @@ export default function NoteOptions({ event, className }: { event: Event; classN
               </Button>
               <Button
                 onClick={() => {
-                  setIsDrawerOpen(false)
-                  navigator.clipboard.writeText(getSharableEventLink(event))
-                }}
-                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
-                variant="ghost"
-              >
-                <Copy />
-                {t('Copy event link')}
-              </Button>
-              <Button
-                onClick={() => {
                   navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')
                   setIsDrawerOpen(false)
                 }}
@@ -84,6 +73,17 @@ export default function NoteOptions({ event, className }: { event: Event; classN
               >
                 <Copy />
                 {t('Copy user ID')}
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDrawerOpen(false)
+                  navigator.clipboard.writeText(getSharableEventLink(event))
+                }}
+                className="w-full p-6 justify-start text-lg gap-4 [&_svg]:size-5"
+                variant="ghost"
+              >
+                <Link />
+                {t('Copy share link')}
               </Button>
               <Button
                 onClick={() => {
@@ -132,16 +132,16 @@ export default function NoteOptions({ event, className }: { event: Event; classN
             {t('Copy event ID')}
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(getSharableEventLink(event))}
-          >
-            <Copy />
-            {t('Copy event link')}
-          </DropdownMenuItem>
-          <DropdownMenuItem
             onClick={() => navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')}
           >
             <Copy />
             {t('Copy user ID')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => navigator.clipboard.writeText(getSharableEventLink(event))}
+          >
+            <Link />
+            {t('Copy share link')}
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
