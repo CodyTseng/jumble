@@ -43,7 +43,6 @@ export default {
     Quote: 'Quota',
     'Copy event ID': 'Copia ID evento',
     'Copy user ID': 'Copia ID utente',
-    'Copy share link': 'Copiare il link di condivisione',
     'View raw event': 'Vedi evento grezzo',
     Like: 'Mi piace',
     'switch to light theme': 'passa al tema luminoso',

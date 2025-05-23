@@ -43,7 +43,6 @@ export default {
     Quote: '引用',
     'Copy event ID': '复制事件 ID',
     'Copy user ID': '复制用户 ID',
-    'Copy share link': '复制共享链接',
     'View raw event': '查看原始事件',
     Like: '点赞',
     'switch to light theme': '切换到浅色主题',

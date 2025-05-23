@@ -44,7 +44,6 @@ export default {
     Quote: 'Citar',
     'Copy event ID': 'Copiar ID del evento',
     'Copy user ID': 'Copiar ID del usuario',
-    'Copy share link': 'Copiar link de compartir',
     'View raw event': 'Ver evento sin procesar',
     Like: 'Me gusta',
     'switch to light theme': 'cambiar a tema claro',

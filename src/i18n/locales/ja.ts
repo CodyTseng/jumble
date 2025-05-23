@@ -44,7 +44,6 @@ export default {
     Quote: '引用',
     'Copy event ID': 'イベントIDをコピー',
     'Copy user ID': 'ユーザーIDをコピー',
-    'Copy share link': '共有リンクをコピーする',
     'View raw event': '生データを表示',
     Like: 'いいね',
     'switch to light theme': 'ライトテーマに切替',

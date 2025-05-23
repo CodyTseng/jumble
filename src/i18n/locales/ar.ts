@@ -44,7 +44,6 @@ export default {
     Quote: 'اقتباس',
     'Copy event ID': 'نسخ معرف الحدث',
     'Copy user ID': 'نسخ معرف المستخدم',
-    'Copy share link': 'نسخ رابط المشاركة',
     'View raw event': 'عرض الحدث الخام',
     Like: 'أعجبني',
     'switch to light theme': 'التبديل إلى الوضع الفاتح',

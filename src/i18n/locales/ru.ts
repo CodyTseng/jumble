@@ -44,7 +44,6 @@ export default {
     Quote: 'Цитировать',
     'Copy event ID': 'Копировать ID события',
     'Copy user ID': 'Копировать ID пользователя',
-    'Copy share link': 'Скопируйте ссылку на общий доступ',
     'View raw event': 'Посмотреть исходное событие',
     Like: 'Нравится',
     'switch to light theme': 'переключить на светлую тему',

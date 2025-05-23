@@ -43,7 +43,6 @@ export default {
     Quote: 'Zacytuj',
     'Copy event ID': 'Skopiuj ID wydarzenia',
     'Copy user ID': 'Skopiuj ID użytkownika',
-    'Copy share link': 'Skopiuj łącze udostępniania',
     'View raw event': 'Pokaż szczegóły wpisu',
     Like: 'Polub',
     'switch to light theme': 'Przełącz na jasny motyw',
