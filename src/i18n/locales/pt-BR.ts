@@ -235,6 +235,6 @@ export default {
       'Você está prestes a publicar um evento assinado por [{{eventAuthorName}}]. Você está atualmente logado como [{{currentUsername}}]. Tem certeza?',
     'Platinum Sponsors': 'Patrocinadores Platinum',
     From: 'Fonte',
-    'Comment on': 'Comentando'
+    'Comment on': 'Comentando:'
   }
 }
