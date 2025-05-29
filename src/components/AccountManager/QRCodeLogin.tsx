@@ -55,7 +55,7 @@ export default function QRCodeLogin({
       </div>
       <Button variant="secondary" disabled={pending}>
         <Loader className={pending ? 'animate-spin' : 'hidden'} />
-        {pending ? t('loading...') : t('Scan QR Code')}
+        {t('loading...')}
       </Button>
       <Button variant="secondary" onClick={back}>
         {t('Back')}
