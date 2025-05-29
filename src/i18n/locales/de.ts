@@ -87,6 +87,7 @@ export default {
     'Login with Browser Extension': 'Mit Browser-Erweiterung anmelden',
     'Login with Bunker': 'Mit Bunker anmelden',
     'Login with Private Key': 'Mit privatem Schlüssel anmelden',
+    'Login with Qrcode': 'Mit QR-Code anmelden',
     'reload notes': 'Notizen neu laden',
     'Logged in Accounts': 'Angemeldete Konten',
     'Add an Account': 'Konto hinzufügen',

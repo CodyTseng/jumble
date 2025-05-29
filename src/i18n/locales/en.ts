@@ -86,6 +86,7 @@ export default {
     'Login with Browser Extension': 'Login with Browser Extension',
     'Login with Bunker': 'Login with Bunker',
     'Login with Private Key': 'Login with Private Key',
+    'Login with Qrcode': 'Login with Qrcode',
     'reload notes': 'reload notes',
     'Logged in Accounts': 'Logged in Accounts',
     'Add an Account': 'Add an Account',

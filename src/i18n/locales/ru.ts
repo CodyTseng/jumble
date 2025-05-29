@@ -87,6 +87,7 @@ export default {
     'Login with Browser Extension': 'Войти через расширение браузера',
     'Login with Bunker': 'Войти через Bunker',
     'Login with Private Key': 'Войти с приватным ключом',
+    'Login with Qrcode': 'Войти с помощью QR-кода',
     'reload notes': 'перезагрузить заметки',
     'Logged in Accounts': 'Вошедшие аккаунты',
     'Add an Account': 'Добавить аккаунт',

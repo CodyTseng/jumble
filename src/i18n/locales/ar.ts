@@ -86,6 +86,7 @@ export default {
     'Login with Browser Extension': 'تسجيل الدخول باستخدام إضافة المتصفح',
     'Login with Bunker': 'تسجيل الدخول باستخدام Bunker',
     'Login with Private Key': 'تسجيل الدخول باستخدام المفتاح الخاص',
+    'Login with Qrcode': 'تسجيل الدخول باستخدام رمز الاستجابة السريعة',
     'reload notes': 'إعادة تحميل الملاحظات',
     'Logged in Accounts': 'الحسابات المسجلة',
     'Add an Account': 'إضافة حساب',

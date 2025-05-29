@@ -8,11 +8,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
 import BunkerLogin from './BunkerLogin'
+import QRCodeLogin from './QRCodeLogin'
 import GenerateNewAccount from './GenerateNewAccount'
 import NpubLogin from './NpubLogin'
 import PrivateKeyLogin from './PrivateKeyLogin'
 
-type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'npub' | null
+type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'npub' | 'qrcode' | null
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
@@ -23,6 +24,8 @@ export default function AccountManager({ close }: { close?: () => void }) {
         <PrivateKeyLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'bunker' ? (
         <BunkerLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
+      ) : page === 'qrcode' ? (
+        <QRCodeLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'generate' ? (
         <GenerateNewAccount back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'npub' ? (
@@ -59,6 +62,9 @@ function AccountManagerNav({
           )}
           <Button variant="secondary" onClick={() => setPage('bunker')} className="w-full">
             {t('Login with Bunker')}
+          </Button>
+          <Button variant="secondary" onClick={() => setPage('qrcode')} className="w-full">
+            {t('Login with Qrcode')}
           </Button>
           <Button variant="secondary" onClick={() => setPage('nsec')} className="w-full">
             {t('Login with Private Key')}
