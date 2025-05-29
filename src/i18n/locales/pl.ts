@@ -86,6 +86,7 @@ export default {
     'Login with Browser Extension': 'Logowanie z rozszerzeniem przeglądarki',
     'Login with Bunker': 'Logowanie z bunkrem',
     'Login with Private Key': 'Logowanie z prywatnym kluczem (nsec)',
+    'Login with Qrcode': 'Logowanie za pomocą kodu QR',
     'reload notes': 'Odśwież',
     'Logged in Accounts': 'Zalogowane konta',
     'Add an Account': 'Dodaj Konto',
