@@ -333,6 +333,7 @@ export class BunkerSigner {
     return new Promise((resolve, reject) => {
       try {
         if (!this.isOpen) throw new Error('this signer is not open anymore, create a new one')
+        if (!this.subCloser) this.setupSubscription()
         this.serial++
         const id = `${this.idPrefix}-${this.serial}`
 

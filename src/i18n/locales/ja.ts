@@ -87,7 +87,6 @@ export default {
     'Login with Browser Extension': 'ブラウザ拡張でログイン',
     'Login with Bunker': 'Bunkerでログイン',
     'Login with Private Key': '秘密鍵でログイン',
-    'Login with Qrcode': 'QRコードでログイン',
     'reload notes': 'ノートを再読み込み',
     'Logged in Accounts': 'ログイン中のアカウント',
     'Add an Account': 'アカウントを追加',

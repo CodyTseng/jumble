@@ -2,7 +2,7 @@ import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex } from '@noble/hashes/utils'
 import { BunkerSigner as NBunkerSigner } from './nip46'
 
-export class QRCodeSigner implements ISigner {
+export class NostrConnectionSigner implements ISigner {
   signer: NBunkerSigner | null = null
   private clientSecretKey: Uint8Array
   private pubkey: string | null = null

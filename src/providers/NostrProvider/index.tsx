@@ -24,7 +24,7 @@ import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
-import { QRCodeSigner } from './qrcode.signer'
+import { NostrConnectionSigner } from './nostrConnection.signer'
 
 type TNostrContext = {
   isInitialized: boolean
@@ -46,7 +46,7 @@ type TNostrContext = {
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
   bunkerLogin: (bunker: string) => Promise<string>
-  qrcodeLogin: (clientSecretKey: Uint8Array, connectionString: string) => Promise<string>
+  nostrConnectionLogin: (clientSecretKey: Uint8Array, connectionString: string) => Promise<string>
   npubLogin(npub: string): Promise<string>
   removeAccount: (account: TAccountPointer) => void
   /**
@@ -406,8 +406,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  const qrcodeLogin = async (clientSecretKey: Uint8Array, connectionString: string) => {
-    const bunkerSigner = new QRCodeSigner(clientSecretKey, connectionString)
+  const nostrConnectionLogin = async (clientSecretKey: Uint8Array, connectionString: string) => {
+    const bunkerSigner = new NostrConnectionSigner(clientSecretKey, connectionString)
     const loginResult = await bunkerSigner.login()
     if (!loginResult.pubkey) {
       throw new Error('Invalid bunker')
@@ -671,7 +671,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         ncryptsecLogin,
         nip07Login,
         bunkerLogin,
-        qrcodeLogin,
+        nostrConnectionLogin,
         npubLogin,
         removeAccount,
         publish,
