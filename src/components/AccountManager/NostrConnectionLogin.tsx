@@ -106,7 +106,7 @@ export default function NostrConnectLogin({
     <>
       <div ref={qrContainerRef} className="flex flex-col items-center w-full space-y-3 mb-3">
         <a href={loginDetails.connectionString} aria-label="Open with Nostr signer app">
-          <QRCodeSVG size={qrCodeSize} value={loginDetails.connectionString} />
+          <QRCodeSVG size={qrCodeSize} value={loginDetails.connectionString} marginSize={1} />
         </a>
         {nostrConnectionErrMsg && (
           <div className="text-xs text-destructive text-center pt-1">
