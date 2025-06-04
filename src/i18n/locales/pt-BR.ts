@@ -148,7 +148,7 @@ export default {
     'Enter a name for the new relay set': 'Digite um nome para o novo conjunto de relé',
     'Save to a new relay set': 'Salvar em um novo conjunto de relé',
     Mute: 'Silenciar',
-    Muted: 'Silenciado',
+    Muted: 'Silenciados',
     Unmute: 'Silenciado',
     'Unmute user': 'Usuário silenciado',
     'Append n relays': 'Adicionar {{n}} relés',
