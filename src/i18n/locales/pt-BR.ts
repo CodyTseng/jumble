@@ -150,7 +150,7 @@ export default {
     Mute: 'Silenciar',
     Muted: 'Silenciado',
     Unmute: 'Silenciado',
-    'Unmute user': 'Desativar silêncio do usuário',
+    'Unmute user': 'Usuário silenciado',
     'Append n relays': 'Adicionar {{n}} relés',
     Append: 'Adicionar',
     'Select relays to append': 'Selecione os relés para adicionar',
