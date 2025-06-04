@@ -412,10 +412,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     if (!loginResult.pubkey) {
       throw new Error('Invalid bunker')
     }
+    const bunkerUrl = new URL(loginResult.bunkerString!)
+    bunkerUrl.searchParams.delete('secret')
     return login(bunkerSigner, {
       pubkey: loginResult.pubkey,
       signerType: 'bunker',
-      bunker: loginResult.bunkerString!,
+      bunker: bunkerUrl.toString(),
       bunkerClientSecretKey: bunkerSigner.getClientSecretKey()
     })
   }
