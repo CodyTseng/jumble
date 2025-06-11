@@ -6,7 +6,8 @@ import Image from '../Image'
 
 export default function WebPreview({ url, className }: { url: string; className?: string }) {
   const { isSmallScreen } = useScreenSize()
-  const { title, description, image } = useFetchWebMetadata(url)
+  const proxyServer = import.meta.env.VITE_PROXY_SERVER
+  const { title, description, image } = useFetchWebMetadata(`${proxyServer}/sites/${encodeURIComponent(url)}`)
   const hostname = useMemo(() => {
     try {
       return new URL(url).hostname
