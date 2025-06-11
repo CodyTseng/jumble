@@ -6,6 +6,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_PROXY_SERVER: http://localhost:8090
     ports:
       - "8089:80"
     restart: unless-stopped
+    networks:
+        - jumble
+
+  proxy-server:
+    image: ghcr.io/danvergara/jumble-proxy-server:latest
+    environment:
+      - ALLOW_ORIGIN=http://localhost:8089
+      - PORT=8080
+    ports:
+      - "8090:8080"
+    networks:
+        - jumble
+
+networks:
+  jumble:
