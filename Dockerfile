@@ -1,6 +1,9 @@
 # Step 1: Build the application
 FROM node:20-alpine as builder
 
+ARG VITE_PROXY_SERVER
+ENV VITE_PROXY_SERVER=${VITE_PROXY_SERVER}
+
 WORKDIR /app
 COPY . .
 
