@@ -5,9 +5,14 @@ ARG VITE_PROXY_SERVER
 ENV VITE_PROXY_SERVER=${VITE_PROXY_SERVER}
 
 WORKDIR /app
-COPY . .
 
-RUN npm install && npm run build
+# Copy package files first
+COPY package*.json ./
+RUN npm install
+
+# Copy the source code to prevent invaliding cache whenever there is a change in the code
+COPY . .
+RUN npm run build
 
 # Step 2: Final container with Nginx and embedded config
 FROM nginx:alpine
