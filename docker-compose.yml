@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_PROXY_SERVER: http://localhost:8090
+        VITE_PROXY_SERVER: ${JUMBLE_PROXY_SERVER_URL:-http://localhost:8090} 
     ports:
       - "8089:80"
     restart: unless-stopped
@@ -17,7 +17,7 @@ services:
   proxy-server:
     image: ghcr.io/danvergara/jumble-proxy-server:latest
     environment:
-      - ALLOW_ORIGIN=http://localhost:8089
+      - ALLOW_ORIGIN=${JUMBLE_SOCIAL_URL:-http://localhost:8089}
       - PORT=8080
     ports:
       - "8090:8080"
