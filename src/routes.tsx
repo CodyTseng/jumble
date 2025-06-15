@@ -13,6 +13,7 @@ import ProfilePage from './pages/secondary/ProfilePage'
 import RelayPage from './pages/secondary/RelayPage'
 import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import SettingsPage from './pages/secondary/SettingsPage'
+import TranslationPage from './pages/secondary/TranslationPage'
 import WalletPage from './pages/secondary/WalletPage'
 
 const ROUTES = [
@@ -28,6 +29,7 @@ const ROUTES = [
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },
+  { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> }
 ]

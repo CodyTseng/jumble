@@ -1,7 +1,13 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toGeneralSettings, toPostSettings, toRelaySettings, toWallet } from '@/lib/link'
+import {
+  toGeneralSettings,
+  toPostSettings,
+  toRelaySettings,
+  toTranslation,
+  toWallet
+} from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -11,6 +17,7 @@ import {
   Copy,
   Info,
   KeyRound,
+  Languages,
   PencilLine,
   Server,
   Settings2,
@@ -39,6 +46,13 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="flex items-center gap-4">
           <Server />
           <div>{t('Relays')}</div>
+        </div>
+        <ChevronRight />
+      </SettingItem>
+      <SettingItem className="clickable" onClick={() => push(toTranslation())}>
+        <div className="flex items-center gap-4">
+          <Languages />
+          <div>{t('Translation')}</div>
         </div>
         <ChevronRight />
       </SettingItem>

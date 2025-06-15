@@ -144,6 +144,22 @@ class ClientService extends EventTarget {
     return result
   }
 
+  async signHttpAuth(url: string, method: string) {
+    if (!this.signer) {
+      throw new Error('Please login first to sign the event')
+    }
+    const event = await this.signer?.signEvent({
+      content: '',
+      kind: kinds.HTTPAuth,
+      created_at: dayjs().unix(),
+      tags: [
+        ['u', url],
+        ['method', method]
+      ]
+    })
+    return 'Nostr ' + btoa(JSON.stringify(event))
+  }
+
   private generateTimelineKey(urls: string[], filter: Filter) {
     const stableFilter: any = {}
     Object.entries(filter)
