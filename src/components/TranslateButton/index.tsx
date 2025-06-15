@@ -76,7 +76,7 @@ export default function TranslateButton({
 
       const normalizedLang = langMap[detectedLang]
       if (!normalizedLang) {
-        return false
+        return true
       }
 
       return !i18n.language.startsWith(normalizedLang)
