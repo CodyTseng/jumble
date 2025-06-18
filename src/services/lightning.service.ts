@@ -154,6 +154,27 @@ class LightningService {
     })
   }
 
+  async payInvoice(invoice: string, closeOuterModel?: () => void): Promise<{ preimage: string; invoice: string } | null> {
+    if (this.provider) {
+      const { preimage } = await this.provider.sendPayment(invoice)
+      closeOuterModel?.()
+      return { preimage, invoice: invoice }
+    }
+
+    return new Promise((resolve) => {
+      closeOuterModel?.()
+      launchPaymentModal({
+        invoice: invoice,
+        onPaid: (response) => {
+          resolve({ preimage: response.preimage, invoice: invoice })
+        },
+        onCancelled: () => {
+          resolve(null)
+        }
+      })
+    })
+  }
+
   async fetchRecentSupporters() {
     if (this.recentSupportersCache) {
       return this.recentSupportersCache
