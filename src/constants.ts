@@ -61,6 +61,7 @@ export const EMOJI_SHORT_CODE_REGEX = /:[a-zA-Z0-9_-]+:/g
 export const EMBEDDED_EVENT_REGEX = /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
 export const EMBEDDED_MENTION_REGEX = /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+)/g
 export const HASHTAG_REGEX = /#[\p{L}\p{N}\p{M}_]+/gu
+export const LN_INVOICE_REGEX = /^(ln(?:bc|tb|bcrt))([0-9]+[munp]?)?1([02-9ac-hj-np-z]+)$/g
 
 export const MONITOR = '9bbbb845e5b6c831c29789900769843ab43bb5047abe697870cb50b6fc9bf923'
 export const MONITOR_RELAYS = ['wss://relay.nostr.watch/']
