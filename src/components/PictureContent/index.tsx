@@ -1,5 +1,6 @@
 import {
   EmbeddedEmojiParser,
+  EmbeddedLNInvoiceParser,
   EmbeddedHashtagParser,
   EmbeddedMentionParser,
   EmbeddedNormalUrlParser,
@@ -12,6 +13,7 @@ import { Event } from 'nostr-tools'
 import { memo, useMemo } from 'react'
 import {
   EmbeddedHashtag,
+  EmbeddedLNInvoice,
   EmbeddedMention,
   EmbeddedNormalUrl,
   EmbeddedWebsocketUrl
@@ -25,6 +27,7 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
 
   const nodes = parseContent(event.content, [
     EmbeddedNormalUrlParser,
+    EmbeddedLNInvoiceParser,
     EmbeddedWebsocketUrlParser,
     EmbeddedHashtagParser,
     EmbeddedMentionParser,
@@ -43,6 +46,9 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
           }
           if (node.type === 'url') {
             return <EmbeddedNormalUrl key={index} url={node.data} />
+          }
+          if (node.type === 'invoice') {
+            return <EmbeddedLNInvoice invoice={node.data} key={index} />
           }
           if (node.type === 'websocket-url') {
             return <EmbeddedWebsocketUrl key={index} url={node.data} />
