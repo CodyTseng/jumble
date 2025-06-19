@@ -3,11 +3,11 @@ import {
   EmbeddedEventParser,
   EmbeddedHashtagParser,
   EmbeddedImageParser,
+  EmbeddedLNInvoiceParser,
   EmbeddedMentionParser,
   EmbeddedNormalUrlParser,
   EmbeddedVideoParser,
   EmbeddedWebsocketUrlParser,
-  EmbeddedLNInvoiceParser,
   parseContent
 } from '@/lib/content-parser'
 import { extractEmojiInfosFromTags, isNsfwEvent } from '@/lib/event'
