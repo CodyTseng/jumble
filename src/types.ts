@@ -121,3 +121,19 @@ export type TEmoji = {
   shortcode: string
   url: string
 }
+
+export type TTranslationAccount = {
+  pubkey: string
+  api_key: string
+  balance: number
+}
+
+export type TTranslationServiceConfig =
+  | {
+      service: 'jumble'
+    }
+  | {
+      service: 'libre_translate'
+      server?: string
+      api_key?: string
+    }

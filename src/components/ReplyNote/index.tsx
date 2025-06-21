@@ -14,6 +14,7 @@ import NoteStats from '../NoteStats'
 import ParentNotePreview from '../ParentNotePreview'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import TranslateButton from '../TranslateButton'
 
 export default function ReplyNote({
   event,
@@ -29,6 +30,7 @@ export default function ReplyNote({
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { mutePubkeys } = useMuteList()
+  const [translatedEvent, setTranslatedEvent] = useState<Event | null>(null)
   const [showMuted, setShowMuted] = useState(false)
   const show = useMemo(
     () => showMuted || !mutePubkeys.includes(event.pubkey),
@@ -55,7 +57,14 @@ export default function ReplyNote({
                   <FormattedTimestamp timestamp={event.created_at} />
                 </div>
               </div>
-              <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
+              <div className="flex items-center">
+                <TranslateButton
+                  event={event}
+                  translatedEvent={translatedEvent}
+                  setTranslatedEvent={setTranslatedEvent}
+                />
+                <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
+              </div>
             </div>
             {parentEventId && (
               <ParentNotePreview
@@ -68,7 +77,7 @@ export default function ReplyNote({
               />
             )}
             {show ? (
-              <Content className="mt-2" event={event} />
+              <Content className="mt-2" event={translatedEvent ?? event} />
             ) : (
               <Button
                 variant="outline"

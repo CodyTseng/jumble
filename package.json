@@ -52,6 +52,7 @@
     "embla-carousel-react": "^8.5.1",
     "emoji-picker-react": "^4.12.2",
     "flexsearch": "^0.7.43",
+    "franc-min": "^6.2.0",
     "i18next": "^24.2.0",
     "i18next-browser-languagedetector": "^8.0.4",
     "lru-cache": "^11.0.2",

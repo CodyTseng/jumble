@@ -15,6 +15,7 @@ import { NostrProvider } from './providers/NostrProvider'
 import { NoteStatsProvider } from './providers/NoteStatsProvider'
 import { ReplyProvider } from './providers/ReplyProvider'
 import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
+import { TranslationServiceProvider } from './providers/TranslationServiceProvider'
 import { UserTrustProvider } from './providers/UserTrustProvider'
 import { ZapProvider } from './providers/ZapProvider'
 
@@ -25,26 +26,28 @@ export default function App(): JSX.Element {
         <ScreenSizeProvider>
           <NostrProvider>
             <ZapProvider>
-              <FavoriteRelaysProvider>
-                <FollowListProvider>
-                  <MuteListProvider>
-                    <UserTrustProvider>
-                      <BookmarksProvider>
-                        <FeedProvider>
-                          <ReplyProvider>
-                            <NoteStatsProvider>
-                              <MediaUploadServiceProvider>
-                                <PageManager />
-                                <Toaster />
-                              </MediaUploadServiceProvider>
-                            </NoteStatsProvider>
-                          </ReplyProvider>
-                        </FeedProvider>
-                      </BookmarksProvider>
-                    </UserTrustProvider>
-                  </MuteListProvider>
-                </FollowListProvider>
-              </FavoriteRelaysProvider>
+              <TranslationServiceProvider>
+                <FavoriteRelaysProvider>
+                  <FollowListProvider>
+                    <MuteListProvider>
+                      <UserTrustProvider>
+                        <BookmarksProvider>
+                          <FeedProvider>
+                            <ReplyProvider>
+                              <NoteStatsProvider>
+                                <MediaUploadServiceProvider>
+                                  <PageManager />
+                                  <Toaster />
+                                </MediaUploadServiceProvider>
+                              </NoteStatsProvider>
+                            </ReplyProvider>
+                          </FeedProvider>
+                        </BookmarksProvider>
+                      </UserTrustProvider>
+                    </MuteListProvider>
+                  </FollowListProvider>
+                </FavoriteRelaysProvider>
+              </TranslationServiceProvider>
             </ZapProvider>
           </NostrProvider>
         </ScreenSizeProvider>

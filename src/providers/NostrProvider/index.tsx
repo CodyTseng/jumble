@@ -562,9 +562,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return event
   }
 
-  const signHttpAuth = async (url: string, method: string) => {
+  const signHttpAuth = async (url: string, method: string, content = '') => {
     const event = await signEvent({
-      content: '',
+      content,
       kind: kinds.HTTPAuth,
       created_at: dayjs().unix(),
       tags: [

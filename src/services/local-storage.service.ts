@@ -7,7 +7,8 @@ import {
   TFeedInfo,
   TNoteListMode,
   TRelaySet,
-  TThemeSetting
+  TThemeSetting,
+  TTranslationServiceConfig
 } from '@/types'
 
 class LocalStorageService {
@@ -27,6 +28,7 @@ class LocalStorageService {
   private autoplay: boolean = true
   private hideUntrustedInteractions: boolean = false
   private hideUntrustedNotifications: boolean = false
+  private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -108,6 +110,13 @@ class LocalStorageService {
     this.hideUntrustedNotifications = storedHideUntrustedNotifications
       ? storedHideUntrustedNotifications === 'true'
       : hideUntrustedEvents
+
+    const translationServiceConfigMapStr = window.localStorage.getItem(
+      StorageKey.TRANSLATION_SERVICE_CONFIG_MAP
+    )
+    if (translationServiceConfigMapStr) {
+      this.translationServiceConfigMap = JSON.parse(translationServiceConfigMapStr)
+    }
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -289,6 +298,15 @@ class LocalStorageService {
       StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS,
       hideUntrustedNotifications.toString()
     )
+  }
+
+  getTranslationServiceConfig(pubkey?: string | null) {
+    return this.translationServiceConfigMap[pubkey ?? '_'] ?? { service: 'jumble' }
+  }
+
+  setTranslationServiceConfig(config: TTranslationServiceConfig, pubkey?: string | null) {
+    this.translationServiceConfigMap[pubkey ?? '_'] = config
+    window.localStorage.setItem(StorageKey.TRANSLATION_SERVICE_CONFIG_MAP, JSON.stringify(config))
   }
 }
 
