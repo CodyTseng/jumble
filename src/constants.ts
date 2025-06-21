@@ -73,7 +73,7 @@ export const DEFAULT_FAVORITE_RELAYS = [
   'wss://pyramid.fiatjaf.com/',
   'wss://140.f7z.io/',
   'wss://news.utxo.one/',
-  'wss://algo.utxo.one'
+  'wss://algo.utxo.one/'
 ]
 
 export const NIP_96_SERVICE = [
