@@ -1,3 +1,4 @@
+import { useTranslatedEvent } from '@/hooks'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -24,17 +25,18 @@ export default function ContentPreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
+  const translatedEvent = useTranslatedEvent(event?.id)
   const nodes = useMemo(() => {
     if (!event) return [{ type: 'text', data: `[${t('Not found the note')}]` }]
 
-    return parseContent(event.content, [
+    return parseContent(translatedEvent?.content ?? event.content, [
       EmbeddedImageParser,
       EmbeddedVideoParser,
       EmbeddedEventParser,
       EmbeddedMentionParser,
       EmbeddedEmojiParser
     ])
-  }, [event])
+  }, [event, translatedEvent])
 
   const emojiInfos = extractEmojiInfosFromTags(event?.tags)
 

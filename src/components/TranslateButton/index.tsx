@@ -7,6 +7,7 @@ import {
   URL_REGEX,
   WS_URL_REGEX
 } from '@/constants'
+import { useTranslatedEvent } from '@/hooks'
 import { isSupportedKind } from '@/lib/event'
 import { toTranslation } from '@/lib/link'
 import { cn } from '@/lib/utils'
@@ -15,27 +16,16 @@ import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { franc } from 'franc-min'
 import { Languages } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function TranslateButton({
-  event,
-  translatedEvent,
-  setTranslatedEvent
-}: {
-  event: Event
-  translatedEvent: Event | null
-  setTranslatedEvent: (event: Event | null) => void
-}) {
+export default function TranslateButton({ event }: { event: Event }) {
   const { i18n } = useTranslation()
   const { push } = useSecondaryPage()
-  const { translatedEventIdSet, translate, showOriginalEvent } = useTranslationService()
+  const { translate, showOriginalEvent } = useTranslationService()
   const [translating, setTranslating] = useState(false)
-  const translated = useMemo(
-    () => translatedEventIdSet.has(event.id),
-    [event, translatedEventIdSet]
-  )
+  const translatedEvent = useTranslatedEvent(event.id)
   const supported = useMemo(() => isSupportedKind(event.kind), [event])
 
   const needTranslation = useMemo(() => {
@@ -92,14 +82,6 @@ export default function TranslateButton({
     }
   }, [event, i18n.language])
 
-  useEffect(() => {
-    if (translated && !translatedEvent) {
-      handleTranslate()
-    } else if (!translated && translatedEvent) {
-      showOriginal()
-    }
-  }, [translated, translatedEvent])
-
   if (!supported || !needTranslation) {
     return null
   }
@@ -109,11 +91,6 @@ export default function TranslateButton({
 
     setTranslating(true)
     await translate(event)
-      .then(async (translatedEvent) => {
-        if (translatedEvent) {
-          setTranslatedEvent(translatedEvent)
-        }
-      })
       .catch((error) => {
         toast.error(
           'Translation failed: ' + (error.message || 'An error occurred while translating the note')
@@ -128,7 +105,6 @@ export default function TranslateButton({
   }
 
   const showOriginal = () => {
-    setTranslatedEvent(null)
     showOriginalEvent(event.id)
   }
 
@@ -138,7 +114,7 @@ export default function TranslateButton({
       disabled={translating}
       onClick={(e) => {
         e.stopPropagation()
-        if (translated) {
+        if (translatedEvent) {
           showOriginal()
         } else {
           handleTranslate()
@@ -150,7 +126,7 @@ export default function TranslateButton({
           'size-4',
           translating
             ? 'text-primary animate-pulse'
-            : translated
+            : translatedEvent
               ? 'text-primary hover:text-primary/60'
               : ''
         )}

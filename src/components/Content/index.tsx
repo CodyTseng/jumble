@@ -1,3 +1,4 @@
+import { useTranslatedEvent } from '@/hooks'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -19,8 +20,8 @@ import { Event } from 'nostr-tools'
 import { memo } from 'react'
 import {
   EmbeddedHashtag,
-  EmbeddedMention,
   EmbeddedLNInvoice,
+  EmbeddedMention,
   EmbeddedNormalUrl,
   EmbeddedNote,
   EmbeddedWebsocketUrl
@@ -31,7 +32,8 @@ import VideoPlayer from '../VideoPlayer'
 import WebPreview from '../WebPreview'
 
 const Content = memo(({ event, className }: { event: Event; className?: string }) => {
-  const nodes = parseContent(event.content, [
+  const translatedEvent = useTranslatedEvent(event.id)
+  const nodes = parseContent(translatedEvent?.content ?? event.content, [
     EmbeddedImageParser,
     EmbeddedVideoParser,
     EmbeddedNormalUrlParser,

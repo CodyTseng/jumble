@@ -8,7 +8,7 @@ import {
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { Event, kinds } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import ImageGallery from '../ImageGallery'
@@ -33,7 +33,6 @@ export default function Note({
   hideParentNotePreview?: boolean
 }) {
   const { push } = useSecondaryPage()
-  const [translatedEvent, setTranslatedEvent] = useState<Event | null>(null)
   const parentEventId = useMemo(
     () => (hideParentNotePreview ? undefined : getParentEventId(event)),
     [event, hideParentNotePreview]
@@ -68,11 +67,7 @@ export default function Note({
           </div>
         </div>
         <div className="flex items-center">
-          <TranslateButton
-            event={event}
-            translatedEvent={translatedEvent}
-            setTranslatedEvent={setTranslatedEvent}
-          />
+          <TranslateButton event={event} />
           {size === 'normal' && <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />}
         </div>
       </div>
@@ -88,9 +83,9 @@ export default function Note({
       )}
       <IValue event={event} className="mt-2" />
       {event.kind === kinds.Highlights ? (
-        <Highlight className="mt-2" event={translatedEvent ?? event} />
+        <Highlight className="mt-2" event={event} />
       ) : isSupportedKind(event.kind) ? (
-        <Content className="mt-2" event={translatedEvent ?? event} />
+        <Content className="mt-2" event={event} />
       ) : (
         <UnknownNote className="mt-2" event={event} />
       )}

@@ -15,6 +15,7 @@ type TTranslationServiceContext = {
   account: TTranslationAccount | null
   translatedEventIdSet: Set<string>
   translate: (event: Event) => Promise<Event | void>
+  getTranslatedEvent: (eventId: string) => Event | null
   showOriginalEvent: (eventId: string) => void
   getAccount: () => Promise<TTranslationAccount | void>
   regenerateApiKey: () => Promise<void>
@@ -79,6 +80,12 @@ export function TranslationServiceProvider({ children }: { children: React.React
     }
   }
 
+  const getTranslatedEvent = (eventId: string): Event | null => {
+    const target = i18n.language
+    const cacheKey = eventId + '_' + target
+    return translatedEventCache[cacheKey] ?? null
+  }
+
   const translate = async (event: Event): Promise<Event | void> => {
     if (config.service === 'jumble' && !pubkey) {
       startLogin()
@@ -137,6 +144,7 @@ export function TranslationServiceProvider({ children }: { children: React.React
         getAccount,
         regenerateApiKey,
         translate,
+        getTranslatedEvent,
         showOriginalEvent,
         updateConfig
       }}

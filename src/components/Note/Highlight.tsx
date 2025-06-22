@@ -1,4 +1,4 @@
-import { useFetchEvent } from '@/hooks'
+import { useFetchEvent, useTranslatedEvent } from '@/hooks'
 import { createFakeEvent, isSupportedKind } from '@/lib/event'
 import { toNjump, toNote } from '@/lib/link'
 import { isValidPubkey } from '@/lib/pubkey'
@@ -13,14 +13,20 @@ import ContentPreview from '../ContentPreview'
 import UserAvatar from '../UserAvatar'
 
 export default function Highlight({ event, className }: { event: Event; className?: string }) {
-  const comment = useMemo(() => event.tags.find((tag) => tag[0] === 'comment')?.[1], [event])
+  const translatedEvent = useTranslatedEvent(event.id)
+  const comment = useMemo(
+    () => (translatedEvent?.tags ?? event.tags).find((tag) => tag[0] === 'comment')?.[1],
+    [event, translatedEvent]
+  )
 
   return (
     <div className={cn('text-wrap break-words whitespace-pre-wrap space-y-4', className)}>
       {comment && <Content event={createFakeEvent({ content: comment })} />}
       <div className="flex gap-4">
         <div className="w-1 flex-shrink-0 my-1 bg-primary/60 rounded-md" />
-        <div className="italic whitespace-pre-line">{event.content}</div>
+        <div className="italic whitespace-pre-line">
+          {translatedEvent?.content ?? event.content}
+        </div>
       </div>
       <HighlightSource event={event} />
     </div>
