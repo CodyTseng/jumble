@@ -2,7 +2,7 @@ import libreTranslate from '@/services/libre-translate.service'
 import storage from '@/services/local-storage.service'
 import translation from '@/services/translation.service'
 import { TTranslationAccount, TTranslationServiceConfig } from '@/types'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -107,6 +107,35 @@ export function TranslationServiceProvider({ children }: { children: React.React
         return
       }
       apiKey = act.api_key
+    }
+
+    if (event.kind === kinds.Highlights) {
+      const comment = event.tags.find((tag) => tag[0] === 'comment')?.[1]
+      const [translatedContent, translatedComment] = await Promise.all([
+        config.service === 'jumble'
+          ? await translation.translate(event.content, target, signHttpAuth, apiKey)
+          : await libreTranslate.translate(event.content, target, config.server, config.api_key),
+        !!comment &&
+          (config.service === 'jumble'
+            ? await translation.translate(comment, target, signHttpAuth, apiKey)
+            : await libreTranslate.translate(comment, target, config.server, config.api_key))
+      ])
+
+      if (!translatedContent) {
+        return
+      }
+      const translatedEvent: Event = {
+        ...event,
+        content: translatedContent
+      }
+      if (translatedComment) {
+        translatedEvent.tags = event.tags.map((tag) =>
+          tag[0] === 'comment' ? ['comment', translatedComment] : tag
+        )
+      }
+      translatedEventCache[cacheKey] = translatedEvent
+      setTranslatedEventIdSet((prev) => new Set(prev.add(event.id)))
+      return translatedEvent
     }
 
     const translatedText =
