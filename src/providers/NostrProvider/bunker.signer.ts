@@ -12,7 +12,7 @@ export class BunkerSigner implements ISigner {
     this.clientSecretKey = clientSecretKey ? hexToBytes(clientSecretKey) : generateSecretKey()
   }
 
-  async login(bunker: string, isInitalLogin = true): Promise<string> {
+  async login(bunker: string, isInitialConnection = true): Promise<string> {
     const bunkerPointer = await parseBunkerInput(bunker)
     if (!bunkerPointer) {
       throw new Error('Invalid bunker')
@@ -23,7 +23,7 @@ export class BunkerSigner implements ISigner {
         window.open(url, '_blank')
       }
     })
-    if (isInitalLogin) {
+    if (isInitialConnection) {
       await this.signer.connect()
     }
     return await this.signer.getPublicKey()
