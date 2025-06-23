@@ -10,11 +10,10 @@ import {
 import { useTranslatedEvent } from '@/hooks'
 import { isSupportedKind } from '@/lib/event'
 import { toTranslation } from '@/lib/link'
-import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { franc } from 'franc-min'
-import { Languages } from 'lucide-react'
+import { Languages, Loader } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -110,7 +109,7 @@ export default function TranslateButton({ event }: { event: Event }) {
 
   return (
     <button
-      className="flex items-center text-muted-foreground hover:text-foreground pl-3 h-full"
+      className="flex items-center text-muted-foreground hover:text-foreground pl-3 h-full [&_svg]:size-4 [&_svg]:shrink-0"
       disabled={translating}
       onClick={(e) => {
         e.stopPropagation()
@@ -121,16 +120,11 @@ export default function TranslateButton({ event }: { event: Event }) {
         }
       }}
     >
-      <Languages
-        className={cn(
-          'size-4',
-          translating
-            ? 'text-primary animate-pulse'
-            : translatedEvent
-              ? 'text-primary hover:text-primary/60'
-              : ''
-        )}
-      />
+      {translating ? (
+        <Loader className="animate-spin" />
+      ) : (
+        <Languages className={translatedEvent ? 'text-primary hover:text-primary/60' : ''} />
+      )}
     </button>
   )
 }
