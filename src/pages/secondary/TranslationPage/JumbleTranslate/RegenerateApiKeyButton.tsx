@@ -10,9 +10,11 @@ import {
 } from '@/components/ui/dialog'
 import { Loader, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useJumbleTranslateAccount } from './JumbleTranslateAccountProvider'
 
 export default function RegenerateApiKeyButton() {
+  const { t } = useTranslation()
   const { account, regenerateApiKey } = useJumbleTranslateAccount()
   const [resettingApiKey, setResettingApiKey] = useState(false)
   const [showResetDialog, setShowResetDialog] = useState(false)
@@ -35,13 +37,15 @@ export default function RegenerateApiKeyButton() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reset API Key</DialogTitle>
+          <DialogTitle>{t('Reset API key')}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to reset your API key? This action cannot be undone.
+            {t('Are you sure you want to reset your API key? This action cannot be undone.')}
             <br />
             <br />
-            <strong>Warning:</strong> Your current API key will become invalid immediately, and any
-            applications using it will stop working until you update them with the new key.
+            <strong>{t('Warning')}:</strong>{' '}
+            {t(
+              'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.'
+            )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -50,11 +54,11 @@ export default function RegenerateApiKeyButton() {
             onClick={() => setShowResetDialog(false)}
             disabled={resettingApiKey}
           >
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button variant="destructive" onClick={handleRegenerateApiKey} disabled={resettingApiKey}>
             {resettingApiKey && <Loader className="animate-spin" />}
-            Reset API Key
+            {t('Reset API key')}
           </Button>
         </DialogFooter>
       </DialogContent>

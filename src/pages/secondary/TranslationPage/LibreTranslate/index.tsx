@@ -2,8 +2,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function LibreTranslate() {
+  const { t } = useTranslation()
   const { config, updateConfig } = useTranslationService()
   const [server, setServer] = useState(
     config.service === 'libre_translate' ? (config.server ?? '') : ''
@@ -30,7 +32,7 @@ export default function LibreTranslate() {
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="libre-translate-server" className="text-base">
-          Server Address
+          {t('Service address')}
         </Label>
         <Input
           id="libre-translate-server"
@@ -42,7 +44,7 @@ export default function LibreTranslate() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="libre-translate-api-key" className="text-base">
-          API Key
+          API key
         </Label>
         <Input
           id="libre-translate-api-key"

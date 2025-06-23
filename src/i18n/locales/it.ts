@@ -246,6 +246,23 @@ export default {
     Quotes: 'Citazioni',
     'Lightning Invoice': 'Fattura Lightning',
     'Bookmark failed': 'Impossibile aggiungere segnalibro',
-    'Remove bookmark failed': 'Impossibile rimuovere segnalibro'
+    'Remove bookmark failed': 'Impossibile rimuovere segnalibro',
+    Translation: 'Traduzione',
+    Balance: 'Saldo',
+    characters: 'caratteri',
+    jumbleTranslateApiKeyDescription:
+      "Puoi utilizzare questa chiave API ovunque supporti LibreTranslate. L'URL del servizio è {{serviceUrl}}",
+    'Top up': 'Torna al saldo',
+    'Will receive: {n} characters': 'Riceverai: {{n}} caratteri',
+    'Top up {n} sats': 'Ricarica {{n}} sats',
+    'Minimum top up is {n} sats': 'La ricarica minima è di {{n}} sats',
+    Service: 'Servizio',
+    'Reset API key': 'Reimposta chiave API',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'Sei sicuro di voler reimpostare la tua chiave API? Questa azione non può essere annullata.',
+    Warning: 'Attenzione',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      'La tua attuale chiave API diventerà immediatamente non valida e tutte le applicazioni che la utilizzano smetteranno di funzionare finché non le aggiornerai con la nuova chiave.',
+    'Service address': 'Indirizzo del servizio'
   }
 }

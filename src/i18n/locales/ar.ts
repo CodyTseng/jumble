@@ -242,6 +242,23 @@ export default {
     Quotes: 'الاقتباسات',
     'Lightning Invoice': 'فاتورة Lightning',
     'Bookmark failed': 'فشل في الإشارة المرجعية',
-    'Remove bookmark failed': 'فشل في إزالة الإشارة المرجعية'
+    'Remove bookmark failed': 'فشل في إزالة الإشارة المرجعية',
+    Translation: 'الترجمة',
+    Balance: 'الرصيد',
+    characters: 'الحروف',
+    jumbleTranslateApiKeyDescription:
+      'يمكنك استخدام مفتاح API هذا في أي مكان آخر يدعم LibreTranslate. عنوان الخدمة هو {{serviceUrl}}',
+    'Top up': 'إعادة شحن',
+    'Will receive: {n} characters': 'ستتلقى: {{n}} حروف',
+    'Top up {n} sats': 'إعادة شحن {{n}} ساتوشي',
+    'Minimum top up is {n} sats': 'الحد الأدنى لإعادة الشحن هو {{n}} ساتوشي',
+    Service: 'الخدمة',
+    'Reset API key': 'إعادة تعيين مفتاح API',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'هل أنت متأكد أنك تريد إعادة تعيين مفتاح API الخاص بك؟ لا يمكن التراجع عن هذا الإجراء.',
+    Warning: 'تحذير',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      'مفتاح API الحالي الخاص بك سيصبح غير صالح على الفور، وأي تطبيقات تستخدمه ستتوقف عن العمل حتى تقوم بتحديثها بالمفتاح الجديد.',
+    'Service address': 'عنوان الخدمة'
   }
 }

@@ -4,11 +4,13 @@ import { JUMBLE_API_BASE_URL } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
 import { Check, Copy, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useJumbleTranslateAccount } from './JumbleTranslateAccountProvider'
 import RegenerateApiKeyButton from './RegenerateApiKeyButton'
 import TopUp from './TopUp'
 
 export function AccountInfo() {
+  const { t } = useTranslation()
   const { pubkey, startLogin } = useNostr()
   const { account } = useJumbleTranslateAccount()
   const [showApiKey, setShowApiKey] = useState(false)
@@ -17,7 +19,7 @@ export function AccountInfo() {
   if (!pubkey) {
     return (
       <div className="w-full flex justify-center">
-        <Button onClick={() => startLogin()}>Login</Button>
+        <Button onClick={() => startLogin()}>{t('Login')}</Button>
       </div>
     )
   }
@@ -26,16 +28,16 @@ export function AccountInfo() {
     <div className="space-y-4">
       {/* Balance display in characters */}
       <div className="space-y-2">
-        <p className="font-medium">Balance</p>
+        <p className="font-medium">{t('Balance')}</p>
         <div className="flex items-baseline gap-2">
           <p className="text-3xl font-bold">{account?.balance.toLocaleString() ?? '0'}</p>
-          <p className="text-muted-foreground">characters</p>
+          <p className="text-muted-foreground">{t('characters')}</p>
         </div>
       </div>
 
       {/* API Key section with visibility toggle and copy functionality */}
       <div className="space-y-2">
-        <p className="font-medium">API Key</p>
+        <p className="font-medium">API key</p>
         <div className="flex items-center gap-2">
           <Input
             type={showApiKey ? 'text' : 'password'}
@@ -61,7 +63,9 @@ export function AccountInfo() {
           <RegenerateApiKeyButton />
         </div>
         <p className="text-sm text-muted-foreground select-text">
-          This API is compatible with LibreTranslate. Service URL: {JUMBLE_API_BASE_URL}
+          {t('jumbleTranslateApiKeyDescription', {
+            serviceUrl: new URL('/v1/translation', JUMBLE_API_BASE_URL).toString()
+          })}
         </p>
       </div>
       <TopUp />

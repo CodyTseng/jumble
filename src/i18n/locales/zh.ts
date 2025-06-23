@@ -243,6 +243,23 @@ export default {
     Quotes: '引用',
     'Lightning Invoice': '闪电发票',
     'Bookmark failed': '收藏失败',
-    'Remove bookmark failed': '取消收藏失败'
+    'Remove bookmark failed': '取消收藏失败',
+    Translation: '翻译',
+    Balance: '余额',
+    characters: '字符',
+    jumbleTranslateApiKeyDescription:
+      '您可以在任何支持 LibreTranslate 的地方使用此 API key。服务地址是 {{serviceUrl}}',
+    'Top up': '充值',
+    'Will receive: {n} characters': '将获得: {{n}} 字符',
+    'Top up {n} sats': '充值 {{n}} 聪',
+    'Minimum top up is {n} sats': '最低充值金额为 {{n}} 聪',
+    Service: '服务',
+    'Reset API key': '重置 API key',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      '您确定要重置您的 API key？此操作无法撤销。',
+    Warning: '警告',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      '您当前的 API key 将立即失效，任何使用它的应用程序将停止工作，直到您用新 key 更新它们。',
+    'Service address': '服务地址'
   }
 }

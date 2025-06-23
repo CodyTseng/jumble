@@ -8,8 +8,10 @@ import { Loader } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useJumbleTranslateAccount } from './JumbleTranslateAccountProvider'
+import { useTranslation } from 'react-i18next'
 
 export default function TopUp() {
+  const { t } = useTranslation()
   const { pubkey } = useNostr()
   const { getAccount } = useJumbleTranslateAccount()
   const [topUpLoading, setTopUpLoading] = useState(false)
@@ -96,7 +98,7 @@ export default function TopUp() {
 
   return (
     <div className="space-y-4">
-      <p className="font-medium">Top Up</p>
+      <p className="font-medium">{t('Top up')}</p>
 
       {/* Preset amounts */}
       <div className="grid grid-cols-2 gap-2">
@@ -110,9 +112,11 @@ export default function TopUp() {
               selectedAmount === amount && 'border border-primary bg-primary/10'
             )}
           >
-            <span className="text-lg font-semibold">{text} sats</span>
+            <span className="text-lg font-semibold">
+              {text} {t('sats')}
+            </span>
             <span className="text-sm text-muted-foreground">
-              {calculateCharacters(amount).toLocaleString()} characters
+              {calculateCharacters(amount).toLocaleString()} {t('characters')}
             </span>
           </Button>
         ))}
@@ -129,11 +133,13 @@ export default function TopUp() {
             min={1000}
             className="w-40"
           />
-          <span className="text-sm text-muted-foreground">sats</span>
+          <span className="text-sm text-muted-foreground">{t('sats')}</span>
         </div>
         {selectedAmount && selectedAmount >= 1000 && (
           <p className="text-sm text-muted-foreground">
-            Will receive: {calculateCharacters(selectedAmount).toLocaleString()} characters
+            {t('Will receive: {n} characters', {
+              n: calculateCharacters(selectedAmount).toLocaleString()
+            })}
           </p>
         )}
       </div>
@@ -145,8 +151,12 @@ export default function TopUp() {
       >
         {topUpLoading && <Loader className="animate-spin" />}
         {selectedAmount && selectedAmount >= 1000
-          ? 'Top up ' + selectedAmount.toLocaleString() + ' sats'
-          : `Minimum top up is ${new Number(1000).toLocaleString()} sats`}
+          ? t('Top up {n} sats', {
+              n: selectedAmount?.toLocaleString()
+            })
+          : t('Minimum top up is {n} sats', {
+              n: new Number(1000).toLocaleString()
+            })}
       </Button>
     </div>
   )

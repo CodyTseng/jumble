@@ -243,6 +243,23 @@ export default {
     Quotes: '引用',
     'Lightning Invoice': 'ライトニングインボイス',
     'Bookmark failed': 'ブックマークに失敗しました',
-    'Remove bookmark failed': 'ブックマークの削除に失敗しました'
+    'Remove bookmark failed': 'ブックマークの削除に失敗しました',
+    Translation: '翻訳',
+    Balance: '残高',
+    characters: '文字',
+    jumbleTranslateApiKeyDescription:
+      'このAPIキーは、LibreTranslateをサポートする他の場所でも使用できます。サービスURLは{{serviceUrl}}です',
+    'Top up': 'チャージ',
+    'Will receive: {n} characters': '受け取る文字数: {{n}} 文字',
+    'Top up {n} sats': 'チャージ {{n}} サッツ',
+    'Minimum top up is {n} sats': '最低チャージは {{n}} サッツです',
+    Service: 'サービス',
+    'Reset API key': 'APIキーをリセット',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'APIキーをリセットしますか？この操作は元に戻せません。',
+    Warning: '警告',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      '現在のAPIキーはすぐに無効になり、それを使用しているアプリケーションは新しいキーで更新するまで動作しなくなります。',
+    'Service address': 'サービスアドレス'
   }
 }

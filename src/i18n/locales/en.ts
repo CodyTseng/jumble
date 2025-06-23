@@ -242,6 +242,23 @@ export default {
     Quotes: 'Quotes',
     'Lightning Invoice': 'Lightning Invoice',
     'Bookmark failed': 'Bookmark failed',
-    'Remove bookmark failed': 'Remove bookmark failed'
+    'Remove bookmark failed': 'Remove bookmark failed',
+    Translation: 'Translation',
+    Balance: 'Balance',
+    characters: 'characters',
+    jumbleTranslateApiKeyDescription:
+      'You can use this API key anywhere else that supports LibreTranslate. The service URL is {{serviceUrl}}',
+    'Top up': 'Top up',
+    'Will receive: {n} characters': 'Will receive: {{n}} characters',
+    'Top up {n} sats': 'Top up {{n}} sats',
+    'Minimum top up is {n} sats': 'Minimum top up is {{n}} sats',
+    Service: 'Service',
+    'Reset API key': 'Reset API key',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'Are you sure you want to reset your API key? This action cannot be undone.',
+    Warning: 'Warning',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.',
+    'Service address': 'Service address'
   }
 }

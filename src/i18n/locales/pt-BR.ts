@@ -245,6 +245,23 @@ export default {
     Quotes: 'Citações',
     'Lightning Invoice': 'Fatura Lightning',
     'Bookmark failed': 'Falha ao favoritar',
-    'Remove bookmark failed': 'Falha ao remover favorito'
+    'Remove bookmark failed': 'Falha ao remover favorito',
+    Translation: 'Tradução',
+    Balance: 'Saldo',
+    characters: 'caracteres',
+    jumbleTranslateApiKeyDescription:
+      'Esta chave API pode ser usada em qualquer outro lugar que suporte LibreTranslate. O URL do serviço é {{serviceUrl}}',
+    'Top up': 'Carregar saldo',
+    'Will receive: {n} characters': 'Receberá: {{n}} caracteres',
+    'Top up {n} sats': 'Carregar {{n}} sats',
+    'Minimum top up is {n} sats': 'Carregamento mínimo é {{n}} sats',
+    Service: 'Serviço',
+    'Reset API key': 'Redefinir chave API',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'Tem certeza de que deseja redefinir sua chave API? Esta ação não pode ser desfeita.',
+    Warning: 'Aviso',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      'Sua chave API atual se tornará inválida imediatamente, e qualquer aplicativo que a utilize deixará de funcionar até que você os atualize com a nova chave.',
+    'Service address': 'Endereço do serviço'
   }
 }

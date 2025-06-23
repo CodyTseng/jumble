@@ -247,6 +247,23 @@ export default {
     Quotes: 'Цитаты',
     'Lightning Invoice': 'Lightning-счет',
     'Bookmark failed': 'Не удалось добавить закладку',
-    'Remove bookmark failed': 'Не удалось удалить закладку'
+    'Remove bookmark failed': 'Не удалось удалить закладку',
+    Translation: 'Перевод',
+    Balance: 'Баланс',
+    characters: 'символов',
+    jumbleTranslateApiKeyDescription:
+      'Вы можете использовать этот API-ключ в любом другом месте, которое поддерживает LibreTranslate. URL сервиса: {{serviceUrl}}',
+    'Top up': 'Пополнить',
+    'Will receive: {n} characters': 'Получите: {{n}} символов',
+    'Top up {n} sats': 'Пополнить на {{n}} сатс',
+    'Minimum top up is {n} sats': 'Минимальное пополнение составляет {{n}} сатс',
+    Service: 'Сервис',
+    'Reset API key': 'Сбросить API-ключ',
+    'Are you sure you want to reset your API key? This action cannot be undone.':
+      'Вы уверены, что хотите сбросить ваш API-ключ? Это действие не может быть отменено.',
+    Warning: 'Предупреждение',
+    'Your current API key will become invalid immediately, and any applications using it will stop working until you update them with the new key.':
+      'Ваш текущий API-ключ станет недействительным немедленно, и любые приложения, использующие его, перестанут работать, пока вы не обновите их новым ключом.',
+    'Service address': 'Адрес сервиса'
   }
 }
