@@ -46,7 +46,7 @@ export default function ReplyNote({
           <UserAvatar userId={event.pubkey} className="shrink-0 h-8 w-8" />
           <div className="w-full overflow-hidden">
             <div className="flex items-start justify-between gap-2">
-              <div className="flex gap-2 items-center flex-1">
+              <div className="flex gap-2 items-center flex-1 w-0">
                 <Username
                   userId={event.pubkey}
                   className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
@@ -56,7 +56,7 @@ export default function ReplyNote({
                   <FormattedTimestamp timestamp={event.created_at} />
                 </div>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center shrink-0">
                 <TranslateButton event={event} />
                 <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
               </div>

@@ -109,7 +109,7 @@ export default function TranslateButton({ event }: { event: Event }) {
 
   return (
     <button
-      className="flex items-center text-muted-foreground hover:text-foreground pl-3 h-full [&_svg]:size-4 [&_svg]:shrink-0"
+      className="flex items-center text-muted-foreground hover:text-pink-400 px-2 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 transition-colors"
       disabled={translating}
       onClick={(e) => {
         e.stopPropagation()
@@ -123,7 +123,7 @@ export default function TranslateButton({ event }: { event: Event }) {
       {translating ? (
         <Loader className="animate-spin" />
       ) : (
-        <Languages className={translatedEvent ? 'text-primary hover:text-primary/60' : ''} />
+        <Languages className={translatedEvent ? 'text-pink-400 hover:text-pink-400/60' : ''} />
       )}
     </button>
   )

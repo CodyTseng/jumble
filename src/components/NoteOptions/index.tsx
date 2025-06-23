@@ -30,7 +30,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
 
   const trigger = (
     <button
-      className="flex items-center text-muted-foreground hover:text-foreground pl-3 h-full"
+      className="flex items-center text-muted-foreground hover:text-foreground pl-2 h-full"
       onClick={() => setIsDrawerOpen(true)}
     >
       <Ellipsis />
