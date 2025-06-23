@@ -131,6 +131,7 @@ export default function TopUp() {
             value={topUpAmount}
             onChange={(e) => handleInputChange(e.target.value)}
             min={1000}
+            step={1000}
             className="w-40"
           />
           <span className="text-sm text-muted-foreground">{t('sats')}</span>
