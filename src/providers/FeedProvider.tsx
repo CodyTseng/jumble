@@ -1,11 +1,13 @@
 import { DEFAULT_FAVORITE_RELAYS } from '@/constants'
+import { getRelaySetFromRelaySetEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
+import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
 import { TFeedInfo, TFeedType } from '@/types'
-import { Filter } from 'nostr-tools'
+import { Filter, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useFavoriteRelays } from './FavoriteRelaysProvider'
 import { useNostr } from './NostrProvider'
@@ -133,14 +135,24 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     }
     if (feedType === 'relays') {
       const relaySetId = options.activeRelaySetId ?? (relaySets.length > 0 ? relaySets[0].id : null)
-      if (!relaySetId) {
+      if (!relaySetId || !pubkey) {
         setIsReady(true)
         return
       }
 
-      const relaySet =
-        relaySets.find((set) => set.id === options.activeRelaySetId) ??
+      let relaySet =
+        relaySets.find((set) => set.id === relaySetId) ??
         (relaySets.length > 0 ? relaySets[0] : null)
+      if (!relaySet) {
+        const storedRelaySetEvent = await indexedDb.getReplaceableEvent(
+          pubkey,
+          kinds.Relaysets,
+          relaySetId
+        )
+        if (storedRelaySetEvent) {
+          relaySet = getRelaySetFromRelaySetEvent(storedRelaySetEvent)
+        }
+      }
       if (relaySet) {
         const newFeedInfo = { feedType, id: relaySet.id }
         setFeedInfo(newFeedInfo)
@@ -160,7 +172,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     }
     if (feedType === 'following') {
       if (!options.pubkey) {
-        return setIsReady(true)
+        setIsReady(true)
+        return
       }
       const newFeedInfo = { feedType }
       setFeedInfo(newFeedInfo)
@@ -172,11 +185,13 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setFilter({
         authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
       })
-      return setIsReady(true)
+      setIsReady(true)
+      return
     }
     if (feedType === 'bookmarks') {
       if (!options.pubkey) {
-        return setIsReady(true)
+        setIsReady(true)
+        return
       }
 
       const newFeedInfo = { feedType }
@@ -186,12 +201,14 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
 
       setRelayUrls([])
       setFilter({})
-      return setIsReady(true)
+      setIsReady(true)
+      return
     }
     if (feedType === 'temporary') {
       const urls = options.temporaryRelayUrls ?? temporaryRelayUrls
       if (!urls.length) {
-        return setIsReady(true)
+        setIsReady(true)
+        return
       }
 
       const newFeedInfo = { feedType }

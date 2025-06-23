@@ -95,6 +95,23 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
   useEffect(() => {
     const hasHistoryState = !!history.state
+    if (['/npub1', '/nprofile1'].some((prefix) => window.location.pathname.startsWith(prefix))) {
+      window.history.replaceState(
+        null,
+        '',
+        '/users' + window.location.pathname + window.location.search + window.location.hash
+      )
+    } else if (
+      ['/note1', '/nevent1', '/naddr1'].some((prefix) =>
+        window.location.pathname.startsWith(prefix)
+      )
+    ) {
+      window.history.replaceState(
+        null,
+        '',
+        '/notes' + window.location.pathname + window.location.search + window.location.hash
+      )
+    }
     window.history.pushState(null, '', window.location.href)
     if (window.location.pathname !== '/') {
       if (

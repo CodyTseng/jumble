@@ -37,7 +37,7 @@ export default {
     Cancel: 'Cancelar',
     Mentions: 'Menções',
     'Failed to post': 'Falha ao postar',
-    'Post successful': 'Sucesso',
+    'Post successful': 'Nota publicada com sucesso',
     'Your post has been published': 'Sua nota foi publicada',
     Repost: 'Repostar',
     Quote: 'Citar',
