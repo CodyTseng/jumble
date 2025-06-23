@@ -306,7 +306,10 @@ class LocalStorageService {
 
   setTranslationServiceConfig(config: TTranslationServiceConfig, pubkey?: string | null) {
     this.translationServiceConfigMap[pubkey ?? '_'] = config
-    window.localStorage.setItem(StorageKey.TRANSLATION_SERVICE_CONFIG_MAP, JSON.stringify(config))
+    window.localStorage.setItem(
+      StorageKey.TRANSLATION_SERVICE_CONFIG_MAP,
+      JSON.stringify(this.translationServiceConfigMap)
+    )
   }
 }
 

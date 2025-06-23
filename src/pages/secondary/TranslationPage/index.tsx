@@ -50,6 +50,7 @@ const TranslationPage = forwardRef(({ index }: { index?: number }, ref) => {
             {t('Service')}
           </Label>
           <Select
+            defaultValue={config.service}
             value={config.service}
             onValueChange={(newService) => {
               updateConfig({ service: newService as 'jumble' | 'libre_translate' })
