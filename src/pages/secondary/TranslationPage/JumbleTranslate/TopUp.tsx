@@ -1,15 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useTranslationService } from '@/providers/TranslationServiceProvider'
+import { useNostr } from '@/providers/NostrProvider'
 import transaction from '@/services/transaction.service'
 import { closeModal, launchPaymentModal } from '@getalby/bitcoin-connect-react'
 import { Loader } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useJumbleTranslateAccount } from './JumbleTranslateAccountProvider'
 
 export default function TopUp() {
-  const { account, getAccount } = useTranslationService()
+  const { pubkey } = useNostr()
+  const { getAccount } = useJumbleTranslateAccount()
   const [topUpLoading, setTopUpLoading] = useState(false)
   const [topUpAmount, setTopUpAmount] = useState(1000)
   const [selectedAmount, setSelectedAmount] = useState<number | null>(1000)
@@ -40,14 +42,11 @@ export default function TopUp() {
   }
 
   const handleTopUp = async (amount: number | null) => {
-    if (topUpLoading || !account || !amount || amount < 1000) return
+    if (topUpLoading || !pubkey || !amount || amount < 1000) return
 
     setTopUpLoading(true)
     try {
-      const { transactionId, invoiceId } = await transaction.createTransaction(
-        account.pubkey,
-        amount
-      )
+      const { transactionId, invoiceId } = await transaction.createTransaction(pubkey, amount)
 
       let checkPaymentInterval: ReturnType<typeof setInterval> | undefined = undefined
       const { setPaid } = launchPaymentModal({

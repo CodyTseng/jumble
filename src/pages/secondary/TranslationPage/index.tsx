@@ -12,7 +12,7 @@ import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { TLanguage } from '@/types'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { JumbleTranslate } from './JumbleTranslate'
+import JumbleTranslate from './JumbleTranslate'
 import LibreTranslate from './LibreTranslate'
 
 const TranslationPage = forwardRef(({ index }: { index?: number }, ref) => {

@@ -30,7 +30,6 @@ export default function ReplyNote({
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { mutePubkeys } = useMuteList()
-  const [translatedEvent, setTranslatedEvent] = useState<Event | null>(null)
   const [showMuted, setShowMuted] = useState(false)
   const show = useMemo(
     () => showMuted || !mutePubkeys.includes(event.pubkey),
@@ -58,11 +57,7 @@ export default function ReplyNote({
                 </div>
               </div>
               <div className="flex items-center">
-                <TranslateButton
-                  event={event}
-                  translatedEvent={translatedEvent}
-                  setTranslatedEvent={setTranslatedEvent}
-                />
+                <TranslateButton event={event} />
                 <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
               </div>
             </div>
@@ -77,7 +72,7 @@ export default function ReplyNote({
               />
             )}
             {show ? (
-              <Content className="mt-2" event={translatedEvent ?? event} />
+              <Content className="mt-2" event={event} />
             ) : (
               <Button
                 variant="outline"

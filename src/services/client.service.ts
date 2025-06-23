@@ -144,12 +144,12 @@ class ClientService extends EventTarget {
     return result
   }
 
-  async signHttpAuth(url: string, method: string) {
+  async signHttpAuth(url: string, method: string, description = '') {
     if (!this.signer) {
       throw new Error('Please login first to sign the event')
     }
     const event = await this.signer?.signEvent({
-      content: '',
+      content: description,
       kind: kinds.HTTPAuth,
       created_at: dayjs().unix(),
       tags: [

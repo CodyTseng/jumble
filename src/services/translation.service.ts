@@ -1,10 +1,12 @@
 import { JUMBLE_API_BASE_URL } from '@/constants'
+import client from '@/services/client.service'
 import { TTranslationAccount } from '@/types'
-
-type SignHttpAuth = (url: string, method: string, content?: string) => Promise<string>
 
 class TranslationService {
   static instance: TranslationService
+
+  private apiKeyMap: Record<string, string | undefined> = {}
+  private currentPubkey: string | null = null
 
   constructor() {
     if (!TranslationService.instance) {
@@ -13,79 +15,113 @@ class TranslationService {
     return TranslationService.instance
   }
 
-  async getAccount(signHttpAuth: SignHttpAuth, api_key?: string): Promise<TTranslationAccount> {
-    const url = new URL('/v1/translation/account', JUMBLE_API_BASE_URL).toString()
+  async getAccount(): Promise<TTranslationAccount> {
+    if (!this.currentPubkey) {
+      throw new Error('Please login first')
+    }
+    const apiKey = this.apiKeyMap[this.currentPubkey]
+    const path = '/v1/translation/account'
+    const method = 'GET'
+    let auth: string | undefined
+    if (!apiKey) {
+      auth = await client.signHttpAuth(
+        new URL(path, JUMBLE_API_BASE_URL).toString(),
+        method,
+        'Auth to get Jumble translation service account'
+      )
+    }
+    const act = await this._fetch<TTranslationAccount>({
+      path,
+      method,
+      auth,
+      retryWhenUnauthorized: !auth
+    })
 
-    let auth: string
-    if (api_key) {
-      auth = `Bearer ${api_key}`
-    } else {
-      auth = await signHttpAuth(url, 'get', 'Auth to get Jumble translation service account')
+    if (act.api_key && act.pubkey) {
+      this.apiKeyMap[act.pubkey] = act.api_key
     }
 
+    return act
+  }
+
+  async regenerateApiKey(): Promise<string> {
+    try {
+      const data = await this._fetch({
+        path: '/v1/translation/regenerate-api-key',
+        method: 'POST'
+      })
+      if (data.api_key && this.currentPubkey) {
+        this.apiKeyMap[this.currentPubkey] = data.api_key
+      }
+      return data.api_key
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : ''
+      throw new Error(errMsg || 'Failed to regenerate API key')
+    }
+  }
+
+  async translate(text: string, target: string): Promise<string | undefined> {
+    try {
+      const data = await this._fetch({
+        path: '/v1/translation/translate',
+        method: 'POST',
+        body: JSON.stringify({ q: text, target })
+      })
+      return data.translatedText
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : ''
+      throw new Error(errMsg || 'Failed to translate')
+    }
+  }
+
+  changeCurrentPubkey(pubkey: string | null): void {
+    this.currentPubkey = pubkey
+  }
+
+  private async _fetch<T = any>({
+    path,
+    method,
+    body,
+    auth,
+    retryWhenUnauthorized = true
+  }: {
+    path: string
+    method: string
+    body?: string
+    auth?: string
+    retryWhenUnauthorized?: boolean
+  }): Promise<T> {
+    if (!this.currentPubkey) {
+      throw new Error('Please login first')
+    }
+    const apiKey = this.apiKeyMap[this.currentPubkey]
+    const hasApiKey = !!apiKey
+    let _auth: string
+    if (auth) {
+      _auth = auth
+    } else if (hasApiKey) {
+      _auth = `Bearer ${apiKey}`
+    } else {
+      const act = await this.getAccount()
+      _auth = `Bearer ${act.api_key}`
+    }
+
+    const url = new URL(path, JUMBLE_API_BASE_URL).toString()
     const response = await fetch(url, {
-      headers: { Authorization: auth }
+      method,
+      headers: { 'Content-Type': 'application/json', Authorization: _auth },
+      body
     })
+
     const data = await response.json()
     if (!response.ok) {
-      throw new Error(data.error ?? 'Failed to fetch account information')
+      if (data.code === '00403' && hasApiKey && retryWhenUnauthorized) {
+        this.apiKeyMap[this.currentPubkey] = undefined
+        return this._fetch({ path, method, body, retryWhenUnauthorized: false })
+      }
+      throw new Error(data.error)
     }
     return data
-  }
-
-  async regenerateApiKey(
-    signHttpAuth: SignHttpAuth,
-    api_key?: string
-  ): Promise<string | undefined> {
-    let auth: string
-    if (!api_key) {
-      const act = await this.getAccount(signHttpAuth)
-      auth = `Bearer ${act.api_key}`
-    } else {
-      auth = `Bearer ${api_key}`
-    }
-    const url = new URL('/v1/translation/regenerate-api-key', JUMBLE_API_BASE_URL).toString()
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: auth }
-    })
-    const data = await response.json()
-    if (!response.ok) {
-      if (data.code === '00403' && !!api_key) {
-        return this.regenerateApiKey(signHttpAuth)
-      }
-      throw new Error(data.error ?? 'Failed to regenerate API key')
-    }
-    return data.api_key
-  }
-
-  async translate(
-    text: string,
-    target: string,
-    signHttpAuth: SignHttpAuth,
-    api_key?: string
-  ): Promise<string | undefined> {
-    let auth: string
-    if (!api_key) {
-      const act = await this.getAccount(signHttpAuth)
-      auth = `Bearer ${act.api_key}`
-    } else {
-      auth = `Bearer ${api_key}`
-    }
-    const url = new URL('/v1/translation/translate', JUMBLE_API_BASE_URL).toString()
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: auth },
-      body: JSON.stringify({ q: text, target })
-    })
-    const data = await response.json()
-    if (!response.ok) {
-      if (data.code === '00403' && !!api_key) {
-        return this.translate(text, target, signHttpAuth)
-      }
-      throw new Error(data.error ?? 'Failed to translate')
-    }
-    return data.translatedText
   }
 }
 

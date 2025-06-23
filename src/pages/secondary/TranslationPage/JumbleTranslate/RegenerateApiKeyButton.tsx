@@ -8,13 +8,12 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { Loader, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { useJumbleTranslateAccount } from './JumbleTranslateAccountProvider'
 
 export default function RegenerateApiKeyButton() {
-  const { account, regenerateApiKey } = useTranslationService()
+  const { account, regenerateApiKey } = useJumbleTranslateAccount()
   const [resettingApiKey, setResettingApiKey] = useState(false)
   const [showResetDialog, setShowResetDialog] = useState(false)
 
@@ -22,17 +21,9 @@ export default function RegenerateApiKeyButton() {
     if (resettingApiKey || !account) return
 
     setResettingApiKey(true)
-    try {
-      await regenerateApiKey()
-      setShowResetDialog(false)
-    } catch (error) {
-      toast.error(
-        'Failed to Reset API Key: ' +
-          (error instanceof Error ? error.message : 'An error occurred while resetting the API key')
-      )
-    } finally {
-      setResettingApiKey(false)
-    }
+    await regenerateApiKey()
+    setShowResetDialog(false)
+    setResettingApiKey(false)
   }
 
   return (
