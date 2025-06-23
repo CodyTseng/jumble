@@ -10,6 +10,7 @@ import {
 import { useTranslatedEvent } from '@/hooks'
 import { isSupportedKind } from '@/lib/event'
 import { toTranslation } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { franc } from 'franc-min'
@@ -19,7 +20,13 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function TranslateButton({ event }: { event: Event }) {
+export default function TranslateButton({
+  event,
+  className
+}: {
+  event: Event
+  className?: string
+}) {
   const { i18n } = useTranslation()
   const { push } = useSecondaryPage()
   const { translate, showOriginalEvent } = useTranslationService()
@@ -109,7 +116,10 @@ export default function TranslateButton({ event }: { event: Event }) {
 
   return (
     <button
-      className="flex items-center text-muted-foreground hover:text-pink-400 px-2 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 transition-colors"
+      className={cn(
+        'flex items-center text-muted-foreground hover:text-pink-400 px-2 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 transition-colors',
+        className
+      )}
       disabled={translating}
       onClick={(e) => {
         e.stopPropagation()

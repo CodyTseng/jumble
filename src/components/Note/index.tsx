@@ -67,7 +67,7 @@ export default function Note({
           </div>
         </div>
         <div className="flex items-center">
-          <TranslateButton event={event} />
+          <TranslateButton event={event} className={size === 'normal' ? '' : 'pr-0'} />
           {size === 'normal' && <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />}
         </div>
       </div>
