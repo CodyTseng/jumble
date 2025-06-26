@@ -16,6 +16,7 @@ import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import { getUsingClient } from '@/lib/event'
 
 export default function ReplyNote({
   event,
@@ -36,6 +37,7 @@ export default function ReplyNote({
     () => showMuted || !mutePubkeys.includes(event.pubkey),
     [showMuted, mutePubkeys, event]
   )
+  const usingClient = useMemo(() => getUsingClient(event), [event])
 
   return (
     <div
@@ -54,12 +56,16 @@ export default function ReplyNote({
                     className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
                     skeletonClassName="h-3"
                   />
-                  <FormattedTimestamp
-                    timestamp={event.created_at}
-                    className="text-xs text-muted-foreground shrink-0"
-                  />
+                  {usingClient && (
+                    <span className="text-sm text-muted-foreground shrink-0">
+                      using {usingClient}
+                    </span>
+                  )}
                 </div>
-                <Nip05 pubkey={event.pubkey} />
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Nip05 pubkey={event.pubkey} append="·" />
+                  <FormattedTimestamp timestamp={event.created_at} className="shrink-0" />
+                </div>
               </div>
               <div className="flex items-center shrink-0">
                 <TranslateButton event={event} className="py-0" />

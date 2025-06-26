@@ -4,7 +4,7 @@ import { useFetchNip05 } from '@/hooks/useFetchNip05'
 import { BadgeAlert, BadgeCheck } from 'lucide-react'
 import { useState } from 'react'
 
-export default function Nip05({ pubkey }: { pubkey: string }) {
+export default function Nip05({ pubkey, append }: { pubkey: string; append?: string }) {
   const { profile } = useFetchProfile(pubkey)
   const { nip05IsVerified, nip05Name, nip05Domain, isFetching } = useFetchNip05(
     profile?.nip05,
@@ -14,7 +14,7 @@ export default function Nip05({ pubkey }: { pubkey: string }) {
   if (isFetching) {
     return (
       <div className="flex items-center py-1">
-        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-16" />
       </div>
     )
   }
@@ -36,6 +36,7 @@ export default function Nip05({ pubkey }: { pubkey: string }) {
         <span className="text-sm truncate">{nip05Domain}</span>
       </a>
       <Favicon domain={nip05Domain} />
+      {append && <span className="text-sm text-muted-foreground truncate">{append}</span>}
     </div>
   )
 }

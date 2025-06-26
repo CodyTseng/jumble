@@ -61,7 +61,7 @@ export default function Note({
               )}
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Nip05 pubkey={event.pubkey} />
+              <Nip05 pubkey={event.pubkey} append="·" />
               <FormattedTimestamp timestamp={event.created_at} className="shrink-0" />
             </div>
           </div>
