@@ -130,7 +130,7 @@ function ProfileListBySearch({ search }: { search: string }) {
   }
 
   return (
-    <div className="space-y-2 px-4">
+    <div className="px-4">
       {Array.from(pubkeySet).map((pubkey, index) => (
         <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
       ))}
