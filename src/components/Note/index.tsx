@@ -7,6 +7,7 @@ import {
   isSupportedKind
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import Content from '../Content'
@@ -34,6 +35,7 @@ export default function Note({
   hideParentNotePreview?: boolean
 }) {
   const { push } = useSecondaryPage()
+  const { isSmallScreen } = useScreenSize()
   const parentEventId = useMemo(
     () => (hideParentNotePreview ? undefined : getParentEventId(event)),
     [event, hideParentNotePreview]
@@ -50,19 +52,23 @@ export default function Note({
         <div className="flex items-center space-x-2 flex-1">
           <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
           <div className="flex-1 w-0">
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-baseline">
               <Username
                 userId={event.pubkey}
                 className={`font-semibold flex truncate ${size === 'small' ? 'text-sm' : ''}`}
                 skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
               />
               {usingClient && size === 'normal' && (
-                <span className="text-sm text-muted-foreground shrink-0">using {usingClient}</span>
+                <span className="text-xs text-muted-foreground shrink-0">using {usingClient}</span>
               )}
             </div>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <div className="flex items-baseline gap-1 text-xs text-muted-foreground">
               <Nip05 pubkey={event.pubkey} append="·" />
-              <FormattedTimestamp timestamp={event.created_at} className="shrink-0" />
+              <FormattedTimestamp
+                timestamp={event.created_at}
+                className="text-xs shrink-0"
+                short={isSmallScreen}
+              />
             </div>
           </div>
         </div>

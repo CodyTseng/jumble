@@ -1,8 +1,10 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getUsingClient } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useMuteList } from '@/providers/MuteListProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +18,6 @@ import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import { getUsingClient } from '@/lib/event'
 
 export default function ReplyNote({
   event,
@@ -30,6 +31,7 @@ export default function ReplyNote({
   highlight?: boolean
 }) {
   const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
   const { mutePubkeys } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
@@ -64,7 +66,11 @@ export default function ReplyNote({
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Nip05 pubkey={event.pubkey} append="·" />
-                  <FormattedTimestamp timestamp={event.created_at} className="shrink-0" />
+                  <FormattedTimestamp
+                    timestamp={event.created_at}
+                    className="shrink-0"
+                    short={isSmallScreen}
+                  />
                 </div>
               </div>
               <div className="flex items-center shrink-0">
