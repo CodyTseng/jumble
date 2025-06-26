@@ -3,6 +3,22 @@ import { useTranslation } from 'react-i18next'
 
 export function FormattedTimestamp({
   timestamp,
+  short = false,
+  className
+}: {
+  timestamp: number
+  short?: boolean
+  className?: string
+}) {
+  return (
+    <span className={className}>
+      <FormattedTimestampContent timestamp={timestamp} short={short} />
+    </span>
+  )
+}
+
+function FormattedTimestampContent({
+  timestamp,
   short = false
 }: {
   timestamp: number

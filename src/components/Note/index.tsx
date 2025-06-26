@@ -12,6 +12,7 @@ import { useMemo } from 'react'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import ImageGallery from '../ImageGallery'
+import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
 import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
@@ -47,10 +48,8 @@ export default function Note({
     <div className={className}>
       <div className="flex justify-between items-start gap-2">
         <div className="flex items-center space-x-2 flex-1">
-          <UserAvatar userId={event.pubkey} size={size === 'small' ? 'small' : 'normal'} />
-          <div
-            className={`flex-1 w-0 ${size === 'small' ? 'flex space-x-2 items-center overflow-hidden' : ''}`}
-          >
+          <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
+          <div className="flex-1 w-0">
             <div className="flex gap-2 items-center">
               <Username
                 userId={event.pubkey}
@@ -58,17 +57,20 @@ export default function Note({
                 skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
               />
               {usingClient && size === 'normal' && (
-                <div className="text-xs text-muted-foreground shrink-0">using {usingClient}</div>
+                <span className="text-sm text-muted-foreground shrink-0">using {usingClient}</span>
               )}
             </div>
-            <div className="text-xs text-muted-foreground shrink-0">
-              <FormattedTimestamp timestamp={event.created_at} />
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Nip05 pubkey={event.pubkey} />
+              <FormattedTimestamp timestamp={event.created_at} className="shrink-0" />
             </div>
           </div>
         </div>
         <div className="flex items-center">
           <TranslateButton event={event} className={size === 'normal' ? '' : 'pr-0'} />
-          {size === 'normal' && <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />}
+          {size === 'normal' && (
+            <NoteOptions event={event} className="py-1 shrink-0 [&_svg]:size-5" />
+          )}
         </div>
       </div>
       {parentEventId && (

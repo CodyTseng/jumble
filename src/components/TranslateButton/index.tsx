@@ -122,7 +122,7 @@ export default function TranslateButton({
   return (
     <button
       className={cn(
-        'flex items-center text-muted-foreground hover:text-pink-400 px-2 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 transition-colors',
+        'flex items-center text-muted-foreground hover:text-pink-400 px-2 py-1 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 transition-colors',
         className
       )}
       disabled={translating}

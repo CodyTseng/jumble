@@ -9,12 +9,13 @@ import { useTranslation } from 'react-i18next'
 import Collapsible from '../Collapsible'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
+import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
 import NoteStats from '../NoteStats'
 import ParentNotePreview from '../ParentNotePreview'
+import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import TranslateButton from '../TranslateButton'
 
 export default function ReplyNote({
   event,
@@ -43,21 +44,25 @@ export default function ReplyNote({
     >
       <Collapsible>
         <div className="flex space-x-2 items-start px-4 pt-3">
-          <UserAvatar userId={event.pubkey} className="shrink-0 h-8 w-8" />
+          <UserAvatar userId={event.pubkey} size="medium" className="shrink-0 mt-1" />
           <div className="w-full overflow-hidden">
             <div className="flex items-start justify-between gap-2">
-              <div className="flex gap-2 items-center flex-1 w-0">
-                <Username
-                  userId={event.pubkey}
-                  className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
-                  skeletonClassName="h-3"
-                />
-                <div className="text-xs text-muted-foreground shrink-0">
-                  <FormattedTimestamp timestamp={event.created_at} />
+              <div className="flex-1 w-0">
+                <div className="flex gap-1 items-center">
+                  <Username
+                    userId={event.pubkey}
+                    className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
+                    skeletonClassName="h-3"
+                  />
+                  <FormattedTimestamp
+                    timestamp={event.created_at}
+                    className="text-xs text-muted-foreground shrink-0"
+                  />
                 </div>
+                <Nip05 pubkey={event.pubkey} />
               </div>
               <div className="flex items-center shrink-0">
-                <TranslateButton event={event} />
+                <TranslateButton event={event} className="py-0" />
                 <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
               </div>
             </div>
