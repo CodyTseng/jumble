@@ -1,11 +1,13 @@
+import { Favicon } from '@/components/Favicon'
+import ProfileList from '@/components/ProfileList'
 import UserItem from '@/components/UserItem'
 import { SEARCHABLE_RELAY_URLS } from '@/constants'
 import { useFetchRelayInfos } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { fetchPubkeysFromDomain } from '@/lib/nip05'
 import { useFeed } from '@/providers/FeedProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
-import { Filter } from 'nostr-tools'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -13,27 +15,75 @@ const LIMIT = 50
 
 const ProfileListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
+  const [title, setTitle] = useState<React.ReactNode>()
+  const [data, setData] = useState<{
+    type: 'search' | 'domain'
+    id: string
+  } | null>(null)
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const search = searchParams.get('s')
+    if (search) {
+      setTitle(`${t('Search')}: ${search}`)
+      setData({ type: 'search', id: search })
+      return
+    }
+
+    const domain = searchParams.get('d')
+    if (domain) {
+      setTitle(
+        <div className="flex items-center gap-1">
+          {domain}
+          <Favicon domain={domain} className="w-5 h-5" />
+        </div>
+      )
+      setData({ type: 'domain', id: domain })
+      return
+    }
+  }, [])
+
+  let content: React.ReactNode = null
+  if (data?.type === 'search') {
+    content = <ProfileListBySearch search={data.id} />
+  } else if (data?.type === 'domain') {
+    content = <ProfileListByDomain domain={data.id} />
+  }
+
+  return (
+    <SecondaryPageLayout ref={ref} index={index} title={title} displayScrollToTopButton>
+      {content}
+    </SecondaryPageLayout>
+  )
+})
+ProfileListPage.displayName = 'ProfileListPage'
+export default ProfileListPage
+
+function ProfileListByDomain({ domain }: { domain: string }) {
+  const [pubkeys, setPubkeys] = useState<string[]>([])
+
+  useEffect(() => {
+    const init = async () => {
+      const _pubkeys = await fetchPubkeysFromDomain(domain)
+      setPubkeys(_pubkeys)
+    }
+    init()
+  }, [domain])
+
+  return <ProfileList pubkeys={pubkeys} />
+}
+
+function ProfileListBySearch({ search }: { search: string }) {
   const { relayUrls } = useFeed()
   const { searchableRelayUrls } = useFetchRelayInfos(relayUrls)
   const [until, setUntil] = useState<number>(() => dayjs().unix())
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [pubkeySet, setPubkeySet] = useState(new Set<string>())
   const bottomRef = useRef<HTMLDivElement>(null)
-  const filter = useMemo(() => {
-    const f: Filter = { until }
-    const searchParams = new URLSearchParams(window.location.search)
-    const search = searchParams.get('s')
-    if (search) {
-      f.search = search
-    }
-    return f
-  }, [until])
+  const filter = { until, search }
   const urls = useMemo(() => {
     return filter.search ? searchableRelayUrls.concat(SEARCHABLE_RELAY_URLS).slice(0, 4) : relayUrls
   }, [relayUrls, searchableRelayUrls, filter])
-  const title = useMemo(() => {
-    return filter.search ? `${t('Search')}: ${filter.search}` : t('All users')
-  }, [filter])
 
   useEffect(() => {
     if (!hasMore) return
@@ -80,15 +130,11 @@ const ProfileListPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title={title} displayScrollToTopButton>
-      <div className="space-y-2 px-4">
-        {Array.from(pubkeySet).map((pubkey, index) => (
-          <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
-        ))}
-        {hasMore && <div ref={bottomRef} />}
-      </div>
-    </SecondaryPageLayout>
+    <div className="space-y-2 px-4">
+      {Array.from(pubkeySet).map((pubkey, index) => (
+        <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
+      ))}
+      {hasMore && <div ref={bottomRef} />}
+    </div>
   )
-})
-ProfileListPage.displayName = 'ProfileListPage'
-export default ProfileListPage
+}

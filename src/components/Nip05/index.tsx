@@ -1,8 +1,10 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchProfile } from '@/hooks'
 import { useFetchNip05 } from '@/hooks/useFetchNip05'
+import { toNoteList } from '@/lib/link'
+import { SecondaryPageLink } from '@/PageManager'
 import { BadgeAlert, BadgeCheck } from 'lucide-react'
-import { useState } from 'react'
+import { Favicon } from '../Favicon'
 
 export default function Nip05({ pubkey, append }: { pubkey: string; append?: string }) {
   const { profile } = useFetchProfile(pubkey)
@@ -26,31 +28,15 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       {nip05Name !== '_' ? (
         <span className="text-sm text-muted-foreground truncate">@{nip05Name}</span>
       ) : null}
-      <a
-        href={`https://${nip05Domain}`}
-        target="_blank"
+      <SecondaryPageLink
+        to={toNoteList({ domain: nip05Domain })}
         className={`flex items-center gap-1 hover:underline truncate [&_svg]:size-3.5 [&_svg]:shrink-0 ${nip05IsVerified ? 'text-primary' : 'text-muted-foreground'}`}
-        rel="noreferrer"
       >
         {nip05IsVerified ? <BadgeCheck /> : <BadgeAlert />}
         <span className="text-sm truncate">{nip05Domain}</span>
-      </a>
-      <Favicon domain={nip05Domain} />
+      </SecondaryPageLink>
+      <Favicon domain={nip05Domain} className="w-3.5 h-3.5" />
       {append && <span className="text-sm text-muted-foreground truncate">{append}</span>}
     </div>
-  )
-}
-
-function Favicon({ domain }: { domain: string }) {
-  const [error, setError] = useState(false)
-  if (error) return null
-
-  return (
-    <img
-      src={`https://${domain}/favicon.ico`}
-      alt={domain}
-      className="w-3.5 h-3.5"
-      onError={() => setError(true)}
-    />
   )
 }

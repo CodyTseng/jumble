@@ -279,6 +279,7 @@ export default {
     'Trusted users include people you follow and people they follow.':
       'Les utilisateurs de confiance incluent les personnes que vous suivez et les personnes qu’elles suivent.',
     Continue: 'Continuer',
-    'Successfully updated mute list': 'Liste de sourdine mise à jour avec succès'
+    'Successfully updated mute list': 'Liste de sourdine mise à jour avec succès',
+    'No pubkeys found from {url}': 'Aucun pubkey trouvé à partir de {{url}}'
   }
 }

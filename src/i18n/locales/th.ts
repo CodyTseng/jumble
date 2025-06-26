@@ -273,6 +273,7 @@ export default {
     'Trusted users include people you follow and people they follow.':
       'ผู้ใช้ที่เชื่อถือได้รวมถึงผู้ที่คุณติดตามและผู้ที่พวกเขาติดตาม',
     Continue: 'ดำเนินการต่อ',
-    'Successfully updated mute list': 'อัปเดตรายการปิดเสียงสำเร็จ'
+    'Successfully updated mute list': 'อัปเดตรายการปิดเสียงสำเร็จ',
+    'No pubkeys found from {url}': 'ไม่พบ pubkeys จาก {{url}}'
   }
 }

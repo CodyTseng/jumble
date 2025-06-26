@@ -277,6 +277,7 @@ export default {
     'Trusted users include people you follow and people they follow.':
       'Usuários confiáveis incluem pessoas que você segue e pessoas que elas seguem.',
     Continue: 'Continuar',
-    'Successfully updated mute list': 'Lista de silenciados atualizada com sucesso'
+    'Successfully updated mute list': 'Lista de silenciados atualizada com sucesso',
+    'No pubkeys found from {url}': 'Nenhum pubkey encontrado em {{url}}'
   }
 }

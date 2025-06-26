@@ -281,6 +281,7 @@ export default {
     'Trusted users include people you follow and people they follow.':
       'Vertrauenswürdige Benutzer sind Personen, denen du folgst, und Personen, denen sie folgen.',
     Continue: 'Weiter',
-    'Successfully updated mute list': 'Stummschalteliste erfolgreich aktualisiert'
+    'Successfully updated mute list': 'Stummschalteliste erfolgreich aktualisiert',
+    'No pubkeys found from {url}': 'Keine Pubkeys von {{url}} gefunden'
   }
 }

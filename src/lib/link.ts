@@ -11,17 +11,20 @@ export const toNote = (eventOrId: Pick<Event, 'id' | 'pubkey'> | string) => {
 export const toNoteList = ({
   hashtag,
   search,
-  externalContentId
+  externalContentId,
+  domain
 }: {
   hashtag?: string
   search?: string
   externalContentId?: string
+  domain?: string
 }) => {
   const path = '/notes'
   const query = new URLSearchParams()
   if (hashtag) query.set('t', hashtag.toLowerCase())
   if (search) query.set('s', search)
   if (externalContentId) query.set('i', externalContentId)
+  if (domain) query.set('d', domain)
   return `${path}?${query.toString()}`
 }
 export const toProfile = (userId: string) => {
@@ -29,10 +32,11 @@ export const toProfile = (userId: string) => {
   const npub = nip19.npubEncode(userId)
   return `/users/${npub}`
 }
-export const toProfileList = ({ search }: { search?: string }) => {
+export const toProfileList = ({ search, domain }: { search?: string; domain?: string }) => {
   const path = '/users'
   const query = new URLSearchParams()
   if (search) query.set('s', search)
+  if (domain) query.set('d', domain)
   return `${path}?${query.toString()}`
 }
 export const toFollowingList = (pubkey: string) => {

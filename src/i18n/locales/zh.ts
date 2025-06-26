@@ -274,6 +274,7 @@ export default {
     'Trusted users include people you follow and people they follow.':
       '受信任的用户包括您关注的人和他们关注的人。',
     Continue: '继续',
-    'Successfully updated mute list': '成功更新屏蔽列表'
+    'Successfully updated mute list': '成功更新屏蔽列表',
+    'No pubkeys found from {url}': '在 {{url}} 中未找到 pubkeys'
   }
 }
