@@ -68,6 +68,7 @@ export async function createShortTextNoteDraftEvent(
     parentEvent?: Event
     addClientTag?: boolean
     protectedEvent?: boolean
+    isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
   const { quoteEventIds, rootETag, parentETag } = await extractRelatedEventIds(
@@ -101,6 +102,10 @@ export async function createShortTextNoteDraftEvent(
 
   if (options.addClientTag) {
     tags.push(['client', 'jumble'])
+  }
+
+  if (options.isNsfw) {
+    tags.push(['content-warning', 'NSFW'])
   }
 
   if (options.protectedEvent) {
@@ -182,6 +187,7 @@ export async function createCommentDraftEvent(
   options: {
     addClientTag?: boolean
     protectedEvent?: boolean
+    isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
   const {
@@ -239,6 +245,10 @@ export async function createCommentDraftEvent(
 
   if (options.addClientTag) {
     tags.push(['client', 'jumble'])
+  }
+
+  if (options.isNsfw) {
+    tags.push(['content-warning', 'NSFW'])
   }
 
   if (options.protectedEvent) {

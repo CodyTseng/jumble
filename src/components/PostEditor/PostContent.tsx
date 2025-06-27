@@ -37,6 +37,7 @@ export default function PostContent({
   const [addClientTag, setAddClientTag] = useState(false)
   const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const [mentions, setMentions] = useState<string[]>([])
+  const [isNsfw, setIsNsfw] = useState(false)
   const canPost = !!text && !posting && !uploadingFiles
 
   const post = async (e?: React.MouseEvent) => {
@@ -50,12 +51,14 @@ export default function PostContent({
           parentEvent && parentEvent.kind !== kinds.ShortTextNote
             ? await createCommentDraftEvent(text, parentEvent, mentions, {
                 addClientTag,
-                protectedEvent: !!specifiedRelayUrls
+                protectedEvent: !!specifiedRelayUrls,
+                isNsfw
               })
             : await createShortTextNoteDraftEvent(text, mentions, {
                 parentEvent,
                 addClientTag,
-                protectedEvent: !!specifiedRelayUrls
+                protectedEvent: !!specifiedRelayUrls,
+                isNsfw
               })
         await publish(draftEvent, { specifiedRelayUrls })
         postContentCache.clearPostCache({ defaultContent, parentEvent })
@@ -159,6 +162,8 @@ export default function PostContent({
         show={showMoreOptions}
         addClientTag={addClientTag}
         setAddClientTag={setAddClientTag}
+        isNsfw={isNsfw}
+        setIsNsfw={setIsNsfw}
       />
       <div className="flex gap-2 items-center justify-around sm:hidden">
         <Button
