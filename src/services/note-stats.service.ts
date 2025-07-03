@@ -57,100 +57,78 @@ class NoteStatsService {
   }
 
   updateNoteStatsByEvents(events: Event[]) {
-    const newRepostsMap = new Map<string, Set<string>>()
-    const newLikesMap = new Map<
-      string,
-      { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
-    >()
-    const newZapsMap = new Map<
-      string,
-      { pr: string; pubkey: string; amount: number; comment?: string }[]
-    >()
+    const updatedEventIdSet = new Set<string>()
     events.forEach((evt) => {
-      if (evt.kind === kinds.Repost) {
-        const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
-        if (!eventId) return
-        const newReposts = newRepostsMap.get(eventId) || new Set()
-        newReposts.add(evt.pubkey)
-        newRepostsMap.set(eventId, newReposts)
-        return
-      }
-
+      let updatedEventId: string | undefined
       if (evt.kind === kinds.Reaction) {
-        const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-        if (targetEventId) {
-          const newLikes = newLikesMap.get(targetEventId) || []
-          if (newLikes.some((like) => like.id === evt.id)) return
-
-          let emoji: TEmoji | string = evt.content.trim()
-          if (!emoji) return
-
-          if (/^:[a-zA-Z0-9_-]+:$/.test(evt.content)) {
-            const emojiInfos = extractEmojiInfosFromTags(evt.tags)
-            const shortcode = evt.content.split(':')[1]
-            const emojiInfo = emojiInfos.find((info) => info.shortcode === shortcode)
-            if (emojiInfo) {
-              emoji = emojiInfo
-            } else {
-              console.log(`Emoji not found for shortcode: ${shortcode}`, emojiInfos)
-            }
-          }
-          newLikes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
-          newLikesMap.set(targetEventId, newLikes)
-        }
-        return
+        updatedEventId = this.addLikeByEvent(evt)
+      } else if (evt.kind === kinds.Repost) {
+        updatedEventId = this.addRepostByEvent(evt)
+      } else if (evt.kind === kinds.Zap) {
+        updatedEventId = this.addZapByEvent(evt)
       }
-
-      if (evt.kind === kinds.Zap) {
-        const info = extractZapInfoFromReceipt(evt)
-        if (!info) return
-        const { originalEventId, senderPubkey, invoice, amount, comment } = info
-        if (!originalEventId || !senderPubkey) return
-        const newZaps = newZapsMap.get(originalEventId) || []
-        newZaps.push({ pr: invoice, pubkey: senderPubkey, amount, comment })
-        newZapsMap.set(originalEventId, newZaps)
-        return
+      if (updatedEventId) {
+        updatedEventIdSet.add(updatedEventId)
       }
     })
-
-    const updatedEventIds = new Set<string>()
-    newRepostsMap.forEach((newReposts, eventId) => {
-      const old = this.noteStatsMap.get(eventId) || {}
-      const reposts = old.reposts || new Set()
-      newReposts.forEach((repost) => reposts.add(repost))
-      this.noteStatsMap.set(eventId, { ...old, reposts })
-      updatedEventIds.add(eventId)
-    })
-    newLikesMap.forEach((newLikes, eventId) => {
-      const old = this.noteStatsMap.get(eventId) || {}
-      const likes = old.likes || []
-      newLikes.forEach((like) => {
-        const exists = likes.find((l) => l.id === like.id)
-        if (!exists) {
-          likes.push(like)
-        }
-      })
-      likes.sort((a, b) => b.created_at - a.created_at)
-      this.noteStatsMap.set(eventId, { ...old, likes })
-      updatedEventIds.add(eventId)
-    })
-    newZapsMap.forEach((newZaps, eventId) => {
-      const old = this.noteStatsMap.get(eventId) || {}
-      const zaps = old.zaps || []
-      const exists = new Set(zaps.map((zap) => zap.pr))
-      newZaps.forEach((zap) => {
-        if (!exists.has(zap.pr)) {
-          exists.add(zap.pr)
-          zaps.push(zap)
-        }
-      })
-      zaps.sort((a, b) => b.amount - a.amount)
-      this.noteStatsMap.set(eventId, { ...old, zaps })
-      updatedEventIds.add(eventId)
-    })
-    updatedEventIds.forEach((eventId) => {
+    updatedEventIdSet.forEach((eventId) => {
       this.notifyNoteStats(eventId)
     })
+  }
+
+  private addLikeByEvent(evt: Event) {
+    const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
+    if (!targetEventId) return
+
+    const old = this.noteStatsMap.get(targetEventId) || {}
+    const likes = old.likes || []
+    const exists = likes.find((l) => l.id === evt.id)
+    if (exists) return
+
+    let emoji: TEmoji | string = evt.content.trim()
+    if (!emoji) return
+
+    if (/^:[a-zA-Z0-9_-]+:$/.test(evt.content)) {
+      const emojiInfos = extractEmojiInfosFromTags(evt.tags)
+      const shortcode = evt.content.split(':')[1]
+      const emojiInfo = emojiInfos.find((info) => info.shortcode === shortcode)
+      if (emojiInfo) {
+        emoji = emojiInfo
+      } else {
+        console.log(`Emoji not found for shortcode: ${shortcode}`, emojiInfos)
+      }
+    }
+
+    likes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
+    this.noteStatsMap.set(targetEventId, { ...old, likes })
+    return targetEventId
+  }
+
+  private addRepostByEvent(evt: Event) {
+    const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
+    if (!eventId) return
+
+    const old = this.noteStatsMap.get(eventId) || {}
+    const reposts = old.reposts || new Set()
+    reposts.add(evt.id)
+    this.noteStatsMap.set(eventId, { ...old, reposts })
+    return eventId
+  }
+
+  private addZapByEvent(evt: Event) {
+    const info = extractZapInfoFromReceipt(evt)
+    if (!info) return
+    const { originalEventId, senderPubkey, invoice, amount, comment } = info
+    if (!originalEventId || !senderPubkey) return
+
+    const old = this.noteStatsMap.get(originalEventId) || {}
+    const zaps = old.zaps || []
+    const exists = zaps.find((zap) => zap.pr === invoice)
+    if (exists) return
+
+    zaps.push({ pr: invoice, pubkey: senderPubkey, amount, comment })
+    this.noteStatsMap.set(originalEventId, { ...old, zaps })
+    return originalEventId
   }
 }
 
