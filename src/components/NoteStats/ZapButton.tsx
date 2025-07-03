@@ -1,10 +1,11 @@
+import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useZap } from '@/providers/ZapProvider'
 import client from '@/services/client.service'
 import lightning from '@/services/lightning.service'
+import noteStatsService from '@/services/note-stats.service'
 import { Loader, Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { MouseEvent, TouchEvent, useEffect, useMemo, useRef, useState } from 'react'
@@ -15,18 +16,17 @@ import ZapDialog from '../ZapDialog'
 export default function ZapButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { checkLogin, pubkey } = useNostr()
-  const { noteStatsMap, addZap } = useNoteStats()
+  const noteStats = useNoteStatsById(event.id)
   const { defaultZapSats, defaultZapComment, quickZap } = useZap()
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
   const { zapAmount, hasZapped } = useMemo(() => {
-    const stats = noteStatsMap.get(event.id) || {}
     return {
-      zapAmount: stats.zaps?.reduce((acc, zap) => acc + zap.amount, 0),
-      hasZapped: pubkey ? stats.zaps?.some((zap) => zap.pubkey === pubkey) : false
+      zapAmount: noteStats?.zaps?.reduce((acc, zap) => acc + zap.amount, 0),
+      hasZapped: pubkey ? noteStats?.zaps?.some((zap) => zap.pubkey === pubkey) : false
     }
-  }, [noteStatsMap, event, pubkey])
+  }, [noteStats, pubkey])
   const [disable, setDisable] = useState(true)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isLongPressRef = useRef(false)
@@ -57,7 +57,13 @@ export default function ZapButton({ event }: { event: Event }) {
       if (!zapResult) {
         return
       }
-      addZap(event.id, zapResult.invoice, defaultZapSats, defaultZapComment)
+      noteStatsService.addZap(
+        pubkey,
+        event.id,
+        zapResult.invoice,
+        defaultZapSats,
+        defaultZapComment
+      )
     } catch (error) {
       toast.error(`${t('Zap failed')}: ${(error as Error).message}`)
     } finally {

@@ -1,8 +1,9 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { createReactionDraftEvent } from '@/lib/draft-event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useNoteStats } from '@/providers/NoteStatsProvider'
+import noteStatsService from '@/services/note-stats.service'
 import { TEmoji } from '@/types'
 import { Loader } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -11,10 +12,10 @@ import Emoji from '../Emoji'
 
 export default function Likes({ event }: { event: Event }) {
   const { pubkey, checkLogin, publish } = useNostr()
-  const { noteStatsMap, updateNoteStatsByEvents } = useNoteStats()
+  const noteStats = useNoteStatsById(event.id)
   const [liking, setLiking] = useState<string | null>(null)
   const likes = useMemo(() => {
-    const _likes = noteStatsMap.get(event.id)?.likes
+    const _likes = noteStats?.likes
     if (!_likes) return []
 
     const stats = new Map<string, { key: string; emoji: TEmoji | string; pubkeys: Set<string> }>()
@@ -26,7 +27,7 @@ export default function Likes({ event }: { event: Event }) {
       stats.get(key)?.pubkeys.add(item.pubkey)
     })
     return Array.from(stats.values()).sort((a, b) => b.pubkeys.size - a.pubkeys.size)
-  }, [noteStatsMap, event])
+  }, [noteStats, event])
 
   if (!likes.length) return null
 
@@ -40,7 +41,7 @@ export default function Likes({ event }: { event: Event }) {
       try {
         const reaction = createReactionDraftEvent(event, emoji)
         const evt = await publish(reaction)
-        updateNoteStatsByEvents([evt])
+        noteStatsService.updateNoteStatsByEvents([evt])
       } catch (error) {
         console.error('like failed', error)
       } finally {

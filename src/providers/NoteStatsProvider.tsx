@@ -1,23 +1,10 @@
-import { extractEmojiInfosFromTags, extractZapInfoFromReceipt } from '@/lib/event'
-import { tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
-import { TEmoji } from '@/types'
-import dayjs from 'dayjs'
+import noteStats from '@/services/note-stats.service'
 import { Event, Filter, kinds } from 'nostr-tools'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { useNostr } from './NostrProvider'
 
-export type TNoteStats = {
-  likes: { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
-  reposts: Set<string>
-  zaps: { pr: string; pubkey: string; amount: number; comment?: string }[]
-  updatedAt?: number
-}
-
 type TNoteStatsContext = {
-  noteStatsMap: Map<string, Partial<TNoteStats>>
-  addZap: (eventId: string, pr: string, amount: number, comment?: string) => void
-  updateNoteStatsByEvents: (events: Event[]) => void
   fetchNoteStats: (event: Event) => Promise<Event[]>
 }
 
@@ -32,7 +19,6 @@ export const useNoteStats = () => {
 }
 
 export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
-  const [noteStatsMap, setNoteStatsMap] = useState<Map<string, Partial<TNoteStats>>>(new Map())
   const { pubkey } = useNostr()
 
   useEffect(() => {
@@ -51,13 +37,13 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
           limit: 100
         }
       ])
-      updateNoteStatsByEvents(events)
+      noteStats.updateNoteStatsByEvents(events)
     }
     init()
   }, [pubkey])
 
   const fetchNoteStats = async (event: Event) => {
-    const oldStats = noteStatsMap.get(event.id)
+    const oldStats = noteStats.getNoteStats(event.id)
     let since: number | undefined
     if (oldStats?.updatedAt) {
       since = oldStats.updatedAt
@@ -111,130 +97,17 @@ export function NoteStatsProvider({ children }: { children: React.ReactNode }) {
     const events: Event[] = []
     await client.fetchEvents(relayList.read.slice(0, 5), filters, {
       onevent(evt) {
-        updateNoteStatsByEvents([evt])
+        noteStats.updateNoteStatsByEvents([evt])
         events.push(evt)
       }
     })
-    setNoteStatsMap((prev) => {
-      prev.set(event.id, { ...(prev.get(event.id) ?? {}), updatedAt: dayjs().unix() })
-      return new Map(prev)
-    })
     return events
-  }
-
-  const updateNoteStatsByEvents = (events: Event[]) => {
-    const newRepostsMap = new Map<string, Set<string>>()
-    const newLikesMap = new Map<
-      string,
-      { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
-    >()
-    const newZapsMap = new Map<
-      string,
-      { pr: string; pubkey: string; amount: number; comment?: string }[]
-    >()
-    events.forEach((evt) => {
-      if (evt.kind === kinds.Repost) {
-        const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
-        if (!eventId) return
-        const newReposts = newRepostsMap.get(eventId) || new Set()
-        newReposts.add(evt.pubkey)
-        newRepostsMap.set(eventId, newReposts)
-        return
-      }
-
-      if (evt.kind === kinds.Reaction) {
-        const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-        if (targetEventId) {
-          const newLikes = newLikesMap.get(targetEventId) || []
-          if (newLikes.some((like) => like.id === evt.id)) return
-
-          let emoji: TEmoji | string = evt.content.trim()
-          if (!emoji) return
-
-          if (/^:[a-zA-Z0-9_-]+:$/.test(evt.content)) {
-            const emojiInfos = extractEmojiInfosFromTags(evt.tags)
-            const shortcode = evt.content.split(':')[1]
-            const emojiInfo = emojiInfos.find((info) => info.shortcode === shortcode)
-            if (emojiInfo) {
-              emoji = emojiInfo
-            } else {
-              console.log(`Emoji not found for shortcode: ${shortcode}`, emojiInfos)
-            }
-          }
-          newLikes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
-          newLikesMap.set(targetEventId, newLikes)
-        }
-        return
-      }
-
-      if (evt.kind === kinds.Zap) {
-        const info = extractZapInfoFromReceipt(evt)
-        if (!info) return
-        const { originalEventId, senderPubkey, invoice, amount, comment } = info
-        if (!originalEventId || !senderPubkey) return
-        const newZaps = newZapsMap.get(originalEventId) || []
-        newZaps.push({ pr: invoice, pubkey: senderPubkey, amount, comment })
-        newZapsMap.set(originalEventId, newZaps)
-        return
-      }
-    })
-    setNoteStatsMap((prev) => {
-      newRepostsMap.forEach((newReposts, eventId) => {
-        const old = prev.get(eventId) || {}
-        const reposts = old.reposts || new Set()
-        newReposts.forEach((repost) => reposts.add(repost))
-        prev.set(eventId, { ...old, reposts })
-      })
-      newLikesMap.forEach((newLikes, eventId) => {
-        const old = prev.get(eventId) || {}
-        const likes = old.likes || []
-        newLikes.forEach((like) => {
-          const exists = likes.find((l) => l.id === like.id)
-          if (!exists) {
-            likes.push(like)
-          }
-        })
-        likes.sort((a, b) => b.created_at - a.created_at)
-        prev.set(eventId, { ...old, likes })
-      })
-      newZapsMap.forEach((newZaps, eventId) => {
-        const old = prev.get(eventId) || {}
-        const zaps = old.zaps || []
-        const exists = new Set(zaps.map((zap) => zap.pr))
-        newZaps.forEach((zap) => {
-          if (!exists.has(zap.pr)) {
-            exists.add(zap.pr)
-            zaps.push(zap)
-          }
-        })
-        zaps.sort((a, b) => b.amount - a.amount)
-        prev.set(eventId, { ...old, zaps })
-      })
-      return new Map(prev)
-    })
-    return
-  }
-
-  const addZap = (eventId: string, pr: string, amount: number, comment?: string) => {
-    if (!pubkey) return
-    setNoteStatsMap((prev) => {
-      const old = prev.get(eventId)
-      const zaps = old?.zaps || []
-      prev.set(eventId, {
-        ...old,
-        zaps: [...zaps, { pr, pubkey, amount, comment }].sort((a, b) => b.amount - a.amount)
-      })
-      return new Map(prev)
-    })
   }
 
   return (
     <NoteStatsContext.Provider
       value={{
-        noteStatsMap,
-        fetchNoteStats,
-        addZap,
-        updateNoteStatsByEvents
+        fetchNoteStats
       }}
     >
       {children}

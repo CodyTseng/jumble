@@ -1,6 +1,6 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { formatAmount } from '@/lib/lightning'
-import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -8,12 +8,11 @@ import { SimpleUserAvatar } from '../UserAvatar'
 import ZapDialog from '../ZapDialog'
 
 export default function TopZaps({ event }: { event: Event }) {
-  const { noteStatsMap } = useNoteStats()
+  const noteStats = useNoteStatsById(event.id)
   const [zapIndex, setZapIndex] = useState(-1)
   const topZaps = useMemo(() => {
-    const stats = noteStatsMap.get(event.id) || {}
-    return stats.zaps?.slice(0, 10) || []
-  }, [noteStatsMap, event])
+    return noteStats?.zaps?.slice(0, 10) || []
+  }, [noteStats])
 
   if (!topZaps.length) return null
 

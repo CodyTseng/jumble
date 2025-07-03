@@ -3,10 +3,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useNotification } from '@/providers/NotificationProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
+import noteStatsService from '@/services/note-stats.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
@@ -25,7 +25,6 @@ const NotificationList = forwardRef((_, ref) => {
   const { pubkey } = useNostr()
   const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
   const { clearNewNotifications, getNotificationsSeenAt } = useNotification()
-  const { updateNoteStatsByEvents } = useNoteStats()
   const [notificationType, setNotificationType] = useState<TNotificationType>('all')
   const [lastReadTime, setLastReadTime] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
@@ -95,7 +94,7 @@ const NotificationList = forwardRef((_, ref) => {
             if (eosed) {
               setLoading(false)
               setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
-              updateNoteStatsByEvents(events)
+              noteStatsService.updateNoteStatsByEvents(events)
             }
           },
           onNew: (event) => {
@@ -109,7 +108,7 @@ const NotificationList = forwardRef((_, ref) => {
               }
               return [...oldEvents.slice(0, index), event, ...oldEvents.slice(index)]
             })
-            updateNoteStatsByEvents([event])
+            noteStatsService.updateNoteStatsByEvents([event])
           }
         }
       )

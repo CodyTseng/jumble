@@ -6,12 +6,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { createRepostDraftEvent } from '@/lib/draft-event'
 import { getSharableEventId } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import noteStatsService from '@/services/note-stats.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -23,17 +25,17 @@ export default function RepostButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { publish, checkLogin, pubkey } = useNostr()
-  const { noteStatsMap, updateNoteStatsByEvents, fetchNoteStats } = useNoteStats()
+  const { fetchNoteStats } = useNoteStats()
+  const noteStats = useNoteStatsById(event.id)
   const [reposting, setReposting] = useState(false)
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { repostCount, hasReposted } = useMemo(() => {
-    const stats = noteStatsMap.get(event.id) || {}
     return {
-      repostCount: stats.reposts?.size,
-      hasReposted: pubkey ? stats.reposts?.has(pubkey) : false
+      repostCount: noteStats?.reposts?.size,
+      hasReposted: pubkey ? noteStats?.reposts?.has(pubkey) : false
     }
-  }, [noteStatsMap, event.id])
+  }, [noteStats, event.id])
   const canRepost = !hasReposted && !reposting
 
   const repost = async () => {
@@ -44,7 +46,6 @@ export default function RepostButton({ event }: { event: Event }) {
       const timer = setTimeout(() => setReposting(false), 5000)
 
       try {
-        const noteStats = noteStatsMap.get(event.id)
         const hasReposted = noteStats?.reposts?.has(pubkey)
         if (hasReposted) return
         if (!noteStats?.updatedAt) {
@@ -56,7 +57,7 @@ export default function RepostButton({ event }: { event: Event }) {
 
         const repost = createRepostDraftEvent(event)
         const evt = await publish(repost)
-        updateNoteStatsByEvents([evt])
+        noteStatsService.updateNoteStatsByEvents([evt])
       } catch (error) {
         console.error('repost failed', error)
       } finally {

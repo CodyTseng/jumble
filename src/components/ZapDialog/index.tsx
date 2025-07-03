@@ -16,10 +16,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useNostr } from '@/providers/NostrProvider'
-import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useZap } from '@/providers/ZapProvider'
 import lightning from '@/services/lightning.service'
+import noteStatsService from '@/services/note-stats.service'
 import { Loader } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -136,7 +136,6 @@ function ZapDialogContent({
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const { defaultZapSats, defaultZapComment } = useZap()
-  const { addZap } = useNoteStats()
   const [sats, setSats] = useState(defaultAmount ?? defaultZapSats)
   const [comment, setComment] = useState(defaultComment ?? defaultZapComment)
   const [zapping, setZapping] = useState(false)
@@ -155,7 +154,7 @@ function ZapDialogContent({
         return
       }
       if (eventId) {
-        addZap(eventId, zapResult.invoice, sats, comment)
+        noteStatsService.addZap(pubkey, eventId, zapResult.invoice, sats, comment)
       }
     } catch (error) {
       toast.error(`${t('Zap failed')}: ${(error as Error).message}`)

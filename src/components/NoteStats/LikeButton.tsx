@@ -4,10 +4,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { createReactionDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNoteStats } from '@/providers/NoteStatsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import noteStatsService from '@/services/note-stats.service'
 import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -21,15 +23,16 @@ export default function LikeButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { noteStatsMap, updateNoteStatsByEvents, fetchNoteStats } = useNoteStats()
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
+  const { fetchNoteStats } = useNoteStats()
+  const noteStats = useNoteStatsById(event.id)
   const { myLastEmoji, likeCount } = useMemo(() => {
-    const stats = noteStatsMap.get(event.id) || {}
+    const stats = noteStats || {}
     const like = stats.likes?.find((like) => like.pubkey === pubkey)
     return { myLastEmoji: like?.emoji, likeCount: stats.likes?.length }
-  }, [noteStatsMap, event, pubkey])
+  }, [noteStats, pubkey])
 
   const like = async (emoji: string) => {
     checkLogin(async () => {
@@ -39,14 +42,13 @@ export default function LikeButton({ event }: { event: Event }) {
       const timer = setTimeout(() => setLiking(false), 10_000)
 
       try {
-        const noteStats = noteStatsMap.get(event.id)
         if (!noteStats?.updatedAt) {
           await fetchNoteStats(event)
         }
 
         const reaction = createReactionDraftEvent(event, emoji)
         const evt = await publish(reaction)
-        updateNoteStatsByEvents([evt])
+        noteStatsService.updateNoteStatsByEvents([evt])
       } catch (error) {
         console.error('like failed', error)
       } finally {
