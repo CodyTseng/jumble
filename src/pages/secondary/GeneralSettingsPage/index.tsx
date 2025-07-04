@@ -9,12 +9,14 @@ import { useTheme } from '@/providers/ThemeProvider'
 import { SelectValue } from '@radix-ui/react-select'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useShowPosts } from '@/providers/ShowPostsProvider'
 
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
   const { autoplay, setAutoplay } = useAutoplay()
+  const { showPosts, setShowPosts } = useShowPosts()
 
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -62,6 +64,21 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             <div className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
           </Label>
           <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="theme" className="text-base font-normal">
+            {t('Show posts')}
+          </Label>
+          <Select defaultValue="system" value={showPosts} onValueChange={setShowPosts}>
+            <SelectTrigger id="theme" className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('Show all')}</SelectItem>
+              <SelectItem value="trusted">{t('Show only trusted')}</SelectItem>
+              <SelectItem value="untrusted">{t('Show only untrusted')}</SelectItem>
+            </SelectContent>
+          </Select>
         </SettingItem>
       </div>
     </SecondaryPageLayout>

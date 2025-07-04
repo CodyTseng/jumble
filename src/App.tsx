@@ -17,37 +17,40 @@ import { ScreenSizeProvider } from './providers/ScreenSizeProvider'
 import { TranslationServiceProvider } from './providers/TranslationServiceProvider'
 import { UserTrustProvider } from './providers/UserTrustProvider'
 import { ZapProvider } from './providers/ZapProvider'
+import { ShowPostsProvider } from './providers/ShowPostsProvider'
 
 export default function App(): JSX.Element {
   return (
     <ThemeProvider>
       <AutoplayProvider>
-        <ScreenSizeProvider>
-          <NostrProvider>
-            <ZapProvider>
-              <TranslationServiceProvider>
-                <FavoriteRelaysProvider>
-                  <FollowListProvider>
-                    <MuteListProvider>
-                      <UserTrustProvider>
-                        <BookmarksProvider>
-                          <FeedProvider>
-                            <ReplyProvider>
-                              <MediaUploadServiceProvider>
-                                <PageManager />
-                                <Toaster />
-                              </MediaUploadServiceProvider>
-                            </ReplyProvider>
-                          </FeedProvider>
-                        </BookmarksProvider>
-                      </UserTrustProvider>
-                    </MuteListProvider>
-                  </FollowListProvider>
-                </FavoriteRelaysProvider>
-              </TranslationServiceProvider>
-            </ZapProvider>
-          </NostrProvider>
-        </ScreenSizeProvider>
+        <ShowPostsProvider>
+          <ScreenSizeProvider>
+            <NostrProvider>
+              <ZapProvider>
+                <TranslationServiceProvider>
+                  <FavoriteRelaysProvider>
+                    <FollowListProvider>
+                      <MuteListProvider>
+                        <UserTrustProvider>
+                          <BookmarksProvider>
+                            <FeedProvider>
+                              <ReplyProvider>
+                                <MediaUploadServiceProvider>
+                                  <PageManager />
+                                  <Toaster />
+                                </MediaUploadServiceProvider>
+                              </ReplyProvider>
+                            </FeedProvider>
+                          </BookmarksProvider>
+                        </UserTrustProvider>
+                      </MuteListProvider>
+                    </FollowListProvider>
+                  </FavoriteRelaysProvider>
+                </TranslationServiceProvider>
+              </ZapProvider>
+            </NostrProvider>
+          </ScreenSizeProvider>
+        </ShowPostsProvider>
       </AutoplayProvider>
     </ThemeProvider>
   )

@@ -19,6 +19,9 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 import { PictureNoteCardMasonry } from '../PictureNoteCardMasonry'
 import Tabs from '../Tabs'
+import { useUserTrust } from '@/providers/UserTrustProvider'
+import { useShowPosts } from '@/providers/ShowPostsProvider'
+import { useFeed } from '@/providers/FeedProvider'
 
 const LIMIT = 100
 const ALGO_LIMIT = 500
@@ -60,14 +63,18 @@ export default function NoteList({
   const [filterType, setFilterType] = useState<Exclude<TNoteListMode, 'postsAndReplies'>>('posts')
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const topRef = useRef<HTMLDivElement | null>(null)
+  const { isUserTrusted } = useUserTrust()
+  const { showPosts } = useShowPosts()
+  const { feedInfo } = useFeed()
   const filteredNewEvents = useMemo(() => {
     return newEvents.filter((event: Event) => {
       return (
         (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-        (listMode !== 'posts' || !isReplyNoteEvent(event))
-      )
+        (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+        (showPosts == 'all' || showPosts === 'trusted' === isUserTrusted(event.pubkey))
+      ) 
     })
-  }, [newEvents, listMode, filterMutedNotes, mutePubkeys])
+  }, [newEvents, listMode, filterMutedNotes, mutePubkeys, showPosts])
 
   useEffect(() => {
     switch (listMode) {
@@ -341,7 +348,10 @@ export default function NoteList({
             <div>
               {events
                 .slice(0, showCount)
-                .filter((event: Event) => listMode !== 'posts' || !isReplyNoteEvent(event))
+                .filter((event: Event) =>
+                  (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+                  ((feedInfo.feedType !== 'relay' && feedInfo.feedType !== 'relays')
+                    || showPosts === 'all' || showPosts === 'trusted' === isUserTrusted(event.pubkey)))
                 .map((event) => (
                   <NoteCard
                     key={event.id}

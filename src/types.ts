@@ -137,3 +137,5 @@ export type TTranslationServiceConfig =
       server?: string
       api_key?: string
     }
+
+export type TShowPosts = 'all' | 'trusted' | 'untrusted'

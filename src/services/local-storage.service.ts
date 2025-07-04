@@ -8,7 +8,8 @@ import {
   TNoteListMode,
   TRelaySet,
   TThemeSetting,
-  TTranslationServiceConfig
+  TTranslationServiceConfig,
+  TShowPosts
 } from '@/types'
 
 class LocalStorageService {
@@ -29,6 +30,7 @@ class LocalStorageService {
   private hideUntrustedInteractions: boolean = false
   private hideUntrustedNotifications: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
+  private showPosts: TShowPosts = 'trusted'
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -95,6 +97,7 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
+    this.showPosts = (window.localStorage.getItem(StorageKey.SHOW_POSTS) as TShowPosts) ?? 'trusted'
 
     const hideUntrustedEvents =
       window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_EVENTS) === 'true'
@@ -275,6 +278,15 @@ class LocalStorageService {
   setAutoplay(autoplay: boolean) {
     this.autoplay = autoplay
     window.localStorage.setItem(StorageKey.AUTOPLAY, autoplay.toString())
+  }
+
+  getShowPosts() {
+    return this.showPosts
+  }
+
+  setShowPosts(showPosts: TShowPosts) {
+    this.showPosts = showPosts
+    window.localStorage.setItem(StorageKey.SHOW_POSTS, showPosts)
   }
 
   getHideUntrustedInteractions() {
