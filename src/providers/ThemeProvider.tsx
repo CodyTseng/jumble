@@ -9,6 +9,7 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   themeSetting: TThemeSetting
+  theme: TTheme
   setThemeSetting: (themeSetting: TThemeSetting) => Promise<void>
 }
 
@@ -62,21 +63,23 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     updateTheme()
   }, [theme])
 
-  const value = {
-    themeSetting: themeSetting,
-    setThemeSetting: async (themeSetting: TThemeSetting) => {
-      storage.setThemeSetting(themeSetting)
-      setThemeSetting(themeSetting)
-      if (themeSetting === 'system') {
-        setTheme(getSystemTheme())
-        return
-      }
-      setTheme(themeSetting)
-    }
-  }
-
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider
+      {...props}
+      value={{
+        themeSetting: themeSetting,
+        theme: theme,
+        setThemeSetting: async (themeSetting: TThemeSetting) => {
+          storage.setThemeSetting(themeSetting)
+          setThemeSetting(themeSetting)
+          if (themeSetting === 'system') {
+            setTheme(getSystemTheme())
+            return
+          }
+          setTheme(themeSetting)
+        }
+      }}
+    >
       {children}
     </ThemeProviderContext.Provider>
   )

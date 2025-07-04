@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useNostr } from '@/providers/NostrProvider'
-import { Loader, Copy, Check } from 'lucide-react'
-import { createNostrConnectURI, NostrConnectParams } from '@/providers/NostrProvider/nip46'
 import { DEFAULT_NOSTRCONNECT_RELAY } from '@/constants'
+import { useNostr } from '@/providers/NostrProvider'
+import { createNostrConnectURI, NostrConnectParams } from '@/providers/NostrProvider/nip46'
+import { Check, Copy, Loader } from 'lucide-react'
 import { generateSecretKey, getPublicKey } from 'nostr-tools'
-import { QRCodeSVG } from 'qrcode.react'
-import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import QrCode from '../QrCode'
 
 export default function NostrConnectLogin({
   back,
@@ -107,12 +107,7 @@ export default function NostrConnectLogin({
     <>
       <div ref={qrContainerRef} className="flex flex-col items-center w-full space-y-3 mb-3">
         <a href={loginDetails.connectionString} aria-label="Open with Nostr signer app">
-          <QRCodeSVG
-            size={qrCodeSize}
-            value={loginDetails.connectionString}
-            bgColor="hsl(var(--background))"
-            fgColor="hsl(var(--foreground))"
-          />
+          <QrCode size={qrCodeSize} value={loginDetails.connectionString} />
         </a>
         {nostrConnectionErrMsg && (
           <div className="text-xs text-destructive text-center pt-1">{nostrConnectionErrMsg}</div>

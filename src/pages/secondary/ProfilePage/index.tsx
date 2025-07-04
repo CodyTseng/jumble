@@ -7,7 +7,7 @@ import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
-import QrCodePopover from '@/components/QrCodePopover'
+import NpubQrCode from '@/components/NpubQrCode'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -157,7 +157,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
             )}
             <div className="flex gap-1 mt-1">
               <PubkeyCopy pubkey={pubkey} />
-              <QrCodePopover pubkey={pubkey} />
+              <NpubQrCode pubkey={pubkey} />
             </div>
             <Collapsible>
               <ProfileAbout

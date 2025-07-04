@@ -2,7 +2,7 @@ import AccountManager from '@/components/AccountManager'
 import LoginDialog from '@/components/LoginDialog'
 import LogoutDialog from '@/components/LogoutDialog'
 import PubkeyCopy from '@/components/PubkeyCopy'
-import QrCodePopover from '@/components/QrCodePopover'
+import NpubQrCode from '@/components/NpubQrCode'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
@@ -53,7 +53,7 @@ const MePage = forwardRef((_, ref) => {
           />
           <div className="flex gap-1 mt-1">
             <PubkeyCopy pubkey={pubkey} />
-            <QrCodePopover pubkey={pubkey} />
+            <NpubQrCode pubkey={pubkey} />
           </div>
         </div>
       </div>

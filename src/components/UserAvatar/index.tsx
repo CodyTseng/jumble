@@ -12,6 +12,7 @@ import { useMemo } from 'react'
 const UserAvatarSizeCnMap = {
   large: 'w-24 h-24',
   big: 'w-16 h-16',
+  semiBig: 'w-12 h-12',
   normal: 'w-10 h-10',
   medium: 'w-8 h-8',
   small: 'w-7 h-7',
@@ -26,7 +27,7 @@ export default function UserAvatar({
 }: {
   userId: string
   className?: string
-  size?: 'large' | 'big' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
+  size?: 'large' | 'big' | 'semiBig' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
 }) {
   const { profile } = useFetchProfile(userId)
   const defaultAvatar = useMemo(
