@@ -19,6 +19,8 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 import { PictureNoteCardMasonry } from '../PictureNoteCardMasonry'
 import Tabs from '../Tabs'
+import { useUserTrust } from '@/providers/UserTrustProvider'
+import { useFeed } from '@/providers/FeedProvider'
 
 const LIMIT = 100
 const ALGO_LIMIT = 500
@@ -60,14 +62,17 @@ export default function NoteList({
   const [filterType, setFilterType] = useState<Exclude<TNoteListMode, 'postsAndReplies'>>('posts')
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const topRef = useRef<HTMLDivElement | null>(null)
+  const { isUserTrusted, hideUntrustedNotes } = useUserTrust()
+  const { feedInfo } = useFeed()
   const filteredNewEvents = useMemo(() => {
     return newEvents.filter((event: Event) => {
       return (
         (!filterMutedNotes || !mutePubkeys.includes(event.pubkey)) &&
-        (listMode !== 'posts' || !isReplyNoteEvent(event))
+        (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+        (!hideUntrustedNotes || isUserTrusted(event.pubkey))
       )
     })
-  }, [newEvents, listMode, filterMutedNotes, mutePubkeys])
+  }, [newEvents, listMode, filterMutedNotes, mutePubkeys, hideUntrustedNotes])
 
   useEffect(() => {
     switch (listMode) {
@@ -341,7 +346,11 @@ export default function NoteList({
             <div>
               {events
                 .slice(0, showCount)
-                .filter((event: Event) => listMode !== 'posts' || !isReplyNoteEvent(event))
+                .filter((event: Event) =>
+                  (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+                  (author
+                    || (feedInfo.feedType !== 'relay' && feedInfo.feedType !== 'relays')
+                    || !hideUntrustedNotes || isUserTrusted(event.pubkey)))
                 .map((event) => (
                   <NoteCard
                     key={event.id}

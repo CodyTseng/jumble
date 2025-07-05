@@ -6,8 +6,10 @@ import { useNostr } from './NostrProvider'
 type TUserTrustContext = {
   hideUntrustedInteractions: boolean
   hideUntrustedNotifications: boolean
+  hideUntrustedNotes: boolean
   updateHideUntrustedInteractions: (hide: boolean) => void
   updateHideUntrustedNotifications: (hide: boolean) => void
+  updateHideUntrustedNotes: (hide: boolean) => void
   isUserTrusted: (pubkey: string) => boolean
 }
 
@@ -30,6 +32,9 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
   )
   const [hideUntrustedNotifications, setHideUntrustedNotifications] = useState(() =>
     storage.getHideUntrustedNotifications()
+  )
+  const [hideUntrustedNotes, setHideUntrustedNotes] = useState(() =>
+    storage.getHideUntrustedNotes ? storage.getHideUntrustedNotes() : false
   )
 
   useEffect(() => {
@@ -66,13 +71,22 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
     storage.setHideUntrustedNotifications(hide)
   }
 
+  const updateHideUntrustedNotes = (hide: boolean) => {
+    setHideUntrustedNotes(hide)
+    if (storage.setHideUntrustedNotes) {
+      storage.setHideUntrustedNotes(hide)
+    }
+  }
+
   return (
     <UserTrustContext.Provider
       value={{
         hideUntrustedInteractions,
         hideUntrustedNotifications,
+        hideUntrustedNotes,
         updateHideUntrustedInteractions,
         updateHideUntrustedNotifications,
+        updateHideUntrustedNotes,
         isUserTrusted
       }}
     >

@@ -9,12 +9,14 @@ import { useTheme } from '@/providers/ThemeProvider'
 import { SelectValue } from '@radix-ui/react-select'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
   const { autoplay, setAutoplay } = useAutoplay()
+  const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
 
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -62,6 +64,12 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             <div className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
           </Label>
           <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="hideUntrustedNotes" className="text-base font-normal">
+            {t('Hide untrusted posts')}
+          </Label>
+            <Switch id="hideUntrustedNotes" checked={hideUntrustedNotes} onCheckedChange={updateHideUntrustedNotes} />
         </SettingItem>
       </div>
     </SecondaryPageLayout>

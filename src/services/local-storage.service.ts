@@ -28,6 +28,7 @@ class LocalStorageService {
   private autoplay: boolean = true
   private hideUntrustedInteractions: boolean = false
   private hideUntrustedNotifications: boolean = false
+  private hideUntrustedNotes: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
 
   constructor() {
@@ -95,8 +96,9 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
+    this.hideUntrustedNotes = window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTES) === 'true'
 
-    const hideUntrustedEvents =
+    const hideUntrustedNotes =
       window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_EVENTS) === 'true'
     const storedHideUntrustedInteractions = window.localStorage.getItem(
       StorageKey.HIDE_UNTRUSTED_INTERACTIONS
@@ -106,10 +108,11 @@ class LocalStorageService {
     )
     this.hideUntrustedInteractions = storedHideUntrustedInteractions
       ? storedHideUntrustedInteractions === 'true'
-      : hideUntrustedEvents
+      : hideUntrustedNotes
     this.hideUntrustedNotifications = storedHideUntrustedNotifications
       ? storedHideUntrustedNotifications === 'true'
-      : hideUntrustedEvents
+      : hideUntrustedNotes
+    this.hideUntrustedNotes = hideUntrustedNotes
 
     const translationServiceConfigMapStr = window.localStorage.getItem(
       StorageKey.TRANSLATION_SERVICE_CONFIG_MAP
@@ -298,6 +301,18 @@ class LocalStorageService {
     window.localStorage.setItem(
       StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS,
       hideUntrustedNotifications.toString()
+    )
+  }
+
+  getHideUntrustedNotes() {
+    return this.hideUntrustedNotes
+  }
+
+  setHideUntrustedNotes(hideUntrustedNotes: boolean) {
+    this.hideUntrustedNotes = hideUntrustedNotes
+    window.localStorage.setItem(
+      StorageKey.HIDE_UNTRUSTED_NOTES,
+      hideUntrustedNotes.toString()
     )
   }
 
