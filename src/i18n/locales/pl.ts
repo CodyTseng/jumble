@@ -282,6 +282,7 @@ export default {
     'Translating...': 'Tłumaczenie...',
     Translate: 'Przetłumacz',
     'Show original': 'Pokaż oryginał',
-    Website: 'Strona internetowa'
+    Website: 'Strona internetowa',
+    'Hide untrusted notes': 'Ukryj wpisy od nieznanych użytkowników'
   }
 }

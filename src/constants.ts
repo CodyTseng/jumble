@@ -92,4 +92,8 @@ export const NIP_96_SERVICE = [
 ]
 export const DEFAULT_NIP_96_SERVICE = 'https://nostr.build'
 
-export const DEFAULT_NOSTRCONNECT_RELAY = ['wss://relay.nsec.app/', 'wss://nos.lol/', 'wss://relay.primal.net']
+export const DEFAULT_NOSTRCONNECT_RELAY = [
+  'wss://relay.nsec.app/',
+  'wss://nos.lol/',
+  'wss://relay.primal.net'
+]

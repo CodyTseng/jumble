@@ -6,10 +6,10 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn } from '@/lib/utils'
 import { useAutoplay } from '@/providers/AutoplayProvider'
 import { useTheme } from '@/providers/ThemeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import { SelectValue } from '@radix-ui/react-select'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
@@ -66,10 +66,14 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
         </SettingItem>
         <SettingItem>
-          <Label htmlFor="hideUntrustedNotes" className="text-base font-normal">
-            {t('Hide untrusted posts')}
+          <Label htmlFor="hide-untrusted-notes" className="text-base font-normal">
+            {t('Hide untrusted notes')}
           </Label>
-            <Switch id="hideUntrustedNotes" checked={hideUntrustedNotes} onCheckedChange={updateHideUntrustedNotes} />
+          <Switch
+            id="hide-untrusted-notes"
+            checked={hideUntrustedNotes}
+            onCheckedChange={updateHideUntrustedNotes}
+          />
         </SettingItem>
       </div>
     </SecondaryPageLayout>

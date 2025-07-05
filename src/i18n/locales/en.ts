@@ -279,6 +279,7 @@ export default {
     'Translating...': 'Translating...',
     Translate: 'Translate',
     'Show original': 'Show original',
-    Website: 'Website'
+    Website: 'Website',
+    'Hide untrusted notes': 'Hide untrusted notes'
   }
 }

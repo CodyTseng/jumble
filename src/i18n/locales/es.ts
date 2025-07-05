@@ -284,6 +284,7 @@ export default {
     'Translating...': 'Traduciendo...',
     Translate: 'Traducir',
     'Show original': 'Mostrar original',
-    Website: 'Sitio web'
+    Website: 'Sitio web',
+    'Hide untrusted notes': 'Ocultar notas no confiables'
   }
 }

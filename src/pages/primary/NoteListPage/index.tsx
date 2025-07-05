@@ -55,6 +55,7 @@ const NoteListPage = forwardRef((_, ref) => {
         filter={filter}
         needCheckAlgoRelay={feedInfo.feedType !== 'following'}
         isMainFeed
+        skipTrustCheck={feedInfo.feedType === 'following'}
       />
     )
   }

@@ -284,6 +284,7 @@ export default {
     'Translating...': 'Перевод...',
     Translate: 'Перевести',
     'Show original': 'Показать оригинал',
-    Website: 'Веб-сайт'
+    Website: 'Веб-сайт',
+    'Hide untrusted notes': 'Скрыть недоверенные заметки'
   }
 }

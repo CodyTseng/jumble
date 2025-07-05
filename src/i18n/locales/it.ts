@@ -283,6 +283,7 @@ export default {
     'Translating...': 'Traduzione in corso...',
     Translate: 'Traduci',
     'Show original': 'Mostra originale',
-    Website: 'Sito web'
+    Website: 'Sito web',
+    'Hide untrusted notes': 'Nascondi note non fidate'
   }
 }

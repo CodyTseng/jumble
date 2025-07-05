@@ -286,6 +286,7 @@ export default {
     'Translating...': 'Übersetze...',
     Translate: 'Übersetzen',
     'Show original': 'Original anzeigen',
-    Website: 'Website'
+    Website: 'Website',
+    'Hide untrusted notes': 'Untrusted Notizen ausblenden'
   }
 }

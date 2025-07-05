@@ -198,6 +198,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
         className="mt-2"
         filterMutedNotes={false}
         topSpace={topContainerHeight + 100}
+        skipTrustCheck
       />
     </SecondaryPageLayout>
   )

@@ -34,7 +34,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
     storage.getHideUntrustedNotifications()
   )
   const [hideUntrustedNotes, setHideUntrustedNotes] = useState(() =>
-    storage.getHideUntrustedNotes ? storage.getHideUntrustedNotes() : false
+    storage.getHideUntrustedNotes()
   )
 
   useEffect(() => {
@@ -73,9 +73,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
 
   const updateHideUntrustedNotes = (hide: boolean) => {
     setHideUntrustedNotes(hide)
-    if (storage.setHideUntrustedNotes) {
-      storage.setHideUntrustedNotes(hide)
-    }
+    storage.setHideUntrustedNotes(hide)
   }
 
   return (

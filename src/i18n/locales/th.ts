@@ -278,6 +278,7 @@ export default {
     'Translating...': 'กำลังแปล...',
     Translate: 'แปล',
     'Show original': 'แสดงต้นฉบับ',
-    Website: 'เว็บไซต์'
+    Website: 'เว็บไซต์',
+    'Hide untrusted notes': 'ซ่อนโน้ตที่ไม่น่าเชื่อถือ'
   }
 }

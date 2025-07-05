@@ -279,6 +279,7 @@ export default {
     'Translating...': 'جارٍ الترجمة...',
     Translate: 'ترجمة',
     'Show original': 'عرض الأصل',
-    Website: 'الموقع الإلكتروني'
+    Website: 'الموقع الإلكتروني',
+    'Hide untrusted notes': 'إخفاء الملاحظات غير الموثوقة'
   }
 }

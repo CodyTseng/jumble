@@ -281,6 +281,7 @@ export default {
     'Translating...': '翻訳中...',
     Translate: '翻訳',
     'Show original': '原文を表示',
-    Website: 'ウェブサイト'
+    Website: 'ウェブサイト',
+    'Hide untrusted notes': '信頼されていないノートを非表示'
   }
 }

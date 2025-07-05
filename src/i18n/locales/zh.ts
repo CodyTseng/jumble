@@ -279,6 +279,7 @@ export default {
     'Translating...': '翻译中...',
     Translate: '翻译',
     'Show original': '显示原文',
-    Website: '网站'
+    Website: '网站',
+    'Hide untrusted notes': '隐藏不受信任的笔记'
   }
 }
