@@ -1,0 +1,171 @@
+import { Button, ButtonProps } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger
+} from '@/components/ui/drawer'
+import { getSharableEventId } from '@/lib/event'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { ExternalLink } from 'lucide-react'
+import { Event, kinds } from 'nostr-tools'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+const clients: Record<string, { name: string; getUrl: (id: string) => string }> = {
+  nosta: {
+    name: 'Nosta',
+    getUrl: (id: string) => `https://nosta.me/${id}`
+  },
+  snort: {
+    name: 'Snort',
+    getUrl: (id: string) => `https://snort.social/${id}`
+  },
+  olas: {
+    name: 'Olas',
+    getUrl: (id: string) => `https://olas.app/e/${id}`
+  },
+  primal: {
+    name: 'Primal',
+    getUrl: (id: string) => `https://primal.net/e/${id}`
+  },
+  nostrudel: {
+    name: 'Nostrudel',
+    getUrl: (id: string) => `https://nostrudel.ninja/l/${id}`
+  },
+  nostter: {
+    name: 'Nostter',
+    getUrl: (id: string) => `https://nostter.app/${id}`
+  },
+  coracle: {
+    name: 'Coracle',
+    getUrl: (id: string) => `https://coracle.social/${id}`
+  },
+  iris: {
+    name: 'Iris',
+    getUrl: (id: string) => `https://iris.to/${id}`
+  },
+  lumilumi: {
+    name: 'Lumilumi',
+    getUrl: (id: string) => `https://lumilumi.app/${id}`
+  },
+  zapStream: {
+    name: 'zap.stream',
+    getUrl: (id: string) => `https://zap.stream/${id}`
+  },
+  yakihonne: {
+    name: 'YakiHonne',
+    getUrl: (id: string) => `https://yakihonne.com/${id}`
+  },
+  habla: {
+    name: 'Habla',
+    getUrl: (id: string) => `https://habla.news/a/${id}`
+  },
+  pareto: {
+    name: 'Pareto',
+    getUrl: (id: string) => `https://pareto.space/a/${id}`
+  },
+  njump: {
+    name: 'Njump',
+    getUrl: (id: string) => `https://njump.me/${id}`
+  }
+}
+
+export default function ClientSelectorDialog({
+  event,
+  ...props
+}: ButtonProps & {
+  event: Event
+}) {
+  const { isSmallScreen } = useScreenSize()
+  const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
+
+  const supportedClients = useMemo(() => {
+    switch (event.kind) {
+      case kinds.LongFormArticle:
+      case kinds.DraftLong:
+        return ['yakihonne', 'lumilumi', 'coracle', 'pareto', 'habla', 'njump']
+      case kinds.LiveEvent:
+        return ['zapStream', 'nostrudel', 'njump']
+      case kinds.Date:
+      case kinds.Time:
+        return ['coracle', 'njump']
+      default:
+        return ['njump']
+    }
+  }, [event])
+
+  const content = (
+    <div className="space-y-2">
+      {supportedClients.map((clientId) => {
+        const client = clients[clientId]
+        if (!client) return null
+
+        return (
+          <Button
+            key={client.name}
+            asChild
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => setOpen(false)}
+          >
+            <a
+              href={client.getUrl(getSharableEventId(event))}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {client.name}
+            </a>
+          </Button>
+        )
+      })}
+    </div>
+  )
+
+  if (isSmallScreen) {
+    return (
+      <div onClick={(e) => e.stopPropagation()}>
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerTrigger asChild>
+            <Button {...props}>
+              <ExternalLink /> {t('Open in another client')}
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>{t('Choose a client')}</DrawerTitle>
+            </DrawerHeader>
+            {content}
+          </DrawerContent>
+        </Drawer>
+      </div>
+    )
+  }
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button {...props}>
+            <ExternalLink /> {t('Open in another client')}
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Choose a client')}</DialogTitle>
+          </DialogHeader>
+          {content}
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

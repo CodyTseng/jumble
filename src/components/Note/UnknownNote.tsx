@@ -1,10 +1,7 @@
-import { Button } from '@/components/ui/button'
-import { getSharableEventId } from '@/lib/event'
-import { toNjump } from '@/lib/link'
 import { cn } from '@/lib/utils'
-import { ExternalLink } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useTranslation } from 'react-i18next'
+import ClientSelectorDialog from '../ClientSelectorDialog'
 
 export function UnknownNote({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
@@ -17,16 +14,7 @@ export function UnknownNote({ event, className }: { event: Event; className?: st
       )}
     >
       <div>{t('Cannot handle event of kind k', { k: event.kind })}</div>
-      <Button
-        onClick={(e) => {
-          e.stopPropagation()
-          window.open(toNjump(getSharableEventId(event)), '_blank')
-        }}
-        variant="outline"
-      >
-        <ExternalLink />
-        <div>{t('View on njump.me')}</div>
-      </Button>
+      <ClientSelectorDialog event={event} variant="secondary" />
     </div>
   )
 }

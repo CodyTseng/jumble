@@ -11,12 +11,14 @@ export default function MainNoteCard({
   event,
   className,
   reposter,
-  embedded
+  embedded,
+  originalNoteId
 }: {
   event: Event
   className?: string
   reposter?: string
   embedded?: boolean
+  originalNoteId?: string
 }) {
   const { push } = useSecondaryPage()
 
@@ -35,6 +37,7 @@ export default function MainNoteCard({
             className={embedded ? '' : 'px-4'}
             size={embedded ? 'small' : 'normal'}
             event={event}
+            originalNoteId={originalNoteId}
           />
         </Collapsible>
         {!embedded && <NoteStats className="mt-3 px-4" event={event} />}

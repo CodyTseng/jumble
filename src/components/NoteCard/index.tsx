@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useTranslation } from 'react-i18next'
-import GenericNoteCard from './GenericNoteCard'
+import MainNoteCard from './MainNoteCard'
 import RepostNoteCard from './RepostNoteCard'
 
 export default function NoteCard({
@@ -24,7 +24,7 @@ export default function NoteCard({
       <RepostNoteCard event={event} className={className} filterMutedNotes={filterMutedNotes} />
     )
   }
-  return <GenericNoteCard event={event} className={className} />
+  return <MainNoteCard event={event} className={className} />
 }
 
 export function NoteCardLoadingSkeleton({ isPictures }: { isPictures: boolean }) {

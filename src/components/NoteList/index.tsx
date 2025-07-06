@@ -115,7 +115,13 @@ export default function NoteList({
         subRequests.push({
           urls: myRelayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
           filter: {
-            kinds: [kinds.ShortTextNote, kinds.Repost, kinds.Highlights, ExtendedKind.COMMENT],
+            kinds: [
+              kinds.ShortTextNote,
+              kinds.Repost,
+              kinds.Highlights,
+              ExtendedKind.COMMENT,
+              kinds.LongFormArticle
+            ],
             authors: [pubkey],
             '#p': [author],
             limit: LIMIT
@@ -124,7 +130,13 @@ export default function NoteList({
         subRequests.push({
           urls: targetRelayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
           filter: {
-            kinds: [kinds.ShortTextNote, kinds.Repost, kinds.Highlights, ExtendedKind.COMMENT],
+            kinds: [
+              kinds.ShortTextNote,
+              kinds.Repost,
+              kinds.Highlights,
+              ExtendedKind.COMMENT,
+              kinds.LongFormArticle
+            ],
             authors: [author],
             '#p': [pubkey],
             limit: LIMIT
@@ -140,7 +152,13 @@ export default function NoteList({
           kinds:
             filterType === 'pictures'
               ? [ExtendedKind.PICTURE]
-              : [kinds.ShortTextNote, kinds.Repost, kinds.Highlights, ExtendedKind.COMMENT],
+              : [
+                  kinds.ShortTextNote,
+                  kinds.Repost,
+                  kinds.Highlights,
+                  ExtendedKind.COMMENT,
+                  kinds.LongFormArticle
+                ],
           limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
         }
         if (relayUrls.length === 0 && (_filter.authors?.length || author)) {

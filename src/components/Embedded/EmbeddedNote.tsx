@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import GenericNoteCard from '../NoteCard/GenericNoteCard'
+import MainNoteCard from '../NoteCard/MainNoteCard'
 
 export function EmbeddedNote({ noteId, className }: { noteId: string; className?: string }) {
   const { event, isFetching } = useFetchEvent(noteId)
@@ -19,7 +19,7 @@ export function EmbeddedNote({ noteId, className }: { noteId: string; className?
   }
 
   return (
-    <GenericNoteCard
+    <MainNoteCard
       className={cn('w-full', className)}
       event={event}
       embedded

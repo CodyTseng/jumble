@@ -3,7 +3,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import client from '@/services/client.service'
 import { Event, kinds, nip19, verifyEvent } from 'nostr-tools'
 import { useEffect, useState } from 'react'
-import GenericNoteCard from './GenericNoteCard'
+import MainNoteCard from './MainNoteCard'
 
 export default function RepostNoteCard({
   event,
@@ -61,5 +61,5 @@ export default function RepostNoteCard({
     return null
   }
 
-  return <GenericNoteCard className={className} reposter={event.pubkey} event={targetEvent} />
+  return <MainNoteCard className={className} reposter={event.pubkey} event={targetEvent} />
 }

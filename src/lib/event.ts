@@ -76,6 +76,11 @@ export function isSupportedKind(kind: number) {
   ].includes(kind)
 }
 
+export function isSupportedDisplayKind(kind: number) {
+  if (isSupportedKind(kind)) return true
+  return [kinds.LongFormArticle, kinds.LiveEvent, ExtendedKind.GROUP_METADATA].includes(kind)
+}
+
 export function getParentEventTag(event?: Event) {
   if (!event || ![kinds.ShortTextNote, ExtendedKind.COMMENT].includes(event.kind)) return undefined
 

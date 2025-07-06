@@ -1,11 +1,12 @@
 import { useSecondaryPage } from '@/PageManager'
+import { ExtendedKind } from '@/constants'
 import {
   extractImageInfosFromEventTags,
   getParentEventId,
   getUsingClient,
   isNsfwEvent,
   isPictureEvent,
-  isSupportedKind
+  isSupportedDisplayKind
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -20,18 +21,25 @@ import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import GroupMetadata from './GroupMetadata'
 import Highlight from './Highlight'
 import IValue from './IValue'
+import LiveEvent from './LiveEvent'
+import LongFormArticle from './LongFormArticle'
 import NsfwNote from './NsfwNote'
 import { UnknownNote } from './UnknownNote'
+import { useMuteList } from '@/providers/MuteListProvider'
+import MutedNote from './MutedNote'
 
 export default function Note({
   event,
+  originalNoteId,
   size = 'normal',
   className,
   hideParentNotePreview = false
 }: {
   event: Event
+  originalNoteId?: string
   size?: 'normal' | 'small'
   className?: string
   hideParentNotePreview?: boolean
@@ -48,14 +56,24 @@ export default function Note({
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])
   const [showNsfw, setShowNsfw] = useState(false)
+  const { mutePubkeys } = useMuteList()
+  const [showMuted, setShowMuted] = useState(false)
 
   let content: React.ReactNode
-  if (!isSupportedKind(event.kind)) {
+  if (!isSupportedDisplayKind(event.kind)) {
     content = <UnknownNote className="mt-2" event={event} />
+  } else if (mutePubkeys.includes(event.pubkey) && !showMuted) {
+    content = <MutedNote show={() => setShowMuted(true)} />
   } else if (isNsfwEvent(event) && !showNsfw) {
     content = <NsfwNote show={() => setShowNsfw(true)} />
   } else if (event.kind === kinds.Highlights) {
     content = <Highlight className="mt-2" event={event} />
+  } else if (event.kind === kinds.LongFormArticle) {
+    content = <LongFormArticle className="mt-2" event={event} />
+  } else if (event.kind === kinds.LiveEvent) {
+    content = <LiveEvent className="mt-2" event={event} />
+  } else if (event.kind === ExtendedKind.GROUP_METADATA) {
+    content = <GroupMetadata className="mt-2" event={event} originalNoteId={originalNoteId} />
   } else {
     content = <Content className="mt-2" event={event} />
   }
