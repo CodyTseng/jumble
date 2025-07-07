@@ -1,13 +1,13 @@
 import Image from '@/components/Image'
+import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
-import { isSupportedKind } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { Heart } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import ContentPreview from '../../ContentPreview'
 import { FormattedTimestamp } from '../../FormattedTimestamp'
@@ -54,7 +54,13 @@ export function ReactionNotification({
     return notification.content
   }, [notification])
 
-  if (!event || !eventId || !isSupportedKind(event.kind)) {
+  if (
+    !event ||
+    !eventId ||
+    ![kinds.ShortTextNote, kinds.Highlights, ExtendedKind.PICTURE, ExtendedKind.COMMENT].includes(
+      event.kind
+    )
+  ) {
     return null
   }
 

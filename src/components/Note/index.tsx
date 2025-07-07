@@ -5,8 +5,7 @@ import {
   getParentEventId,
   getUsingClient,
   isNsfwEvent,
-  isPictureEvent,
-  isSupportedDisplayKind
+  isPictureEvent
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -61,7 +60,18 @@ export default function Note({
   const [showMuted, setShowMuted] = useState(false)
 
   let content: React.ReactNode
-  if (!isSupportedDisplayKind(event.kind)) {
+  if (
+    ![
+      kinds.ShortTextNote,
+      kinds.Highlights,
+      kinds.LongFormArticle,
+      kinds.LiveEvent,
+      kinds.CommunityDefinition,
+      ExtendedKind.GROUP_METADATA,
+      ExtendedKind.PICTURE,
+      ExtendedKind.COMMENT
+    ].includes(event.kind)
+  ) {
     content = <UnknownNote className="mt-2" event={event} />
   } else if (mutePubkeys.includes(event.pubkey) && !showMuted) {
     content = <MutedNote show={() => setShowMuted(true)} />

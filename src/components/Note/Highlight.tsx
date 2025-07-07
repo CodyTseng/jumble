@@ -1,5 +1,5 @@
 import { useFetchEvent, useTranslatedEvent } from '@/hooks'
-import { createFakeEvent, isSupportedKind } from '@/lib/event'
+import { createFakeEvent } from '@/lib/event'
 import { toNjump, toNote } from '@/lib/link'
 import { isValidPubkey } from '@/lib/pubkey'
 import { generateEventIdFromATag } from '@/lib/tag'
@@ -110,7 +110,7 @@ function HighlightSource({ event }: { event: Event }) {
     <div className="flex items-center gap-2 text-muted-foreground">
       <div className="shrink-0">{t('From')}</div>
       {pubkey && <UserAvatar userId={pubkey} size="xSmall" className="cursor-pointer" />}
-      {referenceEvent && isSupportedKind(referenceEvent.kind) ? (
+      {referenceEvent ? (
         <ContentPreview
           className="truncate underline pointer-events-auto cursor-pointer hover:text-foreground"
           event={referenceEvent}

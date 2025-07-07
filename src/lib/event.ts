@@ -67,25 +67,6 @@ export function isProtectedEvent(event: Event) {
   return event.tags.some(([tagName]) => tagName === '-')
 }
 
-export function isSupportedKind(kind: number) {
-  return [
-    kinds.ShortTextNote,
-    kinds.Highlights,
-    ExtendedKind.PICTURE,
-    ExtendedKind.COMMENT
-  ].includes(kind)
-}
-
-export function isSupportedDisplayKind(kind: number) {
-  if (isSupportedKind(kind)) return true
-  return [
-    kinds.LongFormArticle,
-    kinds.LiveEvent,
-    ExtendedKind.GROUP_METADATA,
-    kinds.CommunityDefinition
-  ].includes(kind)
-}
-
 export function getParentEventTag(event?: Event) {
   if (!event || ![kinds.ShortTextNote, ExtendedKind.COMMENT].includes(event.kind)) return undefined
 
