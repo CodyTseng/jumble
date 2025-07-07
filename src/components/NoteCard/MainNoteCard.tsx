@@ -27,7 +27,7 @@ export default function MainNoteCard({
       className={className}
       onClick={(e) => {
         e.stopPropagation()
-        push(toNote(event))
+        push(originalNoteId ?? toNote(event))
       }}
     >
       <div className={`clickable ${embedded ? 'p-2 sm:p-3 border rounded-lg' : 'py-3'}`}>

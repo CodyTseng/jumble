@@ -2,7 +2,7 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
 import { Event, nip19 } from 'nostr-tools'
 import { useMemo } from 'react'
-import ClientSelectorDialog from '../ClientSelectorDialog'
+import ClientSelect from '../ClientSelect'
 import Image from '../Image'
 
 export default function GroupMetadata({
@@ -75,7 +75,12 @@ export default function GroupMetadata({
         <div className="space-y-1">
           {groupNameComponent}
           {groupAboutComponent}
-          <ClientSelectorDialog variant="secondary" className="w-full mt-2" event={event} />
+          <ClientSelect
+            variant="secondary"
+            className="w-full mt-2"
+            event={event}
+            originalNoteId={originalNoteId}
+          />
         </div>
       </div>
     )
@@ -96,7 +101,7 @@ export default function GroupMetadata({
           {groupAboutComponent}
         </div>
       </div>
-      <ClientSelectorDialog variant="secondary" className="w-full mt-2" event={event} />
+      <ClientSelect variant="secondary" className="w-full mt-2" event={event} />
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { tagNameEquals } from '@/lib/tag'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
-import ClientSelectorDialog from '../ClientSelectorDialog'
+import ClientSelect from '../ClientSelect'
 import Image from '../Image'
 
 export default function LiveEvent({ event, className }: { event: Event; className?: string }) {
@@ -77,7 +77,7 @@ export default function LiveEvent({ event, className }: { event: Event; classNam
           {liveStatusComponent}
           {summaryComponent}
           {tagsComponent}
-          <ClientSelectorDialog variant="secondary" className="w-full mt-2" event={event} />
+          <ClientSelect variant="secondary" className="w-full mt-2" event={event} />
         </div>
       </div>
     )
@@ -100,7 +100,7 @@ export default function LiveEvent({ event, className }: { event: Event; classNam
           {tagsComponent}
         </div>
       </div>
-      <ClientSelectorDialog variant="secondary" className="w-full mt-2" event={event} />
+      <ClientSelect variant="secondary" className="w-full mt-2" event={event} />
     </div>
   )
 }

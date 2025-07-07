@@ -81,6 +81,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           event={event}
           className="select-text"
           hideParentNotePreview
+          originalNoteId={id}
         />
         <NoteStats className="mt-3" event={event} fetchIfNotExisting displayTopZapsAndLikes />
       </div>

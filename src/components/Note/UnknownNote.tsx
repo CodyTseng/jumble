@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useTranslation } from 'react-i18next'
-import ClientSelectorDialog from '../ClientSelectorDialog'
+import ClientSelect from '../ClientSelect'
 
 export function UnknownNote({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
@@ -14,7 +14,7 @@ export function UnknownNote({ event, className }: { event: Event; className?: st
       )}
     >
       <div>{t('Cannot handle event of kind k', { k: event.kind })}</div>
-      <ClientSelectorDialog event={event} variant="secondary" />
+      <ClientSelect event={event} variant="secondary" />
     </div>
   )
 }

@@ -13,11 +13,14 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from '@/components/ui/drawer'
-import { getSharableEventId } from '@/lib/event'
+import { ExtendedKind } from '@/constants'
+import { getReplaceableEventIdentifier, getSharableEventId } from '@/lib/event'
+import { toChachiChat } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import clientService from '@/services/client.service'
 import { ExternalLink } from 'lucide-react'
-import { Event, kinds } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { Event, kinds, nip19 } from 'nostr-tools'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const clients: Record<string, { name: string; getUrl: (id: string) => string }> = {
@@ -79,11 +82,13 @@ const clients: Record<string, { name: string; getUrl: (id: string) => string }> 
   }
 }
 
-export default function ClientSelectorDialog({
+export default function ClientSelect({
   event,
+  originalNoteId,
   ...props
 }: ButtonProps & {
   event: Event
+  originalNoteId?: string
 }) {
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
@@ -106,28 +111,26 @@ export default function ClientSelectorDialog({
 
   const content = (
     <div className="space-y-2">
-      {supportedClients.map((clientId) => {
-        const client = clients[clientId]
-        if (!client) return null
+      {event.kind === ExtendedKind.GROUP_METADATA ? (
+        <RelayBasedGroupChatSelector
+          event={event}
+          originalNoteId={originalNoteId}
+          setOpen={setOpen}
+        />
+      ) : (
+        supportedClients.map((clientId) => {
+          const client = clients[clientId]
+          if (!client) return null
 
-        return (
-          <Button
-            key={client.name}
-            asChild
-            variant="outline"
-            className="w-full justify-start"
-            onClick={() => setOpen(false)}
-          >
-            <a
+          return (
+            <ClientSelectItem
+              onClick={() => setOpen(false)}
               href={client.getUrl(getSharableEventId(event))}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {client.name}
-            </a>
-          </Button>
-        )
-      })}
+              name={client.name}
+            />
+          )
+        })
+      )}
     </div>
   )
 
@@ -167,5 +170,62 @@ export default function ClientSelectorDialog({
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function RelayBasedGroupChatSelector({
+  event,
+  originalNoteId,
+  setOpen
+}: {
+  event: Event
+  setOpen: Dispatch<SetStateAction<boolean>>
+  originalNoteId?: string
+}) {
+  const { relay, id } = useMemo(() => {
+    let relay: string | undefined
+    if (originalNoteId) {
+      const pointer = nip19.decode(originalNoteId)
+      if (pointer.type === 'naddr' && pointer.data.relays?.length) {
+        relay = pointer.data.relays[0]
+      }
+    }
+    if (!relay) {
+      relay = clientService.getEventHint(event.id)
+    }
+
+    return { relay, id: getReplaceableEventIdentifier(event) }
+  }, [event, originalNoteId])
+
+  return (
+    <ClientSelectItem
+      onClick={() => setOpen(false)}
+      href={toChachiChat(relay, id)}
+      name="Chachi Chat"
+    />
+  )
+}
+
+function ClientSelectItem({
+  onClick,
+  href,
+  name
+}: {
+  onClick: () => void
+  href: string
+  name: string
+}) {
+  return (
+    <Button
+      key="chachi"
+      asChild
+      variant="outline"
+      className="w-full justify-start"
+      onClick={onClick}
+    >
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {name}
+      </a>
+    </Button>
   )
 }

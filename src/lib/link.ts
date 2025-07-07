@@ -65,5 +65,7 @@ export const toHablaLongFormArticle = (event: Event) => {
 export const toZapStreamLiveEvent = (event: Event) => {
   return `https://zap.stream/${getSharableEventId(event)}`
 }
-export const toChachiChat = (relay: string, d: string) => `https://chachi.chat/${relay}/${d}`
+export const toChachiChat = (relay: string, d: string) => {
+  return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
+}
 export const toNjump = (id: string) => `https://njump.me/${id}`
