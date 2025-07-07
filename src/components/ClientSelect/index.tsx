@@ -13,6 +13,7 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from '@/components/ui/drawer'
+import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
 import { getReplaceableEventIdentifier, getSharableEventId } from '@/lib/event'
 import { toChachiChat } from '@/lib/link'
@@ -126,6 +127,7 @@ export default function ClientSelect({
 
           return (
             <ClientSelectItem
+              key={clientId}
               onClick={() => setOpen(false)}
               href={client.getUrl(getSharableEventId(event))}
               name={client.name}
@@ -133,6 +135,17 @@ export default function ClientSelect({
           )
         })
       )}
+      <Separator />
+      <Button
+        variant="ghost"
+        className="w-full py-6 font-semibold"
+        onClick={() => {
+          navigator.clipboard.writeText(originalNoteId ?? getSharableEventId(event))
+          setOpen(false)
+        }}
+      >
+        {t('Copy event ID')}
+      </Button>
     </div>
   )
 
@@ -218,13 +231,7 @@ function ClientSelectItem({
   name: string
 }) {
   return (
-    <Button
-      key="chachi"
-      asChild
-      variant="ghost"
-      className="w-full py-6 font-semibold"
-      onClick={onClick}
-    >
+    <Button asChild variant="ghost" className="w-full py-6 font-semibold" onClick={onClick}>
       <a href={href} target="_blank" rel="noopener noreferrer">
         {name}
       </a>

@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import CommunityDefinitionPreview from './CommunityDefinitionPreview'
 import GroupMetadataPreview from './GroupMetadataPreview'
+import LiveEventPreview from './LiveEventPreview'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import NormalContentPreview from './NormalContentPreview'
 
@@ -57,6 +58,10 @@ export default function ContentPreview({
 
   if (event.kind === kinds.CommunityDefinition) {
     return <CommunityDefinitionPreview event={event} className={className} onClick={onClick} />
+  }
+
+  if (event.kind === kinds.LiveEvent) {
+    return <LiveEventPreview event={event} className={className} onClick={onClick} />
   }
 
   return <div className={className}>[{t('Cannot handle event of kind k', { k: event.kind })}]</div>
