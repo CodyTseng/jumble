@@ -54,7 +54,7 @@ export default function LongFormArticle({
 
   return (
     <div className={className}>
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         {metadata.image && (
           <Image
             image={{ url: metadata.image }}
@@ -62,7 +62,7 @@ export default function LongFormArticle({
             hideIfError
           />
         )}
-        <div className="flex-1 w-0 space-y-1 px-2">
+        <div className="flex-1 w-0 space-y-1">
           {titleComponent}
           {summaryComponent}
           {tagsComponent}

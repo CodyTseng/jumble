@@ -98,7 +98,7 @@ export default function ClientSelect({
     switch (event.kind) {
       case kinds.LongFormArticle:
       case kinds.DraftLong:
-        return ['yakihonne', 'lumilumi', 'coracle', 'pareto', 'habla', 'njump']
+        return ['yakihonne', 'coracle', 'habla', 'lumilumi', 'pareto', 'njump']
       case kinds.LiveEvent:
         return ['zapStream', 'nostrudel', 'njump']
       case kinds.Date:
@@ -162,7 +162,7 @@ export default function ClientSelect({
             <ExternalLink /> {t('Open in another client')}
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>{t('Choose a client')}</DialogTitle>
           </DialogHeader>
@@ -219,8 +219,8 @@ function ClientSelectItem({
     <Button
       key="chachi"
       asChild
-      variant="outline"
-      className="w-full justify-start"
+      variant="ghost"
+      className="w-full py-6 font-semibold"
       onClick={onClick}
     >
       <a href={href} target="_blank" rel="noopener noreferrer">

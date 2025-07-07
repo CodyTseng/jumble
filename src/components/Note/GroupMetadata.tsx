@@ -1,5 +1,4 @@
 import { getGroupMetadata } from '@/lib/event'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import ClientSelect from '../ClientSelect'
@@ -14,7 +13,6 @@ export default function GroupMetadata({
   originalNoteId?: string
   className?: string
 }) {
-  const { isSmallScreen } = useScreenSize()
   const metadata = useMemo(() => {
     return getGroupMetadata(event, originalNoteId)
   }, [event, originalNoteId])
@@ -24,44 +22,20 @@ export default function GroupMetadata({
   )
 
   const groupAboutComponent = metadata.about && (
-    <div className="text-sm text-muted-foreground line-clamp-4">{metadata.about}</div>
+    <div className="text-sm text-muted-foreground line-clamp-2">{metadata.about}</div>
   )
-
-  if (isSmallScreen) {
-    return (
-      <div className={className}>
-        {metadata.picture && (
-          <Image
-            image={{ url: metadata.picture }}
-            className="w-full aspect-video object-cover rounded-lg"
-            hideIfError
-          />
-        )}
-        <div className="space-y-1">
-          {groupNameComponent}
-          {groupAboutComponent}
-          <ClientSelect
-            variant="secondary"
-            className="w-full mt-2"
-            event={event}
-            originalNoteId={originalNoteId}
-          />
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className={className}>
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         {metadata.picture && (
           <Image
             image={{ url: metadata.picture }}
-            className="rounded-lg aspect-[4/3] xl:aspect-video object-cover bg-foreground h-44"
+            className="rounded-lg aspect-square object-cover bg-foreground h-20"
             hideIfError
           />
         )}
-        <div className="flex-1 w-0 space-y-1 px-2">
+        <div className="flex-1 w-0 space-y-1">
           {groupNameComponent}
           {groupAboutComponent}
         </div>
