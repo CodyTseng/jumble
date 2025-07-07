@@ -1,11 +1,11 @@
+import { ExtendedKind } from '@/constants'
 import { useTranslatedEvent } from '@/hooks'
-import { isSupportedKind } from '@/lib/event'
 import { toTranslation } from '@/lib/link'
 import { cn, detectLanguage } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { Languages, Loader } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -22,7 +22,13 @@ export default function TranslateButton({
   const { translateEvent, showOriginalEvent } = useTranslationService()
   const [translating, setTranslating] = useState(false)
   const translatedEvent = useTranslatedEvent(event.id)
-  const supported = useMemo(() => isSupportedKind(event.kind), [event])
+  const supported = useMemo(
+    () =>
+      [kinds.ShortTextNote, kinds.Highlights, ExtendedKind.COMMENT, ExtendedKind.PICTURE].includes(
+        event.kind
+      ),
+    [event]
+  )
 
   const needTranslation = useMemo(() => {
     const detected = detectLanguage(event.content)

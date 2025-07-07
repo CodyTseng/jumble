@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { tagNameEquals } from '@/lib/tag'
+import { getLiveEventMetadata } from '@/lib/event'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -8,33 +8,7 @@ import Image from '../Image'
 
 export default function LiveEvent({ event, className }: { event: Event; className?: string }) {
   const { isSmallScreen } = useScreenSize()
-  const metadata = useMemo(() => {
-    let title: string | undefined
-    let summary: string | undefined
-    let image: string | undefined
-    let status: string | undefined
-    const tags = new Set<string>()
-
-    event.tags.forEach(([tagName, tagValue]) => {
-      if (tagName === 'title') {
-        title = tagValue
-      } else if (tagName === 'summary') {
-        summary = tagValue
-      } else if (tagName === 'image') {
-        image = tagValue
-      } else if (tagName === 'status') {
-        status = tagValue
-      } else if (tagName === 't' && tagValue && tags.size < 6) {
-        tags.add(tagValue.toLocaleLowerCase())
-      }
-    })
-
-    if (!title) {
-      title = event.tags.find(tagNameEquals('d'))?.[1] ?? 'no title'
-    }
-
-    return { title, summary, image, status, tags: Array.from(tags) }
-  }, [event])
+  const metadata = useMemo(() => getLiveEventMetadata(event), [event])
 
   const liveStatusComponent =
     metadata.status &&

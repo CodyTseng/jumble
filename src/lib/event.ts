@@ -614,3 +614,95 @@ export function createFakeEvent(event: Partial<Event>): Event {
     ...event
   }
 }
+
+export function getLongFormArticleMetadata(event: Event) {
+  let title: string | undefined
+  let summary: string | undefined
+  let image: string | undefined
+  const tags = new Set<string>()
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (tagName === 'title') {
+      title = tagValue
+    } else if (tagName === 'summary') {
+      summary = tagValue
+    } else if (tagName === 'image') {
+      image = tagValue
+    } else if (tagName === 't' && tagValue && tags.size < 6) {
+      tags.add(tagValue.toLocaleLowerCase())
+    }
+  })
+
+  if (!title) {
+    title = event.tags.find(tagNameEquals('d'))?.[1] ?? 'no title'
+  }
+
+  return { title, summary, image, tags: Array.from(tags) }
+}
+
+export function getLiveEventMetadata(event: Event) {
+  let title: string | undefined
+  let summary: string | undefined
+  let image: string | undefined
+  let status: string | undefined
+  const tags = new Set<string>()
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (tagName === 'title') {
+      title = tagValue
+    } else if (tagName === 'summary') {
+      summary = tagValue
+    } else if (tagName === 'image') {
+      image = tagValue
+    } else if (tagName === 'status') {
+      status = tagValue
+    } else if (tagName === 't' && tagValue && tags.size < 6) {
+      tags.add(tagValue.toLocaleLowerCase())
+    }
+  })
+
+  if (!title) {
+    title = event.tags.find(tagNameEquals('d'))?.[1] ?? 'no title'
+  }
+
+  return { title, summary, image, status, tags: Array.from(tags) }
+}
+
+export function getGroupMetadata(event: Event, originalNoteId?: string) {
+  let d: string | undefined
+  let name: string | undefined
+  let about: string | undefined
+  let picture: string | undefined
+  let relay: string | undefined
+  const tags = new Set<string>()
+
+  if (originalNoteId) {
+    const pointer = nip19.decode(originalNoteId)
+    if (pointer.type === 'naddr' && pointer.data.relays?.length) {
+      relay = pointer.data.relays[0]
+    }
+  }
+  if (!relay) {
+    relay = client.getEventHint(event.id)
+  }
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (tagName === 'name') {
+      name = tagValue
+    } else if (tagName === 'about') {
+      about = tagValue
+    } else if (tagName === 'picture') {
+      picture = tagValue
+    } else if (tagName === 't' && tagValue) {
+      tags.add(tagValue.toLocaleLowerCase())
+    } else if (tagName === 'd') {
+      d = tagValue
+    }
+  })
+
+  if (!name) {
+    name = d ?? 'no name'
+  }
+
+  return { d, name, about, picture, tags: Array.from(tags), relay }
+}

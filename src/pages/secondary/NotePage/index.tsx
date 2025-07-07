@@ -11,10 +11,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { getParentEventId, getRootEventId, isPictureEvent, isSupportedKind } from '@/lib/event'
+import { getParentEventId, getRootEventId, isPictureEvent } from '@/lib/event'
 import { toNote, toNoteList } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
-import { useMuteList } from '@/providers/MuteListProvider'
+import { cn } from '@/lib/utils'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
@@ -110,19 +110,14 @@ function ExternalRoot({ value }: { value: string }) {
 }
 
 function ParentNote({ eventId }: { eventId?: string }) {
-  const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { mutePubkeys } = useMuteList()
   const { event, isFetching } = useFetchEvent(eventId)
   if (!eventId) return null
 
   if (isFetching) {
     return (
       <div>
-        <Card
-          className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-          onClick={() => push(toNote(eventId))}
-        >
+        <Card className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground">
           <Skeleton className="shrink w-4 h-4 rounded-full" />
           <div className="py-1 flex-1">
             <Skeleton className="h-3" />
@@ -133,54 +128,19 @@ function ParentNote({ eventId }: { eventId?: string }) {
     )
   }
 
-  if (!event) {
-    return (
-      <div>
-        <Card className="flex p-1 items-center justify-center text-sm text-muted-foreground">
-          [{t('Note not found')}]
-        </Card>
-        <div className="ml-5 w-px h-2 bg-border" />
-      </div>
-    )
-  }
-
-  if (mutePubkeys.includes(event.pubkey)) {
-    return (
-      <div>
-        <Card
-          className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-          onClick={() => push(toNote(eventId))}
-        >
-          <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
-          <div className="shrink-0">[{t('This user has been muted')}]</div>
-        </Card>
-        <div className="ml-5 w-px h-2 bg-border" />
-      </div>
-    )
-  }
-
-  if (!isSupportedKind(event.kind)) {
-    return (
-      <div>
-        <Card
-          className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-          onClick={() => push(toNote(eventId))}
-        >
-          <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
-          <div className="shrink-0">[{t('Cannot handle event of kind k', { k: event.kind })}]</div>
-        </Card>
-        <div className="ml-5 w-px h-2 bg-border" />
-      </div>
-    )
-  }
-
   return (
     <div>
       <Card
-        className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-        onClick={() => push(toNote(eventId))}
+        className={cn(
+          'flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground',
+          event && 'hover:text-foreground'
+        )}
+        onClick={() => {
+          if (!event) return
+          push(toNote(eventId))
+        }}
       >
-        <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />
+        {event && <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />}
         <ContentPreview className="truncate" event={event} />
       </Card>
       <div className="ml-5 w-px h-2 bg-border" />

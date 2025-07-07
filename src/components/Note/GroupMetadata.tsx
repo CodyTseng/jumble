@@ -1,6 +1,6 @@
+import { getGroupMetadata } from '@/lib/event'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import client from '@/services/client.service'
-import { Event, nip19 } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import ClientSelect from '../ClientSelect'
 import Image from '../Image'
@@ -16,42 +16,7 @@ export default function GroupMetadata({
 }) {
   const { isSmallScreen } = useScreenSize()
   const metadata = useMemo(() => {
-    let d: string | undefined
-    let name: string | undefined
-    let about: string | undefined
-    let picture: string | undefined
-    let relay: string | undefined
-    const tags = new Set<string>()
-
-    if (originalNoteId) {
-      const pointer = nip19.decode(originalNoteId)
-      if (pointer.type === 'naddr' && pointer.data.relays?.length) {
-        relay = pointer.data.relays[0]
-      }
-    }
-    if (!relay) {
-      relay = client.getEventHint(event.id)
-    }
-
-    event.tags.forEach(([tagName, tagValue]) => {
-      if (tagName === 'name') {
-        name = tagValue
-      } else if (tagName === 'about') {
-        about = tagValue
-      } else if (tagName === 'picture') {
-        picture = tagValue
-      } else if (tagName === 't' && tagValue) {
-        tags.add(tagValue.toLocaleLowerCase())
-      } else if (tagName === 'd') {
-        d = tagValue
-      }
-    })
-
-    if (!name) {
-      name = d ?? 'no name'
-    }
-
-    return { d, name, about, picture, tags: Array.from(tags), relay }
+    return getGroupMetadata(event, originalNoteId)
   }, [event, originalNoteId])
 
   const groupNameComponent = (

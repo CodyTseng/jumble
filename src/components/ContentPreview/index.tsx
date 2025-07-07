@@ -1,19 +1,12 @@
-import { useTranslatedEvent } from '@/hooks'
-import {
-  EmbeddedEmojiParser,
-  EmbeddedEventParser,
-  EmbeddedImageParser,
-  EmbeddedMentionParser,
-  EmbeddedVideoParser,
-  parseContent
-} from '@/lib/content-parser'
-import { extractEmojiInfosFromTags } from '@/lib/event'
+import { ExtendedKind } from '@/constants'
 import { cn } from '@/lib/utils'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { EmbeddedMentionText } from '../Embedded'
-import Emoji from '../Emoji'
+import GroupMetadataPreview from './GroupMetadataPreview'
+import LongFormArticlePreview from './LongFormArticlePreview'
+import NormalContentPreview from './NormalContentPreview'
 
 export default function ContentPreview({
   event,
@@ -25,56 +18,41 @@ export default function ContentPreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
-  const translatedEvent = useTranslatedEvent(event?.id)
-  const nodes = useMemo(() => {
-    if (!event) return [{ type: 'text', data: `[${t('Note not found')}]` }]
+  const { mutePubkeys } = useMuteList()
+  const isMuted = useMemo(
+    () => (event ? mutePubkeys.includes(event.pubkey) : false),
+    [mutePubkeys, event]
+  )
 
-    if (event.kind === kinds.Highlights) return []
+  if (!event) {
+    return <div className={cn('pointer-events-none', className)}>{`[${t('Note not found')}]`}</div>
+  }
 
-    return parseContent(translatedEvent?.content ?? event.content, [
-      EmbeddedImageParser,
-      EmbeddedVideoParser,
-      EmbeddedEventParser,
-      EmbeddedMentionParser,
-      EmbeddedEmojiParser
-    ])
-  }, [event, translatedEvent])
-
-  if (event?.kind === kinds.Highlights) {
+  if (isMuted) {
     return (
-      <div className={cn('pointer-events-none italic', className)} onClick={onClick}>
-        {event.content}
+      <div className={cn('pointer-events-none', className)}>[{t('This user has been muted')}]</div>
+    )
+  }
+
+  if ([kinds.ShortTextNote, ExtendedKind.COMMENT, ExtendedKind.PICTURE].includes(event.kind)) {
+    return <NormalContentPreview event={event} className={className} onClick={onClick} />
+  }
+
+  if (event.kind === kinds.Highlights) {
+    return (
+      <div className={cn('pointer-events-none', className)}>
+        [{t('Highlight')}] <span className="italic">{event.content}</span>
       </div>
     )
   }
 
-  const emojiInfos = extractEmojiInfosFromTags(event?.tags)
+  if (event.kind === kinds.LongFormArticle) {
+    return <LongFormArticlePreview event={event} className={className} onClick={onClick} />
+  }
 
-  return (
-    <div className={cn('pointer-events-none', className)} onClick={onClick}>
-      {nodes.map((node, index) => {
-        if (node.type === 'text') {
-          return node.data
-        }
-        if (node.type === 'image' || node.type === 'images') {
-          return index > 0 ? ` [${t('image')}]` : `[${t('image')}]`
-        }
-        if (node.type === 'video') {
-          return index > 0 ? ` [${t('video')}]` : `[${t('video')}]`
-        }
-        if (node.type === 'event') {
-          return index > 0 ? ` [${t('note')}]` : `[${t('note')}]`
-        }
-        if (node.type === 'mention') {
-          return <EmbeddedMentionText key={index} userId={node.data.split(':')[1]} />
-        }
-        if (node.type === 'emoji') {
-          const shortcode = node.data.split(':')[1]
-          const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
-          if (!emoji) return node.data
-          return <Emoji key={index} emoji={emoji} />
-        }
-      })}
-    </div>
-  )
+  if (event.kind === ExtendedKind.GROUP_METADATA) {
+    return <GroupMetadataPreview event={event} className={className} onClick={onClick} />
+  }
+
+  return <div className={className}>[{t('Cannot handle event of kind k', { k: event.kind })}]</div>
 }

@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { tagNameEquals } from '@/lib/tag'
+import { getLongFormArticleMetadata } from '@/lib/event'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -14,30 +14,7 @@ export default function LongFormArticle({
   className?: string
 }) {
   const { isSmallScreen } = useScreenSize()
-  const metadata = useMemo(() => {
-    let title: string | undefined
-    let summary: string | undefined
-    let image: string | undefined
-    const tags = new Set<string>()
-
-    event.tags.forEach(([tagName, tagValue]) => {
-      if (tagName === 'title') {
-        title = tagValue
-      } else if (tagName === 'summary') {
-        summary = tagValue
-      } else if (tagName === 'image') {
-        image = tagValue
-      } else if (tagName === 't' && tagValue && tags.size < 6) {
-        tags.add(tagValue.toLocaleLowerCase())
-      }
-    })
-
-    if (!title) {
-      title = event.tags.find(tagNameEquals('d'))?.[1] ?? 'no title'
-    }
-
-    return { title, summary, image, tags: Array.from(tags) }
-  }, [event])
+  const metadata = useMemo(() => getLongFormArticleMetadata(event), [event])
 
   const titleComponent = <div className="text-xl font-semibold line-clamp-2">{metadata.title}</div>
 
