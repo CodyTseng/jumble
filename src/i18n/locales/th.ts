@@ -279,6 +279,11 @@ export default {
     Translate: 'แปล',
     'Show original': 'แสดงต้นฉบับ',
     Website: 'เว็บไซต์',
-    'Hide untrusted notes': 'ซ่อนโน้ตที่ไม่น่าเชื่อถือ'
+    'Hide untrusted notes': 'ซ่อนโน้ตที่ไม่น่าเชื่อถือ',
+    'Open in another client': 'เปิดในไคลเอนต์อื่น',
+    Community: 'ชุมชน',
+    Group: 'กลุ่ม',
+    'Live event': 'เหตุการณ์สด',
+    Article: 'บทความ'
   }
 }

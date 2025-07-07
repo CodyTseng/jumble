@@ -283,6 +283,11 @@ export default {
     Translate: 'Przetłumacz',
     'Show original': 'Pokaż oryginał',
     Website: 'Strona internetowa',
-    'Hide untrusted notes': 'Ukryj wpisy od nieznanych użytkowników'
+    'Hide untrusted notes': 'Ukryj wpisy od nieznanych użytkowników',
+    'Open in another client': 'Otwórz w innym kliencie',
+    Community: 'Społeczność',
+    Group: 'Grupa',
+    'Live event': 'Wydarzenie na żywo',
+    Article: 'Artykuł'
   }
 }

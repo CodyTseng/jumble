@@ -280,6 +280,11 @@ export default {
     Translate: '翻译',
     'Show original': '显示原文',
     Website: '网站',
-    'Hide untrusted notes': '隐藏不受信任的笔记'
+    'Hide untrusted notes': '隐藏不受信任的笔记',
+    'Open in another client': '在其他客户端打开',
+    Community: '社区',
+    Group: '群组',
+    'Live event': '直播',
+    Article: '文章'
   }
 }

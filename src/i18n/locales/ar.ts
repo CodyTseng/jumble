@@ -280,6 +280,11 @@ export default {
     Translate: 'ترجمة',
     'Show original': 'عرض الأصل',
     Website: 'الموقع الإلكتروني',
-    'Hide untrusted notes': 'إخفاء الملاحظات غير الموثوقة'
+    'Hide untrusted notes': 'إخفاء الملاحظات غير الموثوقة',
+    'Open in another client': 'فتح في عميل آخر',
+    Community: 'المجتمع',
+    Group: 'المجموعة',
+    'Live event': 'حدث مباشر',
+    Article: 'مقالة'
   }
 }

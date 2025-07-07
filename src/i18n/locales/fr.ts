@@ -285,6 +285,11 @@ export default {
     Translate: 'Traduire',
     'Show original': 'Afficher l’original',
     Website: 'Site Web',
-    'Hide untrusted notes': 'Cacher les notes non fiables'
+    'Hide untrusted notes': 'Cacher les notes non fiables',
+    'Open in another client': 'Ouvrir dans un autre client',
+    Community: 'Communauté',
+    Group: 'Groupe',
+    'Live event': 'Événement en direct',
+    Article: 'Article'
   }
 }

@@ -285,6 +285,11 @@ export default {
     Translate: 'Перевести',
     'Show original': 'Показать оригинал',
     Website: 'Веб-сайт',
-    'Hide untrusted notes': 'Скрыть недоверенные заметки'
+    'Hide untrusted notes': 'Скрыть недоверенные заметки',
+    'Open in another client': 'Открыть в другом клиенте',
+    Community: 'Сообщество',
+    Group: 'Группа',
+    'Live event': 'Живое событие',
+    Article: 'Статья'
   }
 }

@@ -280,6 +280,11 @@ export default {
     Translate: 'Translate',
     'Show original': 'Show original',
     Website: 'Website',
-    'Hide untrusted notes': 'Hide untrusted notes'
+    'Hide untrusted notes': 'Hide untrusted notes',
+    'Open in another client': 'Open in another client',
+    Community: 'Community',
+    Group: 'Group',
+    'Live event': 'Live event',
+    Article: 'Article'
   }
 }

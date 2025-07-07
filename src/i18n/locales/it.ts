@@ -284,6 +284,11 @@ export default {
     Translate: 'Traduci',
     'Show original': 'Mostra originale',
     Website: 'Sito web',
-    'Hide untrusted notes': 'Nascondi note non fidate'
+    'Hide untrusted notes': 'Nascondi note non fidate',
+    'Open in another client': 'Apri in un altro client',
+    Community: 'Comunità',
+    Group: 'Gruppo',
+    'Live event': 'Evento dal vivo',
+    Article: 'Articolo'
   }
 }

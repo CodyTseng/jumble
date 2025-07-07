@@ -282,6 +282,11 @@ export default {
     Translate: '번역',
     'Show original': '원본 보기',
     Website: '웹사이트',
-    'Hide untrusted notes': '신뢰하지 않는 노트 숨기기'
+    'Hide untrusted notes': '신뢰하지 않는 노트 숨기기',
+    'Open in another client': '다른 클라이언트에서 열기',
+    Community: '커뮤니티',
+    Group: '그룹',
+    'Live event': '라이브 이벤트',
+    Article: '기사'
   }
 }

@@ -284,6 +284,11 @@ export default {
     Translate: 'Traduzir',
     'Show original': 'Mostrar original',
     Website: 'Website',
-    'Hide untrusted notes': 'Esconder notas não confiáveis'
+    'Hide untrusted notes': 'Esconder notas não confiáveis',
+    'Open in another client': 'Abrir em outro cliente',
+    Community: 'Comunidade',
+    Group: 'Grupo',
+    'Live event': 'Evento ao vivo',
+    Article: 'Artigo'
   }
 }

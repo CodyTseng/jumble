@@ -282,6 +282,11 @@ export default {
     Translate: '翻訳',
     'Show original': '原文を表示',
     Website: 'ウェブサイト',
-    'Hide untrusted notes': '信頼されていないノートを非表示'
+    'Hide untrusted notes': '信頼されていないノートを非表示',
+    'Open in another client': '別のクライアントで開く',
+    Community: 'コミュニティ',
+    Group: 'グループ',
+    'Live event': 'ライブイベント',
+    Article: '記事'
   }
 }
