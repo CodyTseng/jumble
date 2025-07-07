@@ -9,6 +9,7 @@ import {
   isSupportedDisplayKind
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -21,15 +22,15 @@ import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import CommunityDefinition from './CommunityDefinition'
 import GroupMetadata from './GroupMetadata'
 import Highlight from './Highlight'
 import IValue from './IValue'
 import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
+import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
 import { UnknownNote } from './UnknownNote'
-import { useMuteList } from '@/providers/MuteListProvider'
-import MutedNote from './MutedNote'
 
 export default function Note({
   event,
@@ -74,6 +75,8 @@ export default function Note({
     content = <LiveEvent className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.GROUP_METADATA) {
     content = <GroupMetadata className="mt-2" event={event} originalNoteId={originalNoteId} />
+  } else if (event.kind === kinds.CommunityDefinition) {
+    content = <CommunityDefinition className="mt-2" event={event} />
   } else {
     content = <Content className="mt-2" event={event} />
   }

@@ -13,9 +13,7 @@ export default function GroupMetadata({
   originalNoteId?: string
   className?: string
 }) {
-  const metadata = useMemo(() => {
-    return getGroupMetadata(event, originalNoteId)
-  }, [event, originalNoteId])
+  const metadata = useMemo(() => getGroupMetadata(event), [event])
 
   const groupNameComponent = (
     <div className="text-xl font-semibold line-clamp-1">{metadata.name}</div>
@@ -40,7 +38,12 @@ export default function GroupMetadata({
           {groupAboutComponent}
         </div>
       </div>
-      <ClientSelect variant="secondary" className="w-full mt-2" event={event} />
+      <ClientSelect
+        variant="secondary"
+        className="w-full mt-2"
+        event={event}
+        originalNoteId={originalNoteId}
+      />
     </div>
   )
 }

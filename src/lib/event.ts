@@ -78,7 +78,12 @@ export function isSupportedKind(kind: number) {
 
 export function isSupportedDisplayKind(kind: number) {
   if (isSupportedKind(kind)) return true
-  return [kinds.LongFormArticle, kinds.LiveEvent, ExtendedKind.GROUP_METADATA].includes(kind)
+  return [
+    kinds.LongFormArticle,
+    kinds.LiveEvent,
+    ExtendedKind.GROUP_METADATA,
+    kinds.CommunityDefinition
+  ].includes(kind)
 }
 
 export function getParentEventTag(event?: Event) {
@@ -668,23 +673,12 @@ export function getLiveEventMetadata(event: Event) {
   return { title, summary, image, status, tags: Array.from(tags) }
 }
 
-export function getGroupMetadata(event: Event, originalNoteId?: string) {
+export function getGroupMetadata(event: Event) {
   let d: string | undefined
   let name: string | undefined
   let about: string | undefined
   let picture: string | undefined
-  let relay: string | undefined
   const tags = new Set<string>()
-
-  if (originalNoteId) {
-    const pointer = nip19.decode(originalNoteId)
-    if (pointer.type === 'naddr' && pointer.data.relays?.length) {
-      relay = pointer.data.relays[0]
-    }
-  }
-  if (!relay) {
-    relay = client.getEventHint(event.id)
-  }
 
   event.tags.forEach(([tagName, tagValue]) => {
     if (tagName === 'name') {
@@ -704,5 +698,27 @@ export function getGroupMetadata(event: Event, originalNoteId?: string) {
     name = d ?? 'no name'
   }
 
-  return { d, name, about, picture, tags: Array.from(tags), relay }
+  return { d, name, about, picture, tags: Array.from(tags) }
+}
+
+export function getCommunityDefinition(event: Event) {
+  let name: string | undefined
+  let description: string | undefined
+  let image: string | undefined
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (tagName === 'name') {
+      name = tagValue
+    } else if (tagName === 'description') {
+      description = tagValue
+    } else if (tagName === 'image') {
+      image = tagValue
+    }
+  })
+
+  if (!name) {
+    name = event.tags.find(tagNameEquals('d'))?.[1] ?? 'no name'
+  }
+
+  return { name, description, image }
 }
