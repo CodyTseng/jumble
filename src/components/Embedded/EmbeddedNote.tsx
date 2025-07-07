@@ -1,10 +1,8 @@
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchEvent } from '@/hooks'
 import { cn } from '@/lib/utils'
-import { Check, Copy } from 'lucide-react'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ClientSelect from '../ClientSelect'
 import MainNoteCard from '../NoteCard/MainNoteCard'
 
 export function EmbeddedNote({ noteId, className }: { noteId: string; className?: string }) {
@@ -46,23 +44,12 @@ function EmbeddedNoteSkeleton({ className }: { className?: string }) {
 
 function EmbeddedNoteNotFound({ noteId, className }: { noteId: string; className?: string }) {
   const { t } = useTranslation()
-  const [isCopied, setIsCopied] = useState(false)
 
   return (
     <div className={cn('text-left p-2 sm:p-3 border rounded-lg', className)}>
       <div className="flex flex-col items-center text-muted-foreground font-medium gap-2">
         <div>{t('Sorry! The note cannot be found 😔')}</div>
-        <Button
-          onClick={(e) => {
-            e.stopPropagation()
-            navigator.clipboard.writeText(noteId)
-            setIsCopied(true)
-            setTimeout(() => setIsCopied(false), 2000)
-          }}
-          variant="ghost"
-        >
-          {isCopied ? <Check /> : <Copy />} {t('Copy event ID')}
-        </Button>
+        <ClientSelect variant="secondary" className="w-full mt-2" originalNoteId={noteId} />
       </div>
     </div>
   )

@@ -1,18 +1,6 @@
 import { Button, ButtonProps } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger
-} from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
 import { getReplaceableEventIdentifier, getSharableEventId } from '@/lib/event'
@@ -88,7 +76,7 @@ export default function ClientSelect({
   originalNoteId,
   ...props
 }: ButtonProps & {
-  event: Event
+  event?: Event
   originalNoteId?: string
 }) {
   const { isSmallScreen } = useScreenSize()
@@ -96,7 +84,25 @@ export default function ClientSelect({
   const { t } = useTranslation()
 
   const supportedClients = useMemo(() => {
-    switch (event.kind) {
+    let kind: number | undefined
+    if (event) {
+      kind = event.kind
+    } else if (originalNoteId) {
+      try {
+        const pointer = nip19.decode(originalNoteId)
+        if (pointer.type === 'naddr') {
+          kind = pointer.data.kind
+        }
+      } catch (error) {
+        console.error('Failed to decode NIP-19 pointer:', error)
+        return ['njump']
+      }
+    }
+    if (!kind) {
+      return ['njump']
+    }
+
+    switch (kind) {
       case kinds.LongFormArticle:
       case kinds.DraftLong:
         return ['yakihonne', 'coracle', 'habla', 'lumilumi', 'pareto', 'njump']
@@ -112,9 +118,13 @@ export default function ClientSelect({
     }
   }, [event])
 
+  if (!originalNoteId && !event) {
+    return null
+  }
+
   const content = (
     <div className="space-y-2">
-      {event.kind === ExtendedKind.GROUP_METADATA ? (
+      {event?.kind === ExtendedKind.GROUP_METADATA ? (
         <RelayBasedGroupChatSelector
           event={event}
           originalNoteId={originalNoteId}
@@ -129,7 +139,7 @@ export default function ClientSelect({
             <ClientSelectItem
               key={clientId}
               onClick={() => setOpen(false)}
-              href={client.getUrl(getSharableEventId(event))}
+              href={client.getUrl(originalNoteId ?? getSharableEventId(event!))}
               name={client.name}
             />
           )
@@ -140,7 +150,7 @@ export default function ClientSelect({
         variant="ghost"
         className="w-full py-6 font-semibold"
         onClick={() => {
-          navigator.clipboard.writeText(originalNoteId ?? getSharableEventId(event))
+          navigator.clipboard.writeText(originalNoteId ?? getSharableEventId(event!))
           setOpen(false)
         }}
       >
@@ -158,12 +168,7 @@ export default function ClientSelect({
               <ExternalLink /> {t('Open in another client')}
             </Button>
           </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>{t('Choose a client')}</DrawerTitle>
-            </DrawerHeader>
-            {content}
-          </DrawerContent>
+          <DrawerContent>{content}</DrawerContent>
         </Drawer>
       </div>
     )
@@ -177,10 +182,7 @@ export default function ClientSelect({
             <ExternalLink /> {t('Open in another client')}
           </Button>
         </DialogTrigger>
-        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-          <DialogHeader>
-            <DialogTitle>{t('Choose a client')}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="px-8" onOpenAutoFocus={(e) => e.preventDefault()}>
           {content}
         </DialogContent>
       </Dialog>
