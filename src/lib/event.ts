@@ -588,6 +588,13 @@ export function extractEmojiInfosFromTags(tags: string[][] = []) {
     .filter(Boolean) as TEmoji[]
 }
 
+export function extractServersFromTags(tags: string[][] = []) {
+  return tags
+    .filter(tagNameEquals('server'))
+    .map(([, url]) => (url ? normalizeHttpUrl(url) : ''))
+    .filter(Boolean)
+}
+
 export function createFakeEvent(event: Partial<Event>): Event {
   return {
     id: '',

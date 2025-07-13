@@ -18,7 +18,8 @@ const StoreNames = {
   RELAY_INFO_EVENTS: 'relayInfoEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
   RELAY_SETS: 'relaySets',
-  FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays'
+  FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays',
+  BLOSSOM_SERVER_LIST: 'blossomServerList'
 }
 
 class IndexedDbService {
@@ -37,7 +38,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 5)
+        const request = window.indexedDB.open('jumble', 6)
 
         request.onerror = (event) => {
           reject(event)
@@ -79,6 +80,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.FOLLOWING_FAVORITE_RELAYS)) {
             db.createObjectStore(StoreNames.FOLLOWING_FAVORITE_RELAYS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.BLOSSOM_SERVER_LIST)) {
+            db.createObjectStore(StoreNames.BLOSSOM_SERVER_LIST, { keyPath: 'key' })
           }
           this.db = db
         }
@@ -439,6 +443,8 @@ class IndexedDbService {
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
+      case ExtendedKind.BLOSSOM_SERVER_LIST:
+        return StoreNames.BLOSSOM_SERVER_LIST
       default:
         return undefined
     }

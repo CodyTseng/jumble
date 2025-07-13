@@ -13,6 +13,7 @@ import {
   isProtectedEvent,
   isReplaceable
 } from './event'
+import { normalizeHttpUrl } from './url'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
@@ -342,6 +343,15 @@ export function createBookmarkDraftEvent(tags: string[][], content = ''): TDraft
     kind: kinds.BookmarkList,
     content,
     tags,
+    created_at: dayjs().unix()
+  }
+}
+
+export function createBlossomServerListDraftEvent(servers: string[]): TDraftEvent {
+  return {
+    kind: ExtendedKind.BLOSSOM_SERVER_LIST,
+    content: '',
+    tags: servers.map((server) => ['server', normalizeHttpUrl(server)]),
     created_at: dayjs().unix()
   }
 }

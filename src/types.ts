@@ -137,3 +137,12 @@ export type TTranslationServiceConfig =
       server?: string
       api_key?: string
     }
+
+export type TMediaUploadServiceConfig =
+  | {
+      type: 'nip96'
+      service: string
+    }
+  | {
+      type: 'blossom'
+    }

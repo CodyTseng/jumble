@@ -1,5 +1,9 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
+import {
+  extractServersFromTags,
+  getProfileFromProfileEvent,
+  getRelayListFromRelayListEvent
+} from '@/lib/event'
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { extractPubkeysFromEventTags } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
@@ -27,6 +31,7 @@ class ClientService extends EventTarget {
   static instance: ClientService
 
   signer?: ISigner
+  pubkey?: string
   private currentRelayUrls: string[] = []
   private pool: SimplePool
 
@@ -74,9 +79,13 @@ class ClientService extends EventTarget {
     max: 2000,
     fetchMethod: this._fetchFollowListEvent.bind(this)
   })
-  private fetchFollowingFavoriteRelaysCache = new LRUCache<string, Promise<[string, string[]][]>>({
+  private followingFavoriteRelaysCache = new LRUCache<string, Promise<[string, string[]][]>>({
     max: 10,
     fetchMethod: this._fetchFollowingFavoriteRelays.bind(this)
+  })
+  private blossomServerListEventCache = new LRUCache<string, Promise<NEvent | null>>({
+    max: 1000,
+    fetchMethod: this._fetchBlossomServerListEvent.bind(this)
   })
 
   private userIndex = new FlexSearch.Index({
@@ -816,7 +825,7 @@ class ClientService extends EventTarget {
   }
 
   async fetchFollowingFavoriteRelays(pubkey: string) {
-    return this.fetchFollowingFavoriteRelaysCache.fetch(pubkey)
+    return this.followingFavoriteRelaysCache.fetch(pubkey)
   }
 
   private async _fetchFollowingFavoriteRelays(pubkey: string) {
@@ -868,6 +877,43 @@ class ClientService extends EventTarget {
       return cached
     }
     return fetchNewData()
+  }
+
+  async fetchBlossomServerList(pubkey: string) {
+    const evt = await this.blossomServerListEventCache.fetch(pubkey)
+    return evt ? extractServersFromTags(evt.tags) : []
+  }
+
+  async fetchBlossomServerListEvent(pubkey: string) {
+    return (await this.blossomServerListEventCache.fetch(pubkey)) ?? null
+  }
+
+  async updateBlossomServerListEventCache(evt: NEvent) {
+    this.blossomServerListEventCache.set(evt.pubkey, Promise.resolve(evt))
+    await indexedDb.putReplaceableEvent(evt)
+  }
+
+  private async _fetchBlossomServerListEvent(pubkey: string) {
+    const storedBlossomServerListEvent = await indexedDb.getReplaceableEvent(
+      pubkey,
+      ExtendedKind.BLOSSOM_SERVER_LIST
+    )
+    if (storedBlossomServerListEvent) {
+      return storedBlossomServerListEvent
+    }
+
+    const relayList = await this.fetchRelayList(pubkey)
+    const events = await this.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 5), {
+      authors: [pubkey],
+      kinds: [ExtendedKind.BLOSSOM_SERVER_LIST]
+    })
+    const blossomServerListEvent = events.sort((a, b) => b.created_at - a.created_at)[0]
+    if (!blossomServerListEvent) {
+      indexedDb.putNullReplaceableEvent(pubkey, ExtendedKind.BLOSSOM_SERVER_LIST)
+      return null
+    }
+    indexedDb.putReplaceableEvent(blossomServerListEvent)
+    return blossomServerListEvent
   }
 
   updateFollowListCache(event: NEvent) {

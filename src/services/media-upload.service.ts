@@ -1,4 +1,6 @@
 import { simplifyUrl } from '@/lib/url'
+import { TMediaUploadServiceConfig } from '@/types'
+import { BlossomClient, Signer } from 'blossom-client-sdk'
 import dayjs from 'dayjs'
 import { kinds } from 'nostr-tools'
 import { z } from 'zod'
@@ -8,8 +10,8 @@ import storage from './local-storage.service'
 class MediaUploadService {
   static instance: MediaUploadService
 
-  private service: string = storage.getMediaUploadService()
-  private serviceUploadUrlMap = new Map<string, string | undefined>()
+  private serviceConfig: TMediaUploadServiceConfig = storage.getMediaUploadServiceConfig()
+  private nip96ServiceUploadUrlMap = new Map<string, string | undefined>()
   private imetaTagMap = new Map<string, string[]>()
 
   constructor() {
@@ -19,32 +21,65 @@ class MediaUploadService {
     return MediaUploadService.instance
   }
 
-  getService() {
-    return this.service
-  }
-
-  setService(service: string) {
-    this.service = service
-    storage.setMediaUploadService(service)
+  setServiceConfig(config: TMediaUploadServiceConfig) {
+    this.serviceConfig = config
   }
 
   async upload(file: File) {
-    let uploadUrl = this.serviceUploadUrlMap.get(this.service)
+    if (this.serviceConfig.type === 'nip96') {
+      return this.uploadByNip96(this.serviceConfig.service, file)
+    }
+
+    return this.uploadByBlossom(file)
+  }
+
+  private async uploadByBlossom(file: File) {
+    const pubkey = client.pubkey
+    const signer = client.signer as Signer | undefined
+    if (!pubkey || !signer) {
+      throw new Error('You need to be logged in to upload media')
+    }
+
+    const servers = await client.fetchBlossomServerList(pubkey)
+    if (servers.length === 0) {
+      throw new Error('No Blossom services available')
+    }
+    const [mainServer, ...mirrorServers] = servers
+
+    const auth = await BlossomClient.createUploadAuth(signer, file, {
+      message: `Uploading ${file.name}`
+    })
+
+    // first upload blob to main server
+    const blob = await BlossomClient.uploadBlob(mainServer, file, { auth })
+
+    if (mirrorServers.length > 0) {
+      await Promise.allSettled(
+        mirrorServers.map((server) => BlossomClient.mirrorBlob(server, blob, { auth }))
+      )
+    }
+
+    // TODO: tags
+    return { url: blob.url, tags: [] as string[][] }
+  }
+
+  private async uploadByNip96(service: string, file: File) {
+    let uploadUrl = this.nip96ServiceUploadUrlMap.get(service)
     if (!uploadUrl) {
-      const response = await fetch(`${this.service}/.well-known/nostr/nip96.json`)
+      const response = await fetch(`${service}/.well-known/nostr/nip96.json`)
       if (!response.ok) {
         throw new Error(
-          `${simplifyUrl(this.service)} does not work, please try another service in your settings`
+          `${simplifyUrl(service)} does not work, please try another service in your settings`
         )
       }
       const data = await response.json()
       uploadUrl = data?.api_url
       if (!uploadUrl) {
         throw new Error(
-          `${simplifyUrl(this.service)} does not work, please try another service in your settings`
+          `${simplifyUrl(service)} does not work, please try another service in your settings`
         )
       }
-      this.serviceUploadUrlMap.set(this.service, uploadUrl)
+      this.nip96ServiceUploadUrlMap.set(service, uploadUrl)
     }
 
     const formData = new FormData()

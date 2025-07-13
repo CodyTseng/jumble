@@ -308,6 +308,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }, [signer])
 
+  useEffect(() => {
+    if (account) {
+      client.pubkey = account.pubkey
+    } else {
+      client.pubkey = undefined
+    }
+  }, [account])
+
   const hasNostrLoginHash = () => {
     return window.location.hash && window.location.hash.startsWith('#nostr-login')
   }
@@ -565,7 +573,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         })
       }
     }
-    if ([kinds.RelayList, kinds.Contacts, ExtendedKind.FAVORITE_RELAYS].includes(draftEvent.kind)) {
+    if (
+      [
+        kinds.RelayList,
+        kinds.Contacts,
+        ExtendedKind.FAVORITE_RELAYS,
+        ExtendedKind.BLOSSOM_SERVER_LIST
+      ].includes(draftEvent.kind)
+    ) {
       additionalRelayUrls.push(...BIG_RELAY_URLS)
     }
 
