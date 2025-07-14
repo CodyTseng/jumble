@@ -1,6 +1,6 @@
 import { simplifyUrl } from '@/lib/url'
-import { TMediaUploadServiceConfig } from '@/types'
-import { BlossomClient, Signer } from 'blossom-client-sdk'
+import { TDraftEvent, TMediaUploadServiceConfig } from '@/types'
+import { BlossomClient } from 'blossom-client-sdk'
 import dayjs from 'dayjs'
 import { kinds } from 'nostr-tools'
 import { z } from 'zod'
@@ -26,17 +26,28 @@ class MediaUploadService {
   }
 
   async upload(file: File) {
+    let result: { url: string; tags: string[][] }
     if (this.serviceConfig.type === 'nip96') {
-      return this.uploadByNip96(this.serviceConfig.service, file)
+      result = await this.uploadByNip96(this.serviceConfig.service, file)
+    } else {
+      result = await this.uploadByBlossom(file)
     }
 
-    return this.uploadByBlossom(file)
+    if (result.tags.length > 0) {
+      this.imetaTagMap.set(result.url, ['imeta', ...result.tags.map(([n, v]) => `${n} ${v}`)])
+    }
+    return result
   }
 
   private async uploadByBlossom(file: File) {
     const pubkey = client.pubkey
-    const signer = client.signer as Signer | undefined
-    if (!pubkey || !signer) {
+    const signer = async (draft: TDraftEvent) => {
+      if (!client.signer) {
+        throw new Error('You need to be logged in to upload media')
+      }
+      return client.signer.signEvent(draft)
+    }
+    if (!pubkey) {
       throw new Error('You need to be logged in to upload media')
     }
 
@@ -59,8 +70,13 @@ class MediaUploadService {
       )
     }
 
-    // TODO: tags
-    return { url: blob.url, tags: [] as string[][] }
+    let tags: string[][] = []
+    const parseResult = z.array(z.array(z.string())).safeParse((blob as any).nip94 ?? [])
+    if (parseResult.success) {
+      tags = parseResult.data
+    }
+
+    return { url: blob.url, tags }
   }
 
   private async uploadByNip96(service: string, file: File) {
@@ -102,8 +118,7 @@ class MediaUploadService {
     const tags = z.array(z.array(z.string())).parse(data.nip94_event?.tags ?? [])
     const url = tags.find(([tagName]) => tagName === 'url')?.[1]
     if (url) {
-      this.imetaTagMap.set(url, ['imeta', ...tags.map(([n, v]) => `${n} ${v}`)])
-      return { url: url, tags }
+      return { url, tags }
     } else {
       throw new Error('No url found')
     }
