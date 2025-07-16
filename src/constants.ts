@@ -2,11 +2,10 @@ export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
 export const DEFAULT_FAVORITE_RELAYS = [
   'wss://nostr.wine/',
-  'wss://pyramid.fiatjaf.com/',
-  'wss://relays.land/spatianostra/',
+  'wss://freelay.sovbit.host/',
+  'wss://nostr.land/',
   'wss://theforest.nostr1.com/',
   'wss://algo.utxo.one/',
-  'wss://140.f7z.io/',
   'wss://news.utxo.one/'
 ]
 
@@ -61,7 +60,9 @@ export const ExtendedKind = {
   PICTURE: 20,
   FAVORITE_RELAYS: 10012,
   COMMENT: 1111,
-  GROUP_METADATA: 39000
+  GROUP_METADATA: 39000,
+  POLL: 1068,
+  POLL_RESPONSE: 1018
 }
 
 export const URL_REGEX =

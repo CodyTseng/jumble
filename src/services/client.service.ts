@@ -1,7 +1,7 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { getProfileFromProfileEvent, getRelayListFromRelayListEvent } from '@/lib/event'
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
-import { extractPubkeysFromEventTags } from '@/lib/tag'
+import { extractPubkeysFromEventTags, tagNameEquals } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { ISigner, TProfile, TRelayList } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
@@ -876,9 +876,30 @@ class ClientService extends EventTarget {
   }
 
   updateRelayListCache(event: NEvent) {
-    this.relayListEventDataLoader.clear(event.pubkey)
-    this.relayListEventDataLoader.prime(event.pubkey, Promise.resolve(event))
-    indexedDb.putReplaceableEvent(event)
+    if (event.kind === ExtendedKind.FAVORITE_RELAYS) {
+      this.relayListEventDataLoader.clear(event.pubkey)
+    } else if (event.kind === kinds.Relaysets) {
+      const identifier = event.tags.find(tagNameEquals('d'))?.[1]
+      if (identifier) {
+        this.relayListEventDataLoader.clear(`${event.pubkey}:${identifier}`)
+      }
+    }
+  }
+
+  async fetchPollResponses(pollEventId: string, relayUrls: string[] = []) {
+    const filter: Filter = {
+      kinds: [ExtendedKind.POLL_RESPONSE],
+      '#e': [pollEventId]
+    }
+
+    const responses: NEvent[] = []
+    await this.fetchEvents(relayUrls.length > 0 ? relayUrls : this.currentRelayUrls, filter, {
+      onevent: (event) => {
+        responses.push(event)
+      }
+    })
+
+    return responses
   }
 
   async searchNpubsFromCache(query: string, limit: number = 100) {
