@@ -14,12 +14,12 @@ const StoreNames = {
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
   BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
+  BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
   RELAY_INFO_EVENTS: 'relayInfoEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
   RELAY_SETS: 'relaySets',
-  FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays',
-  BLOSSOM_SERVER_LIST: 'blossomServerList'
+  FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays'
 }
 
 class IndexedDbService {
@@ -81,8 +81,8 @@ class IndexedDbService {
           if (!db.objectStoreNames.contains(StoreNames.FOLLOWING_FAVORITE_RELAYS)) {
             db.createObjectStore(StoreNames.FOLLOWING_FAVORITE_RELAYS, { keyPath: 'key' })
           }
-          if (!db.objectStoreNames.contains(StoreNames.BLOSSOM_SERVER_LIST)) {
-            db.createObjectStore(StoreNames.BLOSSOM_SERVER_LIST, { keyPath: 'key' })
+          if (!db.objectStoreNames.contains(StoreNames.BLOSSOM_SERVER_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.BLOSSOM_SERVER_LIST_EVENTS, { keyPath: 'key' })
           }
           this.db = db
         }
@@ -437,14 +437,14 @@ class IndexedDbService {
         return StoreNames.FOLLOW_LIST_EVENTS
       case kinds.Mutelist:
         return StoreNames.MUTE_LIST_EVENTS
+      case ExtendedKind.BLOSSOM_SERVER_LIST:
+        return StoreNames.BLOSSOM_SERVER_LIST_EVENTS
       case kinds.Relaysets:
         return StoreNames.RELAY_SETS
       case ExtendedKind.FAVORITE_RELAYS:
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
-      case ExtendedKind.BLOSSOM_SERVER_LIST:
-        return StoreNames.BLOSSOM_SERVER_LIST
       default:
         return undefined
     }
@@ -469,7 +469,11 @@ class IndexedDbService {
       { name: StoreNames.RELAY_LIST_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
+      },
+      {
+        name: StoreNames.BLOSSOM_SERVER_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
       }
     ]
     const transaction = this.db!.transaction(
