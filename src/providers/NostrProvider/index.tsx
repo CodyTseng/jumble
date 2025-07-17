@@ -210,7 +210,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             kinds.Contacts,
             kinds.Mutelist,
             kinds.BookmarkList,
-            ExtendedKind.FAVORITE_RELAYS
+            ExtendedKind.FAVORITE_RELAYS,
+            ExtendedKind.BLOSSOM_SERVER_LIST
           ],
           authors: [account.pubkey]
         },
@@ -226,6 +227,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
       const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
       const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
+      const blossomServerListEvent = sortedEvents.find(
+        (e) => e.kind === ExtendedKind.BLOSSOM_SERVER_LIST
+      )
       const notificationsSeenAtEvent = sortedEvents.find(
         (e) =>
           e.kind === kinds.Application &&
@@ -257,6 +261,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (favoriteRelaysEvent) {
         setFavoriteRelaysEvent(favoriteRelaysEvent)
         await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
+      }
+      if (blossomServerListEvent) {
+        await client.updateBlossomServerListEventCache(blossomServerListEvent)
       }
 
       const notificationsSeenAt = Math.max(
