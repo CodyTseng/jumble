@@ -54,7 +54,7 @@ export default function Image({
   if (hideIfError && hasError) return null
 
   const handleImageError = async () => {
-    const hash = getHashFromURL(url)
+    const hash = getHashFromURL(imageUrl)
     if (!pubkey || !hash) {
       setIsLoading(false)
       setHasError(true)
@@ -63,15 +63,15 @@ export default function Image({
 
     const blossomServerList = await client.fetchBlossomServerList(pubkey)
     const urls = blossomServerList.map((server) => server + hash).filter((u) => !triedUrls.has(u))
-    const firstUrl = urls[0]
-    if (!firstUrl) {
+    const nextUrl = urls[0]
+    if (!nextUrl) {
       setIsLoading(false)
       setHasError(true)
       return
     }
 
-    setTriedUrls((prev) => new Set(prev.add(firstUrl)))
-    setImageUrl(firstUrl)
+    setTriedUrls((prev) => new Set(prev.add(nextUrl)))
+    setImageUrl(nextUrl)
   }
 
   return (
