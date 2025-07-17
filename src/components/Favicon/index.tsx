@@ -20,7 +20,7 @@ export function Favicon({
       <img
         src={`https://${domain}/favicon.ico`}
         alt={domain}
-        className={cn('absolute inset-0', className)}
+        className={cn('absolute inset-0', loading && 'opacity-0', className)}
         onError={() => setError(true)}
         onLoad={() => setLoading(false)}
       />

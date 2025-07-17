@@ -11,10 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { getParentEventId, getRootEventId, isPictureEvent } from '@/lib/event'
+import { getParentEventId, getParentEventTag, getRootEventId, isPictureEvent } from '@/lib/event'
 import { toNote, toNoteList } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
+import { Ellipsis } from 'lucide-react'
+import { Event } from 'nostr-tools'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
@@ -28,6 +30,8 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
     () => (event?.kind === ExtendedKind.COMMENT ? event.tags.find(tagNameEquals('I')) : undefined),
     [event]
   )
+  const { isFetching: isFetchingRootEvent, event: rootEvent } = useFetchEvent(rootEventId)
+  const { isFetching: isFetchingParentEvent, event: parentEvent } = useFetchEvent(parentEventId)
 
   if (!event && isFetching) {
     return (
@@ -73,9 +77,18 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
       <div className="px-4">
         {rootITag && <ExternalRoot value={rootITag[1]} />}
         {rootEventId !== parentEventId && (
-          <ParentNote key={`root-note-${event.id}`} eventId={rootEventId} />
+          <ParentNote
+            key={`root-note-${event.id}`}
+            isFetching={isFetchingRootEvent}
+            event={rootEvent}
+            isConsecutive={isConsecutive(rootEvent, parentEvent)}
+          />
         )}
-        <ParentNote key={`parent-note-${event.id}`} eventId={parentEventId} />
+        <ParentNote
+          key={`parent-note-${event.id}`}
+          isFetching={isFetchingParentEvent}
+          event={parentEvent}
+        />
         <Note
           key={`note-${event.id}`}
           event={event}
@@ -99,7 +112,7 @@ function ExternalRoot({ value }: { value: string }) {
   return (
     <div>
       <Card
-        className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
+        className="flex space-x-1 px-1.5 py-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
         onClick={() => push(toNoteList({ externalContentId: value }))}
       >
         <div className="truncate">{value}</div>
@@ -109,41 +122,59 @@ function ExternalRoot({ value }: { value: string }) {
   )
 }
 
-function ParentNote({ eventId }: { eventId?: string }) {
+function ParentNote({
+  event,
+  isFetching,
+  isConsecutive = true
+}: {
+  event?: Event
+  isFetching: boolean
+  isConsecutive?: boolean
+}) {
   const { push } = useSecondaryPage()
-  const { event, isFetching } = useFetchEvent(eventId)
-  if (!eventId) return null
 
   if (isFetching) {
     return (
       <div>
-        <Card className="flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground">
+        <Card className="flex space-x-1 px-1.5 py-1 items-center clickable text-sm text-muted-foreground">
           <Skeleton className="shrink w-4 h-4 rounded-full" />
           <div className="py-1 flex-1">
             <Skeleton className="h-3" />
           </div>
         </Card>
-        <div className="ml-5 w-px h-2 bg-border" />
+        <div className="ml-5 w-px h-3 bg-border" />
       </div>
     )
   }
+  if (!event) return null
 
   return (
     <div>
       <Card
         className={cn(
-          'flex space-x-1 p-1 items-center clickable text-sm text-muted-foreground',
+          'flex space-x-1 px-1.5 py-1 items-center clickable text-sm text-muted-foreground',
           event && 'hover:text-foreground'
         )}
         onClick={() => {
           if (!event) return
-          push(toNote(eventId))
+          push(toNote(event))
         }}
       >
         {event && <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />}
         <ContentPreview className="truncate" event={event} />
       </Card>
-      <div className="ml-5 w-px h-2 bg-border" />
+      {isConsecutive ? (
+        <div className="ml-5 w-px h-3 bg-border" />
+      ) : (
+        <Ellipsis className="ml-3.5 text-muted-foreground/60 size-3" />
+      )}
     </div>
   )
+}
+
+function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
+  const eTag = getParentEventTag(parentEvent)
+  if (!eTag) return false
+
+  return rootEvent?.id === eTag[1]
 }

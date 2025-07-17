@@ -82,9 +82,13 @@ export const ClipboardAndDropHandler = Extension.create<ClipboardAndDropHandlerO
                     if (i > 0) nodes.push(schema.nodes.hardBreak.create())
                     if (parts[i]) nodes.push(schema.text(parts[i]))
                   }
-                  const fragment = schema.nodes.paragraph.create(null, nodes)
-                  const tr = view.state.tr.replaceSelectionWith(fragment)
-                  view.dispatch(tr)
+                  if (nodes.length > 0) {
+                    const tr = view.state.tr.replaceSelectionWith(nodes[0])
+                    for (let i = 1; i < nodes.length; i++) {
+                      tr.insert(tr.selection.from, nodes[i])
+                    }
+                    view.dispatch(tr)
+                  }
                 })
                 handled = true
               }

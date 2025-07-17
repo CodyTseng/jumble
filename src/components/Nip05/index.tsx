@@ -34,7 +34,7 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       {nip05IsVerified ? (
         <Favicon
           domain={nip05Domain}
-          className="w-3.5 h-3.5"
+          className="w-3.5 h-3.5 rounded-full"
           fallback={<BadgeCheck className="text-primary" />}
         />
       ) : (
