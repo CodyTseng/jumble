@@ -49,13 +49,13 @@ export function generateEventId(event: Pick<Event, 'id' | 'pubkey'>) {
   return nip19.neventEncode({ id: event.id, author: event.pubkey, relays: [relay] })
 }
 
-export function extractImageInfoFromTag(tag: string[]): TImageInfo | null {
+export function extractImageInfoFromTag(tag: string[], pubkey?: string): TImageInfo | null {
   if (tag[0] !== 'imeta') return null
   const urlItem = tag.find((item) => item.startsWith('url '))
   const url = urlItem?.slice(4)
   if (!url) return null
 
-  const image: TImageInfo = { url }
+  const image: TImageInfo = { url, pubkey }
   const blurHashItem = tag.find((item) => item.startsWith('blurhash '))
   const blurHash = blurHashItem?.slice(9)
   if (blurHash) {

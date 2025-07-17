@@ -26,7 +26,7 @@ export default function CommunityDefinition({
       <div className="flex gap-4">
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="rounded-lg aspect-square object-cover bg-foreground h-20"
             hideIfError
           />

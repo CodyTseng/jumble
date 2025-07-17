@@ -41,7 +41,7 @@ export function ReactionNotification({
       if (emojiUrl) {
         return (
           <Image
-            image={{ url: emojiUrl }}
+            image={{ url: emojiUrl, pubkey: notification.pubkey }}
             alt={emojiName}
             className="w-6 h-6"
             classNames={{ errorPlaceholder: 'bg-transparent' }}

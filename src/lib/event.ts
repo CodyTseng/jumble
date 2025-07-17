@@ -451,7 +451,7 @@ export function extractHashtags(content: string) {
 export function extractImageInfosFromEventTags(event: Event) {
   const images: TImageInfo[] = []
   event.tags.forEach((tag) => {
-    const imageInfo = extractImageInfoFromTag(tag)
+    const imageInfo = extractImageInfoFromTag(tag, event.pubkey)
     if (imageInfo) {
       images.push(imageInfo)
     }

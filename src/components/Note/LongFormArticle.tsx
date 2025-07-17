@@ -37,7 +37,7 @@ export default function LongFormArticle({
       <div className={className}>
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="w-full aspect-video object-cover rounded-lg"
             hideIfError
           />
@@ -57,7 +57,7 @@ export default function LongFormArticle({
       <div className="flex gap-4">
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="rounded-lg aspect-[4/3] xl:aspect-video object-cover bg-foreground h-44"
             hideIfError
           />

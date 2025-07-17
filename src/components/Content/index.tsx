@@ -46,7 +46,7 @@ const Content = memo(({ event, className }: { event: Event; className?: string }
   ])
 
   const imageInfos = event.tags
-    .map((tag) => extractImageInfoFromTag(tag))
+    .map((tag) => extractImageInfoFromTag(tag, event.pubkey))
     .filter(Boolean) as TImageInfo[]
   const allImages = nodes
     .map((node) => {
@@ -56,13 +56,15 @@ const Content = memo(({ event, className }: { event: Event; className?: string }
           return imageInfo
         }
         const tag = mediaUpload.getImetaTagByUrl(node.data)
-        return tag ? extractImageInfoFromTag(tag) : { url: node.data }
+        return tag
+          ? extractImageInfoFromTag(tag, event.pubkey)
+          : { url: node.data, pubkey: event.pubkey }
       }
       if (node.type === 'images') {
         const urls = Array.isArray(node.data) ? node.data : [node.data]
         return urls.map((url) => {
           const imageInfo = imageInfos.find((image) => image.url === url)
-          return imageInfo ?? { url }
+          return imageInfo ?? { url, pubkey: event.pubkey }
         })
       }
       return null

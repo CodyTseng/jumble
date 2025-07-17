@@ -28,7 +28,7 @@ export default function GroupMetadata({
       <div className="flex gap-4">
         {metadata.picture && (
           <Image
-            image={{ url: metadata.picture }}
+            image={{ url: metadata.picture, pubkey: event.pubkey }}
             className="rounded-lg aspect-square object-cover bg-foreground h-20"
             hideIfError
           />

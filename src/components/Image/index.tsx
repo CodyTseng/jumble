@@ -1,12 +1,14 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import client from '@/services/client.service'
 import { TImageInfo } from '@/types'
+import { getHashFromURL } from 'blossom-client-sdk'
 import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useState } from 'react'
 
 export default function Image({
-  image: { url, blurHash },
+  image: { url, blurHash, pubkey },
   alt,
   className = '',
   classNames = {},
@@ -27,6 +29,8 @@ export default function Image({
   const [displayBlurHash, setDisplayBlurHash] = useState(true)
   const [blurDataUrl, setBlurDataUrl] = useState<string | null>(null)
   const [hasError, setHasError] = useState(false)
+  const [imageUrl, setImageUrl] = useState(url)
+  const [triedUrls, setTriedUrls] = useState(new Set([url]))
 
   useEffect(() => {
     if (blurHash) {
@@ -49,12 +53,33 @@ export default function Image({
 
   if (hideIfError && hasError) return null
 
+  const handleImageError = async () => {
+    const hash = getHashFromURL(url)
+    if (!pubkey || !hash) {
+      setIsLoading(false)
+      setHasError(true)
+      return
+    }
+
+    const blossomServerList = await client.fetchBlossomServerList(pubkey)
+    const urls = blossomServerList.map((server) => server + hash).filter((u) => !triedUrls.has(u))
+    const firstUrl = urls[0]
+    if (!firstUrl) {
+      setIsLoading(false)
+      setHasError(true)
+      return
+    }
+
+    setTriedUrls((prev) => new Set(prev.add(firstUrl)))
+    setImageUrl(firstUrl)
+  }
+
   return (
     <div className={cn('relative', classNames.wrapper)} {...props}>
       {isLoading && <Skeleton className={cn('absolute inset-0 rounded-lg', className)} />}
       {!hasError ? (
         <img
-          src={url}
+          src={imageUrl}
           alt={alt}
           className={cn(
             'object-cover transition-opacity duration-300',
@@ -66,10 +91,7 @@ export default function Image({
             setHasError(false)
             setTimeout(() => setDisplayBlurHash(false), 500)
           }}
-          onError={() => {
-            setIsLoading(false)
-            setHasError(true)
-          }}
+          onError={handleImageError}
         />
       ) : (
         <div
