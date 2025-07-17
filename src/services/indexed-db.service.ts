@@ -470,10 +470,6 @@ class IndexedDbService {
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
-      },
-      {
-        name: StoreNames.BLOSSOM_SERVER_LIST_EVENTS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
       }
     ]
     const transaction = this.db!.transaction(

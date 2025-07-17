@@ -894,26 +894,30 @@ class ClientService extends EventTarget {
   }
 
   private async _fetchBlossomServerListEvent(pubkey: string) {
+    const fetchNew = async () => {
+      const relayList = await this.fetchRelayList(pubkey)
+      const events = await this.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 5), {
+        authors: [pubkey],
+        kinds: [ExtendedKind.BLOSSOM_SERVER_LIST]
+      })
+      const blossomServerListEvent = events.sort((a, b) => b.created_at - a.created_at)[0]
+      if (!blossomServerListEvent) {
+        indexedDb.putNullReplaceableEvent(pubkey, ExtendedKind.BLOSSOM_SERVER_LIST)
+        return null
+      }
+      indexedDb.putReplaceableEvent(blossomServerListEvent)
+      return blossomServerListEvent
+    }
+
     const storedBlossomServerListEvent = await indexedDb.getReplaceableEvent(
       pubkey,
       ExtendedKind.BLOSSOM_SERVER_LIST
     )
     if (storedBlossomServerListEvent) {
+      fetchNew()
       return storedBlossomServerListEvent
     }
-
-    const relayList = await this.fetchRelayList(pubkey)
-    const events = await this.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 5), {
-      authors: [pubkey],
-      kinds: [ExtendedKind.BLOSSOM_SERVER_LIST]
-    })
-    const blossomServerListEvent = events.sort((a, b) => b.created_at - a.created_at)[0]
-    if (!blossomServerListEvent) {
-      indexedDb.putNullReplaceableEvent(pubkey, ExtendedKind.BLOSSOM_SERVER_LIST)
-      return null
-    }
-    indexedDb.putReplaceableEvent(blossomServerListEvent)
-    return blossomServerListEvent
+    return fetchNew()
   }
 
   updateFollowListCache(event: NEvent) {
