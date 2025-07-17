@@ -30,7 +30,7 @@ export default function Image({
   const [blurDataUrl, setBlurDataUrl] = useState<string | null>(null)
   const [hasError, setHasError] = useState(false)
   const [imageUrl, setImageUrl] = useState(url)
-  const [triedUrls, setTriedUrls] = useState(new Set([url]))
+  const [tried, setTried] = useState(new Set())
 
   useEffect(() => {
     if (blurHash) {
@@ -54,15 +54,21 @@ export default function Image({
   if (hideIfError && hasError) return null
 
   const handleImageError = async () => {
-    const hash = getHashFromURL(imageUrl)
+    const oldImageUrl = new URL(imageUrl)
+    const hash = getHashFromURL(oldImageUrl)
     if (!pubkey || !hash) {
       setIsLoading(false)
       setHasError(true)
       return
     }
 
+    const ext = oldImageUrl.pathname.match(/\.\w+$/i)
+    setTried((prev) => new Set(prev.add(oldImageUrl.hostname)))
+
     const blossomServerList = await client.fetchBlossomServerList(pubkey)
-    const urls = blossomServerList.map((server) => server + hash).filter((u) => !triedUrls.has(u))
+    const urls = blossomServerList
+      .map((server) => new URL(server))
+      .filter((url) => !tried.has(url.hostname))
     const nextUrl = urls[0]
     if (!nextUrl) {
       setIsLoading(false)
@@ -70,8 +76,8 @@ export default function Image({
       return
     }
 
-    setTriedUrls((prev) => new Set(prev.add(nextUrl)))
-    setImageUrl(nextUrl)
+    nextUrl.pathname = '/' + hash + ext
+    setImageUrl(nextUrl.toString())
   }
 
   return (
