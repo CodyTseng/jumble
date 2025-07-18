@@ -289,6 +289,12 @@ export default {
     'Live event': 'ライブイベント',
     Article: '記事',
     Unfavorite: 'お気に入り解除',
-    'Recommended relays': 'おすすめのリレイ'
+    'Recommended relays': 'おすすめのリレイ',
+    'Blossom server URLs': 'BlossomサーバーURL',
+    'You need to add at least one blossom server in order to upload media files.':
+      'メディアファイルをアップロードするには、少なくとも1つのBlossomサーバーを追加する必要があります。',
+    'Recommended blossom servers': 'おすすめのBlossomサーバー',
+    'Enter Blossom server URL': 'BlossomサーバーURLを入力',
+    Preferred: '優先'
   }
 }

@@ -287,6 +287,12 @@ export default {
     'Live event': '直播',
     Article: '文章',
     Unfavorite: '取消收藏',
-    'Recommended relays': '推荐服务器'
+    'Recommended relays': '推荐服务器',
+    'Blossom server URLs': 'Blossom 服务器地址',
+    'You need to add at least one blossom server in order to upload media files.':
+      '您需要添加至少一个 Blossom 服务器才能上传媒体文件。',
+    'Recommended blossom servers': '推荐的 Blossom 服务器',
+    'Enter Blossom server URL': '输入 Blossom 服务器 URL',
+    Preferred: '首选'
   }
 }

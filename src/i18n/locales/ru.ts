@@ -292,6 +292,12 @@ export default {
     'Live event': 'Живое событие',
     Article: 'Статья',
     Unfavorite: 'Убрать из избранного',
-    'Recommended relays': 'Рекомендуемые ретрансляторы'
+    'Recommended relays': 'Рекомендуемые ретрансляторы',
+    'Blossom server URLs': 'URLs сервера Blossom',
+    'You need to add at least one blossom server in order to upload media files.':
+      'Вам нужно добавить хотя бы один сервер Blossom, чтобы загружать медиафайлы.',
+    'Recommended blossom servers': 'Рекомендуемые серверы Blossom',
+    'Enter Blossom server URL': 'Введите URL сервера Blossom',
+    Preferred: 'Предпочтительный'
   }
 }

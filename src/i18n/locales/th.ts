@@ -286,6 +286,12 @@ export default {
     'Live event': 'เหตุการณ์สด',
     Article: 'บทความ',
     Unfavorite: 'เลิกชื่นชอบ',
-    'Recommended relays': 'รีเลย์ที่แนะนำ'
+    'Recommended relays': 'รีเลย์ที่แนะนำ',
+    'Blossom server URLs': 'URL ของเซิร์ฟเวอร์ Blossom',
+    'You need to add at least one blossom server in order to upload media files.':
+      'คุณต้องเพิ่มเซิร์ฟเวอร์ Blossom อย่างน้อยหนึ่งตัวเพื่ออัปโหลดไฟล์สื่อ',
+    'Recommended blossom servers': 'เซิร์ฟเวอร์ Blossom ที่แนะนำ',
+    'Enter Blossom server URL': 'ป้อน URL ของเซิร์ฟเวอร์ Blossom',
+    Preferred: 'ที่ชื่นชอบ'
   }
 }

@@ -100,7 +100,7 @@ export default function BlossomServerListSetting() {
             {t('You need to add at least one media server in order to upload media files.')}
           </div>
           <Separator className="bg-muted-foreground my-2" />
-          <div className="font-medium">{t('Recommended')}:</div>
+          <div className="font-medium">{t('Recommended blossom servers')}:</div>
           <div className="flex flex-col">
             {['https://blossom.nostr.build/', 'https://nostr.download/'].map((recommendedUrl) => (
               <Button
@@ -145,7 +145,7 @@ export default function BlossomServerListSetting() {
                 {movingIndex === idx ? <Loader className="animate-spin" /> : <ArrowUpToLine />}
               </Button>
             ) : (
-              <Badge>Main</Badge>
+              <Badge>{t('Preferred')}</Badge>
             )}
             <Button
               variant="ghost-destructive"
