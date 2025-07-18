@@ -54,9 +54,15 @@ export default function Image({
   if (hideIfError && hasError) return null
 
   const handleImageError = async () => {
-    const oldImageUrl = new URL(imageUrl)
-    const hash = getHashFromURL(oldImageUrl)
-    if (!pubkey || !hash) {
+    let oldImageUrl: URL | undefined
+    let hash: string | null = null
+    try {
+      oldImageUrl = new URL(imageUrl)
+      hash = getHashFromURL(oldImageUrl)
+    } catch (error) {
+      console.error('Invalid image URL:', error)
+    }
+    if (!pubkey || !hash || !oldImageUrl) {
       setIsLoading(false)
       setHasError(true)
       return
@@ -67,8 +73,15 @@ export default function Image({
 
     const blossomServerList = await client.fetchBlossomServerList(pubkey)
     const urls = blossomServerList
-      .map((server) => new URL(server))
-      .filter((url) => !tried.has(url.hostname))
+      .map((server) => {
+        try {
+          return new URL(server)
+        } catch (error) {
+          console.error('Invalid Blossom server URL:', server, error)
+          return undefined
+        }
+      })
+      .filter((url) => !!url && !tried.has(url.hostname))
     const nextUrl = urls[0]
     if (!nextUrl) {
       setIsLoading(false)
