@@ -12,6 +12,8 @@ export const DEFAULT_FAVORITE_RELAYS = [
 
 export const RECOMMENDED_RELAYS = DEFAULT_FAVORITE_RELAYS.concat(['wss://yabu.me/'])
 
+export const RECOMMENDED_BLOSSOM_SERVERS = ['https://blossom.band/', 'https://nostr.download/']
+
 export const StorageKey = {
   VERSION: 'version',
   THEME_SETTING: 'themeSetting',
