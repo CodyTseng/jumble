@@ -20,7 +20,7 @@ export const useMediaUploadService = () => {
 }
 
 export function MediaUploadServiceProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey } = useNostr()
+  const { pubkey, startLogin } = useNostr()
   const [serviceConfig, setServiceConfig] = useState(storage.getMediaUploadServiceConfig())
 
   useEffect(() => {
@@ -31,7 +31,8 @@ export function MediaUploadServiceProvider({ children }: { children: React.React
 
   const updateServiceConfig = (newService: TMediaUploadServiceConfig) => {
     if (!pubkey) {
-      throw new Error('You need to be logged in to update media upload service')
+      startLogin()
+      return
     }
     setServiceConfig(newService)
     storage.setMediaUploadServiceConfig(pubkey, newService)
