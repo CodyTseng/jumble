@@ -48,7 +48,7 @@ export function normalizeHttpUrl(url: string): string {
     return p.toString()
   } catch {
     console.error('Invalid URL:', url)
-    return url
+    return ''
   }
 }
 

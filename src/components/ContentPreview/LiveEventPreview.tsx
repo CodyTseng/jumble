@@ -1,4 +1,4 @@
-import { getLiveEventMetadata } from '@/lib/event'
+import { getLiveEventMetadataFromEvent } from '@/lib/event-metadata'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -14,7 +14,7 @@ export default function LiveEventPreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
-  const metadata = useMemo(() => getLiveEventMetadata(event), [event])
+  const metadata = useMemo(() => getLiveEventMetadataFromEvent(event), [event])
 
   return (
     <div className={cn('pointer-events-none', className)} onClick={onClick}>

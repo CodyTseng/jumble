@@ -290,6 +290,12 @@ export default {
     'Live event': 'Wydarzenie na żywo',
     Article: 'Artykuł',
     Unfavorite: 'Usuń z ulubionych',
-    'Recommended relays': 'Rekomendowane transmitery'
+    'Recommended relays': 'Rekomendowane transmitery',
+    'Blossom server URLs': 'Adresy serwerów Blossom',
+    'You need to add at least one blossom server in order to upload media files.':
+      'Musisz dodać przynajmniej jeden serwer Blossom, aby móc przesyłać pliki multimedialne.',
+    'Recommended blossom servers': 'Zalecane serwery Blossom',
+    'Enter Blossom server URL': 'Wprowadź adres URL serwera Blossom',
+    Preferred: 'Preferowany'
   }
 }

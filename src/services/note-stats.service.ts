@@ -1,5 +1,5 @@
-import { extractEmojiInfosFromTags, extractZapInfoFromReceipt } from '@/lib/event'
-import { tagNameEquals } from '@/lib/tag'
+import { getZapInfoFromEvent } from '@/lib/event-metadata'
+import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
 import dayjs from 'dayjs'
@@ -171,7 +171,7 @@ class NoteStatsService {
     if (!emoji) return
 
     if (/^:[a-zA-Z0-9_-]+:$/.test(evt.content)) {
-      const emojiInfos = extractEmojiInfosFromTags(evt.tags)
+      const emojiInfos = getEmojiInfosFromEmojiTags(evt.tags)
       const shortcode = evt.content.split(':')[1]
       const emojiInfo = emojiInfos.find((info) => info.shortcode === shortcode)
       if (emojiInfo) {
@@ -199,7 +199,7 @@ class NoteStatsService {
   }
 
   private addZapByEvent(evt: Event) {
-    const info = extractZapInfoFromReceipt(evt)
+    const info = getZapInfoFromEvent(evt)
     if (!info) return
     const { originalEventId, senderPubkey, invoice, amount, comment } = info
     if (!originalEventId || !senderPubkey) return

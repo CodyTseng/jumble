@@ -1,5 +1,5 @@
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { isTouchDevice } from '@/lib/common'
+import { isTouchDevice } from '@/lib/utils'
 import { TImageInfo } from '@/types'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'

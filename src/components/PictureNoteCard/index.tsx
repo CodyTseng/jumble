@@ -1,5 +1,5 @@
 import { EmbeddedHashtagParser, EmbeddedMentionParser, parseContent } from '@/lib/content-parser'
-import { extractImageInfosFromEventTags } from '@/lib/event'
+import { getImageInfosFromEvent } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -21,7 +21,7 @@ export default function PictureNoteCard({
   className?: string
 }) {
   const { push } = useSecondaryPage()
-  const images = useMemo(() => extractImageInfosFromEventTags(event), [event])
+  const images = useMemo(() => getImageInfosFromEvent(event), [event])
   const title = useMemo(() => {
     const nodes = parseContent(event.tags.find(tagNameEquals('title'))?.[1] ?? event.content, [
       EmbeddedMentionParser,

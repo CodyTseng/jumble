@@ -7,7 +7,7 @@ import {
   EmbeddedVideoParser,
   parseContent
 } from '@/lib/content-parser'
-import { extractEmojiInfosFromTags } from '@/lib/event'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -36,7 +36,7 @@ export default function NormalContentPreview({
     ])
   }, [event, translatedEvent])
 
-  const emojiInfos = extractEmojiInfosFromTags(event?.tags)
+  const emojiInfos = getEmojiInfosFromEmojiTags(event?.tags)
 
   return (
     <div className={cn('pointer-events-none', className)} onClick={onClick}>

@@ -289,6 +289,12 @@ export default {
     'Live event': '라이브 이벤트',
     Article: '기사',
     Unfavorite: '즐겨찾기 취소',
-    'Recommended relays': '추천 릴레이'
+    'Recommended relays': '추천 릴레이',
+    'Blossom server URLs': 'Blossom 서버 주소',
+    'You need to add at least one blossom server in order to upload media files.':
+      '미디어 파일을 업로드하려면 최소한 하나의 Blossom 서버를 추가해야 합니다.',
+    'Recommended blossom servers': '추천 Blossom 서버',
+    'Enter Blossom server URL': 'Blossom 서버 URL 입력',
+    Preferred: '선호'
   }
 }

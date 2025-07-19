@@ -1,5 +1,5 @@
 import { createFollowListDraftEvent } from '@/lib/draft-event'
-import { extractPubkeysFromEventTags } from '@/lib/tag'
+import { getPubkeysFromPTags } from '@/lib/tag'
 import client from '@/services/client.service'
 import { createContext, useContext, useMemo } from 'react'
 import { useNostr } from './NostrProvider'
@@ -23,7 +23,7 @@ export const useFollowList = () => {
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
   const { pubkey: accountPubkey, followListEvent, publish, updateFollowListEvent } = useNostr()
   const followings = useMemo(
-    () => (followListEvent ? extractPubkeysFromEventTags(followListEvent.tags) : []),
+    () => (followListEvent ? getPubkeysFromPTags(followListEvent.tags) : []),
     [followListEvent]
   )
 

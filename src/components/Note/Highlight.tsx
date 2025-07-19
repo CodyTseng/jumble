@@ -2,7 +2,7 @@ import { useFetchEvent, useTranslatedEvent } from '@/hooks'
 import { createFakeEvent } from '@/lib/event'
 import { toNjump, toNote } from '@/lib/link'
 import { isValidPubkey } from '@/lib/pubkey'
-import { generateEventIdFromATag } from '@/lib/tag'
+import { generateBech32IdFromATag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { Event } from 'nostr-tools'
@@ -70,7 +70,7 @@ function HighlightSource({ event }: { event: Event }) {
       return sourceTag[1]
     }
     if (sourceTag[0] === 'a') {
-      return generateEventIdFromATag(sourceTag)
+      return generateBech32IdFromATag(sourceTag)
     }
   }, [sourceTag])
   const pubkey = useMemo(() => {

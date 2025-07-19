@@ -1,5 +1,5 @@
 import { DEFAULT_FAVORITE_RELAYS } from '@/constants'
-import { getRelaySetFromRelaySetEvent } from '@/lib/event'
+import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
@@ -150,7 +150,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
           relaySetId
         )
         if (storedRelaySetEvent) {
-          relaySet = getRelaySetFromRelaySetEvent(storedRelaySetEvent)
+          relaySet = getRelaySetFromEvent(storedRelaySetEvent)
         }
       }
       if (relaySet) {

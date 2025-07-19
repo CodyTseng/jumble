@@ -100,7 +100,12 @@ export type TFeedInfo = { feedType: TFeedType; id?: string }
 
 export type TLanguage = 'en' | 'zh' | 'pl'
 
-export type TImageInfo = { url: string; blurHash?: string; dim?: { width: number; height: number } }
+export type TImageInfo = {
+  url: string
+  blurHash?: string
+  dim?: { width: number; height: number }
+  pubkey?: string
+}
 
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'pictures' | 'you'
 
@@ -136,6 +141,15 @@ export type TTranslationServiceConfig =
       service: 'libre_translate'
       server?: string
       api_key?: string
+    }
+
+export type TMediaUploadServiceConfig =
+  | {
+      type: 'nip96'
+      service: string
+    }
+  | {
+      type: 'blossom'
     }
 
 export type TPollOption = {

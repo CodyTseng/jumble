@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { extractMentions } from '@/lib/event'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import client from '@/services/client.service'
 import { Check } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import { Event, nip19 } from 'nostr-tools'
 import { HTMLAttributes, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
-import { useMuteList } from '@/providers/MuteListProvider'
 
 export default function Mentions({
   content,
@@ -130,4 +130,51 @@ function PopoverCheckboxItem({
       </Button>
     </div>
   )
+}
+
+async function extractMentions(content: string, parentEvent?: Event) {
+  const parentEventPubkey = parentEvent ? parentEvent.pubkey : undefined
+  const pubkeys: string[] = []
+  const relatedPubkeys: string[] = []
+  const matches = content.match(
+    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
+  )
+
+  const addToSet = (arr: string[], pubkey: string) => {
+    if (pubkey === parentEventPubkey) return
+    if (!arr.includes(pubkey)) arr.push(pubkey)
+  }
+
+  for (const m of matches || []) {
+    try {
+      const id = m.split(':')[1]
+      const { type, data } = nip19.decode(id)
+      if (type === 'nprofile') {
+        addToSet(pubkeys, data.pubkey)
+      } else if (type === 'npub') {
+        addToSet(pubkeys, data)
+      } else if (['nevent', 'note'].includes(type)) {
+        const event = await client.fetchEvent(id)
+        if (event) {
+          addToSet(pubkeys, event.pubkey)
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  if (parentEvent) {
+    parentEvent.tags.forEach(([tagName, tagValue]) => {
+      if (['p', 'P'].includes(tagName) && !!tagValue) {
+        addToSet(relatedPubkeys, tagValue)
+      }
+    })
+  }
+
+  return {
+    pubkeys,
+    relatedPubkeys: relatedPubkeys.filter((p) => !pubkeys.includes(p)),
+    parentEventPubkey
+  }
 }

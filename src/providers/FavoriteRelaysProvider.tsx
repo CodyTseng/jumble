@@ -1,6 +1,7 @@
 import { BIG_RELAY_URLS, DEFAULT_FAVORITE_RELAYS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
-import { getRelaySetFromRelaySetEvent, getReplaceableEventIdentifier } from '@/lib/event'
+import { getReplaceableEventIdentifier } from '@/lib/event'
+import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { randomString } from '@/lib/random'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
@@ -121,7 +122,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     setRelaySets(
-      relaySetEvents.map((evt) => getRelaySetFromRelaySetEvent(evt)).filter(Boolean) as TRelaySet[]
+      relaySetEvents.map((evt) => getRelaySetFromEvent(evt)).filter(Boolean) as TRelaySet[]
     )
   }, [relaySetEvents])
 

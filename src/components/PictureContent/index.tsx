@@ -7,7 +7,8 @@ import {
   EmbeddedWebsocketUrlParser,
   parseContent
 } from '@/lib/content-parser'
-import { extractEmojiInfosFromTags, extractImageInfosFromEventTags } from '@/lib/event'
+import { getImageInfosFromEvent } from '@/lib/event'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { memo, useMemo } from 'react'
@@ -22,7 +23,7 @@ import Emoji from '../Emoji'
 import { ImageCarousel } from '../ImageCarousel'
 
 const PictureContent = memo(({ event, className }: { event: Event; className?: string }) => {
-  const images = useMemo(() => extractImageInfosFromEventTags(event), [event])
+  const images = useMemo(() => getImageInfosFromEvent(event), [event])
 
   const nodes = parseContent(event.content, [
     EmbeddedNormalUrlParser,
@@ -33,7 +34,7 @@ const PictureContent = memo(({ event, className }: { event: Event; className?: s
     EmbeddedEmojiParser
   ])
 
-  const emojiInfos = extractEmojiInfosFromTags(event.tags)
+  const emojiInfos = getEmojiInfosFromEmojiTags(event.tags)
 
   return (
     <div className={cn('text-wrap break-words whitespace-pre-wrap space-y-2', className)}>

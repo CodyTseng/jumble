@@ -42,10 +42,11 @@ export default function GenerateNewAccount({
         <Label>nsec</Label>
         <div className="flex gap-2">
           <Input value={nsec} />
-          <Button variant="secondary" onClick={() => setNsec(generateNsec())}>
+          <Button type="button" variant="secondary" onClick={() => setNsec(generateNsec())}>
             <RefreshCcw />
           </Button>
           <Button
+            type="button"
             onClick={() => {
               navigator.clipboard.writeText(nsec)
               setCopied(true)

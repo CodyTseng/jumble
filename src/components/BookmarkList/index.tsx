@@ -1,5 +1,5 @@
 import { useFetchEvent } from '@/hooks'
-import { generateEventIdFromETag } from '@/lib/tag'
+import { generateBech32IdFromETag } from '@/lib/tag'
 import { useNostr } from '@/providers/NostrProvider'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +15,7 @@ export default function BookmarkList() {
 
     return (
       bookmarkListEvent.tags
-        .map((tag) => (tag[0] === 'e' ? generateEventIdFromETag(tag) : undefined))
+        .map((tag) => (tag[0] === 'e' ? generateBech32IdFromETag(tag) : undefined))
         .filter(Boolean) as `nevent1${string}`[]
     ).reverse()
   }, [bookmarkListEvent])

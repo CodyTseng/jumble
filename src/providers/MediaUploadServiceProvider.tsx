@@ -1,9 +1,12 @@
+import storage from '@/services/local-storage.service'
 import mediaUpload from '@/services/media-upload.service'
-import { createContext, useContext, useState } from 'react'
+import { TMediaUploadServiceConfig } from '@/types'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { useNostr } from './NostrProvider'
 
 type TMediaUploadServiceContext = {
-  service: string
-  updateService: (service: string) => void
+  serviceConfig: TMediaUploadServiceConfig
+  updateServiceConfig: (service: TMediaUploadServiceConfig) => void
 }
 
 const MediaUploadServiceContext = createContext<TMediaUploadServiceContext | undefined>(undefined)
@@ -17,15 +20,27 @@ export const useMediaUploadService = () => {
 }
 
 export function MediaUploadServiceProvider({ children }: { children: React.ReactNode }) {
-  const [service, setService] = useState(mediaUpload.getService())
+  const { pubkey, startLogin } = useNostr()
+  const [serviceConfig, setServiceConfig] = useState(storage.getMediaUploadServiceConfig())
 
-  const updateService = (newService: string) => {
-    setService(newService)
-    mediaUpload.setService(newService)
+  useEffect(() => {
+    const serviceConfig = storage.getMediaUploadServiceConfig(pubkey)
+    setServiceConfig(serviceConfig)
+    mediaUpload.setServiceConfig(serviceConfig)
+  }, [pubkey])
+
+  const updateServiceConfig = (newService: TMediaUploadServiceConfig) => {
+    if (!pubkey) {
+      startLogin()
+      return
+    }
+    setServiceConfig(newService)
+    storage.setMediaUploadServiceConfig(pubkey, newService)
+    mediaUpload.setServiceConfig(newService)
   }
 
   return (
-    <MediaUploadServiceContext.Provider value={{ service, updateService }}>
+    <MediaUploadServiceContext.Provider value={{ serviceConfig, updateServiceConfig }}>
       {children}
     </MediaUploadServiceContext.Provider>
   )

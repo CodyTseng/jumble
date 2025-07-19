@@ -1,4 +1,4 @@
-import { getGroupMetadata } from '@/lib/event'
+import { getGroupMetadataFromEvent } from '@/lib/event-metadata'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -14,7 +14,7 @@ export default function GroupMetadataPreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
-  const metadata = useMemo(() => getGroupMetadata(event), [event])
+  const metadata = useMemo(() => getGroupMetadataFromEvent(event), [event])
 
   return (
     <div className={cn('pointer-events-none', className)} onClick={onClick}>

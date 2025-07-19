@@ -28,7 +28,7 @@ import { useTranslation } from 'react-i18next'
 
 const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { nsec, ncryptsec } = useNostr()
+  const { pubkey, nsec, ncryptsec } = useNostr()
   const { push } = useSecondaryPage()
   const [copiedNsec, setCopiedNsec] = useState(false)
   const [copiedNcryptsec, setCopiedNcryptsec] = useState(false)
@@ -63,13 +63,15 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
         <ChevronRight />
       </SettingItem>
-      <SettingItem className="clickable" onClick={() => push(toPostSettings())}>
-        <div className="flex items-center gap-4">
-          <PencilLine />
-          <div>{t('Post settings')}</div>
-        </div>
-        <ChevronRight />
-      </SettingItem>
+      {!!pubkey && (
+        <SettingItem className="clickable" onClick={() => push(toPostSettings())}>
+          <div className="flex items-center gap-4">
+            <PencilLine />
+            <div>{t('Post settings')}</div>
+          </div>
+          <ChevronRight />
+        </SettingItem>
+      )}
       {!!nsec && (
         <SettingItem
           className="clickable"

@@ -3,16 +3,15 @@ import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
 import { TDraftEvent, TEmoji, TMailboxRelay, TRelaySet } from '@/types'
 import dayjs from 'dayjs'
-import { Event, kinds } from 'nostr-tools'
+import { Event, kinds, nip19 } from 'nostr-tools'
 import {
-  extractCommentMentions,
-  extractHashtags,
-  extractImagesFromContent,
-  extractRelatedEventIds,
-  getEventCoordinate,
+  getReplaceableEventCoordinate,
+  getRootETag,
   isProtectedEvent,
-  isReplaceable
+  isReplaceableEvent
 } from './event'
+import { generateBech32IdFromETag, tagNameEquals } from './tag'
+import { normalizeHttpUrl } from './url'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
@@ -24,8 +23,12 @@ export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = 
     tags.push(['k', event.kind.toString()])
   }
 
-  if (isReplaceable(event.kind)) {
-    tags.push(hint ? ['a', getEventCoordinate(event), hint] : ['a', getEventCoordinate(event)])
+  if (isReplaceableEvent(event.kind)) {
+    tags.push(
+      hint
+        ? ['a', getReplaceableEventCoordinate(event), hint]
+        : ['a', getReplaceableEventCoordinate(event)]
+    )
   }
 
   let content: string
@@ -80,7 +83,7 @@ export async function createShortTextNoteDraftEvent(
   const tags = hashtags.map((hashtag) => ['t', hashtag])
 
   // imeta tags
-  const { images } = extractImagesFromContent(content)
+  const images = extractImagesFromContent(content)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
@@ -208,7 +211,7 @@ export async function createCommentDraftEvent(
     .map((hashtag) => ['t', hashtag])
     .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
 
-  const { images } = extractImagesFromContent(content)
+  const images = extractImagesFromContent(content)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
@@ -318,7 +321,7 @@ export function createFavoriteRelaysDraftEvent(
     tags.push(['relay', url])
   })
   relaySetEvents.forEach((event) => {
-    tags.push(['a', getEventCoordinate(event)])
+    tags.push(['a', getReplaceableEventCoordinate(event)])
   })
   return {
     kind: ExtendedKind.FAVORITE_RELAYS,
@@ -346,6 +349,15 @@ export function createBookmarkDraftEvent(tags: string[][], content = ''): TDraft
   }
 }
 
+export function createBlossomServerListDraftEvent(servers: string[]): TDraftEvent {
+  return {
+    kind: ExtendedKind.BLOSSOM_SERVER_LIST,
+    content: '',
+    tags: servers.map((server) => ['server', normalizeHttpUrl(server)]),
+    created_at: dayjs().unix()
+  }
+}
+
 function generateImetaTags(imageUrls: string[]) {
   return imageUrls
     .map((imageUrl) => {
@@ -353,4 +365,156 @@ function generateImetaTags(imageUrls: string[]) {
       return tag ?? null
     })
     .filter(Boolean) as string[][]
+}
+
+async function extractRelatedEventIds(content: string, parentEvent?: Event) {
+  const quoteEventIds: string[] = []
+  let rootETag: string[] = []
+  let parentETag: string[] = []
+  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+
+  const addToSet = (arr: string[], item: string) => {
+    if (!arr.includes(item)) arr.push(item)
+  }
+
+  for (const m of matches || []) {
+    try {
+      const id = m.split(':')[1]
+      const { type, data } = nip19.decode(id)
+      if (type === 'nevent') {
+        addToSet(quoteEventIds, data.id)
+      } else if (type === 'note') {
+        addToSet(quoteEventIds, data)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  if (parentEvent) {
+    const _rootETag = getRootETag(parentEvent)
+    if (_rootETag) {
+      parentETag = [
+        'e',
+        parentEvent.id,
+        client.getEventHint(parentEvent.id),
+        'reply',
+        parentEvent.pubkey
+      ]
+
+      const [, rootEventHexId, hint, , rootEventPubkey] = _rootETag
+      if (rootEventPubkey) {
+        rootETag = [
+          'e',
+          rootEventHexId,
+          hint ?? client.getEventHint(rootEventHexId),
+          'root',
+          rootEventPubkey
+        ]
+      } else {
+        const rootEventId = generateBech32IdFromETag(_rootETag)
+        const rootEvent = rootEventId ? await client.fetchEvent(rootEventId) : undefined
+        rootETag = rootEvent
+          ? ['e', rootEvent.id, hint ?? client.getEventHint(rootEvent.id), 'root', rootEvent.pubkey]
+          : ['e', rootEventHexId, hint ?? client.getEventHint(rootEventHexId), 'root']
+      }
+    } else {
+      // reply to root event
+      rootETag = [
+        'e',
+        parentEvent.id,
+        client.getEventHint(parentEvent.id),
+        'root',
+        parentEvent.pubkey
+      ]
+    }
+  }
+
+  return {
+    quoteEventIds,
+    rootETag,
+    parentETag
+  }
+}
+
+async function extractCommentMentions(content: string, parentEvent: Event) {
+  const quoteEventIds: string[] = []
+  const parentEventIsReplaceable = isReplaceableEvent(parentEvent.kind)
+  const rootCoordinateTag =
+    parentEvent.kind === ExtendedKind.COMMENT
+      ? parentEvent.tags.find(tagNameEquals('A'))
+      : isReplaceableEvent(parentEvent.kind)
+        ? ['A', getReplaceableEventCoordinate(parentEvent), client.getEventHint(parentEvent.id)]
+        : undefined
+  const rootEventId =
+    parentEvent.kind === ExtendedKind.COMMENT
+      ? parentEvent.tags.find(tagNameEquals('E'))?.[1]
+      : parentEvent.id
+  const rootKind =
+    parentEvent.kind === ExtendedKind.COMMENT
+      ? parentEvent.tags.find(tagNameEquals('K'))?.[1]
+      : parentEvent.kind
+  const rootPubkey =
+    parentEvent.kind === ExtendedKind.COMMENT
+      ? parentEvent.tags.find(tagNameEquals('P'))?.[1]
+      : parentEvent.pubkey
+  const rootUrl =
+    parentEvent.kind === ExtendedKind.COMMENT
+      ? parentEvent.tags.find(tagNameEquals('I'))?.[1]
+      : undefined
+
+  const parentEventId = parentEvent.id
+  const parentCoordinate = parentEventIsReplaceable
+    ? getReplaceableEventCoordinate(parentEvent)
+    : undefined
+  const parentKind = parentEvent.kind
+  const parentPubkey = parentEvent.pubkey
+
+  const addToSet = (arr: string[], item: string) => {
+    if (!arr.includes(item)) arr.push(item)
+  }
+
+  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+  for (const m of matches || []) {
+    try {
+      const id = m.split(':')[1]
+      const { type, data } = nip19.decode(id)
+      if (type === 'nevent') {
+        addToSet(quoteEventIds, data.id)
+      } else if (type === 'note') {
+        addToSet(quoteEventIds, data)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  return {
+    quoteEventIds,
+    rootEventId,
+    rootCoordinateTag,
+    rootKind,
+    rootPubkey,
+    rootUrl,
+    parentEventId,
+    parentCoordinate,
+    parentKind,
+    parentPubkey
+  }
+}
+
+function extractHashtags(content: string) {
+  const hashtags: string[] = []
+  const matches = content.match(/#[\p{L}\p{N}\p{M}]+/gu)
+  matches?.forEach((m) => {
+    const hashtag = m.slice(1).toLowerCase()
+    if (hashtag) {
+      hashtags.push(hashtag)
+    }
+  })
+  return hashtags
+}
+
+function extractImagesFromContent(content: string) {
+  return content.match(/https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp|heic)/gi)
 }

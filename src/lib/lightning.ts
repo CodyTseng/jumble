@@ -1,6 +1,6 @@
 import { TProfile } from '@/types'
 import { Invoice } from '@getalby/lightning-tools'
-import { isEmail } from './common'
+import { isEmail } from './utils'
 
 export function getAmountFromInvoice(invoice: string): number {
   const _invoice = new Invoice({ pr: invoice }) // TODO: need to validate

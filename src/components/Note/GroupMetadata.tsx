@@ -1,4 +1,4 @@
-import { getGroupMetadata } from '@/lib/event'
+import { getGroupMetadataFromEvent } from '@/lib/event-metadata'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import ClientSelect from '../ClientSelect'
@@ -13,7 +13,7 @@ export default function GroupMetadata({
   originalNoteId?: string
   className?: string
 }) {
-  const metadata = useMemo(() => getGroupMetadata(event), [event])
+  const metadata = useMemo(() => getGroupMetadataFromEvent(event), [event])
 
   const groupNameComponent = (
     <div className="text-xl font-semibold line-clamp-1">{metadata.name}</div>
@@ -28,7 +28,7 @@ export default function GroupMetadata({
       <div className="flex gap-4">
         {metadata.picture && (
           <Image
-            image={{ url: metadata.picture }}
+            image={{ url: metadata.picture, pubkey: event.pubkey }}
             className="rounded-lg aspect-square object-cover bg-foreground h-20"
             hideIfError
           />

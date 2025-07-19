@@ -292,6 +292,12 @@ export default {
     'Live event': 'Événement en direct',
     Article: 'Article',
     Unfavorite: 'Ne plus aimer',
-    'Recommended relays': 'Relais recommandés'
+    'Recommended relays': 'Relais recommandés',
+    'Blossom server URLs': 'URLs du serveur Blossom',
+    'You need to add at least one blossom server in order to upload media files.':
+      'Vous devez ajouter au moins un serveur Blossom pour pouvoir télécharger des fichiers multimédias.',
+    'Recommended blossom servers': 'Serveurs Blossom recommandés',
+    'Enter Blossom server URL': 'Entrer l’URL du serveur Blossom',
+    Preferred: 'Préféré'
   }
 }

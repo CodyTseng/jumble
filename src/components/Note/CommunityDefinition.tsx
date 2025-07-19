@@ -1,4 +1,4 @@
-import { getCommunityDefinition } from '@/lib/event'
+import { getCommunityDefinitionFromEvent } from '@/lib/event-metadata'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import ClientSelect from '../ClientSelect'
@@ -11,7 +11,7 @@ export default function CommunityDefinition({
   event: Event
   className?: string
 }) {
-  const metadata = useMemo(() => getCommunityDefinition(event), [event])
+  const metadata = useMemo(() => getCommunityDefinitionFromEvent(event), [event])
 
   const communityNameComponent = (
     <div className="text-xl font-semibold line-clamp-1">{metadata.name}</div>
@@ -26,7 +26,7 @@ export default function CommunityDefinition({
       <div className="flex gap-4">
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="rounded-lg aspect-square object-cover bg-foreground h-20"
             hideIfError
           />

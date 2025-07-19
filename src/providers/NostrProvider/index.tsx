@@ -1,12 +1,8 @@
 import LoginDialog from '@/components/LoginDialog'
 import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { createSeenNotificationsAtDraftEvent } from '@/lib/draft-event'
-import {
-  getLatestEvent,
-  getProfileFromProfileEvent,
-  getRelayListFromRelayListEvent,
-  getReplaceableEventIdentifier
-} from '@/lib/event'
+import { getLatestEvent, getReplaceableEventIdentifier } from '@/lib/event'
+import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
@@ -172,11 +168,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS)
       ])
       if (storedRelayListEvent) {
-        setRelayList(getRelayListFromRelayListEvent(storedRelayListEvent))
+        setRelayList(getRelayListFromEvent(storedRelayListEvent))
       }
       if (storedProfileEvent) {
         setProfileEvent(storedProfileEvent)
-        setProfile(getProfileFromProfileEvent(storedProfileEvent))
+        setProfile(getProfileFromEvent(storedProfileEvent))
       }
       if (storedFollowListEvent) {
         setFollowListEvent(storedFollowListEvent)
@@ -196,7 +192,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         authors: [account.pubkey]
       })
       const relayListEvent = getLatestEvent(relayListEvents) ?? storedRelayListEvent
-      const relayList = getRelayListFromRelayListEvent(relayListEvent)
+      const relayList = getRelayListFromEvent(relayListEvent)
       if (relayListEvent) {
         client.updateRelayListCache(relayListEvent)
         await indexedDb.putReplaceableEvent(relayListEvent)
@@ -210,7 +206,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             kinds.Contacts,
             kinds.Mutelist,
             kinds.BookmarkList,
-            ExtendedKind.FAVORITE_RELAYS
+            ExtendedKind.FAVORITE_RELAYS,
+            ExtendedKind.BLOSSOM_SERVER_LIST
           ],
           authors: [account.pubkey]
         },
@@ -226,6 +223,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
       const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
       const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
+      const blossomServerListEvent = sortedEvents.find(
+        (e) => e.kind === ExtendedKind.BLOSSOM_SERVER_LIST
+      )
       const notificationsSeenAtEvent = sortedEvents.find(
         (e) =>
           e.kind === kinds.Application &&
@@ -233,7 +233,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       )
       if (profileEvent) {
         setProfileEvent(profileEvent)
-        setProfile(getProfileFromProfileEvent(profileEvent))
+        setProfile(getProfileFromEvent(profileEvent))
         await indexedDb.putReplaceableEvent(profileEvent)
       } else if (!storedProfileEvent) {
         setProfile({
@@ -257,6 +257,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (favoriteRelaysEvent) {
         setFavoriteRelaysEvent(favoriteRelaysEvent)
         await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
+      }
+      if (blossomServerListEvent) {
+        await client.updateBlossomServerListEventCache(blossomServerListEvent)
       }
 
       const notificationsSeenAt = Math.max(
@@ -307,6 +310,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       client.signer = undefined
     }
   }, [signer])
+
+  useEffect(() => {
+    if (account) {
+      client.pubkey = account.pubkey
+    } else {
+      client.pubkey = undefined
+    }
+  }, [account])
 
   const hasNostrLoginHash = () => {
     return window.location.hash && window.location.hash.startsWith('#nostr-login')
@@ -565,7 +576,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         })
       }
     }
-    if ([kinds.RelayList, kinds.Contacts, ExtendedKind.FAVORITE_RELAYS].includes(draftEvent.kind)) {
+    if (
+      [
+        kinds.RelayList,
+        kinds.Contacts,
+        ExtendedKind.FAVORITE_RELAYS,
+        ExtendedKind.BLOSSOM_SERVER_LIST
+      ].includes(draftEvent.kind)
+    ) {
       additionalRelayUrls.push(...BIG_RELAY_URLS)
     }
 
@@ -617,13 +635,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   const updateRelayListEvent = async (relayListEvent: Event) => {
     const newRelayList = await indexedDb.putReplaceableEvent(relayListEvent)
-    setRelayList(getRelayListFromRelayListEvent(newRelayList))
+    setRelayList(getRelayListFromEvent(newRelayList))
   }
 
   const updateProfileEvent = async (profileEvent: Event) => {
     const newProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
     setProfileEvent(newProfileEvent)
-    setProfile(getProfileFromProfileEvent(newProfileEvent))
+    setProfile(getProfileFromEvent(newProfileEvent))
   }
 
   const updateFollowListEvent = async (followListEvent: Event) => {

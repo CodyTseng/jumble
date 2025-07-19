@@ -1,14 +1,14 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import {
-  getEventCoordinate,
-  getParentEventTag,
-  getRootAddressableEventTag,
+  getParentETag,
+  getReplaceableEventCoordinate,
+  getRootATag,
+  getRootETag,
   getRootEventHexId,
-  getRootEventTag,
-  isReplaceable,
+  isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
-import { generateEventIdFromETag, tagNameEquals } from '@/lib/tag'
+import { generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -36,16 +36,18 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   const replies = useMemo(() => {
     const replyIdSet = new Set<string>()
     const replyEvents: NEvent[] = []
-    const currentEventId = isReplaceable(event.kind) ? getEventCoordinate(event) : event.id
-    let parentEventIds = [currentEventId]
-    while (parentEventIds.length > 0) {
-      const events = parentEventIds.flatMap((id) => repliesMap.get(id)?.events || [])
+    const currentEventKey = isReplaceableEvent(event.kind)
+      ? getReplaceableEventCoordinate(event)
+      : event.id
+    let parentEventKeys = [currentEventKey]
+    while (parentEventKeys.length > 0) {
+      const events = parentEventKeys.flatMap((id) => repliesMap.get(id)?.events || [])
       events.forEach((evt) => {
         if (replyIdSet.has(evt.id)) return
         replyIdSet.add(evt.id)
         replyEvents.push(evt)
       })
-      parentEventIds = events.map((evt) => evt.id)
+      parentEventKeys = events.map((evt) => evt.id)
     }
     return replyEvents.sort((a, b) => a.created_at - b.created_at)
   }, [event.id, repliesMap])
@@ -59,22 +61,22 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
 
   useEffect(() => {
     const fetchRootEvent = async () => {
-      let root: TRootInfo = isReplaceable(event.kind)
+      let root: TRootInfo = isReplaceableEvent(event.kind)
         ? {
             type: 'A',
-            id: getEventCoordinate(event),
+            id: getReplaceableEventCoordinate(event),
             eventId: event.id,
             pubkey: event.pubkey,
             relay: client.getEventHint(event.id)
           }
         : { type: 'E', id: event.id, pubkey: event.pubkey }
-      const rootEventTag = getRootEventTag(event)
-      if (rootEventTag) {
-        const [, rootEventHexId, , , rootEventPubkey] = rootEventTag
+      const rootETag = getRootETag(event)
+      if (rootETag) {
+        const [, rootEventHexId, , , rootEventPubkey] = rootETag
         if (rootEventHexId && rootEventPubkey) {
           root = { type: 'E', id: rootEventHexId, pubkey: rootEventPubkey }
         } else {
-          const rootEventId = generateEventIdFromETag(rootEventTag)
+          const rootEventId = generateBech32IdFromETag(rootETag)
           if (rootEventId) {
             const rootEvent = await client.fetchEvent(rootEventId)
             if (rootEvent) {
@@ -83,7 +85,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
           }
         }
       } else if (event.kind === ExtendedKind.COMMENT) {
-        const rootATag = getRootAddressableEventTag(event)
+        const rootATag = getRootATag(event)
         if (rootATag) {
           const [, coordinate, relay] = rootATag
           const [, pubkey] = coordinate.split(':')
@@ -295,9 +297,9 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             }
           }
 
-          const parentEventTag = getParentEventTag(reply)
-          const parentEventOriginalId = parentEventTag?.[1]
-          const parentEventId = parentEventTag ? generateEventIdFromETag(parentEventTag) : undefined
+          const parentETag = getParentETag(reply)
+          const parentEventHexId = parentETag?.[1]
+          const parentEventId = parentETag ? generateBech32IdFromETag(parentETag) : undefined
           return (
             <div
               ref={(el) => (replyRefs.current[reply.id] = el)}
@@ -306,8 +308,8 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             >
               <ReplyNote
                 event={reply}
-                parentEventId={event.id !== parentEventOriginalId ? parentEventId : undefined}
-                onClickParent={() => parentEventOriginalId && highlightReply(parentEventOriginalId)}
+                parentEventId={event.id !== parentEventHexId ? parentEventId : undefined}
+                onClickParent={() => parentEventHexId && highlightReply(parentEventHexId)}
                 highlight={highlightReplyId === reply.id}
               />
             </div>

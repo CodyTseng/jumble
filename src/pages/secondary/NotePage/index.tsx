@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { getParentEventId, getParentEventTag, getRootEventId, isPictureEvent } from '@/lib/event'
+import { getParentBech32Id, getParentETag, getRootBech32Id, isPictureEvent } from '@/lib/event'
 import { toNote, toNoteList } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -24,8 +24,8 @@ import NotFoundPage from '../NotFoundPage'
 const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(id)
-  const parentEventId = useMemo(() => getParentEventId(event), [event])
-  const rootEventId = useMemo(() => getRootEventId(event), [event])
+  const parentEventId = useMemo(() => getParentBech32Id(event), [event])
+  const rootEventId = useMemo(() => getRootBech32Id(event), [event])
   const rootITag = useMemo(
     () => (event?.kind === ExtendedKind.COMMENT ? event.tags.find(tagNameEquals('I')) : undefined),
     [event]
@@ -173,7 +173,7 @@ function ParentNote({
 }
 
 function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
-  const eTag = getParentEventTag(parentEvent)
+  const eTag = getParentETag(parentEvent)
   if (!eTag) return false
 
   return rootEvent?.id === eTag[1]

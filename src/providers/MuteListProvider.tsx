@@ -1,5 +1,5 @@
 import { createMuteListDraftEvent } from '@/lib/draft-event'
-import { extractPubkeysFromEventTags } from '@/lib/tag'
+import { getPubkeysFromPTags } from '@/lib/tag'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
 import dayjs from 'dayjs'
@@ -44,9 +44,9 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   } = useNostr()
   const [tags, setTags] = useState<string[][]>([])
   const [privateTags, setPrivateTags] = useState<string[][]>([])
-  const publicMutePubkeySet = useMemo(() => new Set(extractPubkeysFromEventTags(tags)), [tags])
+  const publicMutePubkeySet = useMemo(() => new Set(getPubkeysFromPTags(tags)), [tags])
   const privateMutePubkeySet = useMemo(
-    () => new Set(extractPubkeysFromEventTags(privateTags)),
+    () => new Set(getPubkeysFromPTags(privateTags)),
     [privateTags]
   )
   const mutePubkeys = useMemo(() => {

@@ -1,9 +1,4 @@
-import {
-  getParentAddressableEventTag,
-  getParentEventTag,
-  getRootAddressableEventTag,
-  getRootEventTag
-} from '@/lib/event'
+import { getParentATag, getParentETag, getRootATag, getRootETag } from '@/lib/event'
 import { Event } from 'nostr-tools'
 import { createContext, useCallback, useContext, useState } from 'react'
 
@@ -35,11 +30,11 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
       newReplyIdSet.add(reply.id)
 
       let rootId: string | undefined
-      const rootETag = getRootEventTag(reply)
+      const rootETag = getRootETag(reply)
       if (rootETag) {
         rootId = rootETag[1]
       } else {
-        const rootATag = getRootAddressableEventTag(reply)
+        const rootATag = getRootATag(reply)
         if (rootATag) {
           rootId = rootATag[1]
         }
@@ -49,11 +44,11 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
       }
 
       let parentId: string | undefined
-      const parentETag = getParentEventTag(reply)
+      const parentETag = getParentETag(reply)
       if (parentETag) {
         parentId = parentETag[1]
       } else {
-        const parentATag = getParentAddressableEventTag(reply)
+        const parentATag = getParentATag(reply)
         if (parentATag) {
           parentId = parentATag[1]
         }

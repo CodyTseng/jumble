@@ -287,6 +287,12 @@ export default {
     'Live event': 'حدث مباشر',
     Article: 'مقالة',
     Unfavorite: 'إلغاء المفضلة',
-    'Recommended relays': 'الريلايات الموصى بها'
+    'Recommended relays': 'الريلايات الموصى بها',
+    'Blossom server URLs': 'عناوين خوادم Blossom',
+    'You need to add at least one blossom server in order to upload media files.':
+      'تحتاج إلى إضافة خادم Blossom واحد على الأقل لتحميل ملفات الوسائط.',
+    'Recommended blossom servers': 'خوادم Blossom الموصى بها',
+    'Enter Blossom server URL': 'أدخل عنوان خادم Blossom URL',
+    Preferred: 'المفضل'
   }
 }

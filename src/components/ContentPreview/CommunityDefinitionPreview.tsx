@@ -1,4 +1,4 @@
-import { getCommunityDefinition } from '@/lib/event'
+import { getCommunityDefinitionFromEvent } from '@/lib/event-metadata'
 import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -14,7 +14,7 @@ export default function CommunityDefinitionPreview({
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
-  const metadata = useMemo(() => getCommunityDefinition(event), [event])
+  const metadata = useMemo(() => getCommunityDefinitionFromEvent(event), [event])
 
   return (
     <div className={cn('pointer-events-none', className)} onClick={onClick}>

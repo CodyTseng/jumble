@@ -1,11 +1,10 @@
 import { Event, nip19 } from 'nostr-tools'
-import { getSharableEventId } from './event'
-import { generateEventId } from './tag'
+import { getNoteBech32Id } from './event'
 
 export const toHome = () => '/'
-export const toNote = (eventOrId: Pick<Event, 'id' | 'pubkey'> | string) => {
+export const toNote = (eventOrId: Event | string) => {
   if (typeof eventOrId === 'string') return `/notes/${eventOrId}`
-  const nevent = generateEventId(eventOrId)
+  const nevent = getNoteBech32Id(eventOrId)
   return `/notes/${nevent}`
 }
 export const toNoteList = ({
@@ -59,12 +58,6 @@ export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toMuteList = () => '/mutes'
 
-export const toHablaLongFormArticle = (event: Event) => {
-  return `https://habla.news/a/${getSharableEventId(event)}`
-}
-export const toZapStreamLiveEvent = (event: Event) => {
-  return `https://zap.stream/${getSharableEventId(event)}`
-}
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
 }

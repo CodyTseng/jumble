@@ -1,12 +1,14 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import client from '@/services/client.service'
 import { TImageInfo } from '@/types'
+import { getHashFromURL } from 'blossom-client-sdk'
 import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useState } from 'react'
 
 export default function Image({
-  image: { url, blurHash },
+  image: { url, blurHash, pubkey },
   alt,
   className = '',
   classNames = {},
@@ -27,6 +29,8 @@ export default function Image({
   const [displayBlurHash, setDisplayBlurHash] = useState(true)
   const [blurDataUrl, setBlurDataUrl] = useState<string | null>(null)
   const [hasError, setHasError] = useState(false)
+  const [imageUrl, setImageUrl] = useState(url)
+  const [tried, setTried] = useState(new Set())
 
   useEffect(() => {
     if (blurHash) {
@@ -49,12 +53,52 @@ export default function Image({
 
   if (hideIfError && hasError) return null
 
+  const handleImageError = async () => {
+    let oldImageUrl: URL | undefined
+    let hash: string | null = null
+    try {
+      oldImageUrl = new URL(imageUrl)
+      hash = getHashFromURL(oldImageUrl)
+    } catch (error) {
+      console.error('Invalid image URL:', error)
+    }
+    if (!pubkey || !hash || !oldImageUrl) {
+      setIsLoading(false)
+      setHasError(true)
+      return
+    }
+
+    const ext = oldImageUrl.pathname.match(/\.\w+$/i)
+    setTried((prev) => new Set(prev.add(oldImageUrl.hostname)))
+
+    const blossomServerList = await client.fetchBlossomServerList(pubkey)
+    const urls = blossomServerList
+      .map((server) => {
+        try {
+          return new URL(server)
+        } catch (error) {
+          console.error('Invalid Blossom server URL:', server, error)
+          return undefined
+        }
+      })
+      .filter((url) => !!url && !tried.has(url.hostname))
+    const nextUrl = urls[0]
+    if (!nextUrl) {
+      setIsLoading(false)
+      setHasError(true)
+      return
+    }
+
+    nextUrl.pathname = '/' + hash + ext
+    setImageUrl(nextUrl.toString())
+  }
+
   return (
     <div className={cn('relative', classNames.wrapper)} {...props}>
       {isLoading && <Skeleton className={cn('absolute inset-0 rounded-lg', className)} />}
       {!hasError ? (
         <img
-          src={url}
+          src={imageUrl}
           alt={alt}
           className={cn(
             'object-cover transition-opacity duration-300',
@@ -66,10 +110,7 @@ export default function Image({
             setHasError(false)
             setTimeout(() => setDisplayBlurHash(false), 500)
           }}
-          onError={() => {
-            setIsLoading(false)
-            setHasError(true)
-          }}
+          onError={handleImageError}
         />
       ) : (
         <div

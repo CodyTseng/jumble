@@ -5,6 +5,7 @@ import {
   TAccount,
   TAccountPointer,
   TFeedInfo,
+  TMediaUploadServiceConfig,
   TNoteListMode,
   TRelaySet,
   TThemeSetting,
@@ -30,6 +31,7 @@ class LocalStorageService {
   private hideUntrustedNotifications: boolean = false
   private hideUntrustedNotes: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
+  private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -92,6 +94,7 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.ACCOUNT_FEED_INFO_MAP) ?? '{}'
     this.accountFeedInfoMap = JSON.parse(accountFeedInfoMapStr)
 
+    // deprecated
     this.mediaUploadService =
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
@@ -121,6 +124,13 @@ class LocalStorageService {
     )
     if (translationServiceConfigMapStr) {
       this.translationServiceConfigMap = JSON.parse(translationServiceConfigMapStr)
+    }
+
+    const mediaUploadServiceConfigMapStr = window.localStorage.getItem(
+      StorageKey.MEDIA_UPLOAD_SERVICE_CONFIG_MAP
+    )
+    if (mediaUploadServiceConfigMapStr) {
+      this.mediaUploadServiceConfigMap = JSON.parse(mediaUploadServiceConfigMapStr)
     }
 
     // Clean up deprecated data
@@ -264,15 +274,6 @@ class LocalStorageService {
     )
   }
 
-  getMediaUploadService() {
-    return this.mediaUploadService
-  }
-
-  setMediaUploadService(service: string) {
-    this.mediaUploadService = service
-    window.localStorage.setItem(StorageKey.MEDIA_UPLOAD_SERVICE, service)
-  }
-
   getAutoplay() {
     return this.autoplay
   }
@@ -325,6 +326,26 @@ class LocalStorageService {
       StorageKey.TRANSLATION_SERVICE_CONFIG_MAP,
       JSON.stringify(this.translationServiceConfigMap)
     )
+  }
+
+  getMediaUploadServiceConfig(pubkey?: string | null): TMediaUploadServiceConfig {
+    const defaultConfig = { type: 'nip96', service: this.mediaUploadService } as const
+    if (!pubkey) {
+      return defaultConfig
+    }
+    return this.mediaUploadServiceConfigMap[pubkey] ?? defaultConfig
+  }
+
+  setMediaUploadServiceConfig(
+    pubkey: string,
+    config: TMediaUploadServiceConfig
+  ): TMediaUploadServiceConfig {
+    this.mediaUploadServiceConfigMap[pubkey] = config
+    window.localStorage.setItem(
+      StorageKey.MEDIA_UPLOAD_SERVICE_CONFIG_MAP,
+      JSON.stringify(this.mediaUploadServiceConfigMap)
+    )
+    return config
   }
 }
 

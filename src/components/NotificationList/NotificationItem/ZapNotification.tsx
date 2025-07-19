@@ -1,5 +1,5 @@
 import { useFetchEvent } from '@/hooks'
-import { extractZapInfoFromReceipt } from '@/lib/event'
+import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { formatAmount } from '@/lib/lightning'
 import { toNote, toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
@@ -24,7 +24,7 @@ export function ZapNotification({
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const { senderPubkey, eventId, amount, comment } = useMemo(
-    () => extractZapInfoFromReceipt(notification) ?? ({} as any),
+    () => getZapInfoFromEvent(notification) ?? ({} as any),
     [notification]
   )
   const { event, isFetching } = useFetchEvent(eventId)

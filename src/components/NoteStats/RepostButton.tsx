@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { createRepostDraftEvent } from '@/lib/draft-event'
-import { getSharableEventId } from '@/lib/event'
+import { getNoteBech32Id } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -87,7 +87,7 @@ export default function RepostButton({ event }: { event: Event }) {
     <PostEditor
       open={isPostDialogOpen}
       setOpen={setIsPostDialogOpen}
-      defaultContent={'\nnostr:' + getSharableEventId(event)}
+      defaultContent={'\nnostr:' + getNoteBech32Id(event)}
     />
   )
 

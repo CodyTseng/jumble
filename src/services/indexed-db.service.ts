@@ -14,6 +14,7 @@ const StoreNames = {
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
   BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
+  BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
   RELAY_INFO_EVENTS: 'relayInfoEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
@@ -37,7 +38,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 5)
+        const request = window.indexedDB.open('jumble', 6)
 
         request.onerror = (event) => {
           reject(event)
@@ -79,6 +80,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.FOLLOWING_FAVORITE_RELAYS)) {
             db.createObjectStore(StoreNames.FOLLOWING_FAVORITE_RELAYS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.BLOSSOM_SERVER_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.BLOSSOM_SERVER_LIST_EVENTS, { keyPath: 'key' })
           }
           this.db = db
         }
@@ -433,6 +437,8 @@ class IndexedDbService {
         return StoreNames.FOLLOW_LIST_EVENTS
       case kinds.Mutelist:
         return StoreNames.MUTE_LIST_EVENTS
+      case ExtendedKind.BLOSSOM_SERVER_LIST:
+        return StoreNames.BLOSSOM_SERVER_LIST_EVENTS
       case kinds.Relaysets:
         return StoreNames.RELAY_SETS
       case ExtendedKind.FAVORITE_RELAYS:
@@ -463,7 +469,11 @@ class IndexedDbService {
       { name: StoreNames.RELAY_LIST_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
+      },
+      {
+        name: StoreNames.BLOSSOM_SERVER_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 7 // 7 days
       }
     ]
     const transaction = this.db!.transaction(

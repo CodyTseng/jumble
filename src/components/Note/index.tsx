@@ -1,8 +1,8 @@
 import { useSecondaryPage } from '@/PageManager'
 import { ExtendedKind } from '@/constants'
 import {
-  extractImageInfosFromEventTags,
-  getParentEventId,
+  getImageInfosFromEvent,
+  getParentBech32Id,
   getUsingClient,
   isNsfwEvent,
   isPictureEvent
@@ -48,11 +48,11 @@ export default function Note({
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const parentEventId = useMemo(
-    () => (hideParentNotePreview ? undefined : getParentEventId(event)),
+    () => (hideParentNotePreview ? undefined : getParentBech32Id(event)),
     [event, hideParentNotePreview]
   )
   const imageInfos = useMemo(
-    () => (isPictureEvent(event) ? extractImageInfosFromEventTags(event) : []),
+    () => (isPictureEvent(event) ? getImageInfosFromEvent(event) : []),
     [event]
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])

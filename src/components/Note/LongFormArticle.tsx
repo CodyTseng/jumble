@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { getLongFormArticleMetadata } from '@/lib/event'
+import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -14,7 +14,7 @@ export default function LongFormArticle({
   className?: string
 }) {
   const { isSmallScreen } = useScreenSize()
-  const metadata = useMemo(() => getLongFormArticleMetadata(event), [event])
+  const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(event), [event])
 
   const titleComponent = <div className="text-xl font-semibold line-clamp-2">{metadata.title}</div>
 
@@ -37,7 +37,7 @@ export default function LongFormArticle({
       <div className={className}>
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="w-full aspect-video object-cover rounded-lg"
             hideIfError
           />
@@ -57,7 +57,7 @@ export default function LongFormArticle({
       <div className="flex gap-4">
         {metadata.image && (
           <Image
-            image={{ url: metadata.image }}
+            image={{ url: metadata.image, pubkey: event.pubkey }}
             className="rounded-lg aspect-[4/3] xl:aspect-video object-cover bg-foreground h-44"
             hideIfError
           />

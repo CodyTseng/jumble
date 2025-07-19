@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from '@/components/ui/drawer'
 import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
-import { getReplaceableEventIdentifier, getSharableEventId } from '@/lib/event'
+import { getReplaceableEventIdentifier, getNoteBech32Id } from '@/lib/event'
 import { toChachiChat } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import clientService from '@/services/client.service'
@@ -139,7 +139,7 @@ export default function ClientSelect({
             <ClientSelectItem
               key={clientId}
               onClick={() => setOpen(false)}
-              href={client.getUrl(originalNoteId ?? getSharableEventId(event!))}
+              href={client.getUrl(originalNoteId ?? getNoteBech32Id(event!))}
               name={client.name}
             />
           )
@@ -150,7 +150,7 @@ export default function ClientSelect({
         variant="ghost"
         className="w-full py-6 font-semibold"
         onClick={() => {
-          navigator.clipboard.writeText(originalNoteId ?? getSharableEventId(event!))
+          navigator.clipboard.writeText(originalNoteId ?? getNoteBech32Id(event!))
           setOpen(false)
         }}
       >

@@ -1,5 +1,5 @@
 import { BIG_RELAY_URLS, CODY_PUBKEY } from '@/constants'
-import { extractZapInfoFromReceipt } from '@/lib/event'
+import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { TProfile } from '@/types'
 import {
   init,
@@ -141,7 +141,7 @@ class LightningService {
           filter,
           {
             onevent: (evt) => {
-              const info = extractZapInfoFromReceipt(evt)
+              const info = getZapInfoFromEvent(evt)
               if (!info) return
 
               if (info.invoice === pr) {
@@ -154,7 +154,10 @@ class LightningService {
     })
   }
 
-  async payInvoice(invoice: string, closeOuterModel?: () => void): Promise<{ preimage: string; invoice: string } | null> {
+  async payInvoice(
+    invoice: string,
+    closeOuterModel?: () => void
+  ): Promise<{ preimage: string; invoice: string } | null> {
     if (this.provider) {
       const { preimage } = await this.provider.sendPayment(invoice)
       closeOuterModel?.()
@@ -189,7 +192,7 @@ class LightningService {
     events.sort((a, b) => b.created_at - a.created_at)
     const map = new Map<string, { pubkey: string; amount: number; comment?: string }>()
     events.forEach((event) => {
-      const info = extractZapInfoFromReceipt(event)
+      const info = getZapInfoFromEvent(event)
       if (!info || info.eventId || !info.senderPubkey || info.senderPubkey === CODY_PUBKEY) return
 
       const { amount, comment, senderPubkey } = info
