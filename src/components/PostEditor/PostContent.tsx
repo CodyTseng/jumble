@@ -1,11 +1,12 @@
 import Note from '@/components/Note'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import CreatePollDialog from '@/components/Poll/CreatePollDialog'
 import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import postContentCache from '@/services/post-content-cache.service'
-import { ImageUp, LoaderCircle, Settings, Smile } from 'lucide-react'
+import { ImageUp, LoaderCircle, Settings, Smile, BarChart3 } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -125,6 +126,13 @@ export default function PostContent({
               </Button>
             </EmojiPickerDialog>
           )}
+          <CreatePollDialog
+            trigger={
+              <Button variant="ghost" size="icon" title={t('Create Poll')}>
+                <BarChart3 />
+              </Button>
+            }
+          />
           <Button
             variant="ghost"
             size="icon"
