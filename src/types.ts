@@ -1,4 +1,5 @@
 import { Event, VerifiedEvent } from 'nostr-tools'
+import { POLL_TYPE } from './constants'
 
 export type TProfile = {
   username: string
@@ -157,7 +158,7 @@ export type TPollOption = {
   label: string
 }
 
-export type TPollType = 'singlechoice' | 'multiplechoice'
+export type TPollType = (typeof POLL_TYPE)[keyof typeof POLL_TYPE]
 
 export type TPoll = {
   id: string
@@ -183,4 +184,11 @@ export type TPollResults = {
   responses: TPollResponse[]
   totalVotes: number
   optionResults: Record<string, { count: number; percentage: number }>
+}
+
+export type TPollCreateData = {
+  isMultipleChoice: boolean
+  options: string[]
+  relays: string[]
+  endsAt?: number
 }

@@ -1,4 +1,4 @@
-import { ExtendedKind } from '@/constants'
+import { ExtendedKind, POLL_TYPE } from '@/constants'
 import { TPoll, TPollResponse, TPollType } from '@/types'
 import { Event } from 'nostr-tools'
 
@@ -9,7 +9,7 @@ export function parsePollEvent(event: Event): TPoll | null {
 
   const options: TPoll['options'] = []
   const relayUrls: string[] = []
-  let pollType: TPollType = 'singlechoice'
+  let pollType: TPollType = POLL_TYPE.SINGLE_CHOICE
   let endsAt: number | undefined
 
   for (const [tagName, ...tagValues] of event.tags) {
@@ -85,15 +85,15 @@ export function calculatePollResults(
   optionResults: Record<string, { count: number; percentage: number }>
 } {
   const optionResults: Record<string, { count: number; percentage: number }> = {}
-  
+
   // Initialize counts
-  poll.options.forEach(option => {
+  poll.options.forEach((option) => {
     optionResults[option.id] = { count: 0, percentage: 0 }
   })
 
   // Count votes per option
-  responses.forEach(response => {
-    response.selectedOptionIds.forEach(optionId => {
+  responses.forEach((response) => {
+    response.selectedOptionIds.forEach((optionId) => {
       if (optionResults[optionId]) {
         optionResults[optionId].count++
       }
@@ -102,9 +102,9 @@ export function calculatePollResults(
 
   // Calculate total votes and percentages
   const totalVotes = Object.values(optionResults).reduce((sum, result) => sum + result.count, 0)
-  
+
   if (totalVotes > 0) {
-    Object.values(optionResults).forEach(result => {
+    Object.values(optionResults).forEach((result) => {
       result.percentage = (result.count / totalVotes) * 100
     })
   }
@@ -114,13 +114,13 @@ export function calculatePollResults(
 
 export function getLatestResponsePerUser(responses: TPollResponse[]): TPollResponse[] {
   const userResponses = new Map<string, TPollResponse>()
-  
-  responses.forEach(response => {
+
+  responses.forEach((response) => {
     const existing = userResponses.get(response.pubkey)
     if (!existing || response.created_at > existing.created_at) {
       userResponses.set(response.pubkey, response)
     }
   })
-  
+
   return Array.from(userResponses.values())
-} 
+}

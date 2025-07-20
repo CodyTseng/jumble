@@ -107,3 +107,8 @@ export const DEFAULT_NOSTRCONNECT_RELAY = [
   'wss://nos.lol/',
   'wss://relay.primal.net'
 ]
+
+export const POLL_TYPE = {
+  MULTIPLE_CHOICE: 'multiplechoice',
+  SINGLE_CHOICE: 'singlechoice'
+} as const

@@ -1,7 +1,7 @@
 import { ApplicationDataKey, ExtendedKind } from '@/constants'
 import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
-import { TDraftEvent, TEmoji, TMailboxRelay, TRelaySet } from '@/types'
+import { TDraftEvent, TEmoji, TMailboxRelay, TPollCreateData, TRelaySet } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import {
@@ -11,7 +11,8 @@ import {
   isReplaceableEvent
 } from './event'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
-import { normalizeHttpUrl } from './url'
+import { normalizeHttpUrl, normalizeUrl } from './url'
+import { randomString } from './random'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
@@ -356,6 +357,72 @@ export function createBlossomServerListDraftEvent(servers: string[]): TDraftEven
     tags: servers.map((server) => ['server', normalizeHttpUrl(server)]),
     created_at: dayjs().unix()
   }
+}
+
+const pollDraftEventCache: Map<string, TDraftEvent> = new Map()
+export async function createPollDraftEvent(
+  question: string,
+  mentions: string[],
+  { isMultipleChoice, relays, options, endsAt }: TPollCreateData,
+  {
+    addClientTag,
+    isNsfw
+  }: {
+    addClientTag?: boolean
+    isNsfw?: boolean
+  } = {}
+): Promise<TDraftEvent> {
+  const { quoteEventIds } = await extractRelatedEventIds(question)
+  const hashtags = extractHashtags(question)
+
+  const tags = hashtags.map((hashtag) => ['t', hashtag])
+
+  // imeta tags
+  const images = extractImagesFromContent(question)
+  if (images && images.length) {
+    tags.push(...generateImetaTags(images))
+  }
+
+  // q tags
+  tags.push(...quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
+
+  // p tags
+  tags.push(...mentions.map((pubkey) => ['p', pubkey]))
+
+  const validOptions = options.filter((opt) => opt.trim())
+  tags.push(...validOptions.map((option) => ['option', randomString(9), option.trim()]))
+  tags.push(['polltype', isMultipleChoice ? 'multiplechoice' : 'singlechoice'])
+
+  if (endsAt) {
+    tags.push(['endsAt', endsAt.toString()])
+  }
+
+  relays
+    .map((relay) => normalizeUrl(relay))
+    .forEach((relay) => relay && tags.push(['relay', relay]))
+
+  if (addClientTag) {
+    tags.push(['client', 'jumble'])
+  }
+
+  if (isNsfw) {
+    tags.push(['content-warning', 'NSFW'])
+  }
+
+  const baseDraft = {
+    content: question.trim(),
+    kind: ExtendedKind.POLL,
+    tags
+  }
+  const cacheKey = JSON.stringify(baseDraft)
+  const cache = pollDraftEventCache.get(cacheKey)
+  if (cache) {
+    return cache
+  }
+  const draftEvent = { ...baseDraft, created_at: dayjs().unix() }
+  pollDraftEventCache.set(cacheKey, draftEvent)
+
+  return draftEvent
 }
 
 function generateImetaTags(imageUrls: string[]) {
