@@ -34,7 +34,7 @@ export default function PostContent({
   close: () => void
 }) {
   const { t } = useTranslation()
-  const { publish, checkLogin } = useNostr()
+  const { pubkey, publish, checkLogin } = useNostr()
   const { uploadingFiles, setUploadingFiles } = usePostEditor()
   const [text, setText] = useState('')
   const textareaRef = useRef<TPostTextareaHandle>(null)
@@ -52,6 +52,12 @@ export default function PostContent({
     relays: []
   })
   const isFirstRender = useRef(true)
+  const canPost =
+    !!pubkey &&
+    !!text &&
+    !posting &&
+    !uploadingFiles &&
+    (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2)
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -96,12 +102,6 @@ export default function PostContent({
     addClientTag
   ])
 
-  const canPost =
-    !!text &&
-    !posting &&
-    !uploadingFiles &&
-    (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2)
-
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
     checkLogin(async () => {
@@ -117,7 +117,7 @@ export default function PostContent({
                 isNsfw
               })
             : isPoll
-              ? await createPollDraftEvent(text, mentions, pollCreateData, {
+              ? await createPollDraftEvent(pubkey, text, mentions, pollCreateData, {
                   addClientTag,
                   isNsfw
                 })

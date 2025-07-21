@@ -1,4 +1,4 @@
-import { ApplicationDataKey, ExtendedKind } from '@/constants'
+import { ApplicationDataKey, ExtendedKind, POLL_TYPE } from '@/constants'
 import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
 import { TDraftEvent, TEmoji, TMailboxRelay, TPollCreateData, TRelaySet } from '@/types'
@@ -10,9 +10,9 @@ import {
   isProtectedEvent,
   isReplaceableEvent
 } from './event'
-import { generateBech32IdFromETag, tagNameEquals } from './tag'
-import { normalizeHttpUrl, normalizeUrl } from './url'
 import { randomString } from './random'
+import { generateBech32IdFromETag, tagNameEquals } from './tag'
+import { normalizeHttpUrl } from './url'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
@@ -361,6 +361,7 @@ export function createBlossomServerListDraftEvent(servers: string[]): TDraftEven
 
 const pollDraftEventCache: Map<string, TDraftEvent> = new Map()
 export async function createPollDraftEvent(
+  author: string,
   question: string,
   mentions: string[],
   { isMultipleChoice, relays, options, endsAt }: TPollCreateData,
@@ -391,15 +392,20 @@ export async function createPollDraftEvent(
 
   const validOptions = options.filter((opt) => opt.trim())
   tags.push(...validOptions.map((option) => ['option', randomString(9), option.trim()]))
-  tags.push(['polltype', isMultipleChoice ? 'multiplechoice' : 'singlechoice'])
+  tags.push(['polltype', isMultipleChoice ? POLL_TYPE.MULTIPLE_CHOICE : POLL_TYPE.SINGLE_CHOICE])
 
   if (endsAt) {
     tags.push(['endsAt', endsAt.toString()])
   }
 
-  relays
-    .map((relay) => normalizeUrl(relay))
-    .forEach((relay) => relay && tags.push(['relay', relay]))
+  if (relays.length) {
+    relays.forEach((relay) => tags.push(['relay', relay]))
+  } else {
+    const relayList = await client.fetchRelayList(author)
+    relayList.read.slice(0, 4).forEach((relay) => {
+      tags.push(['relay', relay])
+    })
+  }
 
   if (addClientTag) {
     tags.push(['client', 'jumble'])
