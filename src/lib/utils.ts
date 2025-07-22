@@ -87,6 +87,9 @@ export function detectLanguage(text?: string): string | null {
   if (/[\u0600-\u06ff]/.test(cleanText)) {
     return 'ar'
   }
+  if (/[\u0590-\u05FF]/.test(cleanText)) {
+    return 'fa'
+  }
   if (/[\u0400-\u04ff]/.test(cleanText)) {
     return 'ru'
   }
@@ -98,6 +101,8 @@ export function detectLanguage(text?: string): string | null {
       deu: 'de', // German
       eng: 'en', // English
       spa: 'es', // Spanish
+      fas: 'fa', // Persian (Farsi)
+      pes: 'fa', // Persian (alternative code)
       fra: 'fr', // French
       ita: 'it', // Italian
       jpn: 'ja', // Japanese

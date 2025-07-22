@@ -1,7 +1,14 @@
 import { ApplicationDataKey, ExtendedKind, POLL_TYPE } from '@/constants'
 import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
-import { TDraftEvent, TEmoji, TMailboxRelay, TPollCreateData, TRelaySet } from '@/types'
+import {
+  TDraftEvent,
+  TEmoji,
+  TMailboxRelay,
+  TMailboxRelayScope,
+  TPollCreateData,
+  TRelaySet
+} from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import {
@@ -12,24 +19,18 @@ import {
 } from './event'
 import { randomString } from './random'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
-import { normalizeHttpUrl } from './url'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
   const tags: string[][] = []
-  const hint = client.getEventHint(event.id)
-  tags.push(['e', event.id, hint, event.pubkey])
-  tags.push(['p', event.pubkey])
+  tags.push(buildETag(event.id, event.pubkey))
+  tags.push(buildPTag(event.pubkey))
   if (event.kind !== kinds.ShortTextNote) {
-    tags.push(['k', event.kind.toString()])
+    tags.push(buildKTag(event.kind))
   }
 
   if (isReplaceableEvent(event.kind)) {
-    tags.push(
-      hint
-        ? ['a', getReplaceableEventCoordinate(event), hint]
-        : ['a', getReplaceableEventCoordinate(event)]
-    )
+    tags.push(buildATag(event))
   }
 
   let content: string
@@ -37,7 +38,7 @@ export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = 
     content = emoji
   } else {
     content = `:${emoji.shortcode}:`
-    tags.push(['emoji', emoji.shortcode, emoji.url])
+    tags.push(buildEmojiTag(emoji))
   }
 
   return {
@@ -51,10 +52,7 @@ export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = 
 // https://github.com/nostr-protocol/nips/blob/master/18.md
 export function createRepostDraftEvent(event: Event): TDraftEvent {
   const isProtected = isProtectedEvent(event)
-  const tags = [
-    ['e', event.id, client.getEventHint(event.id), '', event.pubkey],
-    ['p', event.pubkey]
-  ]
+  const tags = [buildETag(event.id, event.pubkey), buildPTag(event.pubkey)]
 
   return {
     kind: kinds.Repost,
@@ -81,7 +79,7 @@ export async function createShortTextNoteDraftEvent(
   )
   const hashtags = extractHashtags(content)
 
-  const tags = hashtags.map((hashtag) => ['t', hashtag])
+  const tags = hashtags.map((hashtag) => buildTTag(hashtag))
 
   // imeta tags
   const images = extractImagesFromContent(content)
@@ -90,7 +88,7 @@ export async function createShortTextNoteDraftEvent(
   }
 
   // q tags
-  tags.push(...quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
+  tags.push(...quoteEventIds.map((eventId) => buildQTag(eventId)))
 
   // e tags
   if (rootETag.length) {
@@ -102,18 +100,18 @@ export async function createShortTextNoteDraftEvent(
   }
 
   // p tags
-  tags.push(...mentions.map((pubkey) => ['p', pubkey]))
+  tags.push(...mentions.map((pubkey) => buildPTag(pubkey)))
 
   if (options.addClientTag) {
-    tags.push(['client', 'jumble'])
+    tags.push(buildClientTag())
   }
 
   if (options.isNsfw) {
-    tags.push(['content-warning', 'NSFW'])
+    tags.push(buildNsfwTag())
   }
 
   if (options.protectedEvent) {
-    tags.push(['-'])
+    tags.push(buildProtectedTag())
   }
 
   const baseDraft = {
@@ -138,9 +136,9 @@ export function createRelaySetDraftEvent(relaySet: TRelaySet): TDraftEvent {
     kind: kinds.Relaysets,
     content: '',
     tags: [
-      ['d', relaySet.id],
-      ['title', relaySet.name],
-      ...relaySet.relayUrls.map((url) => ['relay', url])
+      buildDTag(relaySet.id),
+      buildTitleTag(relaySet.name),
+      ...relaySet.relayUrls.map((url) => buildRelayTag(url))
     ],
     created_at: dayjs().unix()
   }
@@ -162,17 +160,17 @@ export async function createPictureNoteDraftEvent(
   }
 
   const tags = pictureInfos
-    .map((info) => ['imeta', ...info.tags.map(([n, v]) => `${n} ${v}`)])
-    .concat(hashtags.map((hashtag) => ['t', hashtag]))
-    .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
-    .concat(mentions.map((pubkey) => ['p', pubkey]))
+    .map((info) => buildImetaTag(info.tags))
+    .concat(hashtags.map((hashtag) => buildTTag(hashtag)))
+    .concat(quoteEventIds.map((eventId) => buildQTag(eventId)))
+    .concat(mentions.map((pubkey) => buildPTag(pubkey)))
 
   if (options.addClientTag) {
-    tags.push(['client', 'jumble'])
+    tags.push(buildClientTag())
   }
 
   if (options.protectedEvent) {
-    tags.push(['-'])
+    tags.push(buildProtectedTag())
   }
 
   return {
@@ -194,69 +192,57 @@ export async function createCommentDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const {
-    quoteEventIds,
-    rootEventId,
-    rootCoordinateTag,
-    rootKind,
-    rootPubkey,
-    rootUrl,
-    parentEventId,
-    parentCoordinate,
-    parentKind,
-    parentPubkey
-  } = await extractCommentMentions(content, parentEvent)
+  const { quoteEventIds, rootEventId, rootCoordinateTag, rootKind, rootPubkey, rootUrl } =
+    await extractCommentMentions(content, parentEvent)
   const hashtags = extractHashtags(content)
 
   const tags = hashtags
-    .map((hashtag) => ['t', hashtag])
-    .concat(quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
+    .map((hashtag) => buildTTag(hashtag))
+    .concat(quoteEventIds.map((eventId) => buildQTag(eventId)))
 
   const images = extractImagesFromContent(content)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
 
-  tags.push(...mentions.filter((pubkey) => pubkey !== parentPubkey).map((pubkey) => ['p', pubkey]))
+  tags.push(
+    ...mentions.filter((pubkey) => pubkey !== parentEvent.pubkey).map((pubkey) => buildPTag(pubkey))
+  )
 
   if (rootCoordinateTag) {
     tags.push(rootCoordinateTag)
   } else if (rootEventId) {
-    tags.push(
-      rootPubkey
-        ? ['E', rootEventId, client.getEventHint(rootEventId), rootPubkey]
-        : ['E', rootEventId, client.getEventHint(rootEventId)]
-    )
+    tags.push(buildETag(rootEventId, rootPubkey, '', true))
   }
   if (rootPubkey) {
-    tags.push(['P', rootPubkey])
+    tags.push(buildPTag(rootPubkey, true))
   }
   if (rootKind) {
-    tags.push(['K', rootKind.toString()])
+    tags.push(buildKTag(rootKind, true))
   }
   if (rootUrl) {
-    tags.push(['I', rootUrl])
+    tags.push(buildITag(rootUrl, true))
   }
   tags.push(
     ...[
-      parentCoordinate
-        ? ['a', parentCoordinate, client.getEventHint(parentEventId)]
-        : ['e', parentEventId, client.getEventHint(parentEventId), parentPubkey],
-      ['k', parentKind.toString()],
-      ['p', parentPubkey]
+      isReplaceableEvent(parentEvent.kind)
+        ? buildATag(parentEvent)
+        : buildETag(parentEvent.id, parentEvent.pubkey),
+      buildKTag(parentEvent.kind),
+      buildPTag(parentEvent.pubkey)
     ]
   )
 
   if (options.addClientTag) {
-    tags.push(['client', 'jumble'])
+    tags.push(buildClientTag())
   }
 
   if (options.isNsfw) {
-    tags.push(['content-warning', 'NSFW'])
+    tags.push(buildNsfwTag())
   }
 
   if (options.protectedEvent) {
-    tags.push(['-'])
+    tags.push(buildProtectedTag())
   }
 
   const baseDraft = {
@@ -279,9 +265,7 @@ export function createRelayListDraftEvent(mailboxRelays: TMailboxRelay[]): TDraf
   return {
     kind: kinds.RelayList,
     content: '',
-    tags: mailboxRelays.map(({ url, scope }) =>
-      scope === 'both' ? ['r', url] : ['r', url, scope]
-    ),
+    tags: mailboxRelays.map(({ url, scope }) => buildRTag(url, scope)),
     created_at: dayjs().unix()
   }
 }
@@ -319,10 +303,10 @@ export function createFavoriteRelaysDraftEvent(
 ): TDraftEvent {
   const tags: string[][] = []
   favoriteRelays.forEach((url) => {
-    tags.push(['relay', url])
+    tags.push(buildRelayTag(url))
   })
   relaySetEvents.forEach((event) => {
-    tags.push(['a', getReplaceableEventCoordinate(event)])
+    tags.push(buildATag(event))
   })
   return {
     kind: ExtendedKind.FAVORITE_RELAYS,
@@ -336,7 +320,7 @@ export function createSeenNotificationsAtDraftEvent(): TDraftEvent {
   return {
     kind: kinds.Application,
     content: 'Records read time to sync notification status across devices.',
-    tags: [['d', ApplicationDataKey.NOTIFICATIONS_SEEN_AT]],
+    tags: [buildDTag(ApplicationDataKey.NOTIFICATIONS_SEEN_AT)],
     created_at: dayjs().unix()
   }
 }
@@ -354,7 +338,7 @@ export function createBlossomServerListDraftEvent(servers: string[]): TDraftEven
   return {
     kind: ExtendedKind.BLOSSOM_SERVER_LIST,
     content: '',
-    tags: servers.map((server) => ['server', normalizeHttpUrl(server)]),
+    tags: servers.map((server) => buildServerTag(server)),
     created_at: dayjs().unix()
   }
 }
@@ -467,39 +451,21 @@ async function extractRelatedEventIds(content: string, parentEvent?: Event) {
   if (parentEvent) {
     const _rootETag = getRootETag(parentEvent)
     if (_rootETag) {
-      parentETag = [
-        'e',
-        parentEvent.id,
-        client.getEventHint(parentEvent.id),
-        'reply',
-        parentEvent.pubkey
-      ]
+      parentETag = buildETagWithMarker(parentEvent.id, parentEvent.pubkey, '', 'reply')
 
       const [, rootEventHexId, hint, , rootEventPubkey] = _rootETag
       if (rootEventPubkey) {
-        rootETag = [
-          'e',
-          rootEventHexId,
-          hint ?? client.getEventHint(rootEventHexId),
-          'root',
-          rootEventPubkey
-        ]
+        rootETag = buildETagWithMarker(rootEventHexId, rootEventPubkey, hint, 'root')
       } else {
         const rootEventId = generateBech32IdFromETag(_rootETag)
         const rootEvent = rootEventId ? await client.fetchEvent(rootEventId) : undefined
         rootETag = rootEvent
-          ? ['e', rootEvent.id, hint ?? client.getEventHint(rootEvent.id), 'root', rootEvent.pubkey]
-          : ['e', rootEventHexId, hint ?? client.getEventHint(rootEventHexId), 'root']
+          ? buildETagWithMarker(rootEvent.id, rootEvent.pubkey, hint, 'root')
+          : buildETagWithMarker(rootEventHexId, rootEventPubkey, hint, 'root')
       }
     } else {
       // reply to root event
-      rootETag = [
-        'e',
-        parentEvent.id,
-        client.getEventHint(parentEvent.id),
-        'root',
-        parentEvent.pubkey
-      ]
+      rootETag = buildETagWithMarker(parentEvent.id, parentEvent.pubkey, '', 'root')
     }
   }
 
@@ -512,12 +478,11 @@ async function extractRelatedEventIds(content: string, parentEvent?: Event) {
 
 async function extractCommentMentions(content: string, parentEvent: Event) {
   const quoteEventIds: string[] = []
-  const parentEventIsReplaceable = isReplaceableEvent(parentEvent.kind)
   const rootCoordinateTag =
     parentEvent.kind === ExtendedKind.COMMENT
       ? parentEvent.tags.find(tagNameEquals('A'))
       : isReplaceableEvent(parentEvent.kind)
-        ? ['A', getReplaceableEventCoordinate(parentEvent), client.getEventHint(parentEvent.id)]
+        ? buildATag(parentEvent, true)
         : undefined
   const rootEventId =
     parentEvent.kind === ExtendedKind.COMMENT
@@ -535,13 +500,6 @@ async function extractCommentMentions(content: string, parentEvent: Event) {
     parentEvent.kind === ExtendedKind.COMMENT
       ? parentEvent.tags.find(tagNameEquals('I'))?.[1]
       : undefined
-
-  const parentEventId = parentEvent.id
-  const parentCoordinate = parentEventIsReplaceable
-    ? getReplaceableEventCoordinate(parentEvent)
-    : undefined
-  const parentKind = parentEvent.kind
-  const parentPubkey = parentEvent.pubkey
 
   const addToSet = (arr: string[], item: string) => {
     if (!arr.includes(item)) arr.push(item)
@@ -569,10 +527,7 @@ async function extractCommentMentions(content: string, parentEvent: Event) {
     rootKind,
     rootPubkey,
     rootUrl,
-    parentEventId,
-    parentCoordinate,
-    parentKind,
-    parentPubkey
+    parentEvent
   }
 }
 
@@ -590,4 +545,103 @@ function extractHashtags(content: string) {
 
 function extractImagesFromContent(content: string) {
   return content.match(/https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp|heic)/gi)
+}
+
+function buildATag(event: Event, upperCase: boolean = false) {
+  const coordinate = getReplaceableEventCoordinate(event)
+  const hint = client.getEventHint(event.id)
+  return trimTagEnd([upperCase ? 'A' : 'a', coordinate, hint])
+}
+
+function buildDTag(identifier: string) {
+  return ['d', identifier]
+}
+
+function buildETag(
+  eventHexId: string,
+  pubkey: string = '',
+  hint: string = '',
+  upperCase: boolean = false
+) {
+  if (!hint) {
+    hint = client.getEventHint(eventHexId)
+  }
+  return trimTagEnd([upperCase ? 'E' : 'e', eventHexId, hint, pubkey])
+}
+
+function buildETagWithMarker(
+  eventHexId: string,
+  pubkey: string = '',
+  hint: string = '',
+  marker: 'root' | 'reply' | '' = ''
+) {
+  if (!hint) {
+    hint = client.getEventHint(eventHexId)
+  }
+  return trimTagEnd(['e', eventHexId, hint, marker, pubkey])
+}
+
+function buildITag(url: string, upperCase: boolean = false) {
+  return [upperCase ? 'I' : 'i', url]
+}
+
+function buildKTag(kind: number | string, upperCase: boolean = false) {
+  return [upperCase ? 'K' : 'k', kind.toString()]
+}
+
+function buildPTag(pubkey: string, upperCase: boolean = false) {
+  return [upperCase ? 'P' : 'p', pubkey]
+}
+
+function buildQTag(eventHexId: string) {
+  return trimTagEnd(['q', eventHexId, client.getEventHint(eventHexId)]) // TODO: pubkey
+}
+
+function buildRTag(url: string, scope: TMailboxRelayScope) {
+  return scope === 'both' ? ['r', url, scope] : ['r', url]
+}
+
+function buildTTag(hashtag: string) {
+  return ['t', hashtag]
+}
+
+function buildEmojiTag(emoji: TEmoji) {
+  return ['emoji', emoji.shortcode, emoji.url]
+}
+
+function buildTitleTag(title: string) {
+  return ['title', title]
+}
+
+function buildRelayTag(url: string) {
+  return ['relay', url]
+}
+
+function buildServerTag(url: string) {
+  return ['server', url]
+}
+
+function buildImetaTag(nip94Tags: string[][]) {
+  return ['imeta', ...nip94Tags.map(([n, v]) => `${n} ${v}`)]
+}
+
+function buildClientTag() {
+  return ['client', 'jumble']
+}
+
+function buildNsfwTag() {
+  return ['content-warning', 'NSFW']
+}
+
+function buildProtectedTag() {
+  return ['-']
+}
+
+function trimTagEnd(tag: string[]) {
+  let endIndex = tag.length - 1
+  while (endIndex >= 0 && tag[endIndex] === '') {
+    endIndex--
+  }
+
+  return tag.slice(0, endIndex + 1)
 }

@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator'
 import { RECOMMENDED_BLOSSOM_SERVERS } from '@/constants'
 import { createBlossomServerListDraftEvent } from '@/lib/draft-event'
 import { getServersFromServerTags } from '@/lib/tag'
+import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
@@ -56,7 +57,9 @@ export default function BlossomServerListSetting() {
   const handleUrlInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      addBlossomUrl(url)
+      const normalizedUrl = normalizeHttpUrl(url.trim())
+      if (!normalizedUrl) return
+      addBlossomUrl(normalizedUrl)
     }
   }
 
@@ -167,7 +170,15 @@ export default function BlossomServerListSetting() {
           placeholder={t('Enter Blossom server URL')}
           onKeyDown={handleUrlInputKeyDown}
         />
-        <Button type="button" onClick={() => addBlossomUrl(url)} title={t('Add')}>
+        <Button
+          type="button"
+          onClick={() => {
+            const normalizedUrl = normalizeHttpUrl(url.trim())
+            if (!normalizedUrl) return
+            addBlossomUrl(normalizedUrl)
+          }}
+          title={t('Add')}
+        >
           {adding && <Loader className="animate-spin" />}
           {t('Add')}
         </Button>
