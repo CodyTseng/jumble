@@ -3,7 +3,7 @@ import { Event } from 'nostr-tools'
 import { useTranslation } from 'react-i18next'
 import ClientSelect from '../ClientSelect'
 
-export function UnknownNote({ event, className }: { event: Event; className?: string }) {
+export default function UnknownNote({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
 
   return (

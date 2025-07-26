@@ -1,17 +1,23 @@
 import Note from '@/components/Note'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { createCommentDraftEvent, createShortTextNoteDraftEvent } from '@/lib/draft-event'
+import {
+  createCommentDraftEvent,
+  createPollDraftEvent,
+  createShortTextNoteDraftEvent
+} from '@/lib/draft-event'
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import postContentCache from '@/services/post-content-cache.service'
-import { ImageUp, LoaderCircle, Settings, Smile } from 'lucide-react'
+import postEditorCache from '@/services/post-editor-cache.service'
+import { TPollCreateData } from '@/types'
+import { ImageUp, ListTodo, LoaderCircle, Settings, Smile } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import EmojiPickerDialog from '../EmojiPickerDialog'
 import Mentions from './Mentions'
+import PollEditor from './PollEditor'
 import { usePostEditor } from './PostEditorProvider'
 import PostOptions from './PostOptions'
 import PostTextarea, { TPostTextareaHandle } from './PostTextarea'
@@ -28,7 +34,7 @@ export default function PostContent({
   close: () => void
 }) {
   const { t } = useTranslation()
-  const { publish, checkLogin } = useNostr()
+  const { pubkey, publish, checkLogin } = useNostr()
   const { uploadingFiles, setUploadingFiles } = usePostEditor()
   const [text, setText] = useState('')
   const textareaRef = useRef<TPostTextareaHandle>(null)
@@ -38,7 +44,63 @@ export default function PostContent({
   const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const [mentions, setMentions] = useState<string[]>([])
   const [isNsfw, setIsNsfw] = useState(false)
-  const canPost = !!text && !posting && !uploadingFiles
+  const [isPoll, setIsPoll] = useState(false)
+  const [pollCreateData, setPollCreateData] = useState<TPollCreateData>({
+    isMultipleChoice: false,
+    options: ['', ''],
+    endsAt: undefined,
+    relays: []
+  })
+  const isFirstRender = useRef(true)
+  const canPost =
+    !!pubkey &&
+    !!text &&
+    !posting &&
+    !uploadingFiles &&
+    (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2)
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      const cachedSettings = postEditorCache.getPostSettingsCache({
+        defaultContent,
+        parentEvent
+      })
+      if (cachedSettings) {
+        setIsNsfw(cachedSettings.isNsfw ?? false)
+        setIsPoll(cachedSettings.isPoll ?? false)
+        setPollCreateData(
+          cachedSettings.pollCreateData ?? {
+            isMultipleChoice: false,
+            options: ['', ''],
+            endsAt: undefined,
+            relays: []
+          }
+        )
+        setSpecifiedRelayUrls(cachedSettings.specifiedRelayUrls)
+        setAddClientTag(cachedSettings.addClientTag ?? false)
+      }
+      return
+    }
+    postEditorCache.setPostSettingsCache(
+      { defaultContent, parentEvent },
+      {
+        isNsfw,
+        isPoll,
+        pollCreateData,
+        specifiedRelayUrls,
+        addClientTag
+      }
+    )
+  }, [
+    defaultContent,
+    parentEvent,
+    isNsfw,
+    isPoll,
+    pollCreateData,
+    specifiedRelayUrls,
+    addClientTag
+  ])
 
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
@@ -54,14 +116,23 @@ export default function PostContent({
                 protectedEvent: !!specifiedRelayUrls,
                 isNsfw
               })
-            : await createShortTextNoteDraftEvent(text, mentions, {
-                parentEvent,
-                addClientTag,
-                protectedEvent: !!specifiedRelayUrls,
-                isNsfw
-              })
-        await publish(draftEvent, { specifiedRelayUrls })
-        postContentCache.clearPostCache({ defaultContent, parentEvent })
+            : isPoll
+              ? await createPollDraftEvent(pubkey, text, mentions, pollCreateData, {
+                  addClientTag,
+                  isNsfw
+                })
+              : await createShortTextNoteDraftEvent(text, mentions, {
+                  parentEvent,
+                  addClientTag,
+                  protectedEvent: !!specifiedRelayUrls,
+                  isNsfw
+                })
+
+        await publish(draftEvent, {
+          specifiedRelayUrls,
+          additionalRelayUrls: isPoll ? pollCreateData.relays : []
+        })
+        postEditorCache.clearPostCache({ defaultContent, parentEvent })
         close()
       } catch (error) {
         if (error instanceof AggregateError) {
@@ -76,6 +147,12 @@ export default function PostContent({
       }
       toast.success(t('Post successful'), { duration: 2000 })
     })
+  }
+
+  const handlePollToggle = () => {
+    if (parentEvent) return
+
+    setIsPoll((prev) => !prev)
   }
 
   return (
@@ -94,12 +171,18 @@ export default function PostContent({
         defaultContent={defaultContent}
         parentEvent={parentEvent}
         onSubmit={() => post()}
+        className={isPoll ? 'h-20' : 'min-h-52'}
       />
-      <SendOnlyToSwitch
-        parentEvent={parentEvent}
-        specifiedRelayUrls={specifiedRelayUrls}
-        setSpecifiedRelayUrls={setSpecifiedRelayUrls}
-      />
+      {isPoll && (
+        <PollEditor pollCreateData={pollCreateData} setPollCreateData={setPollCreateData} />
+      )}
+      {!isPoll && (
+        <SendOnlyToSwitch
+          parentEvent={parentEvent}
+          specifiedRelayUrls={specifiedRelayUrls}
+          setSpecifiedRelayUrls={setSpecifiedRelayUrls}
+        />
+      )}
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <Uploader
@@ -124,6 +207,17 @@ export default function PostContent({
                 <Smile />
               </Button>
             </EmojiPickerDialog>
+          )}
+          {!parentEvent && (
+            <Button
+              variant="ghost"
+              size="icon"
+              title={t('Create Poll')}
+              className={isPoll ? 'bg-accent' : ''}
+              onClick={handlePollToggle}
+            >
+              <ListTodo />
+            </Button>
           )}
           <Button
             variant="ghost"

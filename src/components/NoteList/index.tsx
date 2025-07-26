@@ -24,6 +24,14 @@ import Tabs from '../Tabs'
 const LIMIT = 100
 const ALGO_LIMIT = 500
 const SHOW_COUNT = 10
+const KINDS = [
+  kinds.ShortTextNote,
+  kinds.Repost,
+  kinds.Highlights,
+  kinds.LongFormArticle,
+  ExtendedKind.COMMENT,
+  ExtendedKind.POLL
+]
 
 export default function NoteList({
   relayUrls = [],
@@ -115,13 +123,7 @@ export default function NoteList({
         subRequests.push({
           urls: myRelayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
           filter: {
-            kinds: [
-              kinds.ShortTextNote,
-              kinds.Repost,
-              kinds.Highlights,
-              ExtendedKind.COMMENT,
-              kinds.LongFormArticle
-            ],
+            kinds: KINDS,
             authors: [pubkey],
             '#p': [author],
             limit: LIMIT
@@ -130,13 +132,7 @@ export default function NoteList({
         subRequests.push({
           urls: targetRelayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
           filter: {
-            kinds: [
-              kinds.ShortTextNote,
-              kinds.Repost,
-              kinds.Highlights,
-              ExtendedKind.COMMENT,
-              kinds.LongFormArticle
-            ],
+            kinds: KINDS,
             authors: [author],
             '#p': [pubkey],
             limit: LIMIT
@@ -149,16 +145,7 @@ export default function NoteList({
         }
         const _filter = {
           ...filter,
-          kinds:
-            filterType === 'pictures'
-              ? [ExtendedKind.PICTURE]
-              : [
-                  kinds.ShortTextNote,
-                  kinds.Repost,
-                  kinds.Highlights,
-                  ExtendedKind.COMMENT,
-                  kinds.LongFormArticle
-                ],
+          kinds: filterType === 'pictures' ? [ExtendedKind.PICTURE] : KINDS,
           limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
         }
         if (relayUrls.length === 0 && (_filter.authors?.length || author)) {

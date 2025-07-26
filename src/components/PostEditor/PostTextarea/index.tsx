@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
-import postContentCache from '@/services/post-content-cache.service'
+import { cn } from '@/lib/utils'
+import postEditorCache from '@/services/post-editor-cache.service'
 import Document from '@tiptap/extension-document'
 import { HardBreak } from '@tiptap/extension-hard-break'
 import History from '@tiptap/extension-history'
@@ -31,8 +32,9 @@ const PostTextarea = forwardRef<
     defaultContent?: string
     parentEvent?: Event
     onSubmit?: () => void
+    className?: string
   }
->(({ text = '', setText, defaultContent, parentEvent, onSubmit }, ref) => {
+>(({ text = '', setText, defaultContent, parentEvent, onSubmit, className }, ref) => {
   const { t } = useTranslation()
   const { setUploadingFiles } = usePostEditor()
   const editor = useEditor({
@@ -56,8 +58,10 @@ const PostTextarea = forwardRef<
     ],
     editorProps: {
       attributes: {
-        class:
-          'border rounded-lg p-3 min-h-52 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+        class: cn(
+          'border rounded-lg p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+          className
+        )
       },
       handleKeyDown: (_view, event) => {
         // Handle Ctrl+Enter or Cmd+Enter for submit
@@ -69,10 +73,10 @@ const PostTextarea = forwardRef<
         return false
       }
     },
-    content: postContentCache.getPostCache({ defaultContent, parentEvent }),
+    content: postEditorCache.getPostContentCache({ defaultContent, parentEvent }),
     onUpdate(props) {
       setText(parseEditorJsonToText(props.editor.getJSON()))
-      postContentCache.setPostCache({ defaultContent, parentEvent }, props.editor.getJSON())
+      postEditorCache.setPostContentCache({ defaultContent, parentEvent }, props.editor.getJSON())
     },
     onCreate(props) {
       setText(parseEditorJsonToText(props.editor.getJSON()))
@@ -122,7 +126,7 @@ const PostTextarea = forwardRef<
         <EditorContent className="tiptap" editor={editor} />
       </TabsContent>
       <TabsContent value="preview">
-        <Preview content={text} />
+        <Preview content={text} className={className} />
       </TabsContent>
     </Tabs>
   )

@@ -23,6 +23,11 @@ import { NostrConnectionSigner } from './nostrConnection.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
 
+type TPublishOptions = {
+  specifiedRelayUrls?: string[]
+  additionalRelayUrls?: string[]
+}
+
 type TNostrContext = {
   isInitialized: boolean
   pubkey: string | null
@@ -49,7 +54,7 @@ type TNostrContext = {
   /**
    * Default publish the event to current relays, user's write relays and additional relays
    */
-  publish: (draftEvent: TDraftEvent, options?: { specifiedRelayUrls?: string[] }) => Promise<Event>
+  publish: (draftEvent: TDraftEvent, options?: TPublishOptions) => Promise<Event>
   signHttpAuth: (url: string, method: string) => Promise<string>
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
@@ -528,7 +533,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   const publish = async (
     draftEvent: TDraftEvent,
-    { specifiedRelayUrls }: { specifiedRelayUrls?: string[] } = {}
+    { specifiedRelayUrls, additionalRelayUrls }: TPublishOptions = {}
   ) => {
     if (!account || !signer || account.signerType === 'npub') {
       throw new Error('You need to login first')
@@ -549,7 +554,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const additionalRelayUrls: string[] = []
+    const _additionalRelayUrls: string[] = additionalRelayUrls ?? []
     if (
       !specifiedRelayUrls?.length &&
       [
@@ -574,7 +579,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (mentions.length > 0) {
         const relayLists = await client.fetchRelayLists(mentions)
         relayLists.forEach((relayList) => {
-          additionalRelayUrls.push(...relayList.read.slice(0, 4))
+          _additionalRelayUrls.push(...relayList.read.slice(0, 4))
         })
       }
     }
@@ -586,7 +591,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         ExtendedKind.BLOSSOM_SERVER_LIST
       ].includes(draftEvent.kind)
     ) {
-      additionalRelayUrls.push(...BIG_RELAY_URLS)
+      _additionalRelayUrls.push(...BIG_RELAY_URLS)
     }
 
     let relays: string[]
@@ -595,7 +600,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     } else {
       const relayList = await client.fetchRelayList(event.pubkey)
       relays = (relayList?.write.slice(0, 10) ?? [])
-        .concat(Array.from(new Set(additionalRelayUrls)) ?? [])
+        .concat(Array.from(new Set(_additionalRelayUrls)) ?? [])
         .concat(client.getCurrentRelayUrls())
     }
 

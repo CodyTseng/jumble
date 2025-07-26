@@ -1,7 +1,14 @@
-import { ApplicationDataKey, ExtendedKind } from '@/constants'
+import { ApplicationDataKey, ExtendedKind, POLL_TYPE } from '@/constants'
 import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
-import { TDraftEvent, TEmoji, TMailboxRelay, TMailboxRelayScope, TRelaySet } from '@/types'
+import {
+  TDraftEvent,
+  TEmoji,
+  TMailboxRelay,
+  TMailboxRelayScope,
+  TPollCreateData,
+  TRelaySet
+} from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import {
@@ -10,6 +17,7 @@ import {
   isProtectedEvent,
   isReplaceableEvent
 } from './event'
+import { randomString } from './random'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
 
 // https://github.com/nostr-protocol/nips/blob/master/25.md
@@ -335,6 +343,93 @@ export function createBlossomServerListDraftEvent(servers: string[]): TDraftEven
   }
 }
 
+const pollDraftEventCache: Map<string, TDraftEvent> = new Map()
+export async function createPollDraftEvent(
+  author: string,
+  question: string,
+  mentions: string[],
+  { isMultipleChoice, relays, options, endsAt }: TPollCreateData,
+  {
+    addClientTag,
+    isNsfw
+  }: {
+    addClientTag?: boolean
+    isNsfw?: boolean
+  } = {}
+): Promise<TDraftEvent> {
+  const { quoteEventIds } = await extractRelatedEventIds(question)
+  const hashtags = extractHashtags(question)
+
+  const tags = hashtags.map((hashtag) => buildTTag(hashtag))
+
+  // imeta tags
+  const images = extractImagesFromContent(question)
+  if (images && images.length) {
+    tags.push(...generateImetaTags(images))
+  }
+
+  // q tags
+  tags.push(...quoteEventIds.map((eventId) => buildQTag(eventId)))
+
+  // p tags
+  tags.push(...mentions.map((pubkey) => buildPTag(pubkey)))
+
+  const validOptions = options.filter((opt) => opt.trim())
+  tags.push(...validOptions.map((option) => ['option', randomString(9), option.trim()]))
+  tags.push(['polltype', isMultipleChoice ? POLL_TYPE.MULTIPLE_CHOICE : POLL_TYPE.SINGLE_CHOICE])
+
+  if (endsAt) {
+    tags.push(['endsAt', endsAt.toString()])
+  }
+
+  if (relays.length) {
+    relays.forEach((relay) => tags.push(buildRelayTag(relay)))
+  } else {
+    const relayList = await client.fetchRelayList(author)
+    relayList.read.slice(0, 4).forEach((relay) => {
+      tags.push(buildRelayTag(relay))
+    })
+  }
+
+  if (addClientTag) {
+    tags.push(buildClientTag())
+  }
+
+  if (isNsfw) {
+    tags.push(buildNsfwTag())
+  }
+
+  const baseDraft = {
+    content: question.trim(),
+    kind: ExtendedKind.POLL,
+    tags
+  }
+  const cacheKey = JSON.stringify(baseDraft)
+  const cache = pollDraftEventCache.get(cacheKey)
+  if (cache) {
+    return cache
+  }
+  const draftEvent = { ...baseDraft, created_at: dayjs().unix() }
+  pollDraftEventCache.set(cacheKey, draftEvent)
+
+  return draftEvent
+}
+
+export function createPollResponseDraftEvent(
+  pollEvent: Event,
+  selectedOptionIds: string[]
+): TDraftEvent {
+  return {
+    content: '',
+    kind: ExtendedKind.POLL_RESPONSE,
+    tags: [
+      buildETag(pollEvent.id, pollEvent.pubkey),
+      ...selectedOptionIds.map((optionId) => buildResponseTag(optionId))
+    ],
+    created_at: dayjs().unix()
+  }
+}
+
 function generateImetaTags(imageUrls: string[]) {
   return imageUrls
     .map((imageUrl) => {
@@ -543,6 +638,10 @@ function buildServerTag(url: string) {
 
 function buildImetaTag(nip94Tags: string[][]) {
   return ['imeta', ...nip94Tags.map(([n, v]) => `${n} ${v}`)]
+}
+
+function buildResponseTag(value: string) {
+  return ['response', value]
 }
 
 function buildClientTag() {

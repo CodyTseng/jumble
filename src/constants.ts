@@ -62,6 +62,8 @@ export const GROUP_METADATA_EVENT_KIND = 39000
 
 export const ExtendedKind = {
   PICTURE: 20,
+  POLL: 1068,
+  POLL_RESPONSE: 1018,
   COMMENT: 1111,
   FAVORITE_RELAYS: 10012,
   BLOSSOM_SERVER_LIST: 10063,
@@ -105,3 +107,8 @@ export const DEFAULT_NOSTRCONNECT_RELAY = [
   'wss://nos.lol/',
   'wss://relay.primal.net'
 ]
+
+export const POLL_TYPE = {
+  MULTIPLE_CHOICE: 'multiplechoice',
+  SINGLE_CHOICE: 'singlechoice'
+} as const

@@ -29,7 +29,8 @@ import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
 import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
-import { UnknownNote } from './UnknownNote'
+import Poll from './Poll'
+import UnknownNote from './UnknownNote'
 
 export default function Note({
   event,
@@ -69,7 +70,8 @@ export default function Note({
       kinds.CommunityDefinition,
       ExtendedKind.GROUP_METADATA,
       ExtendedKind.PICTURE,
-      ExtendedKind.COMMENT
+      ExtendedKind.COMMENT,
+      ExtendedKind.POLL
     ].includes(event.kind)
   ) {
     content = <UnknownNote className="mt-2" event={event} />
@@ -87,6 +89,13 @@ export default function Note({
     content = <GroupMetadata className="mt-2" event={event} originalNoteId={originalNoteId} />
   } else if (event.kind === kinds.CommunityDefinition) {
     content = <CommunityDefinition className="mt-2" event={event} />
+  } else if (event.kind === ExtendedKind.POLL) {
+    content = (
+      <>
+        <Content className="mt-2" event={event} />
+        <Poll className="mt-2" event={event} />
+      </>
+    )
   } else {
     content = <Content className="mt-2" event={event} />
   }

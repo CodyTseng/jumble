@@ -3,6 +3,7 @@ import { execSync } from 'child_process'
 import path from 'path'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import packageJson from './package.json'
 
 const getGitHash = () => {
   try {
@@ -15,7 +16,7 @@ const getGitHash = () => {
 
 const getAppVersion = () => {
   try {
-    return JSON.stringify(require('./package.json').version)
+    return JSON.stringify(packageJson.version)
   } catch (error) {
     console.warn('Failed to retrieve app version:', error)
     return '"unknown"'

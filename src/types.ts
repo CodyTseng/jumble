@@ -1,4 +1,5 @@
 import { Event, VerifiedEvent } from 'nostr-tools'
+import { POLL_TYPE } from './constants'
 
 export type TProfile = {
   username: string
@@ -151,3 +152,12 @@ export type TMediaUploadServiceConfig =
   | {
       type: 'blossom'
     }
+
+export type TPollType = (typeof POLL_TYPE)[keyof typeof POLL_TYPE]
+
+export type TPollCreateData = {
+  isMultipleChoice: boolean
+  options: string[]
+  relays: string[]
+  endsAt?: number
+}

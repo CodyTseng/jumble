@@ -124,4 +124,8 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .dark input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.5);
+  }
 }
