@@ -141,12 +141,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
               >
                 {/* Content */}
                 <div className="flex items-center gap-2 flex-1 w-0 z-10">
-                  <div
-                    className={cn(
-                      'text-wrap break-words whitespace-pre-wrap text-left',
-                      isMax ? 'font-semibold' : ''
-                    )}
-                  >
+                  <div className={cn('line-clamp-2 text-left', isMax ? 'font-semibold' : '')}>
                     {option.label}
                   </div>
                   {votedOptionIds.includes(option.id) && (
@@ -179,7 +174,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
 
         {/* Results Summary */}
         <div className="text-sm text-muted-foreground">
-          {!!pollResults?.totalVotes && t('Total votes') + `: ${pollResults.totalVotes}`}
+          {!!pollResults?.totalVotes && t('{{number}} votes', { number: pollResults.totalVotes })}
           {!!pollResults?.totalVotes && !!poll.endsAt && ' · '}
           {!!poll.endsAt &&
             (isExpired

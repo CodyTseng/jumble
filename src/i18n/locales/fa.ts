@@ -296,6 +296,21 @@ export default {
     'Recommended blossom servers': 'سرورهای blossom توصیه شده',
     'Enter Blossom server URL': 'آدرس سرور Blossom را وارد کنید',
     Preferred: 'ترجیحی',
-    'Multiple choice (select one or more)': 'چند گزینه‌ای (یک یا چند انتخاب کنید)'
+    'Multiple choice (select one or more)': 'چند گزینه‌ای (یک یا چند انتخاب کنید)',
+    Vote: 'رای دادن',
+    '{{number}} votes': '{{number}} رای',
+    'Total votes': 'کل آرا',
+    'Poll has ended': 'نظرسنجی پایان یافته',
+    'Poll ends at {{time}}': 'نظرسنجی در {{time}} پایان می‌یابد',
+    'Load results': 'بارگیری نتایج',
+    'This is a poll note.': 'این یک یادداشت نظرسنجی است.',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      'برخلاف یادداشت‌های معمولی، نظرسنجی‌ها به طور گسترده پشتیبانی نمی‌شوند و ممکن است در کلاینت‌های دیگر نمایش داده نشوند.',
+    'Option {{number}}': 'گزینه {{number}}',
+    'Add Option': 'افزودن گزینه',
+    'Allow multiple choices': 'اجازه انتخاب‌های متعدد',
+    'End Date (optional)': 'تاریخ پایان (اختیاری)',
+    'Clear end date': 'پاک کردن تاریخ پایان',
+    'Relay URLs (optional, comma-separated)': 'آدرس‌های رله (اختیاری، جدا شده با کاما)'
   }
 }

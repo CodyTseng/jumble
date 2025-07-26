@@ -299,6 +299,21 @@ export default {
     'Recommended blossom servers': 'Рекомендуемые серверы Blossom',
     'Enter Blossom server URL': 'Введите URL сервера Blossom',
     Preferred: 'Предпочтительный',
-    'Multiple choice (select one or more)': 'Множественный выбор (выберите один или несколько)'
+    'Multiple choice (select one or more)': 'Множественный выбор (выберите один или несколько)',
+    Vote: 'Голосовать',
+    '{{number}} votes': '{{number}} голосов',
+    'Total votes': 'Всего голосов',
+    'Poll has ended': 'Опрос завершён',
+    'Poll ends at {{time}}': 'Опрос завершается {{time}}',
+    'Load results': 'Загрузить результаты',
+    'This is a poll note.': 'Это заметка с опросом.',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      'В отличие от обычных заметок, опросы не получили широкую поддержку и могут не отображаться в других клиентах.',
+    'Option {{number}}': 'Вариант {{number}}',
+    'Add Option': 'Добавить вариант',
+    'Allow multiple choices': 'Разрешить множественный выбор',
+    'End Date (optional)': 'Дата окончания (необязательно)',
+    'Clear end date': 'Очистить дату окончания',
+    'Relay URLs (optional, comma-separated)': 'URL релеев (необязательно, через запятую)'
   }
 }

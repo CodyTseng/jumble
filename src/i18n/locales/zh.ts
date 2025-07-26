@@ -294,6 +294,21 @@ export default {
     'Recommended blossom servers': '推荐的 Blossom 服务器',
     'Enter Blossom server URL': '输入 Blossom 服务器 URL',
     Preferred: '首选',
-    'Multiple choice (select one or more)': '多选 (选择一个或多个)'
+    'Multiple choice (select one or more)': '多选 (选择一个或多个)',
+    Vote: '投票',
+    '{{number}} votes': '{{number}} 次投票',
+    'Total votes': '总票数',
+    'Poll has ended': '投票已结束',
+    'Poll ends at {{time}}': '投票结束时间：{{time}}',
+    'Load results': '加载结果',
+    'This is a poll note.': '这是一个投票帖子。',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      '与普通帖子不同，投票功能支持范围有限，可能无法在其他客户端中显示。',
+    'Option {{number}}': '选项 {{number}}',
+    'Add Option': '添加选项',
+    'Allow multiple choices': '允许多选',
+    'End Date (optional)': '结束日期（可选）',
+    'Clear end date': '清除结束日期',
+    'Relay URLs (optional, comma-separated)': '中继服务器 URL（可选，逗号分隔）'
   }
 }

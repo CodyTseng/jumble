@@ -294,6 +294,21 @@ export default {
     'Recommended blossom servers': 'خوادم Blossom الموصى بها',
     'Enter Blossom server URL': 'أدخل عنوان خادم Blossom URL',
     Preferred: 'المفضل',
-    'Multiple choice (select one or more)': 'اختيار متعدد (اختر واحداً أو أكثر)'
+    'Multiple choice (select one or more)': 'اختيار متعدد (اختر واحداً أو أكثر)',
+    Vote: 'صوت',
+    '{{number}} votes': '{{number}} أصوات',
+    'Total votes': 'إجمالي الأصوات',
+    'Poll has ended': 'انتهى الاستطلاع',
+    'Poll ends at {{time}}': 'ينتهي الاستطلاع في {{time}}',
+    'Load results': 'تحميل النتائج',
+    'This is a poll note.': 'هذه ملاحظة استطلاع.',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      'على عكس الملاحظات العادية، الاستطلاعات غير مدعومة على نطاق واسع وقد لا تظهر في العملاء الآخرين.',
+    'Option {{number}}': 'الخيار {{number}}',
+    'Add Option': 'إضافة خيار',
+    'Allow multiple choices': 'السماح بخيارات متعددة',
+    'End Date (optional)': 'تاريخ الانتهاء (اختياري)',
+    'Clear end date': 'مسح تاريخ الانتهاء',
+    'Relay URLs (optional, comma-separated)': 'عناوين المرحلات (اختياري، مفصولة بفواصل)'
   }
 }

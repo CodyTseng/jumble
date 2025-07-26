@@ -297,6 +297,21 @@ export default {
     'Recommended blossom servers': 'Servidores Blossom recomendados',
     'Enter Blossom server URL': 'Inserir URL do servidor Blossom',
     Preferred: 'Preferido',
-    'Multiple choice (select one or more)': 'Múltipla escolha (selecione um ou mais)'
+    'Multiple choice (select one or more)': 'Múltipla escolha (selecione um ou mais)',
+    Vote: 'Votar',
+    '{{number}} votes': '{{number}} votos',
+    'Total votes': 'Total de votos',
+    'Poll has ended': 'A enquete terminou',
+    'Poll ends at {{time}}': 'A enquete termina em {{time}}',
+    'Load results': 'Carregar resultados',
+    'This is a poll note.': 'Esta é uma nota de enquete.',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      'Ao contrário das notas regulares, as enquetes não são amplamente suportadas e podem não ser exibidas em outros clientes.',
+    'Option {{number}}': 'Opção {{number}}',
+    'Add Option': 'Adicionar Opção',
+    'Allow multiple choices': 'Permitir múltiplas escolhas',
+    'End Date (optional)': 'Data de término (opcional)',
+    'Clear end date': 'Limpar data de término',
+    'Relay URLs (optional, comma-separated)': 'URLs de relay (opcional, separadas por vírgulas)'
   }
 }

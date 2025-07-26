@@ -56,7 +56,7 @@ export default function PollEditor({
 
   return (
     <div className="space-y-4 border rounded-lg p-3">
-      <div className="border bg-card p-3 rounded-lg text-destructive text-sm [&_svg]:size-4">
+      <div className="p-3 rounded-lg text-sm bg-destructive/40 [&_svg]:size-4">
         <div className="flex items-center gap-2">
           <AlertCircle />
           <div className="font-medium">{t('This is a poll note.')}</div>
@@ -74,7 +74,7 @@ export default function PollEditor({
             <Input
               value={option}
               onChange={(e) => handleOptionChange(index, e.target.value)}
-              placeholder={t(`Option ${index + 1}`)}
+              placeholder={t('Option {{number}}', { number: index + 1 })}
             />
             <Button
               type="button"

@@ -293,6 +293,21 @@ export default {
     'Recommended blossom servers': 'เซิร์ฟเวอร์ Blossom ที่แนะนำ',
     'Enter Blossom server URL': 'ป้อน URL ของเซิร์ฟเวอร์ Blossom',
     Preferred: 'ที่ชื่นชอบ',
-    'Multiple choice (select one or more)': 'ตัวเลือกหลายรายการ (เลือกหนึ่งหรือมากกว่า)'
+    'Multiple choice (select one or more)': 'ตัวเลือกหลายรายการ (เลือกหนึ่งหรือมากกว่า)',
+    Vote: 'โหวต',
+    '{{number}} votes': '{{number}} คะแนน',
+    'Total votes': 'คะแนนรวม',
+    'Poll has ended': 'การโพลล์สิ้นสุดแล้ว',
+    'Poll ends at {{time}}': 'การโพลล์สิ้นสุดเวลา {{time}}',
+    'Load results': 'โหลดผลลัพธ์',
+    'This is a poll note.': 'นี่คือโน้ตโพลล์',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      'ไม่เหมือนโน้ตธรรมดา โพลล์ไม่ได้รับการสนับสนุนอย่างแพร่หลายและอาจไม่แสดงในไคลเอนต์อื่น',
+    'Option {{number}}': 'ตัวเลือก {{number}}',
+    'Add Option': 'เพิ่มตัวเลือก',
+    'Allow multiple choices': 'อนุญาตให้เลือกหลายรายการ',
+    'End Date (optional)': 'วันที่สิ้นสุด (ไม่บังคับ)',
+    'Clear end date': 'ล้างวันที่สิ้นสุด',
+    'Relay URLs (optional, comma-separated)': 'URL รีเลย์ (ไม่บังคับ, คั่นด้วยจุลภาค)'
   }
 }

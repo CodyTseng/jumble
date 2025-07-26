@@ -296,6 +296,21 @@ export default {
     'Recommended blossom servers': '추천 Blossom 서버',
     'Enter Blossom server URL': 'Blossom 서버 URL 입력',
     Preferred: '선호',
-    'Multiple choice (select one or more)': '다중 선택 (하나 이상 선택)'
+    'Multiple choice (select one or more)': '다중 선택 (하나 이상 선택)',
+    Vote: '투표',
+    '{{number}} votes': '{{number}} 표',
+    'Total votes': '총 투표수',
+    'Poll has ended': '투표 종료',
+    'Poll ends at {{time}}': '투표 종료 시간: {{time}}',
+    'Load results': '결과 로드',
+    'This is a poll note.': '이것은 투표 노트입니다.',
+    'Unlike regular notes, polls are not widely supported and may not display on other clients.':
+      '일반 노트와 달리 투표는 널리 지원되지 않으며 다른 클라이언트에서 표시되지 않을 수 있습니다.',
+    'Option {{number}}': '옵션 {{number}}',
+    'Add Option': '옵션 추가',
+    'Allow multiple choices': '다중 선택 허용',
+    'End Date (optional)': '종료 날짜 (선택사항)',
+    'Clear end date': '종료 날짜 지우기',
+    'Relay URLs (optional, comma-separated)': '릴레이 URL (선택사항, 쉼표로 구분)'
   }
 }
