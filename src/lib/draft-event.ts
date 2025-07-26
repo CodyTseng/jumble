@@ -360,7 +360,7 @@ export async function createPollDraftEvent(
   const { quoteEventIds } = await extractRelatedEventIds(question)
   const hashtags = extractHashtags(question)
 
-  const tags = hashtags.map((hashtag) => ['t', hashtag])
+  const tags = hashtags.map((hashtag) => buildTTag(hashtag))
 
   // imeta tags
   const images = extractImagesFromContent(question)
@@ -369,10 +369,10 @@ export async function createPollDraftEvent(
   }
 
   // q tags
-  tags.push(...quoteEventIds.map((eventId) => ['q', eventId, client.getEventHint(eventId)]))
+  tags.push(...quoteEventIds.map((eventId) => buildQTag(eventId)))
 
   // p tags
-  tags.push(...mentions.map((pubkey) => ['p', pubkey]))
+  tags.push(...mentions.map((pubkey) => buildPTag(pubkey)))
 
   const validOptions = options.filter((opt) => opt.trim())
   tags.push(...validOptions.map((option) => ['option', randomString(9), option.trim()]))
@@ -383,20 +383,20 @@ export async function createPollDraftEvent(
   }
 
   if (relays.length) {
-    relays.forEach((relay) => tags.push(['relay', relay]))
+    relays.forEach((relay) => tags.push(buildRelayTag(relay)))
   } else {
     const relayList = await client.fetchRelayList(author)
     relayList.read.slice(0, 4).forEach((relay) => {
-      tags.push(['relay', relay])
+      tags.push(buildRelayTag(relay))
     })
   }
 
   if (addClientTag) {
-    tags.push(['client', 'jumble'])
+    tags.push(buildClientTag())
   }
 
   if (isNsfw) {
-    tags.push(['content-warning', 'NSFW'])
+    tags.push(buildNsfwTag())
   }
 
   const baseDraft = {
@@ -413,6 +413,21 @@ export async function createPollDraftEvent(
   pollDraftEventCache.set(cacheKey, draftEvent)
 
   return draftEvent
+}
+
+export function createPollResponseDraftEvent(
+  pollEvent: Event,
+  selectedOptionIds: string[]
+): TDraftEvent {
+  return {
+    content: '',
+    kind: ExtendedKind.POLL_RESPONSE,
+    tags: [
+      buildETag(pollEvent.id, pollEvent.pubkey),
+      ...selectedOptionIds.map((optionId) => buildResponseTag(optionId))
+    ],
+    created_at: dayjs().unix()
+  }
 }
 
 function generateImetaTags(imageUrls: string[]) {
@@ -623,6 +638,10 @@ function buildServerTag(url: string) {
 
 function buildImetaTag(nip94Tags: string[][]) {
   return ['imeta', ...nip94Tags.map(([n, v]) => `${n} ${v}`)]
+}
+
+function buildResponseTag(value: string) {
+  return ['response', value]
 }
 
 function buildClientTag() {

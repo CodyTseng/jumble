@@ -298,6 +298,7 @@ export default {
       'Вам нужно добавить хотя бы один сервер Blossom, чтобы загружать медиафайлы.',
     'Recommended blossom servers': 'Рекомендуемые серверы Blossom',
     'Enter Blossom server URL': 'Введите URL сервера Blossom',
-    Preferred: 'Предпочтительный'
+    Preferred: 'Предпочтительный',
+    'Multiple choice (select one or more)': 'Множественный выбор (выберите один или несколько)'
   }
 }

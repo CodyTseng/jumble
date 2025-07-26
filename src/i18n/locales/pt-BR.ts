@@ -296,6 +296,7 @@ export default {
       'Você precisa adicionar pelo menos um servidor Blossom para poder carregar arquivos de mídia.',
     'Recommended blossom servers': 'Servidores Blossom recomendados',
     'Enter Blossom server URL': 'Inserir URL do servidor Blossom',
-    Preferred: 'Preferido'
+    Preferred: 'Preferido',
+    'Multiple choice (select one or more)': 'Múltipla escolha (selecione um ou mais)'
   }
 }

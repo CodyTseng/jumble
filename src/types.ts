@@ -153,38 +153,7 @@ export type TMediaUploadServiceConfig =
       type: 'blossom'
     }
 
-export type TPollOption = {
-  id: string
-  label: string
-}
-
 export type TPollType = (typeof POLL_TYPE)[keyof typeof POLL_TYPE]
-
-export type TPoll = {
-  id: string
-  pubkey: string
-  content: string
-  created_at: number
-  options: TPollOption[]
-  pollType: TPollType
-  relayUrls: string[]
-  endsAt?: number
-}
-
-export type TPollResponse = {
-  id: string
-  pubkey: string
-  pollEventId: string
-  selectedOptionIds: string[]
-  created_at: number
-}
-
-export type TPollResults = {
-  poll: TPoll
-  responses: TPollResponse[]
-  totalVotes: number
-  optionResults: Record<string, { count: number; percentage: number }>
-}
 
 export type TPollCreateData = {
   isMultipleChoice: boolean

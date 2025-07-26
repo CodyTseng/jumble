@@ -293,6 +293,7 @@ export default {
       '您需要添加至少一个 Blossom 服务器才能上传媒体文件。',
     'Recommended blossom servers': '推荐的 Blossom 服务器',
     'Enter Blossom server URL': '输入 Blossom 服务器 URL',
-    Preferred: '首选'
+    Preferred: '首选',
+    'Multiple choice (select one or more)': '多选 (选择一个或多个)'
   }
 }

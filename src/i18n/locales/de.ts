@@ -300,6 +300,7 @@ export default {
       'Du musst mindestens einen Blossom-Server hinzufügen, um Mediendateien hochladen zu können.',
     'Recommended blossom servers': 'Empfohlene Blossom-Server',
     'Enter Blossom server URL': 'Blossom-Server-URL eingeben',
-    Preferred: 'Bevorzugt'
+    Preferred: 'Bevorzugt',
+    'Multiple choice (select one or more)': 'Mehrfachauswahl (eine oder mehrere auswählen)'
   }
 }

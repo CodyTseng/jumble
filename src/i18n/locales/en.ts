@@ -293,6 +293,7 @@ export default {
       'You need to add at least one blossom server in order to upload media files.',
     'Recommended blossom servers': 'Recommended blossom servers',
     'Enter Blossom server URL': 'Enter Blossom server URL',
-    Preferred: 'Preferred'
+    Preferred: 'Preferred',
+    'Multiple choice (select one or more)': 'Multiple choice (select one or more)'
   }
 }

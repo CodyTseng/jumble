@@ -1,5 +1,5 @@
-import { BIG_RELAY_URLS } from '@/constants'
-import { TRelayList, TRelaySet } from '@/types'
+import { BIG_RELAY_URLS, POLL_TYPE } from '@/constants'
+import { TPollType, TRelayList, TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { getReplaceableEventIdentifier } from './event'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
@@ -261,4 +261,77 @@ export function getCommunityDefinitionFromEvent(event: Event) {
   }
 
   return { name, description, image }
+}
+
+export function getPollMetadataFromEvent(event: Event) {
+  const options: { id: string; label: string }[] = []
+  const relayUrls: string[] = []
+  let pollType: TPollType = POLL_TYPE.SINGLE_CHOICE
+  let endsAt: number | undefined
+
+  for (const [tagName, ...tagValues] of event.tags) {
+    if (tagName === 'option' && tagValues.length >= 2) {
+      const [optionId, label] = tagValues
+      if (optionId && label) {
+        options.push({ id: optionId, label })
+      }
+    } else if (tagName === 'relay' && tagValues[0]) {
+      const normalizedUrl = normalizeUrl(tagValues[0])
+      if (normalizedUrl) relayUrls.push(tagValues[0])
+    } else if (tagName === 'polltype' && tagValues[0]) {
+      if (tagValues[0] === POLL_TYPE.MULTIPLE_CHOICE) {
+        pollType = POLL_TYPE.MULTIPLE_CHOICE
+      }
+    } else if (tagName === 'endsAt' && tagValues[0]) {
+      const timestamp = parseInt(tagValues[0])
+      if (!isNaN(timestamp)) {
+        endsAt = timestamp
+      }
+    }
+  }
+
+  if (options.length === 0) {
+    return null
+  }
+
+  return {
+    options,
+    pollType,
+    relayUrls,
+    endsAt
+  }
+}
+
+export function getPollResponseFromEvent(
+  event: Event,
+  optionIds: string[],
+  isMultipleChoice: boolean
+) {
+  const selectedOptionIds: string[] = []
+
+  for (const [tagName, ...tagValues] of event.tags) {
+    if (tagName === 'response' && tagValues[0]) {
+      if (optionIds && !optionIds.includes(tagValues[0])) {
+        continue // Skip if the response is not in the provided optionIds
+      }
+      selectedOptionIds.push(tagValues[0])
+    }
+  }
+
+  // If no valid responses are found, return null
+  if (selectedOptionIds.length === 0) {
+    return null
+  }
+
+  // If multiple responses are selected but the poll is not multiple choice, return null
+  if (selectedOptionIds.length > 1 && !isMultipleChoice) {
+    return null
+  }
+
+  return {
+    id: event.id,
+    pubkey: event.pubkey,
+    selectedOptionIds,
+    created_at: event.created_at
+  }
 }

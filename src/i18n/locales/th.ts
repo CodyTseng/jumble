@@ -292,6 +292,7 @@ export default {
       'คุณต้องเพิ่มเซิร์ฟเวอร์ Blossom อย่างน้อยหนึ่งตัวเพื่ออัปโหลดไฟล์สื่อ',
     'Recommended blossom servers': 'เซิร์ฟเวอร์ Blossom ที่แนะนำ',
     'Enter Blossom server URL': 'ป้อน URL ของเซิร์ฟเวอร์ Blossom',
-    Preferred: 'ที่ชื่นชอบ'
+    Preferred: 'ที่ชื่นชอบ',
+    'Multiple choice (select one or more)': 'ตัวเลือกหลายรายการ (เลือกหนึ่งหรือมากกว่า)'
   }
 }

@@ -18,7 +18,6 @@ import ImageGallery from '../ImageGallery'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
 import ParentNotePreview from '../ParentNotePreview'
-import Poll from '../Poll'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -30,7 +29,8 @@ import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
 import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
-import { UnknownNote } from './UnknownNote'
+import Poll from './Poll'
+import UnknownNote from './UnknownNote'
 
 export default function Note({
   event,
@@ -90,7 +90,12 @@ export default function Note({
   } else if (event.kind === kinds.CommunityDefinition) {
     content = <CommunityDefinition className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.POLL) {
-    content = <Poll className="mt-2" event={event} />
+    content = (
+      <>
+        <Content className="mt-2" event={event} />
+        <Poll className="mt-2" event={event} />
+      </>
+    )
   } else {
     content = <Content className="mt-2" event={event} />
   }

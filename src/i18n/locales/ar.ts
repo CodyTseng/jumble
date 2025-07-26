@@ -293,6 +293,7 @@ export default {
       'تحتاج إلى إضافة خادم Blossom واحد على الأقل لتحميل ملفات الوسائط.',
     'Recommended blossom servers': 'خوادم Blossom الموصى بها',
     'Enter Blossom server URL': 'أدخل عنوان خادم Blossom URL',
-    Preferred: 'المفضل'
+    Preferred: 'المفضل',
+    'Multiple choice (select one or more)': 'اختيار متعدد (اختر واحداً أو أكثر)'
   }
 }

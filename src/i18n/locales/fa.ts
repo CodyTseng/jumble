@@ -295,6 +295,7 @@ export default {
       'برای آپلود فایل‌های رسانه نیاز دارید حداقل یک سرور blossom اضافه کنید.',
     'Recommended blossom servers': 'سرورهای blossom توصیه شده',
     'Enter Blossom server URL': 'آدرس سرور Blossom را وارد کنید',
-    Preferred: 'ترجیحی'
+    Preferred: 'ترجیحی',
+    'Multiple choice (select one or more)': 'چند گزینه‌ای (یک یا چند انتخاب کنید)'
   }
 }

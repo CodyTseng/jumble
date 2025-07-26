@@ -295,6 +295,7 @@ export default {
       'メディアファイルをアップロードするには、少なくとも1つのBlossomサーバーを追加する必要があります。',
     'Recommended blossom servers': 'おすすめのBlossomサーバー',
     'Enter Blossom server URL': 'BlossomサーバーURLを入力',
-    Preferred: '優先'
+    Preferred: '優先',
+    'Multiple choice (select one or more)': '複数選択（1つ以上選択）'
   }
 }
