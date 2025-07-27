@@ -311,6 +311,7 @@ export default {
     'Allow multiple choices': '複数選択を許可',
     'End Date (optional)': '終了日（任意）',
     'Clear end date': '終了日をクリア',
-    'Relay URLs (optional, comma-separated)': 'リレーURL（任意、カンマ区切り）'
+    'Relay URLs (optional, comma-separated)': 'リレーURL（任意、カンマ区切り）',
+    'Remove poll': '投票を削除'
   }
 }

@@ -316,6 +316,7 @@ export default {
     'Allow multiple choices': 'Mehrfachauswahl erlauben',
     'End Date (optional)': 'Enddatum (optional)',
     'Clear end date': 'Enddatum löschen',
-    'Relay URLs (optional, comma-separated)': 'Relay-URLs (optional, durch Kommas getrennt)'
+    'Relay URLs (optional, comma-separated)': 'Relay-URLs (optional, durch Kommas getrennt)',
+    'Remove poll': 'Umfrage entfernen'
   }
 }

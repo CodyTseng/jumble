@@ -312,6 +312,7 @@ export default {
     'Allow multiple choices': 'Permitir múltiplas escolhas',
     'End Date (optional)': 'Data de término (opcional)',
     'Clear end date': 'Limpar data de término',
-    'Relay URLs (optional, comma-separated)': 'URLs de relay (opcional, separadas por vírgulas)'
+    'Relay URLs (optional, comma-separated)': 'URLs de relay (opcional, separadas por vírgulas)',
+    'Remove poll': 'Remover enquete'
   }
 }

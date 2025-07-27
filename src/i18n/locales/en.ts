@@ -309,6 +309,7 @@ export default {
     'Allow multiple choices': 'Allow multiple choices',
     'End Date (optional)': 'End Date (optional)',
     'Clear end date': 'Clear end date',
-    'Relay URLs (optional, comma-separated)': 'Relay URLs (optional, comma-separated)'
+    'Relay URLs (optional, comma-separated)': 'Relay URLs (optional, comma-separated)',
+    'Remove poll': 'Remove poll'
   }
 }

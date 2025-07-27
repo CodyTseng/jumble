@@ -174,8 +174,8 @@ export default function Poll({ event, className }: { event: Event; className?: s
 
         {/* Results Summary */}
         <div className="text-sm text-muted-foreground">
-          {!!pollResults?.totalVotes && t('{{number}} votes', { number: pollResults.totalVotes })}
-          {!!pollResults?.totalVotes && !!poll.endsAt && ' · '}
+          {!!pollResults && t('{{number}} votes', { number: pollResults.totalVotes ?? 0 })}
+          {!!pollResults && !!poll.endsAt && ' · '}
           {!!poll.endsAt &&
             (isExpired
               ? t('Poll has ended')

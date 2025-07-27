@@ -315,6 +315,7 @@ export default {
     'End Date (optional)': 'Date de fin (optionnel)',
     'Clear end date': 'Effacer la date de fin',
     'Relay URLs (optional, comma-separated)':
-      'URLs de relais (optionnel, séparées par des virgules)'
+      'URLs de relais (optionnel, séparées par des virgules)',
+    'Remove poll': 'Supprimer le sondage'
   }
 }

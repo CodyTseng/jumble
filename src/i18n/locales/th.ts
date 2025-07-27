@@ -308,6 +308,7 @@ export default {
     'Allow multiple choices': 'อนุญาตให้เลือกหลายรายการ',
     'End Date (optional)': 'วันที่สิ้นสุด (ไม่บังคับ)',
     'Clear end date': 'ล้างวันที่สิ้นสุด',
-    'Relay URLs (optional, comma-separated)': 'URL รีเลย์ (ไม่บังคับ, คั่นด้วยจุลภาค)'
+    'Relay URLs (optional, comma-separated)': 'URL รีเลย์ (ไม่บังคับ, คั่นด้วยจุลภาค)',
+    'Remove poll': 'ลบโพลล์'
   }
 }

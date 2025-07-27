@@ -314,6 +314,7 @@ export default {
     'Allow multiple choices': 'Разрешить множественный выбор',
     'End Date (optional)': 'Дата окончания (необязательно)',
     'Clear end date': 'Очистить дату окончания',
-    'Relay URLs (optional, comma-separated)': 'URL релеев (необязательно, через запятую)'
+    'Relay URLs (optional, comma-separated)': 'URL релеев (необязательно, через запятую)',
+    'Remove poll': 'Удалить опрос'
   }
 }

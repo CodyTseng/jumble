@@ -11,10 +11,12 @@ import { useTranslation } from 'react-i18next'
 
 export default function PollEditor({
   pollCreateData,
-  setPollCreateData
+  setPollCreateData,
+  setIsPoll
 }: {
   pollCreateData: TPollCreateData
   setPollCreateData: Dispatch<SetStateAction<TPollCreateData>>
+  setIsPoll: Dispatch<SetStateAction<boolean>>
 }) {
   const { t } = useTranslation()
   const [isMultipleChoice, setIsMultipleChoice] = useState(pollCreateData.isMultipleChoice)
@@ -56,19 +58,7 @@ export default function PollEditor({
 
   return (
     <div className="space-y-4 border rounded-lg p-3">
-      <div className="p-3 rounded-lg text-sm bg-destructive/40 [&_svg]:size-4">
-        <div className="flex items-center gap-2">
-          <AlertCircle />
-          <div className="font-medium">{t('This is a poll note.')}</div>
-        </div>
-        <div className="pl-6">
-          {t(
-            'Unlike regular notes, polls are not widely supported and may not display on other clients.'
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-2 mt-1">
+      <div className="space-y-2">
         {options.map((option, index) => (
           <div key={index} className="flex gap-2">
             <Input
@@ -131,6 +121,24 @@ export default function PollEditor({
           onChange={(e) => setRelayUrls(e.target.value)}
           placeholder="wss://relay1.com, wss://relay2.com"
         />
+      </div>
+
+      <div className="grid gap-2">
+        <div className="p-3 rounded-lg text-sm bg-destructive [&_svg]:size-4">
+          <div className="flex items-center gap-2">
+            <AlertCircle />
+            <div className="font-medium">{t('This is a poll note.')}</div>
+          </div>
+          <div className="pl-6">
+            {t(
+              'Unlike regular notes, polls are not widely supported and may not display on other clients.'
+            )}
+          </div>
+        </div>
+
+        <Button variant="ghost-destructive" className="w-full" onClick={() => setIsPoll(false)}>
+          {t('Remove poll')}
+        </Button>
       </div>
     </div>
   )

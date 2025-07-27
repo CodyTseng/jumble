@@ -309,6 +309,7 @@ export default {
     'Allow multiple choices': 'السماح بخيارات متعددة',
     'End Date (optional)': 'تاريخ الانتهاء (اختياري)',
     'Clear end date': 'مسح تاريخ الانتهاء',
-    'Relay URLs (optional, comma-separated)': 'عناوين المرحلات (اختياري، مفصولة بفواصل)'
+    'Relay URLs (optional, comma-separated)': 'عناوين المرحلات (اختياري، مفصولة بفواصل)',
+    'Remove poll': 'إزالة الاستطلاع'
   }
 }

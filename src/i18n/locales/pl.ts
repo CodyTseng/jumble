@@ -313,6 +313,7 @@ export default {
     'End Date (optional)': 'Data zakończenia (opcjonalna)',
     'Clear end date': 'Wyczyść datę zakończenia',
     'Relay URLs (optional, comma-separated)':
-      'Adresy URL przekaźników (opcjonalne, oddzielone przecinkami)'
+      'Adresy URL przekaźników (opcjonalne, oddzielone przecinkami)',
+    'Remove poll': 'Usuń ankietę'
   }
 }

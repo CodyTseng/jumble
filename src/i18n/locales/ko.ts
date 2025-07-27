@@ -311,6 +311,7 @@ export default {
     'Allow multiple choices': '다중 선택 허용',
     'End Date (optional)': '종료 날짜 (선택사항)',
     'Clear end date': '종료 날짜 지우기',
-    'Relay URLs (optional, comma-separated)': '릴레이 URL (선택사항, 쉼표로 구분)'
+    'Relay URLs (optional, comma-separated)': '릴레이 URL (선택사항, 쉼표로 구분)',
+    'Remove poll': '투표 제거'
   }
 }

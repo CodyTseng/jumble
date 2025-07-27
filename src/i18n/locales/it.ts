@@ -313,6 +313,7 @@ export default {
     'Allow multiple choices': 'Consenti scelte multiple',
     'End Date (optional)': 'Data di fine (opzionale)',
     'Clear end date': 'Cancella data di fine',
-    'Relay URLs (optional, comma-separated)': 'URL relay (opzionale, separati da virgole)'
+    'Relay URLs (optional, comma-separated)': 'URL relay (opzionale, separati da virgole)',
+    'Remove poll': 'Rimuovi sondaggio'
   }
 }

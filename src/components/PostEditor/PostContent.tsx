@@ -174,7 +174,11 @@ export default function PostContent({
         className={isPoll ? 'h-20' : 'min-h-52'}
       />
       {isPoll && (
-        <PollEditor pollCreateData={pollCreateData} setPollCreateData={setPollCreateData} />
+        <PollEditor
+          pollCreateData={pollCreateData}
+          setPollCreateData={setPollCreateData}
+          setIsPoll={setIsPoll}
+        />
       )}
       {!isPoll && (
         <SendOnlyToSwitch

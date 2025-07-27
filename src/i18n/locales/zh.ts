@@ -303,12 +303,13 @@ export default {
     'Load results': '加载结果',
     'This is a poll note.': '这是一个投票帖子。',
     'Unlike regular notes, polls are not widely supported and may not display on other clients.':
-      '与普通帖子不同，投票功能支持范围有限，可能无法在其他客户端中显示。',
+      '与普通帖子不同，投票功能暂时没有得到广泛的支持，可能无法在其他客户端中显示。',
     'Option {{number}}': '选项 {{number}}',
     'Add Option': '添加选项',
     'Allow multiple choices': '允许多选',
     'End Date (optional)': '结束日期（可选）',
     'Clear end date': '清除结束日期',
-    'Relay URLs (optional, comma-separated)': '中继服务器 URL（可选，逗号分隔）'
+    'Relay URLs (optional, comma-separated)': '中继服务器 URL（可选，逗号分隔）',
+    'Remove poll': '移除投票'
   }
 }
