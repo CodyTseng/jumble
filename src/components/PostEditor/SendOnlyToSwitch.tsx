@@ -42,7 +42,7 @@ export default function SendOnlyToSwitch({
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 truncate">
         <Label htmlFor="send-only-to-current-relays" className="truncate">
           {urls.length === 1
             ? t('Send only to r', { r: simplifyUrl(urls[0]) })
