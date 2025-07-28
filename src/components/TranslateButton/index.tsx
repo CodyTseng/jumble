@@ -24,9 +24,13 @@ export default function TranslateButton({
   const translatedEvent = useTranslatedEvent(event.id)
   const supported = useMemo(
     () =>
-      [kinds.ShortTextNote, kinds.Highlights, ExtendedKind.COMMENT, ExtendedKind.PICTURE].includes(
-        event.kind
-      ),
+      [
+        kinds.ShortTextNote,
+        kinds.Highlights,
+        ExtendedKind.COMMENT,
+        ExtendedKind.PICTURE,
+        ExtendedKind.POLL
+      ].includes(event.kind),
     [event]
   )
 

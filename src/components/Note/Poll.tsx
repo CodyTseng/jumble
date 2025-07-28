@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { POLL_TYPE } from '@/constants'
+import { useTranslatedEvent } from '@/hooks'
 import { useFetchPollResults } from '@/hooks/useFetchPollResults'
 import { createPollResponseDraftEvent } from '@/lib/draft-event'
 import { getPollMetadataFromEvent } from '@/lib/event-metadata'
@@ -16,12 +17,16 @@ import { toast } from 'sonner'
 
 export default function Poll({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
+  const translatedEvent = useTranslatedEvent(event.id)
   const { pubkey, publish, startLogin } = useNostr()
   const [isVoting, setIsVoting] = useState(false)
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([])
   const pollResults = useFetchPollResults(event.id)
   const [isLoadingResults, setIsLoadingResults] = useState(false)
-  const poll = useMemo(() => getPollMetadataFromEvent(event), [event])
+  const poll = useMemo(
+    () => getPollMetadataFromEvent(translatedEvent ?? event),
+    [event, translatedEvent]
+  )
   const votedOptionIds = useMemo(() => {
     if (!pollResults || !pubkey) return []
     return Object.entries(pollResults.results)

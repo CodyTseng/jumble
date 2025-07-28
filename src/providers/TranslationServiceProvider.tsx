@@ -1,3 +1,5 @@
+import { ExtendedKind } from '@/constants'
+import { getPollMetadataFromEvent } from '@/lib/event-metadata'
 import libreTranslate from '@/services/libre-translate.service'
 import storage from '@/services/local-storage.service'
 import translation from '@/services/translation.service'
@@ -96,25 +98,51 @@ export function TranslationServiceProvider({ children }: { children: React.React
   const translateHighlightEvent = async (event: Event): Promise<Event> => {
     const target = i18n.language
     const comment = event.tags.find((tag) => tag[0] === 'comment')?.[1]
-    if (!event.content && !comment) {
-      return event
-    }
-    const [translatedContent, translatedComment] = await Promise.all([
-      translate(event.content, target),
-      !!comment && translate(comment, target)
-    ])
 
-    const translatedEvent: Event = {
-      ...event,
-      content: translatedContent
+    const texts = {
+      content: event.content,
+      comment
     }
-    if (translatedComment) {
-      translatedEvent.tags = event.tags.map((tag) =>
-        tag[0] === 'comment' ? ['comment', translatedComment] : tag
+    const joinedText = joinTexts(texts)
+    if (!joinedText) return event
+
+    const translatedText = await translate(joinedText, target)
+    const translatedTexts = splitTranslatedText(translatedText)
+    return {
+      ...event,
+      content: translatedTexts.content ?? event.content,
+      tags: event.tags.map((tag) =>
+        tag[0] === 'comment' ? ['comment', translatedTexts.comment ?? tag[1]] : tag
       )
     }
-    setTranslatedEventIdSet((prev) => new Set(prev.add(event.id)))
-    return translatedEvent
+  }
+
+  const translatePollEvent = async (event: Event): Promise<Event> => {
+    const target = i18n.language
+    const pollMetadata = getPollMetadataFromEvent(event)
+
+    const texts: Record<string, string> = {
+      question: event.content,
+      ...pollMetadata?.options.reduce(
+        (acc, option) => {
+          acc[option.id] = option.label
+          return acc
+        },
+        {} as Record<string, string>
+      )
+    }
+    const joinedText = joinTexts(texts)
+    if (!joinedText) return event
+
+    const translatedText = await translate(joinedText, target)
+    const translatedTexts = splitTranslatedText(translatedText)
+    return {
+      ...event,
+      content: translatedTexts.question ?? '',
+      tags: event.tags.map((tag) =>
+        tag[0] === 'option' ? ['option', tag[1], translatedTexts[tag[1]] ?? tag[2]] : tag
+      )
+    }
   }
 
   const translateEvent = async (event: Event): Promise<Event | void> => {
@@ -134,6 +162,8 @@ export function TranslationServiceProvider({ children }: { children: React.React
     let translatedEvent: Event | undefined
     if (event.kind === kinds.Highlights) {
       translatedEvent = await translateHighlightEvent(event)
+    } else if (event.kind === ExtendedKind.POLL) {
+      translatedEvent = await translatePollEvent(event)
     } else {
       const translatedText = await translate(event.content, target)
       if (!translatedText) {
@@ -177,4 +207,29 @@ export function TranslationServiceProvider({ children }: { children: React.React
       {children}
     </TranslationServiceContext.Provider>
   )
+}
+
+function joinTexts(texts: Record<string, string | undefined>): string {
+  return (
+    Object.entries(texts).filter(([, content]) => content && content.trim() !== '') as [
+      string,
+      string
+    ][]
+  )
+    .map(([key, content]) => `=== ${key} ===\n${content.trim()}\n=== ${key} ===`)
+    .join('\n\n')
+}
+
+function splitTranslatedText(translated: string) {
+  const regex = /=== (.+?) ===\n([\s\S]*?)\n=== \1 ===/g
+  const results: Record<string, string | undefined> = {}
+
+  let match: RegExpExecArray | null
+  while ((match = regex.exec(translated)) !== null) {
+    const key = match[1].trim()
+    const content = match[2].trim()
+    results[key] = content
+  }
+
+  return results
 }
