@@ -5,9 +5,9 @@ import {
   EmbeddedHashtagParser,
   EmbeddedImageParser,
   EmbeddedLNInvoiceParser,
+  EmbeddedMediaParser,
   EmbeddedMentionParser,
   EmbeddedNormalUrlParser,
-  EmbeddedVideoParser,
   EmbeddedWebsocketUrlParser,
   parseContent
 } from '@/lib/content-parser'
@@ -28,14 +28,14 @@ import {
 } from '../Embedded'
 import Emoji from '../Emoji'
 import ImageGallery from '../ImageGallery'
-import VideoPlayer from '../VideoPlayer'
+import MediaPlayer from '../MediaPlayer'
 import WebPreview from '../WebPreview'
 
 const Content = memo(({ event, className }: { event: Event; className?: string }) => {
   const translatedEvent = useTranslatedEvent(event.id)
   const nodes = parseContent(translatedEvent?.content ?? event.content, [
     EmbeddedImageParser,
-    EmbeddedVideoParser,
+    EmbeddedMediaParser,
     EmbeddedNormalUrlParser,
     EmbeddedLNInvoiceParser,
     EmbeddedWebsocketUrlParser,
@@ -91,8 +91,8 @@ const Content = memo(({ event, className }: { event: Event; className?: string }
             <ImageGallery className="mt-2" key={index} images={allImages} start={start} end={end} />
           )
         }
-        if (node.type === 'video') {
-          return <VideoPlayer className="mt-2" key={index} src={node.data} />
+        if (node.type === 'media') {
+          return <MediaPlayer className="mt-2" key={index} src={node.data} />
         }
         if (node.type === 'url') {
           return <EmbeddedNormalUrl url={node.data} key={index} />

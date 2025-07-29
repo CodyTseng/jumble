@@ -3,7 +3,7 @@ import {
   EmbeddedEventParser,
   EmbeddedImageParser,
   EmbeddedMentionParser,
-  EmbeddedVideoParser,
+  EmbeddedMediaParser,
   parseContent
 } from '@/lib/content-parser'
 import { cn } from '@/lib/utils'
@@ -26,7 +26,7 @@ export default function Content({
   const nodes = useMemo(() => {
     return parseContent(content, [
       EmbeddedImageParser,
-      EmbeddedVideoParser,
+      EmbeddedMediaParser,
       EmbeddedEventParser,
       EmbeddedMentionParser,
       EmbeddedEmojiParser
@@ -42,8 +42,8 @@ export default function Content({
         if (node.type === 'image' || node.type === 'images') {
           return index > 0 ? ` [${t('image')}]` : `[${t('image')}]`
         }
-        if (node.type === 'video') {
-          return index > 0 ? ` [${t('video')}]` : `[${t('video')}]`
+        if (node.type === 'media') {
+          return index > 0 ? ` [${t('media')}]` : `[${t('media')}]`
         }
         if (node.type === 'event') {
           return index > 0 ? ` [${t('note')}]` : `[${t('note')}]`

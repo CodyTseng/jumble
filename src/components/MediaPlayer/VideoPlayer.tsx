@@ -1,6 +1,6 @@
 import { cn, isInViewport } from '@/lib/utils'
 import { useAutoplay } from '@/providers/AutoplayProvider'
-import videoManager from '@/services/video-manager.service'
+import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef } from 'react'
 
 export default function VideoPlayer({ src, className }: { src: string; className?: string }) {
@@ -21,11 +21,11 @@ export default function VideoPlayer({ src, className }: { src: string; className
         if (entry.isIntersecting) {
           setTimeout(() => {
             if (isInViewport(container)) {
-              videoManager.autoPlay(video)
+              mediaManager.autoPlay(video)
             }
           }, 200)
         } else {
-          videoManager.pause(video)
+          mediaManager.pause(video)
         }
       },
       { threshold: 1 }
@@ -48,7 +48,7 @@ export default function VideoPlayer({ src, className }: { src: string; className
         src={src}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {
-          videoManager.play(event.currentTarget)
+          mediaManager.play(event.currentTarget)
         }}
         muted
       />

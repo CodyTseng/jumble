@@ -6,7 +6,7 @@ import {
   IMAGE_REGEX,
   LN_INVOICE_REGEX,
   URL_REGEX,
-  VIDEO_REGEX,
+  MEDIA_REGEX,
   WS_URL_REGEX
 } from '@/constants'
 
@@ -14,7 +14,7 @@ export type TEmbeddedNodeType =
   | 'text'
   | 'image'
   | 'images'
-  | 'video'
+  | 'media'
   | 'event'
   | 'mention'
   | 'legacy-mention'
@@ -61,9 +61,9 @@ export const EmbeddedImageParser: TContentParser = {
   regex: IMAGE_REGEX
 }
 
-export const EmbeddedVideoParser: TContentParser = {
-  type: 'video',
-  regex: VIDEO_REGEX
+export const EmbeddedMediaParser: TContentParser = {
+  type: 'media',
+  regex: MEDIA_REGEX
 }
 
 export const EmbeddedWebsocketUrlParser: TContentParser = {
