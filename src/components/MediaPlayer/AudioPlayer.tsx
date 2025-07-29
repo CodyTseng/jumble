@@ -89,7 +89,7 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {/* Play/Pause Button */}
-      <Button size="icon" className="rounded-full" onClick={togglePlay}>
+      <Button size="icon" className="rounded-full shrink-0" onClick={togglePlay}>
         {isPlaying ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}
       </Button>
 
