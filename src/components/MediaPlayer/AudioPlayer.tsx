@@ -29,15 +29,21 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
     }
     const updateDuration = () => setDuration(audio.duration)
     const handleEnded = () => setIsPlaying(false)
+    const handlePause = () => setIsPlaying(false)
+    const handlePlay = () => setIsPlaying(true)
 
     audio.addEventListener('timeupdate', updateTime)
     audio.addEventListener('loadedmetadata', updateDuration)
     audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('play', handlePlay)
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime)
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('play', handlePlay)
     }
   }, [])
 
@@ -104,6 +110,9 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
 }
 
 const formatTime = (time: number) => {
+  if (time === Infinity || isNaN(time)) {
+    return '-:-'
+  }
   const minutes = Math.floor(time / 60)
   const seconds = Math.floor(time % 60)
   return `${minutes}:${seconds.toString().padStart(2, '0')}`

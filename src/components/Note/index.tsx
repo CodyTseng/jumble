@@ -71,7 +71,9 @@ export default function Note({
       ExtendedKind.GROUP_METADATA,
       ExtendedKind.PICTURE,
       ExtendedKind.COMMENT,
-      ExtendedKind.POLL
+      ExtendedKind.POLL,
+      ExtendedKind.VOICE,
+      ExtendedKind.VOICE_COMMENT
     ].includes(event.kind)
   ) {
     content = <UnknownNote className="mt-2" event={event} />

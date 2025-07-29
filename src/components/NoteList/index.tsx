@@ -30,7 +30,9 @@ const KINDS = [
   kinds.Highlights,
   kinds.LongFormArticle,
   ExtendedKind.COMMENT,
-  ExtendedKind.POLL
+  ExtendedKind.POLL,
+  ExtendedKind.VOICE,
+  ExtendedKind.VOICE_COMMENT
 ]
 
 export default function NoteList({

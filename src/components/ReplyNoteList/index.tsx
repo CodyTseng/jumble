@@ -153,7 +153,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
           if (event.kind !== kinds.ShortTextNote) {
             filters.push({
               '#E': [rootInfo.id],
-              kinds: [ExtendedKind.COMMENT],
+              kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
               limit: LIMIT
             })
           }
@@ -166,7 +166,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             },
             {
               '#A': [rootInfo.id],
-              kinds: [ExtendedKind.COMMENT],
+              kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
               limit: LIMIT
             }
           )
@@ -176,7 +176,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
         } else {
           filters.push({
             '#I': [rootInfo.id],
-            kinds: [ExtendedKind.COMMENT],
+            kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
             limit: LIMIT
           })
         }

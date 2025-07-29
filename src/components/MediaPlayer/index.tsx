@@ -14,11 +14,6 @@ export default function MediaPlayer({ src, className }: { src: string; className
     const url = new URL(src)
     const extension = url.pathname.split('.').pop()?.toLowerCase()
 
-    if (extension && ['webm', 'ogg', 'mov'].includes(extension)) {
-      setMediaType('video')
-      return
-    }
-
     if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
       setMediaType('audio')
       return

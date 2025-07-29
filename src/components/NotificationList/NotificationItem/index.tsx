@@ -31,7 +31,10 @@ export function NotificationItem({
   if (notification.kind === kinds.Zap) {
     return <ZapNotification notification={notification} isNew={isNew} />
   }
-  if (notification.kind === ExtendedKind.COMMENT) {
+  if (
+    notification.kind === ExtendedKind.COMMENT ||
+    notification.kind === ExtendedKind.VOICE_COMMENT
+  ) {
     return <CommentNotification notification={notification} isNew={isNew} />
   }
   if (notification.kind === ExtendedKind.POLL_RESPONSE) {

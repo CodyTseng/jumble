@@ -21,7 +21,10 @@ export function isNsfwEvent(event: Event) {
 }
 
 export function isReplyNoteEvent(event: Event) {
-  if (![kinds.ShortTextNote, ExtendedKind.COMMENT].includes(event.kind)) return false
+  if ([ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT].includes(event.kind)) {
+    return true
+  }
+  if (event.kind !== kinds.ShortTextNote) return false
 
   const cache = EVENT_IS_REPLY_NOTE_CACHE.get(event.id)
   if (cache !== undefined) return cache
@@ -44,9 +47,13 @@ export function isProtectedEvent(event: Event) {
 }
 
 export function getParentETag(event?: Event) {
-  if (!event || ![kinds.ShortTextNote, ExtendedKind.COMMENT].includes(event.kind)) return undefined
+  if (
+    !event ||
+    ![kinds.ShortTextNote, ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT].includes(event.kind)
+  )
+    return undefined
 
-  if (event.kind === ExtendedKind.COMMENT) {
+  if (event.kind === ExtendedKind.COMMENT || event.kind === ExtendedKind.VOICE_COMMENT) {
     return event.tags.find(tagNameEquals('e')) ?? event.tags.find(tagNameEquals('E'))
   }
 

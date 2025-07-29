@@ -36,7 +36,15 @@ export default function ContentPreview({
     )
   }
 
-  if ([kinds.ShortTextNote, ExtendedKind.COMMENT, ExtendedKind.PICTURE].includes(event.kind)) {
+  if (
+    [
+      kinds.ShortTextNote,
+      ExtendedKind.COMMENT,
+      ExtendedKind.PICTURE,
+      ExtendedKind.VOICE,
+      ExtendedKind.VOICE_COMMENT
+    ].includes(event.kind)
+  ) {
     return <NormalContentPreview event={event} className={className} />
   }
 
