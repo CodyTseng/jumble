@@ -94,15 +94,11 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
       </Button>
 
       {/* Progress Section */}
-      <div className="flex-1 flex items-center gap-3">
-        <div className="text-sm font-mono text-muted-foreground">{formatTime(currentTime)}</div>
-
-        <div className="flex-1 relative">
-          <Slider value={[currentTime]} max={duration || 100} step={1} onValueChange={handleSeek} />
-        </div>
-
-        <div className="text-sm font-mono text-muted-foreground">{formatTime(duration)}</div>
+      <div className="flex-1 relative">
+        <Slider value={[currentTime]} max={duration || 100} step={1} onValueChange={handleSeek} />
       </div>
+
+      <div className="text-sm font-mono text-muted-foreground">{formatTime(duration)}</div>
     </div>
   )
 }
