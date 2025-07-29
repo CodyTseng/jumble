@@ -74,25 +74,30 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
 
   return (
     <div
-      className={cn('flex items-center gap-2 p-3 border rounded-lg', className)}
+      className={cn('flex items-center gap-1 py-2 pl-2 pr-5 border rounded-full', className)}
       onClick={(e) => e.stopPropagation()}
     >
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {/* Play/Pause Button */}
-      <Button variant="ghost" size="icon" onClick={togglePlay}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full text-muted-foreground hover:text-foreground"
+        onClick={togglePlay}
+      >
         {isPlaying ? <Pause /> : <Play />}
       </Button>
 
       {/* Progress Section */}
-      <div className="flex-1 flex items-center gap-2">
-        <span className="text-sm font-mono text-muted-foreground">{formatTime(currentTime)}</span>
+      <div className="flex-1 flex items-center gap-3">
+        <div className="text-sm font-mono text-muted-foreground">{formatTime(currentTime)}</div>
 
         <div className="flex-1 relative">
           <Slider value={[currentTime]} max={duration || 100} step={1} onValueChange={handleSeek} />
         </div>
 
-        <span className="text-sm font-mono text-muted-foreground">{formatTime(duration)}</span>
+        <div className="text-sm font-mono text-muted-foreground">{formatTime(duration)}</div>
       </div>
     </div>
   )
