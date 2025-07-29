@@ -80,19 +80,17 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
 
   return (
     <div
-      className={cn('flex items-center gap-1 py-2 pl-2 pr-5 border rounded-full', className)}
+      className={cn(
+        'flex items-center gap-3 py-2 pl-2 pr-4 border rounded-full max-w-md',
+        className
+      )}
       onClick={(e) => e.stopPropagation()}
     >
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {/* Play/Pause Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="rounded-full text-muted-foreground hover:text-foreground"
-        onClick={togglePlay}
-      >
-        {isPlaying ? <Pause /> : <Play />}
+      <Button size="icon" className="rounded-full" onClick={togglePlay}>
+        {isPlaying ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}
       </Button>
 
       {/* Progress Section */}

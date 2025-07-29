@@ -22,7 +22,7 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Track
         className={cn(
           'relative w-full grow overflow-hidden rounded-full bg-primary/20 cursor-pointer transition-all',
-          isHovered ? 'h-4' : 'h-1.5'
+          isHovered ? 'h-3' : 'h-1.5'
         )}
       >
         <SliderPrimitive.Range className="absolute h-full bg-primary rounded-full" />
