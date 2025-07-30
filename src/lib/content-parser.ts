@@ -7,7 +7,8 @@ import {
   LN_INVOICE_REGEX,
   URL_REGEX,
   MEDIA_REGEX,
-  WS_URL_REGEX
+  WS_URL_REGEX,
+  YOUTUBE_URL_REGEX
 } from '@/constants'
 
 export type TEmbeddedNodeType =
@@ -23,6 +24,7 @@ export type TEmbeddedNodeType =
   | 'url'
   | 'emoji'
   | 'invoice'
+  | 'youtube'
 
 export type TEmbeddedNode =
   | {
@@ -74,6 +76,11 @@ export const EmbeddedWebsocketUrlParser: TContentParser = {
 export const EmbeddedNormalUrlParser: TContentParser = {
   type: 'url',
   regex: URL_REGEX
+}
+
+export const EmbeddedYoutubeParser: TContentParser = {
+  type: 'youtube',
+  regex: YOUTUBE_URL_REGEX
 }
 
 export const EmbeddedEmojiParser: TContentParser = {

@@ -119,33 +119,3 @@ export function isVideo(url: string) {
     return false
   }
 }
-
-export function extractVideoId(url: string) {
-    const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-        /youtube\.com\/watch\?.*v=([^&\n?#]+)/
-    ];
-    
-    for (const pattern of patterns) {
-        const match = url.match(pattern);
-        if (match) return match[1];
-    }
-    return null;
-}
-
-export function isYouTubeURL(url: string) {
-    if (!url || typeof url !== 'string') return false;
-    
-    const youtubePatterns = [
-        /^https?:\/\/(www\.)?youtube\.com\/watch\?.*v=[\w-]+/,
-        /^https?:\/\/youtu\.be\/[\w-]+/,
-        /^https?:\/\/(www\.)?youtube\.com\/embed\/[\w-]+/,
-        /^https?:\/\/m\.youtube\.com\/watch\?.*v=[\w-]+/
-    ];
-    
-    return youtubePatterns.some(pattern => pattern.test(url));
-}
-
-export function youtubeEmbdedURL(id: string) {
-    return `https://www.youtube.com/embed/${id}` 
-}

@@ -9,6 +9,7 @@ import {
   EmbeddedMentionParser,
   EmbeddedNormalUrlParser,
   EmbeddedWebsocketUrlParser,
+  EmbeddedYoutubeParser,
   parseContent
 } from '@/lib/content-parser'
 import { getImageInfosFromEvent } from '@/lib/event'
@@ -30,10 +31,12 @@ import Emoji from '../Emoji'
 import ImageGallery from '../ImageGallery'
 import MediaPlayer from '../MediaPlayer'
 import WebPreview from '../WebPreview'
+import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
 
 const Content = memo(({ event, className }: { event: Event; className?: string }) => {
   const translatedEvent = useTranslatedEvent(event.id)
   const nodes = parseContent(translatedEvent?.content ?? event.content, [
+    EmbeddedYoutubeParser,
     EmbeddedImageParser,
     EmbeddedMediaParser,
     EmbeddedNormalUrlParser,
@@ -118,6 +121,9 @@ const Content = memo(({ event, className }: { event: Event; className?: string }
           const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
           if (!emoji) return node.data
           return <Emoji emoji={emoji} key={index} className="size-4" />
+        }
+        if (node.type === 'youtube') {
+          return <YoutubeEmbeddedPlayer key={index} url={node.data} className="mt-2" />
         }
         return null
       })}
