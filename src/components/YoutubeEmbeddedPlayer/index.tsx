@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
-import { useMemo } from 'react'
+import mediaManager from '@/services/media-manager.service'
+import { YouTubePlayer } from '@/types/youtube'
+import { useEffect, useMemo, useRef } from 'react'
 
 export default function YoutubeEmbeddedPlayer({
   url,
@@ -9,9 +11,48 @@ export default function YoutubeEmbeddedPlayer({
   className?: string
 }) {
   const videoId = useMemo(() => extractVideoId(url), [url])
-  const embedUrl = useMemo(() => (videoId ? youtubeEmbeddedUrl(videoId) : null), [videoId])
+  const playerRef = useRef<YouTubePlayer | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  if (!embedUrl) {
+  useEffect(() => {
+    if (!videoId || !containerRef.current) return
+
+    if (!window.YT) {
+      const script = document.createElement('script')
+      script.src = 'https://www.youtube.com/iframe_api'
+      document.body.appendChild(script)
+
+      window.onYouTubeIframeAPIReady = () => {
+        initPlayer()
+      }
+    } else {
+      initPlayer()
+    }
+
+    function initPlayer() {
+      if (!videoId || !containerRef.current) return
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId: videoId,
+        events: {
+          onStateChange: (event: any) => {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              mediaManager.play(playerRef.current)
+            } else if (event.data === window.YT.PlayerState.PAUSED) {
+              mediaManager.pause(playerRef.current)
+            }
+          }
+        }
+      })
+    }
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy()
+      }
+    }
+  }, [videoId])
+
+  if (!videoId) {
     return (
       <a
         href={url}
@@ -25,19 +66,10 @@ export default function YoutubeEmbeddedPlayer({
   }
 
   return (
-    <div className={cn('rounded-lg border overflow-hidden', className)}>
-      <iframe
-        src={embedUrl}
-        className="w-full aspect-video"
-        allowFullScreen
-        title="YouTube video"
-      />
+    <div className={cn('rounded-lg border overflow-hidden w-full aspect-video', className)}>
+      <div ref={containerRef} className="w-full h-full" />
     </div>
   )
-}
-
-function youtubeEmbeddedUrl(id: string) {
-  return `https://www.youtube.com/embed/${id}`
 }
 
 function extractVideoId(url: string) {
