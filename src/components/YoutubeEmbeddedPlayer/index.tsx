@@ -25,12 +25,7 @@ export default function YoutubeEmbeddedPlayer({
   }
 
   return (
-    <div
-      className={cn(
-        'rounded-lg max-h-[80vh] sm:max-h-[50vh] border aspect-video overflow-hidden',
-        className
-      )}
-    >
+    <div className={cn('rounded-lg border overflow-hidden', className)}>
       <iframe
         src={embedUrl}
         className="w-full aspect-video"
