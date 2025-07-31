@@ -87,7 +87,8 @@ export default function YoutubeEmbeddedPlayer({
 function extractVideoId(url: string) {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+    /youtube\.com\/shorts\/([^&\n?#]+)/
   ]
 
   for (const pattern of patterns) {
