@@ -1,0 +1,62 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { MenuAction } from './useMenuActions'
+import { cn } from '@/lib/utils'
+
+interface DesktopMenuProps {
+  menuActions: MenuAction[]
+  trigger: React.ReactNode
+}
+
+export function DesktopMenu({ menuActions, trigger }: DesktopMenuProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {menuActions.map((action, index) => {
+          const Icon = action.icon
+          return (
+            <div key={index}>
+              {action.separator && index > 0 && <DropdownMenuSeparator />}
+              {action.subMenu ? (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className={action.className}>
+                    <Icon />
+                    {action.label}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {action.subMenu.map((subAction, subIndex) => (
+                      <>
+                        {subAction.separator && subIndex > 0 && <DropdownMenuSeparator />}
+                        <DropdownMenuItem
+                          key={subIndex}
+                          onClick={subAction.onClick}
+                          className={cn('w-64', subAction.className)}
+                        >
+                          {subAction.label}
+                        </DropdownMenuItem>
+                      </>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              ) : (
+                <DropdownMenuItem onClick={action.onClick} className={action.className}>
+                  <Icon />
+                  {action.label}
+                </DropdownMenuItem>
+              )}
+            </div>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}

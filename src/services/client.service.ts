@@ -115,35 +115,42 @@ class ClientService extends EventTarget {
   }
 
   async publishEvent(relayUrls: string[], event: NEvent) {
-    const uniqueRelayUrls = Array.from(new Set(relayUrls))
-    const result = await Promise.any(
-      uniqueRelayUrls.map(async (url) => {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const that = this
-        const relay = await this.pool.ensureRelay(url)
-        return relay
-          .publish(event)
-          .catch((error) => {
-            if (
-              error instanceof Error &&
-              error.message.startsWith('auth-required') &&
-              !!that.signer
-            ) {
-              return relay
-                .auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
-                .then(() => relay.publish(event))
-            } else {
-              throw error
-            }
-          })
-          .then((reason) => {
-            this.trackEventSeenOn(event.id, relay)
-            return reason
-          })
-      })
-    )
-    this.dispatchEvent(new CustomEvent('eventPublished', { detail: event }))
-    return result
+    try {
+      const uniqueRelayUrls = Array.from(new Set(relayUrls))
+      const result = await Promise.any(
+        uniqueRelayUrls.map(async (url) => {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          const that = this
+          const relay = await this.pool.ensureRelay(url)
+          return relay
+            .publish(event)
+            .catch((error) => {
+              if (
+                error instanceof Error &&
+                error.message.startsWith('auth-required') &&
+                !!that.signer
+              ) {
+                return relay
+                  .auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
+                  .then(() => relay.publish(event))
+              } else {
+                throw error
+              }
+            })
+            .then((reason) => {
+              this.trackEventSeenOn(event.id, relay)
+              return reason
+            })
+        })
+      )
+      this.dispatchEvent(new CustomEvent('eventPublished', { detail: event }))
+      return result
+    } catch (error) {
+      if (error instanceof AggregateError) {
+        throw error.errors[0]
+      }
+      throw error
+    }
   }
 
   async signHttpAuth(url: string, method: string, description = '') {
