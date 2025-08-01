@@ -314,6 +314,17 @@ export default {
     'Remove poll': 'إزالة الاستطلاع',
     'Refresh results': 'تحديث النتائج',
     Poll: 'استطلاع',
-    media: 'الوسائط'
+    media: 'الوسائط',
+    'Broadcast to ...': 'البث إلى...',
+    'Successfully broadcasted to your write relays': 'تم البث بنجاح إلى مرحلات الكتابة الخاصة بك',
+    'Failed to broadcast to your write relays: {{error}}':
+      'فشل البث إلى مرحلات الكتابة الخاصة بك: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'تم البث بنجاح إلى مجموعة المرحلات: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'فشل البث إلى مجموعة المرحلات: {{name}}. خطأ: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'تم البث بنجاح إلى المرحل: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'فشل البث إلى المرحل: {{url}}. خطأ: {{error}}'
   }
 }

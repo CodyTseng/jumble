@@ -316,6 +316,18 @@ export default {
     'Remove poll': '投票を削除',
     'Refresh results': '結果を更新',
     Poll: '投票',
-    media: 'メディア'
+    media: 'メディア',
+    'Broadcast to ...': 'ブロードキャスト先...',
+    'Successfully broadcasted to your write relays': '書きリレイへのブロードキャストが成功しました',
+    'Failed to broadcast to your write relays: {{error}}':
+      '書きリレイへのブロードキャストが失敗しました：{{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'リレイセットへのブロードキャストが成功しました：{{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'リレイセットへのブロードキャストが失敗しました：{{name}}。エラー：{{error}}',
+    'Successfully broadcasted to relay: {{url}}':
+      'リレイへのブロードキャストが成功しました：{{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'リレイへのブロードキャストが失敗しました：{{url}}。エラー：{{error}}'
   }
 }

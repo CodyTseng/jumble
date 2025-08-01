@@ -320,6 +320,17 @@ export default {
     'Remove poll': 'Supprimer le sondage',
     'Refresh results': 'Rafraîchir les résultats',
     Poll: 'Sondage',
-    media: 'média'
+    media: 'média',
+    'Broadcast to ...': 'Diffuser vers...',
+    'Successfully broadcasted to your write relays': "Diffusion réussie vers vos relais d'écriture",
+    'Failed to broadcast to your write relays: {{error}}':
+      "Échec de la diffusion vers vos relais d'écriture : {{error}}",
+    'Successfully broadcasted to relay set: {{name}}':
+      "Diffusion réussie vers l'ensemble de relais : {{name}}",
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      "Échec de la diffusion vers l'ensemble de relais : {{name}}. Erreur : {{error}}",
+    'Successfully broadcasted to relay: {{url}}': 'Diffusion réussie vers le relais : {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Échec de la diffusion vers le relais : {{url}}. Erreur : {{error}}'
   }
 }

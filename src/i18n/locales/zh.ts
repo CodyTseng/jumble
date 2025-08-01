@@ -314,6 +314,15 @@ export default {
     'Remove poll': '移除投票',
     'Refresh results': '刷新结果',
     Poll: '投票',
-    media: '媒体'
+    media: '媒体',
+    'Broadcast to ...': '广播到...',
+    'Successfully broadcasted to your write relays': '成功广播到您的写服务器',
+    'Failed to broadcast to your write relays: {{error}}': '广播到您的写服务器失败：{{error}}',
+    'Successfully broadcasted to relay set: {{name}}': '成功广播到服务器组：{{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      '广播到服务器组失败：{{name}}。错误：{{error}}',
+    'Successfully broadcasted to relay: {{url}}': '成功广播到服务器：{{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      '广播到服务器失败：{{url}}。错误：{{error}}'
   }
 }

@@ -321,6 +321,17 @@ export default {
     'Remove poll': 'Umfrage entfernen',
     'Refresh results': 'Ergebnisse aktualisieren',
     Poll: 'Umfrage',
-    media: 'Medien'
+    media: 'Medien',
+    'Broadcast to ...': 'Senden an...',
+    'Successfully broadcasted to your write relays': 'Erfolgreich an Ihre Schreibrelays gesendet',
+    'Failed to broadcast to your write relays: {{error}}':
+      'Fehler beim Senden an Ihre Schreibrelays: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'Erfolgreich an Relay-Set gesendet: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'Fehler beim Senden an Relay-Set: {{name}}. Fehler: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'Erfolgreich an Relay gesendet: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Fehler beim Senden an Relay: {{url}}. Fehler: {{error}}'
   }
 }

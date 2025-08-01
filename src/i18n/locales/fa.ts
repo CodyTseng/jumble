@@ -316,6 +316,16 @@ export default {
     'Remove poll': 'حذف نظرسنجی',
     'Refresh results': 'بارگیری مجدد نتایج',
     Poll: 'نظرسنجی',
-    media: 'رسانه'
+    media: 'رسانه',
+    'Broadcast to ...': 'پخش به...',
+    'Successfully broadcasted to your write relays': 'با موفقیت به رله‌های نوشتن شما پخش شد',
+    'Failed to broadcast to your write relays: {{error}}':
+      'پخش به رله‌های نوشتن شما ناموفق بود: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}': 'با موفقیت به مجموعه رله پخش شد: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'پخش به مجموعه رله ناموفق بود: {{name}}. خطا: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'با موفقیت به رله پخش شد: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'پخش به رله ناموفق بود: {{url}}. خطا: {{error}}'
   }
 }

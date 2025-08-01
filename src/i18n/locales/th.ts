@@ -313,6 +313,17 @@ export default {
     'Remove poll': 'ลบโพลล์',
     'Refresh results': 'รีเฟรชผลลัพธ์',
     Poll: 'โพลล์',
-    media: 'สื่อ'
+    media: 'สื่อ',
+    'Broadcast to ...': 'ส่งสัญญาณไปยัง...',
+    'Successfully broadcasted to your write relays': 'ส่งสัญญาณไปยังรีเลย์การเขียนของคุณสำเร็จแล้ว',
+    'Failed to broadcast to your write relays: {{error}}':
+      'การส่งสัญญาณไปยังรีเลย์การเขียนของคุณล้มเหลว: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'ส่งสัญญาณไปยังชุดรีเลย์สำเร็จแล้ว: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'การส่งสัญญาณไปยังชุดรีเลย์ล้มเหลว: {{name}} ข้อผิดพลาด: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'ส่งสัญญาณไปยังรีเลย์สำเร็จแล้ว: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'การส่งสัญญาณไปยังรีเลย์ล้มเหลว: {{url}} ข้อผิดพลาด: {{error}}'
   }
 }

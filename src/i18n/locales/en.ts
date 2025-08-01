@@ -314,6 +314,18 @@ export default {
     'Remove poll': 'Remove poll',
     'Refresh results': 'Refresh results',
     Poll: 'Poll',
-    media: 'media'
+    media: 'media',
+    'Broadcast to ...': 'Broadcast to ...',
+    'Successfully broadcasted to your write relays':
+      'Successfully broadcasted to your write relays',
+    'Failed to broadcast to your write relays: {{error}}':
+      'Failed to broadcast to your write relays: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'Successfully broadcasted to relay set: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'Failed to broadcast to relay set: {{name}}. Error: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'Successfully broadcasted to relay: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Failed to broadcast to relay: {{url}}. Error: {{error}}'
   }
 }

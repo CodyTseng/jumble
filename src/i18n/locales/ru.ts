@@ -309,7 +309,7 @@ export default {
     'Load results': 'Загрузить результаты',
     'This is a poll note.': 'Это заметка с опросом.',
     'Unlike regular notes, polls are not widely supported and may not display on other clients.':
-      'В отличие от обычных заметок, опросы не получили широкую поддержку и могут не отображаться в других клиентах.',
+      'В отличие от обычных заметок, опросы не получили широкой поддержки и могут не отображаться в других клиентах.',
     'Option {{number}}': 'Вариант {{number}}',
     'Add Option': 'Добавить вариант',
     'Allow multiple choices': 'Разрешить множественный выбор',
@@ -319,6 +319,17 @@ export default {
     'Remove poll': 'Удалить опрос',
     'Refresh results': 'Обновить результаты',
     Poll: 'Опрос',
-    media: 'медиа'
+    media: 'медиа',
+    'Broadcast to ...': 'Транслировать в...',
+    'Successfully broadcasted to your write relays': 'Успешно транслировано в ваши релеи записи',
+    'Failed to broadcast to your write relays: {{error}}':
+      'Ошибка трансляции в ваши релеи записи: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'Успешно транслировано в набор релеев: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'Ошибка трансляции в набор релеев: {{name}}. Ошибка: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'Успешно транслировано в релей: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Ошибка трансляции в релей: {{url}}. Ошибка: {{error}}'
   }
 }

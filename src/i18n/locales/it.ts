@@ -318,6 +318,18 @@ export default {
     'Remove poll': 'Rimuovi sondaggio',
     'Refresh results': 'Aggiorna risultati',
     Poll: 'Sondaggio',
-    media: 'media'
+    media: 'media',
+    'Broadcast to ...': 'Trasmetti a...',
+    'Successfully broadcasted to your write relays':
+      'Trasmesso con successo ai tuoi relay di scrittura',
+    'Failed to broadcast to your write relays: {{error}}':
+      'Errore nella trasmissione ai tuoi relay di scrittura: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'Trasmesso con successo al set di relay: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'Errore nella trasmissione al set di relay: {{name}}. Errore: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'Trasmesso con successo al relay: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Errore nella trasmissione al relay: {{url}}. Errore: {{error}}'
   }
 }

@@ -317,6 +317,18 @@ export default {
     'Remove poll': 'Remover enquete',
     'Refresh results': 'Atualizar resultados',
     Poll: 'Enquete',
-    media: 'Mídia'
+    media: 'Mídia',
+    'Broadcast to ...': 'Transmitir para...',
+    'Successfully broadcasted to your write relays':
+      'Transmitido com sucesso para seus relays de escrita',
+    'Failed to broadcast to your write relays: {{error}}':
+      'Falha ao transmitir para seus relays de escrita: {{error}}',
+    'Successfully broadcasted to relay set: {{name}}':
+      'Transmitido com sucesso para o conjunto de relays: {{name}}',
+    'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
+      'Falha ao transmitir para o conjunto de relays: {{name}}. Erro: {{error}}',
+    'Successfully broadcasted to relay: {{url}}': 'Transmitido com sucesso para o relay: {{url}}',
+    'Failed to broadcast to relay: {{url}}. Error: {{error}}':
+      'Falha ao transmitir para o relay: {{url}}. Erro: {{error}}'
   }
 }
