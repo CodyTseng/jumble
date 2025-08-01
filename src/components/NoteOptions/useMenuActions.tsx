@@ -1,4 +1,4 @@
-import { getNoteBech32Id } from '@/lib/event'
+import { getNoteBech32Id, isProtectedEvent } from '@/lib/event'
 import { toNjump } from '@/lib/link'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { simplifyUrl } from '@/lib/url'
@@ -50,9 +50,10 @@ export function useMenuActions({
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeys } = useMuteList()
   const isMuted = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
 
-  const broadcastSubMenu: SubMenuAction[] = useMemo(
-    () => [
-      {
+  const broadcastSubMenu: SubMenuAction[] = useMemo(() => {
+    const items = []
+    if (pubkey) {
+      items.push({
         label: 'Write relays',
         onClick: async () => {
           closeDrawer()
@@ -70,66 +71,77 @@ export function useMenuActions({
               })
           }
         }
-      },
-      ...relaySets
-        .filter((set) => set.relayUrls.length)
-        .map((set, index) => ({
+      })
+    }
+
+    if (relaySets.length) {
+      items.push(
+        ...relaySets
+          .filter((set) => set.relayUrls.length)
+          .map((set, index) => ({
+            label: (
+              <div className="flex items-center gap-2 w-full pl-1">
+                <Server />
+                <div className="flex-1 truncate text-left">{set.name}</div>
+              </div>
+            ),
+            onClick: async () => {
+              closeDrawer()
+              await client
+                .publishEvent(set.relayUrls, event)
+                .then(() => {
+                  toast.success(
+                    t('Successfully broadcasted to relay set: {{name}}', { name: set.name })
+                  )
+                })
+                .catch((error) => {
+                  toast.error(
+                    t('Failed to broadcast to relay set: {{name}}. Error: {{error}}', {
+                      name: set.name,
+                      error: error.message
+                    })
+                  )
+                })
+            },
+            separator: index === 0
+          }))
+      )
+    }
+
+    if (favoriteRelays.length) {
+      items.push(
+        ...favoriteRelays.map((relay, index) => ({
           label: (
-            <div className="flex items-center gap-2 w-full pl-1">
-              <Server />
-              <div className="flex-1 truncate text-left">{set.name}</div>
+            <div className="flex items-center gap-2 w-full">
+              <RelayIcon url={relay} />
+              <div className="flex-1 truncate text-left">{simplifyUrl(relay)}</div>
             </div>
           ),
           onClick: async () => {
             closeDrawer()
             await client
-              .publishEvent(set.relayUrls, event)
+              .publishEvent([relay], event)
               .then(() => {
                 toast.success(
-                  t('Successfully broadcasted to relay set: {{name}}', { name: set.name })
+                  t('Successfully broadcasted to relay: {{url}}', { url: simplifyUrl(relay) })
                 )
               })
               .catch((error) => {
                 toast.error(
-                  t('Failed to broadcast to relay set: {{name}}. Error: {{error}}', {
-                    name: set.name,
+                  t('Failed to broadcast to relay: {{url}}. Error: {{error}}', {
+                    url: simplifyUrl(relay),
                     error: error.message
                   })
                 )
               })
           },
           separator: index === 0
-        })),
-      ...favoriteRelays.map((relay, index) => ({
-        label: (
-          <div className="flex items-center gap-2 w-full">
-            <RelayIcon url={relay} />
-            <div className="flex-1 truncate text-left">{simplifyUrl(relay)}</div>
-          </div>
-        ),
-        onClick: async () => {
-          closeDrawer()
-          await client
-            .publishEvent([relay], event)
-            .then(() => {
-              toast.success(
-                t('Successfully broadcasted to relay: {{url}}', { url: simplifyUrl(relay) })
-              )
-            })
-            .catch((error) => {
-              toast.error(
-                t('Failed to broadcast to relay: {{url}}. Error: {{error}}', {
-                  url: simplifyUrl(relay),
-                  error: error.message
-                })
-              )
-            })
-        },
-        separator: index === 0
-      }))
-    ],
-    [favoriteRelays, relaySets]
-  )
+        }))
+      )
+    }
+
+    return items
+  }, [pubkey, favoriteRelays, relaySets])
 
   const menuActions: MenuAction[] = useMemo(() => {
     const actions: MenuAction[] = [
@@ -165,8 +177,12 @@ export function useMenuActions({
           setIsRawEventDialogOpen(true)
         },
         separator: true
-      },
-      {
+      }
+    ]
+
+    const isProtected = isProtectedEvent(event)
+    if (!isProtected || event.pubkey === pubkey) {
+      actions.push({
         icon: Globe,
         label: t('Broadcast to ...'),
         onClick: isSmallScreen
@@ -174,8 +190,8 @@ export function useMenuActions({
           : undefined,
         subMenu: isSmallScreen ? undefined : broadcastSubMenu,
         separator: true
-      }
-    ]
+      })
+    }
 
     if (pubkey) {
       if (isMuted) {
