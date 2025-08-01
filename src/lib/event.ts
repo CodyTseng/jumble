@@ -222,7 +222,7 @@ export function getEmbeddedPubkeys(event: Event) {
   return embeddedPubkeys
 }
 
-export function getLatestEvent(events: Event[]) {
+export function getLatestEvent(events: Event[]): Event | undefined {
   return events.sort((a, b) => b.created_at - a.created_at)[0]
 }
 

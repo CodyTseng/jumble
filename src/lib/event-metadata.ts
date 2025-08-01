@@ -8,7 +8,7 @@ import { generateBech32IdFromETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 import { isTorBrowser } from './utils'
 
-export function getRelayListFromEvent(event?: Event) {
+export function getRelayListFromEvent(event?: Event | null) {
   if (!event) {
     return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] }
   }

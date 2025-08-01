@@ -650,7 +650,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     if (newFollowListEvent.id !== followListEvent.id) return
 
     setFollowListEvent(newFollowListEvent)
-    client.updateFollowListCache(newFollowListEvent)
+    await client.updateFollowListCache(newFollowListEvent)
   }
 
   const updateMuteListEvent = async (muteListEvent: Event, privateTags: string[][]) => {
