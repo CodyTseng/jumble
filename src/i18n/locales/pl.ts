@@ -330,6 +330,7 @@ export default {
       'Nie udało się transmitować do zestawu przekaźników: {{name}}. Błąd: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'Pomyślnie transmitowano do przekaźnika: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Nie udało się transmitować do przekaźnika: {{url}}. Błąd: {{error}}'
+      'Nie udało się transmitować do przekaźnika: {{url}}. Błąd: {{error}}',
+    'Write relays': 'Przekaźniki zapisu'
   }
 }

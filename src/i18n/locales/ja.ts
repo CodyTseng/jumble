@@ -328,6 +328,7 @@ export default {
     'Successfully broadcasted to relay: {{url}}':
       'リレイへのブロードキャストが成功しました：{{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'リレイへのブロードキャストが失敗しました：{{url}}。エラー：{{error}}'
+      'リレイへのブロードキャストが失敗しました：{{url}}。エラー：{{error}}',
+    'Write relays': '書きリレイ'
   }
 }

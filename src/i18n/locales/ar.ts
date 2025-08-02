@@ -325,6 +325,7 @@ export default {
       'فشل البث إلى مجموعة المرحلات: {{name}}. خطأ: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'تم البث بنجاح إلى المرحل: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'فشل البث إلى المرحل: {{url}}. خطأ: {{error}}'
+      'فشل البث إلى المرحل: {{url}}. خطأ: {{error}}',
+    'Write relays': 'مرحلات الكتابة'
   }
 }

@@ -327,6 +327,7 @@ export default {
       '릴레이 세트로 브로드캐스트에 실패했습니다: {{name}}. 오류: {{error}}',
     'Successfully broadcasted to relay: {{url}}': '릴레이로 브로드캐스트에 성공했습니다: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      '릴레이로 브로드캐스트에 실패했습니다: {{url}}. 오류: {{error}}'
+      '릴레이로 브로드캐스트에 실패했습니다: {{url}}. 오류: {{error}}',
+    'Write relays': '쓰기 릴레이'
   }
 }

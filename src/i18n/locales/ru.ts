@@ -330,6 +330,7 @@ export default {
       'Ошибка трансляции в набор релеев: {{name}}. Ошибка: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'Успешно транслировано в релей: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Ошибка трансляции в релей: {{url}}. Ошибка: {{error}}'
+      'Ошибка трансляции в релей: {{url}}. Ошибка: {{error}}',
+    'Write relays': 'Ретрансляторы для записи'
   }
 }

@@ -331,6 +331,7 @@ export default {
       'Error al transmitir al conjunto de relés: {{name}}. Error: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'Transmitido exitosamente al relé: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Error al transmitir al relé: {{url}}. Error: {{error}}'
+      'Error al transmitir al relé: {{url}}. Error: {{error}}',
+    'Write relays': 'Relés de escritura'
   }
 }

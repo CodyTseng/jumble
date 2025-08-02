@@ -326,6 +326,7 @@ export default {
       'پخش به مجموعه رله ناموفق بود: {{name}}. خطا: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'با موفقیت به رله پخش شد: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'پخش به رله ناموفق بود: {{url}}. خطا: {{error}}'
+      'پخش به رله ناموفق بود: {{url}}. خطا: {{error}}',
+    'Write relays': 'رله‌های نوشتن'
   }
 }

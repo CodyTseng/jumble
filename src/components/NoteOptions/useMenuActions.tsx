@@ -6,7 +6,7 @@ import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Bell, BellOff, Code, Copy, Globe, Link, Server } from 'lucide-react'
+import { Bell, BellOff, Code, Copy, Globe, Link, Mail, Server } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -54,7 +54,12 @@ export function useMenuActions({
     const items = []
     if (pubkey) {
       items.push({
-        label: 'Write relays',
+        label: (
+          <div className="flex items-center gap-2 w-full pl-1">
+            <Mail />
+            <div className="flex-1 truncate text-left">{t('Write relays')}</div>
+          </div>
+        ),
         onClick: async () => {
           closeDrawer()
           const relays = relayList?.write.slice(0, 10)

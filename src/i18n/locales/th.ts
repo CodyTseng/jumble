@@ -324,6 +324,7 @@ export default {
       'การส่งสัญญาณไปยังชุดรีเลย์ล้มเหลว: {{name}} ข้อผิดพลาด: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'ส่งสัญญาณไปยังรีเลย์สำเร็จแล้ว: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'การส่งสัญญาณไปยังรีเลย์ล้มเหลว: {{url}} ข้อผิดพลาด: {{error}}'
+      'การส่งสัญญาณไปยังรีเลย์ล้มเหลว: {{url}} ข้อผิดพลาด: {{error}}',
+    'Write relays': 'รีเลย์การเขียน'
   }
 }

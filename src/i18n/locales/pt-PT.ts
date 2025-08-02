@@ -330,6 +330,7 @@ export default {
       'Falha ao transmitir para o conjunto de relays: {{name}}. Erro: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'Transmitido com sucesso para o relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Falha ao transmitir para o relay: {{url}}. Erro: {{error}}'
+      'Falha ao transmitir para o relay: {{url}}. Erro: {{error}}',
+    'Write relays': 'Relés de escrita'
   }
 }

@@ -326,6 +326,7 @@ export default {
       'Failed to broadcast to relay set: {{name}}. Error: {{error}}',
     'Successfully broadcasted to relay: {{url}}': 'Successfully broadcasted to relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Failed to broadcast to relay: {{url}}. Error: {{error}}'
+      'Failed to broadcast to relay: {{url}}. Error: {{error}}',
+    'Write relays': 'Write relays'
   }
 }

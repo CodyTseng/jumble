@@ -323,6 +323,7 @@ export default {
       '广播到服务器组失败：{{name}}。错误：{{error}}',
     'Successfully broadcasted to relay: {{url}}': '成功广播到服务器：{{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      '广播到服务器失败：{{url}}。错误：{{error}}'
+      '广播到服务器失败：{{url}}。错误：{{error}}',
+    'Write relays': '写服务器'
   }
 }

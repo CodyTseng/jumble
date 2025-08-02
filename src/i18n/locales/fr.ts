@@ -331,6 +331,7 @@ export default {
       "Échec de la diffusion vers l'ensemble de relais : {{name}}. Erreur : {{error}}",
     'Successfully broadcasted to relay: {{url}}': 'Diffusion réussie vers le relais : {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
-      'Échec de la diffusion vers le relais : {{url}}. Erreur : {{error}}'
+      'Échec de la diffusion vers le relais : {{url}}. Erreur : {{error}}',
+    'Write relays': 'Relais d’écriture'
   }
 }
