@@ -31,8 +31,8 @@ export function MobileMenu({
       {trigger}
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerOverlay onClick={closeDrawer} />
-        <DrawerContent hideOverlay>
-          <div className="py-2">
+        <DrawerContent hideOverlay className="max-h-screen">
+          <div className="overflow-y-auto overscroll-contain py-2" style={{ touchAction: 'pan-y' }}>
             {!showSubMenu ? (
               menuActions.map((action, index) => {
                 const Icon = action.icon

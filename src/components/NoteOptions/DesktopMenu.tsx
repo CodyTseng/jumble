@@ -8,8 +8,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { MenuAction } from './useMenuActions'
 import { cn } from '@/lib/utils'
+import { MenuAction } from './useMenuActions'
 
 interface DesktopMenuProps {
   menuActions: MenuAction[]
@@ -20,7 +20,7 @@ export function DesktopMenu({ menuActions, trigger }: DesktopMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="max-h-screen overflow-y-auto">
         {menuActions.map((action, index) => {
           const Icon = action.icon
           return (
@@ -32,7 +32,7 @@ export function DesktopMenu({ menuActions, trigger }: DesktopMenuProps) {
                     <Icon />
                     {action.label}
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
+                  <DropdownMenuSubContent className="max-h-screen overflow-y-auto">
                     {action.subMenu.map((subAction, subIndex) => (
                       <>
                         {subAction.separator && subIndex > 0 && <DropdownMenuSeparator />}
