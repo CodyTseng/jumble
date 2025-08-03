@@ -23,7 +23,7 @@ export const useUserTrust = () => {
   return context
 }
 
-const wotSet = new Set<string>()
+let wotSet = new Set<string>()
 
 export function UserTrustProvider({ children }: { children: React.ReactNode }) {
   const { pubkey: currentPubkey } = useNostr()
@@ -41,14 +41,29 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
     if (!currentPubkey) return
 
     const initWoT = async () => {
+      wotSet = storage.getTrustedPubkeys()
+
       const followings = await client.fetchFollowings(currentPubkey)
-      await Promise.allSettled(
-        followings.map(async (pubkey) => {
-          wotSet.add(pubkey)
-          const _followings = await client.fetchFollowings(pubkey)
-          _followings.forEach((following) => wotSet.add(following))
-        })
-      )
+      followings.forEach((pubkey) => wotSet.add(pubkey))
+      storage.setTrustedPubkeys(wotSet)
+
+      const _wotSet = new Set<string>(followings)
+      const batchSize = 20
+      for (let i = 0; i < followings.length; i += batchSize) {
+        const batch = followings.slice(i, i + batchSize)
+        await Promise.allSettled(
+          batch.map(async (pubkey) => {
+            const _followings = await client.fetchFollowings(pubkey)
+            _followings.forEach((following) => {
+              _wotSet.add(following)
+              wotSet.add(pubkey)
+            })
+          })
+        )
+        storage.setTrustedPubkeys(wotSet)
+      }
+      wotSet = _wotSet
+      storage.setTrustedPubkeys(wotSet)
     }
     initWoT()
   }, [currentPubkey])

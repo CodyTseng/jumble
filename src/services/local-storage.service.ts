@@ -32,6 +32,7 @@ class LocalStorageService {
   private hideUntrustedNotes: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
+  private trustedPubkeys: Set<string> = new Set()
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -131,6 +132,12 @@ class LocalStorageService {
     )
     if (mediaUploadServiceConfigMapStr) {
       this.mediaUploadServiceConfigMap = JSON.parse(mediaUploadServiceConfigMapStr)
+    }
+
+    const trustedPubkeysStr = window.localStorage.getItem(StorageKey.TRUSTED_PUBKEYS)
+    if (trustedPubkeysStr) {
+      const trustedPubkeys = JSON.parse(trustedPubkeysStr)
+      this.trustedPubkeys = new Set(trustedPubkeys)
     }
 
     // Clean up deprecated data
@@ -346,6 +353,15 @@ class LocalStorageService {
       JSON.stringify(this.mediaUploadServiceConfigMap)
     )
     return config
+  }
+
+  getTrustedPubkeys(): Set<string> {
+    return this.trustedPubkeys
+  }
+
+  setTrustedPubkeys(pubkeys: Set<string>) {
+    this.trustedPubkeys = pubkeys
+    window.localStorage.setItem(StorageKey.TRUSTED_PUBKEYS, JSON.stringify(Array.from(pubkeys)))
   }
 }
 
