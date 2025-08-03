@@ -5,7 +5,13 @@ export function isWebsocketUrl(url: string): boolean {
 // copy from nostr-tools/utils
 export function normalizeUrl(url: string): string {
   try {
-    if (url.indexOf('://') === -1) url = 'wss://' + url
+    if (url.indexOf('://') === -1) {
+      if (url.startsWith('localhost:') || url.startsWith('localhost/')) {
+        url = 'ws://' + url
+      } else {
+        url = 'wss://' + url
+      }
+    }
     const p = new URL(url)
     p.pathname = p.pathname.replace(/\/+/g, '/')
     if (p.pathname.endsWith('/')) p.pathname = p.pathname.slice(0, -1)
