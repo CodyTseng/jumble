@@ -892,7 +892,7 @@ class ClientService extends EventTarget {
     }
     const profileFromBigRelays = await this.replaceableEventFromBigRelaysDataloader.load({
       pubkey,
-      kind: kinds.Contacts
+      kind: kinds.Metadata
     })
     if (profileFromBigRelays) {
       this.addUsernameToIndex(profileFromBigRelays)
