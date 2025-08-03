@@ -22,7 +22,7 @@ export function useSearchProfiles(search: string, limit: number) {
       setIsFetching(true)
       setProfiles([])
       try {
-        const profiles = await client.searchProfilesFromCache(search, limit)
+        const profiles = await client.searchProfilesFromLocal(search, limit)
         setProfiles(profiles)
         if (profiles.length >= limit) {
           return

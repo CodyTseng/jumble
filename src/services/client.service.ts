@@ -51,10 +51,6 @@ class ClientService extends EventTarget {
     this.fetchEventsFromBigRelays.bind(this),
     { cache: false, batchScheduleFn: (callback) => setTimeout(callback, 50) }
   )
-  private followingFavoriteRelaysCache = new LRUCache<string, Promise<[string, string[]][]>>({
-    max: 10,
-    fetchMethod: this._fetchFollowingFavoriteRelays.bind(this)
-  })
 
   private userIndex = new FlexSearch.Index({
     tokenize: 'forward'
@@ -133,6 +129,8 @@ class ClientService extends EventTarget {
     })
     return 'Nostr ' + btoa(JSON.stringify(event))
   }
+
+  /** =========== Timeline =========== */
 
   private generateTimelineKey(urls: string[], filter: Filter) {
     const stableFilter: any = {}
@@ -392,27 +390,6 @@ class ClientService extends EventTarget {
     }
   }
 
-  private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {
-    return await new Promise<NEvent[]>((resolve) => {
-      const events: NEvent[] = []
-      const sub = this.subscribe(urls, filter, {
-        onevent(evt) {
-          onevent?.(evt)
-          events.push(evt)
-        },
-        oneose: (eosed) => {
-          if (eosed) {
-            sub.close()
-            resolve(events)
-          }
-        },
-        onclose: () => {
-          resolve(events)
-        }
-      })
-    })
-  }
-
   private async _subscribeTimeline(
     urls: string[],
     filter: Omit<Filter, 'since' | 'until'> & { limit: number }, // filter with limit,
@@ -575,6 +552,54 @@ class ClientService extends EventTarget {
     return [...cachedEvents, ...events]
   }
 
+  /** =========== Event =========== */
+
+  getSeenEventRelays(eventId: string) {
+    return Array.from(this.pool.seenOn.get(eventId)?.values() || [])
+  }
+
+  getSeenEventRelayUrls(eventId: string) {
+    return this.getSeenEventRelays(eventId).map((relay) => relay.url)
+  }
+
+  getEventHints(eventId: string) {
+    return this.getSeenEventRelayUrls(eventId).filter((url) => !isLocalNetworkUrl(url))
+  }
+
+  getEventHint(eventId: string) {
+    return this.getSeenEventRelayUrls(eventId).find((url) => !isLocalNetworkUrl(url)) ?? ''
+  }
+
+  trackEventSeenOn(eventId: string, relay: AbstractRelay) {
+    let set = this.pool.seenOn.get(eventId)
+    if (!set) {
+      set = new Set()
+      this.pool.seenOn.set(eventId, set)
+    }
+    set.add(relay)
+  }
+
+  private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {
+    return await new Promise<NEvent[]>((resolve) => {
+      const events: NEvent[] = []
+      const sub = this.subscribe(urls, filter, {
+        onevent(evt) {
+          onevent?.(evt)
+          events.push(evt)
+        },
+        oneose: (eosed) => {
+          if (eosed) {
+            sub.close()
+            resolve(events)
+          }
+        },
+        onclose: () => {
+          resolve(events)
+        }
+      })
+    })
+  }
+
   async fetchEvents(
     urls: string[],
     filter: Filter | Filter[],
@@ -624,97 +649,6 @@ class ClientService extends EventTarget {
 
   addEventToCache(event: NEvent) {
     this.eventDataLoader.prime(event.id, Promise.resolve(event))
-  }
-
-  async fetchFollowingFavoriteRelays(pubkey: string) {
-    return this.followingFavoriteRelaysCache.fetch(pubkey)
-  }
-
-  private async _fetchFollowingFavoriteRelays(pubkey: string) {
-    const fetchNewData = async () => {
-      const followings = await this.fetchFollowings(pubkey)
-      const events = await this.fetchEvents(BIG_RELAY_URLS, {
-        authors: followings,
-        kinds: [ExtendedKind.FAVORITE_RELAYS, kinds.Relaysets],
-        limit: 1000
-      })
-      const alreadyExistsFavoriteRelaysPubkeySet = new Set<string>()
-      const alreadyExistsRelaySetsPubkeySet = new Set<string>()
-      const uniqueEvents: NEvent[] = []
-      events
-        .sort((a, b) => b.created_at - a.created_at)
-        .forEach((event) => {
-          if (event.kind === ExtendedKind.FAVORITE_RELAYS) {
-            if (alreadyExistsFavoriteRelaysPubkeySet.has(event.pubkey)) return
-            alreadyExistsFavoriteRelaysPubkeySet.add(event.pubkey)
-          } else if (event.kind === kinds.Relaysets) {
-            if (alreadyExistsRelaySetsPubkeySet.has(event.pubkey)) return
-            alreadyExistsRelaySetsPubkeySet.add(event.pubkey)
-          } else {
-            return
-          }
-          uniqueEvents.push(event)
-        })
-
-      const relayMap = new Map<string, Set<string>>()
-      uniqueEvents.forEach((event) => {
-        event.tags.forEach(([tagName, tagValue]) => {
-          if (tagName === 'relay' && tagValue && isWebsocketUrl(tagValue)) {
-            const url = normalizeUrl(tagValue)
-            relayMap.set(url, (relayMap.get(url) || new Set()).add(event.pubkey))
-          }
-        })
-      })
-      const relayMapEntries = Array.from(relayMap.entries())
-        .sort((a, b) => b[1].size - a[1].size)
-        .map(([url, pubkeys]) => [url, Array.from(pubkeys)]) as [string, string[]][]
-
-      indexedDb.putFollowingFavoriteRelays(pubkey, relayMapEntries)
-      return relayMapEntries
-    }
-
-    const cached = await indexedDb.getFollowingFavoriteRelays(pubkey)
-    if (cached) {
-      fetchNewData()
-      return cached
-    }
-    return fetchNewData()
-  }
-
-  async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
-    const followings = await this.fetchFollowings(pubkey)
-    for (let i = 0; i * 20 < followings.length; i++) {
-      if (signal.aborted) return
-      await Promise.all(
-        followings.slice(i * 20, (i + 1) * 20).map((pubkey) => this.fetchProfileEvent(pubkey))
-      )
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-    }
-  }
-
-  getSeenEventRelays(eventId: string) {
-    return Array.from(this.pool.seenOn.get(eventId)?.values() || [])
-  }
-
-  getSeenEventRelayUrls(eventId: string) {
-    return this.getSeenEventRelays(eventId).map((relay) => relay.url)
-  }
-
-  getEventHints(eventId: string) {
-    return this.getSeenEventRelayUrls(eventId).filter((url) => !isLocalNetworkUrl(url))
-  }
-
-  getEventHint(eventId: string) {
-    return this.getSeenEventRelayUrls(eventId).find((url) => !isLocalNetworkUrl(url)) ?? ''
-  }
-
-  trackEventSeenOn(eventId: string, relay: AbstractRelay) {
-    let set = this.pool.seenOn.get(eventId)
-    if (!set) {
-      set = new Set()
-      this.pool.seenOn.set(eventId, set)
-    }
-    set.add(relay)
   }
 
   private async fetchEventById(relayUrls: string[], id: string): Promise<NEvent | undefined> {
@@ -810,6 +744,81 @@ class ClientService extends EventTarget {
     return ids.map((id) => eventsMap.get(id))
   }
 
+  /** =========== Following favorite relays =========== */
+
+  private followingFavoriteRelaysCache = new LRUCache<string, Promise<[string, string[]][]>>({
+    max: 10,
+    fetchMethod: this._fetchFollowingFavoriteRelays.bind(this)
+  })
+
+  async fetchFollowingFavoriteRelays(pubkey: string) {
+    return this.followingFavoriteRelaysCache.fetch(pubkey)
+  }
+
+  private async _fetchFollowingFavoriteRelays(pubkey: string) {
+    const fetchNewData = async () => {
+      const followings = await this.fetchFollowings(pubkey)
+      const events = await this.fetchEvents(BIG_RELAY_URLS, {
+        authors: followings,
+        kinds: [ExtendedKind.FAVORITE_RELAYS, kinds.Relaysets],
+        limit: 1000
+      })
+      const alreadyExistsFavoriteRelaysPubkeySet = new Set<string>()
+      const alreadyExistsRelaySetsPubkeySet = new Set<string>()
+      const uniqueEvents: NEvent[] = []
+      events
+        .sort((a, b) => b.created_at - a.created_at)
+        .forEach((event) => {
+          if (event.kind === ExtendedKind.FAVORITE_RELAYS) {
+            if (alreadyExistsFavoriteRelaysPubkeySet.has(event.pubkey)) return
+            alreadyExistsFavoriteRelaysPubkeySet.add(event.pubkey)
+          } else if (event.kind === kinds.Relaysets) {
+            if (alreadyExistsRelaySetsPubkeySet.has(event.pubkey)) return
+            alreadyExistsRelaySetsPubkeySet.add(event.pubkey)
+          } else {
+            return
+          }
+          uniqueEvents.push(event)
+        })
+
+      const relayMap = new Map<string, Set<string>>()
+      uniqueEvents.forEach((event) => {
+        event.tags.forEach(([tagName, tagValue]) => {
+          if (tagName === 'relay' && tagValue && isWebsocketUrl(tagValue)) {
+            const url = normalizeUrl(tagValue)
+            relayMap.set(url, (relayMap.get(url) || new Set()).add(event.pubkey))
+          }
+        })
+      })
+      const relayMapEntries = Array.from(relayMap.entries())
+        .sort((a, b) => b[1].size - a[1].size)
+        .map(([url, pubkeys]) => [url, Array.from(pubkeys)]) as [string, string[]][]
+
+      indexedDb.putFollowingFavoriteRelays(pubkey, relayMapEntries)
+      return relayMapEntries
+    }
+
+    const cached = await indexedDb.getFollowingFavoriteRelays(pubkey)
+    if (cached) {
+      fetchNewData()
+      return cached
+    }
+    return fetchNewData()
+  }
+
+  /** =========== Followings =========== */
+
+  async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
+    const followings = await this.fetchFollowings(pubkey)
+    for (let i = 0; i * 20 < followings.length; i++) {
+      if (signal.aborted) return
+      await Promise.all(
+        followings.slice(i * 20, (i + 1) * 20).map((pubkey) => this.fetchProfileEvent(pubkey))
+      )
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+  }
+
   /** =========== Profile =========== */
 
   async searchProfiles(relayUrls: string[], filter: Filter): Promise<TProfile[]> {
@@ -824,13 +833,13 @@ class ClientService extends EventTarget {
     return profileEvents.map((profileEvent) => getProfileFromEvent(profileEvent))
   }
 
-  async searchNpubsFromCache(query: string, limit: number = 100) {
+  async searchNpubsFromLocal(query: string, limit: number = 100) {
     const result = await this.userIndex.searchAsync(query, { limit })
     return result.map((pubkey) => pubkeyToNpub(pubkey as string)).filter(Boolean) as string[]
   }
 
-  async searchProfilesFromCache(query: string, limit: number = 100) {
-    const npubs = await this.searchNpubsFromCache(query, limit)
+  async searchProfilesFromLocal(query: string, limit: number = 100) {
+    const npubs = await this.searchNpubsFromLocal(query, limit)
     const profiles = await Promise.all(npubs.map((npub) => this.fetchProfile(npub)))
     return profiles.filter((profile) => !!profile) as TProfile[]
   }
