@@ -28,6 +28,7 @@ import Highlight from './Highlight'
 import IValue from './IValue'
 import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
+import LongFormArticlePreview from './LongFormArticlePreview'
 import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
 import Poll from './Poll'
@@ -38,13 +39,15 @@ export default function Note({
   originalNoteId,
   size = 'normal',
   className,
-  hideParentNotePreview = false
+  hideParentNotePreview = false,
+  showFull = false
 }: {
   event: Event
   originalNoteId?: string
   size?: 'normal' | 'small'
   className?: string
   hideParentNotePreview?: boolean
+  showFull?: boolean
 }) {
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
@@ -85,7 +88,11 @@ export default function Note({
   } else if (event.kind === kinds.Highlights) {
     content = <Highlight className="mt-2" event={event} />
   } else if (event.kind === kinds.LongFormArticle) {
-    content = <LongFormArticle className="mt-2" event={event} />
+    content = showFull ? (
+      <LongFormArticle className="mt-2" event={event} />
+    ) : (
+      <LongFormArticlePreview className="mt-2" event={event} />
+    )
   } else if (event.kind === kinds.LiveEvent) {
     content = <LiveEvent className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.GROUP_METADATA) {
