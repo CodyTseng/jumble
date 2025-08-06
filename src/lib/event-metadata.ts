@@ -1,5 +1,5 @@
 import { BIG_RELAY_URLS, POLL_TYPE } from '@/constants'
-import { TPollType, TRelayList, TRelaySet } from '@/types'
+import { TEmoji, TPollType, TRelayList, TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { getReplaceableEventIdentifier } from './event'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
@@ -334,4 +334,37 @@ export function getPollResponseFromEvent(
     selectedOptionIds,
     created_at: event.created_at
   }
+}
+
+export function getEmojisAndEmojiSetsFromEvent(event: Event) {
+  const emojis: TEmoji[] = []
+  const emojiSetPointers: string[] = []
+
+  event.tags.forEach(([tagName, ...tagValues]) => {
+    if (tagName === 'emoji' && tagValues.length >= 2) {
+      emojis.push({
+        shortcode: tagValues[0],
+        url: tagValues[1]
+      })
+    } else if (tagName === 'a' && tagValues[0]) {
+      emojiSetPointers.push(tagValues[0])
+    }
+  })
+
+  return { emojis, emojiSetPointers }
+}
+
+export function getEmojisFromEvent(event: Event): TEmoji[] {
+  const emojis: TEmoji[] = []
+
+  event.tags.forEach(([tagName, ...tagValues]) => {
+    if (tagName === 'emoji' && tagValues.length >= 2) {
+      emojis.push({
+        shortcode: tagValues[0],
+        url: tagValues[1]
+      })
+    }
+  })
+
+  return emojis
 }

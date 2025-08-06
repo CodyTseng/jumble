@@ -1,5 +1,5 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { getLatestEvent } from '@/lib/event'
+import { getReplaceableEventCoordinate } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { getPubkeysFromPTags, getServersFromServerTags } from '@/lib/tag'
@@ -1070,47 +1070,78 @@ class ClientService extends EventTarget {
   /** =========== Replaceable event dataloader =========== */
 
   private replaceableEventDataLoader = new DataLoader<
-    { pubkey: string; kind: number },
+    { pubkey: string; kind: number; d?: string },
     NEvent | null,
     string
   >(this.replaceableEventBatchLoadFn.bind(this), {
-    cacheKeyFn: ({ pubkey, kind }) => `${pubkey}:${kind}`
+    cacheKeyFn: ({ pubkey, kind, d }) => `${kind}:${pubkey}:${d ?? ''}`
   })
 
-  private async replaceableEventBatchLoadFn(params: readonly { pubkey: string; kind: number }[]) {
-    const results = await Promise.allSettled(
-      params.map(async ({ pubkey, kind }) => {
-        const relayList = await this.fetchRelayList(pubkey)
-        const events = await this.query(relayList.write.concat(BIG_RELAY_URLS).slice(0, 5), {
-          authors: [pubkey],
-          kinds: [kind]
+  private async replaceableEventBatchLoadFn(
+    params: readonly { pubkey: string; kind: number; d?: string }[]
+  ) {
+    const groups = new Map<string, { kind: number; d?: string }[]>()
+    params.forEach(({ pubkey, kind, d }) => {
+      if (!groups.has(pubkey)) {
+        groups.set(pubkey, [])
+      }
+      groups.get(pubkey)!.push({ kind: kind, d })
+    })
+
+    const eventMap = new Map<string, NEvent | null>()
+    await Promise.allSettled(
+      Array.from(groups.entries()).map(async ([pubkey, _params]) => {
+        const groupByKind = new Map<number, string[]>()
+        _params.forEach(({ kind, d }) => {
+          if (!groupByKind.has(kind)) {
+            groupByKind.set(kind, [])
+          }
+          if (d) {
+            groupByKind.get(kind)!.push(d)
+          }
         })
-        const event = getLatestEvent(events) ?? null
-        if (event) {
-          indexedDb.putReplaceableEvent(event)
-        } else {
-          indexedDb.putNullReplaceableEvent(pubkey, kind)
+        const filters = Array.from(groupByKind.entries()).map(
+          ([kind, dList]) =>
+            (dList.length > 0
+              ? {
+                  authors: [pubkey],
+                  kinds: [kind],
+                  '#d': dList
+                }
+              : { authors: [pubkey], kinds: [kind] }) as Filter
+        )
+        const events = await this.query(BIG_RELAY_URLS, filters)
+
+        for (const event of events) {
+          const key = getReplaceableEventCoordinate(event)
+          const existing = eventMap.get(key)
+          if (!existing || existing.created_at < event.created_at) {
+            eventMap.set(key, event)
+          }
         }
-        return event
       })
     )
-    return results.map((result) => {
-      if (result.status === 'fulfilled') {
-        return result.value
+
+    return params.map(({ pubkey, kind, d }) => {
+      const key = `${kind}:${pubkey}:${d ?? ''}`
+      const event = eventMap.get(key)
+      if (event) {
+        indexedDb.putReplaceableEvent(event)
+        return event
       } else {
-        console.error('Failed to load replaceable event:', result.reason)
+        indexedDb.putNullReplaceableEvent(pubkey, kind, d)
         return null
       }
     })
   }
 
-  private async fetchReplaceableEvent(pubkey: string, kind: number) {
-    const storedEvent = await indexedDb.getReplaceableEvent(pubkey, kind)
+  private async fetchReplaceableEvent(pubkey: string, kind: number, d?: string) {
+    const storedEvent = await indexedDb.getReplaceableEvent(pubkey, kind, d)
     if (storedEvent !== undefined) {
       return storedEvent
     }
 
-    return await this.replaceableEventDataLoader.load({ pubkey, kind })
+    return await this.replaceableEventDataLoader.load({ pubkey, kind, d })
   }
 
   private async updateReplaceableEventCache(event: NEvent) {
@@ -1156,6 +1187,21 @@ class ClientService extends EventTarget {
 
   async updateBlossomServerListEventCache(evt: NEvent) {
     await this.updateReplaceableEventCache(evt)
+  }
+
+  async fetchEmojiSetEvents(pointers: string[]) {
+    const params = pointers
+      .map((pointer) => {
+        const [kindStr, pubkey, d = ''] = pointer.split(':')
+        if (!pubkey || !kindStr) return null
+
+        const kind = parseInt(kindStr, 10)
+        if (kind !== kinds.Emojisets) return null
+
+        return { pubkey, kind, d }
+      })
+      .filter(Boolean) as { pubkey: string; kind: number; d: string }[]
+    return await this.replaceableEventDataLoader.loadMany(params)
   }
 }
 

@@ -17,6 +17,8 @@ const StoreNames = {
   BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
   RELAY_INFO_EVENTS: 'relayInfoEvents',
+  USER_EMOJI_LIST_EVENTS: 'userEmojiListEvents',
+  EMOJI_SET_EVENTS: 'emojiSetEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
   RELAY_SETS: 'relaySets',
   FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays'
@@ -38,7 +40,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 6)
+        const request = window.indexedDB.open('jumble', 7)
 
         request.onerror = (event) => {
           reject(event)
@@ -84,6 +86,12 @@ class IndexedDbService {
           if (!db.objectStoreNames.contains(StoreNames.BLOSSOM_SERVER_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.BLOSSOM_SERVER_LIST_EVENTS, { keyPath: 'key' })
           }
+          if (!db.objectStoreNames.contains(StoreNames.USER_EMOJI_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.USER_EMOJI_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.EMOJI_SET_EVENTS)) {
+            db.createObjectStore(StoreNames.EMOJI_SET_EVENTS, { keyPath: 'key' })
+          }
           this.db = db
         }
       })
@@ -92,7 +100,7 @@ class IndexedDbService {
     return this.initPromise
   }
 
-  async putNullReplaceableEvent(pubkey: string, kind: number) {
+  async putNullReplaceableEvent(pubkey: string, kind: number, d?: string) {
     const storeName = this.getStoreNameByKind(kind)
     if (!storeName) {
       return Promise.reject('store name not found')
@@ -105,14 +113,15 @@ class IndexedDbService {
       const transaction = this.db.transaction(storeName, 'readwrite')
       const store = transaction.objectStore(storeName)
 
-      const getRequest = store.get(pubkey)
+      const key = this.getReplaceableEventKey(pubkey, d)
+      const getRequest = store.get(key)
       getRequest.onsuccess = () => {
         const oldValue = getRequest.result as TValue<Event> | undefined
         if (oldValue) {
           transaction.commit()
           return resolve(oldValue.value)
         }
-        const putRequest = store.put(this.formatValue(pubkey, null))
+        const putRequest = store.put(this.formatValue(key, null))
         putRequest.onsuccess = () => {
           transaction.commit()
           resolve(null)
@@ -144,7 +153,7 @@ class IndexedDbService {
       const transaction = this.db.transaction(storeName, 'readwrite')
       const store = transaction.objectStore(storeName)
 
-      const key = this.getReplaceableEventKey(event)
+      const key = this.getReplaceableEventKeyFromEvent(event)
       const getRequest = store.get(key)
       getRequest.onsuccess = () => {
         const oldValue = getRequest.result as TValue<Event> | undefined
@@ -187,7 +196,7 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(storeName, 'readonly')
       const store = transaction.objectStore(storeName)
-      const key = d === undefined ? pubkey : `${pubkey}:${d}`
+      const key = this.getReplaceableEventKey(pubkey, d)
       const request = store.get(key)
 
       request.onsuccess = () => {
@@ -220,7 +229,7 @@ class IndexedDbService {
       const events: (Event | null)[] = new Array(pubkeys.length).fill(undefined)
       let count = 0
       pubkeys.forEach((pubkey, i) => {
-        const request = store.get(pubkey)
+        const request = store.get(this.getReplaceableEventKey(pubkey))
 
         request.onsuccess = () => {
           const event = (request.result as TValue<Event | null>)?.value
@@ -415,16 +424,20 @@ class IndexedDbService {
     })
   }
 
-  private getReplaceableEventKey(event: Event): string {
+  private getReplaceableEventKeyFromEvent(event: Event): string {
     if (
       [kinds.Metadata, kinds.Contacts].includes(event.kind) ||
       (event.kind >= 10000 && event.kind < 20000)
     ) {
-      return event.pubkey
+      return this.getReplaceableEventKey(event.pubkey)
     }
 
     const [, d] = event.tags.find(tagNameEquals('d')) ?? []
-    return `${event.pubkey}:${d ?? ''}`
+    return this.getReplaceableEventKey(event.pubkey, d)
+  }
+
+  private getReplaceableEventKey(pubkey: string, d?: string): string {
+    return d === undefined ? pubkey : `${pubkey}:${d}`
   }
 
   private getStoreNameByKind(kind: number): string | undefined {
@@ -445,6 +458,10 @@ class IndexedDbService {
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
+      case kinds.UserEmojiList:
+        return StoreNames.USER_EMOJI_LIST_EVENTS
+      case kinds.Emojisets:
+        return StoreNames.EMOJI_SET_EVENTS
       default:
         return undefined
     }
