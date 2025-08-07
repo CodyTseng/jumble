@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import {
-  getReplaceableEventCoordinate,
+  getReplaceableCoordinateFromEvent,
   getRootETag,
   isProtectedEvent,
   isReplaceableEvent
@@ -552,7 +552,7 @@ function extractImagesFromContent(content: string) {
 }
 
 function buildATag(event: Event, upperCase: boolean = false) {
-  const coordinate = getReplaceableEventCoordinate(event)
+  const coordinate = getReplaceableCoordinateFromEvent(event)
   const hint = client.getEventHint(event.id)
   return trimTagEnd([upperCase ? 'A' : 'a', coordinate, hint])
 }

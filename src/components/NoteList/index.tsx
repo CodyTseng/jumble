@@ -1,7 +1,11 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { isReplyNoteEvent } from '@/lib/event'
+import {
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent,
+  isReplyNoteEvent
+} from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isSafari } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -296,6 +300,8 @@ export default function NoteList({
     }, 0)
   }
 
+  const idSet = new Set<string>()
+
   return (
     <div className={className}>
       <Tabs
@@ -338,11 +344,17 @@ export default function NoteList({
         <div className="min-h-screen">
           {events
             .slice(0, showCount)
-            .filter(
-              (event: Event) =>
+            .filter((event: Event) => {
+              const id = isReplaceableEvent(event.kind)
+                ? getReplaceableCoordinateFromEvent(event)
+                : event.id
+              if (idSet.has(id)) return false
+              idSet.add(id)
+              return (
                 (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
                 (skipTrustCheck || !hideUntrustedNotes || isUserTrusted(event.pubkey))
-            )
+              )
+            })
             .map((event) => (
               <NoteCard
                 key={event.id}

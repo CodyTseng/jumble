@@ -1,5 +1,11 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { getLatestEvent } from '@/lib/event'
+import {
+  compareEvents,
+  getLatestEvent,
+  getReplaceableCoordinate,
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent
+} from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { getPubkeysFromPTags, getServersFromServerTags } from '@/lib/tag'
@@ -42,6 +48,7 @@ class ClientService extends EventTarget {
     | string[]
     | undefined
   > = {}
+  private replaceableEventCacheMap = new Map<string, NEvent>()
   private eventCacheMap = new Map<string, Promise<NEvent | undefined>>()
   private eventDataLoader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
@@ -438,6 +445,13 @@ class ClientService extends EventTarget {
       startLogin,
       onevent: (evt: NEvent) => {
         that.eventDataLoader.prime(evt.id, Promise.resolve(evt))
+        if (isReplaceableEvent(evt.kind)) {
+          const coordinate = getReplaceableCoordinateFromEvent(evt)
+          const cachedEvent = that.replaceableEventCacheMap.get(coordinate)
+          if (!cachedEvent || compareEvents(evt, cachedEvent) > 0) {
+            that.replaceableEventCacheMap.set(coordinate, evt)
+          }
+        }
         // not eosed yet, push to events
         if (!eosedAt) {
           return events.push(evt)
@@ -635,6 +649,7 @@ class ClientService extends EventTarget {
   async fetchEvent(id: string): Promise<NEvent | undefined> {
     if (!/^[0-9a-f]{64}$/.test(id)) {
       let eventId: string | undefined
+      let coordinate: string | undefined
       const { type, data } = nip19.decode(id)
       switch (type) {
         case 'note':
@@ -643,8 +658,16 @@ class ClientService extends EventTarget {
         case 'nevent':
           eventId = data.id
           break
+        case 'naddr':
+          coordinate = getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
+          break
       }
-      if (eventId) {
+      if (coordinate) {
+        const cache = this.replaceableEventCacheMap.get(coordinate)
+        if (cache) {
+          return cache
+        }
+      } else if (eventId) {
         const cache = this.eventCacheMap.get(eventId)
         if (cache) {
           return cache

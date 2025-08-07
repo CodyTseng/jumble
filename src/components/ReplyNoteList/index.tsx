@@ -1,7 +1,7 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import {
   getParentETag,
-  getReplaceableEventCoordinate,
+  getReplaceableCoordinateFromEvent,
   getRootATag,
   getRootETag,
   getRootEventHexId,
@@ -37,7 +37,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
     const replyIdSet = new Set<string>()
     const replyEvents: NEvent[] = []
     const currentEventKey = isReplaceableEvent(event.kind)
-      ? getReplaceableEventCoordinate(event)
+      ? getReplaceableCoordinateFromEvent(event)
       : event.id
     let parentEventKeys = [currentEventKey]
     while (parentEventKeys.length > 0) {
@@ -64,7 +64,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       let root: TRootInfo = isReplaceableEvent(event.kind)
         ? {
             type: 'A',
-            id: getReplaceableEventCoordinate(event),
+            id: getReplaceableCoordinateFromEvent(event),
             eventId: event.id,
             pubkey: event.pubkey,
             relay: client.getEventHint(event.id)
