@@ -4,6 +4,7 @@ import { useState } from 'react'
 import HideUntrustedContentButton from '../HideUntrustedContentButton'
 import QuoteList from '../QuoteList'
 import ReplyNoteList from '../ReplyNoteList'
+import ReactionList from '../ReactionList'
 import { Tabs, TTabValue } from './Tabs'
 
 export default function NoteInteractions({
@@ -14,6 +15,20 @@ export default function NoteInteractions({
   event: Event
 }) {
   const [type, setType] = useState<TTabValue>('replies')
+  let list
+  switch (type) {
+    case 'replies':
+      list = <ReplyNoteList index={pageIndex} event={event} />
+      break
+    case 'quotes':
+      list = <QuoteList event={event} />
+      break
+    case 'reactions':
+      list = <ReactionList index={pageIndex} event={event} />
+      break
+    default:
+      break
+  }
 
   return (
     <>
@@ -22,11 +37,7 @@ export default function NoteInteractions({
         <HideUntrustedContentButton type="interactions" />
       </div>
       <Separator />
-      {type === 'replies' ? (
-        <ReplyNoteList index={pageIndex} event={event} />
-      ) : (
-        <QuoteList event={event} />
-      )}
+      {list}
     </>
   )
 }
