@@ -94,7 +94,8 @@ function parseYoutubeUrl(url: string) {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
     /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
-    /youtube\.com\/shorts\/([^&\n?#]+)/
+    /youtube\.com\/shorts\/([^&\n?#]+)/,
+    /youtube\.com\/live\/([^&\n?#]+)/
   ]
 
   let videoId: string | null = null
