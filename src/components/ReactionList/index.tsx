@@ -65,13 +65,15 @@ export default function ReactionList({ event }: { event: Event }) {
           className="px-4 py-3 border-b transition-colors clickable flex items-center gap-3"
           onClick={() => push(toProfile(like.pubkey))}
         >
-          <Emoji
-            emoji={like.emoji}
-            classNames={{
-              text: 'text-xl',
-              img: 'size-5'
-            }}
-          />
+          <div className="w-6 flex flex-col items-center">
+            <Emoji
+              emoji={like.emoji}
+              classNames={{
+                text: 'text-xl',
+                img: 'size-5'
+              }}
+            />
+          </div>
 
           <UserAvatar userId={like.pubkey} size="medium" className="shrink-0" />
 
