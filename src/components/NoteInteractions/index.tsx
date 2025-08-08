@@ -3,8 +3,9 @@ import { Event } from 'nostr-tools'
 import { useState } from 'react'
 import HideUntrustedContentButton from '../HideUntrustedContentButton'
 import QuoteList from '../QuoteList'
-import ReplyNoteList from '../ReplyNoteList'
 import ReactionList from '../ReactionList'
+import ReplyNoteList from '../ReplyNoteList'
+import RepostList from '../RepostList'
 import { Tabs, TTabValue } from './Tabs'
 
 export default function NoteInteractions({
@@ -25,6 +26,9 @@ export default function NoteInteractions({
       break
     case 'reactions':
       list = <ReactionList event={event} />
+      break
+    case 'reposts':
+      list = <RepostList event={event} />
       break
     default:
       break

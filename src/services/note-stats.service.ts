@@ -10,6 +10,7 @@ export type TNoteStats = {
   likeIdSet: Set<string>
   likes: { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
   repostPubkeySet: Set<string>
+  reposts: { id: string; pubkey: string; created_at: number }[]
   zapPrSet: Set<string>
   zaps: { pr: string; pubkey: string; amount: number; comment?: string }[]
   updatedAt?: number
@@ -194,8 +195,12 @@ class NoteStatsService {
 
     const old = this.noteStatsMap.get(eventId) || {}
     const repostPubkeySet = old.repostPubkeySet || new Set()
+    const reposts = old.reposts || []
+    if (repostPubkeySet.has(evt.pubkey)) return
+
     repostPubkeySet.add(evt.pubkey)
-    this.noteStatsMap.set(eventId, { ...old, repostPubkeySet })
+    reposts.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at })
+    this.noteStatsMap.set(eventId, { ...old, repostPubkeySet, reposts })
     return eventId
   }
 
