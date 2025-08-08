@@ -24,7 +24,7 @@ export default function NoteInteractions({
       list = <QuoteList event={event} />
       break
     case 'reactions':
-      list = <ReactionList index={pageIndex} event={event} />
+      list = <ReactionList event={event} />
       break
     default:
       break

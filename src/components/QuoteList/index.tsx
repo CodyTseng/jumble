@@ -130,7 +130,7 @@ export default function QuoteList({ event, className }: { event: Event; classNam
 
   return (
     <div className={className}>
-      <div className="min-h-screen">
+      <div className="min-h-[80vh]">
         <div>
           {events.slice(0, showCount).map((event) => {
             if (hideUntrustedInteractions && !isUserTrusted(event.pubkey)) {

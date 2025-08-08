@@ -274,7 +274,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[80vh]">
       {loading && (replies.length === 0 ? <ReplyNoteSkeleton /> : <LoadingBar />)}
       {!loading && until && (
         <div

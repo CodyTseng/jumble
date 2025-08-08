@@ -1,35 +1,31 @@
-import { useMemo, useEffect, useState, useRef } from 'react'
 import { useSecondaryPage } from '@/PageManager'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { toProfile } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
+import { Event } from 'nostr-tools'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LoadingBar } from '../LoadingBar'
-import { cn } from '@/lib/utils'
-import Collapsible from '../Collapsible'
-import { FormattedTimestamp } from '../FormattedTimestamp'
 import Emoji from '../Emoji'
+import { FormattedTimestamp } from '../FormattedTimestamp'
+import { LoadingBar } from '../LoadingBar'
+import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
-const SHOW_COUNT = 10
+const SHOW_COUNT = 20
 
-export default function ReactionList({ index, event }: { index?: number; event: any }) {
+export default function ReactionList({ event }: { event: Event }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const { currentIndex } = useSecondaryPage()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
-
   const noteStats = useNoteStatsById(event.id)
-  const likes = useMemo(() => noteStats?.likes ?? [], [noteStats, event.id])
-
-  const filteredLikes = useMemo(
-    () =>
-      likes
-        .filter((like) => !hideUntrustedInteractions || isUserTrusted(like.pubkey))
-        .sort((a, b) => b.created_at - a.created_at),
-    [likes, hideUntrustedInteractions, isUserTrusted]
-  )
+  const filteredLikes = useMemo(() => {
+    return (noteStats?.likes ?? [])
+      .filter((like) => !hideUntrustedInteractions || isUserTrusted(like.pubkey))
+      .sort((a, b) => b.created_at - a.created_at)
+  }, [noteStats, event.id, hideUntrustedInteractions, isUserTrusted])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [loading, setLoading] = useState(true)
@@ -53,50 +49,49 @@ export default function ReactionList({ index, event }: { index?: number; event: 
     return () => obs.disconnect()
   }, [filteredLikes.length, showCount])
 
-  if (currentIndex !== index) return null
-
   return (
-    <div>
+    <div className="min-h-[80vh]">
       {loading && <LoadingBar />}
 
       {!loading && filteredLikes.length === 0 && (
-        <div className="text-sm text-muted-foreground text-center my-4">
-          {t('No reactions yet')}
+        <div className="text-sm mt-2 text-center text-muted-foreground">
+          {t('no reactions yet')}
         </div>
       )}
 
-      {filteredLikes.slice(0, showCount).map((like, id) => (
-        <div key={id} className="pb-3 border-b transition-colors duration-500 clickable">
-          <Collapsible>
-            <div className="flex items-center space-x-3 px-4 pt-3">
-              <Emoji emoji={like.emoji} className="text-xl size-6" />
+      {filteredLikes.slice(0, showCount).map((like) => (
+        <div
+          key={like.id}
+          className="px-4 py-3 border-b transition-colors clickable flex items-center gap-3"
+          onClick={() => push(toProfile(like.pubkey))}
+        >
+          <div className="w-6 flex justify-center">
+            <Emoji
+              emoji={like.emoji}
+              classNames={{
+                text: 'text-xl',
+                img: 'size-6'
+              }}
+            />
+          </div>
 
-              <UserAvatar userId={like.pubkey} size="medium" className="shrink-0" />
+          <UserAvatar userId={like.pubkey} size="medium" className="shrink-0" />
 
-              <div className="w-full overflow-hidden">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 w-0">
-                    <div className="flex gap-1 items-center">
-                      <Username
-                        userId={like.pubkey}
-                        className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
-                        skeletonClassName="h-3"
-                      />
-                    </div>
-                    {like.created_at && (
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <FormattedTimestamp
-                          timestamp={like.created_at}
-                          className="shrink-0"
-                          short={isSmallScreen}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+          <div className="flex-1 w-0">
+            <Username
+              userId={like.pubkey}
+              className="text-sm font-semibold text-muted-foreground hover:text-foreground max-w-fit truncate"
+              skeletonClassName="h-3"
+            />
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Nip05 pubkey={like.pubkey} append="·" />
+              <FormattedTimestamp
+                timestamp={like.created_at}
+                className="shrink-0"
+                short={isSmallScreen}
+              />
             </div>
-          </Collapsible>
+          </div>
         </div>
       ))}
 
