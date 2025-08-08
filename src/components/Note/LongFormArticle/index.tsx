@@ -46,9 +46,6 @@ export default function LongFormArticle({
         components={
           {
             nostr: (props) => <NostrNode {...props} />,
-            img: ({ src, ...props }) => (
-              <ImageWithLightbox image={{ url: src ?? '', pubkey: event.pubkey }} {...props} />
-            ),
             a: (props) => <a {...props} target="_blank" rel="noreferrer noopener" />
           } as Components
         }
