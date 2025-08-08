@@ -1,4 +1,5 @@
 import { BIG_RELAY_URLS } from '@/constants'
+import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
@@ -38,6 +39,11 @@ class NoteStatsService {
       client.fetchRelayList(event.pubkey),
       client.fetchProfile(event.pubkey)
     ])
+
+    const replaceableCoordinate = isReplaceableEvent(event.kind)
+      ? getReplaceableCoordinateFromEvent(event)
+      : undefined
+
     const filters: Filter[] = [
       {
         '#e': [event.id],
@@ -51,12 +57,35 @@ class NoteStatsService {
       }
     ]
 
+    if (replaceableCoordinate) {
+      filters.push(
+        {
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Reaction],
+          limit: 500
+        },
+        {
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Repost],
+          limit: 100
+        }
+      )
+    }
+
     if (authorProfile?.lightningAddress) {
       filters.push({
         '#e': [event.id],
         kinds: [kinds.Zap],
         limit: 500
       })
+
+      if (replaceableCoordinate) {
+        filters.push({
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Zap],
+          limit: 500
+        })
+      }
     }
 
     if (pubkey) {
@@ -66,12 +95,28 @@ class NoteStatsService {
         kinds: [kinds.Reaction, kinds.Repost]
       })
 
+      if (replaceableCoordinate) {
+        filters.push({
+          '#a': [replaceableCoordinate],
+          authors: [pubkey],
+          kinds: [kinds.Reaction, kinds.Repost]
+        })
+      }
+
       if (authorProfile?.lightningAddress) {
         filters.push({
           '#e': [event.id],
           '#P': [pubkey],
           kinds: [kinds.Zap]
         })
+
+        if (replaceableCoordinate) {
+          filters.push({
+            '#a': [replaceableCoordinate],
+            '#P': [pubkey],
+            kinds: [kinds.Zap]
+          })
+        }
       }
     }
 
