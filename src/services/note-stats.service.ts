@@ -12,7 +12,7 @@ export type TNoteStats = {
   repostPubkeySet: Set<string>
   reposts: { id: string; pubkey: string; created_at: number }[]
   zapPrSet: Set<string>
-  zaps: { pr: string; pubkey: string; amount: number; comment?: string }[]
+  zaps: { pr: string; pubkey: string; amount: number; created_at: number; comment?: string }[]
   updatedAt?: number
 }
 
@@ -124,6 +124,7 @@ class NoteStatsService {
     pr: string,
     amount: number,
     comment?: string,
+    created_at: number = dayjs().unix(),
     notify: boolean = true
   ) {
     const old = this.noteStatsMap.get(eventId) || {}
@@ -132,7 +133,7 @@ class NoteStatsService {
     if (zapPrSet.has(pr)) return
 
     zapPrSet.add(pr)
-    zaps.push({ pr, pubkey, amount, comment })
+    zaps.push({ pr, pubkey, amount, comment, created_at })
     this.noteStatsMap.set(eventId, { ...old, zapPrSet, zaps })
     if (notify) {
       this.notifyNoteStats(eventId)
@@ -210,7 +211,15 @@ class NoteStatsService {
     const { originalEventId, senderPubkey, invoice, amount, comment } = info
     if (!originalEventId || !senderPubkey) return
 
-    return this.addZap(senderPubkey, originalEventId, invoice, amount, comment, false)
+    return this.addZap(
+      senderPubkey,
+      originalEventId,
+      invoice,
+      amount,
+      comment,
+      evt.created_at,
+      false
+    )
   }
 }
 
