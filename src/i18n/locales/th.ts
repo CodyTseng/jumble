@@ -325,6 +325,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'ส่งสัญญาณไปยังรีเลย์สำเร็จแล้ว: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'การส่งสัญญาณไปยังรีเลย์ล้มเหลว: {{url}} ข้อผิดพลาด: {{error}}',
-    'Write relays': 'รีเลย์การเขียน'
+    'Write relays': 'รีเลย์การเขียน',
+    'No more reactions': 'ไม่มีปฏิกิริยาเพิ่มเติม',
+    'No reactions yet': 'ยังไม่มีปฏิกิริยา',
+    'No more zaps': 'ไม่มีซาตส์เพิ่มเติม',
+    'No zaps yet': 'ยังไม่มีซาตส์',
+    'No more reposts': 'ไม่มีการรีโพสต์เพิ่มเติม',
+    'No reposts yet': 'ยังไม่มีการรีโพสต์',
+    Reposts: 'การรีโพสต์'
   }
 }

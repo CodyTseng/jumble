@@ -331,6 +331,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Pomyślnie transmitowano do przekaźnika: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Nie udało się transmitować do przekaźnika: {{url}}. Błąd: {{error}}',
-    'Write relays': 'Przekaźniki zapisu'
+    'Write relays': 'Przekaźniki zapisu',
+    'No more reactions': 'Brak kolejnych reakcji',
+    'No reactions yet': 'Brak reakcji',
+    'No more zaps': 'Brak kolejnych zapów',
+    'No zaps yet': 'Brak zapów',
+    'No more reposts': 'Brak kolejnych repostów',
+    'No reposts yet': 'Brak repostów',
+    Reposts: 'Reposty'
   }
 }

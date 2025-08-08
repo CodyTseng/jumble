@@ -324,6 +324,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': '成功广播到服务器：{{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       '广播到服务器失败：{{url}}。错误：{{error}}',
-    'Write relays': '写服务器'
+    'Write relays': '写服务器',
+    'No more reactions': '没有更多互动了',
+    'No reactions yet': '暂无互动',
+    'No more zaps': '没有更多打闪了',
+    'No zaps yet': '暂无打闪',
+    'No more reposts': '没有更多转发了',
+    'No reposts yet': '暂无转发',
+    Reposts: '转发'
   }
 }

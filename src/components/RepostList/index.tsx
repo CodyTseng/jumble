@@ -8,7 +8,6 @@ import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormattedTimestamp } from '../FormattedTimestamp'
-import { LoadingBar } from '../LoadingBar'
 import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -28,14 +27,7 @@ export default function RepostList({ event }: { event: Event }) {
   }, [noteStats, event.id, hideUntrustedInteractions, isUserTrusted])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [loading, setLoading] = useState(true)
   const bottomRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (noteStats) {
-      setLoading(false)
-    }
-  }, [noteStats])
 
   useEffect(() => {
     if (!bottomRef.current || filteredReposts.length <= showCount) return
@@ -51,12 +43,6 @@ export default function RepostList({ event }: { event: Event }) {
 
   return (
     <div className="min-h-[80vh]">
-      {loading && <LoadingBar />}
-
-      {!loading && filteredReposts.length === 0 && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">{t('no reposts yet')}</div>
-      )}
-
       {filteredReposts.slice(0, showCount).map((repost) => (
         <div
           key={repost.id}
@@ -87,9 +73,9 @@ export default function RepostList({ event }: { event: Event }) {
 
       <div ref={bottomRef} />
 
-      {!loading && filteredReposts.length > 0 && showCount >= filteredReposts.length && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">{t('no more reposts')}</div>
-      )}
+      <div className="text-sm mt-2 text-center text-muted-foreground">
+        {filteredReposts.length > 0 ? t('No more reposts') : t('No reposts yet')}
+      </div>
     </div>
   )
 }

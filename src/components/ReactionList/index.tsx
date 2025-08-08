@@ -8,7 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Emoji from '../Emoji'
 import { FormattedTimestamp } from '../FormattedTimestamp'
-import { LoadingBar } from '../LoadingBar'
 import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -28,14 +27,7 @@ export default function ReactionList({ event }: { event: Event }) {
   }, [noteStats, event.id, hideUntrustedInteractions, isUserTrusted])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [loading, setLoading] = useState(true)
   const bottomRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (noteStats) {
-      setLoading(false)
-    }
-  }, [noteStats])
 
   useEffect(() => {
     if (!bottomRef.current || filteredLikes.length <= showCount) return
@@ -51,14 +43,6 @@ export default function ReactionList({ event }: { event: Event }) {
 
   return (
     <div className="min-h-[80vh]">
-      {loading && <LoadingBar />}
-
-      {!loading && filteredLikes.length === 0 && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">
-          {t('no reactions yet')}
-        </div>
-      )}
-
       {filteredLikes.slice(0, showCount).map((like) => (
         <div
           key={like.id}
@@ -97,11 +81,9 @@ export default function ReactionList({ event }: { event: Event }) {
 
       <div ref={bottomRef} />
 
-      {!loading && filteredLikes.length > 0 && showCount >= filteredLikes.length && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">
-          {t('no more reactions')}
-        </div>
-      )}
+      <div className="text-sm mt-2 text-center text-muted-foreground">
+        {filteredLikes.length > 0 ? t('No more reactions') : t('No reactions yet')}
+      </div>
     </div>
   )
 }

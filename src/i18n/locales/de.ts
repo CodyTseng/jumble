@@ -333,6 +333,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Erfolgreich an Relay gesendet: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Fehler beim Senden an Relay: {{url}}. Fehler: {{error}}',
-    'Write relays': 'Schreib-Relays'
+    'Write relays': 'Schreib-Relays',
+    'No more reactions': 'Keine weiteren Reaktionen',
+    'No reactions yet': 'Noch keine Reaktionen',
+    'No more zaps': 'Keine weiteren Zaps',
+    'No zaps yet': 'Noch keine Zaps',
+    'No more reposts': 'Keine weiteren Reposts',
+    'No reposts yet': 'Noch keine Reposts',
+    Reposts: 'Reposts'
   }
 }

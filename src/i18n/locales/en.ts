@@ -327,6 +327,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Successfully broadcasted to relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Failed to broadcast to relay: {{url}}. Error: {{error}}',
-    'Write relays': 'Write relays'
+    'Write relays': 'Write relays',
+    'No more reactions': 'No more reactions',
+    'No reactions yet': 'No reactions yet',
+    'No more zaps': 'No more zaps',
+    'No zaps yet': 'No zaps yet',
+    'No more reposts': 'No more reposts',
+    'No reposts yet': 'No reposts yet',
+    Reposts: 'Reposts'
   }
 }

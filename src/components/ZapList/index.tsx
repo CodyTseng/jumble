@@ -7,12 +7,11 @@ import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
-import { LoadingBar } from '../LoadingBar'
 import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import Content from '../Content'
 
 const SHOW_COUNT = 20
 
@@ -26,14 +25,7 @@ export default function ZapList({ event }: { event: Event }) {
   }, [noteStats, event.id])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [loading, setLoading] = useState(true)
   const bottomRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (noteStats) {
-      setLoading(false)
-    }
-  }, [noteStats])
 
   useEffect(() => {
     if (!bottomRef.current || filteredZaps.length <= showCount) return
@@ -49,12 +41,6 @@ export default function ZapList({ event }: { event: Event }) {
 
   return (
     <div className="min-h-[80vh]">
-      {loading && <LoadingBar />}
-
-      {!loading && filteredZaps.length === 0 && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">{t('no zaps yet')}</div>
-      )}
-
       {filteredZaps.slice(0, showCount).map((zap) => (
         <div
           key={zap.pr}
@@ -90,9 +76,9 @@ export default function ZapList({ event }: { event: Event }) {
 
       <div ref={bottomRef} />
 
-      {!loading && filteredZaps.length > 0 && showCount >= filteredZaps.length && (
-        <div className="text-sm mt-2 text-center text-muted-foreground">{t('no more zaps')}</div>
-      )}
+      <div className="text-sm mt-2 text-center text-muted-foreground">
+        {filteredZaps.length > 0 ? t('No more zaps') : t('No zaps yet')}
+      </div>
     </div>
   )
 }

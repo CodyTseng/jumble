@@ -326,6 +326,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'تم البث بنجاح إلى المرحل: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'فشل البث إلى المرحل: {{url}}. خطأ: {{error}}',
-    'Write relays': 'مرحلات الكتابة'
+    'Write relays': 'مرحلات الكتابة',
+    'No more reactions': 'لا توجد تفاعلات إضافية',
+    'No reactions yet': 'لا توجد تفاعلات بعد',
+    'No more zaps': 'لا توجد مزيد من الزابس',
+    'No zaps yet': 'لا توجد زابس بعد',
+    'No more reposts': 'لا توجد مزيد من إعادة النشر',
+    'No reposts yet': 'لا توجد إعادة نشر بعد',
+    Reposts: 'إعادة النشر'
   }
 }

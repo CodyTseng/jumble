@@ -328,6 +328,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': '릴레이로 브로드캐스트에 성공했습니다: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       '릴레이로 브로드캐스트에 실패했습니다: {{url}}. 오류: {{error}}',
-    'Write relays': '쓰기 릴레이'
+    'Write relays': '쓰기 릴레이',
+    'No more reactions': '더 이상 반응이 없습니다',
+    'No reactions yet': '아직 반응이 없습니다',
+    'No more zaps': '더 이상 즙이 없습니다',
+    'No zaps yet': '아직 즙이 없습니다',
+    'No more reposts': '더 이상 리포스트가 없습니다',
+    'No reposts yet': '아직 리포스트가 없습니다',
+    Reposts: '리포스트'
   }
 }

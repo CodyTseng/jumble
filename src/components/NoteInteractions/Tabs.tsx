@@ -5,10 +5,10 @@ import { useRef, useEffect, useState } from 'react'
 export type TTabValue = 'replies' | 'quotes' | 'reactions' | 'reposts' | 'zaps'
 const TABS = [
   { value: 'replies', label: 'Replies' },
-  { value: 'quotes', label: 'Quotes' },
   { value: 'zaps', label: 'Zaps' },
+  { value: 'reposts', label: 'Reposts' },
   { value: 'reactions', label: 'Reactions' },
-  { value: 'reposts', label: 'Reposts' }
+  { value: 'quotes', label: 'Quotes' }
 ] as { value: TTabValue; label: string }[]
 
 export function Tabs({

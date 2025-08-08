@@ -327,6 +327,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'با موفقیت به رله پخش شد: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'پخش به رله ناموفق بود: {{url}}. خطا: {{error}}',
-    'Write relays': 'رله‌های نوشتن'
+    'Write relays': 'رله‌های نوشتن',
+    'No more reactions': 'هیچ واکنشی بیشتر وجود ندارد',
+    'No reactions yet': 'هنوز هیچ واکنشی وجود ندارد',
+    'No more zaps': 'هیچ زپی بیشتر وجود ندارد',
+    'No zaps yet': 'هنوز هیچ زپی وجود ندارد',
+    'No more reposts': 'هیچ بازنشر بیشتری وجود ندارد',
+    'No reposts yet': 'هنوز هیچ بازنشر وجود ندارد',
+    Reposts: 'بازنشرها'
   }
 }

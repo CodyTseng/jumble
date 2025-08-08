@@ -331,6 +331,13 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Успешно транслировано в релей: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Ошибка трансляции в релей: {{url}}. Ошибка: {{error}}',
-    'Write relays': 'Ретрансляторы для записи'
+    'Write relays': 'Ретрансляторы для записи',
+    'No more reactions': 'Больше нет реакций',
+    'No reactions yet': 'Пока нет реакций',
+    'No more zaps': 'Больше нет запов',
+    'No zaps yet': 'Пока нет запов',
+    'No more reposts': 'Больше нет репостов',
+    'No reposts yet': 'Пока нет репостов',
+    Reposts: 'Репосты'
   }
 }

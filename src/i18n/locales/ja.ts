@@ -329,6 +329,13 @@ export default {
       'リレイへのブロードキャストが成功しました：{{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'リレイへのブロードキャストが失敗しました：{{url}}。エラー：{{error}}',
-    'Write relays': '書きリレイ'
+    'Write relays': '書きリレイ',
+    'No more reactions': 'これ以上の反応はありません',
+    'No reactions yet': 'まだ反応はありません',
+    'No more zaps': 'これ以上のZapはありません',
+    'No zaps yet': 'まだZapはありません',
+    'No more reposts': 'これ以上のリポストはありません',
+    'No reposts yet': 'まだリポストはありません',
+    Reposts: 'リポスト'
   }
 }
