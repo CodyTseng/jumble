@@ -5,7 +5,8 @@ import { useRef, useEffect, useState } from 'react'
 export type TTabValue = 'replies' | 'quotes'
 const TABS = [
   { value: 'replies', label: 'Replies' },
-  { value: 'quotes', label: 'Quotes' }
+  { value: 'quotes', label: 'Quotes' },
+  { value: 'reactions', label: 'Reactions' }
 ] as { value: TTabValue; label: string }[]
 
 export function Tabs({
