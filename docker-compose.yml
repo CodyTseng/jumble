@@ -18,6 +18,8 @@ services:
     image: ghcr.io/danvergara/jumble-proxy-server:latest
     environment:
       - ALLOW_ORIGIN=${JUMBLE_SOCIAL_URL:-http://localhost:8089}
+      - JUMBLE_PROXY_GITHUB_TOKEN=${JUMBLE_PROXY_GITHUB_TOKEN}
+      - ENABLE_PPROF=true
       - PORT=8080
     ports:
       - "8090:8080"
