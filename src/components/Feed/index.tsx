@@ -38,7 +38,7 @@ const KINDS = [
   ExtendedKind.PICTURE
 ]
 
-export default function NoteList({
+export default function Feed({
   relayUrls = [],
   filter = {},
   author,

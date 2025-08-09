@@ -1,5 +1,5 @@
 import { Favicon } from '@/components/Favicon'
-import NoteList from '@/components/NoteList'
+import Feed from '@/components/Feed'
 import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
@@ -108,7 +108,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    content = <NoteList filter={data.filter} relayUrls={data.urls} />
+    content = <Feed filter={data.filter} relayUrls={data.urls} />
   }
 
   return (

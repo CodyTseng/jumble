@@ -1,7 +1,7 @@
 import Collapsible from '@/components/Collapsible'
 import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
-import NoteList from '@/components/NoteList'
+import Feed from '@/components/Feed'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
@@ -193,7 +193,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
           </div>
         </div>
       </div>
-      <NoteList
+      <Feed
         author={pubkey}
         className="mt-2"
         filterMutedNotes={false}

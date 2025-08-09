@@ -1,5 +1,5 @@
 import BookmarkList from '@/components/BookmarkList'
-import NoteList from '@/components/NoteList'
+import Feed from '@/components/Feed'
 import PostEditor from '@/components/PostEditor'
 import SaveRelayDropdownMenu from '@/components/SaveRelayDropdownMenu'
 import { Button } from '@/components/ui/button'
@@ -50,7 +50,7 @@ const NoteListPage = forwardRef((_, ref) => {
     }
   } else if (isReady) {
     content = (
-      <NoteList
+      <Feed
         relayUrls={relayUrls}
         filter={filter}
         needCheckAlgoRelay={feedInfo.feedType !== 'following'}
