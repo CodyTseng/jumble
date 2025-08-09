@@ -19,17 +19,19 @@ export default function LongFormArticle({
   const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(event), [event])
 
   return (
-    <div className={`prose prose-zinc max-w-none dark:prose-invert ${className || ''}`}>
-      <h1>{metadata.title}</h1>
+    <div
+      className={`prose prose-zinc max-w-none dark:prose-invert break-words overflow-wrap-anywhere ${className || ''}`}
+    >
+      <h1 className="break-words">{metadata.title}</h1>
       {metadata.summary && (
         <blockquote>
-          <p>{metadata.summary}</p>
+          <p className="break-words">{metadata.summary}</p>
         </blockquote>
       )}
       {metadata.tags.length > 0 && (
         <div className="flex gap-1 flex-wrap">
           {metadata.tags.map((tag) => (
-            <Badge key={tag} variant="secondary">
+            <Badge key={tag} variant="secondary" className="break-words">
               {tag}
             </Badge>
           ))}
@@ -46,7 +48,12 @@ export default function LongFormArticle({
         components={
           {
             nostr: (props) => <NostrNode {...props} />,
-            a: (props) => <a {...props} target="_blank" rel="noreferrer noopener" />
+            a: (props) => (
+              <a {...props} target="_blank" rel="noreferrer noopener" className="break-words" />
+            ),
+            p: (props) => <p {...props} className="break-words" />,
+            div: (props) => <div {...props} className="break-words" />,
+            code: (props) => <code {...props} className="break-words whitespace-pre-wrap" />
           } as Components
         }
       >
