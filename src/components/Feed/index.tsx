@@ -1,11 +1,7 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import {
-  getReplaceableCoordinateFromEvent,
-  isReplaceableEvent,
-  isReplyNoteEvent
-} from '@/lib/event'
+import { isReplyNoteEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
 import { isSafari } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -20,7 +16,8 @@ import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
-import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
+import { NoteCardLoadingSkeleton } from '../NoteCard'
+import NoteList from '../NoteList'
 import Tabs from '../Tabs'
 
 const LIMIT = 100
@@ -300,8 +297,6 @@ export default function Feed({
     }, 0)
   }
 
-  const idSet = new Set<string>()
-
   return (
     <div className={className}>
       <Tabs
@@ -342,27 +337,16 @@ export default function Feed({
         pullingContent=""
       >
         <div className="min-h-screen">
-          {events
-            .slice(0, showCount)
-            .filter((event: Event) => {
-              const id = isReplaceableEvent(event.kind)
-                ? getReplaceableCoordinateFromEvent(event)
-                : event.id
-              if (idSet.has(id)) return false
-              idSet.add(id)
-              return (
-                (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
-                (skipTrustCheck || !hideUntrustedNotes || isUserTrusted(event.pubkey))
-              )
-            })
-            .map((event) => (
-              <NoteCard
-                key={event.id}
-                className="w-full"
-                event={event}
-                filterMutedNotes={filterMutedNotes}
-              />
-            ))}
+          <NoteList
+            events={events
+              .slice(0, showCount)
+              .filter(
+                (event: Event) =>
+                  (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+                  (skipTrustCheck || !hideUntrustedNotes || isUserTrusted(event.pubkey))
+              )}
+            filterMutedNotes={filterMutedNotes}
+          />
           {hasMore || loading ? (
             <div ref={bottomRef}>
               <NoteCardLoadingSkeleton />
