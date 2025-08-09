@@ -18,7 +18,7 @@ export default function ReplyButton({ event }: { event: Event }) {
       return repliesMap.get(event.id)?.events.filter((evt) => isUserTrusted(evt.pubkey)).length ?? 0
     }
     return repliesMap.get(event.id)?.events.length ?? 0
-  }, [repliesMap, event.id, isUserTrusted])
+  }, [repliesMap, event.id, hideUntrustedInteractions])
   const [open, setOpen] = useState(false)
 
   return (

@@ -12,6 +12,7 @@ import { getNoteBech32Id } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import noteStatsService from '@/services/note-stats.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
@@ -23,6 +24,7 @@ import { formatCount } from './utils'
 export default function RepostButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { publish, checkLogin, pubkey } = useNostr()
   const noteStats = useNoteStatsById(event.id)
   const [reposting, setReposting] = useState(false)
@@ -30,10 +32,12 @@ export default function RepostButton({ event }: { event: Event }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { repostCount, hasReposted } = useMemo(() => {
     return {
-      repostCount: noteStats?.repostPubkeySet?.size,
+      repostCount: hideUntrustedInteractions
+        ? noteStats?.reposts?.filter((repost) => isUserTrusted(repost.pubkey)).length
+        : noteStats?.reposts?.length,
       hasReposted: pubkey ? noteStats?.repostPubkeySet?.has(pubkey) : false
     }
-  }, [noteStats, event.id])
+  }, [noteStats, event.id, hideUntrustedInteractions])
   const canRepost = !hasReposted && !reposting
 
   const repost = async () => {

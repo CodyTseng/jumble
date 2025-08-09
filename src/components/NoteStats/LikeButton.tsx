@@ -8,6 +8,7 @@ import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { createReactionDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import noteStatsService from '@/services/note-stats.service'
 import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -22,15 +23,19 @@ export default function LikeButton({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
+  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const noteStats = useNoteStatsById(event.id)
   const { myLastEmoji, likeCount } = useMemo(() => {
     const stats = noteStats || {}
-    const like = stats.likes?.find((like) => like.pubkey === pubkey)
-    return { myLastEmoji: like?.emoji, likeCount: stats.likes?.length }
-  }, [noteStats, pubkey])
+    const myLike = stats.likes?.find((like) => like.pubkey === pubkey)
+    const likes = hideUntrustedInteractions
+      ? stats.likes?.filter((like) => isUserTrusted(like.pubkey))
+      : stats.likes
+    return { myLastEmoji: myLike?.emoji, likeCount: likes?.length }
+  }, [noteStats, pubkey, hideUntrustedInteractions])
 
   const like = async (emoji: string) => {
     checkLogin(async () => {

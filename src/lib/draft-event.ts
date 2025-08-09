@@ -1,4 +1,4 @@
-import { ApplicationDataKey, ExtendedKind, POLL_TYPE } from '@/constants'
+import { ApplicationDataKey, EMBEDDED_EVENT_REGEX, ExtendedKind, POLL_TYPE } from '@/constants'
 import client from '@/services/client.service'
 import mediaUpload from '@/services/media-upload.service'
 import {
@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import {
+  getReplaceableCoordinate,
   getReplaceableCoordinateFromEvent,
   getRootETag,
   isProtectedEvent,
@@ -54,6 +55,10 @@ export function createRepostDraftEvent(event: Event): TDraftEvent {
   const isProtected = isProtectedEvent(event)
   const tags = [buildETag(event.id, event.pubkey), buildPTag(event.pubkey)]
 
+  if (isReplaceableEvent(event.kind)) {
+    tags.push(buildATag(event))
+  }
+
   return {
     kind: kinds.Repost,
     content: isProtected ? '' : JSON.stringify(event),
@@ -73,10 +78,8 @@ export async function createShortTextNoteDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const { quoteEventIds, rootETag, parentETag } = await extractRelatedEventIds(
-    content,
-    options.parentEvent
-  )
+  const { quoteEventHexIds, quoteReplaceableCoordinates, rootETag, parentETag } =
+    await extractRelatedEventIds(content, options.parentEvent)
   const hashtags = extractHashtags(content)
 
   const tags = hashtags.map((hashtag) => buildTTag(hashtag))
@@ -88,7 +91,8 @@ export async function createShortTextNoteDraftEvent(
   }
 
   // q tags
-  tags.push(...quoteEventIds.map((eventId) => buildQTag(eventId)))
+  tags.push(...quoteEventHexIds.map((eventId) => buildQTag(eventId)))
+  tags.push(...quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
 
   // e tags
   if (rootETag.length) {
@@ -153,7 +157,7 @@ export async function createPictureNoteDraftEvent(
     protectedEvent?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const { quoteEventIds } = await extractRelatedEventIds(content)
+  const { quoteEventHexIds, quoteReplaceableCoordinates } = await extractRelatedEventIds(content)
   const hashtags = extractHashtags(content)
   if (!pictureInfos.length) {
     throw new Error('No images found in content')
@@ -162,7 +166,8 @@ export async function createPictureNoteDraftEvent(
   const tags = pictureInfos
     .map((info) => buildImetaTag(info.tags))
     .concat(hashtags.map((hashtag) => buildTTag(hashtag)))
-    .concat(quoteEventIds.map((eventId) => buildQTag(eventId)))
+    .concat(quoteEventHexIds.map((eventId) => buildQTag(eventId)))
+    .concat(quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
     .concat(mentions.map((pubkey) => buildPTag(pubkey)))
 
   if (options.addClientTag) {
@@ -192,13 +197,21 @@ export async function createCommentDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const { quoteEventIds, rootEventId, rootCoordinateTag, rootKind, rootPubkey, rootUrl } =
-    await extractCommentMentions(content, parentEvent)
+  const {
+    quoteEventHexIds,
+    quoteReplaceableCoordinates,
+    rootEventId,
+    rootCoordinateTag,
+    rootKind,
+    rootPubkey,
+    rootUrl
+  } = await extractCommentMentions(content, parentEvent)
   const hashtags = extractHashtags(content)
 
   const tags = hashtags
     .map((hashtag) => buildTTag(hashtag))
-    .concat(quoteEventIds.map((eventId) => buildQTag(eventId)))
+    .concat(quoteEventHexIds.map((eventId) => buildQTag(eventId)))
+    .concat(quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
 
   const images = extractImagesFromContent(content)
   if (images && images.length) {
@@ -357,7 +370,7 @@ export async function createPollDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const { quoteEventIds } = await extractRelatedEventIds(question)
+  const { quoteEventHexIds, quoteReplaceableCoordinates } = await extractRelatedEventIds(question)
   const hashtags = extractHashtags(question)
 
   const tags = hashtags.map((hashtag) => buildTTag(hashtag))
@@ -369,7 +382,8 @@ export async function createPollDraftEvent(
   }
 
   // q tags
-  tags.push(...quoteEventIds.map((eventId) => buildQTag(eventId)))
+  tags.push(...quoteEventHexIds.map((eventId) => buildQTag(eventId)))
+  tags.push(...quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
 
   // p tags
   tags.push(...mentions.map((pubkey) => buildPTag(pubkey)))
@@ -441,10 +455,11 @@ function generateImetaTags(imageUrls: string[]) {
 }
 
 async function extractRelatedEventIds(content: string, parentEvent?: Event) {
-  const quoteEventIds: string[] = []
+  const quoteEventHexIds: string[] = []
+  const quoteReplaceableCoordinates: string[] = []
   let rootETag: string[] = []
   let parentETag: string[] = []
-  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+  const matches = content.match(EMBEDDED_EVENT_REGEX)
 
   const addToSet = (arr: string[], item: string) => {
     if (!arr.includes(item)) arr.push(item)
@@ -455,9 +470,14 @@ async function extractRelatedEventIds(content: string, parentEvent?: Event) {
       const id = m.split(':')[1]
       const { type, data } = nip19.decode(id)
       if (type === 'nevent') {
-        addToSet(quoteEventIds, data.id)
+        addToSet(quoteEventHexIds, data.id)
       } else if (type === 'note') {
-        addToSet(quoteEventIds, data)
+        addToSet(quoteEventHexIds, data)
+      } else if (type === 'naddr') {
+        addToSet(
+          quoteReplaceableCoordinates,
+          getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
+        )
       }
     } catch (e) {
       console.error(e)
@@ -486,14 +506,16 @@ async function extractRelatedEventIds(content: string, parentEvent?: Event) {
   }
 
   return {
-    quoteEventIds,
+    quoteEventHexIds,
+    quoteReplaceableCoordinates,
     rootETag,
     parentETag
   }
 }
 
 async function extractCommentMentions(content: string, parentEvent: Event) {
-  const quoteEventIds: string[] = []
+  const quoteEventHexIds: string[] = []
+  const quoteReplaceableCoordinates: string[] = []
   const isComment = [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT].includes(parentEvent.kind)
   const rootCoordinateTag = isComment
     ? parentEvent.tags.find(tagNameEquals('A'))
@@ -509,15 +531,20 @@ async function extractCommentMentions(content: string, parentEvent: Event) {
     if (!arr.includes(item)) arr.push(item)
   }
 
-  const matches = content.match(/nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g)
+  const matches = content.match(EMBEDDED_EVENT_REGEX)
   for (const m of matches || []) {
     try {
       const id = m.split(':')[1]
       const { type, data } = nip19.decode(id)
       if (type === 'nevent') {
-        addToSet(quoteEventIds, data.id)
+        addToSet(quoteEventHexIds, data.id)
       } else if (type === 'note') {
-        addToSet(quoteEventIds, data)
+        addToSet(quoteEventHexIds, data)
+      } else if (type === 'naddr') {
+        addToSet(
+          quoteReplaceableCoordinates,
+          getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
+        )
       }
     } catch (e) {
       console.error(e)
@@ -525,7 +552,8 @@ async function extractCommentMentions(content: string, parentEvent: Event) {
   }
 
   return {
-    quoteEventIds,
+    quoteEventHexIds,
+    quoteReplaceableCoordinates,
     rootEventId,
     rootCoordinateTag,
     rootKind,
@@ -599,6 +627,10 @@ function buildPTag(pubkey: string, upperCase: boolean = false) {
 
 function buildQTag(eventHexId: string) {
   return trimTagEnd(['q', eventHexId, client.getEventHint(eventHexId)]) // TODO: pubkey
+}
+
+function buildReplaceableQTag(coordinate: string) {
+  return trimTagEnd(['q', coordinate])
 }
 
 function buildRTag(url: string, scope: TMailboxRelayScope) {
