@@ -1,5 +1,5 @@
 import { Favicon } from '@/components/Favicon'
-import Feed from '@/components/Feed'
+import NormalFeed from '@/components/NormalFeed'
 import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
@@ -7,63 +7,67 @@ import { toProfileList } from '@/lib/link'
 import { fetchPubkeysFromDomain, getWellKnownNip05Url } from '@/lib/nip05'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import client from '@/services/client.service'
+import { TNormalFeedSubRequest } from '@/types'
 import { UserRound } from 'lucide-react'
-import { Filter } from 'nostr-tools'
 import React, { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { relayList } = useNostr()
+  const { relayList, pubkey } = useNostr()
   const [title, setTitle] = useState<React.ReactNode>(null)
   const [controls, setControls] = useState<React.ReactNode>(null)
   const [data, setData] = useState<
     | {
         type: 'hashtag' | 'search' | 'externalContent'
-        filter: Filter
-        urls: string[]
       }
     | {
         type: 'domain'
-        filter: Filter
         domain: string
-        urls?: string[]
       }
     | null
   >(null)
+  const [subRequests, setSubRequests] = useState<TNormalFeedSubRequest[]>([])
 
   useEffect(() => {
     const init = async () => {
       const searchParams = new URLSearchParams(window.location.search)
       const hashtag = searchParams.get('t')
       if (hashtag) {
-        setData({
-          type: 'hashtag',
-          filter: { '#t': [hashtag] },
-          urls: BIG_RELAY_URLS
-        })
+        setData({ type: 'hashtag' })
         setTitle(`# ${hashtag}`)
+        setSubRequests([
+          {
+            filter: { '#t': [hashtag] },
+            urls: BIG_RELAY_URLS
+          }
+        ])
         return
       }
       const search = searchParams.get('s')
       if (search) {
-        setData({
-          type: 'search',
-          filter: { search },
-          urls: SEARCHABLE_RELAY_URLS
-        })
+        setData({ type: 'search' })
         setTitle(`${t('Search')}: ${search}`)
+        setSubRequests([
+          {
+            filter: { search },
+            urls: SEARCHABLE_RELAY_URLS
+          }
+        ])
         return
       }
       const externalContentId = searchParams.get('i')
       if (externalContentId) {
-        setData({
-          type: 'externalContent',
-          filter: { '#I': [externalContentId] },
-          urls: BIG_RELAY_URLS.concat(relayList?.write || [])
-        })
+        setData({ type: 'externalContent' })
         setTitle(externalContentId)
+        setSubRequests([
+          {
+            filter: { '#I': [externalContentId] },
+            urls: BIG_RELAY_URLS.concat(relayList?.write || [])
+          }
+        ])
         return
       }
       const domain = searchParams.get('d')
@@ -75,13 +79,12 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
           </div>
         )
         const pubkeys = await fetchPubkeysFromDomain(domain)
-        console.log(domain, pubkeys)
         setData({
           type: 'domain',
-          domain,
-          filter: { authors: pubkeys }
+          domain
         })
         if (pubkeys.length) {
+          setSubRequests(await client.generateSubRequestsForPubkeys(pubkeys, pubkey))
           setControls(
             <Button
               variant="ghost"
@@ -99,7 +102,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   }, [])
 
   let content: React.ReactNode = null
-  if (data?.type === 'domain' && data.filter?.authors?.length === 0) {
+  if (data?.type === 'domain' && setSubRequests.length === 0) {
     content = (
       <div className="text-center w-full py-10">
         <span className="text-muted-foreground">
@@ -108,7 +111,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    content = <Feed filter={data.filter} relayUrls={data.urls} />
+    content = <NormalFeed subRequests={subRequests} />
   }
 
   return (

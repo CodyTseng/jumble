@@ -1,5 +1,15 @@
-import { Event, VerifiedEvent } from 'nostr-tools'
+import { Event, VerifiedEvent, Filter } from 'nostr-tools'
 import { POLL_TYPE } from './constants'
+
+export type TSubRequest = {
+  urls: string[]
+  filter: Omit<Filter, 'since' | 'until'> & { limit: number }
+}
+
+export type TNormalFeedSubRequest = {
+  urls: string[]
+  filter: Omit<Filter, 'since' | 'until' | 'kinds'>
+}
 
 export type TProfile = {
   username: string
