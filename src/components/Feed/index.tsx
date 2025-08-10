@@ -1,5 +1,3 @@
-import NewNotesButton from '@/components/NewNotesButton'
-import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { isReplyNoteEvent } from '@/lib/event'
 import { checkAlgoRelay } from '@/lib/relay'
@@ -14,15 +12,11 @@ import { TNoteListMode } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import PullToRefresh from 'react-simple-pull-to-refresh'
-import { NoteCardLoadingSkeleton } from '../NoteCard'
-import NoteList from '../NoteList'
+import NoteList, { TNoteListRef } from '../NoteList'
 import Tabs from '../Tabs'
 
 const LIMIT = 100
 const ALGO_LIMIT = 500
-const SHOW_COUNT = 10
 const KINDS = [
   kinds.ShortTextNote,
   kinds.Repost,
@@ -56,22 +50,19 @@ export default function Feed({
   topSpace?: number
   skipTrustCheck?: boolean
 }) {
-  const { t } = useTranslation()
   const { pubkey, startLogin } = useNostr()
   const { mutePubkeys } = useMuteList()
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [events, setEvents] = useState<Event[]>([])
   const [newEvents, setNewEvents] = useState<Event[]>([])
-  const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
   const [listMode, setListMode] = useState<TNoteListMode>(() =>
     isMainFeed ? storage.getNoteListMode() : 'posts'
   )
   const [filterType, setFilterType] = useState<Exclude<TNoteListMode, 'postsAndReplies'>>('posts')
-  const bottomRef = useRef<HTMLDivElement | null>(null)
-  const topRef = useRef<HTMLDivElement | null>(null)
+  const noteListRef = useRef<TNoteListRef | null>(null)
   const { isUserTrusted, hideUntrustedNotes } = useUserTrust()
   const filteredNewEvents = useMemo(() => {
     return newEvents.filter((event: Event) => {
@@ -239,61 +230,27 @@ export default function Feed({
     }
   }, [JSON.stringify(relayUrls), filterType, refreshCount, JSON.stringify(filter)])
 
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '10px',
-      threshold: 0.1
+  const loadMore = async () => {
+    if (!timelineKey) return
+    setLoading(true)
+    const newEvents = await client.loadMoreTimeline(
+      timelineKey,
+      events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
+      LIMIT
+    )
+    setLoading(false)
+    if (newEvents.length === 0) {
+      setHasMore(false)
+      return
     }
-
-    const loadMore = async () => {
-      if (showCount < events.length) {
-        setShowCount((prev) => prev + SHOW_COUNT)
-        // preload more
-        if (events.length - showCount > LIMIT / 2) {
-          return
-        }
-      }
-
-      if (!timelineKey || loading || !hasMore) return
-      setLoading(true)
-      const newEvents = await client.loadMoreTimeline(
-        timelineKey,
-        events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
-        LIMIT
-      )
-      setLoading(false)
-      if (newEvents.length === 0) {
-        setHasMore(false)
-        return
-      }
-      setEvents((oldEvents) => [...oldEvents, ...newEvents])
-    }
-
-    const observerInstance = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMore()
-      }
-    }, options)
-
-    const currentBottomRef = bottomRef.current
-
-    if (currentBottomRef) {
-      observerInstance.observe(currentBottomRef)
-    }
-
-    return () => {
-      if (observerInstance && currentBottomRef) {
-        observerInstance.unobserve(currentBottomRef)
-      }
-    }
-  }, [timelineKey, loading, hasMore, events, filterType, showCount])
+    setEvents((oldEvents) => [...oldEvents, ...newEvents])
+  }
 
   const showNewEvents = () => {
     setEvents((oldEvents) => [...newEvents, ...oldEvents])
     setNewEvents([])
     setTimeout(() => {
-      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      noteListRef.current?.scrollToTop()
     }, 0)
   }
 
@@ -315,56 +272,32 @@ export default function Feed({
         }
         onTabChange={(listMode) => {
           setListMode(listMode as TNoteListMode)
-          setShowCount(SHOW_COUNT)
           if (isMainFeed) {
             storage.setNoteListMode(listMode as TNoteListMode)
           }
           setTimeout(() => {
-            topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            noteListRef.current?.scrollToTop()
           }, 0)
         }}
         threshold={Math.max(800, topSpace)}
       />
-      {filteredNewEvents.length > 0 && (
-        <NewNotesButton newEvents={filteredNewEvents} onClick={showNewEvents} />
-      )}
-      <div ref={topRef} className="scroll-mt-24" />
-      <PullToRefresh
-        onRefresh={async () => {
+      <NoteList
+        ref={noteListRef}
+        events={events.filter(
+          (event: Event) =>
+            (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
+            (skipTrustCheck || !hideUntrustedNotes || isUserTrusted(event.pubkey))
+        )}
+        hasMore={hasMore}
+        loading={loading}
+        loadMore={loadMore}
+        filterMutedNotes={filterMutedNotes}
+        onRefresh={() => {
           setRefreshCount((count) => count + 1)
-          await new Promise((resolve) => setTimeout(resolve, 1000))
         }}
-        pullingContent=""
-      >
-        <div className="min-h-screen">
-          <NoteList
-            events={events
-              .slice(0, showCount)
-              .filter(
-                (event: Event) =>
-                  (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
-                  (skipTrustCheck || !hideUntrustedNotes || isUserTrusted(event.pubkey))
-              )}
-            filterMutedNotes={filterMutedNotes}
-          />
-          {hasMore || loading ? (
-            <div ref={bottomRef}>
-              <NoteCardLoadingSkeleton />
-            </div>
-          ) : events.length ? (
-            <div className="text-center text-sm text-muted-foreground mt-2">
-              {t('no more notes')}
-            </div>
-          ) : (
-            <div className="flex justify-center w-full mt-2">
-              <Button size="lg" onClick={() => setRefreshCount((pre) => pre + 1)}>
-                {t('reload notes')}
-              </Button>
-            </div>
-          )}
-        </div>
-      </PullToRefresh>
-      <div className="h-40" />
+        newEvents={filteredNewEvents}
+        showNewEvents={showNewEvents}
+      />
     </div>
   )
 }
