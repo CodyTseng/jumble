@@ -8,7 +8,7 @@ import { fetchPubkeysFromDomain, getWellKnownNip05Url } from '@/lib/nip05'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { TNormalFeedSubRequest } from '@/types'
+import { TFeedSubRequest } from '@/types'
 import { UserRound } from 'lucide-react'
 import React, { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -29,7 +29,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
     | null
   >(null)
-  const [subRequests, setSubRequests] = useState<TNormalFeedSubRequest[]>([])
+  const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
 
   useEffect(() => {
     const init = async () => {
@@ -94,6 +94,8 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
               {pubkeys.length.toLocaleString()} <UserRound />
             </Button>
           )
+        } else {
+          setSubRequests([])
         }
         return
       }
@@ -102,7 +104,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   }, [])
 
   let content: React.ReactNode = null
-  if (data?.type === 'domain' && setSubRequests.length === 0) {
+  if (data?.type === 'domain' && subRequests.length === 0) {
     content = (
       <div className="text-center w-full py-10">
         <span className="text-muted-foreground">

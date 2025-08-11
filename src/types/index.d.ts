@@ -1,12 +1,9 @@
 import { Event, VerifiedEvent, Filter } from 'nostr-tools'
 import { POLL_TYPE } from './constants'
 
-export type TSubRequest = {
-  urls: string[]
-  filter: Omit<Filter, 'since' | 'until'> & { limit: number }
-}
+export type TSubRequestFilter = Omit<Filter, 'since' | 'until'> & { limit: number }
 
-export type TNormalFeedSubRequest = {
+export type TFeedSubRequest = {
   urls: string[]
   filter: Omit<Filter, 'since' | 'until' | 'kinds'>
 }

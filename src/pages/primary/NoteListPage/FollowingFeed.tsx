@@ -2,13 +2,13 @@ import NormalFeed from '@/components/NormalFeed'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { TNormalFeedSubRequest } from '@/types'
+import { TFeedSubRequest } from '@/types'
 import { useEffect, useState } from 'react'
 
 export default function FollowingFeed() {
   const { pubkey } = useNostr()
   const { feedInfo } = useFeed()
-  const [subRequests, setSubRequests] = useState<TNormalFeedSubRequest[]>([])
+  const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
 
   useEffect(() => {
     async function init() {

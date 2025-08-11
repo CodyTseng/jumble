@@ -10,7 +10,7 @@ import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { getPubkeysFromPTags, getServersFromServerTags } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
-import { ISigner, TProfile, TRelayList } from '@/types'
+import { ISigner, TProfile, TRelayList, TSubRequestFilter } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import dayjs from 'dayjs'
@@ -43,7 +43,7 @@ class ClientService extends EventTarget {
     string,
     | {
         refs: TTimelineRef[]
-        filter: Omit<Filter, 'since' | 'until'> & { limit: number }
+        filter: TSubRequestFilter
         urls: string[]
       }
     | string[]
@@ -178,7 +178,7 @@ class ClientService extends EventTarget {
   }
 
   async subscribeTimeline(
-    subRequests: { urls: string[]; filter: Omit<Filter, 'since' | 'until'> & { limit: number } }[],
+    subRequests: { urls: string[]; filter: TSubRequestFilter }[],
     {
       onEvents,
       onNew
@@ -407,7 +407,7 @@ class ClientService extends EventTarget {
 
   private async _subscribeTimeline(
     urls: string[],
-    filter: Omit<Filter, 'since' | 'until'> & { limit: number }, // filter with limit,
+    filter: TSubRequestFilter, // filter with limit,
     {
       onEvents,
       onNew

@@ -1,53 +1,162 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
-import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
-import { Event } from 'nostr-tools'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { ExtendedKind } from '@/constants'
+import {
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent,
+  isReplyNoteEvent
+} from '@/lib/event'
+import { useMuteList } from '@/providers/MuteListProvider'
+import { useNostr } from '@/providers/NostrProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
+import client from '@/services/client.service'
+import { TFeedSubRequest } from '@/types'
+import dayjs from 'dayjs'
+import { Event, kinds } from 'nostr-tools'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
+
+const LIMIT = 100
+const ALGO_LIMIT = 500
+const KINDS = [
+  kinds.ShortTextNote,
+  kinds.Repost,
+  kinds.Highlights,
+  kinds.LongFormArticle,
+  ExtendedKind.COMMENT,
+  ExtendedKind.POLL,
+  ExtendedKind.VOICE,
+  ExtendedKind.VOICE_COMMENT,
+  ExtendedKind.PICTURE
+]
 
 const SHOW_COUNT = 10
 
 const NoteList = forwardRef(
   (
     {
-      events,
-      hasMore,
-      loading,
-      loadMore,
-      newEvents = [],
-      showNewEvents,
-      onRefresh,
-      filterMutedNotes
+      subRequests,
+      filterMutedNotes = true,
+      hideReplies = false,
+      hideUntrustedNotes = false,
+      areAlgoRelays = false
     }: {
-      events: Event[]
-      hasMore: boolean
-      loading: boolean
-      loadMore?: () => void
-      newEvents?: Event[]
-      showNewEvents?: () => void
-      onRefresh?: () => void
+      subRequests: TFeedSubRequest[]
       filterMutedNotes?: boolean
+      hideReplies?: boolean
+      hideUntrustedNotes?: boolean
+      areAlgoRelays?: boolean
     },
     ref
   ) => {
     const { t } = useTranslation()
+    const { startLogin } = useNostr()
+    const { isUserTrusted } = useUserTrust()
+    const { mutePubkeys } = useMuteList()
+    const [events, setEvents] = useState<Event[]>([])
+    const [newEvents, setNewEvents] = useState<Event[]>([])
+    const [hasMore, setHasMore] = useState<boolean>(true)
+    const [loading, setLoading] = useState(true)
+    const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
+    const [refreshCount, setRefreshCount] = useState(0)
     const [showCount, setShowCount] = useState(SHOW_COUNT)
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const topRef = useRef<HTMLDivElement | null>(null)
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        scrollToTop: () => {
-          topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }),
-      []
-    )
+    const filteredEvents = useMemo(() => {
+      const idSet = new Set<string>()
 
-    const idSet = new Set<string>()
+      return events.slice(0, showCount).filter((evt) => {
+        if (hideReplies && isReplyNoteEvent(evt)) return false
+        if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return false
+
+        const id = isReplaceableEvent(evt.kind) ? getReplaceableCoordinateFromEvent(evt) : evt.id
+        if (idSet.has(id)) {
+          return false
+        }
+        idSet.add(id)
+        return true
+      })
+    }, [events, hideReplies, hideUntrustedNotes, showCount])
+
+    const filteredNewEvents = useMemo(() => {
+      const idSet = new Set<string>()
+
+      return newEvents.filter((event: Event) => {
+        if (hideReplies && isReplyNoteEvent(event)) return false
+        if (hideUntrustedNotes && !isUserTrusted(event.pubkey)) return false
+        if (filterMutedNotes && mutePubkeys.includes(event.pubkey)) return false
+
+        const id = isReplaceableEvent(event.kind)
+          ? getReplaceableCoordinateFromEvent(event)
+          : event.id
+        if (idSet.has(id)) {
+          return false
+        }
+        idSet.add(id)
+        return true
+      })
+    }, [newEvents, hideReplies, hideUntrustedNotes, filterMutedNotes, mutePubkeys])
+
+    const scrollToTop = () => {
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    useImperativeHandle(ref, () => ({ scrollToTop }), [])
+
+    useEffect(() => {
+      if (!subRequests.length) return
+
+      async function init() {
+        setLoading(true)
+        setEvents([])
+        setNewEvents([])
+        setHasMore(true)
+
+        const { closer, timelineKey } = await client.subscribeTimeline(
+          subRequests.map(({ urls, filter }) => ({
+            urls,
+            filter: {
+              ...filter,
+              kinds: KINDS,
+              limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
+            }
+          })),
+          {
+            onEvents: (events, eosed) => {
+              if (events.length > 0) {
+                setEvents(events)
+              }
+              if (areAlgoRelays) {
+                setHasMore(false)
+              }
+              if (eosed) {
+                setLoading(false)
+                setHasMore(events.length > 0)
+              }
+            },
+            onNew: (event) => {
+              setNewEvents((oldEvents) =>
+                [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
+              )
+            }
+          },
+          {
+            startLogin,
+            needSort: !areAlgoRelays
+          }
+        )
+        setTimelineKey(timelineKey)
+        return closer
+      }
+
+      const promise = init()
+      return () => {
+        promise.then((closer) => closer())
+      }
+    }, [JSON.stringify(subRequests), refreshCount])
 
     useEffect(() => {
       const options = {
@@ -56,22 +165,33 @@ const NoteList = forwardRef(
         threshold: 0.1
       }
 
-      const _loadMore = async () => {
+      const loadMore = async () => {
         if (showCount < events.length) {
           setShowCount((prev) => prev + SHOW_COUNT)
           // preload more
-          if (events.length - showCount > 2 * SHOW_COUNT) {
+          if (events.length - showCount > showCount * 5) {
             return
           }
         }
 
-        if (loading || !hasMore) return
-        loadMore?.()
+        if (!timelineKey || loading || !hasMore) return
+        setLoading(true)
+        const newEvents = await client.loadMoreTimeline(
+          timelineKey,
+          events.length ? events[events.length - 1].created_at - 1 : dayjs().unix(),
+          LIMIT
+        )
+        setLoading(false)
+        if (newEvents.length === 0) {
+          setHasMore(false)
+          return
+        }
+        setEvents((oldEvents) => [...oldEvents, ...newEvents])
       }
 
       const observerInstance = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          _loadMore()
+          loadMore()
         }
       }, options)
 
@@ -86,39 +206,38 @@ const NoteList = forwardRef(
           observerInstance.unobserve(currentBottomRef)
         }
       }
-    }, [loading, hasMore, events, loadMore])
+    }, [loading, hasMore, events])
+
+    const showNewEvents = () => {
+      setEvents((oldEvents) => [...newEvents, ...oldEvents])
+      setNewEvents([])
+      setTimeout(() => {
+        scrollToTop()
+      }, 0)
+    }
 
     return (
       <div>
-        {newEvents.length > 0 && <NewNotesButton newEvents={newEvents} onClick={showNewEvents} />}
+        {filteredNewEvents.length > 0 && (
+          <NewNotesButton newEvents={filteredNewEvents} onClick={showNewEvents} />
+        )}
         <div ref={topRef} className="scroll-mt-24" />
         <PullToRefresh
           onRefresh={async () => {
-            onRefresh?.()
+            setRefreshCount((count) => count + 1)
             await new Promise((resolve) => setTimeout(resolve, 1000))
           }}
           pullingContent=""
         >
           <div className="min-h-screen">
-            {events.slice(0, showCount).map((event) => {
-              const id = isReplaceableEvent(event.kind)
-                ? getReplaceableCoordinateFromEvent(event)
-                : event.id
-
-              if (idSet.has(id)) {
-                return null
-              }
-
-              idSet.add(id)
-              return (
-                <NoteCard
-                  key={event.id}
-                  className="w-full"
-                  event={event}
-                  filterMutedNotes={filterMutedNotes}
-                />
-              )
-            })}
+            {filteredEvents.map((event) => (
+              <NoteCard
+                key={event.id}
+                className="w-full"
+                event={event}
+                filterMutedNotes={filterMutedNotes}
+              />
+            ))}
             {hasMore || loading ? (
               <div ref={bottomRef}>
                 <NoteCardLoadingSkeleton />
@@ -129,7 +248,7 @@ const NoteList = forwardRef(
               </div>
             ) : (
               <div className="flex justify-center w-full mt-2">
-                <Button size="lg" onClick={onRefresh}>
+                <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
                   {t('reload notes')}
                 </Button>
               </div>
