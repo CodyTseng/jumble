@@ -1,13 +1,12 @@
 import Collapsible from '@/components/Collapsible'
 import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
-import Feed from '@/components/Feed'
+import NpubQrCode from '@/components/NpubQrCode'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
-import NpubQrCode from '@/components/NpubQrCode'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -25,6 +24,7 @@ import { useTranslation } from 'react-i18next'
 import NotFoundPage from '../NotFoundPage'
 import FollowedBy from './FollowedBy'
 import Followings from './Followings'
+import ProfileFeed from './ProfileFeed'
 import Relays from './Relays'
 
 const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
@@ -193,13 +193,7 @@ const ProfilePage = forwardRef(({ id, index }: { id?: string; index?: number }, 
           </div>
         </div>
       </div>
-      <Feed
-        author={pubkey}
-        className="mt-2"
-        filterMutedNotes={false}
-        topSpace={topContainerHeight + 100}
-        skipTrustCheck
-      />
+      <ProfileFeed pubkey={pubkey} topSpace={topContainerHeight + 100} />
     </SecondaryPageLayout>
   )
 })

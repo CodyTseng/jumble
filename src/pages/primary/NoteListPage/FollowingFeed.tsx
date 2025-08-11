@@ -24,5 +24,5 @@ export default function FollowingFeed() {
     init()
   }, [feedInfo.feedType, pubkey])
 
-  return <NormalFeed subRequests={subRequests} />
+  return <NormalFeed subRequests={subRequests} isMainFeed />
 }

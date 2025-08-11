@@ -1,18 +1,16 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
-import { ExtendedKind } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { isReplyNoteEvent } from '@/lib/event'
 import { useNostr } from '@/providers/NostrProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
-import { TNormalFeedSubRequest, TNoteListMode } from '@/types'
+import { TNoteListMode, TSubRequest } from '@/types'
 import dayjs from 'dayjs'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 const LIMIT = 100
-const ALGO_LIMIT = 500
 const KINDS = [
   kinds.ShortTextNote,
   kinds.Repost,
@@ -25,17 +23,14 @@ const KINDS = [
   ExtendedKind.PICTURE
 ]
 
-export default function NormalFeed({
-  subRequests,
-  areAlgoRelays = false,
-  isMainFeed = false
+export default function ProfileFeed({
+  pubkey,
+  topSpace = 0
 }: {
-  subRequests: TNormalFeedSubRequest[]
-  areAlgoRelays?: boolean
-  isMainFeed?: boolean
+  pubkey: string
+  topSpace?: number
 }) {
-  const { startLogin } = useNostr()
-  const { isUserTrusted, hideUntrustedNotes } = useUserTrust()
+  const { startLogin, pubkey: myPubkey } = useNostr()
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const [events, setEvents] = useState<Event[]>([])
   const [newEvents, setNewEvents] = useState<Event[]>([])
@@ -46,12 +41,73 @@ export default function NormalFeed({
   const noteListRef = useRef<TNoteListRef>(null)
   const filteredNewEvents = useMemo(() => {
     return newEvents.filter((event: Event) => {
-      return (
-        (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
-        (!hideUntrustedNotes || isUserTrusted(event.pubkey))
-      )
+      return listMode !== 'posts' || !isReplyNoteEvent(event)
     })
-  }, [newEvents, listMode, hideUntrustedNotes])
+  }, [newEvents, listMode])
+  const [subRequests, setSubRequests] = useState<TSubRequest[]>([])
+  const tabs = useMemo(() => {
+    const _tabs = [
+      { value: 'posts', label: 'Notes' },
+      { value: 'postsAndReplies', label: 'Replies' }
+    ]
+
+    if (myPubkey && myPubkey !== pubkey) {
+      _tabs.push({ value: 'you', label: 'YouTabName' })
+    }
+
+    return _tabs
+  }, [myPubkey, pubkey])
+
+  useEffect(() => {
+    const init = async () => {
+      if (listMode === 'you') {
+        if (!myPubkey) {
+          setSubRequests([])
+          return
+        }
+
+        const [relayList, myRelayList] = await Promise.all([
+          client.fetchRelayList(pubkey),
+          client.fetchRelayList(myPubkey)
+        ])
+
+        setSubRequests([
+          {
+            urls: myRelayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
+            filter: {
+              kinds: KINDS,
+              authors: [myPubkey],
+              '#p': [pubkey],
+              limit: LIMIT
+            }
+          },
+          {
+            urls: relayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
+            filter: {
+              kinds: KINDS,
+              authors: [pubkey],
+              '#p': [myPubkey],
+              limit: LIMIT
+            }
+          }
+        ])
+        return
+      }
+
+      const relayList = await client.fetchRelayList(pubkey)
+      setSubRequests([
+        {
+          urls: relayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
+          filter: {
+            kinds: KINDS,
+            authors: [pubkey],
+            limit: LIMIT
+          }
+        }
+      ])
+    }
+    init()
+  }, [pubkey, listMode])
 
   useEffect(() => {
     if (!subRequests.length) return
@@ -63,21 +119,11 @@ export default function NormalFeed({
       setHasMore(true)
 
       const { closer, timelineKey } = await client.subscribeTimeline(
-        subRequests.map(({ urls, filter }) => ({
-          urls,
-          filter: {
-            ...filter,
-            kinds: KINDS,
-            limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
-          }
-        })),
+        subRequests,
         {
           onEvents: (events, eosed) => {
             if (events.length > 0) {
               setEvents(events)
-            }
-            if (areAlgoRelays) {
-              setHasMore(false)
             }
             if (eosed) {
               setLoading(false)
@@ -91,8 +137,7 @@ export default function NormalFeed({
           }
         },
         {
-          startLogin,
-          needSort: !areAlgoRelays
+          startLogin
         }
       )
       setTimelineKey(timelineKey)
@@ -106,7 +151,7 @@ export default function NormalFeed({
   }, [JSON.stringify(subRequests), refreshCount])
 
   const loadMore = async () => {
-    if (!timelineKey || areAlgoRelays) return
+    if (!timelineKey) return
     setLoading(true)
     const newEvents = await client.loadMoreTimeline(
       timelineKey,
@@ -131,9 +176,6 @@ export default function NormalFeed({
 
   const handleListModeChange = (mode: TNoteListMode) => {
     setListMode(mode)
-    if (isMainFeed && mode !== 'you') {
-      storage.setNoteListMode(mode)
-    }
     setTimeout(() => {
       noteListRef.current?.scrollToTop()
     }, 0)
@@ -143,21 +185,15 @@ export default function NormalFeed({
     <>
       <Tabs
         value={listMode}
-        tabs={[
-          { value: 'posts', label: 'Notes' },
-          { value: 'postsAndReplies', label: 'Replies' }
-        ]}
+        tabs={tabs}
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
         }}
+        threshold={Math.max(800, topSpace)}
       />
       <NoteList
         ref={noteListRef}
-        events={events.filter(
-          (event: Event) =>
-            (listMode !== 'posts' || !isReplyNoteEvent(event)) &&
-            (!hideUntrustedNotes || isUserTrusted(event.pubkey))
-        )}
+        events={events.filter((event: Event) => listMode !== 'posts' || !isReplyNoteEvent(event))}
         hasMore={hasMore}
         loading={loading}
         loadMore={loadMore}

@@ -31,6 +31,10 @@ export default function RelaysFeed() {
   }
 
   return (
-    <NormalFeed subRequests={[{ urls: relayUrls, filter: {} }]} areAlgoRelays={areAlgoRelays} />
+    <NormalFeed
+      subRequests={[{ urls: relayUrls, filter: {} }]}
+      areAlgoRelays={areAlgoRelays}
+      isMainFeed
+    />
   )
 }
