@@ -1,44 +1,30 @@
-import { useTheme } from '@/providers/ThemeProvider'
 import QRCodeStyling from 'qr-code-styling'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import iconSvg from '../../../public/favicon.svg'
 
 export default function QrCode({ value, size = 180 }: { value: string; size?: number }) {
-  const { theme } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
-  const [foregroundColor, setForegroundColor] = useState<string | undefined>()
-  const [backgroundColor, setBackgroundColor] = useState<string | undefined>()
-
-  useEffect(() => {
-    setTimeout(() => {
-      const fgColor = `hsl(${getColor('foreground')})`
-      const bgColor = `hsl(${getColor('background')})`
-      setForegroundColor(fgColor)
-      setBackgroundColor(bgColor)
-    }, 0)
-  }, [theme])
 
   useEffect(() => {
     setTimeout(() => {
       const pixelRatio = window.devicePixelRatio || 2
 
       const qrCode = new QRCodeStyling({
+        qrOptions: {
+          errorCorrectionLevel: 'M'
+        },
+        image: iconSvg,
         width: size * pixelRatio,
         height: size * pixelRatio,
         data: value,
         dotsOptions: {
-          type: 'dots',
-          color: foregroundColor
+          type: 'extra-rounded'
         },
         cornersDotOptions: {
-          type: 'extra-rounded',
-          color: foregroundColor
+          type: 'extra-rounded'
         },
         cornersSquareOptions: {
-          type: 'extra-rounded',
-          color: foregroundColor
-        },
-        backgroundOptions: {
-          color: backgroundColor
+          type: 'extra-rounded'
         }
       })
 
@@ -58,13 +44,11 @@ export default function QrCode({ value, size = 180 }: { value: string; size?: nu
     return () => {
       if (ref.current) ref.current.innerHTML = ''
     }
-  }, [value, size, foregroundColor, backgroundColor])
+  }, [value, size])
 
-  return <div ref={ref} />
-}
-
-function getColor(name: string) {
-  if (typeof window !== 'undefined') {
-    return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim()
-  }
+  return (
+    <div className="rounded-2xl overflow-hidden p-2 bg-white">
+      <div ref={ref} />
+    </div>
+  )
 }
