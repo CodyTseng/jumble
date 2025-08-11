@@ -169,7 +169,7 @@ const NoteList = forwardRef(
         if (showCount < events.length) {
           setShowCount((prev) => prev + SHOW_COUNT)
           // preload more
-          if (events.length - showCount > showCount * 5) {
+          if (events.length - showCount > SHOW_COUNT * 5) {
             return
           }
         }
@@ -206,7 +206,7 @@ const NoteList = forwardRef(
           observerInstance.unobserve(currentBottomRef)
         }
       }
-    }, [loading, hasMore, events])
+    }, [loading, hasMore, events, showCount, timelineKey])
 
     const showNewEvents = () => {
       setEvents((oldEvents) => [...newEvents, ...oldEvents])
