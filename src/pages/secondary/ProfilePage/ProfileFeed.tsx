@@ -66,7 +66,7 @@ export default function ProfileFeed({
       const relayList = await client.fetchRelayList(pubkey)
       setSubRequests([
         {
-          urls: relayList.write.concat(BIG_RELAY_URLS).slice(0, 5),
+          urls: relayList.write.concat(BIG_RELAY_URLS).slice(0, 8),
           filter: {
             authors: [pubkey]
           }
