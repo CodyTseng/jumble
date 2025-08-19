@@ -1,67 +1,21 @@
 import customEmojiService from '@/services/custom-emoji.service'
 import postEditor from '@/services/post-editor.service'
-import { computePosition } from '@floating-ui/dom'
 import type { Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
-import tippy, { GetReferenceClientRect, Instance } from 'tippy.js'
-import { EmojiList } from './EmojiList'
-import { emojis } from '@tiptap/extension-emoji'
-
-interface EmojiListRef {
-  onKeyDown: (props: SuggestionKeyDownProps) => boolean
-}
+import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
+import { EmojiList, EmojiListHandler, EmojiListProps } from './EmojiList'
 
 const suggestion = {
   items: async ({ query }: { query: string }) => {
-    if (!query) {
-      return []
-    }
-    const buildInEmojis = emojis
-      .filter(({ emoji, shortcodes, tags }) => {
-        return (
-          emoji &&
-          (shortcodes.find((shortcode) => shortcode.startsWith(query.toLowerCase())) ||
-            tags.find((tag) => tag.startsWith(query.toLowerCase())))
-        )
-      })
-      .slice(0, 20)
-    const customEmojis = await customEmojiService.searchEmojis(query)
-    return [...customEmojis, ...buildInEmojis]
+    return await customEmojiService.searchEmojis(query)
   },
 
-  allowSpaces: false,
-  char: ':',
-
   render: () => {
-    let component: ReactRenderer | null = null
+    let component: ReactRenderer<EmojiListHandler, EmojiListProps>
     let popup: Instance[]
     let touchListener: (e: TouchEvent) => void
     let closePopup: () => void
-
-    function repositionComponent(clientRect: DOMRect): void {
-      if (!component || !component.element) {
-        return
-      }
-
-      const virtualElement = {
-        getBoundingClientRect() {
-          return clientRect
-        }
-      }
-
-      computePosition(virtualElement, component.element as HTMLElement, {
-        placement: 'bottom-start'
-      }).then((pos) => {
-        if (component) {
-          Object.assign((component.element as HTMLElement).style, {
-            left: `${pos.x}px`,
-            top: `${pos.y}px`,
-            position: pos.strategy === 'fixed' ? 'fixed' : 'absolute'
-          })
-        }
-      })
-    }
 
     return {
       onBeforeStart: () => {
@@ -82,7 +36,6 @@ const suggestion = {
         }
         postEditor.addEventListener('closeSuggestionPopup', closePopup)
       },
-
       onStart: (props: { editor: Editor; clientRect?: (() => DOMRect | null) | null }) => {
         component = new ReactRenderer(EmojiList, {
           props,
@@ -112,37 +65,33 @@ const suggestion = {
         })
       },
 
-      onUpdate(props: { clientRect?: (() => DOMRect | null) | null }) {
-        if (component && props.clientRect) {
-          component.updateProps(props)
-          repositionComponent(props.clientRect() as ReturnType<GetReferenceClientRect>)
+      onUpdate(props: { clientRect?: (() => DOMRect | null) | null | undefined }) {
+        component.updateProps(props)
+
+        if (!props.clientRect) {
+          return
         }
+
+        popup[0].setProps({
+          getReferenceClientRect: props.clientRect
+        } as Partial<Props>)
       },
 
       onKeyDown(props: SuggestionKeyDownProps) {
         if (props.event.key === 'Escape') {
-          if (component) {
-            document.body.removeChild(component.element)
-            component.destroy()
-          }
+          popup[0].hide()
           return true
         }
-
-        return component?.ref &&
-          typeof component.ref === 'object' &&
-          component.ref &&
-          'onKeyDown' in component.ref
-          ? (component.ref as EmojiListRef).onKeyDown(props)
-          : false
+        return component.ref?.onKeyDown(props) ?? false
       },
 
       onExit() {
-        if (component) {
-          if (document.body.contains(component.element)) {
-            document.body.removeChild(component.element)
-          }
-          component.destroy()
-        }
+        postEditor.isSuggestionPopupOpen = false
+        popup[0].destroy()
+        component.destroy()
+
+        document.removeEventListener('touchstart', touchListener)
+        postEditor.removeEventListener('closeSuggestionPopup', closePopup)
       }
     }
   }

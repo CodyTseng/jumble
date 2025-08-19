@@ -1,6 +1,7 @@
 import { getEmojisAndEmojiSetsFromEvent, getEmojisFromEvent } from '@/lib/event-metadata'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
+import { sha256 } from '@noble/hashes/sha2'
 import FlexSearch from 'flexsearch'
 import { Event } from 'nostr-tools'
 
@@ -35,17 +36,18 @@ class CustomEmojiService {
     )
   }
 
-  async searchEmojis(query: string = ''): Promise<TEmoji[]> {
-    const results = await this.emojiIndex.searchAsync(query, { limit: 100 })
-    const emojis: TEmoji[] = []
-    for (const result of results) {
-      if (typeof result !== 'string') continue
-      const emoji = this.emojiMap.get(result)
-      if (emoji) {
-        emojis.push(emoji)
-      }
+  async searchEmojis(query: string = '', limit = 20): Promise<string[]> {
+    if (!query) {
+      return Array.from(this.emojiMap.keys()).slice(0, limit)
     }
-    return emojis
+    const results = await this.emojiIndex.searchAsync(query, { limit })
+    return results.filter((id) => typeof id === 'string') as string[]
+  }
+
+  getEmojiById(id?: string): TEmoji | undefined {
+    if (!id) return undefined
+
+    return this.emojiMap.get(id)
   }
 
   private async addEmojisToIndex(emojis: TEmoji[]) {
@@ -59,7 +61,11 @@ class CustomEmojiService {
   }
 
   private getEmojiId(emoji: TEmoji) {
-    return `:${emoji.shortcode}:${emoji.url}`
+    const encoder = new TextEncoder()
+    const data = encoder.encode(`${emoji.shortcode}:${emoji.url}`)
+    const hashBuffer = sha256(data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }
 }
 
