@@ -3,9 +3,9 @@ import { formatNpub, userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import Nip05 from '../../Nip05'
-import { SimpleUserAvatar } from '../../UserAvatar'
-import { SimpleUsername } from '../../Username'
+import Nip05 from '../../../Nip05'
+import { SimpleUserAvatar } from '../../../UserAvatar'
+import { SimpleUsername } from '../../../Username'
 
 export interface MentionListProps {
   items: string[]

@@ -1,5 +1,5 @@
 import { formatNpub } from '@/lib/pubkey'
-import Mention from '@tiptap/extension-mention'
+import TTMention from '@tiptap/extension-mention'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 import MentionNode from './MentionNode'
 
@@ -13,7 +13,7 @@ declare module '@tiptap/core' {
 
 // const MENTION_REGEX = /(nostr:)?(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+)/g
 
-const CustomMention = Mention.extend({
+const Mention = TTMention.extend({
   selectable: true,
 
   addNodeView() {
@@ -67,7 +67,7 @@ const CustomMention = Mention.extend({
   //   ]
   // }
 })
-export default CustomMention
+export default Mention
 
 // function handler({
 //   range,

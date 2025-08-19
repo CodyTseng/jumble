@@ -14,9 +14,9 @@ import { Event } from 'nostr-tools'
 import { Dispatch, forwardRef, SetStateAction, useImperativeHandle } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
-import CustomMention from './CustomMention'
+import Mention from './Mention'
 import Preview from './Preview'
-import suggestion from './suggestion'
+import suggestion from './Mention/suggestion'
 
 export type TPostTextareaHandle = {
   appendText: (text: string, addNewline?: boolean) => void
@@ -63,7 +63,7 @@ const PostTextarea = forwardRef<
           placeholder:
             t('Write something...') + ' (' + t('Paste or drop media files to upload') + ')'
         }),
-        CustomMention.configure({
+        Mention.configure({
           suggestion
         }),
         ClipboardAndDropHandler.configure({
