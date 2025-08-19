@@ -30,7 +30,6 @@ const suggestion = {
         document.addEventListener('touchstart', touchListener)
 
         closePopup = () => {
-          console.log('closePopup')
           if (popup && popup[0]) {
             popup[0].hide()
           }

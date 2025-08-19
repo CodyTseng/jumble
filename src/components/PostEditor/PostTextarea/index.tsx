@@ -3,6 +3,7 @@ import { parseEditorJsonToText } from '@/lib/tiptap'
 import { cn } from '@/lib/utils'
 import postEditorCache from '@/services/post-editor-cache.service'
 import Document from '@tiptap/extension-document'
+import Emoji from '@tiptap/extension-emoji'
 import { HardBreak } from '@tiptap/extension-hard-break'
 import History from '@tiptap/extension-history'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -14,9 +15,10 @@ import { Event } from 'nostr-tools'
 import { Dispatch, forwardRef, SetStateAction, useImperativeHandle } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
+import emojiSuggestion from './Emoji/suggestion'
 import Mention from './Mention'
+import mentionSuggestion from './Mention/suggestion'
 import Preview from './Preview'
-import suggestion from './Mention/suggestion'
 
 export type TPostTextareaHandle = {
   appendText: (text: string, addNewline?: boolean) => void
@@ -63,8 +65,11 @@ const PostTextarea = forwardRef<
           placeholder:
             t('Write something...') + ' (' + t('Paste or drop media files to upload') + ')'
         }),
+        Emoji.configure({
+          suggestion: emojiSuggestion
+        }),
         Mention.configure({
-          suggestion
+          suggestion: mentionSuggestion
         }),
         ClipboardAndDropHandler.configure({
           onUploadStart: (file, cancel) => {

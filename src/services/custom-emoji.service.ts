@@ -7,6 +7,7 @@ import { Event } from 'nostr-tools'
 class CustomEmojiService {
   static instance: CustomEmojiService
 
+  private emojiMap = new Map<string, TEmoji>()
   private emojiIndex = new FlexSearch.Index({
     tokenize: 'forward'
   })
@@ -34,24 +35,31 @@ class CustomEmojiService {
     )
   }
 
-  async searchEmojis(query: string): Promise<TEmoji[]> {
+  async searchEmojis(query: string = ''): Promise<TEmoji[]> {
     const results = await this.emojiIndex.searchAsync(query, { limit: 100 })
     const emojis: TEmoji[] = []
     for (const result of results) {
       if (typeof result !== 'string') continue
-      const [shortcode, url] = result.split(':')
-      if (!shortcode || !url) continue
-      emojis.push({ shortcode, url })
+      const emoji = this.emojiMap.get(result)
+      if (emoji) {
+        emojis.push(emoji)
+      }
     }
     return emojis
   }
 
   private async addEmojisToIndex(emojis: TEmoji[]) {
     await Promise.allSettled(
-      emojis.map((emoji) =>
-        this.emojiIndex.addAsync(`:${emoji.shortcode}:${emoji.url}:`, emoji.shortcode)
-      )
+      emojis.map(async (emoji) => {
+        const id = this.getEmojiId(emoji)
+        this.emojiMap.set(id, emoji)
+        await this.emojiIndex.addAsync(id, emoji.shortcode)
+      })
     )
+  }
+
+  private getEmojiId(emoji: TEmoji) {
+    return `:${emoji.shortcode}:${emoji.url}`
   }
 }
 
