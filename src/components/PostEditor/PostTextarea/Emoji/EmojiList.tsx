@@ -61,6 +61,10 @@ export const EmojiList = forwardRef<EmojiListHandler, EmojiListProps>((props, re
     }
   }, [upHandler, downHandler, enterHandler])
 
+  if (!props.items?.length) {
+    return null
+  }
+
   return (
     <ScrollArea
       className="border rounded-lg bg-background z-50 pointer-events-auto flex flex-col max-h-80 overflow-y-auto"

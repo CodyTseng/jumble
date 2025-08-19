@@ -38,6 +38,8 @@ function _parseEditorJsonToText(node?: JSONContent): string {
       return '\n'
     case 'mention':
       return node.attrs ? `nostr:${node.attrs.id}` : ''
+    case 'emoji':
+      return node.attrs?.name ? `:${node.attrs.name}:` : ''
     default:
       return ''
   }

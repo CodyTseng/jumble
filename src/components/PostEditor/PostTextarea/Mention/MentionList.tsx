@@ -64,7 +64,7 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
     }
   }))
 
-  if (props.items.length === 0) {
+  if (!props.items?.length) {
     return null
   }
 

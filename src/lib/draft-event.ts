@@ -1,5 +1,6 @@
 import { ApplicationDataKey, EMBEDDED_EVENT_REGEX, ExtendedKind, POLL_TYPE } from '@/constants'
 import client from '@/services/client.service'
+import customEmojiService from '@/services/custom-emoji.service'
 import mediaUpload from '@/services/media-upload.service'
 import {
   TDraftEvent,
@@ -78,14 +79,15 @@ export async function createShortTextNoteDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
+  const { content: transformedEmojisContent, emojiTags } = transformCustomEmojisInContent(content)
   const { quoteEventHexIds, quoteReplaceableCoordinates, rootETag, parentETag } =
-    await extractRelatedEventIds(content, options.parentEvent)
-  const hashtags = extractHashtags(content)
+    await extractRelatedEventIds(transformedEmojisContent, options.parentEvent)
+  const hashtags = extractHashtags(transformedEmojisContent)
 
-  const tags = hashtags.map((hashtag) => buildTTag(hashtag))
+  const tags = emojiTags.concat(hashtags.map((hashtag) => buildTTag(hashtag)))
 
   // imeta tags
-  const images = extractImagesFromContent(content)
+  const images = extractImagesFromContent(transformedEmojisContent)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
@@ -120,7 +122,7 @@ export async function createShortTextNoteDraftEvent(
 
   const baseDraft = {
     kind: kinds.ShortTextNote,
-    content,
+    content: transformedEmojisContent,
     tags
   }
   const cacheKey = JSON.stringify(baseDraft)
@@ -148,44 +150,6 @@ export function createRelaySetDraftEvent(relaySet: Omit<TRelaySet, 'aTag'>): TDr
   }
 }
 
-export async function createPictureNoteDraftEvent(
-  content: string,
-  pictureInfos: { url: string; tags: string[][] }[],
-  mentions: string[],
-  options: {
-    addClientTag?: boolean
-    protectedEvent?: boolean
-  } = {}
-): Promise<TDraftEvent> {
-  const { quoteEventHexIds, quoteReplaceableCoordinates } = await extractRelatedEventIds(content)
-  const hashtags = extractHashtags(content)
-  if (!pictureInfos.length) {
-    throw new Error('No images found in content')
-  }
-
-  const tags = pictureInfos
-    .map((info) => buildImetaTag(info.tags))
-    .concat(hashtags.map((hashtag) => buildTTag(hashtag)))
-    .concat(quoteEventHexIds.map((eventId) => buildQTag(eventId)))
-    .concat(quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
-    .concat(mentions.map((pubkey) => buildPTag(pubkey)))
-
-  if (options.addClientTag) {
-    tags.push(buildClientTag())
-  }
-
-  if (options.protectedEvent) {
-    tags.push(buildProtectedTag())
-  }
-
-  return {
-    kind: ExtendedKind.PICTURE,
-    content,
-    tags,
-    created_at: dayjs().unix()
-  }
-}
-
 const commentDraftEventCache: Map<string, TDraftEvent> = new Map()
 export async function createCommentDraftEvent(
   content: string,
@@ -197,6 +161,7 @@ export async function createCommentDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
+  const { content: transformedEmojisContent, emojiTags } = transformCustomEmojisInContent(content)
   const {
     quoteEventHexIds,
     quoteReplaceableCoordinates,
@@ -205,15 +170,15 @@ export async function createCommentDraftEvent(
     rootKind,
     rootPubkey,
     rootUrl
-  } = await extractCommentMentions(content, parentEvent)
-  const hashtags = extractHashtags(content)
+  } = await extractCommentMentions(transformedEmojisContent, parentEvent)
+  const hashtags = extractHashtags(transformedEmojisContent)
 
-  const tags = hashtags
-    .map((hashtag) => buildTTag(hashtag))
+  const tags = emojiTags
+    .concat(hashtags.map((hashtag) => buildTTag(hashtag)))
     .concat(quoteEventHexIds.map((eventId) => buildQTag(eventId)))
     .concat(quoteReplaceableCoordinates.map((coordinate) => buildReplaceableQTag(coordinate)))
 
-  const images = extractImagesFromContent(content)
+  const images = extractImagesFromContent(transformedEmojisContent)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
@@ -260,7 +225,7 @@ export async function createCommentDraftEvent(
 
   const baseDraft = {
     kind: ExtendedKind.COMMENT,
-    content,
+    content: transformedEmojisContent,
     tags
   }
   const cacheKey = JSON.stringify(baseDraft)
@@ -374,13 +339,15 @@ export async function createPollDraftEvent(
     isNsfw?: boolean
   } = {}
 ): Promise<TDraftEvent> {
-  const { quoteEventHexIds, quoteReplaceableCoordinates } = await extractRelatedEventIds(question)
-  const hashtags = extractHashtags(question)
+  const { content: transformedEmojisContent, emojiTags } = transformCustomEmojisInContent(question)
+  const { quoteEventHexIds, quoteReplaceableCoordinates } =
+    await extractRelatedEventIds(transformedEmojisContent)
+  const hashtags = extractHashtags(transformedEmojisContent)
 
-  const tags = hashtags.map((hashtag) => buildTTag(hashtag))
+  const tags = emojiTags.concat(hashtags.map((hashtag) => buildTTag(hashtag)))
 
   // imeta tags
-  const images = extractImagesFromContent(question)
+  const images = extractImagesFromContent(transformedEmojisContent)
   if (images && images.length) {
     tags.push(...generateImetaTags(images))
   }
@@ -418,7 +385,7 @@ export async function createPollDraftEvent(
   }
 
   const baseDraft = {
-    content: question.trim(),
+    content: transformedEmojisContent.trim(),
     kind: ExtendedKind.POLL,
     tags
   }
@@ -583,6 +550,29 @@ function extractImagesFromContent(content: string) {
   return content.match(/https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp|heic)/gi)
 }
 
+export function transformCustomEmojisInContent(content: string) {
+  const emojiTags: string[][] = []
+  let processedContent = content
+  const matches = content.match(/:[a-zA-Z0-9]+:/g)
+
+  const emojiIdSet = new Set<string>()
+  matches?.forEach((m) => {
+    if (emojiIdSet.has(m)) return
+    emojiIdSet.add(m)
+
+    const emoji = customEmojiService.getEmojiById(m.slice(1, -1))
+    if (emoji) {
+      emojiTags.push(buildEmojiTag(emoji))
+      processedContent = processedContent.replace(new RegExp(m, 'g'), `:${emoji.shortcode}:`)
+    }
+  })
+
+  return {
+    emojiTags,
+    content: processedContent
+  }
+}
+
 export function buildATag(event: Event, upperCase: boolean = false) {
   const coordinate = getReplaceableCoordinateFromEvent(event)
   const hint = client.getEventHint(event.id)
@@ -659,10 +649,6 @@ function buildRelayTag(url: string) {
 
 function buildServerTag(url: string) {
   return ['server', url]
-}
-
-function buildImetaTag(nip94Tags: string[][]) {
-  return ['imeta', ...nip94Tags.map(([n, v]) => `${n} ${v}`)]
 }
 
 function buildResponseTag(value: string) {
