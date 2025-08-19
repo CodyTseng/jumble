@@ -21,7 +21,7 @@ export const EmojiList = forwardRef<EmojiListRef, EmojiListProps>((props, ref) =
     const item = props.items[index]
 
     if (item) {
-      props.command({ name: getEmojiId(item) })
+      props.command({ name: convertToName(item) })
     }
   }
 
@@ -103,4 +103,11 @@ function formatEmoji(emoji: TEmoji | EmojiItem) {
     return (emoji as EmojiItem).emoji || (emoji as EmojiItem).name
   }
   return emoji as TEmoji
+}
+
+function convertToName(emoji: TEmoji | EmojiItem): string {
+  if ((emoji as EmojiItem).name) {
+    return (emoji as EmojiItem).emoji || (emoji as EmojiItem).name
+  }
+  return `:${(emoji as TEmoji).shortcode}:${(emoji as TEmoji).url}:`
 }
