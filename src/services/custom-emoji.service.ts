@@ -1,12 +1,15 @@
 import { getEmojisAndEmojiSetsFromEvent, getEmojisFromEvent } from '@/lib/event-metadata'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
+import FlexSearch from 'flexsearch'
 import { Event } from 'nostr-tools'
 
 class CustomEmojiService {
   static instance: CustomEmojiService
 
-  private emojis: TEmoji[] = []
+  private emojiIndex = new FlexSearch.Index({
+    tokenize: 'forward'
+  })
 
   constructor() {
     if (!CustomEmojiService.instance) {
@@ -19,18 +22,36 @@ class CustomEmojiService {
     if (!userEmojiListEvent) return
 
     const { emojis, emojiSetPointers } = getEmojisAndEmojiSetsFromEvent(userEmojiListEvent)
-    this.emojis = emojis
+    await this.addEmojisToIndex(emojis)
 
     const emojiSetEvents = await client.fetchEmojiSetEvents(emojiSetPointers)
-    emojiSetEvents.forEach((event) => {
-      if (!event || event instanceof Error) return
+    await Promise.allSettled(
+      emojiSetEvents.map(async (event) => {
+        if (!event || event instanceof Error) return
 
-      getEmojisFromEvent(event).forEach((emoji) => {
-        this.emojis.push(emoji)
+        await this.addEmojisToIndex(getEmojisFromEvent(event))
       })
-    })
+    )
+  }
 
-    console.log('CustomEmojiService initialized with emojis:', this.emojis)
+  async searchEmojis(query: string): Promise<TEmoji[]> {
+    const results = await this.emojiIndex.searchAsync(query, { limit: 100 })
+    const emojis: TEmoji[] = []
+    for (const result of results) {
+      if (typeof result !== 'string') continue
+      const [shortcode, url] = result.split(':')
+      if (!shortcode || !url) continue
+      emojis.push({ shortcode, url })
+    }
+    return emojis
+  }
+
+  private async addEmojisToIndex(emojis: TEmoji[]) {
+    await Promise.allSettled(
+      emojis.map((emoji) =>
+        this.emojiIndex.addAsync(`:${emoji.shortcode}:${emoji.url}:`, emoji.shortcode)
+      )
+    )
   }
 }
 
