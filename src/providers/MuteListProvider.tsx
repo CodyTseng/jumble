@@ -5,10 +5,10 @@ import indexedDb from '@/services/indexed-db.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { useNostr } from './NostrProvider'
-import { useTranslation } from 'react-i18next'
 
 type TMuteListContext = {
   mutePubkeys: string[]
@@ -116,12 +116,23 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     return event
   }
 
+  const checkMuteListEvent = (muteListEvent: Event | null) => {
+    if (!muteListEvent) {
+      const result = confirm(t('MuteListNotFoundConfirmation'))
+
+      if (!result) {
+        throw new Error('Mute list not found')
+      }
+    }
+  }
+
   const mutePubkeyPublicly = async (pubkey: string) => {
     if (!accountPubkey || changing) return
 
     setChanging(true)
     try {
       const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      checkMuteListEvent(muteListEvent)
       if (
         muteListEvent &&
         muteListEvent.tags.some(([tagName, tagValue]) => tagName === 'p' && tagValue === pubkey)
@@ -132,6 +143,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       const newMuteListEvent = await publishNewMuteListEvent(newTags, muteListEvent?.content)
       const privateTags = await getPrivateTags(newMuteListEvent)
       await updateMuteListEvent(newMuteListEvent, privateTags)
+    } catch (error) {
+      toast.error(t('Failed to mute user publicly') + ': ' + (error as Error).message)
     } finally {
       setChanging(false)
     }
@@ -143,6 +156,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     setChanging(true)
     try {
       const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      checkMuteListEvent(muteListEvent)
       const privateTags = muteListEvent ? await getPrivateTags(muteListEvent) : []
       if (privateTags.some(([tagName, tagValue]) => tagName === 'p' && tagValue === pubkey)) {
         return
@@ -152,6 +166,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       const cipherText = await nip04Encrypt(accountPubkey, JSON.stringify(newPrivateTags))
       const newMuteListEvent = await publishNewMuteListEvent(muteListEvent?.tags ?? [], cipherText)
       await updateMuteListEvent(newMuteListEvent, newPrivateTags)
+    } catch (error) {
+      toast.error(t('Failed to mute user privately') + ': ' + (error as Error).message)
     } finally {
       setChanging(false)
     }

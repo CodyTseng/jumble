@@ -12,7 +12,7 @@ export default function ProfileBanner({
   className?: string
 }) {
   const defaultBanner = useMemo(() => generateImageByPubkey(pubkey), [pubkey])
-  const [bannerUrl, setBannerUrl] = useState(banner || defaultBanner)
+  const [bannerUrl, setBannerUrl] = useState(banner ?? defaultBanner)
 
   useEffect(() => {
     if (banner) {

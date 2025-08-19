@@ -18,7 +18,7 @@ import { Ellipsis } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import NotFoundPage from '../NotFoundPage'
+import NotFound from './NotFound'
 
 const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
@@ -59,7 +59,13 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
       </SecondaryPageLayout>
     )
   }
-  if (!event) return <NotFoundPage />
+  if (!event) {
+    return (
+      <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
+        <NotFound bech32Id={id} />
+      </SecondaryPageLayout>
+    )
+  }
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
@@ -84,6 +90,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           className="select-text"
           hideParentNotePreview
           originalNoteId={id}
+          showFull
         />
         <NoteStats className="mt-3" event={event} fetchIfNotExisting displayTopZapsAndLikes />
       </div>

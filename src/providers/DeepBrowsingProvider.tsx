@@ -31,7 +31,6 @@ export function DeepBrowsingProvider({
   const [lastScrollTop, setLastScrollTop] = useState(lastScrollTopRef.current)
 
   useEffect(() => {
-    setDeepBrowsing(false)
     if (!active) return
 
     const handleScroll = () => {
@@ -51,16 +50,11 @@ export function DeepBrowsingProvider({
       }
     }
 
-    if (!scrollAreaRef) {
-      window.addEventListener('scroll', handleScroll)
-      return () => {
-        window.removeEventListener('scroll', handleScroll)
-      }
-    }
+    const target = scrollAreaRef ? scrollAreaRef.current : window
 
-    scrollAreaRef.current?.addEventListener('scroll', handleScroll)
+    target?.addEventListener('scroll', handleScroll)
     return () => {
-      scrollAreaRef.current?.removeEventListener('scroll', handleScroll)
+      target?.removeEventListener('scroll', handleScroll)
     }
   }, [active])
 

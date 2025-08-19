@@ -10,12 +10,15 @@ import { Input } from '@/components/ui/input'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TRelaySet } from '@/types'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import {
   Check,
   ChevronDown,
   Edit,
   EllipsisVertical,
   FolderClosed,
+  GripVertical,
   Link,
   Trash2
 } from 'lucide-react'
@@ -28,24 +31,44 @@ import { useRelaySetsSettingComponent } from './provider'
 export default function RelaySet({ relaySet }: { relaySet: TRelaySet }) {
   const { t } = useTranslation()
   const { expandedRelaySetId } = useRelaySetsSettingComponent()
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: relaySet.id
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1
+  }
 
   return (
-    <div className="w-full border rounded-lg pl-4 pr-2 py-2.5">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2 items-center">
-          <div className="flex justify-center items-center w-6 h-6 shrink-0">
-            <FolderClosed className="size-4" />
+    <div ref={setNodeRef} style={style} className="relative group">
+      <div className="w-full border rounded-lg px-2 py-2.5">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <div
+              className="cursor-grab active:cursor-grabbing p-2 hover:bg-muted rounded touch-none"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="size-4 text-muted-foreground" />
+            </div>
+            <div className="flex gap-2 items-center">
+              <div className="flex justify-center items-center w-6 h-6 shrink-0">
+                <FolderClosed className="size-4" />
+              </div>
+              <RelaySetName relaySet={relaySet} />
+            </div>
           </div>
-          <RelaySetName relaySet={relaySet} />
+          <div className="flex gap-1">
+            <RelayUrlsExpandToggle relaySetId={relaySet.id}>
+              {t('n relays', { n: relaySet.relayUrls.length })}
+            </RelayUrlsExpandToggle>
+            <RelaySetOptions relaySet={relaySet} />
+          </div>
         </div>
-        <div className="flex gap-1">
-          <RelayUrlsExpandToggle relaySetId={relaySet.id}>
-            {t('n relays', { n: relaySet.relayUrls.length })}
-          </RelayUrlsExpandToggle>
-          <RelaySetOptions relaySet={relaySet} />
-        </div>
+        {expandedRelaySetId === relaySet.id && <RelayUrls relaySetId={relaySet.id} />}
       </div>
-      {expandedRelaySetId === relaySet.id && <RelayUrls relaySetId={relaySet.id} />}
     </div>
   )
 }

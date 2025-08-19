@@ -331,6 +331,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Pomyślnie transmitowano do przekaźnika: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Nie udało się transmitować do przekaźnika: {{url}}. Błąd: {{error}}',
-    'Write relays': 'Przekaźniki zapisu'
+    'Write relays': 'Przekaźniki zapisu',
+    'No more reactions': 'Brak kolejnych reakcji',
+    'No reactions yet': 'Brak reakcji',
+    'No more zaps': 'Brak kolejnych zapów',
+    'No zaps yet': 'Brak zapów',
+    'No more reposts': 'Brak kolejnych repostów',
+    'No reposts yet': 'Brak repostów',
+    Reposts: 'Reposty',
+    FollowListNotFoundConfirmation:
+      'Lista obserwowanych nie została znaleziona. Czy chcesz utworzyć nową? Jeśli wcześniej obserwowałeś użytkowników, proszę NIE potwierdzaj, ponieważ ta operacja spowoduje utratę poprzedniej listy obserwowanych.',
+    MuteListNotFoundConfirmation:
+      'Lista wyciszonych nie została znaleziona. Czy chcesz utworzyć nową? Jeśli wcześniej wyciszałeś użytkowników, proszę NIE potwierdzaj, ponieważ ta operacja spowoduje utratę poprzedniej listy wyciszonych.',
+    'Show NSFW content by default': 'Domyślnie pokazuj treści NSFW',
+    'Too many read relays': 'Too many read relays',
+    'Too many write relays': 'Too many write relays',
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.',
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.',
+    'Optimize Relay Settings': 'Optymalizuj ustawienia przekaźników',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      'Twoja obecna konfiguracja przekaźników może nie być optymalna. To może utrudnić innym znalezienie Twoich postów i może skutkować niekompletnymi powiadomieniami.',
+    'Optimize Now': 'Optymalizuj teraz',
+    'Maybe Later': 'Może później',
+    "Don't remind me again": 'Nie przypominaj mi więcej'
   }
 }

@@ -24,9 +24,9 @@ export default function NpubQrCode({ pubkey }: { pubkey: string }) {
   const content = (
     <div className="w-full flex flex-col items-center gap-4 p-8">
       <div className="flex items-center w-full gap-2 pointer-events-none px-1">
-        <UserAvatar size="semiBig" userId={pubkey} />
+        <UserAvatar size="big" userId={pubkey} />
         <div className="flex-1 w-0">
-          <Username userId={pubkey} className="text-xl font-semibold truncate" />
+          <Username userId={pubkey} className="text-2xl font-semibold truncate" />
           <Nip05 pubkey={pubkey} />
         </div>
       </div>

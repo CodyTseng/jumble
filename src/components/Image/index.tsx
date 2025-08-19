@@ -33,6 +33,14 @@ export default function Image({
   const [tried, setTried] = useState(new Set())
 
   useEffect(() => {
+    setImageUrl(url)
+    setIsLoading(true)
+    setHasError(false)
+    setDisplayBlurHash(true)
+    setTried(new Set())
+  }, [url])
+
+  useEffect(() => {
     if (blurHash) {
       const { numX, numY } = decodeBlurHashSize(blurHash)
       const width = numX * 3

@@ -1,6 +1,11 @@
 import LoginDialog from '@/components/LoginDialog'
 import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { createSeenNotificationsAtDraftEvent } from '@/lib/draft-event'
+import {
+  createFollowListDraftEvent,
+  createMuteListDraftEvent,
+  createRelayListDraftEvent,
+  createSeenNotificationsAtDraftEvent
+} from '@/lib/draft-event'
 import { getLatestEvent, getReplaceableEventIdentifier } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub } from '@/lib/pubkey'
@@ -35,9 +40,9 @@ type TNostrContext = {
   profile: TProfile | null
   profileEvent: Event | null
   relayList: TRelayList | null
-  followListEvent?: Event
-  muteListEvent?: Event
-  bookmarkListEvent?: Event
+  followListEvent: Event | null
+  muteListEvent: Event | null
+  bookmarkListEvent: Event | null
   favoriteRelaysEvent: Event | null
   userEmojiListEvent: Event | null
   notificationsSeenAt: number
@@ -46,7 +51,7 @@ type TNostrContext = {
   nsec: string | null
   ncryptsec: string | null
   switchAccount: (account: TAccountPointer | null) => Promise<void>
-  nsecLogin: (nsec: string, password?: string) => Promise<string>
+  nsecLogin: (nsec: string, password?: string, needSetup?: boolean) => Promise<string>
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
   bunkerLogin: (bunker: string) => Promise<string>
@@ -97,9 +102,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<TProfile | null>(null)
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
-  const [followListEvent, setFollowListEvent] = useState<Event | undefined>(undefined)
-  const [muteListEvent, setMuteListEvent] = useState<Event | undefined>(undefined)
-  const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | undefined>(undefined)
+  const [followListEvent, setFollowListEvent] = useState<Event | null>(null)
+  const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
+  const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | null>(null)
   const [favoriteRelaysEvent, setFavoriteRelaysEvent] = useState<Event | null>(null)
   const [userEmojiListEvent, setUserEmojiListEvent] = useState<Event | null>(null)
   const [notificationsSeenAt, setNotificationsSeenAt] = useState(-1)
@@ -141,6 +146,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       setProfileEvent(null)
       setNsec(null)
       setFavoriteRelaysEvent(null)
+      setFollowListEvent(null)
+      setMuteListEvent(null)
+      setBookmarkListEvent(null)
       setNotificationsSeenAt(-1)
       if (!account) {
         return
@@ -402,7 +410,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     await loginWithAccountPointer(act)
   }
 
-  const nsecLogin = async (nsecOrHex: string, password?: string) => {
+  const nsecLogin = async (nsecOrHex: string, password?: string, needSetup?: boolean) => {
     const nsecSigner = new NsecSigner()
     let privkey: Uint8Array
     if (nsecOrHex.startsWith('nsec')) {
@@ -419,9 +427,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const pubkey = nsecSigner.login(privkey)
     if (password) {
       const ncryptsec = nip49.encrypt(privkey, password)
-      return login(nsecSigner, { pubkey, signerType: 'ncryptsec', ncryptsec })
+      login(nsecSigner, { pubkey, signerType: 'ncryptsec', ncryptsec })
+    } else {
+      login(nsecSigner, { pubkey, signerType: 'nsec', nsec: nip19.nsecEncode(privkey) })
     }
-    return login(nsecSigner, { pubkey, signerType: 'nsec', nsec: nip19.nsecEncode(privkey) })
+    if (needSetup) {
+      setupNewUser(nsecSigner)
+    }
+    return pubkey
   }
 
   const ncryptsecLogin = async (ncryptsec: string) => {
@@ -551,6 +564,19 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
     storage.removeAccount(account)
     return null
+  }
+
+  const setupNewUser = async (signer: ISigner) => {
+    await Promise.allSettled([
+      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createFollowListDraftEvent([]))),
+      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createMuteListDraftEvent([]))),
+      client.publishEvent(
+        BIG_RELAY_URLS,
+        await signer.signEvent(
+          createRelayListDraftEvent(BIG_RELAY_URLS.map((url) => ({ url, scope: 'both' })))
+        )
+      )
+    ])
   }
 
   const signEvent = async (draftEvent: TDraftEvent) => {

@@ -1,4 +1,5 @@
 import { BIG_RELAY_URLS } from '@/constants'
+import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
@@ -10,8 +11,9 @@ export type TNoteStats = {
   likeIdSet: Set<string>
   likes: { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
   repostPubkeySet: Set<string>
+  reposts: { id: string; pubkey: string; created_at: number }[]
   zapPrSet: Set<string>
-  zaps: { pr: string; pubkey: string; amount: number; comment?: string }[]
+  zaps: { pr: string; pubkey: string; amount: number; created_at: number; comment?: string }[]
   updatedAt?: number
 }
 
@@ -37,6 +39,11 @@ class NoteStatsService {
       client.fetchRelayList(event.pubkey),
       client.fetchProfile(event.pubkey)
     ])
+
+    const replaceableCoordinate = isReplaceableEvent(event.kind)
+      ? getReplaceableCoordinateFromEvent(event)
+      : undefined
+
     const filters: Filter[] = [
       {
         '#e': [event.id],
@@ -50,12 +57,35 @@ class NoteStatsService {
       }
     ]
 
+    if (replaceableCoordinate) {
+      filters.push(
+        {
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Reaction],
+          limit: 500
+        },
+        {
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Repost],
+          limit: 100
+        }
+      )
+    }
+
     if (authorProfile?.lightningAddress) {
       filters.push({
         '#e': [event.id],
         kinds: [kinds.Zap],
         limit: 500
       })
+
+      if (replaceableCoordinate) {
+        filters.push({
+          '#a': [replaceableCoordinate],
+          kinds: [kinds.Zap],
+          limit: 500
+        })
+      }
     }
 
     if (pubkey) {
@@ -65,12 +95,28 @@ class NoteStatsService {
         kinds: [kinds.Reaction, kinds.Repost]
       })
 
+      if (replaceableCoordinate) {
+        filters.push({
+          '#a': [replaceableCoordinate],
+          authors: [pubkey],
+          kinds: [kinds.Reaction, kinds.Repost]
+        })
+      }
+
       if (authorProfile?.lightningAddress) {
         filters.push({
           '#e': [event.id],
           '#P': [pubkey],
           kinds: [kinds.Zap]
         })
+
+        if (replaceableCoordinate) {
+          filters.push({
+            '#a': [replaceableCoordinate],
+            '#P': [pubkey],
+            kinds: [kinds.Zap]
+          })
+        }
       }
     }
 
@@ -90,7 +136,7 @@ class NoteStatsService {
       ...(this.noteStatsMap.get(event.id) ?? {}),
       updatedAt: dayjs().unix()
     })
-    return events
+    return this.noteStatsMap.get(event.id) ?? {}
   }
 
   subscribeNoteStats(noteId: string, callback: () => void) {
@@ -123,6 +169,7 @@ class NoteStatsService {
     pr: string,
     amount: number,
     comment?: string,
+    created_at: number = dayjs().unix(),
     notify: boolean = true
   ) {
     const old = this.noteStatsMap.get(eventId) || {}
@@ -131,7 +178,7 @@ class NoteStatsService {
     if (zapPrSet.has(pr)) return
 
     zapPrSet.add(pr)
-    zaps.push({ pr, pubkey, amount, comment })
+    zaps.push({ pr, pubkey, amount, comment, created_at })
     this.noteStatsMap.set(eventId, { ...old, zapPrSet, zaps })
     if (notify) {
       this.notifyNoteStats(eventId)
@@ -194,8 +241,12 @@ class NoteStatsService {
 
     const old = this.noteStatsMap.get(eventId) || {}
     const repostPubkeySet = old.repostPubkeySet || new Set()
+    const reposts = old.reposts || []
+    if (repostPubkeySet.has(evt.pubkey)) return
+
     repostPubkeySet.add(evt.pubkey)
-    this.noteStatsMap.set(eventId, { ...old, repostPubkeySet })
+    reposts.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at })
+    this.noteStatsMap.set(eventId, { ...old, repostPubkeySet, reposts })
     return eventId
   }
 
@@ -205,7 +256,15 @@ class NoteStatsService {
     const { originalEventId, senderPubkey, invoice, amount, comment } = info
     if (!originalEventId || !senderPubkey) return
 
-    return this.addZap(senderPubkey, originalEventId, invoice, amount, comment, false)
+    return this.addZap(
+      senderPubkey,
+      originalEventId,
+      invoice,
+      amount,
+      comment,
+      evt.created_at,
+      false
+    )
   }
 }
 

@@ -327,6 +327,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Successfully broadcasted to relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Failed to broadcast to relay: {{url}}. Error: {{error}}',
-    'Write relays': 'Write relays'
+    'Write relays': 'Write relays',
+    'No more reactions': 'No more reactions',
+    'No reactions yet': 'No reactions yet',
+    'No more zaps': 'No more zaps',
+    'No zaps yet': 'No zaps yet',
+    'No more reposts': 'No more reposts',
+    'No reposts yet': 'No reposts yet',
+    Reposts: 'Reposts',
+    FollowListNotFoundConfirmation:
+      'Follow list not found. Do you want to create a new one? If you have followed users before, please DO NOT confirm as this operation will cause you to lose your previous follow list.',
+    MuteListNotFoundConfirmation:
+      'Mute list not found. Do you want to create a new one? If you have muted users before, please DO NOT confirm as this operation will cause you to lose your previous mute list.',
+    'Show NSFW content by default': 'Show NSFW content by default',
+    'Too many read relays': 'Too many read relays',
+    'Too many write relays': 'Too many write relays',
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.',
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.',
+    'Optimize Relay Settings': 'Optimize Relay Settings',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.',
+    'Optimize Now': 'Optimize Now',
+    'Maybe Later': 'Maybe Later',
+    "Don't remind me again": "Don't remind me again"
   }
 }

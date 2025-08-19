@@ -7,7 +7,7 @@ import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
 import { TFeedInfo, TFeedType } from '@/types'
-import { Filter, kinds } from 'nostr-tools'
+import { kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useFavoriteRelays } from './FavoriteRelaysProvider'
 import { useNostr } from './NostrProvider'
@@ -16,7 +16,6 @@ type TFeedContext = {
   feedInfo: TFeedInfo
   relayUrls: string[]
   temporaryRelayUrls: string[]
-  filter: Filter
   isReady: boolean
   switchFeed: (
     feedType: TFeedType,
@@ -40,7 +39,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
-  const [filter, setFilter] = useState<Filter>({})
   const [isReady, setIsReady] = useState(false)
   const [feedInfo, setFeedInfo] = useState<TFeedInfo>({
     feedType: 'relay',
@@ -125,7 +123,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setFeedInfo(newFeedInfo)
       feedInfoRef.current = newFeedInfo
       setRelayUrls([normalizedUrl])
-      setFilter({})
       storage.setFeedInfo(newFeedInfo, pubkey)
       setIsReady(true)
 
@@ -158,7 +155,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         setFeedInfo(newFeedInfo)
         feedInfoRef.current = newFeedInfo
         setRelayUrls(relaySet.relayUrls)
-        setFilter({})
         storage.setFeedInfo(newFeedInfo, pubkey)
         setIsReady(true)
 
@@ -180,11 +176,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       feedInfoRef.current = newFeedInfo
       storage.setFeedInfo(newFeedInfo, pubkey)
 
-      const followings = await client.fetchFollowings(options.pubkey)
       setRelayUrls([])
-      setFilter({
-        authors: followings.includes(options.pubkey) ? followings : [...followings, options.pubkey]
-      })
       setIsReady(true)
       return
     }
@@ -200,7 +192,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       storage.setFeedInfo(newFeedInfo, pubkey)
 
       setRelayUrls([])
-      setFilter({})
       setIsReady(true)
       return
     }
@@ -216,7 +207,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       feedInfoRef.current = newFeedInfo
       setTemporaryRelayUrls(urls)
       setRelayUrls(urls)
-      setFilter({})
       setIsReady(true)
 
       const relayInfos = await relayInfoService.getRelayInfos(urls)
@@ -234,7 +224,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         feedInfo,
         relayUrls,
         temporaryRelayUrls,
-        filter,
         isReady,
         switchFeed
       }}

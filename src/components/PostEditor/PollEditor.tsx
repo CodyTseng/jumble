@@ -5,9 +5,10 @@ import { Switch } from '@/components/ui/switch'
 import { normalizeUrl } from '@/lib/url'
 import { TPollCreateData } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, Eraser, X } from 'lucide-react'
+import { Eraser, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import AlertCard from '../AlertCard'
 
 export default function PollEditor({
   pollCreateData,
@@ -124,17 +125,12 @@ export default function PollEditor({
       </div>
 
       <div className="grid gap-2">
-        <div className="p-3 rounded-lg text-sm bg-destructive [&_svg]:size-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle />
-            <div className="font-medium">{t('This is a poll note.')}</div>
-          </div>
-          <div className="pl-6">
-            {t(
-              'Unlike regular notes, polls are not widely supported and may not display on other clients.'
-            )}
-          </div>
-        </div>
+        <AlertCard
+          title={t('This is a poll note.')}
+          content={t(
+            'Unlike regular notes, polls are not widely supported and may not display on other clients.'
+          )}
+        />
 
         <Button variant="ghost-destructive" className="w-full" onClick={() => setIsPoll(false)}>
           {t('Remove poll')}

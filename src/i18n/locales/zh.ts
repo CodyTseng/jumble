@@ -324,6 +324,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': '成功广播到服务器：{{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       '广播到服务器失败：{{url}}。错误：{{error}}',
-    'Write relays': '写服务器'
+    'Write relays': '写服务器',
+    'No more reactions': '没有更多互动了',
+    'No reactions yet': '暂无互动',
+    'No more zaps': '没有更多打闪了',
+    'No zaps yet': '暂无打闪',
+    'No more reposts': '没有更多转发了',
+    'No reposts yet': '暂无转发',
+    Reposts: '转发',
+    FollowListNotFoundConfirmation:
+      '未找到关注列表。你想创建一个新的吗？如果你之前已经关注了用户，请不要确认，因为此操作会导致你丢失之前的关注列表。',
+    MuteListNotFoundConfirmation:
+      '未找到屏蔽列表。你想创建一个新的吗？如果你之前已经屏蔽了用户，请不要确认，因为此操作会导致你丢失之前的屏蔽列表。',
+    'Show NSFW content by default': '默认显示 NSFW 内容',
+    'Too many read relays': '读取中继过多',
+    'Too many write relays': '写入中继过多',
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      '您有 {{count}} 个读取中继。大多数客户端只使用 2-4 个中继，设置更多是不必要的。',
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      '您有 {{count}} 个写入中继。大多数客户端只使用 2-4 个中继，设置更多是不必要的。',
+    'Optimize Relay Settings': '优化中继设置',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      '您当前的中继配置可能不是最优的。这可能导致其他人难以找到您发布的内容，也可能导致您无法获取完整的通知列表。',
+    'Optimize Now': '立即优化',
+    'Maybe Later': '稍后处理',
+    "Don't remind me again": '不再提醒'
   }
 }

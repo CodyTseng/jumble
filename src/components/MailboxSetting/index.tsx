@@ -4,8 +4,26 @@ import { useNostr } from '@/providers/NostrProvider'
 import { TMailboxRelay, TMailboxRelayScope } from '@/types'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
 import MailboxRelay from './MailboxRelay'
 import NewMailboxRelayInput from './NewMailboxRelayInput'
+import RelayCountWarning from './RelayCountWarning'
 import SaveButton from './SaveButton'
 
 export default function MailboxSetting() {
@@ -13,6 +31,37 @@ export default function MailboxSetting() {
   const { pubkey, relayList, checkLogin } = useNostr()
   const [relays, setRelays] = useState<TMailboxRelay[]>([])
   const [hasChange, setHasChange] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+
+    if (active.id !== over?.id) {
+      const oldIndex = relays.findIndex((relay) => relay.url === active.id)
+      const newIndex = relays.findIndex((relay) => relay.url === over?.id)
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setRelays((relays) => arrayMove(relays, oldIndex, newIndex))
+        setHasChange(true)
+      }
+    }
+  }
 
   useEffect(() => {
     if (!relayList) return
@@ -65,17 +114,27 @@ export default function MailboxSetting() {
         <div>{t('write relays description')}</div>
         <div>{t('read & write relays notice')}</div>
       </div>
+      <RelayCountWarning relays={relays} />
       <SaveButton mailboxRelays={relays} hasChange={hasChange} setHasChange={setHasChange} />
-      <div className="space-y-2">
-        {relays.map((relay) => (
-          <MailboxRelay
-            key={relay.url}
-            mailboxRelay={relay}
-            changeMailboxRelayScope={changeMailboxRelayScope}
-            removeMailboxRelay={removeMailboxRelay}
-          />
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      >
+        <SortableContext items={relays.map((r) => r.url)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {relays.map((relay) => (
+              <MailboxRelay
+                key={relay.url}
+                mailboxRelay={relay}
+                changeMailboxRelayScope={changeMailboxRelayScope}
+                removeMailboxRelay={removeMailboxRelay}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
       <NewMailboxRelayInput saveNewMailboxRelay={saveNewMailboxRelay} />
     </div>
   )

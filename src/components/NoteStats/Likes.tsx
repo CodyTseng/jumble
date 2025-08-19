@@ -65,6 +65,9 @@ export default function Likes({ event }: { event: Event }) {
             )}
             onClick={(e) => {
               e.stopPropagation()
+              if (pubkey && pubkeys.has(pubkey)) {
+                return
+              }
               like(key, emoji)
             }}
           >

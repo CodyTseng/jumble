@@ -15,6 +15,7 @@ import {
   useRef,
   useState
 } from 'react'
+import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
 import ExplorePage from './pages/primary/ExplorePage'
 import MePage from './pages/primary/MePage'
 import NotificationListPage from './pages/primary/NotificationListPage'
@@ -300,6 +301,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 {element}
               </div>
             ))}
+            <TooManyRelaysAlertDialog />
           </NotificationProvider>
         </SecondaryPageContext.Provider>
       </PrimaryPageContext.Provider>
@@ -387,6 +389,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
           </div>
+          <TooManyRelaysAlertDialog />
         </NotificationProvider>
       </SecondaryPageContext.Provider>
     </PrimaryPageContext.Provider>

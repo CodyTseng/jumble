@@ -1,8 +1,8 @@
 import { useFetchEvent, useTranslatedEvent } from '@/hooks'
 import { createFakeEvent } from '@/lib/event'
-import { toNjump, toNote } from '@/lib/link'
+import { toNote } from '@/lib/link'
 import { isValidPubkey } from '@/lib/pubkey'
-import { generateBech32IdFromATag } from '@/lib/tag'
+import { generateBech32IdFromATag, generateBech32IdFromETag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { Event } from 'nostr-tools'
@@ -62,7 +62,13 @@ function HighlightSource({ event }: { event: Event }) {
     return sourceTag
   }, [event])
   const { event: referenceEvent } = useFetchEvent(
-    sourceTag && sourceTag[0] === 'e' ? sourceTag[1] : undefined
+    sourceTag
+      ? sourceTag[0] === 'e'
+        ? generateBech32IdFromETag(sourceTag)
+        : sourceTag[0] === 'a'
+          ? generateBech32IdFromATag(sourceTag)
+          : undefined
+      : undefined
   )
   const referenceEventId = useMemo(() => {
     if (!sourceTag || sourceTag[0] === 'r') return
@@ -110,29 +116,17 @@ function HighlightSource({ event }: { event: Event }) {
     <div className="flex items-center gap-2 text-muted-foreground">
       <div className="shrink-0">{t('From')}</div>
       {pubkey && <UserAvatar userId={pubkey} size="xSmall" className="cursor-pointer" />}
-      {referenceEvent ? (
+      {referenceEventId && (
         <div
           className="truncate underline pointer-events-auto cursor-pointer hover:text-foreground"
           onClick={(e) => {
             e.stopPropagation()
-            push(toNote(referenceEvent))
+            push(toNote(referenceEvent ?? referenceEventId))
           }}
         >
-          <ContentPreview event={referenceEvent} />
+          {referenceEvent ? <ContentPreview event={referenceEvent} /> : referenceEventId}
         </div>
-      ) : referenceEventId ? (
-        <div className="truncate text-muted-foreground">
-          <a
-            href={toNjump(referenceEventId)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-muted-foreground hover:text-foreground"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {toNjump(referenceEventId)}
-          </a>
-        </div>
-      ) : null}
+      )}
     </div>
   )
 }

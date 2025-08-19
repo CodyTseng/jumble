@@ -8,6 +8,7 @@ import {
   isPictureEvent
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event, kinds } from 'nostr-tools'
@@ -28,6 +29,7 @@ import Highlight from './Highlight'
 import IValue from './IValue'
 import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
+import LongFormArticlePreview from './LongFormArticlePreview'
 import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
 import Poll from './Poll'
@@ -38,13 +40,15 @@ export default function Note({
   originalNoteId,
   size = 'normal',
   className,
-  hideParentNotePreview = false
+  hideParentNotePreview = false,
+  showFull = false
 }: {
   event: Event
   originalNoteId?: string
   size?: 'normal' | 'small'
   className?: string
   hideParentNotePreview?: boolean
+  showFull?: boolean
 }) {
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
@@ -57,6 +61,7 @@ export default function Note({
     [event]
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])
+  const { defaultShowNsfw } = useContentPolicy()
   const [showNsfw, setShowNsfw] = useState(false)
   const { mutePubkeys } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
@@ -80,12 +85,16 @@ export default function Note({
     content = <UnknownNote className="mt-2" event={event} />
   } else if (mutePubkeys.includes(event.pubkey) && !showMuted) {
     content = <MutedNote show={() => setShowMuted(true)} />
-  } else if (isNsfwEvent(event) && !showNsfw) {
+  } else if (!defaultShowNsfw && isNsfwEvent(event) && !showNsfw) {
     content = <NsfwNote show={() => setShowNsfw(true)} />
   } else if (event.kind === kinds.Highlights) {
     content = <Highlight className="mt-2" event={event} />
   } else if (event.kind === kinds.LongFormArticle) {
-    content = <LongFormArticle className="mt-2" event={event} />
+    content = showFull ? (
+      <LongFormArticle className="mt-2" event={event} />
+    ) : (
+      <LongFormArticlePreview className="mt-2" event={event} />
+    )
   } else if (event.kind === kinds.LiveEvent) {
     content = <LiveEvent className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.GROUP_METADATA) {

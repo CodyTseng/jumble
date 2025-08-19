@@ -22,7 +22,7 @@ export default function GenerateNewAccount({
   const [password, setPassword] = useState('')
 
   const handleLogin = () => {
-    nsecLogin(nsec, password).then(() => onLoginSuccess())
+    nsecLogin(nsec, password, true).then(() => onLoginSuccess())
   }
 
   return (

@@ -1,6 +1,7 @@
 import { BIG_RELAY_URLS, POLL_TYPE } from '@/constants'
 import { TEmoji, TPollType, TRelayList, TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
+import { buildATag } from './draft-event'
 import { getReplaceableEventIdentifier } from './event'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey, pubkeyToNpub } from './pubkey'
@@ -91,7 +92,7 @@ export function getRelaySetFromEvent(event: Event): TRelaySet {
     name = id
   }
 
-  return { id, name, relayUrls }
+  return { id, name, relayUrls, aTag: buildATag(event) }
 }
 
 export function getZapInfoFromEvent(receiptEvent: Event) {

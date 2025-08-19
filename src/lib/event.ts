@@ -149,9 +149,13 @@ export function getRootBech32Id(event?: Event) {
   return generateBech32IdFromETag(eTag)
 }
 
-export function getReplaceableEventCoordinate(event: Event) {
+export function getReplaceableCoordinate(kind: number, pubkey: string, d: string = '') {
+  return `${kind}:${pubkey}:${d}`
+}
+
+export function getReplaceableCoordinateFromEvent(event: Event) {
   const d = event.tags.find(tagNameEquals('d'))?.[1]
-  return `${event.kind}:${event.pubkey}:${d ?? ''}`
+  return getReplaceableCoordinate(event.kind, event.pubkey, d)
 }
 
 export function getNoteBech32Id(event: Event) {
@@ -241,4 +245,27 @@ export function createFakeEvent(event: Partial<Event>): Event {
     sig: '',
     ...event
   }
+}
+
+// Legacy compare function for sorting compatibility
+// If return 0, it means the two events are equal.
+// If return a negative number, it means `b` should be retained, and `a` should be discarded.
+// If return a positive number, it means `a` should be retained, and `b` should be discarded.
+export function compareEvents(a: Event, b: Event): number {
+  if (a.created_at !== b.created_at) {
+    return a.created_at - b.created_at
+  }
+  // In case of replaceable events with the same timestamp, the event with the lowest id (first in lexical order) should be retained, and the other discarded.
+  if (a.id !== b.id) {
+    return a.id < b.id ? 1 : -1
+  }
+  return 0
+}
+
+// Returns the event that should be retained when comparing two events
+export function getRetainedEvent(a: Event, b: Event): Event {
+  if (compareEvents(a, b) > 0) {
+    return a
+  }
+  return b
 }

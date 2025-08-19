@@ -1,17 +1,21 @@
-import mediaUpload from '@/services/media-upload.service'
+import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from '@/services/media-upload.service'
 import { useRef } from 'react'
 import { toast } from 'sonner'
 
 export default function Uploader({
   children,
   onUploadSuccess,
-  onUploadingChange,
+  onUploadStart,
+  onUploadEnd,
+  onProgress,
   className,
   accept = 'image/*'
 }: {
   children: React.ReactNode
   onUploadSuccess: ({ url, tags }: { url: string; tags: string[][] }) => void
-  onUploadingChange?: (uploading: boolean) => void
+  onUploadStart?: (file: File, cancel: () => void) => void
+  onUploadEnd?: (file: File) => void
+  onProgress?: (file: File, progress: number) => void
   className?: string
   accept?: string
 }) {
@@ -20,20 +24,34 @@ export default function Uploader({
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return
 
-    onUploadingChange?.(true)
-    try {
-      for (const file of event.target.files) {
-        const result = await mediaUpload.upload(file)
+    const abortControllerMap = new Map<File, AbortController>()
+
+    for (const file of event.target.files) {
+      const abortController = new AbortController()
+      abortControllerMap.set(file, abortController)
+      onUploadStart?.(file, () => abortController.abort())
+    }
+
+    for (const file of event.target.files) {
+      try {
+        const abortController = abortControllerMap.get(file)
+        const result = await mediaUpload.upload(file, {
+          onProgress: (p) => onProgress?.(file, p),
+          signal: abortController?.signal
+        })
         onUploadSuccess(result)
+        onUploadEnd?.(file)
+      } catch (error) {
+        console.error('Error uploading file', error)
+        const message = (error as Error).message
+        if (message !== UPLOAD_ABORTED_ERROR_MSG) {
+          toast.error(`Failed to upload file: ${message}`)
+        }
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+        onUploadEnd?.(file)
       }
-    } catch (error) {
-      console.error('Error uploading file', error)
-      toast.error(`Failed to upload file: ${(error as Error).message}`)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    } finally {
-      onUploadingChange?.(false)
     }
   }
 
@@ -45,8 +63,8 @@ export default function Uploader({
   }
 
   return (
-    <div onClick={handleUploadClick} className={className}>
-      {children}
+    <div className={className}>
+      <div onClick={handleUploadClick}>{children}</div>
       <input
         type="file"
         ref={fileInputRef}

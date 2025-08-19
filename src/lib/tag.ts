@@ -18,7 +18,13 @@ export function tagNameEquals(tagName: string) {
 
 export function generateBech32IdFromETag(tag: string[]) {
   try {
-    const [, id, relay, , author] = tag
+    const [, id, relay, markerOrPubkey, pubkey] = tag
+    let author: string | undefined
+    if (markerOrPubkey && isValidPubkey(markerOrPubkey)) {
+      author = markerOrPubkey
+    } else if (pubkey && isValidPubkey(pubkey)) {
+      author = pubkey
+    }
     return nip19.neventEncode({ id, relays: relay ? [relay] : undefined, author })
   } catch {
     return undefined

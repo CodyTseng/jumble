@@ -328,6 +328,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': '릴레이로 브로드캐스트에 성공했습니다: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       '릴레이로 브로드캐스트에 실패했습니다: {{url}}. 오류: {{error}}',
-    'Write relays': '쓰기 릴레이'
+    'Write relays': '쓰기 릴레이',
+    'No more reactions': '더 이상 반응이 없습니다',
+    'No reactions yet': '아직 반응이 없습니다',
+    'No more zaps': '더 이상 즙이 없습니다',
+    'No zaps yet': '아직 즙이 없습니다',
+    'No more reposts': '더 이상 리포스트가 없습니다',
+    'No reposts yet': '아직 리포스트가 없습니다',
+    Reposts: '리포스트',
+    FollowListNotFoundConfirmation:
+      '팔로우 목록을 찾을 수 없습니다. 새로 만드시겠습니까? 이전에 사용자를 팔로우한 적이 있다면 이 작업으로 인해 이전 팔로우 목록을 잃게 되므로 확인하지 마시기 바랍니다.',
+    MuteListNotFoundConfirmation:
+      '음소거 목록을 찾을 수 없습니다. 새로 만드시겠습니까? 이전에 사용자를 음소거한 적이 있다면 이 작업으로 인해 이전 음소거 목록을 잃게 되므로 확인하지 마시기 바랍니다.',
+    'Show NSFW content by default': '기본적으로 NSFW 콘텐츠 표시',
+    'Too many read relays': '읽기 릴레이가 너무 많습니다',
+    'Too many write relays': '쓰기 릴레이가 너무 많습니다',
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      '{{count}}개의 읽기 릴레이가 있습니다. 대부분의 클라이언트는 2-4개의 릴레이만 사용하므로 더 설정하는 것은 불필요합니다.',
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      '{{count}}개의 쓰기 릴레이가 있습니다. 대부분의 클라이언트는 2-4개의 릴레이만 사용하므로 더 설정하는 것은 불필요합니다.',
+    'Optimize Relay Settings': '릴레이 설정 최적화',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      '현재 릴레이 설정이 최적이 아닐 수 있습니다. 이로 인해 다른 사람들이 귀하의 게시물을 찾기 어려워지고 알림이 불완전할 수 있습니다.',
+    'Optimize Now': '지금 최적화',
+    'Maybe Later': '나중에',
+    "Don't remind me again": '다시 알리지 않기'
   }
 }

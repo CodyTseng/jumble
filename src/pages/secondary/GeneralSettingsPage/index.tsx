@@ -4,7 +4,7 @@ import { Switch } from '@/components/ui/switch'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn } from '@/lib/utils'
-import { useAutoplay } from '@/providers/AutoplayProvider'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { SelectValue } from '@radix-ui/react-select'
@@ -15,7 +15,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
-  const { autoplay, setAutoplay } = useAutoplay()
+  const { autoplay, setAutoplay, defaultShowNsfw, setDefaultShowNsfw } = useContentPolicy()
   const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
 
   const handleLanguageChange = (value: TLanguage) => {
@@ -74,6 +74,12 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             checked={hideUntrustedNotes}
             onCheckedChange={updateHideUntrustedNotes}
           />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="show-nsfw" className="text-base font-normal">
+            {t('Show NSFW content by default')}
+          </Label>
+          <Switch id="show-nsfw" checked={defaultShowNsfw} onCheckedChange={setDefaultShowNsfw} />
         </SettingItem>
       </div>
     </SecondaryPageLayout>

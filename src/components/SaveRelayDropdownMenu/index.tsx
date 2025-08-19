@@ -88,7 +88,9 @@ export default function SaveRelayDropdownMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild className="px-2">
+        {trigger}
+      </DropdownMenuTrigger>
       <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
         <DropdownMenuLabel>{t('Save to')} ...</DropdownMenuLabel>
         <DropdownMenuSeparator />

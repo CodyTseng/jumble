@@ -26,7 +26,7 @@ export default function Tabs({
   return (
     <div
       className={cn(
-        'sticky flex top-12 bg-background z-30 w-full transition-transform',
+        'sticky flex top-12 py-1 bg-background z-30 w-full transition-transform',
         deepBrowsing && lastScrollTop > threshold ? '-translate-y-[calc(100%+12rem)]' : ''
       )}
     >

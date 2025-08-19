@@ -1,10 +1,16 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
-import { getReplaceableEventCoordinate } from '@/lib/event'
+import {
+  compareEvents,
+  getReplaceableCoordinate,
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent
+} from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { getPubkeysFromPTags, getServersFromServerTags } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
-import { ISigner, TProfile, TRelayList } from '@/types'
+import { isSafari } from '@/lib/utils'
+import { ISigner, TProfile, TRelayList, TSubRequestFilter } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import dayjs from 'dayjs'
@@ -36,12 +42,13 @@ class ClientService extends EventTarget {
     string,
     | {
         refs: TTimelineRef[]
-        filter: Omit<Filter, 'since' | 'until'> & { limit: number }
+        filter: TSubRequestFilter
         urls: string[]
       }
     | string[]
     | undefined
   > = {}
+  private replaceableEventCacheMap = new Map<string, NEvent>()
   private eventCacheMap = new Map<string, Promise<NEvent | undefined>>()
   private eventDataLoader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
@@ -170,7 +177,7 @@ class ClientService extends EventTarget {
   }
 
   async subscribeTimeline(
-    subRequests: { urls: string[]; filter: Omit<Filter, 'since' | 'until'> & { limit: number } }[],
+    subRequests: { urls: string[]; filter: TSubRequestFilter }[],
     {
       onEvents,
       onNew
@@ -399,7 +406,7 @@ class ClientService extends EventTarget {
 
   private async _subscribeTimeline(
     urls: string[],
-    filter: Omit<Filter, 'since' | 'until'> & { limit: number }, // filter with limit,
+    filter: TSubRequestFilter, // filter with limit,
     {
       onEvents,
       onNew
@@ -438,6 +445,13 @@ class ClientService extends EventTarget {
       startLogin,
       onevent: (evt: NEvent) => {
         that.eventDataLoader.prime(evt.id, Promise.resolve(evt))
+        if (isReplaceableEvent(evt.kind)) {
+          const coordinate = getReplaceableCoordinateFromEvent(evt)
+          const cachedEvent = that.replaceableEventCacheMap.get(coordinate)
+          if (!cachedEvent || compareEvents(evt, cachedEvent) > 0) {
+            that.replaceableEventCacheMap.set(coordinate, evt)
+          }
+        }
         // not eosed yet, push to events
         if (!eosedAt) {
           return events.push(evt)
@@ -635,6 +649,7 @@ class ClientService extends EventTarget {
   async fetchEvent(id: string): Promise<NEvent | undefined> {
     if (!/^[0-9a-f]{64}$/.test(id)) {
       let eventId: string | undefined
+      let coordinate: string | undefined
       const { type, data } = nip19.decode(id)
       switch (type) {
         case 'note':
@@ -643,8 +658,16 @@ class ClientService extends EventTarget {
         case 'nevent':
           eventId = data.id
           break
+        case 'naddr':
+          coordinate = getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
+          break
       }
-      if (eventId) {
+      if (coordinate) {
+        const cache = this.replaceableEventCacheMap.get(coordinate)
+        if (cache) {
+          return cache
+        }
+      } else if (eventId) {
         const cache = this.eventCacheMap.get(eventId)
         if (cache) {
           return cache
@@ -1113,7 +1136,7 @@ class ClientService extends EventTarget {
         const events = await this.query(BIG_RELAY_URLS, filters)
 
         for (const event of events) {
-          const key = getReplaceableEventCoordinate(event)
+          const key = getReplaceableCoordinateFromEvent(event)
           const existing = eventMap.get(key)
           if (!existing || existing.created_at < event.created_at) {
             eventMap.set(key, event)
@@ -1202,6 +1225,55 @@ class ClientService extends EventTarget {
       })
       .filter(Boolean) as { pubkey: string; kind: number; d: string }[]
     return await this.replaceableEventDataLoader.loadMany(params)
+  }
+
+  // ================= Utils =================
+
+  async generateSubRequestsForPubkeys(pubkeys: string[], myPubkey?: string | null) {
+    // If many websocket connections are initiated simultaneously, it will be
+    // very slow on Safari (for unknown reason)
+    if (isSafari()) {
+      let urls = BIG_RELAY_URLS
+      if (myPubkey) {
+        const relayList = await this.fetchRelayList(myPubkey)
+        urls = relayList.read.concat(BIG_RELAY_URLS).slice(0, 5)
+      }
+      return [{ urls, filter: { authors: pubkeys } }]
+    }
+
+    const relayLists = await this.fetchRelayLists(pubkeys)
+    const group: Record<string, Set<string>> = {}
+    relayLists.forEach((relayList, index) => {
+      relayList.write.slice(0, 4).forEach((url) => {
+        if (!group[url]) {
+          group[url] = new Set()
+        }
+        group[url].add(pubkeys[index])
+      })
+    })
+
+    const relayCount = Object.keys(group).length
+    const coveredCount = new Map<string, number>()
+    Object.entries(group)
+      .sort(([, a], [, b]) => b.size - a.size)
+      .forEach(([url, pubkeys]) => {
+        if (
+          relayCount > 10 &&
+          pubkeys.size < 10 &&
+          Array.from(pubkeys).every((pubkey) => (coveredCount.get(pubkey) ?? 0) >= 2)
+        ) {
+          delete group[url]
+        } else {
+          pubkeys.forEach((pubkey) => {
+            coveredCount.set(pubkey, (coveredCount.get(pubkey) ?? 0) + 1)
+          })
+        }
+      })
+
+    return Object.entries(group).map(([url, authors]) => ({
+      urls: [url],
+      filter: { authors: Array.from(authors) }
+    }))
   }
 }
 

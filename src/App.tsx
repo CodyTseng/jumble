@@ -4,8 +4,8 @@ import './index.css'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { Toaster } from './components/ui/sonner'
 import { PageManager } from './PageManager'
-import { AutoplayProvider } from './providers/AutoplayProvider'
 import { BookmarksProvider } from './providers/BookmarksProvider'
+import { ContentPolicyProvider } from './providers/ContentPolicyProvider'
 import { FavoriteRelaysProvider } from './providers/FavoriteRelaysProvider'
 import { FeedProvider } from './providers/FeedProvider'
 import { FollowListProvider } from './providers/FollowListProvider'
@@ -21,7 +21,7 @@ import { ZapProvider } from './providers/ZapProvider'
 export default function App(): JSX.Element {
   return (
     <ThemeProvider>
-      <AutoplayProvider>
+      <ContentPolicyProvider>
         <ScreenSizeProvider>
           <NostrProvider>
             <ZapProvider>
@@ -48,7 +48,7 @@ export default function App(): JSX.Element {
             </ZapProvider>
           </NostrProvider>
         </ScreenSizeProvider>
-      </AutoplayProvider>
+      </ContentPolicyProvider>
     </ThemeProvider>
   )
 }

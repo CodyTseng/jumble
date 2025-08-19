@@ -332,6 +332,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Diffusion réussie vers le relais : {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Échec de la diffusion vers le relais : {{url}}. Erreur : {{error}}',
-    'Write relays': 'Relais d’écriture'
+    'Write relays': 'Relais d’écriture',
+    'No more reactions': 'Plus de réactions',
+    'No reactions yet': 'Pas encore de réactions',
+    'No more zaps': 'Plus de zaps',
+    'No zaps yet': 'Pas encore de zaps',
+    'No more reposts': 'Plus de reposts',
+    'No reposts yet': 'Pas encore de reposts',
+    Reposts: 'Reposts',
+    FollowListNotFoundConfirmation:
+      'Liste de suivi non trouvée. Voulez-vous en créer une nouvelle ? Si vous avez suivi des utilisateurs auparavant, veuillez NE PAS confirmer car cette opération vous fera perdre votre liste de suivi précédente.',
+    MuteListNotFoundConfirmation:
+      'Liste de mise en sourdine non trouvée. Voulez-vous en créer une nouvelle ? Si vous avez mis en sourdine des utilisateurs auparavant, veuillez NE PAS confirmer car cette opération vous fera perdre votre liste de mise en sourdine précédente.',
+    'Show NSFW content by default': 'Afficher le contenu NSFW par défaut',
+    'Too many read relays': 'Trop de relais de lecture',
+    'Too many write relays': "Trop de relais d'écriture",
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      "Vous avez {{count}} relais de lecture. La plupart des clients n'utilisent que 2 à 4 relais, en configurer plus est inutile.",
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      "Vous avez {{count}} relais d'écriture. La plupart des clients n'utilisent que 2 à 4 relais, en configurer plus est inutile.",
+    'Optimize Relay Settings': 'Optimiser les paramètres de relais',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      'Votre configuration de relais actuelle pourrait ne pas être optimale. Cela pourrait rendre difficile pour les autres de trouver vos publications et pourrait entraîner des notifications incomplètes.',
+    'Optimize Now': 'Optimiser maintenant',
+    'Maybe Later': 'Peut-être plus tard',
+    "Don't remind me again": 'Ne plus me rappeler'
   }
 }

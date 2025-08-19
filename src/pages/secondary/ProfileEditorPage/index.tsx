@@ -128,7 +128,8 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="relative bg-cover bg-center rounded-lg mb-2">
           <Uploader
             onUploadSuccess={onBannerUploadSuccess}
-            onUploadingChange={(uploading) => setTimeout(() => setUploadingBanner(uploading), 50)}
+            onUploadStart={() => setUploadingBanner(true)}
+            onUploadEnd={() => setUploadingBanner(false)}
             className="w-full relative cursor-pointer"
           >
             <ProfileBanner
@@ -146,7 +147,8 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           </Uploader>
           <Uploader
             onUploadSuccess={onAvatarUploadSuccess}
-            onUploadingChange={(uploading) => setTimeout(() => setUploadingAvatar(uploading), 50)}
+            onUploadStart={() => setUploadingAvatar(true)}
+            onUploadEnd={() => setUploadingAvatar(false)}
             className="w-24 h-24 absolute bottom-0 left-4 translate-y-1/2 border-4 border-background cursor-pointer rounded-full"
           >
             <Avatar className="w-full h-full">

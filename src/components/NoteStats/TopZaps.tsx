@@ -22,14 +22,14 @@ export default function TopZaps({ event }: { event: Event }) {
         {topZaps.map((zap, index) => (
           <div
             key={zap.pr}
-            className="flex gap-1 py-1 pl-1 pr-2 text-sm rounded-full bg-muted/80 items-center text-yellow-400 border border-yellow-400 hover:bg-yellow-400/20 cursor-pointer"
+            className="flex gap-1 py-1 pl-1 pr-2 text-sm max-w-72 rounded-full bg-muted/80 items-center text-yellow-400 border border-yellow-400 hover:bg-yellow-400/20 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation()
               setZapIndex(index)
             }}
           >
             <SimpleUserAvatar userId={zap.pubkey} size="xSmall" />
-            <Zap className="size-3 fill-yellow-400" />
+            <Zap className="size-3 fill-yellow-400 shrink-0" />
             <div className="font-semibold">{formatAmount(zap.amount)}</div>
             <div className="truncate">{zap.comment}</div>
             <div onClick={(e) => e.stopPropagation()}>

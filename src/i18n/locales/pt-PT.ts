@@ -331,6 +331,30 @@ export default {
     'Successfully broadcasted to relay: {{url}}': 'Transmitido com sucesso para o relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Falha ao transmitir para o relay: {{url}}. Erro: {{error}}',
-    'Write relays': 'Relés de escrita'
+    'Write relays': 'Relés de escrita',
+    'No more reactions': 'Sem mais reações',
+    'No reactions yet': 'Ainda sem reações',
+    'No more zaps': 'Sem mais zaps',
+    'No zaps yet': 'Ainda sem zaps',
+    'No more reposts': 'Sem mais reposts',
+    'No reposts yet': 'Ainda sem reposts',
+    Reposts: 'Reposts',
+    FollowListNotFoundConfirmation:
+      'Lista de seguir não encontrada. Deseja criar uma nova? Se seguiu utilizadores anteriormente, por favor NÃO confirme, pois esta operação fará com que perca a sua lista de seguir anterior.',
+    MuteListNotFoundConfirmation:
+      'Lista de silenciados não encontrada. Deseja criar uma nova? Se silenciou utilizadores anteriormente, por favor NÃO confirme, pois esta operação fará com que perca a sua lista de silenciados anterior.',
+    'Show NSFW content by default': 'Mostrar conteúdo NSFW por padrão',
+    'Too many read relays': 'Demasiados relays de leitura',
+    'Too many write relays': 'Demasiados relays de escrita',
+    'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'Tem {{count}} relays de leitura. A maioria dos clientes usa apenas 2-4 relays, configurar mais é desnecessário.',
+    'You have {{count}} write relays. Most clients only use 2-4 relays, setting more is unnecessary.':
+      'Tem {{count}} relays de escrita. A maioria dos clientes usa apenas 2-4 relays, configurar mais é desnecessário.',
+    'Optimize Relay Settings': 'Optimizar definições de relay',
+    'Your current relay configuration may not be optimal. This could make it difficult for others to find your posts and may result in incomplete notifications.':
+      'A sua configuração actual de relay pode não ser ideal. Isto pode tornar difícil para outros encontrarem as suas publicações e pode resultar em notificações incompletas.',
+    'Optimize Now': 'Optimizar agora',
+    'Maybe Later': 'Talvez mais tarde',
+    "Don't remind me again": 'Não me relembrar novamente'
   }
 }

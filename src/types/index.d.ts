@@ -1,5 +1,12 @@
-import { Event, VerifiedEvent } from 'nostr-tools'
+import { Event, VerifiedEvent, Filter } from 'nostr-tools'
 import { POLL_TYPE } from './constants'
+
+export type TSubRequestFilter = Omit<Filter, 'since' | 'until'> & { limit: number }
+
+export type TFeedSubRequest = {
+  urls: string[]
+  filter: Omit<Filter, 'since' | 'until'>
+}
 
 export type TProfile = {
   username: string
@@ -52,6 +59,7 @@ export type TWebMetadata = {
 
 export type TRelaySet = {
   id: string
+  aTag: string[]
   name: string
   relayUrls: string[]
 }

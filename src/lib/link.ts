@@ -11,16 +11,21 @@ export const toNoteList = ({
   hashtag,
   search,
   externalContentId,
-  domain
+  domain,
+  kinds
 }: {
   hashtag?: string
   search?: string
   externalContentId?: string
   domain?: string
+  kinds?: number[]
 }) => {
   const path = '/notes'
   const query = new URLSearchParams()
   if (hashtag) query.set('t', hashtag.toLowerCase())
+  if (kinds?.length) {
+    kinds.forEach((k) => query.append('k', k.toString()))
+  }
   if (search) query.set('s', search)
   if (externalContentId) query.set('i', externalContentId)
   if (domain) query.set('d', domain)

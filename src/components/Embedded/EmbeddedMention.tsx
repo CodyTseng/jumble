@@ -1,9 +1,14 @@
 import { cn } from '@/lib/utils'
 import Username, { SimpleUsername } from '../Username'
 
-export function EmbeddedMention({ userId }: { userId: string }) {
+export function EmbeddedMention({ userId, className }: { userId: string; className?: string }) {
   return (
-    <Username userId={userId} showAt className="text-primary font-normal inline" withoutSkeleton />
+    <Username
+      userId={userId}
+      showAt
+      className={cn('text-primary font-normal inline', className)}
+      withoutSkeleton
+    />
   )
 }
 

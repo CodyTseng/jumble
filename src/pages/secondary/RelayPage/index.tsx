@@ -1,4 +1,4 @@
-import NoteList from '@/components/NoteList'
+import NormalFeed from '@/components/NormalFeed'
 import RelayInfo from '@/components/RelayInfo'
 import SaveRelayDropdownMenu from '@/components/SaveRelayDropdownMenu'
 import SearchInput from '@/components/SearchInput'
@@ -52,10 +52,10 @@ const RelayPage = forwardRef(({ url, index }: { url?: string; index?: number }, 
           />
         </div>
       )}
-      <NoteList
-        relayUrls={[normalizedUrl]}
-        needCheckAlgoRelay
-        filter={debouncedInput ? { search: debouncedInput } : {}}
+      <NormalFeed
+        subRequests={[
+          { urls: [normalizedUrl], filter: debouncedInput ? { search: debouncedInput } : {} }
+        ]}
       />
     </SecondaryPageLayout>
   )

@@ -60,7 +60,7 @@ const PrimaryPageLayout = forwardRef(
 
     if (isSmallScreen) {
       return (
-        <DeepBrowsingProvider active={current === pageName}>
+        <DeepBrowsingProvider active={current === pageName && display}>
           <div
             ref={smallScreenScrollAreaRef}
             style={{
@@ -77,7 +77,7 @@ const PrimaryPageLayout = forwardRef(
     }
 
     return (
-      <DeepBrowsingProvider active={current === pageName} scrollAreaRef={scrollAreaRef}>
+      <DeepBrowsingProvider active={current === pageName && display} scrollAreaRef={scrollAreaRef}>
         <ScrollArea
           className="h-screen overflow-auto"
           scrollBarClassName="z-50 pt-12"

@@ -18,7 +18,6 @@ import postEditor from '@/services/post-editor.service'
 import { Event } from 'nostr-tools'
 import { Dispatch, useMemo } from 'react'
 import PostContent from './PostContent'
-import { PostEditorProvider } from './PostEditorProvider'
 import Title from './Title'
 
 export default function PostEditor({
@@ -36,13 +35,11 @@ export default function PostEditor({
 
   const content = useMemo(() => {
     return (
-      <PostEditorProvider>
-        <PostContent
-          defaultContent={defaultContent}
-          parentEvent={parentEvent}
-          close={() => setOpen(false)}
-        />
-      </PostEditorProvider>
+      <PostContent
+        defaultContent={defaultContent}
+        parentEvent={parentEvent}
+        close={() => setOpen(false)}
+      />
     )
   }, [])
 
