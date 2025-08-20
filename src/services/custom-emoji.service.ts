@@ -50,6 +50,14 @@ class CustomEmojiService {
     return this.emojiMap.get(id)
   }
 
+  getAllCustomEmojisForPicker() {
+    return Array.from(this.emojiMap.values()).map((emoji) => ({
+      id: `:${emoji.shortcode}:${emoji.url}`,
+      imgUrl: emoji.url,
+      names: [emoji.shortcode]
+    }))
+  }
+
   private async addEmojisToIndex(emojis: TEmoji[]) {
     await Promise.allSettled(
       emojis.map(async (emoji) => {
@@ -60,9 +68,9 @@ class CustomEmojiService {
     )
   }
 
-  private getEmojiId(emoji: TEmoji) {
+  getEmojiId(emoji: TEmoji) {
     const encoder = new TextEncoder()
-    const data = encoder.encode(`${emoji.shortcode}:${emoji.url}`)
+    const data = encoder.encode(`${emoji.shortcode}:${emoji.url}`.toLowerCase())
     const hashBuffer = sha256(data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')

@@ -254,7 +254,12 @@ export default function PostContent({
               opening the emoji picker drawer causes an issue,
               the emoji I tap isn't the one that gets inserted. */}
           {!isTouchDevice() && (
-            <EmojiPickerDialog onEmojiClick={(emoji) => textareaRef.current?.insertText(emoji)}>
+            <EmojiPickerDialog
+              onEmojiClick={(emoji) => {
+                if (!emoji) return
+                textareaRef.current?.insertEmoji(emoji)
+              }}
+            >
               <Button variant="ghost" size="icon">
                 <Smile />
               </Button>

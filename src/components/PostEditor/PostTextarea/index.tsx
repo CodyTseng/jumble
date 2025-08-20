@@ -1,7 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
 import { cn } from '@/lib/utils'
+import customEmojiService from '@/services/custom-emoji.service'
 import postEditorCache from '@/services/post-editor-cache.service'
+import { TEmoji } from '@/types'
 import Document from '@tiptap/extension-document'
 import { HardBreak } from '@tiptap/extension-hard-break'
 import History from '@tiptap/extension-history'
@@ -23,6 +25,7 @@ import Preview from './Preview'
 export type TPostTextareaHandle = {
   appendText: (text: string, addNewline?: boolean) => void
   insertText: (text: string) => void
+  insertEmoji: (emoji: string | TEmoji) => void
 }
 
 const PostTextarea = forwardRef<
@@ -134,6 +137,18 @@ const PostTextarea = forwardRef<
       insertText: (text: string) => {
         if (editor) {
           editor.chain().focus().insertContent(text).run()
+        }
+      },
+      insertEmoji: (emoji: string | TEmoji) => {
+        if (editor) {
+          if (typeof emoji === 'string') {
+            editor.chain().insertContent(emoji).run()
+          } else {
+            const emojiNode = editor.schema.nodes.emoji.create({
+              name: customEmojiService.getEmojiId(emoji)
+            })
+            editor.chain().insertContent(emojiNode).insertContent(' ').run()
+          }
         }
       }
     }))

@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { TEmoji } from '@/types'
 import { useState } from 'react'
 import EmojiPicker from '../EmojiPicker'
 
@@ -13,7 +14,7 @@ export default function EmojiPickerDialog({
   onEmojiClick
 }: {
   children: React.ReactNode
-  onEmojiClick?: (emoji: string) => void
+  onEmojiClick?: (emoji: string | TEmoji | undefined) => void
 }) {
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
@@ -24,10 +25,10 @@ export default function EmojiPickerDialog({
         <DrawerTrigger asChild>{children}</DrawerTrigger>
         <DrawerContent>
           <EmojiPicker
-            onEmojiClick={(data, e) => {
+            onEmojiClick={(emoji, e) => {
               e.stopPropagation()
               setOpen(false)
-              onEmojiClick?.(data.emoji)
+              onEmojiClick?.(emoji)
             }}
           />
         </DrawerContent>
@@ -40,10 +41,10 @@ export default function EmojiPickerDialog({
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent side="top" className="p-0 w-fit">
         <EmojiPicker
-          onEmojiClick={(data, e) => {
+          onEmojiClick={(emoji, e) => {
             e.stopPropagation()
             setOpen(false)
-            onEmojiClick?.(data.emoji)
+            onEmojiClick?.(emoji)
           }}
         />
       </DropdownMenuContent>

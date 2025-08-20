@@ -10,6 +10,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import noteStatsService from '@/services/note-stats.service'
+import { TEmoji } from '@/types'
 import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -37,7 +38,7 @@ export default function LikeButton({ event }: { event: Event }) {
     return { myLastEmoji: myLike?.emoji, likeCount: likes?.length }
   }, [noteStats, pubkey, hideUntrustedInteractions])
 
-  const like = async (emoji: string) => {
+  const like = async (emoji: string | TEmoji) => {
     checkLogin(async () => {
       if (liking || !pubkey) return
 
@@ -97,9 +98,11 @@ export default function LikeButton({ event }: { event: Event }) {
           <DrawerOverlay onClick={() => setIsEmojiReactionsOpen(false)} />
           <DrawerContent hideOverlay>
             <EmojiPicker
-              onEmojiClick={(data) => {
+              onEmojiClick={(emoji) => {
                 setIsEmojiReactionsOpen(false)
-                like(data.emoji)
+                if (!emoji) return
+
+                like(emoji)
               }}
             />
           </DrawerContent>
@@ -122,10 +125,12 @@ export default function LikeButton({ event }: { event: Event }) {
       <DropdownMenuContent side="top" className="p-0 w-fit">
         {isPickerOpen ? (
           <EmojiPicker
-            onEmojiClick={(data, e) => {
+            onEmojiClick={(emoji, e) => {
               e.stopPropagation()
               setIsEmojiReactionsOpen(false)
-              like(data.emoji)
+              if (!emoji) return
+
+              like(emoji)
             }}
           />
         ) : (

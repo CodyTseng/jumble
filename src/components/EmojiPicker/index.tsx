@@ -1,14 +1,20 @@
+import { parseEmojiPickerUnified } from '@/lib/utils'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
+import customEmojiService from '@/services/custom-emoji.service'
+import { TEmoji } from '@/types'
 import EmojiPickerReact, {
   EmojiStyle,
   SkinTonePickerLocation,
   SuggestionMode,
   Theme
 } from 'emoji-picker-react'
-import { MouseDownEvent } from 'emoji-picker-react/dist/config/config'
 
-export default function EmojiPicker({ onEmojiClick }: { onEmojiClick: MouseDownEvent }) {
+export default function EmojiPicker({
+  onEmojiClick
+}: {
+  onEmojiClick: (emoji: string | TEmoji | undefined, event: MouseEvent) => void
+}) {
   const { themeSetting } = useTheme()
   const { isSmallScreen } = useScreenSize()
 
@@ -31,7 +37,11 @@ export default function EmojiPicker({ onEmojiClick }: { onEmojiClick: MouseDownE
         } as React.CSSProperties
       }
       suggestedEmojisMode={SuggestionMode.FREQUENT}
-      onEmojiClick={onEmojiClick}
+      onEmojiClick={(data, e) => {
+        const emoji = parseEmojiPickerUnified(data.unified)
+        onEmojiClick(emoji, e)
+      }}
+      customEmojis={customEmojiService.getAllCustomEmojisForPicker()}
     />
   )
 }
