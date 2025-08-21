@@ -2,7 +2,7 @@ import Emoji from '@/components/Emoji'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import customEmojiService from '@/services/custom-emoji.service'
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 
 export interface EmojiListProps {
   items: string[]
@@ -73,33 +73,57 @@ export const EmojiList = forwardRef<EmojiListHandler, EmojiListProps>((props, re
     >
       <div className="p-1">
         {props.items.map((item, index) => {
-          const emoji = customEmojiService.getEmojiById(item)
-          if (!emoji) return null
-
           return (
-            <button
-              className={cn(
-                'cursor-pointer w-full p-1 rounded-lg transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-                selectedIndex === index && 'bg-accent text-accent-foreground'
-              )}
+            <EmojiListItem
               key={item}
-              onClick={() => selectItem(index)}
-              onMouseEnter={() => setSelectedIndex(index)}
-            >
-              <div className="flex gap-2 items-center truncate pointer-events-none">
-                <Emoji
-                  emoji={emoji}
-                  classNames={{
-                    img: 'size-8 shrink-0 rounded-md',
-                    text: 'w-8 text-center shrink-0'
-                  }}
-                />
-                <span className="truncate">:{emoji.shortcode}:</span>
-              </div>
-            </button>
+              id={item}
+              selectedIndex={selectedIndex}
+              index={index}
+              selectItem={selectItem}
+              setSelectedIndex={setSelectedIndex}
+            />
           )
         })}
       </div>
     </ScrollArea>
   )
 })
+
+function EmojiListItem({
+  id,
+  selectedIndex,
+  index,
+  selectItem,
+  setSelectedIndex
+}: {
+  id: string
+  selectedIndex: number
+  index: number
+  selectItem: (index: number) => void
+  setSelectedIndex: (index: number) => void
+}) {
+  const emoji = useMemo(() => customEmojiService.getEmojiById(id), [id])
+  if (!emoji) return null
+
+  return (
+    <button
+      className={cn(
+        'cursor-pointer w-full p-1 rounded-lg transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+        selectedIndex === index && 'bg-accent text-accent-foreground'
+      )}
+      onClick={() => selectItem(index)}
+      onMouseEnter={() => setSelectedIndex(index)}
+    >
+      <div className="flex gap-2 items-center truncate pointer-events-none">
+        <Emoji
+          emoji={emoji}
+          classNames={{
+            img: 'size-8 shrink-0 rounded-md',
+            text: 'w-8 text-center shrink-0'
+          }}
+        />
+        <span className="truncate">:{emoji.shortcode}:</span>
+      </div>
+    </button>
+  )
+}

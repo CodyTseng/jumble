@@ -1,7 +1,9 @@
 import { getEmojisAndEmojiSetsFromEvent, getEmojisFromEvent } from '@/lib/event-metadata'
+import { parseEmojiPickerUnified } from '@/lib/utils'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
+import { getSuggested } from 'emoji-picker-react/src/dataUtils/suggested'
 import FlexSearch from 'flexsearch'
 import { Event } from 'nostr-tools'
 
@@ -10,7 +12,7 @@ class CustomEmojiService {
 
   private emojiMap = new Map<string, TEmoji>()
   private emojiIndex = new FlexSearch.Index({
-    tokenize: 'forward'
+    tokenize: 'full'
   })
 
   constructor() {
@@ -36,11 +38,26 @@ class CustomEmojiService {
     )
   }
 
-  async searchEmojis(query: string = '', limit = 20): Promise<string[]> {
+  async searchEmojis(query: string = ''): Promise<string[]> {
     if (!query) {
-      return Array.from(this.emojiMap.keys()).slice(0, limit)
+      const idSet = new Set<string>()
+      getSuggested()
+        .sort((a, b) => b.count - a.count)
+        .map((item) => parseEmojiPickerUnified(item.unified))
+        .forEach((item) => {
+          if (item && typeof item !== 'string') {
+            const id = this.getEmojiId(item)
+            if (!idSet.has(id)) {
+              idSet.add(id)
+            }
+          }
+        })
+      for (const key of this.emojiMap.keys()) {
+        idSet.add(key)
+      }
+      return Array.from(idSet)
     }
-    const results = await this.emojiIndex.searchAsync(query, { limit })
+    const results = await this.emojiIndex.searchAsync(query)
     return results.filter((id) => typeof id === 'string') as string[]
   }
 
