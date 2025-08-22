@@ -27,7 +27,7 @@ export default function EmojiNode(props: NodeViewRendererProps) {
 
   return (
     <NodeViewWrapper className="inline">
-      <Emoji emoji={emoji} />
+      <Emoji emoji={emoji} classNames={{ img: 'mb-1' }} />
     </NodeViewWrapper>
   )
 }

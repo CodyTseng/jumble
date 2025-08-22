@@ -71,7 +71,11 @@ export default function Likes({ event }: { event: Event }) {
               like(key, emoji)
             }}
           >
-            {liking === key ? <Loader className="animate-spin size-4" /> : <Emoji emoji={emoji} />}
+            {liking === key ? (
+              <Loader className="animate-spin size-4" />
+            ) : (
+              <Emoji emoji={emoji} classNames={{ img: 'size-4' }} />
+            )}
             <div className="text-sm">{pubkeys.size}</div>
           </div>
         ))}

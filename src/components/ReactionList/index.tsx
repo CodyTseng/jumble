@@ -53,8 +53,7 @@ export default function ReactionList({ event }: { event: Event }) {
             <Emoji
               emoji={like.emoji}
               classNames={{
-                text: 'text-xl',
-                img: 'size-5'
+                text: 'text-xl'
               }}
             />
           </div>

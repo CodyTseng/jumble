@@ -130,7 +130,7 @@ const Content = memo(
             const shortcode = node.data.split(':')[1]
             const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
             if (!emoji) return node.data
-            return <Emoji emoji={emoji} key={index} />
+            return <Emoji classNames={{ img: 'mb-1' }} emoji={emoji} key={index} />
           }
           if (node.type === 'youtube') {
             return <YoutubeEmbeddedPlayer key={index} url={node.data} className="mt-2" />
