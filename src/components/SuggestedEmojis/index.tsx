@@ -6,6 +6,8 @@ import { MoreHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Emoji from '../Emoji'
 
+const DEFAULT_SUGGESTED_EMOJIS = ['👍', '❤️', '😂', '🥲', '👀', '🫡', '🫂']
+
 export default function SuggestedEmojis({
   onEmojiClick,
   onMoreButtonClick
@@ -13,15 +15,8 @@ export default function SuggestedEmojis({
   onEmojiClick: (emoji: string | TEmoji) => void
   onMoreButtonClick: () => void
 }) {
-  const [suggestedEmojis, setSuggestedEmojis] = useState<(string | TEmoji)[]>([
-    '👍',
-    '❤️',
-    '😂',
-    '🥲',
-    '👀',
-    '🫡',
-    '🫂'
-  ])
+  const [suggestedEmojis, setSuggestedEmojis] =
+    useState<(string | TEmoji)[]>(DEFAULT_SUGGESTED_EMOJIS)
 
   useEffect(() => {
     try {
@@ -30,9 +25,7 @@ export default function SuggestedEmojis({
         .sort((a, b) => b.count - a.count)
         .map((item) => parseEmojiPickerUnified(item.unified))
         .filter(Boolean) as (string | TEmoji)[]
-      setSuggestedEmojis((pre) =>
-        [...suggestEmojis, ...pre.filter((e) => !suggestEmojis.includes(e))].slice(0, 8)
-      )
+      setSuggestedEmojis(() => [...suggestEmojis, ...DEFAULT_SUGGESTED_EMOJIS].slice(0, 8))
     } catch {
       // ignore
     }
@@ -53,12 +46,9 @@ export default function SuggestedEmojis({
           <div
             className="flex flex-col items-center justify-center p-1 rounded-lg clickable"
             key={index}
+            onClick={() => onEmojiClick(emoji)}
           >
-            <Emoji
-              emoji={emoji}
-              onClick={() => onEmojiClick(emoji)}
-              classNames={{ img: 'size-6 rounded-md' }}
-            />
+            <Emoji emoji={emoji} classNames={{ img: 'size-6 rounded-md' }} />
           </div>
         )
       )}

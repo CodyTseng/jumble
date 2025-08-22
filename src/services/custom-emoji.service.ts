@@ -3,7 +3,8 @@ import { parseEmojiPickerUnified } from '@/lib/utils'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
 import { sha256 } from '@noble/hashes/sha2'
-import { getSuggested } from 'emoji-picker-react/src/dataUtils/suggested'
+import { SkinTones } from 'emoji-picker-react'
+import { getSuggested, setSuggested } from 'emoji-picker-react/src/dataUtils/suggested'
 import FlexSearch from 'flexsearch'
 import { Event } from 'nostr-tools'
 
@@ -95,6 +96,21 @@ class CustomEmojiService {
     const hashBuffer = sha256(data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  }
+
+  updateSuggested(id: string) {
+    const emoji = this.getEmojiById(id)
+    if (!emoji) return
+
+    setSuggested(
+      {
+        n: [emoji.shortcode.toLowerCase()],
+        u: `:${emoji.shortcode}:${emoji.url}`.toLowerCase(),
+        a: '0',
+        imgUrl: emoji.url
+      },
+      SkinTones.NEUTRAL
+    )
   }
 }
 

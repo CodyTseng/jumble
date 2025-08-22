@@ -22,6 +22,8 @@ export const EmojiList = forwardRef<EmojiListHandler, EmojiListProps>((props, re
     if (item) {
       props.command({ name: item })
     }
+
+    customEmojiService.updateSuggested(item)
   }
 
   const upHandler = (): void => {
