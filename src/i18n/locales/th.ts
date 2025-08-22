@@ -338,6 +338,9 @@ export default {
     MuteListNotFoundConfirmation:
       'ไม่พบรายการปิดเสียง คุณต้องการสร้างรายการใหม่หรือไม่? หากคุณเคยปิดเสียงผู้ใช้มาก่อน กรุณาอย่ายืนยัน เพราะการดำเนินการนี้จะทำให้คุณสูญเสียรายการปิดเสียงก่อนหน้านี้',
     'Show NSFW content by default': 'แสดงเนื้อหา NSFW โดยค่าเริ่มต้น',
+    'Custom emoji management': 'จัดการอีโมจิที่กำหนดเอง',
+    'After changing emojis, you may need to refresh the page':
+      'หลังจากเปลี่ยนอีโมจิแล้ว คุณอาจต้องรีเฟรชหน้า',
     'Too many read relays': 'Too many read relays',
     'Too many write relays': 'Too many write relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

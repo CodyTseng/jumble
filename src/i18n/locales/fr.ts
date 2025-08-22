@@ -345,6 +345,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Liste de mise en sourdine non trouvée. Voulez-vous en créer une nouvelle ? Si vous avez mis en sourdine des utilisateurs auparavant, veuillez NE PAS confirmer car cette opération vous fera perdre votre liste de mise en sourdine précédente.',
     'Show NSFW content by default': 'Afficher le contenu NSFW par défaut',
+    'Custom emoji management': 'Gestion des émojis personnalisés',
+    'After changing emojis, you may need to refresh the page':
+      'Après avoir modifié les émojis, vous devrez peut-être actualiser la page',
     'Too many read relays': 'Trop de relais de lecture',
     'Too many write relays': "Trop de relais d'écriture",
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

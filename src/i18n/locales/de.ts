@@ -346,6 +346,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Stummschaltungsliste nicht gefunden. Möchten Sie eine neue erstellen? Wenn Sie zuvor Benutzer stummgeschaltet haben, bestätigen Sie bitte NICHT, da diese Operation dazu führt, dass Sie Ihre vorherige Stummschaltungsliste verlieren.',
     'Show NSFW content by default': 'NSFW-Inhalte standardmäßig anzeigen',
+    'Custom emoji management': 'Benutzerdefinierte Emoji-Verwaltung',
+    'After changing emojis, you may need to refresh the page':
+      'Nach dem Ändern von Emojis müssen Sie möglicherweise die Seite aktualisieren',
     'Too many read relays': 'Zu viele Lese-Relays',
     'Too many write relays': 'Zu viele Schreib-Relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

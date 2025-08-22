@@ -344,6 +344,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Список заблокированных не найден. Хотите создать новый? Если вы уже блокировали пользователей ранее, пожалуйста, НЕ подтверждайте, так как эта операция приведет к потере вашего предыдущего списка заблокированных.',
     'Show NSFW content by default': 'Показывать контент NSFW по умолчанию',
+    'Custom emoji management': 'Управление пользовательскими эмодзи',
+    'After changing emojis, you may need to refresh the page':
+      'После изменения эмодзи может потребоваться обновить страницу',
     'Too many read relays': 'Слишком много релеев для чтения',
     'Too many write relays': 'Слишком много релеев для записи',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

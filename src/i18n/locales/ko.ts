@@ -341,6 +341,9 @@ export default {
     MuteListNotFoundConfirmation:
       '음소거 목록을 찾을 수 없습니다. 새로 만드시겠습니까? 이전에 사용자를 음소거한 적이 있다면 이 작업으로 인해 이전 음소거 목록을 잃게 되므로 확인하지 마시기 바랍니다.',
     'Show NSFW content by default': '기본적으로 NSFW 콘텐츠 표시',
+    'Custom emoji management': '사용자 정의 이모지 관리',
+    'After changing emojis, you may need to refresh the page':
+      '이모지를 변경한 후 페이지를 새로고침해야 할 수 있습니다',
     'Too many read relays': '읽기 릴레이가 너무 많습니다',
     'Too many write relays': '쓰기 릴레이가 너무 많습니다',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

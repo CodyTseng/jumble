@@ -344,6 +344,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Lista wyciszonych nie została znaleziona. Czy chcesz utworzyć nową? Jeśli wcześniej wyciszałeś użytkowników, proszę NIE potwierdzaj, ponieważ ta operacja spowoduje utratę poprzedniej listy wyciszonych.',
     'Show NSFW content by default': 'Domyślnie pokazuj treści NSFW',
+    'Custom emoji management': 'Zarządzanie niestandardowymi emoji',
+    'After changing emojis, you may need to refresh the page':
+      'Po zmianie emoji może być konieczne odświeżenie strony',
     'Too many read relays': 'Too many read relays',
     'Too many write relays': 'Too many write relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

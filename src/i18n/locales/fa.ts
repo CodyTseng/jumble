@@ -340,6 +340,9 @@ export default {
     MuteListNotFoundConfirmation:
       'فهرست بی‌صدا شده‌ها پیدا نشد. آیا می‌خواهید یکی جدید ایجاد کنید؟ اگر قبلاً کاربرانی را بی‌صدا کرده‌اید، لطفاً تأیید نکنید زیرا این عملیات باعث از دست رفتن فهرست بی‌صدا شده‌های قبلی شما خواهد شد.',
     'Show NSFW content by default': 'نمایش محتوای NSFW به صورت پیش‌فرض',
+    'Custom emoji management': 'مدیریت شکلک‌های سفارشی',
+    'After changing emojis, you may need to refresh the page':
+      'پس از تغییر شکلک‌ها، ممکن است نیاز به تازه‌سازی صفحه داشته باشید',
     'Too many read relays': 'Too many read relays',
     'Too many write relays': 'Too many write relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

@@ -342,6 +342,9 @@ export default {
     MuteListNotFoundConfirmation:
       'ミュートリストが見つかりません。新しいものを作成しますか？以前にユーザーをミュートしたことがある場合は、この操作により前のミュートリストが失われるため、確認しないでください。',
     'Show NSFW content by default': 'デフォルトでNSFWコンテンツを表示',
+    'Custom emoji management': 'カスタム絵文字管理',
+    'After changing emojis, you may need to refresh the page':
+      '絵文字を変更した後、ページを更新する必要がある場合があります',
     'Too many read relays': '読み取りリレイが多すぎます',
     'Too many write relays': '書き込みリレイが多すぎます',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

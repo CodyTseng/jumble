@@ -337,6 +337,8 @@ export default {
     MuteListNotFoundConfirmation:
       '未找到屏蔽列表。你想创建一个新的吗？如果你之前已经屏蔽了用户，请不要确认，因为此操作会导致你丢失之前的屏蔽列表。',
     'Show NSFW content by default': '默认显示 NSFW 内容',
+    'Custom emoji management': '自定义表情符号管理',
+    'After changing emojis, you may need to refresh the page': '更改表情符号后，您可能需要刷新页面',
     'Too many read relays': '读取中继过多',
     'Too many write relays': '写入中继过多',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

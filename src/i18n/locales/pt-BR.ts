@@ -343,6 +343,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Lista de silenciados não encontrada. Deseja criar uma nova? Se você silenciou usuários antes, por favor NÃO confirme, pois esta operação fará você perder sua lista de silenciados anterior.',
     'Show NSFW content by default': 'Mostrar conteúdo NSFW por padrão',
+    'Custom emoji management': 'Gerenciamento de emojis personalizados',
+    'After changing emojis, you may need to refresh the page':
+      'Após alterar os emojis, você pode precisar atualizar a página',
     'Too many read relays': 'Muitos relays de leitura',
     'Too many write relays': 'Muitos relays de escrita',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

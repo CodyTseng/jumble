@@ -339,6 +339,9 @@ export default {
     MuteListNotFoundConfirmation:
       'لم يتم العثور على قائمة الكتم. هل تريد إنشاء واحدة جديدة؟ إذا كنت قد كتمت مستخدمين من قبل، يرجى عدم التأكيد لأن هذه العملية ستؤدي إلى فقدان قائمة الكتم السابقة.',
     'Show NSFW content by default': 'إظهار محتوى NSFW افتراضياً',
+    'Custom emoji management': 'إدارة الرموز التعبيرية المخصصة',
+    'After changing emojis, you may need to refresh the page':
+      'بعد تغيير الرموز التعبيرية، قد تحتاج إلى تحديث الصفحة',
     'Too many read relays': 'Too many read relays',
     'Too many write relays': 'Too many write relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

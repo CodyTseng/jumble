@@ -340,6 +340,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Mute list not found. Do you want to create a new one? If you have muted users before, please DO NOT confirm as this operation will cause you to lose your previous mute list.',
     'Show NSFW content by default': 'Show NSFW content by default',
+    'Custom emoji management': 'Custom emoji management',
+    'After changing emojis, you may need to refresh the page':
+      'After changing emojis, you may need to refresh the page',
     'Too many read relays': 'Too many read relays',
     'Too many write relays': 'Too many write relays',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':

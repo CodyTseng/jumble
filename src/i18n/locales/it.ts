@@ -344,6 +344,9 @@ export default {
     MuteListNotFoundConfirmation:
       'Elenco utenti silenziati non trovato. Vuoi crearne uno nuovo? Se hai già silenziato degli utenti in precedenza, per favore NON confermare poiché questa operazione causerà la perdita del tuo elenco utenti silenziati precedente.',
     'Show NSFW content by default': 'Mostra contenuti NSFW per impostazione predefinita',
+    'Custom emoji management': 'Gestione emoji personalizzate',
+    'After changing emojis, you may need to refresh the page':
+      'Dopo aver modificato le emoji, potrebbe essere necessario aggiornare la pagina',
     'Too many read relays': 'Troppi relay di lettura',
     'Too many write relays': 'Troppi relay di scrittura',
     'You have {{count}} read relays. Most clients only use 2-4 relays, setting more is unnecessary.':
