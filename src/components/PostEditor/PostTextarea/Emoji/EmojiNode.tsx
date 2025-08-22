@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 export default function EmojiNode(props: NodeViewRendererProps) {
   const emoji = useMemo(() => {
     const name = props.node.attrs.name
-    if (name.length === 64) {
+    if (customEmojiService.isCustomEmojiId(name)) {
       return customEmojiService.getEmojiById(name)
     }
     return shortcodeToEmoji(name, emojis)?.emoji

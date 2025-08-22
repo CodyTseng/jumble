@@ -75,6 +75,10 @@ class CustomEmojiService {
     }))
   }
 
+  isCustomEmojiId(shortcode: string) {
+    return this.emojiMap.has(shortcode)
+  }
+
   private async addEmojisToIndex(emojis: TEmoji[]) {
     await Promise.allSettled(
       emojis.map(async (emoji) => {

@@ -1,3 +1,5 @@
+import customEmojiService from '@/services/custom-emoji.service'
+import { emojis, shortcodeToEmoji } from '@tiptap/extension-emoji'
 import { JSONContent } from '@tiptap/react'
 import { nip19 } from 'nostr-tools'
 
@@ -39,8 +41,17 @@ function _parseEditorJsonToText(node?: JSONContent): string {
     case 'mention':
       return node.attrs ? `nostr:${node.attrs.id}` : ''
     case 'emoji':
-      return node.attrs?.name ? `:${node.attrs.name}:` : ''
+      return parseEmojiNodeName(node.attrs?.name)
     default:
       return ''
   }
+}
+
+function parseEmojiNodeName(name?: string): string {
+  if (!name) return ''
+  if (customEmojiService.isCustomEmojiId(name)) {
+    return `:${name}:`
+  }
+  const emoji = shortcodeToEmoji(name, emojis)
+  return emoji ? (emoji.emoji ?? '') : ''
 }
