@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
-import { useMemo } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type TabDefinition = {
@@ -21,20 +21,37 @@ export default function Tabs({
 }) {
   const { t } = useTranslation()
   const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.value === value), [value, tabs])
+  const tabRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 })
+
+  useEffect(() => {
+    setTimeout(() => {
+      const activeIndex = tabs.findIndex((tab) => tab.value === value)
+      if (activeIndex >= 0 && tabRefs.current[activeIndex]) {
+        const activeTab = tabRefs.current[activeIndex]
+        const { offsetWidth, offsetLeft } = activeTab
+        const padding = 32 // 16px padding on each side
+        setIndicatorStyle({
+          width: offsetWidth - padding,
+          left: offsetLeft + padding / 2
+        })
+      }
+    }, 20) // ensure tabs are rendered before calculating
+  }, [tabs, value])
 
   return (
     <div
       className={cn(
-        'sticky flex top-12 py-1 bg-background z-30 w-full transition-transform',
+        'sticky flex top-12 py-1 bg-background z-30 w-fit transition-transform',
         deepBrowsing && lastScrollTop > threshold ? '-translate-y-[calc(100%+12rem)]' : ''
       )}
     >
-      {tabs.map((tab) => (
+      {tabs.map((tab, index) => (
         <div
           key={tab.value}
+          ref={(el) => (tabRefs.current[index] = el)}
           className={cn(
-            `flex-1 text-center py-2 font-semibold clickable cursor-pointer rounded-lg`,
+            `w-fit text-center py-2 px-4 font-semibold clickable cursor-pointer rounded-lg`,
             value === tab.value ? '' : 'text-muted-foreground'
           )}
           onClick={() => {
@@ -45,16 +62,12 @@ export default function Tabs({
         </div>
       ))}
       <div
-        className="absolute bottom-0 left-0 transition-all duration-500"
+        className="absolute bottom-0 h-1 bg-primary rounded-full transition-all duration-500"
         style={{
-          width: `${100 / tabs.length}%`,
-          left: `${activeIndex >= 0 ? activeIndex * (100 / tabs.length) : 0}%`
+          width: `${indicatorStyle.width}px`,
+          left: `${indicatorStyle.left}px`
         }}
-      >
-        <div className="px-4">
-          <div className="w-full h-1 bg-primary rounded-full" />
-        </div>
-      </div>
+      />
     </div>
   )
 }
