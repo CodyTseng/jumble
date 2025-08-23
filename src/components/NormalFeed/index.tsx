@@ -1,9 +1,11 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
+import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { useRef, useState } from 'react'
+import KindFilter from '../KindFilter'
 
 export default function NormalFeed({
   subRequests,
@@ -15,6 +17,8 @@ export default function NormalFeed({
   isMainFeed?: boolean
 }) {
   const { hideUntrustedNotes } = useUserTrust()
+  const { showKinds } = useKindFilter()
+  const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const noteListRef = useRef<TNoteListRef>(null)
 
@@ -23,9 +27,12 @@ export default function NormalFeed({
     if (isMainFeed) {
       storage.setNoteListMode(mode)
     }
-    setTimeout(() => {
-      noteListRef.current?.scrollToTop()
-    }, 0)
+    noteListRef.current?.scrollToTop('smooth')
+  }
+
+  const handleShowKindsChange = (newShowKinds: number[]) => {
+    setTemporaryShowKinds(newShowKinds)
+    noteListRef.current?.scrollToTop()
   }
 
   return (
@@ -39,9 +46,13 @@ export default function NormalFeed({
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
         }}
+        options={
+          <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />
+        }
       />
       <NoteList
         ref={noteListRef}
+        showKinds={temporaryShowKinds}
         subRequests={subRequests}
         hideReplies={listMode === 'posts'}
         hideUntrustedNotes={hideUntrustedNotes}

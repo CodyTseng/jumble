@@ -1,3 +1,5 @@
+import { kinds } from 'nostr-tools'
+
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
 export const DEFAULT_FAVORITE_RELAYS = [
@@ -36,6 +38,7 @@ export const StorageKey = {
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes',
   DEFAULT_SHOW_NSFW: 'defaultShowNsfw',
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
+  SHOW_KINDS: 'showKinds',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -73,6 +76,18 @@ export const ExtendedKind = {
   BLOSSOM_SERVER_LIST: 10063,
   GROUP_METADATA: 39000
 }
+
+export const DEFAULT_SHOW_KINDS = [
+  kinds.ShortTextNote,
+  kinds.Repost,
+  ExtendedKind.PICTURE,
+  ExtendedKind.POLL,
+  ExtendedKind.COMMENT,
+  ExtendedKind.VOICE,
+  ExtendedKind.VOICE_COMMENT,
+  kinds.Highlights,
+  kinds.LongFormArticle
+]
 
 export const URL_REGEX =
   /https?:\/\/[\w\p{L}\p{N}\p{M}&.-/?=#\-@%+_:!~*]+(?<![.,;:'")\]}!?，。；：""''！？】）])/gu

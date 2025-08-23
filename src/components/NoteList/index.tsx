@@ -1,6 +1,5 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
-import { ExtendedKind } from '@/constants'
 import {
   getReplaceableCoordinateFromEvent,
   isReplaceableEvent,
@@ -12,7 +11,7 @@ import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
-import { Event, kinds } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
@@ -20,30 +19,20 @@ import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 
 const LIMIT = 100
 const ALGO_LIMIT = 500
-const KINDS = [
-  kinds.ShortTextNote,
-  kinds.Repost,
-  kinds.Highlights,
-  kinds.LongFormArticle,
-  ExtendedKind.COMMENT,
-  ExtendedKind.POLL,
-  ExtendedKind.VOICE,
-  ExtendedKind.VOICE_COMMENT,
-  ExtendedKind.PICTURE
-]
-
 const SHOW_COUNT = 10
 
 const NoteList = forwardRef(
   (
     {
       subRequests,
+      showKinds,
       filterMutedNotes = true,
       hideReplies = false,
       hideUntrustedNotes = false,
       areAlgoRelays = false
     }: {
       subRequests: TFeedSubRequest[]
+      showKinds: number[]
       filterMutedNotes?: boolean
       hideReplies?: boolean
       hideUntrustedNotes?: boolean
@@ -100,8 +89,10 @@ const NoteList = forwardRef(
       })
     }, [newEvents, hideReplies, hideUntrustedNotes, filterMutedNotes, mutePubkeys])
 
-    const scrollToTop = () => {
-      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
+      setTimeout(() => {
+        topRef.current?.scrollIntoView({ behavior, block: 'start' })
+      }, 20)
     }
 
     useImperativeHandle(ref, () => ({ scrollToTop }), [])
@@ -115,11 +106,17 @@ const NoteList = forwardRef(
         setNewEvents([])
         setHasMore(true)
 
+        if (showKinds.length === 0) {
+          setLoading(false)
+          setHasMore(false)
+          return () => {}
+        }
+
         const { closer, timelineKey } = await client.subscribeTimeline(
           subRequests.map(({ urls, filter }) => ({
             urls,
             filter: {
-              kinds: KINDS,
+              kinds: showKinds,
               ...filter,
               limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
             }
@@ -156,7 +153,7 @@ const NoteList = forwardRef(
       return () => {
         promise.then((closer) => closer())
       }
-    }, [JSON.stringify(subRequests), refreshCount])
+    }, [JSON.stringify(subRequests), refreshCount, showKinds])
 
     useEffect(() => {
       const options = {
@@ -264,5 +261,5 @@ NoteList.displayName = 'NoteList'
 export default NoteList
 
 export type TNoteListRef = {
-  scrollToTop: () => void
+  scrollToTop: (behavior?: ScrollBehavior) => void
 }

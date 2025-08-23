@@ -1,4 +1,4 @@
-import { DEFAULT_NIP_96_SERVICE, StorageKey } from '@/constants'
+import { DEFAULT_NIP_96_SERVICE, DEFAULT_SHOW_KINDS, StorageKey } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
 import {
@@ -34,6 +34,7 @@ class LocalStorageService {
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private defaultShowNsfw: boolean = false
   private dismissedTooManyRelaysAlert: boolean = false
+  private showKinds: number[] = []
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -139,6 +140,9 @@ class LocalStorageService {
 
     this.dismissedTooManyRelaysAlert =
       window.localStorage.getItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT) === 'true'
+
+    const showKindsStr = window.localStorage.getItem(StorageKey.SHOW_KINDS)
+    this.showKinds = showKindsStr ? JSON.parse(showKindsStr) : DEFAULT_SHOW_KINDS
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -371,6 +375,15 @@ class LocalStorageService {
   setDismissedTooManyRelaysAlert(dismissed: boolean) {
     this.dismissedTooManyRelaysAlert = dismissed
     window.localStorage.setItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT, dismissed.toString())
+  }
+
+  getShowKinds() {
+    return this.showKinds
+  }
+
+  setShowKinds(kinds: number[]) {
+    this.showKinds = kinds
+    window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(kinds))
   }
 }
 

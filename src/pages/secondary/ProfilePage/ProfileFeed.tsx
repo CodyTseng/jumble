@@ -1,6 +1,8 @@
+import KindFilter from '@/components/KindFilter'
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import { BIG_RELAY_URLS } from '@/constants'
+import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
@@ -15,6 +17,8 @@ export default function ProfileFeed({
   topSpace?: number
 }) {
   const { pubkey: myPubkey } = useNostr()
+  const { showKinds } = useKindFilter()
+  const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const noteListRef = useRef<TNoteListRef>(null)
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
@@ -78,9 +82,12 @@ export default function ProfileFeed({
 
   const handleListModeChange = (mode: TNoteListMode) => {
     setListMode(mode)
-    setTimeout(() => {
-      noteListRef.current?.scrollToTop()
-    }, 0)
+    noteListRef.current?.scrollToTop('smooth')
+  }
+
+  const handleShowKindsChange = (newShowKinds: number[]) => {
+    setTemporaryShowKinds(newShowKinds)
+    noteListRef.current?.scrollToTop()
   }
 
   return (
@@ -92,8 +99,16 @@ export default function ProfileFeed({
           handleListModeChange(listMode as TNoteListMode)
         }}
         threshold={Math.max(800, topSpace)}
+        options={
+          <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />
+        }
       />
-      <NoteList ref={noteListRef} subRequests={subRequests} hideReplies={listMode === 'posts'} />
+      <NoteList
+        ref={noteListRef}
+        subRequests={subRequests}
+        showKinds={temporaryShowKinds}
+        hideReplies={listMode === 'posts'}
+      />
     </>
   )
 }
