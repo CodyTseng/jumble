@@ -362,7 +362,7 @@ export default {
     Articles: 'Artigos',
     Highlights: 'Destaques',
     Polls: 'Enquetes',
-    'Voice Posts': 'Áudio',
+    'Voice Posts': 'Áudios',
     'Photo Posts': 'Fotos',
     'Select All': 'Selecionar tudo',
     'Clear All': 'Limpar tudo',
