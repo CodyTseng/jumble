@@ -360,7 +360,7 @@ export default {
     "Don't remind me again": 'Não me lembrar novamente',
     Posts: 'Notas',
     Articles: 'Artigos',
-    Highlights: 'Destaques',
+    Highlights: 'Marcações',
     Polls: 'Enquetes',
     'Voice Posts': 'Áudios',
     'Photo Posts': 'Fotos',
