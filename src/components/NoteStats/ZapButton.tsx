@@ -51,7 +51,7 @@ export default function ZapButton({ event }: { event: Event }) {
         event.pubkey,
         defaultZapSats,
         defaultZapComment,
-        event.id
+        event
       )
       // user canceled
       if (!zapResult) {
@@ -159,7 +159,7 @@ export default function ZapButton({ event }: { event: Event }) {
           setZapping(open)
         }}
         pubkey={event.pubkey}
-        eventId={event.id}
+        event={event}
       />
     </>
   )

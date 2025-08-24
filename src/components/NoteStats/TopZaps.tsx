@@ -43,7 +43,7 @@ export default function TopZaps({ event }: { event: Event }) {
                   }
                 }}
                 pubkey={event.pubkey}
-                eventId={event.id}
+                event={event}
                 defaultAmount={zap.amount}
                 defaultComment={zap.comment}
               />

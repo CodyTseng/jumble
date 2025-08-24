@@ -26,19 +26,20 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import { NostrEvent } from 'nostr-tools'
 
 export default function ZapDialog({
   open,
   setOpen,
   pubkey,
-  eventId,
+  event,
   defaultAmount,
   defaultComment
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   pubkey: string
-  eventId?: string
+  event?: NostrEvent
   defaultAmount?: number
   defaultComment?: string
 }) {
@@ -87,7 +88,7 @@ export default function ZapDialog({
             open={open}
             setOpen={setOpen}
             recipient={pubkey}
-            eventId={eventId}
+            event={event}
             defaultAmount={defaultAmount}
             defaultComment={defaultComment}
           />
@@ -110,7 +111,7 @@ export default function ZapDialog({
           open={open}
           setOpen={setOpen}
           recipient={pubkey}
-          eventId={eventId}
+          event={event}
           defaultAmount={defaultAmount}
           defaultComment={defaultComment}
         />
@@ -122,14 +123,14 @@ export default function ZapDialog({
 function ZapDialogContent({
   setOpen,
   recipient,
-  eventId,
+  event,
   defaultAmount,
   defaultComment
 }: {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   recipient: string
-  eventId?: string
+  event?: NostrEvent
   defaultAmount?: number
   defaultComment?: string
 }) {
@@ -146,15 +147,15 @@ function ZapDialogContent({
         throw new Error('You need to be logged in to zap')
       }
       setZapping(true)
-      const zapResult = await lightning.zap(pubkey, recipient, sats, comment, eventId, () =>
+      const zapResult = await lightning.zap(pubkey, recipient, sats, comment, event, () =>
         setOpen(false)
       )
       // user canceled
       if (!zapResult) {
         return
       }
-      if (eventId) {
-        noteStatsService.addZap(pubkey, eventId, zapResult.invoice, sats, comment)
+      if (event) {
+        noteStatsService.addZap(pubkey, event?.id, zapResult.invoice, sats, comment)
       }
     } catch (error) {
       toast.error(`${t('Zap failed')}: ${(error as Error).message}`)

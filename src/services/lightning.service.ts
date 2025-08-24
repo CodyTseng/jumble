@@ -11,7 +11,7 @@ import { Invoice } from '@getalby/lightning-tools'
 import { bech32 } from '@scure/base'
 import { WebLNProvider } from '@webbtc/webln-types'
 import dayjs from 'dayjs'
-import { Filter, kinds } from 'nostr-tools'
+import { Filter, kinds, NostrEvent } from 'nostr-tools'
 import { SubCloser } from 'nostr-tools/abstract-pool'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
@@ -46,7 +46,7 @@ class LightningService {
     recipient: string,
     sats: number,
     comment: string,
-    eventId?: string,
+    event?: NostrEvent,
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string } | null> {
     if (!client.signer) {
@@ -70,8 +70,8 @@ class LightningService {
     const { callback, lnurl } = zapEndpoint
     const amount = sats * 1000
     const zapRequestDraft = makeZapRequest({
-      profile: recipient,
-      event: eventId ?? null,
+      event: event,
+      pubkey: recipient,
       amount,
       relays: receiptRelayList.read
         .slice(0, 4)
@@ -133,8 +133,8 @@ class LightningService {
           '#p': [recipient],
           since: dayjs().subtract(1, 'minute').unix()
         }
-        if (eventId) {
-          filter['#e'] = [eventId]
+        if (event) {
+          filter['#e'] = [event.id]
         }
         subCloser = client.subscribe(
           senderRelayList.write.concat(BIG_RELAY_URLS).slice(0, 4),
@@ -226,7 +226,7 @@ class LightningService {
         const [name, domain] = profile.lightningAddress.split('@')
         lnurl = new URL(`/.well-known/lnurlp/${name}`, `https://${domain}`).toString()
       } else {
-        const { words } = bech32.decode(profile.lightningAddress, 1000)
+        const { words } = bech32.decode(profile.lightningAddress as any, 1000)
         const data = bech32.fromWords(words)
         lnurl = utf8Decoder.decode(data)
       }

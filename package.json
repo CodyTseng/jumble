@@ -66,7 +66,7 @@
     "lru-cache": "^11.0.2",
     "lucide-react": "^0.469.0",
     "next-themes": "^0.4.6",
-    "nostr-tools": "^2.13.0",
+    "nostr-tools": "^2.16.2",
     "nstart-modal": "^2.0.0",
     "path-to-regexp": "^8.2.0",
     "qr-code-styling": "^1.9.2",
