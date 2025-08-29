@@ -318,7 +318,7 @@ export default {
     'Refresh results': 'Atualizar resultados',
     Poll: 'Enquete',
     Media: 'Mídia',
-    'Broadcast to ...': 'Transmitir para...',
+    'Broadcast to ...': 'Republicar em...',
     'Successfully broadcasted to your write relays':
       'Transmitido com sucesso para seus relays de escrita',
     'Failed to broadcast to your write relays: {{error}}':

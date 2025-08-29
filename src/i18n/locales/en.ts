@@ -315,7 +315,7 @@ export default {
     'Refresh results': 'Refresh results',
     Poll: 'Poll',
     Media: 'Media',
-    'Broadcast to ...': 'Broadcast to ...',
+    'Broadcast to ...': 'Republish to ...',
     'Successfully broadcasted to your write relays':
       'Successfully broadcasted to your write relays',
     'Failed to broadcast to your write relays: {{error}}':
@@ -324,7 +324,7 @@ export default {
       'Successfully broadcasted to relay set: {{name}}',
     'Failed to broadcast to relay set: {{name}}. Error: {{error}}':
       'Failed to broadcast to relay set: {{name}}. Error: {{error}}',
-    'Successfully broadcasted to relay: {{url}}': 'Successfully broadcasted to relay: {{url}}',
+    'Successfully broadcasted to relay: {{url}}': 'Successfully republished to relay: {{url}}',
     'Failed to broadcast to relay: {{url}}. Error: {{error}}':
       'Failed to broadcast to relay: {{url}}. Error: {{error}}',
     'Write relays': 'Write relays',
