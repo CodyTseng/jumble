@@ -318,7 +318,7 @@ export default {
     'Refresh results': 'Atualizar resultados',
     Poll: 'Enquete',
     Media: 'Mídia',
-    'Republish to ...': 'Republicar para ...',
+    'Republish to ...': 'Republicar em ...',
     'Successfully republish to your write relays': 'Successfully republish to your write relays',
     'Failed to republish to your write relays: {{error}}':
       'Failed to republish to your write relays: {{error}}',
