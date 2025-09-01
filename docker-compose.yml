@@ -7,12 +7,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_PROXY_SERVER: ${JUMBLE_PROXY_SERVER_URL:-http://localhost:8090} 
+        VITE_PROXY_SERVER: ${JUMBLE_PROXY_SERVER_URL:-http://localhost:8090}
     ports:
       - "8089:80"
     restart: unless-stopped
     networks:
-        - jumble
+      - jumble
 
   proxy-server:
     image: ghcr.io/danvergara/jumble-proxy-server:latest
@@ -24,7 +24,23 @@ services:
     ports:
       - "8090:8080"
     networks:
-        - jumble
+      - jumble
+
+  nostr-relay:
+    image: scsibug/nostr-rs-relay:latest
+    container_name: jumble-nostr-relay
+    ports:
+      - "7000:8080"
+    environment:
+      - RUST_LOG=warn,nostr_rs_relay=info
+    volumes:
+      - relay-data:/usr/src/app/db
+    networks:
+      - jumble
+    restart: unless-stopped
+
+volumes:
+  relay-data:
 
 networks:
   jumble:
