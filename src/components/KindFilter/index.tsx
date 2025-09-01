@@ -73,17 +73,18 @@ export default function KindFilter({
   const trigger = (
     <Button
       variant="ghost"
-      size="titlebar-icon"
-      className="relative"
+      size="sm"
+      className="relative flex items-center gap-2 px-3 py-2"
       onClick={() => {
         if (isSmallScreen) {
           setOpen(true)
         }
       }}
     >
-      <ListFilter />
+      <ListFilter size={16} />
+      <span className="text-sm font-medium">{t('Feed Settings')}</span>
       {isDifferentFromSaved && (
-        <div className="absolute size-2 rounded-full bg-primary right-2 top-2.5 ring-2 ring-background" />
+        <div className="absolute size-2 rounded-full bg-primary right-1 top-1 ring-2 ring-background" />
       )}
     </Button>
   )
