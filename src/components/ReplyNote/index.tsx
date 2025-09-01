@@ -5,6 +5,7 @@ import { getUsingClient } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -34,12 +35,16 @@ export default function ReplyNote({
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
   const { mutePubkeys } = useMuteList()
+  const { defaultShowMuted } = useContentPolicy()
   const [showMuted, setShowMuted] = useState(false)
   const show = useMemo(
-    () => showMuted || !mutePubkeys.includes(event.pubkey),
-    [showMuted, mutePubkeys, event]
+    () => defaultShowMuted || showMuted || !mutePubkeys.includes(event.pubkey),
+    [defaultShowMuted, showMuted, mutePubkeys, event]
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])
+  if (!showMuted && !show) return (
+    <div></div>
+  )
 
   return (
     <div

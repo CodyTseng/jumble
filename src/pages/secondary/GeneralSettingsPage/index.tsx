@@ -1,5 +1,10 @@
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
@@ -16,7 +21,14 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
-  const { autoplay, setAutoplay, defaultShowNsfw, setDefaultShowNsfw } = useContentPolicy()
+  const {
+    autoplay,
+    setAutoplay,
+    defaultShowNsfw,
+    setDefaultShowNsfw,
+    defaultShowMuted,
+    setDefaultShowMuted
+  } = useContentPolicy()
   const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
 
   const handleLanguageChange = (value: TLanguage) => {
@@ -31,7 +43,8 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Label htmlFor="languages" className="text-base font-normal">
             {t('Languages')}
           </Label>
-          <Select defaultValue="en" value={language} onValueChange={handleLanguageChange}>
+          <Select defaultValue="en" value={language}
+                  onValueChange={handleLanguageChange}>
             <SelectTrigger id="languages" className="w-48">
               <SelectValue />
             </SelectTrigger>
@@ -48,7 +61,8 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Label htmlFor="theme" className="text-base font-normal">
             {t('Theme')}
           </Label>
-          <Select defaultValue="system" value={themeSetting} onValueChange={setThemeSetting}>
+          <Select defaultValue="system" value={themeSetting}
+                  onValueChange={setThemeSetting}>
             <SelectTrigger id="theme" className="w-48">
               <SelectValue />
             </SelectTrigger>
@@ -62,12 +76,15 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         <SettingItem>
           <Label htmlFor="autoplay" className="text-base font-normal">
             <div>{t('Autoplay')}</div>
-            <div className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
+            <div
+              className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
           </Label>
-          <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
+          <Switch id="autoplay" checked={autoplay}
+                  onCheckedChange={setAutoplay} />
         </SettingItem>
         <SettingItem>
-          <Label htmlFor="hide-untrusted-notes" className="text-base font-normal">
+          <Label htmlFor="hide-untrusted-notes"
+                 className="text-base font-normal">
             {t('Hide untrusted notes')}
           </Label>
           <Switch
@@ -80,7 +97,15 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Label htmlFor="show-nsfw" className="text-base font-normal">
             {t('Show NSFW content by default')}
           </Label>
-          <Switch id="show-nsfw" checked={defaultShowNsfw} onCheckedChange={setDefaultShowNsfw} />
+          <Switch id="show-nsfw" checked={defaultShowNsfw}
+                  onCheckedChange={setDefaultShowNsfw} />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="show-muted" className="text-base font-normal">
+            {t('Display muted notes with discloser')}
+          </Label>
+          <Switch id="show-muted" checked={defaultShowMuted}
+                  onCheckedChange={setDefaultShowMuted} />
         </SettingItem>
         <SettingItem>
           <div>

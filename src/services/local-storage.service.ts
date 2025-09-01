@@ -33,6 +33,7 @@ class LocalStorageService {
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private defaultShowNsfw: boolean = false
+  private defaultShowMuted: boolean = true
   private dismissedTooManyRelaysAlert: boolean = false
   private showKinds: number[] = []
 
@@ -137,6 +138,9 @@ class LocalStorageService {
     }
 
     this.defaultShowNsfw = window.localStorage.getItem(StorageKey.DEFAULT_SHOW_NSFW) === 'true'
+    // default true when not set
+    const storedDefaultShowMuted = window.localStorage.getItem(StorageKey.DEFAULT_SHOW_MUTED)
+    this.defaultShowMuted = storedDefaultShowMuted ? storedDefaultShowMuted === 'true' : true
 
     this.dismissedTooManyRelaysAlert =
       window.localStorage.getItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT) === 'true'
@@ -375,9 +379,18 @@ class LocalStorageService {
     return this.defaultShowNsfw
   }
 
+  getDefaultShowMuted() {
+    return this.defaultShowMuted
+  }
+
   setDefaultShowNsfw(defaultShowNsfw: boolean) {
     this.defaultShowNsfw = defaultShowNsfw
     window.localStorage.setItem(StorageKey.DEFAULT_SHOW_NSFW, defaultShowNsfw.toString())
+  }
+
+  setDefaultShowMuted(defaultShowMuted: boolean) {
+    this.defaultShowMuted = defaultShowMuted
+    window.localStorage.setItem(StorageKey.DEFAULT_SHOW_MUTED, defaultShowMuted.toString())
   }
 
   getDismissedTooManyRelaysAlert() {

@@ -37,6 +37,7 @@ export const StorageKey = {
   MEDIA_UPLOAD_SERVICE_CONFIG_MAP: 'mediaUploadServiceConfigMap',
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes',
   DEFAULT_SHOW_NSFW: 'defaultShowNsfw',
+  DEFAULT_SHOW_MUTED: 'defaultShowMuted',
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
   SHOW_KINDS: 'showKinds',
   SHOW_KINDS_VERSION: 'showKindsVersion',
