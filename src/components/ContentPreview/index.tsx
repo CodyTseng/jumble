@@ -29,12 +29,16 @@ export default function ContentPreview({
     () => (event ? mutePubkeys.includes(event.pubkey) : false),
     [mutePubkeys, event]
   )
+  const hasMutedMentionPTags = useMemo(
+    () => (event ? event.tags.some((t) => t[0] === 'p' && !!t[1] && mutePubkeys.includes(t[1])) : false),
+    [event, mutePubkeys]
+  )
 
   if (!event) {
     return <div className={cn('pointer-events-none', className)}>{`[${t('Note not found')}]`}</div>
   }
 
-  if (isMuted && !defaultShowMuted) {
+  if ((isMuted || hasMutedMentionPTags) && !defaultShowMuted) {
     return (
       <div></div>
       // <div className={cn('pointer-events-none', className)}>[{t('This user has been muted')}]</div>

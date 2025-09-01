@@ -52,10 +52,22 @@ export default function Note({
     [event, hideParentNotePreview]
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])
-  const { defaultShowNsfw } = useContentPolicy()
+  const { defaultShowNsfw, defaultShowMuted } = useContentPolicy()
   const [showNsfw, setShowNsfw] = useState(false)
   const { mutePubkeys } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
+
+  const hasMutedMentionPTags = useMemo(
+    () => event.tags.some((t) => t[0] === 'p' && !!t[1] && mutePubkeys.includes(t[1])),
+    [event, mutePubkeys]
+  )
+
+  const isMutedAuthor = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
+
+  // When hide muted is enabled globally, do not show muted posts at all (no revealer)
+  if (!defaultShowMuted && (isMutedAuthor || hasMutedMentionPTags) && !showMuted) {
+    return null
+  }
 
   let content: React.ReactNode
   if (
@@ -67,8 +79,9 @@ export default function Note({
     ].includes(event.kind)
   ) {
     content = <UnknownNote className="mt-2" event={event} />
-  } else if (mutePubkeys.includes(event.pubkey) && !showMuted) {
-    content = <MutedNote show={() => setShowMuted(true)} />
+  } else if (defaultShowMuted && (isMutedAuthor || hasMutedMentionPTags) && !showMuted) {
+    // Do not render the full note frame for muted content; render only the muted placeholder
+    return <MutedNote show={() => setShowMuted(true)} />
   } else if (!defaultShowNsfw && isNsfwEvent(event) && !showNsfw) {
     content = <NsfwNote show={() => setShowNsfw(true)} />
   } else if (event.kind === kinds.Highlights) {

@@ -1,13 +1,13 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getUsingClient } from '@/lib/event'
+import { getUsingClient, getParentBech32Id } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { Event } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Collapsible from '../Collapsible'
 import Content from '../Content'
@@ -37,11 +37,81 @@ export default function ReplyNote({
   const { mutePubkeys } = useMuteList()
   const { defaultShowMuted } = useContentPolicy()
   const [showMuted, setShowMuted] = useState(false)
+
+  const repliedToPubkey = useMemo(() => event.tags.find((t) => t[0] === 'p')?.[1], [event])
+  const isMutedAuthor = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
+  const [isMutedReplyTargetDeep, setIsMutedReplyTargetDeep] = useState<boolean>(false)
+
+  // Any mention p tag that references a muted user
+  const isMutedMentionPTags = useMemo(
+    () => event.tags.some((t) => t[0] === 'p' && !!t[1] && mutePubkeys.includes(t[1])),
+    [event, mutePubkeys]
+  )
+
+  // Compute shallow immediate target muted state for quick check
+  const isMutedReplyTarget = useMemo(
+    () => (repliedToPubkey ? mutePubkeys.includes(repliedToPubkey) : false),
+    [mutePubkeys, repliedToPubkey]
+  )
+
+  // Traverse the reply chain upwards to detect any muted ancestor author
+  useEffect(() => {
+    let aborted = false
+    async function checkAncestors() {
+      try {
+        // Start with the current event
+        let current: Event | undefined = event
+        let depth = 0
+        const MAX_DEPTH = 12 // safety cap to avoid long traversals
+        while (current && depth < MAX_DEPTH) {
+          // get parent bech32 id and fetch parent event if exists
+          const parentId = getParentBech32Id(current)
+          if (!parentId) break
+          // We cannot call hooks conditionally; fetch directly via client
+          const client = (await import('@/services/client.service')).default
+          const parent = await client.fetchEvent(parentId)
+          if (!parent) break
+          if (mutePubkeys.includes(parent.pubkey)) {
+            if (!aborted) setIsMutedReplyTargetDeep(true)
+            return
+          }
+          current = parent
+          depth += 1
+        }
+        if (!aborted) setIsMutedReplyTargetDeep(false)
+      } catch {
+        if (!aborted) setIsMutedReplyTargetDeep(false)
+      }
+    }
+    setIsMutedReplyTargetDeep(false)
+    checkAncestors()
+    return () => {
+      aborted = true
+    }
+  }, [event, mutePubkeys])
+
   const show = useMemo(
-    () => defaultShowMuted || showMuted || !mutePubkeys.includes(event.pubkey),
-    [defaultShowMuted, showMuted, mutePubkeys, event]
+    () => defaultShowMuted || showMuted || !(isMutedAuthor || isMutedReplyTarget || isMutedReplyTargetDeep || isMutedMentionPTags),
+    [defaultShowMuted, showMuted, isMutedAuthor, isMutedReplyTarget, isMutedReplyTargetDeep, isMutedMentionPTags]
   )
   const usingClient = useMemo(() => getUsingClient(event), [event])
+  // If muted and not revealed, and global setting allows a revealer, render only a minimal revealer without the reply frame
+  if (!show && defaultShowMuted && !showMuted) {
+    return (
+      <div className="px-4 pt-3 pb-3 border-b">
+        <Button
+          variant="outline"
+          className="text-muted-foreground font-medium"
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowMuted(true)
+          }}
+        >
+          {t('Temporarily display this reply')}
+        </Button>
+      </div>
+    )
+  }
   if (!showMuted && !show) return (
     <div></div>
   )
