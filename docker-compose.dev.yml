@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   jumble:
     container_name: jumble-nginx
@@ -25,6 +23,22 @@ services:
       - "8090:8080"
     networks:
       - jumble
+
+  nostr-relay:
+    image: scsibug/nostr-rs-relay:latest
+    container_name: jumble-nostr-relay
+    ports:
+      - "7000:8080"
+    environment:
+      - RUST_LOG=warn,nostr_rs_relay=info
+    volumes:
+      - relay-data:/usr/src/app/db
+    networks:
+      - jumble
+    restart: unless-stopped
+
+volumes:
+  relay-data:
 
 networks:
   jumble:
