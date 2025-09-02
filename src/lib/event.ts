@@ -47,6 +47,15 @@ export function isProtectedEvent(event: Event) {
   return event.tags.some(([tagName]) => tagName === '-')
 }
 
+export function isMentioningMutedUsers(event: Event, mutePubkeySet: Set<string>) {
+  for (const [tagName, pubkey] of event.tags) {
+    if (tagName === 'p' && mutePubkeySet.has(pubkey)) {
+      return true
+    }
+  }
+  return false
+}
+
 export function getParentETag(event?: Event) {
   if (!event) return undefined
 

@@ -54,7 +54,7 @@ export default function Note({
   const usingClient = useMemo(() => getUsingClient(event), [event])
   const { defaultShowNsfw } = useContentPolicy()
   const [showNsfw, setShowNsfw] = useState(false)
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
 
   let content: React.ReactNode
@@ -67,7 +67,7 @@ export default function Note({
     ].includes(event.kind)
   ) {
     content = <UnknownNote className="mt-2" event={event} />
-  } else if (mutePubkeys.includes(event.pubkey) && !showMuted) {
+  } else if (mutePubkeySet.has(event.pubkey) && !showMuted) {
     content = <MutedNote show={() => setShowMuted(true)} />
   } else if (!defaultShowNsfw && isNsfwEvent(event) && !showNsfw) {
     content = <NsfwNote show={() => setShowNsfw(true)} />

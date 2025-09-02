@@ -1,5 +1,7 @@
 import { ExtendedKind } from '@/constants'
+import { isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -22,10 +24,18 @@ export default function ContentPreview({
   className?: string
 }) {
   const { t } = useTranslation()
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const isMuted = useMemo(
-    () => (event ? mutePubkeys.includes(event.pubkey) : false),
-    [mutePubkeys, event]
+    () => (event ? mutePubkeySet.has(event.pubkey) : false),
+    [mutePubkeySet, event]
+  )
+  const isMentioningMuted = useMemo(
+    () =>
+      hideContentMentioningMutedUsers && event
+        ? isMentioningMutedUsers(event, mutePubkeySet)
+        : false,
+    [event, mutePubkeySet]
   )
 
   if (!event) {
@@ -35,6 +45,14 @@ export default function ContentPreview({
   if (isMuted) {
     return (
       <div className={cn('pointer-events-none', className)}>[{t('This user has been muted')}]</div>
+    )
+  }
+
+  if (isMentioningMuted) {
+    return (
+      <div className={cn('pointer-events-none', className)}>
+        [{t('This note mentions a user you muted')}]
+      </div>
     )
   }
 

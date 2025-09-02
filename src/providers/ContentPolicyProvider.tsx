@@ -7,6 +7,9 @@ type TContentPolicyContext = {
 
   defaultShowNsfw: boolean
   setDefaultShowNsfw: (showNsfw: boolean) => void
+
+  hideContentMentioningMutedUsers?: boolean
+  setHideContentMentioningMutedUsers?: (hide: boolean) => void
 }
 
 const ContentPolicyContext = createContext<TContentPolicyContext | undefined>(undefined)
@@ -22,6 +25,9 @@ export const useContentPolicy = () => {
 export function ContentPolicyProvider({ children }: { children: React.ReactNode }) {
   const [autoplay, setAutoplay] = useState<boolean>(storage.getAutoplay())
   const [defaultShowNsfw, setDefaultShowNsfw] = useState<boolean>(storage.getDefaultShowNsfw())
+  const [hideContentMentioningMutedUsers, setHideContentMentioningMutedUsers] = useState<boolean>(
+    storage.getHideContentMentioningMutedUsers()
+  )
 
   const updateAutoplay = (autoplay: boolean) => {
     storage.setAutoplay(autoplay)
@@ -33,13 +39,20 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setDefaultShowNsfw(defaultShowNsfw)
   }
 
+  const updateHideContentMentioningMutedUsers = (hide: boolean) => {
+    storage.setHideContentMentioningMutedUsers(hide)
+    setHideContentMentioningMutedUsers(hide)
+  }
+
   return (
     <ContentPolicyContext.Provider
       value={{
         autoplay,
         setAutoplay: updateAutoplay,
         defaultShowNsfw,
-        setDefaultShowNsfw: updateDefaultShowNsfw
+        setDefaultShowNsfw: updateDefaultShowNsfw,
+        hideContentMentioningMutedUsers,
+        setHideContentMentioningMutedUsers: updateHideContentMentioningMutedUsers
       }}
     >
       {children}

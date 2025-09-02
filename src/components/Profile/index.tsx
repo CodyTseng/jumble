@@ -31,7 +31,7 @@ export default function Profile({ id }: { id?: string }) {
   const { push } = useSecondaryPage()
   const { profile, isFetching } = useFetchProfile(id)
   const { pubkey: accountPubkey } = useNostr()
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
   const { followings } = useFetchFollowings(profile?.pubkey)
   const isFollowingYou = useMemo(() => {
     return (
@@ -176,7 +176,7 @@ export default function Profile({ id }: { id?: string }) {
                 <Relays pubkey={pubkey} />
                 {isSelf && (
                   <SecondaryPageLink to={toMuteList()} className="flex gap-1 hover:underline w-fit">
-                    {mutePubkeys.length}
+                    {mutePubkeySet.size}
                     <div className="text-muted-foreground">{t('Muted')}</div>
                   </SecondaryPageLink>
                 )}

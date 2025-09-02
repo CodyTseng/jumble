@@ -47,8 +47,8 @@ export function useMenuActions({
   const { t } = useTranslation()
   const { pubkey, attemptDelete } = useNostr()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
-  const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeys } = useMuteList()
-  const isMuted = useMemo(() => mutePubkeys.includes(event.pubkey), [mutePubkeys, event])
+  const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
+  const isMuted = useMemo(() => mutePubkeySet.has(event.pubkey), [mutePubkeySet, event])
 
   const broadcastSubMenu: SubMenuAction[] = useMemo(() => {
     const items = []

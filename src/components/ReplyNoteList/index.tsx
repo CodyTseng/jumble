@@ -5,11 +5,15 @@ import {
   getRootATag,
   getRootETag,
   getRootEventHexId,
+  isMentioningMutedUsers,
   isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
+import { toNote } from '@/lib/link'
 import { generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
@@ -29,8 +33,10 @@ const SHOW_COUNT = 10
 
 export default function ReplyNoteList({ index, event }: { index?: number; event: NEvent }) {
   const { t } = useTranslation()
-  const { currentIndex } = useSecondaryPage()
+  const { push, currentIndex } = useSecondaryPage()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [rootInfo, setRootInfo] = useState<TRootInfo | undefined>(undefined)
   const { repliesMap, addReplies } = useReply()
   const replies = useMemo(() => {
@@ -44,6 +50,9 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       const events = parentEventKeys.flatMap((id) => repliesMap.get(id)?.events || [])
       events.forEach((evt) => {
         if (replyIdSet.has(evt.id)) return
+        if (mutePubkeySet.has(evt.pubkey)) return
+        if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) return
+
         replyIdSet.add(evt.id)
         replyEvents.push(evt)
       })
@@ -309,7 +318,14 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
               <ReplyNote
                 event={reply}
                 parentEventId={event.id !== parentEventHexId ? parentEventId : undefined}
-                onClickParent={() => parentEventHexId && highlightReply(parentEventHexId)}
+                onClickParent={() => {
+                  if (!parentEventHexId) return
+                  if (replies.every((r) => r.id !== parentEventHexId)) {
+                    push(toNote(parentEventId ?? parentEventHexId))
+                    return
+                  }
+                  highlightReply(parentEventHexId)
+                }}
                 highlight={highlightReplyId === reply.id}
               />
             </div>

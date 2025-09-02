@@ -108,6 +108,7 @@ export default function ProfileFeed({
         subRequests={subRequests}
         showKinds={temporaryShowKinds}
         hideReplies={listMode === 'posts'}
+        filterMutedNotes={false}
       />
     </>
   )

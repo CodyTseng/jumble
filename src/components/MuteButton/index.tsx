@@ -18,10 +18,10 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey: accountPubkey, checkLogin } = useNostr()
-  const { mutePubkeys, changing, mutePubkeyPrivately, mutePubkeyPublicly, unmutePubkey } =
+  const { mutePubkeySet, changing, mutePubkeyPrivately, mutePubkeyPublicly, unmutePubkey } =
     useMuteList()
   const [updating, setUpdating] = useState(false)
-  const isMuted = useMemo(() => mutePubkeys.includes(pubkey), [mutePubkeys, pubkey])
+  const isMuted = useMemo(() => mutePubkeySet.has(pubkey), [mutePubkeySet, pubkey])
 
   if (!accountPubkey || (pubkey && pubkey === accountPubkey)) return null
 

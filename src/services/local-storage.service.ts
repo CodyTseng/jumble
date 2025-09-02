@@ -35,6 +35,7 @@ class LocalStorageService {
   private defaultShowNsfw: boolean = false
   private dismissedTooManyRelaysAlert: boolean = false
   private showKinds: number[] = []
+  private hideContentMentioningMutedUsers: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -155,6 +156,9 @@ class LocalStorageService {
     }
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(this.showKinds))
     window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '1')
+
+    this.hideContentMentioningMutedUsers =
+      window.localStorage.getItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS) === 'true'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -396,6 +400,15 @@ class LocalStorageService {
   setShowKinds(kinds: number[]) {
     this.showKinds = kinds
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(kinds))
+  }
+
+  getHideContentMentioningMutedUsers() {
+    return this.hideContentMentioningMutedUsers
+  }
+
+  setHideContentMentioningMutedUsers(hide: boolean) {
+    this.hideContentMentioningMutedUsers = hide
+    window.localStorage.setItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS, hide.toString())
   }
 }
 

@@ -23,7 +23,7 @@ export default function Mentions({
 }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
   const [potentialMentions, setPotentialMentions] = useState<string[]>([])
   const [parentEventPubkey, setParentEventPubkey] = useState<string | undefined>()
   const [removedPubkeys, setRemovedPubkeys] = useState<string[]>([])
@@ -43,13 +43,13 @@ export default function Mentions({
             pubkeys
               .filter((p) => potentialMentions.includes(p))
               .concat(
-                potentialMentions.filter((p) => mutePubkeys.includes(p) && p !== _parentEventPubkey)
+                potentialMentions.filter((p) => mutePubkeySet.has(p) && p !== _parentEventPubkey)
               )
           )
         )
       })
     })
-  }, [content, parentEvent, pubkey])
+  }, [content, parentEvent, pubkey, mutePubkeySet])
 
   useEffect(() => {
     const newMentions = potentialMentions.filter((pubkey) => !removedPubkeys.includes(pubkey))

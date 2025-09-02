@@ -1,6 +1,9 @@
 import { Skeleton } from '@/components/ui/skeleton'
+import { isMentioningMutedUsers } from '@/lib/event'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
+import { useMemo } from 'react'
 import MainNoteCard from './MainNoteCard'
 import RepostNoteCard from './RepostNoteCard'
 
@@ -13,10 +16,18 @@ export default function NoteCard({
   className?: string
   filterMutedNotes?: boolean
 }) {
-  const { mutePubkeys } = useMuteList()
-  if (filterMutedNotes && mutePubkeys.includes(event.pubkey)) {
-    return null
-  }
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
+  const shouldHide = useMemo(() => {
+    if (filterMutedNotes && mutePubkeySet.has(event.pubkey)) {
+      return true
+    }
+    if (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) {
+      return true
+    }
+    return false
+  }, [event, filterMutedNotes, mutePubkeySet])
+  if (shouldHide) return null
 
   if (event.kind === kinds.Repost) {
     return (

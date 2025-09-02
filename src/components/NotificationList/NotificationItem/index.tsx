@@ -1,6 +1,9 @@
 import { ExtendedKind } from '@/constants'
+import { isMentioningMutedUsers } from '@/lib/event'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
+import { useMemo } from 'react'
 import { MentionNotification } from './MentionNotification'
 import { PollResponseNotification } from './PollResponseNotification'
 import { ReactionNotification } from './ReactionNotification'
@@ -14,10 +17,19 @@ export function NotificationItem({
   notification: Event
   isNew?: boolean
 }) {
-  const { mutePubkeys } = useMuteList()
-  if (mutePubkeys.includes(notification.pubkey)) {
-    return null
-  }
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
+  const shouldHide = useMemo(() => {
+    if (mutePubkeySet.has(notification.pubkey)) {
+      return true
+    }
+    if (hideContentMentioningMutedUsers && isMentioningMutedUsers(notification, mutePubkeySet)) {
+      return true
+    }
+    return false
+  }, [])
+  if (shouldHide) return null
+
   if (notification.kind === kinds.Reaction) {
     return <ReactionNotification notification={notification} isNew={isNew} />
   }

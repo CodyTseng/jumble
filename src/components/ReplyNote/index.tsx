@@ -1,8 +1,9 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getUsingClient } from '@/lib/event'
+import { getUsingClient, isMentioningMutedUsers } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event } from 'nostr-tools'
@@ -33,12 +34,21 @@ export default function ReplyNote({
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [showMuted, setShowMuted] = useState(false)
-  const show = useMemo(
-    () => showMuted || !mutePubkeys.includes(event.pubkey),
-    [showMuted, mutePubkeys, event]
-  )
+  const show = useMemo(() => {
+    if (showMuted) {
+      return true
+    }
+    if (mutePubkeySet.has(event.pubkey)) {
+      return false
+    }
+    if (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) {
+      return false
+    }
+    return true
+  }, [showMuted, mutePubkeySet, event, hideContentMentioningMutedUsers])
   const usingClient = useMemo(() => getUsingClient(event), [event])
 
   return (

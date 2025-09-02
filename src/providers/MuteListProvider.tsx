@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { useNostr } from './NostrProvider'
 
 type TMuteListContext = {
-  mutePubkeys: string[]
+  mutePubkeySet: Set<string>
   changing: boolean
   getMutePubkeys: () => string[]
   getMuteType: (pubkey: string) => 'public' | 'private' | null
@@ -49,10 +49,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     () => new Set(getPubkeysFromPTags(privateTags)),
     [privateTags]
   )
-  const mutePubkeys = useMemo(() => {
-    return Array.from(
-      new Set([...Array.from(privateMutePubkeySet), ...Array.from(publicMutePubkeySet)])
-    )
+  const mutePubkeySet = useMemo(() => {
+    return new Set([...Array.from(privateMutePubkeySet), ...Array.from(publicMutePubkeySet)])
   }, [publicMutePubkeySet, privateMutePubkeySet])
   const [changing, setChanging] = useState(false)
 
@@ -94,7 +92,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   }, [muteListEvent])
 
   const getMutePubkeys = () => {
-    return mutePubkeys
+    return Array.from(mutePubkeySet)
   }
 
   const getMuteType = useCallback(
@@ -253,7 +251,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   return (
     <MuteListContext.Provider
       value={{
-        mutePubkeys,
+        mutePubkeySet,
         changing,
         getMutePubkeys,
         getMuteType,

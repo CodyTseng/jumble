@@ -2,9 +2,11 @@ import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
 import {
   getReplaceableCoordinateFromEvent,
+  isMentioningMutedUsers,
   isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -13,7 +15,15 @@ import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
@@ -44,7 +54,8 @@ const NoteList = forwardRef(
     const { t } = useTranslation()
     const { startLogin } = useNostr()
     const { isUserTrusted } = useUserTrust()
-    const { mutePubkeys } = useMuteList()
+    const { mutePubkeySet } = useMuteList()
+    const { hideContentMentioningMutedUsers } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
     const [events, setEvents] = useState<Event[]>([])
     const [newEvents, setNewEvents] = useState<Event[]>([])
@@ -56,13 +67,30 @@ const NoteList = forwardRef(
     const bottomRef = useRef<HTMLDivElement | null>(null)
     const topRef = useRef<HTMLDivElement | null>(null)
 
+    const shouldHideEvent = useCallback(
+      (evt: Event) => {
+        if (isEventDeleted(evt)) return true
+        if (hideReplies && isReplyNoteEvent(evt)) return true
+        if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return true
+        if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
+        if (
+          filterMutedNotes &&
+          hideContentMentioningMutedUsers &&
+          isMentioningMutedUsers(evt, mutePubkeySet)
+        ) {
+          return true
+        }
+
+        return false
+      },
+      [hideReplies, hideUntrustedNotes, mutePubkeySet, isEventDeleted]
+    )
+
     const filteredEvents = useMemo(() => {
       const idSet = new Set<string>()
 
       return events.slice(0, showCount).filter((evt) => {
-        if (isEventDeleted(evt)) return false
-        if (hideReplies && isReplyNoteEvent(evt)) return false
-        if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return false
+        if (shouldHideEvent(evt)) return false
 
         const id = isReplaceableEvent(evt.kind) ? getReplaceableCoordinateFromEvent(evt) : evt.id
         if (idSet.has(id)) {
@@ -71,16 +99,13 @@ const NoteList = forwardRef(
         idSet.add(id)
         return true
       })
-    }, [events, hideReplies, hideUntrustedNotes, showCount, isEventDeleted])
+    }, [events, showCount, shouldHideEvent])
 
     const filteredNewEvents = useMemo(() => {
       const idSet = new Set<string>()
 
       return newEvents.filter((event: Event) => {
-        if (isEventDeleted(event)) return false
-        if (hideReplies && isReplyNoteEvent(event)) return false
-        if (hideUntrustedNotes && !isUserTrusted(event.pubkey)) return false
-        if (filterMutedNotes && mutePubkeys.includes(event.pubkey)) return false
+        if (shouldHideEvent(event)) return false
 
         const id = isReplaceableEvent(event.kind)
           ? getReplaceableCoordinateFromEvent(event)
@@ -91,7 +116,7 @@ const NoteList = forwardRef(
         idSet.add(id)
         return true
       })
-    }, [newEvents, hideReplies, hideUntrustedNotes, filterMutedNotes, mutePubkeys, isEventDeleted])
+    }, [events, showCount, shouldHideEvent])
 
     const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {

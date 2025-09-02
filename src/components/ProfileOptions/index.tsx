@@ -9,16 +9,16 @@ import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { Bell, BellOff, Copy, Ellipsis } from 'lucide-react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function ProfileOptions({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation()
   const { pubkey: accountPubkey } = useNostr()
-  const { mutePubkeys, mutePubkeyPrivately, mutePubkeyPublicly, unmutePubkey } = useMuteList()
+  const { mutePubkeySet, mutePubkeyPrivately, mutePubkeyPublicly, unmutePubkey } = useMuteList()
+  const isMuted = useMemo(() => mutePubkeySet.has(pubkey), [mutePubkeySet, pubkey])
 
   if (pubkey === accountPubkey) return null
-
-  const isMuted = mutePubkeys.includes(pubkey)
 
   return (
     <DropdownMenu>

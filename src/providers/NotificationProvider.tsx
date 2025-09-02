@@ -1,8 +1,10 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { isMentioningMutedUsers } from '@/lib/event'
 import client from '@/services/client.service'
 import { kinds } from 'nostr-tools'
 import { SubCloser } from 'nostr-tools/abstract-pool'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { useContentPolicy } from './ContentPolicyProvider'
 import { useMuteList } from './MuteListProvider'
 import { useNostr } from './NostrProvider'
 import { useUserTrust } from './UserTrustProvider'
@@ -26,7 +28,8 @@ export const useNotification = () => {
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
   const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
-  const { mutePubkeys } = useMuteList()
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [newNotificationIds, setNewNotificationIds] = useState(new Set<string>())
   const subCloserRef = useRef<SubCloser | null>(null)
 
@@ -67,7 +70,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
               // Only show notification if not from self and not muted
               if (
                 evt.pubkey !== pubkey &&
-                !mutePubkeys.includes(evt.pubkey) &&
+                !mutePubkeySet.has(evt.pubkey) &&
+                (!hideContentMentioningMutedUsers || !isMentioningMutedUsers(evt, mutePubkeySet)) &&
                 (!hideUntrustedNotifications || isUserTrusted(evt.pubkey))
               ) {
                 setNewNotificationIds((prev) => {
