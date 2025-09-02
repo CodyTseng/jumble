@@ -82,7 +82,7 @@ export default function KindFilter({
       }}
     >
       <ListFilter size={16} />
-      <span className="text-sm font-medium">{t('Feed Settings')}</span>
+      <span className="text-sm font-medium">{t('Filter')}</span>
       {isDifferentFromSaved && (
         <div className="absolute size-2 rounded-full bg-primary right-1 top-1 ring-2 ring-background" />
       )}
