@@ -16,7 +16,14 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const { themeSetting, setThemeSetting } = useTheme()
-  const { autoplay, setAutoplay, defaultShowNsfw, setDefaultShowNsfw } = useContentPolicy()
+  const {
+    autoplay,
+    setAutoplay,
+    defaultShowNsfw,
+    setDefaultShowNsfw,
+    hideContentMentioningMutedUsers,
+    setHideContentMentioningMutedUsers
+  } = useContentPolicy()
   const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
 
   const handleLanguageChange = (value: TLanguage) => {
@@ -74,6 +81,16 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             id="hide-untrusted-notes"
             checked={hideUntrustedNotes}
             onCheckedChange={updateHideUntrustedNotes}
+          />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="hide-content-mentioning-muted-users" className="text-base font-normal">
+            {t('Hide content mentioning muted users')}
+          </Label>
+          <Switch
+            id="hide-content-mentioning-muted-users"
+            checked={hideContentMentioningMutedUsers}
+            onCheckedChange={setHideContentMentioningMutedUsers}
           />
         </SettingItem>
         <SettingItem>

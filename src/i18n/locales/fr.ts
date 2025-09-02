@@ -379,6 +379,10 @@ export default {
       'Demande de suppression envoyée à {{count}} relais',
     'Suitable Relays': 'Relais adaptés',
     'Type searching for people, keywords, or relays':
-      'Tapez pour rechercher des personnes, des mots-clés ou des relais'
+      'Tapez pour rechercher des personnes, des mots-clés ou des relais',
+    'Hide content mentioning muted users':
+      'Masquer le contenu mentionnant des utilisateurs masqués',
+    'This note mentions a user you muted':
+      'Cette note mentionne un utilisateur que vous avez masqué'
   }
 }

@@ -378,6 +378,8 @@ export default {
       'Żądanie usunięcia wysłane do {{count}} przekaźników',
     'Suitable Relays': 'Odpowiednie przekaźniki',
     'Type searching for people, keywords, or relays':
-      'Wpisz, aby wyszukać osoby, słowa kluczowe lub przekaźniki'
+      'Wpisz, aby wyszukać osoby, słowa kluczowe lub przekaźniki',
+    'Hide content mentioning muted users': 'Ukryj treści wspominające wyciszonych użytkowników',
+    'This note mentions a user you muted': 'Ten wpis wspomina użytkownika, którego wyciszyłeś'
   }
 }

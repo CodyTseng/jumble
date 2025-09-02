@@ -374,6 +374,8 @@ export default {
       '削除リクエストが{{count}}個のリレーに送信されました',
     'Suitable Relays': '適切なリレー',
     'Type searching for people, keywords, or relays':
-      '人、キーワード、またはリレーを検索するために入力してください'
+      '人、キーワード、またはリレーを検索するために入力してください',
+    'Hide content mentioning muted users': 'ミュートしたユーザーを言及するコンテンツを非表示',
+    'This note mentions a user you muted': 'このノートはミュートしたユーザーを言及しています'
   }
 }

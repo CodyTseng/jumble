@@ -367,6 +367,8 @@ export default {
     'Try deleting this note': '尝试删除此笔记',
     'Deletion request sent to {{count}} relays': '删除请求已发送到 {{count}} 个服务器',
     'Suitable Relays': '适合的服务器',
-    'Type searching for people, keywords, or relays': '输入以搜索用户、关键词或服务器'
+    'Type searching for people, keywords, or relays': '输入以搜索用户、关键词或服务器',
+    'Hide content mentioning muted users': '隐藏提及已屏蔽用户的内容',
+    'This note mentions a user you muted': '此笔记提及了您已屏蔽的用户'
   }
 }

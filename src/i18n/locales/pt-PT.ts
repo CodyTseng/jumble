@@ -377,6 +377,8 @@ export default {
       'Pedido de eliminação enviado para {{count}} relays',
     'Suitable Relays': 'Relays adequados',
     'Type searching for people, keywords, or relays':
-      'Digite para buscar pessoas, palavras-chave ou relays'
+      'Digite para buscar pessoas, palavras-chave ou relays',
+    'Hide content mentioning muted users': 'Ocultar conteúdo que menciona utilizadores silenciados',
+    'This note mentions a user you muted': 'Esta nota menciona um utilizador que silenciou'
   }
 }

@@ -369,6 +369,8 @@ export default {
     'Try deleting this note': 'ลองลบโน้ตนี้ดู',
     'Deletion request sent to {{count}} relays': 'คำขอลบถูกส่งไปยังรีเลย์ {{count}} รายการ',
     'Suitable Relays': 'รีเลย์ที่เหมาะสม',
-    'Type searching for people, keywords, or relays': 'พิมพ์เพื่อค้นหาผู้คน คีย์เวิร์ด หรือรีเลย์'
+    'Type searching for people, keywords, or relays': 'พิมพ์เพื่อค้นหาผู้คน คีย์เวิร์ด หรือรีเลย์',
+    'Hide content mentioning muted users': 'ซ่อนเนื้อหาที่กล่าวถึงผู้ใช้ที่ปิดเสียง',
+    'This note mentions a user you muted': 'โน้ตนี้กล่าวถึงผู้ใช้ที่คุณปิดเสียง'
   }
 }
