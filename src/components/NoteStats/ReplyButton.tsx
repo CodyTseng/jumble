@@ -1,4 +1,7 @@
+import { isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -14,18 +17,29 @@ export default function ReplyButton({ event }: { event: Event }) {
   const { pubkey, checkLogin } = useNostr()
   const { repliesMap } = useReply()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { mutePubkeySet } = useMuteList()
+  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { replyCount, hasReplied } = useMemo(() => {
     const hasReplied = pubkey
       ? repliesMap.get(event.id)?.events.some((evt) => evt.pubkey === pubkey)
       : false
-    if (hideUntrustedInteractions) {
-      return {
-        replyCount:
-          repliesMap.get(event.id)?.events.filter((evt) => isUserTrusted(evt.pubkey)).length ?? 0,
-        hasReplied
-      }
+
+    return {
+      replyCount:
+        repliesMap.get(event.id)?.events.filter((evt) => {
+          if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
+            return false
+          }
+          if (mutePubkeySet.has(evt.pubkey)) {
+            return false
+          }
+          if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) {
+            return false
+          }
+          return true
+        }).length ?? 0,
+      hasReplied
     }
-    return { replyCount: repliesMap.get(event.id)?.events.length ?? 0, hasReplied }
   }, [repliesMap, event.id, hideUntrustedInteractions])
   const [open, setOpen] = useState(false)
 
