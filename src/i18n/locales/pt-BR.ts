@@ -366,7 +366,7 @@ export default {
     'Video Posts': 'Vídeos',
     'Select All': 'Selecionar tudo',
     'Clear All': 'Limpar tudo',
-    'Remember my choice': 'Lembrar minha escolha',
+    'Set as default filter': 'Definir como filtro padrão',
     Apply: 'Aplicar',
     Reset: 'Redefinir',
     'Share something on this Relay': 'Compartilhe algo neste Relay',

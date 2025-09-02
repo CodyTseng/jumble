@@ -73,8 +73,8 @@ export default function KindFilter({
   const trigger = (
     <Button
       variant="ghost"
-      size="sm"
-      className="relative flex items-center gap-2 px-3 py-2"
+      size="titlebar-icon"
+      className="relative w-fit px-3"
       onClick={() => {
         if (isSmallScreen) {
           setOpen(true)
@@ -82,9 +82,9 @@ export default function KindFilter({
       }}
     >
       <ListFilter size={16} />
-      <span className="text-sm font-medium">{t('Filter')}</span>
+      {t('Filter')}
       {isDifferentFromSaved && (
-        <div className="absolute size-2 rounded-full bg-primary right-1 top-1 ring-2 ring-background" />
+        <div className="absolute size-2 rounded-full bg-primary left-7 top-2 ring-2 ring-background" />
       )}
     </Button>
   )
@@ -151,7 +151,7 @@ export default function KindFilter({
           checked={isPersistent}
           onCheckedChange={(checked) => setIsPersistent(!!checked)}
         />
-        <span className="text-sm">{t('Remember my choice')}</span>
+        <span className="text-sm">{t('Set as default filter')}</span>
       </Label>
 
       <Button

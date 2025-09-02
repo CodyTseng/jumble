@@ -365,7 +365,7 @@ export default {
     'Video Posts': 'ビデオ投稿',
     'Select All': 'すべて選択',
     'Clear All': 'すべてクリア',
-    'Remember my choice': '選択を記憶',
+    'Set as default filter': 'デフォルトフィルターに設定',
     Apply: '適用',
     Reset: 'リセット',
     'Share something on this Relay': 'このリレーで何かを共有する',

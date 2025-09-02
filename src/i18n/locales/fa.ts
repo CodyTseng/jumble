@@ -365,7 +365,7 @@ export default {
     'Video Posts': 'پست‌های ویدیو',
     'Select All': 'انتخاب همه',
     'Clear All': 'پاک کردن همه',
-    'Remember my choice': 'انتخاب من را به خاطر بسپار',
+    'Set as default filter': 'تنظیم به عنوان فیلتر پیش‌فرض',
     Apply: 'اعمال',
     Reset: 'بازنشانی',
     'Share something on this Relay': 'در این رله چیزی به اشتراک بگذارید',

@@ -362,7 +362,7 @@ export default {
     'Video Posts': 'โพสต์วิดีโอ',
     'Select All': 'เลือกทั้งหมด',
     'Clear All': 'ล้างทั้งหมด',
-    'Remember my choice': 'จำการเลือกของฉัน',
+    'Set as default filter': 'ตั้งเป็นตัวกรองเริ่มต้น',
     Apply: 'ใช้',
     Reset: 'รีเซ็ต',
     'Share something on this Relay': 'แชร์บางอย่างบนรีเลย์นี้',

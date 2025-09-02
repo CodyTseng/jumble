@@ -360,7 +360,7 @@ export default {
     'Video Posts': '视频帖子',
     'Select All': '全选',
     'Clear All': '清空',
-    'Remember my choice': '记住我的选择',
+    'Set as default filter': '设为默认过滤器',
     Apply: '应用',
     Reset: '重置',
     'Share something on this Relay': '在此服务器上分享点什么',

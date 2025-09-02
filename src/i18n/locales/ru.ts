@@ -369,7 +369,7 @@ export default {
     'Video Posts': 'Видео посты',
     'Select All': 'Выбрать все',
     'Clear All': 'Очистить все',
-    'Remember my choice': 'Запомнить мой выбор',
+    'Set as default filter': 'Установить как фильтр по умолчанию',
     Apply: 'Применить',
     Reset: 'Сбросить',
     'Share something on this Relay': 'Поделиться чем-то на этом релее',

@@ -365,7 +365,7 @@ export default {
     'Video Posts': '비디오 게시물',
     'Select All': '모두 선택',
     'Clear All': '모두 지우기',
-    'Remember my choice': '내 선택 기억하기',
+    'Set as default filter': '기본 필터로 설정',
     Apply: '적용',
     Reset: '초기화',
     'Share something on this Relay': '이 릴레이에서 무언가를 공유하세요',

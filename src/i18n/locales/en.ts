@@ -363,7 +363,7 @@ export default {
     'Video Posts': 'Video Posts',
     'Select All': 'Select All',
     'Clear All': 'Clear All',
-    'Remember my choice': 'Remember my choice',
+    'Set as default filter': 'Set as default filter',
     Apply: 'Apply',
     Reset: 'Reset',
     'Share something on this Relay': 'Share something on this Relay',

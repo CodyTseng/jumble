@@ -372,7 +372,7 @@ export default {
     'Video Posts': 'Videobeiträge',
     'Select All': 'Alle auswählen',
     'Clear All': 'Alle löschen',
-    'Remember my choice': 'Meine Auswahl merken',
+    'Set as default filter': 'Als Standardfilter festlegen',
     Apply: 'Anwenden',
     Reset: 'Zurücksetzen',
     'Share something on this Relay': 'Teile etwas auf diesem Relay',

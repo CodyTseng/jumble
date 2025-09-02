@@ -364,7 +364,7 @@ export default {
     'Video Posts': 'مشاركات الفيديو',
     'Select All': 'تحديد الكل',
     'Clear All': 'مسح الكل',
-    'Remember my choice': 'تذكر اختياري',
+    'Set as default filter': 'تعيين كمرشح افتراضي',
     Apply: 'تطبيق',
     Reset: 'إعادة تعيين',
     'Share something on this Relay': 'شارك شيئاً على هذا الريلاي',
