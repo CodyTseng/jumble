@@ -1,4 +1,3 @@
-import { Separator } from '@/components/ui/separator'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -31,8 +30,7 @@ const NotificationList = forwardRef((_, ref) => {
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<Event[]>([])
-  const [newNotifications, setNewNotifications] = useState<Event[]>([])
-  const [oldNotifications, setOldNotifications] = useState<Event[]>([])
+  const [visibleNotifications, setVisibleNotifications] = useState<Event[]>([])
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
   const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -142,15 +140,8 @@ const NotificationList = forwardRef((_, ref) => {
       visibleNotifications = visibleNotifications.filter((event) => isUserTrusted(event.pubkey))
     }
 
-    const index = visibleNotifications.findIndex((event) => event.created_at <= lastReadTime)
-    if (index === -1) {
-      setNewNotifications(visibleNotifications)
-      setOldNotifications([])
-    } else {
-      setNewNotifications(visibleNotifications.slice(0, index))
-      setOldNotifications(visibleNotifications.slice(index))
-    }
-  }, [notifications, lastReadTime, showCount, hideUntrustedNotifications, isUserTrusted])
+    setVisibleNotifications(visibleNotifications)
+  }, [notifications, showCount, hideUntrustedNotifications, isUserTrusted])
 
   useEffect(() => {
     const options = {
@@ -228,20 +219,13 @@ const NotificationList = forwardRef((_, ref) => {
         }}
         pullingContent=""
       >
-        <div className="pt-2">
-          {newNotifications.map((notification) => (
-            <NotificationItem key={notification.id} notification={notification} isNew />
-          ))}
-          {!!newNotifications.length && (
-            <div className="relative my-2">
-              <Separator />
-              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
-                {t('Earlier notifications')}
-              </span>
-            </div>
-          )}
-          {oldNotifications.map((notification) => (
-            <NotificationItem key={notification.id} notification={notification} />
+        <div>
+          {visibleNotifications.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              isNew={notification.created_at > lastReadTime}
+            />
           ))}
           <div className="text-center text-sm text-muted-foreground">
             {until || loading ? (

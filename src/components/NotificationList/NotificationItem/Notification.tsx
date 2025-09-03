@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { toNote, toProfile } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { NostrEvent } from 'nostr-tools'
@@ -30,7 +31,10 @@ export default function Notification({
 
   return (
     <div
-      className="flex items-start gap-4 cursor-pointer py-2 px-4 border-b"
+      className={cn(
+        'clickable flex items-start gap-4 cursor-pointer py-2 px-4 border-b',
+        isNew && 'bg-muted/20'
+      )}
       onClick={() => {
         if (targetEvent) {
           push(toNote(targetEvent.id))
