@@ -1,5 +1,6 @@
 import ContentPreview from '@/components/ContentPreview'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
+import NoteStats from '@/components/NoteStats'
 import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
@@ -16,7 +17,8 @@ export default function Notification({
   description,
   middle = null,
   targetEvent,
-  isNew = false
+  isNew = false,
+  showStats = false
 }: {
   icon: React.ReactNode
   sender: string
@@ -25,6 +27,7 @@ export default function Notification({
   middle?: React.ReactNode
   targetEvent?: NostrEvent
   isNew?: boolean
+  showStats?: boolean
 }) {
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
@@ -57,6 +60,7 @@ export default function Notification({
           <ContentPreview className="line-clamp-2 text-muted-foreground" event={targetEvent} />
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-muted-foreground text-sm" />
+        {showStats && targetEvent && <NoteStats event={targetEvent} />}
       </div>
     </div>
   )

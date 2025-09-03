@@ -52,6 +52,7 @@ export function MentionNotification({
       }
       description={isMention ? t('mentioned you in a note') : t('replied to your note')}
       isNew={isNew}
+      showStats={!!parentEventId}
     />
   )
 }
