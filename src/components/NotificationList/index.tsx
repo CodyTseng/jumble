@@ -1,5 +1,4 @@
 import { Separator } from '@/components/ui/separator'
-import { Skeleton } from '@/components/ui/skeleton'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -15,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import Tabs from '../Tabs'
 import { NotificationItem } from './NotificationItem'
+import { NotificationSkeleton } from './NotificationItem/Notification'
 
 const LIMIT = 100
 const SHOW_COUNT = 30
@@ -246,10 +246,7 @@ const NotificationList = forwardRef((_, ref) => {
           <div className="text-center text-sm text-muted-foreground">
             {until || loading ? (
               <div ref={bottomRef}>
-                <div className="flex gap-2 items-center h-11 py-2">
-                  <Skeleton className="w-7 h-7 rounded-full" />
-                  <Skeleton className="h-6 flex-1 w-0" />
-                </div>
+                <NotificationSkeleton />
               </div>
             ) : (
               t('no more notifications')

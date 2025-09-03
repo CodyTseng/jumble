@@ -1,5 +1,6 @@
 import ContentPreview from '@/components/ContentPreview'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
+import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { toNote, toProfile } from '@/lib/link'
@@ -52,6 +53,28 @@ export default function Notification({
           <ContentPreview className="line-clamp-2 text-muted-foreground" event={targetEvent} />
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-muted-foreground text-sm" />
+      </div>
+    </div>
+  )
+}
+
+export function NotificationSkeleton() {
+  return (
+    <div className="flex items-start gap-4 cursor-pointer py-2 px-4">
+      <div className="flex gap-4 items-center mt-1.5">
+        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="w-9 h-9 rounded-full" />
+      </div>
+      <div className="flex-1 w-0 flex flex-col gap-1">
+        <div className="py-1">
+          <Skeleton className="w-16 h-4" />
+        </div>
+        <div className="py-1">
+          <Skeleton className="w-full h-4" />
+        </div>
+        <div className="py-1">
+          <Skeleton className="w-12 h-4" />
+        </div>
       </div>
     </div>
   )
