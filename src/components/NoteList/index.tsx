@@ -167,8 +167,6 @@ const NoteList = forwardRef(
               if (pubkey && event.pubkey === pubkey) {
                 // If the new event is from the current user, insert it directly into the feed
                 setEvents((oldEvents) => (oldEvents.some((e) => e.id === event.id) ? oldEvents : [event, ...oldEvents]))
-                // Ensure it isn't kept in the buffered new events list
-                setNewEvents((oldEvents) => oldEvents.filter((e) => e.id !== event.id))
               } else {
                 // Otherwise, buffer it and show the New Notes button
                 setNewEvents((oldEvents) =>
