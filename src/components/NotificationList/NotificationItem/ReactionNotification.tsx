@@ -1,16 +1,12 @@
 import Image from '@/components/Image'
 import { useFetchEvent } from '@/hooks'
-import { toNote } from '@/lib/link'
 import { generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
-import { cn } from '@/lib/utils'
-import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { Heart } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
-import ContentPreview from '../../ContentPreview'
-import { FormattedTimestamp } from '../../FormattedTimestamp'
-import UserAvatar from '../../UserAvatar'
+import { useTranslation } from 'react-i18next'
+import Notification from './Notification'
 
 export function ReactionNotification({
   notification,
@@ -19,7 +15,7 @@ export function ReactionNotification({
   notification: Event
   isNew?: boolean
 }) {
-  const { push } = useSecondaryPage()
+  const { t } = useTranslation()
   const { pubkey } = useNostr()
   const eventId = useMemo(() => {
     const targetPubkey = notification.tags.findLast(tagNameEquals('p'))?.[1]
@@ -58,21 +54,13 @@ export function ReactionNotification({
   }
 
   return (
-    <div
-      className="flex items-center justify-between cursor-pointer py-2"
-      onClick={() => push(toNote(event))}
-    >
-      <div className="flex gap-2 items-center flex-1">
-        <UserAvatar userId={notification.pubkey} size="small" />
-        <div className="text-xl min-w-6 text-center">{reaction}</div>
-        <ContentPreview
-          className={cn('truncate flex-1 w-0', isNew ? 'font-semibold' : 'text-muted-foreground')}
-          event={event}
-        />
-      </div>
-      <div className="text-muted-foreground">
-        <FormattedTimestamp timestamp={notification.created_at} short />
-      </div>
-    </div>
+    <Notification
+      icon={<div className="text-xl min-w-6 text-center">{reaction}</div>}
+      sender={notification.pubkey}
+      sentAt={notification.created_at}
+      targetEvent={event}
+      description={t('reacted to your note')}
+      isNew={isNew}
+    />
   )
 }

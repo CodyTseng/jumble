@@ -1,14 +1,13 @@
-import { getEmbeddedPubkeys } from '@/lib/event'
+import ParentNotePreview from '@/components/ParentNotePreview'
+import { getEmbeddedPubkeys, getParentBech32Id } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { AtSign, MessageCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
-import ContentPreview from '../../ContentPreview'
-import { FormattedTimestamp } from '../../FormattedTimestamp'
-import UserAvatar from '../../UserAvatar'
+import { useTranslation } from 'react-i18next'
+import Notification from './Notification'
 
 export function MentionNotification({
   notification,
@@ -17,6 +16,7 @@ export function MentionNotification({
   notification: Event
   isNew?: boolean
 }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const isMention = useMemo(() => {
@@ -24,25 +24,34 @@ export function MentionNotification({
     const mentions = getEmbeddedPubkeys(notification)
     return mentions.includes(pubkey)
   }, [pubkey, notification])
+  const parentEventId = useMemo(() => getParentBech32Id(notification), [notification])
 
   return (
-    <div
-      className="flex gap-2 items-center cursor-pointer py-2"
-      onClick={() => push(toNote(notification))}
-    >
-      <UserAvatar userId={notification.pubkey} size="small" />
-      {isMention ? (
-        <AtSign size={24} className="text-pink-400" />
-      ) : (
-        <MessageCircle size={24} className="text-blue-400" />
-      )}
-      <ContentPreview
-        className={cn('truncate flex-1 w-0', isNew ? 'font-semibold' : 'text-muted-foreground')}
-        event={notification}
-      />
-      <div className="text-muted-foreground">
-        <FormattedTimestamp timestamp={notification.created_at} short />
-      </div>
-    </div>
+    <Notification
+      icon={
+        isMention ? (
+          <AtSign size={24} className="text-pink-400" />
+        ) : (
+          <MessageCircle size={24} className="text-blue-400" />
+        )
+      }
+      sender={notification.pubkey}
+      sentAt={notification.created_at}
+      targetEvent={notification}
+      middle={
+        parentEventId && (
+          <ParentNotePreview
+            eventId={parentEventId}
+            className=""
+            onClick={(e) => {
+              e.stopPropagation()
+              push(toNote(parentEventId))
+            }}
+          />
+        )
+      }
+      description={isMention ? t('mentioned you in a note') : t('replied to your note')}
+      isNew={isNew}
+    />
   )
 }

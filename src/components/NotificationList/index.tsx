@@ -228,7 +228,7 @@ const NotificationList = forwardRef((_, ref) => {
         }}
         pullingContent=""
       >
-        <div className="px-4 pt-2">
+        <div className="pt-2">
           {newNotifications.map((notification) => (
             <NotificationItem key={notification.id} notification={notification} isNew />
           ))}
