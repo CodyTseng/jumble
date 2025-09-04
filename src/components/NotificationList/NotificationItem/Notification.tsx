@@ -5,7 +5,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { toNote, toProfile } from '@/lib/link'
-import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { NostrEvent } from 'nostr-tools'
@@ -34,10 +33,7 @@ export default function Notification({
 
   return (
     <div
-      className={cn(
-        'clickable flex items-start gap-2 cursor-pointer py-2 px-4 border-b',
-        isNew && 'bg-muted/20'
-      )}
+      className="clickable flex items-start gap-2 cursor-pointer py-2 px-4 border-b"
       onClick={() => {
         if (targetEvent) {
           push(toNote(targetEvent.id))
@@ -51,13 +47,16 @@ export default function Notification({
         <UserAvatar userId={sender} size="medium" />
       </div>
       <div className="flex-1 w-0">
-        <div className="flex gap-1 items-center">
-          <Username
-            userId={sender}
-            className="flex-1 max-w-fit truncate font-semibold"
-            skeletonClassName="h-4"
-          />
-          <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex gap-1 items-center">
+            <Username
+              userId={sender}
+              className="flex-1 max-w-fit truncate font-semibold"
+              skeletonClassName="h-4"
+            />
+            <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
+          </div>
+          {isNew && <div className="size-2 bg-primary rounded-full shrink-0" />}
         </div>
         {middle}
         {targetEvent && (
@@ -72,12 +71,12 @@ export default function Notification({
 
 export function NotificationSkeleton() {
   return (
-    <div className="flex items-start gap-4 cursor-pointer py-2 px-4">
-      <div className="flex gap-4 items-center mt-1.5">
+    <div className="flex items-start gap-2 cursor-pointer py-2 px-4">
+      <div className="flex gap-2 items-center mt-1.5">
         <Skeleton className="w-7 h-7 rounded-full" />
         <Skeleton className="w-9 h-9 rounded-full" />
       </div>
-      <div className="flex-1 w-0 flex flex-col gap-1">
+      <div className="flex-1 w-0">
         <div className="py-1">
           <Skeleton className="w-16 h-4" />
         </div>

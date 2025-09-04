@@ -34,7 +34,7 @@ export function ZapNotification({
           {formatAmount(amount)} {t('sats')} {comment}
         </div>
       }
-      description={t('zapped you')}
+      description={event ? t('zapped your note') : t('zapped you')}
       isNew={isNew}
     />
   )
