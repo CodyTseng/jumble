@@ -372,6 +372,13 @@ export default {
     'Type searching for people, keywords, or relays': 'พิมพ์เพื่อค้นหาผู้คน คีย์เวิร์ด หรือรีเลย์',
     'Hide content mentioning muted users': 'ซ่อนเนื้อหาที่กล่าวถึงผู้ใช้ที่ปิดเสียง',
     'This note mentions a user you muted': 'โน้ตนี้กล่าวถึงผู้ใช้ที่คุณปิดเสียง',
-    Filter: 'ตัวกรอง'
+    Filter: 'ตัวกรอง',
+    'mentioned you in a note': 'ได้กล่าวถึงคุณในโน้ต',
+    'quoted your note': 'ได้ยกคำพูดจากโน้ตของคุณ',
+    'voted in your poll': 'ได้โหวตในการสำรวจของคุณ',
+    'reacted to your note': 'ได้แสดงปฏิกิริยาต่อโน้ตของคุณ',
+    'reposted your note': 'ได้รีโพสต์โน้ตของคุณ',
+    'zapped your note': 'ได้แซปโน้ตของคุณ',
+    'zapped you': 'ได้แซปคุณ'
   }
 }

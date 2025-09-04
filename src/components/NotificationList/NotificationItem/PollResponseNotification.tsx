@@ -4,6 +4,7 @@ import { Vote } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import Notification from './Notification'
+import { useTranslation } from 'react-i18next'
 
 export function PollResponseNotification({
   notification,
@@ -12,6 +13,7 @@ export function PollResponseNotification({
   notification: Event
   isNew?: boolean
 }) {
+  const { t } = useTranslation()
   const eventId = useMemo(() => {
     const eTag = notification.tags.find(tagNameEquals('e'))
     return eTag ? generateBech32IdFromETag(eTag) : undefined
@@ -28,7 +30,7 @@ export function PollResponseNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={pollEvent}
-      description="voted in your poll"
+      description={t('voted in your poll')}
       isNew={isNew}
     />
   )

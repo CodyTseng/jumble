@@ -381,6 +381,13 @@ export default {
       'Wpisz, aby wyszukać osoby, słowa kluczowe lub przekaźniki',
     'Hide content mentioning muted users': 'Ukryj treści wspominające wyciszonych użytkowników',
     'This note mentions a user you muted': 'Ten wpis wspomina użytkownika, którego wyciszyłeś',
-    Filter: 'Filtr'
+    Filter: 'Filtr',
+    'mentioned you in a note': 'wspomniał o tobie w notatce',
+    'quoted your note': 'zacytował twoją notatkę',
+    'voted in your poll': 'zagłosował w twojej ankiecie',
+    'reacted to your note': 'zareagował na twoją notatkę',
+    'reposted your note': 'przepostował twoją notatkę',
+    'zapped your note': 'zappował twoją notatkę',
+    'zapped you': 'zappował cię'
   }
 }

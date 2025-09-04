@@ -380,6 +380,13 @@ export default {
       'Escribe para buscar personas, palabras clave o relés',
     'Hide content mentioning muted users': 'Ocultar contenido que mencione usuarios silenciados',
     'This note mentions a user you muted': 'Esta nota menciona a un usuario que silenciaste',
-    Filter: 'Filtro'
+    Filter: 'Filtro',
+    'mentioned you in a note': 'te mencionó en una nota',
+    'quoted your note': 'citó tu nota',
+    'voted in your poll': 'votó en tu encuesta',
+    'reacted to your note': 'reaccionó a tu nota',
+    'reposted your note': 'reposteó tu nota',
+    'zapped your note': 'zappeó tu nota',
+    'zapped you': 'te zappeó'
   }
 }

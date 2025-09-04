@@ -376,6 +376,13 @@ export default {
       'برای جستجو افراد، کلمات کلیدی یا رله‌ها تایپ کنید',
     'Hide content mentioning muted users': 'مخفی کردن محتوای اشاره کننده به کاربران بی‌صدا شده',
     'This note mentions a user you muted': 'این یادداشت به کاربری که بی‌صدا کرده‌اید اشاره می‌کند',
-    Filter: 'فیلتر'
+    Filter: 'فیلتر',
+    'mentioned you in a note': 'در یادداشتی از شما نام برد',
+    'quoted your note': 'یادداشت شما را نقل قول کرد',
+    'voted in your poll': 'در نظرسنجی شما رأی داد',
+    'reacted to your note': 'به یادداشت شما واکنش نشان داد',
+    'reposted your note': 'یادداشت شما را بازنشر کرد',
+    'zapped your note': 'یادداشت شما را زپ کرد',
+    'zapped you': 'شما را زپ کرد'
   }
 }

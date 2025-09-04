@@ -384,6 +384,13 @@ export default {
       'Masquer le contenu mentionnant des utilisateurs masqués',
     'This note mentions a user you muted':
       'Cette note mentionne un utilisateur que vous avez masqué',
-    Filter: 'Filtre'
+    Filter: 'Filtre',
+    'mentioned you in a note': 'vous a mentionné dans une note',
+    'quoted your note': 'a cité votre note',
+    'voted in your poll': 'a voté dans votre sondage',
+    'reacted to your note': 'a réagi à votre note',
+    'reposted your note': 'a repartagé votre note',
+    'zapped your note': 'a zappé votre note',
+    'zapped you': 'vous a zappé'
   }
 }

@@ -377,6 +377,13 @@ export default {
       'Digite para buscar pessoas, palavras-chave ou relays',
     'Hide content mentioning muted users': 'Ocultar conteúdo que menciona usuários silenciados',
     'This note mentions a user you muted': 'Esta nota menciona um usuário que você silenciou',
-    Filter: 'Filtro'
+    Filter: 'Filtro',
+    'mentioned you in a note': 'mencionou você em uma nota',
+    'quoted your note': 'citou sua nota',
+    'voted in your poll': 'votou na sua enquete',
+    'reacted to your note': 'reagiu à sua nota',
+    'reposted your note': 'republicou sua nota',
+    'zapped your note': 'zappeou sua nota',
+    'zapped you': 'zappeou você'
   }
 }

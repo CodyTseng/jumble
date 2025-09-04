@@ -384,6 +384,13 @@ export default {
     'Hide content mentioning muted users': 'Inhalte ausblenden, die stumme Benutzer erwähnen',
     'This note mentions a user you muted':
       'Diese Notiz erwähnt einen Benutzer, den Sie stumm geschaltet haben',
-    Filter: 'Filter'
+    Filter: 'Filter',
+    'mentioned you in a note': 'hat Sie in einer Notiz erwähnt',
+    'quoted your note': 'hat Ihre Notiz zitiert',
+    'voted in your poll': 'hat in Ihrer Umfrage abgestimmt',
+    'reacted to your note': 'hat auf Ihre Notiz reagiert',
+    'reposted your note': 'hat Ihre Notiz geteilt',
+    'zapped your note': 'hat Ihre Notiz gezappt',
+    'zapped you': 'hat Sie gezappt'
   }
 }

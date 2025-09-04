@@ -374,6 +374,13 @@ export default {
       'Type searching for people, keywords, or relays',
     'Hide content mentioning muted users': 'Hide content mentioning muted users',
     'This note mentions a user you muted': 'This note mentions a user you muted',
-    Filter: 'Filter'
+    Filter: 'Filter',
+    'mentioned you in a note': 'mentioned you in a note',
+    'quoted your note': 'quoted your note',
+    'voted in your poll': 'voted in your poll',
+    'reacted to your note': 'reacted to your note',
+    'reposted your note': 'reposted your note',
+    'zapped your note': 'zapped your note',
+    'zapped you': 'zapped you'
   }
 }

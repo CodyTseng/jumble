@@ -370,6 +370,13 @@ export default {
     'Type searching for people, keywords, or relays': '输入以搜索用户、关键词或服务器',
     'Hide content mentioning muted users': '隐藏提及已屏蔽用户的内容',
     'This note mentions a user you muted': '此笔记提及了您已屏蔽的用户',
-    Filter: '过滤器'
+    Filter: '过滤器',
+    'mentioned you in a note': '在笔记中提及了您',
+    'quoted your note': '引用了您的笔记',
+    'voted in your poll': '在您的投票中投票',
+    'reacted to your note': '对您的笔记做出了反应',
+    'reposted your note': '转发了您的笔记',
+    'zapped your note': '打闪了您的笔记',
+    'zapped you': '给您打闪'
   }
 }

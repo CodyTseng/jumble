@@ -381,6 +381,13 @@ export default {
     'Hide content mentioning muted users': 'Скрыть контент, упоминающий заглушённых пользователей',
     'This note mentions a user you muted':
       'Эта заметка упоминает пользователя, которого вы заглушили',
-    Filter: 'Фильтр'
+    Filter: 'Фильтр',
+    'mentioned you in a note': 'упомянул вас в заметке',
+    'quoted your note': 'процитировал вашу заметку',
+    'voted in your poll': 'проголосовал в вашем опросе',
+    'reacted to your note': 'отреагировал на вашу заметку',
+    'reposted your note': 'репостнул вашу заметку',
+    'zapped your note': 'заппил вашу заметку',
+    'zapped you': 'заппил вас'
   }
 }

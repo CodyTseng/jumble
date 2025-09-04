@@ -375,6 +375,13 @@ export default {
       'اكتب للبحث عن أشخاص، كلمات مفتاحية، أو ريلايات',
     'Hide content mentioning muted users': 'إخفاء المحتوى الذي يذكر المستخدمين المكتومين',
     'This note mentions a user you muted': 'هذه الملاحظة تذكر مستخدماً قمت بكتمه',
-    Filter: 'مرشح'
+    Filter: 'مرشح',
+    'mentioned you in a note': 'ذكرك في ملاحظة',
+    'quoted your note': 'اقتبس ملاحظتك',
+    'voted in your poll': 'صوت في استطلاعك',
+    'reacted to your note': 'تفاعل مع ملاحظتك',
+    'reposted your note': 'أعاد نشر ملاحظتك',
+    'zapped your note': 'زاب ملاحظتك',
+    'zapped you': 'زابك'
   }
 }

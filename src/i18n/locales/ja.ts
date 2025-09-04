@@ -377,6 +377,13 @@ export default {
       '人、キーワード、またはリレーを検索するために入力してください',
     'Hide content mentioning muted users': 'ミュートしたユーザーを言及するコンテンツを非表示',
     'This note mentions a user you muted': 'このノートはミュートしたユーザーを言及しています',
-    Filter: 'フィルター'
+    Filter: 'フィルター',
+    'mentioned you in a note': 'ノートであなたに言及しました',
+    'quoted your note': 'あなたのノートを引用しました',
+    'voted in your poll': 'あなたの投票に投票しました',
+    'reacted to your note': 'あなたのノートにリアクションしました',
+    'reposted your note': 'あなたのノートをリポストしました',
+    'zapped your note': 'あなたのノートにザップしました',
+    'zapped you': 'あなたにザップしました'
   }
 }
