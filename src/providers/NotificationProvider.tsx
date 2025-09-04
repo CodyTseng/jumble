@@ -8,6 +8,7 @@ import { useContentPolicy } from './ContentPolicyProvider'
 import { useMuteList } from './MuteListProvider'
 import { useNostr } from './NostrProvider'
 import { useUserTrust } from './UserTrustProvider'
+import storage from '@/services/local-storage.service'
 
 type TNotificationContext = {
   hasNewNotification: boolean
@@ -178,7 +179,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [newNotificationIds])
 
   const getNotificationsSeenAt = () => {
-    return notificationsSeenAt
+    if (notificationsSeenAt >= 0) {
+      return notificationsSeenAt
+    }
+    if (pubkey) {
+      return storage.getLastReadNotificationTime(pubkey)
+    }
+    return 0
   }
 
   const clearNewNotifications = async () => {
