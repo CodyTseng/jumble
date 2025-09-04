@@ -15,7 +15,7 @@ export function ZapNotification({
   isNew?: boolean
 }) {
   const { t } = useTranslation()
-  const { senderPubkey, eventId, amount } = useMemo(
+  const { senderPubkey, eventId, amount, comment } = useMemo(
     () => getZapInfoFromEvent(notification) ?? ({} as any),
     [notification]
   )
@@ -31,7 +31,7 @@ export function ZapNotification({
       targetEvent={event}
       middle={
         <div className="font-semibold text-yellow-400 shrink-0">
-          {formatAmount(amount)} {t('sats')}
+          {formatAmount(amount)} {t('sats')} {comment}
         </div>
       }
       description={t('zapped you')}

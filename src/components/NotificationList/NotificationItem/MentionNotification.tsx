@@ -3,7 +3,7 @@ import { getEmbeddedPubkeys, getParentBech32Id } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { AtSign, MessageCircle } from 'lucide-react'
+import { AtSign, MessageCircle, Quote } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -31,8 +31,10 @@ export function MentionNotification({
       icon={
         isMention ? (
           <AtSign size={24} className="text-pink-400" />
-        ) : (
+        ) : parentEventId ? (
           <MessageCircle size={24} className="text-blue-400" />
+        ) : (
+          <Quote size={24} className="text-green-400" />
         )
       }
       sender={notification.pubkey}
@@ -50,9 +52,15 @@ export function MentionNotification({
           />
         )
       }
-      description={isMention ? t('mentioned you in a note') : t('replied to your note')}
+      description={
+        isMention
+          ? t('mentioned you in a note')
+          : parentEventId
+            ? t('replied to your note')
+            : t('quoted your note')
+      }
       isNew={isNew}
-      showStats={!!parentEventId}
+      showStats={!isMention}
     />
   )
 }

@@ -35,7 +35,7 @@ export default function Notification({
   return (
     <div
       className={cn(
-        'clickable flex items-start gap-4 cursor-pointer py-2 px-4 border-b',
+        'clickable flex items-start gap-2 cursor-pointer py-2 px-4 border-b',
         isNew && 'bg-muted/20'
       )}
       onClick={() => {
@@ -46,13 +46,17 @@ export default function Notification({
         }
       }}
     >
-      <div className="flex gap-4 items-center mt-1.5">
+      <div className="flex gap-2 items-center mt-1.5">
         {icon}
         <UserAvatar userId={sender} size="medium" />
       </div>
-      <div className="flex-1 w-0 flex flex-col gap-1">
+      <div className="flex-1 w-0">
         <div className="flex gap-1 items-center">
-          <Username userId={sender} className="font-semibold" skeletonClassName="h-4" />
+          <Username
+            userId={sender}
+            className="flex-1 max-w-fit truncate font-semibold"
+            skeletonClassName="h-4"
+          />
           <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
         </div>
         {middle}
@@ -60,7 +64,7 @@ export default function Notification({
           <ContentPreview className="line-clamp-2 text-muted-foreground" event={targetEvent} />
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-muted-foreground text-sm" />
-        {showStats && targetEvent && <NoteStats event={targetEvent} />}
+        {showStats && targetEvent && <NoteStats event={targetEvent} className="mt-1" />}
       </div>
     </div>
   )
