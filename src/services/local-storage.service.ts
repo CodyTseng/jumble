@@ -278,7 +278,7 @@ class LocalStorageService {
   }
 
   getLastReadNotificationTime(pubkey: string) {
-    return this.lastReadNotificationTimeMap[pubkey] ?? 0
+    return this.lastReadNotificationTimeMap[pubkey] ?? -1
   }
 
   setLastReadNotificationTime(pubkey: string, time: number) {

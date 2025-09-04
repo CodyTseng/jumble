@@ -90,7 +90,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
               // Only reconnect if still mounted and not a manual close
               if (isMountedRef.current && subCloserRef.current) {
                 setTimeout(() => {
-                  if (isMountedRef.current) {
+                  if (isMountedRef.current && subCloserRef.current) {
                     subscribe()
                   }
                 }, 5_000)

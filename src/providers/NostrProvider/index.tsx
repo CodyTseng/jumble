@@ -176,6 +176,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
 
       const storedNotificationsSeenAt = storage.getLastReadNotificationTime(account.pubkey)
+      if (storedNotificationsSeenAt > 0) {
+        setNotificationsSeenAt(storedNotificationsSeenAt)
+      }
 
       const [
         storedRelayListEvent,
