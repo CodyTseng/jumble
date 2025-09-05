@@ -28,6 +28,7 @@ export function RepostNotification({
 
   return (
     <Notification
+      notificationId={notification.id}
       icon={<Repeat size={24} className="text-green-400" />}
       sender={notification.pubkey}
       sentAt={notification.created_at}

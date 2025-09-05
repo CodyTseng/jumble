@@ -8,10 +8,14 @@ import { toNote, toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { useNotification } from '@/providers/NotificationProvider'
 import { NostrEvent } from 'nostr-tools'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function Notification({
   icon,
+  notificationId,
   sender,
   sentAt,
   description,
@@ -21,6 +25,7 @@ export default function Notification({
   showStats = false
 }: {
   icon: React.ReactNode
+  notificationId: string
   sender: string
   sentAt: number
   description: string
@@ -29,13 +34,20 @@ export default function Notification({
   isNew?: boolean
   showStats?: boolean
 }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
+  const { isNotificationRead, markNotificationAsRead } = useNotification()
+  const unread = useMemo(
+    () => isNew && !isNotificationRead(notificationId),
+    [isNew, isNotificationRead, notificationId]
+  )
 
   return (
     <div
       className="clickable flex items-start gap-2 cursor-pointer py-2 px-4 border-b"
       onClick={() => {
+        markNotificationAsRead(notificationId)
         if (targetEvent) {
           push(toNote(targetEvent.id))
         } else if (pubkey) {
@@ -57,12 +69,21 @@ export default function Notification({
             />
             <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
           </div>
-          {isNew && <div className="m-0.5 size-3 bg-primary rounded-full shrink-0" />}
+          {unread && (
+            <button
+              className="m-0.5 size-3 bg-primary rounded-full shrink-0 transition-all hover:ring-4 hover:ring-primary/20"
+              title={t('Mark as read')}
+              onClick={(e) => {
+                e.stopPropagation()
+                markNotificationAsRead(notificationId)
+              }}
+            />
+          )}
         </div>
         {middle}
         {targetEvent && (
           <ContentPreview
-            className={cn('line-clamp-2', !isNew && 'text-muted-foreground')}
+            className={cn('line-clamp-2', !unread && 'text-muted-foreground')}
             event={targetEvent}
           />
         )}

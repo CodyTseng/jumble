@@ -28,6 +28,7 @@ export function MentionNotification({
 
   return (
     <Notification
+      notificationId={notification.id}
       icon={
         isMention ? (
           <AtSign size={24} className="text-pink-400" />

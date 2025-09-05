@@ -14,6 +14,8 @@ import { useUserTrust } from './UserTrustProvider'
 type TNotificationContext = {
   hasNewNotification: boolean
   getNotificationsSeenAt: () => number
+  isNotificationRead: (id: string) => boolean
+  markNotificationAsRead: (id: string) => void
 }
 
 const NotificationContext = createContext<TNotificationContext | undefined>(undefined)
@@ -34,6 +36,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
+  const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
   const filteredNewNotifications = useMemo(() => {
     if (active || notificationsSeenAt < 0) {
       return []
@@ -72,6 +75,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     if (!pubkey) return
 
     setNewNotifications([])
+    setReadNotificationIdSet(new Set())
 
     // Track if component is mounted
     const isMountedRef = { current: true }
@@ -229,11 +233,21 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     return 0
   }
 
+  const isNotificationRead = (notificationId: string): boolean => {
+    return readNotificationIdSet.has(notificationId)
+  }
+
+  const markNotificationAsRead = (notificationId: string): void => {
+    setReadNotificationIdSet((prev) => new Set([...prev, notificationId]))
+  }
+
   return (
     <NotificationContext.Provider
       value={{
         hasNewNotification: filteredNewNotifications.length > 0,
-        getNotificationsSeenAt
+        getNotificationsSeenAt,
+        isNotificationRead,
+        markNotificationAsRead
       }}
     >
       {children}

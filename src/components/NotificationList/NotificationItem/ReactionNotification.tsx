@@ -55,6 +55,7 @@ export function ReactionNotification({
 
   return (
     <Notification
+      notificationId={notification.id}
       icon={<div className="text-xl min-w-6 text-center">{reaction}</div>}
       sender={notification.pubkey}
       sentAt={notification.created_at}

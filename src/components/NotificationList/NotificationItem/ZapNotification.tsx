@@ -25,6 +25,7 @@ export function ZapNotification({
 
   return (
     <Notification
+      notificationId={notification.id}
       icon={<Zap size={24} className="text-yellow-400 shrink-0" />}
       sender={senderPubkey}
       sentAt={notification.created_at}
