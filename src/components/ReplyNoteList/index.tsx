@@ -125,9 +125,9 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       }
     }
 
-    client.addEventListener('eventPublished', handleEventPublished)
+    client.addEventListener('newEvent', handleEventPublished)
     return () => {
-      client.removeEventListener('eventPublished', handleEventPublished)
+      client.removeEventListener('newEvent', handleEventPublished)
     }
   }, [rootInfo, onNewReply])
 

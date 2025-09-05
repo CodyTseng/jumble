@@ -164,7 +164,7 @@ class ClientService extends EventTarget {
             })
         })
       )
-      this.dispatchEvent(new CustomEvent('eventPublished', { detail: event }))
+      this.emitNewEvent(event)
       return result
     } catch (error) {
       if (error instanceof AggregateError) {
@@ -172,6 +172,10 @@ class ClientService extends EventTarget {
       }
       throw error
     }
+  }
+
+  emitNewEvent(event: NEvent) {
+    this.dispatchEvent(new CustomEvent('newEvent', { detail: event }))
   }
 
   async signHttpAuth(url: string, method: string, description = '') {

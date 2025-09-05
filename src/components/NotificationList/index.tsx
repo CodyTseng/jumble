@@ -1,4 +1,5 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { compareEvents } from '@/lib/event'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
@@ -7,8 +8,16 @@ import client from '@/services/client.service'
 import noteStatsService from '@/services/note-stats.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
-import { Event, kinds } from 'nostr-tools'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { NostrEvent, kinds } from 'nostr-tools'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import Tabs from '../Tabs'
@@ -20,17 +29,18 @@ const SHOW_COUNT = 30
 
 const NotificationList = forwardRef((_, ref) => {
   const { t } = useTranslation()
-  const { current } = usePrimaryPage()
+  const { current, display } = usePrimaryPage()
+  const active = useMemo(() => current === 'notifications' && display, [current, display])
   const { pubkey } = useNostr()
   const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
-  const { clearNewNotifications, getNotificationsSeenAt } = useNotification()
+  const { getNotificationsSeenAt } = useNotification()
   const [notificationType, setNotificationType] = useState<TNotificationType>('all')
   const [lastReadTime, setLastReadTime] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(true)
-  const [notifications, setNotifications] = useState<Event[]>([])
-  const [visibleNotifications, setVisibleNotifications] = useState<Event[]>([])
+  const [notifications, setNotifications] = useState<NostrEvent[]>([])
+  const [visibleNotifications, setVisibleNotifications] = useState<NostrEvent[]>([])
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [until, setUntil] = useState<number | undefined>(dayjs().unix())
   const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -71,6 +81,25 @@ const NotificationList = forwardRef((_, ref) => {
     [loading]
   )
 
+  const handleNewEvent = useCallback(
+    (event: NostrEvent) => {
+      if (event.pubkey === pubkey) return
+      setNotifications((oldEvents) => {
+        const index = oldEvents.findIndex((oldEvent) => compareEvents(oldEvent, event) <= 0)
+        if (index !== -1 && oldEvents[index].id === event.id) {
+          return oldEvents
+        }
+
+        noteStatsService.updateNoteStatsByEvents([event])
+        if (index === -1) {
+          return [...oldEvents, event]
+        }
+        return [...oldEvents.slice(0, index), event, ...oldEvents.slice(index)]
+      })
+    },
+    [pubkey]
+  )
+
   useEffect(() => {
     if (current !== 'notifications') return
 
@@ -84,7 +113,6 @@ const NotificationList = forwardRef((_, ref) => {
       setNotifications([])
       setShowCount(SHOW_COUNT)
       setLastReadTime(getNotificationsSeenAt())
-      clearNewNotifications()
       const relayList = await client.fetchRelayList(pubkey)
 
       const { closer, timelineKey } = await client.subscribeTimeline(
@@ -110,17 +138,7 @@ const NotificationList = forwardRef((_, ref) => {
             }
           },
           onNew: (event) => {
-            if (event.pubkey === pubkey) return
-            setNotifications((oldEvents) => {
-              const index = oldEvents.findIndex(
-                (oldEvent) => oldEvent.created_at < event.created_at
-              )
-              if (index === -1) {
-                return [...oldEvents, event]
-              }
-              return [...oldEvents.slice(0, index), event, ...oldEvents.slice(index)]
-            })
-            noteStatsService.updateNoteStatsByEvents([event])
+            handleNewEvent(event)
           }
         }
       )
@@ -133,6 +151,21 @@ const NotificationList = forwardRef((_, ref) => {
       promise.then((closer) => closer?.())
     }
   }, [pubkey, refreshCount, filterKinds, current])
+
+  useEffect(() => {
+    if (!active) return
+
+    const handler = (data: Event) => {
+      const customEvent = data as CustomEvent<NostrEvent>
+      const evt = customEvent.detail
+      handleNewEvent(evt)
+    }
+
+    client.addEventListener('newEvent', handler)
+    return () => {
+      client.removeEventListener('newEvent', handler)
+    }
+  }, [active, handleNewEvent])
 
   useEffect(() => {
     let visibleNotifications = notifications.slice(0, showCount)

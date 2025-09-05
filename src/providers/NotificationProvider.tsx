@@ -1,5 +1,6 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { compareEvents, isMentioningMutedUsers } from '@/lib/event'
+import { usePrimaryPage } from '@/PageManager'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import { kinds, NostrEvent } from 'nostr-tools'
@@ -13,7 +14,6 @@ import { useUserTrust } from './UserTrustProvider'
 type TNotificationContext = {
   hasNewNotification: boolean
   getNotificationsSeenAt: () => number
-  clearNewNotifications: () => Promise<void>
 }
 
 const NotificationContext = createContext<TNotificationContext | undefined>(undefined)
@@ -27,13 +27,15 @@ export const useNotification = () => {
 }
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
+  const { current, display } = usePrimaryPage()
+  const active = useMemo(() => current === 'notifications' && display, [current, display])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
   const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
   const filteredNewNotifications = useMemo(() => {
-    if (notificationsSeenAt < 0) {
+    if (active || notificationsSeenAt < 0) {
       return []
     }
     const filtered: NostrEvent[] = []
@@ -57,8 +59,14 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     mutePubkeySet,
     hideContentMentioningMutedUsers,
     hideUntrustedNotifications,
-    isUserTrusted
+    isUserTrusted,
+    active
   ])
+
+  useEffect(() => {
+    setNewNotifications([])
+    updateNotificationsSeenAt()
+  }, [active])
 
   useEffect(() => {
     if (!pubkey) return
@@ -117,6 +125,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                   if (prev.length && compareEvents(prev[0], evt) >= 0) {
                     return prev
                   }
+
+                  client.emitNewEvent(evt)
                   return [evt, ...prev]
                 })
               }
@@ -219,18 +229,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     return 0
   }
 
-  const clearNewNotifications = async () => {
-    if (!pubkey) return
-
-    setNewNotifications([])
-    await updateNotificationsSeenAt()
-  }
-
   return (
     <NotificationContext.Provider
       value={{
         hasNewNotification: filteredNewNotifications.length > 0,
-        clearNewNotifications,
         getNotificationsSeenAt
       }}
     >
