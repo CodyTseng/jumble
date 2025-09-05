@@ -387,6 +387,7 @@ export default {
     'reacted to your note': 'reaccionó a tu nota',
     'reposted your note': 'reposteó tu nota',
     'zapped your note': 'zappeó tu nota',
-    'zapped you': 'te zappeó'
+    'zapped you': 'te zappeó',
+    'Mark as read': 'Marcar como leído'
   }
 }

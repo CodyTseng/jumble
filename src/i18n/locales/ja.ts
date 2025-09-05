@@ -384,6 +384,7 @@ export default {
     'reacted to your note': 'あなたのノートにリアクションしました',
     'reposted your note': 'あなたのノートをリポストしました',
     'zapped your note': 'あなたのノートにザップしました',
-    'zapped you': 'あなたにザップしました'
+    'zapped you': 'あなたにザップしました',
+    'Mark as read': '既読にする'
   }
 }

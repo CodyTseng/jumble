@@ -388,6 +388,7 @@ export default {
     'reacted to your note': 'zareagował na twoją notatkę',
     'reposted your note': 'przepostował twoją notatkę',
     'zapped your note': 'zappował twoją notatkę',
-    'zapped you': 'zappował cię'
+    'zapped you': 'zappował cię',
+    'Mark as read': 'Oznacz jako przeczytane'
   }
 }

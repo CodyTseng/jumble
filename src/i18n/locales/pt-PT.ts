@@ -387,6 +387,7 @@ export default {
     'reacted to your note': 'reagiu à sua nota',
     'reposted your note': 'republicou a sua nota',
     'zapped your note': 'zappeou a sua nota',
-    'zapped you': 'zappeou-o'
+    'zapped you': 'zappeou-o',
+    'Mark as read': 'Marcar como lida'
   }
 }

@@ -382,6 +382,7 @@ export default {
     'reacted to your note': 'تفاعل مع ملاحظتك',
     'reposted your note': 'أعاد نشر ملاحظتك',
     'zapped your note': 'زاب ملاحظتك',
-    'zapped you': 'زابك'
+    'zapped you': 'زابك',
+    'Mark as read': 'تعليم كمقروء'
   }
 }

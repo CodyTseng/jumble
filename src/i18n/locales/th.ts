@@ -379,6 +379,7 @@ export default {
     'reacted to your note': 'ได้แสดงปฏิกิริยาต่อโน้ตของคุณ',
     'reposted your note': 'ได้รีโพสต์โน้ตของคุณ',
     'zapped your note': 'ได้แซปโน้ตของคุณ',
-    'zapped you': 'ได้แซปคุณ'
+    'zapped you': 'ได้แซปคุณ',
+    'Mark as read': 'ทำเครื่องหมายว่าอ่านแล้ว'
   }
 }
