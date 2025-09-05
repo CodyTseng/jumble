@@ -65,7 +65,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     setNewNotifications([])
-    updateNotificationsSeenAt()
+    updateNotificationsSeenAt(!active)
   }, [active])
 
   useEffect(() => {

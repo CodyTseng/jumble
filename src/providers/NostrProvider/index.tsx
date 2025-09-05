@@ -80,7 +80,7 @@ type TNostrContext = {
   updateMuteListEvent: (muteListEvent: Event, privateTags: string[][]) => Promise<void>
   updateBookmarkListEvent: (bookmarkListEvent: Event) => Promise<void>
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
-  updateNotificationsSeenAt: () => Promise<void>
+  updateNotificationsSeenAt: (skipPublish?: boolean) => Promise<void>
 }
 
 const NostrContext = createContext<TNostrContext | undefined>(undefined)
@@ -711,7 +711,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setFavoriteRelaysEvent(newFavoriteRelaysEvent)
   }
 
-  const updateNotificationsSeenAt = async () => {
+  const updateNotificationsSeenAt = async (skipPublish = false) => {
     if (!account) return
 
     const now = dayjs().unix()
@@ -724,8 +724,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const lastPublishedSeenNotificationsAtEventAt =
       lastPublishedSeenNotificationsAtEventAtMap.get(account.pubkey) ?? -1
     if (
-      lastPublishedSeenNotificationsAtEventAt < 0 ||
-      now - lastPublishedSeenNotificationsAtEventAt > 10 * 60 // 10 minutes
+      !skipPublish &&
+      (lastPublishedSeenNotificationsAtEventAt < 0 ||
+        now - lastPublishedSeenNotificationsAtEventAt > 10 * 60) // 10 minutes
     ) {
       await publish(createSeenNotificationsAtDraftEvent())
       lastPublishedSeenNotificationsAtEventAtMap.set(account.pubkey, now)
