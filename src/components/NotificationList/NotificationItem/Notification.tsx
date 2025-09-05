@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { toNote, toProfile } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { NostrEvent } from 'nostr-tools'
@@ -56,11 +57,14 @@ export default function Notification({
             />
             <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
           </div>
-          {isNew && <div className="size-2 bg-primary rounded-full shrink-0" />}
+          {isNew && <div className="m-0.5 size-3 bg-primary rounded-full shrink-0" />}
         </div>
         {middle}
         {targetEvent && (
-          <ContentPreview className="line-clamp-2 text-muted-foreground" event={targetEvent} />
+          <ContentPreview
+            className={cn('line-clamp-2', !isNew && 'text-muted-foreground')}
+            event={targetEvent}
+          />
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-muted-foreground text-sm" />
         {showStats && targetEvent && <NoteStats event={targetEvent} className="mt-1" />}
