@@ -29,8 +29,8 @@ export const useNotification = () => {
 }
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const { current, display } = usePrimaryPage()
-  const active = useMemo(() => current === 'notifications' && display, [current, display])
+  const { current } = usePrimaryPage()
+  const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
   const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
@@ -100,12 +100,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             {
               kinds: [
                 kinds.ShortTextNote,
-                kinds.Reaction,
                 kinds.Repost,
+                kinds.Reaction,
                 kinds.Zap,
                 ExtendedKind.COMMENT,
                 ExtendedKind.POLL_RESPONSE,
-                ExtendedKind.VOICE_COMMENT
+                ExtendedKind.VOICE_COMMENT,
+                ExtendedKind.POLL
               ],
               '#p': [pubkey],
               limit: 20
@@ -116,7 +117,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
               if (e) {
                 eosed = e
                 setNewNotifications((prev) => {
-                  return [...prev.sort(compareEvents)]
+                  return [...prev.sort((a, b) => compareEvents(b, a))]
                 })
               }
             },

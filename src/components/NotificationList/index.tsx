@@ -8,7 +8,7 @@ import client from '@/services/client.service'
 import noteStatsService from '@/services/note-stats.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
-import { NostrEvent, kinds } from 'nostr-tools'
+import { NostrEvent, kinds, matchFilter } from 'nostr-tools'
 import {
   forwardRef,
   useCallback,
@@ -153,19 +153,29 @@ const NotificationList = forwardRef((_, ref) => {
   }, [pubkey, refreshCount, filterKinds, current])
 
   useEffect(() => {
-    if (!active) return
+    if (!active || !pubkey) return
 
     const handler = (data: Event) => {
       const customEvent = data as CustomEvent<NostrEvent>
       const evt = customEvent.detail
-      handleNewEvent(evt)
+      if (
+        matchFilter(
+          {
+            kinds: filterKinds,
+            '#p': [pubkey]
+          },
+          evt
+        )
+      ) {
+        handleNewEvent(evt)
+      }
     }
 
     client.addEventListener('newEvent', handler)
     return () => {
       client.removeEventListener('newEvent', handler)
     }
-  }, [active, handleNewEvent])
+  }, [pubkey, active, filterKinds, handleNewEvent])
 
   useEffect(() => {
     let visibleNotifications = notifications.slice(0, showCount)
