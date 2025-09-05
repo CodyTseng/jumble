@@ -98,7 +98,7 @@ export function NotificationSkeleton() {
   return (
     <div className="flex items-start gap-2 cursor-pointer py-2 px-4">
       <div className="flex gap-2 items-center mt-1.5">
-        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="w-6 h-6" />
         <Skeleton className="w-9 h-9 rounded-full" />
       </div>
       <div className="flex-1 w-0">
