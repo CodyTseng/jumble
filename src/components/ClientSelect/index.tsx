@@ -65,6 +65,10 @@ const clients: Record<string, { name: string; getUrl: (id: string) => string }> 
     name: 'Pareto',
     getUrl: (id: string) => `https://pareto.space/a/${id}`
   },
+  shosho: {
+    name: 'Shosho',
+    getUrl: (id: string) => `https://shosho.live/live/${id}`
+  },
   njump: {
     name: 'Njump',
     getUrl: (id: string) => `https://njump.me/${id}`
@@ -107,7 +111,7 @@ export default function ClientSelect({
       case kinds.DraftLong:
         return ['yakihonne', 'coracle', 'habla', 'lumilumi', 'pareto', 'njump']
       case kinds.LiveEvent:
-        return ['zapStream', 'nostrudel', 'njump']
+        return ['zapStream', 'nostrudel', 'njump', 'shosho']
       case kinds.Date:
       case kinds.Time:
         return ['coracle', 'njump']
