@@ -111,7 +111,7 @@ export default function ClientSelect({
       case kinds.DraftLong:
         return ['yakihonne', 'coracle', 'habla', 'lumilumi', 'pareto', 'njump']
       case kinds.LiveEvent:
-        return ['zapStream', 'nostrudel', 'njump', 'shosho']
+        return ['zapStream', 'shosho', 'nostrudel', 'njump']
       case kinds.Date:
       case kinds.Time:
         return ['coracle', 'njump']
