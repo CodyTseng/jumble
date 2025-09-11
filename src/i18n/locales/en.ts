@@ -370,7 +370,7 @@ export default {
     'Try deleting this note': 'Try deleting this note',
     'Deletion request sent to {{count}} relays': 'Deletion request sent to {{count}} relays',
     'Suitable Relays': 'Suitable Relays',
-    'Type searching for people, keywords, or relays':
+    'People, keywords, or relays':
       'Type searching for people, keywords, or relays',
     'Hide content mentioning muted users': 'Hide content mentioning muted users',
     'This note mentions a user you muted': 'This note mentions a user you muted',
