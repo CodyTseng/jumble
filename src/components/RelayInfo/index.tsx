@@ -8,7 +8,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import PostEditor from '../PostEditor'
-import RelayBadges from '../RelayBadges'
 import RelayIcon from '../RelayIcon'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import UserAvatar from '../UserAvatar'
@@ -35,7 +34,6 @@ export default function RelayInfo({ url, className }: { url: string; className?:
           </div>
           <RelayControls url={relayInfo.url} />
         </div>
-        <RelayBadges relayInfo={relayInfo} />
         {!!relayInfo.tags?.length && (
           <div className="flex gap-2">
             {relayInfo.tags.map((tag) => (
@@ -61,18 +59,6 @@ export default function RelayInfo({ url, className }: { url: string; className?:
         </a>
       </div>
 
-      {relayInfo.payments_url && (
-        <div className="space-y-2">
-          <div className="text-sm font-semibold text-muted-foreground">{t('Payment page')}:</div>
-          <a
-            href={normalizeHttpUrl(relayInfo.payments_url)}
-            target="_blank"
-            className="hover:underline text-primary select-text"
-          >
-            {relayInfo.payments_url}
-          </a>
-        </div>
-      )}
       <div className="flex flex-wrap gap-4">
         {relayInfo.pubkey && (
           <div className="space-y-2 flex-1">

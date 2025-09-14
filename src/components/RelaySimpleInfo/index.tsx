@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils'
 import { TRelayInfo } from '@/types'
 import { HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
-import RelayBadges from '../RelayBadges'
 import RelayIcon from '../RelayIcon'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import { SimpleUserAvatar } from '../UserAvatar'
@@ -11,13 +10,11 @@ import { SimpleUserAvatar } from '../UserAvatar'
 export default function RelaySimpleInfo({
   relayInfo,
   users,
-  hideBadge = false,
   className,
   ...props
 }: HTMLProps<HTMLDivElement> & {
   relayInfo?: TRelayInfo
   users?: string[]
-  hideBadge?: boolean
 }) {
   const { t } = useTranslation()
 
@@ -35,7 +32,6 @@ export default function RelaySimpleInfo({
         </div>
         {relayInfo && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
       </div>
-      {!hideBadge && relayInfo && <RelayBadges relayInfo={relayInfo} />}
       {!!relayInfo?.description && <div className="line-clamp-3">{relayInfo.description}</div>}
       {!!users?.length && (
         <div className="flex items-center gap-2">
