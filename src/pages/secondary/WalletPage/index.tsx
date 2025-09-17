@@ -2,13 +2,9 @@ import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toRizful } from '@/lib/link'
-import {
-  disconnect,
-  launchModal,
-  onConnected,
-  onDisconnected
-} from '@getalby/bitcoin-connect-react'
-import { forwardRef, useEffect, useState } from 'react'
+import { useZap } from '@/providers/ZapProvider'
+import { disconnect, launchModal } from '@getalby/bitcoin-connect-react'
+import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultZapAmountInput from './DefaultZapAmountInput'
 import DefaultZapCommentInput from './DefaultZapCommentInput'
@@ -18,26 +14,12 @@ import QuickZapSwitch from './QuickZapSwitch'
 const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const [connected, setConnected] = useState(false)
-
-  useEffect(() => {
-    const unSubOnConnected = onConnected(() => {
-      setConnected(true)
-    })
-    const unSubOnDisconnected = onDisconnected(() => {
-      setConnected(false)
-    })
-
-    return () => {
-      unSubOnConnected()
-      unSubOnDisconnected()
-    }
-  }, [])
+  const { isWalletConnected } = useZap()
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')}>
       <div className="px-4 pt-3 space-y-4">
-        {connected ? (
+        {isWalletConnected ? (
           // TODO: alert dialog to confirm disconnecting wallet
           <Button variant="destructive" onClick={() => disconnect()}>
             {t('Disconnect Wallet')}
