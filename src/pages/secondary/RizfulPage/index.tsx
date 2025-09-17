@@ -1,10 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { createProfileDraftEvent } from '@/lib/draft-event'
+import { isEmail } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { connectNWC } from '@getalby/bitcoin-connect'
-import { ExternalLink, Loader2 } from 'lucide-react'
-import { forwardRef, useState } from 'react'
+import { useZap } from '@/providers/ZapProvider'
+import { connectNWC, WebLNProviders } from '@getalby/bitcoin-connect'
+import { Check, CheckCircle2, Copy, ExternalLink, Loader2 } from 'lucide-react'
+import { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -15,9 +18,59 @@ const RIZFUL_TOKEN_EXCHANGE_URL = `${RIZFUL_URL}/nostr_onboarding_auth_token/pos
 
 const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { pubkey } = useNostr()
+  const { pubkey, profile, profileEvent, publish, updateProfileEvent } = useNostr()
+  const { provider } = useZap()
   const [token, setToken] = useState('')
   const [connecting, setConnecting] = useState(false)
+  const [connected, setConnected] = useState(false)
+  const [copiedLightningAddress, setCopiedLightningAddress] = useState(false)
+  const [lightningAddress, setLightningAddress] = useState('')
+
+  useEffect(() => {
+    if (provider instanceof WebLNProviders.NostrWebLNProvider) {
+      const lud16 = provider.client.lud16
+      const domain = lud16?.split('@')[1]
+      if (domain !== 'rizful.com') return
+
+      if (lud16) {
+        setConnected(true)
+        setLightningAddress(lud16)
+      }
+    }
+  }, [provider])
+
+  const updateLightningAddress = async (address: string) => {
+    try {
+      if (address === profile?.lightningAddress) {
+        return
+      }
+
+      let lud16 = profile?.lud16
+      let lud06 = profile?.lud06
+      if (isEmail(address)) {
+        lud16 = address
+      } else if (address.startsWith('lnurl')) {
+        lud06 = address
+      } else {
+        throw new Error(t('Invalid Lightning Address'))
+      }
+
+      const oldProfileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
+      const newProfileContent = {
+        ...oldProfileContent,
+        lud06,
+        lud16
+      }
+      const profileDraftEvent = createProfileDraftEvent(
+        JSON.stringify(newProfileContent),
+        profileEvent?.tags
+      )
+      const newProfileEvent = await publish(profileDraftEvent)
+      await updateProfileEvent(newProfileEvent)
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : String(e))
+    }
+  }
 
   const connectRizful = async () => {
     setConnecting(true)
@@ -45,11 +98,48 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
       if (j.nwc_uri) {
         connectNWC(j.nwc_uri)
       }
+      if (j.lightning_address) {
+        updateLightningAddress(j.lightning_address)
+      }
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : String(e))
     } finally {
       setConnecting(false)
     }
+  }
+
+  if (connected) {
+    return (
+      <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Wallet')}>
+        <div className="px-4 pt-3 space-y-6 flex flex-col items-center">
+          <CheckCircle2 className="size-40 fill-green-400 text-background" />
+          <div className="font-semibold text-2xl">{t('Rizful Wallet connected!')}</div>
+          <div className="text-center text-sm text-muted-foreground">
+            {t('You can now use your Rizful Wallet to zap your favorite notes and creators.')}
+          </div>
+          {lightningAddress && (
+            <div className="flex flex-col items-center gap-2">
+              <div>{t('Your Lightning Address')}:</div>
+              <div
+                className="font-semibold text-lg rounded-lg px-4 py-1 flex justify-center items-center gap-2 cursor-pointer hover:bg-accent/80"
+                onClick={() => {
+                  navigator.clipboard.writeText(lightningAddress)
+                  setCopiedLightningAddress(true)
+                  setTimeout(() => setCopiedLightningAddress(false), 2000)
+                }}
+              >
+                {lightningAddress}{' '}
+                {copiedLightningAddress ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Copy className="size-4" />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </SecondaryPageLayout>
+    )
   }
 
   return (
@@ -71,7 +161,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="space-y-2">
           <div className="font-semibold">{t('Get your one-time code')}</div>
           <Button
-            className="bg-sky-500 hover:bg-sky-500/90 w-64"
+            className="bg-orange-500 hover:bg-orange-500/90 w-64"
             onClick={() => openPopup(RIZFUL_GET_TOKEN_URL, 'rizful_codes')}
           >
             {t('Get code')}
@@ -89,7 +179,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
             }}
           />
           <Button
-            className="bg-orange-500 hover:bg-orange-500/90 w-64"
+            className="bg-sky-500 hover:bg-sky-500/90 w-64"
             disabled={!token || connecting}
             onClick={() => connectRizful()}
           >

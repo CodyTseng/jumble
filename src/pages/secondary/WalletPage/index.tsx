@@ -14,16 +14,23 @@ import QuickZapSwitch from './QuickZapSwitch'
 const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { isWalletConnected } = useZap()
+  const { isWalletConnected, walletInfo } = useZap()
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')}>
       <div className="px-4 pt-3 space-y-4">
         {isWalletConnected ? (
           // TODO: alert dialog to confirm disconnecting wallet
-          <Button variant="destructive" onClick={() => disconnect()}>
-            {t('Disconnect Wallet')}
-          </Button>
+          <div>
+            {walletInfo?.node.alias && (
+              <div className="mb-2">
+                {t('Connected to')} <strong>{walletInfo.node.alias}</strong>
+              </div>
+            )}
+            <Button variant="destructive" onClick={() => disconnect()}>
+              {t('Disconnect Wallet')}
+            </Button>
+          </div>
         ) : (
           <div className="flex items-center gap-2">
             <Button
@@ -43,10 +50,10 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             </Button>
           </div>
         )}
-        <LightningAddressInput />
         <DefaultZapAmountInput />
         <DefaultZapCommentInput />
         <QuickZapSwitch />
+        <LightningAddressInput />
       </div>
     </SecondaryPageLayout>
   )
