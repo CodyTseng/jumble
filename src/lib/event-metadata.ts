@@ -369,3 +369,14 @@ export function getEmojisFromEvent(event: Event): TEmoji[] {
 
   return emojis
 }
+
+export function getStarsFromRelayReviewEvent(event: Event): number {
+  const ratingTag = event.tags.find((t) => t[0] === 'rating')
+  if (ratingTag) {
+    const stars = parseFloat(ratingTag[1]) * 5
+    if (stars > 0 && stars <= 5) {
+      return stars
+    }
+  }
+  return 0
+}

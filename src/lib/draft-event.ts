@@ -459,6 +459,22 @@ export function createReportDraftEvent(event: Event, reason: string): TDraftEven
   }
 }
 
+export function createRelayReviewDraftEvent(
+  relay: string,
+  review: string,
+  stars: number
+): TDraftEvent {
+  return {
+    kind: ExtendedKind.RELAY_REVIEW,
+    content: review,
+    tags: [
+      ['d', relay],
+      ['rating', (stars / 5).toString()]
+    ],
+    created_at: dayjs().unix()
+  }
+}
+
 function generateImetaTags(imageUrls: string[]) {
   return imageUrls
     .map((imageUrl) => {
