@@ -39,30 +39,27 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
   }, [provider])
 
-  const updateLightningAddress = async (address: string) => {
+  const updateUserProfile = async (address: string) => {
     try {
       if (address === profile?.lightningAddress) {
         return
       }
 
-      let lud16 = profile?.lud16
-      let lud06 = profile?.lud06
+      const profileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
       if (isEmail(address)) {
-        lud16 = address
+        profileContent.lud16 = address
       } else if (address.startsWith('lnurl')) {
-        lud06 = address
+        profileContent.lud06 = address
       } else {
         throw new Error(t('Invalid Lightning Address'))
       }
 
-      const oldProfileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
-      const newProfileContent = {
-        ...oldProfileContent,
-        lud06,
-        lud16
+      if (!profileContent.nip05) {
+        profileContent.nip05 = address
       }
+
       const profileDraftEvent = createProfileDraftEvent(
-        JSON.stringify(newProfileContent),
+        JSON.stringify(profileContent),
         profileEvent?.tags
       )
       const newProfileEvent = await publish(profileDraftEvent)
@@ -99,7 +96,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
         connectNWC(j.nwc_uri)
       }
       if (j.lightning_address) {
-        updateLightningAddress(j.lightning_address)
+        updateUserProfile(j.lightning_address)
       }
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : String(e))
@@ -110,12 +107,12 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   if (connected) {
     return (
-      <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Wallet')}>
+      <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Vault')}>
         <div className="px-4 pt-3 space-y-6 flex flex-col items-center">
           <CheckCircle2 className="size-40 fill-green-400 text-background" />
-          <div className="font-semibold text-2xl">{t('Rizful Wallet connected!')}</div>
+          <div className="font-semibold text-2xl">{t('Rizful Vault connected!')}</div>
           <div className="text-center text-sm text-muted-foreground">
-            {t('You can now use your Rizful Wallet to zap your favorite notes and creators.')}
+            {t('You can now use your Rizful Vault to zap your favorite notes and creators.')}
           </div>
           {lightningAddress && (
             <div className="flex flex-col items-center gap-2">
@@ -143,7 +140,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Wallet')}>
+    <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Vault')}>
       <div className="px-4 pt-3 space-y-6">
         <div className="space-y-2">
           <div className="font-semibold">{t('New to Rizful?')}</div>
