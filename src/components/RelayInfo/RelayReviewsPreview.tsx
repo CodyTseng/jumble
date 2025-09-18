@@ -11,7 +11,7 @@ import { ExtendedKind } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
 import { toRelayReviews } from '@/lib/link'
-import { isTouchDevice } from '@/lib/utils'
+import { cn, isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { Filter, NostrEvent } from 'nostr-tools'
@@ -97,8 +97,15 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
             <Stars stars={stars} />
           </div>
           <div
-            className="text-sm text-muted-foreground underline cursor-pointer hover:text-foreground"
-            onClick={() => push(toRelayReviews(relayUrl))}
+            className={cn(
+              'text-sm text-muted-foreground',
+              count > 0 && 'underline cursor-pointer hover:text-foreground'
+            )}
+            onClick={() => {
+              if (count > 0) {
+                push(toRelayReviews(relayUrl))
+              }
+            }}
           >
             {t('{{count}} reviews', { count })}
           </div>
