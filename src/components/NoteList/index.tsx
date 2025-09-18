@@ -6,6 +6,7 @@ import {
   isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
+import { isTouchDevice } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -27,7 +28,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
-import { isTouchDevice } from '@/lib/utils'
 
 const LIMIT = 200
 const ALGO_LIMIT = 500

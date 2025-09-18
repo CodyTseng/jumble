@@ -6,10 +6,10 @@ import ClientTag from '../ClientTag'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
+import Stars from '../Stars'
 import TranslateButton from '../TranslateButton'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
-import Stars from './Stars'
 
 export default function RelayReviewCard({
   event,

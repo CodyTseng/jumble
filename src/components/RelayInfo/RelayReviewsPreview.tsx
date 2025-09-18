@@ -1,3 +1,4 @@
+import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import {
   Carousel,
@@ -9,18 +10,20 @@ import {
 import { ExtendedKind } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
+import { toRelayReviews } from '@/lib/link'
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { Filter, NostrEvent } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import Stars from '../Stars'
 import RelayReviewCard from './RelayReviewCard'
 import ReviewEditor from './ReviewEditor'
-import Stars from './Stars'
 
 export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const [showEditor, setShowEditor] = useState(false)
   const [myReview, setMyReview] = useState<NostrEvent | null>(null)
@@ -93,7 +96,12 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
             <div className="text-lg font-semibold">{stars}</div>
             <Stars stars={stars} />
           </div>
-          <div className="text-sm text-muted-foreground">{t('{{count}} reviews', { count })}</div>
+          <div
+            className="text-sm text-muted-foreground underline cursor-pointer hover:text-foreground"
+            onClick={() => push(toRelayReviews(relayUrl))}
+          >
+            {t('{{count}} reviews', { count })}
+          </div>
         </div>
         {!showEditor && !myReview && (
           <Button variant="outline" onClick={() => setShowEditor(true)}>
@@ -105,7 +113,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       {showEditor && <ReviewEditor relayUrl={relayUrl} onReviewed={handleReviewed} />}
 
       {myReview || reviews.length > 0 ? (
-        <ReviewCarousel myReview={myReview} reviews={reviews} />
+        <ReviewCarousel relayUrl={relayUrl} myReview={myReview} reviews={reviews} />
       ) : !showEditor ? (
         <div className="flex items-center justify-center text-sm text-muted-foreground p-4">
           {t('No reviews yet. Be the first to write one!')}
@@ -116,13 +124,16 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
 }
 
 function ReviewCarousel({
+  relayUrl,
   myReview,
   reviews
 }: {
+  relayUrl: string
   myReview: NostrEvent | null
   reviews: NostrEvent[]
 }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const showPreviousAndNext = useMemo(() => !isTouchDevice(), [])
 
   return (
@@ -143,7 +154,10 @@ function ReviewCarousel({
         ))}
         {reviews.length > 10 && (
           <CarouselItem className="basis-11/12 sm:basis-2/3 md:basis-5/12 pl-0 pr-2">
-            <div className="border rounded-lg bg-muted/20 p-3 flex items-center justify-center h-full">
+            <div
+              className="border rounded-lg bg-muted/20 p-3 flex items-center justify-center h-full hover:bg-muted cursor-pointer"
+              onClick={() => push(toRelayReviews(relayUrl))}
+            >
               <div className="text-sm text-muted-foreground">{t('View more reviews')}</div>
             </div>
           </CarouselItem>

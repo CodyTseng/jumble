@@ -11,6 +11,7 @@ import ProfileEditorPage from './pages/secondary/ProfileEditorPage'
 import ProfileListPage from './pages/secondary/ProfileListPage'
 import ProfilePage from './pages/secondary/ProfilePage'
 import RelayPage from './pages/secondary/RelayPage'
+import RelayReviewsPage from './pages/secondary/RelayReviewsPage'
 import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
@@ -25,6 +26,7 @@ const ROUTES = [
   { path: '/users/:id/following', element: <FollowingListPage /> },
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
+  { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/settings/relays', element: <RelaySettingsPage /> },

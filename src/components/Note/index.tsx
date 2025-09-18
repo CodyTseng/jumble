@@ -30,6 +30,7 @@ import PictureNote from './PictureNote'
 import Poll from './Poll'
 import UnknownNote from './UnknownNote'
 import VideoNote from './VideoNote'
+import RelayReview from './RelayReview'
 
 export default function Note({
   event,
@@ -98,6 +99,8 @@ export default function Note({
     content = <PictureNote className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.VIDEO || event.kind === ExtendedKind.SHORT_VIDEO) {
     content = <VideoNote className="mt-2" event={event} />
+  } else if (event.kind === ExtendedKind.RELAY_REVIEW) {
+    content = <RelayReview className="mt-2" event={event} />
   } else {
     content = <Content className="mt-2" event={event} />
   }
