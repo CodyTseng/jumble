@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next'
 import Stars from '../Stars'
 import RelayReviewCard from './RelayReviewCard'
 import ReviewEditor from './ReviewEditor'
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 
 export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) {
   const { t } = useTranslation()
@@ -144,7 +145,12 @@ function ReviewCarousel({
   const showPreviousAndNext = useMemo(() => !isTouchDevice(), [])
 
   return (
-    <Carousel>
+    <Carousel
+      opts={{
+        skipSnaps: true
+      }}
+      plugins={[WheelGesturesPlugin()]}
+    >
       <CarouselContent className="ml-4 mr-2">
         {myReview && (
           <Item key={myReview.id}>
