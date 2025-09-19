@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { NostrEvent } from 'nostr-tools'
 import { useMemo } from 'react'
 import ClientTag from '../ClientTag'
-import Content from '../Content'
+import ContentPreview from '../ContentPreview'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import Stars from '../Stars'
@@ -21,7 +21,7 @@ export default function RelayReviewCard({
   const stars = useMemo(() => getStarsFromRelayReviewEvent(event), [event])
 
   return (
-    <div className={cn('border rounded-lg bg-muted/20 p-3', className)}>
+    <div className={cn('border rounded-lg bg-muted/20 p-3 h-full', className)}>
       <div className="flex justify-between items-start gap-2">
         <div className="flex items-center space-x-2 flex-1">
           <SimpleUserAvatar userId={event.pubkey} size="medium" />
@@ -45,7 +45,7 @@ export default function RelayReviewCard({
         </div>
       </div>
       <Stars stars={stars} className="mt-2 gap-0.5 [&_svg]:size-3" />
-      <Content className="mt-2" event={event} />
+      <ContentPreview className="mt-2 line-clamp-4" event={event} />
     </div>
   )
 }

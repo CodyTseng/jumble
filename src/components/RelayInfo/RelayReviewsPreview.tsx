@@ -147,31 +147,36 @@ function ReviewCarousel({
     <Carousel>
       <CarouselContent className="ml-4 mr-2">
         {myReview && (
-          <CarouselItem
-            key={myReview.id}
-            className="basis-11/12 sm:basis-2/3 md:basis-5/12 pl-0 pr-2"
-          >
+          <Item key={myReview.id}>
             <RelayReviewCard event={myReview} className="border-primary/60 bg-primary/5" />
-          </CarouselItem>
+          </Item>
         )}
         {reviews.slice(0, 10).map((evt) => (
-          <CarouselItem key={evt.id} className="basis-11/12 sm:basis-2/3 md:basis-5/12 pl-0 pr-2">
+          <Item key={evt.id}>
             <RelayReviewCard event={evt} />
-          </CarouselItem>
+          </Item>
         ))}
         {reviews.length > 10 && (
-          <CarouselItem className="basis-11/12 sm:basis-2/3 md:basis-5/12 pl-0 pr-2">
+          <Item>
             <div
               className="border rounded-lg bg-muted/20 p-3 flex items-center justify-center h-full hover:bg-muted cursor-pointer"
               onClick={() => push(toRelayReviews(relayUrl))}
             >
               <div className="text-sm text-muted-foreground">{t('View more reviews')}</div>
             </div>
-          </CarouselItem>
+          </Item>
         )}
       </CarouselContent>
       {showPreviousAndNext && <CarouselPrevious />}
       {showPreviousAndNext && <CarouselNext />}
     </Carousel>
+  )
+}
+
+function Item({ children }: { children: React.ReactNode }) {
+  return (
+    <CarouselItem className="basis-11/12 lg:basis-2/3 2xl:basis-5/12 pl-0 pr-2">
+      {children}
+    </CarouselItem>
   )
 }

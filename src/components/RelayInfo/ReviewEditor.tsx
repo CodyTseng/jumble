@@ -29,7 +29,7 @@ export default function ReviewEditor({
     setSubmitting(true)
     try {
       const draftEvent = createRelayReviewDraftEvent(relayUrl, review, stars)
-      const evt = await publish(draftEvent, { additionalRelayUrls: [relayUrl] })
+      const evt = await publish(draftEvent, { specifiedRelayUrls: [relayUrl] })
       onReviewed(evt)
     } catch (error) {
       if (error instanceof AggregateError) {
@@ -56,19 +56,18 @@ export default function ReviewEditor({
         <div className="flex items-center">
           {Array.from({ length: 5 }).map((_, index) => (
             <div
+              key={index}
               className="pr-2 cursor-pointer"
               onMouseEnter={() => setHoverStars(index + 1)}
               onMouseLeave={() => setHoverStars(0)}
             >
               {index < (hoverStars || stars) ? (
                 <Star
-                  key={index}
                   className="size-6 text-yellow-400 fill-yellow-400"
                   onClick={() => setStars(index + 1)}
                 />
               ) : (
                 <Star
-                  key={index}
                   className="size-6 text-muted-foreground"
                   onClick={() => setStars(index + 1)}
                 />
