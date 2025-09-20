@@ -7,7 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-import { ExtendedKind } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
 import { toRelayReviews } from '@/lib/link'
@@ -33,6 +33,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
   const [showEditor, setShowEditor] = useState(false)
   const [myReview, setMyReview] = useState<NostrEvent | null>(null)
   const [reviews, setReviews] = useState<NostrEvent[]>([])
+  const [initialized, setInitialized] = useState(false)
   const { stars, count } = useMemo(() => {
     let totalStars = 0
     let totalCount = 0
@@ -58,7 +59,9 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       if (pubkey) {
         filters.push({ kinds: [ExtendedKind.RELAY_REVIEW], authors: [pubkey], '#d': [relayUrl] })
       }
-      const events = await client.fetchEvents([relayUrl], filters, { cache: true })
+      const events = await client.fetchEvents([relayUrl, ...BIG_RELAY_URLS], filters, {
+        cache: true
+      })
 
       const pubkeySet = new Set<string>()
       const reviews: NostrEvent[] = []
@@ -88,6 +91,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
 
       setMyReview(myReview)
       setReviews(reviews)
+      setInitialized(true)
     }
     init()
   }, [relayUrl, pubkey, mutePubkeySet, hideUntrustedNotes, isUserTrusted])
@@ -132,7 +136,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
         <ReviewCarousel relayUrl={relayUrl} myReview={myReview} reviews={reviews} />
       ) : !showEditor ? (
         <div className="flex items-center justify-center text-sm text-muted-foreground p-4">
-          {t('No reviews yet. Be the first to write one!')}
+          {initialized ? t('No reviews yet. Be the first to write one!') : t('Loading...')}
         </div>
       ) : null}
     </div>

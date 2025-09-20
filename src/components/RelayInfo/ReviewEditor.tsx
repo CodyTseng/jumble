@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { BIG_RELAY_URLS } from '@/constants'
 import { createRelayReviewDraftEvent } from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import { Loader2, Star } from 'lucide-react'
@@ -29,7 +30,7 @@ export default function ReviewEditor({
     setSubmitting(true)
     try {
       const draftEvent = createRelayReviewDraftEvent(relayUrl, review, stars)
-      const evt = await publish(draftEvent, { specifiedRelayUrls: [relayUrl] })
+      const evt = await publish(draftEvent, { specifiedRelayUrls: [relayUrl, ...BIG_RELAY_URLS] })
       onReviewed(evt)
     } catch (error) {
       if (error instanceof AggregateError) {

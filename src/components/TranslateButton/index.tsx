@@ -29,7 +29,8 @@ export default function TranslateButton({
         kinds.Highlights,
         ExtendedKind.COMMENT,
         ExtendedKind.PICTURE,
-        ExtendedKind.POLL
+        ExtendedKind.POLL,
+        ExtendedKind.RELAY_REVIEW
       ].includes(event.kind),
     [event]
   )
