@@ -12,20 +12,24 @@ import { compareEvents } from '@/lib/event'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
 import { toRelayReviews } from '@/lib/link'
 import { cn, isTouchDevice } from '@/lib/utils'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import { Filter, NostrEvent } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Stars from '../Stars'
 import RelayReviewCard from './RelayReviewCard'
 import ReviewEditor from './ReviewEditor'
-import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 
 export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { pubkey } = useNostr()
+  const { pubkey, checkLogin } = useNostr()
+  const { hideUntrustedNotes, isUserTrusted } = useUserTrust()
+  const { mutePubkeySet } = useMuteList()
   const [showEditor, setShowEditor] = useState(false)
   const [myReview, setMyReview] = useState<NostrEvent | null>(null)
   const [reviews, setReviews] = useState<NostrEvent[]>([])
@@ -62,7 +66,11 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
 
       events.sort((a, b) => compareEvents(b, a))
       for (const evt of events) {
-        if (pubkeySet.has(evt.pubkey)) {
+        if (
+          mutePubkeySet.has(evt.pubkey) ||
+          pubkeySet.has(evt.pubkey) ||
+          (hideUntrustedNotes && !isUserTrusted(evt.pubkey))
+        ) {
           continue
         }
         const stars = getStarsFromRelayReviewEvent(evt)
@@ -82,7 +90,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       setReviews(reviews)
     }
     init()
-  }, [relayUrl, pubkey])
+  }, [relayUrl, pubkey, mutePubkeySet, hideUntrustedNotes, isUserTrusted])
 
   const handleReviewed = (evt: NostrEvent) => {
     setMyReview(evt)
@@ -112,7 +120,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
           </div>
         </div>
         {!showEditor && !myReview && (
-          <Button variant="outline" onClick={() => setShowEditor(true)}>
+          <Button variant="outline" onClick={() => checkLogin(() => setShowEditor(true))}>
             {t('Write a review')}
           </Button>
         )}

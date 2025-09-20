@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useFetchRelayInfo } from '@/hooks'
 import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
+import { useNostr } from '@/providers/NostrProvider'
 import { Check, Copy, GitBranch, Link, Mail, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +17,7 @@ import RelayReviewsPreview from './RelayReviewsPreview'
 
 export default function RelayInfo({ url, className }: { url: string; className?: string }) {
   const { t } = useTranslation()
+  const { checkLogin } = useNostr()
   const { relayInfo, isFetching } = useFetchRelayInfo(url)
   const [open, setOpen] = useState(false)
 
@@ -99,7 +101,11 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             </div>
           )}
         </div>
-        <Button variant="secondary" className="w-full" onClick={() => setOpen(true)}>
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={() => checkLogin(() => setOpen(true))}
+        >
           {t('Share something on this Relay')}
         </Button>
         <PostEditor open={open} setOpen={setOpen} openFrom={[relayInfo.url]} />
