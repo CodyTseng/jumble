@@ -13,6 +13,7 @@ import ProfilePage from './pages/secondary/ProfilePage'
 import RelayPage from './pages/secondary/RelayPage'
 import RelayReviewsPage from './pages/secondary/RelayReviewsPage'
 import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
+import RizfulPage from './pages/secondary/RizfulPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
 import TranslationPage from './pages/secondary/TranslationPage'
@@ -35,7 +36,8 @@ const ROUTES = [
   { path: '/settings/general', element: <GeneralSettingsPage /> },
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
-  { path: '/mutes', element: <MuteListPage /> }
+  { path: '/mutes', element: <MuteListPage /> },
+  { path: '/rizful', element: <RizfulPage /> }
 ]
 
 export const routes = ROUTES.map(({ path, element }) => ({

@@ -1,12 +1,7 @@
 import { BIG_RELAY_URLS, CODY_PUBKEY, JUMBLE_PUBKEY } from '@/constants'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { TProfile } from '@/types'
-import {
-  init,
-  launchPaymentModal,
-  onConnected,
-  onDisconnected
-} from '@getalby/bitcoin-connect-react'
+import { init, launchPaymentModal } from '@getalby/bitcoin-connect-react'
 import { Invoice } from '@getalby/lightning-tools'
 import { bech32 } from '@scure/base'
 import { WebLNProvider } from '@webbtc/webln-types'
@@ -23,7 +18,7 @@ const OFFICIAL_PUBKEYS = [JUMBLE_PUBKEY, CODY_PUBKEY]
 
 class LightningService {
   static instance: LightningService
-  private provider: WebLNProvider | null = null
+  provider: WebLNProvider | null = null
   private recentSupportersCache: TRecentSupporter[] | null = null
 
   constructor() {
@@ -32,12 +27,6 @@ class LightningService {
       init({
         appName: 'Jumble',
         showBalance: false
-      })
-      onConnected((provider) => {
-        this.provider = provider
-      })
-      onDisconnected(() => {
-        this.provider = null
       })
     }
     return LightningService.instance
