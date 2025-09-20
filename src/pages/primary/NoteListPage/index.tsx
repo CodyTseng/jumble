@@ -1,6 +1,7 @@
 import { useSecondaryPage } from '@/PageManager'
 import BookmarkList from '@/components/BookmarkList'
 import PostEditor from '@/components/PostEditor'
+import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { toSearch } from '@/lib/link'
@@ -8,8 +9,16 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { PencilLine, Search } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { Info, PencilLine, Search } from 'lucide-react'
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
@@ -20,6 +29,7 @@ const NoteListPage = forwardRef((_, ref) => {
   const layoutRef = useRef<TPageRef>(null)
   const { pubkey, checkLogin } = useNostr()
   const { feedInfo, relayUrls, isReady } = useFeed()
+  const [showRelayDetails, setShowRelayDetails] = useState(false)
   useImperativeHandle(ref, () => layoutRef.current)
 
   useEffect(() => {
@@ -54,14 +64,29 @@ const NoteListPage = forwardRef((_, ref) => {
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
   } else {
-    content = <RelaysFeed />
+    content = (
+      <>
+        {showRelayDetails && feedInfo.feedType === 'relay' && !!feedInfo.id && (
+          <RelayInfo url={feedInfo.id!} className="mb-2 pt-3" />
+        )}
+        <RelaysFeed />
+      </>
+    )
   }
 
   return (
     <PrimaryPageLayout
       pageName="home"
       ref={layoutRef}
-      titlebar={<NoteListPageTitlebar />}
+      titlebar={
+        <NoteListPageTitlebar
+          layoutRef={layoutRef}
+          showRelayDetails={showRelayDetails}
+          setShowRelayDetails={
+            feedInfo.feedType === 'relay' && !!feedInfo.id ? setShowRelayDetails : undefined
+          }
+        />
+      }
       displayScrollToTopButton
     >
       {content}
@@ -71,18 +96,45 @@ const NoteListPage = forwardRef((_, ref) => {
 NoteListPage.displayName = 'NoteListPage'
 export default NoteListPage
 
-function NoteListPageTitlebar() {
+function NoteListPageTitlebar({
+  layoutRef,
+  showRelayDetails,
+  setShowRelayDetails
+}: {
+  layoutRef?: React.RefObject<TPageRef>
+  showRelayDetails?: boolean
+  setShowRelayDetails?: Dispatch<SetStateAction<boolean>>
+}) {
   const { isSmallScreen } = useScreenSize()
 
   return (
     <div className="flex gap-1 items-center h-full justify-between">
       <FeedButton className="flex-1 max-w-fit w-0" />
-      {isSmallScreen && (
-        <div className="shrink-0 flex gap-1 items-center">
-          <SearchButton />
-          <PostButton />
-        </div>
-      )}
+      <div className="shrink-0 flex gap-1 items-center">
+        {setShowRelayDetails && (
+          <Button
+            variant="ghost"
+            size="titlebar-icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowRelayDetails((show) => !show)
+
+              if (!showRelayDetails) {
+                layoutRef?.current?.scrollToTop('smooth')
+              }
+            }}
+            className={showRelayDetails ? 'bg-accent/50' : ''}
+          >
+            <Info />
+          </Button>
+        )}
+        {isSmallScreen && (
+          <>
+            <SearchButton />
+            <PostButton />
+          </>
+        )}
+      </div>
     </div>
   )
 }
