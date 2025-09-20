@@ -409,6 +409,15 @@ export default {
     Never: 'しない',
     'Click to load image': 'クリックして画像を読み込む',
     'Click to load media': 'クリックしてメディアを読み込む',
-    'Click to load YouTube video': 'クリックしてYouTubeビデオを読み込む'
+    'Click to load YouTube video': 'クリックしてYouTubeビデオを読み込む',
+    '{{count}} reviews': '{{count}}件のレビュー',
+    'Write a review': 'レビューを書く',
+    'No reviews yet. Be the first to write one!':
+      'まだレビューがありません。最初のレビューを書いてみませんか！',
+    'View more reviews': 'もっとレビューを見る',
+    'Failed to review': 'レビュー失敗',
+    'Write a review and pick a star rating': 'レビューを書いて星評価を選択してください',
+    Submit: '送信',
+    'Reviews for {{relay}}': '{{relay}} のレビュー'
   }
 }

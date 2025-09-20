@@ -405,6 +405,14 @@ export default {
     Never: 'ไม่เลย',
     'Click to load image': 'คลิกเพื่อโหลดรูปภาพ',
     'Click to load media': 'คลิกเพื่อโหลดสื่อ',
-    'Click to load YouTube video': 'คลิกเพื่อโหลดวิดีโอ YouTube'
+    'Click to load YouTube video': 'คลิกเพื่อโหลดวิดีโอ YouTube',
+    '{{count}} reviews': '{{count}} รีวิว',
+    'Write a review': 'เขียนรีวิว',
+    'No reviews yet. Be the first to write one!': 'ยังไม่มีรีวิว เป็นคนแรกที่เขียนรีวิวสิ!',
+    'View more reviews': 'ดูรีวิวเพิ่มเติม',
+    'Failed to review': 'รีวิวล้มเหลว',
+    'Write a review and pick a star rating': 'เขียนรีวิวและเลือกคะแนนดาว',
+    Submit: 'ส่ง',
+    'Reviews for {{relay}}': 'รีวิวสำหรับ {{relay}}'
   }
 }

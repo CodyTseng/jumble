@@ -407,6 +407,14 @@ export default {
     Never: 'أبداً',
     'Click to load image': 'انقر لتحميل الصورة',
     'Click to load media': 'انقر لتحميل الوسائط',
-    'Click to load YouTube video': 'انقر لتحميل فيديو YouTube'
+    'Click to load YouTube video': 'انقر لتحميل فيديو YouTube',
+    '{{count}} reviews': '{{count}} مراجعة',
+    'Write a review': 'كتابة مراجعة',
+    'No reviews yet. Be the first to write one!': 'لا توجد مراجعات بعد. كن أول من يكتب واحدة!',
+    'View more reviews': 'عرض المزيد من المراجعات',
+    'Failed to review': 'فشل في المراجعة',
+    'Write a review and pick a star rating': 'اكتب مراجعة واختر تقييماً بالنجوم',
+    Submit: 'إرسال',
+    'Reviews for {{relay}}': 'مراجعات لـ {{relay}}'
   }
 }

@@ -406,6 +406,14 @@ export default {
     Never: 'Never',
     'Click to load image': 'Click to load image',
     'Click to load media': 'Click to load media',
-    'Click to load YouTube video': 'Click to load YouTube video'
+    'Click to load YouTube video': 'Click to load YouTube video',
+    '{{count}} reviews': '{{count}} reviews',
+    'Write a review': 'Write a review',
+    'No reviews yet. Be the first to write one!': 'No reviews yet. Be the first to write one!',
+    'View more reviews': 'View more reviews',
+    'Failed to review': 'Failed to review',
+    'Write a review and pick a star rating': 'Write a review and pick a star rating',
+    Submit: 'Submit',
+    'Reviews for {{relay}}': 'Reviews for {{relay}}'
   }
 }

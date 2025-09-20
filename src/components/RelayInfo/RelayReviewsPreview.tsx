@@ -14,6 +14,7 @@ import { toRelayReviews } from '@/lib/link'
 import { cn, isTouchDevice } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import { Filter, NostrEvent } from 'nostr-tools'
@@ -22,7 +23,6 @@ import { useTranslation } from 'react-i18next'
 import Stars from '../Stars'
 import RelayReviewCard from './RelayReviewCard'
 import ReviewEditor from './ReviewEditor'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 
 export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) {
   const { t } = useTranslation()

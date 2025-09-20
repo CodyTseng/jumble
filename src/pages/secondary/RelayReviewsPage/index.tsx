@@ -10,7 +10,7 @@ const RelayReviewsPage = forwardRef(({ url, index }: { url?: string; index?: num
   const { t } = useTranslation()
   const normalizedUrl = useMemo(() => (url ? normalizeUrl(url) : undefined), [url])
   const title = useMemo(
-    () => (url ? t("{{relay}}'s reviews", { relay: simplifyUrl(url) }) : undefined),
+    () => (url ? t('Reviews for {{relay}}', { relay: simplifyUrl(url) }) : undefined),
     [url]
   )
 

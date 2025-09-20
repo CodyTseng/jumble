@@ -412,6 +412,16 @@ export default {
     Never: 'Mai',
     'Click to load image': "Clicca per caricare l'immagine",
     'Click to load media': 'Clicca per caricare i media',
-    'Click to load YouTube video': 'Clicca per caricare il video di YouTube'
+    'Click to load YouTube video': 'Clicca per caricare il video di YouTube',
+    '{{count}} reviews': '{{count}} recensioni',
+    'Write a review': 'Scrivi una recensione',
+    'No reviews yet. Be the first to write one!':
+      'Nessuna recensione ancora. Sii il primo a scriverne una!',
+    'View more reviews': 'Visualizza più recensioni',
+    'Failed to review': 'Recensione fallita',
+    'Write a review and pick a star rating':
+      'Scrivi una recensione e scegli una valutazione a stelle',
+    Submit: 'Invia',
+    'Reviews for {{relay}}': 'Recensioni per {{relay}}'
   }
 }

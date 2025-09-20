@@ -414,6 +414,15 @@ export default {
     Never: 'Никогда',
     'Click to load image': 'Нажмите, чтобы загрузить изображение',
     'Click to load media': 'Нажмите, чтобы загрузить медиа',
-    'Click to load YouTube video': 'Нажмите, чтобы загрузить видео YouTube'
+    'Click to load YouTube video': 'Нажмите, чтобы загрузить видео YouTube',
+    '{{count}} reviews': '{{count}} отзывов',
+    'Write a review': 'Написать отзыв',
+    'No reviews yet. Be the first to write one!':
+      'Отзывов пока нет. Станьте первым, кто напишет отзыв!',
+    'View more reviews': 'Посмотреть больше отзывов',
+    'Failed to review': 'Ошибка отзыва',
+    'Write a review and pick a star rating': 'Напишите отзыв и выберите звездный рейтинг',
+    Submit: 'Отправить',
+    'Reviews for {{relay}}': 'Отзывы для {{relay}}'
   }
 }

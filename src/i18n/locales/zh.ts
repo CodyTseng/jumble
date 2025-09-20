@@ -403,6 +403,14 @@ export default {
     Never: '从不',
     'Click to load image': '点击加载图片',
     'Click to load media': '点击加载音视频',
-    'Click to load YouTube video': '点击加载 YouTube 视频'
+    'Click to load YouTube video': '点击加载 YouTube 视频',
+    '{{count}} reviews': '{{count}} 条评价',
+    'Write a review': '写评价',
+    'No reviews yet. Be the first to write one!': '还没有评价，成为第一个评价的人吧！',
+    'View more reviews': '查看更多评价',
+    'Failed to review': '评价失败',
+    'Write a review and pick a star rating': '写下评价并选择星级评分',
+    Submit: '提交',
+    'Reviews for {{relay}}': '关于 {{relay}} 的评价'
   }
 }

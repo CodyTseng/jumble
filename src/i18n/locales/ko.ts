@@ -409,6 +409,15 @@ export default {
     Never: '안함',
     'Click to load image': '이미지 로드하려면 클릭',
     'Click to load media': '미디어 로드하려면 클릭',
-    'Click to load YouTube video': 'YouTube 비디오 로드하려면 클릭'
+    'Click to load YouTube video': 'YouTube 비디오 로드하려면 클릭',
+    '{{count}} reviews': '{{count}}개 리뷰',
+    'Write a review': '리뷰 작성',
+    'No reviews yet. Be the first to write one!':
+      '아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!',
+    'View more reviews': '더 많은 리뷰 보기',
+    'Failed to review': '리뷰 실패',
+    'Write a review and pick a star rating': '리뷰를 작성하고 별점을 선택하세요',
+    Submit: '제출',
+    'Reviews for {{relay}}': '{{relay}}에 대한 리뷰'
   }
 }

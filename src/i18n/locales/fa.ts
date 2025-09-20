@@ -408,6 +408,15 @@ export default {
     Never: 'هرگز',
     'Click to load image': 'برای بارگذاری تصویر کلیک کنید',
     'Click to load media': 'برای بارگذاری رسانه کلیک کنید',
-    'Click to load YouTube video': 'برای بارگذاری ویدیو YouTube کلیک کنید'
+    'Click to load YouTube video': 'برای بارگذاری ویدیو YouTube کلیک کنید',
+    '{{count}} reviews': '{{count}} نقد',
+    'Write a review': 'نوشتن نقد',
+    'No reviews yet. Be the first to write one!':
+      'هنوز نقدی وجود ندارد. اولین نفری باشید که می‌نویسد!',
+    'View more reviews': 'مشاهده نقدهای بیشتر',
+    'Failed to review': 'نقد ناموفق',
+    'Write a review and pick a star rating': 'نقدی بنویسید و امتیاز ستاره‌ای انتخاب کنید',
+    Submit: 'ارسال',
+    'Reviews for {{relay}}': 'نقدها برای {{relay}}'
   }
 }

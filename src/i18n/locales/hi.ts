@@ -411,6 +411,14 @@ export default {
     Never: 'कभी नहीं',
     'Click to load image': 'इमेज लोड करने के लिए क्लिक करें',
     'Click to load media': 'मीडिया लोड करने के लिए क्लिक करें',
-    'Click to load YouTube video': 'YouTube वीडियो लोड करने के लिए क्लिक करें'
+    'Click to load YouTube video': 'YouTube वीडियो लोड करने के लिए क्लिक करें',
+    '{{count}} reviews': '{{count}} समीक्षाएं',
+    'Write a review': 'समीक्षा लिखें',
+    'No reviews yet. Be the first to write one!': 'अभी तक कोई समीक्षा नहीं। पहले लिखने वाले बनें!',
+    'View more reviews': 'और समीक्षाएं देखें',
+    'Failed to review': 'समीक्षा असफल',
+    'Write a review and pick a star rating': 'एक समीक्षा लिखें और स्टार रेटिंग चुनें',
+    Submit: 'सबमिट करें',
+    'Reviews for {{relay}}': '{{relay}} के लिए समीक्षाएं'
   }
 }
