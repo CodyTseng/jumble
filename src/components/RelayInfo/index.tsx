@@ -53,7 +53,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
         </div>
 
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-muted-foreground">{t('Homepage')}:</div>
+          <div className="text-sm font-semibold text-muted-foreground">{t('Homepage')}</div>
           <a
             href={normalizeHttpUrl(relayInfo.url)}
             target="_blank"
