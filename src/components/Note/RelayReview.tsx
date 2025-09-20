@@ -10,7 +10,7 @@ export default function RelayReview({ event, className }: { event: Event; classN
   return (
     <div className={className}>
       <Stars stars={stars} className="mt-2" />
-      <Content event={event} />
+      <Content event={event} className="mt-2" />
     </div>
   )
 }

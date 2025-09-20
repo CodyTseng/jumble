@@ -1,4 +1,6 @@
+import { useSecondaryPage } from '@/PageManager'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
+import { toNote } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { NostrEvent } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -18,10 +20,14 @@ export default function RelayReviewCard({
   event: NostrEvent
   className?: string
 }) {
+  const { push } = useSecondaryPage()
   const stars = useMemo(() => getStarsFromRelayReviewEvent(event), [event])
 
   return (
-    <div className={cn('border rounded-lg bg-muted/20 p-3 h-full', className)}>
+    <div
+      className={cn('clickable border rounded-lg bg-muted/20 p-3 h-full', className)}
+      onClick={() => push(toNote(event))}
+    >
       <div className="flex justify-between items-start gap-2">
         <div className="flex items-center space-x-2 flex-1">
           <SimpleUserAvatar userId={event.pubkey} size="medium" />

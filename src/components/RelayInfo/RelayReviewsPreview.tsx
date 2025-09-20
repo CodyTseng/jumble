@@ -58,7 +58,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       if (pubkey) {
         filters.push({ kinds: [ExtendedKind.RELAY_REVIEW], authors: [pubkey], '#d': [relayUrl] })
       }
-      const events = await client.fetchEvents([relayUrl], filters)
+      const events = await client.fetchEvents([relayUrl], filters, { cache: true })
 
       const pubkeySet = new Set<string>()
       const reviews: NostrEvent[] = []
