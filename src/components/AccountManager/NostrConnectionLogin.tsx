@@ -3,9 +3,10 @@ import { Input } from '@/components/ui/input'
 import { DEFAULT_NOSTRCONNECT_RELAY } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
 import { createNostrConnectURI, NostrConnectParams } from '@/providers/NostrProvider/nip46'
-import { Check, Copy, Loader } from 'lucide-react'
+import { Check, Copy, Loader, QrCode as QrCodeIcon } from 'lucide-react'
 import { generateSecretKey, getPublicKey } from 'nostr-tools'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import QrScanner from 'qr-scanner'
 import { useTranslation } from 'react-i18next'
 import QrCode from '../QrCode'
 
@@ -25,6 +26,9 @@ export default function NostrConnectLogin({
   const [nostrConnectionErrMsg, setNostrConnectionErrMsg] = useState<string | null>(null)
   const qrContainerRef = useRef<HTMLDivElement>(null)
   const [qrCodeSize, setQrCodeSize] = useState(100)
+  const [isScanning, setIsScanning] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const qrScannerRef = useRef<QrScanner | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBunkerInput(e.target.value)
@@ -103,6 +107,69 @@ export default function NostrConnectLogin({
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const startQrScan = async () => {
+    try {
+      setIsScanning(true)
+      setErrMsg(null)
+
+      // Wait for next render cycle to ensure video element is in DOM
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      if (!videoRef.current) {
+        throw new Error('Video element not found')
+      }
+
+      const hasCamera = await QrScanner.hasCamera()
+      if (!hasCamera) {
+        throw new Error('No camera found')
+      }
+
+      const qrScanner = new QrScanner(
+        videoRef.current,
+        (result) => {
+          setBunkerInput(result.data)
+          stopQrScan()
+        },
+        {
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          preferredCamera: 'environment'
+        }
+      )
+
+      qrScannerRef.current = qrScanner
+      await qrScanner.start()
+
+      // Check video feed after a delay
+      setTimeout(() => {
+        if (
+          videoRef.current &&
+          (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0)
+        ) {
+          setErrMsg('Camera feed not available')
+        }
+      }, 1000)
+    } catch (error) {
+      setErrMsg(`Failed to start camera: ${error instanceof Error ? error.message : 'Unknown error'}. Please check permissions.`)
+      setIsScanning(false)
+    }
+  }
+
+  const stopQrScan = () => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop()
+      qrScannerRef.current.destroy()
+      qrScannerRef.current = null
+    }
+    setIsScanning(false)
+  }
+
+  useEffect(() => {
+    return () => {
+      stopQrScan()
+    }
+  }, [])
+
   return (
     <>
       <div ref={qrContainerRef} className="flex flex-col items-center w-full space-y-3 mb-3">
@@ -138,17 +205,47 @@ export default function NostrConnectLogin({
 
       <div className="w-full space-y-1">
         <div className="flex items-start space-x-2">
-          <Input
-            placeholder="bunker://..."
-            value={bunkerInput}
-            onChange={handleInputChange}
-            className={errMsg ? 'border-destructive' : ''}
-          />
+          <div className="flex-1 relative">
+            <Input
+              placeholder="bunker://..."
+              value={bunkerInput}
+              onChange={handleInputChange}
+              className={errMsg ? 'border-destructive pr-10' : 'pr-10'}
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              onClick={isScanning ? stopQrScan : startQrScan}
+              disabled={pending}
+            >
+              <QrCodeIcon size={16} />
+            </Button>
+          </div>
           <Button onClick={handleLogin} disabled={pending}>
             <Loader className={pending ? 'animate-spin mr-2' : 'hidden'} />
             {t('Login')}
           </Button>
         </div>
+        {isScanning && (
+          <div className="relative flex justify-center">
+            <video
+              ref={videoRef}
+              className="w-full mt-1 rounded-lg border"
+              autoPlay
+              playsInline
+              muted
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={stopQrScan}
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
         {errMsg && <div className="text-xs text-destructive pl-3 pt-1">{errMsg}</div>}
       </div>
       <Button variant="secondary" onClick={back} className="w-full">
