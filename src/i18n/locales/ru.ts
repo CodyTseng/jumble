@@ -423,6 +423,11 @@ export default {
     'Failed to review': 'Ошибка отзыва',
     'Write a review and pick a star rating': 'Напишите отзыв и выберите звездный рейтинг',
     Submit: 'Отправить',
-    'Reviews for {{relay}}': 'Отзывы для {{relay}}'
+    'Reviews for {{relay}}': 'Отзывы для {{relay}}',
+    'No relays selected': 'Ретрансляторы не выбраны',
+    'Post to': 'Опубликовать в',
+    'Write relays and {{count}} other relays':
+      'Ретрансляторы записи и {{count}} других ретрансляторов',
+    '{{count}} relays': '{{count}} ретрансляторов'
   }
 }

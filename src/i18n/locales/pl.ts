@@ -422,6 +422,10 @@ export default {
     'Failed to review': 'Błąd opinii',
     'Write a review and pick a star rating': 'Napisz opinię i wybierz ocenę gwiazdkową',
     Submit: 'Prześlij',
-    'Reviews for {{relay}}': 'Opinie o {{relay}}'
+    'Reviews for {{relay}}': 'Opinie o {{relay}}',
+    'No relays selected': 'Nie wybrano przekaźników',
+    'Post to': 'Opublikuj na',
+    'Write relays and {{count}} other relays': 'Przekaźniki zapisu i {{count}} innych przekaźników',
+    '{{count}} relays': '{{count}} przekaźników'
   }
 }

@@ -413,6 +413,10 @@ export default {
     'Failed to review': 'รีวิวล้มเหลว',
     'Write a review and pick a star rating': 'เขียนรีวิวและเลือกคะแนนดาว',
     Submit: 'ส่ง',
-    'Reviews for {{relay}}': 'รีวิวสำหรับ {{relay}}'
+    'Reviews for {{relay}}': 'รีวิวสำหรับ {{relay}}',
+    'No relays selected': 'ไม่ได้เลือกรีเลย์',
+    'Post to': 'โพสต์ไปยัง',
+    'Write relays and {{count}} other relays': 'รีเลย์เขียนและรีเลย์อื่น ๆ {{count}} ตัว',
+    '{{count}} relays': 'รีเลย์ {{count}} ตัว'
   }
 }

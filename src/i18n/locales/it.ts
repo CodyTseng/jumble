@@ -422,6 +422,10 @@ export default {
     'Write a review and pick a star rating':
       'Scrivi una recensione e scegli una valutazione a stelle',
     Submit: 'Invia',
-    'Reviews for {{relay}}': 'Recensioni per {{relay}}'
+    'Reviews for {{relay}}': 'Recensioni per {{relay}}',
+    'No relays selected': 'Nessun relay selezionato',
+    'Post to': 'Pubblica su',
+    'Write relays and {{count}} other relays': 'Relay di scrittura e {{count}} altri relay',
+    '{{count}} relays': '{{count}} relay'
   }
 }

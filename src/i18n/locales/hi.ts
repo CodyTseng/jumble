@@ -419,6 +419,10 @@ export default {
     'Failed to review': 'समीक्षा असफल',
     'Write a review and pick a star rating': 'एक समीक्षा लिखें और स्टार रेटिंग चुनें',
     Submit: 'सबमिट करें',
-    'Reviews for {{relay}}': '{{relay}} के लिए समीक्षाएं'
+    'Reviews for {{relay}}': '{{relay}} के लिए समीक्षाएं',
+    'No relays selected': 'कोई रिले चयनित नहीं',
+    'Post to': 'पोस्ट करें',
+    'Write relays and {{count}} other relays': 'राइट रिले और {{count}} अन्य रिले',
+    '{{count}} relays': '{{count}} रिले'
   }
 }

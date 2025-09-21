@@ -418,6 +418,10 @@ export default {
     'Failed to review': 'レビュー失敗',
     'Write a review and pick a star rating': 'レビューを書いて星評価を選択してください',
     Submit: '送信',
-    'Reviews for {{relay}}': '{{relay}} のレビュー'
+    'Reviews for {{relay}}': '{{relay}} のレビュー',
+    'No relays selected': 'リレーが選択されていません',
+    'Post to': '投稿先',
+    'Write relays and {{count}} other relays': '書き込みリレーと他の {{count}} 個のリレー',
+    '{{count}} relays': '{{count}} 個のリレー'
   }
 }

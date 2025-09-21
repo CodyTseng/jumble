@@ -418,6 +418,10 @@ export default {
     'Failed to review': '리뷰 실패',
     'Write a review and pick a star rating': '리뷰를 작성하고 별점을 선택하세요',
     Submit: '제출',
-    'Reviews for {{relay}}': '{{relay}}에 대한 리뷰'
+    'Reviews for {{relay}}': '{{relay}}에 대한 리뷰',
+    'No relays selected': '선택된 릴레이가 없습니다',
+    'Post to': '게시 대상',
+    'Write relays and {{count}} other relays': '쓰기 릴레이 및 기타 {{count}}개 릴레이',
+    '{{count}} relays': '{{count}}개 릴레이'
   }
 }

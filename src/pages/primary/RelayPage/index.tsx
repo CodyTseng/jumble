@@ -1,19 +1,11 @@
 import Relay from '@/components/Relay'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { normalizeUrl, simplifyUrl } from '@/lib/url'
-import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { Server } from 'lucide-react'
-import { forwardRef, useEffect, useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 
 const RelayPage = forwardRef(({ url }: { url?: string }, ref) => {
-  const { setTemporaryRelayUrls } = useCurrentRelays()
   const normalizedUrl = useMemo(() => (url ? normalizeUrl(url) : undefined), [url])
-
-  useEffect(() => {
-    if (normalizedUrl) {
-      setTemporaryRelayUrls([normalizedUrl])
-    }
-  }, [normalizedUrl])
 
   return (
     <PrimaryPageLayout

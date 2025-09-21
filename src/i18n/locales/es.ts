@@ -422,6 +422,10 @@ export default {
     'Write a review and pick a star rating':
       'Escriba una reseña y elija una calificación de estrellas',
     Submit: 'Enviar',
-    'Reviews for {{relay}}': 'Reseñas para {{relay}}'
+    'Reviews for {{relay}}': 'Reseñas para {{relay}}',
+    'No relays selected': 'No hay relés seleccionados',
+    'Post to': 'Publicar en',
+    'Write relays and {{count}} other relays': 'Relés de escritura y {{count}} otros relés',
+    '{{count}} relays': '{{count}} relés'
   }
 }

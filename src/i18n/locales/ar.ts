@@ -415,6 +415,10 @@ export default {
     'Failed to review': 'فشل في المراجعة',
     'Write a review and pick a star rating': 'اكتب مراجعة واختر تقييماً بالنجوم',
     Submit: 'إرسال',
-    'Reviews for {{relay}}': 'مراجعات لـ {{relay}}'
+    'Reviews for {{relay}}': 'مراجعات لـ {{relay}}',
+    'No relays selected': 'لم يتم اختيار أي مرحل',
+    'Post to': 'نشر إلى',
+    'Write relays and {{count}} other relays': 'مرحلات الكتابة و {{count}} مرحل آخر',
+    '{{count}} relays': '{{count}} ريلايات'
   }
 }

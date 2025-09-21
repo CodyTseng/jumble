@@ -2,22 +2,12 @@ import { getNoteBech32Id, isProtectedEvent } from '@/lib/event'
 import { toNjump } from '@/lib/link'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { simplifyUrl } from '@/lib/url'
+import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import {
-  Bell,
-  BellOff,
-  Code,
-  Copy,
-  Link,
-  Mail,
-  SatelliteDish,
-  Server,
-  Trash2,
-  TriangleAlert
-} from 'lucide-react'
+import { Bell, BellOff, Code, Copy, Link, SatelliteDish, Trash2, TriangleAlert } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -59,7 +49,11 @@ export function useMenuActions({
 }: UseMenuActionsProps) {
   const { t } = useTranslation()
   const { pubkey, attemptDelete } = useNostr()
+  const { relayUrls: currentBrowsingRelayUrls } = useCurrentRelays()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
+  const relayUrls = useMemo(() => {
+    return Array.from(new Set(currentBrowsingRelayUrls.concat(favoriteRelays)))
+  }, [currentBrowsingRelayUrls, favoriteRelays])
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
   const isMuted = useMemo(() => mutePubkeySet.has(event.pubkey), [mutePubkeySet, event])
 
@@ -67,12 +61,7 @@ export function useMenuActions({
     const items = []
     if (pubkey && event.pubkey === pubkey) {
       items.push({
-        label: (
-          <div className="flex items-center gap-2 w-full pl-1">
-            <Mail />
-            <div className="flex-1 truncate text-left">{t('Suitable Relays')}</div>
-          </div>
-        ),
+        label: <div className="text-left"> {t('Write relays')}</div>,
         onClick: async () => {
           closeDrawer()
           const relays = await client.determineTargetRelays(event)
@@ -97,12 +86,7 @@ export function useMenuActions({
         ...relaySets
           .filter((set) => set.relayUrls.length)
           .map((set, index) => ({
-            label: (
-              <div className="flex items-center gap-2 w-full pl-1">
-                <Server />
-                <div className="flex-1 truncate text-left">{set.name}</div>
-              </div>
-            ),
+            label: <div className="text-left truncate">{set.name}</div>,
             onClick: async () => {
               closeDrawer()
               await client
@@ -126,9 +110,9 @@ export function useMenuActions({
       )
     }
 
-    if (favoriteRelays.length) {
+    if (relayUrls.length) {
       items.push(
-        ...favoriteRelays.map((relay, index) => ({
+        ...relayUrls.map((relay, index) => ({
           label: (
             <div className="flex items-center gap-2 w-full">
               <RelayIcon url={relay} />
@@ -159,7 +143,7 @@ export function useMenuActions({
     }
 
     return items
-  }, [pubkey, favoriteRelays, relaySets])
+  }, [pubkey, relayUrls, relaySets])
 
   const menuActions: MenuAction[] = useMemo(() => {
     const actions: MenuAction[] = [

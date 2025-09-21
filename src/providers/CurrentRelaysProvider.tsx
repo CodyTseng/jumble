@@ -1,10 +1,9 @@
-import { usePrimaryPage } from '@/PageManager'
-import { createContext, useContext, useEffect, useState } from 'react'
-import { useFeed } from './FeedProvider'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 type TCurrentRelaysContext = {
-  currentRelayUrls: string[]
-  setTemporaryRelayUrls: (urls: string[]) => void
+  relayUrls: string[]
+  addRelayUrls: (urls: string[]) => void
+  removeRelayUrls: (urls: string[]) => void
 }
 
 const CurrentRelaysContext = createContext<TCurrentRelaysContext | undefined>(undefined)
@@ -18,17 +17,36 @@ export const useCurrentRelays = () => {
 }
 
 export function CurrentRelaysProvider({ children }: { children: React.ReactNode }) {
-  const { current } = usePrimaryPage()
-  const { relayUrls } = useFeed()
-  const [currentRelayUrls, setCurrentRelayUrls] = useState<string[]>([])
-  const [temporaryRelayUrls, setTemporaryRelayUrls] = useState<string[]>([])
+  const [relayRefCount, setRelayRefCount] = useState<Record<string, number>>({})
+  const relayUrls = useMemo(() => Object.keys(relayRefCount), [relayRefCount])
 
-  useEffect(() => {
-    setCurrentRelayUrls(current === 'relay' ? temporaryRelayUrls : relayUrls)
-  }, [temporaryRelayUrls, current, relayUrls])
+  const addRelayUrls = useCallback((urls: string[]) => {
+    setRelayRefCount((prev) => {
+      const newCounts = { ...prev }
+      urls.forEach((url) => {
+        newCounts[url] = (newCounts[url] || 0) + 1
+      })
+      return newCounts
+    })
+  }, [])
+
+  const removeRelayUrls = useCallback((urls: string[]) => {
+    setRelayRefCount((prev) => {
+      const newCounts = { ...prev }
+      urls.forEach((url) => {
+        if (newCounts[url]) {
+          newCounts[url] -= 1
+          if (newCounts[url] <= 0) {
+            delete newCounts[url]
+          }
+        }
+      })
+      return newCounts
+    })
+  }, [])
 
   return (
-    <CurrentRelaysContext.Provider value={{ currentRelayUrls, setTemporaryRelayUrls }}>
+    <CurrentRelaysContext.Provider value={{ relayUrls, addRelayUrls, removeRelayUrls }}>
       {children}
     </CurrentRelaysContext.Provider>
   )

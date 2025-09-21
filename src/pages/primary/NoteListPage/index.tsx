@@ -5,6 +5,7 @@ import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { toSearch } from '@/lib/link'
+import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -26,6 +27,7 @@ import RelaysFeed from './RelaysFeed'
 
 const NoteListPage = forwardRef((_, ref) => {
   const { t } = useTranslation()
+  const { addRelayUrls, removeRelayUrls } = useCurrentRelays()
   const layoutRef = useRef<TPageRef>(null)
   const { pubkey, checkLogin } = useNostr()
   const { feedInfo, relayUrls, isReady } = useFeed()
@@ -37,6 +39,15 @@ const NoteListPage = forwardRef((_, ref) => {
       layoutRef.current.scrollToTop('instant')
     }
   }, [JSON.stringify(relayUrls), feedInfo])
+
+  useEffect(() => {
+    if (relayUrls.length) {
+      addRelayUrls(relayUrls)
+      return () => {
+        removeRelayUrls(relayUrls)
+      }
+    }
+  }, [relayUrls])
 
   let content: React.ReactNode = null
   if (!isReady) {

@@ -426,6 +426,10 @@ export default {
     'Failed to review': 'Échec de l’avis',
     'Write a review and pick a star rating': 'Écrivez un avis et choisissez une note en étoiles',
     Submit: 'Soumettre',
-    'Reviews for {{relay}}': 'Avis pour {{relay}}'
+    'Reviews for {{relay}}': 'Avis pour {{relay}}',
+    'No relays selected': 'Aucun relais sélectionné',
+    'Post to': 'Publier sur',
+    'Write relays and {{count}} other relays': 'Relais d’écriture et {{count}} autres relais',
+    '{{count}} relays': '{{count}} relais'
   }
 }

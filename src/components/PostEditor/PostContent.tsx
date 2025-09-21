@@ -14,15 +14,15 @@ import postEditorCache from '@/services/post-editor-cache.service'
 import { TPollCreateData } from '@/types'
 import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import EmojiPickerDialog from '../EmojiPickerDialog'
 import Mentions from './Mentions'
 import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
+import PostRelaySelector from './PostRelaySelector'
 import PostTextarea, { TPostTextareaHandle } from './PostTextarea'
-import SendOnlyToSwitch from './SendOnlyToSwitch'
 import Uploader from './Uploader'
 
 export default function PostContent({
@@ -47,10 +47,11 @@ export default function PostContent({
   >([])
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [addClientTag, setAddClientTag] = useState(false)
-  const [specifiedRelayUrls, setSpecifiedRelayUrls] = useState<string[] | undefined>(undefined)
   const [mentions, setMentions] = useState<string[]>([])
   const [isNsfw, setIsNsfw] = useState(false)
   const [isPoll, setIsPoll] = useState(false)
+  const [isProtectedEvent, setIsProtectedEvent] = useState(false)
+  const [additionalRelayUrls, setAdditionalRelayUrls] = useState<string[]>([])
   const [pollCreateData, setPollCreateData] = useState<TPollCreateData>({
     isMultipleChoice: false,
     options: ['', ''],
@@ -59,12 +60,25 @@ export default function PostContent({
   })
   const [minPow, setMinPow] = useState(0)
   const isFirstRender = useRef(true)
-  const canPost =
-    !!pubkey &&
-    !!text &&
-    !posting &&
-    !uploadProgresses.length &&
-    (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2)
+  const canPost = useMemo(() => {
+    return (
+      !!pubkey &&
+      !!text &&
+      !posting &&
+      !uploadProgresses.length &&
+      (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2) &&
+      (!isProtectedEvent || additionalRelayUrls.length > 0)
+    )
+  }, [
+    pubkey,
+    text,
+    posting,
+    uploadProgresses,
+    isPoll,
+    pollCreateData,
+    isProtectedEvent,
+    additionalRelayUrls
+  ])
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -97,15 +111,7 @@ export default function PostContent({
         addClientTag
       }
     )
-  }, [
-    defaultContent,
-    parentEvent,
-    isNsfw,
-    isPoll,
-    pollCreateData,
-    specifiedRelayUrls,
-    addClientTag
-  ])
+  }, [defaultContent, parentEvent, isNsfw, isPoll, pollCreateData, addClientTag])
 
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
@@ -118,24 +124,24 @@ export default function PostContent({
           parentEvent && parentEvent.kind !== kinds.ShortTextNote
             ? await createCommentDraftEvent(text, parentEvent, mentions, {
                 addClientTag,
-                protectedEvent: !!specifiedRelayUrls,
+                protectedEvent: isProtectedEvent,
                 isNsfw
               })
             : isPoll
-              ? await createPollDraftEvent(pubkey, text, mentions, pollCreateData, {
+              ? await createPollDraftEvent(pubkey!, text, mentions, pollCreateData, {
                   addClientTag,
                   isNsfw
                 })
               : await createShortTextNoteDraftEvent(text, mentions, {
                   parentEvent,
                   addClientTag,
-                  protectedEvent: !!specifiedRelayUrls,
+                  protectedEvent: isProtectedEvent,
                   isNsfw
                 })
 
         const newEvent = await publish(draftEvent, {
-          specifiedRelayUrls,
-          additionalRelayUrls: isPoll ? pollCreateData.relays : [],
+          specifiedRelayUrls: isProtectedEvent ? additionalRelayUrls : undefined,
+          additionalRelayUrls: isPoll ? pollCreateData.relays : additionalRelayUrls,
           minPow
         })
         postEditorCache.clearPostCache({ defaultContent, parentEvent })
@@ -233,10 +239,10 @@ export default function PostContent({
           </div>
         ))}
       {!isPoll && (
-        <SendOnlyToSwitch
+        <PostRelaySelector
+          setIsProtectedEvent={setIsProtectedEvent}
+          setAdditionalRelayUrls={setAdditionalRelayUrls}
           parentEvent={parentEvent}
-          specifiedRelayUrls={specifiedRelayUrls}
-          setSpecifiedRelayUrls={setSpecifiedRelayUrls}
           openFrom={openFrom}
         />
       )}

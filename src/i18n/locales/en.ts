@@ -414,6 +414,10 @@ export default {
     'Failed to review': 'Failed to review',
     'Write a review and pick a star rating': 'Write a review and pick a star rating',
     Submit: 'Submit',
-    'Reviews for {{relay}}': 'Reviews for {{relay}}'
+    'Reviews for {{relay}}': 'Reviews for {{relay}}',
+    'No relays selected': 'No relays selected',
+    'Post to': 'Post to',
+    'Write relays and {{count}} other relays': 'Write relays and {{count}} other relays',
+    '{{count}} relays': '{{count}} relays'
   }
 }

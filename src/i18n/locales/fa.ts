@@ -417,6 +417,10 @@ export default {
     'Failed to review': 'نقد ناموفق',
     'Write a review and pick a star rating': 'نقدی بنویسید و امتیاز ستاره‌ای انتخاب کنید',
     Submit: 'ارسال',
-    'Reviews for {{relay}}': 'نقدها برای {{relay}}'
+    'Reviews for {{relay}}': 'نقدها برای {{relay}}',
+    'No relays selected': 'هیچ رله‌ای انتخاب نشده',
+    'Post to': 'پست کردن به',
+    'Write relays and {{count}} other relays': 'رله‌های نوشتن و {{count}} رله دیگر',
+    '{{count}} relays': '{{count}} رله'
   }
 }

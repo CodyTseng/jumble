@@ -411,6 +411,10 @@ export default {
     'Failed to review': '评价失败',
     'Write a review and pick a star rating': '写下评价并选择星级评分',
     Submit: '提交',
-    'Reviews for {{relay}}': '关于 {{relay}} 的评价'
+    'Reviews for {{relay}}': '关于 {{relay}} 的评价',
+    'No relays selected': '未选择服务器',
+    'Post to': '发布到',
+    'Write relays and {{count}} other relays': '写服务器和其他 {{count}} 个服务器',
+    '{{count}} relays': '{{count}} 个服务器'
   }
 }
