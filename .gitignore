@@ -24,3 +24,5 @@ dev-dist
 *.njsproj
 *.sln
 *.sw?
+
+.vercel
