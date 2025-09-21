@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DEFAULT_NOSTRCONNECT_RELAY } from '@/constants'
+import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { Check, Copy, Loader, ScanQrCode } from 'lucide-react'
 import { generateSecretKey, getPublicKey } from 'nostr-tools'
@@ -9,7 +10,6 @@ import QrScanner from 'qr-scanner'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import QrCode from '../QrCode'
-import { cn } from '@/lib/utils'
 
 export default function NostrConnectLogin({
   back,
@@ -110,6 +110,7 @@ export default function NostrConnectLogin({
 
   const startQrScan = async () => {
     try {
+      setIsScanning(true)
       setErrMsg(null)
 
       // Wait for next render cycle to ensure video element is in DOM
