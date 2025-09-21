@@ -251,7 +251,7 @@ export default function NostrConnectLogin({
       <div className={cn('w-full h-full flex justify-center', isScanning ? '' : 'hidden')}>
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full z-50 bg-background"
+          className="absolute inset-0 w-full h-full bg-background"
           autoPlay
           playsInline
           muted
