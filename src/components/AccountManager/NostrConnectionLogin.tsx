@@ -9,6 +9,7 @@ import QrScanner from 'qr-scanner'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import QrCode from '../QrCode'
+import { cn } from '@/lib/utils'
 
 export default function NostrConnectLogin({
   back,
@@ -217,7 +218,7 @@ export default function NostrConnectLogin({
               size="sm"
               variant="ghost"
               className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-              onClick={isScanning ? stopQrScan : startQrScan}
+              onClick={startQrScan}
               disabled={pending}
             >
               <ScanQrCode />
@@ -235,25 +236,23 @@ export default function NostrConnectLogin({
         {t('Back')}
       </Button>
 
-      {isScanning && (
-        <div className="w-full h-full flex justify-center">
-          <video
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full rounded-lg border"
-            autoPlay
-            playsInline
-            muted
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            className="absolute top-2 right-2"
-            onClick={stopQrScan}
-          >
-            Cancel
-          </Button>
-        </div>
-      )}
+      <div className={cn('w-full h-full flex justify-center', isScanning ? '' : 'hidden')}>
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full rounded-lg border"
+          autoPlay
+          playsInline
+          muted
+        />
+        <Button
+          variant="secondary"
+          size="sm"
+          className="absolute top-2 right-2"
+          onClick={stopQrScan}
+        >
+          Cancel
+        </Button>
+      </div>
     </div>
   )
 }
