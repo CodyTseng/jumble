@@ -1,6 +1,6 @@
 import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex } from '@noble/hashes/utils'
-import { BunkerSigner as NBunkerSigner } from './nip46'
+import { BunkerSigner as NBunkerSigner, toBunkerURL } from 'nostr-tools/nip46'
 
 export class NostrConnectionSigner implements ISigner {
   signer: NBunkerSigner | null = null
@@ -8,7 +8,6 @@ export class NostrConnectionSigner implements ISigner {
   private pubkey: string | null = null
   private connectionString: string
   private bunkerString: string | null = null
-  private readonly CONNECTION_TIMEOUT = 300_000 // 300 seconds
 
   constructor(clientSecretKey: Uint8Array, connectionString: string) {
     this.clientSecretKey = clientSecretKey
@@ -23,12 +22,12 @@ export class NostrConnectionSigner implements ISigner {
       }
     }
 
-    this.signer = new NBunkerSigner(this.clientSecretKey, this.connectionString, {
+    this.signer = await NBunkerSigner.fromURI(this.clientSecretKey, this.connectionString, {
       onauth: (url) => {
         window.open(url, '_blank')
       }
     })
-    this.bunkerString = await this.signer.connect(this.CONNECTION_TIMEOUT)
+    this.bunkerString = toBunkerURL(this.signer.bp)
     this.pubkey = await this.signer.getPublicKey()
     return {
       bunkerString: this.bunkerString,

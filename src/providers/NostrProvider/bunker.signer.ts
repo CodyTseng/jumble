@@ -18,7 +18,7 @@ export class BunkerSigner implements ISigner {
       throw new Error('Invalid bunker')
     }
 
-    this.signer = new NBunkerSigner(this.clientSecretKey, bunkerPointer, {
+    this.signer = NBunkerSigner.fromBunker(this.clientSecretKey, bunkerPointer, {
       onauth: (url) => {
         window.open(url, '_blank')
       }
