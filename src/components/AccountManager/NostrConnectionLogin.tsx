@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DEFAULT_NOSTRCONNECT_RELAY } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
-import { Check, Copy, Loader, QrCode as QrCodeIcon } from 'lucide-react'
+import { Check, Copy, Loader, ScanQrCode } from 'lucide-react'
 import { generateSecretKey, getPublicKey } from 'nostr-tools'
 import { createNostrConnectURI, NostrConnectParams } from 'nostr-tools/nip46'
 import QrScanner from 'qr-scanner'
@@ -109,7 +109,6 @@ export default function NostrConnectLogin({
 
   const startQrScan = async () => {
     try {
-      setIsScanning(true)
       setErrMsg(null)
 
       // Wait for next render cycle to ensure video element is in DOM
@@ -173,7 +172,7 @@ export default function NostrConnectLogin({
   }, [])
 
   return (
-    <>
+    <div className="relative flex flex-col gap-4">
       <div ref={qrContainerRef} className="flex flex-col items-center w-full space-y-3 mb-3">
         <a href={loginDetails.connectionString} aria-label="Open with Nostr signer app">
           <QrCode size={qrCodeSize} value={loginDetails.connectionString} />
@@ -221,7 +220,7 @@ export default function NostrConnectLogin({
               onClick={isScanning ? stopQrScan : startQrScan}
               disabled={pending}
             >
-              <QrCodeIcon size={16} />
+              <ScanQrCode />
             </Button>
           </div>
           <Button onClick={handleLogin} disabled={pending}>
@@ -229,30 +228,32 @@ export default function NostrConnectLogin({
             {t('Login')}
           </Button>
         </div>
-        {isScanning && (
-          <div className="relative flex justify-center">
-            <video
-              ref={videoRef}
-              className="w-full mt-1 rounded-lg border"
-              autoPlay
-              playsInline
-              muted
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              className="absolute top-2 right-2"
-              onClick={stopQrScan}
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
+
         {errMsg && <div className="text-xs text-destructive pl-3 pt-1">{errMsg}</div>}
       </div>
       <Button variant="secondary" onClick={back} className="w-full">
         {t('Back')}
       </Button>
-    </>
+
+      {isScanning && (
+        <div className="w-full h-full flex justify-center">
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full rounded-lg border"
+            autoPlay
+            playsInline
+            muted
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            className="absolute top-2 right-2"
+            onClick={stopQrScan}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }
