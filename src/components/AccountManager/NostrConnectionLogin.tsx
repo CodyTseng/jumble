@@ -236,7 +236,7 @@ export default function NostrConnectLogin({
               <ScanQrCode />
             </Button>
           </div>
-          <Button onClick={handleLogin} disabled={pending}>
+          <Button onClick={() => handleLogin()} disabled={pending}>
             <Loader className={pending ? 'animate-spin mr-2' : 'hidden'} />
             {t('Login')}
           </Button>
