@@ -73,6 +73,7 @@
     "nstart-modal": "^2.0.0",
     "path-to-regexp": "^8.2.0",
     "qr-code-styling": "^1.9.2",
+    "qr-scanner": "^1.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.2.0",
