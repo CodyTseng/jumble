@@ -30,6 +30,7 @@ export default function NostrConnectLogin({
   const [isScanning, setIsScanning] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
+  const qrScannerCheckTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBunkerInput(e.target.value)
@@ -142,7 +143,7 @@ export default function NostrConnectLogin({
       await qrScanner.start()
 
       // Check video feed after a delay
-      setTimeout(() => {
+      qrScannerCheckTimerRef.current = setTimeout(() => {
         if (
           videoRef.current &&
           (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0)
@@ -155,6 +156,10 @@ export default function NostrConnectLogin({
         `Failed to start camera: ${error instanceof Error ? error.message : 'Unknown error'}. Please check permissions.`
       )
       setIsScanning(false)
+      if (qrScannerCheckTimerRef.current) {
+        clearTimeout(qrScannerCheckTimerRef.current)
+        qrScannerCheckTimerRef.current = null
+      }
     }
   }
 
@@ -165,6 +170,10 @@ export default function NostrConnectLogin({
       qrScannerRef.current = null
     }
     setIsScanning(false)
+    if (qrScannerCheckTimerRef.current) {
+      clearTimeout(qrScannerCheckTimerRef.current)
+      qrScannerCheckTimerRef.current = null
+    }
   }
 
   useEffect(() => {
@@ -240,7 +249,7 @@ export default function NostrConnectLogin({
       <div className={cn('w-full h-full flex justify-center', isScanning ? '' : 'hidden')}>
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full rounded-lg border z-50 bg-background"
+          className="absolute inset-0 w-full h-full z-50 bg-background"
           autoPlay
           playsInline
           muted
