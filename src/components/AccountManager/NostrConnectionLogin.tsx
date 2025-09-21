@@ -131,7 +131,9 @@ export default function NostrConnectLogin({
         (result) => {
           setBunkerInput(result.data)
           stopQrScan()
-          handleLogin()
+
+          // Wait a moment to ensure bunkerInput value is set before login
+          setTimeout(() => handleLogin(), 200)
         },
         {
           highlightScanRegion: true,
