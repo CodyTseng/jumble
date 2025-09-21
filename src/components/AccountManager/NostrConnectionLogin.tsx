@@ -131,6 +131,7 @@ export default function NostrConnectLogin({
         (result) => {
           setBunkerInput(result.data)
           stopQrScan()
+          handleLogin()
         },
         {
           highlightScanRegion: true,
