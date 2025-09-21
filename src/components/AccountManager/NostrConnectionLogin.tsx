@@ -37,11 +37,12 @@ export default function NostrConnectLogin({
     if (errMsg) setErrMsg(null)
   }
 
-  const handleLogin = () => {
-    if (bunkerInput === '') return
+  const handleLogin = (bunker: string = bunkerInput) => {
+    const _bunker = bunker.trim()
+    if (_bunker.trim() === '') return
 
     setPending(true)
-    bunkerLogin(bunkerInput)
+    bunkerLogin(_bunker)
       .then(() => onLoginSuccess())
       .catch((err) => setErrMsg(err.message || 'Login failed'))
       .finally(() => setPending(false))
@@ -131,9 +132,7 @@ export default function NostrConnectLogin({
         (result) => {
           setBunkerInput(result.data)
           stopQrScan()
-
-          // Wait a moment to ensure bunkerInput value is set before login
-          setTimeout(() => handleLogin(), 200)
+          handleLogin(result.data)
         },
         {
           highlightScanRegion: true,
