@@ -421,7 +421,7 @@ export default {
     Submit: 'Enviar',
     'Reviews for {{relay}}': 'Avaliações para {{relay}}',
     'No relays selected': 'Nenhum relay selecionado',
-    'Post to': 'Postar para',
+    'Post to': 'Postar em',
     'Write relays and {{count}} other relays': 'Relays de escrita e {{count}} outros relays',
     '{{count}} relays': '{{count}} relays'
   }
