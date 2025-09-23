@@ -66,6 +66,7 @@ const SearchBar = forwardRef<
     if (!input) {
       onSearch(null)
     }
+    setSelectedIndex(-1)
   }, [input])
 
   useEffect(() => {

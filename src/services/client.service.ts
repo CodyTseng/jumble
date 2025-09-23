@@ -238,10 +238,12 @@ class ClientService extends EventTarget {
     subRequests: { urls: string[]; filter: TSubRequestFilter }[],
     {
       onEvents,
-      onNew
+      onNew,
+      onClose
     }: {
       onEvents: (events: NEvent[], eosed: boolean) => void
       onNew: (evt: NEvent) => void
+      onClose?: (url: string, reason: string) => void
     },
     {
       startLogin,
@@ -285,7 +287,8 @@ class ClientService extends EventTarget {
               if (newEventIdSet.has(evt.id)) return
               newEventIdSet.add(evt.id)
               onNew(evt)
-            }
+            },
+            onClose
           },
           { startLogin, needSort }
         )
@@ -337,12 +340,14 @@ class ClientService extends EventTarget {
       onevent,
       oneose,
       onclose,
-      startLogin
+      startLogin,
+      onAllClose
     }: {
       onevent?: (evt: NEvent) => void
       oneose?: (eosed: boolean) => void
-      onclose?: (reasons: string[]) => void
+      onclose?: (url: string, reason: string) => void
       startLogin?: () => void
+      onAllClose?: (reasons: string[]) => void
     }
   ) {
     const relays = Array.from(new Set(urls))
@@ -437,8 +442,9 @@ class ClientService extends EventTarget {
             // close the subscription
             closedCount++
             closeReasons.push(reason)
+            onclose?.(url, reason)
             if (closedCount >= startedCount) {
-              onclose?.(closeReasons)
+              onAllClose?.(closeReasons)
             }
             return
           },
@@ -467,10 +473,12 @@ class ClientService extends EventTarget {
     filter: TSubRequestFilter, // filter with limit,
     {
       onEvents,
-      onNew
+      onNew,
+      onClose
     }: {
       onEvents: (events: NEvent[], eosed: boolean) => void
       onNew: (evt: NEvent) => void
+      onClose?: (url: string, reason: string) => void
     },
     {
       startLogin,
@@ -575,7 +583,8 @@ class ClientService extends EventTarget {
           timeline.refs = newRefs.concat(timeline.refs)
           onEvents([...events.concat(cachedEvents).slice(0, filter.limit)], true)
         }
-      }
+      },
+      onclose: onClose
     })
 
     return {

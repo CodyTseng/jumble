@@ -1,5 +1,6 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
+import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
@@ -7,16 +8,17 @@ import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
-import { isTouchDevice } from '@/lib/utils'
 
 export default function NormalFeed({
   subRequests,
   areAlgoRelays = false,
-  isMainFeed = false
+  isMainFeed = false,
+  showRelayCloseReason = false
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
   isMainFeed?: boolean
+  showRelayCloseReason?: boolean
 }) {
   const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
@@ -63,6 +65,7 @@ export default function NormalFeed({
         hideReplies={listMode === 'posts'}
         hideUntrustedNotes={hideUntrustedNotes}
         areAlgoRelays={areAlgoRelays}
+        showRelayCloseReason={showRelayCloseReason}
       />
     </>
   )

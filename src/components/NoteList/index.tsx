@@ -27,6 +27,7 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
+import { toast } from 'sonner'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 
 const LIMIT = 200
@@ -41,7 +42,8 @@ const NoteList = forwardRef(
       filterMutedNotes = true,
       hideReplies = false,
       hideUntrustedNotes = false,
-      areAlgoRelays = false
+      areAlgoRelays = false,
+      showRelayCloseReason = false
     }: {
       subRequests: TFeedSubRequest[]
       showKinds: number[]
@@ -49,6 +51,7 @@ const NoteList = forwardRef(
       hideReplies?: boolean
       hideUntrustedNotes?: boolean
       areAlgoRelays?: boolean
+      showRelayCloseReason?: boolean
     },
     ref
   ) => {
@@ -184,6 +187,11 @@ const NoteList = forwardRef(
                   [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
                 )
               }
+            },
+            onClose: (url, reason) => {
+              if (!showRelayCloseReason) return
+              if (reason === 'closed by caller') return
+              toast.error(`${url}: ${reason}`)
             }
           },
           {

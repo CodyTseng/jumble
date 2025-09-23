@@ -50,7 +50,7 @@ export default function Content({
           const shortcode = node.data.split(':')[1]
           const emoji = emojiInfos?.find((e) => e.shortcode === shortcode)
           if (!emoji) return node.data
-          return <Emoji key={index} emoji={emoji} classNames={{ img: 'mb-1' }} />
+          return <Emoji key={index} emoji={emoji} classNames={{ img: 'size-4' }} />
         }
         return node.data
       })}
