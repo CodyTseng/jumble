@@ -422,6 +422,7 @@ export default {
     'No relays selected': 'リレーが選択されていません',
     'Post to': '投稿先',
     'Write relays and {{count}} other relays': '書き込みリレーと他の {{count}} 個のリレー',
-    '{{count}} relays': '{{count}} 個のリレー'
+    '{{count}} relays': '{{count}} 個のリレー',
+    'Republishing...': '再公開中...'
   }
 }

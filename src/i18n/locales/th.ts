@@ -417,6 +417,7 @@ export default {
     'No relays selected': 'ไม่ได้เลือกรีเลย์',
     'Post to': 'โพสต์ไปยัง',
     'Write relays and {{count}} other relays': 'รีเลย์เขียนและรีเลย์อื่น ๆ {{count}} ตัว',
-    '{{count}} relays': 'รีเลย์ {{count}} ตัว'
+    '{{count}} relays': 'รีเลย์ {{count}} ตัว',
+    'Republishing...': 'กำลังเผยแพร่ซ้ำ...'
   }
 }

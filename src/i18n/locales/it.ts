@@ -426,6 +426,7 @@ export default {
     'No relays selected': 'Nessun relay selezionato',
     'Post to': 'Pubblica su',
     'Write relays and {{count}} other relays': 'Relay di scrittura e {{count}} altri relay',
-    '{{count}} relays': '{{count}} relay'
+    '{{count}} relays': '{{count}} relay',
+    'Republishing...': 'Ricondivisione in corso...'
   }
 }

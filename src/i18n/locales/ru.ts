@@ -428,6 +428,7 @@ export default {
     'Post to': 'Опубликовать в',
     'Write relays and {{count}} other relays':
       'Ретрансляторы записи и {{count}} других ретрансляторов',
-    '{{count}} relays': '{{count}} ретрансляторов'
+    '{{count}} relays': '{{count}} ретрансляторов',
+    'Republishing...': 'Ретрансляция...'
   }
 }

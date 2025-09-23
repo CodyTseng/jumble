@@ -423,6 +423,7 @@ export default {
     'No relays selected': 'कोई रिले चयनित नहीं',
     'Post to': 'पोस्ट करें',
     'Write relays and {{count}} other relays': 'राइट रिले और {{count}} अन्य रिले',
-    '{{count}} relays': '{{count}} रिले'
+    '{{count}} relays': '{{count}} रिले',
+    'Republishing...': 'पुनः प्रकाशित कर रहे हैं...'
   }
 }

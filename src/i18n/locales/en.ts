@@ -418,6 +418,7 @@ export default {
     'No relays selected': 'No relays selected',
     'Post to': 'Post to',
     'Write relays and {{count}} other relays': 'Write relays and {{count}} other relays',
-    '{{count}} relays': '{{count}} relays'
+    '{{count}} relays': '{{count}} relays',
+    'Republishing...': 'Republishing...'
   }
 }

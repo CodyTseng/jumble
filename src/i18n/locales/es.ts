@@ -426,6 +426,7 @@ export default {
     'No relays selected': 'No hay relés seleccionados',
     'Post to': 'Publicar en',
     'Write relays and {{count}} other relays': 'Relés de escritura y {{count}} otros relés',
-    '{{count}} relays': '{{count}} relés'
+    '{{count}} relays': '{{count}} relés',
+    'Republishing...': 'Republicando...'
   }
 }

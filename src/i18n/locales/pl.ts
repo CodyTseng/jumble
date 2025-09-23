@@ -426,6 +426,7 @@ export default {
     'No relays selected': 'Nie wybrano przekaźników',
     'Post to': 'Opublikuj na',
     'Write relays and {{count}} other relays': 'Przekaźniki zapisu i {{count}} innych przekaźników',
-    '{{count}} relays': '{{count}} przekaźników'
+    '{{count}} relays': '{{count}} przekaźników',
+    'Republishing...': 'Ponowne publikowanie...'
   }
 }

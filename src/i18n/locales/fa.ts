@@ -421,6 +421,7 @@ export default {
     'No relays selected': 'هیچ رله‌ای انتخاب نشده',
     'Post to': 'پست کردن به',
     'Write relays and {{count}} other relays': 'رله‌های نوشتن و {{count}} رله دیگر',
-    '{{count}} relays': '{{count}} رله'
+    '{{count}} relays': '{{count}} رله',
+    'Republishing...': 'در حال بازنشر...'
   }
 }

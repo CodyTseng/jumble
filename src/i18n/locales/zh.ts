@@ -415,6 +415,7 @@ export default {
     'No relays selected': '未选择服务器',
     'Post to': '发布到',
     'Write relays and {{count}} other relays': '写服务器和其他 {{count}} 个服务器',
-    '{{count}} relays': '{{count}} 个服务器'
+    '{{count}} relays': '{{count}} 个服务器',
+    'Republishing...': '正在重新发布...'
   }
 }

@@ -430,6 +430,7 @@ export default {
     'No relays selected': 'Aucun relais sélectionné',
     'Post to': 'Publier sur',
     'Write relays and {{count}} other relays': 'Relais d’écriture et {{count}} autres relais',
-    '{{count}} relays': '{{count}} relais'
+    '{{count}} relays': '{{count}} relais',
+    'Republishing...': 'Republication en cours...'
   }
 }

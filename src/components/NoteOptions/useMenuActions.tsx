@@ -64,19 +64,23 @@ export function useMenuActions({
         label: <div className="text-left"> {t('Write relays')}</div>,
         onClick: async () => {
           closeDrawer()
-          const relays = await client.determineTargetRelays(event)
-          if (relays?.length) {
-            await client
-              .publishEvent(relays, event)
-              .then(() => {
-                toast.success(t('Successfully republish to your write relays'))
-              })
-              .catch((error) => {
-                toast.error(
-                  t('Failed to republish to your write relays: {{error}}', { error: error.message })
-                )
-              })
+          const promise = async () => {
+            const relays = await client.determineTargetRelays(event)
+            if (relays?.length) {
+              await client.publishEvent(relays, event)
+            }
           }
+          toast.promise(promise, {
+            loading: t('Republishing...'),
+            success: () => {
+              return t('Successfully republish to your write relays')
+            },
+            error: (err) => {
+              return t('Failed to republish to your write relays: {{error}}', {
+                error: err.message
+              })
+            }
+          })
         }
       })
     }
@@ -89,21 +93,19 @@ export function useMenuActions({
             label: <div className="text-left truncate">{set.name}</div>,
             onClick: async () => {
               closeDrawer()
-              await client
-                .publishEvent(set.relayUrls, event)
-                .then(() => {
-                  toast.success(
-                    t('Successfully republish to relay set: {{name}}', { name: set.name })
-                  )
-                })
-                .catch((error) => {
-                  toast.error(
-                    t('Failed to republish to relay set: {{name}}. Error: {{error}}', {
-                      name: set.name,
-                      error: error.message
-                    })
-                  )
-                })
+              const promise = client.publishEvent(set.relayUrls, event)
+              toast.promise(promise, {
+                loading: t('Republishing...'),
+                success: () => {
+                  return t('Successfully republish to relay set: {{name}}', { name: set.name })
+                },
+                error: (err) => {
+                  return t('Failed to republish to relay set: {{name}}. Error: {{error}}', {
+                    name: set.name,
+                    error: err.message
+                  })
+                }
+              })
             },
             separator: index === 0
           }))
@@ -121,21 +123,19 @@ export function useMenuActions({
           ),
           onClick: async () => {
             closeDrawer()
-            await client
-              .publishEvent([relay], event)
-              .then(() => {
-                toast.success(
-                  t('Successfully republish to relay: {{url}}', { url: simplifyUrl(relay) })
-                )
-              })
-              .catch((error) => {
-                toast.error(
-                  t('Failed to republish to relay: {{url}}. Error: {{error}}', {
-                    url: simplifyUrl(relay),
-                    error: error.message
-                  })
-                )
-              })
+            const promise = client.publishEvent([relay], event)
+            toast.promise(promise, {
+              loading: t('Republishing...'),
+              success: () => {
+                return t('Successfully republish to relay: {{url}}', { url: simplifyUrl(relay) })
+              },
+              error: (err) => {
+                return t('Failed to republish to relay: {{url}}. Error: {{error}}', {
+                  url: simplifyUrl(relay),
+                  error: err.message
+                })
+              }
+            })
           },
           separator: index === 0
         }))

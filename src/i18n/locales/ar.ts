@@ -419,6 +419,7 @@ export default {
     'No relays selected': 'لم يتم اختيار أي مرحل',
     'Post to': 'نشر إلى',
     'Write relays and {{count}} other relays': 'مرحلات الكتابة و {{count}} مرحل آخر',
-    '{{count}} relays': '{{count}} ريلايات'
+    '{{count}} relays': '{{count}} ريلايات',
+    'Republishing...': 'جارٍ إعادة النشر...'
   }
 }
