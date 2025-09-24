@@ -190,7 +190,19 @@ const NoteList = forwardRef(
             },
             onClose: (url, reason) => {
               if (!showRelayCloseReason) return
-              if (reason === 'closed by caller') return
+              // ignore reasons from nostr-tools
+              if (
+                [
+                  'closed by caller',
+                  'relay connection errored',
+                  'relay connection closed',
+                  'pingpong timed out',
+                  'relay connection closed by us'
+                ].includes(reason)
+              ) {
+                return
+              }
+
               toast.error(`${url}: ${reason}`)
             }
           },
