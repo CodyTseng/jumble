@@ -427,6 +427,7 @@ export default {
     'Post to': 'Pubblica su',
     'Write relays and {{count}} other relays': 'Relay di scrittura e {{count}} altri relay',
     '{{count}} relays': '{{count}} relay',
-    'Republishing...': 'Ricondivisione in corso...'
+    'Republishing...': 'Ricondivisione in corso...',
+    'Trending Notes': 'Note di tendenza'
   }
 }

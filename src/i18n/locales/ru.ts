@@ -429,6 +429,7 @@ export default {
     'Write relays and {{count}} other relays':
       'Ретрансляторы записи и {{count}} других ретрансляторов',
     '{{count}} relays': '{{count}} ретрансляторов',
-    'Republishing...': 'Ретрансляция...'
+    'Republishing...': 'Ретрансляция...',
+    'Trending Notes': 'Популярные заметки'
   }
 }

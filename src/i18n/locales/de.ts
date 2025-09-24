@@ -432,6 +432,7 @@ export default {
     'Post to': 'Posten an',
     'Write relays and {{count}} other relays': 'Schreib-Relays und {{count}} andere Relays',
     '{{count}} relays': '{{count}} Relays',
-    'Republishing...': 'Wird erneut veröffentlicht...'
+    'Republishing...': 'Wird erneut veröffentlicht...',
+    'Trending Notes': 'Trendende Notizen'
   }
 }

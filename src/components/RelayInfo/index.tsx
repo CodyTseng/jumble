@@ -58,7 +58,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
           <a
             href={normalizeHttpUrl(relayInfo.url)}
             target="_blank"
-            className="hover:underline text-primary select-text"
+            className="hover:underline text-primary select-text truncate block"
           >
             {normalizeHttpUrl(relayInfo.url)}
           </a>

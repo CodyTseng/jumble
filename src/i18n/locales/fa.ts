@@ -422,6 +422,7 @@ export default {
     'Post to': 'پست کردن به',
     'Write relays and {{count}} other relays': 'رله‌های نوشتن و {{count}} رله دیگر',
     '{{count}} relays': '{{count}} رله',
-    'Republishing...': 'در حال بازنشر...'
+    'Republishing...': 'در حال بازنشر...',
+    'Trending Notes': 'یادداشت‌های محبوب'
   }
 }

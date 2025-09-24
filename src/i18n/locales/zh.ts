@@ -416,6 +416,7 @@ export default {
     'Post to': '发布到',
     'Write relays and {{count}} other relays': '写服务器和其他 {{count}} 个服务器',
     '{{count}} relays': '{{count}} 个服务器',
-    'Republishing...': '正在重新发布...'
+    'Republishing...': '正在重新发布...',
+    'Trending Notes': '热门笔记'
   }
 }

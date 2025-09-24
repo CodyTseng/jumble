@@ -423,6 +423,7 @@ export default {
     'Post to': '게시 대상',
     'Write relays and {{count}} other relays': '쓰기 릴레이 및 기타 {{count}}개 릴레이',
     '{{count}} relays': '{{count}}개 릴레이',
-    'Republishing...': '다시 게시 중...'
+    'Republishing...': '다시 게시 중...',
+    'Trending Notes': '트렌딩 노트'
   }
 }

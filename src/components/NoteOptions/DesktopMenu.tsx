@@ -20,7 +20,7 @@ export function DesktopMenu({ menuActions, trigger }: DesktopMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent className="max-h-screen overflow-y-auto">
+      <DropdownMenuContent className="max-h-[50vh] overflow-y-auto">
         {menuActions.map((action, index) => {
           const Icon = action.icon
           return (
@@ -32,7 +32,10 @@ export function DesktopMenu({ menuActions, trigger }: DesktopMenuProps) {
                     <Icon />
                     {action.label}
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="max-h-screen overflow-y-auto">
+                  <DropdownMenuSubContent
+                    className="max-h-[50vh] overflow-y-auto"
+                    showScrollButtons
+                  >
                     {action.subMenu.map((subAction, subIndex) => (
                       <div key={subIndex}>
                         {subAction.separator && subIndex > 0 && <DropdownMenuSeparator />}

@@ -418,6 +418,7 @@ export default {
     'Post to': 'โพสต์ไปยัง',
     'Write relays and {{count}} other relays': 'รีเลย์เขียนและรีเลย์อื่น ๆ {{count}} ตัว',
     '{{count}} relays': 'รีเลย์ {{count}} ตัว',
-    'Republishing...': 'กำลังเผยแพร่ซ้ำ...'
+    'Republishing...': 'กำลังเผยแพร่ซ้ำ...',
+    'Trending Notes': 'โน้ตยอดนิยม'
   }
 }

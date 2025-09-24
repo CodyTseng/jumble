@@ -241,7 +241,7 @@ export default function PostRelaySelector({
           </Button>
         </DropdownMenuTrigger>
       </div>
-      <DropdownMenuContent align="start" className="max-w-96">
+      <DropdownMenuContent align="start" className="max-w-96 max-h-[50vh]" showScrollButtons>
         {content}
       </DropdownMenuContent>
     </DropdownMenu>

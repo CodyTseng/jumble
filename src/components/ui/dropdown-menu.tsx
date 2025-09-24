@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, Circle } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, ChevronUp, Circle } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -39,36 +39,175 @@ DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayNam
 
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
->(({ className, ...props }, ref) => (
-  <DropdownMenuPrimitive.SubContent
-    ref={ref}
-    className={cn(
-      'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-      className
-    )}
-    {...props}
-  />
-))
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent> & {
+    showScrollButtons?: boolean
+  }
+>(({ className, showScrollButtons = true, ...props }, ref) => {
+  const [canScrollUp, setCanScrollUp] = React.useState(false)
+  const [canScrollDown, setCanScrollDown] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const scrollAreaRef = React.useRef<HTMLDivElement>(null)
+
+  React.useImperativeHandle(ref, () => contentRef.current!)
+
+  const checkScrollability = React.useCallback(() => {
+    const scrollArea = scrollAreaRef.current
+    if (!scrollArea) return
+
+    setCanScrollUp(scrollArea.scrollTop > 0)
+    setCanScrollDown(scrollArea.scrollTop < scrollArea.scrollHeight - scrollArea.clientHeight)
+  }, [])
+
+  const scrollUp = () => {
+    scrollAreaRef.current?.scroll({ top: 0, behavior: 'smooth' })
+  }
+
+  const scrollDown = () => {
+    scrollAreaRef.current?.scroll({
+      top: scrollAreaRef.current.scrollHeight,
+      behavior: 'smooth'
+    })
+  }
+
+  return (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.SubContent
+        ref={contentRef}
+        className={cn(
+          'relative z-50 min-w-52 overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
+        )}
+        onAnimationEnd={() => {
+          if (showScrollButtons) {
+            checkScrollability()
+          }
+        }}
+        collisionPadding={10}
+        {...props}
+      >
+        {showScrollButtons && canScrollUp && (
+          <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-center bg-popover">
+            <button
+              onClick={scrollUp}
+              onMouseEnter={scrollUp}
+              className="flex items-center justify-center w-full h-6 hover:bg-accent rounded-sm transition-colors"
+              type="button"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <div
+          ref={scrollAreaRef}
+          className={cn('p-1 overflow-y-auto', className)}
+          onScroll={checkScrollability}
+        >
+          {props.children}
+        </div>
+
+        {showScrollButtons && canScrollDown && (
+          <div className="absolute bottom-0 inset-x-0 flex items-center justify-center bg-popover">
+            <button
+              onClick={scrollDown}
+              onMouseEnter={scrollDown}
+              className="flex items-center justify-center w-full h-6 hover:bg-accent rounded-sm transition-colors"
+              type="button"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </DropdownMenuPrimitive.SubContent>
+    </DropdownMenuPrimitive.Portal>
+  )
+})
 DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <DropdownMenuPrimitive.Portal>
-    <DropdownMenuPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        'z-50 min-w-52 overflow-hidden rounded-lg border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-        className
-      )}
-      collisionPadding={10}
-      {...props}
-    />
-  </DropdownMenuPrimitive.Portal>
-))
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> & {
+    showScrollButtons?: boolean
+  }
+>(({ className, sideOffset = 4, showScrollButtons = false, ...props }, ref) => {
+  const [canScrollUp, setCanScrollUp] = React.useState(false)
+  const [canScrollDown, setCanScrollDown] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const scrollAreaRef = React.useRef<HTMLDivElement>(null)
+
+  React.useImperativeHandle(ref, () => contentRef.current!)
+
+  const checkScrollability = React.useCallback(() => {
+    const scrollArea = scrollAreaRef.current
+    if (!scrollArea) return
+
+    setCanScrollUp(scrollArea.scrollTop > 0)
+    setCanScrollDown(scrollArea.scrollTop < scrollArea.scrollHeight - scrollArea.clientHeight)
+  }, [])
+
+  const scrollUp = () => {
+    scrollAreaRef.current?.scroll({ top: 0, behavior: 'smooth' })
+  }
+
+  const scrollDown = () => {
+    scrollAreaRef.current?.scroll({
+      top: scrollAreaRef.current.scrollHeight,
+      behavior: 'smooth'
+    })
+  }
+
+  return (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.Content
+        ref={contentRef}
+        sideOffset={sideOffset}
+        className={cn(
+          'relative z-50 min-w-52 overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
+        )}
+        onAnimationEnd={() => {
+          if (showScrollButtons) {
+            checkScrollability()
+          }
+        }}
+        collisionPadding={10}
+        {...props}
+      >
+        {showScrollButtons && canScrollUp && (
+          <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-center bg-popover">
+            <button
+              onClick={scrollUp}
+              onMouseEnter={scrollUp}
+              className="flex items-center justify-center w-full h-6 hover:bg-accent rounded-sm transition-colors"
+              type="button"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <div
+          ref={scrollAreaRef}
+          className={cn('p-1 overflow-y-auto', className)}
+          onScroll={checkScrollability}
+        >
+          {props.children}
+        </div>
+
+        {showScrollButtons && canScrollDown && (
+          <div className="absolute bottom-0 inset-x-0 flex items-center justify-center bg-popover">
+            <button
+              onClick={scrollDown}
+              onMouseEnter={scrollDown}
+              className="flex items-center justify-center w-full h-6 hover:bg-accent rounded-sm transition-colors"
+              type="button"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </DropdownMenuPrimitive.Content>
+    </DropdownMenuPrimitive.Portal>
+  )
+})
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<

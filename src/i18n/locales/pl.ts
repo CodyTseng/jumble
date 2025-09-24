@@ -427,6 +427,7 @@ export default {
     'Post to': 'Opublikuj na',
     'Write relays and {{count}} other relays': 'Przekaźniki zapisu i {{count}} innych przekaźników',
     '{{count}} relays': '{{count}} przekaźników',
-    'Republishing...': 'Ponowne publikowanie...'
+    'Republishing...': 'Ponowne publikowanie...',
+    'Trending Notes': 'Popularne wpisy'
   }
 }

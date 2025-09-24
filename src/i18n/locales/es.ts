@@ -427,6 +427,7 @@ export default {
     'Post to': 'Publicar en',
     'Write relays and {{count}} other relays': 'Relés de escritura y {{count}} otros relés',
     '{{count}} relays': '{{count}} relés',
-    'Republishing...': 'Republicando...'
+    'Republishing...': 'Republicando...',
+    'Trending Notes': 'Notas de tendencia'
   }
 }

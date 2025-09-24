@@ -420,6 +420,7 @@ export default {
     'Post to': 'نشر إلى',
     'Write relays and {{count}} other relays': 'مرحلات الكتابة و {{count}} مرحل آخر',
     '{{count}} relays': '{{count}} ريلايات',
-    'Republishing...': 'جارٍ إعادة النشر...'
+    'Republishing...': 'جارٍ إعادة النشر...',
+    'Trending Notes': 'الملاحظات الرائجة'
   }
 }
