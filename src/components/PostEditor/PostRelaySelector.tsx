@@ -218,7 +218,14 @@ export default function PostRelaySelector({
         </div>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent hideOverlay>{content}</DrawerContent>
+          <DrawerContent className="max-h-[80vh]" hideOverlay>
+            <div
+              className="overflow-y-auto overscroll-contain py-2"
+              style={{ touchAction: 'pan-y' }}
+            >
+              {content}
+            </div>
+          </DrawerContent>
         </Drawer>
       </>
     )

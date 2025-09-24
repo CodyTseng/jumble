@@ -16,7 +16,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { feedInfo, switchFeed } = useFeed()
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {pubkey && (
         <FeedSwitcherItem
           isActive={feedInfo.feedType === 'following'}
@@ -53,46 +53,44 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
         </FeedSwitcherItem>
       )}
 
-      <div className="space-y-2">
-        <div className="flex justify-end items-center text-sm">
-          <SecondaryPageLink
-            to={toRelaySettings()}
-            className="text-primary font-semibold"
-            onClick={() => close?.()}
-          >
-            {t('edit')}
-          </SecondaryPageLink>
-        </div>
-        {relaySets
-          .filter((set) => set.relayUrls.length > 0)
-          .map((set) => (
-            <RelaySetCard
-              key={set.id}
-              relaySet={set}
-              select={feedInfo.feedType === 'relays' && set.id === feedInfo.id}
-              onSelectChange={(select) => {
-                if (!select) return
-                switchFeed('relays', { activeRelaySetId: set.id })
-                close?.()
-              }}
-            />
-          ))}
-        {favoriteRelays.map((relay) => (
-          <FeedSwitcherItem
-            key={relay}
-            isActive={feedInfo.feedType === 'relay' && feedInfo.id === relay}
-            onClick={() => {
-              switchFeed('relay', { relay })
+      <div className="flex justify-end items-center text-sm">
+        <SecondaryPageLink
+          to={toRelaySettings()}
+          className="text-primary font-semibold"
+          onClick={() => close?.()}
+        >
+          {t('edit')}
+        </SecondaryPageLink>
+      </div>
+      {relaySets
+        .filter((set) => set.relayUrls.length > 0)
+        .map((set) => (
+          <RelaySetCard
+            key={set.id}
+            relaySet={set}
+            select={feedInfo.feedType === 'relays' && set.id === feedInfo.id}
+            onSelectChange={(select) => {
+              if (!select) return
+              switchFeed('relays', { activeRelaySetId: set.id })
               close?.()
             }}
-          >
-            <div className="flex gap-2 items-center w-full">
-              <RelayIcon url={relay} />
-              <div className="flex-1 w-0 truncate">{simplifyUrl(relay)}</div>
-            </div>
-          </FeedSwitcherItem>
+          />
         ))}
-      </div>
+      {favoriteRelays.map((relay) => (
+        <FeedSwitcherItem
+          key={relay}
+          isActive={feedInfo.feedType === 'relay' && feedInfo.id === relay}
+          onClick={() => {
+            switchFeed('relay', { relay })
+            close?.()
+          }}
+        >
+          <div className="flex gap-2 items-center w-full">
+            <RelayIcon url={relay} />
+            <div className="flex-1 w-0 truncate">{simplifyUrl(relay)}</div>
+          </div>
+        </FeedSwitcherItem>
+      ))}
     </div>
   )
 }

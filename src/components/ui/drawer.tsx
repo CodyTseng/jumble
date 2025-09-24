@@ -85,7 +85,7 @@ const DrawerContent = React.forwardRef<
       onOpenAutoFocus={(e) => e.preventDefault()}
       {...props}
     >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto mt-4 pb-2 mb-2 h-2 w-[100px] rounded-full bg-muted" />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>

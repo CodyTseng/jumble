@@ -20,7 +20,10 @@ export default function FeedButton({ className }: { className?: string }) {
         <FeedSwitcherTrigger className={className} onClick={() => setOpen(true)} />
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerContent className="max-h-[80vh]">
-            <div className="py-4 px-2 overflow-auto">
+            <div
+              className="overflow-y-auto overscroll-contain py-2 px-4"
+              style={{ touchAction: 'pan-y' }}
+            >
               <FeedSwitcher close={() => setOpen(false)} />
             </div>
           </DrawerContent>
