@@ -425,6 +425,6 @@ export default {
     'Write relays and {{count}} other relays': 'Relays de escrita e {{count}} outros relays',
     '{{count}} relays': '{{count}} relays',
     'Republishing...': 'Republicando...',
-    'Trending Notes': 'Notas de tendência'
+    'Trending Notes': 'Notas em tendência'
   }
 }
