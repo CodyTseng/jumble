@@ -91,9 +91,9 @@ class LightningService {
     if (zapRequestResBody.error) {
       throw new Error(zapRequestResBody.message)
     }
-    const { pr, verify } = zapRequestResBody
+    const { pr, verify, reason } = zapRequestResBody
     if (!pr) {
-      throw new Error('Failed to create invoice')
+      throw new Error(reason ?? 'Failed to create invoice')
     }
 
     if (this.provider) {

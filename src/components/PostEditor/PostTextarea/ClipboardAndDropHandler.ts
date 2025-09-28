@@ -123,7 +123,6 @@ async function uploadFiles(
     abortControllers.set(file, abortController)
     options.onUploadStart?.(file, () => abortController.abort())
   })
-  await new Promise((resolve) => setTimeout(resolve, 10000))
 
   for (const file of files) {
     const name = file.name
