@@ -143,7 +143,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
     <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Vault')}>
       <div className="px-4 pt-3 space-y-6">
         <div className="space-y-2">
-          <div className="font-semibold">{t('New to Rizful?')}</div>
+          <div className="font-semibold">1. {t('New to Rizful?')}</div>
           <Button
             className="bg-lime-500 hover:bg-lime-500/90 w-64"
             onClick={() => window.open(RIZFUL_SIGNUP_URL, '_blank')}
@@ -156,7 +156,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
 
         <div className="space-y-2">
-          <div className="font-semibold">{t('Get your one-time code')}</div>
+          <div className="font-semibold">2. {t('Get your one-time code')}</div>
           <Button
             className="bg-orange-500 hover:bg-orange-500/90 w-64"
             onClick={() => openPopup(RIZFUL_GET_TOKEN_URL, 'rizful_codes')}
@@ -167,7 +167,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
 
         <div className="space-y-2">
-          <div className="font-semibold">{t('Connect to your Rizful Vault')}</div>
+          <div className="font-semibold">3. {t('Connect to your Rizful Vault')}</div>
           <Input
             placeholder={t('Paste your one-time code here')}
             value={token}
