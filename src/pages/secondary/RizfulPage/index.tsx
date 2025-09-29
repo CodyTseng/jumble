@@ -167,7 +167,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
 
         <div className="space-y-2">
-          <div className="font-semibold">{t('Connect to your Rizful Wallet')}</div>
+          <div className="font-semibold">{t('Connect to your Rizful Vault')}</div>
           <Input
             placeholder={t('Paste your one-time code here')}
             value={token}
