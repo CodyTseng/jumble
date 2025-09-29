@@ -412,6 +412,27 @@ export default {
     Never: 'Nunca',
     'Click to load image': 'Haz clic para cargar la imagen',
     'Click to load media': 'Haz clic para cargar los medios',
-    'Click to load YouTube video': 'Haz clic para cargar el video de YouTube'
+    'Click to load YouTube video': 'Haz clic para cargar el video de YouTube',
+    'Connected to': 'Conectado a',
+    'Disconnect Wallet': 'Desconectar billetera',
+    'Are you absolutely sure?': '¿Estás absolutamente seguro?',
+    'You will not be able to send zaps to others.': 'No podrás enviar zaps a otros.',
+    Disconnect: 'Desconectar',
+    'Start with a Rizful Vault': 'Comienza con una Bóveda Rizful',
+    'or other wallets': 'o otras billeteras',
+    'Rizful Vault': 'Bóveda Rizful',
+    'Rizful Vault connected!': '¡Bóveda Rizful conectada!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'Ahora puedes usar tu Bóveda Rizful para zapear tus notas y creadores favoritos.',
+    'Your Lightning Address': 'Tu Dirección Lightning',
+    'New to Rizful?': '¿Nuevo en Rizful?',
+    'Sign up for Rizful': 'Regístrate en Rizful',
+    'If you already have a Rizful account, you can skip this step.':
+      'Si ya tienes una cuenta de Rizful, puedes omitir este paso.',
+    'Get your one-time code': 'Obtén tu código de un solo uso',
+    'Get code': 'Obtener código',
+    'Connect to your Rizful Vault': 'Conéctate a tu Bóveda Rizful',
+    'Paste your one-time code here': 'Pega tu código de un solo uso aquí',
+    Connect: 'Conectar'
   }
 }

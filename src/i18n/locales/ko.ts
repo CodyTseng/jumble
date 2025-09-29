@@ -409,6 +409,27 @@ export default {
     Never: '안함',
     'Click to load image': '이미지 로드하려면 클릭',
     'Click to load media': '미디어 로드하려면 클릭',
-    'Click to load YouTube video': 'YouTube 비디오 로드하려면 클릭'
+    'Click to load YouTube video': 'YouTube 비디오 로드하려면 클릭',
+    'Connected to': '연결됨',
+    'Disconnect Wallet': '지갑 연결 해제',
+    'Are you absolutely sure?': '정말 확실합니까?',
+    'You will not be able to send zaps to others.': '다른 사람에게 잽을 보낼 수 없습니다.',
+    Disconnect: '연결 해제',
+    'Start with a Rizful Vault': 'Rizful Vault로 시작하기',
+    'or other wallets': '또는 다른 지갑',
+    'Rizful Vault': 'Rizful Vault',
+    'Rizful Vault connected!': 'Rizful Vault 연결됨!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      '이제 Rizful Vault를 사용하여 좋아하는 노트와 크리에이터에게 잽을 보낼 수 있습니다.',
+    'Your Lightning Address': '귀하의 라이트닝 주소',
+    'New to Rizful?': 'Rizful이 처음이신가요?',
+    'Sign up for Rizful': 'Rizful에 가입하기',
+    'If you already have a Rizful account, you can skip this step.':
+      '이미 Rizful 계정이 있다면 이 단계를 건너뛸 수 있습니다.',
+    'Get your one-time code': '일회용 코드 받기',
+    'Get code': '코드 받기',
+    'Connect to your Rizful Vault': 'Rizful Vault에 연결',
+    'Paste your one-time code here': '여기에 일회용 코드를 붙여넣기',
+    Connect: '연결'
   }
 }

@@ -411,6 +411,27 @@ export default {
     Never: 'कभी नहीं',
     'Click to load image': 'इमेज लोड करने के लिए क्लिक करें',
     'Click to load media': 'मीडिया लोड करने के लिए क्लिक करें',
-    'Click to load YouTube video': 'YouTube वीडियो लोड करने के लिए क्लिक करें'
+    'Click to load YouTube video': 'YouTube वीडियो लोड करने के लिए क्लिक करें',
+    'Connected to': 'से कनेक्टेड',
+    'Disconnect Wallet': 'वॉलेट डिस्कनेक्ट करें',
+    'Are you absolutely sure?': 'क्या आप पूरी तरह से सुनिश्चित हैं?',
+    'You will not be able to send zaps to others.': 'आप दूसरों को जैप नहीं भेज पाएंगे।',
+    Disconnect: 'डिस्कनेक्ट करें',
+    'Start with a Rizful Vault': 'Rizful वॉल्ट के साथ शुरू करें',
+    'or other wallets': 'या अन्य वॉलेट',
+    'Rizful Vault': 'Rizful वॉल्ट',
+    'Rizful Vault connected!': 'Rizful वॉल्ट कनेक्टेड!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'अब आप अपने Rizful वॉल्ट का उपयोग अपने पसंदीदा नोट्स और क्रिएटर्स को जैप करने के लिए कर सकते हैं।',
+    'Your Lightning Address': 'आपका लाइटनिंग पता',
+    'New to Rizful?': 'Rizful में नया?',
+    'Sign up for Rizful': 'Rizful के लिए साइन अप करें',
+    'If you already have a Rizful account, you can skip this step.':
+      'यदि आपके पास पहले से ही एक Rizful अकाउंट है, तो आप इस चरण को छोड़ सकते हैं।',
+    'Get your one-time code': 'अपना वन-टाइम कोड प्राप्त करें',
+    'Get code': 'कोड प्राप्त करें',
+    'Connect to your Rizful Vault': 'अपने Rizful वॉल्ट से कनेक्ट करें',
+    'Paste your one-time code here': 'अपना वन-टाइम कोड यहां पेस्ट करें',
+    Connect: 'कनेक्ट करें'
   }
 }

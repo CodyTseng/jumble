@@ -407,6 +407,27 @@ export default {
     Never: 'أبداً',
     'Click to load image': 'انقر لتحميل الصورة',
     'Click to load media': 'انقر لتحميل الوسائط',
-    'Click to load YouTube video': 'انقر لتحميل فيديو YouTube'
+    'Click to load YouTube video': 'انقر لتحميل فيديو YouTube',
+    'Connected to': 'متصل بـ',
+    'Disconnect Wallet': 'قطع الاتصال بالمحفظة',
+    'Are you absolutely sure?': 'هل أنت متأكد تماماً؟',
+    'You will not be able to send zaps to others.': 'لن تتمكن من إرسال zaps للآخرين.',
+    Disconnect: 'قطع الاتصال',
+    'Start with a Rizful Vault': 'ابدأ بمحفظة Rizful',
+    'or other wallets': 'أو محافظ أخرى',
+    'Rizful Vault': 'محفظة Rizful',
+    'Rizful Vault connected!': 'تم توصيل محفظة Rizful!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'يمكنك الآن استخدام محفظة Rizful الخاصة بك لإرسال zap إلى ملاحظاتك والمبدعين المفضلين لديك.',
+    'Your Lightning Address': 'عنوان Lightning الخاص بك',
+    'New to Rizful?': 'جديد في Rizful؟',
+    'Sign up for Rizful': 'سجل في Rizful',
+    'If you already have a Rizful account, you can skip this step.':
+      'إذا كان لديك حساب Rizful بالفعل، يمكنك تخطي هذه الخطوة.',
+    'Get your one-time code': 'احصل على رمز الاستخدام مرة واحدة',
+    'Get code': 'احصل على الرمز',
+    'Connect to your Rizful Vault': 'الاتصال بمحفظة Rizful الخاصة بك',
+    'Paste your one-time code here': 'الصق رمز الاستخدام مرة واحدة هنا',
+    Connect: 'اتصال'
   }
 }

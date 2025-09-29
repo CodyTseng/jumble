@@ -406,6 +406,27 @@ export default {
     Never: 'Never',
     'Click to load image': 'Click to load image',
     'Click to load media': 'Click to load media',
-    'Click to load YouTube video': 'Click to load YouTube video'
+    'Click to load YouTube video': 'Click to load YouTube video',
+    'Connected to': 'Connected to',
+    'Disconnect Wallet': 'Disconnect Wallet',
+    'Are you absolutely sure?': 'Are you absolutely sure?',
+    'You will not be able to send zaps to others.': 'You will not be able to send zaps to others.',
+    Disconnect: 'Disconnect',
+    'Start with a Rizful Vault': 'Start with a Rizful Vault',
+    'or other wallets': 'or other wallets',
+    'Rizful Vault': 'Rizful Vault',
+    'Rizful Vault connected!': 'Rizful Vault connected!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'You can now use your Rizful Vault to zap your favorite notes and creators.',
+    'Your Lightning Address': 'Your Lightning Address',
+    'New to Rizful?': 'New to Rizful?',
+    'Sign up for Rizful': 'Sign up for Rizful',
+    'If you already have a Rizful account, you can skip this step.':
+      'If you already have a Rizful account, you can skip this step.',
+    'Get your one-time code': 'Get your one-time code',
+    'Get code': 'Get code',
+    'Connect to your Rizful Vault': 'Connect to your Rizful Vault',
+    'Paste your one-time code here': 'Paste your one-time code here',
+    Connect: 'Connect'
   }
 }

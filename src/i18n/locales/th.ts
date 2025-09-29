@@ -405,6 +405,27 @@ export default {
     Never: 'ไม่เลย',
     'Click to load image': 'คลิกเพื่อโหลดรูปภาพ',
     'Click to load media': 'คลิกเพื่อโหลดสื่อ',
-    'Click to load YouTube video': 'คลิกเพื่อโหลดวิดีโอ YouTube'
+    'Click to load YouTube video': 'คลิกเพื่อโหลดวิดีโอ YouTube',
+    'Connected to': 'เชื่อมต่อกับ',
+    'Disconnect Wallet': 'ตัดการเชื่อมต่อกระเป๋าสตางค์',
+    'Are you absolutely sure?': 'คุณแน่ใจอย่างยิ่งหรือไม่?',
+    'You will not be able to send zaps to others.': 'คุณจะไม่สามารถส่งซาตส์ไปยังผู้อื่นได้',
+    Disconnect: 'ตัดการเชื่อมต่อ',
+    'Start with a Rizful Vault': 'เริ่มต้นด้วย Rizful Vault',
+    'or other wallets': 'หรือกระเป๋าสตางค์อื่นๆ',
+    'Rizful Vault': 'Rizful Vault',
+    'Rizful Vault connected!': 'Rizful Vault เชื่อมต่อแล้ว!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'คุณสามารถใช้ Rizful Vault ของคุณเพื่อส่งซาตส์ไปยังโน้ตและผู้สร้างที่คุณชื่นชอบได้แล้ว',
+    'Your Lightning Address': 'ที่อยู่ Lightning ของคุณ',
+    'New to Rizful?': 'ใหม่กับ Rizful?',
+    'Sign up for Rizful': 'สมัครสมาชิก Rizful',
+    'If you already have a Rizful account, you can skip this step.':
+      'หากคุณมีบัญชี Rizful อยู่แล้ว คุณสามารถข้ามขั้นตอนนี้ได้',
+    'Get your one-time code': 'รับรหัสใช้ครั้งเดียวของคุณ',
+    'Get code': 'รับรหัส',
+    'Connect to your Rizful Vault': 'เชื่อมต่อกับ Rizful Vault ของคุณ',
+    'Paste your one-time code here': 'วางรหัสใช้ครั้งเดียวของคุณที่นี่',
+    Connect: 'เชื่อมต่อ'
   }
 }

@@ -414,6 +414,27 @@ export default {
     Never: 'Никогда',
     'Click to load image': 'Нажмите, чтобы загрузить изображение',
     'Click to load media': 'Нажмите, чтобы загрузить медиа',
-    'Click to load YouTube video': 'Нажмите, чтобы загрузить видео YouTube'
+    'Click to load YouTube video': 'Нажмите, чтобы загрузить видео YouTube',
+    'Connected to': 'Подключено к',
+    'Disconnect Wallet': 'Отключить кошелёк',
+    'Are you absolutely sure?': 'Вы абсолютно уверены?',
+    'You will not be able to send zaps to others.': 'Вы не сможете отправлять запы другим.',
+    Disconnect: 'Отключить',
+    'Start with a Rizful Vault': 'Начать с Rizful Vault',
+    'or other wallets': 'или другие кошельки',
+    'Rizful Vault': 'Rizful Vault',
+    'Rizful Vault connected!': 'Rizful Vault подключён!',
+    'You can now use your Rizful Vault to zap your favorite notes and creators.':
+      'Теперь вы можете использовать свой Rizful Vault, чтобы заппить ваши любимые заметки и создателей.',
+    'Your Lightning Address': 'Ваш Lightning-адрес',
+    'New to Rizful?': 'Новичок в Rizful?',
+    'Sign up for Rizful': 'Зарегистрируйтесь на Rizful',
+    'If you already have a Rizful account, you can skip this step.':
+      'Если у вас уже есть аккаунт Rizful, вы можете пропустить этот шаг.',
+    'Get your one-time code': 'Получите ваш одноразовый код',
+    'Get code': 'Получить код',
+    'Connect to your Rizful Vault': 'Подключитесь к вашему Rizful Vault',
+    'Paste your one-time code here': 'Вставьте ваш одноразовый код здесь',
+    Connect: 'Подключить'
   }
 }
