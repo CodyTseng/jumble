@@ -28,6 +28,7 @@ import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { routes } from './routes'
 import modalManager from './services/modal-manager.service'
+import CreateWalletGuideToast from './components/CreateWalletGuideToast'
 
 export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
@@ -321,6 +322,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ))}
               <BottomNavigationBar />
               <TooManyRelaysAlertDialog />
+              <CreateWalletGuideToast />
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -382,6 +384,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
+            <CreateWalletGuideToast />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>

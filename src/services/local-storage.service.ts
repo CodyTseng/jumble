@@ -47,6 +47,7 @@ class LocalStorageService {
   private hideContentMentioningMutedUsers: boolean = false
   private notificationListStyle: TNotificationStyle = NOTIFICATION_LIST_STYLE.DETAILED
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
+  private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -184,6 +185,13 @@ class LocalStorageService {
     ) {
       this.mediaAutoLoadPolicy = mediaAutoLoadPolicy as TMediaAutoLoadPolicy
     }
+
+    const shownCreateWalletGuideToastPubkeysStr = window.localStorage.getItem(
+      StorageKey.SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS
+    )
+    this.shownCreateWalletGuideToastPubkeys = shownCreateWalletGuideToastPubkeysStr
+      ? new Set(JSON.parse(shownCreateWalletGuideToastPubkeysStr))
+      : new Set()
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -452,6 +460,21 @@ class LocalStorageService {
   setMediaAutoLoadPolicy(policy: TMediaAutoLoadPolicy) {
     this.mediaAutoLoadPolicy = policy
     window.localStorage.setItem(StorageKey.MEDIA_AUTO_LOAD_POLICY, policy)
+  }
+
+  hasShownCreateWalletGuideToast(pubkey: string) {
+    return this.shownCreateWalletGuideToastPubkeys.has(pubkey)
+  }
+
+  markCreateWalletGuideToastAsShown(pubkey: string) {
+    if (this.shownCreateWalletGuideToastPubkeys.has(pubkey)) {
+      return
+    }
+    this.shownCreateWalletGuideToastPubkeys.add(pubkey)
+    window.localStorage.setItem(
+      StorageKey.SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS,
+      JSON.stringify(Array.from(this.shownCreateWalletGuideToastPubkeys))
+    )
   }
 }
 
