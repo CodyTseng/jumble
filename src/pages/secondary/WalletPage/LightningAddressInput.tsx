@@ -28,26 +28,21 @@ export default function LightningAddressInput() {
 
   const handleSave = async () => {
     setSaving(true)
-    let lud06 = profile.lud06
-    let lud16 = profile.lud16
+    const profileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
     if (lightningAddress.startsWith('lnurl')) {
-      lud06 = lightningAddress
+      profileContent.lud06 = lightningAddress
     } else if (isEmail(lightningAddress)) {
-      lud16 = lightningAddress
-    } else {
+      profileContent.lud16 = lightningAddress
+    } else if (lightningAddress) {
       toast.error(t('Invalid Lightning Address. Please enter a valid Lightning Address or LNURL.'))
       setSaving(false)
       return
+    } else {
+      delete profileContent.lud16
     }
 
-    const oldProfileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
-    const newProfileContent = {
-      ...oldProfileContent,
-      lud06,
-      lud16
-    }
     const profileDraftEvent = createProfileDraftEvent(
-      JSON.stringify(newProfileContent),
+      JSON.stringify(profileContent),
       profileEvent?.tags
     )
     const newProfileEvent = await publish(profileDraftEvent)

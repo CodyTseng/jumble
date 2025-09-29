@@ -65,21 +65,6 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
-    let lud06 = profile.lud06
-    let lud16 = profile.lud16
-    if (lightningAddress) {
-      if (isEmail(lightningAddress)) {
-        lud16 = lightningAddress
-      } else if (lightningAddress.startsWith('lnurl')) {
-        lud06 = lightningAddress
-      } else {
-        setLightningAddressError(t('Invalid Lightning Address'))
-        return
-      }
-    }
-
-    setSaving(true)
-    setHasChanged(false)
     const oldProfileContent = profileEvent ? JSON.parse(profileEvent.content) : {}
     const newProfileContent = {
       ...oldProfileContent,
@@ -90,10 +75,24 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       website,
       nip05,
       banner,
-      picture: avatar,
-      lud06,
-      lud16
+      picture: avatar
     }
+
+    if (lightningAddress) {
+      if (isEmail(lightningAddress)) {
+        newProfileContent.lud16 = lightningAddress
+      } else if (lightningAddress.startsWith('lnurl')) {
+        newProfileContent.lud06 = lightningAddress
+      } else {
+        setLightningAddressError(t('Invalid Lightning Address'))
+        return
+      }
+    } else {
+      delete newProfileContent.lud16
+    }
+
+    setSaving(true)
+    setHasChanged(false)
     const profileDraftEvent = createProfileDraftEvent(
       JSON.stringify(newProfileContent),
       profileEvent?.tags
