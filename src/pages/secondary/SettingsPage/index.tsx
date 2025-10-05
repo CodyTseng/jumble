@@ -116,7 +116,7 @@ const SettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           </div>
           <div className="flex gap-2 items-center">
             <div className="text-muted-foreground">
-              v{__APP_VERSION__} ({__GIT_COMMIT__})
+              v{import.meta.env.APP_VERSION} ({import.meta.env.GIT_COMMIT})
             </div>
             <ChevronRight />
           </div>

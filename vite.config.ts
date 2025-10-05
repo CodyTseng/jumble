@@ -26,8 +26,8 @@ const getAppVersion = () => {
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    __GIT_COMMIT__: getGitHash(),
-    __APP_VERSION__: getAppVersion()
+    'import.meta.env.GIT_COMMIT': getGitHash(),
+    'import.meta.env.APP_VERSION': getAppVersion()
   },
   resolve: {
     alias: {
