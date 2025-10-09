@@ -11,6 +11,8 @@ import GenerateNewAccount from './GenerateNewAccount'
 import NostrConnectLogin from './NostrConnectionLogin'
 import NpubLogin from './NpubLogin'
 import PrivateKeyLogin from './PrivateKeyLogin'
+import { NesignerSigner } from '../../providers/NostrProvider/nesigner.signer'
+import { verifyEvent } from 'nostr-tools'
 
 type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'npub' | null
 
@@ -66,6 +68,45 @@ function AccountManagerNav({
           {isDevEnv() && (
             <Button variant="secondary" onClick={() => setPage('npub')} className="w-full">
               Login with Public key (for development)
+            </Button>
+          )}
+          {isDevEnv() && (
+            <Button variant="secondary" onClick={async () => {
+              let nesigenrSigner = new NesignerSigner("12345678");
+              let pubkey = await nesigenrSigner.login();
+              if (pubkey) {
+                console.log(pubkey);
+
+                let sourceText = 'Hello, Nesigner!'
+
+                let event = await nesigenrSigner.signEvent({
+                  kind: 1,
+                  tags: [],
+                  content: sourceText,
+                  created_at: Math.floor(Date.now() / 1000)
+                })
+                if (event) {
+                  console.log(event);
+
+                  var isValid = verifyEvent(event);
+                  console.log("event verify result: " + isValid);
+                }
+
+                let othersPubkey = "37c10448a0fd9295d166100dcd80b01f52f3cc70c98431a89f480fc9f8256861"
+                let nip04EncryptedText = await nesigenrSigner.nip04Encrypt(othersPubkey, sourceText);
+                console.log("nip04EncryptedText: " + nip04EncryptedText);
+
+                let nip04DecryptedText = await nesigenrSigner.nip04Decrypt(othersPubkey, nip04EncryptedText);
+                console.log("nip04DecryptedText: " + nip04DecryptedText);
+
+                let nip44EncryptedText = await nesigenrSigner.nip44Encrypt(othersPubkey, sourceText);
+                console.log("nip44EncryptedText: " + nip44EncryptedText);
+
+                let nip44DecryptedText = await nesigenrSigner.nip44Decrypt(othersPubkey, nip44EncryptedText);
+                console.log("nip44DecryptedText: " + nip44DecryptedText);
+              }
+            }} className="w-full">
+              Login with Nesigner (for test)
             </Button>
           )}
         </div>
