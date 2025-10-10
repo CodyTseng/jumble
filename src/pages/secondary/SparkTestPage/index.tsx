@@ -35,6 +35,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [lightningAddress, setLightningAddress] = useState('')
   const [invoice, setInvoice] = useState('')
   const [paymentRequest, setPaymentRequest] = useState('')
+  const [paymentAmount, setPaymentAmount] = useState<number>(0)
   const [loading, setLoading] = useState(false)
   const [hasSavedWallet, setHasSavedWallet] = useState(false)
   const [topUpAmount, setTopUpAmount] = useState<number>(1000)
@@ -324,15 +325,25 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
+    // Check if amount is needed (for Lightning addresses or zero-amount invoices)
+    const isLightningAddress = paymentRequest.includes('@')
+    if (isLightningAddress && paymentAmount === 0) {
+      toast.error('Amount is required for Lightning addresses')
+      return
+    }
+
     setLoading(true)
     try {
-      await sparkService.sendPayment(paymentRequest)
+      // Pass amount if it's set, otherwise undefined
+      const amountToSend = paymentAmount > 0 ? paymentAmount : undefined
+      await sparkService.sendPayment(paymentRequest, amountToSend)
       toast.success('Payment sent successfully')
 
       // Refresh balance
       const info = await sparkService.getInfo()
       setBalance(info.balanceSats)
       setPaymentRequest('')
+      setPaymentAmount(0)
     } catch (error) {
       toast.error(`Payment failed: ${(error as Error).message}`)
     } finally {
@@ -668,6 +679,24 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 value={paymentRequest}
                 onChange={(e) => setPaymentRequest(e.target.value)}
               />
+
+              {/* Amount field - shown for Lightning addresses or optional for invoices */}
+              {paymentRequest.includes('@') && (
+                <div className="space-y-2">
+                  <Label htmlFor="paymentAmount">
+                    Amount (sats) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="paymentAmount"
+                    type="number"
+                    placeholder="Enter amount in sats"
+                    value={paymentAmount || ''}
+                    onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                    min="1"
+                  />
+                </div>
+              )}
+
               <Button onClick={handleSendPayment} disabled={loading || !paymentRequest} className="w-full">
                 {loading && <Loader2 className="animate-spin" />}
                 Send Payment

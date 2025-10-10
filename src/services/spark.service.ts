@@ -9,6 +9,7 @@ import initBreezSDK, {
   LightningAddressInfo,
   ListPaymentsResponse,
   Network,
+  parse,
   Payment,
   ReceivePaymentResponse,
   SdkEvent,
@@ -75,13 +76,18 @@ class SparkService {
       await this.initializeWasm()
     }
 
-    if (this.connecting) {
-      throw new Error('Connection already in progress')
+    // If already connected, return existing connection
+    if (this.sdk) {
+      console.log('[SparkService] Already connected, returning existing SDK')
+      // Reset connecting flag if it was stuck
+      this.connecting = false
+      return { sdk: this.sdk, mnemonic: this.currentMnemonic }
     }
 
-    if (this.sdk) {
-      console.log('[SparkService] Already connected')
-      return { sdk: this.sdk, mnemonic: this.currentMnemonic }
+    if (this.connecting) {
+      console.warn('[SparkService] Connection already in progress, but no SDK instance. Resetting...')
+      // Reset the flag if we're stuck (e.g., from a previous failed attempt)
+      this.connecting = false
     }
 
     this.connecting = true
@@ -166,6 +172,9 @@ class SparkService {
    * Disconnect and cleanup
    */
   async disconnect(): Promise<void> {
+    // Reset connecting flag first
+    this.connecting = false
+
     if (this.sdk) {
       try {
         // Remove event listener
@@ -183,6 +192,14 @@ class SparkService {
     this.config = null
     this.currentMnemonic = ''
     this.eventCallbacks = []
+  }
+
+  /**
+   * Reset connection state (useful if stuck in connecting state)
+   */
+  resetConnectionState(): void {
+    console.log('[SparkService] Resetting connection state')
+    this.connecting = false
   }
 
   /**
@@ -297,7 +314,7 @@ class SparkService {
    * Send payment via Lightning
    *
    * @param paymentRequest - Bolt11 invoice or Lightning address
-   * @param amountSats - Amount (required for zero-amount invoices)
+   * @param amountSats - Amount (required for Lightning addresses and zero-amount invoices)
    */
   async sendPayment(
     paymentRequest: string,
@@ -306,25 +323,83 @@ class SparkService {
     if (!this.sdk) throw new Error('SDK not connected')
 
     try {
-      // Prepare the payment
-      const prepareResponse = await this.sdk.prepareSendPayment({
-        paymentRequest,
-        amountSats
-      })
+      // Parse the input to determine what type it is
+      console.log('[SparkService] Parsing payment input:', paymentRequest)
+      const parsedInput = await parse(paymentRequest)
+      console.log('[SparkService] Parsed input:', JSON.stringify(parsedInput, null, 2))
+      console.log('[SparkService] Parsed input type:', parsedInput.type)
 
-      console.log('[SparkService] Payment prepared:', prepareResponse)
+      // Handle Lightning addresses via LNURL-Pay
+      if (parsedInput.type === 'lightningAddress') {
+        console.log('[SparkService] Using LNURL-Pay flow for Lightning address')
 
-      // Send the payment
-      const response = await this.sdk.sendPayment({
-        prepareResponse,
-        options: {
-          type: 'bolt11Invoice',
-          preferSpark: false // Use Lightning for compatibility
+        if (!amountSats || amountSats <= 0) {
+          throw new Error('Amount is required for Lightning addresses')
         }
-      })
 
-      console.log('[SparkService] Payment sent:', response)
-      return response
+        // Extract the payRequest from the parsed Lightning address
+        const lightningAddressDetails = parsedInput as any
+        const payRequest = lightningAddressDetails.payRequest
+
+        console.log('[SparkService] PayRequest:', payRequest)
+
+        // Prepare LNURL-Pay with the payRequest details
+        const prepareResponse = await this.sdk.prepareLnurlPay({
+          payRequest,
+          amountSats
+        })
+
+        console.log('[SparkService] LNURL-Pay prepared:', prepareResponse)
+
+        const response = await this.sdk.lnurlPay({
+          prepareResponse
+        })
+
+        console.log('[SparkService] LNURL-Pay sent:', response)
+        return response.payment as any // Return the payment from LNURL response
+      } else if (parsedInput.type === 'lnurlPay') {
+        console.log('[SparkService] Using LNURL-Pay flow for lnurlPay type')
+
+        if (!amountSats || amountSats <= 0) {
+          throw new Error('Amount is required for LNURL-Pay')
+        }
+
+        // For lnurlPay type, the parsed input IS the payRequest
+        const prepareResponse = await this.sdk.prepareLnurlPay({
+          payRequest: parsedInput as any,
+          amountSats
+        })
+
+        console.log('[SparkService] LNURL-Pay prepared:', prepareResponse)
+
+        const response = await this.sdk.lnurlPay({
+          prepareResponse
+        })
+
+        console.log('[SparkService] LNURL-Pay sent:', response)
+        return response.payment as any
+      } else {
+        // Regular Bolt11 invoice or other supported types
+        console.log('[SparkService] Using regular payment flow')
+
+        const prepareResponse = await this.sdk.prepareSendPayment({
+          paymentRequest,
+          amountSats
+        })
+
+        console.log('[SparkService] Payment prepared:', prepareResponse)
+
+        const response = await this.sdk.sendPayment({
+          prepareResponse,
+          options: {
+            type: 'bolt11Invoice',
+            preferSpark: false
+          }
+        })
+
+        console.log('[SparkService] Payment sent:', response)
+        return response
+      }
     } catch (error) {
       console.error('[SparkService] Payment failed:', error)
       throw error
@@ -350,13 +425,13 @@ class SparkService {
    * Register a Lightning address
    * Format: username@domain
    */
-  async registerLightningAddress(username: string): Promise<LightningAddressInfo> {
+  async registerLightningAddress(username: string, description?: string): Promise<LightningAddressInfo> {
     if (!this.sdk) throw new Error('SDK not connected')
 
     try {
       const response = await this.sdk.registerLightningAddress({
         username,
-        description: 'Juicebox Spark Wallet'
+        description: description || 'Jumble Spark Wallet'
       })
       console.log('[SparkService] Lightning address registered:', response.lightningAddress)
       return response
@@ -378,6 +453,110 @@ class SparkService {
     } catch (error) {
       console.error('[SparkService] Failed to get Lightning address:', error)
       return null
+    }
+  }
+
+  /**
+   * Check if a Lightning address username is available
+   */
+  async checkLightningAddressAvailable(username: string): Promise<boolean> {
+    if (!this.sdk) throw new Error('SDK not connected')
+
+    try {
+      const isAvailable = await this.sdk.checkLightningAddressAvailable({ username })
+      return isAvailable
+    } catch (error) {
+      console.error('[SparkService] Failed to check Lightning address availability:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Delete current Lightning address
+   */
+  async deleteLightningAddress(): Promise<void> {
+    if (!this.sdk) throw new Error('SDK not connected')
+
+    try {
+      await this.sdk.deleteLightningAddress()
+      console.log('[SparkService] Lightning address deleted')
+    } catch (error) {
+      console.error('[SparkService] Failed to delete Lightning address:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Find an available username variation based on preferred name
+   * Sanitizes the name and tries variations with numeric suffixes if needed
+   */
+  async suggestAvailableUsername(preferredName: string): Promise<string> {
+    if (!this.sdk) throw new Error('SDK not connected')
+
+    // Sanitize username: lowercase, alphanumeric + underscores only
+    const sanitize = (name: string): string => {
+      return name
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, '') // Remove special chars
+        .replace(/^[0-9]+/, '') // Remove leading numbers
+        .substring(0, 32) // Max length
+        .trim()
+    }
+
+    let username = sanitize(preferredName)
+
+    // Fallback if sanitization results in empty string
+    if (!username) {
+      username = 'user'
+    }
+
+    try {
+      // Check if base username is available
+      const isAvailable = await this.checkLightningAddressAvailable(username)
+      if (isAvailable) {
+        return username
+      }
+
+      // Try variations with numeric suffix
+      for (let i = 1; i <= 999; i++) {
+        const variation = `${username}${i}`
+        const isVariationAvailable = await this.checkLightningAddressAvailable(variation)
+        if (isVariationAvailable) {
+          return variation
+        }
+      }
+
+      // If we couldn't find anything after 999 tries, throw error
+      throw new Error('Unable to find available username variation')
+    } catch (error) {
+      console.error('[SparkService] Failed to suggest available username:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Register or update Lightning address
+   * If address already exists, deletes it first then registers the new one
+   */
+  async setLightningAddress(username: string, description?: string): Promise<LightningAddressInfo> {
+    if (!this.sdk) throw new Error('SDK not connected')
+
+    try {
+      // Check if we already have a Lightning address
+      const existing = await this.getLightningAddress()
+
+      if (existing) {
+        console.log('[SparkService] Deleting existing Lightning address:', existing.lightningAddress)
+        await this.deleteLightningAddress()
+      }
+
+      // Register new address
+      const response = await this.registerLightningAddress(username, description)
+      console.log('[SparkService] Lightning address set:', response.lightningAddress)
+      return response
+    } catch (error) {
+      console.error('[SparkService] Failed to set Lightning address:', error)
+      throw error
     }
   }
 }

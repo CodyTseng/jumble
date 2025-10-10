@@ -31,6 +31,12 @@ class SparkProfileSyncService {
     updateProfileEvent: (event: NostrEvent) => Promise<void>
   ): Promise<void> {
     try {
+      // Safety check - don't publish if we don't have existing profile data
+      if (!currentProfileEvent) {
+        console.warn('[SparkProfileSync] No existing profile event - skipping sync to avoid data loss')
+        return
+      }
+
       const oldProfileContent = currentProfileEvent ? JSON.parse(currentProfileEvent.content) : {}
 
       // Check if Lightning address is already set to this value
@@ -39,6 +45,7 @@ class SparkProfileSyncService {
         return
       }
 
+      console.log('[SparkProfileSync] Old profile content:', oldProfileContent)
       console.log('[SparkProfileSync] Updating profile with Lightning address:', lightningAddress)
 
       // Create updated profile content with new Lightning address
@@ -47,10 +54,20 @@ class SparkProfileSyncService {
         lud16: lightningAddress
       }
 
+      console.log('[SparkProfileSync] New profile content:', newProfileContent)
+
+      // Verify we're not losing data
+      const oldKeys = Object.keys(oldProfileContent).length
+      const newKeys = Object.keys(newProfileContent).length
+      if (newKeys < oldKeys) {
+        console.error('[SparkProfileSync] Data loss detected! Old keys:', oldKeys, 'New keys:', newKeys)
+        throw new Error('Profile update would lose data - aborting')
+      }
+
       // Create and sign the profile event
       const profileDraftEvent = createProfileDraftEvent(
         JSON.stringify(newProfileContent),
-        currentProfileEvent?.tags
+        currentProfileEvent?.tags || []
       )
 
       // Publish to relays

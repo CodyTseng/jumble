@@ -27,3 +27,6 @@ dev-dist
 
 .vercel
 .env.local
+
+# Dev notes
+dev-notes-*.md
