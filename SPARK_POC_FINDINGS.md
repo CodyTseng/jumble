@@ -1,15 +1,20 @@
-# Breez Spark SDK - POC Phase 1 Findings
+# Breez Spark SDK - POC Phase 1 & 2 Findings
 
-**Date:** October 9, 2025
-**Status:** Ready for Testing
+**Date:** October 10, 2025
+**Status:** Phase 2 Complete - Lightning Address Management Implemented
 
 ## Summary
 
-Successfully integrated Breez Spark SDK v0.2.6 into Juicebox. The POC demonstrates:
+Successfully integrated Breez Spark SDK v0.2.6 into Jumble. The POC demonstrates:
 - ✅ SDK installation and WebAssembly initialization
 - ✅ Service wrapper for SDK operations
 - ✅ Test UI for manual validation
-- ⏳ Pending: Live testing with API key
+- ✅ Live testing completed with mainnet
+- ✅ Lightning address registration and management
+- ✅ Secure encrypted mnemonic storage
+- ✅ Auto-wallet restoration
+- ✅ Nostr profile synchronization
+- 🔄 In Progress: UI redesign with tabbed interface
 
 ## Installation
 
@@ -145,44 +150,162 @@ const sdk = await connect({
 - [ ] Verify balance decreases
 
 #### 4. Lightning Address Test
-- [ ] Check if Lightning address is automatically generated
-- [ ] If not, try `registerLightningAddress()` method
-- [ ] Verify address format
+- [x] Check if Lightning address is automatically generated ✅
+- [x] Implemented `registerLightningAddress()` method ✅
+- [x] Verified address format: `username@breez.tips` ✅
+- [x] Tested with user: `haxmedroom@breez.tips` ✅
 
 #### 5. NIP-57 Zap Test
 - [ ] Generate Spark invoice for 21 sats
 - [ ] Try to pay via existing jumble zap flow
 - [ ] Check if Spark can pay zaps from other users
 
+---
+
+## Phase 2: Lightning Address Management (October 10, 2025)
+
+### ✅ Completed Features
+
+#### 1. Lightning Address API Methods (`spark.service.ts`)
+- **`checkLightningAddressAvailable(username)`** - Check if username is available before registration
+- **`getLightningAddress()`** - Retrieve current Lightning address (already existed)
+- **`registerLightningAddress(username, description?)`** - Register new Lightning address
+- **`deleteLightningAddress()`** - Delete current Lightning address
+- **`suggestAvailableUsername(preferredName)`** - Smart username suggestion with:
+  - Sanitization (lowercase, alphanumeric + underscores only)
+  - Automatic fallback with numeric suffixes if taken (e.g., `alice` → `alice1`, `alice2`)
+  - Tries up to 999 variations before giving up
+- **`setLightningAddress(username, description?)`** - Unified method to set/update address
+  - Automatically deletes existing address if present
+  - Registers new address in one call
+
+#### 2. Auto-Registration Flow
+- **Automatic username detection** from Nostr profile:
+  1. First tries `original_username` (raw Nostr display name)
+  2. Falls back to `username` (formatted username)
+  3. Falls back to first 12 chars of npub
+  4. Final fallback to 'user'
+- **Auto-registration on connection**:
+  - Checks if Lightning address already exists
+  - If not, automatically suggests and registers one
+  - Syncs to Nostr profile with user confirmation
+- **User confirmation dialogs** before publishing profile updates
+- Tested successfully with user `haxmedroom` → `haxmedroom@breez.tips`
+
+#### 3. Profile Sync Safety Features (`spark-profile-sync.service.ts`)
+- **Safety check**: Won't publish if no existing profile event (prevents creating blank profiles)
+- **Data loss detection**: Aborts if update would reduce number of profile fields
+- **User confirmation**: Asks permission before syncing Lightning address to Nostr profile
+- **Debug logging**: Shows old and new profile content for troubleshooting
+- **Preserves all existing profile fields** using spread operator
+
+#### 4. UI Enhancements
+- **Lightning Address Management Section**:
+  - Display mode: Shows current address with Change/Delete buttons
+  - Edit mode: Input field with real-time availability checking
+  - Empty state: "Register Lightning Address" button if none exists
+  - Change functionality with username validation
+  - Delete functionality with confirmation
+- **User feedback** via toast notifications for all operations
+- **Loading states** for async operations
+
+#### 5. Encrypted Storage Integration
+- Mnemonic encrypted with XChaCha20-Poly1305 using Nostr pubkey
+- Auto-restore wallet on page reload
+- Wallet tied to user's Nostr account (can't be used by others)
+
+### 🔍 Testing Results
+
+**Test User:** haxmedroom
+**Lightning Address:** `haxmedroom@breez.tips`
+**Network:** Mainnet
+**Status:** ✅ All features working
+
+- ✅ Auto-registration picked up username correctly
+- ✅ Lightning address change/delete works
+- ✅ Profile sync with user confirmation works
+- ✅ Profile data preserved (no data loss)
+- ✅ Encrypted mnemonic storage and restoration works
+- ✅ Balance updates automatically
+- ✅ Payment animations work
+
+### 📝 Files Modified/Created
+
+**Modified:**
+- `src/services/spark.service.ts` - Added Lightning address management methods (+108 lines)
+- `src/services/spark-profile-sync.service.ts` - Added safety checks and logging
+- `src/pages/secondary/SparkTestPage/index.tsx` - Added Lightning address UI and auto-registration (+275 lines)
+
+**Created:**
+- `src/components/SparkPaymentsList/index.tsx` - Payment history component (for Phase 3)
+
+### ⚠️ Known Issues & Lessons Learned
+
+1. **Profile data was lost during initial testing**
+   - Cause: Synced to profile before safety checks were in place
+   - Fix: Added multiple layers of safety (confirmation dialogs, data loss detection, safety checks)
+   - Status: ✅ Resolved with comprehensive safety features
+
+2. **Initial username fallback to 'user'**
+   - Cause: Profile not loaded when registration ran
+   - Fix: Improved username detection priority chain
+   - Status: ✅ Resolved - now correctly uses Nostr username
+
+3. **UI needs reorganization**
+   - Current: Long scrolling page with all features mixed
+   - Needed: Tabbed interface (Payments tab + Top-Up tab)
+   - Status: 🔄 In progress
+
 ## Next Steps
 
-### Immediate (Based on Testing)
-1. Test with actual API key and funds
-2. Document any errors or issues
-3. Verify Lightning address functionality
-4. Test zap compatibility
+### Phase 3: Lightning Address Payments (Completed ✅)
+1. ✅ Updated `sendPayment()` method to support Lightning addresses
+2. ✅ Implemented input type detection using `parse()` function
+3. ✅ Added LNURL-Pay flow routing for Lightning addresses
+4. ✅ Maintained backward compatibility with Bolt11 invoices
+5. ✅ Added amount validation for Lightning address payments
+6. ✅ Fixed `payRequest` structure extraction from parsed Lightning address
+7. ✅ Added amount input field in UI (appears when `@` detected)
+8. ✅ Successfully tested sending payments to Lightning addresses
 
-### Short-term (If POC Succeeds)
-1. Add BIP39 library for mnemonic generation
-2. Implement secure mnemonic storage (encrypted)
+**Key Implementation Details:**
+- `parse(lightningAddress)` returns `{ type: 'lightningAddress', payRequest: LnurlPayRequestDetails }`
+- Must extract `payRequest` field before passing to `prepareLnurlPay()`
+- Amount is required for Lightning addresses (validated in both service and UI)
+- Payment flow: parse → extract payRequest → prepareLnurlPay → lnurlPay
+
+### Phase 4: UI Redesign (Pending)
+1. ⏸️ Implement tabbed interface (Payments tab + Top-Up tab)
+2. ⏸️ Add payment history list with scroll/pagination as primary view
+3. ⏸️ Move Disconnect/Delete wallet to collapsible settings section
+4. ⏸️ Improve mobile responsiveness
+
+**Note**: UI redesign was attempted but reverted due to JSX complexity. Current UI is functional and includes all Phase 2 features (Lightning address management, encrypted storage, profile sync). UI improvements deferred to avoid regression.
+
+### Short-term (Post-POC)
+1. ~~Add BIP39 library for mnemonic generation~~ (Using external generator for now)
+2. ~~Implement secure mnemonic storage (encrypted)~~ ✅ Completed
 3. Create WebLN adapter if needed
-4. Build proper wallet creation flow
-5. Add seed backup/recovery UI
+4. Build proper wallet creation flow UI
+5. Add seed backup/recovery UI with warnings
+6. Test NIP-57 zap compatibility
 
 ### Medium-term (Full Integration)
-1. Replace Rizful flow with Spark option
+1. Replace/complement Rizful flow with Spark option
 2. Add toggle between wallet types
 3. Integrate with existing zap functionality
-4. Payment history UI
-5. Balance display in main UI
-6. Lightning address auto-update to profile
+4. ~~Payment history UI~~ 🔄 In progress
+5. Balance display in main UI (not just test page)
+6. ~~Lightning address auto-update to profile~~ ✅ Completed
 
 ### Long-term (Production)
 1. Security audit of key storage
-2. Backup/recovery testing
+2. Comprehensive backup/recovery testing
 3. Error handling improvements
 4. Performance optimization
 5. User education about self-custody
+6. Rate limiting and abuse prevention
+7. Multi-device wallet sync considerations
 
 ## Security Considerations
 
