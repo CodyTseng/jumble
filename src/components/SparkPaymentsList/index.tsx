@@ -27,50 +27,59 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
   }
 
   const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp * 1000)
+    // Check if timestamp is in seconds (Unix timestamp) or milliseconds
+    // If the timestamp is less than 10^12, it's in seconds (before year 2286)
+    const milliseconds = timestamp < 10000000000 ? timestamp * 1000 : timestamp
+    const date = new Date(milliseconds)
     return date.toLocaleString()
   }
 
-  const formatAmount = (amountSats: number, paymentType: string) => {
-    const prefix = paymentType === 'sent' ? '-' : '+'
-    const color = paymentType === 'sent' ? 'text-red-600' : 'text-green-600'
+  const formatAmount = (amount: number | undefined, paymentType: string) => {
+    const amountSats = amount || 0
+    const prefix = paymentType === 'send' ? '-' : '+'
+    const color = paymentType === 'send' ? 'text-red-600' : 'text-green-600'
     return <span className={color}>{prefix}{amountSats.toLocaleString()} sats</span>
   }
 
   return (
-    <div className="space-y-2 max-h-[500px] overflow-y-auto">
+    <div className="space-y-1 max-h-[500px] overflow-y-auto">
       {payments.map((payment, index) => (
         <div
           key={payment.id || index}
-          className="p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+          className="p-2 border rounded bg-card hover:bg-accent/50 transition-colors"
         >
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                {formatAmount(payment.amountSats, payment.paymentType)}
-                <span className="text-xs text-muted-foreground capitalize">
-                  {payment.paymentType}
-                </span>
-                <span className={`text-xs px-1.5 py-0.5 rounded ${
-                  payment.status === 'complete'
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                    : payment.status === 'pending'
-                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                    : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
-                }`}>
-                  {payment.status}
-                </span>
-              </div>
-              {payment.description && (
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {payment.description}
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">
-                {formatDate(payment.createdAt)}
-              </p>
+          <div className="flex items-center justify-between gap-3">
+            {/* Amount - Left side */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {formatAmount(payment.amount, payment.paymentType)}
+              <span className="text-xs text-muted-foreground capitalize">
+                {payment.paymentType}
+              </span>
+            </div>
+
+            {/* Date and Status - Right side */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs text-muted-foreground">
+                {formatDate(payment.timestamp)}
+              </span>
+              <span className={`text-xs px-1.5 py-0.5 rounded ${
+                payment.status === 'completed'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                  : payment.status === 'pending'
+                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                  : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
+              }`}>
+                {payment.status}
+              </span>
             </div>
           </div>
+
+          {/* Description - Full width on second line if exists */}
+          {payment.details && 'description' in payment.details && (
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              {payment.details.description}
+            </p>
+          )}
         </div>
       ))}
     </div>
