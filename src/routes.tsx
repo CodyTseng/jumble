@@ -16,6 +16,7 @@ import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import RizfulPage from './pages/secondary/RizfulPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
+import SparkTestPage from './pages/secondary/SparkTestPage'
 import TranslationPage from './pages/secondary/TranslationPage'
 import WalletPage from './pages/secondary/WalletPage'
 
@@ -37,7 +38,8 @@ const ROUTES = [
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
-  { path: '/rizful', element: <RizfulPage /> }
+  { path: '/rizful', element: <RizfulPage /> },
+  { path: '/spark-test', element: <SparkTestPage /> }
 ]
 
 export const routes = ROUTES.map(({ path, element }) => ({
