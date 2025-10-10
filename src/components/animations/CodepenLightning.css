@@ -1,0 +1,57 @@
+.lightning-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  transition: background 0.2s;
+  /* Ensure content is centered */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Allow content to overflow without being cut off */
+  overflow: visible;
+}
+
+.lightning-svg {
+  position: absolute;
+  top: 0;
+  /* Increased size to allow for overflow without cutting off bolts */
+  width: 100vw; /* Use full viewport width */
+  height: 100vh;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7));
+  /* Center the SVG */
+  left: 50%;
+  transform: translateX(-50%);
+  /* Explicitly allow overflow */
+  overflow: visible;
+}
+
+.rayo {
+  stroke-linecap: round;
+  opacity: 0;
+  animation: aparecer 0.2s ease-out, desvanecer 0.6s ease-in 0.2s; /* Slightly longer fade-out */
+  fill: none; /* Ensure no fill */
+}
+
+@keyframes aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes desvanecer {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.flash {
+  animation: flash 0.2s;
+}
+
+@keyframes flash {
+  0% { background: rgba(255, 255, 255, 0.3); }
+  100% { background: transparent; }
+}

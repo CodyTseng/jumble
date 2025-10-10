@@ -11,6 +11,7 @@ import { SubCloser } from 'nostr-tools/abstract-pool'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
 import client from './client.service'
+import sparkService from './spark.service'
 
 export type TRecentSupporter = { pubkey: string; amount: number; comment?: string }
 
@@ -85,6 +86,20 @@ class LightningService {
       throw new Error(reason ?? 'Failed to create invoice')
     }
 
+    // Try Spark wallet first if connected
+    if (sparkService.isConnected()) {
+      try {
+        console.log('[LightningService] Paying zap with Spark wallet')
+        const response = await sparkService.sendPayment(pr)
+        closeOuterModel?.()
+        return { preimage: response.preimage || '', invoice: pr }
+      } catch (error) {
+        console.error('[LightningService] Spark payment failed, falling back to WebLN:', error)
+        // Fall through to WebLN provider
+      }
+    }
+
+    // Try WebLN provider next
     if (this.provider) {
       const { preimage } = await this.provider.sendPayment(pr)
       closeOuterModel?.()
@@ -151,12 +166,27 @@ class LightningService {
     invoice: string,
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string } | null> {
+    // Try Spark wallet first if connected
+    if (sparkService.isConnected()) {
+      try {
+        console.log('[LightningService] Paying invoice with Spark wallet')
+        const response = await sparkService.sendPayment(invoice)
+        closeOuterModel?.()
+        return { preimage: response.preimage || '', invoice }
+      } catch (error) {
+        console.error('[LightningService] Spark payment failed, falling back to WebLN:', error)
+        // Fall through to WebLN provider
+      }
+    }
+
+    // Try WebLN provider next
     if (this.provider) {
       const { preimage } = await this.provider.sendPayment(invoice)
       closeOuterModel?.()
-      return { preimage, invoice: invoice }
+      return { preimage, invoice }
     }
 
+    // Fall back to payment modal
     return new Promise((resolve) => {
       closeOuterModel?.()
       launchPaymentModal({

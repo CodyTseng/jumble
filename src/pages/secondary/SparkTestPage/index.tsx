@@ -5,9 +5,12 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useNostr } from '@/providers/NostrProvider'
 import sparkService from '@/services/spark.service'
 import sparkStorage from '@/services/spark-storage.service'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { forwardRef, useEffect, useState } from 'react'
+import sparkProfileSync from '@/services/spark-profile-sync.service'
+import CodepenLightning from '@/components/animations/CodepenLightning'
+import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import QRCodeStyling from 'qr-code-styling'
 
 /**
  * SparkTestPage - POC Test Page for Breez Spark SDK
@@ -20,11 +23,12 @@ import { toast } from 'sonner'
  * - Payment sending
  */
 const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
-  const { pubkey } = useNostr()
+  const { pubkey, profileEvent, publish, updateProfileEvent } = useNostr()
   const [apiKey, setApiKey] = useState(import.meta.env.VITE_BREEZ_SPARK_API_KEY || '')
   const [mnemonic, setMnemonic] = useState('')
   const [showMnemonic, setShowMnemonic] = useState(false)
   const [generatedMnemonic, setGeneratedMnemonic] = useState('')
+  const [showGeneratedMnemonic, setShowGeneratedMnemonic] = useState(false)
   const [connecting, setConnecting] = useState(false)
   const [connected, setConnected] = useState(false)
   const [balance, setBalance] = useState<number | null>(null)
@@ -33,6 +37,11 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [paymentRequest, setPaymentRequest] = useState('')
   const [loading, setLoading] = useState(false)
   const [hasSavedWallet, setHasSavedWallet] = useState(false)
+  const [topUpAmount, setTopUpAmount] = useState<number>(1000)
+  const [showTopUpDialog, setShowTopUpDialog] = useState(false)
+  const [showLightning, setShowLightning] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const qrCodeRef = useRef<HTMLDivElement>(null)
 
   // Check for saved wallet on mount
   useEffect(() => {
@@ -65,7 +74,22 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
           setBalance(info.balanceSats)
 
           if (event.type === 'paymentSucceeded') {
-            toast.success('Payment received! Balance updated')
+            // Show lightning animation
+            setShowLightning(true)
+
+            // Show success checkmark after lightning starts
+            setTimeout(() => {
+              setShowSuccess(true)
+              toast.success('Payment received! Balance updated')
+            }, 300)
+
+            // Hide animations and close dialog after they complete
+            setTimeout(() => {
+              setShowLightning(false)
+              setShowSuccess(false)
+              setShowTopUpDialog(false)
+              setInvoice('')
+            }, 2500)
           }
         } catch (error) {
           console.error('Failed to update balance:', error)
@@ -75,6 +99,58 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     return unsubscribe
   }, [connected])
+
+  // Generate QR code when invoice changes
+  useEffect(() => {
+    if (!invoice || !qrCodeRef.current || !showTopUpDialog) return
+
+    // Clear QR code if showing success animation
+    if (showSuccess) {
+      qrCodeRef.current.innerHTML = ''
+      return
+    }
+
+    // Clear previous QR code
+    qrCodeRef.current.innerHTML = ''
+
+    // Calculate responsive QR code size
+    const containerWidth = qrCodeRef.current.parentElement?.clientWidth || 300
+    const qrSize = Math.min(containerWidth - 32, 400) // Max 400px, with padding
+
+    const qrCode = new QRCodeStyling({
+      width: qrSize,
+      height: qrSize,
+      data: invoice.toUpperCase(),
+      margin: 10,
+      qrOptions: {
+        typeNumber: 0,
+        mode: 'Byte',
+        errorCorrectionLevel: 'M'
+      },
+      imageOptions: {
+        hideBackgroundDots: true,
+        imageSize: 0.4,
+        margin: 5
+      },
+      dotsOptions: {
+        color: '#000000',
+        type: 'rounded'
+      },
+      backgroundOptions: {
+        color: '#ffffff'
+      },
+      cornersSquareOptions: {
+        color: '#000000',
+        type: 'extra-rounded'
+      },
+      cornersDotOptions: {
+        color: '#000000',
+        type: 'dot'
+      }
+    })
+
+    qrCode.append(qrCodeRef.current)
+  }, [invoice, showTopUpDialog, showSuccess])
 
   const autoConnect = async () => {
     if (!pubkey) {
@@ -104,6 +180,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const addr = await sparkService.getLightningAddress()
       if (addr) {
         setLightningAddress(addr.lightningAddress)
+
+        // Sync Lightning address to Nostr profile
+        await sparkProfileSync.syncLightningAddressToProfile(
+          addr.lightningAddress,
+          profileEvent,
+          publish,
+          updateProfileEvent
+        )
       }
 
       toast.success('Wallet restored from encrypted storage')
@@ -150,6 +234,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const addr = await sparkService.getLightningAddress()
       if (addr) {
         setLightningAddress(addr.lightningAddress)
+
+        // Sync Lightning address to Nostr profile
+        await sparkProfileSync.syncLightningAddressToProfile(
+          addr.lightningAddress,
+          profileEvent,
+          publish,
+          updateProfileEvent
+        )
       }
 
       // Hide mnemonic input after successful connection
@@ -212,12 +304,13 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
   }
 
-  const handleGenerateInvoice = async () => {
+  const handleGenerateInvoice = async (amount: number) => {
     setLoading(true)
     try {
-      const response = await sparkService.receivePayment(1000, 'Juicebox test payment')
+      const response = await sparkService.receivePayment(amount, `Top up Spark wallet: ${amount} sats`)
       setInvoice(response.paymentRequest)
-      toast.success('Invoice generated')
+      setShowTopUpDialog(true)
+      toast.success('Invoice generated - scan to top up')
     } catch (error) {
       toast.error(`Invoice generation failed: ${(error as Error).message}`)
     } finally {
@@ -249,6 +342,9 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title="Spark SDK Test (POC)">
+      {/* Lightning animation overlay */}
+      {showLightning && <CodepenLightning duration={1000} active={showLightning} />}
+
       <div className="px-4 pt-3 space-y-6">
         {!pubkey && (
           <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg">
@@ -336,12 +432,28 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
           <>
             {generatedMnemonic && (
               <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg space-y-2">
-                <p className="font-semibold text-yellow-900 dark:text-yellow-200">
-                  ⚠️ Save Your Mnemonic!
-                </p>
-                <p className="text-sm text-yellow-800 dark:text-yellow-300 font-mono break-all">
-                  {generatedMnemonic}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-yellow-900 dark:text-yellow-200">
+                    ⚠️ Save Your Mnemonic!
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowGeneratedMnemonic(!showGeneratedMnemonic)}
+                    className="h-auto p-1"
+                  >
+                    {showGeneratedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </Button>
+                </div>
+                {showGeneratedMnemonic ? (
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300 font-mono break-all">
+                    {generatedMnemonic}
+                  </p>
+                ) : (
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                    Click the eye icon to reveal your recovery phrase
+                  </p>
+                )}
                 <p className="text-xs text-yellow-700 dark:text-yellow-400">
                   Write this down securely. You'll need it to recover your wallet.
                 </p>
@@ -372,18 +484,179 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
               )}
             </div>
 
-            <div className="space-y-2">
+            {/* Wallet Top-Up Section */}
+            <div className="space-y-4">
+              {!showTopUpDialog && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-lg font-semibold">Choose an amount to deposit</Label>
+                    {(balance || 0) + topUpAmount > 100000 && (
+                      <span className="text-xs text-amber-600 dark:text-amber-500">
+                        ⚠️ Hot wallet
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Preset Amounts - 2 column grid like Fountain */}
+                  <div className="grid grid-cols-2 gap-3">
+                {[1000, 5000, 10000, 20000, 50000, 100000].map((amount) => {
+                  const currentBalance = balance || 0
+                  const maxAllowed = 500000
+                  const remainingCapacity = maxAllowed - currentBalance
+                  const wouldExceedLimit = amount > remainingCapacity
+                  const newBalance = currentBalance + amount
+
+                  return (
+                    <Button
+                      key={amount}
+                      variant={topUpAmount === amount ? 'default' : 'outline'}
+                      size="lg"
+                      onClick={() => setTopUpAmount(amount)}
+                      disabled={wouldExceedLimit}
+                      className="h-auto py-4 flex flex-col items-start gap-1"
+                      title={wouldExceedLimit ? `Would exceed 500k limit (current: ${currentBalance.toLocaleString()})` : undefined}
+                    >
+                      <span className={`text-lg font-bold ${wouldExceedLimit ? 'text-muted-foreground' : ''}`}>
+                        {amount.toLocaleString()} sats
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        ≈${(amount * 0.001217).toFixed(2)}
+                      </span>
+                      {wouldExceedLimit && (
+                        <span className="text-xs text-red-500">Over limit</span>
+                      )}
+                    </Button>
+                  )
+                })}
+              </div>
+
+              {/* Custom Amount Button */}
               <Button
-                onClick={handleGenerateInvoice}
-                disabled={loading}
-                variant="secondary"
-                className="w-full"
+                variant={topUpAmount > 100000 && topUpAmount !== 100000 ? 'default' : 'outline'}
+                size="lg"
+                onClick={() => {
+                  const currentBalance = balance || 0
+                  const maxAllowed = 500000
+                  const remainingCapacity = maxAllowed - currentBalance
+                  const customAmount = prompt(
+                    `Enter custom amount in sats (max ${remainingCapacity.toLocaleString()} remaining):`,
+                    Math.min(topUpAmount, remainingCapacity).toString()
+                  )
+                  if (customAmount) {
+                    const val = parseInt(customAmount) || 0
+                    setTopUpAmount(Math.min(Math.max(val, 0), remainingCapacity))
+                  }
+                }}
+                className="w-full h-auto py-4 flex items-center justify-between"
               >
-                {loading && <Loader2 className="animate-spin" />}
-                Generate Test Invoice (1000 sats)
+                <span className="text-lg">Custom</span>
+                <span className="text-muted-foreground">⚙️</span>
               </Button>
-              {invoice && (
-                <div className="p-2 bg-muted rounded text-xs font-mono break-all">{invoice}</div>
+
+              {/* Safety Warning */}
+              {(balance || 0) + topUpAmount > 100000 && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-700 rounded text-xs">
+                  <p className="font-semibold text-amber-900 dark:text-amber-200">
+                    ⚠️ Hot Wallet Warning
+                  </p>
+                  <p className="text-amber-800 dark:text-amber-300 mt-1">
+                    Hot wallets should not contain large balances. Consider keeping less than 100k sats for daily use.
+                  </p>
+                </div>
+              )}
+
+              {/* Balance Limit Warning */}
+              {(balance || 0) + topUpAmount > 500000 && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-300 dark:border-red-700 rounded text-xs">
+                  <p className="font-semibold text-red-900 dark:text-red-200">
+                    Maximum Balance Exceeded
+                  </p>
+                  <p className="text-red-800 dark:text-red-300 mt-1">
+                    Total balance would be {((balance || 0) + topUpAmount).toLocaleString()} sats.
+                    Maximum allowed is 500,000 sats.
+                  </p>
+                </div>
+              )}
+
+                  <Button
+                    onClick={() => handleGenerateInvoice(topUpAmount)}
+                    disabled={loading || topUpAmount === 0 || (balance || 0) + topUpAmount > 500000}
+                    className="w-full h-12 text-base"
+                    size="lg"
+                  >
+                    {loading && <Loader2 className="animate-spin" />}
+                    Generate invoice
+                  </Button>
+                </>
+              )}
+
+              {/* Invoice Display Dialog */}
+              {showTopUpDialog && invoice && (
+                <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-700 rounded">
+                <div className="flex items-center justify-between">
+                  <Label className="font-semibold text-blue-900 dark:text-blue-200">
+                    Invoice Generated
+                  </Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowTopUpDialog(false)
+                      setInvoice('')
+                    }}
+                    className="h-auto p-1"
+                  >
+                    ✕
+                  </Button>
+                </div>
+                {!showSuccess && (
+                  <p className="text-xs text-blue-800 dark:text-blue-300">
+                    Scan QR code or copy invoice to top up your wallet
+                  </p>
+                )}
+
+                {/* QR Code or Success Animation */}
+                <div className={`flex justify-center p-4 rounded-lg overflow-hidden min-h-[280px] relative ${showSuccess ? 'bg-transparent' : 'bg-white'}`}>
+                  {/* QR Code Container - hidden when success is showing */}
+                  <div
+                    ref={qrCodeRef}
+                    className={`flex items-center justify-center max-w-full ${showSuccess ? 'hidden' : ''}`}
+                  />
+
+                  {/* Success Animation - shown when payment succeeds */}
+                  {showSuccess && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-green-500 rounded-full p-8 animate-in fade-in zoom-in duration-300">
+                        <CheckCircle className="w-32 h-32 text-white" strokeWidth={2} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Invoice String - hidden when success is showing */}
+                {!showSuccess && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-blue-900 dark:text-blue-200">Lightning Invoice</Label>
+                      <div className="p-2 bg-white dark:bg-gray-900 rounded text-xs font-mono break-all border max-h-24 overflow-y-auto">
+                        {invoice}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(invoice)
+                        toast.success('Invoice copied to clipboard')
+                      }}
+                      className="w-full"
+                    >
+                      Copy Invoice
+                    </Button>
+                  </>
+                )}
+                </div>
               )}
             </div>
 
