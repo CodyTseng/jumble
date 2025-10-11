@@ -573,7 +573,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleGenerateInvoice = async (amount: number) => {
     setLoading(true)
     try {
-      const response = await sparkService.receivePayment(amount, `Top up Spark wallet: ${amount} sats`)
+      const response = await sparkService.receivePayment(amount, `Payment requested: ${amount} sats`)
       setInvoice(response.paymentRequest)
       setShowTopUpDialog(true)
       toast.success('Invoice generated - scan to top up')
@@ -702,7 +702,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${result.lightningAddress}?`)) {
         console.log('[SparkTestPage] Syncing Lightning address to Nostr profile...')
         try {
-          await sparkProfileSyncService.syncLightningAddressToProfile(
+          await sparkProfileSync.syncLightningAddressToProfile(
             result.lightningAddress,
             profileEvent,
             publish,
@@ -711,8 +711,9 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
           console.log('[SparkTestPage] Lightning address synced to Nostr profile')
         } catch (syncError) {
           console.error('[SparkTestPage] Failed to sync to Nostr profile:', syncError)
-          console.error('[SparkTestPage] Sync error details:', syncError instanceof Error ? syncError.message : String(syncError))
-          toast.warning('⚠️ Lightning address is active, but couldn\'t update your Nostr profile. You can manually add it to your profile later.')
+          const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
+          console.error('[SparkTestPage] Sync error details:', errorMessage)
+          toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually add it to your profile later.`)
         }
       }
     } catch (error) {
@@ -739,7 +740,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         publish,
         updateProfileEvent
       )
-      toast.success('✅ Lightning address synced to your Nostr profile!')
+      toast.success('Lightning address synced to your Nostr profile!')
       console.log('[SparkTestPage] Successfully synced to profile')
     } catch (error) {
       console.error('[SparkTestPage] Failed to sync to profile:', error)

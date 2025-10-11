@@ -16,6 +16,7 @@ import { toRizful, toSparkTest } from '@/lib/link'
 import { useZap } from '@/providers/ZapProvider'
 import { useSparkWallet } from '@/providers/SparkWalletProvider'
 import { disconnect, launchModal } from '@getalby/bitcoin-connect-react'
+import { Info } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultZapAmountInput from './DefaultZapAmountInput'
@@ -91,20 +92,28 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             </Button>
           </div>
           <div className="pt-4 border-t">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => push(toSparkTest())}
-            >
-              {sparkConnecting ? '⏳' : '🧪'} Spark SDK Test (POC)
-              {sparkConnected && ' ✓'}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                className="bg-foreground hover:bg-foreground/90"
+                onClick={() => push(toSparkTest())}
+              >
+                {sparkConnecting ? 'Setting up...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
+              </Button>
+              <Button
+                variant="link"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground px-0"
+                onClick={() => window.open('https://breez.technology/spark/', '_blank')}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground mt-2">
               {sparkConnecting
-                ? 'Setting up your Spark wallet...'
+                ? 'Initializing Spark wallet...'
                 : sparkConnected
-                  ? 'Your Spark wallet is ready! Click to open.'
-                  : 'Test the Breez Spark self-custodial wallet integration'}
+                  ? 'Your Spark wallet is ready'
+                  : 'Experimental Spark wallet integration'}
             </p>
           </div>
         </div>
