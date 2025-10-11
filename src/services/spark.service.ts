@@ -130,7 +130,7 @@ class SparkService {
       const connectRequest: ConnectRequest = {
         config: this.config,
         seed,
-        storageDir: 'juicebox-spark-wallet'
+        storageDir: 'jumble-spark-wallet'
       }
 
       console.log('[SparkService] Connect request prepared')
@@ -290,7 +290,7 @@ class SparkService {
    */
   async receivePayment(
     amountSats?: number,
-    description = 'Juicebox payment'
+    description = 'Jumble payment'
   ): Promise<ReceivePaymentResponse> {
     if (!this.sdk) throw new Error('SDK not connected')
 
