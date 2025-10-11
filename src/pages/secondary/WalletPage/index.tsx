@@ -14,8 +14,9 @@ import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toRizful, toSparkTest } from '@/lib/link'
 import { useZap } from '@/providers/ZapProvider'
+import { useSparkWallet } from '@/providers/SparkWalletProvider'
 import { disconnect, launchModal } from '@getalby/bitcoin-connect-react'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultZapAmountInput from './DefaultZapAmountInput'
 import DefaultZapCommentInput from './DefaultZapCommentInput'
@@ -26,6 +27,17 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isWalletConnected, walletInfo } = useZap()
+  const { connected: sparkConnected, connecting: sparkConnecting } = useSparkWallet()
+  const hasAutoNavigated = useRef(false)
+
+  // Auto-navigate to Spark wallet if it's connected (only once on mount)
+  useEffect(() => {
+    if (sparkConnected && !isWalletConnected && !hasAutoNavigated.current) {
+      console.log('[WalletPage] Spark wallet detected, navigating to Spark page')
+      hasAutoNavigated.current = true
+      push(toSparkTest())
+    }
+  }, [sparkConnected, isWalletConnected, push])
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')}>
@@ -84,10 +96,15 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
               className="w-full"
               onClick={() => push(toSparkTest())}
             >
-              🧪 Spark SDK Test (POC)
+              {sparkConnecting ? '⏳' : '🧪'} Spark SDK Test (POC)
+              {sparkConnected && ' ✓'}
             </Button>
             <p className="text-xs text-muted-foreground mt-2">
-              Test the Breez Spark self-custodial wallet integration
+              {sparkConnecting
+                ? 'Setting up your Spark wallet...'
+                : sparkConnected
+                  ? 'Your Spark wallet is ready! Click to open.'
+                  : 'Test the Breez Spark self-custodial wallet integration'}
             </p>
           </div>
         </div>

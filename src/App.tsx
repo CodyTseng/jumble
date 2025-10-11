@@ -14,6 +14,7 @@ import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
 import { ReplyProvider } from '@/providers/ReplyProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
+import { SparkWalletProvider } from '@/providers/SparkWalletProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
 import { UserPreferencesProvider } from '@/providers/UserPreferencesProvider'
@@ -28,32 +29,34 @@ export default function App(): JSX.Element {
         <ScreenSizeProvider>
           <DeletedEventProvider>
             <NostrProvider>
-              <ZapProvider>
-                <TranslationServiceProvider>
-                  <FavoriteRelaysProvider>
-                    <FollowListProvider>
-                      <MuteListProvider>
-                        <UserTrustProvider>
-                          <BookmarksProvider>
-                            <FeedProvider>
-                              <ReplyProvider>
-                                <MediaUploadServiceProvider>
-                                  <KindFilterProvider>
-                                    <UserPreferencesProvider>
-                                      <PageManager />
-                                      <Toaster />
-                                    </UserPreferencesProvider>
-                                  </KindFilterProvider>
-                                </MediaUploadServiceProvider>
-                              </ReplyProvider>
-                            </FeedProvider>
-                          </BookmarksProvider>
-                        </UserTrustProvider>
-                      </MuteListProvider>
-                    </FollowListProvider>
-                  </FavoriteRelaysProvider>
-                </TranslationServiceProvider>
-              </ZapProvider>
+              <SparkWalletProvider>
+                <ZapProvider>
+                  <TranslationServiceProvider>
+                    <FavoriteRelaysProvider>
+                      <FollowListProvider>
+                        <MuteListProvider>
+                          <UserTrustProvider>
+                            <BookmarksProvider>
+                              <FeedProvider>
+                                <ReplyProvider>
+                                  <MediaUploadServiceProvider>
+                                    <KindFilterProvider>
+                                      <UserPreferencesProvider>
+                                        <PageManager />
+                                        <Toaster />
+                                      </UserPreferencesProvider>
+                                    </KindFilterProvider>
+                                  </MediaUploadServiceProvider>
+                                </ReplyProvider>
+                              </FeedProvider>
+                            </BookmarksProvider>
+                          </UserTrustProvider>
+                        </MuteListProvider>
+                      </FollowListProvider>
+                    </FavoriteRelaysProvider>
+                  </TranslationServiceProvider>
+                </ZapProvider>
+              </SparkWalletProvider>
             </NostrProvider>
           </DeletedEventProvider>
         </ScreenSizeProvider>
