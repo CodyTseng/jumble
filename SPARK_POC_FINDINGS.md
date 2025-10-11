@@ -62,7 +62,7 @@ const seed = { type: 'mnemonic', mnemonic: '12 or 24 words' }
 const sdk = await connect({
   config,
   seed,
-  storageDir: 'juicebox-spark-wallet'
+  storageDir: 'jumble-spark-wallet'
 })
 ```
 
@@ -385,4 +385,4 @@ This provides maximum flexibility and doesn't break existing functionality.
 
 **Ready for testing with API key!**
 
-Access test page at: http://localhost:5173/ → Settings → Wallet → "🧪 Spark SDK Test (POC)"
+Access test page at: http://localhost:5174/ → Settings → Wallet → "🧪 Spark SDK Test (POC)"
