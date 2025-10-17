@@ -407,9 +407,9 @@ export default {
     Always: 'Sempre',
     'Wi-Fi only': 'Apenas Wi-Fi',
     Never: 'Nunca',
-    'Click to load image': 'Clique para carregar a imagem',
-    'Click to load media': 'Clique para carregar a mídia',
-    'Click to load YouTube video': 'Clique para carregar o vídeo do YouTube',
+    'Click to load image': 'Carregar imagem',
+    'Click to load media': 'Carregar mídia',
+    'Click to load YouTube video': 'Carregar vídeo do YouTube',
     '{{count}} reviews': '{{count}} avaliações',
     'Write a review': 'Escrever uma avaliação',
     'No reviews yet. Be the first to write one!':
