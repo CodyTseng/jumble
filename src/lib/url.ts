@@ -137,3 +137,33 @@ export function isMedia(url: string) {
     return false
   }
 }
+
+export const truncateUrl = (url: string, maxLength: number = 40) => {
+  try {
+    const urlObj = new URL(url)
+    let domain = urlObj.hostname
+    let path = urlObj.pathname
+
+    if (domain.startsWith('www.')) {
+      domain = domain.slice(4)
+    }
+
+    if (!path || path === '/') {
+      return domain
+    }
+
+    if (path.endsWith('/')) {
+      path = path.slice(0, -1)
+    }
+
+    const u = domain + path
+
+    if (u.length > maxLength) {
+      return domain + path.slice(0, maxLength - domain.length - 3) + '...'
+    }
+
+    return u
+  } catch {
+    return url
+  }
+}
