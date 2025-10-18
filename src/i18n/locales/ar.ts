@@ -455,6 +455,27 @@ export default {
     'Unpinned!': 'تم إلغاء التثبيت!',
     'Failed to unpin: {{error}}': 'فشل في إلغاء التثبيت: {{error}}',
     'Unpin from profile': 'إلغاء التثبيت من الملف الشخصي',
-    'Pin to profile': 'تثبيت في الملف الشخصي'
+    'Pin to profile': 'تثبيت في الملف الشخصي',
+    Appearance: 'المظهر',
+    'Pure Black': 'أسود نقي',
+    Default: 'افتراضي',
+    Red: 'أحمر',
+    Orange: 'برتقالي',
+    Amber: 'عنبر',
+    Yellow: 'أصفر',
+    Lime: 'ليموني',
+    Green: 'أخضر',
+    Emerald: 'زمردي',
+    Teal: 'أزرق مخضر',
+    Cyan: 'سماوي',
+    Sky: 'سماء',
+    Blue: 'أزرق',
+    Indigo: 'نيلي',
+    Violet: 'بنفسجي',
+    Purple: 'أرجواني',
+    Fuchsia: 'فوشيا',
+    Pink: 'وردي',
+    Rose: 'وردة',
+    'Primary color': 'اللون الأساسي'
   }
 }

@@ -4,7 +4,8 @@ import {
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   SUPPORTED_KINDS,
-  StorageKey
+  StorageKey,
+  TPrimaryColor
 } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
@@ -49,6 +50,7 @@ class LocalStorageService {
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
   private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
   private sidebarCollapse: boolean = false
+  private primaryColor: TPrimaryColor = 'DEFAULT'
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -195,6 +197,9 @@ class LocalStorageService {
       : new Set()
 
     this.sidebarCollapse = window.localStorage.getItem(StorageKey.SIDEBAR_COLLAPSE) === 'true'
+
+    this.primaryColor =
+      (window.localStorage.getItem(StorageKey.PRIMARY_COLOR) as TPrimaryColor) ?? 'DEFAULT'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -487,6 +492,15 @@ class LocalStorageService {
   setSidebarCollapse(collapse: boolean) {
     this.sidebarCollapse = collapse
     window.localStorage.setItem(StorageKey.SIDEBAR_COLLAPSE, collapse.toString())
+  }
+
+  getPrimaryColor() {
+    return this.primaryColor
+  }
+
+  setPrimaryColor(color: TPrimaryColor) {
+    this.primaryColor = color
+    window.localStorage.setItem(StorageKey.PRIMARY_COLOR, color)
   }
 }
 

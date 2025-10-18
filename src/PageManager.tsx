@@ -28,6 +28,7 @@ import RelayPage from './pages/primary/RelayPage'
 import SearchPage from './pages/primary/SearchPage'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
+import { useTheme } from './providers/ThemeProvider'
 import { routes } from './routes'
 import modalManager from './services/modal-manager.service'
 
@@ -104,6 +105,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
+  const { themeSetting } = useTheme()
   const ignorePopStateRef = useRef(false)
 
   useEffect(() => {
@@ -356,8 +358,18 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 }}
               >
                 <Sidebar />
-                <div className="grid grid-cols-2 gap-2 w-full pr-2 py-2">
-                  <div className="rounded-lg shadow-lg bg-background overflow-hidden">
+                <div
+                  className={cn(
+                    'grid grid-cols-2 w-full',
+                    themeSetting === 'pure-black' ? '' : 'gap-2 pr-2 py-2'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'bg-background overflow-hidden',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                    )}
+                  >
                     {primaryPages.map(({ name, element, props }) => (
                       <div
                         key={name}
@@ -370,7 +382,12 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                       </div>
                     ))}
                   </div>
-                  <div className="rounded-lg shadow-lg bg-background overflow-hidden">
+                  <div
+                    className={cn(
+                      'bg-background overflow-hidden',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                    )}
+                  >
                     {secondaryStack.map((item, index) => (
                       <div
                         key={item.index}

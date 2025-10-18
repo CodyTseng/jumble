@@ -453,6 +453,27 @@ export default {
     'Unpinned!': 'ยกเลิกปักหมุดแล้ว!',
     'Failed to unpin: {{error}}': 'ไม่สามารถยกเลิกปักหมุดได้: {{error}}',
     'Unpin from profile': 'ยกเลิกปักหมุดจากโปรไฟล์',
-    'Pin to profile': 'ปักหมุดไปที่โปรไฟล์'
+    'Pin to profile': 'ปักหมุดไปที่โปรไฟล์',
+    Appearance: 'รูปลักษณ์',
+    'Pure Black': 'สีดำล้วน',
+    Default: 'ค่าเริ่มต้น',
+    Red: 'แดง',
+    Orange: 'ส้ม',
+    Amber: 'อำพัน',
+    Yellow: 'เหลือง',
+    Lime: 'มะนาว',
+    Green: 'เขียว',
+    Emerald: 'มรกต',
+    Teal: 'ฟ้าเขียว',
+    Cyan: 'ฟ้าน้ำทะเล',
+    Sky: 'ฟ้า',
+    Blue: 'น้ำเงิน',
+    Indigo: 'คราม',
+    Violet: 'ม่วงอ่อน',
+    Purple: 'ม่วง',
+    Fuchsia: 'บานเย็น',
+    Pink: 'ชมพู',
+    Rose: 'กุหลาบ',
+    'Primary color': 'สีหลัก'
   }
 }

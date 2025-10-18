@@ -6,7 +6,6 @@ import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn, isSupportCheckConnectionType } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { TMediaAutoLoadPolicy } from '@/types'
@@ -18,7 +17,6 @@ import { useTranslation } from 'react-i18next'
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
-  const { themeSetting, setThemeSetting } = useTheme()
   const {
     autoplay,
     setAutoplay,
@@ -54,21 +52,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                   {value}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-        </SettingItem>
-        <SettingItem>
-          <Label htmlFor="theme" className="text-base font-normal">
-            {t('Theme')}
-          </Label>
-          <Select defaultValue="system" value={themeSetting} onValueChange={setThemeSetting}>
-            <SelectTrigger id="theme" className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">{t('System')}</SelectItem>
-              <SelectItem value="light">{t('Light')}</SelectItem>
-              <SelectItem value="dark">{t('Dark')}</SelectItem>
             </SelectContent>
           </Select>
         </SettingItem>

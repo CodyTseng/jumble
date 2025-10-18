@@ -465,6 +465,27 @@ export default {
     'Unpinned!': 'Откреплено!',
     'Failed to unpin: {{error}}': 'Не удалось открепить: {{error}}',
     'Unpin from profile': 'Открепить из профиля',
-    'Pin to profile': 'Закрепить в профиле'
+    'Pin to profile': 'Закрепить в профиле',
+    Appearance: 'Внешний вид',
+    'Pure Black': 'Чистый Черный',
+    Default: 'По умолчанию',
+    Red: 'Красный',
+    Orange: 'Оранжевый',
+    Amber: 'Янтарный',
+    Yellow: 'Желтый',
+    Lime: 'Лаймовый',
+    Green: 'Зеленый',
+    Emerald: 'Изумрудный',
+    Teal: 'Бирюзовый',
+    Cyan: 'Голубой',
+    Sky: 'Небесный',
+    Blue: 'Синий',
+    Indigo: 'Индиго',
+    Violet: 'Фиолетовый',
+    Purple: 'Пурпурный',
+    Fuchsia: 'Фуксия',
+    Pink: 'Розовый',
+    Rose: 'Роза',
+    'Primary color': 'Основной цвет'
   }
 }

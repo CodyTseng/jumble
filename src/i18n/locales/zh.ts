@@ -451,6 +451,27 @@ export default {
     'Unpinned!': '已取消置顶！',
     'Failed to unpin: {{error}}': '取消置顶失败: {{error}}',
     'Unpin from profile': '从个人资料取消置顶',
-    'Pin to profile': '置顶到个人资料'
+    'Pin to profile': '置顶到个人资料',
+    Appearance: '外观',
+    'Pure Black': '纯黑',
+    Default: '默认',
+    Red: '红色',
+    Orange: '橙色',
+    Amber: '琥珀色',
+    Yellow: '黄色',
+    Lime: '青柠色',
+    Green: '绿色',
+    Emerald: '翡翠色',
+    Teal: '蓝绿色',
+    Cyan: '青色',
+    Sky: '天空色',
+    Blue: '蓝色',
+    Indigo: '靛蓝色',
+    Violet: '紫罗兰色',
+    Purple: '紫色',
+    Fuchsia: '紫红色',
+    Pink: '粉色',
+    Rose: '玫瑰色',
+    'Primary color': '主色调'
   }
 }

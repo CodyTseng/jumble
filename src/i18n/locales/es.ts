@@ -463,6 +463,27 @@ export default {
     'Unpinned!': '¡Desfijado!',
     'Failed to unpin: {{error}}': 'Error al desfijar: {{error}}',
     'Unpin from profile': 'Desfijar del perfil',
-    'Pin to profile': 'Fijar al perfil'
+    'Pin to profile': 'Fijar al perfil',
+    Appearance: 'Apariencia',
+    'Pure Black': 'Negro Puro',
+    Default: 'Predeterminado',
+    Red: 'Rojo',
+    Orange: 'Naranja',
+    Amber: 'Ámbar',
+    Yellow: 'Amarillo',
+    Lime: 'Lima',
+    Green: 'Verde',
+    Emerald: 'Esmeralda',
+    Teal: 'Verde azulado',
+    Cyan: 'Cian',
+    Sky: 'Cielo',
+    Blue: 'Azul',
+    Indigo: 'Índigo',
+    Violet: 'Violeta',
+    Purple: 'Púrpura',
+    Fuchsia: 'Fucsia',
+    Pink: 'Rosa',
+    Rose: 'Rosa',
+    'Primary color': 'Color primario'
   }
 }

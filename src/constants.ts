@@ -49,6 +49,7 @@ export const StorageKey = {
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
   SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS: 'shownCreateWalletGuideToastPubkeys',
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
+  PRIMARY_COLOR: 'primaryColor',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -156,3 +157,241 @@ export const MEDIA_AUTO_LOAD_POLICY = {
 } as const
 
 export const MAX_PINNED_NOTES = 10
+
+export const PRIMARY_COLORS = {
+  DEFAULT: {
+    name: 'Default',
+    light: {
+      primary: '259 43% 56%',
+      'primary-hover': '259 43% 65%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '259 43% 56%',
+      'primary-hover': '259 43% 65%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  RED: {
+    name: 'Red',
+    light: {
+      primary: '0 65% 55%',
+      'primary-hover': '0 65% 65%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '0 65% 55%',
+      'primary-hover': '0 65% 65%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  ORANGE: {
+    name: 'Orange',
+    light: {
+      primary: '30 100% 50%',
+      'primary-hover': '30 100% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '30 100% 50%',
+      'primary-hover': '30 100% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  AMBER: {
+    name: 'Amber',
+    light: {
+      primary: '42 100% 50%',
+      'primary-hover': '42 100% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '42 100% 50%',
+      'primary-hover': '42 100% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  YELLOW: {
+    name: 'Yellow',
+    light: {
+      primary: '54 100% 50%',
+      'primary-hover': '54 100% 60%',
+      'primary-foreground': '0 0% 10%'
+    },
+    dark: {
+      primary: '54 100% 50%',
+      'primary-hover': '54 100% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  LIME: {
+    name: 'Lime',
+    light: {
+      primary: '90 60% 50%',
+      'primary-hover': '90 60% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '90 60% 50%',
+      'primary-hover': '90 60% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  GREEN: {
+    name: 'Green',
+    light: {
+      primary: '140 60% 40%',
+      'primary-hover': '140 60% 50%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '140 60% 40%',
+      'primary-hover': '140 60% 50%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  EMERALD: {
+    name: 'Emerald',
+    light: {
+      primary: '160 70% 40%',
+      'primary-hover': '160 70% 50%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '160 70% 40%',
+      'primary-hover': '160 70% 50%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  TEAL: {
+    name: 'Teal',
+    light: {
+      primary: '180 70% 40%',
+      'primary-hover': '180 70% 50%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '180 70% 40%',
+      'primary-hover': '180 70% 50%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  CYAN: {
+    name: 'Cyan',
+    light: {
+      primary: '200 70% 40%',
+      'primary-hover': '200 70% 50%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '200 70% 40%',
+      'primary-hover': '200 70% 50%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  SKY: {
+    name: 'Sky',
+    light: {
+      primary: '210 70% 50%',
+      'primary-hover': '210 70% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '210 70% 50%',
+      'primary-hover': '210 70% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  BLUE: {
+    name: 'Blue',
+    light: {
+      primary: '220 80% 50%',
+      'primary-hover': '220 80% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '220 80% 50%',
+      'primary-hover': '220 80% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  INDIGO: {
+    name: 'Indigo',
+    light: {
+      primary: '230 80% 50%',
+      'primary-hover': '230 80% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '230 80% 50%',
+      'primary-hover': '230 80% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  VIOLET: {
+    name: 'Violet',
+    light: {
+      primary: '250 80% 50%',
+      'primary-hover': '250 80% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '250 80% 50%',
+      'primary-hover': '250 80% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  PURPLE: {
+    name: 'Purple',
+    light: {
+      primary: '280 80% 50%',
+      'primary-hover': '280 80% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '280 80% 50%',
+      'primary-hover': '280 80% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  FUCHSIA: {
+    name: 'Fuchsia',
+    light: {
+      primary: '310 80% 50%',
+      'primary-hover': '310 80% 60%',
+      'primary-foreground': '0 0% 98%'
+    },
+    dark: {
+      primary: '310 80% 50%',
+      'primary-hover': '310 80% 60%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  PINK: {
+    name: 'Pink',
+    light: {
+      primary: '330 80% 60%',
+      'primary-hover': '330 80% 70%',
+      'primary-foreground': '0 0% 10%'
+    },
+    dark: {
+      primary: '330 80% 60%',
+      'primary-hover': '330 80% 70%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  },
+  ROSE: {
+    name: 'Rose',
+    light: {
+      primary: '350 80% 60%',
+      'primary-hover': '350 80% 70%',
+      'primary-foreground': '0 0% 10%'
+    },
+    dark: {
+      primary: '350 80% 60%',
+      'primary-hover': '350 80% 70%',
+      'primary-foreground': '240 5.9% 10%'
+    }
+  }
+} as const
+export type TPrimaryColor = keyof typeof PRIMARY_COLORS

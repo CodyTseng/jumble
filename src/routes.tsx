@@ -1,5 +1,6 @@
 import { match } from 'path-to-regexp'
 import { isValidElement } from 'react'
+import AppearanceSettingsPage from './pages/secondary/AppearanceSettingsPage'
 import FollowingListPage from './pages/secondary/FollowingListPage'
 import GeneralSettingsPage from './pages/secondary/GeneralSettingsPage'
 import MuteListPage from './pages/secondary/MuteListPage'
@@ -34,6 +35,7 @@ const ROUTES = [
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },
+  { path: '/settings/appearance', element: <AppearanceSettingsPage /> },
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },

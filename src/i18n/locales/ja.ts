@@ -459,6 +459,27 @@ export default {
     'Unpinned!': '固定が解除されました！',
     'Failed to unpin: {{error}}': '固定解除に失敗しました: {{error}}',
     'Unpin from profile': 'プロフィールから固定解除',
-    'Pin to profile': 'プロフィールに固定'
+    'Pin to profile': 'プロフィールに固定',
+    Appearance: '外観',
+    'Pure Black': '純黒',
+    Default: 'デフォルト',
+    Red: '赤',
+    Orange: 'オレンジ',
+    Amber: 'アンバー',
+    Yellow: '黄色',
+    Lime: 'ライム',
+    Green: '緑',
+    Emerald: 'エメラルド',
+    Teal: 'ティール',
+    Cyan: 'シアン',
+    Sky: 'スカイ',
+    Blue: '青',
+    Indigo: 'インディゴ',
+    Violet: 'バイオレット',
+    Purple: '紫',
+    Fuchsia: 'フクシア',
+    Pink: 'ピンク',
+    Rose: 'ローズ',
+    'Primary color': '主要な色'
   }
 }

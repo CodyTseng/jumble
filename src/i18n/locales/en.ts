@@ -454,6 +454,27 @@ export default {
     'Unpinned!': 'Unpinned!',
     'Failed to unpin: {{error}}': 'Failed to unpin: {{error}}',
     'Unpin from profile': 'Unpin from profile',
-    'Pin to profile': 'Pin to profile'
+    'Pin to profile': 'Pin to profile',
+    Appearance: 'Appearance',
+    'Pure Black': 'Pure Black',
+    Default: 'Default',
+    Red: 'Red',
+    Orange: 'Orange',
+    Amber: 'Amber',
+    Yellow: 'Yellow',
+    Lime: 'Lime',
+    Green: 'Green',
+    Emerald: 'Emerald',
+    Teal: 'Teal',
+    Cyan: 'Cyan',
+    Sky: 'Sky',
+    Blue: 'Blue',
+    Indigo: 'Indigo',
+    Violet: 'Violet',
+    Purple: 'Purple',
+    Fuchsia: 'Fuchsia',
+    Pink: 'Pink',
+    Rose: 'Rose',
+    'Primary color': 'Primary color'
   }
 }
