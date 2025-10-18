@@ -45,7 +45,7 @@ export default function MainNoteCard({
             originalNoteId={originalNoteId}
           />
         </Collapsible>
-        {!embedded && <NoteStats className="mt-3 px-4" event={event} />}
+        {!embedded && <NoteStats className="mt-3 px-4" event={event} displayTopZapsAndLikes={false} fetchIfNotExisting={true} />}
       </div>
       {!embedded && <Separator />}
     </div>
