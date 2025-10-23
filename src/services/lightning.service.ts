@@ -96,7 +96,7 @@ class LightningService {
         const response = await sparkService.sendPayment(pr)
         console.log('[LightningService] Spark zap successful!')
         closeOuterModel?.()
-        return { preimage: response.preimage || '', invoice: pr }
+        return { preimage: (response as any).preimage || '', invoice: pr }
       } catch (error) {
         console.error('[LightningService] ❌ Spark zap payment failed:', error)
         console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))
@@ -183,7 +183,7 @@ class LightningService {
         const response = await sparkService.sendPayment(invoice)
         console.log('[LightningService] Spark invoice payment successful!')
         closeOuterModel?.()
-        return { preimage: response.preimage || '', invoice }
+        return { preimage: (response as any).preimage || '', invoice }
       } catch (error) {
         console.error('[LightningService] ❌ Spark invoice payment failed:', error)
         console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))

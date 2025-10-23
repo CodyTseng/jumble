@@ -1,4 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
+import { toSparkTest } from '@/lib/link'
 import { useZap } from '@/providers/ZapProvider'
 import { Wallet, Zap } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -24,7 +25,7 @@ export function SparkWalletBalance() {
       variant="ghost"
       size="sm"
       className="gap-2 h-8 px-2 text-xs"
-      onClick={() => push({ type: 'secondary', name: 'spark-test' })}
+      onClick={() => push(toSparkTest())}
       title="Open Spark wallet"
     >
       <Wallet className="size-4" />
