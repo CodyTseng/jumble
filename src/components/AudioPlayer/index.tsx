@@ -2,16 +2,25 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import mediaManager from '@/services/media-manager.service'
-import { Pause, Play } from 'lucide-react'
+import { Minimize2, Pause, Play, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
 interface AudioPlayerProps {
   src: string
+  autoPlay?: boolean
+  startTime?: number
+  isMinimized?: boolean
   className?: string
 }
 
-export default function AudioPlayer({ src, className }: AudioPlayerProps) {
+export default function AudioPlayer({
+  src,
+  autoPlay = false,
+  startTime,
+  isMinimized = false,
+  className
+}: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -19,10 +28,20 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
   const [error, setError] = useState(false)
   const seekTimeoutRef = useRef<NodeJS.Timeout>()
   const isSeeking = useRef(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+
+    if (startTime) {
+      setCurrentTime(startTime)
+      audio.currentTime = startTime
+    }
+
+    if (autoPlay) {
+      togglePlay()
+    }
 
     const updateTime = () => {
       if (!isSeeking.current) {
@@ -46,6 +65,28 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
       audio.removeEventListener('ended', handleEnded)
       audio.removeEventListener('pause', handlePause)
       audio.removeEventListener('play', handlePlay)
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    const container = containerRef.current
+
+    if (!audio || !container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          audio.pause()
+        }
+      },
+      { threshold: 1 }
+    )
+
+    observer.observe(container)
+
+    return () => {
+      observer.unobserve(container)
     }
   }, [])
 
@@ -86,8 +127,9 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
 
   return (
     <div
+      ref={containerRef}
       className={cn(
-        'flex items-center gap-3 py-2 pl-2 pr-4 border rounded-full max-w-md',
+        'flex items-center gap-3 py-2 px-2 border rounded-full max-w-md bg-background',
         className
       )}
       onClick={(e) => e.stopPropagation()}
@@ -114,6 +156,25 @@ export default function AudioPlayer({ src, className }: AudioPlayerProps) {
       <div className="text-sm font-mono text-muted-foreground">
         {formatTime(Math.max(duration - currentTime, 0))}
       </div>
+      {isMinimized ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full shrink-0 text-muted-foreground"
+          onClick={() => mediaManager.stopAudioBackground()}
+        >
+          <X />
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full shrink-0 text-muted-foreground"
+          onClick={() => mediaManager.playAudioBackground(src, audioRef.current?.currentTime || 0)}
+        >
+          <Minimize2 />
+        </Button>
+      )}
     </div>
   )
 }

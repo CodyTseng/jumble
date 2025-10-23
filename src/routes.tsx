@@ -1,5 +1,7 @@
 import { match } from 'path-to-regexp'
 import { isValidElement } from 'react'
+import AppearanceSettingsPage from './pages/secondary/AppearanceSettingsPage'
+import BookmarkPage from './pages/secondary/BookmarkPage'
 import FollowingListPage from './pages/secondary/FollowingListPage'
 import GeneralSettingsPage from './pages/secondary/GeneralSettingsPage'
 import MuteListPage from './pages/secondary/MuteListPage'
@@ -16,6 +18,7 @@ import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import RizfulPage from './pages/secondary/RizfulPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
+import SparkTestPage from './pages/secondary/SparkTestPage'
 import TranslationPage from './pages/secondary/TranslationPage'
 import WalletPage from './pages/secondary/WalletPage'
 
@@ -34,10 +37,13 @@ const ROUTES = [
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },
+  { path: '/settings/appearance', element: <AppearanceSettingsPage /> },
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
-  { path: '/rizful', element: <RizfulPage /> }
+  { path: '/rizful', element: <RizfulPage /> },
+  { path: '/spark-test', element: <SparkTestPage /> },
+  { path: '/bookmarks', element: <BookmarkPage /> }
 ]
 
 export const routes = ROUTES.map(({ path, element }) => ({

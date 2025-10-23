@@ -20,10 +20,10 @@ import { toast } from 'sonner'
 export default function FollowButton({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation()
   const { pubkey: accountPubkey, checkLogin } = useNostr()
-  const { followings, follow, unfollow } = useFollowList()
+  const { followingSet, follow, unfollow } = useFollowList()
   const [updating, setUpdating] = useState(false)
   const [hover, setHover] = useState(false)
-  const isFollowing = useMemo(() => followings.includes(pubkey), [followings, pubkey])
+  const isFollowing = useMemo(() => followingSet.has(pubkey), [followingSet, pubkey])
 
   if (!accountPubkey || (pubkey && pubkey === accountPubkey)) return null
 

@@ -11,6 +11,7 @@ import { SubCloser } from 'nostr-tools/abstract-pool'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
 import client from './client.service'
+import sparkService from './spark.service'
 
 export type TRecentSupporter = { pubkey: string; amount: number; comment?: string }
 
@@ -85,6 +86,27 @@ class LightningService {
       throw new Error(reason ?? 'Failed to create invoice')
     }
 
+    // Try Spark wallet first if connected
+    const isSparkConnected = sparkService.isConnected()
+    console.log('[LightningService] Spark wallet connected:', isSparkConnected)
+
+    if (isSparkConnected) {
+      try {
+        console.log('[LightningService] Paying zap with Spark wallet, amount:', sats, 'sats')
+        const response = await sparkService.sendPayment(pr)
+        console.log('[LightningService] Spark zap successful!')
+        closeOuterModel?.()
+        return { preimage: (response as any).preimage || '', invoice: pr }
+      } catch (error) {
+        console.error('[LightningService] ❌ Spark zap payment failed:', error)
+        console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))
+        // Fall through to WebLN provider
+      }
+    } else {
+      console.log('[LightningService] Spark wallet not connected, skipping to WebLN/modal')
+    }
+
+    // Try WebLN provider next
     if (this.provider) {
       const { preimage } = await this.provider.sendPayment(pr)
       closeOuterModel?.()
@@ -151,12 +173,34 @@ class LightningService {
     invoice: string,
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string } | null> {
+    // Try Spark wallet first if connected
+    const isSparkConnected = sparkService.isConnected()
+    console.log('[LightningService] Spark wallet connected:', isSparkConnected)
+
+    if (isSparkConnected) {
+      try {
+        console.log('[LightningService] Paying invoice with Spark wallet')
+        const response = await sparkService.sendPayment(invoice)
+        console.log('[LightningService] Spark invoice payment successful!')
+        closeOuterModel?.()
+        return { preimage: (response as any).preimage || '', invoice }
+      } catch (error) {
+        console.error('[LightningService] ❌ Spark invoice payment failed:', error)
+        console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))
+        // Fall through to WebLN provider
+      }
+    } else {
+      console.log('[LightningService] Spark wallet not connected, skipping to WebLN/modal')
+    }
+
+    // Try WebLN provider next
     if (this.provider) {
       const { preimage } = await this.provider.sendPayment(invoice)
       closeOuterModel?.()
-      return { preimage, invoice: invoice }
+      return { preimage, invoice }
     }
 
+    // Fall back to payment modal
     return new Promise((resolve) => {
       closeOuterModel?.()
       launchPaymentModal({

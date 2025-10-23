@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useNostr } from './NostrProvider'
 
 type TFollowListContext = {
-  followings: string[]
+  followingSet: Set<string>
   follow: (pubkey: string) => Promise<void>
   unfollow: (pubkey: string) => Promise<void>
 }
@@ -24,8 +24,8 @@ export const useFollowList = () => {
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { pubkey: accountPubkey, followListEvent, publish, updateFollowListEvent } = useNostr()
-  const followings = useMemo(
-    () => (followListEvent ? getPubkeysFromPTags(followListEvent.tags) : []),
+  const followingSet = useMemo(
+    () => new Set(followListEvent ? getPubkeysFromPTags(followListEvent.tags) : []),
     [followListEvent]
   )
 
@@ -65,7 +65,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
   return (
     <FollowListContext.Provider
       value={{
-        followings,
+        followingSet,
         follow,
         unfollow
       }}

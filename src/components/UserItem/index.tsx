@@ -3,29 +3,39 @@ import Nip05 from '@/components/Nip05'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { Skeleton } from '@/components/ui/skeleton'
+import { userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
+import { useMemo } from 'react'
+import FollowingBadge from '../FollowingBadge'
 
 export default function UserItem({
-  pubkey,
+  userId,
   hideFollowButton,
+  showFollowingBadge = false,
   className
 }: {
-  pubkey: string
+  userId: string
   hideFollowButton?: boolean
+  showFollowingBadge?: boolean
   className?: string
 }) {
+  const pubkey = useMemo(() => userIdToPubkey(userId), [userId])
+
   return (
     <div className={cn('flex gap-2 items-center h-14', className)}>
-      <UserAvatar userId={pubkey} className="shrink-0" />
+      <UserAvatar userId={userId} className="shrink-0" />
       <div className="w-full overflow-hidden">
-        <Username
-          userId={pubkey}
-          className="font-semibold truncate max-w-full w-fit"
-          skeletonClassName="h-4"
-        />
-        <Nip05 pubkey={pubkey} />
+        <div className="flex items-center gap-2">
+          <Username
+            userId={userId}
+            className="font-semibold truncate max-w-full w-fit"
+            skeletonClassName="h-4"
+          />
+          {showFollowingBadge && <FollowingBadge pubkey={pubkey} />}
+        </div>
+        <Nip05 pubkey={userId} />
       </div>
-      {!hideFollowButton && <FollowButton pubkey={pubkey} />}
+      {!hideFollowButton && <FollowButton pubkey={userId} />}
     </div>
   )
 }

@@ -19,6 +19,7 @@ const StoreNames = {
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags',
   USER_EMOJI_LIST_EVENTS: 'userEmojiListEvents',
   EMOJI_SET_EVENTS: 'emojiSetEvents',
+  PIN_LIST_EVENTS: 'pinListEvents',
   FAVORITE_RELAYS: 'favoriteRelays',
   RELAY_SETS: 'relaySets',
   FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays',
@@ -42,7 +43,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 8)
+        const request = window.indexedDB.open('jumble', 9)
 
         request.onerror = (event) => {
           reject(event)
@@ -93,6 +94,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.RELAY_INFOS)) {
             db.createObjectStore(StoreNames.RELAY_INFOS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.PIN_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.PIN_LIST_EVENTS, { keyPath: 'key' })
           }
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
             db.deleteObjectStore(StoreNames.RELAY_INFO_EVENTS)
@@ -459,6 +463,8 @@ class IndexedDbService {
         return StoreNames.USER_EMOJI_LIST_EVENTS
       case kinds.Emojisets:
         return StoreNames.EMOJI_SET_EVENTS
+      case kinds.Pinlist:
+        return StoreNames.PIN_LIST_EVENTS
       default:
         return undefined
     }
@@ -492,6 +498,10 @@ class IndexedDbService {
       {
         name: StoreNames.RELAY_INFOS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 days
+      },
+      {
+        name: StoreNames.PIN_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 days
       }
     ]
     const transaction = this.db!.transaction(

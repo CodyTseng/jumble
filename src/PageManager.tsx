@@ -15,20 +15,25 @@ import {
   useRef,
   useState
 } from 'react'
+import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
+import CreateWalletGuideToast from './components/CreateWalletGuideToast'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
 import { normalizeUrl } from './lib/url'
+import BookmarkPage from './pages/primary/BookmarkPage'
 import ExplorePage from './pages/primary/ExplorePage'
 import MePage from './pages/primary/MePage'
 import NotificationListPage from './pages/primary/NotificationListPage'
 import ProfilePage from './pages/primary/ProfilePage'
 import RelayPage from './pages/primary/RelayPage'
 import SearchPage from './pages/primary/SearchPage'
+import SettingsPage from './pages/primary/SettingsPage'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
+import { useTheme } from './providers/ThemeProvider'
+import { useUserPreferences } from './providers/UserPreferencesProvider'
 import { routes } from './routes'
 import modalManager from './services/modal-manager.service'
-import CreateWalletGuideToast from './components/CreateWalletGuideToast'
 
 export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
@@ -58,7 +63,9 @@ const PRIMARY_PAGE_REF_MAP = {
   me: createRef<TPageRef>(),
   profile: createRef<TPageRef>(),
   relay: createRef<TPageRef>(),
-  search: createRef<TPageRef>()
+  search: createRef<TPageRef>(),
+  bookmark: createRef<TPageRef>(),
+  settings: createRef<TPageRef>()
 }
 
 const PRIMARY_PAGE_MAP = {
@@ -68,7 +75,9 @@ const PRIMARY_PAGE_MAP = {
   me: <MePage ref={PRIMARY_PAGE_REF_MAP.me} />,
   profile: <ProfilePage ref={PRIMARY_PAGE_REF_MAP.profile} />,
   relay: <RelayPage ref={PRIMARY_PAGE_REF_MAP.relay} />,
-  search: <SearchPage ref={PRIMARY_PAGE_REF_MAP.search} />
+  search: <SearchPage ref={PRIMARY_PAGE_REF_MAP.search} />,
+  bookmark: <BookmarkPage ref={PRIMARY_PAGE_REF_MAP.bookmark} />,
+  settings: <SettingsPage ref={PRIMARY_PAGE_REF_MAP.settings} />
 }
 
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)
@@ -103,6 +112,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
+  const { themeSetting } = useTheme()
+  const { enableSingleColumnLayout } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
 
   useEffect(() => {
@@ -240,7 +251,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     if (needScrollToTop) {
       PRIMARY_PAGE_REF_MAP[page].current?.scrollToTop('smooth')
     }
-    if (isSmallScreen) {
+    if (enableSingleColumnLayout) {
       clearSecondaryPages()
     }
   }
@@ -330,6 +341,68 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     )
   }
 
+  if (enableSingleColumnLayout) {
+    return (
+      <PrimaryPageContext.Provider
+        value={{
+          navigate: navigatePrimaryPage,
+          current: currentPrimaryPage,
+          display: secondaryStack.length === 0
+        }}
+      >
+        <SecondaryPageContext.Provider
+          value={{
+            push: pushSecondaryPage,
+            pop: popSecondaryPage,
+            currentIndex: secondaryStack.length
+              ? secondaryStack[secondaryStack.length - 1].index
+              : 0
+          }}
+        >
+          <CurrentRelaysProvider>
+            <NotificationProvider>
+              <div className="flex lg:justify-around w-full">
+                <div className="sticky top-0 lg:w-full flex justify-end self-start h-[var(--vh)]">
+                  <Sidebar />
+                </div>
+                <div className="flex-1 w-0 bg-background border-x lg:flex-auto lg:w-[640px] lg:shrink-0">
+                  {!!secondaryStack.length &&
+                    secondaryStack.map((item, index) => (
+                      <div
+                        key={item.index}
+                        style={{
+                          display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                        }}
+                      >
+                        {item.component}
+                      </div>
+                    ))}
+                  {primaryPages.map(({ name, element, props }) => (
+                    <div
+                      key={name}
+                      style={{
+                        display:
+                          secondaryStack.length === 0 && currentPrimaryPage === name
+                            ? 'block'
+                            : 'none'
+                      }}
+                    >
+                      {props ? cloneElement(element as React.ReactElement, props) : element}
+                    </div>
+                  ))}
+                </div>
+                <div className="hidden lg:w-full lg:block" />
+              </div>
+              <TooManyRelaysAlertDialog />
+              <CreateWalletGuideToast />
+              <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 rounded-l-full rounded-r-none overflow-hidden shadow-lg border" />
+            </NotificationProvider>
+          </CurrentRelaysProvider>
+        </SecondaryPageContext.Provider>
+      </PrimaryPageContext.Provider>
+    )
+  }
+
   return (
     <PrimaryPageContext.Provider
       value={{
@@ -347,44 +420,67 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       >
         <CurrentRelaysProvider>
           <NotificationProvider>
-            <div className="flex h-[var(--vh)] overflow-hidden bg-surface-background">
-              <Sidebar />
-              <div className="grid grid-cols-2 gap-2 w-full pr-2 py-2">
-                <div className="rounded-lg shadow-lg bg-background overflow-hidden">
-                  {primaryPages.map(({ name, element, props }) => (
-                    <div
-                      key={name}
-                      className="flex flex-col h-full w-full"
-                      style={{
-                        display: currentPrimaryPage === name ? 'block' : 'none'
-                      }}
-                    >
-                      {props ? cloneElement(element as React.ReactElement, props) : element}
-                    </div>
-                  ))}
-                </div>
-                <div className="rounded-lg shadow-lg bg-background overflow-hidden">
-                  {secondaryStack.map((item, index) => (
-                    <div
-                      key={item.index}
-                      className="flex flex-col h-full w-full"
-                      style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
-                    >
-                      {item.component}
-                    </div>
-                  ))}
+            <div className="flex flex-col items-center bg-surface-background">
+              <div
+                className="flex h-[var(--vh)] w-full bg-surface-background"
+                style={{
+                  maxWidth: '1920px'
+                }}
+              >
+                <Sidebar />
+                <div
+                  className={cn(
+                    'grid grid-cols-2 w-full',
+                    themeSetting === 'pure-black' ? '' : 'gap-2 pr-2 py-2'
+                  )}
+                >
                   <div
-                    key="home"
-                    className="w-full"
-                    style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}
+                    className={cn(
+                      'bg-background overflow-hidden',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                    )}
                   >
-                    <HomePage />
+                    {primaryPages.map(({ name, element, props }) => (
+                      <div
+                        key={name}
+                        className="flex flex-col h-full w-full"
+                        style={{
+                          display: currentPrimaryPage === name ? 'block' : 'none'
+                        }}
+                      >
+                        {props ? cloneElement(element as React.ReactElement, props) : element}
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    className={cn(
+                      'bg-background overflow-hidden',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                    )}
+                  >
+                    {secondaryStack.map((item, index) => (
+                      <div
+                        key={item.index}
+                        className="flex flex-col h-full w-full"
+                        style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
+                      >
+                        {item.component}
+                      </div>
+                    ))}
+                    <div
+                      key="home"
+                      className="w-full"
+                      style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}
+                    >
+                      <HomePage />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             <TooManyRelaysAlertDialog />
             <CreateWalletGuideToast />
+            <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 rounded-l-full rounded-r-none overflow-hidden shadow-lg border" />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>

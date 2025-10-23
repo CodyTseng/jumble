@@ -33,7 +33,8 @@ export default function EmojiPicker({
           '--epr-category-label-bg-color': 'hsl(var(--background))',
           '--epr-text-color': 'hsl(var(--foreground))',
           '--epr-hover-bg-color': 'hsl(var(--muted) / 0.5)',
-          '--epr-picker-border-color': 'transparent'
+          '--epr-picker-border-color': 'transparent',
+          '--epr-search-input-bg-color': 'hsl(var(--muted) / 0.5)'
         } as React.CSSProperties
       }
       suggestedEmojisMode={SuggestionMode.FREQUENT}

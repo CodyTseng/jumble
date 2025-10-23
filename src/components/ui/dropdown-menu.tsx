@@ -1,10 +1,46 @@
-import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronDown, ChevronRight, ChevronUp, Circle } from 'lucide-react'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
+import { createPortal } from 'react-dom'
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu = ({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>) => {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : uncontrolledOpen
+
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(newOpen)
+      }
+      controlledOnOpenChange?.(newOpen)
+    },
+    [isControlled, controlledOnOpenChange]
+  )
+
+  return (
+    <>
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-50" onClick={() => handleOpenChange(false)} />,
+          document.body
+        )}
+      <DropdownMenuPrimitive.Root
+        {...props}
+        open={open}
+        onOpenChange={handleOpenChange}
+        modal={false}
+      />
+    </>
+  )
+}
+DropdownMenu.displayName = 'DropdownMenu'
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
@@ -306,18 +342,18 @@ DropdownMenuShortcut.displayName = 'DropdownMenuShortcut'
 
 export {
   DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup
+  DropdownMenuTrigger
 }

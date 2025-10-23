@@ -1,15 +1,19 @@
 import Explore from '@/components/Explore'
 import FollowingFavoriteRelayList from '@/components/FollowingFavoriteRelayList'
+import NoteList from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import { Button } from '@/components/ui/button'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Compass, Plus } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-type TExploreTabs = 'following' | 'explore'
+type TExploreTabs = 'following' | 'explore' | 'reviews'
 
 const ExplorePage = forwardRef((_, ref) => {
+  const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TExploreTabs>('explore')
 
   return (
@@ -23,11 +27,23 @@ const ExplorePage = forwardRef((_, ref) => {
         value={tab}
         tabs={[
           { value: 'explore', label: 'Explore' },
+          { value: 'reviews', label: 'Reviews' },
           { value: 'following', label: "Following's Favorites" }
         ]}
         onTabChange={(tab) => setTab(tab as TExploreTabs)}
       />
-      {tab === 'following' ? <FollowingFavoriteRelayList /> : <Explore />}
+      {tab === 'explore' ? (
+        <Explore />
+      ) : tab === 'reviews' ? (
+        <NoteList
+          showKinds={[ExtendedKind.RELAY_REVIEW]}
+          subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
+          filterMutedNotes
+          hideUntrustedNotes={hideUntrustedNotes}
+        />
+      ) : (
+        <FollowingFavoriteRelayList />
+      )}
     </PrimaryPageLayout>
   )
 })

@@ -1,4 +1,4 @@
-import { BIG_RELAY_URLS, POLL_TYPE } from '@/constants'
+import { BIG_RELAY_URLS, MAX_PINNED_NOTES, POLL_TYPE } from '@/constants'
 import { TEmoji, TPollType, TRelayList, TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { buildATag } from './draft-event'
@@ -379,4 +379,14 @@ export function getStarsFromRelayReviewEvent(event: Event): number {
     }
   }
   return 0
+}
+
+export function getPinnedEventHexIdSetFromPinListEvent(event?: Event | null): Set<string> {
+  return new Set(
+    event?.tags
+      .filter((tag) => tag[0] === 'e')
+      .map((tag) => tag[1])
+      .reverse()
+      .slice(0, MAX_PINNED_NOTES) ?? []
+  )
 }

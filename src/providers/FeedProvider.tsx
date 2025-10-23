@@ -69,10 +69,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       if (feedInfo.feedType === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
       }
-
-      if (feedInfo.feedType === 'bookmarks' && pubkey) {
-        return await switchFeed('bookmarks', { pubkey })
-      }
     }
 
     init()
@@ -138,21 +134,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         setIsReady(true)
         return
       }
-      const newFeedInfo = { feedType }
-      setFeedInfo(newFeedInfo)
-      feedInfoRef.current = newFeedInfo
-      storage.setFeedInfo(newFeedInfo, pubkey)
-
-      setRelayUrls([])
-      setIsReady(true)
-      return
-    }
-    if (feedType === 'bookmarks') {
-      if (!options.pubkey) {
-        setIsReady(true)
-        return
-      }
-
       const newFeedInfo = { feedType }
       setFeedInfo(newFeedInfo)
       feedInfoRef.current = newFeedInfo

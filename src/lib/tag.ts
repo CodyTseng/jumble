@@ -34,7 +34,8 @@ export function generateBech32IdFromETag(tag: string[]) {
 export function generateBech32IdFromATag(tag: string[]) {
   try {
     const [, coordinate, relay] = tag
-    const [kind, pubkey, identifier] = coordinate.split(':')
+    const [kind, pubkey, ...items] = coordinate.split(':')
+    const identifier = items.join(':')
     return nip19.naddrEncode({
       kind: Number(kind),
       pubkey,

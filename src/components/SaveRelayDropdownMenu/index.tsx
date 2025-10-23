@@ -27,10 +27,10 @@ import DrawerMenuItem from '../DrawerMenuItem'
 
 export default function SaveRelayDropdownMenu({
   urls,
-  atTitlebar = false
+  bigButton = false
 }: {
   urls: string[]
-  atTitlebar?: boolean
+  bigButton?: boolean
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
@@ -44,13 +44,13 @@ export default function SaveRelayDropdownMenu({
   }, [relaySets, normalizedUrls])
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-  const trigger = atTitlebar ? (
+  const trigger = bigButton ? (
     <Button variant="ghost" size="titlebar-icon" onClick={() => setIsDrawerOpen(true)}>
       <Star className={alreadySaved ? 'fill-primary stroke-primary' : ''} />
     </Button>
   ) : (
     <button
-      className="enabled:hover:text-primary [&_svg]:size-5"
+      className="enabled:hover:text-primary [&_svg]:size-5 pr-0 pt-0.5"
       onClick={(e) => {
         e.stopPropagation()
         setIsDrawerOpen(true)
@@ -62,7 +62,7 @@ export default function SaveRelayDropdownMenu({
 
   if (isSmallScreen) {
     return (
-      <>
+      <div>
         {trigger}
         <div onClick={(e) => e.stopPropagation()}>
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -82,7 +82,7 @@ export default function SaveRelayDropdownMenu({
             </DrawerContent>
           </Drawer>
         </div>
-      </>
+      </div>
     )
   }
 

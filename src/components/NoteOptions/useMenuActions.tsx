@@ -6,9 +6,21 @@ import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { usePinList } from '@/providers/PinListProvider'
 import client from '@/services/client.service'
-import { Bell, BellOff, Code, Copy, Link, SatelliteDish, Trash2, TriangleAlert } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import {
+  Bell,
+  BellOff,
+  Code,
+  Copy,
+  Link,
+  Pin,
+  PinOff,
+  SatelliteDish,
+  Trash2,
+  TriangleAlert
+} from 'lucide-react'
+import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -55,6 +67,7 @@ export function useMenuActions({
     return Array.from(new Set(currentBrowsingRelayUrls.concat(favoriteRelays)))
   }, [currentBrowsingRelayUrls, favoriteRelays])
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
+  const { pinnedEventHexIdSet, pin, unpin } = usePinList()
   const isMuted = useMemo(() => mutePubkeySet.has(event.pubkey), [mutePubkeySet, event])
 
   const broadcastSubMenu: SubMenuAction[] = useMemo(() => {
@@ -195,6 +208,18 @@ export function useMenuActions({
       })
     }
 
+    if (event.pubkey === pubkey && event.kind === kinds.ShortTextNote) {
+      const pinned = pinnedEventHexIdSet.has(event.id)
+      actions.push({
+        icon: pinned ? PinOff : Pin,
+        label: pinned ? t('Unpin from profile') : t('Pin to profile'),
+        onClick: async () => {
+          closeDrawer()
+          await (pinned ? unpin(event) : pin(event))
+        }
+      })
+    }
+
     if (pubkey && event.pubkey !== pubkey) {
       actions.push({
         icon: TriangleAlert,
@@ -266,6 +291,7 @@ export function useMenuActions({
     isMuted,
     isSmallScreen,
     broadcastSubMenu,
+    pinnedEventHexIdSet,
     closeDrawer,
     showSubMenuActions,
     setIsRawEventDialogOpen,

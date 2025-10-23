@@ -1,6 +1,6 @@
+import { TSearchParams } from '@/types'
 import { Event, nip19 } from 'nostr-tools'
 import { getNoteBech32Id } from './event'
-import { TSearchParams } from '@/types'
 
 export const toHome = () => '/'
 export const toNote = (eventOrId: Event | string) => {
@@ -69,12 +69,15 @@ export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
 export const toWallet = () => '/settings/wallet'
 export const toPostSettings = () => '/settings/posts'
 export const toGeneralSettings = () => '/settings/general'
+export const toAppearanceSettings = () => '/settings/appearance'
 export const toTranslation = () => '/settings/translation'
 export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toRelayReviews = (url: string) => `/relays/${encodeURIComponent(url)}/reviews`
 export const toMuteList = () => '/mutes'
 export const toRizful = () => '/rizful'
+export const toSparkTest = () => '/spark-test'
+export const toBookmarks = () => '/bookmarks'
 
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`

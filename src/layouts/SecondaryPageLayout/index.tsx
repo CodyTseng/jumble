@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSecondaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronLeft } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -33,7 +33,7 @@ const SecondaryPageLayout = forwardRef(
     ref
   ) => {
     const scrollAreaRef = useRef<HTMLDivElement>(null)
-    const { isSmallScreen } = useScreenSize()
+    const { enableSingleColumnLayout } = useUserPreferences()
     const { currentIndex } = useSecondaryPage()
 
     useImperativeHandle(
@@ -52,13 +52,13 @@ const SecondaryPageLayout = forwardRef(
     )
 
     useEffect(() => {
-      if (isSmallScreen) {
+      if (enableSingleColumnLayout) {
         setTimeout(() => window.scrollTo({ top: 0 }), 10)
         return
       }
     }, [])
 
-    if (isSmallScreen) {
+    if (enableSingleColumnLayout) {
       return (
         <DeepBrowsingProvider active={currentIndex === index}>
           <div

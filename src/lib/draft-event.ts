@@ -332,6 +332,15 @@ export function createBookmarkDraftEvent(tags: string[][], content = ''): TDraft
   }
 }
 
+export function createPinListDraftEvent(tags: string[][], content = ''): TDraftEvent {
+  return {
+    kind: kinds.Pinlist,
+    content,
+    tags,
+    created_at: dayjs().unix()
+  }
+}
+
 export function createBlossomServerListDraftEvent(servers: string[]): TDraftEvent {
   return {
     kind: ExtendedKind.BLOSSOM_SERVER_LIST,

@@ -12,10 +12,12 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { toRizful } from '@/lib/link'
+import { toRizful, toSparkTest } from '@/lib/link'
 import { useZap } from '@/providers/ZapProvider'
+import { useSparkWallet } from '@/providers/SparkWalletProvider'
 import { disconnect, launchModal } from '@getalby/bitcoin-connect-react'
-import { forwardRef } from 'react'
+import { Info } from 'lucide-react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultZapAmountInput from './DefaultZapAmountInput'
 import DefaultZapCommentInput from './DefaultZapCommentInput'
@@ -26,6 +28,17 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isWalletConnected, walletInfo } = useZap()
+  const { connected: sparkConnected, connecting: sparkConnecting } = useSparkWallet()
+  const hasAutoNavigated = useRef(false)
+
+  // Auto-navigate to Spark wallet if it's connected (only once on mount)
+  useEffect(() => {
+    if (sparkConnected && !isWalletConnected && !hasAutoNavigated.current) {
+      console.log('[WalletPage] Spark wallet detected, navigating to Spark page')
+      hasAutoNavigated.current = true
+      push(toSparkTest())
+    }
+  }, [sparkConnected, isWalletConnected, push])
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Wallet')}>
@@ -63,19 +76,46 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           <LightningAddressInput />
         </div>
       ) : (
-        <div className="px-4 pt-3 flex items-center gap-2">
-          <Button className="bg-foreground hover:bg-foreground/90" onClick={() => push(toRizful())}>
-            {t('Start with a Rizful Vault')}
-          </Button>
-          <Button
-            variant="link"
-            className="text-muted-foreground hover:text-foreground px-0"
-            onClick={() => {
-              launchModal()
-            }}
-          >
-            {t('or other wallets')}
-          </Button>
+        <div className="px-4 pt-3 space-y-4">
+          <div className="flex items-center gap-2">
+            <Button className="bg-foreground hover:bg-foreground/90" onClick={() => push(toRizful())}>
+              {t('Start with a Rizful Vault')}
+            </Button>
+            <Button
+              variant="link"
+              className="text-muted-foreground hover:text-foreground px-0"
+              onClick={() => {
+                launchModal()
+              }}
+            >
+              {t('or other wallets')}
+            </Button>
+          </div>
+          <div className="pt-4 border-t">
+            <div className="flex items-center gap-1">
+              <Button
+                className="bg-foreground hover:bg-foreground/90"
+                onClick={() => push(toSparkTest())}
+              >
+                {sparkConnecting ? 'Setting up...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
+              </Button>
+              <Button
+                variant="link"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground px-0"
+                onClick={() => window.open('https://breez.technology/spark/', '_blank')}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {sparkConnecting
+                ? 'Initializing Spark wallet...'
+                : sparkConnected
+                  ? 'Your Spark wallet is ready'
+                  : 'Experimental Spark wallet integration'}
+            </p>
+          </div>
         </div>
       )}
     </SecondaryPageLayout>

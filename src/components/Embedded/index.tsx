@@ -1,6 +1,5 @@
 export * from './EmbeddedHashtag'
 export * from './EmbeddedLNInvoice'
 export * from './EmbeddedMention'
-export * from './EmbeddedNormalUrl'
 export * from './EmbeddedNote'
 export * from './EmbeddedWebsocketUrl'

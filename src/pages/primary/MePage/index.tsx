@@ -1,19 +1,21 @@
 import AccountManager from '@/components/AccountManager'
 import LoginDialog from '@/components/LoginDialog'
 import LogoutDialog from '@/components/LogoutDialog'
-import PubkeyCopy from '@/components/PubkeyCopy'
 import NpubQrCode from '@/components/NpubQrCode'
+import PubkeyCopy from '@/components/PubkeyCopy'
+import { SparkWalletBalance } from '@/components/SparkWalletBalance'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toProfile, toRelaySettings, toSettings, toWallet } from '@/lib/link'
+import { toBookmarks, toProfile, toRelaySettings, toSettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import {
   ArrowDownUp,
+  Bookmark,
   ChevronRight,
   LogOut,
   Server,
@@ -75,6 +77,9 @@ const MePage = forwardRef((_, ref) => {
         <Item onClick={() => push(toRelaySettings())}>
           <Server /> {t('Relays')}
         </Item>
+        <Item onClick={() => push(toBookmarks())}>
+          <Bookmark /> {t('Bookmarks')}
+        </Item>
         <Item onClick={() => push(toWallet())}>
           <Wallet />
           {t('Wallet')}
@@ -103,7 +108,8 @@ export default MePage
 function MePageTitlebar() {
   const { push } = useSecondaryPage()
   return (
-    <div className="flex justify-end items-center">
+    <div className="flex justify-end items-center gap-1">
+      <SparkWalletBalance />
       <Button variant="ghost" size="titlebar-icon" onClick={() => push(toSettings())}>
         <Settings />
       </Button>

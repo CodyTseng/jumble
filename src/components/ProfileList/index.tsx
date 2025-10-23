@@ -37,7 +37,7 @@ export default function ProfileList({ pubkeys }: { pubkeys: string[] }) {
   return (
     <div className="px-4 pt-2">
       {visiblePubkeys.map((pubkey, index) => (
-        <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
+        <UserItem key={`${index}-${pubkey}`} userId={pubkey} />
       ))}
       {pubkeys.length > visiblePubkeys.length && <div ref={bottomRef} />}
     </div>
