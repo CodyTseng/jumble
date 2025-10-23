@@ -30,3 +30,11 @@ dev-dist
 
 # Dev notes
 dev-notes-*.md
+DEV_NOTES_*.md
+
+# Dev tools
+verify-zap-receipt.js
+BREEZ_NIP57_FEATURE_REQUEST.md
+
+# Screenshots
+screenshots/

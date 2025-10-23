@@ -1,6 +1,8 @@
 import { useNostr } from '@/providers/NostrProvider'
 import sparkService from '@/services/spark.service'
 import sparkStorage from '@/services/spark-storage.service'
+import sparkProfileSync from '@/services/spark-profile-sync.service'
+import sparkZapReceipt from '@/services/spark-zap-receipt.service'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 type TSparkWalletContext = {
@@ -22,8 +24,8 @@ export const useSparkWallet = () => {
   return context
 }
 
-export function SparkWalletProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey } = useNostr()
+export function SparkWalletProvider({ children }: { children: React.ReactNode}) {
+  const { pubkey, profileEvent, publish, updateProfileEvent } = useNostr()
   const [connected, setConnected] = useState(false)
   const [connecting, setConnecting] = useState(false)
   const [balance, setBalance] = useState<number | null>(null)
@@ -131,6 +133,40 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode })
         console.log('[SparkWalletProvider] Balance:', info.balanceSats, 'sats')
         console.log('[SparkWalletProvider] Lightning address:', address?.lightningAddress)
 
+        // NOTE: Auto-sync disabled until Breez adds NIP-57 support
+        // The Breez Lightning address works for regular payments but does not support
+        // Nostr zaps because the LNURL endpoint is missing required NIP-57 fields:
+        // - allowsNostr: true
+        // - nostrPubkey: <hex-pubkey>
+        //
+        // Regular Lightning payments to daniel@breez.tips work fine, but NIP-57 compliant
+        // wallets reject zap attempts with "invalid lightning address" error.
+        //
+        // Feature request submitted to Breez SDK team.
+        // TODO: Re-enable auto-sync once Breez adds NIP-57 support
+        //
+        // Auto-sync Lightning address to Nostr profile if needed
+        // if (address?.lightningAddress && profileEvent && publish && updateProfileEvent) {
+        //   try {
+        //     const profileContent = JSON.parse(profileEvent.content)
+        //     if (profileContent.lud16 !== address.lightningAddress) {
+        //       console.log('[SparkWalletProvider] Auto-syncing Lightning address to Nostr profile...')
+        //       await sparkProfileSync.syncLightningAddressToProfile(
+        //         address.lightningAddress,
+        //         profileEvent,
+        //         publish,
+        //         updateProfileEvent
+        //       )
+        //       console.log('[SparkWalletProvider] ✅ Lightning address synced to profile')
+        //     } else {
+        //       console.log('[SparkWalletProvider] Lightning address already in profile')
+        //     }
+        //   } catch (error) {
+        //     console.error('[SparkWalletProvider] Failed to auto-sync Lightning address:', error)
+        //     // Non-critical error, don't throw
+        //   }
+        // }
+
         clearTimeout(timeoutId)
       } catch (error) {
         console.error('[SparkWalletProvider] ❌ Auto-connect failed:', error)
@@ -145,7 +181,7 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode })
     autoConnect()
   }, [pubkey])
 
-  // Listen for balance updates
+  // Listen for balance updates and publish zap receipts for incoming payments
   useEffect(() => {
     if (!connected) return
 
@@ -155,6 +191,26 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode })
           const info = await sparkService.getInfo(false)
           setBalance(info.balanceSats)
           console.log('[SparkWalletProvider] Balance updated:', info.balanceSats, 'sats')
+
+          // If this is an incoming payment (received), publish zap receipt
+          if (event.type === 'paymentSucceeded' && event.payment) {
+            const payment = event.payment
+            const isReceived = payment.paymentType === 'receive'
+
+            if (isReceived && publish) {
+              console.log('[SparkWalletProvider] Incoming payment received, checking for zap...')
+              console.log('[SparkWalletProvider] Payment object:', JSON.stringify(payment, null, 2))
+
+              // Check if this is a zap payment (has zap request in description)
+              if (sparkZapReceipt.isZapPayment(payment)) {
+                console.log('[SparkWalletProvider] This is a zap! Publishing zap receipt...')
+                await sparkZapReceipt.publishZapReceipt(payment, publish)
+              } else {
+                console.log('[SparkWalletProvider] Regular payment, not a zap')
+                console.log('[SparkWalletProvider] Payment description:', payment.description)
+              }
+            }
+          }
         } catch (error) {
           console.error('[SparkWalletProvider] Failed to update balance:', error)
         }
@@ -162,7 +218,7 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode })
     })
 
     return () => unsubscribe()
-  }, [connected])
+  }, [connected, publish])
 
   // Refresh wallet state (balance and Lightning address)
   const refreshWalletState = async () => {
