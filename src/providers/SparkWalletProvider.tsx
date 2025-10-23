@@ -1,7 +1,7 @@
 import { useNostr } from '@/providers/NostrProvider'
 import sparkService from '@/services/spark.service'
 import sparkStorage from '@/services/spark-storage.service'
-import sparkProfileSync from '@/services/spark-profile-sync.service'
+// import sparkProfileSync from '@/services/spark-profile-sync.service' // Disabled until Breez adds NIP-57 support
 import sparkZapReceipt from '@/services/spark-zap-receipt.service'
 import { createContext, useContext, useEffect, useState } from 'react'
 
@@ -25,7 +25,7 @@ export const useSparkWallet = () => {
 }
 
 export function SparkWalletProvider({ children }: { children: React.ReactNode}) {
-  const { pubkey, profileEvent, publish, updateProfileEvent } = useNostr()
+  const { pubkey, publish } = useNostr()
   const [connected, setConnected] = useState(false)
   const [connecting, setConnecting] = useState(false)
   const [balance, setBalance] = useState<number | null>(null)
@@ -114,7 +114,7 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
 
         // Connect to Spark (this will initialize WASM automatically if needed)
         console.log('[SparkWalletProvider] Connecting to Spark SDK...')
-        const { sdk } = await sparkService.connect(apiKey, mnemonic, 'mainnet')
+        await sparkService.connect(apiKey, mnemonic, 'mainnet')
         console.log('[SparkWalletProvider] ✅ Spark SDK connected')
 
         setConnected(true)
@@ -207,7 +207,8 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
                 await sparkZapReceipt.publishZapReceipt(payment, publish)
               } else {
                 console.log('[SparkWalletProvider] Regular payment, not a zap')
-                console.log('[SparkWalletProvider] Payment description:', payment.description)
+                const description = payment.details?.type === 'lightning' ? payment.details.description : undefined
+                console.log('[SparkWalletProvider] Payment description:', description)
               }
             }
           }

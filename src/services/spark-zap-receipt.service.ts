@@ -1,5 +1,4 @@
 import { BIG_RELAY_URLS } from '@/constants'
-import client from '@/services/client.service'
 import { kinds, NostrEvent } from 'nostr-tools'
 import { Payment } from '@breeztech/breez-sdk-spark/web'
 
