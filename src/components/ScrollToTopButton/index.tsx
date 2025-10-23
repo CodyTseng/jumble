@@ -2,7 +2,11 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
+import { hasBackgroundAudioAtom } from '@/services/media-manager.service'
+import { useAtomValue } from 'jotai'
 import { ChevronUp } from 'lucide-react'
+import { useMemo } from 'react'
 
 export default function ScrollToTopButton({
   scrollAreaRef,
@@ -11,13 +15,37 @@ export default function ScrollToTopButton({
   scrollAreaRef?: React.RefObject<HTMLDivElement>
   className?: string
 }) {
-  const { isSmallScreen } = useScreenSize()
+  const { enableSingleColumnLayout } = useUserPreferences()
   const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
-  const visible = !deepBrowsing && lastScrollTop > 800
+  const { isSmallScreen } = useScreenSize()
+  const hasBackgroundAudio = useAtomValue(hasBackgroundAudioAtom)
+  const visible = useMemo(() => !deepBrowsing && lastScrollTop > 800, [deepBrowsing, lastScrollTop])
 
   const handleScrollToTop = () => {
     if (!scrollAreaRef) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      // scroll to top with custom animation
+      const startPosition = window.pageYOffset || document.documentElement.scrollTop
+      const duration = 500
+      const startTime = performance.now()
+
+      const easeInOutQuad = (t: number) => {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+      }
+
+      const scroll = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const ease = easeInOutQuad(progress)
+
+        const position = startPosition * (1 - ease)
+        window.scrollTo(0, position)
+
+        if (progress < 1) {
+          requestAnimationFrame(scroll)
+        }
+      }
+
+      requestAnimationFrame(scroll)
       return
     }
     scrollAreaRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -26,13 +54,15 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        `fixed sm:sticky z-30 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700 ${visible ? '' : 'opacity-0'}`,
+        'z-30 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700',
+        enableSingleColumnLayout ? 'sticky' : 'fixed',
+        visible ? '' : 'opacity-0',
         className
       )}
       style={{
         bottom: isSmallScreen
-          ? 'calc(env(safe-area-inset-bottom) + 3.75rem)'
-          : 'calc(env(safe-area-inset-bottom) + 0.75rem)'
+          ? `calc(env(safe-area-inset-bottom) + ${hasBackgroundAudio ? 7.25 : 3.85}rem)`
+          : `calc(env(safe-area-inset-bottom) + 0.85rem)`
       }}
     >
       <Button

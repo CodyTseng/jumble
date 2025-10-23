@@ -1,15 +1,23 @@
 import { YouTubePlayer } from '@/types/youtube'
+import { atom, getDefaultStore } from 'jotai'
+
+export const hasBackgroundAudioAtom = atom(false)
+const store = getDefaultStore()
 
 type Media = HTMLMediaElement | YouTubePlayer
 
-class MediaManagerService {
+class MediaManagerService extends EventTarget {
   static instance: MediaManagerService
 
   private currentMedia: Media | null = null
 
   constructor() {
+    super()
+  }
+
+  public static getInstance(): MediaManagerService {
     if (!MediaManagerService.instance) {
-      MediaManagerService.instance = this
+      MediaManagerService.instance = new MediaManagerService()
     }
     return MediaManagerService.instance
   }
@@ -24,13 +32,20 @@ class MediaManagerService {
     if (this.currentMedia === media) {
       this.currentMedia = null
     }
-    pause(media)
+    _pause(media)
   }
 
   autoPlay(media: Media) {
     if (
       document.pictureInPictureElement &&
       isMediaPlaying(document.pictureInPictureElement as HTMLMediaElement)
+    ) {
+      return
+    }
+    if (
+      store.get(hasBackgroundAudioAtom) &&
+      this.currentMedia &&
+      isMediaPlaying(this.currentMedia)
     ) {
       return
     }
@@ -45,21 +60,31 @@ class MediaManagerService {
       ;(document.pictureInPictureElement as HTMLMediaElement).pause()
     }
     if (this.currentMedia && this.currentMedia !== media) {
-      pause(this.currentMedia)
+      _pause(this.currentMedia)
     }
     this.currentMedia = media
     if (isMediaPlaying(media)) {
       return
     }
 
-    play(this.currentMedia).catch((error) => {
+    _play(this.currentMedia).catch((error) => {
       console.error('Error playing media:', error)
       this.currentMedia = null
     })
   }
+
+  playAudioBackground(src: string, time: number = 0) {
+    this.dispatchEvent(new CustomEvent('playAudioBackground', { detail: { src, time } }))
+    store.set(hasBackgroundAudioAtom, true)
+  }
+
+  stopAudioBackground() {
+    this.dispatchEvent(new Event('stopAudioBackground'))
+    store.set(hasBackgroundAudioAtom, false)
+  }
 }
 
-const instance = new MediaManagerService()
+const instance = MediaManagerService.getInstance()
 export default instance
 
 function isYouTubePlayer(media: Media): media is YouTubePlayer {
@@ -83,14 +108,14 @@ function isPipElement(media: Media) {
   return (media as any).webkitPresentationMode === 'picture-in-picture'
 }
 
-function pause(media: Media) {
+function _pause(media: Media) {
   if (isYouTubePlayer(media)) {
     return media.pauseVideo()
   }
   return media.pause()
 }
 
-async function play(media: Media) {
+async function _play(media: Media) {
   if (isYouTubePlayer(media)) {
     return media.playVideo()
   }

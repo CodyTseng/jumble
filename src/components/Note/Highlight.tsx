@@ -10,6 +10,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Content from '../Content'
 import ContentPreview from '../ContentPreview'
+import ExternalLink from '../ExternalLink'
 import UserAvatar from '../UserAvatar'
 
 export default function Highlight({ event, className }: { event: Event; className?: string }) {
@@ -39,22 +40,27 @@ function HighlightSource({ event }: { event: Event }) {
   const sourceTag = useMemo(() => {
     let sourceTag: string[] | undefined
     for (const tag of event.tags) {
+      // Highest priority: 'source' tag
       if (tag[2] === 'source') {
         sourceTag = tag
         break
       }
-      if (tag[0] === 'r') {
+
+      // Give 'e' tags highest priority
+      if (tag[0] === 'e') {
         sourceTag = tag
         continue
-      } else if (tag[0] === 'a') {
-        if (!sourceTag || sourceTag[0] !== 'r') {
-          sourceTag = tag
-        }
+      }
+
+      // Give 'a' tags second priority over 'e' tags
+      if (tag[0] === 'a' && (!sourceTag || sourceTag[0] !== 'e')) {
+        sourceTag = tag
         continue
-      } else if (tag[0] === 'e') {
-        if (!sourceTag || sourceTag[0] === 'e') {
-          sourceTag = tag
-        }
+      }
+
+      // Give 'r' tags lowest priority
+      if (tag[0] === 'r' && (!sourceTag || sourceTag[0] === 'r')) {
+        sourceTag = tag
         continue
       }
     }
@@ -99,15 +105,10 @@ function HighlightSource({ event }: { event: Event }) {
     return (
       <div className="truncate text-muted-foreground">
         {t('From')}{' '}
-        <a
-          href={sourceTag[1]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline text-muted-foreground hover:text-foreground"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {sourceTag[1]}
-        </a>
+        <ExternalLink
+          url={sourceTag[1]}
+          className="underline italic text-muted-foreground hover:text-foreground"
+        />
       </div>
     )
   }

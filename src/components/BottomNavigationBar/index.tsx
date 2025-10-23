@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import BackgroundAudio from '../BackgroundAudio'
 import AccountButton from './AccountButton'
 import ExploreButton from './ExploreButton'
 import HomeButton from './HomeButton'
@@ -7,18 +8,18 @@ import NotificationsButton from './NotificationsButton'
 export default function BottomNavigationBar() {
   return (
     <div
-      className={cn(
-        'fixed bottom-0 w-full z-40 bg-background border-t flex items-center justify-around [&_svg]:size-4 [&_svg]:shrink-0'
-      )}
+      className={cn('fixed bottom-0 w-full z-40 bg-background border-t')}
       style={{
-        height: 'calc(3rem + env(safe-area-inset-bottom))',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
-      <HomeButton />
-      <ExploreButton />
-      <NotificationsButton />
-      <AccountButton />
+      <BackgroundAudio className="rounded-none border-x-0 border-t-0 border-b bg-background" />
+      <div className="w-full flex justify-around items-center [&_svg]:size-4 [&_svg]:shrink-0">
+        <HomeButton />
+        <ExploreButton />
+        <NotificationsButton />
+        <AccountButton />
+      </div>
     </div>
   )
 }

@@ -12,6 +12,7 @@ import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
 import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
+import { PinListProvider } from '@/providers/PinListProvider'
 import { ReplyProvider } from '@/providers/ReplyProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
@@ -23,41 +24,43 @@ import { PageManager } from './PageManager'
 
 export default function App(): JSX.Element {
   return (
-    <ThemeProvider>
-      <ContentPolicyProvider>
-        <ScreenSizeProvider>
-          <DeletedEventProvider>
-            <NostrProvider>
-              <ZapProvider>
-                <TranslationServiceProvider>
-                  <FavoriteRelaysProvider>
-                    <FollowListProvider>
-                      <MuteListProvider>
-                        <UserTrustProvider>
-                          <BookmarksProvider>
-                            <FeedProvider>
-                              <ReplyProvider>
-                                <MediaUploadServiceProvider>
-                                  <KindFilterProvider>
-                                    <UserPreferencesProvider>
-                                      <PageManager />
-                                      <Toaster />
-                                    </UserPreferencesProvider>
-                                  </KindFilterProvider>
-                                </MediaUploadServiceProvider>
-                              </ReplyProvider>
-                            </FeedProvider>
-                          </BookmarksProvider>
-                        </UserTrustProvider>
-                      </MuteListProvider>
-                    </FollowListProvider>
-                  </FavoriteRelaysProvider>
-                </TranslationServiceProvider>
-              </ZapProvider>
-            </NostrProvider>
-          </DeletedEventProvider>
-        </ScreenSizeProvider>
-      </ContentPolicyProvider>
-    </ThemeProvider>
+    <ScreenSizeProvider>
+      <UserPreferencesProvider>
+        <ThemeProvider>
+          <ContentPolicyProvider>
+            <DeletedEventProvider>
+              <NostrProvider>
+                <ZapProvider>
+                  <TranslationServiceProvider>
+                    <FavoriteRelaysProvider>
+                      <FollowListProvider>
+                        <MuteListProvider>
+                          <UserTrustProvider>
+                            <BookmarksProvider>
+                              <PinListProvider>
+                                <FeedProvider>
+                                  <ReplyProvider>
+                                    <MediaUploadServiceProvider>
+                                      <KindFilterProvider>
+                                        <PageManager />
+                                        <Toaster />
+                                      </KindFilterProvider>
+                                    </MediaUploadServiceProvider>
+                                  </ReplyProvider>
+                                </FeedProvider>
+                              </PinListProvider>
+                            </BookmarksProvider>
+                          </UserTrustProvider>
+                        </MuteListProvider>
+                      </FollowListProvider>
+                    </FavoriteRelaysProvider>
+                  </TranslationServiceProvider>
+                </ZapProvider>
+              </NostrProvider>
+            </DeletedEventProvider>
+          </ContentPolicyProvider>
+        </ThemeProvider>
+      </UserPreferencesProvider>
+    </ScreenSizeProvider>
   )
 }

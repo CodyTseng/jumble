@@ -20,6 +20,7 @@ import {
   EventTemplate,
   Filter,
   kinds,
+  matchFilters,
   Event as NEvent,
   nip19,
   Relay,
@@ -470,8 +471,24 @@ class ClientService extends EventTarget {
       }
     })
 
+    const handleNewEventFromInternal = (data: Event) => {
+      const customEvent = data as CustomEvent<NEvent>
+      const evt = customEvent.detail
+      if (!matchFilters(filters, evt)) return
+
+      const id = evt.id
+      const have = _knownIds.has(id)
+      if (have) return
+
+      _knownIds.add(id)
+      onevent?.(evt)
+    }
+
+    this.addEventListener('newEvent', handleNewEventFromInternal)
+
     return {
       close: () => {
+        this.removeEventListener('newEvent', handleNewEventFromInternal)
         subPromises.forEach((subPromise) => {
           subPromise
             .then((sub) => {
@@ -838,14 +855,13 @@ class ClientService extends EventTarget {
     }
 
     let event: NEvent | undefined
-    if (filter.ids) {
+    if (filter.ids?.length) {
       event = await this.fetchEventById(relays, filter.ids[0])
-    } else {
-      if (author) {
-        const relayList = await this.fetchRelayList(author)
-        relays.push(...relayList.write.slice(0, 4))
-      }
-      event = await this.tryHarderToFetchEvent(relays, filter)
+    }
+
+    if (!event && author) {
+      const relayList = await this.fetchRelayList(author)
+      event = await this.tryHarderToFetchEvent(relayList.write.slice(0, 5), filter)
     }
 
     if (event && event.id !== id) {
@@ -1261,6 +1277,8 @@ class ClientService extends EventTarget {
     return params.map(({ pubkey, kind, d }) => {
       const key = `${kind}:${pubkey}:${d ?? ''}`
       const event = eventMap.get(key)
+      if (kind === kinds.Pinlist) return event ?? null
+
       if (event) {
         indexedDb.putReplaceableEvent(event)
         return event
@@ -1319,6 +1337,10 @@ class ClientService extends EventTarget {
   async fetchBlossomServerList(pubkey: string) {
     const evt = await this.fetchBlossomServerListEvent(pubkey)
     return evt ? getServersFromServerTags(evt.tags) : []
+  }
+
+  async fetchPinListEvent(pubkey: string) {
+    return this.fetchReplaceableEvent(pubkey, kinds.Pinlist)
   }
 
   async updateBlossomServerListEventCache(evt: NEvent) {

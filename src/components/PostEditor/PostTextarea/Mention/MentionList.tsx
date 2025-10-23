@@ -1,3 +1,4 @@
+import FollowingBadge from '@/components/FollowingBadge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatNpub, userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
@@ -87,7 +88,10 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
           <div className="flex gap-2 w-80 items-center truncate pointer-events-none">
             <SimpleUserAvatar userId={item} />
             <div className="flex-1 w-0">
-              <SimpleUsername userId={item} className="font-semibold truncate" />
+              <div className="flex items-center gap-2">
+                <SimpleUsername userId={item} className="font-semibold truncate" />
+                <FollowingBadge userId={item} />
+              </div>
               <Nip05 pubkey={userIdToPubkey(item)} />
             </div>
           </div>

@@ -1,7 +1,5 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./resources/logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./resources/logo-light.svg">
     <img src="./resources/logo-light.svg" alt="Jumble Logo" width="400" />
   </picture>
   <p>logo designed by <a href="http://wolfertdan.com/">Daniel David</a></p>
@@ -9,23 +7,17 @@
 
 # Jumble
 
-A user-friendly Nostr client focused on relay feed browsing and relay discovery
+A user-friendly Nostr client for exploring relay feeds
 
-## Features
+Experience Jumble at [https://jumble.social](https://jumble.social)
 
-- **Relay Feeds:** Explore content directly through relays without following specific users
-- **Relay-Friendly Design:** Minimized and simplified requests ensure efficient communication with relays
-- **Relay Sets:** Easily manage and switch between relay sets
-- **Clean Interface:** Enjoy a minimalist design and intuitive interactions
+## Forks
 
-## Screenshots
+> Some interesting forks of Jumble.
 
-<img src="./screenshots/01.png" alt="Jumble Screenshot 01" width="650" />
-<div> 
-  <img src="./screenshots/02.png" alt="Jumble Screenshot 02" width="200" />
-  <img src="./screenshots/03.png" alt="Jumble Screenshot 03" width="200" />
-  <img src="./screenshots/04.png" alt="Jumble Screenshot 04" width="200" />
-</div>
+- [https://jumble.imwald.eu/](https://jumble.imwald.eu/) Repo: [Silberengel/jumble](https://github.com/Silberengel/jumble) - Discussions support
+- [https://grouped-notes.dtonon.com/](https://grouped-notes.dtonon.com/) - "Grouped Notes" mode: organizes posts by user and timeframe for cleaner browsing and easier discovery
+- [https://jumblekat.shakespeare.wtf/](https://jumblekat.shakespeare.wtf/) - Supports custom styles
 
 ## Run Locally
 
@@ -68,11 +60,9 @@ After finishing, access: http://localhost:8089
 
 If you like this project, you can buy me a coffee :)
 
-lightning: ⚡️ codytseng@getalby.com ⚡️
-
-bitcoin: bc1qx8kvutghdhejx7vuvatmvw2ghypdungu0qm7ds
-
-geyser: https://geyser.fund/project/jumble
+- **Lightning:** ⚡️ codytseng@getalby.com ⚡️
+- **Bitcoin:** bc1qwp2uqjd2dy32qfe39kehnlgx3hyey0h502fvht
+- **Geyser:** https://geyser.fund/project/jumble
 
 ## License
 

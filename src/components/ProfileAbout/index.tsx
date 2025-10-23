@@ -10,12 +10,8 @@ import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import {
-  EmbeddedHashtag,
-  EmbeddedMention,
-  EmbeddedNormalUrl,
-  EmbeddedWebsocketUrl
-} from '../Embedded'
+import { EmbeddedHashtag, EmbeddedMention, EmbeddedWebsocketUrl } from '../Embedded'
+import ExternalLink from '../ExternalLink'
 
 export default function ProfileAbout({ about, className }: { about?: string; className?: string }) {
   const { t, i18n } = useTranslation()
@@ -39,7 +35,7 @@ export default function ProfileAbout({ about, className }: { about?: string; cla
     ])
     return nodes.map((node, index) => {
       if (node.type === 'url') {
-        return <EmbeddedNormalUrl key={index} url={node.data} />
+        return <ExternalLink key={index} url={node.data} />
       }
       if (node.type === 'websocket-url') {
         return <EmbeddedWebsocketUrl key={index} url={node.data} />

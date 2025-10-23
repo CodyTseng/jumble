@@ -1,19 +1,20 @@
 import AccountManager from '@/components/AccountManager'
 import LoginDialog from '@/components/LoginDialog'
 import LogoutDialog from '@/components/LogoutDialog'
-import PubkeyCopy from '@/components/PubkeyCopy'
 import NpubQrCode from '@/components/NpubQrCode'
+import PubkeyCopy from '@/components/PubkeyCopy'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toProfile, toRelaySettings, toSettings, toWallet } from '@/lib/link'
+import { toBookmarks, toProfile, toRelaySettings, toSettings, toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import {
   ArrowDownUp,
+  Bookmark,
   ChevronRight,
   LogOut,
   Server,
@@ -74,6 +75,9 @@ const MePage = forwardRef((_, ref) => {
         </Item>
         <Item onClick={() => push(toRelaySettings())}>
           <Server /> {t('Relays')}
+        </Item>
+        <Item onClick={() => push(toBookmarks())}>
+          <Bookmark /> {t('Bookmarks')}
         </Item>
         <Item onClick={() => push(toWallet())}>
           <Wallet />

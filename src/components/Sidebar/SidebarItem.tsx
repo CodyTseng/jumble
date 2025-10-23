@@ -5,14 +5,17 @@ import { useTranslation } from 'react-i18next'
 
 const SidebarItem = forwardRef<
   HTMLButtonElement,
-  ButtonProps & { title: string; description?: string; active?: boolean }
->(({ children, title, description, className, active, ...props }, ref) => {
+  ButtonProps & { title: string; collapse: boolean; description?: string; active?: boolean }
+>(({ children, title, description, className, active, collapse, ...props }, ref) => {
   const { t } = useTranslation()
 
   return (
     <Button
       className={cn(
-        'flex shadow-none items-center transition-colors duration-500 bg-transparent w-12 h-12 xl:w-full xl:h-auto p-3 m-0 xl:py-2 xl:px-3 rounded-lg xl:justify-start gap-4 text-lg font-semibold [&_svg]:size-full xl:[&_svg]:size-4',
+        'flex shadow-none items-center transition-colors duration-500 bg-transparent m-0 rounded-lg gap-4 text-lg font-semibold',
+        collapse
+          ? 'w-12 h-12 p-3 [&_svg]:size-full'
+          : 'justify-start w-full h-auto py-2 px-3 [&_svg]:size-5',
         active && 'text-primary hover:text-primary bg-primary/10 hover:bg-primary/10',
         className
       )}
@@ -22,7 +25,7 @@ const SidebarItem = forwardRef<
       {...props}
     >
       {children}
-      <div className="max-xl:hidden">{t(description ?? title)}</div>
+      {!collapse && <div>{t(description ?? title)}</div>}
     </Button>
   )
 })

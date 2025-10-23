@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { YouTubePlayer } from '@/types/youtube'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -17,12 +18,15 @@ export default function YoutubeEmbeddedPlayer({
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
+  const { muteMedia, updateMuteMedia } = useUserPreferences()
   const [display, setDisplay] = useState(autoLoadMedia)
   const { videoId, isShort } = useMemo(() => parseYoutubeUrl(url), [url])
   const [initSuccess, setInitSuccess] = useState(false)
   const [error, setError] = useState(false)
   const playerRef = useRef<YouTubePlayer | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const muteStateRef = useRef(muteMedia)
 
   useEffect(() => {
     if (autoLoadMedia) {
@@ -47,24 +51,48 @@ export default function YoutubeEmbeddedPlayer({
       initPlayer()
     }
 
+    let checkMutedInterval: NodeJS.Timeout | null = null
     function initPlayer() {
       try {
         if (!videoId || !containerRef.current || !window.YT.Player) return
+
+        let currentMuteState = muteStateRef.current
         playerRef.current = new window.YT.Player(containerRef.current, {
           videoId: videoId,
           playerVars: {
-            mute: 1
+            mute: currentMuteState ? 1 : 0
           },
           events: {
             onStateChange: (event: any) => {
               if (event.data === window.YT.PlayerState.PLAYING) {
                 mediaManager.play(playerRef.current)
-              } else if (event.data === window.YT.PlayerState.PAUSED) {
+              } else if (
+                event.data === window.YT.PlayerState.PAUSED ||
+                event.data === window.YT.PlayerState.ENDED
+              ) {
                 mediaManager.pause(playerRef.current)
               }
             },
             onReady: () => {
               setInitSuccess(true)
+              checkMutedInterval = setInterval(() => {
+                if (playerRef.current) {
+                  const mute = playerRef.current.isMuted()
+                  if (mute !== currentMuteState) {
+                    currentMuteState = mute
+
+                    if (mute !== muteStateRef.current) {
+                      updateMuteMedia(currentMuteState)
+                    }
+                  } else if (muteStateRef.current !== mute) {
+                    if (muteStateRef.current) {
+                      playerRef.current.mute()
+                    } else {
+                      playerRef.current.unMute()
+                    }
+                  }
+                }
+              }, 200)
             },
             onError: () => setError(true)
           }
@@ -80,8 +108,45 @@ export default function YoutubeEmbeddedPlayer({
       if (playerRef.current) {
         playerRef.current.destroy()
       }
+      if (checkMutedInterval) {
+        clearInterval(checkMutedInterval)
+        checkMutedInterval = null
+      }
     }
   }, [videoId, display, mustLoad])
+
+  useEffect(() => {
+    muteStateRef.current = muteMedia
+  }, [muteMedia])
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+
+    if (!wrapper || !initSuccess) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const player = playerRef.current
+        if (!player) return
+
+        if (
+          !entry.isIntersecting &&
+          [window.YT.PlayerState.PLAYING, window.YT.PlayerState.BUFFERING].includes(
+            player.getPlayerState()
+          )
+        ) {
+          mediaManager.pause(player)
+        }
+      },
+      { threshold: 1 }
+    )
+
+    observer.observe(wrapper)
+
+    return () => {
+      observer.unobserve(wrapper)
+    }
+  }, [videoId, display, mustLoad, initSuccess])
 
   if (error) {
     return <ExternalLink url={url} />
@@ -104,8 +169,10 @@ export default function YoutubeEmbeddedPlayer({
   if (!videoId && !initSuccess) {
     return <ExternalLink url={url} />
   }
+
   return (
     <div
+      ref={wrapperRef}
       className={cn(
         'rounded-lg border overflow-hidden',
         isShort ? 'aspect-[9/16] max-h-[80vh] sm:max-h-[60vh]' : 'aspect-video max-h-[60vh]',
