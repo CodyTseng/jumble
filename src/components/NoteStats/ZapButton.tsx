@@ -45,6 +45,8 @@ export default function ZapButton({ event }: { event: Event }) {
       if (!pubkey) {
         throw new Error('You need to be logged in to zap')
       }
+      if (zapping) return
+
       setZapping(true)
       const zapResult = await lightning.zap(pubkey, event, defaultZapSats, defaultZapComment)
       // user canceled
@@ -133,6 +135,7 @@ export default function ZapButton({ event }: { event: Event }) {
             : 'cursor-pointer enabled:hover:text-yellow-400'
         )}
         title={t('Zap')}
+        disabled={disable || zapping}
         onMouseDown={handleClickStart}
         onMouseUp={handleClickEnd}
         onMouseLeave={handleMouseLeave}

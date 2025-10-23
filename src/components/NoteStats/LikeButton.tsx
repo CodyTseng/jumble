@@ -68,6 +68,7 @@ export default function LikeButton({ event }: { event: Event }) {
     <button
       className="flex items-center enabled:hover:text-primary gap-1 px-3 h-full text-muted-foreground"
       title={t('Like')}
+      disabled={liking}
       onClick={() => {
         if (isSmallScreen) {
           setIsEmojiReactionsOpen(true)

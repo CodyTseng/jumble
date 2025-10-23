@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react'
 import AudioPlayer from '../AudioPlayer'
 import ClientTag from '../ClientTag'
 import Content from '../Content'
+import FollowingBadge from '../FollowingBadge'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
@@ -28,9 +29,9 @@ import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
 import PictureNote from './PictureNote'
 import Poll from './Poll'
+import RelayReview from './RelayReview'
 import UnknownNote from './UnknownNote'
 import VideoNote from './VideoNote'
-import RelayReview from './RelayReview'
 
 export default function Note({
   event,
@@ -117,6 +118,7 @@ export default function Note({
                 className={`font-semibold flex truncate ${size === 'small' ? 'text-sm' : ''}`}
                 skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
               />
+              <FollowingBadge pubkey={event.pubkey} />
               <ClientTag event={event} />
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">

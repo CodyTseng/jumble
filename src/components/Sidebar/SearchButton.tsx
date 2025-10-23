@@ -2,7 +2,7 @@ import { usePrimaryPage } from '@/PageManager'
 import { Search } from 'lucide-react'
 import SidebarItem from './SidebarItem'
 
-export default function SearchButton() {
+export default function SearchButton({ collapse }: { collapse: boolean }) {
   const { navigate, current, display } = usePrimaryPage()
 
   return (
@@ -10,8 +10,9 @@ export default function SearchButton() {
       title="Search"
       onClick={() => navigate('search')}
       active={current === 'search' && display}
+      collapse={collapse}
     >
-      <Search strokeWidth={3} />
+      <Search />
     </SidebarItem>
   )
 }

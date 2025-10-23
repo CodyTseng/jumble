@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { toWallet } from '@/lib/link'
 import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
+import { cn } from '@/lib/utils'
 import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { ArrowDownUp, LogIn, LogOut, UserRound, Wallet } from 'lucide-react'
@@ -18,17 +19,17 @@ import LoginDialog from '../LoginDialog'
 import LogoutDialog from '../LogoutDialog'
 import SidebarItem from './SidebarItem'
 
-export default function AccountButton() {
+export default function AccountButton({ collapse }: { collapse: boolean }) {
   const { pubkey } = useNostr()
 
   if (pubkey) {
-    return <ProfileButton />
+    return <ProfileButton collapse={collapse} />
   } else {
-    return <LoginButton />
+    return <LoginButton collapse={collapse} />
   }
 }
 
-function ProfileButton() {
+function ProfileButton({ collapse }: { collapse: boolean }) {
   const { t } = useTranslation()
   const { account, profile } = useNostr()
   const pubkey = account?.pubkey
@@ -46,7 +47,10 @@ function ProfileButton() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="clickable shadow-none p-2 xl:px-2 xl:py-2 w-12 h-12 xl:w-full xl:h-auto flex items-center bg-transparent text-foreground hover:text-accent-foreground rounded-lg justify-start gap-4 text-lg font-semibold"
+          className={cn(
+            'clickable shadow-none p-2 flex items-center bg-transparent text-foreground hover:text-accent-foreground rounded-lg justify-start gap-4 text-lg font-semibold',
+            collapse ? 'w-12 h-12' : 'w-full h-auto'
+          )}
         >
           <div className="flex gap-2 items-center flex-1 w-0">
             <Avatar className="w-8 h-8">
@@ -55,7 +59,7 @@ function ProfileButton() {
                 <img src={defaultAvatar} />
               </AvatarFallback>
             </Avatar>
-            <div className="truncate font-semibold text-lg">{username}</div>
+            {!collapse && <div className="truncate font-semibold text-lg">{username}</div>}
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -88,12 +92,12 @@ function ProfileButton() {
   )
 }
 
-function LoginButton() {
+function LoginButton({ collapse }: { collapse: boolean }) {
   const { checkLogin } = useNostr()
 
   return (
-    <SidebarItem onClick={() => checkLogin()} title="Login">
-      <LogIn strokeWidth={3} />
+    <SidebarItem onClick={() => checkLogin()} title="Login" collapse={collapse}>
+      <LogIn />
     </SidebarItem>
   )
 }

@@ -1,6 +1,10 @@
+import { truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
+import { useMemo } from 'react'
 
 export default function ExternalLink({ url, className }: { url: string; className?: string }) {
+  const displayUrl = useMemo(() => truncateUrl(url), [url])
+
   return (
     <a
       className={cn('text-primary hover:underline', className)}
@@ -8,8 +12,9 @@ export default function ExternalLink({ url, className }: { url: string; classNam
       target="_blank"
       onClick={(e) => e.stopPropagation()}
       rel="noreferrer"
+      title={url}
     >
-      {url}
+      {displayUrl}
     </a>
   )
 }

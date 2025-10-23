@@ -285,7 +285,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   return (
     <div className="min-h-[80vh]">
       {loading && <LoadingBar />}
-      {!loading && until && (
+      {!loading && until && until > event.created_at && (
         <div
           className={`text-sm text-center text-muted-foreground border-b py-2 ${!loading ? 'hover:text-foreground cursor-pointer' : ''}`}
           onClick={loadMore}

@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ExtendedKind, SUPPORTED_KINDS } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -22,6 +22,7 @@ const KIND_FILTER_OPTIONS = [
   { kindGroup: [ExtendedKind.PICTURE], label: 'Photo Posts' },
   { kindGroup: [ExtendedKind.VIDEO, ExtendedKind.SHORT_VIDEO], label: 'Video Posts' }
 ]
+const ALL_KINDS = KIND_FILTER_OPTIONS.flatMap(({ kindGroup }) => kindGroup)
 
 export default function KindFilter({
   showKinds,
@@ -105,7 +106,6 @@ export default function KindFilter({
                 checked ? 'border-primary/60 bg-primary/5' : 'clickable'
               )}
               onClick={() => {
-                console.log(checked)
                 if (!checked) {
                   // add all kinds in this group
                   setTemporaryShowKinds((prev) => Array.from(new Set([...prev, ...kindGroup])))
@@ -126,7 +126,7 @@ export default function KindFilter({
         <Button
           variant="secondary"
           onClick={() => {
-            setTemporaryShowKinds(SUPPORTED_KINDS)
+            setTemporaryShowKinds(ALL_KINDS)
           }}
         >
           {t('Select All')}

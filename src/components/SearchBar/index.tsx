@@ -378,7 +378,12 @@ function ProfileItem({
       className={cn('px-2 hover:bg-accent rounded-md cursor-pointer', selected && 'bg-accent')}
       onClick={onClick}
     >
-      <UserItem pubkey={userId} hideFollowButton className="pointer-events-none" />
+      <UserItem
+        userId={userId}
+        className="pointer-events-none"
+        hideFollowButton
+        showFollowingBadge
+      />
     </div>
   )
 }

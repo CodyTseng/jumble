@@ -67,7 +67,7 @@ export function ProfileListBySearch({ search }: { search: string }) {
   return (
     <div className="px-4">
       {Array.from(pubkeySet).map((pubkey, index) => (
-        <UserItem key={`${index}-${pubkey}`} pubkey={pubkey} />
+        <UserItem key={`${index}-${pubkey}`} userId={pubkey} />
       ))}
       {hasMore && <UserItemSkeleton />}
       {hasMore && <div ref={bottomRef} />}

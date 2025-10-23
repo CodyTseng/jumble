@@ -1,6 +1,6 @@
 import QRCodeStyling from 'qr-code-styling'
 import { useEffect, useRef } from 'react'
-import iconSvg from '../../../public/favicon.svg'
+import iconSvg from '../../assets/favicon.svg'
 
 export default function QrCode({ value, size = 180 }: { value: string; size?: number }) {
   const ref = useRef<HTMLDivElement>(null)

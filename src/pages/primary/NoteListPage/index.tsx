@@ -1,5 +1,4 @@
 import { useSecondaryPage } from '@/PageManager'
-import BookmarkList from '@/components/BookmarkList'
 import PostEditor from '@/components/PostEditor'
 import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
@@ -60,18 +59,6 @@ const NoteListPage = forwardRef((_, ref) => {
         </Button>
       </div>
     )
-  } else if (feedInfo.feedType === 'bookmarks') {
-    if (!pubkey) {
-      content = (
-        <div className="flex justify-center w-full">
-          <Button size="lg" onClick={() => checkLogin()}>
-            {t('Please login to view bookmarks')}
-          </Button>
-        </div>
-      )
-    } else {
-      content = <BookmarkList />
-    }
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
   } else {

@@ -13,7 +13,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
     <>
       <div className="text-xl font-semibold">Jumble</div>
       <div className="text-muted-foreground">
-        A user-friendly Nostr client focused on relay feed browsing and relay discovery
+        A user-friendly Nostr client for exploring relay feeds
       </div>
       <div>
         Made by <Username userId={CODY_PUBKEY} className="inline-block text-primary" showAt />

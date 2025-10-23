@@ -13,7 +13,7 @@ import Text from '@tiptap/extension-text'
 import { TextSelection } from '@tiptap/pm/state'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { Event } from 'nostr-tools'
-import { Dispatch, forwardRef, SetStateAction, useImperativeHandle } from 'react'
+import { Dispatch, forwardRef, SetStateAction, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
 import Emoji from './Emoji'
@@ -57,6 +57,7 @@ const PostTextarea = forwardRef<
     ref
   ) => {
     const { t } = useTranslation()
+    const [tabValue, setTabValue] = useState('edit')
     const editor = useEditor({
       extensions: [
         Document,
@@ -158,7 +159,12 @@ const PostTextarea = forwardRef<
     }
 
     return (
-      <Tabs defaultValue="edit" className="space-y-2">
+      <Tabs
+        defaultValue="edit"
+        value={tabValue}
+        onValueChange={(v) => setTabValue(v)}
+        className="space-y-2"
+      >
         <TabsList>
           <TabsTrigger value="edit">{t('Edit')}</TabsTrigger>
           <TabsTrigger value="preview">{t('Preview')}</TabsTrigger>
@@ -166,7 +172,13 @@ const PostTextarea = forwardRef<
         <TabsContent value="edit">
           <EditorContent className="tiptap" editor={editor} />
         </TabsContent>
-        <TabsContent value="preview">
+        <TabsContent
+          value="preview"
+          onClick={() => {
+            setTabValue('edit')
+            editor.commands.focus()
+          }}
+        >
           <Preview content={text} className={className} />
         </TabsContent>
       </Tabs>

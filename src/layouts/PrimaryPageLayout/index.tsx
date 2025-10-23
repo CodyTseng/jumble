@@ -3,7 +3,7 @@ import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
 const PrimaryPageLayout = forwardRef(
@@ -26,7 +26,7 @@ const PrimaryPageLayout = forwardRef(
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenScrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenLastScrollTopRef = useRef(0)
-    const { isSmallScreen } = useScreenSize()
+    const { enableSingleColumnLayout } = useUserPreferences()
     const { current, display } = usePrimaryPage()
 
     useImperativeHandle(
@@ -45,7 +45,7 @@ const PrimaryPageLayout = forwardRef(
     )
 
     useEffect(() => {
-      if (!isSmallScreen) return
+      if (!enableSingleColumnLayout) return
 
       const isVisible = () => {
         return smallScreenScrollAreaRef.current?.checkVisibility
@@ -65,9 +65,9 @@ const PrimaryPageLayout = forwardRef(
       return () => {
         window.removeEventListener('scroll', handleScroll)
       }
-    }, [current, isSmallScreen, display])
+    }, [current, enableSingleColumnLayout, display])
 
-    if (isSmallScreen) {
+    if (enableSingleColumnLayout) {
       return (
         <DeepBrowsingProvider active={current === pageName && display}>
           <div

@@ -21,18 +21,34 @@ export default function SuggestedEmojis({
   useEffect(() => {
     try {
       const suggested = getSuggested()
-      const suggestEmojis = suggested
-        .sort((a, b) => b.count - a.count)
-        .map((item) => parseEmojiPickerUnified(item.unified))
-        .filter(Boolean) as (string | TEmoji)[]
-      setSuggestedEmojis(() => [...suggestEmojis, ...DEFAULT_SUGGESTED_EMOJIS].slice(0, 8))
+      const emojiSet = new Set<string>()
+      const suggestEmojis = (
+        suggested
+          .sort((a, b) => b.count - a.count)
+          .map((item) => parseEmojiPickerUnified(item.unified))
+          .filter(Boolean) as (string | TEmoji)[]
+      )
+        .concat(DEFAULT_SUGGESTED_EMOJIS)
+        .filter((emoji) => {
+          if (typeof emoji !== 'string') return true
+          if (emojiSet.has(emoji)) return false
+          emojiSet.add(emoji)
+          return true
+        })
+      setSuggestedEmojis(suggestEmojis.slice(0, 9))
     } catch {
       // ignore
     }
   }, [])
 
   return (
-    <div className="flex gap-2 p-1" onClick={(e) => e.stopPropagation()}>
+    <div className="flex gap-1 p-1" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="w-8 h-8 rounded-lg clickable flex justify-center items-center text-xl"
+        onClick={() => onEmojiClick('+')}
+      >
+        <Emoji emoji="+" />
+      </div>
       {suggestedEmojis.map((emoji, index) =>
         typeof emoji === 'string' ? (
           <div

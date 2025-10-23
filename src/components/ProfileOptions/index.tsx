@@ -28,9 +28,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem
-          onClick={() => navigator.clipboard.writeText('nostr:' + pubkeyToNpub(pubkey))}
-        >
+        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(pubkeyToNpub(pubkey) ?? '')}>
           <Copy />
           {t('Copy user ID')}
         </DropdownMenuItem>

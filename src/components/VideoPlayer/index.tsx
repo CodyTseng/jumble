@@ -1,32 +1,34 @@
 import { cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
 export default function VideoPlayer({ src, className }: { src: string; className?: string }) {
   const { autoplay } = useContentPolicy()
+  const { muteMedia, updateMuteMedia } = useUserPreferences()
   const [error, setError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!autoplay) return
-
     const video = videoRef.current
     const container = containerRef.current
 
-    if (!video || !container) return
+    if (!video || !container || error) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && autoplay) {
           setTimeout(() => {
             if (isInViewport(container)) {
               mediaManager.autoPlay(video)
             }
           }, 200)
-        } else {
+        }
+
+        if (!entry.isIntersecting) {
           mediaManager.pause(video)
         }
       },
@@ -38,7 +40,34 @@ export default function VideoPlayer({ src, className }: { src: string; className
     return () => {
       observer.unobserve(container)
     }
-  }, [autoplay])
+  }, [autoplay, error])
+
+  useEffect(() => {
+    if (!videoRef.current) return
+
+    const video = videoRef.current
+
+    const handleVolumeChange = () => {
+      updateMuteMedia(video.muted)
+    }
+
+    video.addEventListener('volumechange', handleVolumeChange)
+
+    return () => {
+      video.removeEventListener('volumechange', handleVolumeChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || video.muted === muteMedia) return
+
+    if (muteMedia) {
+      video.muted = true
+    } else {
+      video.muted = false
+    }
+  }, [muteMedia])
 
   if (error) {
     return <ExternalLink url={src} />
@@ -56,7 +85,7 @@ export default function VideoPlayer({ src, className }: { src: string; className
         onPlay={(event) => {
           mediaManager.play(event.currentTarget)
         }}
-        muted
+        muted={muteMedia}
         onError={() => setError(true)}
       />
     </div>

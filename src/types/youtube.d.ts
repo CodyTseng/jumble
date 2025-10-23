@@ -41,6 +41,9 @@ export interface YouTubePlayer {
   getCurrentTime(): number
   getDuration(): number
   getPlayerState(): number
+  isMuted(): boolean
+  mute(): void
+  unMute(): void
 }
 
 export {}
