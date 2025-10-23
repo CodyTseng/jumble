@@ -15,7 +15,6 @@ import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp } from 'lucid
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
-import { useSecondaryPage } from '@/PageManager'
 import { toWallet } from '@/lib/link'
 
 /**
@@ -30,17 +29,14 @@ import { toWallet } from '@/lib/link'
  */
 const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { pubkey, profileEvent, publish, updateProfileEvent, nip04Encrypt, nip04Decrypt } = useNostr()
-  const { pop, push } = useSecondaryPage()
   const {
     connected,
-    connecting: providerConnecting,
     balance: providerBalance,
     lightningAddress: providerLightningAddress,
-    refreshWalletState,
-    deleteWallet: providerDeleteWallet
+    refreshWalletState
   } = useSparkWallet()
 
-  const [apiKey, setApiKey] = useState(import.meta.env.VITE_BREEZ_SPARK_API_KEY || '')
+  const [apiKey] = useState(import.meta.env.VITE_BREEZ_SPARK_API_KEY || '')
   const [mnemonic, setMnemonic] = useState('')
   const [showMnemonic, setShowMnemonic] = useState(false)
   const [generatedMnemonic, setGeneratedMnemonic] = useState('')
@@ -610,7 +606,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
       // Poll for payment status updates for up to 10 seconds
       // This handles cases where the payment is pending and needs time to settle
-      const paymentId = result.id
+      const paymentId = (result as any).id
       let pollCount = 0
       const maxPolls = 10
 
@@ -806,7 +802,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
 
       // Save to Nostr relays if publish is available
-      if (publish) {
+      if (typeof publish === 'function') {
         try {
           console.log('[SparkTestPage] Step 4: Saving to Nostr relays...')
           await sparkBackup.saveToNostr(newMnemonic)
@@ -1061,7 +1057,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     value={mnemonic}
                     onChange={(e) => setMnemonic(e.target.value)}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-                    style={{ WebkitTextSecurity: showMnemonic ? 'none' : 'disc' }}
+                    style={{ WebkitTextSecurity: showMnemonic ? 'none' : 'disc' } as React.CSSProperties}
                   />
                   <p className="text-xs text-muted-foreground">Words should be separated by spaces</p>
                 </div>
@@ -1335,7 +1331,6 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                           const maxAllowed = 500000
                           const remainingCapacity = maxAllowed - currentBalance
                           const wouldExceedLimit = amount > remainingCapacity
-                          const newBalance = currentBalance + amount
 
                           return (
                             <Button
