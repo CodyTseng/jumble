@@ -1647,7 +1647,16 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setShowRevealedMnemonic(!showRevealedMnemonic)}
+                              onClick={() => {
+                                // Show warning when revealing, just toggle when hiding
+                                if (!showRevealedMnemonic) {
+                                  if (confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+                                    setShowRevealedMnemonic(true)
+                                  }
+                                } else {
+                                  setShowRevealedMnemonic(false)
+                                }
+                              }}
                               className="h-auto p-1"
                             >
                               {showRevealedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
