@@ -5,15 +5,17 @@ import { nip19 } from 'nostr-tools'
 
 export function parseEditorJsonToText(node?: JSONContent) {
   const text = _parseEditorJsonToText(node).trim()
-  const regex = /(?:^|\s)(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g
+  const regex = /(?:^|\s|@)(?:nostr:)?(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g
 
   return text.replace(regex, (match) => {
-    const trimmed = match.trim()
-    const leadingSpace = match.startsWith(' ') ? ' ' : ''
+    const leadingWhitespaceMatch = match.match(/^\s+/)
+    const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : ''
+    const trimmed = match.slice(leadingWhitespace.length)
+    const normalized = trimmed.replace(/^@/, '').replace(/^nostr:/, '')
 
     try {
-      nip19.decode(trimmed)
-      return `${leadingSpace}nostr:${trimmed}`
+      nip19.decode(normalized)
+      return `${leadingWhitespace}nostr:${normalized}`
     } catch {
       return match
     }
