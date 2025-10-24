@@ -199,6 +199,59 @@ class SparkBackupService {
   }
 
   /**
+   * Check which relays have the backup available
+   * Returns a map of relay URL to availability status
+   */
+  async checkBackupAvailability(): Promise<Record<string, boolean>> {
+    if (!client.signer) {
+      console.error('[SparkBackup] No signer available')
+      throw new Error('User must be logged in to check backup availability')
+    }
+
+    try {
+      const pubkey = await client.signer.getPublicKey()
+      const relayList = await client.fetchRelayList(pubkey)
+      const relays = Array.from(
+        new Set([...relayList.write.slice(0, 5), ...BIG_RELAY_URLS])
+      )
+
+      console.log('[SparkBackup] Checking backup availability on relays:', relays)
+
+      const availabilityMap: Record<string, boolean> = {}
+
+      // Check each relay individually with timeout
+      await Promise.allSettled(
+        relays.map(async (relayUrl) => {
+          try {
+            const events = await Promise.race([
+              client.fetchEvents([relayUrl], {
+                kinds: [this.BACKUP_KIND],
+                authors: [pubkey],
+                '#d': [this.BACKUP_D_TAG],
+                limit: 1
+              }),
+              new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout')), 5000)
+              )
+            ])
+
+            availabilityMap[relayUrl] = events.length > 0
+            console.log(`[SparkBackup] ${relayUrl}: ${events.length > 0 ? 'Found' : 'Not found'}`)
+          } catch (error) {
+            availabilityMap[relayUrl] = false
+            console.log(`[SparkBackup] ${relayUrl}: Failed to check (${error instanceof Error ? error.message : 'Unknown error'})`)
+          }
+        })
+      )
+
+      return availabilityMap
+    } catch (error) {
+      console.error('[SparkBackup] Failed to check backup availability:', error)
+      throw new Error('Failed to check backup availability on relays')
+    }
+  }
+
+  /**
    * Generate a new 12-word BIP39 mnemonic
    */
   generateMnemonic(): string {
