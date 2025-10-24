@@ -16,6 +16,7 @@ import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
 import { toWallet } from '@/lib/link'
+import nwcIcon from '@/assets/nwc-icon.svg'
 
 /**
  * SparkTestPage - POC Test Page for Breez Spark SDK
@@ -1656,7 +1657,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <div className="p-4 bg-muted/50 rounded-lg border border-dashed space-y-3">
                       <div className="flex items-center gap-3">
                         <img
-                          src="/src/assets/nwc-icon.svg"
+                          src={nwcIcon}
                           alt="NWC"
                           className="size-8"
                         />
