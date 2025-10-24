@@ -69,6 +69,10 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [waitingForFileSelection, setWaitingForFileSelection] = useState(false)
   const [hasRelayBackup, setHasRelayBackup] = useState(false)
   const [checkingRelayBackup, setCheckingRelayBackup] = useState(false)
+  const [resyncingBackup, setResyncingBackup] = useState(false)
+  const [checkingBackupLocations, setCheckingBackupLocations] = useState(false)
+  const [backupLocations, setBackupLocations] = useState<Record<string, boolean>>({})
+  const [showBackupLocations, setShowBackupLocations] = useState(false)
   const qrCodeRef = useRef<HTMLDivElement>(null)
   const lightningAddressQRRef = useRef<HTMLDivElement>(null)
   const lightningAddressSectionRef = useRef<HTMLDivElement>(null)
@@ -941,6 +945,76 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
   }
 
+  // Check which relays have the backup
+  const handleCheckBackupLocations = async () => {
+    if (!pubkey) {
+      toast.error('Please sign in with Nostr first')
+      return
+    }
+
+    setCheckingBackupLocations(true)
+    try {
+      console.log('[SparkTestPage] Checking backup locations...')
+      const locations = await sparkBackup.checkBackupAvailability()
+      setBackupLocations(locations)
+      setShowBackupLocations(true)
+
+      const availableCount = Object.values(locations).filter(Boolean).length
+      const totalCount = Object.keys(locations).length
+      toast.success(`Backup found on ${availableCount} of ${totalCount} relays`)
+      console.log('[SparkTestPage] Backup locations:', locations)
+    } catch (error) {
+      console.error('[SparkTestPage] Failed to check backup locations:', error)
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      toast.error(`Failed to check backup locations: ${errorMsg}`)
+    } finally {
+      setCheckingBackupLocations(false)
+    }
+  }
+
+  // Re-sync backup to current relays
+  const handleResyncBackupToRelays = async () => {
+    if (!pubkey) {
+      toast.error('Please sign in with Nostr first')
+      return
+    }
+
+    if (!publish) {
+      toast.error('Publish function not available')
+      return
+    }
+
+    setResyncingBackup(true)
+    try {
+      console.log('[SparkTestPage] Re-syncing backup to relays...')
+
+      // Load mnemonic from storage (already decrypted)
+      const mnemonic = await sparkStorage.loadMnemonic(pubkey)
+      if (!mnemonic) {
+        toast.error('No wallet found in storage')
+        return
+      }
+
+      // Re-publish to current relays
+      console.log('[SparkTestPage] Publishing backup to current relays...')
+      await sparkBackup.saveToNostr(mnemonic)
+
+      toast.success('Backup re-synced to your current relays!')
+      console.log('[SparkTestPage] Backup re-synced successfully')
+
+      // Optionally re-check locations after sync
+      if (showBackupLocations) {
+        setTimeout(() => handleCheckBackupLocations(), 1000)
+      }
+    } catch (error) {
+      console.error('[SparkTestPage] Failed to re-sync backup:', error)
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      toast.error(`Failed to re-sync backup: ${errorMsg}`)
+    } finally {
+      setResyncingBackup(false)
+    }
+  }
+
   return (
     <SecondaryPageLayout ref={ref} index={index} title={
       <div className="flex items-center gap-2">
@@ -1543,7 +1617,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 onClick={() => setShowSettings(!showSettings)}
                 className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
               >
-                <span className="text-sm">Wallet Settings</span>
+                <span className="text-sm">⚙️ Wallet Settings</span>
                 {showSettings ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
               </Button>
 
@@ -1767,6 +1841,84 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <p className="text-xs text-muted-foreground">
                       Download an encrypted backup file. Easier to store than writing down 12 words.
                     </p>
+
+                    {/* Relay Backup Management */}
+                    <div className="space-y-2 pt-2">
+                      <Button
+                        onClick={handleResyncBackupToRelays}
+                        variant="outline"
+                        className="w-full"
+                        size="sm"
+                        disabled={resyncingBackup || !publish}
+                      >
+                        {resyncingBackup ? (
+                          <>
+                            <Loader2 className="animate-spin size-4 mr-2" />
+                            Re-syncing...
+                          </>
+                        ) : (
+                          '🔄 Re-sync Backup to Relays'
+                        )}
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        Re-publish your encrypted backup to your current relay list. Use this after changing relays.
+                      </p>
+
+                      {/* Expandable backup locations section */}
+                      <div className="pt-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (!showBackupLocations) {
+                              handleCheckBackupLocations()
+                            } else {
+                              setShowBackupLocations(false)
+                            }
+                          }}
+                          className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground"
+                          disabled={checkingBackupLocations}
+                        >
+                          <span>
+                            {checkingBackupLocations ? (
+                              <>
+                                <Loader2 className="inline-block animate-spin size-3 mr-1" />
+                                Checking backup locations...
+                              </>
+                            ) : (
+                              'Show which relays have backup'
+                            )}
+                          </span>
+                          {!checkingBackupLocations && (
+                            showBackupLocations ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />
+                          )}
+                        </Button>
+
+                        {showBackupLocations && Object.keys(backupLocations).length > 0 && (
+                          <div className="mt-2 p-3 bg-muted/50 rounded-lg border space-y-2">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Backup Status by Relay:</p>
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                              {Object.entries(backupLocations).map(([relayUrl, hasBackup]) => (
+                                <div
+                                  key={relayUrl}
+                                  className="flex items-start gap-2 text-xs"
+                                >
+                                  <span className={`mt-0.5 ${hasBackup ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                    {hasBackup ? '✓' : '✗'}
+                                  </span>
+                                  <span className="flex-1 font-mono text-[10px] break-all leading-relaxed">
+                                    {relayUrl}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                              {Object.values(backupLocations).filter(Boolean).length} of {Object.keys(backupLocations).length} relays have your backup
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                     <div className="pt-2 border-t space-y-3">
                       <Label className="text-xs text-muted-foreground">Remove Wallet</Label>
