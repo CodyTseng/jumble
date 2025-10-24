@@ -1645,6 +1645,39 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     )}
                   </div>
 
+                  {/* Nostr Wallet Connect */}
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Nostr Wallet Connect</Label>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg border border-dashed space-y-3">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src="/src/assets/nwc-icon.svg"
+                          alt="NWC"
+                          className="size-8"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Create Wallet Connections</p>
+                          <p className="text-xs text-muted-foreground">
+                            Connect your wallet to other Nostr apps with customizable permissions
+                          </p>
+                        </div>
+                      </div>
+                      <a
+                        href="https://nwc.dev/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        Learn more about Nostr Wallet Connect →
+                      </a>
+                    </div>
+                  </div>
+
                   {/* Backup & Remove Wallet */}
                   <div className="space-y-2 pt-2 border-t">
                     <Label className="text-xs text-muted-foreground">Wallet Backup & Recovery</Label>
