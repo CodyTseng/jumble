@@ -6,6 +6,9 @@ interface SparkPaymentsListProps {
   loading: boolean
 }
 
+const SentIcon = () => <img src="/sent_icon.svg" alt="Sent" className="size-5" />
+const ReceivedIcon = () => <img src="/received_icon.svg" alt="Received" className="size-5" />
+
 export default function SparkPaymentsList({ payments, loading }: SparkPaymentsListProps) {
   if (loading) {
     return (
@@ -34,16 +37,22 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
     return date.toLocaleString()
   }
 
-  const formatAmount = (amount: number | undefined, paymentType: string) => {
+  const formatAmount = (amount: number | undefined, fees: number | undefined, paymentType: string) => {
     const amountSats = amount || 0
+    const feeSats = fees || 0
     const prefix = paymentType === 'send' ? '-' : '+'
     const color = paymentType === 'send' ? 'text-red-600' : 'text-green-600'
-    return <span className={color}>{prefix}{amountSats.toLocaleString()} sats</span>
-  }
 
-  const formatFees = (fees: number | undefined) => {
-    if (fees === undefined || fees === 0) return null
-    return <span className="text-xs text-muted-foreground">({fees.toLocaleString()} sats fee)</span>
+    return (
+      <span className={color}>
+        {prefix}{amountSats.toLocaleString()} sat{amountSats !== 1 ? 's' : ''}
+        {feeSats > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {' + '}{feeSats.toLocaleString()} sat{feeSats !== 1 ? 's' : ''} fee
+          </span>
+        )}
+      </span>
+    )
   }
 
   return (
@@ -54,17 +63,10 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
           className="p-2 border rounded bg-card hover:bg-accent/50 transition-colors"
         >
           <div className="flex items-center justify-between gap-3">
-            {/* Amount - Left side */}
+            {/* Icon and Amount - Left side */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2">
-                  {formatAmount(payment.amount, payment.paymentType)}
-                  <span className="text-xs text-muted-foreground capitalize">
-                    {payment.paymentType}
-                  </span>
-                </div>
-                {formatFees(payment.fees)}
-              </div>
+              {payment.paymentType === 'send' ? <SentIcon /> : <ReceivedIcon />}
+              {formatAmount(payment.amount, payment.fees, payment.paymentType)}
             </div>
 
             {/* Date and Status - Right side */}
