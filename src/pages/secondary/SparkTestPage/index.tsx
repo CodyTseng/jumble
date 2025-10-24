@@ -987,19 +987,36 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 )}
 
                 <div className="space-y-3">
-                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold">🆕 Create New Wallet (Recommended)</span>
-                    <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
-                  </Button>
+                  {/* If relay backup exists, recommend "Restore from Relays" */}
+                  {hasRelayBackup ? (
+                    <>
+                      <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">☁️ Restore from Relays (Recommended)</span>
+                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
+                      </Button>
+
+                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">🆕 Create New Wallet</span>
+                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">🆕 Create New Wallet (Recommended)</span>
+                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                      </Button>
+
+                      <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">☁️ Restore from Relays</span>
+                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
+                      </Button>
+                    </>
+                  )}
 
                   <Button onClick={handleRestoreFromFile} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
                     <span className="font-semibold">📁 Restore from Backup File</span>
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
-                  </Button>
-
-                  <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold">☁️ Restore from Relays</span>
-                    <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
                   </Button>
 
                   <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
