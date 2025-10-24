@@ -351,20 +351,33 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       await refreshWalletState()
       console.log('[SparkTestPage] Wallet state refreshed')
 
-      // Try to get Lightning address and sync to profile
+      // Try to get Lightning address and ask if user wants to sync to profile
       console.log('[SparkTestPage] Fetching Lightning address...')
       const addr = await sparkService.getLightningAddress()
       console.log('[SparkTestPage] Lightning address result:', addr)
       if (addr) {
-        console.log('[SparkTestPage] Syncing Lightning address to Nostr profile...')
-        // Sync Lightning address to Nostr profile
-        await sparkProfileSync.syncLightningAddressToProfile(
-          addr.lightningAddress,
-          profileEvent,
-          publish,
-          updateProfileEvent
-        )
-        console.log('[SparkTestPage] Lightning address synced to profile')
+        // Ask user if they want to update their Nostr profile with this Lightning address
+        if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${addr.lightningAddress}?`)) {
+          console.log('[SparkTestPage] User confirmed - syncing Lightning address to Nostr profile...')
+          try {
+            await sparkProfileSync.syncLightningAddressToProfile(
+              addr.lightningAddress,
+              profileEvent,
+              publish,
+              updateProfileEvent
+            )
+            console.log('[SparkTestPage] Lightning address synced to profile')
+            toast.success(`Lightning address ${addr.lightningAddress} added to your Nostr profile`)
+          } catch (syncError) {
+            console.error('[SparkTestPage] Failed to sync to Nostr profile:', syncError)
+            const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
+            console.error('[SparkTestPage] Sync error details:', errorMessage)
+            toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually sync it in Settings.`)
+          }
+        } else {
+          console.log('[SparkTestPage] User declined to sync Lightning address to profile')
+          toast.info(`Lightning address ${addr.lightningAddress} is active. You can sync it to your profile later in Settings.`)
+        }
       } else {
         console.log('[SparkTestPage] No Lightning address found for this wallet')
         // If this was a manual connection (not from create/restore handlers), show helpful message
@@ -855,16 +868,16 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       setWaitingForFileSelection(false)
       await handleConnect(mnemonic)
 
-      // Check if Lightning address exists
+      // Simple success message - handleConnect() already provided Lightning address feedback
+      toast.success('Wallet restored successfully!')
+
+      // Show reminder to register Lightning address if they don't have one
       const addr = await sparkService.getLightningAddress()
-      if (addr?.lightningAddress) {
-        toast.success(`Wallet restored! Lightning address: ${addr.lightningAddress}`)
-      } else {
-        toast.success('Wallet restored! Go to Settings to register a Lightning address.')
-        // Automatically switch to settings tab to make it easier
+      if (!addr?.lightningAddress) {
         setTimeout(() => {
+          toast.info('💡 Tip: Register a Lightning address in Settings to receive payments easily')
           setActiveTab('payments') // Reset to payments tab but show the Register button prominently
-        }, 100)
+        }, 1000)
       }
     } catch (error) {
       if (aborted) {
@@ -910,12 +923,15 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
       await handleConnect(mnemonic)
 
-      // Check if Lightning address exists
+      // Simple success message - handleConnect() already provided Lightning address feedback
+      toast.success('Wallet restored successfully!')
+
+      // Show reminder to register Lightning address if they don't have one
       const addr = await sparkService.getLightningAddress()
-      if (addr?.lightningAddress) {
-        toast.success(`Wallet restored! Lightning address: ${addr.lightningAddress}`)
-      } else {
-        toast.success('Wallet restored! Go to Settings to register a Lightning address.')
+      if (!addr?.lightningAddress) {
+        setTimeout(() => {
+          toast.info('💡 Tip: Register a Lightning address in Settings to receive payments easily')
+        }, 1000)
       }
     } catch (error) {
       console.error('[SparkTestPage] Failed to restore from relays:', error)
@@ -987,19 +1003,36 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 )}
 
                 <div className="space-y-3">
-                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold">🆕 Create New Wallet (Recommended)</span>
-                    <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
-                  </Button>
+                  {/* If relay backup exists, recommend "Restore from Relays" */}
+                  {hasRelayBackup ? (
+                    <>
+                      <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">☁️ Restore from Relays (Recommended)</span>
+                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
+                      </Button>
+
+                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">🆕 Create New Wallet</span>
+                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">🆕 Create New Wallet (Recommended)</span>
+                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                      </Button>
+
+                      <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                        <span className="font-semibold">☁️ Restore from Relays</span>
+                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
+                      </Button>
+                    </>
+                  )}
 
                   <Button onClick={handleRestoreFromFile} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
                     <span className="font-semibold">📁 Restore from Backup File</span>
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
-                  </Button>
-
-                  <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold">☁️ Restore from Relays</span>
-                    <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
                   </Button>
 
                   <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
@@ -1086,7 +1119,16 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setShowGeneratedMnemonic(!showGeneratedMnemonic)}
+                      onClick={() => {
+                        // Show warning when revealing, just toggle when hiding
+                        if (!showGeneratedMnemonic) {
+                          if (confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+                            setShowGeneratedMnemonic(true)
+                          }
+                        } else {
+                          setShowGeneratedMnemonic(false)
+                        }
+                      }}
                       className="h-auto p-1"
                     >
                       {showGeneratedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -1630,7 +1672,16 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setShowRevealedMnemonic(!showRevealedMnemonic)}
+                              onClick={() => {
+                                // Show warning when revealing, just toggle when hiding
+                                if (!showRevealedMnemonic) {
+                                  if (confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+                                    setShowRevealedMnemonic(true)
+                                  }
+                                } else {
+                                  setShowRevealedMnemonic(false)
+                                }
+                              }}
                               className="h-auto p-1"
                             >
                               {showRevealedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
