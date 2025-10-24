@@ -11,6 +11,9 @@ import sparkProfileSync from '@/services/spark-profile-sync.service'
 import sparkBackup from '@/services/spark-backup.service'
 import CodepenLightning from '@/components/animations/CodepenLightning'
 import SparkPaymentsList from '@/components/SparkPaymentsList'
+import DefaultZapAmountInput from '@/pages/secondary/WalletPage/DefaultZapAmountInput'
+import DefaultZapCommentInput from '@/pages/secondary/WalletPage/DefaultZapCommentInput'
+import QuickZapSwitch from '@/pages/secondary/WalletPage/QuickZapSwitch'
 import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -1722,6 +1725,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Zap Settings */}
+                  <div className="space-y-4 pt-2 border-t">
+                    <Label className="text-sm">Zap Settings</Label>
+                    <DefaultZapAmountInput />
+                    <DefaultZapCommentInput />
+                    <QuickZapSwitch />
                   </div>
 
                   {/* Nostr Wallet Connect */}
