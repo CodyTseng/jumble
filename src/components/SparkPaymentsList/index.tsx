@@ -41,6 +41,11 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
     return <span className={color}>{prefix}{amountSats.toLocaleString()} sats</span>
   }
 
+  const formatFees = (fees: number | undefined) => {
+    if (fees === undefined || fees === 0) return null
+    return <span className="text-xs text-muted-foreground">({fees.toLocaleString()} sats fee)</span>
+  }
+
   return (
     <div className="space-y-1 max-h-[500px] overflow-y-auto">
       {payments.map((payment, index) => (
@@ -51,10 +56,15 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
           <div className="flex items-center justify-between gap-3">
             {/* Amount - Left side */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              {formatAmount(payment.amount, payment.paymentType)}
-              <span className="text-xs text-muted-foreground capitalize">
-                {payment.paymentType}
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  {formatAmount(payment.amount, payment.paymentType)}
+                  <span className="text-xs text-muted-foreground capitalize">
+                    {payment.paymentType}
+                  </span>
+                </div>
+                {formatFees(payment.fees)}
+              </div>
             </div>
 
             {/* Date and Status - Right side */}

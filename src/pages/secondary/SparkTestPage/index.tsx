@@ -170,6 +170,25 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
   }, [connected, activeTab])
 
+  // Poll for pending payment status updates
+  useEffect(() => {
+    if (!connected || activeTab !== 'payments') return
+
+    // Check for pending payments and poll for updates
+    const checkPendingPayments = () => {
+      const hasPending = payments.some(p => p.status === 'pending')
+      if (hasPending) {
+        console.log('[SparkTestPage] Pending payments detected, refreshing...')
+        loadPayments(true)
+      }
+    }
+
+    // Poll every 3 seconds when there are pending payments
+    const intervalId = setInterval(checkPendingPayments, 3000)
+
+    return () => clearInterval(intervalId)
+  }, [connected, activeTab, payments])
+
   // Auto-refresh balance when payment events occur
   useEffect(() => {
     if (!connected) return
