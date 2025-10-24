@@ -1,6 +1,6 @@
 import { nip19 } from 'nostr-tools'
 
-const ENCODED_IDENTIFIER_REGEX =
+export const ENCODED_IDENTIFIER_REGEX =
   /(^|\s|@)(?:nostr:)?((?:nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+)/g
 
 export function normalizeNostrReferences(value: string) {
@@ -15,4 +15,18 @@ export function normalizeNostrReferences(value: string) {
       return match
     }
   })
+}
+
+export function extractNostrReferences(value: string) {
+  const matches = value.matchAll(ENCODED_IDENTIFIER_REGEX)
+  const identifiers = new Set<string>()
+
+  for (const match of matches) {
+    const identifier = match[2]
+    if (identifier) {
+      identifiers.add(identifier)
+    }
+  }
+
+  return Array.from(identifiers)
 }
