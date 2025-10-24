@@ -1,25 +1,11 @@
 import customEmojiService from '@/services/custom-emoji.service'
 import { emojis, shortcodeToEmoji } from '@tiptap/extension-emoji'
 import { JSONContent } from '@tiptap/react'
-import { nip19 } from 'nostr-tools'
+import { normalizeNostrReferences } from './nostr'
 
 export function parseEditorJsonToText(node?: JSONContent) {
   const text = _parseEditorJsonToText(node).trim()
-  const regex = /(?:^|\s|@)(?:nostr:)?(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g
-
-  return text.replace(regex, (match) => {
-    const leadingWhitespaceMatch = match.match(/^\s+/)
-    const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : ''
-    const trimmed = match.slice(leadingWhitespace.length)
-    const normalized = trimmed.replace(/^@/, '').replace(/^nostr:/, '')
-
-    try {
-      nip19.decode(normalized)
-      return `${leadingWhitespace}nostr:${normalized}`
-    } catch {
-      return match
-    }
-  })
+  return normalizeNostrReferences(text)
 }
 
 function _parseEditorJsonToText(node?: JSONContent): string {

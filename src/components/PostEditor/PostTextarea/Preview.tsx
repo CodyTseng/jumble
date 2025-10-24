@@ -1,14 +1,16 @@
 import { Card } from '@/components/ui/card'
 import { transformCustomEmojisInContent } from '@/lib/draft-event'
+import { normalizeNostrReferences } from '@/lib/nostr'
 import { createFakeEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
 import Content from '../../Content'
 
 export default function Preview({ content, className }: { content: string; className?: string }) {
+  const normalizedContent = useMemo(() => normalizeNostrReferences(content), [content])
   const { content: processedContent, emojiTags } = useMemo(
-    () => transformCustomEmojisInContent(content),
-    [content]
+    () => transformCustomEmojisInContent(normalizedContent),
+    [normalizedContent]
   )
   return (
     <Card className={cn('p-3', className)}>
