@@ -42,7 +42,7 @@ const ROUTES = [
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },
-  { path: '/spark-test', element: <SparkTestPage /> },
+  { path: '/spark', element: <SparkTestPage /> },
   { path: '/bookmarks', element: <BookmarkPage /> }
 ]
 
