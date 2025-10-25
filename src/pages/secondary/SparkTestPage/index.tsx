@@ -1075,7 +1075,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 <div className="p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 rounded-lg">
                   <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Set up your Spark Wallet</p>
                   <p className="text-sm text-blue-800 dark:text-blue-300 mb-1">
-                    Choose how you'd like to set up your self-custodial Lightning wallet
+                    Choose how you'd like to set up your wallet
                   </p>
                   <p className="text-xs text-blue-700 dark:text-blue-400">
                     Powered by Breez SDK
