@@ -1,16 +1,16 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import {
-  getParentETag,
+  getEventKey,
+  getEventKeyFromTag,
+  getParentTag,
   getReplaceableCoordinateFromEvent,
-  getRootATag,
-  getRootETag,
-  getRootEventHexId,
+  getRootTag,
   isMentioningMutedUsers,
   isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
+import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -40,23 +40,22 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   const [rootInfo, setRootInfo] = useState<TRootInfo | undefined>(undefined)
   const { repliesMap, addReplies } = useReply()
   const replies = useMemo(() => {
-    const replyIdSet = new Set<string>()
+    const replyKeySet = new Set<string>()
     const replyEvents: NEvent[] = []
-    const currentEventKey = isReplaceableEvent(event.kind)
-      ? getReplaceableCoordinateFromEvent(event)
-      : event.id
+    const currentEventKey = getEventKey(event)
     let parentEventKeys = [currentEventKey]
     while (parentEventKeys.length > 0) {
-      const events = parentEventKeys.flatMap((id) => repliesMap.get(id)?.events || [])
+      const events = parentEventKeys.flatMap((key) => repliesMap.get(key)?.events || [])
       events.forEach((evt) => {
-        if (replyIdSet.has(evt.id)) return
+        const key = getEventKey(evt)
+        if (replyKeySet.has(key)) return
         if (mutePubkeySet.has(evt.pubkey)) return
         if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) return
 
-        replyIdSet.add(evt.id)
+        replyKeySet.add(key)
         replyEvents.push(evt)
       })
-      parentEventKeys = events.map((evt) => evt.id)
+      parentEventKeys = events.map((evt) => getEventKey(evt))
     }
     return replyEvents.sort((a, b) => a.created_at - b.created_at)
   }, [event.id, repliesMap])
@@ -64,7 +63,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   const [until, setUntil] = useState<number | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(false)
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [highlightReplyId, setHighlightReplyId] = useState<string | undefined>(undefined)
+  const [highlightReplyKey, setHighlightReplyKey] = useState<string | undefined>(undefined)
   const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
@@ -79,13 +78,14 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             relay: client.getEventHint(event.id)
           }
         : { type: 'E', id: event.id, pubkey: event.pubkey }
-      const rootETag = getRootETag(event)
-      if (rootETag) {
-        const [, rootEventHexId, , , rootEventPubkey] = rootETag
+
+      const rootTag = getRootTag(event)
+      if (rootTag?.type === 'e') {
+        const [, rootEventHexId, , , rootEventPubkey] = rootTag.tag
         if (rootEventHexId && rootEventPubkey) {
           root = { type: 'E', id: rootEventHexId, pubkey: rootEventPubkey }
         } else {
-          const rootEventId = generateBech32IdFromETag(rootETag)
+          const rootEventId = generateBech32IdFromETag(rootTag.tag)
           if (rootEventId) {
             const rootEvent = await client.fetchEvent(rootEventId)
             if (rootEvent) {
@@ -93,13 +93,11 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             }
           }
         }
-      } else if (event.kind === ExtendedKind.COMMENT) {
-        const rootATag = getRootATag(event)
-        if (rootATag) {
-          const [, coordinate, relay] = rootATag
-          const [, pubkey] = coordinate.split(':')
-          root = { type: 'A', id: coordinate, eventId: event.id, pubkey, relay }
-        }
+      } else if (rootTag?.type === 'a') {
+        const [, coordinate, relay] = rootTag.tag
+        const [, pubkey] = coordinate.split(':')
+        root = { type: 'A', id: coordinate, eventId: event.id, pubkey, relay }
+      } else {
         const rootITag = event.tags.find(tagNameEquals('I'))
         if (rootITag) {
           root = { type: 'I', id: rootITag[1] }
@@ -109,27 +107,6 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
     }
     fetchRootEvent()
   }, [event])
-
-  const onNewReply = useCallback((evt: NEvent) => {
-    addReplies([evt])
-  }, [])
-
-  useEffect(() => {
-    if (!rootInfo) return
-    const handleEventPublished = (data: Event) => {
-      const customEvent = data as CustomEvent<NEvent>
-      const evt = customEvent.detail
-      const rootId = getRootEventHexId(evt)
-      if (rootId === rootInfo.id && isReplyNoteEvent(evt)) {
-        onNewReply(evt)
-      }
-    }
-
-    client.addEventListener('newEvent', handleEventPublished)
-    return () => {
-      client.removeEventListener('newEvent', handleEventPublished)
-    }
-  }, [rootInfo, onNewReply])
 
   useEffect(() => {
     if (loading || !rootInfo || currentIndex !== index) return
@@ -222,7 +199,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
     return () => {
       promise.then((closer) => closer?.())
     }
-  }, [rootInfo, currentIndex, index, onNewReply])
+  }, [rootInfo, currentIndex, index])
 
   useEffect(() => {
     if (replies.length === 0) {
@@ -269,16 +246,23 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
     setLoading(false)
   }, [loading, until, timelineKey])
 
-  const highlightReply = useCallback((eventId: string, scrollTo = true) => {
+  const highlightReply = useCallback((key: string, eventId?: string, scrollTo = true) => {
+    let found = false
     if (scrollTo) {
-      const ref = replyRefs.current[eventId]
+      const ref = replyRefs.current[key]
       if (ref) {
+        found = true
         ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       }
     }
-    setHighlightReplyId(eventId)
+    if (!found) {
+      if (eventId) push(toNote(eventId))
+      return
+    }
+
+    setHighlightReplyKey(key)
     setTimeout(() => {
-      setHighlightReplyId((pre) => (pre === eventId ? undefined : pre))
+      setHighlightReplyKey((pre) => (pre === key ? undefined : pre))
     }, 1500)
   }, [])
 
@@ -296,7 +280,8 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       <div>
         {replies.slice(0, showCount).map((reply) => {
           if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
-            const repliesForThisReply = repliesMap.get(reply.id)
+            const replyKey = getEventKey(reply)
+            const repliesForThisReply = repliesMap.get(replyKey)
             // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
             if (
               !repliesForThisReply ||
@@ -306,27 +291,29 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             }
           }
 
-          const parentETag = getParentETag(reply)
-          const parentEventHexId = parentETag?.[1]
-          const parentEventId = parentETag ? generateBech32IdFromETag(parentETag) : undefined
+          const rootEventKey = getEventKey(event)
+          const currentReplyKey = getEventKey(reply)
+          const parentTag = getParentTag(reply)
+          const parentEventKey = parentTag ? getEventKeyFromTag(parentTag.tag) : undefined
+          const parentEventId = parentTag
+            ? parentTag.type === 'e'
+              ? generateBech32IdFromETag(parentTag.tag)
+              : generateBech32IdFromATag(parentTag.tag)
+            : undefined
           return (
             <div
-              ref={(el) => (replyRefs.current[reply.id] = el)}
-              key={reply.id}
+              ref={(el) => (replyRefs.current[currentReplyKey] = el)}
+              key={currentReplyKey}
               className="scroll-mt-12"
             >
               <ReplyNote
                 event={reply}
-                parentEventId={event.id !== parentEventHexId ? parentEventId : undefined}
+                parentEventId={rootEventKey !== parentEventKey ? parentEventId : undefined}
                 onClickParent={() => {
-                  if (!parentEventHexId) return
-                  if (replies.every((r) => r.id !== parentEventHexId)) {
-                    push(toNote(parentEventId ?? parentEventHexId))
-                    return
-                  }
-                  highlightReply(parentEventHexId)
+                  if (!parentEventKey) return
+                  highlightReply(parentEventKey, parentEventId)
                 }}
-                highlight={highlightReplyId === reply.id}
+                highlight={highlightReplyKey === currentReplyKey}
               />
             </div>
           )

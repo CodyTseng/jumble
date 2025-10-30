@@ -5,9 +5,11 @@ import Tabs from '@/components/Tabs'
 import { Button } from '@/components/ui/button'
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
+import { getReplaceableEventIdentifier } from '@/lib/event'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Compass, Plus } from 'lucide-react'
-import { forwardRef, useState } from 'react'
+import { NostrEvent } from 'nostr-tools'
+import { forwardRef, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type TExploreTabs = 'following' | 'explore' | 'reviews'
@@ -15,6 +17,34 @@ type TExploreTabs = 'following' | 'explore' | 'reviews'
 const ExplorePage = forwardRef((_, ref) => {
   const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TExploreTabs>('explore')
+
+  const relayReviewFilterFn = useCallback((evt: NostrEvent) => {
+    const d = getReplaceableEventIdentifier(evt)
+    if (!d) return false
+
+    try {
+      const url = new URL(d)
+      return url.hostname !== 'localhost'
+    } catch {
+      return false
+    }
+  }, [])
+
+  const content = useMemo(() => {
+    return tab === 'explore' ? (
+      <Explore />
+    ) : tab === 'reviews' ? (
+      <NoteList
+        showKinds={[ExtendedKind.RELAY_REVIEW]}
+        subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
+        filterMutedNotes
+        hideUntrustedNotes={hideUntrustedNotes}
+        filterFn={relayReviewFilterFn}
+      />
+    ) : (
+      <FollowingFavoriteRelayList />
+    )
+  }, [tab, relayReviewFilterFn, hideUntrustedNotes])
 
   return (
     <PrimaryPageLayout
@@ -32,18 +62,7 @@ const ExplorePage = forwardRef((_, ref) => {
         ]}
         onTabChange={(tab) => setTab(tab as TExploreTabs)}
       />
-      {tab === 'explore' ? (
-        <Explore />
-      ) : tab === 'reviews' ? (
-        <NoteList
-          showKinds={[ExtendedKind.RELAY_REVIEW]}
-          subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
-          filterMutedNotes
-          hideUntrustedNotes={hideUntrustedNotes}
-        />
-      ) : (
-        <FollowingFavoriteRelayList />
-      )}
+      {content}
     </PrimaryPageLayout>
   )
 })

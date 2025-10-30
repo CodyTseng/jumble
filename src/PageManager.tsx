@@ -274,19 +274,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     })
   }
 
-  const popSecondaryPage = () => {
-    if (secondaryStack.length === 1) {
+  const popSecondaryPage = (delta = -1) => {
+    if (secondaryStack.length <= -delta) {
       // back to home page
       window.history.replaceState(null, '', '/')
       setSecondaryStack([])
     } else {
-      window.history.go(-1)
+      window.history.go(delta)
     }
   }
 
   const clearSecondaryPages = () => {
     if (secondaryStack.length === 0) return
-    window.history.go(-secondaryStack.length)
+    popSecondaryPage(-secondaryStack.length)
   }
 
   if (isSmallScreen) {

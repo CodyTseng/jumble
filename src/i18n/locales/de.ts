@@ -494,6 +494,10 @@ export default {
     Layout: 'Layout',
     'Two-column': 'Zweispaltig',
     'Single-column': 'Einspaltig',
-    Reviews: 'Bewertungen'
+    Reviews: 'Bewertungen',
+    Extension: 'Erweiterung',
+    Remote: 'Remote',
+    'Encrypted Key': 'Verschlüsselter Schlüssel',
+    'Private Key': 'Privater Schlüssel'
   }
 }

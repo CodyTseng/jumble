@@ -7,12 +7,10 @@ import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchFollowings, useFetchProfile } from '@/hooks'
 import { toMuteList, toProfileEditor } from '@/lib/link'
-import { generateImageByPubkey } from '@/lib/pubkey'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -22,6 +20,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 import SearchInput from '../SearchInput'
+import { SimpleUserAvatar } from '../UserAvatar'
 import FollowedBy from './FollowedBy'
 import Followings from './Followings'
 import ProfileFeed from './ProfileFeed'
@@ -41,10 +40,6 @@ export default function Profile({ id }: { id?: string }) {
       !!accountPubkey && accountPubkey !== profile?.pubkey && followings.includes(accountPubkey)
     )
   }, [followings, profile, accountPubkey])
-  const defaultImage = useMemo(
-    () => (profile?.pubkey ? generateImageByPubkey(profile?.pubkey) : ''),
-    [profile]
-  )
   const [topContainerHeight, setTopContainerHeight] = useState(0)
   const isSelf = accountPubkey === profile?.pubkey
   const [topContainer, setTopContainer] = useState<HTMLDivElement | null>(null)
@@ -114,18 +109,16 @@ export default function Profile({ id }: { id?: string }) {
   }
   if (!profile) return <NotFound />
 
-  const { banner, username, about, avatar, pubkey, website, lightningAddress } = profile
+  const { banner, username, about, pubkey, website, lightningAddress } = profile
   return (
     <>
       <div ref={topContainerRef}>
         <div className="relative bg-cover bg-center mb-2">
           <ProfileBanner banner={banner} pubkey={pubkey} className="w-full aspect-[3/1]" />
-          <Avatar className="w-24 h-24 absolute left-3 bottom-0 translate-y-1/2 border-4 border-background">
-            <AvatarImage src={avatar} className="object-cover object-center" />
-            <AvatarFallback>
-              <img src={defaultImage} />
-            </AvatarFallback>
-          </Avatar>
+          <SimpleUserAvatar
+            userId={pubkey}
+            className="w-24 h-24 absolute left-3 bottom-0 translate-y-1/2 border-4 border-background rounded-full"
+          />
         </div>
         <div className="px-4">
           <div className="flex justify-end h-8 gap-2 items-center">

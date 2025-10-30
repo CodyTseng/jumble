@@ -478,6 +478,10 @@ export default {
     Layout: 'เค้าโครง',
     'Two-column': 'สองคอลัมน์',
     'Single-column': 'คอลัมน์เดียว',
-    Reviews: 'รีวิว'
+    Reviews: 'รีวิว',
+    Extension: 'ส่วนขยาย',
+    Remote: 'ระยะไกล',
+    'Encrypted Key': 'คีย์ที่เข้ารหัส',
+    'Private Key': 'คีย์ส่วนตัว'
   }
 }

@@ -1,4 +1,4 @@
-import { isMentioningMutedUsers } from '@/lib/event'
+import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -20,27 +20,35 @@ export default function ReplyButton({ event }: { event: Event }) {
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { replyCount, hasReplied } = useMemo(() => {
+    const key = getEventKey(event)
     const hasReplied = pubkey
-      ? repliesMap.get(event.id)?.events.some((evt) => evt.pubkey === pubkey)
+      ? repliesMap.get(key)?.events.some((evt) => evt.pubkey === pubkey)
       : false
 
-    return {
-      replyCount:
-        repliesMap.get(event.id)?.events.filter((evt) => {
-          if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
-            return false
-          }
-          if (mutePubkeySet.has(evt.pubkey)) {
-            return false
-          }
-          if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) {
-            return false
-          }
-          return true
-        }).length ?? 0,
-      hasReplied
+    let replyCount = 0
+    const replies = [...(repliesMap.get(key)?.events || [])]
+    while (replies.length > 0) {
+      const reply = replies.pop()
+      if (!reply) break
+
+      const replyKey = getEventKey(reply)
+      const nestedReplies = repliesMap.get(replyKey)?.events ?? []
+      replies.push(...nestedReplies)
+
+      if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
+        continue
+      }
+      if (mutePubkeySet.has(reply.pubkey)) {
+        continue
+      }
+      if (hideContentMentioningMutedUsers && isMentioningMutedUsers(reply, mutePubkeySet)) {
+        continue
+      }
+      replyCount++
     }
-  }, [repliesMap, event.id, hideUntrustedInteractions])
+
+    return { replyCount, hasReplied }
+  }, [repliesMap, event, hideUntrustedInteractions])
   const [open, setOpen] = useState(false)
 
   return (

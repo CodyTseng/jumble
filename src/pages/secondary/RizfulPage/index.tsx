@@ -41,7 +41,8 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   const updateUserProfile = async (address: string) => {
     try {
-      if (address === profile?.lightningAddress) {
+      // If the profile already has a lightning address, do nothing
+      if (profile?.lightningAddress) {
         return
       }
 
@@ -101,7 +102,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : String(e))
     } finally {
-      setConnecting(false)
+      setTimeout(() => setConnecting(false), 5000)
     }
   }
 

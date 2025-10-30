@@ -19,8 +19,8 @@ export default function Username({
   skeletonClassName?: string
   withoutSkeleton?: boolean
 }) {
-  const { profile } = useFetchProfile(userId)
-  if (!profile && !withoutSkeleton) {
+  const { profile, isFetching } = useFetchProfile(userId)
+  if (!profile && isFetching && !withoutSkeleton) {
     return (
       <div className="py-1">
         <Skeleton className={cn('w-16', skeletonClassName)} />
@@ -29,24 +29,22 @@ export default function Username({
   }
   if (!profile) return null
 
-  const { username, pubkey } = profile
-
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
         <div className={className}>
           <SecondaryPageLink
-            to={toProfile(pubkey)}
+            to={toProfile(userId)}
             className="truncate hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
             {showAt && '@'}
-            {username}
+            {profile.username}
           </SecondaryPageLink>
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-80">
-        <ProfileCard pubkey={pubkey} />
+        <ProfileCard userId={userId} />
       </HoverCardContent>
     </HoverCard>
   )
@@ -65,8 +63,8 @@ export function SimpleUsername({
   skeletonClassName?: string
   withoutSkeleton?: boolean
 }) {
-  const { profile } = useFetchProfile(userId)
-  if (!profile && !withoutSkeleton) {
+  const { profile, isFetching } = useFetchProfile(userId)
+  if (!profile && isFetching && !withoutSkeleton) {
     return (
       <div className="py-1">
         <Skeleton className={cn('w-16', skeletonClassName)} />

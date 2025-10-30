@@ -46,7 +46,8 @@ const NoteList = forwardRef(
       hideUntrustedNotes = false,
       areAlgoRelays = false,
       showRelayCloseReason = false,
-      pinnedEventIds = []
+      pinnedEventIds = [],
+      filterFn
     }: {
       subRequests: TFeedSubRequest[]
       showKinds: number[]
@@ -56,6 +57,7 @@ const NoteList = forwardRef(
       areAlgoRelays?: boolean
       showRelayCloseReason?: boolean
       pinnedEventIds?: string[]
+      filterFn?: (event: Event) => boolean
     },
     ref
   ) => {
@@ -102,10 +104,13 @@ const NoteList = forwardRef(
         ) {
           return true
         }
+        if (filterFn && !filterFn(evt)) {
+          return true
+        }
 
         return false
       },
-      [hideReplies, hideUntrustedNotes, mutePubkeySet, pinnedEventIds, isEventDeleted]
+      [hideReplies, hideUntrustedNotes, mutePubkeySet, pinnedEventIds, isEventDeleted, filterFn]
     )
 
     const filteredEvents = useMemo(() => {

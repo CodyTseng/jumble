@@ -164,6 +164,19 @@ export const truncateUrl = (url: string, maxLength: number = 40) => {
 
     return u
   } catch {
-    return url
+    // invalid URL
+    let truncated = url
+    if (truncated.startsWith('https://')) {
+      truncated = truncated.slice(8)
+    } else if (truncated.startsWith('http://')) {
+      truncated = truncated.slice(7)
+    }
+    if (truncated.startsWith('www.')) {
+      truncated = truncated.slice(4)
+    }
+    if (truncated.length > maxLength) {
+      return truncated.slice(0, maxLength - 3) + '...'
+    }
+    return truncated
   }
 }

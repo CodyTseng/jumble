@@ -89,7 +89,7 @@ export default {
     'Login with Private Key': 'Entrar com chave privada',
     'reload notes': 'Recarregar notas',
     'Logged in Accounts': 'Contas conectadas',
-    'Add an Account': 'Acessar conta',
+    'Add an Account': 'Nova conta',
     'More options': 'Mais opções',
     'Add client tag': 'Adicionar tag de cliente',
     'Show others this was sent via Jumble': 'Mostrar aos outros que isso foi enviado via Jumble',
@@ -485,6 +485,10 @@ export default {
     Layout: 'Layout',
     'Two-column': 'Coluna dupla',
     'Single-column': 'Coluna única',
-    Reviews: 'Avaliações'
+    Reviews: 'Avaliações',
+    Extension: 'Extensão',
+    Remote: 'Remoto',
+    'Encrypted Key': 'Chave Criptografada',
+    'Private Key': 'Chave Privada'
   }
 }

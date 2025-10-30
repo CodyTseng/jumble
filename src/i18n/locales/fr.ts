@@ -493,6 +493,10 @@ export default {
     Layout: 'Disposition',
     'Two-column': 'Deux colonnes',
     'Single-column': 'Une seule colonne',
-    Reviews: 'Avis'
+    Reviews: 'Avis',
+    Extension: 'Extension',
+    Remote: 'Distant',
+    'Encrypted Key': 'Clé chiffrée',
+    'Private Key': 'Clé privée'
   }
 }

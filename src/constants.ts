@@ -434,3 +434,5 @@ export const PRIMARY_COLORS = {
   }
 } as const
 export type TPrimaryColor = keyof typeof PRIMARY_COLORS
+
+export const LONG_PRESS_THRESHOLD = 500

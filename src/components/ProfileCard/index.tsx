@@ -1,11 +1,14 @@
 import { useFetchProfile } from '@/hooks'
+import { userIdToPubkey } from '@/lib/pubkey'
+import { useMemo } from 'react'
 import FollowButton from '../FollowButton'
 import Nip05 from '../Nip05'
 import ProfileAbout from '../ProfileAbout'
 import { SimpleUserAvatar } from '../UserAvatar'
 
-export default function ProfileCard({ pubkey }: { pubkey: string }) {
-  const { profile } = useFetchProfile(pubkey)
+export default function ProfileCard({ userId }: { userId: string }) {
+  const pubkey = useMemo(() => userIdToPubkey(userId), [userId])
+  const { profile } = useFetchProfile(userId)
   const { username, about } = profile || {}
 
   return (

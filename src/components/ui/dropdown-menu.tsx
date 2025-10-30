@@ -13,6 +13,7 @@ const DropdownMenu = ({
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
   const isControlled = controlledOpen !== undefined
   const open = isControlled ? controlledOpen : uncontrolledOpen
+  const backdropRef = React.useRef<HTMLDivElement>(null)
 
   const handleOpenChange = React.useCallback(
     (newOpen: boolean) => {
@@ -24,11 +25,32 @@ const DropdownMenu = ({
     [isControlled, controlledOnOpenChange]
   )
 
+  React.useEffect(() => {
+    if (open) {
+      const preventScroll = (e: Event) => e.preventDefault()
+
+      document.addEventListener('wheel', preventScroll, { passive: false })
+      document.addEventListener('touchmove', preventScroll, { passive: false })
+
+      return () => {
+        document.removeEventListener('wheel', preventScroll)
+        document.removeEventListener('touchmove', preventScroll)
+      }
+    }
+  }, [open])
+
   return (
     <>
       {open &&
         createPortal(
-          <div className="fixed inset-0 z-50" onClick={() => handleOpenChange(false)} />,
+          <div
+            ref={backdropRef}
+            className="fixed inset-0 z-50 pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleOpenChange(false)
+            }}
+          />,
           document.body
         )}
       <DropdownMenuPrimitive.Root
@@ -135,7 +157,7 @@ const DropdownMenuSubContent = React.forwardRef<
 
         <div
           ref={scrollAreaRef}
-          className={cn('p-1 overflow-y-auto', className)}
+          className={cn('p-1 overflow-y-auto scrollbar-hide', className)}
           onScroll={checkScrollability}
         >
           {props.children}
@@ -222,8 +244,9 @@ const DropdownMenuContent = React.forwardRef<
 
         <div
           ref={scrollAreaRef}
-          className={cn('p-1 overflow-y-auto', className)}
+          className={cn('p-1 overflow-y-auto scrollbar-hide', className)}
           onScroll={checkScrollability}
+          onWheel={(e) => e.stopPropagation()}
         >
           {props.children}
         </div>

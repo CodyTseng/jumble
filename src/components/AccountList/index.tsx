@@ -1,12 +1,12 @@
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { isSameAccount } from '@/lib/account'
 import { formatPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { TAccountPointer, TSignerType } from '@/types'
+import { TAccountPointer } from '@/types'
 import { Loader, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import SignerTypeBadge from '../SignerTypeBadge'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
 
@@ -73,18 +73,4 @@ export default function AccountList({
       ))}
     </div>
   )
-}
-
-function SignerTypeBadge({ signerType }: { signerType: TSignerType }) {
-  if (signerType === 'nip-07') {
-    return <Badge className=" bg-green-400 hover:bg-green-400/80">NIP-07</Badge>
-  } else if (signerType === 'bunker') {
-    return <Badge className=" bg-blue-400 hover:bg-blue-400/80">Bunker</Badge>
-  } else if (signerType === 'ncryptsec') {
-    return <Badge>NCRYPTSEC</Badge>
-  } else if (signerType === 'nsec') {
-    return <Badge className=" bg-orange-400 hover:bg-orange-400/80">NSEC</Badge>
-  } else if (signerType === 'npub') {
-    return <Badge className=" bg-yellow-400 hover:bg-yellow-400/80">NPUB</Badge>
-  }
 }
