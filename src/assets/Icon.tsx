@@ -1,26 +1,11 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/providers/ThemeProvider'
 import { cn } from '@/lib/utils'
-import { useEffect, useState } from 'react'
 
 export default function Icon({ className }: { className?: string }) {
-  const { theme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme } = useTheme()
 
-  // Wait for component to mount to avoid hydration mismatch
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Use black kat for light mode
-  // Use white kat for dark mode and pure black mode
-  // Use resolvedTheme as fallback for when theme is 'system'
-  const currentTheme = theme === 'system' ? resolvedTheme : theme
-  const fill = currentTheme === 'light' ? '#111111' : '#FFFFFF'
-
-  // Don't render until mounted to prevent hydration issues
-  if (!mounted) {
-    return <div className={cn("flex items-center justify-center w-12 h-12", className)} />
-  }
+  // Simple: if light > black kat, if dark > white kat
+  const fill = theme === 'light' ? '#111111' : '#FFFFFF'
 
   return (
     <div className={cn("flex items-center justify-center w-12 h-12", className)}>
