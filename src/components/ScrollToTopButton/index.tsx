@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { hasBackgroundAudioAtom } from '@/services/media-manager.service'
 import { useAtomValue } from 'jotai'
 import { ChevronUp } from 'lucide-react'
@@ -15,7 +14,6 @@ export default function ScrollToTopButton({
   scrollAreaRef?: React.RefObject<HTMLDivElement>
   className?: string
 }) {
-  const { enableSingleColumnLayout } = useUserPreferences()
   const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
   const { isSmallScreen } = useScreenSize()
   const hasBackgroundAudio = useAtomValue(hasBackgroundAudioAtom)
@@ -54,8 +52,7 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        'z-30 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700',
-        enableSingleColumnLayout ? 'sticky' : 'fixed',
+        'sticky z-30 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700',
         visible ? '' : 'opacity-0',
         className
       )}
