@@ -52,31 +52,31 @@ export default defineConfig({
         short_name: 'JumbleKat',
         icons: [
           {
-            src: '/pwa-512x512.png',
+            src: '/pwa-512x512.png?v=2',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/pwa-192x192.png',
+            src: '/pwa-192x192.png?v=2',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/pwa-512x512.png?v=2',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
           },
           {
-            src: '/pwa-192x192.png',
+            src: '/pwa-192x192.png?v=2',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable'
           },
           {
-            src: '/pwa-monochrome.svg',
+            src: '/pwa-monochrome.svg?v=2',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'monochrome'
