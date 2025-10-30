@@ -32,7 +32,7 @@ export default function PrimaryPageSidebar() {
     )}>
       <div className="space-y-2">
         <div className={cn(
-          "px-3 mb-6 w-full transition-all duration-300",
+          "mb-6 w-full transition-all duration-300",
           compactSidebar ? "" : "xl:px-4"
         )}>
           <Icon className={cn(compactSidebar ? "" : "xl:hidden")} />
