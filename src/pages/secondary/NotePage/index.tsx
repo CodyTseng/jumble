@@ -10,7 +10,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExtendedKind } from '@/constants'
 import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { getParentBech32Id, getParentETag, getRootBech32Id } from '@/lib/event'
+import {
+  getEventKey,
+  getEventKeyFromTag,
+  getParentBech32Id,
+  getParentTag,
+  getRootBech32Id
+} from '@/lib/event'
 import { toNote, toNoteList } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -173,8 +179,10 @@ function ParentNote({
 }
 
 function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
-  const eTag = getParentETag(parentEvent)
-  if (!eTag) return false
+  if (!rootEvent || !parentEvent) return false
 
-  return rootEvent?.id === eTag[1]
+  const tag = getParentTag(parentEvent)
+  if (!tag) return false
+
+  return getEventKey(rootEvent) === getEventKeyFromTag(tag.tag)
 }

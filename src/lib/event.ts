@@ -31,12 +31,13 @@ export function isReplyNoteEvent(event: Event) {
   const cache = EVENT_IS_REPLY_NOTE_CACHE.get(event.id)
   if (cache !== undefined) return cache
 
-  const isReply = !!getParentETag(event) || !!getParentATag(event)
+  const isReply = !!getParentTag(event)
   EVENT_IS_REPLY_NOTE_CACHE.set(event.id, isReply)
   return isReply
 }
 
 export function isReplaceableEvent(kind: number) {
+  if (isNaN(kind)) return false
   return kinds.isReplaceableKind(kind) || kinds.isAddressableKind(kind)
 }
 
@@ -98,16 +99,32 @@ export function getParentEventHexId(event?: Event) {
   return tag?.[1]
 }
 
-export function getParentBech32Id(event?: Event) {
-  const eTag = getParentETag(event)
-  if (!eTag) {
-    const aTag = getParentATag(event)
-    if (!aTag) return undefined
+export function getParentTag(event?: Event): { type: 'e' | 'a'; tag: string[] } | undefined {
+  if (!event) return undefined
 
-    return generateBech32IdFromATag(aTag)
+  if (event.kind === kinds.ShortTextNote) {
+    const tag = getParentETag(event)
+    return tag ? { type: 'e', tag } : undefined
   }
 
-  return generateBech32IdFromETag(eTag)
+  // NIP-22
+  const parentKindStr = event.tags.find(tagNameEquals('k'))?.[1]
+  if (parentKindStr && isReplaceableEvent(parseInt(parentKindStr))) {
+    const tag = getParentATag(event)
+    return tag ? { type: 'a', tag } : undefined
+  }
+
+  const tag = getParentETag(event)
+  return tag ? { type: 'e', tag } : undefined
+}
+
+export function getParentBech32Id(event?: Event) {
+  const parentTag = getParentTag(event)
+  if (!parentTag) return undefined
+
+  return parentTag.type === 'e'
+    ? generateBech32IdFromETag(parentTag.tag)
+    : generateBech32IdFromATag(parentTag.tag)
 }
 
 export function getRootETag(event?: Event) {
@@ -147,16 +164,42 @@ export function getRootEventHexId(event?: Event) {
   return tag?.[1]
 }
 
-export function getRootBech32Id(event?: Event) {
-  const eTag = getRootETag(event)
-  if (!eTag) {
-    const aTag = getRootATag(event)
-    if (!aTag) return undefined
+export function getRootTag(event?: Event): { type: 'e' | 'a'; tag: string[] } | undefined {
+  if (!event) return undefined
 
-    return generateBech32IdFromATag(aTag)
+  if (event.kind === kinds.ShortTextNote) {
+    const tag = getRootETag(event)
+    return tag ? { type: 'e', tag } : undefined
   }
 
-  return generateBech32IdFromETag(eTag)
+  // NIP-22
+  const rootKindStr = event.tags.find(tagNameEquals('K'))?.[1]
+  if (rootKindStr && isReplaceableEvent(parseInt(rootKindStr))) {
+    const tag = getRootATag(event)
+    return tag ? { type: 'a', tag } : undefined
+  }
+
+  const tag = getRootETag(event)
+  return tag ? { type: 'e', tag } : undefined
+}
+
+export function getRootBech32Id(event?: Event) {
+  const rootTag = getRootTag(event)
+  if (!rootTag) return undefined
+
+  return rootTag.type === 'e'
+    ? generateBech32IdFromETag(rootTag.tag)
+    : generateBech32IdFromATag(rootTag.tag)
+}
+
+// For internal identification of events
+export function getEventKey(event: Event) {
+  return isReplaceableEvent(event.kind) ? getReplaceableCoordinateFromEvent(event) : event.id
+}
+
+// Only used for e, E, a, A tags
+export function getEventKeyFromTag([, tagValue]: (string | undefined)[]) {
+  return tagValue
 }
 
 export function getReplaceableCoordinate(kind: number, pubkey: string, d: string = '') {

@@ -1,8 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import client from '@/services/client.service'
+import blossomService from '@/services/blossom.service'
 import { TImetaInfo } from '@/types'
-import { getHashFromURL } from 'blossom-client-sdk'
 import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
@@ -28,63 +27,47 @@ export default function Image({
   const [isLoading, setIsLoading] = useState(true)
   const [displaySkeleton, setDisplaySkeleton] = useState(true)
   const [hasError, setHasError] = useState(false)
-  const [imageUrl, setImageUrl] = useState(url)
-  const [tried, setTried] = useState(new Set())
+  const [imageUrl, setImageUrl] = useState<string>()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    setImageUrl(url)
     setIsLoading(true)
     setHasError(false)
     setDisplaySkeleton(true)
-    setTried(new Set())
+
+    if (pubkey) {
+      blossomService.getValidUrl(url, pubkey).then((validUrl) => {
+        setImageUrl(validUrl)
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = null
+        }
+      })
+      timeoutRef.current = setTimeout(() => {
+        setImageUrl(url)
+      }, 5000)
+    } else {
+      setImageUrl(url)
+    }
   }, [url])
 
   if (hideIfError && hasError) return null
 
   const handleError = async () => {
-    let oldImageUrl: URL | undefined
-    let hash: string | null = null
-    try {
-      oldImageUrl = new URL(imageUrl)
-      hash = getHashFromURL(oldImageUrl)
-    } catch (error) {
-      console.error('Invalid image URL:', error)
-    }
-    if (!pubkey || !hash || !oldImageUrl) {
+    const nextUrl = await blossomService.tryNextUrl(url)
+    if (nextUrl) {
+      setImageUrl(nextUrl)
+    } else {
       setIsLoading(false)
       setHasError(true)
-      return
     }
-
-    const ext = oldImageUrl.pathname.match(/\.\w+$/i)
-    setTried((prev) => new Set(prev.add(oldImageUrl.hostname)))
-
-    const blossomServerList = await client.fetchBlossomServerList(pubkey)
-    const urls = blossomServerList
-      .map((server) => {
-        try {
-          return new URL(server)
-        } catch (error) {
-          console.error('Invalid Blossom server URL:', server, error)
-          return undefined
-        }
-      })
-      .filter((url) => !!url && !tried.has(url.hostname))
-    const nextUrl = urls[0]
-    if (!nextUrl) {
-      setIsLoading(false)
-      setHasError(true)
-      return
-    }
-
-    nextUrl.pathname = '/' + hash + ext
-    setImageUrl(nextUrl.toString())
   }
 
   const handleLoad = () => {
     setIsLoading(false)
     setHasError(false)
     setTimeout(() => setDisplaySkeleton(false), 600)
+    blossomService.markAsSuccess(url, imageUrl || url)
   }
 
   return (
@@ -95,14 +78,14 @@ export default function Image({
             <BlurHashCanvas
               blurHash={blurHash}
               className={cn(
-                'absolute inset-0 transition-opacity duration-500 rounded-lg',
+                'absolute inset-0 transition-opacity rounded-lg',
                 isLoading ? 'opacity-100' : 'opacity-0'
               )}
             />
           ) : (
             <Skeleton
               className={cn(
-                'absolute inset-0 transition-opacity duration-500 rounded-lg',
+                'absolute inset-0 transition-opacity rounded-lg',
                 isLoading ? 'opacity-100' : 'opacity-0'
               )}
             />
@@ -114,29 +97,39 @@ export default function Image({
           src={imageUrl}
           alt={alt}
           decoding="async"
-          loading="lazy"
+          draggable={false}
+          {...props}
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
-            'object-cover rounded-lg w-full h-full transition-opacity duration-500',
+            'object-cover rounded-lg w-full h-full transition-opacity pointer-events-none',
+            isLoading ? 'opacity-0' : 'opacity-100',
             className
           )}
           width={dim?.width}
           height={dim?.height}
-          {...props}
         />
       )}
-      {hasError && (
-        <div
-          className={cn(
-            'object-cover flex flex-col items-center justify-center w-full h-full bg-muted',
-            className,
-            classNames.errorPlaceholder
-          )}
-        >
-          {errorPlaceholder}
-        </div>
-      )}
+      {hasError &&
+        (typeof errorPlaceholder === 'string' ? (
+          <img
+            src={errorPlaceholder}
+            alt={alt}
+            decoding="async"
+            loading="lazy"
+            className={cn('object-cover rounded-lg w-full h-full transition-opacity', className)}
+          />
+        ) : (
+          <div
+            className={cn(
+              'object-cover flex flex-col items-center justify-center w-full h-full bg-muted',
+              className,
+              classNames.errorPlaceholder
+            )}
+          >
+            {errorPlaceholder}
+          </div>
+        ))}
     </div>
   )
 }

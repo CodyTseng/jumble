@@ -488,6 +488,10 @@ export default {
     Layout: 'Diseño',
     'Two-column': 'Doble columna',
     'Single-column': 'Columna única',
-    Reviews: 'Reseñas'
+    Reviews: 'Reseñas',
+    Extension: 'Extensión',
+    Remote: 'Remoto',
+    'Encrypted Key': 'Clave privada cifrada',
+    'Private Key': 'Clave privada'
   }
 }

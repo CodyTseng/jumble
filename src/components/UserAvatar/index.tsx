@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchProfile } from '@/hooks'
@@ -7,6 +6,7 @@ import { generateImageByPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
 import { useMemo } from 'react'
+import Image from '../Image'
 import ProfileCard from '../ProfileCard'
 
 const UserAvatarSizeCnMap = {
@@ -29,33 +29,15 @@ export default function UserAvatar({
   className?: string
   size?: 'large' | 'big' | 'semiBig' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
 }) {
-  const { profile } = useFetchProfile(userId)
-  const defaultAvatar = useMemo(
-    () => (profile?.pubkey ? generateImageByPubkey(profile.pubkey) : ''),
-    [profile]
-  )
-
-  if (!profile) {
-    return (
-      <Skeleton className={cn('shrink-0', UserAvatarSizeCnMap[size], 'rounded-full', className)} />
-    )
-  }
-  const { avatar, pubkey } = profile
-
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <SecondaryPageLink to={toProfile(pubkey)} onClick={(e) => e.stopPropagation()}>
-          <Avatar className={cn('shrink-0', UserAvatarSizeCnMap[size], className)}>
-            <AvatarImage src={avatar} className="object-cover object-center" />
-            <AvatarFallback>
-              <img src={defaultAvatar} alt={pubkey} />
-            </AvatarFallback>
-          </Avatar>
+        <SecondaryPageLink to={toProfile(userId)} onClick={(e) => e.stopPropagation()}>
+          <SimpleUserAvatar userId={userId} size={size} className={className} />
         </SecondaryPageLink>
       </HoverCardTrigger>
       <HoverCardContent className="w-72">
-        <ProfileCard pubkey={pubkey} />
+        <ProfileCard userId={userId} />
       </HoverCardContent>
     </HoverCard>
   )
@@ -68,7 +50,7 @@ export function SimpleUserAvatar({
   onClick
 }: {
   userId: string
-  size?: 'large' | 'big' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
+  size?: 'large' | 'big' | 'semiBig' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
   className?: string
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {
@@ -83,14 +65,17 @@ export function SimpleUserAvatar({
       <Skeleton className={cn('shrink-0', UserAvatarSizeCnMap[size], 'rounded-full', className)} />
     )
   }
-  const { avatar, pubkey } = profile
+  const { avatar, pubkey } = profile || {}
 
   return (
-    <Avatar className={cn('shrink-0', UserAvatarSizeCnMap[size], className)} onClick={onClick}>
-      <AvatarImage src={avatar} className="object-cover object-center" />
-      <AvatarFallback>
-        <img src={defaultAvatar} alt={pubkey} />
-      </AvatarFallback>
-    </Avatar>
+    <Image
+      image={{ url: avatar ?? defaultAvatar, pubkey }}
+      errorPlaceholder={defaultAvatar}
+      className="object-cover object-center"
+      classNames={{
+        wrapper: cn('shrink-0 rounded-full bg-background', UserAvatarSizeCnMap[size], className)
+      }}
+      onClick={onClick}
+    />
   )
 }

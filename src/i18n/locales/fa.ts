@@ -483,6 +483,10 @@ export default {
     Layout: 'چیدمان',
     'Two-column': 'دو ستونی',
     'Single-column': 'تک ستونی',
-    Reviews: 'نقدها'
+    Reviews: 'نقدها',
+    Extension: 'افزونه',
+    Remote: 'از راه دور',
+    'Encrypted Key': 'رمزگذاری شده کلید',
+    'Private Key': 'کلید خصوصی'
   }
 }

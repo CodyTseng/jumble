@@ -485,6 +485,10 @@ export default {
     Layout: 'लेआउट',
     'Two-column': 'दोहरा स्तंभ',
     'Single-column': 'एकल स्तंभ',
-    Reviews: 'समीक्षाएं'
+    Reviews: 'समीक्षाएं',
+    Extension: 'एक्सटेंशन',
+    Remote: 'रिमोट',
+    'Encrypted Key': 'एन्क्रिप्टेड की',
+    'Private Key': 'प्राइवेट की'
   }
 }

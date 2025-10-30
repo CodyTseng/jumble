@@ -1,9 +1,9 @@
-import { getParentATag, getParentETag, getRootATag, getRootETag } from '@/lib/event'
+import { getEventKey, getEventKeyFromTag, getParentTag } from '@/lib/event'
 import { Event } from 'nostr-tools'
 import { createContext, useCallback, useContext, useState } from 'react'
 
 type TReplyContext = {
-  repliesMap: Map<string, { events: Event[]; eventIdSet: Set<string> }>
+  repliesMap: Map<string, { events: Event[]; eventKeySet: Set<string> }>
   addReplies: (replies: Event[]) => void
 }
 
@@ -19,56 +19,38 @@ export const useReply = () => {
 
 export function ReplyProvider({ children }: { children: React.ReactNode }) {
   const [repliesMap, setRepliesMap] = useState<
-    Map<string, { events: Event[]; eventIdSet: Set<string> }>
+    Map<string, { events: Event[]; eventKeySet: Set<string> }>
   >(new Map())
 
   const addReplies = useCallback((replies: Event[]) => {
-    const newReplyIdSet = new Set<string>()
+    const newReplyKeySet = new Set<string>()
     const newReplyEventMap = new Map<string, Event[]>()
     replies.forEach((reply) => {
-      if (newReplyIdSet.has(reply.id)) return
-      newReplyIdSet.add(reply.id)
+      const key = getEventKey(reply)
+      if (newReplyKeySet.has(key)) return
+      newReplyKeySet.add(key)
 
-      let rootId: string | undefined
-      const rootETag = getRootETag(reply)
-      if (rootETag) {
-        rootId = rootETag[1]
-      } else {
-        const rootATag = getRootATag(reply)
-        if (rootATag) {
-          rootId = rootATag[1]
+      const parentTag = getParentTag(reply)
+      if (parentTag) {
+        const parentKey = getEventKeyFromTag(parentTag.tag)
+        if (parentKey) {
+          newReplyEventMap.set(parentKey, [...(newReplyEventMap.get(parentKey) || []), reply])
         }
-      }
-      if (rootId) {
-        newReplyEventMap.set(rootId, [...(newReplyEventMap.get(rootId) || []), reply])
-      }
-
-      let parentId: string | undefined
-      const parentETag = getParentETag(reply)
-      if (parentETag) {
-        parentId = parentETag[1]
-      } else {
-        const parentATag = getParentATag(reply)
-        if (parentATag) {
-          parentId = parentATag[1]
-        }
-      }
-      if (parentId && parentId !== rootId) {
-        newReplyEventMap.set(parentId, [...(newReplyEventMap.get(parentId) || []), reply])
       }
     })
     if (newReplyEventMap.size === 0) return
 
     setRepliesMap((prev) => {
-      for (const [id, newReplyEvents] of newReplyEventMap.entries()) {
-        const replies = prev.get(id) || { events: [], eventIdSet: new Set() }
+      for (const [key, newReplyEvents] of newReplyEventMap.entries()) {
+        const replies = prev.get(key) || { events: [], eventKeySet: new Set() }
         newReplyEvents.forEach((reply) => {
-          if (!replies.eventIdSet.has(reply.id)) {
+          const key = getEventKey(reply)
+          if (!replies.eventKeySet.has(key)) {
             replies.events.push(reply)
-            replies.eventIdSet.add(reply.id)
+            replies.eventKeySet.add(key)
           }
         })
-        prev.set(id, replies)
+        prev.set(key, replies)
       }
       return new Map(prev)
     })

@@ -1,15 +1,19 @@
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Button } from '../ui/button'
 import { MouseEventHandler } from 'react'
 
 export default function BottomNavigationBarItem({
   children,
   active = false,
-  onClick
+  onClick,
+  onPointerDown,
+  onPointerUp
 }: {
   children: React.ReactNode
   active?: boolean
-  onClick: MouseEventHandler
+  onClick?: MouseEventHandler
+  onPointerDown?: MouseEventHandler
+  onPointerUp?: MouseEventHandler
 }) {
   return (
     <Button
@@ -19,6 +23,8 @@ export default function BottomNavigationBarItem({
       )}
       variant="ghost"
       onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
     >
       {children}
     </Button>

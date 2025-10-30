@@ -1,6 +1,7 @@
 import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import blossomService from '@/services/blossom.service'
 import modalManager from '@/services/modal-manager.service'
 import { TImetaInfo } from '@/types'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
@@ -26,6 +27,7 @@ export default function ImageGallery({
   const id = useMemo(() => `image-gallery-${randomString()}`, [])
   const { autoLoadMedia } = useContentPolicy()
   const [index, setIndex] = useState(-1)
+  const [slides, setSlides] = useState<{ src: string }[]>(images.map(({ url }) => ({ src: url })))
   useEffect(() => {
     if (index >= 0) {
       modalManager.register(id, () => {
@@ -35,6 +37,49 @@ export default function ImageGallery({
       modalManager.unregister(id)
     }
   }, [index])
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const slides = await Promise.all(
+        images.map(({ url, pubkey }) => {
+          return new Promise<{ src: string }>((resolve) => {
+            const img = new window.Image()
+            let validUrl = url
+            img.onload = () => {
+              blossomService.markAsSuccess(url, validUrl)
+              resolve({ src: validUrl })
+            }
+            img.onerror = () => {
+              blossomService.tryNextUrl(url).then((nextUrl) => {
+                if (nextUrl) {
+                  validUrl = nextUrl
+                  resolve({ src: validUrl })
+                } else {
+                  resolve({ src: url })
+                }
+              })
+            }
+            if (pubkey) {
+              blossomService
+                .getValidUrl(url, pubkey)
+                .then((u) => {
+                  validUrl = u
+                  img.src = validUrl
+                })
+                .catch(() => {
+                  resolve({ src: url })
+                })
+            } else {
+              img.src = url
+            }
+          })
+        })
+      )
+      setSlides(slides)
+    }
+
+    loadImages()
+  }, [images])
 
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
     event.stopPropagation()
@@ -62,9 +107,10 @@ export default function ImageGallery({
     imageContent = (
       <Image
         key={0}
-        className="max-h-[80vh] sm:max-h-[50vh] cursor-zoom-in object-contain"
+        className="max-h-[80vh] sm:max-h-[50vh] object-contain"
         classNames={{
-          errorPlaceholder: 'aspect-square h-[30vh]'
+          errorPlaceholder: 'aspect-square h-[30vh]',
+          wrapper: 'cursor-zoom-in'
         }}
         image={displayImages[0]}
         onClick={(e) => handlePhotoClick(e, 0)}
@@ -76,7 +122,8 @@ export default function ImageGallery({
         {displayImages.map((image, i) => (
           <Image
             key={i}
-            className="aspect-square w-full cursor-zoom-in"
+            className="aspect-square w-full"
+            classNames={{ wrapper: 'cursor-zoom-in' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -89,7 +136,8 @@ export default function ImageGallery({
         {displayImages.map((image, i) => (
           <Image
             key={i}
-            className="aspect-square w-full cursor-zoom-in"
+            className="aspect-square w-full"
+            classNames={{ wrapper: 'cursor-zoom-in' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -106,7 +154,7 @@ export default function ImageGallery({
           <div onClick={(e) => e.stopPropagation()}>
             <Lightbox
               index={index}
-              slides={images.map(({ url }) => ({ src: url }))}
+              slides={slides}
               plugins={[Zoom]}
               open={index >= 0}
               close={() => setIndex(-1)}

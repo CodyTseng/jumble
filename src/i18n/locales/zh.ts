@@ -476,6 +476,10 @@ export default {
     Layout: '布局',
     'Two-column': '双栏',
     'Single-column': '单栏',
-    Reviews: '评价'
+    Reviews: '评价',
+    Extension: '扩展',
+    Remote: '远程',
+    'Encrypted Key': '加密私钥',
+    'Private Key': '私钥'
   }
 }

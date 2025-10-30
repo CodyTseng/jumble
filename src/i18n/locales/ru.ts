@@ -490,6 +490,10 @@ export default {
     Layout: 'Макет',
     'Two-column': 'Две колонки',
     'Single-column': 'Одна колонка',
-    Reviews: 'Отзывы'
+    Reviews: 'Отзывы',
+    Extension: 'Расширение',
+    Remote: 'Удалённый',
+    'Encrypted Key': 'Зашифрованный ключ',
+    'Private Key': 'Приватный ключ'
   }
 }

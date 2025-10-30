@@ -3,6 +3,7 @@ import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
+import { useNostr } from '@/providers/NostrProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
@@ -23,6 +24,7 @@ const PrimaryPageLayout = forwardRef(
     },
     ref
   ) => {
+    const { pubkey } = useNostr()
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenScrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenLastScrollTopRef = useRef(0)
@@ -66,6 +68,10 @@ const PrimaryPageLayout = forwardRef(
         window.removeEventListener('scroll', handleScroll)
       }
     }, [current, enableSingleColumnLayout, display])
+
+    useEffect(() => {
+      smallScreenLastScrollTopRef.current = 0
+    }, [pubkey])
 
     if (enableSingleColumnLayout) {
       return (

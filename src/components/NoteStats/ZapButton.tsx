@@ -1,3 +1,4 @@
+import { LONG_PRESS_THRESHOLD } from '@/constants'
 import { useNoteStatsById } from '@/hooks/useNoteStatsById'
 import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
@@ -86,7 +87,7 @@ export default function ZapButton({ event }: { event: Event }) {
           setOpenZapDialog(true)
           setZapping(true)
         })
-      }, 500)
+      }, LONG_PRESS_THRESHOLD)
     }
   }
 

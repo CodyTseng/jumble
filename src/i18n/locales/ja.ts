@@ -484,6 +484,10 @@ export default {
     Layout: 'レイアウト',
     'Two-column': '2列',
     'Single-column': '1列',
-    Reviews: 'レビュー'
+    Reviews: 'レビュー',
+    Extension: '拡張機能',
+    Remote: 'リモート',
+    'Encrypted Key': '暗号化キー',
+    'Private Key': '暗号化されたキー'
   }
 }

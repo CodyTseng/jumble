@@ -15,9 +15,9 @@ Experience Jumble at [https://jumble.social](https://jumble.social)
 
 > Some interesting forks of Jumble.
 
-- [https://jumble.imwald.eu/](https://jumble.imwald.eu/) Repo: [Silberengel/jumble](https://github.com/Silberengel/jumble) - Discussions support
-- [https://grouped-notes.dtonon.com/](https://grouped-notes.dtonon.com/) - "Grouped Notes" mode: organizes posts by user and timeframe for cleaner browsing and easier discovery
-- [https://jumblekat.shakespeare.wtf/](https://jumblekat.shakespeare.wtf/) - Supports custom styles
+- [https://jumblekat.com/](https://jumblekat.com/) - by [@Karnage](https://jumble.social/users/npub1r0rs5q2gk0e3dk3nlc7gnu378ec6cnlenqp8a3cjhyzu6f8k5sgs4sq9ac)
+- [https://grouped-notes.dtonon.com/](https://grouped-notes.dtonon.com/) - by [@daniele](https://jumble.social/users/npub10000003zmk89narqpczy4ff6rnuht2wu05na7kpnh3mak7z2tqzsv8vwqk)
+- [https://jumble.imwald.eu/](https://jumble.imwald.eu/) Repo: [Silberengel/jumble](https://github.com/Silberengel/jumble) - by [@Silberengel](https://jumble.social/users/npub1l5sga6xg72phsz5422ykujprejwud075ggrr3z2hwyrfgr7eylqstegx9z)
 
 ## Run Locally
 

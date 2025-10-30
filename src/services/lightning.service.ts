@@ -271,7 +271,7 @@ class LightningService {
       const res = await fetch(lnurl)
       const body = await res.json()
 
-      if (body.allowsNostr && body.nostrPubkey) {
+      if (body.allowsNostr !== false && body.callback) {
         return {
           callback: body.callback,
           lnurl

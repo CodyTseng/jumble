@@ -1,22 +1,24 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toWallet } from '@/lib/link'
-import { formatPubkey, generateImageByPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
-import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { ArrowDownUp, LogIn, LogOut, UserRound, Wallet } from 'lucide-react'
+import { LogIn, LogOut, Plus, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LoginDialog from '../LoginDialog'
 import LogoutDialog from '../LogoutDialog'
+import SignerTypeBadge from '../SignerTypeBadge'
+import { SimpleUserAvatar } from '../UserAvatar'
+import { SimpleUsername } from '../Username'
 import SidebarItem from './SidebarItem'
 
 export default function AccountButton({ collapse }: { collapse: boolean }) {
@@ -31,16 +33,12 @@ export default function AccountButton({ collapse }: { collapse: boolean }) {
 
 function ProfileButton({ collapse }: { collapse: boolean }) {
   const { t } = useTranslation()
-  const { account, profile } = useNostr()
+  const { account, accounts, switchAccount } = useNostr()
   const pubkey = account?.pubkey
-  const { navigate } = usePrimaryPage()
   const { push } = useSecondaryPage()
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   if (!pubkey) return null
-
-  const defaultAvatar = generateImageByPubkey(pubkey)
-  const { username, avatar } = profile || { username: formatPubkey(pubkey), avatar: defaultAvatar }
 
   return (
     <DropdownMenu>
@@ -53,37 +51,68 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
           )}
         >
           <div className="flex gap-2 items-center flex-1 w-0">
-            <Avatar className="w-8 h-8">
-              <AvatarImage src={avatar} />
-              <AvatarFallback>
-                <img src={defaultAvatar} />
-              </AvatarFallback>
-            </Avatar>
-            {!collapse && <div className="truncate font-semibold text-lg">{username}</div>}
+            <SimpleUserAvatar size="medium" userId={pubkey} />
+            {!collapse && (
+              <SimpleUsername className="truncate font-semibold text-lg" userId={pubkey} />
+            )}
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top">
-        <DropdownMenuItem onClick={() => navigate('profile')}>
-          <UserRound />
-          {t('Profile')}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent side="top" className="w-72">
         <DropdownMenuItem onClick={() => push(toWallet())}>
           <Wallet />
           {t('Wallet')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => setLoginDialogOpen(true)}>
-          <ArrowDownUp />
-          {t('Switch account')}
+        <DropdownMenuLabel>{t('Switch account')}</DropdownMenuLabel>
+        {accounts.map((act) => (
+          <DropdownMenuItem
+            className={act.pubkey === pubkey ? 'cursor-default focus:bg-background' : ''}
+            key={`${act.pubkey}:${act.signerType}`}
+            onClick={() => {
+              if (act.pubkey !== pubkey) {
+                switchAccount(act)
+              }
+            }}
+          >
+            <div className="flex gap-2 items-center flex-1">
+              <SimpleUserAvatar userId={act.pubkey} />
+              <div className="flex-1 w-0">
+                <SimpleUsername
+                  userId={act.pubkey}
+                  className="font-medium truncate"
+                  skeletonClassName="h-3"
+                />
+                <SignerTypeBadge signerType={act.signerType} />
+              </div>
+            </div>
+            <div
+              className={cn(
+                'border border-muted-foreground rounded-full size-3.5',
+                act.pubkey === pubkey && 'size-4 border-4 border-primary'
+              )}
+            />
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem
+          onClick={() => setLoginDialogOpen(true)}
+          className="border border-dashed m-2 focus:border-muted-foreground focus:bg-background"
+        >
+          <div className="flex gap-2 items-center justify-center w-full py-2">
+            <Plus />
+            {t('Add an Account')}
+          </div>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
           onClick={() => setLogoutDialogOpen(true)}
         >
           <LogOut />
-          {t('Logout')}
+          <span className="shrink-0">{t('Logout')}</span>
+          <SimpleUsername
+            userId={pubkey}
+            className="text-muted-foreground border border-muted-foreground px-1 rounded-md text-xs truncate"
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
       <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />

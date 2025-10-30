@@ -52,7 +52,7 @@ class LocalStorageService {
   private sidebarCollapse: boolean = false
   private showWalletInSidebar: boolean = true
   private primaryColor: TPrimaryColor = 'DEFAULT'
-  private enableSingleColumnLayout: boolean = false
+  private enableSingleColumnLayout: boolean = true
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -207,7 +207,7 @@ class LocalStorageService {
       (window.localStorage.getItem(StorageKey.PRIMARY_COLOR) as TPrimaryColor) ?? 'DEFAULT'
 
     this.enableSingleColumnLayout =
-      window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) === 'true'
+      window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)

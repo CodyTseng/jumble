@@ -484,6 +484,10 @@ export default {
     Layout: '레이아웃',
     'Two-column': '두 열',
     'Single-column': '한 열',
-    Reviews: '리뷰'
+    Reviews: '리뷰',
+    Extension: '확장 프로그램',
+    Remote: '원격',
+    'Encrypted Key': '암호화된 키',
+    'Private Key': '개인 키'
   }
 }
