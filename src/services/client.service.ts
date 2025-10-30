@@ -59,7 +59,8 @@ class ClientService extends EventTarget {
     this.fetchEventsFromBigRelays.bind(this),
     { cache: false, batchScheduleFn: (callback) => setTimeout(callback, 50) }
   )
-  private trendingNotesCache: NEvent[] | null = null
+  private trendingNotesCache: { notes: NEvent[]; timestamp: number } | null = null
+  private readonly TRENDING_NOTES_CACHE_DURATION = 30 * 60 * 1000 // 30 minutes in milliseconds
 
   private userIndex = new FlexSearch.Index({
     tokenize: 'forward'
@@ -751,8 +752,14 @@ class ClientService extends EventTarget {
   }
 
   async fetchTrendingNotes() {
-    if (this.trendingNotesCache) {
-      return this.trendingNotesCache
+    const now = Date.now()
+
+    // Return cached notes if they're still fresh
+    if (
+      this.trendingNotesCache &&
+      now - this.trendingNotesCache.timestamp < this.TRENDING_NOTES_CACHE_DURATION
+    ) {
+      return this.trendingNotesCache.notes
     }
 
     try {
@@ -775,10 +782,14 @@ class ClientService extends EventTarget {
           }
         }
       }
-      this.trendingNotesCache = events
-      return this.trendingNotesCache
+      this.trendingNotesCache = { notes: events, timestamp: now }
+      return this.trendingNotesCache.notes
     } catch (error) {
       console.error('fetchTrendingNotes error', error)
+      // If fetch fails but we have cached data, return it even if stale
+      if (this.trendingNotesCache) {
+        return this.trendingNotesCache.notes
+      }
       return []
     }
   }
