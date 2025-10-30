@@ -58,8 +58,8 @@ export default function BookmarkButton({ event }: { event: Event }) {
   return (
     <button
       className={`flex items-center gap-1 ${
-        isBookmarked ? 'text-rose-400 opacity-100 pointer-events-auto' : 'text-muted-foreground opacity-0 pointer-events-none'
-      } enabled:hover:text-rose-400 px-3 h-full group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity`}
+        isBookmarked ? 'text-primary opacity-100 pointer-events-auto' : 'text-muted-foreground opacity-0 pointer-events-none'
+      } enabled:hover:text-primary px-3 h-full group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity`}
       onClick={isBookmarked ? handleRemoveBookmark : handleBookmark}
       disabled={updating}
       title={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
@@ -67,7 +67,7 @@ export default function BookmarkButton({ event }: { event: Event }) {
       {updating ? (
         <Loader className="animate-spin" />
       ) : (
-        <BookmarkIcon className={isBookmarked ? 'fill-rose-400' : ''} />
+        <BookmarkIcon className={isBookmarked ? 'fill-primary' : ''} />
       )}
     </button>
   )

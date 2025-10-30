@@ -71,7 +71,7 @@ export default function TranslateButton({
   return (
     <button
       className={cn(
-        'flex items-center text-muted-foreground hover:text-pink-400 px-2 py-1 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0',
+        'flex items-center text-muted-foreground hover:text-primary px-2 py-1 h-full disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0',
         'opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity',
         className
       )}
@@ -88,7 +88,7 @@ export default function TranslateButton({
       {translating ? (
         <Loader className="animate-spin" />
       ) : (
-        <Languages className={translatedEvent ? 'text-pink-400 hover:text-pink-400/60' : ''} />
+        <Languages className={translatedEvent ? 'text-primary hover:text-primary/60' : ''} />
       )}
     </button>
   )

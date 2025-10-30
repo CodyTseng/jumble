@@ -72,8 +72,8 @@ export default function RepostButton({ event }: { event: Event }) {
   const trigger = (
     <button
       className={cn(
-        'flex gap-1 items-center enabled:hover:text-lime-500 px-3 h-full',
-        hasReposted ? 'text-lime-500' : 'text-muted-foreground'
+        'flex gap-1 items-center enabled:hover:text-primary px-3 h-full',
+        hasReposted ? 'text-primary' : 'text-muted-foreground'
       )}
       title={t('Repost')}
       onClick={() => {

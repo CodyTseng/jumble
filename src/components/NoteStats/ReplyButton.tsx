@@ -47,8 +47,8 @@ export default function ReplyButton({ event }: { event: Event }) {
     <>
       <button
         className={cn(
-          'flex gap-1 items-center enabled:hover:text-blue-400 pr-3 h-full',
-          hasReplied ? 'text-blue-400' : 'text-muted-foreground'
+          'flex gap-1 items-center enabled:hover:text-primary pr-3 h-full',
+          hasReplied ? 'text-primary' : 'text-muted-foreground'
         )}
         onClick={(e) => {
           e.stopPropagation()
