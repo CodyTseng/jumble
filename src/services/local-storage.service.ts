@@ -50,6 +50,7 @@ class LocalStorageService {
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
   private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
   private sidebarCollapse: boolean = false
+  private showWalletInSidebar: boolean = true
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = false
 
@@ -198,6 +199,9 @@ class LocalStorageService {
       : new Set()
 
     this.sidebarCollapse = window.localStorage.getItem(StorageKey.SIDEBAR_COLLAPSE) === 'true'
+
+    const showWalletInSidebarValue = window.localStorage.getItem(StorageKey.SHOW_WALLET_IN_SIDEBAR)
+    this.showWalletInSidebar = showWalletInSidebarValue === null ? true : showWalletInSidebarValue === 'true'
 
     this.primaryColor =
       (window.localStorage.getItem(StorageKey.PRIMARY_COLOR) as TPrimaryColor) ?? 'DEFAULT'
@@ -496,6 +500,15 @@ class LocalStorageService {
   setSidebarCollapse(collapse: boolean) {
     this.sidebarCollapse = collapse
     window.localStorage.setItem(StorageKey.SIDEBAR_COLLAPSE, collapse.toString())
+  }
+
+  getShowWalletInSidebar() {
+    return this.showWalletInSidebar
+  }
+
+  setShowWalletInSidebar(show: boolean) {
+    this.showWalletInSidebar = show
+    window.localStorage.setItem(StorageKey.SHOW_WALLET_IN_SIDEBAR, show.toString())
   }
 
   getPrimaryColor() {

@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useNostr } from '@/providers/NostrProvider'
 import { useSparkWallet } from '@/providers/SparkWalletProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import sparkService from '@/services/spark.service'
 import sparkStorage from '@/services/spark-storage.service'
 import sparkProfileSync from '@/services/spark-profile-sync.service'
@@ -14,24 +16,27 @@ import SparkPaymentsList from '@/components/SparkPaymentsList'
 import DefaultZapAmountInput from '@/pages/secondary/WalletPage/DefaultZapAmountInput'
 import DefaultZapCommentInput from '@/pages/secondary/WalletPage/DefaultZapCommentInput'
 import QuickZapSwitch from '@/pages/secondary/WalletPage/QuickZapSwitch'
-import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp, PlusCircle, Cloud, FolderOpen, AlertTriangle, Zap, Settings, RefreshCw, XCircle, Key, HardDrive, Download, Pencil } from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
 import { toWallet } from '@/lib/link'
 
 /**
- * SparkTestPage - POC Test Page for Breez Spark SDK
+ * Spark Wallet - Lightning wallet powered by Breez Spark SDK
  *
- * This page tests basic Spark SDK functionality:
- * - SDK initialization
- * - Wallet connection
- * - Balance retrieval
+ * Core functionality:
+ * - Wallet management and connection
+ * - Balance display and monitoring
+ * - Send and receive Lightning payments
+ * - Lightning address registration
  * - Invoice generation
- * - Payment sending
+ * - Encrypted backup and recovery
+ * - Nostr relay sync
  */
-const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
+const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { pubkey, profileEvent, publish, updateProfileEvent, nip04Encrypt, nip04Decrypt } = useNostr()
+  const { showWalletInSidebar, updateShowWalletInSidebar } = useUserPreferences()
   const {
     connected,
     balance: providerBalance,
@@ -52,6 +57,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [hasSavedWallet, setHasSavedWallet] = useState(false)
   const [topUpAmount, setTopUpAmount] = useState<number>(1000)
   const [showTopUpDialog, setShowTopUpDialog] = useState(false)
+  const [showCustomInput, setShowCustomInput] = useState(false)
   const [showLightning, setShowLightning] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [activeTab, setActiveTab] = useState<'payments' | 'topup'>('payments')
@@ -90,11 +96,11 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     setHasSavedWallet(hasSaved)
 
     if (!hasSaved) {
-      console.log('[SparkTestPage] No saved wallet found locally')
+      console.log('[SparkWallet] No saved wallet found locally')
       // Check if there's a relay backup available
       checkForRelayBackup()
     } else {
-      console.log('[SparkTestPage] Found saved wallet, provider will auto-connect')
+      console.log('[SparkWallet] Found saved wallet, provider will auto-connect')
     }
   }, [pubkey])
 
@@ -107,12 +113,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const hasBackup = await sparkBackup.hasBackupOnNostr()
       setHasRelayBackup(hasBackup)
       if (hasBackup) {
-        console.log('[SparkTestPage] Found wallet backup on Nostr relays')
+        console.log('[SparkWallet] Found wallet backup on Nostr relays')
       } else {
-        console.log('[SparkTestPage] No wallet backup found on relays')
+        console.log('[SparkWallet] No wallet backup found on relays')
       }
     } catch (error) {
-      console.error('[SparkTestPage] Failed to check for relay backup:', error)
+      console.error('[SparkWallet] Failed to check for relay backup:', error)
       setHasRelayBackup(false)
     } finally {
       setCheckingRelayBackup(false)
@@ -140,9 +146,9 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       // If we got fewer payments than requested, there are no more
       setHasMorePayments(paymentList.length >= limit)
 
-      console.log('[SparkTestPage] Loaded payments:', paymentList.length, 'Total:', reset ? paymentList.length : payments.length + paymentList.length)
+      console.log('[SparkWallet] Loaded payments:', paymentList.length, 'Total:', reset ? paymentList.length : payments.length + paymentList.length)
     } catch (error) {
-      console.error('[SparkTestPage] Failed to load payments:', error)
+      console.error('[SparkWallet] Failed to load payments:', error)
     } finally {
       setLoadingPayments(false)
     }
@@ -158,7 +164,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   // Refresh wallet state when connected
   useEffect(() => {
     if (connected) {
-      console.log('[SparkTestPage] Wallet connected, refreshing state...')
+      console.log('[SparkWallet] Wallet connected, refreshing state...')
       refreshWalletState()
     }
   }, [connected])
@@ -178,7 +184,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     const checkPendingPayments = () => {
       const hasPending = payments.some(p => p.status === 'pending')
       if (hasPending) {
-        console.log('[SparkTestPage] Pending payments detected, refreshing...')
+        console.log('[SparkWallet] Pending payments detected, refreshing...')
         loadPayments(true)
       }
     }
@@ -194,7 +200,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
     if (!connected) return
 
     const unsubscribe = sparkService.onEvent(async (event) => {
-      console.log('[SparkTestPage] Received event:', event.type)
+      console.log('[SparkWallet] Received event:', event.type)
 
       if (event.type === 'paymentSucceeded' || event.type === 'paymentFailed' || event.type === 'synced') {
         // Refresh balance from provider
@@ -206,14 +212,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
             const payment = event.payment
             const isReceived = payment?.paymentType === 'receive'
 
-            console.log('[SparkTestPage] Payment succeeded, type:', payment?.paymentType)
+            console.log('[SparkWallet] Payment succeeded, type:', payment?.paymentType)
 
             // Create a unique event ID using timestamp + amount + type
             const eventId = `${payment?.paymentType}_${payment?.timestamp || Date.now()}_${payment?.amount || 0}`
 
             // Check if we already processed this payment event
             if (lastPaymentEventRef.current === eventId) {
-              console.log('[SparkTestPage] Duplicate payment event detected, skipping notification')
+              console.log('[SparkWallet] Duplicate payment event detected, skipping notification')
               return
             }
 
@@ -243,12 +249,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
               }, 2500)
             }
           } else if (event.type === 'paymentFailed') {
-            console.log('[SparkTestPage] Payment failed:', event.payment)
+            console.log('[SparkWallet] Payment failed:', event.payment)
             // Reload payments to update status
             loadPayments(true)
           }
         } catch (error) {
-          console.error('[SparkTestPage] Failed to update balance:', error)
+          console.error('[SparkWallet] Failed to update balance:', error)
         }
       }
     })
@@ -373,18 +379,18 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       toast.success('Wallet connected & encrypted mnemonic saved!')
 
       // Refresh wallet state from provider
-      console.log('[SparkTestPage] Refreshing wallet state from provider...')
+      console.log('[SparkWallet] Refreshing wallet state from provider...')
       await refreshWalletState()
-      console.log('[SparkTestPage] Wallet state refreshed')
+      console.log('[SparkWallet] Wallet state refreshed')
 
       // Try to get Lightning address and ask if user wants to sync to profile
-      console.log('[SparkTestPage] Fetching Lightning address...')
+      console.log('[SparkWallet] Fetching Lightning address...')
       const addr = await sparkService.getLightningAddress()
-      console.log('[SparkTestPage] Lightning address result:', addr)
+      console.log('[SparkWallet] Lightning address result:', addr)
       if (addr) {
         // Ask user if they want to update their Nostr profile with this Lightning address
         if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${addr.lightningAddress}?`)) {
-          console.log('[SparkTestPage] User confirmed - syncing Lightning address to Nostr profile...')
+          console.log('[SparkWallet] User confirmed - syncing Lightning address to Nostr profile...')
           try {
             await sparkProfileSync.syncLightningAddressToProfile(
               addr.lightningAddress,
@@ -392,23 +398,23 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
               publish,
               updateProfileEvent
             )
-            console.log('[SparkTestPage] Lightning address synced to profile')
+            console.log('[SparkWallet] Lightning address synced to profile')
             toast.success(`Lightning address ${addr.lightningAddress} added to your Nostr profile`)
           } catch (syncError) {
-            console.error('[SparkTestPage] Failed to sync to Nostr profile:', syncError)
+            console.error('[SparkWallet] Failed to sync to Nostr profile:', syncError)
             const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
-            console.error('[SparkTestPage] Sync error details:', errorMessage)
+            console.error('[SparkWallet] Sync error details:', errorMessage)
             toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually sync it in Settings.`)
           }
         } else {
-          console.log('[SparkTestPage] User declined to sync Lightning address to profile')
+          console.log('[SparkWallet] User declined to sync Lightning address to profile')
           toast.info(`Lightning address ${addr.lightningAddress} is active. You can sync it to your profile later in Settings.`)
         }
       } else {
-        console.log('[SparkTestPage] No Lightning address found for this wallet')
+        console.log('[SparkWallet] No Lightning address found for this wallet')
         // If this was a manual connection (not from create/restore handlers), show helpful message
         if (!providedMnemonic) {
-          toast.info('💡 Tip: Register a Lightning address in Settings to receive payments easily')
+          toast.info('Tip: Register a Lightning address in Settings to receive payments easily')
         }
       }
 
@@ -450,7 +456,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       setShowRevealedMnemonic(true)
       toast.success('Recovery phrase revealed below. Write it down securely!')
     } catch (error) {
-      console.error('[SparkTestPage] Failed to reveal recovery phrase:', error)
+      console.error('[SparkWallet] Failed to reveal recovery phrase:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to reveal recovery phrase: ${errorMsg}`)
     } finally {
@@ -477,7 +483,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       await sparkBackup.downloadBackupFile(currentMnemonic, pubkey, nip04Encrypt)
       toast.success('Backup file downloaded!')
     } catch (error) {
-      console.error('[SparkTestPage] Failed to download backup:', error)
+      console.error('[SparkWallet] Failed to download backup:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to download backup: ${errorMsg}`)
     } finally {
@@ -516,14 +522,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       setInvoice('')
       setPaymentRequest('')
 
-      toast.success('✅ Wallet removed from device. Relay backup preserved for future restoration.')
+      toast.success('Wallet removed from device. Relay backup preserved for future restoration.')
 
       // Navigate back to wallet selection page
       setTimeout(() => {
         window.location.href = toWallet()
       }, 500)
     } catch (error) {
-      console.error('[SparkTestPage] Failed to remove wallet:', error)
+      console.error('[SparkWallet] Failed to remove wallet:', error)
       toast.error(`Failed to remove wallet: ${(error as Error).message}`)
     }
   }
@@ -585,7 +591,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         window.location.href = toWallet()
       }, 500)
     } catch (error) {
-      console.error('[SparkTestPage] Failed to remove wallet:', error)
+      console.error('[SparkWallet] Failed to remove wallet:', error)
       toast.error(`Failed to remove wallet: ${(error as Error).message}`)
     }
   }
@@ -593,7 +599,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleRefreshBalance = async () => {
     setLoading(true)
     try {
-      console.log('[SparkTestPage] Manual sync & refresh...')
+      console.log('[SparkWallet] Manual sync & refresh...')
       await sparkService.syncWallet()
       await refreshWalletState() // Refresh provider state
       const info = await sparkService.getInfo(false)
@@ -651,7 +657,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
       const pollInterval = setInterval(async () => {
         pollCount++
-        console.log(`[SparkTestPage] Polling payment status (${pollCount}/${maxPolls})...`)
+        console.log(`[SparkWallet] Polling payment status (${pollCount}/${maxPolls})...`)
 
         // Sync wallet and reload payments to check for status updates
         try {
@@ -663,12 +669,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
           const sentPayment = updatedPayments.find(p => p.id === paymentId)
 
           if (sentPayment) {
-            console.log(`[SparkTestPage] Payment status: ${sentPayment.status}`)
+            console.log(`[SparkWallet] Payment status: ${sentPayment.status}`)
 
             // Stop polling if payment is no longer pending
             if (sentPayment.status !== 'pending') {
               clearInterval(pollInterval)
-              console.log('[SparkTestPage] Payment finalized, stopped polling')
+              console.log('[SparkWallet] Payment finalized, stopped polling')
               loadPayments(true)
               return
             }
@@ -676,12 +682,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
           loadPayments(true)
         } catch (error) {
-          console.error('[SparkTestPage] Error during payment status poll:', error)
+          console.error('[SparkWallet] Error during payment status poll:', error)
         }
 
         if (pollCount >= maxPolls) {
           clearInterval(pollInterval)
-          console.log('[SparkTestPage] Stopped polling payment status (timeout)')
+          console.log('[SparkWallet] Stopped polling payment status (timeout)')
         }
       }, 1000) // Poll every 1 second
 
@@ -707,7 +713,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         const available = await sparkService.checkLightningAddressAvailable(newLightningUsername)
         setUsernameAvailable(available)
       } catch (error) {
-        console.error('[SparkTestPage] Error checking username:', error)
+        console.error('[SparkWallet] Error checking username:', error)
         setUsernameAvailable(null)
       } finally {
         setCheckingUsername(false)
@@ -722,12 +728,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     setLoading(true)
     try {
-      console.log('[SparkTestPage] Setting Lightning address:', newLightningUsername)
+      console.log('[SparkWallet] Setting Lightning address:', newLightningUsername)
       const result = await sparkService.setLightningAddress(newLightningUsername)
-      console.log('[SparkTestPage] Lightning address set successfully:', result.lightningAddress)
+      console.log('[SparkWallet] Lightning address set successfully:', result.lightningAddress)
 
       await refreshWalletState() // Refresh provider state
-      console.log('[SparkTestPage] Provider state refreshed')
+      console.log('[SparkWallet] Provider state refreshed')
 
       setEditingLightningAddress(false)
       setNewLightningUsername('')
@@ -735,7 +741,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
       // Sync to Nostr profile with confirmation
       if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${result.lightningAddress}?`)) {
-        console.log('[SparkTestPage] Syncing Lightning address to Nostr profile...')
+        console.log('[SparkWallet] Syncing Lightning address to Nostr profile...')
         try {
           await sparkProfileSync.syncLightningAddressToProfile(
             result.lightningAddress,
@@ -743,16 +749,16 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
             publish,
             updateProfileEvent
           )
-          console.log('[SparkTestPage] Lightning address synced to Nostr profile')
+          console.log('[SparkWallet] Lightning address synced to Nostr profile')
         } catch (syncError) {
-          console.error('[SparkTestPage] Failed to sync to Nostr profile:', syncError)
+          console.error('[SparkWallet] Failed to sync to Nostr profile:', syncError)
           const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
-          console.error('[SparkTestPage] Sync error details:', errorMessage)
+          console.error('[SparkWallet] Sync error details:', errorMessage)
           toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually add it to your profile later.`)
         }
       }
     } catch (error) {
-      console.error('[SparkTestPage] Failed to set Lightning address:', error)
+      console.error('[SparkWallet] Failed to set Lightning address:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to change Lightning address: ${errorMsg}`)
     } finally {
@@ -768,7 +774,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     setLoading(true)
     try {
-      console.log('[SparkTestPage] Manually syncing Lightning address to Nostr profile...')
+      console.log('[SparkWallet] Manually syncing Lightning address to Nostr profile...')
       await sparkProfileSync.syncLightningAddressToProfile(
         providerLightningAddress,
         profileEvent,
@@ -776,9 +782,9 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         updateProfileEvent
       )
       toast.success('Lightning address synced to your Nostr profile!')
-      console.log('[SparkTestPage] Successfully synced to profile')
+      console.log('[SparkWallet] Successfully synced to profile')
     } catch (error) {
-      console.error('[SparkTestPage] Failed to sync to profile:', error)
+      console.error('[SparkWallet] Failed to sync to profile:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to sync: ${errorMsg}`)
     } finally {
@@ -795,7 +801,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       await refreshWalletState() // Refresh provider state
       toast.success('Lightning address deleted from Breez')
     } catch (error) {
-      console.error('[SparkTestPage] Failed to delete Lightning address:', error)
+      console.error('[SparkWallet] Failed to delete Lightning address:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to delete Lightning address: ${errorMsg}`)
     } finally {
@@ -806,36 +812,36 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   // Create new wallet with backup options
   const handleCreateNewWallet = async () => {
     if (!pubkey || !nip04Encrypt) {
-      console.error('[SparkTestPage] Missing pubkey or nip04Encrypt')
+      console.error('[SparkWallet] Missing pubkey or nip04Encrypt')
       toast.error('Please sign in with Nostr first')
       return
     }
 
     setConnecting(true)
     try {
-      console.log('[SparkTestPage] Step 1: Generating mnemonic...')
+      console.log('[SparkWallet] Step 1: Generating mnemonic...')
       // Generate new mnemonic
       const newMnemonic = sparkBackup.generateMnemonic()
       setGeneratedMnemonic(newMnemonic)
-      console.log('[SparkTestPage] Mnemonic generated successfully')
+      console.log('[SparkWallet] Mnemonic generated successfully')
 
-      console.log('[SparkTestPage] Step 2: Connecting wallet...')
+      console.log('[SparkWallet] Step 2: Connecting wallet...')
       // Connect wallet
       await handleConnect(newMnemonic)
-      console.log('[SparkTestPage] Wallet connected successfully')
+      console.log('[SparkWallet] Wallet connected successfully')
 
       // Offer backup options
       setBackingUp(true)
       toast.success('Wallet created! Creating backups...')
 
       try {
-        console.log('[SparkTestPage] Step 3: Downloading backup file...')
+        console.log('[SparkWallet] Step 3: Downloading backup file...')
         // Download encrypted backup file
         await sparkBackup.downloadBackupFile(newMnemonic, pubkey, nip04Encrypt)
         toast.success('Backup file downloaded!')
-        console.log('[SparkTestPage] Backup file downloaded')
+        console.log('[SparkWallet] Backup file downloaded')
       } catch (backupError) {
-        console.error('[SparkTestPage] Backup file download failed:', backupError)
+        console.error('[SparkWallet] Backup file download failed:', backupError)
         // Don't fail the whole process if backup download fails
         toast.error('Backup file download failed, but wallet is connected')
       }
@@ -843,22 +849,22 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       // Save to Nostr relays if publish is available
       if (typeof publish === 'function') {
         try {
-          console.log('[SparkTestPage] Step 4: Saving to Nostr relays...')
+          console.log('[SparkWallet] Step 4: Saving to Nostr relays...')
           await sparkBackup.saveToNostr(newMnemonic)
           toast.success('Backup saved to your relays!')
-          console.log('[SparkTestPage] Backup saved to relays')
+          console.log('[SparkWallet] Backup saved to relays')
         } catch (relayError) {
-          console.error('[SparkTestPage] Relay backup failed:', relayError)
+          console.error('[SparkWallet] Relay backup failed:', relayError)
           const errorMsg = relayError instanceof Error ? relayError.message : String(relayError)
           // Don't fail the whole process if relay backup fails
           toast.error(`Relay backup failed: ${errorMsg}`)
-          console.error('[SparkTestPage] But wallet is connected and backup file downloaded')
+          console.error('[SparkWallet] But wallet is connected and backup file downloaded')
         }
       } else {
-        console.log('[SparkTestPage] Publish function not available, skipping relay backup')
+        console.log('[SparkWallet] Publish function not available, skipping relay backup')
       }
     } catch (error) {
-      console.error('[SparkTestPage] Failed to create wallet:', error)
+      console.error('[SparkWallet] Failed to create wallet:', error)
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(`Wallet creation failed: ${errorMessage || 'Unknown error'}`)
     } finally {
@@ -880,14 +886,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       aborted = true
       setConnecting(false)
       setWaitingForFileSelection(false)
-      console.log('[SparkTestPage] File selection manually cancelled')
+      console.log('[SparkWallet] File selection manually cancelled')
     }
 
     try {
       const mnemonic = await sparkBackup.restoreFromFile(pubkey, nip04Decrypt)
 
       if (aborted) {
-        console.log('[SparkTestPage] Operation was aborted, stopping')
+        console.log('[SparkWallet] Operation was aborted, stopping')
         return
       }
 
@@ -901,13 +907,13 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const addr = await sparkService.getLightningAddress()
       if (!addr?.lightningAddress) {
         setTimeout(() => {
-          toast.info('💡 Tip: Register a Lightning address in Settings to receive payments easily')
+          toast.info('Tip: Register a Lightning address in Settings to receive payments easily')
           setActiveTab('payments') // Reset to payments tab but show the Register button prominently
         }, 1000)
       }
     } catch (error) {
       if (aborted) {
-        console.log('[SparkTestPage] Operation was aborted, ignoring error')
+        console.log('[SparkWallet] Operation was aborted, ignoring error')
         return
       }
 
@@ -916,11 +922,11 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
       // Don't show error toast if user cancelled the file selection
       if (errorMsg === 'File selection cancelled') {
-        console.log('[SparkTestPage] File restoration cancelled by user')
+        console.log('[SparkWallet] File restoration cancelled by user')
         return
       }
 
-      console.error('[SparkTestPage] Failed to restore from file:', error)
+      console.error('[SparkWallet] Failed to restore from file:', error)
       toast.error(`Restore failed: ${errorMsg}`)
     } finally {
       setConnecting(false)
@@ -956,11 +962,11 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const addr = await sparkService.getLightningAddress()
       if (!addr?.lightningAddress) {
         setTimeout(() => {
-          toast.info('💡 Tip: Register a Lightning address in Settings to receive payments easily')
+          toast.info('Tip: Register a Lightning address in Settings to receive payments easily')
         }, 1000)
       }
     } catch (error) {
-      console.error('[SparkTestPage] Failed to restore from relays:', error)
+      console.error('[SparkWallet] Failed to restore from relays:', error)
       toast.error(`Restore failed: ${(error as Error).message}`)
     } finally {
       setConnecting(false)
@@ -976,7 +982,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     setCheckingBackupLocations(true)
     try {
-      console.log('[SparkTestPage] Checking backup locations...')
+      console.log('[SparkWallet] Checking backup locations...')
       const locations = await sparkBackup.checkBackupAvailability()
       setBackupLocations(locations)
       setShowBackupLocations(true)
@@ -984,9 +990,9 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       const availableCount = Object.values(locations).filter(Boolean).length
       const totalCount = Object.keys(locations).length
       toast.success(`Backup found on ${availableCount} of ${totalCount} relays`)
-      console.log('[SparkTestPage] Backup locations:', locations)
+      console.log('[SparkWallet] Backup locations:', locations)
     } catch (error) {
-      console.error('[SparkTestPage] Failed to check backup locations:', error)
+      console.error('[SparkWallet] Failed to check backup locations:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to check backup locations: ${errorMsg}`)
     } finally {
@@ -1008,7 +1014,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     setResyncingBackup(true)
     try {
-      console.log('[SparkTestPage] Re-syncing backup to relays...')
+      console.log('[SparkWallet] Re-syncing backup to relays...')
 
       // Load mnemonic from storage (already decrypted)
       const mnemonic = await sparkStorage.loadMnemonic(pubkey)
@@ -1018,18 +1024,18 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
 
       // Re-publish to current relays
-      console.log('[SparkTestPage] Publishing backup to current relays...')
+      console.log('[SparkWallet] Publishing backup to current relays...')
       await sparkBackup.saveToNostr(mnemonic)
 
       toast.success('Backup re-synced to your current relays!')
-      console.log('[SparkTestPage] Backup re-synced successfully')
+      console.log('[SparkWallet] Backup re-synced successfully')
 
       // Optionally re-check locations after sync
       if (showBackupLocations) {
         setTimeout(() => handleCheckBackupLocations(), 1000)
       }
     } catch (error) {
-      console.error('[SparkTestPage] Failed to re-sync backup:', error)
+      console.error('[SparkWallet] Failed to re-sync backup:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       toast.error(`Failed to re-sync backup: ${errorMsg}`)
     } finally {
@@ -1092,10 +1098,10 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 {!checkingRelayBackup && hasRelayBackup && (
                   <div className="p-3 bg-green-100 dark:bg-green-900/20 border border-green-400 rounded-lg">
                     <p className="font-semibold text-green-900 dark:text-green-200 mb-1 flex items-center gap-2">
-                      ✅ Wallet Backup Found!
+                      <CheckCircle className="size-4" /> Wallet Backup Found!
                     </p>
                     <p className="text-sm text-green-800 dark:text-green-300">
-                      We found an existing wallet backup on your Nostr relays. Click "☁️ Restore from Relays" below to access your wallet.
+                      We found an existing wallet backup on your Nostr relays. Click "Restore from Relays" below to access your wallet.
                     </p>
                   </div>
                 )}
@@ -1105,37 +1111,37 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                   {hasRelayBackup ? (
                     <>
                       <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold">☁️ Restore from Relays (Recommended)</span>
+                        <span className="font-semibold flex items-center gap-2"><Cloud className="size-4" /> Restore from Relays (Recommended)</span>
                         <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
                       </Button>
 
                       <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold">🆕 Create New Wallet</span>
+                        <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet</span>
                         <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
                       </Button>
                     </>
                   ) : (
                     <>
                       <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold">🆕 Create New Wallet (Recommended)</span>
+                        <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet (Recommended)</span>
                         <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
                       </Button>
 
                       <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold">☁️ Restore from Relays</span>
+                        <span className="font-semibold flex items-center gap-2"><Cloud className="size-4" /> Restore from Relays</span>
                         <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
                       </Button>
                     </>
                   )}
 
                   <Button onClick={handleRestoreFromFile} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold">📁 Restore from Backup File</span>
+                    <span className="font-semibold flex items-center gap-2"><FolderOpen className="size-4" /> Restore from Backup File</span>
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
                   </Button>
 
                   <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
-                    <span className="font-semibold text-yellow-600 dark:text-yellow-500">⚠️ Manual Seed Phrase Entry</span>
-                    <span className="text-xs opacity-80">Less secure - not recommended</span>
+                    <span className="font-semibold text-yellow-600 dark:text-yellow-500 flex items-center gap-2"><AlertTriangle className="size-4" /> Manual Seed Phrase Entry</span>
+                    <span className="text-xs opacity-80">Less secure - be sure no one is watching</span>
                   </Button>
                 </div>
 
@@ -1169,7 +1175,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
             {setupMode === 'manual' && (
               <>
                 <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg">
-                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1">⚠️ Security Warning</p>
+                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1 flex items-center gap-1.5"><AlertTriangle className="size-4" /> Security Warning</p>
                   <p className="text-sm text-yellow-800 dark:text-yellow-300">
                     Entering your seed phrase into a website is not recommended. Use backup files or relay backups instead.
                   </p>
@@ -1210,8 +1216,8 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
             {generatedMnemonic && (
               <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold text-yellow-900 dark:text-yellow-200">
-                    ⚠️ Save Your Recovery Phrase!
+                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 flex items-center gap-1.5">
+                    <AlertTriangle className="size-4" /> Save Your Recovery Phrase!
                   </p>
                   <div className="flex items-center gap-1">
                     <Button
@@ -1354,7 +1360,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     }}
                     className="h-auto p-0 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                   >
-                    ⚡ Get a Lightning Address
+                    <span className="flex items-center gap-1.5"><Zap className="size-3.5" /> Get a Lightning Address</span>
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">
                     Set up a Lightning address to receive payments easily
@@ -1458,8 +1464,8 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                       <div className="flex items-center justify-between">
                         <Label className="text-lg font-semibold">Choose an amount to deposit</Label>
                         {(providerBalance || 0) + topUpAmount > 100000 && (
-                          <span className="text-xs text-amber-600 dark:text-amber-500">
-                            ⚠️ Hot wallet
+                          <span className="text-xs text-amber-600 dark:text-amber-500 flex items-center gap-1">
+                            <AlertTriangle className="size-3" /> Hot wallet
                           </span>
                         )}
                       </div>
@@ -1498,32 +1504,54 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                       {/* Custom Amount Button */}
                       <Button
-                        variant={topUpAmount > 100000 && topUpAmount !== 100000 ? 'default' : 'outline'}
+                        variant={showCustomInput ? 'default' : 'outline'}
                         size="lg"
-                        onClick={() => {
-                          const currentBalance = providerBalance || 0
-                          const maxAllowed = 500000
-                          const remainingCapacity = maxAllowed - currentBalance
-                          const customAmount = prompt(
-                            `Enter custom amount in sats (max ${remainingCapacity.toLocaleString()} remaining):`,
-                            Math.min(topUpAmount, remainingCapacity).toString()
-                          )
-                          if (customAmount) {
-                            const val = parseInt(customAmount) || 0
-                            setTopUpAmount(Math.min(Math.max(val, 0), remainingCapacity))
-                          }
-                        }}
+                        onClick={() => setShowCustomInput(!showCustomInput)}
                         className="w-full h-auto py-4 flex items-center justify-between"
                       >
                         <span className="text-lg">Custom</span>
-                        <span className="text-muted-foreground">⚙️</span>
+                        <Pencil className="size-4 text-muted-foreground" />
                       </Button>
+
+                      {/* Custom Amount Input - Inline */}
+                      {showCustomInput && (
+                        <div className="p-4 bg-muted/50 rounded-lg space-y-2 animate-in slide-in-from-top-2">
+                          <Label className="text-sm">Enter custom amount</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              placeholder="Amount in sats"
+                              value={topUpAmount}
+                              onChange={(e) => {
+                                const currentBalance = providerBalance || 0
+                                const maxAllowed = 500000
+                                const remainingCapacity = maxAllowed - currentBalance
+                                const val = parseInt(e.target.value) || 0
+                                setTopUpAmount(Math.min(Math.max(val, 0), remainingCapacity))
+                              }}
+                              className="flex-1"
+                              min="0"
+                              max={500000 - (providerBalance || 0)}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShowCustomInput(false)}
+                            >
+                              Done
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Max: {(500000 - (providerBalance || 0)).toLocaleString()} sats remaining
+                          </p>
+                        </div>
+                      )}
 
                       {/* Safety Warning */}
                       {(providerBalance || 0) + topUpAmount > 100000 && (
                         <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-700 rounded text-xs">
-                          <p className="font-semibold text-amber-900 dark:text-amber-200">
-                            ⚠️ Hot Wallet Warning
+                          <p className="font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                            <AlertTriangle className="size-3.5" /> Hot Wallet Warning
                           </p>
                           <p className="text-amber-800 dark:text-amber-300 mt-1">
                             Hot wallets should not contain large balances. Consider keeping less than 100k sats for daily use.
@@ -1636,7 +1664,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                 onClick={() => setShowSettings(!showSettings)}
                 className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
               >
-                <span className="text-sm">⚙️ Wallet Settings</span>
+                <span className="text-sm flex items-center gap-1.5"><Settings className="size-4" /> Wallet Settings</span>
                 {showSettings ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
               </Button>
 
@@ -1687,7 +1715,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                             onClick={() => setEditingLightningAddress(true)}
                             className="w-full relative bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-300 dark:border-blue-700 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 before:absolute before:inset-0 before:rounded-md before:animate-pulse before:border-2 before:border-blue-400 dark:before:border-blue-500 before:pointer-events-none"
                           >
-                            ⚡ Get Lightning Address
+                            <span className="flex items-center gap-1.5"><Zap className="size-4" /> Get Lightning Address</span>
                           </Button>
                         )}
                       </div>
@@ -1751,6 +1779,21 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <QuickZapSwitch />
                   </div>
 
+                  {/* Wallet Sidebar Settings */}
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="wallet-sidebar" className="text-sm cursor-pointer">Show Wallet in Sidebar</Label>
+                      <Switch
+                        id="wallet-sidebar"
+                        checked={showWalletInSidebar}
+                        onCheckedChange={updateShowWalletInSidebar}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Display wallet balance in the left sidebar for quick access
+                    </p>
+                  </div>
+
                   {/* Nostr Wallet Connect */}
                   <div className="space-y-2 pt-2 border-t">
                     <div className="flex items-center justify-between">
@@ -1795,7 +1838,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                       size="sm"
                       disabled={loading}
                     >
-                      🔑 Reveal Recovery Phrase
+                      <span className="flex items-center gap-1.5"><Key className="size-4" /> Reveal Recovery Phrase</span>
                     </Button>
                     <p className="text-xs text-muted-foreground">
                       Show your 12-word recovery phrase. Write it down and store it securely offline.
@@ -1804,8 +1847,8 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                     {revealedMnemonic && (
                       <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg space-y-2">
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-yellow-900 dark:text-yellow-200">
-                            ⚠️ Your Recovery Phrase
+                          <p className="font-semibold text-yellow-900 dark:text-yellow-200 flex items-center gap-1.5">
+                            <AlertTriangle className="size-4" /> Your Recovery Phrase
                           </p>
                           <div className="flex items-center gap-1">
                             <Button
@@ -1863,7 +1906,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                       size="sm"
                       disabled={loading}
                     >
-                      📥 Download Encrypted Backup File
+                      <span className="flex items-center gap-1.5"><Download className="size-4" /> Download Encrypted Backup File</span>
                     </Button>
                     <p className="text-xs text-muted-foreground">
                       Download an encrypted backup file. Easier to store than writing down 12 words.
@@ -1884,7 +1927,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                             Re-syncing...
                           </>
                         ) : (
-                          '🔄 Re-sync Backup to Relays'
+                          <span className="flex items-center gap-1.5"><RefreshCw className="size-4" /> Re-sync Backup to Relays</span>
                         )}
                       </Button>
                       <p className="text-xs text-muted-foreground">
@@ -1959,7 +2002,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                           size="sm"
                           disabled={loading}
                         >
-                          ♻️ Remove & Keep Relay Backup
+                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove & Keep Relay Backup</span>
                         </Button>
                         <p className="text-xs text-muted-foreground">
                           Removes wallet from this device only. Your relay backup is preserved and you can restore later.
@@ -1975,7 +2018,7 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
                           size="sm"
                           disabled={loading}
                         >
-                          ⚠️ Remove & Delete Relay Backup
+                          <span className="flex items-center gap-1.5"><AlertTriangle className="size-4" /> Remove & Delete Relay Backup</span>
                         </Button>
                         <p className="text-xs text-red-600 dark:text-red-400">
                           <strong>Caution:</strong> Deletes relay backup. You can only restore from backup file or recovery phrase.
@@ -1990,14 +2033,14 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         ) : null}
 
         <div className="text-xs text-muted-foreground space-y-1 pt-4 border-t">
-          <p>⚡️ Breez SDK + Spark wallet integration</p>
-          <p>🔐 Recovery phrase encrypted with XChaCha20-Poly1305 using your Nostr pubkey</p>
-          <p>💾 Saved locally on this device</p>
-          <p>⚠️ Experimental - do not use with large amounts!</p>
+          <p className="flex items-center gap-1.5"><Zap className="size-3" /> Breez SDK + Spark wallet integration</p>
+          <p className="flex items-center gap-1.5"><Key className="size-3" /> Recovery phrase encrypted with XChaCha20-Poly1305</p>
+          <p className="flex items-center gap-1.5"><HardDrive className="size-3" /> Saved locally on this device</p>
+          <p className="flex items-center gap-1.5"><AlertTriangle className="size-3" /> Experimental - do not use with large amounts!</p>
         </div>
       </div>
     </SecondaryPageLayout>
   )
 })
-SparkTestPage.displayName = 'SparkTestPage'
-export default SparkTestPage
+SparkWalletPage.displayName = 'SparkWalletPage'
+export default SparkWalletPage

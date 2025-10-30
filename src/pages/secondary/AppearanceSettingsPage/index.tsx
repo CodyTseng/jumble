@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { Columns2, LayoutList, List, Monitor, Moon, PanelLeft, Sun } from 'lucide-react'
+import { Columns2, LayoutList, List, Monitor, Moon, PanelLeft, Sun, Wallet, X } from 'lucide-react'
 import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -26,6 +26,11 @@ const NOTIFICATION_STYLES = [
   { key: 'compact', label: 'Compact', icon: <List className="size-5" /> }
 ] as const
 
+const WALLET_SIDEBAR_OPTIONS = [
+  { key: true, label: 'Show', icon: <Wallet className="size-5" /> },
+  { key: false, label: 'Hide', icon: <X className="size-5" /> }
+] as const
+
 const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
@@ -34,7 +39,9 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
     enableSingleColumnLayout,
     updateEnableSingleColumnLayout,
     notificationListStyle,
-    updateNotificationListStyle
+    updateNotificationListStyle,
+    showWalletInSidebar,
+    updateShowWalletInSidebar
   } = useUserPreferences()
 
   return (
@@ -84,6 +91,22 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             ))}
           </div>
         </div>
+        {!isSmallScreen && (
+          <div className="flex flex-col gap-2 px-4">
+            <Label className="text-base">{t('Wallet in sidebar')}</Label>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {WALLET_SIDEBAR_OPTIONS.map(({ key, label, icon }) => (
+                <OptionButton
+                  key={key.toString()}
+                  isSelected={showWalletInSidebar === key}
+                  icon={icon}
+                  label={t(label)}
+                  onClick={() => updateShowWalletInSidebar(key)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex flex-col gap-2 px-4">
           <Label className="text-base">{t('Primary color')}</Label>
           <div className="grid grid-cols-4 gap-4 w-full">
