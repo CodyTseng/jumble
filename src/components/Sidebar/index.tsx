@@ -16,11 +16,12 @@ import PostButton from './PostButton'
 import ProfileButton from './ProfileButton'
 import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
+import WalletButton from './WalletButton'
 
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
   const { themeSetting } = useTheme()
-  const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout } = useUserPreferences()
+  const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout, showWalletInSidebar } = useUserPreferences()
   const { pubkey } = useNostr()
 
   if (isSmallScreen) return null
@@ -53,6 +54,7 @@ export default function PrimaryPageSidebar() {
       </div>
       <div className="space-y-4">
         <LayoutSwitcher collapse={sidebarCollapse} />
+        {showWalletInSidebar && <WalletButton collapse={sidebarCollapse} />}
         <AccountButton collapse={sidebarCollapse} />
       </div>
       <button

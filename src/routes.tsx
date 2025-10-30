@@ -18,7 +18,7 @@ import RelaySettingsPage from './pages/secondary/RelaySettingsPage'
 import RizfulPage from './pages/secondary/RizfulPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
-import SparkTestPage from './pages/secondary/SparkTestPage'
+import SparkWalletPage from './pages/secondary/SparkWalletPage'
 import TranslationPage from './pages/secondary/TranslationPage'
 import WalletPage from './pages/secondary/WalletPage'
 
@@ -42,7 +42,7 @@ const ROUTES = [
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },
-  { path: '/spark', element: <SparkTestPage /> },
+  { path: '/spark', element: <SparkWalletPage /> },
   { path: '/bookmarks', element: <BookmarkPage /> }
 ]
 
