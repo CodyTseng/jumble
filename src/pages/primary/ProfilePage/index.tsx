@@ -30,7 +30,7 @@ function ProfilePageTitlebar({ pubkey }: { pubkey: string | null }) {
     <div className="flex gap-2 items-center justify-between h-full pl-3">
       <div className="flex gap-2 items-center [&_svg]:text-muted-foreground">
         <UserRound />
-        <div className="text-lg font-semibold" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>{t('Profile')}</div>
+        <div className="text-lg font-semibold" style={{ fontSize: `var(--title-font-size, 18px)` }}>{t('Profile')}</div>
       </div>
       {pubkey && <PinButton column={{ type: 'profile', props: { pubkey } }} size="titlebar-icon" />}
     </div>

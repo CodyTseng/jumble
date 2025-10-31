@@ -174,7 +174,7 @@ function ExploreTitlebar({ onClose }: { onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Compass className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {t('Explore')}
         </div>
       </div>
@@ -191,7 +191,7 @@ function NotificationsTitlebar({ onClose }: { onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Bell className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {t('Notifications')}
         </div>
       </div>
@@ -208,7 +208,7 @@ function ProfileTitlebar({ pubkey, onClose }: { pubkey: string; onClose: () => v
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <UserRound className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           <Username userId={pubkey} />
         </div>
       </div>
@@ -225,7 +225,7 @@ function SearchTitlebar({ searchParams, onClose }: { searchParams: any; onClose:
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Search className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {displayText}
         </div>
       </div>
@@ -241,7 +241,7 @@ function RelayTitlebar({ url, onClose }: { url: string; onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Server className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {simplifyUrl(url)}
         </div>
       </div>
@@ -257,7 +257,7 @@ function RelaySetTitlebar({ name, onClose }: { name: string; onClose: () => void
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Server className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {name}
         </div>
       </div>
@@ -273,7 +273,7 @@ function CustomFeedTitlebar({ name, onClose }: { name: string; onClose: () => vo
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Search className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {name}
         </div>
       </div>
@@ -290,7 +290,7 @@ function BookmarksTitlebar({ onClose }: { onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Bookmark className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {t('Bookmarks')}
         </div>
       </div>
@@ -307,7 +307,7 @@ function ReadsTitlebar({ onClose }: { onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <BookOpen className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {t('Reads')}
         </div>
       </div>
@@ -357,7 +357,7 @@ function ListsIndexTitlebar({ onClose }: { onClose: () => void }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <List className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {t('Lists')}
         </div>
       </div>
@@ -385,7 +385,7 @@ function ListTitlebar({ listId, title, onClose }: { listId: string; title?: stri
     <div className="flex items-center justify-between gap-2 px-3 h-full w-full">
       <div className="flex items-center gap-2 min-w-0">
         <Users className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>
           {displayTitle}
         </div>
       </div>

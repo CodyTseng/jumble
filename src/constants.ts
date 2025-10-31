@@ -52,6 +52,7 @@ export const StorageKey = {
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
   SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS: 'shownCreateWalletGuideToastPubkeys',
   FONT_SIZE: 'fontSize',
+  TITLE_FONT_SIZE: 'titleFontSize',
   PRIMARY_COLOR: 'primaryColor',
   LAYOUT_MODE: 'layoutMode',
   BUTTON_RADIUS: 'buttonRadius',
@@ -199,6 +200,9 @@ export const DEFAULT_DISTRACTION_FREE_MODE = 'drain-my-time'
 
 export const FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const
 export const DEFAULT_FONT_SIZE = 14
+
+export const TITLE_FONT_SIZES = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] as const
+export const DEFAULT_TITLE_FONT_SIZE = 18
 
 // Available font families for the application
 export const FONT_FAMILIES = {

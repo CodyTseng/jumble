@@ -17,6 +17,7 @@ import { FeedProvider } from '@/providers/FeedProvider'
 import { FollowListProvider } from '@/providers/FollowListProvider'
 import { FontFamilyProvider } from '@/providers/FontFamilyProvider'
 import { FontSizeProvider } from '@/providers/FontSizeProvider'
+import { TitleFontSizeProvider } from '@/providers/TitleFontSizeProvider'
 import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { LayoutModeProvider } from '@/providers/LayoutModeProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
@@ -50,8 +51,9 @@ export default function App(): JSX.Element {
         <PageThemeProvider>
           <PrimaryColorProvider>
           <FontSizeProvider>
-            <FontFamilyProvider>
-              <ButtonRadiusProvider>
+            <TitleFontSizeProvider>
+              <FontFamilyProvider>
+                <ButtonRadiusProvider>
                 <PostButtonStyleProvider>
                   <CardRadiusProvider>
                     <LayoutModeProvider>
@@ -116,8 +118,9 @@ export default function App(): JSX.Element {
                 </LayoutModeProvider>
                   </CardRadiusProvider>
                 </PostButtonStyleProvider>
-              </ButtonRadiusProvider>
-            </FontFamilyProvider>
+                </ButtonRadiusProvider>
+              </FontFamilyProvider>
+            </TitleFontSizeProvider>
           </FontSizeProvider>
           </PrimaryColorProvider>
         </PageThemeProvider>

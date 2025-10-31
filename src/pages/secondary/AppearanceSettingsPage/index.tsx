@@ -7,6 +7,7 @@ import {
   DECK_VIEW_MODE,
   FONT_FAMILIES,
   FONT_SIZES,
+  TITLE_FONT_SIZES,
   LAYOUT_MODE,
   NOTIFICATION_LIST_STYLE,
   POST_BUTTON_STYLE,
@@ -20,6 +21,7 @@ import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
 import { useDeckView } from '@/providers/DeckViewProvider'
 import { useFontFamily } from '@/providers/FontFamilyProvider'
 import { useFontSize } from '@/providers/FontSizeProvider'
+import { useTitleFontSize } from '@/providers/TitleFontSizeProvider'
 import { useLayoutMode } from '@/providers/LayoutModeProvider'
 import { usePageTheme } from '@/providers/PageThemeProvider'
 import { usePostButtonStyle } from '@/providers/PostButtonStyleProvider'
@@ -70,6 +72,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { colorPalette, setColorPalette } = useColorPalette()
   const { pageTheme, setPageTheme } = usePageTheme()
   const { fontSize, setFontSize } = useFontSize()
+  const { titleFontSize, setTitleFontSize } = useTitleFontSize()
   const { fontFamily, setFontFamily } = useFontFamily()
   const { primaryColor, setPrimaryColor } = usePrimaryColor()
   const { layoutMode, setLayoutMode } = useLayoutMode()
@@ -518,6 +521,28 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
               <span>{FONT_SIZES[0]}px</span>
               <span>{FONT_SIZES[FONT_SIZES.length - 1]}px</span>
+            </div>
+          </div>
+        </SettingItem>
+        <SettingItem className="flex-col items-start gap-3">
+          <div className="w-full">
+            <Label className="text-base font-normal">{t('Title font size')}</Label>
+            <div className="text-sm text-muted-foreground">{titleFontSize}px</div>
+          </div>
+          <div className="w-full px-2">
+            <Slider
+              min={0}
+              max={TITLE_FONT_SIZES.length - 1}
+              step={1}
+              value={[TITLE_FONT_SIZES.indexOf(titleFontSize as any)]}
+              onValueChange={(value) => {
+                setTitleFontSize(TITLE_FONT_SIZES[value[0]])
+              }}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground mt-2">
+              <span>{TITLE_FONT_SIZES[0]}px</span>
+              <span>{TITLE_FONT_SIZES[TITLE_FONT_SIZES.length - 1]}px</span>
             </div>
           </div>
         </SettingItem>

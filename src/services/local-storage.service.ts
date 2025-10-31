@@ -5,6 +5,7 @@ import {
   DEFAULT_CARD_RADIUS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_TITLE_FONT_SIZE,
   DEFAULT_NIP_96_SERVICE,
   DEFAULT_PAGE_THEME,
   DEFAULT_POST_BUTTON_STYLE,
@@ -13,6 +14,7 @@ import {
   ExtendedKind,
   FONT_FAMILIES,
   FONT_SIZES,
+  TITLE_FONT_SIZES,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   POST_BUTTON_STYLE,
@@ -79,6 +81,7 @@ class LocalStorageService {
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
   private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
   private fontSize: number = DEFAULT_FONT_SIZE
+  private titleFontSize: number = DEFAULT_TITLE_FONT_SIZE
   private fontFamily: TFontFamily = DEFAULT_FONT_FAMILY
   private primaryColor: TPrimaryColor = DEFAULT_PRIMARY_COLOR
   private buttonRadius: number = DEFAULT_BUTTON_RADIUS
@@ -271,6 +274,14 @@ class LocalStorageService {
       const fontSize = parseInt(fontSizeStr)
       if (FONT_SIZES.includes(fontSize as any)) {
         this.fontSize = fontSize
+      }
+    }
+
+    const titleFontSizeStr = window.localStorage.getItem(StorageKey.TITLE_FONT_SIZE)
+    if (titleFontSizeStr) {
+      const titleFontSize = parseInt(titleFontSizeStr)
+      if (TITLE_FONT_SIZES.includes(titleFontSize as any)) {
+        this.titleFontSize = titleFontSize
       }
     }
 
@@ -751,6 +762,18 @@ class LocalStorageService {
     }
     this.fontSize = fontSize
     window.localStorage.setItem(StorageKey.FONT_SIZE, fontSize.toString())
+  }
+
+  getTitleFontSize() {
+    return this.titleFontSize
+  }
+
+  setTitleFontSize(titleFontSize: number) {
+    if (!TITLE_FONT_SIZES.includes(titleFontSize as any)) {
+      return
+    }
+    this.titleFontSize = titleFontSize
+    window.localStorage.setItem(StorageKey.TITLE_FONT_SIZE, titleFontSize.toString())
   }
 
   getFontFamily() {

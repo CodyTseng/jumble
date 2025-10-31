@@ -40,7 +40,7 @@ function NotificationListPageTitlebar() {
     <div className="flex gap-2 items-center justify-between h-full pl-3">
       <div className="flex items-center gap-2 [&_svg]:text-muted-foreground">
         <Bell />
-        <div className="text-lg font-semibold" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>{t('Notifications')}</div>
+        <div className="text-lg font-semibold" style={{ fontSize: `var(--title-font-size, 18px)` }}>{t('Notifications')}</div>
       </div>
       <div className="flex gap-1 items-center">
         <PinButton column={{ type: 'notifications' }} size="titlebar-icon" />

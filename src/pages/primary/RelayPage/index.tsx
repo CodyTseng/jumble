@@ -27,7 +27,7 @@ function RelayPageTitlebar({ url }: { url?: string }) {
     <div className="flex items-center justify-between gap-2 px-3 h-full">
       <div className="flex items-center gap-2 min-w-0 [&_svg]:text-muted-foreground">
         <Box className="shrink-0" />
-        <div className="text-lg font-semibold truncate" style={{ fontSize: `calc(var(--font-size, 14px) * 1.286)` }}>{simplifyUrl(url ?? '')}</div>
+        <div className="text-lg font-semibold truncate" style={{ fontSize: `var(--title-font-size, 18px)` }}>{simplifyUrl(url ?? '')}</div>
       </div>
       {url && <PinButton column={{ type: 'relay', props: { url } }} size="titlebar-icon" />}
     </div>
