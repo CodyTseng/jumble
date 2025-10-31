@@ -10,10 +10,12 @@ export function FormattedTimestamp({
   short?: boolean
   className?: string
 }) {
+  const isoDateTime = new Date(timestamp * 1000).toISOString()
+
   return (
-    <span className={className}>
+    <time dateTime={isoDateTime} className={className}>
       <FormattedTimestampContent timestamp={timestamp} short={short} />
-    </span>
+    </time>
   )
 }
 

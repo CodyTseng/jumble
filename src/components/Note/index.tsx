@@ -117,7 +117,7 @@ export default function Note({
 
   return (
     <div className={className}>
-      <div className="flex justify-between items-start gap-2">
+      <header className="flex justify-between items-start gap-2">
         <div className="flex items-center space-x-2 flex-1">
           <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
           <div className="flex-1 w-0">
@@ -126,6 +126,8 @@ export default function Note({
                 userId={event.pubkey}
                 className={`font-semibold flex truncate ${size === 'small' ? 'text-sm' : ''}`}
                 skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
+                asHeading={true}
+                headingLevel={size === 'small' ? 4 : 3}
               />
               <ClientTag event={event} />
             </div>
@@ -145,7 +147,7 @@ export default function Note({
             <NoteOptions event={event} className="py-1 shrink-0 [&_svg]:size-5" />
           )}
         </div>
-      </div>
+      </header>
       {parentEventId && (
         <ParentNotePreview
           eventId={parentEventId}
