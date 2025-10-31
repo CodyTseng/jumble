@@ -253,6 +253,7 @@ export default function PostContent({
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
         onImageUploadSuccess={handleImageUploadSuccess}
+        images={images}
       />
       <ImagePreview
         images={images}

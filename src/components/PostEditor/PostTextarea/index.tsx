@@ -13,7 +13,7 @@ import Text from '@tiptap/extension-text'
 import { TextSelection } from '@tiptap/pm/state'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { Event } from 'nostr-tools'
-import { Dispatch, forwardRef, SetStateAction, useImperativeHandle, useState } from 'react'
+import { Dispatch, forwardRef, SetStateAction, useImperativeHandle, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
 import Emoji from './Emoji'
@@ -49,6 +49,7 @@ const PostTextarea = forwardRef<
     onUploadProgress?: (file: File, progress: number) => void
     onUploadEnd?: (file: File) => void
     onImageUploadSuccess?: (url: string) => void
+    images?: Array<{ url: string; alt?: string }>
   }
 >(
   (
@@ -62,7 +63,8 @@ const PostTextarea = forwardRef<
       onUploadStart,
       onUploadProgress,
       onUploadEnd,
-      onImageUploadSuccess
+      onImageUploadSuccess,
+      images = []
     },
     ref
   ) => {
@@ -187,6 +189,16 @@ const PostTextarea = forwardRef<
       return null
     }
 
+    const previewContent = useMemo(() => {
+      // Combine text with image URLs for preview
+      let content = text.trim()
+      if (images.length > 0) {
+        const imageUrls = images.map((img) => img.url).join('\n')
+        content = content ? `${content}\n${imageUrls}` : imageUrls
+      }
+      return content
+    }, [text, images])
+
     return (
       <Tabs
         defaultValue="edit"
@@ -208,7 +220,7 @@ const PostTextarea = forwardRef<
             editor.commands.focus()
           }}
         >
-          <Preview content={text} className={className} />
+          <Preview content={previewContent} images={images} className={className} />
         </TabsContent>
       </Tabs>
     )
