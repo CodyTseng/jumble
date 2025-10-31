@@ -30,7 +30,7 @@ export default function NpubQrCode({ pubkey }: { pubkey: string }) {
           <Nip05 pubkey={pubkey} />
         </div>
       </div>
-      <QrCode size={512} value={`nostr:${npub}`} />
+      <QrCode size={256} value={`nostr:${npub}`} />
       <div className="flex flex-col items-center">
         <PubkeyCopy pubkey={pubkey} />
       </div>
@@ -49,7 +49,7 @@ export default function NpubQrCode({ pubkey }: { pubkey: string }) {
   return (
     <Dialog>
       <DialogTrigger>{trigger}</DialogTrigger>
-      <DialogContent className="w-80 p-0 m-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-sm p-0 m-0" onOpenAutoFocus={(e) => e.preventDefault()}>
         {content}
       </DialogContent>
     </Dialog>
