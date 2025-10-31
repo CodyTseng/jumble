@@ -192,24 +192,6 @@ See `INTEGRATION_GUIDE_FOR_JUMBLE_SOCIAL.md` for complete deployment instruction
 ### Breaking Changes
 **None.** This is a purely additive feature.
 
-## 📸 Screenshots
-
-### Wallet Sidebar Button
-![Wallet Button](https://github.com/user-attachments/assets/...)
-*Quick access to wallet from any page*
-
-### Wallet Overview
-![Wallet Overview](https://github.com/user-attachments/assets/...)
-*Balance, Lightning address, payment history*
-
-### Payment Flow
-![Payment Flow](https://github.com/user-attachments/assets/...)
-*Send payments inline, no external wallet popup*
-
-### Multi-Device Sync
-![Multi-Device](https://github.com/user-attachments/assets/...)
-*Wallet automatically syncs across devices*
-
 ## 🔄 Migration Notes
 
 ### For Existing Users
