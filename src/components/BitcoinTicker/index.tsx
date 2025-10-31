@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useWidgets } from '@/providers/WidgetsProvider'
 import { cn } from '@/lib/utils'
-import { Blocks } from 'lucide-react'
+import { Box } from 'lucide-react'
 
 type BitcoinPrice = {
   usd: number
@@ -108,7 +108,7 @@ export default function BitcoinTicker() {
       <div className={cn('font-bold', textSizeClass)}>{formatPrice(price.usd)}</div>
       {bitcoinTickerShowBlockHeight && blockHeight !== null && (
         <div className="ml-auto flex items-center gap-2 text-muted-foreground">
-          <Blocks
+          <Box
             className={cn(
               'h-4 w-4 transition-transform duration-700',
               isHovered && 'rotate-180'
