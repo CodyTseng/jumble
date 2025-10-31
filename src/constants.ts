@@ -64,6 +64,7 @@ export const StorageKey = {
   TRENDING_NOTES_HEIGHT: 'trendingNotesHeight',
   BITCOIN_TICKER_ALIGNMENT: 'bitcoinTickerAlignment',
   BITCOIN_TICKER_TEXT_SIZE: 'bitcoinTickerTextSize',
+  BITCOIN_TICKER_SHOW_BLOCK_HEIGHT: 'bitcoinTickerShowBlockHeight',
   COMPACT_SIDEBAR: 'compactSidebar',
   ENABLED_WIDGETS: 'enabledWidgets',
   PINNED_NOTE_WIDGETS: 'pinnedNoteWidgets',

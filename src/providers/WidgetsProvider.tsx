@@ -73,6 +73,8 @@ type TWidgetsContext = {
   setBitcoinTickerAlignment: (alignment: TBitcoinTickerAlignment) => void
   bitcoinTickerTextSize: TBitcoinTickerTextSize
   setBitcoinTickerTextSize: (size: TBitcoinTickerTextSize) => void
+  bitcoinTickerShowBlockHeight: boolean
+  setBitcoinTickerShowBlockHeight: (show: boolean) => void
   pinnedNoteWidgets: TPinnedNoteWidget[]
   pinNoteWidget: (eventId: string) => string
   unpinNoteWidget: (widgetId: string) => void
@@ -114,6 +116,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     return localStorageService.getBitcoinTickerTextSize()
   })
 
+  const [bitcoinTickerShowBlockHeight, setBitcoinTickerShowBlockHeightState] = useState<boolean>(() => {
+    return localStorageService.getBitcoinTickerShowBlockHeight()
+  })
+
   useEffect(() => {
     localStorageService.setEnabledWidgets(enabledWidgets)
   }, [enabledWidgets])
@@ -136,6 +142,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     localStorageService.setBitcoinTickerTextSize(bitcoinTickerTextSize)
   }, [bitcoinTickerTextSize])
 
+  useEffect(() => {
+    localStorageService.setBitcoinTickerShowBlockHeight(bitcoinTickerShowBlockHeight)
+  }, [bitcoinTickerShowBlockHeight])
+
   const setTrendingNotesHeight = (height: TTrendingNotesHeight) => {
     setTrendingNotesHeightState(height)
   }
@@ -146,6 +156,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
 
   const setBitcoinTickerTextSize = (size: TBitcoinTickerTextSize) => {
     setBitcoinTickerTextSizeState(size)
+  }
+
+  const setBitcoinTickerShowBlockHeight = (show: boolean) => {
+    setBitcoinTickerShowBlockHeightState(show)
   }
 
   const toggleWidget = (widgetId: TWidgetId) => {
@@ -264,6 +278,8 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
         setBitcoinTickerAlignment,
         bitcoinTickerTextSize,
         setBitcoinTickerTextSize,
+        bitcoinTickerShowBlockHeight,
+        setBitcoinTickerShowBlockHeight,
         pinnedNoteWidgets,
         pinNoteWidget,
         unpinNoteWidget,

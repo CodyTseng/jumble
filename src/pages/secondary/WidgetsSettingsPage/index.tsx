@@ -36,7 +36,9 @@ function SortableWidgetCard({
   bitcoinTickerAlignment,
   onBitcoinTickerAlignmentChange,
   bitcoinTickerTextSize,
-  onBitcoinTickerTextSizeChange
+  onBitcoinTickerTextSizeChange,
+  bitcoinTickerShowBlockHeight,
+  onBitcoinTickerShowBlockHeightChange
 }: {
   id: TWidgetId
   enabled: boolean
@@ -47,6 +49,8 @@ function SortableWidgetCard({
   onBitcoinTickerAlignmentChange?: (alignment: TBitcoinTickerAlignment) => void
   bitcoinTickerTextSize?: TBitcoinTickerTextSize
   onBitcoinTickerTextSizeChange?: (size: TBitcoinTickerTextSize) => void
+  bitcoinTickerShowBlockHeight?: boolean
+  onBitcoinTickerShowBlockHeightChange?: (show: boolean) => void
 }) {
   const { t } = useTranslation()
   const widget = AVAILABLE_WIDGETS.find((w) => w.id === id)
@@ -165,8 +169,8 @@ function SortableWidgetCard({
         </div>
       )}
 
-      {showBitcoinSettings && bitcoinTickerAlignment && onBitcoinTickerAlignmentChange && bitcoinTickerTextSize && onBitcoinTickerTextSizeChange && (
-        <div className="px-4 pb-4 pt-2 border-t border-border/50">
+      {showBitcoinSettings && bitcoinTickerAlignment && onBitcoinTickerAlignmentChange && bitcoinTickerTextSize && onBitcoinTickerTextSizeChange && bitcoinTickerShowBlockHeight !== undefined && onBitcoinTickerShowBlockHeightChange && (
+        <div className="px-4 pb-4 pt-2 border-t border-border/50 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium mb-2 block">Text Alignment</Label>
@@ -212,6 +216,17 @@ function SortableWidgetCard({
               </RadioGroup>
             </div>
           </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium">Show Block Height</Label>
+              <p className="text-xs text-muted-foreground mt-1">Display current Bitcoin block height</p>
+            </div>
+            <Switch
+              checked={bitcoinTickerShowBlockHeight}
+              onCheckedChange={onBitcoinTickerShowBlockHeightChange}
+            />
+          </div>
         </div>
       )}
 
@@ -235,7 +250,9 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     bitcoinTickerAlignment,
     setBitcoinTickerAlignment,
     bitcoinTickerTextSize,
-    setBitcoinTickerTextSize
+    setBitcoinTickerTextSize,
+    bitcoinTickerShowBlockHeight,
+    setBitcoinTickerShowBlockHeight
   } = useWidgets()
   const [activeId, setActiveId] = useState<TWidgetId | null>(null)
 
@@ -309,6 +326,8 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                   onBitcoinTickerAlignmentChange={setBitcoinTickerAlignment}
                   bitcoinTickerTextSize={bitcoinTickerTextSize}
                   onBitcoinTickerTextSizeChange={setBitcoinTickerTextSize}
+                  bitcoinTickerShowBlockHeight={bitcoinTickerShowBlockHeight}
+                  onBitcoinTickerShowBlockHeightChange={setBitcoinTickerShowBlockHeight}
                 />
               ))}
             </div>

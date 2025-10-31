@@ -96,6 +96,7 @@ class LocalStorageService {
   private trendingNotesHeight: 'short' | 'medium' | 'tall' | 'remaining' = 'medium'
   private bitcoinTickerAlignment: 'left' | 'center' = 'left'
   private bitcoinTickerTextSize: 'large' | 'small' = 'large'
+  private bitcoinTickerShowBlockHeight: boolean = false
   private zapSound: TZapSound = ZAP_SOUNDS.NONE
   private customFeeds: TCustomFeed[] = []
   private chargeZapEnabled: boolean = false
@@ -359,6 +360,11 @@ class LocalStorageService {
     const bitcoinTickerTextSize = window.localStorage.getItem(StorageKey.BITCOIN_TICKER_TEXT_SIZE)
     if (bitcoinTickerTextSize && ['large', 'small'].includes(bitcoinTickerTextSize)) {
       this.bitcoinTickerTextSize = bitcoinTickerTextSize as 'large' | 'small'
+    }
+
+    const bitcoinTickerShowBlockHeight = window.localStorage.getItem(StorageKey.BITCOIN_TICKER_SHOW_BLOCK_HEIGHT)
+    if (bitcoinTickerShowBlockHeight !== null) {
+      this.bitcoinTickerShowBlockHeight = bitcoinTickerShowBlockHeight === 'true'
     }
 
     const zapSound = window.localStorage.getItem(StorageKey.ZAP_SOUND)
@@ -894,6 +900,15 @@ class LocalStorageService {
   setBitcoinTickerTextSize(size: 'large' | 'small') {
     this.bitcoinTickerTextSize = size
     window.localStorage.setItem(StorageKey.BITCOIN_TICKER_TEXT_SIZE, size)
+  }
+
+  getBitcoinTickerShowBlockHeight() {
+    return this.bitcoinTickerShowBlockHeight
+  }
+
+  setBitcoinTickerShowBlockHeight(show: boolean) {
+    this.bitcoinTickerShowBlockHeight = show
+    window.localStorage.setItem(StorageKey.BITCOIN_TICKER_SHOW_BLOCK_HEIGHT, show.toString())
   }
 
   getPinnedNoteWidgets() {
