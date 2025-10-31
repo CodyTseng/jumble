@@ -76,7 +76,7 @@ export default function PrivateNote({ pubkey }: PrivateNoteProps) {
       className={cn(
         'relative bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-200 dark:to-yellow-300',
         'border border-yellow-300 dark:border-yellow-400 rounded-md shadow-md',
-        'mb-3 transition-all hover:shadow-lg',
+        'mt-3 mb-3 transition-all hover:shadow-lg',
         'before:content-[""] before:absolute before:top-0 before:left-0 before:w-full before:h-2',
         'before:bg-gradient-to-b before:from-yellow-300/50 before:to-transparent before:rounded-t-md'
       )}
@@ -132,7 +132,7 @@ export default function PrivateNote({ pubkey }: PrivateNoteProps) {
         </div>
       </div>
       {note?.noteEventId && pinnedEvent && (
-        <div className="border-t border-yellow-600 dark:border-yellow-600 mx-3 pt-2 pb-3">
+        <div className="border-t border-yellow-600 dark:border-yellow-600 mx-3 pt-2 pb-2">
           <div className="text-xs text-yellow-700 dark:text-yellow-800 mb-2 flex items-center gap-1">
             <StickyNote className="size-3" />
             <span>{t('Pinned note:')}</span>
