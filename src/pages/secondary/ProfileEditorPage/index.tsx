@@ -181,7 +181,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Label htmlFor="profile-about-textarea">{t('Bio')}</Label>
           <Textarea
             id="profile-about-textarea"
-            className="h-44"
+            className="h-24"
             value={about}
             onChange={(e) => {
               setAbout(e.target.value)
