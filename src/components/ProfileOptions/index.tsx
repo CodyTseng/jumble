@@ -112,13 +112,13 @@ function NpubQrCodeDialog({
   const content = (
     <div className="w-full flex flex-col items-center gap-4 p-8">
       <div className="flex items-center w-full gap-2 pointer-events-none px-1">
-        <UserAvatar size="big" userId={pubkey} />
+        <UserAvatar size="md" userId={pubkey} />
         <div className="flex-1 w-0">
-          <Username userId={pubkey} className="text-2xl font-semibold truncate" />
+          <Username userId={pubkey} className="text-base font-semibold truncate" />
           <Nip05 pubkey={pubkey} />
         </div>
       </div>
-      <QrCodeComponent size={512} value={`nostr:${npub}`} />
+      <QrCodeComponent size={256} value={`nostr:${npub}`} />
       <div className="flex flex-col items-center">
         <PubkeyCopy pubkey={pubkey} />
       </div>
@@ -135,7 +135,7 @@ function NpubQrCodeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-80 p-0 m-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-sm p-0 m-0" onOpenAutoFocus={(e) => e.preventDefault()}>
         {content}
       </DialogContent>
     </Dialog>
