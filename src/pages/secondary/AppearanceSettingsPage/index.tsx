@@ -41,7 +41,7 @@ const getPaletteColor = (palette: TColorPalette, theme: string, type: 'backgroun
     },
     slate: {
       light: { background: 'hsl(215, 20.2%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(214.3, 31.8%, 91.4%)' },
-      dark: { background: 'hsl(215.4, 16.3%, 25.9%)', muted: 'hsl(222.2, 84%, 4.9%)', border: 'hsl(215.4, 16.3%, 25.9%)' }
+      dark: { background: 'hsl(222.2, 47.4%, 11.2%)', muted: 'hsl(222.2, 84%, 4.9%)', border: 'hsl(217.2, 32.6%, 17.5%)' }
     },
     gray: {
       light: { background: 'hsl(220, 14.3%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(220, 13%, 91%)' },

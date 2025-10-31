@@ -259,21 +259,21 @@
 
   /* Dark Slate Palette */
   .dark.palette-slate {
-    --surface-background: 222.2 84% 4.9%;
-    --background: 215.4 16.3% 25.9%;
+    --surface-background: 222.2 47.4% 11.2%;
+    --background: 222.2 47.4% 11.2%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --secondary: 215.4 16.3% 25.9%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 215.4 16.3% 25.9%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 215.4 16.3% 25.9%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --border: 215.4 16.3% 25.9%;
-    --input: 215.4 16.3% 25.9%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
   }
 
   /* Dark Gray Palette */
