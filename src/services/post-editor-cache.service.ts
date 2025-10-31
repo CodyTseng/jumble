@@ -2,11 +2,17 @@ import { TPollCreateData } from '@/types'
 import { Content } from '@tiptap/react'
 import { Event } from 'nostr-tools'
 
+export type ImageAttachment = {
+  url: string
+  alt?: string
+}
+
 type TPostSettings = {
   isNsfw?: boolean
   isPoll?: boolean
   pollCreateData?: TPollCreateData
   addClientTag?: boolean
+  images?: ImageAttachment[]
 }
 
 class PostEditorCacheService {

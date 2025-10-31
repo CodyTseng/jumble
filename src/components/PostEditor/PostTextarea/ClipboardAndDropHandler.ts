@@ -15,6 +15,7 @@ export interface ClipboardAndDropHandlerOptions {
   onUploadStart?: (file: File, cancel: () => void) => void
   onUploadEnd?: (file: File) => void
   onUploadProgress?: (file: File, progress: number) => void
+  onImageUploadSuccess?: (url: string) => void
 }
 
 export const ClipboardAndDropHandler = Extension.create<ClipboardAndDropHandlerOptions>({
@@ -27,7 +28,8 @@ export const ClipboardAndDropHandler = Extension.create<ClipboardAndDropHandlerO
       onUploadError: undefined,
       onUploadEnd: undefined,
       onUploadProgress: undefined,
-      onProvideCancel: undefined
+      onProvideCancel: undefined,
+      onImageUploadSuccess: undefined
     }
   },
 
@@ -126,6 +128,7 @@ async function uploadFiles(
 
   for (const file of files) {
     const name = file.name
+    const isImage = file.type.startsWith('image/')
 
     const placeholder = `[Uploading "${name}"...]`
     const uploadingNode = view.state.schema.text(placeholder)
@@ -143,8 +146,8 @@ async function uploadFiles(
       })
       .then((result) => {
         options.onUploadEnd?.(file)
-        const urlNode = view.state.schema.text(result.url)
 
+        // Remove the placeholder text
         const tr = view.state.tr
         let didReplace = false
 
@@ -153,7 +156,8 @@ async function uploadFiles(
             const startPos = node.text.indexOf(placeholder)
             const from = pos + startPos
             const to = from + placeholder.length
-            tr.replaceWith(from, to, urlNode)
+            // Just delete the placeholder, don't insert the URL
+            tr.delete(from, to)
             didReplace = true
             return false
           }
@@ -162,14 +166,19 @@ async function uploadFiles(
 
         if (didReplace) {
           view.dispatch(tr)
-        } else {
-          const endPos = view.state.doc.content.size
+        }
 
+        // If it's an image and we have the callback, use it instead of inserting URL
+        if (isImage && options.onImageUploadSuccess) {
+          options.onImageUploadSuccess(result.url)
+        } else {
+          // For non-images (video/audio), insert URL into the text
+          const urlNode = view.state.schema.text(result.url)
+          const endPos = view.state.doc.content.size
           const paragraphNode = view.state.schema.nodes.paragraph.create(
             null,
-            view.state.schema.text(result.url)
+            urlNode
           )
-
           const insertTr = view.state.tr.insert(endPos, paragraphNode)
           const newPos = endPos + 1 + result.url.length
           insertTr.setSelection(TextSelection.near(insertTr.doc.resolve(newPos)))

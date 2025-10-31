@@ -10,7 +10,7 @@ import {
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useReply } from '@/providers/ReplyProvider'
-import postEditorCache from '@/services/post-editor-cache.service'
+import postEditorCache, { ImageAttachment } from '@/services/post-editor-cache.service'
 import { TPollCreateData } from '@/types'
 import { ImagePlay, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import EmojiPickerDialog from '../EmojiPickerDialog'
 import GifPicker from '../GifPicker'
+import ImagePreview from './ImagePreview'
 import Mentions from './Mentions'
 import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
@@ -46,6 +47,7 @@ export default function PostContent({
   const [uploadProgresses, setUploadProgresses] = useState<
     { file: File; progress: number; cancel: () => void }[]
   >([])
+  const [images, setImages] = useState<ImageAttachment[]>([])
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [addClientTag, setAddClientTag] = useState(false)
   const [mentions, setMentions] = useState<string[]>([])
@@ -100,6 +102,7 @@ export default function PostContent({
           }
         )
         setAddClientTag(cachedSettings.addClientTag ?? false)
+        setImages(cachedSettings.images ?? [])
       }
       return
     }
@@ -109,10 +112,11 @@ export default function PostContent({
         isNsfw,
         isPoll,
         pollCreateData,
-        addClientTag
+        addClientTag,
+        images
       }
     )
-  }, [defaultContent, parentEvent, isNsfw, isPoll, pollCreateData, addClientTag])
+  }, [defaultContent, parentEvent, isNsfw, isPoll, pollCreateData, addClientTag, images])
 
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
@@ -121,24 +125,43 @@ export default function PostContent({
 
       setPosting(true)
       try {
+        // Combine text with image URLs at the end
+        let contentWithImages = text.trim()
+        if (images.length > 0) {
+          const imageUrls = images.map((img) => img.url).join('\n')
+          contentWithImages = contentWithImages ? `${contentWithImages}\n${imageUrls}` : imageUrls
+        }
+
         const draftEvent =
           parentEvent && parentEvent.kind !== kinds.ShortTextNote
-            ? await createCommentDraftEvent(text, parentEvent, mentions, {
+            ? await createCommentDraftEvent(contentWithImages, parentEvent, mentions, {
                 addClientTag,
                 protectedEvent: isProtectedEvent,
                 isNsfw
               })
             : isPoll
-              ? await createPollDraftEvent(pubkey!, text, mentions, pollCreateData, {
+              ? await createPollDraftEvent(pubkey!, contentWithImages, mentions, pollCreateData, {
                   addClientTag,
                   isNsfw
                 })
-              : await createShortTextNoteDraftEvent(text, mentions, {
+              : await createShortTextNoteDraftEvent(contentWithImages, mentions, {
                   parentEvent,
                   addClientTag,
                   protectedEvent: isProtectedEvent,
                   isNsfw
                 })
+
+        // Add imeta tags for images with alt text
+        if (images.length > 0) {
+          images.forEach((img) => {
+            const imetaTags: string[] = ['imeta', `url ${img.url}`]
+            if (img.alt) {
+              imetaTags.push(`alt ${img.alt}`)
+            }
+            // Add the tag as a single string with space-separated key-value pairs
+            draftEvent.tags.push(imetaTags)
+          })
+        }
 
         const newEvent = await publish(draftEvent, {
           specifiedRelayUrls: isProtectedEvent ? additionalRelayUrls : undefined,
@@ -186,6 +209,29 @@ export default function PostContent({
     setUploadProgresses((prev) => prev.filter((item) => item.file !== file))
   }
 
+  const handleImageUploadSuccess = (url: string) => {
+    // Check if it's an image URL (not video/audio)
+    const isImage =
+      url.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i) ||
+      url.includes('image') ||
+      url.includes('nostr.build')
+
+    if (isImage) {
+      setImages((prev) => [...prev, { url }])
+    } else {
+      // For non-images (video/audio), add to textarea as before
+      textareaRef.current?.appendText(url, true)
+    }
+  }
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleUpdateImageAlt = (index: number, alt: string) => {
+    setImages((prev) => prev.map((img, i) => (i === index ? { ...img, alt } : img)))
+  }
+
   return (
     <div className="space-y-2">
       {parentEvent && (
@@ -206,6 +252,12 @@ export default function PostContent({
         onUploadStart={handleUploadStart}
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
+        onImageUploadSuccess={handleImageUploadSuccess}
+      />
+      <ImagePreview
+        images={images}
+        onRemove={handleRemoveImage}
+        onUpdateAlt={handleUpdateImageAlt}
       />
       {isPoll && (
         <PollEditor
@@ -253,7 +305,7 @@ export default function PostContent({
         <div className="flex gap-2 items-center">
           <Uploader
             onUploadSuccess={({ url }) => {
-              textareaRef.current?.appendText(url, true)
+              handleImageUploadSuccess(url)
             }}
             onUploadStart={handleUploadStart}
             onUploadEnd={handleUploadEnd}
@@ -266,7 +318,7 @@ export default function PostContent({
           </Uploader>
           <GifPicker
             onGifSelect={(url) => {
-              textareaRef.current?.appendText(url, true)
+              setImages((prev) => [...prev, { url }])
             }}
           >
             <Button variant="ghost" size="icon" className="bg-foreground/5 hover:bg-foreground/10">

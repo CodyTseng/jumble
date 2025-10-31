@@ -48,6 +48,7 @@ const PostTextarea = forwardRef<
     onUploadStart?: (file: File, cancel: () => void) => void
     onUploadProgress?: (file: File, progress: number) => void
     onUploadEnd?: (file: File) => void
+    onImageUploadSuccess?: (url: string) => void
   }
 >(
   (
@@ -60,7 +61,8 @@ const PostTextarea = forwardRef<
       className,
       onUploadStart,
       onUploadProgress,
-      onUploadEnd
+      onUploadEnd,
+      onImageUploadSuccess
     },
     ref
   ) => {
@@ -103,7 +105,8 @@ const PostTextarea = forwardRef<
             onUploadStart?.(file, cancel)
           },
           onUploadEnd: (file) => onUploadEnd?.(file),
-          onUploadProgress: (file, p) => onUploadProgress?.(file, p)
+          onUploadProgress: (file, p) => onUploadProgress?.(file, p),
+          onImageUploadSuccess: (url) => onImageUploadSuccess?.(url)
         })
       ],
       editorProps: {
