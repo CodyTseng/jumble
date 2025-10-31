@@ -66,7 +66,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const getThemeLabel = (theme: string) => {
     switch (theme) {
       case 'pure-black':
-        return 'Pure Black'
+        return 'Black'
       case 'white':
         return 'White'
       default:
@@ -82,7 +82,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             {t('Theme')}
           </Label>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 w-full">
-            {(['system', 'light', 'white', 'dark', 'pure-black'] as const).map((theme) => (
+            {(['system', 'light', 'dark', 'white', 'pure-black'] as const).map((theme) => (
               <button
                 key={theme}
                 onClick={() => {
