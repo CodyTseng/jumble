@@ -70,6 +70,12 @@ const PrimaryPageLayout = forwardRef(
     if (isSmallScreen) {
       return (
         <DeepBrowsingProvider active={current === pageName && display}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded"
+          >
+            Skip to main content
+          </a>
           <div
             ref={smallScreenScrollAreaRef}
             style={{
@@ -79,7 +85,9 @@ const PrimaryPageLayout = forwardRef(
             <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
               {titlebar}
             </PrimaryPageTitlebar>
-            {children}
+            <main id="main-content">
+              {children}
+            </main>
           </div>
           {displayScrollToTopButton && <ScrollToTopButton />}
         </DeepBrowsingProvider>
@@ -88,6 +96,12 @@ const PrimaryPageLayout = forwardRef(
 
     return (
       <DeepBrowsingProvider active={current === pageName && display} scrollAreaRef={scrollAreaRef}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded"
+        >
+          Skip to main content
+        </a>
         <ScrollArea
           className="h-full overflow-auto"
           scrollBarClassName="z-50 pt-12"
@@ -96,7 +110,9 @@ const PrimaryPageLayout = forwardRef(
           <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
             {titlebar}
           </PrimaryPageTitlebar>
-          {children}
+          <main id="main-content">
+            {children}
+          </main>
           <div className="h-4" />
         </ScrollArea>
         {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}

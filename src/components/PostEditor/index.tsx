@@ -59,11 +59,12 @@ export default function PostEditor({
               postEditor.closeSuggestionPopup()
             }
           }}
+          aria-labelledby="post-editor-title"
         >
           <ScrollArea className="px-4 h-full max-h-screen">
             <div className="space-y-4 px-2 py-6">
               <SheetHeader>
-                <SheetTitle className="text-start">
+                <SheetTitle id="post-editor-title" className="text-start">
                   <Title parentEvent={parentEvent} />
                 </SheetTitle>
                 <SheetDescription className="hidden" />
@@ -87,11 +88,12 @@ export default function PostEditor({
             postEditor.closeSuggestionPopup()
           }
         }}
+        aria-labelledby="post-editor-title"
       >
         <ScrollArea className="px-4 h-full max-h-screen">
           <div className="space-y-4 px-2 py-6">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle id="post-editor-title">
                 <Title parentEvent={parentEvent} />
               </DialogTitle>
               <DialogDescription className="hidden" />

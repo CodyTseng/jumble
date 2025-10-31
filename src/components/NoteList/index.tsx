@@ -300,23 +300,31 @@ const NoteList = forwardRef(
 
     const list = (
       <div className="min-h-screen">
-        {pinnedEventIds.map((id) => (
-          <PinnedNoteCard key={id} eventId={id} className="w-full" />
-        ))}
-        {filteredEvents.map((event) => (
-          <NoteCard
-            key={event.id}
-            className="w-full"
-            event={event}
-            filterMutedNotes={filterMutedNotes}
-          />
-        ))}
+        <ul role="feed" aria-label="Notes feed" className="list-none">
+          {pinnedEventIds.map((id) => (
+            <li key={id}>
+              <PinnedNoteCard eventId={id} className="w-full" />
+            </li>
+          ))}
+          {filteredEvents.map((event) => (
+            <li key={event.id}>
+              <NoteCard
+                className="w-full"
+                event={event}
+                filterMutedNotes={filterMutedNotes}
+              />
+            </li>
+          ))}
+        </ul>
         {hasMore || loading ? (
           <div ref={bottomRef}>
+            <div role="status" aria-live="polite" className="sr-only">
+              {loading && t('Loading more posts')}
+            </div>
             <NoteCardLoadingSkeleton />
           </div>
         ) : events.length ? (
-          <div className="text-center text-sm text-muted-foreground mt-2">{t('no more notes')}</div>
+          <div role="status" aria-live="polite" className="text-center text-sm text-muted-foreground mt-2">{t('no more notes')}</div>
         ) : (
           <div className="flex justify-center w-full mt-2">
             <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>

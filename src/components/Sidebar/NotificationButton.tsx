@@ -14,13 +14,14 @@ export default function NotificationsButton() {
   return (
     <SidebarItem
       title="Notifications"
+      description={hasNewNotification && !isDistractionFree ? "Notifications, new notifications" : "Notifications"}
       onClick={() => checkLogin(() => navigate('notifications'))}
       active={current === 'notifications'}
     >
       <div className="relative">
         <Bell strokeWidth={1.3} />
         {hasNewNotification && !isDistractionFree && (
-          <div className="absolute -top-1 right-0 w-2 h-2 ring-2 ring-background bg-primary rounded-full" />
+          <div className="absolute -top-1 right-0 w-2 h-2 ring-2 ring-background bg-primary rounded-full" aria-label="New notifications" />
         )}
       </div>
     </SidebarItem>

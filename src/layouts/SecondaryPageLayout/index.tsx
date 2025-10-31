@@ -83,7 +83,9 @@ const SecondaryPageLayout = forwardRef(
                 onClose={onClose}
               />
             )}
-            {children}
+            <main>
+              {children}
+            </main>
           </div>
           {displayScrollToTopButton && <ScrollToTopButton />}
         </DeepBrowsingProvider>
@@ -108,7 +110,9 @@ const SecondaryPageLayout = forwardRef(
               onClose={onClose}
             />
           )}
-          {children}
+          <main>
+            {children}
+          </main>
           <div className="h-4" />
         </ScrollArea>
         {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}

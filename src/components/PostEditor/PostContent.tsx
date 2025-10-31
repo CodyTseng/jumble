@@ -325,8 +325,14 @@ export default function PostContent({
             >
               {t('Cancel')}
             </Button>
-            <Button type="submit" disabled={!canPost} onClick={post}>
-              {posting && <LoaderCircle className="animate-spin" />}
+            <Button
+              type="submit"
+              disabled={!canPost}
+              onClick={post}
+              aria-busy={posting}
+              aria-label={posting ? (parentEvent ? t('Replying...') : t('Posting...')) : (parentEvent ? t('Reply') : t('Post'))}
+            >
+              {posting && <LoaderCircle className="animate-spin" aria-hidden="true" />}
               {parentEvent ? t('Reply') : t('Post')}
             </Button>
           </div>

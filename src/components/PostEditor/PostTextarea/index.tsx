@@ -111,7 +111,10 @@ const PostTextarea = forwardRef<
           class: cn(
             'border rounded-lg p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
             className
-          )
+          ),
+          'aria-label': t('Write something...'),
+          role: 'textbox',
+          'aria-multiline': 'true'
         },
         handleKeyDown: (_view, event) => {
           // Handle Ctrl+Enter or Cmd+Enter for submit
