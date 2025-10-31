@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { createProfileDraftEvent } from '@/lib/draft-event'
 import { generateImageByPubkey } from '@/lib/pubkey'
@@ -13,7 +14,7 @@ import { isEmail } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { TGalleryImage } from '@/types'
-import { Loader, Upload } from 'lucide-react'
+import { Info, Loader, Upload } from 'lucide-react'
 import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -200,7 +201,21 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           />
         </Item>
         <Item>
-          <Label htmlFor="profile-nip05-input">{t('Nostr Address (NIP-05)')}</Label>
+          <div className="flex items-center gap-1">
+            <Label htmlFor="profile-nip05-input">{t('Nostr Address')}</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>{t('Nostr Address Info')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Input
             id="profile-nip05-input"
             value={nip05}

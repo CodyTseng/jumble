@@ -139,7 +139,9 @@ export default {
     Save: '저장',
     'Display Name': '표시 이름',
     Bio: '소개',
-    'Nostr Address (NIP-05)': 'Nostr 주소 (NIP-05)',
+    'Nostr Address': 'Nostr 주소',
+    'Nostr Address Info':
+      'Nostr 주소는 이메일과 같은 형식의 사용자 이름(예: user@domain.com)으로, 다른 사람들이 쉽게 찾고 확인할 수 있도록 Nostr 계정에 연결됩니다.',
     'Invalid NIP-05 address': '유효하지 않은 NIP-05 주소',
     'Copy private key': '개인 키 복사',
     'Enter the password to decrypt your ncryptsec': 'ncryptsec를 복호화할 비밀번호 입력',

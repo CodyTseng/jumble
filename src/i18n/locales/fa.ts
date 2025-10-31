@@ -137,7 +137,9 @@ export default {
     Save: 'ذخیره',
     'Display Name': 'نام نمایشی',
     Bio: 'بیوگرافی',
-    'Nostr Address (NIP-05)': 'آدرس Nostr (NIP-05)',
+    'Nostr Address': 'آدرس Nostr',
+    'Nostr Address Info':
+      'آدرس Nostr یک نام کاربری است که شبیه یک ایمیل به نظر می‌رسد (مثلاً user@domain.com) و به حساب Nostr شما متصل است تا دیگران بتوانند شما را به راحتی پیدا و تأیید کنند.',
     'Invalid NIP-05 address': 'آدرس NIP-05 نامعتبر',
     'Copy private key': 'کپی کلید خصوصی',
     'Enter the password to decrypt your ncryptsec':

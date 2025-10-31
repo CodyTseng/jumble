@@ -138,7 +138,9 @@ export default {
     Save: 'सेव करें',
     'Display Name': 'प्रदर्शन नाम',
     Bio: 'बायो',
-    'Nostr Address (NIP-05)': 'Nostr पता (NIP-05)',
+    'Nostr Address': 'Nostr पता',
+    'Nostr Address Info':
+      'Nostr पता एक उपयोगकर्ता नाम है जो ईमेल जैसा दिखता है (जैसे, user@domain.com) और आपके Nostr खाते से जुड़ा होता है ताकि अन्य लोग आपको आसानी से ढूंढ और सत्यापित कर सकें।',
     'Invalid NIP-05 address': 'अमान्य NIP-05 पता',
     'Copy private key': 'प्राइवेट की कॉपी करें',
     'Enter the password to decrypt your ncryptsec':

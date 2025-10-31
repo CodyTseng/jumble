@@ -138,7 +138,9 @@ export default {
     Save: '保存',
     'Display Name': '昵称',
     Bio: '简介',
-    'Nostr Address (NIP-05)': 'Nostr 地址 (NIP-05)',
+    'Nostr Address': 'Nostr 地址',
+    'Nostr Address Info':
+      'Nostr 地址是一个类似于电子邮件的用户名（例如：user@domain.com），它链接到您的 Nostr 账户，以便其他人可以轻松找到并验证您。',
     'Invalid NIP-05 address': '无效的 NIP-05 地址',
     'Copy private key': '复制私钥',
     'Enter the password to decrypt your ncryptsec': '输入密码以解密您的 ncryptsec',

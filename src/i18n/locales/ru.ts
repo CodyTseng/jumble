@@ -139,7 +139,9 @@ export default {
     Save: 'Сохранить',
     'Display Name': 'Отображаемое имя',
     Bio: 'О себе',
-    'Nostr Address (NIP-05)': 'Адрес Nostr (NIP-05)',
+    'Nostr Address': 'Адрес Nostr',
+    'Nostr Address Info':
+      'Адрес Nostr — это имя пользователя, которое выглядит как электронная почта (например, user@domain.com) и связано с вашей учетной записью Nostr, чтобы другие могли легко найти и проверить вас.',
     'Invalid NIP-05 address': 'Неверный адрес NIP-05',
     'Copy private key': 'Скопировать приватный ключ',
     'Enter the password to decrypt your ncryptsec':

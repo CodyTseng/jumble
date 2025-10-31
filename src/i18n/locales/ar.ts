@@ -136,7 +136,9 @@ export default {
     Save: 'حفظ',
     'Display Name': 'اسم العرض',
     Bio: 'السيرة الذاتية',
-    'Nostr Address (NIP-05)': 'عنوان Nostr (NIP-05)',
+    'Nostr Address': 'عنوان Nostr',
+    'Nostr Address Info':
+      'عنوان Nostr هو اسم مستخدم يشبه البريد الإلكتروني (مثل user@domain.com) ويرتبط بحساب Nostr الخاص بك حتى يتمكن الآخرون من العثور عليك والتحقق منك بسهولة.',
     'Invalid NIP-05 address': 'عنوان NIP-05 غير صالح',
     'Copy private key': 'نسخ المفتاح الخاص',
     'Enter the password to decrypt your ncryptsec': 'أدخل كلمة المرور لفك تشفير ncryptsec',

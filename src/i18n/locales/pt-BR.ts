@@ -137,7 +137,9 @@ export default {
     Save: 'Salvar',
     'Display Name': 'Nome de exibição',
     Bio: 'Biografia',
-    'Nostr Address (NIP-05)': 'Endereço Nostr (NIP-05)',
+    'Nostr Address': 'Endereço Nostr',
+    'Nostr Address Info':
+      'Um endereço Nostr é um nome de usuário que se parece com um e-mail (ex: usuario@dominio.com) e está vinculado à sua conta Nostr para que outras pessoas possam encontrá-lo e verificá-lo facilmente.',
     'Invalid NIP-05 address': 'Endereço NIP-05 inválido',
     'Copy private key': 'Copiar chave privada',
     'Enter the password to decrypt your ncryptsec':
