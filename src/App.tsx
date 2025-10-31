@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { AIProvider } from '@/providers/AIProvider'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { ButtonRadiusProvider } from '@/providers/ButtonRadiusProvider'
+import { CardRadiusProvider } from '@/providers/CardRadiusProvider'
 import { CompactSidebarProvider } from '@/providers/CompactSidebarProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
 import { DeckViewProvider } from '@/providers/DeckViewProvider'
@@ -23,6 +24,7 @@ import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
 import { PageThemeProvider } from '@/providers/PageThemeProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
+import { PostButtonStyleProvider } from '@/providers/PostButtonStyleProvider'
 import { PrimaryColorProvider } from '@/providers/PrimaryColorProvider'
 import { ReadsVisibilityProvider } from '@/providers/ReadsVisibilityProvider'
 import { ListsVisibilityProvider } from '@/providers/ListsVisibilityProvider'
@@ -48,15 +50,17 @@ export default function App(): JSX.Element {
           <FontSizeProvider>
             <FontFamilyProvider>
               <ButtonRadiusProvider>
-                <LayoutModeProvider>
-                  <DeckViewProvider>
-                    <CompactSidebarProvider>
-                      <DistractionFreeModeProvider>
-                        <ContentPolicyProvider>
-                          <ReadsVisibilityProvider>
-                            <ListsVisibilityProvider>
-                              <ScreenSizeProvider>
-                                <DeletedEventProvider>
+                <PostButtonStyleProvider>
+                  <CardRadiusProvider>
+                    <LayoutModeProvider>
+                      <DeckViewProvider>
+                        <CompactSidebarProvider>
+                          <DistractionFreeModeProvider>
+                            <ContentPolicyProvider>
+                              <ReadsVisibilityProvider>
+                                <ListsVisibilityProvider>
+                                  <ScreenSizeProvider>
+                                    <DeletedEventProvider>
                               <NostrProvider>
                                 <ListsProvider>
                                   <ZapProvider>
@@ -108,6 +112,8 @@ export default function App(): JSX.Element {
                     </CompactSidebarProvider>
                   </DeckViewProvider>
                 </LayoutModeProvider>
+                  </CardRadiusProvider>
+                </PostButtonStyleProvider>
               </ButtonRadiusProvider>
             </FontFamilyProvider>
           </FontSizeProvider>

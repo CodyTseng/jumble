@@ -54,6 +54,8 @@ export const StorageKey = {
   PRIMARY_COLOR: 'primaryColor',
   LAYOUT_MODE: 'layoutMode',
   BUTTON_RADIUS: 'buttonRadius',
+  POST_BUTTON_STYLE: 'postButtonStyle',
+  CARD_RADIUS: 'cardRadius',
   PAGE_THEME: 'pageTheme',
   PRIVATE_NOTES: 'privateNotes',
   TRENDING_NOTES_DISMISSED: 'trendingNotesDismissed',
@@ -256,6 +258,16 @@ export const ACTUAL_ZAP_SOUNDS = [
 
 export const BUTTON_RADIUS_VALUES = [0, 2, 4, 6, 8, 12, 16, 9999] as const
 export const DEFAULT_BUTTON_RADIUS = 6
+
+export const POST_BUTTON_STYLE = {
+  FILLED: 'filled',
+  OUTLINED: 'outlined'
+} as const
+
+export const DEFAULT_POST_BUTTON_STYLE = 'filled'
+
+export const CARD_RADIUS_VALUES = [0, 4, 8, 12, 16, 20, 24] as const
+export const DEFAULT_CARD_RADIUS = 8
 
 export const PRIMARY_COLORS = {
   RED: {

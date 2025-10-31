@@ -3,22 +3,26 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import {
   BUTTON_RADIUS_VALUES,
+  CARD_RADIUS_VALUES,
   DECK_VIEW_MODE,
   FONT_FAMILIES,
   FONT_SIZES,
   LAYOUT_MODE,
   NOTIFICATION_LIST_STYLE,
+  POST_BUTTON_STYLE,
   PRIMARY_COLORS
 } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn } from '@/lib/utils'
 import { useButtonRadius } from '@/providers/ButtonRadiusProvider'
+import { useCardRadius } from '@/providers/CardRadiusProvider'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
 import { useDeckView } from '@/providers/DeckViewProvider'
 import { useFontFamily } from '@/providers/FontFamilyProvider'
 import { useFontSize } from '@/providers/FontSizeProvider'
 import { useLayoutMode } from '@/providers/LayoutModeProvider'
 import { usePageTheme } from '@/providers/PageThemeProvider'
+import { usePostButtonStyle } from '@/providers/PostButtonStyleProvider'
 import { usePrimaryColor } from '@/providers/PrimaryColorProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -38,6 +42,8 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { deckViewMode, setDeckViewMode } = useDeckView()
   const { notificationListStyle, updateNotificationListStyle } = useUserPreferences()
   const { buttonRadius, setButtonRadius } = useButtonRadius()
+  const { postButtonStyle, setPostButtonStyle } = usePostButtonStyle()
+  const { cardRadius, setCardRadius } = useCardRadius()
   const { compactSidebar, setCompactSidebar } = useCompactSidebar()
 
   const getThemeIcon = (theme: string) => {
@@ -306,6 +312,75 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
               value={[BUTTON_RADIUS_VALUES.indexOf(buttonRadius as any)]}
               onValueChange={(value) => {
                 setButtonRadius(BUTTON_RADIUS_VALUES[value[0]])
+              }}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground mt-2">
+              <span>{t('Square')}</span>
+              <span>{t('Round')}</span>
+            </div>
+          </div>
+        </SettingItem>
+        <SettingItem className="flex-col items-start gap-3">
+          <Label className="text-base font-normal">
+            {t('Post button style')}
+          </Label>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            <button
+              onClick={() => setPostButtonStyle(POST_BUTTON_STYLE.FILLED)}
+              className={cn(
+                'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                postButtonStyle === POST_BUTTON_STYLE.FILLED
+                  ? 'border-primary'
+                  : 'border-border hover:border-muted-foreground/30'
+              )}
+            >
+              <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-full">
+                <PencilLine className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <span className="text-xs font-medium">{t('Filled')}</span>
+              {postButtonStyle === POST_BUTTON_STYLE.FILLED && (
+                <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                  <Check className="w-3 h-3" />
+                </div>
+              )}
+            </button>
+            <button
+              onClick={() => setPostButtonStyle(POST_BUTTON_STYLE.OUTLINED)}
+              className={cn(
+                'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                postButtonStyle === POST_BUTTON_STYLE.OUTLINED
+                  ? 'border-primary'
+                  : 'border-border hover:border-muted-foreground/30'
+              )}
+            >
+              <div className="flex items-center justify-center w-8 h-8 border-2 border-primary rounded-full">
+                <PencilLine className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-xs font-medium">{t('Outlined')}</span>
+              {postButtonStyle === POST_BUTTON_STYLE.OUTLINED && (
+                <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                  <Check className="w-3 h-3" />
+                </div>
+              )}
+            </button>
+          </div>
+        </SettingItem>
+        <SettingItem className="flex-col items-start gap-3">
+          <div className="w-full">
+            <Label className="text-base font-normal">{t('Feed / Card radius')}</Label>
+            <div className="text-sm text-muted-foreground">
+              {cardRadius === 0 ? t('Square corners') : `${cardRadius}px`}
+            </div>
+          </div>
+          <div className="w-full px-2">
+            <Slider
+              min={0}
+              max={CARD_RADIUS_VALUES.length - 1}
+              step={1}
+              value={[CARD_RADIUS_VALUES.indexOf(cardRadius as any)]}
+              onValueChange={(value) => {
+                setCardRadius(CARD_RADIUS_VALUES[value[0]])
               }}
               className="w-full"
             />

@@ -1,10 +1,13 @@
 import {
   BUTTON_RADIUS_VALUES,
+  CARD_RADIUS_VALUES,
   DEFAULT_BUTTON_RADIUS,
+  DEFAULT_CARD_RADIUS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_NIP_96_SERVICE,
   DEFAULT_PAGE_THEME,
+  DEFAULT_POST_BUTTON_STYLE,
   DEFAULT_PRIMARY_COLOR,
   DISTRACTION_FREE_MODE,
   ExtendedKind,
@@ -12,6 +15,7 @@ import {
   FONT_SIZES,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
+  POST_BUTTON_STYLE,
   PRIMARY_COLORS,
   SUPPORTED_KINDS,
   StorageKey,
@@ -34,6 +38,7 @@ import {
   TNoteListMode,
   TNotificationStyle,
   TPageTheme,
+  TPostButtonStyle,
   TPrimaryColor,
   TRelaySet,
   TThemeSetting,
@@ -75,6 +80,8 @@ class LocalStorageService {
   private fontFamily: TFontFamily = DEFAULT_FONT_FAMILY
   private primaryColor: TPrimaryColor = DEFAULT_PRIMARY_COLOR
   private buttonRadius: number = DEFAULT_BUTTON_RADIUS
+  private postButtonStyle: TPostButtonStyle = DEFAULT_POST_BUTTON_STYLE
+  private cardRadius: number = DEFAULT_CARD_RADIUS
   private pageTheme: TPageTheme = DEFAULT_PAGE_THEME
   private trendingNotesDismissed: boolean = false
   private compactSidebar: boolean = false
@@ -278,6 +285,19 @@ class LocalStorageService {
       const buttonRadius = parseInt(buttonRadiusStr)
       if (BUTTON_RADIUS_VALUES.includes(buttonRadius as any)) {
         this.buttonRadius = buttonRadius
+      }
+    }
+
+    const postButtonStyle = window.localStorage.getItem(StorageKey.POST_BUTTON_STYLE)
+    if (postButtonStyle && (postButtonStyle === POST_BUTTON_STYLE.FILLED || postButtonStyle === POST_BUTTON_STYLE.OUTLINED)) {
+      this.postButtonStyle = postButtonStyle as TPostButtonStyle
+    }
+
+    const cardRadiusStr = window.localStorage.getItem(StorageKey.CARD_RADIUS)
+    if (cardRadiusStr) {
+      const cardRadius = parseInt(cardRadiusStr)
+      if (CARD_RADIUS_VALUES.includes(cardRadius as any)) {
+        this.cardRadius = cardRadius
       }
     }
 
@@ -751,6 +771,30 @@ class LocalStorageService {
     }
     this.buttonRadius = radius
     window.localStorage.setItem(StorageKey.BUTTON_RADIUS, radius.toString())
+  }
+
+  getPostButtonStyle() {
+    return this.postButtonStyle
+  }
+
+  setPostButtonStyle(style: TPostButtonStyle) {
+    if (style !== POST_BUTTON_STYLE.FILLED && style !== POST_BUTTON_STYLE.OUTLINED) {
+      return
+    }
+    this.postButtonStyle = style
+    window.localStorage.setItem(StorageKey.POST_BUTTON_STYLE, style)
+  }
+
+  getCardRadius() {
+    return this.cardRadius
+  }
+
+  setCardRadius(radius: number) {
+    if (!CARD_RADIUS_VALUES.includes(radius as any)) {
+      return
+    }
+    this.cardRadius = radius
+    window.localStorage.setItem(StorageKey.CARD_RADIUS, radius.toString())
   }
 
   getPageTheme() {

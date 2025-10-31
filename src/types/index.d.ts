@@ -87,6 +87,8 @@ export type TPrimaryColor = 'RED' | 'ORANGE' | 'AMBER' | 'YELLOW' | 'LIME' | 'GR
 
 export type TFontFamily = 'DEFAULT' | 'SYSTEM' | 'IBM_PLEX_SANS' | 'LATO' | 'OUTFIT' | 'ROBOTO' | 'GEIST_MONO'
 
+export type TPostButtonStyle = 'filled' | 'outlined'
+
 export type TLayoutMode = 'boxed' | 'full-width'
 
 export type TDeckViewMode = 'standard' | 'multi-column'

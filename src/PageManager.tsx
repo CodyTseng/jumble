@@ -409,11 +409,14 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 />
               ) : (
                 <div className={cn("grid grid-cols-2 gap-2 w-full px-2 py-2", layoutMode === LAYOUT_MODE.BOXED && "max-w-screen-xl")}>
-                  <div className={cn(
-                    "rounded-lg bg-background overflow-hidden",
-                    pageTheme === 'pure-black' && "border border-neutral-900",
-                    pageTheme === 'white' ? "border border-border" : "shadow-lg"
-                  )}>
+                  <div
+                    className={cn(
+                      "bg-background overflow-hidden",
+                      pageTheme === 'pure-black' && "border border-neutral-900",
+                      pageTheme === 'white' ? "border border-border" : "shadow-lg"
+                    )}
+                    style={{ borderRadius: 'var(--card-radius, 8px)' }}
+                  >
                     {primaryPages.map(({ name, element, props }) => (
                       <div
                         key={name}
@@ -551,7 +554,7 @@ function HomePageWrapper({
   return (
     <div
       className={cn(
-        'rounded-lg overflow-hidden',
+        'overflow-hidden',
         // Make the wrapper transparent when on home page or when dismissed
         isHomePage || isDismissed ? 'bg-transparent shadow-none' : cn(
           'bg-background',
@@ -560,6 +563,7 @@ function HomePageWrapper({
         pageTheme === 'pure-black' && !isHomePage && !isDismissed && 'border border-neutral-900',
         pageTheme === 'white' && !isHomePage && !isDismissed && 'border border-border'
       )}
+      style={{ borderRadius: 'var(--card-radius, 8px)' }}
     >
       {children}
     </div>
@@ -616,11 +620,14 @@ function DeckLayout({
         }}
       >
         {/* Main column */}
-        <div className={cn(
-          "rounded-lg bg-background overflow-hidden w-full",
-          pageTheme === 'pure-black' && "border border-neutral-900",
-          pageTheme === 'white' ? "border border-border" : "shadow-lg"
-        )}>
+        <div
+          className={cn(
+            "bg-background overflow-hidden w-full",
+            pageTheme === 'pure-black' && "border border-neutral-900",
+            pageTheme === 'white' ? "border border-border" : "shadow-lg"
+          )}
+          style={{ borderRadius: 'var(--card-radius, 8px)' }}
+        >
           {primaryPages.map(({ name, element, props }) => (
             <div
               key={name}

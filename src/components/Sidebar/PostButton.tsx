@@ -1,6 +1,8 @@
 import PostEditor from '@/components/PostEditor'
+import { POST_BUTTON_STYLE } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
+import { usePostButtonStyle } from '@/providers/PostButtonStyleProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { PencilLine } from 'lucide-react'
 import { useState } from 'react'
@@ -10,6 +12,8 @@ export default function PostButton() {
   const { checkLogin } = useNostr()
   const [open, setOpen] = useState(false)
   const { compactSidebar } = useCompactSidebar()
+  const { postButtonStyle } = usePostButtonStyle()
+  const isOutlined = postButtonStyle === POST_BUTTON_STYLE.OUTLINED
 
   return (
     <div className="pt-4">
@@ -24,7 +28,10 @@ export default function PostButton() {
         }}
         variant="default"
         className={cn(
-          "bg-primary gap-2",
+          "gap-2",
+          isOutlined
+            ? "border-2 border-primary text-primary bg-transparent hover:bg-primary/10"
+            : "bg-primary",
           compactSidebar ? "" : "xl:justify-center"
         )}
       >

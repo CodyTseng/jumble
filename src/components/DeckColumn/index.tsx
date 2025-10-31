@@ -138,10 +138,11 @@ export default function DeckColumn({ column }: { column: TPinnedColumn }) {
   return (
     <div
       className={cn(
-        'rounded-lg shadow-lg bg-background overflow-hidden flex flex-col',
+        'shadow-lg bg-background overflow-hidden flex flex-col',
         pageTheme === 'pure-black' && 'border border-neutral-900',
         pageTheme === 'white' && 'border border-border shadow-none'
       )}
+      style={{ borderRadius: 'var(--card-radius, 8px)' }}
     >
       {titlebar && (
         <div className={cn(

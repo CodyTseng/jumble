@@ -22,10 +22,12 @@ export default function Widgets() {
 
   // Use border for pure-black and white themes, shadow for others
   const widgetClassName = cn(
-    "rounded-xl bg-card overflow-hidden",
+    "bg-card overflow-hidden",
     pageTheme === 'pure-black' ? "border border-neutral-900" :
     pageTheme === 'white' ? "border border-border" : "shadow-lg"
   )
+
+  const widgetStyle = { borderRadius: 'var(--card-radius, 8px)' }
 
   return (
     <>
@@ -37,7 +39,7 @@ export default function Widgets() {
             const pinnedNote = pinnedNoteWidgets.find((w) => w.id === widgetId)
             if (pinnedNote) {
               return (
-                <div key={widgetId} className={widgetClassName}>
+                <div key={widgetId} className={widgetClassName} style={widgetStyle}>
                   <PinnedNoteWidget widgetId={widgetId} eventId={pinnedNote.eventId} />
                 </div>
               )
@@ -58,7 +60,7 @@ export default function Widgets() {
             if (!WidgetComponent) return null
 
             return (
-              <div key={widgetId} className={widgetClassName}>
+              <div key={widgetId} className={widgetClassName} style={widgetStyle}>
                 <WidgetComponent />
               </div>
             )
