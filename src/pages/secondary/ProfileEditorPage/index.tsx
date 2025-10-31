@@ -247,7 +247,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
                       href="https://lightningwallets.xyz/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary underline"
+                      className="text-blue-500 dark:text-blue-400 underline hover:text-blue-600 dark:hover:text-blue-300"
                     >
                       {t('here')}
                     </a>
