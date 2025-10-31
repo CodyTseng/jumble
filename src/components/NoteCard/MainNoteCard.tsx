@@ -42,7 +42,7 @@ export default function MainNoteCard({
       }}
     >
       <div
-        className={cn('clickable group', embedded ? 'p-2 sm:p-3 border' : 'py-3')}
+        className={cn('clickable group bg-card', embedded ? 'p-2 sm:p-3 border' : 'py-3')}
         style={embedded ? { borderRadius: 'var(--card-radius, 8px)' } : undefined}
       >
         <Collapsible alwaysExpand={embedded}>
