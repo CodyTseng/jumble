@@ -135,8 +135,8 @@
 
   /* Light Slate Palette */
   .light.palette-slate {
-    --surface-background: 215 20.2% 98%;
-    --background: 0 0% 100%;
+    --surface-background: 0 0% 100%;
+    --background: 215 20.2% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -154,8 +154,8 @@
 
   /* Light Gray Palette */
   .light.palette-gray {
-    --surface-background: 220 14.3% 98%;
-    --background: 0 0% 100%;
+    --surface-background: 0 0% 100%;
+    --background: 220 14.3% 98%;
     --foreground: 220 8.9% 5%;
     --card: 0 0% 100%;
     --card-foreground: 220 8.9% 5%;
@@ -173,8 +173,8 @@
 
   /* Light Zinc Palette */
   .light.palette-zinc {
-    --surface-background: 240 4.8% 98%;
-    --background: 0 0% 100%;
+    --surface-background: 0 0% 100%;
+    --background: 240 4.8% 98%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -192,8 +192,8 @@
 
   /* Light Neutral Palette */
   .light.palette-neutral {
-    --surface-background: 0 0% 98%;
-    --background: 0 0% 100%;
+    --surface-background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -211,8 +211,8 @@
 
   /* Light Stone Palette */
   .light.palette-stone {
-    --surface-background: 60 9.1% 98%;
-    --background: 0 0% 100%;
+    --surface-background: 0 0% 100%;
+    --background: 60 9.1% 98%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 20 14.3% 4.1%;
@@ -259,8 +259,8 @@
 
   /* Dark Slate Palette */
   .dark.palette-slate {
-    --surface-background: 217.2 32.6% 17.5%;
-    --background: 222.2 84% 4.9%;
+    --surface-background: 222.2 84% 4.9%;
+    --background: 217.2 32.6% 17.5%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -278,8 +278,8 @@
 
   /* Dark Gray Palette */
   .dark.palette-gray {
-    --surface-background: 217.2 32.6% 17.5%;
-    --background: 224 71.4% 4.1%;
+    --surface-background: 224 71.4% 4.1%;
+    --background: 215 27.9% 16.9%;
     --foreground: 210 20% 98%;
     --card: 224 71.4% 4.1%;
     --card-foreground: 210 20% 98%;
@@ -297,8 +297,8 @@
 
   /* Dark Zinc Palette */
   .dark.palette-zinc {
-    --surface-background: 240 5.9% 10%;
-    --background: 240 10% 3.9%;
+    --surface-background: 240 10% 3.9%;
+    --background: 240 5.9% 10%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -316,8 +316,8 @@
 
   /* Dark Neutral Palette */
   .dark.palette-neutral {
-    --surface-background: 0 0% 10%;
-    --background: 0 0% 3.9%;
+    --surface-background: 0 0% 3.9%;
+    --background: 0 0% 10%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -335,8 +335,8 @@
 
   /* Dark Stone Palette */
   .dark.palette-stone {
-    --surface-background: 20 5.9% 10%;
-    --background: 20 14.3% 4.1%;
+    --surface-background: 20 14.3% 4.1%;
+    --background: 12 6.5% 15.1%;
     --foreground: 60 9.1% 97.8%;
     --card: 20 14.3% 4.1%;
     --card-foreground: 60 9.1% 97.8%;

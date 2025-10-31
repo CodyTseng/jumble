@@ -33,31 +33,31 @@ import { forwardRef, HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const getPaletteColor = (palette: TColorPalette, theme: string, type: 'background' | 'muted' | 'border') => {
-  // Color palette HSL values for preview
+  // Color palette HSL values for preview (background is darker, card/muted is lighter)
   const colors: Record<TColorPalette, { light: Record<string, string>, dark: Record<string, string> }> = {
     default: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(240, 4.8%, 94%)', border: 'hsl(240, 5.9%, 94%)' },
-      dark: { background: 'hsl(0, 0%, 9%)', muted: 'hsl(240, 3.7%, 15.9%)', border: 'hsl(240, 3.7%, 15.9%)' }
+      light: { background: 'hsl(0, 0%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(240, 5.9%, 94%)' },
+      dark: { background: 'hsl(240, 3.7%, 15.9%)', muted: 'hsl(0, 0%, 9%)', border: 'hsl(240, 3.7%, 15.9%)' }
     },
     slate: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(210, 40%, 96.1%)', border: 'hsl(214.3, 31.8%, 91.4%)' },
-      dark: { background: 'hsl(222.2, 84%, 4.9%)', muted: 'hsl(217.2, 32.6%, 17.5%)', border: 'hsl(217.2, 32.6%, 17.5%)' }
+      light: { background: 'hsl(215, 20.2%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(214.3, 31.8%, 91.4%)' },
+      dark: { background: 'hsl(217.2, 32.6%, 17.5%)', muted: 'hsl(222.2, 84%, 4.9%)', border: 'hsl(217.2, 32.6%, 17.5%)' }
     },
     gray: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(220, 14.3%, 95.9%)', border: 'hsl(220, 13%, 91%)' },
-      dark: { background: 'hsl(224, 71.4%, 4.1%)', muted: 'hsl(215, 27.9%, 16.9%)', border: 'hsl(215, 27.9%, 16.9%)' }
+      light: { background: 'hsl(220, 14.3%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(220, 13%, 91%)' },
+      dark: { background: 'hsl(215, 27.9%, 16.9%)', muted: 'hsl(224, 71.4%, 4.1%)', border: 'hsl(215, 27.9%, 16.9%)' }
     },
     zinc: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(240, 4.8%, 95.9%)', border: 'hsl(240, 5.9%, 90%)' },
-      dark: { background: 'hsl(240, 10%, 3.9%)', muted: 'hsl(240, 3.7%, 15.9%)', border: 'hsl(240, 3.7%, 15.9%)' }
+      light: { background: 'hsl(240, 4.8%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(240, 5.9%, 90%)' },
+      dark: { background: 'hsl(240, 5.9%, 10%)', muted: 'hsl(240, 10%, 3.9%)', border: 'hsl(240, 3.7%, 15.9%)' }
     },
     neutral: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(0, 0%, 96.1%)', border: 'hsl(0, 0%, 89.8%)' },
-      dark: { background: 'hsl(0, 0%, 3.9%)', muted: 'hsl(0, 0%, 14.9%)', border: 'hsl(0, 0%, 14.9%)' }
+      light: { background: 'hsl(0, 0%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(0, 0%, 89.8%)' },
+      dark: { background: 'hsl(0, 0%, 10%)', muted: 'hsl(0, 0%, 3.9%)', border: 'hsl(0, 0%, 14.9%)' }
     },
     stone: {
-      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(60, 4.8%, 95.9%)', border: 'hsl(20, 5.9%, 90%)' },
-      dark: { background: 'hsl(20, 14.3%, 4.1%)', muted: 'hsl(12, 6.5%, 15.1%)', border: 'hsl(12, 6.5%, 15.1%)' }
+      light: { background: 'hsl(60, 9.1%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(20, 5.9%, 90%)' },
+      dark: { background: 'hsl(12, 6.5%, 15.1%)', muted: 'hsl(20, 14.3%, 4.1%)', border: 'hsl(12, 6.5%, 15.1%)' }
     }
   }
 
