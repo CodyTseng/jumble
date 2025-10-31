@@ -37,9 +37,9 @@ export default function SparkPaymentsList({ payments, loading }: SparkPaymentsLi
     return date.toLocaleString()
   }
 
-  const formatAmount = (amount: number | undefined, fees: number | undefined, paymentType: string) => {
-    const amountSats = amount || 0
-    const feeSats = fees || 0
+  const formatAmount = (amount: bigint | undefined, fees: bigint | undefined, paymentType: string) => {
+    const amountSats = amount ? Number(amount) : 0
+    const feeSats = fees ? Number(fees) : 0
     const prefix = paymentType === 'send' ? '-' : '+'
     const color = paymentType === 'send' ? 'text-red-600' : 'text-green-600'
 

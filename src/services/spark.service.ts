@@ -9,7 +9,6 @@ import initBreezSDK, {
   LightningAddressInfo,
   ListPaymentsResponse,
   Network,
-  parse,
   Payment,
   ReceivePaymentResponse,
   SdkEvent,
@@ -325,7 +324,7 @@ class SparkService {
     try {
       // Parse the input to determine what type it is
       console.log('[SparkService] Parsing payment input:', paymentRequest)
-      const parsedInput = await parse(paymentRequest)
+      const parsedInput = await this.sdk.parse(paymentRequest)
       console.log('[SparkService] Parsed input:', JSON.stringify(parsedInput, null, 2))
       console.log('[SparkService] Parsed input type:', parsedInput.type)
 
@@ -384,7 +383,7 @@ class SparkService {
 
         const prepareResponse = await this.sdk.prepareSendPayment({
           paymentRequest,
-          amountSats
+          amount: amountSats !== undefined ? BigInt(amountSats) : undefined
         })
 
         console.log('[SparkService] Payment prepared:', prepareResponse)
