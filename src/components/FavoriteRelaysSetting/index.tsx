@@ -3,6 +3,7 @@ import AddNewRelaySet from './AddNewRelaySet'
 import FavoriteRelayList from './FavoriteRelayList'
 import { RelaySetsSettingComponentProvider } from './provider'
 import RelaySetList from './RelaySetList'
+import RecommendedRelays from './RecommendedRelays'
 
 export default function FavoriteRelaysSetting() {
   return (
@@ -10,6 +11,7 @@ export default function FavoriteRelaysSetting() {
       <div className="space-y-4">
         <RelaySetList />
         <AddNewRelaySet />
+        <RecommendedRelays />
         <FavoriteRelayList />
         <AddNewRelay />
       </div>

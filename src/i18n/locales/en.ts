@@ -324,6 +324,7 @@ export default {
     'Live event': 'Live event',
     Article: 'Article',
     Unfavorite: 'Unfavorite',
+    Recommended: 'Recommended',
     'Recommended relays': 'Recommended relays',
     'Blossom server URLs': 'Blossom server URLs',
     'You need to add at least one blossom server in order to upload media files.':
