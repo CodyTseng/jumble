@@ -259,12 +259,12 @@
 
   /* Dark Slate Palette */
   .dark.palette-slate {
-    --surface-background: 222.2 47.4% 11.2%;
+    --surface-background: 222.2 84% 4.9%;
     --background: 215.4 16.3% 25.9%;
     --foreground: 210 40% 98%;
-    --card: 222.2 47.4% 11.2%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 47.4% 11.2%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --secondary: 215.4 16.3% 25.9%;
     --secondary-foreground: 210 40% 98%;
