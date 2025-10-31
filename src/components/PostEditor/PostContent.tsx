@@ -12,7 +12,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useReply } from '@/providers/ReplyProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
 import { TPollCreateData } from '@/types'
-import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
+import { ImagePlay, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -260,7 +260,7 @@ export default function PostContent({
             onProgress={handleUploadProgress}
             accept="image/*,video/*,audio/*"
           >
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
               <ImageUp />
             </Button>
           </Uploader>
@@ -268,7 +268,11 @@ export default function PostContent({
             onGifSelect={(url) => {
               textareaRef.current?.appendText(url, true)
             }}
-          />
+          >
+            <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
+              <ImagePlay />
+            </Button>
+          </GifPicker>
           {/* I'm not sure why, but after triggering the virtual keyboard,
               opening the emoji picker drawer causes an issue,
               the emoji I tap isn't the one that gets inserted. */}
@@ -279,7 +283,7 @@ export default function PostContent({
                 textareaRef.current?.insertEmoji(emoji)
               }}
             >
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
                 <Smile />
               </Button>
             </EmojiPickerDialog>
@@ -289,7 +293,7 @@ export default function PostContent({
               variant="ghost"
               size="icon"
               title={t('Create Poll')}
-              className={isPoll ? 'bg-accent' : ''}
+              className={isPoll ? 'bg-accent' : 'bg-muted/50 hover:bg-muted'}
               onClick={handlePollToggle}
             >
               <ListTodo />
@@ -298,7 +302,7 @@ export default function PostContent({
           <Button
             variant="ghost"
             size="icon"
-            className={showMoreOptions ? 'bg-accent' : ''}
+            className={showMoreOptions ? 'bg-accent' : 'bg-muted/50 hover:bg-muted'}
             onClick={() => setShowMoreOptions((pre) => !pre)}
           >
             <Settings />
