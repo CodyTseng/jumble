@@ -1,6 +1,7 @@
 import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
+import { useLogoStyle } from '@/providers/LogoStyleProvider'
 import { useReadsVisibility } from '@/providers/ReadsVisibilityProvider'
 import { useListsVisibility } from '@/providers/ListsVisibilityProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -20,6 +21,7 @@ import MultiColumnToggle from './MultiColumnToggle'
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
   const { compactSidebar } = useCompactSidebar()
+  const { logoStyle } = useLogoStyle()
   const { hideReadsInNavigation } = useReadsVisibility()
   const { hideListsInNavigation } = useListsVisibility()
 
@@ -39,7 +41,16 @@ export default function PrimaryPageSidebar() {
           compactSidebar ? "" : "xl:px-4"
         )}>
           <Icon className={cn(compactSidebar ? "" : "xl:hidden")} />
-          <Logo className={cn(compactSidebar ? "hidden" : "max-xl:hidden")} />
+          {logoStyle === 'image' ? (
+            <Logo className={cn(compactSidebar ? "hidden" : "max-xl:hidden")} />
+          ) : (
+            <div className={cn(
+              "text-2xl font-bold max-xl:hidden",
+              compactSidebar && "hidden"
+            )}>
+              JumbleKat
+            </div>
+          )}
         </div>
         <HomeButton />
         {!hideReadsInNavigation && <ReadsButton />}

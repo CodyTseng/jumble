@@ -45,7 +45,8 @@ import {
   TRelaySet,
   TThemeSetting,
   TTranslationServiceConfig,
-  TColorPalette
+  TColorPalette,
+  TLogoStyle
 } from '@/types'
 
 class LocalStorageService {
@@ -90,6 +91,7 @@ class LocalStorageService {
   private pageTheme: TPageTheme = DEFAULT_PAGE_THEME
   private trendingNotesDismissed: boolean = false
   private compactSidebar: boolean = false
+  private logoStyle: TLogoStyle = 'image'
   private enabledWidgets: string[] = []
   private pinnedNoteWidgets: { id: string; eventId: string }[] = []
   private aiPromptWidgets: { id: string; eventId: string; messages: any[] }[] = []
@@ -327,6 +329,11 @@ class LocalStorageService {
 
     this.compactSidebar =
       window.localStorage.getItem(StorageKey.COMPACT_SIDEBAR) === 'true'
+
+    const logoStyle = window.localStorage.getItem(StorageKey.LOGO_STYLE)
+    if (logoStyle && ['image', 'text'].includes(logoStyle)) {
+      this.logoStyle = logoStyle as TLogoStyle
+    }
 
     const enabledWidgetsStr = window.localStorage.getItem(StorageKey.ENABLED_WIDGETS)
     if (enabledWidgetsStr) {
@@ -864,6 +871,15 @@ class LocalStorageService {
   setCompactSidebar(compact: boolean) {
     this.compactSidebar = compact
     window.localStorage.setItem(StorageKey.COMPACT_SIDEBAR, compact.toString())
+  }
+
+  getLogoStyle() {
+    return this.logoStyle
+  }
+
+  setLogoStyle(style: TLogoStyle) {
+    this.logoStyle = style
+    window.localStorage.setItem(StorageKey.LOGO_STYLE, style)
   }
 
   getEnabledWidgets() {

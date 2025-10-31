@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils'
 import { useButtonRadius } from '@/providers/ButtonRadiusProvider'
 import { useCardRadius } from '@/providers/CardRadiusProvider'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
+import { useLogoStyle } from '@/providers/LogoStyleProvider'
 import { useDeckView } from '@/providers/DeckViewProvider'
 import { useFontFamily } from '@/providers/FontFamilyProvider'
 import { useFontSize } from '@/providers/FontSizeProvider'
@@ -87,6 +88,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { postButtonStyle, setPostButtonStyle } = usePostButtonStyle()
   const { cardRadius, setCardRadius } = useCardRadius()
   const { compactSidebar, setCompactSidebar } = useCompactSidebar()
+  const { logoStyle, setLogoStyle } = useLogoStyle()
 
   const getThemeIcon = (theme: string) => {
     switch (theme) {
@@ -266,6 +268,51 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
         {/* LAYOUT TAB */}
         {activeTab === 'layout' && (
           <div className="space-y-4 mt-4">
+            <SettingItem className="flex-col items-start gap-3">
+              <Label className="text-base font-normal">
+                {t('Logo style')}
+              </Label>
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  onClick={() => setLogoStyle('image')}
+                  className={cn(
+                    'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                    logoStyle === 'image'
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted-foreground/30'
+                  )}
+                >
+                  <div className="flex items-center justify-center w-8 h-8">
+                    <Image className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium">{t('Image Logo')}</span>
+                  {logoStyle === 'image' && (
+                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+                <button
+                  onClick={() => setLogoStyle('text')}
+                  className={cn(
+                    'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                    logoStyle === 'text'
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted-foreground/30'
+                  )}
+                >
+                  <div className="flex items-center justify-center w-8 h-8">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium">{t('Text Logo')}</span>
+                  {logoStyle === 'text' && (
+                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+              </div>
+            </SettingItem>
             <SettingItem className="flex-col items-start gap-3">
               <Label className="text-base font-normal">
                 {t('Layout mode')}

@@ -91,6 +91,8 @@ export type TFontFamily = 'DEFAULT' | 'SYSTEM' | 'IBM_PLEX_SANS' | 'LATO' | 'OUT
 
 export type TPostButtonStyle = 'filled' | 'outlined'
 
+export type TLogoStyle = 'image' | 'text'
+
 export type TLayoutMode = 'boxed' | 'full-width'
 
 export type TDeckViewMode = 'standard' | 'multi-column'
