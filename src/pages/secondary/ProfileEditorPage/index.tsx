@@ -229,9 +229,34 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           {nip05Error && <div className="text-xs text-destructive pl-3">{nip05Error}</div>}
         </Item>
         <Item>
-          <Label htmlFor="profile-lightning-address-input">
-            {t('Lightning Address (or LNURL)')}
-          </Label>
+          <div className="flex items-center gap-1">
+            <Label htmlFor="profile-lightning-address-input">
+              {t('Lightning Payment Address')}
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>
+                    {t('Lightning Payment Address Info')}{' '}
+                    <a
+                      href="https://lightningwallets.xyz/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      {t('here')}
+                    </a>
+                    .
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Input
             id="profile-lightning-address-input"
             value={lightningAddress}

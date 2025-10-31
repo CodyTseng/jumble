@@ -198,6 +198,10 @@ export default {
     'Default zap amount': 'Default zap amount',
     'Default zap comment': 'Default zap comment',
     'Lightning Address (or LNURL)': 'Lightning Address (or LNURL)',
+    'Lightning Payment Address': 'Lightning Payment Address',
+    'Lightning Payment Address Info':
+      'A Lightning address looks like an email (e.g., user@domain.com) but is used to send or receive Bitcoin instantly over the Lightning Network. You can get one',
+    here: 'here',
     'Quick zap': 'Quick zap',
     'If enabled, you can zap with a single click. Click and hold for custom amounts':
       'If enabled, you can zap with a single click. Click and hold for custom amounts',
