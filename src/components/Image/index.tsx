@@ -8,7 +8,7 @@ import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 
 export default function Image({
-  image: { url, blurHash, pubkey, dim },
+  image: { url, blurHash, pubkey, dim, alt: imageAlt },
   alt,
   className = '',
   classNames = {},
@@ -119,7 +119,7 @@ export default function Image({
       {!hasError && (
         <img
           src={imageUrl}
-          alt={alt}
+          alt={alt || imageAlt || ''}
           decoding="async"
           loading="lazy"
           onLoad={handleLoad}

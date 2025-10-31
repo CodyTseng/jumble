@@ -124,7 +124,7 @@ export default function ImageGallery({
           <div onClick={(e) => e.stopPropagation()}>
             <Lightbox
               index={index}
-              slides={images.map(({ url }) => ({ src: url }))}
+              slides={images.map(({ url, alt }) => ({ src: url, alt: alt || '' }))}
               plugins={[Zoom]}
               open={index >= 0}
               close={() => setIndex(-1)}

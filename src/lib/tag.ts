@@ -53,6 +53,13 @@ export function getImetaInfoFromImetaTag(tag: string[], pubkey?: string): TImeta
   if (!url) return null
 
   const imeta: TImetaInfo = { url, pubkey }
+
+  const altItem = tag.find((item) => item.startsWith('alt '))
+  const alt = altItem?.slice(4)
+  if (alt) {
+    imeta.alt = alt
+  }
+
   const blurHashItem = tag.find((item) => item.startsWith('blurhash '))
   const blurHash = blurHashItem?.slice(9)
   if (blurHash) {
