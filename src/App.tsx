@@ -20,6 +20,7 @@ import { FontSizeProvider } from '@/providers/FontSizeProvider'
 import { TitleFontSizeProvider } from '@/providers/TitleFontSizeProvider'
 import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { LayoutModeProvider } from '@/providers/LayoutModeProvider'
+import { MediaStyleProvider } from '@/providers/MediaStyleProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
 import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
@@ -57,8 +58,9 @@ export default function App(): JSX.Element {
                 <PostButtonStyleProvider>
                   <CardRadiusProvider>
                     <LayoutModeProvider>
-                      <DeckViewProvider>
-                        <CompactSidebarProvider>
+                      <MediaStyleProvider>
+                        <DeckViewProvider>
+                          <CompactSidebarProvider>
                           <DistractionFreeModeProvider>
                             <ContentPolicyProvider>
                               <ReadsVisibilityProvider>
@@ -113,9 +115,10 @@ export default function App(): JSX.Element {
                           </ReadsVisibilityProvider>
                         </ContentPolicyProvider>
                       </DistractionFreeModeProvider>
-                    </CompactSidebarProvider>
-                  </DeckViewProvider>
-                </LayoutModeProvider>
+                          </CompactSidebarProvider>
+                        </DeckViewProvider>
+                      </MediaStyleProvider>
+                    </LayoutModeProvider>
                   </CardRadiusProvider>
                 </PostButtonStyleProvider>
                 </ButtonRadiusProvider>

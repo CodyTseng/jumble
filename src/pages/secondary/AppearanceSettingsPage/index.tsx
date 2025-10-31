@@ -10,6 +10,7 @@ import {
   FONT_SIZES,
   TITLE_FONT_SIZES,
   LAYOUT_MODE,
+  MEDIA_STYLE,
   NOTIFICATION_LIST_STYLE,
   POST_BUTTON_STYLE,
   PRIMARY_COLORS
@@ -24,6 +25,7 @@ import { useFontFamily } from '@/providers/FontFamilyProvider'
 import { useFontSize } from '@/providers/FontSizeProvider'
 import { useTitleFontSize } from '@/providers/TitleFontSizeProvider'
 import { useLayoutMode } from '@/providers/LayoutModeProvider'
+import { useMediaStyle } from '@/providers/MediaStyleProvider'
 import { usePageTheme } from '@/providers/PageThemeProvider'
 import { usePostButtonStyle } from '@/providers/PostButtonStyleProvider'
 import { usePrimaryColor } from '@/providers/PrimaryColorProvider'
@@ -31,7 +33,7 @@ import { useTheme } from '@/providers/ThemeProvider'
 import { useColorPalette } from '@/providers/ColorPaletteProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TFontFamily, TPrimaryColor, TColorPalette } from '@/types'
-import { Check, Moon, Sun, Monitor, LayoutGrid, Maximize2, List, FileText, Columns, PencilLine } from 'lucide-react'
+import { Check, Moon, Sun, Monitor, LayoutGrid, Maximize2, List, FileText, Columns, PencilLine, Image } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -78,6 +80,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { fontFamily, setFontFamily } = useFontFamily()
   const { primaryColor, setPrimaryColor } = usePrimaryColor()
   const { layoutMode, setLayoutMode } = useLayoutMode()
+  const { mediaStyle, setMediaStyle } = useMediaStyle()
   const { deckViewMode, setDeckViewMode } = useDeckView()
   const { notificationListStyle, updateNotificationListStyle } = useUserPreferences()
   const { buttonRadius, setButtonRadius } = useButtonRadius()
@@ -396,6 +399,51 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
                   </div>
                   <span className="text-xs font-medium">{t('Detailed')}</span>
                   {notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED && (
+                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+              </div>
+            </SettingItem>
+            <SettingItem className="flex-col items-start gap-3">
+              <Label className="text-base font-normal">
+                {t('Media style')}
+              </Label>
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  onClick={() => setMediaStyle(MEDIA_STYLE.DEFAULT)}
+                  className={cn(
+                    'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                    mediaStyle === MEDIA_STYLE.DEFAULT
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted-foreground/30'
+                  )}
+                >
+                  <div className="flex items-center justify-center w-8 h-8">
+                    <Image className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium">{t('Default')}</span>
+                  {mediaStyle === MEDIA_STYLE.DEFAULT && (
+                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+                <button
+                  onClick={() => setMediaStyle(MEDIA_STYLE.FULL_WIDTH)}
+                  className={cn(
+                    'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                    mediaStyle === MEDIA_STYLE.FULL_WIDTH
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted-foreground/30'
+                  )}
+                >
+                  <div className="flex items-center justify-center w-8 h-8">
+                    <Maximize2 className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium">{t('Full width')}</span>
+                  {mediaStyle === MEDIA_STYLE.FULL_WIDTH && (
                     <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
                       <Check className="w-3 h-3" />
                     </div>

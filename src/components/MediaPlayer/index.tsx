@@ -9,12 +9,14 @@ export default function MediaPlayer({
   src,
   className,
   mustLoad = false,
-  compactMedia = false
+  compactMedia = false,
+  isSingleMedia = true
 }: {
   src: string
   className?: string
   mustLoad?: boolean
   compactMedia?: boolean
+  isSingleMedia?: boolean
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -90,7 +92,7 @@ export default function MediaPlayer({
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={compactMedia ? 'w-20 h-20 rounded overflow-hidden' : className} compactMedia={compactMedia} />
+    return <VideoPlayer src={src} className={compactMedia ? 'w-20 h-20 rounded overflow-hidden' : className} compactMedia={compactMedia} isSingleMedia={isSingleMedia} />
   }
 
   return <AudioPlayer src={src} className={className} />

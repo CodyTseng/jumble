@@ -95,6 +95,8 @@ export type TLayoutMode = 'boxed' | 'full-width'
 
 export type TDeckViewMode = 'standard' | 'multi-column'
 
+export type TMediaStyle = 'default' | 'full-width'
+
 export type TPinnedColumnType = 'explore' | 'notifications' | 'profile' | 'search' | 'relay' | 'relays' | 'custom' | 'bookmarks' | 'reads' | 'lists' | 'list'
 
 export type TPinnedColumn = {

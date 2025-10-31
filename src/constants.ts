@@ -85,6 +85,7 @@ export const StorageKey = {
   HIDE_READS_IN_PROFILES: 'hideReadsInProfiles',
   HIDE_LISTS_IN_NAVIGATION: 'hideListsInNavigation',
   FAVORITE_LISTS: 'favoriteLists',
+  MEDIA_STYLE: 'mediaStyle',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -416,3 +417,10 @@ export const DECK_VIEW_MODE = {
 export const DEFAULT_DECK_VIEW_MODE = 'standard'
 
 export const DEFAULT_PAGE_THEME = 'default'
+
+export const MEDIA_STYLE = {
+  DEFAULT: 'default',
+  FULL_WIDTH: 'full-width'
+} as const
+
+export const DEFAULT_MEDIA_STYLE = 'default'

@@ -1,6 +1,8 @@
 import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
+import { MEDIA_STYLE } from '@/constants'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useMediaStyle } from '@/providers/MediaStyleProvider'
 import modalManager from '@/services/modal-manager.service'
 import { TImetaInfo } from '@/types'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
@@ -27,7 +29,9 @@ export default function ImageGallery({
 }) {
   const id = useMemo(() => `image-gallery-${randomString()}`, [])
   const { autoLoadMedia } = useContentPolicy()
+  const { mediaStyle } = useMediaStyle()
   const [index, setIndex] = useState(-1)
+  const isFullWidth = mediaStyle === MEDIA_STYLE.FULL_WIDTH
   useEffect(() => {
     if (index >= 0) {
       modalManager.register(id, () => {
@@ -80,7 +84,10 @@ export default function ImageGallery({
     imageContent = (
       <Image
         key={0}
-        className="max-h-[80vh] sm:max-h-[50vh] cursor-zoom-in object-contain"
+        className={cn(
+          'cursor-zoom-in',
+          isFullWidth ? 'w-full object-cover' : 'max-h-[80vh] sm:max-h-[50vh] object-contain'
+        )}
         classNames={{
           errorPlaceholder: 'aspect-square h-[30vh]'
         }}
@@ -117,7 +124,7 @@ export default function ImageGallery({
   }
 
   return (
-    <div className={cn(compactMedia ? 'w-full' : (displayImages.length === 1 ? 'w-fit max-w-full' : 'w-full'), className)}>
+    <div className={cn(compactMedia ? 'w-full' : (displayImages.length === 1 ? (isFullWidth ? 'w-full' : 'w-fit max-w-full') : 'w-full'), className)}>
       {imageContent}
       {index >= 0 &&
         createPortal(

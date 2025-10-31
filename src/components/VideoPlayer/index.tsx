@@ -1,11 +1,25 @@
 import { cn, isInViewport } from '@/lib/utils'
+import { MEDIA_STYLE } from '@/constants'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useMediaStyle } from '@/providers/MediaStyleProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
-export default function VideoPlayer({ src, className, compactMedia = false }: { src: string; className?: string; compactMedia?: boolean }) {
+export default function VideoPlayer({
+  src,
+  className,
+  compactMedia = false,
+  isSingleMedia = true
+}: {
+  src: string
+  className?: string
+  compactMedia?: boolean
+  isSingleMedia?: boolean
+}) {
+  const { mediaStyle } = useMediaStyle()
+  const isFullWidth = mediaStyle === MEDIA_STYLE.FULL_WIDTH && isSingleMedia
   const { autoplay } = useContentPolicy()
   const { muteMedia, updateMuteMedia } = useUserPreferences()
   const [error, setError] = useState(false)
@@ -79,7 +93,14 @@ export default function VideoPlayer({ src, className, compactMedia = false }: { 
         ref={videoRef}
         controls
         playsInline
-        className={cn(compactMedia ? 'w-20 h-20 object-cover' : 'rounded-lg max-h-[80vh] sm:max-h-[60vh] border', className)}
+        className={cn(
+          compactMedia
+            ? 'w-20 h-20 object-cover'
+            : isFullWidth
+              ? 'rounded-lg w-full border'
+              : 'rounded-lg max-h-[80vh] sm:max-h-[60vh] border',
+          className
+        )}
         src={src}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {
