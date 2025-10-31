@@ -21,7 +21,10 @@ export default function NotificationsButton() {
       <div className="relative">
         <Bell strokeWidth={1.3} />
         {hasNewNotification && !isDistractionFree && (
-          <div className="absolute -top-1 right-0 w-2 h-2 ring-2 ring-background bg-primary rounded-full" aria-hidden="true" />
+          <>
+            <div className="absolute -top-1 right-0 w-2 h-2 ring-2 ring-background bg-primary rounded-full" aria-hidden="true" />
+            <span className="sr-only">New notifications</span>
+          </>
         )}
       </div>
     </SidebarItem>
