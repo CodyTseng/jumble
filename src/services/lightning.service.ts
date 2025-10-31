@@ -12,7 +12,6 @@ import { SubCloser } from 'nostr-tools/abstract-pool'
 import { makeZapRequest } from 'nostr-tools/nip57'
 import { utf8Decoder } from 'nostr-tools/utils'
 import client from './client.service'
-import sparkService from './spark.service'
 
 export type TRecentSupporter = { pubkey: string; amount: number; comment?: string }
 
@@ -22,6 +21,12 @@ class LightningService {
   static instance: LightningService
   provider: WebLNProvider | null = null
   private recentSupportersCache: TRecentSupporter[] | null = null
+
+  // Lazy load sparkService only when needed to avoid blocking app initialization
+  private async getSparkService() {
+    const { default: sparkService } = await import('./spark.service')
+    return sparkService
+  }
 
   constructor() {
     if (!LightningService.instance) {
@@ -92,6 +97,7 @@ class LightningService {
     }
 
     // Try Spark wallet first if connected
+    const sparkService = await this.getSparkService()
     const isSparkConnected = sparkService.isConnected()
     console.log('[LightningService] Spark wallet connected:', isSparkConnected)
 
@@ -179,6 +185,7 @@ class LightningService {
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string } | null> {
     // Try Spark wallet first if connected
+    const sparkService = await this.getSparkService()
     const isSparkConnected = sparkService.isConnected()
     console.log('[LightningService] Spark wallet connected:', isSparkConnected)
 
