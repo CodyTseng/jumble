@@ -2,12 +2,12 @@
 
 ## 🎉 Overview
 
-This PR adds a **self-custodial Lightning wallet** to Jumble using the Breez Spark SDK, enabling users to send and receive Lightning payments (including Nostr zaps) directly within the app—no external wallet required.
+This PR adds a **trust-minimized Lightning wallet** to Jumble using the Breez Spark SDK, enabling users to send and receive Lightning payments (including Nostr zaps) directly within the app—no external wallet required.
 
 ## ✨ Key Features
 
 ### Lightning Wallet
-- ✅ **Self-custodial** - Users control their keys (12-word mnemonic)
+- ✅ **Trust-minimized** - Users control their keys (12-word mnemonic)
 - ✅ **In-browser** - WebAssembly-based, works in any modern browser
 - ✅ **Send & receive** - Full Lightning payment support
 - ✅ **Lightning addresses** - Register `username@breez.tips` addresses
@@ -33,7 +33,7 @@ This PR adds a **self-custodial Lightning wallet** to Jumble using the Breez Spa
 
 **Current state:** Users need external Lightning wallets (Alby, Zeus, etc.) to zap
 
-**With this PR:** Users get an integrated, self-custodial wallet that:
+**With this PR:** Users get an integrated, trust-minimized wallet that:
 - Works on desktop, mobile, any browser
 - Doesn't require installing browser extensions
 - Syncs across devices automatically
@@ -252,7 +252,7 @@ The wallet features gracefully degrade without an API key:
 - Addresses user requests for built-in Lightning wallet
 - Enables NIP-57 zap support
 - Improves mobile UX (no extension required)
-- Provides self-custodial option
+- Provides trust-minimized option
 
 ## 🙏 Credits
 
@@ -304,8 +304,8 @@ Potential follow-ups (not in this PR):
 - 6 comprehensive documentation files
 - Full NIP-57 zap support
 - Multi-device encrypted sync
-- Self-custodial Lightning wallet
+- Trust-minimized Lightning wallet
 
-This PR represents ~2 months of development and testing, bringing Jumble to feature parity with major Nostr clients while maintaining the self-custodial ethos of Nostr.
+This PR represents ~2 months of development and testing, bringing Jumble to feature parity with major Nostr clients while maintaining the trust-minimized ethos of Nostr.
 
 Ready for review! 🚀

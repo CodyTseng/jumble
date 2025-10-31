@@ -12,7 +12,7 @@
 The Jumble-Spark fork now has **full NIP-57 zap support** via Breez Spark SDK! This guide will help you integrate it into the main jumble.social deployment.
 
 ### What This Adds:
-- ✅ **Self-custodial Lightning wallet** for all users
+- ✅ **Trust-minimized Lightning wallet** for all users
 - ✅ **Send zaps** from the Spark wallet (no external wallet needed)
 - ✅ **Receive zaps** via Lightning addresses (`username@breez.tips`)
 - ✅ **Automatic zap receipts** published to Nostr (NIP-57)
