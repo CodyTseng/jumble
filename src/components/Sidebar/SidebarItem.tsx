@@ -25,10 +25,12 @@ const SidebarItem = forwardRef<
       style={{ fontSize: 'var(--font-size, 14px)' }}
       variant="ghost"
       title={t(title)}
+      aria-label={t(description ?? title)}
+      aria-current={active ? 'page' : undefined}
       ref={ref}
       {...props}
     >
-      {children}
+      <span aria-hidden="true">{children}</span>
       <div className={cn(compactSidebar ? "hidden" : "max-xl:hidden")}>{t(description ?? title)}</div>
     </Button>
   )

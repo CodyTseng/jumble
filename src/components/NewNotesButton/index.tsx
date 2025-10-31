@@ -43,13 +43,17 @@ export default function NewNotesButton({
               ? `calc(${hasBackgroundAudio ? 7.35 : 4}rem + env(safe-area-inset-bottom))`
               : '1rem'
           }}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
           <Button
             onClick={onClick}
             className="group rounded-full h-fit py-2 pl-2 pr-3 hover:bg-primary-hover pointer-events-auto"
+            aria-label={t('Show n new notes', { n: newEvents.length > 99 ? '99+' : newEvents.length })}
           >
             {pubkeys.length > 0 && (
-              <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+              <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale" aria-hidden="true">
                 {pubkeys.map((pubkey) => (
                   <SimpleUserAvatar key={pubkey} userId={pubkey} size="small" />
                 ))}
@@ -58,7 +62,7 @@ export default function NewNotesButton({
             <div className="text-md font-medium">
               {t('Show n new notes', { n: newEvents.length > 99 ? '99+' : newEvents.length })}
             </div>
-            <ArrowUp />
+            <ArrowUp aria-hidden="true" />
           </Button>
         </div>
       )}

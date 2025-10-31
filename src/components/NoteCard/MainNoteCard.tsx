@@ -29,7 +29,7 @@ export default function MainNoteCard({
   const { push } = useSecondaryPage()
 
   return (
-    <div
+    <article
       className={className}
       onClick={(e) => {
         // Don't navigate if clicking on a button or interactive element
@@ -40,6 +40,7 @@ export default function MainNoteCard({
         e.stopPropagation()
         push(toNote(originalNoteId ?? event))
       }}
+      aria-label="Note"
     >
       <div
         className={cn('clickable group', embedded ? 'p-2 sm:p-3 border' : 'py-3')}
@@ -58,6 +59,6 @@ export default function MainNoteCard({
         {!embedded && <NoteStats className="mt-3 px-4" event={event} />}
       </div>
       {!embedded && !hideSeparator && <Separator />}
-    </div>
+    </article>
   )
 }

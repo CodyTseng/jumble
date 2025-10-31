@@ -72,9 +72,11 @@ export default function FollowButton({ pubkey, size = 'default' }: { pubkey: str
           disabled={updating}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
+          aria-label={hover ? t('Unfollow') : t('buttonFollowing')}
+          aria-pressed="true"
         >
           {updating ? (
-            <Loader className="animate-spin" />
+            <Loader className="animate-spin" aria-hidden="true" />
           ) : hover ? (
             t('Unfollow')
           ) : (
@@ -98,8 +100,15 @@ export default function FollowButton({ pubkey, size = 'default' }: { pubkey: str
       </AlertDialogContent>
     </AlertDialog>
   ) : (
-    <Button className={buttonClass} size={buttonSize} onClick={handleFollow} disabled={updating}>
-      {updating ? <Loader className="animate-spin" /> : t('Follow')}
+    <Button
+      className={buttonClass}
+      size={buttonSize}
+      onClick={handleFollow}
+      disabled={updating}
+      aria-label={t('Follow')}
+      aria-pressed="false"
+    >
+      {updating ? <Loader className="animate-spin" aria-hidden="true" /> : t('Follow')}
     </Button>
   )
 }

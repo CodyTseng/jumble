@@ -63,11 +63,13 @@ export default function BookmarkButton({ event }: { event: Event }) {
       onClick={isBookmarked ? handleRemoveBookmark : handleBookmark}
       disabled={updating}
       title={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
+      aria-label={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
+      aria-pressed={isBookmarked}
     >
       {updating ? (
-        <Loader className="animate-spin" />
+        <Loader className="animate-spin" aria-hidden="true" />
       ) : (
-        <BookmarkIcon className={isBookmarked ? 'fill-primary' : ''} />
+        <BookmarkIcon className={isBookmarked ? 'fill-primary' : ''} aria-hidden="true" />
       )}
     </button>
   )

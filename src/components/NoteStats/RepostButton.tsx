@@ -81,9 +81,11 @@ export default function RepostButton({ event }: { event: Event }) {
           setIsDrawerOpen(true)
         }
       }}
+      aria-label={hasReposted ? t('Repost') + `, ${t('you have reposted')}` : t('Repost')}
+      aria-pressed={hasReposted}
     >
-      {reposting ? <Loader className="animate-spin" /> : <Repeat />}
-      {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
+      {reposting ? <Loader className="animate-spin" aria-hidden="true" /> : <Repeat aria-hidden="true" />}
+      {!!repostCount && <div className="text-sm" aria-label={`${repostCount} ${repostCount === 1 ? t('repost') : t('reposts')}`}>{formatCount(repostCount)}</div>}
     </button>
   )
 

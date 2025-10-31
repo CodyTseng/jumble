@@ -129,18 +129,20 @@ export default function LikeButton({ event }: { event: Event }) {
           setIsEmojiReactionsOpen(true)
         }
       }}
+      aria-label={myLastEmoji ? `${t('React')}, ${t('you reacted')}` : t('React')}
+      aria-pressed={!!myLastEmoji}
     >
       {liking ? (
-        <Loader className="animate-spin" />
+        <Loader className="animate-spin" aria-hidden="true" />
       ) : myLastEmoji ? (
         <>
           <Emoji emoji={myLastEmoji} classNames={{ img: 'size-4' }} />
-          {!!likeCount && <div className="text-sm">{formatCount(likeCount)}</div>}
+          {!!likeCount && <div className="text-sm" aria-label={`${likeCount} ${likeCount === 1 ? t('reaction') : t('reactions')}`}>{formatCount(likeCount)}</div>}
         </>
       ) : (
         <>
-          <SmilePlus />
-          {!!likeCount && <div className="text-sm">{formatCount(likeCount)}</div>}
+          <SmilePlus aria-hidden="true" />
+          {!!likeCount && <div className="text-sm" aria-label={`${likeCount} ${likeCount === 1 ? t('reaction') : t('reactions')}`}>{formatCount(likeCount)}</div>}
         </>
       )}
     </button>

@@ -68,8 +68,10 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
         variant="secondary"
         onClick={handleUnmute}
         disabled={updating || changing}
+        aria-label={t('Unmute')}
+        aria-pressed="true"
       >
-        {updating ? <Loader className="animate-spin" /> : t('Unmute')}
+        {updating ? <Loader className="animate-spin" aria-hidden="true" /> : t('Unmute')}
       </Button>
     )
   }
@@ -79,8 +81,10 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
       variant="destructive"
       className="w-20 min-w-20 rounded-full"
       disabled={updating || changing}
+      aria-label={t('Mute')}
+      aria-pressed="false"
     >
-      {updating ? <Loader className="animate-spin" /> : t('Mute')}
+      {updating ? <Loader className="animate-spin" aria-hidden="true" /> : t('Mute')}
     </Button>
   )
 

@@ -26,10 +26,13 @@ export default function PrimaryPageSidebar() {
   if (isSmallScreen) return null
 
   return (
-    <div className={cn(
-      "flex flex-col pb-2 pt-4 px-2 justify-between h-full shrink-0 transition-all duration-300",
-      compactSidebar ? "w-16" : "w-16 xl:w-52 xl:px-4"
-    )}>
+    <nav
+      className={cn(
+        "flex flex-col pb-2 pt-4 px-2 justify-between h-full shrink-0 transition-all duration-300",
+        compactSidebar ? "w-16" : "w-16 xl:w-52 xl:px-4"
+      )}
+      aria-label="Primary navigation"
+    >
       <div className="space-y-2">
         <div className={cn(
           "mb-6 w-full transition-all duration-300",
@@ -52,6 +55,6 @@ export default function PrimaryPageSidebar() {
         <MultiColumnToggle />
         <AccountButton />
       </div>
-    </div>
+    </nav>
   )
 }

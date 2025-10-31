@@ -54,8 +54,10 @@ export default function PinButton({ column, className, variant = 'ghost', size =
       onClick={handleClick}
       className={cn(isPinned && 'text-primary', className)}
       title={isPinned ? t('Unpin column') : t('Pin as new column')}
+      aria-label={isPinned ? t('Unpin column') : t('Pin as new column')}
+      aria-pressed={isPinned}
     >
-      {isPinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+      {isPinned ? <PinOff className="size-4" aria-hidden="true" /> : <Pin className="size-4" aria-hidden="true" />}
     </Button>
   )
 }

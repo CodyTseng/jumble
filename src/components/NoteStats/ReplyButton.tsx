@@ -57,9 +57,11 @@ export default function ReplyButton({ event }: { event: Event }) {
           })
         }}
         title={t('Reply')}
+        aria-label={hasReplied ? t('Reply') + `, ${t('you have replied')}` : t('Reply')}
+        aria-pressed={hasReplied}
       >
-        <MessageCircle />
-        {!!replyCount && <div className="text-sm">{formatCount(replyCount)}</div>}
+        <MessageCircle aria-hidden="true" />
+        {!!replyCount && <div className="text-sm" aria-label={`${replyCount} ${replyCount === 1 ? t('reply') : t('replies')}`}>{formatCount(replyCount)}</div>}
       </button>
       <PostEditor parentEvent={event} open={open} setOpen={setOpen} />
     </>

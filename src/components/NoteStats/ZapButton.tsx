@@ -157,13 +157,15 @@ export default function ZapButton({ event }: { event: Event }) {
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleClickStart}
         onTouchEnd={handleClickEnd}
+        aria-label={hasZapped ? t('Zap') + `, ${t('you have zapped')}` : t('Zap')}
+        aria-pressed={hasZapped}
       >
         {zapping ? (
-          <Loader className="animate-spin" />
+          <Loader className="animate-spin" aria-hidden="true" />
         ) : (
-          <Zap className={hasZapped ? 'fill-primary' : ''} />
+          <Zap className={hasZapped ? 'fill-primary' : ''} aria-hidden="true" />
         )}
-        {!!zapAmount && <div className="text-sm">{formatAmount(zapAmount)}</div>}
+        {!!zapAmount && <div className="text-sm" aria-label={`${zapAmount} ${t('sats')} ${t('total')}`}>{formatAmount(zapAmount)}</div>}
       </button>
       <ZapDialog
         open={openZapDialog}
