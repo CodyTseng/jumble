@@ -267,9 +267,11 @@ The wallet features gracefully degrade without an API key:
 
 ## 🔮 Future Enhancements
 
-Potential follow-ups (not in this PR):
+**In Development (Breez SDK Roadmap):**
+- 🚧 **NWC (Nostr Wallet Connect)** - Planned and in active development by Breez
+- 🚧 **Zap comment display** - Show zap messages/comments in wallet transaction history
 
-- [ ] NWC (Nostr Wallet Connect) support
+**Potential Follow-ups (not in this PR):**
 - [ ] Bolt12 offers
 - [ ] Channel management UI
 - [ ] Multi-wallet support
