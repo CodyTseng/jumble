@@ -254,11 +254,8 @@ export default function PostContent({
         onUploadEnd={handleUploadEnd}
         onImageUploadSuccess={handleImageUploadSuccess}
         images={images}
-      />
-      <ImagePreview
-        images={images}
-        onRemove={handleRemoveImage}
-        onUpdateAlt={handleUpdateImageAlt}
+        onRemoveImage={handleRemoveImage}
+        onUpdateImageAlt={handleUpdateImageAlt}
       />
       {isPoll && (
         <PollEditor

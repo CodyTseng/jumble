@@ -29,6 +29,7 @@ import imageCommandSuggestion from './ImageCommand/suggestion'
 import WebCommand from './WebCommand'
 import webCommandSuggestion from './WebCommand/suggestion'
 import Preview from './Preview'
+import ImagePreview from '../ImagePreview'
 
 export type TPostTextareaHandle = {
   appendText: (text: string, addNewline?: boolean) => void
@@ -50,6 +51,8 @@ const PostTextarea = forwardRef<
     onUploadEnd?: (file: File) => void
     onImageUploadSuccess?: (url: string) => void
     images?: Array<{ url: string; alt?: string }>
+    onRemoveImage?: (index: number) => void
+    onUpdateImageAlt?: (index: number, alt: string) => void
   }
 >(
   (
@@ -64,7 +67,9 @@ const PostTextarea = forwardRef<
       onUploadProgress,
       onUploadEnd,
       onImageUploadSuccess,
-      images = []
+      images = [],
+      onRemoveImage,
+      onUpdateImageAlt
     },
     ref
   ) => {
@@ -200,29 +205,34 @@ const PostTextarea = forwardRef<
     }, [text, images])
 
     return (
-      <Tabs
-        defaultValue="edit"
-        value={tabValue}
-        onValueChange={(v) => setTabValue(v)}
-        className="space-y-2"
-      >
-        <TabsList>
-          <TabsTrigger value="edit">{t('Edit')}</TabsTrigger>
-          <TabsTrigger value="preview">{t('Preview')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="edit">
-          <EditorContent className="tiptap" editor={editor} />
-        </TabsContent>
-        <TabsContent
-          value="preview"
-          onClick={() => {
-            setTabValue('edit')
-            editor.commands.focus()
-          }}
+      <div className="space-y-2">
+        <Tabs
+          defaultValue="edit"
+          value={tabValue}
+          onValueChange={(v) => setTabValue(v)}
         >
-          <Preview content={previewContent} images={images} className={className} />
-        </TabsContent>
-      </Tabs>
+          <TabsList>
+            <TabsTrigger value="edit">{t('Edit')}</TabsTrigger>
+            <TabsTrigger value="preview">{t('Preview')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="edit" className="mt-2">
+            <EditorContent className="tiptap" editor={editor} />
+          </TabsContent>
+          <TabsContent
+            value="preview"
+            className="mt-2"
+            onClick={() => {
+              setTabValue('edit')
+              editor.commands.focus()
+            }}
+          >
+            <Preview content={previewContent} images={images} className={className} />
+          </TabsContent>
+        </Tabs>
+        {tabValue === 'edit' && onRemoveImage && onUpdateImageAlt && (
+          <ImagePreview images={images} onRemove={onRemoveImage} onUpdateAlt={onUpdateImageAlt} />
+        )}
+      </div>
     )
   }
 )
