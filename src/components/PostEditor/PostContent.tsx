@@ -260,7 +260,7 @@ export default function PostContent({
             onProgress={handleUploadProgress}
             accept="image/*,video/*,audio/*"
           >
-            <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
+            <Button variant="ghost" size="icon" className="bg-secondary/60 hover:bg-secondary">
               <ImageUp />
             </Button>
           </Uploader>
@@ -269,7 +269,7 @@ export default function PostContent({
               textareaRef.current?.appendText(url, true)
             }}
           >
-            <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
+            <Button variant="ghost" size="icon" className="bg-secondary/60 hover:bg-secondary">
               <ImagePlay />
             </Button>
           </GifPicker>
@@ -283,7 +283,7 @@ export default function PostContent({
                 textareaRef.current?.insertEmoji(emoji)
               }}
             >
-              <Button variant="ghost" size="icon" className="bg-muted/50 hover:bg-muted">
+              <Button variant="ghost" size="icon" className="bg-secondary/60 hover:bg-secondary">
                 <Smile />
               </Button>
             </EmojiPickerDialog>
@@ -293,7 +293,7 @@ export default function PostContent({
               variant="ghost"
               size="icon"
               title={t('Create Poll')}
-              className={isPoll ? 'bg-accent' : 'bg-muted/50 hover:bg-muted'}
+              className={isPoll ? 'bg-accent' : 'bg-secondary/60 hover:bg-secondary'}
               onClick={handlePollToggle}
             >
               <ListTodo />
@@ -302,7 +302,7 @@ export default function PostContent({
           <Button
             variant="ghost"
             size="icon"
-            className={showMoreOptions ? 'bg-accent' : 'bg-muted/50 hover:bg-muted'}
+            className={showMoreOptions ? 'bg-accent' : 'bg-secondary/60 hover:bg-secondary'}
             onClick={() => setShowMoreOptions((pre) => !pre)}
           >
             <Settings />
