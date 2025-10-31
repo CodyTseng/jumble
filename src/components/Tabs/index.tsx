@@ -102,7 +102,7 @@ export default function Tabs({
     <div
       ref={containerRef}
       className={cn(
-        'sticky flex justify-between bg-background/80 backdrop-blur-xl z-30 px-1 w-full transition-transform',
+        'sticky flex justify-between bg-card/80 backdrop-blur-xl z-30 px-1 w-full transition-transform',
         !isSmallScreen && 'border-b',
         isInDeckView ? 'top-0' : 'top-12',
         deepBrowsing && lastScrollTop > threshold

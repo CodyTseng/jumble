@@ -15,7 +15,7 @@ export function Titlebar({
   return (
     <div
       className={cn(
-        'sticky top-0 w-full h-12 z-40 bg-background/80 backdrop-blur-xl [&_svg]:size-5 [&_svg]:shrink-0 select-none',
+        'sticky top-0 w-full h-12 z-40 bg-card/80 backdrop-blur-xl [&_svg]:size-5 [&_svg]:shrink-0 select-none',
         !hideBottomBorder && !isSmallScreen && 'border-b',
         className
       )}

@@ -44,7 +44,7 @@
     transition: background-color 0.2s ease;
 
     &:active {
-      background-color: hsl(var(--muted) / 0.5);
+      background-color: hsl(var(--hover, var(--muted)) / 0.5);
     }
   }
 
@@ -85,16 +85,24 @@
 
   @media (hover: hover) and (pointer: fine) {
     .clickable:hover {
-      background-color: hsl(var(--hover, var(--muted)) / 0.5);
+      background-color: hsl(var(--muted) / 0.5);
     }
   }
 
-  .dark.palette-slate .clickable:hover {
+  .dark.palette-slate .clickable:hover,
+  .dark.palette-gray .clickable:hover,
+  .dark.palette-zinc .clickable:hover,
+  .dark.palette-neutral .clickable:hover,
+  .dark.palette-stone .clickable:hover {
     background-color: hsl(var(--hover));
   }
 
-  .dark.palette-slate .clickable:active {
-    background-color: hsl(var(--hover) / 0.8);
+  .dark.palette-slate .clickable:active,
+  .dark.palette-gray .clickable:active,
+  .dark.palette-zinc .clickable:active,
+  .dark.palette-neutral .clickable:active,
+  .dark.palette-stone .clickable:active {
+    background-color: hsl(var(--hover) / 0.85);
   }
 
   @keyframes shimmer {
@@ -270,9 +278,9 @@
     --surface-background: 222.2 47.4% 8%;
     --background: 222.2 47.4% 8%;
     --foreground: 210 40% 98%;
-    --card: 222.2 47.4% 14%;
+    --card: 222.2 47.4% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 47.4% 14%;
+    --popover: 222.2 47.4% 11%;
     --popover-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -282,7 +290,7 @@
     --accent-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --hover: 222.2 47.4% 18%;
+    --hover: 222.2 47.4% 13%;
   }
 
   /* Dark Gray Palette */
@@ -302,6 +310,7 @@
     --accent-foreground: 210 20% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
+    --hover: 220.9 39.3% 13%;
   }
 
   /* Dark Zinc Palette */
@@ -321,6 +330,7 @@
     --accent-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
+    --hover: 240 10% 6%;
   }
 
   /* Dark Neutral Palette */
@@ -340,6 +350,7 @@
     --accent-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
+    --hover: 0 0% 6%;
   }
 
   /* Dark Stone Palette */
@@ -359,6 +370,7 @@
     --accent-foreground: 60 9.1% 97.8%;
     --border: 12 6.5% 15.1%;
     --input: 12 6.5% 15.1%;
+    --hover: 24 9.8% 12%;
   }
 
   .dark input[type='datetime-local']::-webkit-calendar-picker-indicator {
