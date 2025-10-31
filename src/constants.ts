@@ -194,7 +194,7 @@ export const DISTRACTION_FREE_MODE = {
 
 export const DEFAULT_DISTRACTION_FREE_MODE = 'drain-my-time'
 
-export const FONT_SIZES = [10, 12, 14, 16, 18, 20] as const
+export const FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const
 export const DEFAULT_FONT_SIZE = 14
 
 // Available font families for the application
