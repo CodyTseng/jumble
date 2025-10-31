@@ -151,8 +151,8 @@
 
   /* Light Slate Palette */
   .light.palette-slate {
-    --surface-background: 215 20.2% 98%;
-    --background: 215 20.2% 98%;
+    --surface-background: 215 20.2% 96%;
+    --background: 215 20.2% 96%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -170,8 +170,8 @@
 
   /* Light Gray Palette */
   .light.palette-gray {
-    --surface-background: 220 14.3% 98%;
-    --background: 220 14.3% 98%;
+    --surface-background: 220 14.3% 96%;
+    --background: 220 14.3% 96%;
     --foreground: 220 8.9% 5%;
     --card: 0 0% 100%;
     --card-foreground: 220 8.9% 5%;
@@ -189,8 +189,8 @@
 
   /* Light Zinc Palette */
   .light.palette-zinc {
-    --surface-background: 240 4.8% 98%;
-    --background: 240 4.8% 98%;
+    --surface-background: 240 4.8% 96%;
+    --background: 240 4.8% 96%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -208,8 +208,8 @@
 
   /* Light Neutral Palette */
   .light.palette-neutral {
-    --surface-background: 0 0% 98%;
-    --background: 0 0% 98%;
+    --surface-background: 0 0% 96%;
+    --background: 0 0% 96%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -227,8 +227,8 @@
 
   /* Light Stone Palette */
   .light.palette-stone {
-    --surface-background: 60 9.1% 98%;
-    --background: 60 9.1% 98%;
+    --surface-background: 60 9.1% 96%;
+    --background: 60 9.1% 96%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 20 14.3% 4.1%;
