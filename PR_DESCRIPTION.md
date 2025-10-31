@@ -192,6 +192,13 @@ See `INTEGRATION_GUIDE_FOR_JUMBLE_SOCIAL.md` for complete deployment instruction
 ### Breaking Changes
 **None.** This is a purely additive feature.
 
+### Bug Fixes Included
+**Fixed:** Deep link routing for logged-out users
+- **Issue:** Deep links (e.g., `/notes/nevent1...`) showed errors for logged-out users
+- **Cause:** Eager import of Breez SDK WebAssembly at module level blocked app initialization
+- **Solution:** Lazy-loaded sparkService using dynamic imports
+- **Result:** Logged-out users can now access shared notes/profiles via deep links ✅
+
 ## 🔄 Migration Notes
 
 ### For Existing Users
@@ -219,6 +226,7 @@ See `INTEGRATION_GUIDE_FOR_JUMBLE_SOCIAL.md` for complete deployment instruction
 - [x] NIP-57 zaps tested end-to-end
 - [x] No breaking changes
 - [x] Backward compatible
+- [x] **Deep links work for logged-out users** (fixed routing issue)
 
 ## 🎯 Merge Strategy
 
@@ -269,10 +277,11 @@ The wallet features gracefully degrade without an API key:
 - Technical Details: `BREEZ_NIP57_INTEGRATION.md`
 - Deployment: `SPARK_DEPLOYMENT.md`
 
-**Need Help?**
-- Tag @dmnyc in review comments
-- Check Breez docs: https://sdk-doc-spark.breez.technology/
+**More Information**
+- Breez docs: https://sdk-doc-spark.breez.technology/
 - Breez support: contact@breez.technology
+- Created by @dmnyc
+- Vibed with Claude
 
 ---
 
