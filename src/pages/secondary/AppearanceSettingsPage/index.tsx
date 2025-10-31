@@ -27,7 +27,7 @@ import { usePrimaryColor } from '@/providers/PrimaryColorProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TFontFamily, TPrimaryColor } from '@/types'
-import { Check, Moon, Sun, Monitor, LayoutGrid, Maximize2, List, FileText, Columns } from 'lucide-react'
+import { Check, Moon, Sun, Monitor, LayoutGrid, Maximize2, List, FileText, Columns, PencilLine } from 'lucide-react'
 import { forwardRef, HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
 
