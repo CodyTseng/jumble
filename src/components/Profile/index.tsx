@@ -1,13 +1,11 @@
 import Collapsible from '@/components/Collapsible'
 import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
-import NpubQrCode from '@/components/NpubQrCode'
 import PrivateNote from '@/components/PrivateNote'
 import ProfileAbout from '@/components/ProfileAbout'
 import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
-import PubkeyCopy from '@/components/PubkeyCopy'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -209,10 +207,7 @@ export default function Profile({ id, isInDeckView = false }: { id?: string; isI
                 <div className="flex-1 max-w-fit w-0 truncate">{lightningAddress}</div>
               </div>
             )}
-            <div className="flex gap-1 mt-1">
-              <PubkeyCopy pubkey={pubkey} />
-              <NpubQrCode pubkey={pubkey} />
-            </div>
+
             <Collapsible>
               <ProfileAbout
                 about={about}

@@ -1,5 +1,12 @@
+import Nip05 from '@/components/Nip05'
 import PrivateNoteDialog from '@/components/PrivateNoteDialog'
+import PubkeyCopy from '@/components/PubkeyCopy'
+import QrCodeComponent from '@/components/QrCode'
+import UserAvatar from '@/components/UserAvatar'
+import Username from '@/components/Username'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +16,9 @@ import {
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { Bell, BellOff, Copy, Ellipsis, StickyNote } from 'lucide-react'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { Bell, BellOff, Copy, Ellipsis, QrCode, StickyNote } from 'lucide-react'
+import { nip19 } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -19,6 +28,7 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
   const { mutePubkeySet, mutePubkeyPrivately, mutePubkeyPublicly, unmutePubkey } = useMuteList()
   const isMuted = useMemo(() => mutePubkeySet.has(pubkey), [mutePubkeySet, pubkey])
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false)
+  const [isQrCodeOpen, setIsQrCodeOpen] = useState(false)
 
   if (pubkey === accountPubkey) return null
 
@@ -33,7 +43,11 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
         <DropdownMenuContent>
           <DropdownMenuItem onClick={() => navigator.clipboard.writeText(pubkeyToNpub(pubkey) ?? '')}>
             <Copy />
-            {t('Copy user ID')}
+            {t('Copy public key')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsQrCodeOpen(true)}>
+            <QrCode />
+            {t('Show QR code')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsNoteDialogOpen(true)}>
             <StickyNote />
@@ -72,6 +86,58 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
         onOpenChange={setIsNoteDialogOpen}
         pubkey={pubkey}
       />
+      <NpubQrCodeDialog
+        open={isQrCodeOpen}
+        onOpenChange={setIsQrCodeOpen}
+        pubkey={pubkey}
+      />
     </>
+  )
+}
+
+function NpubQrCodeDialog({
+  pubkey,
+  open,
+  onOpenChange
+}: {
+  pubkey: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void
+}) {
+  const { isSmallScreen } = useScreenSize()
+  const npub = useMemo(() => (pubkey ? nip19.npubEncode(pubkey) : ''), [pubkey])
+
+  if (!npub) return null
+
+  const content = (
+    <div className="w-full flex flex-col items-center gap-4 p-8">
+      <div className="flex items-center w-full gap-2 pointer-events-none px-1">
+        <UserAvatar size="big" userId={pubkey} />
+        <div className="flex-1 w-0">
+          <Username userId={pubkey} className="text-2xl font-semibold truncate" />
+          <Nip05 pubkey={pubkey} />
+        </div>
+      </div>
+      <QrCodeComponent size={512} value={`nostr:${npub}`} />
+      <div className="flex flex-col items-center">
+        <PubkeyCopy pubkey={pubkey} />
+      </div>
+    </div>
+  )
+
+  if (isSmallScreen) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent>{content}</DrawerContent>
+      </Drawer>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-80 p-0 m-0" onOpenAutoFocus={(e) => e.preventDefault()}>
+        {content}
+      </DialogContent>
+    </Dialog>
   )
 }
