@@ -1,7 +1,11 @@
 # NIP-57 Zap Implementation Status
 
+**UPDATE - October 31, 2025**: 🎉 **BREEZ HAS ADDED NIP57 SUPPORT!**
+
+PR #317 "Nostr Zap support" was merged to spark-sdk on October 31, 2025. We have upgraded to SDK v0.3.4 and are ready for testing.
+
 ## Summary
-The Spark wallet integration has **full NIP-57 zap support implemented**, but is blocked by a Breez SDK backend limitation.
+The Spark wallet integration has **full NIP-57 zap support** on both the SDK backend and in our client code. Ready for end-to-end testing!
 
 ## What Works ✅
 
@@ -37,55 +41,45 @@ The Spark wallet integration has **full NIP-57 zap support implemented**, but is
 - ✅ Payment notifications and balance updates
 - ✅ Invoice generation
 
-## What Doesn't Work ❌
+## What Should Now Work ✅ (Pending Testing)
 
 ### Receiving Zaps to Breez Lightning Address
-- ❌ Cannot receive zaps to `daniel@breez.tips`
-- ❌ Wallets show "invalid lightning address" error
-- ❌ Cannot use as `lud16` in Nostr profile for zaps
+- ✅ SDK v0.3.4 includes backend NIP57 support
+- ✅ LNURL responses should include `allowsNostr` and `nostrPubkey`
+- ✅ Can use `@breez.tips` address as `lud16` in Nostr profile
+- 🧪 **Needs manual testing to confirm**
 
-**Root Cause:** Breez backend LNURL response missing NIP-57 fields
+## Testing Required
 
-## The Problem
-
-### Current LNURL Response
+### Verify LNURL Response
 ```bash
-curl https://breez.tips/.well-known/lnurlp/daniel
+curl https://breez.tips/.well-known/lnurlp/{your-username}
 ```
 
+**Expected Response (with SDK v0.3.4):**
 ```json
 {
-  "callback": "https://breez.tips/lnurlp/daniel/invoice",
+  "callback": "https://breez.tips/lnurlp/{username}/invoice",
   "maxSendable": 4000000000,
   "minSendable": 1000,
   "tag": "payRequest",
-  "metadata": "[[\"text/plain\",\"Pay breez.tips user\"],[\"text/identifier\",\"daniel@breez.tips\"]]"
-}
-```
-
-### Required for NIP-57
-```json
-{
-  "callback": "https://breez.tips/lnurlp/daniel/invoice",
-  "maxSendable": 4000000000,
-  "minSendable": 1000,
-  "tag": "payRequest",
-  "metadata": "[[\"text/plain\",\"Pay breez.tips user\"],[\"text/identifier\",\"daniel@breez.tips\"]]",
-  "allowsNostr": true,           // ← MISSING
-  "nostrPubkey": "<hex-pubkey>"  // ← MISSING
+  "metadata": "[[\"text/plain\",\"Pay breez.tips user\"],[\"text/identifier\",\"{username}@breez.tips\"]]",
+  "allowsNostr": true,           // ✅ Should now be present
+  "nostrPubkey": "<hex-pubkey>"  // ✅ Should now be present
 }
 ```
 
 ## Technical Details
 
-### Why the Callback Works But Wallets Reject It
-1. The callback endpoint (`/lnurlp/daniel/invoice`) **does accept** the `nostr` parameter
-2. Invoices are generated correctly with zap requests in description
-3. BUT wallets check the metadata **before** calling the callback
-4. Without `allowsNostr: true`, NIP-57 compliant wallets refuse to proceed
+### How It Works Now
 
-### SDK Limitation
-The Breez Spark SDK `registerLightningAddress()` method only accepts:
+1. **Backend Implementation**: Breez added server-side zap handling (PR #317)
+2. **Automatic NIP57**: Lightning addresses automatically get NIP57 support
+3. **No Client Changes**: Our existing registration code works as-is
+4. **Smart Monitoring**: Backend subscribes to Nostr events when zap invoices are open
+
+### SDK Integration
+The SDK `registerLightningAddress()` interface remains unchanged:
 ```typescript
 {
   username: string;
@@ -93,7 +87,7 @@ The Breez Spark SDK `registerLightningAddress()` method only accepts:
 }
 ```
 
-There's no way to provide a `nostrPubkey` or enable NIP-57 support.
+The backend server automatically adds NIP57 metadata to LNURL responses.
 
 ## What's Been Done
 
@@ -111,22 +105,22 @@ There's no way to provide a `nostrPubkey` or enable NIP-57 support.
 
 ## Next Steps
 
-### Immediate
-1. **Contact Breez SDK team** with feature request
-   - File: `BREEZ_NIP57_FEATURE_REQUEST.md`
-   - Submit as GitHub issue or support request
-   - Reference NIP-57 specification
+### Immediate Testing
+1. ✅ Upgrade SDK to 0.3.4 (done)
+2. ✅ Fix breaking changes (done)
+3. ✅ Build successfully (done)
+4. 🧪 **Test Lightning address registration**
+5. 🧪 **Verify LNURL response includes NIP57 fields**
+6. 🧪 **Receive test zap and confirm receipt publishing**
 
-### When Breez Adds NIP-57 Support
+### Optional Enhancements
 1. Re-enable auto-sync in `SparkWalletProvider.tsx` (lines 136-168)
-2. Test receiving zaps
-3. Verify zap receipts are published correctly
-4. Update documentation
+2. Add UI toggle for profile sync preference
+3. Update user documentation with zap receiving guide
 
-### Alternative (If Breez Doesn't Add Support)
-- Use separate Lightning address for receiving zaps
-- Keep Spark wallet for sending zaps and payments
-- Consider LNURL proxy workaround
+### Documentation
+- See `BREEZ_NIP57_INTEGRATION.md` for full integration details
+- See `BREEZ_NIP57_FEATURE_REQUEST.md` for historical context (can archive)
 
 ## Files Modified
 
@@ -169,6 +163,6 @@ There's no way to provide a `nostrPubkey` or enable NIP-57 support.
 
 ---
 
-**Status:** Waiting for Breez SDK NIP-57 support
+**Status:** ✅ SDK Upgraded - Ready for Testing
 
-**Updated:** 2025-10-11
+**Updated:** 2025-10-31 (Breez SDK 0.3.4 with NIP57 support)
