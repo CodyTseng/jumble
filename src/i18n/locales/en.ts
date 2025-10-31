@@ -532,6 +532,8 @@ export default {
     '{{count}} relays': '{{count}} relays',
     'Republishing...': 'Republishing...',
     'Trending Notes': 'Trending Notes',
+    'Powered by nostr.band API. Issues may be due to API availability.':
+      'Powered by nostr.band API. Issues may be due to API availability.',
     'Connected to': 'Connected to',
     'Disconnect Wallet': 'Disconnect Wallet',
     'Are you absolutely sure?': 'Are you absolutely sure?',
