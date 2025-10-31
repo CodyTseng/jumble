@@ -30,7 +30,7 @@ export default function PostButton() {
         className={cn(
           "gap-2",
           isOutlined
-            ? "border-2 border-primary text-primary bg-transparent hover:bg-primary/10"
+            ? "border-2 border-primary text-primary-foreground bg-transparent hover:bg-primary/10"
             : "bg-primary",
           compactSidebar ? "" : "xl:justify-center"
         )}
