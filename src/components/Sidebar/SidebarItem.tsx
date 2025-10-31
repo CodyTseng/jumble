@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 const SidebarItem = forwardRef<
   HTMLButtonElement,
   ButtonProps & { title: string; description?: string; active?: boolean }
->(({ children, title, description, className, active, ...props }, ref) => {
+>(({ children, title, description, className, active, 'aria-label': ariaLabel, ...props }, ref) => {
   const { t } = useTranslation()
   const { compactSidebar } = useCompactSidebar()
 
@@ -25,7 +25,7 @@ const SidebarItem = forwardRef<
       style={{ fontSize: 'var(--font-size, 14px)' }}
       variant="ghost"
       title={t(title)}
-      aria-label={t(description ?? title)}
+      aria-label={ariaLabel || t(description ?? title)}
       aria-current={active ? 'page' : undefined}
       ref={ref}
       {...props}
