@@ -159,7 +159,7 @@ export default function SidebarAIPromptWidget() {
                 : 'bg-muted mr-8'
             )}
           >
-            <div className="whitespace-pre-wrap break-words">
+            <div className="whitespace-pre-wrap break-words select-text">
               {message.content}
             </div>
           </div>

@@ -14,6 +14,13 @@
     white-space: nowrap;
     border-width: 0;
   }
+
+  .select-text {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+  }
 }
 
 @layer base {
