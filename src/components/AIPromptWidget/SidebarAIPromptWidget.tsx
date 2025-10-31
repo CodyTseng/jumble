@@ -95,7 +95,7 @@ export default function SidebarAIPromptWidget() {
       >
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4" />
-          <h3 className="font-semibold text-muted-foreground" style={{ fontSize: '14px' }}>{widgetName}</h3>
+          <h3 className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</h3>
         </div>
         <div className="flex items-center gap-1">
           {isHovered && (

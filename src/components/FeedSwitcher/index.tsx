@@ -65,7 +65,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
 
       {customFeeds.length > 0 && (
         <>
-          <div className="text-xs font-semibold text-muted-foreground mt-4 mb-2">
+          <div className="text-xs font-semibold mt-4 mb-2">
             {t('Custom Feeds')}
           </div>
           {customFeeds.map((feed) => (

@@ -39,7 +39,7 @@ export default function TrendingNotesWidget() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <CardTitle className="font-semibold text-muted-foreground" style={{ fontSize: '14px' }}>{widgetName}</CardTitle>
+        <CardTitle className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</CardTitle>
         {isHovered && (
           <button
             className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"

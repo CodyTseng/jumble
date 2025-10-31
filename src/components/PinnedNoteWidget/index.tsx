@@ -29,7 +29,7 @@ export default function PinnedNoteWidget({ widgetId, eventId }: PinnedNoteWidget
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <CardTitle className="font-semibold text-muted-foreground flex items-center gap-2" style={{ fontSize: '14px' }}>
+        <CardTitle className="font-semibold flex items-center gap-2" style={{ fontSize: '14px' }}>
           <Pin className="h-4 w-4" />
           {t('Pinned Note')}
         </CardTitle>
