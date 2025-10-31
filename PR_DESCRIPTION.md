@@ -306,6 +306,6 @@ Potential follow-ups (not in this PR):
 - Multi-device encrypted sync
 - Trust-minimized Lightning wallet
 
-This PR represents ~2 months of development and testing, bringing Jumble to feature parity with major Nostr clients while maintaining the trust-minimized ethos of Nostr.
+This PR represents ~3 weeks of development and testing, bringing Jumble to feature parity with major Nostr clients.
 
 Ready for review! 🚀
