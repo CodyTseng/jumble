@@ -37,7 +37,7 @@ export default function PrimaryPageSidebar() {
       <div className="space-y-2">
         {sidebarCollapse ? (
           <button
-            className="px-3 py-1 mb-6 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            className="px-3 py-1 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
@@ -45,7 +45,7 @@ export default function PrimaryPageSidebar() {
           </button>
         ) : (
           <button
-            className="px-4 mb-6 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            className="px-4 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
