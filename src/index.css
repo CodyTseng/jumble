@@ -85,8 +85,16 @@
 
   @media (hover: hover) and (pointer: fine) {
     .clickable:hover {
-      background-color: hsl(var(--muted) / 0.5);
+      background-color: hsl(var(--hover, var(--muted)) / 0.5);
     }
+  }
+
+  .dark.palette-slate .clickable:hover {
+    background-color: hsl(var(--hover));
+  }
+
+  .dark.palette-slate .clickable:active {
+    background-color: hsl(var(--hover) / 0.8);
   }
 
   @keyframes shimmer {
@@ -274,6 +282,7 @@
     --accent-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
+    --hover: 222.2 47.4% 18%;
   }
 
   /* Dark Gray Palette */
