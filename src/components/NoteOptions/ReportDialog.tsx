@@ -94,7 +94,15 @@ function ReportContent({ event, closeDialog }: { event: NostrEvent; closeDialog:
       toast.success(t('Successfully report'))
       closeDialog()
     } catch (error) {
-      toast.error(t('Failed to report') + ': ' + (error as Error).message)
+      const errors = error instanceof AggregateError ? error.errors : [error]
+      errors.forEach((err) => {
+        toast.error(
+          `${t('Failed to report')}: ${err instanceof Error ? err.message : String(err)}`,
+          { duration: 10_000 }
+        )
+        console.error(err)
+      })
+      return
     } finally {
       setReporting(false)
     }

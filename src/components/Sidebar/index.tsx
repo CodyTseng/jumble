@@ -1,6 +1,7 @@
 import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import { cn } from '@/lib/utils'
+import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
@@ -23,6 +24,7 @@ export default function PrimaryPageSidebar() {
   const { themeSetting } = useTheme()
   const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout, showWalletInSidebar } = useUserPreferences()
   const { pubkey } = useNostr()
+  const { navigate } = usePrimaryPage()
 
   if (isSmallScreen) return null
 
@@ -35,13 +37,21 @@ export default function PrimaryPageSidebar() {
     >
       <div className="space-y-2">
         {sidebarCollapse ? (
-          <div className="px-3 py-1 mb-6 w-full">
+          <button
+            className="px-3 py-1 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('home')}
+            aria-label="Go to home"
+          >
             <Icon />
-          </div>
+          </button>
         ) : (
-          <div className="px-4 mb-6 w-full">
+          <button
+            className="px-4 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('home')}
+            aria-label="Go to home"
+          >
             <Logo />
-          </div>
+          </button>
         )}
         <HomeButton collapse={sidebarCollapse} />
         <RelaysButton collapse={sidebarCollapse} />
