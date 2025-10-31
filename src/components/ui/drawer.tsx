@@ -70,7 +70,7 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & { hideOverlay?: boolean }
->(({ className, children, hideOverlay = false, ...props }, ref) => (
+>(({ className, children, hideOverlay = false, style, ...props }, ref) => (
   <DrawerPortal>
     {!hideOverlay && <DrawerOverlay />}
     <DrawerPrimitive.Content
@@ -80,7 +80,10 @@ const DrawerContent = React.forwardRef<
         className
       )}
       style={{
-        paddingBottom: 'env(safe-area-inset-bottom)'
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        borderTopLeftRadius: 'var(--card-radius, 8px)',
+        borderTopRightRadius: 'var(--card-radius, 8px)',
+        ...style
       }}
       onOpenAutoFocus={(e) => e.preventDefault()}
       {...props}
