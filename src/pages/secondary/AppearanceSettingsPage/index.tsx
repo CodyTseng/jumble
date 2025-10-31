@@ -41,11 +41,11 @@ const getPaletteColor = (palette: TColorPalette, theme: string, type: 'backgroun
     },
     slate: {
       light: { background: 'hsl(215, 20.2%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(214.3, 31.8%, 91.4%)' },
-      dark: { background: 'hsl(217.2, 32.6%, 17.5%)', muted: 'hsl(215.4, 16.3%, 9%)', border: 'hsl(217.2, 32.6%, 17.5%)' }
+      dark: { background: 'hsl(215.4, 16.3%, 25.9%)', muted: 'hsl(222.2, 47.4%, 11.2%)', border: 'hsl(215.4, 16.3%, 25.9%)' }
     },
     gray: {
       light: { background: 'hsl(220, 14.3%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(220, 13%, 91%)' },
-      dark: { background: 'hsl(215, 27.9%, 16.9%)', muted: 'hsl(220, 8.9%, 9%)', border: 'hsl(215, 27.9%, 16.9%)' }
+      dark: { background: 'hsl(215, 27.9%, 16.9%)', muted: 'hsl(220.9, 39.3%, 11%)', border: 'hsl(215, 27.9%, 16.9%)' }
     },
     zinc: {
       light: { background: 'hsl(240, 4.8%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(240, 5.9%, 90%)' },
@@ -57,7 +57,7 @@ const getPaletteColor = (palette: TColorPalette, theme: string, type: 'backgroun
     },
     stone: {
       light: { background: 'hsl(60, 9.1%, 98%)', muted: 'hsl(0, 0%, 100%)', border: 'hsl(20, 5.9%, 90%)' },
-      dark: { background: 'hsl(12, 6.5%, 15.1%)', muted: 'hsl(24, 9.8%, 9%)', border: 'hsl(12, 6.5%, 15.1%)' }
+      dark: { background: 'hsl(12, 6.5%, 15.1%)', muted: 'hsl(24, 9.8%, 10%)', border: 'hsl(12, 6.5%, 15.1%)' }
     }
   }
 
