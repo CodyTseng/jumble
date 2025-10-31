@@ -259,12 +259,12 @@
 
   /* Dark Slate Palette */
   .dark.palette-slate {
-    --surface-background: 222.2 84% 4.9%;
+    --surface-background: 215.4 16.3% 9%;
     --background: 217.2 32.6% 17.5%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 215.4 16.3% 9%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 215.4 16.3% 9%;
     --popover-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -278,12 +278,12 @@
 
   /* Dark Gray Palette */
   .dark.palette-gray {
-    --surface-background: 224 71.4% 4.1%;
+    --surface-background: 220 8.9% 9%;
     --background: 215 27.9% 16.9%;
     --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
+    --card: 220 8.9% 9%;
     --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
+    --popover: 220 8.9% 9%;
     --popover-foreground: 210 20% 98%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 210 20% 98%;
@@ -335,12 +335,12 @@
 
   /* Dark Stone Palette */
   .dark.palette-stone {
-    --surface-background: 20 14.3% 4.1%;
+    --surface-background: 24 9.8% 9%;
     --background: 12 6.5% 15.1%;
     --foreground: 60 9.1% 97.8%;
-    --card: 20 14.3% 4.1%;
+    --card: 24 9.8% 9%;
     --card-foreground: 60 9.1% 97.8%;
-    --popover: 20 14.3% 4.1%;
+    --popover: 24 9.8% 9%;
     --popover-foreground: 60 9.1% 97.8%;
     --secondary: 12 6.5% 15.1%;
     --secondary-foreground: 60 9.1% 97.8%;
