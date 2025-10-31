@@ -18,13 +18,19 @@ export default function QrCode({ value, size = 180 }: { value: string; size?: nu
         height: size * pixelRatio,
         data: value,
         dotsOptions: {
-          type: 'extra-rounded'
+          type: 'extra-rounded',
+          color: '#000000'
         },
         cornersDotOptions: {
-          type: 'extra-rounded'
+          type: 'extra-rounded',
+          color: '#000000'
         },
         cornersSquareOptions: {
-          type: 'extra-rounded'
+          type: 'extra-rounded',
+          color: '#000000'
+        },
+        backgroundOptions: {
+          color: '#ffffff'
         }
       })
 
