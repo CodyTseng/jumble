@@ -32,6 +32,7 @@ import { ListsProvider } from '@/providers/ListsProvider'
 import { ReplyProvider } from '@/providers/ReplyProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
+import { ColorPaletteProvider } from '@/providers/ColorPaletteProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
 import { TrendingNotesDismissedProvider } from '@/providers/TrendingNotesDismissedProvider'
 import { UserPreferencesProvider } from '@/providers/UserPreferencesProvider'
@@ -45,8 +46,9 @@ import { AppWithListPreview } from './components/AppWithListPreview'
 export default function App(): JSX.Element {
   return (
     <ThemeProvider>
-      <PageThemeProvider>
-        <PrimaryColorProvider>
+      <ColorPaletteProvider>
+        <PageThemeProvider>
+          <PrimaryColorProvider>
           <FontSizeProvider>
             <FontFamilyProvider>
               <ButtonRadiusProvider>
@@ -117,8 +119,9 @@ export default function App(): JSX.Element {
               </ButtonRadiusProvider>
             </FontFamilyProvider>
           </FontSizeProvider>
-        </PrimaryColorProvider>
-      </PageThemeProvider>
+          </PrimaryColorProvider>
+        </PageThemeProvider>
+      </ColorPaletteProvider>
     </ThemeProvider>
   )
 }

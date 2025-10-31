@@ -42,7 +42,8 @@ import {
   TPrimaryColor,
   TRelaySet,
   TThemeSetting,
-  TTranslationServiceConfig
+  TTranslationServiceConfig,
+  TColorPalette
 } from '@/types'
 
 class LocalStorageService {
@@ -50,6 +51,7 @@ class LocalStorageService {
 
   private relaySets: TRelaySet[] = []
   private themeSetting: TThemeSetting = 'system'
+  private colorPalette: TColorPalette = 'default'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
   private noteListMode: TNoteListMode = 'posts'
@@ -113,6 +115,8 @@ class LocalStorageService {
   init() {
     this.themeSetting =
       (window.localStorage.getItem(StorageKey.THEME_SETTING) as TThemeSetting) ?? 'system'
+    this.colorPalette =
+      (window.localStorage.getItem(StorageKey.COLOR_PALETTE) as TColorPalette) ?? 'default'
     const accountsStr = window.localStorage.getItem(StorageKey.ACCOUNTS)
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
@@ -425,6 +429,15 @@ class LocalStorageService {
   setThemeSetting(themeSetting: TThemeSetting) {
     window.localStorage.setItem(StorageKey.THEME_SETTING, themeSetting)
     this.themeSetting = themeSetting
+  }
+
+  getColorPalette() {
+    return this.colorPalette
+  }
+
+  setColorPalette(colorPalette: TColorPalette) {
+    window.localStorage.setItem(StorageKey.COLOR_PALETTE, colorPalette)
+    this.colorPalette = colorPalette
   }
 
   getNoteListMode() {

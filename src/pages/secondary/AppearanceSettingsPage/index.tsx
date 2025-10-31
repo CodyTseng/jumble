@@ -25,15 +25,49 @@ import { usePageTheme } from '@/providers/PageThemeProvider'
 import { usePostButtonStyle } from '@/providers/PostButtonStyleProvider'
 import { usePrimaryColor } from '@/providers/PrimaryColorProvider'
 import { useTheme } from '@/providers/ThemeProvider'
+import { useColorPalette } from '@/providers/ColorPaletteProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { TFontFamily, TPrimaryColor } from '@/types'
+import { TFontFamily, TPrimaryColor, TColorPalette } from '@/types'
 import { Check, Moon, Sun, Monitor, LayoutGrid, Maximize2, List, FileText, Columns, PencilLine } from 'lucide-react'
 import { forwardRef, HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
 
+const getPaletteColor = (palette: TColorPalette, theme: string, type: 'background' | 'muted' | 'border') => {
+  // Color palette HSL values for preview
+  const colors: Record<TColorPalette, { light: Record<string, string>, dark: Record<string, string> }> = {
+    default: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(240, 4.8%, 94%)', border: 'hsl(240, 5.9%, 94%)' },
+      dark: { background: 'hsl(0, 0%, 9%)', muted: 'hsl(240, 3.7%, 15.9%)', border: 'hsl(240, 3.7%, 15.9%)' }
+    },
+    slate: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(210, 40%, 96.1%)', border: 'hsl(214.3, 31.8%, 91.4%)' },
+      dark: { background: 'hsl(222.2, 84%, 4.9%)', muted: 'hsl(217.2, 32.6%, 17.5%)', border: 'hsl(217.2, 32.6%, 17.5%)' }
+    },
+    gray: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(220, 14.3%, 95.9%)', border: 'hsl(220, 13%, 91%)' },
+      dark: { background: 'hsl(224, 71.4%, 4.1%)', muted: 'hsl(215, 27.9%, 16.9%)', border: 'hsl(215, 27.9%, 16.9%)' }
+    },
+    zinc: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(240, 4.8%, 95.9%)', border: 'hsl(240, 5.9%, 90%)' },
+      dark: { background: 'hsl(240, 10%, 3.9%)', muted: 'hsl(240, 3.7%, 15.9%)', border: 'hsl(240, 3.7%, 15.9%)' }
+    },
+    neutral: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(0, 0%, 96.1%)', border: 'hsl(0, 0%, 89.8%)' },
+      dark: { background: 'hsl(0, 0%, 3.9%)', muted: 'hsl(0, 0%, 14.9%)', border: 'hsl(0, 0%, 14.9%)' }
+    },
+    stone: {
+      light: { background: 'hsl(0, 0%, 100%)', muted: 'hsl(60, 4.8%, 95.9%)', border: 'hsl(20, 5.9%, 90%)' },
+      dark: { background: 'hsl(20, 14.3%, 4.1%)', muted: 'hsl(12, 6.5%, 15.1%)', border: 'hsl(12, 6.5%, 15.1%)' }
+    }
+  }
+
+  return colors[palette][theme === 'dark' ? 'dark' : 'light'][type]
+}
+
 const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { themeSetting, setThemeSetting } = useTheme()
+  const { themeSetting, setThemeSetting, theme } = useTheme()
+  const { colorPalette, setColorPalette } = useColorPalette()
   const { pageTheme, setPageTheme } = usePageTheme()
   const { fontSize, setFontSize } = useFontSize()
   const { fontFamily, setFontFamily } = useFontFamily()
@@ -121,6 +155,53 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             ))}
           </div>
         </SettingItem>
+        {themeSetting !== 'system' && pageTheme === 'default' && (
+          <SettingItem className="flex-col items-start gap-3">
+            <Label className="text-base font-normal">
+              {t('Color Palette')}
+            </Label>
+            <div className="text-sm text-muted-foreground mb-1">
+              {t('Choose a color palette for')} {themeSetting === 'light' ? t('light') : t('dark')} {t('theme')}
+            </div>
+            <div className="grid grid-cols-3 gap-3 w-full">
+              {(['default', 'slate', 'gray', 'zinc', 'neutral', 'stone'] as TColorPalette[]).map((palette) => (
+                <button
+                  key={palette}
+                  onClick={() => setColorPalette(palette)}
+                  className={cn(
+                    'relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                    colorPalette === palette
+                      ? 'border-primary'
+                      : 'border-border hover:border-muted-foreground/30'
+                  )}
+                >
+                  <div className="flex gap-1">
+                    <div
+                      className="w-6 h-6 rounded-full border"
+                      style={{
+                        backgroundColor: getPaletteColor(palette, theme, 'background'),
+                        borderColor: getPaletteColor(palette, theme, 'border')
+                      }}
+                    />
+                    <div
+                      className="w-6 h-6 rounded-full border"
+                      style={{
+                        backgroundColor: getPaletteColor(palette, theme, 'muted'),
+                        borderColor: getPaletteColor(palette, theme, 'border')
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium capitalize">{palette}</span>
+                  {colorPalette === palette && (
+                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </SettingItem>
+        )}
         <SettingItem className="flex-col items-start gap-3">
           <Label className="text-base font-normal">
             {t('Layout mode')}

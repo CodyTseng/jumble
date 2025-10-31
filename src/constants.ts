@@ -23,6 +23,7 @@ export const RECOMMENDED_BLOSSOM_SERVERS = [
 export const StorageKey = {
   VERSION: 'version',
   THEME_SETTING: 'themeSetting',
+  COLOR_PALETTE: 'colorPalette',
   RELAY_SETS: 'relaySets',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',

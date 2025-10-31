@@ -83,6 +83,8 @@ export type TTheme = 'light' | 'dark'
 
 export type TPageTheme = 'default' | 'pure-black' | 'white'
 
+export type TColorPalette = 'default' | 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone'
+
 export type TPrimaryColor = 'RED' | 'ORANGE' | 'AMBER' | 'YELLOW' | 'LIME' | 'GREEN' | 'EMERALD' | 'TEAL' | 'CYAN' | 'SKY' | 'BLUE' | 'INDIGO' | 'VIOLET' | 'PURPLE' | 'FUCHSIA' | 'PINK' | 'ROSE'
 
 export type TFontFamily = 'DEFAULT' | 'SYSTEM' | 'IBM_PLEX_SANS' | 'LATO' | 'OUTFIT' | 'ROBOTO' | 'GEIST_MONO'
