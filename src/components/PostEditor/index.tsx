@@ -50,7 +50,7 @@ export default function PostEditor({
     return (
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
-          className="h-full w-full p-0 border-none"
+          className="h-full w-full p-0 border-none bg-card"
           side="bottom"
           hideClose
           onEscapeKeyDown={(e) => {
@@ -79,7 +79,7 @@ export default function PostEditor({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="p-0 max-w-2xl"
+        className="p-0 max-w-2xl bg-card"
         withoutClose
         onEscapeKeyDown={(e) => {
           if (postEditor.isSuggestionPopupOpen) {
