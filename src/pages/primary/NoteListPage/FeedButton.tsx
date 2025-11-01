@@ -7,7 +7,7 @@ import { useCustomFeeds } from '@/providers/CustomFeedsProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { BookmarkIcon, Box, ChevronDown, Hash, Search, UsersRound } from 'lucide-react'
+import { BookmarkIcon, Box, ChevronDown, Hash, Highlighter, Search, UsersRound } from 'lucide-react'
 import { forwardRef, HTMLAttributes, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -72,6 +72,9 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
       if (feedInfo.feedType === 'bookmarks') {
         return t('Bookmarks')
       }
+      if (feedInfo.feedType === 'highlights') {
+        return t('Highlights')
+      }
       if (feedInfo.feedType === 'custom') {
         return activeCustomFeed?.name ?? t('Custom Feed')
       }
@@ -91,6 +94,9 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
       }
       if (feedInfo.feedType === 'bookmarks') {
         return <BookmarkIcon />
+      }
+      if (feedInfo.feedType === 'highlights') {
+        return <Highlighter />
       }
       if (feedInfo.feedType === 'custom') {
         if (activeCustomFeed?.searchParams.type === 'hashtag') {

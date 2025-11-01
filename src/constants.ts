@@ -139,7 +139,6 @@ export const SUPPORTED_KINDS = [
   ExtendedKind.COMMENT,
   ExtendedKind.VOICE,
   ExtendedKind.VOICE_COMMENT,
-  kinds.Highlights,
   kinds.LongFormArticle,
   ExtendedKind.RELAY_REVIEW
 ]

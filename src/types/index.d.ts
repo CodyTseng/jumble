@@ -99,7 +99,7 @@ export type TDeckViewMode = 'standard' | 'multi-column'
 
 export type TMediaStyle = 'default' | 'full-width'
 
-export type TPinnedColumnType = 'explore' | 'notifications' | 'profile' | 'search' | 'relay' | 'relays' | 'custom' | 'bookmarks' | 'reads' | 'lists' | 'list'
+export type TPinnedColumnType = 'explore' | 'notifications' | 'profile' | 'search' | 'relay' | 'relays' | 'custom' | 'bookmarks' | 'highlights' | 'reads' | 'lists' | 'list'
 
 export type TPinnedColumn = {
   id: string
@@ -139,7 +139,7 @@ export type TAccount = {
 
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
-export type TFeedType = 'following' | 'relays' | 'relay' | 'bookmarks' | 'custom'
+export type TFeedType = 'following' | 'relays' | 'relay' | 'bookmarks' | 'highlights' | 'custom'
 export type TFeedInfo = { feedType: TFeedType; id?: string }
 
 export type TCustomFeed = {

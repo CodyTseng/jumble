@@ -5,7 +5,7 @@ import { useCustomFeeds } from '@/providers/CustomFeedsProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { BookmarkIcon, Hash, Search, Trash2, UsersRound } from 'lucide-react'
+import { BookmarkIcon, Hash, Highlighter, Search, Trash2, UsersRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import PinButton from '../PinButton'
 import { Button } from '../ui/button'
@@ -59,6 +59,30 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
               <BookmarkIcon className="size-4" />
             </div>
             <div>{t('Bookmarks')}</div>
+          </div>
+        </FeedSwitcherItem>
+      )}
+
+      {pubkey && (
+        <FeedSwitcherItem
+          isActive={feedInfo.feedType === 'highlights'}
+          onClick={() => {
+            if (!pubkey) return
+            switchFeed('highlights', { pubkey })
+            close?.()
+          }}
+          controls={
+            <PinButton
+              column={{ type: 'highlights' }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            />
+          }
+        >
+          <div className="flex gap-2 items-center">
+            <div className="flex justify-center items-center w-6 h-6 shrink-0">
+              <Highlighter className="size-4" />
+            </div>
+            <div>{t('Highlights')}</div>
           </div>
         </FeedSwitcherItem>
       )}

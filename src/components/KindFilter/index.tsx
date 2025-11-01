@@ -16,7 +16,6 @@ const KIND_FILTER_OPTIONS = [
   { kindGroup: [kinds.ShortTextNote, ExtendedKind.COMMENT], label: 'Posts' },
   { kindGroup: [kinds.Repost], label: 'Reposts' },
   { kindGroup: [kinds.LongFormArticle], label: 'Articles' },
-  { kindGroup: [kinds.Highlights], label: 'Highlights' },
   { kindGroup: [ExtendedKind.POLL], label: 'Polls' },
   { kindGroup: [ExtendedKind.VOICE, ExtendedKind.VOICE_COMMENT], label: 'Voice Posts' },
   { kindGroup: [ExtendedKind.PICTURE], label: 'Photo Posts' },
