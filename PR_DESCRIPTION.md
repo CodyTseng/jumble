@@ -26,6 +26,10 @@ This PR adds a **trust-minimized Lightning wallet** to Jumble using the Breez Sp
 ### User Experience
 - ✅ **Wallet sidebar button** - Quick access from anywhere
 - ✅ **Payment history** - View all transactions with status
+- ✅ **Expandable payment details** - Click any payment to see full transaction info
+- ✅ **Sparkscan.io integration** - Direct links to view transactions on block explorer
+- ✅ **Manual refresh** - Refresh button for pending payments
+- ✅ **Pending payment warnings** - Alerts for payments stuck >10 minutes
 - ✅ **Balance display** - Real-time satoshi balance
 - ✅ **Settings integration** - Wallet preferences in settings
 
@@ -53,7 +57,7 @@ This PR adds a **trust-minimized Lightning wallet** to Jumble using the Breez Sp
 **New Components:**
 - `SparkWalletPage` - Main wallet UI (2046 lines)
 - `SparkWalletProvider` - Wallet state management (294 lines)
-- `SparkPaymentsList` - Transaction history (99 lines)
+- `SparkPaymentsList` - Transaction history with expandable details (350 lines)
 - `SparkWalletBalance` - Balance display (38 lines)
 - `WalletButton` - Sidebar navigation (75 lines)
 
@@ -192,12 +196,27 @@ See `INTEGRATION_GUIDE_FOR_JUMBLE_SOCIAL.md` for complete deployment instruction
 ### Breaking Changes
 **None.** This is a purely additive feature.
 
-### Bug Fixes Included
-**Fixed:** Deep link routing for logged-out users
+### Bug Fixes & Improvements Included
+
+**1. Deep link routing for logged-out users**
 - **Issue:** Deep links (e.g., `/notes/nevent1...`) showed errors for logged-out users
 - **Cause:** Eager import of Breez SDK WebAssembly at module level blocked app initialization
 - **Solution:** Lazy-loaded sparkService using dynamic imports
 - **Result:** Logged-out users can now access shared notes/profiles via deep links ✅
+
+**2. Payment history visual flicker**
+- **Issue:** Automatic refresh of payment history caused visual flicker every 3 seconds
+- **Solution:** Added silent refresh mode that updates data without showing loading indicators
+- **Result:** Smooth, flicker-free background updates for pending payments ✅
+
+**3. Payment details UX improvements**
+- **Added:** Expandable payment rows with detailed transaction information
+- **Added:** Payment hash, invoice, preimage display with copy buttons
+- **Added:** Direct links to sparkscan.io block explorer for transaction verification
+- **Added:** Manual refresh button for stuck pending payments
+- **Added:** Warning messages for payments pending >10 minutes
+- **Added:** Consistent spacing and row heights across all detail fields
+- **Result:** Much better debugging and transaction tracking experience ✅
 
 ## 🔄 Migration Notes
 
@@ -227,6 +246,8 @@ See `INTEGRATION_GUIDE_FOR_JUMBLE_SOCIAL.md` for complete deployment instruction
 - [x] No breaking changes
 - [x] Backward compatible
 - [x] **Deep links work for logged-out users** (fixed routing issue)
+- [x] **Payment history flicker eliminated** (silent refresh mode)
+- [x] **Transaction details easily accessible** (expandable rows with sparkscan links)
 
 ## 🎯 Merge Strategy
 
