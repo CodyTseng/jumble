@@ -1,9 +1,9 @@
 import { isMentioningMutedUsers } from '@/lib/event'
-import { tagNameEquals } from '@/lib/tag'
+import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import client from '@/services/client.service'
-import { Event, kinds, nip19, verifyEvent } from 'nostr-tools'
+import { Event, kinds, verifyEvent } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import MainNoteCard from './MainNoteCard'
 
@@ -51,15 +51,20 @@ export default function RepostNoteCard({
           return
         }
 
-        const [, id, relay, , pubkey] = event.tags.find(tagNameEquals('e')) ?? []
-        if (!id) {
+        let targetEventId: string | undefined
+        const aTag = event.tags.find(tagNameEquals('a'))
+        if (aTag) {
+          targetEventId = generateBech32IdFromATag(aTag)
+        } else {
+          const eTag = event.tags.find(tagNameEquals('e'))
+          if (eTag) {
+            targetEventId = generateBech32IdFromETag(eTag)
+          }
+        }
+        if (!targetEventId) {
           return
         }
-        const targetEventId = nip19.neventEncode({
-          id,
-          relays: relay ? [relay] : [],
-          author: pubkey
-        })
+
         const targetEvent = await client.fetchEvent(targetEventId)
         if (targetEvent) {
           setTargetEvent(targetEvent)
@@ -76,7 +81,7 @@ export default function RepostNoteCard({
   return (
     <MainNoteCard
       className={className}
-      reposter={event.pubkey}
+      reposters={[event.pubkey]}
       event={targetEvent}
       pinned={pinned}
     />

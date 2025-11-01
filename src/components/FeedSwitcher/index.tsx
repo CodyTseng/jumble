@@ -1,5 +1,6 @@
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
+import { cn } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
@@ -17,23 +18,22 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
 
   return (
     <div className="space-y-2">
-      {pubkey && (
-        <FeedSwitcherItem
-          isActive={feedInfo.feedType === 'following'}
-          onClick={() => {
-            if (!pubkey) return
-            switchFeed('following', { pubkey })
-            close?.()
-          }}
-        >
-          <div className="flex gap-2 items-center">
-            <div className="flex justify-center items-center w-6 h-6 shrink-0">
-              <UsersRound className="size-4" />
-            </div>
-            <div>{t('Following')}</div>
+      <FeedSwitcherItem
+        isActive={feedInfo?.feedType === 'following'}
+        disabled={!pubkey}
+        onClick={() => {
+          if (!pubkey) return
+          switchFeed('following', { pubkey })
+          close?.()
+        }}
+      >
+        <div className="flex gap-2 items-center">
+          <div className="flex justify-center items-center w-6 h-6 shrink-0">
+            <UsersRound className="size-4" />
           </div>
-        </FeedSwitcherItem>
-      )}
+          <div>{t('Following')}</div>
+        </div>
+      </FeedSwitcherItem>
 
       <div className="flex justify-end items-center text-sm">
         <SecondaryPageLink
@@ -50,7 +50,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
           <RelaySetCard
             key={set.id}
             relaySet={set}
-            select={feedInfo.feedType === 'relays' && set.id === feedInfo.id}
+            select={feedInfo?.feedType === 'relays' && set.id === feedInfo.id}
             onSelectChange={(select) => {
               if (!select) return
               switchFeed('relays', { activeRelaySetId: set.id })
@@ -61,7 +61,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
       {favoriteRelays.map((relay) => (
         <FeedSwitcherItem
           key={relay}
-          isActive={feedInfo.feedType === 'relay' && feedInfo.id === relay}
+          isActive={feedInfo?.feedType === 'relay' && feedInfo.id === relay}
           onClick={() => {
             switchFeed('relay', { relay })
             close?.()
@@ -80,18 +80,27 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
 function FeedSwitcherItem({
   children,
   isActive,
+  disabled,
   onClick,
   controls
 }: {
   children: React.ReactNode
   isActive: boolean
+  disabled?: boolean
   onClick: () => void
   controls?: React.ReactNode
 }) {
   return (
     <div
-      className={`w-full border rounded-lg p-4 ${isActive ? 'border-primary bg-primary/5' : 'clickable'}`}
-      onClick={onClick}
+      className={cn(
+        'w-full border rounded-lg p-4',
+        disabled && 'opacity-50 pointer-events-none',
+        isActive ? 'border-primary bg-primary/5' : 'clickable'
+      )}
+      onClick={() => {
+        if (disabled) return
+        onClick()
+      }}
     >
       <div className="flex justify-between items-center">
         <div className="font-semibold flex-1">{children}</div>

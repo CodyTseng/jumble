@@ -54,21 +54,21 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
     const { feedInfo, relayUrls } = useFeed()
     const { relaySets } = useFavoriteRelays()
     const activeRelaySet = useMemo(() => {
-      return feedInfo.feedType === 'relays' && feedInfo.id
+      return feedInfo?.feedType === 'relays' && feedInfo.id
         ? relaySets.find((set) => set.id === feedInfo.id)
         : undefined
     }, [feedInfo, relaySets])
     const title = useMemo(() => {
-      if (feedInfo.feedType === 'following') {
+      if (feedInfo?.feedType === 'following') {
         return t('Following')
       }
       if (relayUrls.length === 0) {
-        return t('Choose a relay')
+        return t('Choose a feed')
       }
-      if (feedInfo.feedType === 'relay') {
-        return simplifyUrl(feedInfo.id ?? '')
+      if (feedInfo?.feedType === 'relay') {
+        return simplifyUrl(feedInfo?.id ?? '')
       }
-      if (feedInfo.feedType === 'relays') {
+      if (feedInfo?.feedType === 'relays') {
         return activeRelaySet?.name ?? activeRelaySet?.id
       }
     }, [feedInfo, activeRelaySet])
@@ -79,7 +79,7 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
         ref={ref}
         {...props}
       >
-        {feedInfo.feedType === 'following' ? <UsersRound /> : <Server />}
+        {feedInfo?.feedType === 'following' ? <UsersRound /> : <Server />}
         <div className="text-lg font-semibold truncate">{title}</div>
         <ChevronDown />
       </div>

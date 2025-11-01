@@ -489,6 +489,12 @@ export default {
     Extension: 'एक्सटेंशन',
     Remote: 'रिमोट',
     'Encrypted Key': 'एन्क्रिप्टेड की',
-    'Private Key': 'प्राइवेट की'
+    'Private Key': 'प्राइवेट की',
+    'Welcome to Jumble': 'Jumble में आपका स्वागत है',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      'Jumble एक क्लाइंट है जो रिले ब्राउज़ करने पर केंद्रित है। रोचक रिले की खोज करके शुरू करें या अपनी फ़ॉलोइंग फ़ीड देखने के लिए लॉगिन करें।',
+    'Explore Relays': 'रिले एक्सप्लोर करें',
+    'Choose a feed': 'एक फीड चुनें',
+    'and {{x}} others': 'और {{x}} अन्य'
   }
 }

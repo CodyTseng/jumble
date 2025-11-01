@@ -1,4 +1,4 @@
-import { BIG_RELAY_URLS, DEFAULT_FAVORITE_RELAYS } from '@/constants'
+import { BIG_RELAY_URLS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
@@ -43,7 +43,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     if (!favoriteRelaysEvent) {
-      const favoriteRelays: string[] = DEFAULT_FAVORITE_RELAYS
+      const favoriteRelays: string[] = []
       const storedRelaySets = storage.getRelaySets()
       storedRelaySets.forEach(({ relayUrls }) => {
         relayUrls.forEach((url) => {

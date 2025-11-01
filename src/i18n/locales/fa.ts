@@ -487,6 +487,12 @@ export default {
     Extension: 'افزونه',
     Remote: 'از راه دور',
     'Encrypted Key': 'رمزگذاری شده کلید',
-    'Private Key': 'کلید خصوصی'
+    'Private Key': 'کلید خصوصی',
+    'Welcome to Jumble': 'به Jumble خوش آمدید',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      'Jumble یک کلاینت متمرکز بر مرور رله‌هاست. با کاوش در رله‌های جالب شروع کنید یا وارد شوید تا فید دنبال‌کننده‌های خود را مشاهده کنید.',
+    'Explore Relays': 'کاوش در رله‌ها',
+    'Choose a feed': 'یک فید انتخاب کنید',
+    'and {{x}} others': 'و {{x}} دیگر'
   }
 }

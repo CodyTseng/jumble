@@ -482,6 +482,12 @@ export default {
     Extension: 'ส่วนขยาย',
     Remote: 'ระยะไกล',
     'Encrypted Key': 'คีย์ที่เข้ารหัส',
-    'Private Key': 'คีย์ส่วนตัว'
+    'Private Key': 'คีย์ส่วนตัว',
+    'Welcome to Jumble': 'ยินดีต้อนรับสู่ Jumble',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      'Jumble เป็นไคลเอนต์ที่เน้นการเรียกดูรีเลย์ เริ่มต้นด้วยการสำรวจรีเลย์ที่น่าสนใจ หรือเข้าสู่ระบบเพื่อดูฟีดที่คุณติดตาม',
+    'Explore Relays': 'สำรวจรีเลย์',
+    'Choose a feed': 'เลือกฟีด',
+    'and {{x}} others': 'และอื่น ๆ {{x}} รายการ'
   }
 }

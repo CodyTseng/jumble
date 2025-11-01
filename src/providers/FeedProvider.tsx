@@ -1,4 +1,3 @@
-import { DEFAULT_FAVORITE_RELAYS } from '@/constants'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
@@ -14,7 +13,7 @@ type TFeedContext = {
   relayUrls: string[]
   isReady: boolean
   switchFeed: (
-    feedType: TFeedType,
+    feedType: TFeedType | null,
     options?: { activeRelaySetId?: string; pubkey?: string; relay?: string | null }
   ) => Promise<void>
 }
@@ -31,13 +30,10 @@ export const useFeed = () => {
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
   const { pubkey, isInitialized } = useNostr()
-  const { relaySets, favoriteRelays } = useFavoriteRelays()
+  const { relaySets } = useFavoriteRelays()
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [isReady, setIsReady] = useState(false)
-  const [feedInfo, setFeedInfo] = useState<TFeedInfo>({
-    feedType: 'relay',
-    id: DEFAULT_FAVORITE_RELAYS[0]
-  })
+  const [feedInfo, setFeedInfo] = useState<TFeedInfo>(null)
   const feedInfoRef = useRef<TFeedInfo>(feedInfo)
 
   useEffect(() => {
@@ -46,15 +42,19 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      let feedInfo: TFeedInfo = {
-        feedType: 'relay',
-        id: favoriteRelays[0] ?? DEFAULT_FAVORITE_RELAYS[0]
-      }
+      let feedInfo: TFeedInfo = null
       if (pubkey) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
         if (storedFeedInfo) {
           feedInfo = storedFeedInfo
+        } else {
+          feedInfo = { feedType: 'following' }
         }
+      }
+
+      if (!feedInfo) {
+        setIsReady(true)
+        return
       }
 
       if (feedInfo.feedType === 'relays') {
@@ -75,13 +75,20 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   }, [pubkey, isInitialized])
 
   const switchFeed = async (
-    feedType: TFeedType,
+    feedType: TFeedType | null,
     options: {
       activeRelaySetId?: string | null
       pubkey?: string | null
       relay?: string | null
     } = {}
   ) => {
+    if (!feedType) {
+      setFeedInfo(null)
+      feedInfoRef.current = null
+      setRelayUrls([])
+      return
+    }
+
     setIsReady(false)
     if (feedType === 'relay') {
       const normalizedUrl = normalizeUrl(options.relay ?? '')

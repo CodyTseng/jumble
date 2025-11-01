@@ -483,6 +483,12 @@ export default {
     Extension: 'Extension',
     Remote: 'Remote',
     'Encrypted Key': 'Encrypted Key',
-    'Private Key': 'Private Key'
+    'Private Key': 'Private Key',
+    'Welcome to Jumble': 'Welcome to Jumble',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.',
+    'Explore Relays': 'Explore Relays',
+    'Choose a feed': 'Choose a feed',
+    'and {{x}} others': 'and {{x}} others'
   }
 }

@@ -494,6 +494,12 @@ export default {
     Extension: 'Расширение',
     Remote: 'Удалённый',
     'Encrypted Key': 'Зашифрованный ключ',
-    'Private Key': 'Приватный ключ'
+    'Private Key': 'Приватный ключ',
+    'Welcome to Jumble': 'Добро пожаловать в Jumble',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      'Jumble — это клиент, ориентированный на просмотр relay. Начните с изучения интересных relay или войдите, чтобы увидеть ленту подписок.',
+    'Explore Relays': 'Исследовать Relay',
+    'Choose a feed': 'Выберите ленту',
+    'and {{x}} others': 'и {{x}} других'
   }
 }

@@ -1,7 +1,6 @@
 import Sidebar from '@/components/Sidebar'
 import { cn } from '@/lib/utils'
 import NoteListPage from '@/pages/primary/NoteListPage'
-import HomePage from '@/pages/secondary/HomePage'
 import { CurrentRelaysProvider } from '@/providers/CurrentRelaysProvider'
 import { TPageRef } from '@/types'
 import {
@@ -455,7 +454,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     className={cn(
                       'bg-background overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg',
+                      secondaryStack.length === 0 ? 'bg-surface' : ''
                     )}
                   >
                     {secondaryStack.map((item, index) => (
@@ -467,13 +467,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                         {item.component}
                       </div>
                     ))}
-                    <div
-                      key="home"
-                      className="w-full"
-                      style={{ display: secondaryStack.length === 0 ? 'block' : 'none' }}
-                    >
-                      <HomePage />
-                    </div>
                   </div>
                 </div>
               </div>

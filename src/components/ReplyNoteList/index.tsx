@@ -6,6 +6,7 @@ import {
   getReplaceableCoordinateFromEvent,
   getRootTag,
   isMentioningMutedUsers,
+  isProtectedEvent,
   isReplaceableEvent,
   isReplyNoteEvent
 } from '@/lib/event'
@@ -118,14 +119,13 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
         const relayList = await client.fetchRelayList(
           (rootInfo as { pubkey?: string }).pubkey ?? event.pubkey
         )
-        const relayUrls = relayList.read.concat(BIG_RELAY_URLS)
-        const seenOn =
-          rootInfo.type === 'E'
-            ? client.getSeenEventRelayUrls(rootInfo.id)
-            : rootInfo.type === 'A'
-              ? client.getSeenEventRelayUrls(rootInfo.eventId)
-              : []
-        relayUrls.unshift(...seenOn)
+        const relayUrls = relayList.read.concat(BIG_RELAY_URLS).slice(0, 4)
+
+        // If current event is protected, we can assume its replies are also protected and stored on the same relays
+        if (isProtectedEvent(event)) {
+          const seenOn = client.getSeenEventRelayUrls(event.id)
+          relayUrls.concat(...seenOn)
+        }
 
         const filters: (Omit<Filter, 'since' | 'until'> & {
           limit: number
@@ -168,7 +168,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
         }
         const { closer, timelineKey } = await client.subscribeTimeline(
           filters.map((filter) => ({
-            urls: relayUrls.slice(0, 5),
+            urls: relayUrls.slice(0, 8),
             filter
           })),
           {

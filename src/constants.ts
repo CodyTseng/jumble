@@ -2,18 +2,6 @@ import { kinds } from 'nostr-tools'
 
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
-export const DEFAULT_FAVORITE_RELAYS = [
-  'wss://nostr.wine/',
-  'wss://pyramid.fiatjaf.com/',
-  'wss://relays.land/spatianostra/',
-  'wss://theforest.nostr1.com/',
-  'wss://algo.utxo.one/',
-  'wss://140.f7z.io/',
-  'wss://news.utxo.one/'
-]
-
-export const RECOMMENDED_RELAYS = DEFAULT_FAVORITE_RELAYS.concat(['wss://yabu.me/'])
-
 export const RECOMMENDED_BLOSSOM_SERVERS = [
   'https://blossom.band/',
   'https://blossom.primal.net/',

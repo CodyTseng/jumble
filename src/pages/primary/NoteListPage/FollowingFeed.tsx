@@ -12,7 +12,7 @@ export default function FollowingFeed() {
 
   useEffect(() => {
     async function init() {
-      if (feedInfo.feedType !== 'following' || !pubkey) {
+      if (feedInfo?.feedType !== 'following' || !pubkey) {
         setSubRequests([])
         return
       }
@@ -22,7 +22,7 @@ export default function FollowingFeed() {
     }
 
     init()
-  }, [feedInfo.feedType, pubkey])
+  }, [feedInfo?.feedType, pubkey])
 
   return <NormalFeed subRequests={subRequests} isMainFeed />
 }

@@ -497,6 +497,12 @@ export default {
     Extension: 'Extension',
     Remote: 'Distant',
     'Encrypted Key': 'Clé chiffrée',
-    'Private Key': 'Clé privée'
+    'Private Key': 'Clé privée',
+    'Welcome to Jumble': 'Bienvenue sur Jumble',
+    'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
+      "Jumble est un client axé sur la navigation des relais. Commencez par explorer des relais intéressants ou connectez-vous pour voir votre fil d'abonnements.",
+    'Explore Relays': 'Explorer les relais',
+    'Choose a feed': 'Choisir un fil',
+    'and {{x}} others': 'et {{x}} autres'
   }
 }
