@@ -15,6 +15,28 @@ import { Info, Pencil, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+// Helper function to detect if a URL is a video
+function isVideoUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url)
+    const extension = urlObj.pathname.split('.').pop()?.toLowerCase()
+    return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '')
+  } catch {
+    return false
+  }
+}
+
+// Helper function to detect if a URL is audio
+function isAudioUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url)
+    const extension = urlObj.pathname.split('.').pop()?.toLowerCase()
+    return ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension || '')
+  } catch {
+    return false
+  }
+}
+
 export default function ImagePreview({
   images,
   onRemove,
@@ -48,47 +70,66 @@ export default function ImagePreview({
       <div className="space-y-2">
         <ScrollArea className="w-full">
           <div className="flex gap-2 pb-2">
-            {images.map((image, index) => (
-              <div
-                key={`${image.url}-${index}`}
-                className="relative group rounded-lg overflow-hidden border bg-muted/40 shrink-0"
-                style={{ width: '120px', height: '120px' }}
-              >
-                <img
-                  src={image.url}
-                  alt={image.alt || t('Uploaded image')}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 text-white hover:bg-white/20"
-                    onClick={() => handleOpenAltDialog(index)}
-                    title={t('Add alt text')}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 text-white hover:bg-white/20"
-                    onClick={() => onRemove(index)}
-                    title={t('Remove image')}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                {image.alt && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 truncate">
-                    {image.alt}
+            {images.map((image, index) => {
+              const isVideo = isVideoUrl(image.url)
+              const isAudio = isAudioUrl(image.url)
+
+              return (
+                <div
+                  key={`${image.url}-${index}`}
+                  className="relative group rounded-lg overflow-hidden border bg-muted/40 shrink-0"
+                  style={{ width: '120px', height: '120px' }}
+                >
+                  {isVideo ? (
+                    <video
+                      src={image.url}
+                      className="w-full h-full object-cover"
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : isAudio ? (
+                    <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xs p-2 text-center">
+                      🎵 {t('Audio')}
+                    </div>
+                  ) : (
+                    <img
+                      src={image.url}
+                      alt={image.alt || t('Uploaded image')}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-white hover:bg-white/20"
+                      onClick={() => handleOpenAltDialog(index)}
+                      title={t('Add alt text')}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-white hover:bg-white/20"
+                      onClick={() => onRemove(index)}
+                      title={isVideo ? t('Remove video') : isAudio ? t('Remove audio') : t('Remove image')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                )}
-              </div>
-            ))}
+                  {image.alt && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 truncate">
+                      {image.alt}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
@@ -110,11 +151,23 @@ export default function ImagePreview({
           <div className="space-y-4">
             {editingIndex !== null && images[editingIndex] && (
               <div className="rounded-lg overflow-hidden border bg-muted/40">
-                <img
-                  src={images[editingIndex].url}
-                  alt={images[editingIndex].alt || t('Preview')}
-                  className="w-full h-auto max-h-48 object-contain"
-                />
+                {isVideoUrl(images[editingIndex].url) ? (
+                  <video
+                    src={images[editingIndex].url}
+                    controls
+                    className="w-full h-auto max-h-48 object-contain"
+                  />
+                ) : isAudioUrl(images[editingIndex].url) ? (
+                  <div className="w-full p-8 flex items-center justify-center bg-muted text-muted-foreground">
+                    <audio src={images[editingIndex].url} controls className="w-full" />
+                  </div>
+                ) : (
+                  <img
+                    src={images[editingIndex].url}
+                    alt={images[editingIndex].alt || t('Preview')}
+                    className="w-full h-auto max-h-48 object-contain"
+                  />
+                )}
               </div>
             )}
             <div className="space-y-2">
