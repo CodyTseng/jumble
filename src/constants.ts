@@ -12,6 +12,14 @@ export const DEFAULT_FAVORITE_RELAYS = [
   'wss://news.utxo.one/'
 ]
 
+export const DEFAULT_FAVORITE_DOMAINS = [
+  'nostr.build',
+  'nostrplebs.com',
+  'stacker.news',
+  'primal.net',
+  'iris.to'
+]
+
 export const RECOMMENDED_RELAYS = DEFAULT_FAVORITE_RELAYS.concat(['wss://yabu.me/'])
 
 export const RECOMMENDED_BLOSSOM_SERVERS = [
@@ -24,6 +32,8 @@ export const StorageKey = {
   VERSION: 'version',
   THEME_SETTING: 'themeSetting',
   RELAY_SETS: 'relaySets',
+  FAVORITE_DOMAINS: 'favoriteDomains',
+  NIP05_COMMUNITY_SETS: 'nip05CommunitySets',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',

@@ -1,4 +1,5 @@
 import {
+  DEFAULT_FAVORITE_DOMAINS,
   DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
@@ -15,6 +16,7 @@ import {
   TFeedInfo,
   TMediaAutoLoadPolicy,
   TMediaUploadServiceConfig,
+  TNip05CommunitySet,
   TNoteListMode,
   TNotificationStyle,
   TRelaySet,
@@ -26,6 +28,8 @@ class LocalStorageService {
   static instance: LocalStorageService
 
   private relaySets: TRelaySet[] = []
+  private favoriteDomains: string[] = []
+  private nip05CommunitySets: TNip05CommunitySet[] = []
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
@@ -98,6 +102,24 @@ class LocalStorageService {
       this.relaySets = relaySets
     } else {
       this.relaySets = JSON.parse(relaySetsStr)
+    }
+
+    // Initialize favorite domains
+    const favoriteDomainsStr = window.localStorage.getItem(StorageKey.FAVORITE_DOMAINS)
+    if (!favoriteDomainsStr) {
+      this.favoriteDomains = DEFAULT_FAVORITE_DOMAINS
+      window.localStorage.setItem(StorageKey.FAVORITE_DOMAINS, JSON.stringify(this.favoriteDomains))
+    } else {
+      this.favoriteDomains = JSON.parse(favoriteDomainsStr)
+    }
+
+    // Initialize NIP-05 community sets
+    const nip05CommunitySetsStr = window.localStorage.getItem(StorageKey.NIP05_COMMUNITY_SETS)
+    if (!nip05CommunitySetsStr) {
+      this.nip05CommunitySets = []
+      window.localStorage.setItem(StorageKey.NIP05_COMMUNITY_SETS, JSON.stringify(this.nip05CommunitySets))
+    } else {
+      this.nip05CommunitySets = JSON.parse(nip05CommunitySetsStr)
     }
 
     const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
@@ -514,6 +536,25 @@ class LocalStorageService {
   setEnableSingleColumnLayout(enable: boolean) {
     this.enableSingleColumnLayout = enable
     window.localStorage.setItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT, enable.toString())
+  }
+
+  // NIP-05 Community Methods
+  getFavoriteDomains() {
+    return this.favoriteDomains
+  }
+
+  setFavoriteDomains(domains: string[]) {
+    this.favoriteDomains = domains
+    window.localStorage.setItem(StorageKey.FAVORITE_DOMAINS, JSON.stringify(this.favoriteDomains))
+  }
+
+  getNip05CommunitySets() {
+    return this.nip05CommunitySets
+  }
+
+  setNip05CommunitySets(sets: TNip05CommunitySet[]) {
+    this.nip05CommunitySets = sets
+    window.localStorage.setItem(StorageKey.NIP05_COMMUNITY_SETS, JSON.stringify(this.nip05CommunitySets))
   }
 }
 
