@@ -126,10 +126,12 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   // Load payment history
-  const loadPayments = async (reset = false) => {
+  const loadPayments = async (reset = false, silent = false) => {
     if (!connected) return
 
-    setLoadingPayments(true)
+    if (!silent) {
+      setLoadingPayments(true)
+    }
     try {
       const offset = reset ? 0 : paymentsOffset
       const limit = 20 // Load 20 at a time
@@ -150,7 +152,31 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     } catch (error) {
       console.error('[SparkWallet] Failed to load payments:', error)
     } finally {
-      setLoadingPayments(false)
+      if (!silent) {
+        setLoadingPayments(false)
+      }
+    }
+  }
+
+  // Refresh a specific payment
+  const refreshPayment = async (paymentId: string) => {
+    if (!connected) return
+
+    try {
+      // Reload the payment list to get updated status
+      const paymentList = await sparkService.listPayments(0, payments.length || 20)
+
+      // Update the payments list while preserving pagination
+      setPayments(paymentList)
+
+      // Find the updated payment to check if status changed
+      const updatedPayment = paymentList.find(p => p.id === paymentId)
+      if (updatedPayment) {
+        console.log('[SparkWallet] Payment refreshed:', paymentId, 'Status:', updatedPayment.status)
+      }
+    } catch (error) {
+      console.error('[SparkWallet] Failed to refresh payment:', error)
+      throw error
     }
   }
 
@@ -184,8 +210,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     const checkPendingPayments = () => {
       const hasPending = payments.some(p => p.status === 'pending')
       if (hasPending) {
-        console.log('[SparkWallet] Pending payments detected, refreshing...')
-        loadPayments(true)
+        console.log('[SparkWallet] Pending payments detected, refreshing silently...')
+        loadPayments(true, true) // Silent refresh - no loading indicator
       }
     }
 
@@ -1425,7 +1451,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       {loadingPayments ? <Loader2 className="animate-spin size-3" /> : 'Refresh'}
                     </Button>
                   </div>
-                  <SparkPaymentsList payments={payments} loading={loadingPayments} />
+                  <SparkPaymentsList
+                    payments={payments}
+                    loading={loadingPayments}
+                    onRefreshPayment={refreshPayment}
+                  />
 
                   {/* Load More Button */}
                   {hasMorePayments && payments.length > 0 && !loadingPayments && (
