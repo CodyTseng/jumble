@@ -1,6 +1,11 @@
 import { ExtendedKind } from '@/constants'
 import { tagNameEquals } from '@/lib/tag'
-import { TRelayInfo } from '@/types'
+import {
+  TNip05Community,
+  TNip05CommunitySet,
+  TNip05DomainInfo,
+  TRelayInfo
+} from '@/types'
 import { Event, kinds } from 'nostr-tools'
 
 type TValue<T = any> = {
@@ -24,7 +29,10 @@ const StoreNames = {
   RELAY_SETS: 'relaySets',
   FOLLOWING_FAVORITE_RELAYS: 'followingFavoriteRelays',
   RELAY_INFOS: 'relayInfos',
-  RELAY_INFO_EVENTS: 'relayInfoEvents' // deprecated
+  RELAY_INFO_EVENTS: 'relayInfoEvents', // deprecated
+  NIP05_COMMUNITIES: 'nip05Communities',
+  NIP05_COMMUNITY_SETS: 'nip05CommunitySets',
+  NIP05_DOMAIN_INFOS: 'nip05DomainInfos'
 }
 
 class IndexedDbService {
@@ -43,7 +51,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 9)
+        const request = window.indexedDB.open('jumble', 10)
 
         request.onerror = (event) => {
           reject(event)
@@ -97,6 +105,15 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.PIN_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.PIN_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP05_COMMUNITIES)) {
+            db.createObjectStore(StoreNames.NIP05_COMMUNITIES, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP05_COMMUNITY_SETS)) {
+            db.createObjectStore(StoreNames.NIP05_COMMUNITY_SETS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP05_DOMAIN_INFOS)) {
+            db.createObjectStore(StoreNames.NIP05_DOMAIN_INFOS, { keyPath: 'key' })
           }
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
             db.deleteObjectStore(StoreNames.RELAY_INFO_EVENTS)
@@ -425,6 +442,231 @@ class IndexedDbService {
     })
   }
 
+  // NIP-05 Community Methods
+  async putNip05Community(community: TNip05Community): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITIES, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITIES)
+
+      const putRequest = store.put(this.formatValue(community.domain, community))
+      putRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getNip05Community(domain: string): Promise<TNip05Community | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITIES, 'readonly')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITIES)
+      const request = store.get(domain)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve((request.result as TValue<TNip05Community>)?.value)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getAllNip05Communities(): Promise<TNip05Community[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITIES, 'readonly')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITIES)
+      const request = store.getAll()
+
+      request.onsuccess = () => {
+        transaction.commit()
+        const results = request.result as TValue<TNip05Community>[]
+        resolve(results.map((r) => r.value).filter((v): v is TNip05Community => v !== null))
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteNip05Community(domain: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITIES, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITIES)
+
+      const deleteRequest = store.delete(domain)
+      deleteRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      deleteRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  // NIP-05 Community Set Methods
+  async putNip05CommunitySet(communitySet: TNip05CommunitySet): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITY_SETS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITY_SETS)
+
+      const putRequest = store.put(this.formatValue(communitySet.id, communitySet))
+      putRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getNip05CommunitySet(id: string): Promise<TNip05CommunitySet | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITY_SETS, 'readonly')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITY_SETS)
+      const request = store.get(id)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve((request.result as TValue<TNip05CommunitySet>)?.value)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getAllNip05CommunitySets(): Promise<TNip05CommunitySet[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITY_SETS, 'readonly')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITY_SETS)
+      const request = store.getAll()
+
+      request.onsuccess = () => {
+        transaction.commit()
+        const results = request.result as TValue<TNip05CommunitySet>[]
+        resolve(results.map((r) => r.value).filter((v): v is TNip05CommunitySet => v !== null))
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteNip05CommunitySet(id: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_COMMUNITY_SETS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP05_COMMUNITY_SETS)
+
+      const deleteRequest = store.delete(id)
+      deleteRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      deleteRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  // NIP-05 Domain Info Methods
+  async putNip05DomainInfo(domainInfo: TNip05DomainInfo): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_DOMAIN_INFOS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP05_DOMAIN_INFOS)
+
+      const putRequest = store.put(this.formatValue(domainInfo.domain, domainInfo))
+      putRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getNip05DomainInfo(domain: string): Promise<TNip05DomainInfo | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.NIP05_DOMAIN_INFOS, 'readonly')
+      const store = transaction.objectStore(StoreNames.NIP05_DOMAIN_INFOS)
+      const request = store.get(domain)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve((request.result as TValue<TNip05DomainInfo>)?.value)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   private getReplaceableEventKeyFromEvent(event: Event): string {
     if (
       [kinds.Metadata, kinds.Contacts].includes(event.kind) ||
@@ -502,6 +744,14 @@ class IndexedDbService {
       {
         name: StoreNames.PIN_LIST_EVENTS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 days
+      },
+      {
+        name: StoreNames.NIP05_COMMUNITIES,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 7 // 7 days
+      },
+      {
+        name: StoreNames.NIP05_DOMAIN_INFOS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 7 // 7 days
       }
     ]
     const transaction = this.db!.transaction(
