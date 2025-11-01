@@ -7,6 +7,7 @@ import { TFeedInfo, TFeedType } from '@/types'
 import { kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useFavoriteRelays } from './FavoriteRelaysProvider'
+import { useNip05Communities } from './Nip05CommunitiesProvider'
 import { useNostr } from './NostrProvider'
 
 type TFeedContext = {
@@ -15,7 +16,13 @@ type TFeedContext = {
   isReady: boolean
   switchFeed: (
     feedType: TFeedType,
-    options?: { activeRelaySetId?: string; pubkey?: string; relay?: string | null }
+    options?: {
+      activeRelaySetId?: string
+      pubkey?: string
+      relay?: string | null
+      activeCommunitySetId?: string
+      domain?: string | null
+    }
   ) => Promise<void>
 }
 
@@ -32,6 +39,7 @@ export const useFeed = () => {
 export function FeedProvider({ children }: { children: React.ReactNode }) {
   const { pubkey, isInitialized } = useNostr()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
+  const { communitySets } = useNip05Communities()
   const [relayUrls, setRelayUrls] = useState<string[]>([])
   const [isReady, setIsReady] = useState(false)
   const [feedInfo, setFeedInfo] = useState<TFeedInfo>({
@@ -65,6 +73,14 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return await switchFeed('relay', { relay: feedInfo.id })
       }
 
+      if (feedInfo.feedType === 'nip05-domains') {
+        return await switchFeed('nip05-domains', { activeCommunitySetId: feedInfo.id })
+      }
+
+      if (feedInfo.feedType === 'nip05-domain') {
+        return await switchFeed('nip05-domain', { domain: feedInfo.id })
+      }
+
       // update following feed if pubkey changes
       if (feedInfo.feedType === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
@@ -80,6 +96,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       activeRelaySetId?: string | null
       pubkey?: string | null
       relay?: string | null
+      activeCommunitySetId?: string | null
+      domain?: string | null
     } = {}
   ) => {
     setIsReady(false)
@@ -140,6 +158,55 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       storage.setFeedInfo(newFeedInfo, pubkey)
 
       setRelayUrls([])
+      setIsReady(true)
+      return
+    }
+    if (feedType === 'nip05-domain') {
+      const domain = (options.domain ?? '').toLowerCase().trim()
+      if (!domain) {
+        setIsReady(true)
+        return
+      }
+
+      const newFeedInfo = { feedType, id: domain }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
+      storage.setFeedInfo(newFeedInfo, pubkey)
+
+      // For domain feeds, we set relayUrls to empty and let the feed consumer
+      // handle fetching members and their relays
+      setRelayUrls([])
+      setIsReady(true)
+      return
+    }
+    if (feedType === 'nip05-domains') {
+      const communitySetId =
+        options.activeCommunitySetId ?? (communitySets.length > 0 ? communitySets[0].id : null)
+      if (!communitySetId) {
+        setIsReady(true)
+        return
+      }
+
+      let communitySet =
+        communitySets.find((set) => set.id === communitySetId) ??
+        (communitySets.length > 0 ? communitySets[0] : null)
+      if (!communitySet) {
+        const storedCommunitySet = await indexedDb.getNip05CommunitySet(communitySetId)
+        if (storedCommunitySet) {
+          communitySet = storedCommunitySet
+        }
+      }
+      if (communitySet) {
+        const newFeedInfo = { feedType, id: communitySet.id }
+        setFeedInfo(newFeedInfo)
+        feedInfoRef.current = newFeedInfo
+        storage.setFeedInfo(newFeedInfo, pubkey)
+
+        // For domain sets, we set relayUrls to empty and let the feed consumer
+        // handle fetching members and their relays
+        setRelayUrls([])
+        setIsReady(true)
+      }
       setIsReady(true)
       return
     }
