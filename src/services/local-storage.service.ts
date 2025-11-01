@@ -92,6 +92,7 @@ class LocalStorageService {
   private trendingNotesDismissed: boolean = false
   private compactSidebar: boolean = false
   private logoStyle: TLogoStyle = 'image'
+  private customLogoText: string = 'Jumble'
   private enabledWidgets: string[] = []
   private pinnedNoteWidgets: { id: string; eventId: string }[] = []
   private aiPromptWidgets: { id: string; eventId: string; messages: any[] }[] = []
@@ -333,6 +334,11 @@ class LocalStorageService {
     const logoStyle = window.localStorage.getItem(StorageKey.LOGO_STYLE)
     if (logoStyle && ['image', 'text'].includes(logoStyle)) {
       this.logoStyle = logoStyle as TLogoStyle
+    }
+
+    const customLogoText = window.localStorage.getItem(StorageKey.CUSTOM_LOGO_TEXT)
+    if (customLogoText) {
+      this.customLogoText = customLogoText
     }
 
     const enabledWidgetsStr = window.localStorage.getItem(StorageKey.ENABLED_WIDGETS)
@@ -880,6 +886,15 @@ class LocalStorageService {
   setLogoStyle(style: TLogoStyle) {
     this.logoStyle = style
     window.localStorage.setItem(StorageKey.LOGO_STYLE, style)
+  }
+
+  getCustomLogoText() {
+    return this.customLogoText
+  }
+
+  setCustomLogoText(text: string) {
+    this.customLogoText = text
+    window.localStorage.setItem(StorageKey.CUSTOM_LOGO_TEXT, text)
   }
 
   getEnabledWidgets() {

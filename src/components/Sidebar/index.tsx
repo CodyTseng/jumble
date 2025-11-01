@@ -21,7 +21,7 @@ import MultiColumnToggle from './MultiColumnToggle'
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
   const { compactSidebar } = useCompactSidebar()
-  const { logoStyle } = useLogoStyle()
+  const { logoStyle, customLogoText } = useLogoStyle()
   const { hideReadsInNavigation } = useReadsVisibility()
   const { hideListsInNavigation } = useListsVisibility()
 
@@ -48,7 +48,7 @@ export default function PrimaryPageSidebar() {
               "text-2xl font-bold max-xl:hidden",
               compactSidebar && "hidden"
             )}>
-              JumbleKat
+              {customLogoText}
             </div>
           )}
         </div>

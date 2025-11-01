@@ -67,6 +67,7 @@ export const StorageKey = {
   BITCOIN_TICKER_SHOW_BLOCK_HEIGHT: 'bitcoinTickerShowBlockHeight',
   COMPACT_SIDEBAR: 'compactSidebar',
   LOGO_STYLE: 'logoStyle',
+  CUSTOM_LOGO_TEXT: 'customLogoText',
   ENABLED_WIDGETS: 'enabledWidgets',
   PINNED_NOTE_WIDGETS: 'pinnedNoteWidgets',
   AI_PROMPT_WIDGETS: 'aiPromptWidgets',

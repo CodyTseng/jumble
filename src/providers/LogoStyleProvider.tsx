@@ -5,6 +5,8 @@ import { createContext, useContext, useState } from 'react'
 type TLogoStyleContext = {
   logoStyle: TLogoStyle
   setLogoStyle: (style: TLogoStyle) => void
+  customLogoText: string
+  setCustomLogoText: (text: string) => void
 }
 
 const LogoStyleContext = createContext<TLogoStyleContext | undefined>(undefined)
@@ -19,17 +21,25 @@ export const useLogoStyle = () => {
 
 export function LogoStyleProvider({ children }: { children: React.ReactNode }) {
   const [logoStyle, setLogoStyleState] = useState(storage.getLogoStyle())
+  const [customLogoText, setCustomLogoTextState] = useState(storage.getCustomLogoText())
 
   const setLogoStyle = (style: TLogoStyle) => {
     setLogoStyleState(style)
     storage.setLogoStyle(style)
   }
 
+  const setCustomLogoText = (text: string) => {
+    setCustomLogoTextState(text)
+    storage.setCustomLogoText(text)
+  }
+
   return (
     <LogoStyleContext.Provider
       value={{
         logoStyle,
-        setLogoStyle
+        setLogoStyle,
+        customLogoText,
+        setCustomLogoText
       }}
     >
       {children}

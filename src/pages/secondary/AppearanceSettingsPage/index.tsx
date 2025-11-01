@@ -1,6 +1,7 @@
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { Input } from '@/components/ui/input'
 import Tabs from '@/components/Tabs'
 import {
   BUTTON_RADIUS_VALUES,
@@ -88,7 +89,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { postButtonStyle, setPostButtonStyle } = usePostButtonStyle()
   const { cardRadius, setCardRadius } = useCardRadius()
   const { compactSidebar, setCompactSidebar } = useCompactSidebar()
-  const { logoStyle, setLogoStyle } = useLogoStyle()
+  const { logoStyle, setLogoStyle, customLogoText, setCustomLogoText } = useLogoStyle()
 
   const getThemeIcon = (theme: string) => {
     switch (theme) {
@@ -312,6 +313,22 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
                   )}
                 </button>
               </div>
+              {logoStyle === 'text' && (
+                <div className="w-full space-y-2">
+                  <Label htmlFor="custom-logo-text" className="text-sm text-muted-foreground">
+                    {t('Custom logo text')}
+                  </Label>
+                  <Input
+                    id="custom-logo-text"
+                    type="text"
+                    value={customLogoText}
+                    onChange={(e) => setCustomLogoText(e.target.value)}
+                    placeholder={t('Enter your custom text')}
+                    className="w-full"
+                    maxLength={50}
+                  />
+                </div>
+              )}
             </SettingItem>
             <SettingItem className="flex-col items-start gap-3">
               <Label className="text-base font-normal">
