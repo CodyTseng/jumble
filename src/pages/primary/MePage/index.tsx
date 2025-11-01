@@ -3,6 +3,7 @@ import LoginDialog from '@/components/LoginDialog'
 import LogoutDialog from '@/components/LogoutDialog'
 import NpubQrCode from '@/components/NpubQrCode'
 import PubkeyCopy from '@/components/PubkeyCopy'
+import { SparkWalletBalance } from '@/components/SparkWalletBalance'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
@@ -107,7 +108,8 @@ export default MePage
 function MePageTitlebar() {
   const { push } = useSecondaryPage()
   return (
-    <div className="flex justify-end items-center">
+    <div className="flex justify-end items-center gap-1">
+      <SparkWalletBalance />
       <Button variant="ghost" size="titlebar-icon" onClick={() => push(toSettings())}>
         <Settings />
       </Button>
