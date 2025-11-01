@@ -30,6 +30,7 @@ import {
 } from 'nostr-tools'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import indexedDb from './indexed-db.service'
+import nip05CommunityService from './nip05-community.service'
 
 type TTimelineRef = [string, number]
 
@@ -1409,6 +1410,60 @@ class ClientService extends EventTarget {
       urls: [url],
       filter: { authors: Array.from(authors) }
     }))
+  }
+
+  // ================= NIP-05 Domain Feeds =================
+
+  /**
+   * Generate subscription requests for a single NIP-05 domain community.
+   * Fetches community members from the domain and generates optimized relay subscriptions.
+   *
+   * @param domain - The NIP-05 domain (e.g., "nostr.build")
+   * @param myPubkey - Optional pubkey of current user for relay optimization
+   * @returns Array of subscription requests with relay URLs and author filters
+   */
+  async generateSubRequestsForDomain(domain: string, myPubkey?: string | null) {
+    try {
+      const members = await nip05CommunityService.getDomainMembers(domain)
+      if (members.length === 0) {
+        console.warn(`No members found for domain: ${domain}`)
+        return []
+      }
+      return await this.generateSubRequestsForPubkeys(members, myPubkey)
+    } catch (error) {
+      console.error(`Error generating sub requests for domain ${domain}:`, error)
+      return []
+    }
+  }
+
+  /**
+   * Generate subscription requests for multiple NIP-05 domain communities.
+   * Fetches members from all domains and generates optimized relay subscriptions.
+   *
+   * @param domains - Array of NIP-05 domains
+   * @param myPubkey - Optional pubkey of current user for relay optimization
+   * @returns Array of subscription requests with relay URLs and author filters
+   */
+  async generateSubRequestsForDomains(domains: string[], myPubkey?: string | null) {
+    try {
+      // Fetch members from all domains in parallel
+      const membersArrays = await Promise.all(
+        domains.map((domain) => nip05CommunityService.getDomainMembers(domain))
+      )
+
+      // Flatten and deduplicate members
+      const allMembers = Array.from(new Set(membersArrays.flat()))
+
+      if (allMembers.length === 0) {
+        console.warn(`No members found for domains: ${domains.join(', ')}`)
+        return []
+      }
+
+      return await this.generateSubRequestsForPubkeys(allMembers, myPubkey)
+    } catch (error) {
+      console.error(`Error generating sub requests for domains ${domains.join(', ')}:`, error)
+      return []
+    }
   }
 }
 
