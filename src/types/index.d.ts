@@ -66,6 +66,37 @@ export type TRelaySet = {
   relayUrls: string[]
 }
 
+export type TNip05Community = {
+  id: string // domain name (e.g., "bitcoin.org")
+  domain: string // same as id for clarity
+  name?: string // display name for the community
+  description?: string // community description
+  icon?: string // community icon/logo URL
+  memberCount?: number // cached count of verified users
+  members: string[] // array of pubkeys with verified NIP-05 at this domain
+  lastUpdated: number // timestamp for cache invalidation
+  featured?: boolean // if this is a featured/curated community
+  tags?: string[] // category tags (e.g., ["bitcoin", "development"])
+}
+
+export type TNip05CommunitySet = {
+  id: string // unique set ID (UUID or hash)
+  name: string // "My Favorite Communities", "Bitcoin Communities", etc.
+  domains: string[] // array of domain names
+  created_at: number // timestamp
+}
+
+export type TNip05DomainInfo = {
+  domain: string // the domain name
+  name?: string // display name if provided
+  description?: string // description if provided
+  icon?: string // icon/logo if provided
+  website?: string // official website
+  contact?: string // contact info
+  verified: boolean // if we successfully fetched .well-known/nostr.json
+  lastChecked: number // timestamp of last verification check
+}
+
 export type TConfig = {
   relayGroups: TRelaySet[]
   theme: TThemeSetting
@@ -106,7 +137,7 @@ export type TAccount = {
 
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
-export type TFeedType = 'following' | 'relays' | 'relay'
+export type TFeedType = 'following' | 'relays' | 'relay' | 'nip05-domains' | 'nip05-domain'
 export type TFeedInfo = { feedType: TFeedType; id?: string }
 
 export type TLanguage = 'en' | 'zh' | 'pl'
@@ -169,7 +200,7 @@ export type TPollCreateData = {
   endsAt?: number
 }
 
-export type TSearchType = 'profile' | 'profiles' | 'notes' | 'note' | 'hashtag' | 'relay'
+export type TSearchType = 'profile' | 'profiles' | 'notes' | 'note' | 'hashtag' | 'relay' | 'nip05-community'
 
 export type TSearchParams = {
   type: TSearchType
@@ -185,6 +216,14 @@ export type TAwesomeRelayCollection = {
   name: string
   description: string
   relays: string[]
+}
+
+export type TAwesomeNip05CommunityCollection = {
+  id: string
+  name: string
+  description: string
+  domains: string[]
+  category?: string // e.g., "Regional", "Topic-Based", "Popular"
 }
 
 export type TMediaAutoLoadPolicy =
