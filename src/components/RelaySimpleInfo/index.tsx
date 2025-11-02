@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { getRelayDisplayName } from '@/lib/relay'
 import { TRelayInfo } from '@/types'
 import { HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,6 +24,9 @@ export default function RelaySimpleInfo({
 }) {
   const { t } = useTranslation()
 
+  const displayName = getRelayDisplayName(relayInfo)
+  const showShortUrl = relayInfo?.name || relayInfo?.url.includes('lang.relays.land/')
+
   return (
     <div className={cn(compact ? 'space-y-0' : 'space-y-1', className)} {...props}>
       <div className="flex items-start justify-between gap-2 w-full">
@@ -30,9 +34,9 @@ export default function RelaySimpleInfo({
           <RelayIcon url={relayInfo?.url} className={compact ? 'h-7 w-7' : 'h-9 w-9'} />
           <div className="flex-1 w-0">
             <div className={cn('truncate font-semibold', compact && 'text-sm')}>
-              {relayInfo?.name || relayInfo?.shortUrl}
+              {displayName}
             </div>
-            {relayInfo?.name && (
+            {showShortUrl && (
               <div className="text-xs text-muted-foreground truncate">{relayInfo?.shortUrl}</div>
             )}
           </div>

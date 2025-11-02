@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useFetchRelayInfo } from '@/hooks'
 import { normalizeHttpUrl } from '@/lib/url'
+import { getRelayDisplayName } from '@/lib/relay'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { Check, Copy, GitBranch, Link, Mail, SquareCode } from 'lucide-react'
@@ -34,7 +35,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             <div className="flex gap-2 items-center truncate">
               <RelayIcon url={url} className="w-8 h-8" />
               <div className="text-2xl font-semibold truncate select-text">
-                {relayInfo.name || relayInfo.shortUrl}
+                {getRelayDisplayName(relayInfo)}
               </div>
             </div>
             <RelayControls url={relayInfo.url} />
