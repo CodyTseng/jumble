@@ -163,8 +163,6 @@ function UserHighlightCard({
   count: number
   onClick: () => void
 }) {
-  const { t } = useTranslation()
-
   return (
     <div
       className="flex items-center gap-3 p-4 border rounded-lg clickable hover:bg-accent/50 transition-colors cursor-pointer"
@@ -175,9 +173,9 @@ function UserHighlightCard({
         <div className="font-semibold truncate">
           <Username pubkey={pubkey} />
         </div>
-        <div className="text-sm text-muted-foreground">
-          {count} {count === 1 ? t('highlight') : t('highlights')}
-        </div>
+      </div>
+      <div className="flex items-center justify-center min-w-[2rem] h-8 px-3 bg-primary/10 text-primary rounded-full font-semibold text-sm">
+        {count}
       </div>
     </div>
   )
