@@ -8,6 +8,7 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronsLeft, ChevronsRight, Globe } from 'lucide-react'
+import { useState } from 'react'
 import AccountButton from './AccountButton'
 import BookmarkButton from './BookmarkButton'
 import RelaysButton from './ExploreButton'
@@ -18,6 +19,35 @@ import PostButton from './PostButton'
 import ProfileButton from './ProfileButton'
 import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
+
+function CommunityFavicon({ domain, size }: { domain: string; size: number }) {
+  const [faviconError, setFaviconError] = useState(false)
+
+  // Use inline styles for dynamic sizing
+  const sizeInRem = size * 0.25 // Tailwind size-8 = 2rem, size-12 = 3rem
+  const style = {
+    width: `${sizeInRem}rem`,
+    height: `${sizeInRem}rem`
+  }
+
+  if (faviconError) {
+    // Fallback to globe icon
+    return <Globe style={style} className="text-primary" />
+  }
+
+  // Try to load favicon from domain
+  const faviconUrl = `https://${domain}/favicon.ico`
+
+  return (
+    <img
+      src={faviconUrl}
+      alt={`${domain} favicon`}
+      style={style}
+      className="object-contain"
+      onError={() => setFaviconError(true)}
+    />
+  )
+}
 
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
@@ -47,19 +77,19 @@ export default function PrimaryPageSidebar() {
             aria-label="Go to home"
           >
             {hasCommunity ? (
-              <Globe className="size-8 text-primary" />
+              <CommunityFavicon key={feedInfo.id} domain={feedInfo.id!} size={8} />
             ) : (
               <Icon />
             )}
           </button>
         ) : (
           <button
-            className="px-4 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            className="px-4 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity flex justify-center"
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
             {hasCommunity ? (
-              <Globe className="size-12 text-primary" />
+              <CommunityFavicon key={feedInfo.id} domain={feedInfo.id!} size={12} />
             ) : (
               <Logo />
             )}
