@@ -39,6 +39,14 @@ const languages = {
 } as const
 
 export type TLanguage = keyof typeof languages
+
+// RTL languages list
+export const RTL_LANGUAGES: TLanguage[] = ['ar', 'fa']
+
+export const isRTLLanguage = (language: TLanguage): boolean => {
+  return RTL_LANGUAGES.includes(language)
+}
+
 export const LocalizedLanguageNames: { [key in TLanguage]?: string } = {}
 const resources: { [key in TLanguage]?: Resource } = {}
 const supportedLanguages: TLanguage[] = []

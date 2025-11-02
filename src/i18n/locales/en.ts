@@ -113,6 +113,7 @@ export default {
     'relay sets': 'relay sets',
     edit: 'edit',
     Languages: 'Languages',
+    'Right-to-left layout': 'Right-to-left layout',
     Theme: 'Theme',
     'Primary color': 'Primary color',
     System: 'System',

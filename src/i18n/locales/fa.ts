@@ -98,6 +98,7 @@ export default {
     'relay sets': 'مجموعه‌های رله',
     edit: 'ویرایش',
     Languages: 'زبان‌ها',
+    'Right-to-left layout': 'چیدمان راست به چپ',
     Theme: 'تم',
     System: 'سیستم',
     Light: 'روشن',

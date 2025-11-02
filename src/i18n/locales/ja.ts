@@ -100,6 +100,7 @@ export default {
     'relay sets': 'リレイセット',
     edit: '編集',
     Languages: '言語',
+    'Right-to-left layout': '右から左へのレイアウト',
     Theme: 'テーマ',
     System: 'システム',
     Light: 'ライト',

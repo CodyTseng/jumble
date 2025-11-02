@@ -98,6 +98,7 @@ export default {
     'relay sets': 'Zestawy transmiterów',
     edit: 'edytuj',
     Languages: 'Języki',
+    'Right-to-left layout': 'Układ od prawej do lewej',
     Theme: 'Wygląd',
     System: 'Domyślny',
     Light: 'Jasny',

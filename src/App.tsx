@@ -43,6 +43,7 @@ import { UserTrustProvider } from '@/providers/UserTrustProvider'
 import { WidgetsProvider } from '@/providers/WidgetsProvider'
 import { WidgetSidebarDismissedProvider } from '@/providers/WidgetSidebarDismissedProvider'
 import { ZapProvider } from '@/providers/ZapProvider'
+import { RTLProvider } from '@/providers/RTLProvider'
 import { PageManager } from './PageManager'
 import { AppWithListPreview } from './components/AppWithListPreview'
 
@@ -55,6 +56,7 @@ export default function App(): JSX.Element {
           <FontSizeProvider>
             <TitleFontSizeProvider>
               <FontFamilyProvider>
+                <RTLProvider>
                 <ButtonRadiusProvider>
                 <PostButtonStyleProvider>
                   <CardRadiusProvider>
@@ -125,6 +127,7 @@ export default function App(): JSX.Element {
                   </CardRadiusProvider>
                 </PostButtonStyleProvider>
                 </ButtonRadiusProvider>
+                </RTLProvider>
               </FontFamilyProvider>
             </TitleFontSizeProvider>
           </FontSizeProvider>

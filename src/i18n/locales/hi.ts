@@ -99,6 +99,7 @@ export default {
     'relay sets': 'रिले सेट',
     edit: 'संपादित करें',
     Languages: 'भाषाएं',
+    'Right-to-left layout': 'दाएं से बाएं लेआउट',
     Theme: 'थीम',
     System: 'सिस्टम',
     Light: 'लाइट',

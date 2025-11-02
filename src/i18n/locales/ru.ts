@@ -100,6 +100,7 @@ export default {
     'relay sets': 'наборы ретрансляторов',
     edit: 'редактировать',
     Languages: 'Языки',
+    'Right-to-left layout': 'Макет справа налево',
     Theme: 'Тема',
     System: 'Система',
     Light: 'Светлая',

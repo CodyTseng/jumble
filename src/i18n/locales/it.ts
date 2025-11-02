@@ -99,6 +99,7 @@ export default {
     'relay sets': 'set di relay',
     edit: 'modifica',
     Languages: 'Lingue',
+    'Right-to-left layout': 'Layout da destra a sinistra',
     Theme: 'Tema',
     System: 'Sistema',
     Light: 'Luminoso',

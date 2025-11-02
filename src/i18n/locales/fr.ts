@@ -100,6 +100,7 @@ export default {
     'relay sets': 'groupes de relais',
     edit: 'modifier',
     Languages: 'Langues',
+    'Right-to-left layout': 'Mise en page de droite à gauche',
     Theme: 'Thème',
     System: 'Système',
     Light: 'Clair',

@@ -11,6 +11,7 @@ import { useDistractionFreeMode } from '@/providers/DistractionFreeModeProvider'
 import { useReadsVisibility } from '@/providers/ReadsVisibilityProvider'
 import { useListsVisibility } from '@/providers/ListsVisibilityProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { useRTL } from '@/providers/RTLProvider'
 import { TMediaAutoLoadPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
 import { Check, ExternalLink, BellOff, BellRing } from 'lucide-react'
@@ -44,6 +45,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     setHideReadsInProfiles
   } = useReadsVisibility()
   const { hideListsInNavigation, setHideListsInNavigation } = useListsVisibility()
+  const { isRTL, toggleRTL, showRTLToggle } = useRTL()
 
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -86,6 +88,18 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                 </SelectContent>
               </Select>
             </SettingItem>
+            {showRTLToggle && (
+              <SettingItem>
+                <Label htmlFor="rtl-mode" className="text-base font-normal">
+                  {t('Right-to-left layout')}
+                </Label>
+                <Switch
+                  id="rtl-mode"
+                  checked={isRTL}
+                  onCheckedChange={toggleRTL}
+                />
+              </SettingItem>
+            )}
             <SettingItem className="flex-col items-start gap-3">
               <Label className="text-base font-normal">
                 {t('Distraction-Free Mode')}

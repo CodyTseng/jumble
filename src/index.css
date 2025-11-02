@@ -59,6 +59,16 @@
     position: relative;
   }
 
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="rtl"] .tiptap p.is-editor-empty:first-child::before {
+    float: right;
+  }
+
 
 
   .clickable {

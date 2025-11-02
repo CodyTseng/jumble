@@ -100,6 +100,7 @@ export default {
     'relay sets': 'conjuntos de relés',
     edit: 'editar',
     Languages: 'Idiomas',
+    'Right-to-left layout': 'Diseño de derecha a izquierda',
     Theme: 'Tema',
     System: 'Sistema',
     Light: 'Claro',

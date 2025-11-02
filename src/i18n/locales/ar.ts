@@ -98,6 +98,7 @@ export default {
     'relay sets': 'مجموعات الريلاي',
     edit: 'تعديل',
     Languages: 'اللغات',
+    'Right-to-left layout': 'تخطيط من اليمين إلى اليسار',
     Theme: 'المظهر',
     System: 'النظام',
     Light: 'فاتح',

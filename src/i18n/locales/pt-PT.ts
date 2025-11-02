@@ -99,6 +99,7 @@ export default {
     'relay sets': 'conjuntos de relé',
     edit: 'editar',
     Languages: 'Idiomas',
+    'Right-to-left layout': 'Disposição da direita para a esquerda',
     Theme: 'Tema',
     System: 'Sistema',
     Light: 'Claro',

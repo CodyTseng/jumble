@@ -100,6 +100,7 @@ export default {
     'relay sets': 'Relay-Sets',
     edit: 'bearbeiten',
     Languages: 'Sprachen',
+    'Right-to-left layout': 'Rechts-nach-links-Layout',
     Theme: 'Design',
     System: 'System',
     Light: 'Hell',

@@ -98,6 +98,7 @@ export default {
     'relay sets': '服务器组',
     edit: '编辑',
     Languages: '语言',
+    'Right-to-left layout': '从右到左布局',
     Theme: '主题',
     System: '系统',
     Light: '浅色',

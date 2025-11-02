@@ -98,6 +98,7 @@ export default {
     'relay sets': 'ชุดรีเลย์',
     edit: 'แก้ไข',
     Languages: 'ภาษา',
+    'Right-to-left layout': 'เค้าโครงจากขวาไปซ้าย',
     Theme: 'ธีม',
     System: 'ระบบ',
     Light: 'สว่าง',

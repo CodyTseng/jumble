@@ -98,6 +98,7 @@ export default {
     'relay sets': 'Conjuntos de relay',
     edit: 'Editar',
     Languages: 'Idiomas',
+    'Right-to-left layout': 'Layout da direita para a esquerda',
     Theme: 'Tema',
     System: 'Sistema',
     Light: 'Claro',

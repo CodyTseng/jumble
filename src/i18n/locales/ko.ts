@@ -99,6 +99,7 @@ export default {
     'relay sets': '릴레이 세트',
     edit: '편집',
     Languages: '언어',
+    'Right-to-left layout': '오른쪽에서 왼쪽 레이아웃',
     Theme: '테마',
     System: '시스템',
     Light: '라이트',
