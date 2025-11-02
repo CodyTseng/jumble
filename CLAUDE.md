@@ -17,7 +17,33 @@ The app uses a **deep Context Provider stack** as the primary state management m
 - UI state (ThemeProvider, ScreenSizeProvider)
 - Nostr protocol specifics (ZapProvider, ReplyProvider, NotificationProvider)
 
-**Key Pattern Insight**: The architecture treats Nostr relays as first-class navigation targets, not just data sources. Users can browse individual relay feeds or follow-based feeds seamlessly through the `FeedProvider` which manages the current feed context.
+**Key Pattern Insight**: The architecture treats Nostr relays AND NIP-05 domain communities as first-class navigation targets. Users can browse:
+- Individual relay feeds
+- Follow-based feeds
+- Domain community feeds (new: NIP-05 verified users grouped by domain)
+
+All managed seamlessly through the `FeedProvider` and `Nip05CommunitiesProvider`.
+
+---
+
+## 1.5. NIP-05 Communities Feature
+
+**New Addition**: Domain-based community discovery and navigation system built on NIP-05 verification.
+
+The app now treats verified NIP-05 domains (e.g., @nostr.build, @stacker.news) as communities, grouping users who share the same verified domain. This creates natural community boundaries based on domain verification.
+
+**Key Components**:
+- **Nip05CommunitiesProvider**: Manages favorite domains, community sets, and community data
+- **nip05-community.service**: Fetches domain members, caches community data, provides search
+- **ExplorePage tabs**: Discover Communities, Community Profiles, Following's Domains
+- **Nip05CommunityPage**: Detail page showing community feed and member list
+- **Domain discovery**: Search, trending, and personalized suggestions
+
+**Architecture Additions**:
+- New IndexedDB schema v10 for community data (communities, domainInfo, communitySets)
+- New localStorage keys for favorite domains and onboarding flag
+- Integration with existing ClientService for domain-based feed generation
+- Onboarding dialog for first-time users
 
 ---
 
@@ -28,7 +54,8 @@ The app uses a **deep Context Provider stack** as the primary state management m
 
 Key providers:
 - **NostrProvider**: Central auth/signing system. Manages multiple signer types (nsec, nip-07, bunker, ncryptsec, npub)
-- **FeedProvider**: Controls feed type (relay, relays, following) and relay URLs for the current feed
+- **FeedProvider**: Controls feed type (relay, relays, following, domain) and relay URLs for the current feed
+- **Nip05CommunitiesProvider**: NEW - Manages favorite domains, community sets, community discovery and onboarding
 - **FavoriteRelaysProvider**: Manages user's favorite relay sets and NIP-65 relay lists
 - **MuteListProvider**: Encrypted mute list management with NIP-59
 - **FollowListProvider**: Manages follow relationships (contacts/people list)
@@ -65,8 +92,9 @@ Each provider typically:
   - Emoji lists, pin lists, relay sets
 
 **Supporting services**:
+- **nip05-community.service.ts** - NEW - Domain community management, member fetching, search
 - **note-stats.service.ts** - Aggregates reactions/reposts/zaps
-- **local-storage.service.ts** - Lightweight browser storage for preferences
+- **local-storage.service.ts** - Lightweight browser storage for preferences (now includes community data)
 - **relay-info.service.ts** - NIP-11 relay info caching
 - **media-upload.service.ts** - NIP-96 file uploads
 - **lightning.service.ts** - LNURL-pay integration for zaps
@@ -512,6 +540,10 @@ Persistence:
 | Paginate timeline | client.service `loadMoreTimeline()` |
 | Search profiles | client.service userIndex (FlexSearch) |
 | Handle zaps | ZapProvider + lightning.service |
+| **Fetch domain members** | **nip05-community.service `getDomainMembers()`** |
+| **Search communities** | **nip05-community.service `search()`** |
+| **Generate domain feed** | **client.service `generateSubRequestsForDomain()`** |
+| **Manage favorite domains** | **useNip05Communities hook, localStorage** |
 
 ---
 
