@@ -1,50 +1,27 @@
-import Explore from '@/components/Explore'
-import FollowingFavoriteRelayList from '@/components/FollowingFavoriteRelayList'
-import NoteList from '@/components/NoteList'
+import DiscoverCommunities from '@/components/DiscoverCommunities'
+import CommunityProfiles from '@/components/CommunityProfiles'
+import FollowingFavoriteDomainList from '@/components/FollowingFavoriteDomainList'
 import Tabs from '@/components/Tabs'
 import { Button } from '@/components/ui/button'
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { getReplaceableEventIdentifier } from '@/lib/event'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Compass, Plus } from 'lucide-react'
-import { NostrEvent } from 'nostr-tools'
-import { forwardRef, useCallback, useMemo, useState } from 'react'
+import { forwardRef, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-type TExploreTabs = 'following' | 'explore' | 'reviews'
+type TExploreTabs = 'discover' | 'profiles' | 'following'
 
 const ExplorePage = forwardRef((_, ref) => {
-  const { hideUntrustedNotes } = useUserTrust()
-  const [tab, setTab] = useState<TExploreTabs>('explore')
-
-  const relayReviewFilterFn = useCallback((evt: NostrEvent) => {
-    const d = getReplaceableEventIdentifier(evt)
-    if (!d) return false
-
-    try {
-      const url = new URL(d)
-      return url.hostname !== 'localhost'
-    } catch {
-      return false
-    }
-  }, [])
+  const [tab, setTab] = useState<TExploreTabs>('discover')
 
   const content = useMemo(() => {
-    return tab === 'explore' ? (
-      <Explore />
-    ) : tab === 'reviews' ? (
-      <NoteList
-        showKinds={[ExtendedKind.RELAY_REVIEW]}
-        subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
-        filterMutedNotes
-        hideUntrustedNotes={hideUntrustedNotes}
-        filterFn={relayReviewFilterFn}
-      />
+    return tab === 'discover' ? (
+      <DiscoverCommunities />
+    ) : tab === 'profiles' ? (
+      <CommunityProfiles />
     ) : (
-      <FollowingFavoriteRelayList />
+      <FollowingFavoriteDomainList />
     )
-  }, [tab, relayReviewFilterFn, hideUntrustedNotes])
+  }, [tab])
 
   return (
     <PrimaryPageLayout
@@ -56,9 +33,9 @@ const ExplorePage = forwardRef((_, ref) => {
       <Tabs
         value={tab}
         tabs={[
-          { value: 'explore', label: 'Explore' },
-          { value: 'reviews', label: 'Reviews' },
-          { value: 'following', label: "Following's Favorites" }
+          { value: 'discover', label: 'Discover Communities' },
+          { value: 'profiles', label: 'Community Profiles' },
+          { value: 'following', label: "Following's Domains" }
         ]}
         onTabChange={(tab) => setTab(tab as TExploreTabs)}
       />
@@ -84,13 +61,13 @@ function ExplorePageTitlebar() {
         className="relative w-fit px-3"
         onClick={() => {
           window.open(
-            'https://github.com/CodyTseng/awesome-nostr-relays/issues/new?template=add-relay.md',
+            'https://github.com/nostr-protocol/nips/blob/master/05.md',
             '_blank'
           )
         }}
       >
         <Plus size={16} />
-        {t('Submit Relay')}
+        {t('Add Community')}
       </Button>
     </div>
   )

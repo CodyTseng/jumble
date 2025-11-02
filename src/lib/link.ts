@@ -74,6 +74,7 @@ export const toTranslation = () => '/settings/translation'
 export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toRelayReviews = (url: string) => `/relays/${encodeURIComponent(url)}/reviews`
+export const toNip05Community = (domain: string) => `/communities/${encodeURIComponent(domain)}`
 export const toMuteList = () => '/mutes'
 export const toRizful = () => '/rizful'
 export const toBookmarks = () => '/bookmarks'
