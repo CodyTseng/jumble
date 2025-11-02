@@ -56,6 +56,7 @@ class LocalStorageService {
   private sidebarCollapse: boolean = false
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
+  private hasSeenCommunitiesOnboarding: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -121,6 +122,9 @@ class LocalStorageService {
     } else {
       this.nip05CommunitySets = JSON.parse(nip05CommunitySetsStr)
     }
+
+    // Initialize communities onboarding flag
+    this.hasSeenCommunitiesOnboarding = window.localStorage.getItem(StorageKey.HAS_SEEN_COMMUNITIES_ONBOARDING) === 'true'
 
     const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
     if (defaultZapSatsStr) {
@@ -555,6 +559,15 @@ class LocalStorageService {
   setNip05CommunitySets(sets: TNip05CommunitySet[]) {
     this.nip05CommunitySets = sets
     window.localStorage.setItem(StorageKey.NIP05_COMMUNITY_SETS, JSON.stringify(this.nip05CommunitySets))
+  }
+
+  getHasSeenCommunitiesOnboarding() {
+    return this.hasSeenCommunitiesOnboarding
+  }
+
+  setHasSeenCommunitiesOnboarding(value: boolean) {
+    this.hasSeenCommunitiesOnboarding = value
+    window.localStorage.setItem(StorageKey.HAS_SEEN_COMMUNITIES_ONBOARDING, value ? 'true' : 'false')
   }
 }
 
