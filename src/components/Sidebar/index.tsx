@@ -2,11 +2,12 @@ import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import { cn } from '@/lib/utils'
 import { usePrimaryPage } from '@/PageManager'
+import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, Globe } from 'lucide-react'
 import AccountButton from './AccountButton'
 import BookmarkButton from './BookmarkButton'
 import RelaysButton from './ExploreButton'
@@ -23,7 +24,11 @@ export default function PrimaryPageSidebar() {
   const { themeSetting } = useTheme()
   const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout } = useUserPreferences()
   const { pubkey } = useNostr()
+  const { feedInfo } = useFeed()
   const { navigate } = usePrimaryPage()
+
+  // Check if user has a community domain
+  const hasCommunity = feedInfo.feedType === 'nip05-domain' && feedInfo.id
 
   if (isSmallScreen) return null
 
@@ -37,11 +42,15 @@ export default function PrimaryPageSidebar() {
       <div className="space-y-2">
         {sidebarCollapse ? (
           <button
-            className="px-3 py-1 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity"
+            className="px-3 py-1 mb-4 w-full cursor-pointer hover:opacity-80 transition-opacity flex justify-center"
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
-            <Icon />
+            {hasCommunity ? (
+              <Globe className="size-8 text-primary" />
+            ) : (
+              <Icon />
+            )}
           </button>
         ) : (
           <button
@@ -49,7 +58,11 @@ export default function PrimaryPageSidebar() {
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
-            <Logo />
+            {hasCommunity ? (
+              <Globe className="size-12 text-primary" />
+            ) : (
+              <Logo />
+            )}
           </button>
         )}
         <HomeButton collapse={sidebarCollapse} />

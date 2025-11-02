@@ -9,7 +9,7 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { Globe, Info, PencilLine, Search } from 'lucide-react'
+import { Info, PencilLine, Search } from 'lucide-react'
 import {
   Dispatch,
   forwardRef,
@@ -114,7 +114,6 @@ function NoteListPageTitlebar({
       {/* Community name display */}
       {feedInfo.feedType === 'nip05-domain' && feedInfo.id && (
         <div className="flex gap-2 items-center px-2">
-          <Globe className="size-5 text-primary shrink-0" />
           <div className="font-semibold truncate">{feedInfo.id}</div>
         </div>
       )}
