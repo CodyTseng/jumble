@@ -7,8 +7,13 @@ import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import { Button } from '../ui/button'
-import NoteCard from '../NoteCard'
 import { Skeleton } from '../ui/skeleton'
+import Highlight from '../Note/Highlight'
+import { useSecondaryPage } from '@/PageManager'
+import { toNote } from '@/lib/link'
+import { FormattedTimestamp } from '../FormattedTimestamp'
+import NoteStats from '../NoteStats'
+import NoteOptions from '../NoteOptions'
 
 type HighlightsByUser = {
   pubkey: string
@@ -130,9 +135,13 @@ export default function HighlightsList() {
           </Button>
           <UserHighlightsHeader pubkey={selectedPubkey} count={userHighlights.count} />
         </div>
-        <div className="space-y-2">
-          {userHighlights.highlights.map((highlight) => (
-            <NoteCard key={highlight.id} event={highlight} className="w-full" />
+        <div>
+          {userHighlights.highlights.map((highlight, index) => (
+            <HighlightItem
+              key={highlight.id}
+              event={highlight}
+              isLast={index === userHighlights.highlights.length - 1}
+            />
           ))}
         </div>
       </div>
@@ -194,6 +203,35 @@ function UserHighlightsHeader({ pubkey, count }: { pubkey: string; count: number
         </div>
         <div className="text-muted-foreground">
           {count} {count === 1 ? t('highlight') : t('highlights')}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function HighlightItem({ event, isLast }: { event: NEvent; isLast: boolean }) {
+  const { push } = useSecondaryPage()
+
+  return (
+    <div
+      className={`pb-3 clickable ${!isLast ? 'border-b' : ''}`}
+      onClick={() => push(toNote(event))}
+    >
+      <div className="flex space-x-2 items-start px-4 pt-3">
+        <UserAvatar pubkey={event.pubkey} size={40} />
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-semibold truncate">
+              <Username pubkey={event.pubkey} />
+            </span>
+            <span className="text-muted-foreground">·</span>
+            <FormattedTimestamp timestamp={event.created_at} />
+          </div>
+          <Highlight event={event} />
+          <div className="flex items-center justify-between pt-2">
+            <NoteStats event={event} />
+            <NoteOptions event={event} />
+          </div>
         </div>
       </div>
     </div>
