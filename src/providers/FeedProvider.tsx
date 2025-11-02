@@ -37,7 +37,7 @@ export const useFeed = () => {
 }
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
-  const { pubkey, isInitialized } = useNostr()
+  const { pubkey, isInitialized, profile } = useNostr()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const { communitySets } = useNip05Communities()
   const [relayUrls, setRelayUrls] = useState<string[]>([])
@@ -58,6 +58,22 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         feedType: 'relay',
         id: favoriteRelays[0] ?? DEFAULT_FAVORITE_RELAYS[0]
       }
+
+      // If user has NIP-05, default to their community feed
+      if (pubkey && profile?.nip05) {
+        const nip05Parts = profile.nip05.split('@')
+        if (nip05Parts.length === 2) {
+          const domain = nip05Parts[1].toLowerCase().trim()
+          if (domain) {
+            feedInfo = {
+              feedType: 'nip05-domain',
+              id: domain
+            }
+          }
+        }
+      }
+
+      // Check for stored feed preference (user's manual selection overrides default)
       if (pubkey) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
         if (storedFeedInfo) {
@@ -88,7 +104,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     }
 
     init()
-  }, [pubkey, isInitialized])
+  }, [pubkey, isInitialized, profile?.nip05, favoriteRelays])
 
   const switchFeed = async (
     feedType: TFeedType,
