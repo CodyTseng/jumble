@@ -30,12 +30,15 @@ function CommunityFavicon({ domain, size }: { domain: string; size: number }) {
     height: `${sizeInRem}rem`
   }
 
+  // Add cache busting parameter to force fresh loads
+  const cacheBuster = Date.now()
+
   // Try multiple favicon sources in order of preference
   const faviconUrls = [
-    `https://${domain}/favicon.svg`,
-    `https://${domain}/favicon.png`,
-    `https://${domain}/favicon.ico`,
-    `https://${domain}/apple-touch-icon.png`
+    `https://${domain}/favicon.svg?v=${cacheBuster}`,
+    `https://${domain}/favicon.png?v=${cacheBuster}`,
+    `https://${domain}/favicon.ico?v=${cacheBuster}`,
+    `https://${domain}/apple-touch-icon.png?v=${cacheBuster}`
   ]
 
   const handleError = () => {
