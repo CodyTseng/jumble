@@ -54,6 +54,12 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      console.log('[FeedProvider] Initializing feed', {
+        pubkey,
+        nip05: profile?.nip05,
+        isInitialized
+      })
+
       let feedInfo: TFeedInfo = {
         feedType: 'relay',
         id: favoriteRelays[0] ?? DEFAULT_FAVORITE_RELAYS[0]
@@ -62,22 +68,30 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       // If user has NIP-05, default to their community feed
       if (pubkey && profile?.nip05) {
         const nip05Parts = profile.nip05.split('@')
+        console.log('[FeedProvider] NIP-05 parts:', nip05Parts)
         if (nip05Parts.length === 2) {
           const domain = nip05Parts[1].toLowerCase().trim()
+          console.log('[FeedProvider] Extracted domain:', domain)
           if (domain) {
             feedInfo = {
               feedType: 'nip05-domain',
               id: domain
             }
+            console.log('[FeedProvider] Setting default feed to community:', domain)
           }
         }
+      } else {
+        console.log('[FeedProvider] No NIP-05 found, using relay feed')
       }
 
       // Check for stored feed preference (user's manual selection overrides default)
       if (pubkey) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
         if (storedFeedInfo) {
+          console.log('[FeedProvider] Found stored feed preference:', storedFeedInfo)
           feedInfo = storedFeedInfo
+        } else {
+          console.log('[FeedProvider] No stored feed preference, using default:', feedInfo)
         }
       }
 
@@ -179,12 +193,15 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     }
     if (feedType === 'nip05-domain') {
       const domain = (options.domain ?? '').toLowerCase().trim()
+      console.log('[FeedProvider] Switching to nip05-domain feed:', domain)
       if (!domain) {
+        console.log('[FeedProvider] No domain provided, aborting')
         setIsReady(true)
         return
       }
 
       const newFeedInfo = { feedType, id: domain }
+      console.log('[FeedProvider] Setting feedInfo:', newFeedInfo)
       setFeedInfo(newFeedInfo)
       feedInfoRef.current = newFeedInfo
       storage.setFeedInfo(newFeedInfo, pubkey)
@@ -193,6 +210,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       // handle fetching members and their relays
       setRelayUrls([])
       setIsReady(true)
+      console.log('[FeedProvider] Domain feed ready')
       return
     }
     if (feedType === 'nip05-domains') {

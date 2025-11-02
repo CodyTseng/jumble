@@ -318,21 +318,27 @@ class Nip05CommunityService {
    * Get members for a domain (with caching)
    */
   async getDomainMembers(domain: string): Promise<string[]> {
+    console.log('[Nip05CommunityService] Getting members for domain:', domain)
+
     // Check cache first
     const cached = this.memberFetchCache.get(domain)
     if (cached) {
+      console.log('[Nip05CommunityService] Found cached members:', cached.length)
       return cached
     }
 
     // Check if we have it in community data
     const community = await this.getCommunity(domain)
     if (community && Date.now() - community.lastUpdated < CACHE_EXPIRATION) {
+      console.log('[Nip05CommunityService] Found community data with members:', community.members.length)
       this.memberFetchCache.set(domain, community.members)
       return community.members
     }
 
     // Fetch fresh
+    console.log('[Nip05CommunityService] Fetching fresh members from .well-known/nostr.json')
     const members = await fetchPubkeysFromDomain(domain)
+    console.log('[Nip05CommunityService] Fetched members:', members.length, members)
     this.memberFetchCache.set(domain, members)
 
     return members
