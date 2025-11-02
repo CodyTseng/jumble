@@ -1,9 +1,9 @@
 # NIP-05 Community Feature Implementation
 
 ## ✅ COMPLETED - Progress Overview
-- **Completed**: 57/60 tasks (95%)
-- **Remaining**: 3/60 tasks (5%) - Community Settings (deferred for future)
-- **Status**: Feature complete and merged to master!
+- **Completed**: 66/69 tasks (96%)
+- **Remaining**: 3/69 tasks (4%) - Community Settings (deferred for future)
+- **Status**: Feature complete with UX enhancements merged to master!
 
 ---
 
@@ -117,7 +117,7 @@
 
 ## 📊 Implementation Summary
 
-### Branches Created and Merged: 11
+### Branches Created and Merged: 14
 1. ✅ `foundation/types`
 2. ✅ `data/indexed-db`
 3. ✅ `service/client-domain-feed`
@@ -130,9 +130,10 @@
 10. ✅ `page/community-detail`
 11. ✅ `feature/domain-discovery`
 12. ✅ `migration/user-migration`
-13. ⏳ `final/polish` (current)
+13. ✅ `final/polish`
+14. ✅ `feature/my-community-default-feed`
 
-### New Files Created: 15+
+### New Files Created: 16+
 **Services**:
 - `src/services/nip05-community.service.ts`
 
@@ -148,11 +149,12 @@
 - `src/components/Nip05Community/CommunityFeed.tsx`
 - `src/components/Nip05Community/CommunityMembers.tsx`
 - `src/components/CommunitiesOnboardingDialog/index.tsx`
+- `src/pages/primary/NoteListPage/DomainFeed.tsx`
 
 **Pages**:
 - `src/pages/secondary/Nip05CommunityPage/index.tsx`
 
-**Updated Files**: 20+
+**Updated Files**: 23+
 - IndexedDB schema upgrade to v10
 - Constants (storage keys, default domains)
 - LocalStorage service (community methods)
@@ -210,6 +212,32 @@
 **TypeScript**: ✅ No errors
 **Bundle Size**: 3.6MB (optimized)
 **Performance**: ✅ Tested with large domain lists
+
+---
+
+## Phase 5: UX Enhancements (9 tasks) ✅
+
+### Default Community Feed (9 tasks) ✅
+**Branch**: `feature/my-community-default-feed` - MERGED
+- ✅ Create branch for community default feed work
+- ✅ Analyze current home page and feed initialization logic
+- ✅ Create DomainFeed component for rendering community feeds
+- ✅ Update NoteListPage to handle domain feed types
+- ✅ Extract user's NIP-05 domain from profile in FeedProvider
+- ✅ Set user's community as default feed (with preference override)
+- ✅ Update FeedSwitcher to display "My Community" prominently
+- ✅ Test complete flow and build
+- ✅ Commit and merge to master
+
+**Features**:
+- Automatic NIP-05 domain extraction from user profile
+- Default home feed shows user's community posts (not relay/following)
+- "My Community" displayed prominently in FeedSwitcher with special styling
+- Smart mode switching (Communities tab active for community feeds)
+- User's stored preferences always override defaults
+- Prevents duplicate domain listings in FeedSwitcher
+
+**Impact**: Users with verified NIP-05 identifiers now get a personalized, community-focused home experience by default.
 
 ---
 
