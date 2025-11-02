@@ -8,6 +8,7 @@ import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import { Button } from '../ui/button'
 import NoteCard from '../NoteCard'
+import { Skeleton } from '../ui/skeleton'
 
 type HighlightsByUser = {
   pubkey: string
@@ -24,7 +25,7 @@ export default function HighlightsList() {
 
   const groupedHighlights = useMemo(() => {
     const groups = new Map<string, NEvent[]>()
-    
+
     highlights.forEach((highlight) => {
       const author = highlight.pubkey
       if (!groups.has(author)) {
@@ -53,44 +54,55 @@ export default function HighlightsList() {
       }
 
       setIsLoading(true)
+      setHighlights([]) // Clear existing highlights
+
       try {
         const followings = await client.fetchFollowings(pubkey)
         const authors = [pubkey, ...followings]
-        
+
         // Fetch highlights from all followed users
         const subRequests = await client.generateSubRequestsForPubkeys(authors, pubkey)
-        
-        const allHighlights: NEvent[] = []
-        
+
+        // Fetch highlights progressively and update state as they arrive
         for (const subRequest of subRequests) {
-          const events = await client.fetchEvents(subRequest.urls, {
+          client.fetchEvents(subRequest.urls, {
             ...subRequest.filter,
             kinds: [kinds.Highlights],
             limit: 100
+          }).then((events) => {
+            if (events.length > 0) {
+              setHighlights((prev) => [...prev, ...events])
+            }
           })
-          allHighlights.push(...events)
         }
-
-        setHighlights(allHighlights)
       } catch (error) {
         console.error('Error fetching highlights:', error)
       } finally {
-        setIsLoading(false)
+        // Set loading to false after a short delay to allow initial events to arrive
+        setTimeout(() => setIsLoading(false), 1000)
       }
     }
 
     fetchHighlights()
   }, [pubkey])
 
-  if (isLoading) {
+  if (isLoading && groupedHighlights.length === 0) {
     return (
-      <div className="text-center text-sm text-muted-foreground mt-4">
-        {t('loading...')}
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3 p-4 border rounded-lg">
+            <Skeleton className="w-12 h-12 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
 
-  if (groupedHighlights.length === 0) {
+  if (!isLoading && groupedHighlights.length === 0) {
     return (
       <div className="text-center text-sm text-muted-foreground mt-4">
         {t('No highlights found from your followings')}
@@ -155,20 +167,17 @@ function UserHighlightCard({
 
   return (
     <div
-      className="flex items-center gap-3 p-4 border rounded-lg clickable hover:bg-accent/50 transition-colors"
+      className="flex items-center gap-3 p-4 border rounded-lg clickable hover:bg-accent/50 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <UserAvatar pubkey={pubkey} size={48} />
-      <div className="flex-1">
-        <div className="font-semibold">
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold truncate">
           <Username pubkey={pubkey} />
         </div>
         <div className="text-sm text-muted-foreground">
           {count} {count === 1 ? t('highlight') : t('highlights')}
         </div>
-      </div>
-      <div className="flex items-center justify-center min-w-[2rem] h-8 px-3 bg-primary/10 text-primary rounded-full font-semibold text-sm">
-        {count}
       </div>
     </div>
   )
@@ -177,7 +186,7 @@ function UserHighlightCard({
 function UserHighlightsHeader({ pubkey, count }: { pubkey: string; count: number }) {
   const { t } = useTranslation()
   const { profile } = useFetchProfile(pubkey)
-  
+
   return (
     <div className="flex items-center gap-3 p-4 border rounded-lg">
       <UserAvatar pubkey={pubkey} size={64} />
