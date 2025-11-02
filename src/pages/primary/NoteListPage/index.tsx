@@ -114,7 +114,7 @@ function NoteListPageTitlebar({
       {/* Community name display */}
       {feedInfo.feedType === 'nip05-domain' && feedInfo.id && (
         <div className="flex gap-2 items-center px-2">
-          <div className="font-semibold truncate">{feedInfo.id}</div>
+          <div className="font-bold text-xl truncate">{feedInfo.id}</div>
         </div>
       )}
       {feedInfo.feedType === 'following' && (
