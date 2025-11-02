@@ -14,11 +14,19 @@ import { Button } from '../ui/button'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { t } = useTranslation()
-  const { pubkey } = useNostr()
+  const { pubkey, profile } = useNostr()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const { communitySets, favoriteDomains } = useNip05Communities()
   const { feedInfo, switchFeed } = useFeed()
-  const [mode, setMode] = useState<'relays' | 'communities'>('relays')
+
+  // Extract user's NIP-05 domain
+  const userDomain = pubkey && profile?.nip05 ? profile.nip05.split('@')[1]?.toLowerCase().trim() : null
+
+  // Default to communities mode if user is viewing a community feed
+  const defaultMode = feedInfo.feedType === 'nip05-domain' || feedInfo.feedType === 'nip05-domains'
+    ? 'communities'
+    : 'relays'
+  const [mode, setMode] = useState<'relays' | 'communities'>(defaultMode)
 
   return (
     <div className="space-y-2">
@@ -104,6 +112,25 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
         </>
       ) : (
         <>
+          {/* User's own community */}
+          {userDomain && (
+            <FeedSwitcherItem
+              isActive={feedInfo.feedType === 'nip05-domain' && feedInfo.id === userDomain}
+              onClick={() => {
+                switchFeed('nip05-domain', { domain: userDomain })
+                close?.()
+              }}
+            >
+              <div className="flex gap-2 items-center w-full">
+                <Globe className="size-5 text-primary" />
+                <div className="flex-1 w-0 truncate">
+                  <div className="font-semibold">{t('My Community')}</div>
+                  <div className="text-xs text-muted-foreground">{userDomain}</div>
+                </div>
+              </div>
+            </FeedSwitcherItem>
+          )}
+
           {communitySets
             .filter((set) => set.domains.length > 0)
             .map((set) => (
@@ -118,21 +145,23 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
                 }}
               />
             ))}
-          {favoriteDomains.map((domain) => (
-            <FeedSwitcherItem
-              key={domain}
-              isActive={feedInfo.feedType === 'nip05-domain' && feedInfo.id === domain}
-              onClick={() => {
-                switchFeed('nip05-domain', { domain })
-                close?.()
-              }}
-            >
-              <div className="flex gap-2 items-center w-full">
-                <Globe className="size-5 text-muted-foreground" />
-                <div className="flex-1 w-0 truncate">{domain}</div>
-              </div>
-            </FeedSwitcherItem>
-          ))}
+          {favoriteDomains
+            .filter((domain) => domain !== userDomain) // Don't duplicate user's domain
+            .map((domain) => (
+              <FeedSwitcherItem
+                key={domain}
+                isActive={feedInfo.feedType === 'nip05-domain' && feedInfo.id === domain}
+                onClick={() => {
+                  switchFeed('nip05-domain', { domain })
+                  close?.()
+                }}
+              >
+                <div className="flex gap-2 items-center w-full">
+                  <Globe className="size-5 text-muted-foreground" />
+                  <div className="flex-1 w-0 truncate">{domain}</div>
+                </div>
+              </FeedSwitcherItem>
+            ))}
         </>
       )}
     </div>

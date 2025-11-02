@@ -20,6 +20,7 @@ import {
   useState
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import DomainFeed from './DomainFeed'
 import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
@@ -61,6 +62,8 @@ const NoteListPage = forwardRef((_, ref) => {
     )
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
+  } else if (feedInfo.feedType === 'nip05-domain' || feedInfo.feedType === 'nip05-domains') {
+    content = <DomainFeed />
   } else {
     content = (
       <>
