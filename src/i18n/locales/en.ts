@@ -643,6 +643,12 @@ export default {
     'Your GIF has been uploaded successfully and is now available in "My Gifs"': 'Your GIF has been uploaded successfully and is now available in "My Gifs"',
     'Failed to upload GIF': 'Failed to upload GIF',
     'Uploading...': 'Uploading...',
-    'Error': 'Error'
+    'Error': 'Error',
+    'Distraction-Free Mode': 'Distraction-Free Mode',
+    'Drain my time': 'Drain my time',
+    'Focus mode': 'Focus mode',
+    'Hide lists in navigation': 'Hide lists in navigation',
+    'Powered by nostr.band API. Issues may be due to API availability.':
+      'Powered by nostr.band API. Issues may be due to API availability.'
   }
 }
