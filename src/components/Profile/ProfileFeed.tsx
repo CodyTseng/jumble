@@ -11,7 +11,7 @@ import { useReadsVisibility } from '@/providers/ReadsVisibilityProvider'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
-import { NostrEvent } from 'nostr-tools'
+import { NostrEvent, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshButton } from '../RefreshButton'
 
@@ -34,7 +34,8 @@ export default function ProfileFeed({
   const tabs = useMemo(() => {
     const _tabs = [
       { value: 'posts', label: 'Notes' },
-      { value: 'postsAndReplies', label: 'Replies' }
+      { value: 'postsAndReplies', label: 'Replies' },
+      { value: 'highlights', label: 'Highlights' }
     ]
 
     if (!hideReadsInProfiles) {
@@ -157,9 +158,10 @@ export default function ProfileFeed({
         threshold={Math.max(800, topSpace)}
         options={
           <>
-            {!supportTouch && listMode !== 'reads' && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}
+            {!supportTouch && listMode !== 'reads' && listMode !== 'highlights' && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}
             {!supportTouch && listMode === 'reads' && <RefreshButton onClick={() => articleListRef.current?.refresh()} />}
-            {listMode !== 'reads' && <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />}
+            {!supportTouch && listMode === 'highlights' && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}
+            {listMode !== 'reads' && listMode !== 'highlights' && <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />}
           </>
         }
         isInDeckView={isInDeckView}
@@ -168,6 +170,15 @@ export default function ProfileFeed({
         <ArticleList
           ref={articleListRef}
           subRequests={subRequests}
+        />
+      ) : listMode === 'highlights' ? (
+        <NoteList
+          ref={noteListRef}
+          subRequests={subRequests}
+          showKinds={[kinds.Highlights]}
+          hideReplies={false}
+          filterMutedNotes={false}
+          pinnedEventIds={[]}
         />
       ) : (
         <NoteList
