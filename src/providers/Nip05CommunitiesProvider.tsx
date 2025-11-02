@@ -5,6 +5,7 @@ import storage from '@/services/local-storage.service'
 import nip05CommunityService from '@/services/nip05-community.service'
 import { TNip05Community, TNip05CommunitySet } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
+import CommunitiesOnboardingDialog from '@/components/CommunitiesOnboardingDialog'
 
 type TNip05CommunitiesContext = {
   favoriteDomains: string[]
@@ -35,6 +36,7 @@ export function Nip05CommunitiesProvider({ children }: { children: React.ReactNo
   const [favoriteDomains, setFavoriteDomains] = useState<string[]>([])
   const [communitySets, setCommunitySets] = useState<TNip05CommunitySet[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   // Initialize from LocalStorage on mount
   useEffect(() => {
@@ -51,6 +53,12 @@ export function Nip05CommunitiesProvider({ children }: { children: React.ReactNo
         // Initialize the nip05CommunityService with cached data from IndexedDB
         await nip05CommunityService.init()
 
+        // Check if user has seen onboarding
+        const hasSeenOnboarding = storage.getHasSeenCommunitiesOnboarding()
+        if (!hasSeenOnboarding) {
+          setShowOnboarding(true)
+        }
+
         setIsLoading(false)
       } catch (error) {
         console.error('Error initializing Nip05CommunitiesProvider:', error)
@@ -60,6 +68,13 @@ export function Nip05CommunitiesProvider({ children }: { children: React.ReactNo
 
     init()
   }, [])
+
+  const handleOnboardingClose = (open: boolean) => {
+    if (!open) {
+      storage.setHasSeenCommunitiesOnboarding(true)
+      setShowOnboarding(false)
+    }
+  }
 
   // Add domains to favorites
   const addFavoriteDomains = (domains: string[]) => {
@@ -164,6 +179,7 @@ export function Nip05CommunitiesProvider({ children }: { children: React.ReactNo
       }}
     >
       {children}
+      <CommunitiesOnboardingDialog open={showOnboarding} onOpenChange={handleOnboardingClose} />
     </Nip05CommunitiesContext.Provider>
   )
 }
