@@ -21,7 +21,7 @@ import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
 
 function CommunityFavicon({ domain, size }: { domain: string; size: number }) {
-  const [faviconError, setFaviconError] = useState(false)
+  const [faviconUrlIndex, setFaviconUrlIndex] = useState(0)
 
   // Use inline styles for dynamic sizing
   const sizeInRem = size * 0.25 // Tailwind size-8 = 2rem, size-12 = 3rem
@@ -30,21 +30,36 @@ function CommunityFavicon({ domain, size }: { domain: string; size: number }) {
     height: `${sizeInRem}rem`
   }
 
-  if (faviconError) {
-    // Fallback to globe icon
+  // Try multiple favicon sources in order of preference
+  const faviconUrls = [
+    `https://${domain}/favicon.svg`,
+    `https://${domain}/favicon.png`,
+    `https://${domain}/favicon.ico`,
+    `https://${domain}/apple-touch-icon.png`
+  ]
+
+  const handleError = () => {
+    // Try next favicon URL
+    if (faviconUrlIndex < faviconUrls.length - 1) {
+      setFaviconUrlIndex(faviconUrlIndex + 1)
+    } else {
+      // All URLs failed, will show globe
+      setFaviconUrlIndex(-1)
+    }
+  }
+
+  if (faviconUrlIndex === -1) {
+    // All favicon attempts failed, fallback to globe icon
     return <Globe style={style} className="text-primary" />
   }
 
-  // Try to load favicon from domain
-  const faviconUrl = `https://${domain}/favicon.ico`
-
   return (
     <img
-      src={faviconUrl}
+      src={faviconUrls[faviconUrlIndex]}
       alt={`${domain} favicon`}
       style={style}
       className="object-contain"
-      onError={() => setFaviconError(true)}
+      onError={handleError}
     />
   )
 }
