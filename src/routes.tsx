@@ -5,6 +5,7 @@ import BookmarkPage from './pages/secondary/BookmarkPage'
 import FollowingListPage from './pages/secondary/FollowingListPage'
 import GeneralSettingsPage from './pages/secondary/GeneralSettingsPage'
 import MuteListPage from './pages/secondary/MuteListPage'
+import Nip05CommunityPage from './pages/secondary/Nip05CommunityPage'
 import NoteListPage from './pages/secondary/NoteListPage'
 import NotePage from './pages/secondary/NotePage'
 import OthersRelaySettingsPage from './pages/secondary/OthersRelaySettingsPage'
@@ -30,6 +31,7 @@ const ROUTES = [
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
+  { path: '/communities/:domain', element: <Nip05CommunityPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/settings/relays', element: <RelaySettingsPage /> },
