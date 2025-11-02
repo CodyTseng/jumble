@@ -125,6 +125,7 @@ export function detectLanguage(text?: string): string | null {
       pes: 'fa', // Persian (alternative code)
       fra: 'fr', // French
       hin: 'hi', // Hindi
+      hun: 'hu', // Hungarian
       ita: 'it', // Italian
       jpn: 'ja', // Japanese
       pol: 'pl', // Polish
