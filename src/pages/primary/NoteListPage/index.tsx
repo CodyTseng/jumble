@@ -9,7 +9,7 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { Info, PencilLine, Search } from 'lucide-react'
+import { Globe, Info, PencilLine, Search } from 'lucide-react'
 import {
   Dispatch,
   forwardRef,
@@ -21,7 +21,6 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import DomainFeed from './DomainFeed'
-import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
 
@@ -107,10 +106,29 @@ function NoteListPageTitlebar({
   setShowRelayDetails?: Dispatch<SetStateAction<boolean>>
 }) {
   const { isSmallScreen } = useScreenSize()
+  const { feedInfo } = useFeed()
+  const { t } = useTranslation()
 
   return (
     <div className="flex gap-1 items-center h-full justify-between">
-      <FeedButton className="flex-1 max-w-fit w-0" />
+      {/* Community name display */}
+      {feedInfo.feedType === 'nip05-domain' && feedInfo.id && (
+        <div className="flex gap-2 items-center px-2">
+          <Globe className="size-5 text-primary shrink-0" />
+          <div className="font-semibold truncate">{feedInfo.id}</div>
+        </div>
+      )}
+      {feedInfo.feedType === 'following' && (
+        <div className="flex gap-2 items-center px-2">
+          <div className="font-semibold">{t('Following')}</div>
+        </div>
+      )}
+      {(feedInfo.feedType === 'relay' || feedInfo.feedType === 'relays') && (
+        <div className="flex gap-2 items-center px-2">
+          <div className="font-semibold">{t('Relay Feed')}</div>
+        </div>
+      )}
+
       <div className="shrink-0 flex gap-1 items-center">
         {setShowRelayDetails && (
           <Button
