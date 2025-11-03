@@ -133,6 +133,20 @@ export default function FollowingFavoriteDomainList() {
         setCommunities(new Map(communityMap))
         console.log(`[FollowingDomains] Fetched ${communityMap.size}/${sortedDomains.length} communities`)
       }
+
+      // Re-sort domains by actual community member count (descending)
+      const sortedByMemberCount = sortedDomains.sort((a, b) => {
+        const communityA = communityMap.get(a[0])
+        const communityB = communityMap.get(b[0])
+
+        const countA = communityA?.memberCount || communityA?.members.length || 0
+        const countB = communityB?.memberCount || communityB?.members.length || 0
+
+        return countB - countA
+      })
+
+      setDomains(sortedByMemberCount)
+      console.log('[FollowingDomains] Sorted by member count')
     }
     init().finally(() => {
       setLoading(false)
