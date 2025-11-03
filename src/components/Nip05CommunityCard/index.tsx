@@ -4,6 +4,7 @@ import { ChevronDown, Globe } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
+import { useFetchProfile } from '@/hooks'
 
 export default function Nip05CommunityCard({
   community,
@@ -44,7 +45,7 @@ export default function Nip05CommunityCard({
         {showMembers && (
           <div className="flex gap-1">
             <MembersExpandToggle expand={expand} onExpandChange={setExpand}>
-              {t('n members', { n: community.memberCount || community.members.length })}
+              {community.memberCount || community.members.length} {t('members')}
             </MembersExpandToggle>
           </div>
         )}
@@ -111,13 +112,22 @@ function MembersList({ members }: { members: string[] }) {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {members.map((pubkey) => (
-          <div key={pubkey} className="flex items-center gap-2">
-            <UserAvatar userId={pubkey} size="tiny" />
-            <div className="text-sm text-muted-foreground truncate">
-              {pubkey.slice(0, 8)}...
-            </div>
-          </div>
+          <MemberItem key={pubkey} pubkey={pubkey} />
         ))}
+      </div>
+    </div>
+  )
+}
+
+function MemberItem({ pubkey }: { pubkey: string }) {
+  const { profile } = useFetchProfile(pubkey)
+  const displayName = profile?.username || pubkey.slice(0, 8)
+
+  return (
+    <div className="flex items-center gap-2 min-w-0">
+      <UserAvatar userId={pubkey} size="tiny" />
+      <div className="text-sm text-muted-foreground truncate">
+        {displayName}
       </div>
     </div>
   )
