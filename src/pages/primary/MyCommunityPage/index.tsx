@@ -34,15 +34,11 @@ export default MyCommunityPage
 
 function MyCommunityPageTitlebar() {
   const { t } = useTranslation()
-  const { feedInfo } = useFeed()
-  const domain = feedInfo.feedType === 'nip05-domain' ? feedInfo.id : null
 
   return (
     <div className="flex gap-2 items-center h-full pl-3">
       <Users />
-      <div className="text-lg font-semibold">
-        {domain ? t('My Community') + ` - ${domain}` : t('My Community')}
-      </div>
+      <div className="text-lg font-semibold">{t('My Community')}</div>
     </div>
   )
 }
@@ -136,7 +132,7 @@ function MyCommunityContent() {
           <div className="flex-1">
             <h1 className="text-2xl font-bold mb-1">{domain}</h1>
             <p className="text-sm text-muted-foreground">
-              {t('n members', { n: members.length })}
+              {members.length} {t('members')}
             </p>
           </div>
         </div>
