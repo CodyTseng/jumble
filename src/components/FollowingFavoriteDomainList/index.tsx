@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { toNip05Community } from '@/lib/link'
+import { fetchPubkeysFromDomain } from '@/lib/nip05'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNip05Communities } from '@/providers/Nip05CommunitiesProvider'
@@ -26,19 +27,36 @@ export default function FollowingFavoriteDomainList() {
     setLoading(true)
 
     const init = async () => {
-      if (!pubkey) return
+      if (!pubkey) {
+        setDomains([])
+        setLoading(false)
+        return
+      }
+
+      console.log('[FollowingDomains] Fetching followings for:', pubkey)
 
       // Fetch followings
       const followings = await client.fetchFollowings(pubkey)
       if (!followings || followings.length === 0) {
+        console.log('[FollowingDomains] No followings found')
         setDomains([])
+        setLoading(false)
         return
       }
 
-      // Fetch profiles for all followings
-      const profiles = await Promise.all(
-        followings.map((followingPubkey) => client.fetchProfile(followingPubkey))
-      )
+      console.log('[FollowingDomains] Found followings:', followings.length)
+
+      // Fetch profiles for all followings in batches
+      const batchSize = 20
+      const profiles = []
+      for (let i = 0; i < followings.length; i += batchSize) {
+        const batch = followings.slice(i, i + batchSize)
+        const batchProfiles = await Promise.all(
+          batch.map((followingPubkey) => client.fetchProfile(followingPubkey))
+        )
+        profiles.push(...batchProfiles)
+        console.log(`[FollowingDomains] Fetched ${profiles.length}/${followings.length} profiles`)
+      }
 
       // Extract NIP-05 domains and count users per domain
       const domainMap = new Map<string, Set<string>>()
@@ -58,6 +76,8 @@ export default function FollowingFavoriteDomainList() {
         }
       })
 
+      console.log('[FollowingDomains] Found unique domains:', domainMap.size)
+
       // Convert to sorted array (by user count descending)
       const sortedDomains = Array.from(domainMap.entries())
         .map(([domain, pubkeys]) => [domain, Array.from(pubkeys)] as [string, string[]])
@@ -65,22 +85,54 @@ export default function FollowingFavoriteDomainList() {
 
       setDomains(sortedDomains)
 
-      // Fetch community data for top domains
-      const topDomains = sortedDomains.slice(0, 20).map(([domain]) => domain)
-      const communityData = await Promise.all(
-        topDomains.map(async (domain) => {
-          const community = await getCommunity(domain)
-          return { domain, community }
-        })
-      )
+      // Fetch community data for ALL domains (not just top 20) in the background
+      // This ensures we have nostr.json data for each community
+      console.log('[FollowingDomains] Fetching community data for', sortedDomains.length, 'domains')
 
+      // Fetch in batches to avoid overwhelming the system
+      const communityBatchSize = 5
       const communityMap = new Map<string, TNip05Community>()
-      communityData.forEach(({ domain, community }) => {
-        if (community) {
-          communityMap.set(domain, community)
-        }
-      })
-      setCommunities(communityMap)
+
+      for (let i = 0; i < sortedDomains.length; i += communityBatchSize) {
+        const batch = sortedDomains.slice(i, i + communityBatchSize)
+        const communityData = await Promise.all(
+          batch.map(async ([domain]) => {
+            try {
+              // First try to get cached data
+              let community = await getCommunity(domain)
+
+              // If no cached data or stale data, refresh from nostr.json
+              if (!community || !community.members || community.members.length === 0) {
+                console.log('[FollowingDomains] Fetching fresh data for:', domain)
+                const members = await fetchPubkeysFromDomain(domain)
+                if (members.length > 0) {
+                  community = {
+                    id: domain,
+                    domain,
+                    members,
+                    memberCount: members.length,
+                    lastUpdated: Date.now()
+                  }
+                }
+              }
+
+              return { domain, community }
+            } catch (error) {
+              console.error('[FollowingDomains] Error fetching community:', domain, error)
+              return { domain, community: undefined }
+            }
+          })
+        )
+
+        communityData.forEach(({ domain, community }) => {
+          if (community) {
+            communityMap.set(domain, community)
+          }
+        })
+
+        setCommunities(new Map(communityMap))
+        console.log(`[FollowingDomains] Fetched ${communityMap.size}/${sortedDomains.length} communities`)
+      }
     }
     init().finally(() => {
       setLoading(false)
