@@ -16,6 +16,7 @@ import {
   SetStateAction,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from 'react'
@@ -24,6 +25,8 @@ import DomainFeed from './DomainFeed'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
 
+type THomeFeedTab = 'domain' | 'following'
+
 const NoteListPage = forwardRef((_, ref) => {
   const { t } = useTranslation()
   const { addRelayUrls, removeRelayUrls } = useCurrentRelays()
@@ -31,7 +34,20 @@ const NoteListPage = forwardRef((_, ref) => {
   const { pubkey, checkLogin } = useNostr()
   const { feedInfo, relayUrls, isReady } = useFeed()
   const [showRelayDetails, setShowRelayDetails] = useState(false)
+  const [activeTab, setActiveTab] = useState<THomeFeedTab>('domain')
   useImperativeHandle(ref, () => layoutRef.current)
+
+  // Determine if we should show tabs (only for domain community feeds)
+  const showTabs = useMemo(() => {
+    return (feedInfo.feedType === 'nip05-domain' || feedInfo.feedType === 'nip05-domains') && pubkey
+  }, [feedInfo.feedType, pubkey])
+
+  const tabs = useMemo(() => {
+    return [
+      { value: 'domain', label: feedInfo.id || 'Community' },
+      { value: 'following', label: 'Following' }
+    ]
+  }, [feedInfo.id])
 
   useEffect(() => {
     if (layoutRef.current) {
@@ -62,7 +78,13 @@ const NoteListPage = forwardRef((_, ref) => {
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
   } else if (feedInfo.feedType === 'nip05-domain' || feedInfo.feedType === 'nip05-domains') {
-    content = <DomainFeed />
+    // When showing tabs, render based on active tab
+    if (showTabs) {
+      content = activeTab === 'domain' ? <DomainFeed /> : <FollowingFeed forceLoad />
+    } else {
+      // No tabs (not logged in), just show domain feed
+      content = <DomainFeed />
+    }
   } else {
     content = (
       <>
@@ -85,6 +107,13 @@ const NoteListPage = forwardRef((_, ref) => {
           setShowRelayDetails={
             feedInfo.feedType === 'relay' && !!feedInfo.id ? setShowRelayDetails : undefined
           }
+          showTabs={showTabs}
+          activeTab={activeTab}
+          tabs={tabs}
+          onTabChange={(tab) => {
+            setActiveTab(tab as THomeFeedTab)
+            layoutRef.current?.scrollToTop('smooth')
+          }}
         />
       }
       displayScrollToTopButton
@@ -99,11 +128,19 @@ export default NoteListPage
 function NoteListPageTitlebar({
   layoutRef,
   showRelayDetails,
-  setShowRelayDetails
+  setShowRelayDetails,
+  showTabs,
+  activeTab,
+  tabs,
+  onTabChange
 }: {
   layoutRef?: React.RefObject<TPageRef>
   showRelayDetails?: boolean
   setShowRelayDetails?: Dispatch<SetStateAction<boolean>>
+  showTabs?: boolean
+  activeTab?: string
+  tabs?: { value: string; label: string }[]
+  onTabChange?: (tab: string) => void
 }) {
   const { isSmallScreen } = useScreenSize()
   const { feedInfo } = useFeed()
@@ -111,21 +148,35 @@ function NoteListPageTitlebar({
 
   return (
     <div className="flex gap-1 items-center h-full justify-between">
-      {/* Community name display */}
-      {feedInfo.feedType === 'nip05-domain' && feedInfo.id && (
-        <div className="flex gap-2 items-center px-2">
-          <div className="font-black text-[2.55rem] truncate">{feedInfo.id}</div>
+      {showTabs && tabs && activeTab && onTabChange ? (
+        <div className="flex gap-2 items-center justify-center flex-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => onTabChange(tab.value)}
+              className={`px-6 py-1 text-sm font-semibold rounded-lg transition-all flex-1 max-w-[200px] ${
+                activeTab === tab.value
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t(tab.label)}
+            </button>
+          ))}
         </div>
-      )}
-      {feedInfo.feedType === 'following' && (
-        <div className="flex gap-2 items-center px-2">
-          <div className="font-semibold">{t('Following')}</div>
-        </div>
-      )}
-      {(feedInfo.feedType === 'relay' || feedInfo.feedType === 'relays') && (
-        <div className="flex gap-2 items-center px-2">
-          <div className="font-semibold">{t('Relay Feed')}</div>
-        </div>
+      ) : (
+        <>
+          {feedInfo.feedType === 'following' && (
+            <div className="flex gap-2 items-center px-2">
+              <div className="font-semibold">{t('Following')}</div>
+            </div>
+          )}
+          {(feedInfo.feedType === 'relay' || feedInfo.feedType === 'relays') && (
+            <div className="flex gap-2 items-center px-2">
+              <div className="font-semibold">{t('Relay Feed')}</div>
+            </div>
+          )}
+        </>
       )}
 
       <div className="shrink-0 flex gap-1 items-center">

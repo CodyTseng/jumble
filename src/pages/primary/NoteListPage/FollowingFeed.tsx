@@ -5,14 +5,17 @@ import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import { useEffect, useState } from 'react'
 
-export default function FollowingFeed() {
+export default function FollowingFeed({ forceLoad = false }: { forceLoad?: boolean }) {
   const { pubkey } = useNostr()
   const { feedInfo } = useFeed()
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
 
   useEffect(() => {
     async function init() {
-      if (feedInfo.feedType !== 'following' || !pubkey) {
+      // Allow loading if forceLoad is true OR if feedType is 'following'
+      const shouldLoad = forceLoad || feedInfo.feedType === 'following'
+
+      if (!shouldLoad || !pubkey) {
         setSubRequests([])
         return
       }
@@ -22,7 +25,7 @@ export default function FollowingFeed() {
     }
 
     init()
-  }, [feedInfo.feedType, pubkey])
+  }, [feedInfo.feedType, pubkey, forceLoad])
 
   return <NormalFeed subRequests={subRequests} isMainFeed />
 }
