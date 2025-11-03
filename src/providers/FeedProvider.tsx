@@ -65,7 +65,11 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         id: favoriteRelays[0] ?? DEFAULT_FAVORITE_RELAYS[0]
       }
 
-      // If user has NIP-05, default to their community feed
+      // Track NIP-05 changes
+      let nip05Changed = false
+      let currentDomain: string | null = null
+
+      // If user has NIP-05, check if it's new or changed
       if (pubkey && profile?.nip05) {
         const nip05Parts = profile.nip05.split('@')
         console.log('[FeedProvider] NIP-05 parts:', nip05Parts)
@@ -73,19 +77,36 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
           const domain = nip05Parts[1].toLowerCase().trim()
           console.log('[FeedProvider] Extracted domain:', domain)
           if (domain) {
-            feedInfo = {
-              feedType: 'nip05-domain',
-              id: domain
+            currentDomain = domain
+            const lastKnownNip05 = storage.getLastKnownNip05(pubkey)
+            console.log('[FeedProvider] Last known NIP-05:', lastKnownNip05, 'Current:', profile.nip05)
+
+            // Check if NIP-05 is new or has changed
+            if (!lastKnownNip05 || lastKnownNip05 !== profile.nip05) {
+              console.log('[FeedProvider] NIP-05 is new or changed, switching to community feed')
+              nip05Changed = true
+              feedInfo = {
+                feedType: 'nip05-domain',
+                id: domain
+              }
+              // Update the stored NIP-05
+              storage.setLastKnownNip05(pubkey, profile.nip05)
             }
-            console.log('[FeedProvider] Setting default feed to community:', domain)
           }
         }
-      } else {
+      } else if (pubkey) {
+        // User doesn't have NIP-05 anymore (or never had one)
+        const lastKnownNip05 = storage.getLastKnownNip05(pubkey)
+        if (lastKnownNip05) {
+          console.log('[FeedProvider] NIP-05 was removed')
+          storage.setLastKnownNip05(pubkey, null)
+          nip05Changed = true
+        }
         console.log('[FeedProvider] No NIP-05 found, using relay feed')
       }
 
-      // Check for stored feed preference (user's manual selection overrides default)
-      if (pubkey) {
+      // Check for stored feed preference (only if NIP-05 hasn't changed)
+      if (pubkey && !nip05Changed) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
         if (storedFeedInfo) {
           console.log('[FeedProvider] Found stored feed preference:', storedFeedInfo)
@@ -93,6 +114,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         } else {
           console.log('[FeedProvider] No stored feed preference, using default:', feedInfo)
         }
+      } else if (nip05Changed) {
+        console.log('[FeedProvider] NIP-05 changed, using new community feed:', feedInfo)
       }
 
       if (feedInfo.feedType === 'relays') {

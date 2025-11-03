@@ -6,6 +6,7 @@ import nip05CommunityService from '@/services/nip05-community.service'
 import { TNip05Community, TNip05CommunitySet } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
 import CommunitiesOnboardingDialog from '@/components/CommunitiesOnboardingDialog'
+import { useNostr } from './NostrProvider'
 
 type TNip05CommunitiesContext = {
   favoriteDomains: string[]
@@ -33,6 +34,7 @@ export const useNip05Communities = () => {
 }
 
 export function Nip05CommunitiesProvider({ children }: { children: React.ReactNode }) {
+  const { profile, pubkey } = useNostr()
   const [favoriteDomains, setFavoriteDomains] = useState<string[]>([])
   const [communitySets, setCommunitySets] = useState<TNip05CommunitySet[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -68,6 +70,22 @@ export function Nip05CommunitiesProvider({ children }: { children: React.ReactNo
 
     init()
   }, [])
+
+  // Auto-add user's own NIP-05 domain to favorites
+  useEffect(() => {
+    if (!pubkey || !profile?.nip05 || isLoading) return
+
+    const nip05Parts = profile.nip05.split('@')
+    if (nip05Parts.length === 2) {
+      const domain = nip05Parts[1].toLowerCase().trim()
+      if (domain && !favoriteDomains.includes(domain)) {
+        console.log('[Nip05CommunitiesProvider] Auto-adding user NIP-05 domain to favorites:', domain)
+        const newDomains = [domain, ...favoriteDomains]
+        setFavoriteDomains(newDomains)
+        storage.setFavoriteDomains(newDomains)
+      }
+    }
+  }, [pubkey, profile?.nip05, isLoading, favoriteDomains])
 
   const handleOnboardingClose = (open: boolean) => {
     if (!open) {

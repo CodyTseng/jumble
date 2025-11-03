@@ -57,6 +57,7 @@ class LocalStorageService {
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
   private hasSeenCommunitiesOnboarding: boolean = false
+  private accountNip05Map: Record<string, string | undefined> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -125,6 +126,10 @@ class LocalStorageService {
 
     // Initialize communities onboarding flag
     this.hasSeenCommunitiesOnboarding = window.localStorage.getItem(StorageKey.HAS_SEEN_COMMUNITIES_ONBOARDING) === 'true'
+
+    // Initialize account NIP-05 map
+    const accountNip05MapStr = window.localStorage.getItem(StorageKey.ACCOUNT_NIP05_MAP) ?? '{}'
+    this.accountNip05Map = JSON.parse(accountNip05MapStr)
 
     const defaultZapSatsStr = window.localStorage.getItem(StorageKey.DEFAULT_ZAP_SATS)
     if (defaultZapSatsStr) {
@@ -369,6 +374,22 @@ class LocalStorageService {
     window.localStorage.setItem(
       StorageKey.ACCOUNT_FEED_INFO_MAP,
       JSON.stringify(this.accountFeedInfoMap)
+    )
+  }
+
+  getLastKnownNip05(pubkey: string) {
+    return this.accountNip05Map[pubkey]
+  }
+
+  setLastKnownNip05(pubkey: string, nip05: string | null) {
+    if (nip05) {
+      this.accountNip05Map[pubkey] = nip05
+    } else {
+      delete this.accountNip05Map[pubkey]
+    }
+    window.localStorage.setItem(
+      StorageKey.ACCOUNT_NIP05_MAP,
+      JSON.stringify(this.accountNip05Map)
     )
   }
 

@@ -35,6 +35,7 @@ export const StorageKey = {
   FAVORITE_DOMAINS: 'favoriteDomains',
   NIP05_COMMUNITY_SETS: 'nip05CommunitySets',
   HAS_SEEN_COMMUNITIES_ONBOARDING: 'hasSeenCommunitiesOnboarding',
+  ACCOUNT_NIP05_MAP: 'accountNip05Map',
   ACCOUNTS: 'accounts',
   CURRENT_ACCOUNT: 'currentAccount',
   ADD_CLIENT_TAG: 'addClientTag',
