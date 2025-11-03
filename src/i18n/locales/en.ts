@@ -483,6 +483,8 @@ export default {
     Extension: 'Extension',
     Remote: 'Remote',
     'Encrypted Key': 'Encrypted Key',
-    'Private Key': 'Private Key'
+    'Private Key': 'Private Key',
+    'Active Community Members': 'Active Community Members',
+    'No active members found': 'No active members found'
   }
 }
