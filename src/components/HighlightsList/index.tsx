@@ -150,13 +150,14 @@ export default function HighlightsList() {
 
   // Show grouped list
   return (
-    <div className="space-y-2">
-      {groupedHighlights.map((group) => (
+    <div>
+      {groupedHighlights.map((group, index) => (
         <UserHighlightCard
           key={group.pubkey}
           pubkey={group.pubkey}
           count={group.count}
           onClick={() => setSelectedPubkey(group.pubkey)}
+          isLast={index === groupedHighlights.length - 1}
         />
       ))}
     </div>
@@ -166,15 +167,17 @@ export default function HighlightsList() {
 function UserHighlightCard({
   pubkey,
   count,
-  onClick
+  onClick,
+  isLast
 }: {
   pubkey: string
   count: number
   onClick: () => void
+  isLast: boolean
 }) {
   return (
     <div
-      className="flex items-center gap-3 p-4 border rounded-lg clickable hover:bg-accent/50 transition-colors cursor-pointer"
+      className={`flex items-center gap-3 p-4 clickable hover:bg-accent/50 transition-colors cursor-pointer ${!isLast ? 'border-b' : ''}`}
       onClick={onClick}
     >
       <UserAvatar pubkey={pubkey} size={48} />
