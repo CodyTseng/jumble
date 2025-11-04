@@ -49,7 +49,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
       className="flex items-center text-muted-foreground hover:text-foreground pl-2 h-full"
       onClick={() => setIsDrawerOpen(true)}
     >
-      <Ellipsis />
+      <Ellipsis size={16} />
     </button>
   )
 
