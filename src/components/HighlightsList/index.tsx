@@ -219,13 +219,13 @@ function UserHighlightsHeader({ pubkey, count }: { pubkey: string; count: number
   const { t } = useTranslation()
 
   return (
-    <div className="flex items-center gap-3 p-4 border rounded-lg">
-      <UserAvatar userId={pubkey} size="big" />
-      <div>
-        <div className="text-xl font-bold">
+    <div className="flex items-center gap-3 px-4 py-2 border-b">
+      <UserAvatar userId={pubkey} size="normal" />
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold truncate">
           <Username userId={pubkey} />
         </div>
-        <div className="text-muted-foreground">
+        <div className="text-sm text-muted-foreground">
           {count} {count === 1 ? t('highlight') : t('highlights')}
         </div>
       </div>
