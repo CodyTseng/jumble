@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRTLLanguage, TLanguage } from '@/i18n'
-import { localStorageService } from '@/services/local-storage.service'
+import localStorageService from '@/services/local-storage.service'
 
 type RTLContextType = {
   isRTL: boolean
