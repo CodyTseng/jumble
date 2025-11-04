@@ -51,6 +51,25 @@ export default function HighlightsList() {
     return result.sort((a, b) => b.count - a.count)
   }, [highlights])
 
+  // Prefetch profiles for all authors as highlights arrive
+  useEffect(() => {
+    if (highlights.length === 0) return
+
+    const uniquePubkeys = Array.from(new Set(highlights.map(h => h.pubkey)))
+
+    // Trigger profile fetches in batches to avoid overwhelming the relays
+    const batchSize = 10
+    for (let i = 0; i < uniquePubkeys.length; i += batchSize) {
+      const batch = uniquePubkeys.slice(i, i + batchSize)
+      // The client service will handle fetching profiles
+      batch.forEach(pubkey => {
+        client.fetchProfile(pubkey).catch(() => {
+          // Silently fail - profile will show skeleton
+        })
+      })
+    }
+  }, [highlights])
+
   useEffect(() => {
     async function fetchHighlights() {
       if (!pubkey) {
@@ -183,7 +202,7 @@ function UserHighlightCard({
       <UserAvatar userId={pubkey} size="semiBig" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold truncate">
-          <Username pubkey={pubkey} />
+          <Username userId={pubkey} />
         </div>
       </div>
       <div className="flex items-center justify-center min-w-[2rem] h-8 px-3 bg-primary/10 text-primary rounded-full font-semibold text-sm">
@@ -195,14 +214,13 @@ function UserHighlightCard({
 
 function UserHighlightsHeader({ pubkey, count }: { pubkey: string; count: number }) {
   const { t } = useTranslation()
-  const { profile } = useFetchProfile(pubkey)
 
   return (
     <div className="flex items-center gap-3 p-4 border rounded-lg">
       <UserAvatar userId={pubkey} size="big" />
       <div>
         <div className="text-xl font-bold">
-          <Username pubkey={pubkey} />
+          <Username userId={pubkey} />
         </div>
         <div className="text-muted-foreground">
           {count} {count === 1 ? t('highlight') : t('highlights')}
@@ -225,7 +243,7 @@ function HighlightItem({ event, isLast }: { event: NEvent; isLast: boolean }) {
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold truncate">
-              <Username pubkey={event.pubkey} />
+              <Username userId={event.pubkey} />
             </span>
             <span className="text-muted-foreground">·</span>
             <FormattedTimestamp timestamp={event.created_at} />
