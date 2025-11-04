@@ -180,7 +180,7 @@ function UserHighlightCard({
       className={`flex items-center gap-3 p-4 clickable hover:bg-accent/50 transition-colors cursor-pointer ${!isLast ? 'border-b' : ''}`}
       onClick={onClick}
     >
-      <UserAvatar pubkey={pubkey} size={48} />
+      <UserAvatar userId={pubkey} size="semiBig" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold truncate">
           <Username pubkey={pubkey} />
@@ -199,7 +199,7 @@ function UserHighlightsHeader({ pubkey, count }: { pubkey: string; count: number
 
   return (
     <div className="flex items-center gap-3 p-4 border rounded-lg">
-      <UserAvatar pubkey={pubkey} size={64} />
+      <UserAvatar userId={pubkey} size="big" />
       <div>
         <div className="text-xl font-bold">
           <Username pubkey={pubkey} />
@@ -221,7 +221,7 @@ function HighlightItem({ event, isLast }: { event: NEvent; isLast: boolean }) {
       onClick={() => push(toNote(event))}
     >
       <div className="flex space-x-2 items-start px-4 pt-3">
-        <UserAvatar pubkey={event.pubkey} size={40} />
+        <UserAvatar userId={event.pubkey} size="normal" />
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold truncate">
