@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { formatAmount, getAmountFromInvoice } from '@/lib/lightning'
+import { formatAmount, getInvoiceDetails } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import lightning from '@/services/lightning.service'
@@ -13,8 +13,8 @@ export function EmbeddedLNInvoice({ invoice, className }: { invoice: string; cla
   const { checkLogin, pubkey } = useNostr()
   const [paying, setPaying] = useState(false)
 
-  const amount = useMemo(() => {
-    return getAmountFromInvoice(invoice)
+  const { amount, description } = useMemo(() => {
+    return getInvoiceDetails(invoice)
   }, [invoice])
 
   const handlePay = async () => {
@@ -49,6 +49,9 @@ export function EmbeddedLNInvoice({ invoice, className }: { invoice: string; cla
         <Zap className="w-5 h-5 text-yellow-400" />
         <div className="font-semibold text-sm">{t('Lightning Invoice')}</div>
       </div>
+      {description && (
+        <div className="text-sm text-muted-foreground break-words">{description}</div>
+      )}
       <div className="text-lg font-bold">
         {formatAmount(amount)} {t('sats')}
       </div>
