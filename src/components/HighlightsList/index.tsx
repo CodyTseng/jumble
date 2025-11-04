@@ -196,10 +196,10 @@ function UserHighlightCard({
 }) {
   return (
     <div
-      className={`flex items-center gap-3 p-4 clickable hover:bg-accent/50 transition-colors cursor-pointer ${!isLast ? 'border-b' : ''}`}
+      className={`flex items-center gap-3 px-4 py-2 clickable hover:bg-accent/50 transition-colors cursor-pointer ${!isLast ? 'border-b' : ''}`}
       onClick={onClick}
     >
-      <UserAvatar userId={pubkey} size="semiBig" />
+      <UserAvatar userId={pubkey} size="normal" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold truncate">
           <Username userId={pubkey} />
@@ -235,11 +235,11 @@ function HighlightItem({ event, isLast }: { event: NEvent; isLast: boolean }) {
 
   return (
     <div
-      className={`pb-3 clickable ${!isLast ? 'border-b' : ''}`}
+      className={`py-2 clickable ${!isLast ? 'border-b' : ''}`}
       onClick={() => push(toNote(event))}
     >
-      <div className="flex space-x-2 items-start px-4 pt-3">
-        <UserAvatar userId={event.pubkey} size="normal" />
+      <div className="flex space-x-2 items-start px-4">
+        <UserAvatar userId={event.pubkey} size="compact" />
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold truncate">
