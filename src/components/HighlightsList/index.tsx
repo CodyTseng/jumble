@@ -112,14 +112,17 @@ export default function HighlightsList() {
 
   if (isLoading && groupedHighlights.length === 0) {
     return (
-      <div className="space-y-2">
+      <div>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 p-4 border rounded-lg">
+          <div
+            key={i}
+            className={`flex items-center gap-3 px-4 py-2 ${i < 4 ? 'border-b' : ''}`}
+          >
             <Skeleton className="w-12 h-12 rounded-full" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-24" />
             </div>
+            <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         ))}
       </div>
