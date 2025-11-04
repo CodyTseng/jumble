@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRTLLanguage, TLanguage } from '@/i18n'
-import localStorageService from '@/services/local-storage.service'
 
 type RTLContextType = {
   isRTL: boolean
@@ -11,6 +10,8 @@ type RTLContextType = {
 
 const RTLContext = createContext<RTLContextType | undefined>(undefined)
 
+const RTL_STORAGE_KEY = 'rtl-enabled'
+
 export const RTLProvider = ({ children }: { children: React.ReactNode }) => {
   const { i18n } = useTranslation()
   const currentLanguage = i18n.language as TLanguage
@@ -18,7 +19,7 @@ export const RTLProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Initialize RTL state based on language or stored preference
   const [isRTL, setIsRTL] = useState<boolean>(() => {
-    const stored = localStorageService.getItem('rtl-enabled')
+    const stored = window.localStorage.getItem(RTL_STORAGE_KEY)
     if (stored !== null) {
       return stored === 'true'
     }
@@ -28,7 +29,7 @@ export const RTLProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Update RTL when language changes
   useEffect(() => {
-    const stored = localStorageService.getItem('rtl-enabled')
+    const stored = window.localStorage.getItem(RTL_STORAGE_KEY)
     if (stored !== null) {
       // User has explicitly set a preference
       setIsRTL(stored === 'true')
@@ -46,7 +47,7 @@ export const RTLProvider = ({ children }: { children: React.ReactNode }) => {
   const toggleRTL = () => {
     const newValue = !isRTL
     setIsRTL(newValue)
-    localStorageService.setItem('rtl-enabled', newValue.toString())
+    window.localStorage.setItem(RTL_STORAGE_KEY, newValue.toString())
   }
 
   return (
