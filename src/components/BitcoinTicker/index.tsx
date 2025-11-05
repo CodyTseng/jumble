@@ -107,7 +107,7 @@ export default function BitcoinTicker() {
 
   if (loading) {
     return (
-      <div className={cn('flex items-center px-6 py-3', alignmentClass)}>
+      <div className={cn('flex items-center px-4 py-3', alignmentClass)}>
         <div className="animate-pulse text-sm text-muted-foreground">Loading...</div>
       </div>
     )
@@ -115,7 +115,7 @@ export default function BitcoinTicker() {
 
   if (error || !price) {
     return (
-      <div className={cn('flex items-center px-6 py-3', alignmentClass)}>
+      <div className={cn('flex items-center px-4 py-3', alignmentClass)}>
         <div className="text-sm text-red-500">{error || 'Failed to load price'}</div>
       </div>
     )
@@ -123,7 +123,7 @@ export default function BitcoinTicker() {
 
   return (
     <div
-      className={cn('px-6 py-3 flex items-center', alignmentClass)}
+      className={cn('px-4 py-3 flex items-center', alignmentClass)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
