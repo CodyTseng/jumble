@@ -43,7 +43,9 @@ function SortableWidgetCard({
   bitcoinTickerTextSize,
   onBitcoinTickerTextSizeChange,
   bitcoinTickerShowBlockHeight,
-  onBitcoinTickerShowBlockHeightChange
+  onBitcoinTickerShowBlockHeightChange,
+  bitcoinTickerShowSatsMode,
+  onBitcoinTickerShowSatsModeChange
 }: {
   id: TWidgetId
   enabled: boolean
