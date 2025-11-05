@@ -179,7 +179,7 @@ function SortableWidgetCard({
         </div>
       )}
 
-      {showBitcoinSettings && bitcoinTickerAlignment && onBitcoinTickerAlignmentChange && bitcoinTickerTextSize && onBitcoinTickerTextSizeChange && bitcoinTickerShowBlockHeight !== undefined && onBitcoinTickerShowBlockHeightChange && (
+      {showBitcoinSettings && bitcoinTickerAlignment && onBitcoinTickerAlignmentChange && bitcoinTickerTextSize && onBitcoinTickerTextSizeChange && bitcoinTickerShowBlockHeight !== undefined && onBitcoinTickerShowBlockHeightChange && bitcoinTickerShowSatsMode !== undefined && onBitcoinTickerShowSatsModeChange && (
         <div className="px-4 pb-4 pt-2 border-t border-border/50 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
