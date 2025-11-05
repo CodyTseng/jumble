@@ -10,6 +10,7 @@ import { DECK_VIEW_MODE, LAYOUT_MODE } from '@/constants'
 import { forwardRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { X, Settings } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toWidgetsSettings } from '@/lib/link'
 
@@ -19,8 +20,11 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
   const { deckViewMode } = useDeckView()
   const { clear, push } = useSecondaryPage()
   const { setWidgetSidebarDismissed } = useWidgetSidebarDismissed()
-  const { widgetSidebarTitle } = useWidgetSidebarTitle()
+  const { widgetSidebarTitle, widgetSidebarIcon } = useWidgetSidebarTitle()
   const { t } = useTranslation()
+
+  // Get the icon component if one is selected
+  const IconComponent = widgetSidebarIcon ? (LucideIcons as any)[widgetSidebarIcon] : null
 
   const handleClose = () => {
     // If we have a secondary page open (index is defined), clear the stack
@@ -49,7 +53,10 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
       <div className="px-4 pt-4 pb-4 bg-transparent">
         {/* Title Header */}
         <div className="flex items-center justify-between mb-4 px-1">
-          <h2 className="text-lg font-semibold">{widgetSidebarTitle}</h2>
+          <div className="flex items-center gap-2">
+            {IconComponent && <IconComponent className="h-5 w-5" />}
+            <h2 className="text-lg font-semibold">{widgetSidebarTitle}</h2>
+          </div>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"

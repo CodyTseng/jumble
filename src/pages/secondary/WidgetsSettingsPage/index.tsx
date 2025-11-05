@@ -3,12 +3,15 @@ import { AVAILABLE_WIDGETS, useWidgets, TWidgetId, TTrendingNotesHeight, TBitcoi
 import { useWidgetSidebarTitle } from '@/providers/WidgetSidebarTitleProvider'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, GripVertical } from 'lucide-react'
+import { Check, GripVertical, Plus } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import IconPickerDialog from '@/components/IconPickerDialog'
 import {
   DndContext,
   closestCenter,
@@ -259,8 +262,11 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     bitcoinTickerShowBlockHeight,
     setBitcoinTickerShowBlockHeight
   } = useWidgets()
-  const { widgetSidebarTitle, setWidgetSidebarTitle } = useWidgetSidebarTitle()
+  const { widgetSidebarTitle, setWidgetSidebarTitle, widgetSidebarIcon, setWidgetSidebarIcon } = useWidgetSidebarTitle()
   const [activeId, setActiveId] = useState<TWidgetId | null>(null)
+
+  // Get the icon component if one is selected
+  const SelectedIconComponent = widgetSidebarIcon ? (LucideIcons as any)[widgetSidebarIcon] : null
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -311,21 +317,61 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         {t('Customize which widgets appear in your sidebar. Drag widgets to reorder them.')}
       </div>
 
-      {/* Custom Sidebar Title Setting */}
-      <div className="px-4 pt-4 pb-3 border-b">
-        <Label htmlFor="sidebar-title" className="text-sm font-medium mb-2 block">
-          {t('Sidebar Title')}
-        </Label>
-        <Input
-          id="sidebar-title"
-          value={widgetSidebarTitle}
-          onChange={(e) => setWidgetSidebarTitle(e.target.value)}
-          placeholder="Widgets"
-          className="max-w-xs"
-        />
-        <p className="text-xs text-muted-foreground mt-2">
-          {t('Customize the title displayed at the top of your widget sidebar')}
-        </p>
+      {/* Custom Sidebar Title & Icon Settings */}
+      <div className="px-4 pt-4 pb-3 border-b space-y-4">
+        <div>
+          <Label htmlFor="sidebar-title" className="text-sm font-medium mb-2 block">
+            {t('Sidebar Title')}
+          </Label>
+          <Input
+            id="sidebar-title"
+            value={widgetSidebarTitle}
+            onChange={(e) => setWidgetSidebarTitle(e.target.value)}
+            placeholder="Widgets"
+            className="max-w-xs"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            {t('Customize the title displayed at the top of your widget sidebar')}
+          </p>
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium mb-2 block">
+            {t('Sidebar Icon')}
+          </Label>
+          <div className="flex items-center gap-2">
+            <IconPickerDialog
+              selectedIcon={widgetSidebarIcon || undefined}
+              onIconSelect={setWidgetSidebarIcon}
+            >
+              <Button
+                variant="outline"
+                className={cn(
+                  "h-12 w-12 p-0",
+                  !widgetSidebarIcon && "border-dashed"
+                )}
+              >
+                {SelectedIconComponent ? (
+                  <SelectedIconComponent className="h-5 w-5" />
+                ) : (
+                  <Plus className="h-5 w-5 text-muted-foreground" />
+                )}
+              </Button>
+            </IconPickerDialog>
+            <div className="flex-1">
+              <p className="text-sm">
+                {widgetSidebarIcon ? (
+                  <span className="font-medium">{widgetSidebarIcon}</span>
+                ) : (
+                  <span className="text-muted-foreground">{t('No icon selected')}</span>
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t('Choose an icon to display next to your sidebar title')}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="p-4">

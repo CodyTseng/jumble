@@ -94,6 +94,7 @@ class LocalStorageService {
   private logoStyle: TLogoStyle = 'image'
   private customLogoText: string = 'Jumble'
   private widgetSidebarTitle: string = 'Widgets'
+  private widgetSidebarIcon: string | null = null
   private enabledWidgets: string[] = []
   private pinnedNoteWidgets: { id: string; eventId: string }[] = []
   private aiPromptWidgets: { id: string; eventId: string; messages: any[] }[] = []
@@ -345,6 +346,11 @@ class LocalStorageService {
     const widgetSidebarTitle = window.localStorage.getItem(StorageKey.WIDGET_SIDEBAR_TITLE)
     if (widgetSidebarTitle) {
       this.widgetSidebarTitle = widgetSidebarTitle
+    }
+
+    const widgetSidebarIcon = window.localStorage.getItem(StorageKey.WIDGET_SIDEBAR_ICON)
+    if (widgetSidebarIcon) {
+      this.widgetSidebarIcon = widgetSidebarIcon
     }
 
     const enabledWidgetsStr = window.localStorage.getItem(StorageKey.ENABLED_WIDGETS)
@@ -910,6 +916,19 @@ class LocalStorageService {
   setWidgetSidebarTitle(title: string) {
     this.widgetSidebarTitle = title
     window.localStorage.setItem(StorageKey.WIDGET_SIDEBAR_TITLE, title)
+  }
+
+  getWidgetSidebarIcon() {
+    return this.widgetSidebarIcon
+  }
+
+  setWidgetSidebarIcon(icon: string | null) {
+    this.widgetSidebarIcon = icon
+    if (icon === null) {
+      window.localStorage.removeItem(StorageKey.WIDGET_SIDEBAR_ICON)
+    } else {
+      window.localStorage.setItem(StorageKey.WIDGET_SIDEBAR_ICON, icon)
+    }
   }
 
   getEnabledWidgets() {
