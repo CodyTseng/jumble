@@ -72,6 +72,7 @@ export const StorageKey = {
   LOGO_FONT_SIZE: 'logoFontSize',
   WIDGET_SIDEBAR_TITLE: 'widgetSidebarTitle',
   WIDGET_SIDEBAR_ICON: 'widgetSidebarIcon',
+  HIDE_WIDGET_TITLES: 'hideWidgetTitles',
   ENABLED_WIDGETS: 'enabledWidgets',
   PINNED_NOTE_WIDGETS: 'pinnedNoteWidgets',
   AI_PROMPT_WIDGETS: 'aiPromptWidgets',

@@ -268,6 +268,8 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     isWidgetEnabled,
     toggleWidget,
     reorderWidgets,
+    hideWidgetTitles,
+    setHideWidgetTitles,
     trendingNotesHeight,
     setTrendingNotesHeight,
     bitcoinTickerAlignment,
@@ -388,6 +390,21 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-sm font-medium">
+              {t('Hide Widget Titles')}
+            </Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t('Remove titles from all widgets for a cleaner look')}
+            </p>
+          </div>
+          <Switch
+            checked={hideWidgetTitles}
+            onCheckedChange={setHideWidgetTitles}
+          />
         </div>
       </div>
 

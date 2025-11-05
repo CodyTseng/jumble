@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useWidgets } from '@/providers/WidgetsProvider'
 
 type WidgetContainerProps = {
   children: ReactNode
@@ -18,9 +19,11 @@ export default function WidgetContainer({
   dismissible = false,
   onDismiss
 }: WidgetContainerProps) {
+  const { hideWidgetTitles } = useWidgets()
+
   return (
     <div className={cn('flex flex-col overflow-hidden', className)}>
-      {title && (
+      {title && !hideWidgetTitles && (
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="font-semibold text-sm">{title}</h3>
           {dismissible && onDismiss && (

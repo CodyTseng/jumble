@@ -98,6 +98,7 @@ class LocalStorageService {
   private logoFontSize: number = DEFAULT_LOGO_FONT_SIZE
   private widgetSidebarTitle: string = 'Widgets'
   private widgetSidebarIcon: string | null = null
+  private hideWidgetTitles: boolean = false
   private enabledWidgets: string[] = []
   private pinnedNoteWidgets: { id: string; eventId: string }[] = []
   private aiPromptWidgets: { id: string; eventId: string; messages: any[] }[] = []
@@ -363,6 +364,11 @@ class LocalStorageService {
     const widgetSidebarIcon = window.localStorage.getItem(StorageKey.WIDGET_SIDEBAR_ICON)
     if (widgetSidebarIcon) {
       this.widgetSidebarIcon = widgetSidebarIcon
+    }
+
+    const hideWidgetTitles = window.localStorage.getItem(StorageKey.HIDE_WIDGET_TITLES)
+    if (hideWidgetTitles) {
+      this.hideWidgetTitles = hideWidgetTitles === 'true'
     }
 
     const enabledWidgetsStr = window.localStorage.getItem(StorageKey.ENABLED_WIDGETS)
@@ -955,6 +961,15 @@ class LocalStorageService {
     } else {
       window.localStorage.setItem(StorageKey.WIDGET_SIDEBAR_ICON, icon)
     }
+  }
+
+  getHideWidgetTitles() {
+    return this.hideWidgetTitles
+  }
+
+  setHideWidgetTitles(hide: boolean) {
+    this.hideWidgetTitles = hide
+    window.localStorage.setItem(StorageKey.HIDE_WIDGET_TITLES, hide.toString())
   }
 
   getEnabledWidgets() {

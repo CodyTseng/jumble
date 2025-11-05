@@ -15,7 +15,7 @@ const HEIGHT_CLASSES = {
 
 export default function TrendingNotesWidget() {
   const { t } = useTranslation()
-  const { trendingNotesHeight, enabledWidgets, toggleWidget } = useWidgets()
+  const { trendingNotesHeight, enabledWidgets, toggleWidget, hideWidgetTitles } = useWidgets()
   const [isHovered, setIsHovered] = useState(false)
 
   // Check if trending notes is the only enabled widget
@@ -34,23 +34,25 @@ export default function TrendingNotesWidget() {
 
   return (
     <WidgetContainer className={useFullHeight ? 'h-full flex flex-col' : 'flex flex-col'}>
-      <CardHeader
-        className="flex flex-row items-center justify-between space-y-0 p-4 pb-3 border-b group flex-shrink-0"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <CardTitle className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</CardTitle>
-        {isHovered && (
-          <button
-            className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-            onClick={() => toggleWidget('trending-notes')}
-            title={t('Hide widget')}
-          >
-            <EyeOff className="h-3.5 w-3.5" />
-          </button>
-        )}
-      </CardHeader>
-      <div className={`${heightClass} overflow-y-auto overflow-x-hidden scrollbar-hide px-4 pb-4 ${useFullHeight ? 'flex-1 min-h-0' : ''}`}>
+      {!hideWidgetTitles && (
+        <CardHeader
+          className="flex flex-row items-center justify-between space-y-0 p-4 pb-3 border-b group flex-shrink-0"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <CardTitle className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</CardTitle>
+          {isHovered && (
+            <button
+              className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              onClick={() => toggleWidget('trending-notes')}
+              title={t('Hide widget')}
+            >
+              <EyeOff className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </CardHeader>
+      )}
+      <div className={`${heightClass} overflow-y-auto overflow-x-hidden scrollbar-hide px-4 ${hideWidgetTitles ? 'pt-4' : ''} pb-4 ${useFullHeight ? 'flex-1 min-h-0' : ''}`}>
         <CompactTrendingNotes />
       </div>
     </WidgetContainer>

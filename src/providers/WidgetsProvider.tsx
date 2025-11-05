@@ -67,6 +67,8 @@ type TWidgetsContext = {
   isWidgetEnabled: (widgetId: TWidgetId) => boolean
   getWidgetById: (widgetId: TWidgetId) => TWidget | undefined
   reorderWidgets: (newOrder: TWidgetId[]) => void
+  hideWidgetTitles: boolean
+  setHideWidgetTitles: (hide: boolean) => void
   trendingNotesHeight: TTrendingNotesHeight
   setTrendingNotesHeight: (height: TTrendingNotesHeight) => void
   bitcoinTickerAlignment: TBitcoinTickerAlignment
@@ -126,6 +128,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     return localStorageService.getBitcoinTickerShowSatsMode()
   })
 
+  const [hideWidgetTitles, setHideWidgetTitlesState] = useState<boolean>(() => {
+    return localStorageService.getHideWidgetTitles()
+  })
+
   useEffect(() => {
     localStorageService.setEnabledWidgets(enabledWidgets)
   }, [enabledWidgets])
@@ -155,6 +161,14 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorageService.setBitcoinTickerShowSatsMode(bitcoinTickerShowSatsMode)
   }, [bitcoinTickerShowSatsMode])
+
+  useEffect(() => {
+    localStorageService.setHideWidgetTitles(hideWidgetTitles)
+  }, [hideWidgetTitles])
+
+  const setHideWidgetTitles = (hide: boolean) => {
+    setHideWidgetTitlesState(hide)
+  }
 
   const setTrendingNotesHeight = (height: TTrendingNotesHeight) => {
     setTrendingNotesHeightState(height)
@@ -286,6 +300,8 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
         isWidgetEnabled,
         getWidgetById,
         reorderWidgets,
+        hideWidgetTitles,
+        setHideWidgetTitles,
         trendingNotesHeight,
         setTrendingNotesHeight,
         bitcoinTickerAlignment,

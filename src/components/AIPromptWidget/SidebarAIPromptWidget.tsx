@@ -14,7 +14,7 @@ export default function SidebarAIPromptWidget() {
   const { t } = useTranslation()
   const { chat, isConfigured } = useAI()
   const { pubkey } = useNostr()
-  const { toggleWidget } = useWidgets()
+  const { toggleWidget, hideWidgetTitles } = useWidgets()
   const [prompt, setPrompt] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -88,40 +88,42 @@ export default function SidebarAIPromptWidget() {
   return (
     <div className="flex flex-col h-full max-h-[600px]">
       {/* Header */}
-      <div
-        className="flex items-center justify-between p-4 border-b group"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
-          <h3 className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</h3>
+      {!hideWidgetTitles && (
+        <div
+          className="flex items-center justify-between p-4 border-b group"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            <h3 className="font-semibold" style={{ fontSize: '14px' }}>{widgetName}</h3>
+          </div>
+          <div className="flex items-center gap-1">
+            {isHovered && (
+              <button
+                className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                onClick={() => toggleWidget('ai-prompt')}
+                title={t('Hide widget')}
+              >
+                <EyeOff className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {!isConfigured && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 w-7 p-0"
+                onClick={handleConfigureAI}
+              >
+                <Settings className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          {isHovered && (
-            <button
-              className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-              onClick={() => toggleWidget('ai-prompt')}
-              title={t('Hide widget')}
-            >
-              <EyeOff className="h-3.5 w-3.5" />
-            </button>
-          )}
-          {!isConfigured && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 w-7 p-0"
-              onClick={handleConfigureAI}
-            >
-              <Settings className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-0">
+      <div className={`flex-1 overflow-y-auto px-4 ${hideWidgetTitles ? 'pt-4' : ''} py-4 space-y-3 min-h-0`}>
         {!isConfigured && (
           <div className="flex items-start gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
             <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
