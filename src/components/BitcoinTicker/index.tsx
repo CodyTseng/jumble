@@ -78,15 +78,28 @@ export default function BitcoinTicker() {
       return new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(satsPerDollar) + ' sats/$'
+      }).format(satsPerDollar)
     }
-    
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(price)
+  }
+
+  const formatSatsLabel = () => {
+    return (
+      <>
+        <span className="text-muted-foreground" style={{ fontSize: '14pt' }}>
+          {' sats'}
+        </span>
+        <span className="text-muted-foreground" style={{ fontSize: '14pt' }}>
+          /$
+        </span>
+      </>
+    )
   }
 
   const alignmentClass = bitcoinTickerAlignment === 'center' ? 'justify-center' : 'justify-start'
@@ -114,7 +127,10 @@ export default function BitcoinTicker() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={cn('font-bold', textSizeClass)}>{formatPrice(price.usd)}</div>
+      <div className={cn('font-bold', textSizeClass)}>
+        {formatPrice(price.usd)}
+        {bitcoinTickerShowSatsMode && formatSatsLabel()}
+      </div>
       {bitcoinTickerShowBlockHeight && blockHeight !== null && (
         <div className="ml-auto flex items-center gap-2 text-muted-foreground">
           <Box
