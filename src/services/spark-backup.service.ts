@@ -3,6 +3,7 @@ import client from '@/services/client.service'
 import { generateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { kinds } from 'nostr-tools'
+import { toast } from 'sonner'
 
 /**
  * SparkBackupService - Nostr-based encrypted backup for Spark wallet
@@ -134,15 +135,19 @@ class SparkBackupService {
       } else {
         // Legacy NIP-04 backup
         console.log('[SparkBackup] ⚠️  Found legacy NIP-04 backup, decrypting...')
+        toast.info('Found backup using older encryption (NIP-04)')
         mnemonic = await client.signer.nip04Decrypt(pubkey, backupEvent.content)
 
         // Automatically migrate to NIP-44 for better security
         console.log('[SparkBackup] 🔄 Migrating backup to NIP-44...')
+        toast.loading('Upgrading backup encryption to NIP-44...', { id: 'migration' })
         try {
           await this.saveToNostr(mnemonic)
           console.log('[SparkBackup] ✅ Backup successfully migrated to NIP-44')
+          toast.success('Backup upgraded to NIP-44 encryption!', { id: 'migration' })
         } catch (migrationError) {
           console.warn('[SparkBackup] ⚠️  Migration to NIP-44 failed (backup still works):', migrationError)
+          toast.warning('Backup encryption upgrade failed (your backup still works)', { id: 'migration' })
         }
       }
 
