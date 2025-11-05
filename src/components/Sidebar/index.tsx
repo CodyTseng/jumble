@@ -2,6 +2,7 @@ import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
 import { useLogoStyle } from '@/providers/LogoStyleProvider'
+import { useLogoFontSize } from '@/providers/LogoFontSizeProvider'
 import { useReadsVisibility } from '@/providers/ReadsVisibilityProvider'
 import { useListsVisibility } from '@/providers/ListsVisibilityProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -22,6 +23,7 @@ export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
   const { compactSidebar } = useCompactSidebar()
   const { logoStyle, customLogoText } = useLogoStyle()
+  const { logoFontSize } = useLogoFontSize()
   const { hideReadsInNavigation } = useReadsVisibility()
   const { hideListsInNavigation } = useListsVisibility()
 
@@ -44,10 +46,13 @@ export default function PrimaryPageSidebar() {
           {logoStyle === 'image' ? (
             <Logo className={cn(compactSidebar ? "hidden" : "max-xl:hidden")} />
           ) : (
-            <div className={cn(
-              "text-2xl font-bold max-xl:hidden",
-              compactSidebar && "hidden"
-            )}>
+            <div
+              className={cn(
+                "font-bold max-xl:hidden",
+                compactSidebar && "hidden"
+              )}
+              style={{ fontSize: `${logoFontSize}px` }}
+            >
               {customLogoText}
             </div>
           )}

@@ -68,6 +68,7 @@ export const StorageKey = {
   COMPACT_SIDEBAR: 'compactSidebar',
   LOGO_STYLE: 'logoStyle',
   CUSTOM_LOGO_TEXT: 'customLogoText',
+  LOGO_FONT_SIZE: 'logoFontSize',
   WIDGET_SIDEBAR_TITLE: 'widgetSidebarTitle',
   WIDGET_SIDEBAR_ICON: 'widgetSidebarIcon',
   ENABLED_WIDGETS: 'enabledWidgets',
@@ -209,6 +210,9 @@ export const DEFAULT_FONT_SIZE = 14
 
 export const TITLE_FONT_SIZES = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] as const
 export const DEFAULT_TITLE_FONT_SIZE = 18
+
+export const LOGO_FONT_SIZES = [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40] as const
+export const DEFAULT_LOGO_FONT_SIZE = 24
 
 // Available font families for the application
 export const FONT_FAMILIES = {

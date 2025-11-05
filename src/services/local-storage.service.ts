@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TITLE_FONT_SIZE,
+  DEFAULT_LOGO_FONT_SIZE,
   DEFAULT_NIP_96_SERVICE,
   DEFAULT_PAGE_THEME,
   DEFAULT_POST_BUTTON_STYLE,
@@ -15,6 +16,7 @@ import {
   FONT_FAMILIES,
   FONT_SIZES,
   TITLE_FONT_SIZES,
+  LOGO_FONT_SIZES,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   POST_BUTTON_STYLE,
@@ -93,6 +95,7 @@ class LocalStorageService {
   private compactSidebar: boolean = false
   private logoStyle: TLogoStyle = 'image'
   private customLogoText: string = 'Jumble'
+  private logoFontSize: number = DEFAULT_LOGO_FONT_SIZE
   private widgetSidebarTitle: string = 'Widgets'
   private widgetSidebarIcon: string | null = null
   private enabledWidgets: string[] = []
@@ -341,6 +344,14 @@ class LocalStorageService {
     const customLogoText = window.localStorage.getItem(StorageKey.CUSTOM_LOGO_TEXT)
     if (customLogoText) {
       this.customLogoText = customLogoText
+    }
+
+    const logoFontSize = window.localStorage.getItem(StorageKey.LOGO_FONT_SIZE)
+    if (logoFontSize) {
+      const size = Number(logoFontSize)
+      if (LOGO_FONT_SIZES.includes(size as any)) {
+        this.logoFontSize = size
+      }
     }
 
     const widgetSidebarTitle = window.localStorage.getItem(StorageKey.WIDGET_SIDEBAR_TITLE)
@@ -907,6 +918,15 @@ class LocalStorageService {
   setCustomLogoText(text: string) {
     this.customLogoText = text
     window.localStorage.setItem(StorageKey.CUSTOM_LOGO_TEXT, text)
+  }
+
+  getLogoFontSize() {
+    return this.logoFontSize
+  }
+
+  setLogoFontSize(size: number) {
+    this.logoFontSize = size
+    window.localStorage.setItem(StorageKey.LOGO_FONT_SIZE, size.toString())
   }
 
   getWidgetSidebarTitle() {

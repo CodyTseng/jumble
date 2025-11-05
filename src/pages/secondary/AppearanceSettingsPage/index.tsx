@@ -10,6 +10,7 @@ import {
   FONT_FAMILIES,
   FONT_SIZES,
   TITLE_FONT_SIZES,
+  LOGO_FONT_SIZES,
   LAYOUT_MODE,
   MEDIA_STYLE,
   NOTIFICATION_LIST_STYLE,
@@ -22,6 +23,7 @@ import { useButtonRadius } from '@/providers/ButtonRadiusProvider'
 import { useCardRadius } from '@/providers/CardRadiusProvider'
 import { useCompactSidebar } from '@/providers/CompactSidebarProvider'
 import { useLogoStyle } from '@/providers/LogoStyleProvider'
+import { useLogoFontSize } from '@/providers/LogoFontSizeProvider'
 import { useDeckView } from '@/providers/DeckViewProvider'
 import { useFontFamily } from '@/providers/FontFamilyProvider'
 import { useFontSize } from '@/providers/FontSizeProvider'
@@ -90,6 +92,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { cardRadius, setCardRadius } = useCardRadius()
   const { compactSidebar, setCompactSidebar } = useCompactSidebar()
   const { logoStyle, setLogoStyle, customLogoText, setCustomLogoText } = useLogoStyle()
+  const { logoFontSize, setLogoFontSize } = useLogoFontSize()
 
   const getThemeIcon = (theme: string) => {
     switch (theme) {
@@ -593,6 +596,30 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
                 </div>
               </div>
             </SettingItem>
+            {logoStyle === 'text' && (
+              <SettingItem className="flex-col items-start gap-3">
+                <div className="w-full">
+                  <Label className="text-base font-normal">{t('Logo font size')}</Label>
+                  <div className="text-sm text-muted-foreground">{logoFontSize}px</div>
+                </div>
+                <div className="w-full px-2">
+                  <Slider
+                    min={0}
+                    max={LOGO_FONT_SIZES.length - 1}
+                    step={1}
+                    value={[LOGO_FONT_SIZES.indexOf(logoFontSize as any)]}
+                    onValueChange={(value) => {
+                      setLogoFontSize(LOGO_FONT_SIZES[value[0]])
+                    }}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>{LOGO_FONT_SIZES[0]}px</span>
+                    <span>{LOGO_FONT_SIZES[LOGO_FONT_SIZES.length - 1]}px</span>
+                  </div>
+                </div>
+              </SettingItem>
+            )}
           </div>
         )}
 
