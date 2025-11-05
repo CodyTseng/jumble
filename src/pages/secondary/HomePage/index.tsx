@@ -4,6 +4,7 @@ import { useWidgets } from '@/providers/WidgetsProvider'
 import { useDeckView } from '@/providers/DeckViewProvider'
 import { useLayoutMode } from '@/providers/LayoutModeProvider'
 import { useWidgetSidebarDismissed } from '@/providers/WidgetSidebarDismissedProvider'
+import { useWidgetSidebarTitle } from '@/providers/WidgetSidebarTitleProvider'
 import { useSecondaryPage } from '@/PageManager'
 import { DECK_VIEW_MODE, LAYOUT_MODE } from '@/constants'
 import { forwardRef } from 'react'
@@ -18,6 +19,7 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
   const { deckViewMode } = useDeckView()
   const { clear, push } = useSecondaryPage()
   const { setWidgetSidebarDismissed } = useWidgetSidebarDismissed()
+  const { widgetSidebarTitle } = useWidgetSidebarTitle()
   const { t } = useTranslation()
 
   const handleClose = () => {
@@ -47,7 +49,7 @@ const HomePage = forwardRef(({ index }: { index?: number }, ref) => {
       <div className="px-4 pt-4 pb-4 bg-transparent">
         {/* Title Header */}
         <div className="flex items-center justify-between mb-4 px-1">
-          <h2 className="text-lg font-semibold">My Jumble</h2>
+          <h2 className="text-lg font-semibold">{widgetSidebarTitle}</h2>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"

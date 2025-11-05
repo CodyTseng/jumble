@@ -8,6 +8,7 @@ import { ButtonRadiusProvider } from '@/providers/ButtonRadiusProvider'
 import { CardRadiusProvider } from '@/providers/CardRadiusProvider'
 import { CompactSidebarProvider } from '@/providers/CompactSidebarProvider'
 import { LogoStyleProvider } from '@/providers/LogoStyleProvider'
+import { WidgetSidebarTitleProvider } from '@/providers/WidgetSidebarTitleProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
 import { DeckViewProvider } from '@/providers/DeckViewProvider'
 import { CustomFeedsProvider } from '@/providers/CustomFeedsProvider'
@@ -65,6 +66,7 @@ export default function App(): JSX.Element {
                         <DeckViewProvider>
                           <CompactSidebarProvider>
                             <LogoStyleProvider>
+                              <WidgetSidebarTitleProvider>
                           <DistractionFreeModeProvider>
                             <ContentPolicyProvider>
                               <ReadsVisibilityProvider>
@@ -119,6 +121,7 @@ export default function App(): JSX.Element {
                           </ReadsVisibilityProvider>
                         </ContentPolicyProvider>
                       </DistractionFreeModeProvider>
+                              </WidgetSidebarTitleProvider>
                             </LogoStyleProvider>
                           </CompactSidebarProvider>
                         </DeckViewProvider>

@@ -1,6 +1,8 @@
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { AVAILABLE_WIDGETS, useWidgets, TWidgetId, TTrendingNotesHeight, TBitcoinTickerAlignment, TBitcoinTickerTextSize } from '@/providers/WidgetsProvider'
+import { useWidgetSidebarTitle } from '@/providers/WidgetSidebarTitleProvider'
 import { Switch } from '@/components/ui/switch'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -257,6 +259,7 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     bitcoinTickerShowBlockHeight,
     setBitcoinTickerShowBlockHeight
   } = useWidgets()
+  const { widgetSidebarTitle, setWidgetSidebarTitle } = useWidgetSidebarTitle()
   const [activeId, setActiveId] = useState<TWidgetId | null>(null)
 
   const sensors = useSensors(
@@ -307,6 +310,24 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
       <div className="px-4 py-3 text-sm text-muted-foreground border-b">
         {t('Customize which widgets appear in your sidebar. Drag widgets to reorder them.')}
       </div>
+
+      {/* Custom Sidebar Title Setting */}
+      <div className="px-4 pt-4 pb-3 border-b">
+        <Label htmlFor="sidebar-title" className="text-sm font-medium mb-2 block">
+          {t('Sidebar Title')}
+        </Label>
+        <Input
+          id="sidebar-title"
+          value={widgetSidebarTitle}
+          onChange={(e) => setWidgetSidebarTitle(e.target.value)}
+          placeholder="Widgets"
+          className="max-w-xs"
+        />
+        <p className="text-xs text-muted-foreground mt-2">
+          {t('Customize the title displayed at the top of your widget sidebar')}
+        </p>
+      </div>
+
       <div className="p-4">
         <DndContext
           sensors={sensors}
