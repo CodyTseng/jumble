@@ -75,6 +75,8 @@ type TWidgetsContext = {
   setBitcoinTickerTextSize: (size: TBitcoinTickerTextSize) => void
   bitcoinTickerShowBlockHeight: boolean
   setBitcoinTickerShowBlockHeight: (show: boolean) => void
+  bitcoinTickerShowSatsMode: boolean
+  setBitcoinTickerShowSatsMode: (show: boolean) => void
   pinnedNoteWidgets: TPinnedNoteWidget[]
   pinNoteWidget: (eventId: string) => string
   unpinNoteWidget: (widgetId: string) => void
@@ -120,6 +122,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     return localStorageService.getBitcoinTickerShowBlockHeight()
   })
 
+  const [bitcoinTickerShowSatsMode, setBitcoinTickerShowSatsModeState] = useState<boolean>(() => {
+    return localStorageService.getBitcoinTickerShowSatsMode()
+  })
+
   useEffect(() => {
     localStorageService.setEnabledWidgets(enabledWidgets)
   }, [enabledWidgets])
@@ -146,6 +152,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
     localStorageService.setBitcoinTickerShowBlockHeight(bitcoinTickerShowBlockHeight)
   }, [bitcoinTickerShowBlockHeight])
 
+  useEffect(() => {
+    localStorageService.setBitcoinTickerShowSatsMode(bitcoinTickerShowSatsMode)
+  }, [bitcoinTickerShowSatsMode])
+
   const setTrendingNotesHeight = (height: TTrendingNotesHeight) => {
     setTrendingNotesHeightState(height)
   }
@@ -160,6 +170,10 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
 
   const setBitcoinTickerShowBlockHeight = (show: boolean) => {
     setBitcoinTickerShowBlockHeightState(show)
+  }
+
+  const setBitcoinTickerShowSatsMode = (show: boolean) => {
+    setBitcoinTickerShowSatsModeState(show)
   }
 
   const toggleWidget = (widgetId: TWidgetId) => {
@@ -280,6 +294,8 @@ export function WidgetsProvider({ children }: { children: ReactNode }) {
         setBitcoinTickerTextSize,
         bitcoinTickerShowBlockHeight,
         setBitcoinTickerShowBlockHeight,
+        bitcoinTickerShowSatsMode,
+        setBitcoinTickerShowSatsMode,
         pinnedNoteWidgets,
         pinNoteWidget,
         unpinNoteWidget,

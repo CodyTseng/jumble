@@ -56,6 +56,8 @@ function SortableWidgetCard({
   onBitcoinTickerTextSizeChange?: (size: TBitcoinTickerTextSize) => void
   bitcoinTickerShowBlockHeight?: boolean
   onBitcoinTickerShowBlockHeightChange?: (show: boolean) => void
+  bitcoinTickerShowSatsMode?: boolean
+  onBitcoinTickerShowSatsModeChange?: (show: boolean) => void
 }) {
   const { t } = useTranslation()
   const widget = AVAILABLE_WIDGETS.find((w) => w.id === id)
@@ -227,6 +229,17 @@ function SortableWidgetCard({
 
           <div className="flex items-center justify-between">
             <div>
+              <Label className="text-sm font-medium">Show Sats per Dollar</Label>
+              <p className="text-xs text-muted-foreground mt-1">Display sats per dollar instead of USD price</p>
+            </div>
+            <Switch
+              checked={bitcoinTickerShowSatsMode}
+              onCheckedChange={onBitcoinTickerShowSatsModeChange}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
               <Label className="text-sm font-medium">Show Block Height</Label>
               <p className="text-xs text-muted-foreground mt-1">Display current Bitcoin block height</p>
             </div>
@@ -260,7 +273,9 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     bitcoinTickerTextSize,
     setBitcoinTickerTextSize,
     bitcoinTickerShowBlockHeight,
-    setBitcoinTickerShowBlockHeight
+    setBitcoinTickerShowBlockHeight,
+    bitcoinTickerShowSatsMode,
+    setBitcoinTickerShowSatsMode
   } = useWidgets()
   const { widgetSidebarTitle, setWidgetSidebarTitle, widgetSidebarIcon, setWidgetSidebarIcon } = useWidgetSidebarTitle()
   const [activeId, setActiveId] = useState<TWidgetId | null>(null)
@@ -398,6 +413,8 @@ const WidgetsSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                   onBitcoinTickerTextSizeChange={setBitcoinTickerTextSize}
                   bitcoinTickerShowBlockHeight={bitcoinTickerShowBlockHeight}
                   onBitcoinTickerShowBlockHeightChange={setBitcoinTickerShowBlockHeight}
+                  bitcoinTickerShowSatsMode={bitcoinTickerShowSatsMode}
+                  onBitcoinTickerShowSatsModeChange={setBitcoinTickerShowSatsMode}
                 />
               ))}
             </div>

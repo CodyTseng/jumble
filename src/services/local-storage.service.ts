@@ -105,6 +105,7 @@ class LocalStorageService {
   private bitcoinTickerAlignment: 'left' | 'center' = 'left'
   private bitcoinTickerTextSize: 'large' | 'small' = 'large'
   private bitcoinTickerShowBlockHeight: boolean = false
+  private bitcoinTickerShowSatsMode: boolean = false
   private zapSound: TZapSound = ZAP_SOUNDS.NONE
   private customFeeds: TCustomFeed[] = []
   private chargeZapEnabled: boolean = false
@@ -401,6 +402,11 @@ class LocalStorageService {
     const bitcoinTickerShowBlockHeight = window.localStorage.getItem(StorageKey.BITCOIN_TICKER_SHOW_BLOCK_HEIGHT)
     if (bitcoinTickerShowBlockHeight !== null) {
       this.bitcoinTickerShowBlockHeight = bitcoinTickerShowBlockHeight === 'true'
+    }
+
+    const bitcoinTickerShowSatsMode = window.localStorage.getItem(StorageKey.BITCOIN_TICKER_SHOW_SATS_MODE)
+    if (bitcoinTickerShowSatsMode !== null) {
+      this.bitcoinTickerShowSatsMode = bitcoinTickerShowSatsMode === 'true'
     }
 
     const zapSound = window.localStorage.getItem(StorageKey.ZAP_SOUND)
@@ -994,6 +1000,15 @@ class LocalStorageService {
   setBitcoinTickerShowBlockHeight(show: boolean) {
     this.bitcoinTickerShowBlockHeight = show
     window.localStorage.setItem(StorageKey.BITCOIN_TICKER_SHOW_BLOCK_HEIGHT, show.toString())
+  }
+
+  getBitcoinTickerShowSatsMode() {
+    return this.bitcoinTickerShowSatsMode
+  }
+
+  setBitcoinTickerShowSatsMode(show: boolean) {
+    this.bitcoinTickerShowSatsMode = show
+    window.localStorage.setItem(StorageKey.BITCOIN_TICKER_SHOW_SATS_MODE, show.toString())
   }
 
   getPinnedNoteWidgets() {

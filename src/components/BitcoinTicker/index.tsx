@@ -10,7 +10,7 @@ type BitcoinPrice = {
 type BlockHeight = number
 
 export default function BitcoinTicker() {
-  const { bitcoinTickerAlignment, bitcoinTickerTextSize, bitcoinTickerShowBlockHeight } = useWidgets()
+  const { bitcoinTickerAlignment, bitcoinTickerTextSize, bitcoinTickerShowBlockHeight, bitcoinTickerShowSatsMode } = useWidgets()
   const [price, setPrice] = useState<BitcoinPrice | null>(null)
   const [blockHeight, setBlockHeight] = useState<BlockHeight | null>(null)
   const [loading, setLoading] = useState(true)
@@ -72,6 +72,15 @@ export default function BitcoinTicker() {
   }, [bitcoinTickerShowBlockHeight])
 
   const formatPrice = (price: number) => {
+    if (bitcoinTickerShowSatsMode) {
+      // Calculate sats per dollar (100,000,000 sats per BTC / price in USD)
+      const satsPerDollar = Math.round(100000000 / price)
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(satsPerDollar) + ' sats/$'
+    }
+    
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
