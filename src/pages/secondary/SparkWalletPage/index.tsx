@@ -870,6 +870,30 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
+    // Warn if relay backup exists
+    if (hasRelayBackup) {
+      const confirmed = confirm(
+        '⚠️ WARNING: Existing Wallet Backup Found\n\n' +
+        '🔍 We found a wallet backup on your Nostr relays.\n\n' +
+        '❌ Creating a NEW wallet will:\n' +
+        '• Generate a completely different wallet\n' +
+        '• Create new Lightning addresses\n' +
+        '• NOT have access to funds from your existing wallet\n\n' +
+        '⚠️ If you later sync this NEW wallet to relays:\n' +
+        '• It will OVERWRITE your existing backup\n' +
+        '• Your old wallet will be harder to recover\n\n' +
+        '💡 RECOMMENDED: Click "Restore from Relays" instead\n' +
+        'to access your existing wallet and funds.\n\n' +
+        '❓ Are you SURE you want to create a NEW wallet?\n\n' +
+        'Click OK only if you want to start fresh.\n' +
+        'Click Cancel to go back and restore your existing wallet.'
+      )
+
+      if (!confirmed) {
+        return
+      }
+    }
+
     setConnecting(true)
     try {
       console.log('[SparkWallet] Step 1: Generating mnemonic...')
@@ -1160,9 +1184,21 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                 )}
 
                 <div className="space-y-3">
-                  {/* Always recommend "Create New Wallet" for new users */}
-                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet (Recommended)</span>
+                  {/* If relay backup exists, show it first with primary styling */}
+                  {hasRelayBackup && (
+                    <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+                      <span className="font-semibold flex items-center gap-2 text-white">
+                        <Cloud className="size-4" /> Restore from Relays ✓
+                      </span>
+                      <span className="text-xs opacity-90 text-white">
+                        Backup found on your relays!
+                      </span>
+                    </Button>
+                  )}
+
+                  {/* Wallet setup options */}
+                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant={hasRelayBackup ? "outline" : "default"} className="w-full h-auto py-3 flex-col items-start">
+                    <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet</span>
                     <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
                   </Button>
 
@@ -1171,15 +1207,17 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
                   </Button>
 
-                  {/* Show recommendation if relay backup exists */}
-                  <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className={`w-full h-auto py-3 flex-col items-start ${hasRelayBackup ? 'border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-950/20' : ''}`}>
-                    <span className={`font-semibold flex items-center gap-2 ${hasRelayBackup ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      <Cloud className="size-4" /> Restore from Relays{hasRelayBackup && ' ✓'}
-                    </span>
-                    <span className="text-xs opacity-80">
-                      {hasRelayBackup ? 'Backup found on your relays!' : 'Fetch backup from Nostr relays'}
-                    </span>
-                  </Button>
+                  {/* Show restore from relays if no backup found */}
+                  {!hasRelayBackup && (
+                    <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                      <span className="font-semibold flex items-center gap-2">
+                        <Cloud className="size-4" /> Restore from Relays
+                      </span>
+                      <span className="text-xs opacity-80">
+                        Fetch backup from Nostr relays
+                      </span>
+                    </Button>
+                  )}
 
                   <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
                     <span className="font-semibold text-yellow-600 dark:text-yellow-500 flex items-center gap-2"><AlertTriangle className="size-4" /> Manual Seed Phrase Entry</span>
