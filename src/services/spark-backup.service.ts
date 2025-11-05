@@ -37,6 +37,7 @@ class SparkBackupService {
   /**
    * Save encrypted mnemonic to Nostr relays
    * Uses NIP-44 self-encryption for enhanced security
+   * Falls back to NIP-04 for browser extensions that don't support NIP-44
    */
   async saveToNostr(mnemonic: string): Promise<void> {
     if (!client.signer) {
@@ -49,10 +50,29 @@ class SparkBackupService {
       const pubkey = await client.signer.getPublicKey()
       console.log('[SparkBackup] Pubkey obtained:', pubkey.substring(0, 8) + '...')
 
-      // Encrypt mnemonic to self using NIP-44 (more secure than NIP-04)
-      console.log('[SparkBackup] Step 2: Encrypting mnemonic with NIP-44...')
-      const encryptedContent = await client.signer.nip44Encrypt(pubkey, mnemonic)
-      console.log('[SparkBackup] Mnemonic encrypted successfully')
+      // Try NIP-44 first, fall back to NIP-04 if not supported
+      let encryptedContent: string
+      let encryptionVersion: 'nip44' | 'nip04' = 'nip44'
+
+      console.log('[SparkBackup] Step 2: Encrypting mnemonic...')
+      try {
+        console.log('[SparkBackup] Attempting NIP-44 encryption...')
+        // Add timeout to prevent indefinite hanging
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('NIP-44 encryption timeout')), 5000)
+        )
+        encryptedContent = await Promise.race([
+          client.signer.nip44Encrypt(pubkey, mnemonic),
+          timeoutPromise
+        ])
+        console.log('[SparkBackup] ✓ NIP-44 encryption successful')
+      } catch (nip44Error) {
+        console.warn('[SparkBackup] NIP-44 not available, falling back to NIP-04:', nip44Error)
+        toast.warning('Your wallet extension doesn\'t support NIP-44. Using NIP-04 encryption.', { duration: 5000 })
+        encryptedContent = await client.signer.nip04Encrypt(pubkey, mnemonic)
+        encryptionVersion = 'nip04'
+        console.log('[SparkBackup] ✓ NIP-04 encryption successful (fallback)')
+      }
 
       // Create NIP-78 event with encryption version tag
       console.log('[SparkBackup] Step 3: Signing backup event...')
@@ -63,7 +83,7 @@ class SparkBackupService {
           ['d', this.BACKUP_D_TAG], // Addressable event identifier
           ['client', 'Jumble'],
           ['description', 'Encrypted Spark wallet backup'],
-          [this.ENCRYPTION_VERSION_TAG, 'nip44'] // Track encryption version
+          [this.ENCRYPTION_VERSION_TAG, encryptionVersion] // Track encryption version
         ],
         created_at: Math.floor(Date.now() / 1000)
       })
