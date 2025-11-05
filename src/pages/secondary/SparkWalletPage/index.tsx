@@ -16,7 +16,7 @@ import SparkPaymentsList from '@/components/SparkPaymentsList'
 import DefaultZapAmountInput from '@/pages/secondary/WalletPage/DefaultZapAmountInput'
 import DefaultZapCommentInput from '@/pages/secondary/WalletPage/DefaultZapCommentInput'
 import QuickZapSwitch from '@/pages/secondary/WalletPage/QuickZapSwitch'
-import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp, PlusCircle, Cloud, FolderOpen, AlertTriangle, Zap, Settings, RefreshCw, XCircle, Key, HardDrive, Download, Pencil } from 'lucide-react'
+import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp, PlusCircle, Cloud, FolderOpen, AlertTriangle, Zap, Settings, XCircle, Key, HardDrive, Download, Pencil } from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
@@ -35,7 +35,7 @@ import { toWallet } from '@/lib/link'
  * - Nostr relay sync
  */
 const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
-  const { pubkey, profileEvent, publish, updateProfileEvent, nip04Encrypt, nip04Decrypt } = useNostr()
+  const { pubkey, profileEvent, publish, updateProfileEvent, nip44Encrypt, nip44Decrypt, nip04Decrypt } = useNostr()
   const { showWalletInSidebar, updateShowWalletInSidebar } = useUserPreferences()
   const {
     connected,
@@ -82,6 +82,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [checkingBackupLocations, setCheckingBackupLocations] = useState(false)
   const [backupLocations, setBackupLocations] = useState<Record<string, boolean>>({})
   const [showBackupLocations, setShowBackupLocations] = useState(false)
+  const [backupEncryptionVersion, setBackupEncryptionVersion] = useState<'nip44' | 'nip04' | null>(null)
   const qrCodeRef = useRef<HTMLDivElement>(null)
   const lightningAddressQRRef = useRef<HTMLDivElement>(null)
   const lightningAddressSectionRef = useRef<HTMLDivElement>(null)
@@ -103,6 +104,13 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       console.log('[SparkWallet] Found saved wallet, provider will auto-connect')
     }
   }, [pubkey])
+
+  // Check encryption version when settings are opened
+  useEffect(() => {
+    if (showSettings && connected && pubkey) {
+      handleCheckEncryptionVersion()
+    }
+  }, [showSettings, connected, pubkey])
 
   // Check if user has a wallet backup on Nostr relays
   const checkForRelayBackup = async () => {
@@ -491,7 +499,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   const handleDownloadBackup = async () => {
-    if (!pubkey || !nip04Encrypt) {
+    if (!pubkey || !nip44Encrypt) {
       toast.error('Unable to create backup - missing encryption')
       return
     }
@@ -505,8 +513,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         return
       }
 
-      // Download encrypted backup file
-      await sparkBackup.downloadBackupFile(currentMnemonic, pubkey, nip04Encrypt)
+      // Download encrypted backup file (using NIP-44)
+      await sparkBackup.downloadBackupFile(currentMnemonic, pubkey, nip44Encrypt)
       toast.success('Backup file downloaded!')
     } catch (error) {
       console.error('[SparkWallet] Failed to download backup:', error)
@@ -521,14 +529,20 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleRemoveWalletKeepBackup = async () => {
     if (!pubkey) return
 
+    // Check if relay backup exists
+    const hasBackup = await sparkBackup.hasBackupOnNostr()
+
     const confirmed = confirm(
-      '♻️ Remove wallet from device (keep relay backup)\n\n' +
-      '✅ Your wallet backup will remain on your Nostr relays\n' +
-      '✅ You can restore it later from relays\n' +
+      '♻️ Remove wallet from device\n\n' +
+      (hasBackup
+        ? '✅ Your relay backup will be preserved (you synced it earlier)\n✅ You can restore it later from relays\n'
+        : '⚠️ No relay backup found - you never synced to relays\n⚠️ Make sure you have a backup file or recovery phrase!\n') +
       '✅ Your Lightning address and funds remain safe\n' +
-      '✅ No data will be permanently deleted\n\n' +
-      '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n' +
-      'Click OK to remove wallet from this device only.\n' +
+      '✅ Only removes wallet from this device\n\n' +
+      (hasBackup
+        ? '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n'
+        : '⚠️ Without a relay backup, you can only restore from backup file or recovery phrase!\n\n') +
+      'Click OK to remove wallet from this device.\n' +
       'Click Cancel to go back safely.'
     )
 
@@ -538,7 +552,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     try {
       await sparkService.disconnect()
-      await sparkStorage.deleteMnemonic(pubkey, false) // Keep relay backup
+      await sparkStorage.deleteMnemonic(pubkey, false) // Keep relay backup (if it exists)
 
       // Clear all local state
       setGeneratedMnemonic('')
@@ -548,7 +562,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       setInvoice('')
       setPaymentRequest('')
 
-      toast.success('Wallet removed from device. Relay backup preserved for future restoration.')
+      const message = hasBackup
+        ? 'Wallet removed from device. Relay backup preserved.'
+        : 'Wallet removed from device. No relay backup to preserve.'
+      toast.success(message)
 
       // Navigate back to wallet selection page
       setTimeout(() => {
@@ -564,11 +581,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleRemoveWalletDeleteBackup = async () => {
     if (!pubkey) return
 
+    // Check if relay backup exists
+    const hasBackup = await sparkBackup.hasBackupOnNostr()
+
     const confirmed = confirm(
       '⚠️ PERMANENTLY REMOVE WALLET\n\n' +
       '🚨 This will:\n' +
       '❌ Remove the wallet from this device\n' +
-      '❌ DELETE the backup from your Nostr relays\n' +
+      (hasBackup
+        ? '❌ DELETE the backup from your Nostr relays\n'
+        : '• No relay backup exists (you never synced to relays)\n') +
       '❌ Make restoration impossible without a backup file or recovery phrase\n\n' +
       '✅ Your Lightning address will still work\n' +
       '✅ Your funds remain safe in your Spark wallet\n\n' +
@@ -576,7 +598,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       '• You have downloaded your backup file, OR\n' +
       '• You have written down your 12-word recovery phrase, OR\n' +
       '• You are intentionally removing this wallet completely\n\n' +
-      'Click OK to permanently remove wallet and delete relay backup.\n' +
+      'Click OK to permanently remove wallet' + (hasBackup ? ' and delete relay backup' : '') + '.\n' +
       'Click Cancel to go back safely.'
     )
 
@@ -584,23 +606,25 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
-    // Second confirmation for safety
-    const doubleCheck = confirm(
-      '⚠️ FINAL CONFIRMATION\n\n' +
-      'Are you absolutely sure?\n\n' +
-      'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
-      'Have you saved your backup file or recovery phrase?\n\n' +
-      'Click OK to proceed with permanent removal.\n' +
-      'Click Cancel to go back safely.'
-    )
+    // Second confirmation for safety (only if relay backup exists)
+    if (hasBackup) {
+      const doubleCheck = confirm(
+        '⚠️ FINAL CONFIRMATION\n\n' +
+        'Are you absolutely sure?\n\n' +
+        'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
+        'Have you saved your backup file or recovery phrase?\n\n' +
+        'Click OK to proceed with permanent removal.\n' +
+        'Click Cancel to go back safely.'
+      )
 
-    if (!doubleCheck) {
-      return
+      if (!doubleCheck) {
+        return
+      }
     }
 
     try {
       await sparkService.disconnect()
-      await sparkStorage.deleteMnemonic(pubkey, true) // Delete relay backup
+      await sparkStorage.deleteMnemonic(pubkey, true) // Delete relay backup (if it exists)
 
       // Clear all local state
       setGeneratedMnemonic('')
@@ -610,7 +634,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       setInvoice('')
       setPaymentRequest('')
 
-      toast.success('Wallet removed from device and relay backup deleted.')
+      const message = hasBackup
+        ? 'Wallet removed from device and relay backup deleted.'
+        : 'Wallet removed from device.'
+      toast.success(message)
 
       // Navigate back to wallet selection page
       setTimeout(() => {
@@ -837,10 +864,34 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   // Create new wallet with backup options
   const handleCreateNewWallet = async () => {
-    if (!pubkey || !nip04Encrypt) {
-      console.error('[SparkWallet] Missing pubkey or nip04Encrypt')
+    if (!pubkey || !nip44Encrypt) {
+      console.error('[SparkWallet] Missing pubkey or nip44Encrypt')
       toast.error('Please sign in with Nostr first')
       return
+    }
+
+    // Warn if relay backup exists
+    if (hasRelayBackup) {
+      const confirmed = confirm(
+        '⚠️ WARNING: Existing Wallet Backup Found\n\n' +
+        '🔍 We found a wallet backup on your Nostr relays.\n\n' +
+        '❌ Creating a NEW wallet will:\n' +
+        '• Generate a completely different wallet\n' +
+        '• Create new Lightning addresses\n' +
+        '• NOT have access to funds from your existing wallet\n\n' +
+        '⚠️ If you later sync this NEW wallet to relays:\n' +
+        '• It will OVERWRITE your existing backup\n' +
+        '• Your old wallet will be harder to recover\n\n' +
+        '💡 RECOMMENDED: Click "Restore from Relays" instead\n' +
+        'to access your existing wallet and funds.\n\n' +
+        '❓ Are you SURE you want to create a NEW wallet?\n\n' +
+        'Click OK only if you want to start fresh.\n' +
+        'Click Cancel to go back and restore your existing wallet.'
+      )
+
+      if (!confirmed) {
+        return
+      }
     }
 
     setConnecting(true)
@@ -862,8 +913,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
       try {
         console.log('[SparkWallet] Step 3: Downloading backup file...')
-        // Download encrypted backup file
-        await sparkBackup.downloadBackupFile(newMnemonic, pubkey, nip04Encrypt)
+        // Download encrypted backup file (using NIP-44)
+        await sparkBackup.downloadBackupFile(newMnemonic, pubkey, nip44Encrypt)
         toast.success('Backup file downloaded!')
         console.log('[SparkWallet] Backup file downloaded')
       } catch (backupError) {
@@ -872,23 +923,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         toast.error('Backup file download failed, but wallet is connected')
       }
 
-      // Save to Nostr relays if publish is available
-      if (typeof publish === 'function') {
-        try {
-          console.log('[SparkWallet] Step 4: Saving to Nostr relays...')
-          await sparkBackup.saveToNostr(newMnemonic)
-          toast.success('Backup saved to your relays!')
-          console.log('[SparkWallet] Backup saved to relays')
-        } catch (relayError) {
-          console.error('[SparkWallet] Relay backup failed:', relayError)
-          const errorMsg = relayError instanceof Error ? relayError.message : String(relayError)
-          // Don't fail the whole process if relay backup fails
-          toast.error(`Relay backup failed: ${errorMsg}`)
-          console.error('[SparkWallet] But wallet is connected and backup file downloaded')
-        }
-      } else {
-        console.log('[SparkWallet] Publish function not available, skipping relay backup')
-      }
+      // Note: Relay backup is now opt-in, not automatic
+      // User must explicitly enable it in settings
+      console.log('[SparkWallet] Relay backup is opt-in - skipping automatic upload')
     } catch (error) {
       console.error('[SparkWallet] Failed to create wallet:', error)
       const errorMessage = error instanceof Error ? error.message : String(error)
@@ -901,7 +938,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   // Restore from backup file
   const handleRestoreFromFile = async () => {
-    if (!pubkey || !nip04Decrypt) return
+    if (!pubkey || !nip44Decrypt) return
 
     setConnecting(true)
     setWaitingForFileSelection(true)
@@ -916,7 +953,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
 
     try {
-      const mnemonic = await sparkBackup.restoreFromFile(pubkey, nip04Decrypt)
+      // Pass both nip44Decrypt (primary) and nip04Decrypt (for legacy v1 backups)
+      const mnemonic = await sparkBackup.restoreFromFile(pubkey, nip44Decrypt, nip04Decrypt)
 
       if (aborted) {
         console.log('[SparkWallet] Operation was aborted, stopping')
@@ -1026,6 +1064,18 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
   }
 
+  // Check encryption version of backup
+  const handleCheckEncryptionVersion = async () => {
+    if (!pubkey) return
+
+    try {
+      const version = await sparkBackup.getBackupEncryptionVersion()
+      setBackupEncryptionVersion(version)
+    } catch (error) {
+      console.error('[SparkWallet] Failed to check encryption version:', error)
+    }
+  }
+
   // Re-sync backup to current relays
   const handleResyncBackupToRelays = async () => {
     if (!pubkey) {
@@ -1053,17 +1103,18 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       console.log('[SparkWallet] Publishing backup to current relays...')
       await sparkBackup.saveToNostr(mnemonic)
 
-      toast.success('Backup re-synced to your current relays!')
-      console.log('[SparkWallet] Backup re-synced successfully')
+      toast.success('Backup synced to your current relays!')
+      console.log('[SparkWallet] Backup synced successfully')
 
-      // Optionally re-check locations after sync
+      // Re-check encryption version and locations after sync
+      handleCheckEncryptionVersion()
       if (showBackupLocations) {
         setTimeout(() => handleCheckBackupLocations(), 1000)
       }
     } catch (error) {
-      console.error('[SparkWallet] Failed to re-sync backup:', error)
+      console.error('[SparkWallet] Failed to sync backup:', error)
       const errorMsg = error instanceof Error ? error.message : String(error)
-      toast.error(`Failed to re-sync backup: ${errorMsg}`)
+      toast.error(`Failed to sync backup: ${errorMsg}`)
     } finally {
       setResyncingBackup(false)
     }
@@ -1133,37 +1184,40 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                 )}
 
                 <div className="space-y-3">
-                  {/* If relay backup exists, recommend "Restore from Relays" */}
-                  {hasRelayBackup ? (
-                    <>
-                      <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold flex items-center gap-2"><Cloud className="size-4" /> Restore from Relays (Recommended)</span>
-                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
-                      </Button>
-
-                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet</span>
-                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet (Recommended)</span>
-                        <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
-                      </Button>
-
-                      <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                        <span className="font-semibold flex items-center gap-2"><Cloud className="size-4" /> Restore from Relays</span>
-                        <span className="text-xs opacity-80">Fetch your backup from Nostr relays</span>
-                      </Button>
-                    </>
+                  {/* If relay backup exists, show it first with primary styling */}
+                  {hasRelayBackup && (
+                    <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+                      <span className="font-semibold flex items-center gap-2 text-white">
+                        <Cloud className="size-4" /> Restore from Relays ✓
+                      </span>
+                      <span className="text-xs opacity-90 text-white">
+                        Backup found on your relays!
+                      </span>
+                    </Button>
                   )}
+
+                  {/* Wallet setup options */}
+                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant={hasRelayBackup ? "outline" : "default"} className="w-full h-auto py-3 flex-col items-start">
+                    <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet</span>
+                    <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                  </Button>
 
                   <Button onClick={handleRestoreFromFile} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
                     <span className="font-semibold flex items-center gap-2"><FolderOpen className="size-4" /> Restore from Backup File</span>
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
                   </Button>
+
+                  {/* Show restore from relays if no backup found */}
+                  {!hasRelayBackup && (
+                    <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
+                      <span className="font-semibold flex items-center gap-2">
+                        <Cloud className="size-4" /> Restore from Relays
+                      </span>
+                      <span className="text-xs opacity-80">
+                        Fetch backup from Nostr relays
+                      </span>
+                    </Button>
+                  )}
 
                   <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
                     <span className="font-semibold text-yellow-600 dark:text-yellow-500 flex items-center gap-2"><AlertTriangle className="size-4" /> Manual Seed Phrase Entry</span>
@@ -1944,6 +1998,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                     {/* Relay Backup Management */}
                     <div className="space-y-2 pt-2">
+                      {/* Encryption Version Indicator */}
+                      {backupEncryptionVersion && (
+                        <div className={`flex items-center gap-2 text-xs p-2 rounded ${
+                          backupEncryptionVersion === 'nip44'
+                            ? 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400'
+                            : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400'
+                        }`}>
+                          <span className="font-medium">
+                            {backupEncryptionVersion === 'nip44' ? '✓ NIP-44 Encryption' : '⚠️ NIP-04 (Legacy)'}
+                          </span>
+                          {backupEncryptionVersion === 'nip04' && (
+                            <span className="text-xs opacity-80">Will auto-upgrade on next load</span>
+                          )}
+                        </div>
+                      )}
+
                       <Button
                         onClick={handleResyncBackupToRelays}
                         variant="outline"
@@ -1954,14 +2024,14 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         {resyncingBackup ? (
                           <>
                             <Loader2 className="animate-spin size-4 mr-2" />
-                            Re-syncing...
+                            Syncing...
                           </>
                         ) : (
-                          <span className="flex items-center gap-1.5"><RefreshCw className="size-4" /> Re-sync Backup to Relays</span>
+                          <span className="flex items-center gap-1.5"><Cloud className="size-4" /> Sync Backup to Relays</span>
                         )}
                       </Button>
                       <p className="text-xs text-muted-foreground">
-                        Re-publish your encrypted backup to your current relay list. Use this after changing relays.
+                        Optional: Upload encrypted backup to Nostr relays for multi-device access. Syncs to your current relay list.
                       </p>
 
                       {/* Expandable backup locations section */}
@@ -2032,10 +2102,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           size="sm"
                           disabled={loading}
                         >
-                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove & Keep Relay Backup</span>
+                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove from Device</span>
                         </Button>
                         <p className="text-xs text-muted-foreground">
-                          Removes wallet from this device only. Your relay backup is preserved and you can restore later.
+                          Removes wallet from this device only. If you synced to relays, that backup will be preserved.
                         </p>
                       </div>
 
@@ -2051,7 +2121,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           <span className="flex items-center gap-1.5"><AlertTriangle className="size-4" /> Remove & Delete Relay Backup</span>
                         </Button>
                         <p className="text-xs text-red-600 dark:text-red-400">
-                          <strong>Caution:</strong> Deletes relay backup. You can only restore from backup file or recovery phrase.
+                          <strong>Caution:</strong> If you synced to relays, this deletes that backup. You can only restore from backup file or recovery phrase.
                         </p>
                       </div>
                     </div>
