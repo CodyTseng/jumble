@@ -529,14 +529,20 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleRemoveWalletKeepBackup = async () => {
     if (!pubkey) return
 
+    // Check if relay backup exists
+    const hasBackup = await sparkBackup.hasBackupOnNostr()
+
     const confirmed = confirm(
-      '♻️ Remove wallet from device (keep relay backup)\n\n' +
-      '✅ Your wallet backup will remain on your Nostr relays\n' +
-      '✅ You can restore it later from relays\n' +
+      '♻️ Remove wallet from device\n\n' +
+      (hasBackup
+        ? '✅ Your relay backup will be preserved (you synced it earlier)\n✅ You can restore it later from relays\n'
+        : '⚠️ No relay backup found - you never synced to relays\n⚠️ Make sure you have a backup file or recovery phrase!\n') +
       '✅ Your Lightning address and funds remain safe\n' +
-      '✅ No data will be permanently deleted\n\n' +
-      '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n' +
-      'Click OK to remove wallet from this device only.\n' +
+      '✅ Only removes wallet from this device\n\n' +
+      (hasBackup
+        ? '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n'
+        : '⚠️ Without a relay backup, you can only restore from backup file or recovery phrase!\n\n') +
+      'Click OK to remove wallet from this device.\n' +
       'Click Cancel to go back safely.'
     )
 
@@ -546,7 +552,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     try {
       await sparkService.disconnect()
-      await sparkStorage.deleteMnemonic(pubkey, false) // Keep relay backup
+      await sparkStorage.deleteMnemonic(pubkey, false) // Keep relay backup (if it exists)
 
       // Clear all local state
       setGeneratedMnemonic('')
@@ -556,7 +562,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       setInvoice('')
       setPaymentRequest('')
 
-      toast.success('Wallet removed from device. Relay backup preserved for future restoration.')
+      const message = hasBackup
+        ? 'Wallet removed from device. Relay backup preserved.'
+        : 'Wallet removed from device. No relay backup to preserve.'
+      toast.success(message)
 
       // Navigate back to wallet selection page
       setTimeout(() => {
@@ -572,11 +581,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleRemoveWalletDeleteBackup = async () => {
     if (!pubkey) return
 
+    // Check if relay backup exists
+    const hasBackup = await sparkBackup.hasBackupOnNostr()
+
     const confirmed = confirm(
       '⚠️ PERMANENTLY REMOVE WALLET\n\n' +
       '🚨 This will:\n' +
       '❌ Remove the wallet from this device\n' +
-      '❌ DELETE the backup from your Nostr relays\n' +
+      (hasBackup
+        ? '❌ DELETE the backup from your Nostr relays\n'
+        : '• No relay backup exists (you never synced to relays)\n') +
       '❌ Make restoration impossible without a backup file or recovery phrase\n\n' +
       '✅ Your Lightning address will still work\n' +
       '✅ Your funds remain safe in your Spark wallet\n\n' +
@@ -584,7 +598,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       '• You have downloaded your backup file, OR\n' +
       '• You have written down your 12-word recovery phrase, OR\n' +
       '• You are intentionally removing this wallet completely\n\n' +
-      'Click OK to permanently remove wallet and delete relay backup.\n' +
+      'Click OK to permanently remove wallet' + (hasBackup ? ' and delete relay backup' : '') + '.\n' +
       'Click Cancel to go back safely.'
     )
 
@@ -592,23 +606,25 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
-    // Second confirmation for safety
-    const doubleCheck = confirm(
-      '⚠️ FINAL CONFIRMATION\n\n' +
-      'Are you absolutely sure?\n\n' +
-      'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
-      'Have you saved your backup file or recovery phrase?\n\n' +
-      'Click OK to proceed with permanent removal.\n' +
-      'Click Cancel to go back safely.'
-    )
+    // Second confirmation for safety (only if relay backup exists)
+    if (hasBackup) {
+      const doubleCheck = confirm(
+        '⚠️ FINAL CONFIRMATION\n\n' +
+        'Are you absolutely sure?\n\n' +
+        'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
+        'Have you saved your backup file or recovery phrase?\n\n' +
+        'Click OK to proceed with permanent removal.\n' +
+        'Click Cancel to go back safely.'
+      )
 
-    if (!doubleCheck) {
-      return
+      if (!doubleCheck) {
+        return
+      }
     }
 
     try {
       await sparkService.disconnect()
-      await sparkStorage.deleteMnemonic(pubkey, true) // Delete relay backup
+      await sparkStorage.deleteMnemonic(pubkey, true) // Delete relay backup (if it exists)
 
       // Clear all local state
       setGeneratedMnemonic('')
@@ -618,7 +634,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       setInvoice('')
       setPaymentRequest('')
 
-      toast.success('Wallet removed from device and relay backup deleted.')
+      const message = hasBackup
+        ? 'Wallet removed from device and relay backup deleted.'
+        : 'Wallet removed from device.'
+      toast.success(message)
 
       // Navigate back to wallet selection page
       setTimeout(() => {
@@ -2045,10 +2064,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           size="sm"
                           disabled={loading}
                         >
-                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove & Keep Relay Backup</span>
+                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove from Device</span>
                         </Button>
                         <p className="text-xs text-muted-foreground">
-                          Removes wallet from this device only. Your relay backup is preserved and you can restore later.
+                          Removes wallet from this device only. If you synced to relays, that backup will be preserved.
                         </p>
                       </div>
 
@@ -2064,7 +2083,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           <span className="flex items-center gap-1.5"><AlertTriangle className="size-4" /> Remove & Delete Relay Backup</span>
                         </Button>
                         <p className="text-xs text-red-600 dark:text-red-400">
-                          <strong>Caution:</strong> Deletes relay backup. You can only restore from backup file or recovery phrase.
+                          <strong>Caution:</strong> If you synced to relays, this deletes that backup. You can only restore from backup file or recovery phrase.
                         </p>
                       </div>
                     </div>
