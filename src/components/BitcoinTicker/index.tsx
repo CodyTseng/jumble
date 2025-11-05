@@ -92,10 +92,10 @@ export default function BitcoinTicker() {
   const formatSatsLabel = () => {
     return (
       <>
-        <span className="text-muted-foreground" style={{ fontSize: '14pt' }}>
+        <span className="text-muted-foreground !text-sm">
           {' sats'}
         </span>
-        <span className="text-muted-foreground" style={{ fontSize: '14pt' }}>
+        <span className="text-muted-foreground !text-sm">
           /$
         </span>
       </>
