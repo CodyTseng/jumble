@@ -7,12 +7,17 @@ import sparkBackup from './spark-backup.service'
 /**
  * SparkStorageService - Secure encrypted storage for Spark wallet mnemonic
  *
- * Dual-layer storage strategy:
- * 1. Local: XChaCha20-Poly1305 encryption in localStorage (fast access)
- * 2. Nostr: NIP-04 encrypted backup on relays (multi-device sync)
+ * Storage strategy:
+ * 1. Local: XChaCha20-Poly1305 encryption in localStorage (always enabled)
+ * 2. Nostr: NIP-44 encrypted backup on relays (opt-in for multi-device sync)
  *
- * Uses XChaCha20-Poly1305 for authenticated encryption
- * Derives encryption key from user's Nostr pubkey
+ * Security features:
+ * - XChaCha20-Poly1305 authenticated encryption for local storage
+ * - NIP-44 encryption for relay backups (stronger than legacy NIP-04)
+ * - Automatic migration from NIP-04 to NIP-44 for existing backups
+ * - Relay backup is opt-in (privacy-first approach)
+ *
+ * Note: Local encryption key is derived from user's Nostr pubkey
  */
 class SparkStorageService {
   static instance: SparkStorageService
@@ -42,12 +47,13 @@ class SparkStorageService {
   }
 
   /**
-   * Encrypt and save mnemonic to both local storage and Nostr relays
+   * Encrypt and save mnemonic to local storage
+   * Optionally backup to Nostr relays if user has opted in
    * @param pubkey - User's Nostr public key
    * @param mnemonic - Wallet mnemonic to save
-   * @param syncToNostr - Whether to also backup to Nostr relays (default: true)
+   * @param syncToNostr - Whether to also backup to Nostr relays (default: false - opt-in required)
    */
-  async saveMnemonic(pubkey: string, mnemonic: string, syncToNostr = true): Promise<void> {
+  async saveMnemonic(pubkey: string, mnemonic: string, syncToNostr = false): Promise<void> {
     try {
       // Derive encryption key from pubkey
       const key = this.deriveKey(pubkey)
@@ -70,15 +76,17 @@ class SparkStorageService {
 
       console.log('[SparkStorage] Mnemonic encrypted and saved locally for pubkey:', pubkey.slice(0, 8))
 
-      // Also backup to Nostr relays for multi-device sync
+      // Optionally backup to Nostr relays for multi-device sync (user must opt-in)
       if (syncToNostr) {
         try {
           await sparkBackup.saveToNostr(mnemonic)
-          console.log('[SparkStorage] Mnemonic also backed up to Nostr relays')
+          console.log('[SparkStorage] Mnemonic also backed up to Nostr relays (user opted in)')
         } catch (error) {
           console.warn('[SparkStorage] Failed to backup to Nostr (local save succeeded):', error)
-          // Don't throw - local save succeeded, Nostr is just a backup
+          // Don't throw - local save succeeded, Nostr backup is optional
         }
+      } else {
+        console.log('[SparkStorage] Nostr backup skipped (user has not opted in)')
       }
     } catch (error) {
       console.error('[SparkStorage] Failed to save mnemonic:', error)
@@ -143,6 +151,28 @@ class SparkStorageService {
    */
   hasMnemonic(pubkey: string): boolean {
     return localStorage.getItem(this.getStorageKey(pubkey)) !== null
+  }
+
+  /**
+   * Enable relay backup for existing wallet
+   * Uploads local mnemonic to Nostr relays (opt-in)
+   * @param pubkey - User's Nostr public key
+   */
+  async enableRelayBackup(pubkey: string): Promise<void> {
+    try {
+      // Load mnemonic from local storage
+      const mnemonic = await this.loadMnemonic(pubkey)
+      if (!mnemonic) {
+        throw new Error('No wallet found to backup')
+      }
+
+      // Save to Nostr relays
+      await sparkBackup.saveToNostr(mnemonic)
+      console.log('[SparkStorage] Relay backup enabled for pubkey:', pubkey.slice(0, 8))
+    } catch (error) {
+      console.error('[SparkStorage] Failed to enable relay backup:', error)
+      throw new Error('Failed to enable relay backup')
+    }
   }
 
   /**
