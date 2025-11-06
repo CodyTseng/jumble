@@ -195,6 +195,7 @@ export default {
     All: '전체',
     Reactions: '반응',
     Zaps: '잽',
+    'selfZapWarning': 'Jumble은 자신에게 Zap을 보낼 때 발생하는 일에 대해 책임을 지지 않습니다. 본인의 책임 하에 진행하세요. 😉⚡',
     'Enjoying Jumble?': 'Jumble이 마음에 드시나요?',
     'Your donation helps me maintain Jumble and make it better! 😊':
       '후원해주시면 Jumble을 더 잘 유지하고 발전시킬 수 있습니다! 😊',

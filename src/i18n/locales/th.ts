@@ -192,6 +192,7 @@ export default {
     All: 'ทั้งหมด',
     Reactions: 'ปฏิกิริยา',
     Zaps: 'ซาตส์',
+    'selfZapWarning': 'Jumble ไม่รับผิดชอบต่อสิ่งที่เกิดขึ้นหากคุณ zap ตัวเอง ดำเนินการด้วยความเสี่ยงของคุณเอง 😉⚡',
     'Enjoying Jumble?': 'ชอบ Jumble ไหม?',
     'Your donation helps me maintain Jumble and make it better! 😊':
       'การบริจาคของคุณช่วยให้ฉันดูแลและพัฒนา Jumble ให้ดีขึ้น! 😊',

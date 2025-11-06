@@ -193,6 +193,7 @@ export default {
     All: 'All',
     Reactions: 'Reactions',
     Zaps: 'Zaps',
+    'selfZapWarning': 'Jumble is not responsible for what happens if you zap yourself. Proceed at your own risk. 😉⚡',
     'Enjoying Jumble?': 'Enjoying Jumble?',
     'Your donation helps me maintain Jumble and make it better! 😊':
       'Your donation helps me maintain Jumble and make it better! 😊',
