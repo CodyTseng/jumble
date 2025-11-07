@@ -494,7 +494,7 @@ export default {
       'Jumble은 릴레이 탐색에 중점을 둔 클라이언트입니다. 흥미로운 릴레이를 탐색하거나 로그인하여 팔로잉 피드를 확인하세요.',
     'Explore Relays': '릴레이 탐색',
     'Choose a feed': '피드 선택',
-    'and {{x}} others': '및 기타 {{x}}명'
+    'and {{x}} others': '및 기타 {{x}}명',
     selfZapWarning: 'Jumble은 자신에게 Zap을 보낼 때 발생하는 일에 대해 책임을 지지 않습니다. 본인의 책임 하에 진행하세요. 😉⚡',
   }
 }

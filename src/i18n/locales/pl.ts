@@ -498,7 +498,7 @@ export default {
       'Jumble to klient skupiony na przeglądaniu relay. Zacznij od eksploracji ciekawych relay lub zaloguj się, aby zobaczyć swój feed obserwowanych.',
     'Explore Relays': 'Eksploruj Relay',
     'Choose a feed': 'Wybierz feed',
-    'and {{x}} others': 'i {{x}} innych'
+    'and {{x}} others': 'i {{x}} innych',
     selfZapWarning: 'Jumble nie ponosi odpowiedzialności za to, co się stanie, jeśli zappujesz samego siebie. Kontynuuj na własne ryzyko. 😉⚡',
   }
 }

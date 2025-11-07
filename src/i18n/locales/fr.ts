@@ -503,7 +503,7 @@ export default {
       "Jumble est un client axé sur la navigation des relais. Commencez par explorer des relais intéressants ou connectez-vous pour voir votre fil d'abonnements.",
     'Explore Relays': 'Explorer les relais',
     'Choose a feed': 'Choisir un fil',
-    'and {{x}} others': 'et {{x}} autres'
+    'and {{x}} others': 'et {{x}} autres',
     selfZapWarning: "Jumble n'est pas responsable de ce qui se passe si vous vous zappez vous-même. Procédez à vos risques et périls. 😉⚡",
   }
 }

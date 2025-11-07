@@ -498,7 +498,7 @@ export default {
       'Jumble è un client focalizzato sulla navigazione dei relay. Inizia esplorando relay interessanti o effettua il login per visualizzare il tuo feed di following.',
     'Explore Relays': 'Esplora Relay',
     'Choose a feed': 'Scegli un feed',
-    'and {{x}} others': 'e altri {{x}}'
+    'and {{x}} others': 'e altri {{x}}',
     selfZapWarning: 'Jumble non è responsabile di ciò che accade se zappi te stesso. Procedi a tuo rischio e pericolo. 😉⚡',
   }
 }
