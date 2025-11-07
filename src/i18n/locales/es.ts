@@ -499,5 +499,6 @@ export default {
     'Explore Relays': 'Explorar Relays',
     'Choose a feed': 'Elige un feed',
     'and {{x}} others': 'y {{x}} otros'
+    selfZapWarning: 'Jumble no se hace responsable de lo que suceda si te zapeas a ti mismo. Procede bajo tu propio riesgo. 😉⚡',
   }
 }

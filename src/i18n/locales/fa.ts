@@ -494,5 +494,6 @@ export default {
     'Explore Relays': 'کاوش در رله‌ها',
     'Choose a feed': 'یک فید انتخاب کنید',
     'and {{x}} others': 'و {{x}} دیگر'
+    selfZapWarning: 'Jumble مسئولیتی در قبال اتفاقاتی که در صورت ارسال zap به خودتان می‌افتد ندارد. با مسئولیت خود ادامه دهید. 😉⚡',
   }
 }

@@ -495,5 +495,6 @@ export default {
     'Explore Relays': 'リレーを探索',
     'Choose a feed': 'フィードを選択',
     'and {{x}} others': 'および他{{x}}人'
+    selfZapWarning: 'Jumble は、あなたが自分自身にザップした場合の結果について責任を負いません。自己責任で続行してください。😉⚡',
   }
 }

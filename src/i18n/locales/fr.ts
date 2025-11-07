@@ -504,5 +504,6 @@ export default {
     'Explore Relays': 'Explorer les relais',
     'Choose a feed': 'Choisir un fil',
     'and {{x}} others': 'et {{x}} autres'
+    selfZapWarning: "Jumble n'est pas responsable de ce qui se passe si vous vous zappez vous-même. Procédez à vos risques et périls. 😉⚡",
   }
 }

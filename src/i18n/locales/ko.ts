@@ -495,5 +495,6 @@ export default {
     'Explore Relays': '릴레이 탐색',
     'Choose a feed': '피드 선택',
     'and {{x}} others': '및 기타 {{x}}명'
+    selfZapWarning: 'Jumble은 자신에게 Zap을 보낼 때 발생하는 일에 대해 책임을 지지 않습니다. 본인의 책임 하에 진행하세요. 😉⚡',
   }
 }
