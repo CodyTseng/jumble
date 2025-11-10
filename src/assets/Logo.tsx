@@ -13,8 +13,8 @@ export default function Logo({ className }: { className?: string }) {
   return (
     <img
       src={logoSrc}
-      alt="JumbleKat"
-      className={cn("w-full h-auto", className)}
+      alt="x21"
+      className={cn("w-full h-auto max-w-[48px]", className)}
     />
   )
 }

@@ -94,7 +94,7 @@ class LocalStorageService {
   private trendingNotesDismissed: boolean = false
   private compactSidebar: boolean = false
   private logoStyle: TLogoStyle = 'image'
-  private customLogoText: string = 'Jumble'
+  private customLogoText: string = 'x21'
   private logoFontSize: number = DEFAULT_LOGO_FONT_SIZE
   private widgetSidebarTitle: string = 'Widgets'
   private widgetSidebarIcon: string | null = null

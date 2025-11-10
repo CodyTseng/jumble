@@ -14,7 +14,7 @@ export default function Icon({ className }: { className?: string }) {
     <div className={cn("flex items-center justify-center w-12 h-12", className)}>
       <img
         src={iconSrc}
-        alt="JumbleKat"
+        alt="x21"
         className="w-12 h-12 object-contain"
       />
     </div>
