@@ -35,6 +35,13 @@ export default function Image({
     setHasError(false)
     setDisplaySkeleton(true)
 
+    // Validate URL before trying to load
+    if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
+      setHasError(true)
+      setIsLoading(false)
+      return
+    }
+
     if (pubkey) {
       blossomService.getValidUrl(url, pubkey).then((validUrl) => {
         setImageUrl(validUrl)

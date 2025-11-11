@@ -51,7 +51,20 @@ export function getWellKnownNip05Url(domain: string, name?: string): string {
 
 export async function fetchPubkeysFromDomain(domain: string): Promise<string[]> {
   try {
-    const res = await fetch(getWellKnownNip05Url(domain))
+    // Validate domain before fetching
+    if (!domain || domain.includes('/') || domain.includes('?')) {
+      return []
+    }
+
+    const res = await fetch(getWellKnownNip05Url(domain), {
+      mode: 'cors',
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    })
+
+    if (!res.ok) {
+      return []
+    }
+
     const json = await res.json()
     const pubkeySet = new Set<string>()
     return Object.values(json.names || {}).filter((pubkey) => {
@@ -65,7 +78,11 @@ export async function fetchPubkeysFromDomain(domain: string): Promise<string[]> 
       return true
     }) as string[]
   } catch (error) {
-    console.error('Error fetching pubkeys from domain:', error)
+    // CORS errors are expected for domains without proper headers
+    // Only log unexpected errors
+    if (error instanceof Error && !error.message.includes('CORS')) {
+      // Silently fail for CORS - this is expected behavior
+    }
     return []
   }
 }

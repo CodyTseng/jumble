@@ -131,7 +131,7 @@ export default function FollowingFavoriteDomainList({
                 }
               } catch (fetchError) {
                 // Fetch failed (CORS, network, etc.), use followed users as fallback
-                console.warn('[FollowingDomains] Fetch failed, using followed users for:', domain)
+                // Silently handle - CORS errors are expected for many domains
                 community = {
                   id: domain,
                   domain,
