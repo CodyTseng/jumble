@@ -95,8 +95,28 @@ export default function Nip05Community({ domain }: { domain?: string }) {
         <div className="flex items-start gap-4">
           <CommunityAvatar domain={domain} icon={icon} name={name} />
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-1">{name || domain}</h1>
-            {name && <div className="text-sm text-muted-foreground mb-1">{domain}</div>}
+            {name ? (
+              <>
+                <h1 className="text-2xl font-bold mb-1">{name}</h1>
+                <a
+                  href={`https://${domain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground mb-1 hover:underline hover:text-primary transition-colors inline-block"
+                >
+                  {domain}
+                </a>
+              </>
+            ) : (
+              <a
+                href={`https://${domain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl font-bold mb-1 hover:underline hover:text-primary transition-colors inline-block"
+              >
+                {domain}
+              </a>
+            )}
             <p className="text-sm text-muted-foreground">
               {memberCount || members.length} {t('members')}
             </p>
