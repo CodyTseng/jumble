@@ -103,51 +103,44 @@ export default function FollowingFavoriteDomainList({
         const communityData = await Promise.all(
           batch.map(async ([domain, followedPubkeys]) => {
             try {
-              // First try to get cached data from the service
-              let community = await getCommunity(domain)
+              let community: TNip05Community | undefined
 
-              // Check if cached data has full member list (not just followed users)
-              const hasCachedFullData =
-                community && community.members && community.members.length > followedPubkeys.length
-
-              // If no cached full data, try to fetch from nostr.json
-              if (!hasCachedFullData) {
-                console.log('[FollowingDomains] Fetching fresh data for:', domain)
-                try {
-                  const members = await fetchPubkeysFromDomain(domain)
-                  if (members.length > 0) {
-                    community = {
-                      id: domain,
-                      domain,
-                      members,
-                      memberCount: members.length,
-                      lastUpdated: Date.now()
-                    }
-                    // Save to service cache
-                    await nip05CommunityService.addCommunity(community)
-                    console.log(
-                      '[FollowingDomains] Successfully fetched:',
-                      domain,
-                      members.length,
-                      'members'
-                    )
-                  } else {
-                    // nostr.json returned empty, fall back to followed users
-                    throw new Error('Empty nostr.json')
-                  }
-                } catch (fetchError) {
-                  // Fetch failed (CORS, network, etc.), use followed users as fallback
-                  console.warn('[FollowingDomains] Fetch failed, using followed users for:', domain)
+              // Try to fetch from nostr.json for actual member count
+              console.log('[FollowingDomains] Fetching data for:', domain)
+              try {
+                const members = await fetchPubkeysFromDomain(domain)
+                if (members.length > 0) {
                   community = {
                     id: domain,
                     domain,
-                    members: followedPubkeys,
-                    memberCount: followedPubkeys.length,
+                    members,
+                    memberCount: members.length,
                     lastUpdated: Date.now()
                   }
-                  // Save fallback data to cache
+                  // Save to service cache immediately
                   await nip05CommunityService.addCommunity(community)
+                  console.log(
+                    '[FollowingDomains] Successfully fetched:',
+                    domain,
+                    members.length,
+                    'members'
+                  )
+                } else {
+                  // nostr.json returned empty, fall back to followed users
+                  throw new Error('Empty nostr.json')
                 }
+              } catch (fetchError) {
+                // Fetch failed (CORS, network, etc.), use followed users as fallback
+                console.warn('[FollowingDomains] Fetch failed, using followed users for:', domain)
+                community = {
+                  id: domain,
+                  domain,
+                  members: followedPubkeys,
+                  memberCount: followedPubkeys.length,
+                  lastUpdated: Date.now()
+                }
+                // Save fallback data to cache immediately
+                await nip05CommunityService.addCommunity(community)
               }
 
               return { domain, community }

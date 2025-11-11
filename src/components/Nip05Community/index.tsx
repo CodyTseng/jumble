@@ -36,6 +36,8 @@ export default function Nip05Community({ domain }: { domain?: string }) {
     getCommunity(decodedDomain)
       .then((data) => {
         console.log('[Nip05Community] Got community data:', data)
+        console.log('[Nip05Community] Community members:', data?.members?.length)
+        console.log('[Nip05Community] Community memberCount:', data?.memberCount)
         setCommunity(data || null)
       })
       .catch((error) => {
@@ -43,6 +45,7 @@ export default function Nip05Community({ domain }: { domain?: string }) {
         setCommunity(null)
       })
       .finally(() => {
+        console.log('[Nip05Community] Loading finished, community set to:', community)
         setIsLoading(false)
       })
   }, [domain, getCommunity])
