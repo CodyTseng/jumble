@@ -251,8 +251,8 @@ export default {
       'يمكنك استخدام مفتاح API هذا في أي مكان آخر يدعم LibreTranslate. عنوان الخدمة هو {{serviceUrl}}',
     'Top up': 'إعادة شحن',
     'Will receive: {n} characters': 'ستتلقى: {{n}} حروف',
-    'Top up {n} sats': 'إعادة شحن {{n}} ساتوشي',
-    'Minimum top up is {n} sats': 'الحد الأدنى لإعادة الشحن هو {{n}} ساتوشي',
+    'Top up {n} sats': 'إعادة شحن {{n}} sats',
+    'Minimum top up is {n} sats': 'الحد الأدنى لإعادة الشحن هو {{n}} sats',
     Service: 'الخدمة',
     'Reset API key': 'إعادة تعيين مفتاح API',
     'Are you sure you want to reset your API key? This action cannot be undone.':
@@ -443,7 +443,7 @@ export default {
     'Connect to your Rizful Vault': 'الاتصال بمحفظة Rizful الخاصة بك',
     'Paste your one-time code here': 'الصق رمز الاستخدام مرة واحدة هنا',
     Connect: 'اتصال',
-    'Set up your wallet to send and receive sats!': 'قم بإعداد محفظتك لإرسال واستقبال الساتس!',
+    'Set up your wallet to send and receive sats!': 'قم بإعداد محفظتك لإرسال واستقبال sats!',
     'Set up': 'إعداد',
     Pinned: 'مثبت',
     Unpin: 'إلغاء التثبيت',
@@ -484,6 +484,12 @@ export default {
     Extension: 'امتداد',
     Remote: 'عن بُعد',
     'Encrypted Key': 'مفتاح مشفر',
-    'Private Key': 'مفتاح خاص'
+    'Private Key': 'مفتاح خاص',
+    'Active Community Members': 'الأعضاء النشطون في المجتمع',
+    'No active members found': 'لم يتم العثور على أعضاء نشطين',
+    'My Community': 'مجتمعي',
+    'Community Admin': 'المشرف',
+    Members: 'الأعضاء',
+    'showing first 20': 'عرض أول 20'
   }
 }
