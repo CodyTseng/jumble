@@ -56,33 +56,40 @@ export async function fetchPubkeysFromDomain(domain: string): Promise<string[]> 
       return []
     }
 
-    const res = await fetch(getWellKnownNip05Url(domain), {
-      mode: 'cors',
-      signal: AbortSignal.timeout(5000) // 5 second timeout
-    })
+    // Create abort controller for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-    if (!res.ok) {
-      return []
+    try {
+      const res = await fetch(getWellKnownNip05Url(domain), {
+        mode: 'cors',
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!res.ok) {
+        return []
+      }
+
+      const json = await res.json()
+      const pubkeySet = new Set<string>()
+      return Object.values(json.names || {}).filter((pubkey) => {
+        if (typeof pubkey !== 'string' || !isValidPubkey(pubkey)) {
+          return false
+        }
+        if (pubkeySet.has(pubkey)) {
+          return false
+        }
+        pubkeySet.add(pubkey)
+        return true
+      }) as string[]
+    } finally {
+      clearTimeout(timeoutId)
     }
-
-    const json = await res.json()
-    const pubkeySet = new Set<string>()
-    return Object.values(json.names || {}).filter((pubkey) => {
-      if (typeof pubkey !== 'string' || !isValidPubkey(pubkey)) {
-        return false
-      }
-      if (pubkeySet.has(pubkey)) {
-        return false
-      }
-      pubkeySet.add(pubkey)
-      return true
-    }) as string[]
   } catch (error) {
-    // CORS errors are expected for domains without proper headers
-    // Only log unexpected errors
-    if (error instanceof Error && !error.message.includes('CORS')) {
-      // Silently fail for CORS - this is expected behavior
-    }
+    // CORS errors and timeouts are expected for domains without proper headers
+    // Silently fail - this is expected behavior
     return []
   }
 }

@@ -36,7 +36,7 @@ export default function Image({
     setDisplaySkeleton(true)
 
     // Validate URL before trying to load
-    if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
+    if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
       setHasError(true)
       setIsLoading(false)
       return
