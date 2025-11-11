@@ -1,84 +1,62 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TNip05Community } from '@/types'
-import { Globe, Heart, Users } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { Globe, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNip05Communities } from '@/providers/Nip05CommunitiesProvider'
 import NotFound from '../NotFound'
-import Tabs from '../Tabs'
-import CommunityFeed from './CommunityFeed'
-import CommunityMembers from './CommunityMembers'
-
-type TCommunityTabs = 'feed' | 'members'
+import { useFetchProfile } from '@/hooks'
+import { toProfile } from '@/lib/link'
+import { useSecondaryPage } from '@/PageManager'
+import { SimpleUserAvatar } from '../UserAvatar'
+import ProfileAbout from '../ProfileAbout'
+import Nip05 from '../Nip05'
 
 export default function Nip05Community({ domain }: { domain?: string }) {
   const { t } = useTranslation()
-  const { getCommunity, favoriteDomains, addFavoriteDomains, deleteFavoriteDomains } =
-    useNip05Communities()
+  const { getCommunity } = useNip05Communities()
   const [community, setCommunity] = useState<TNip05Community | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
-  const [tab, setTab] = useState<TCommunityTabs>('feed')
-  const [topContainerHeight, setTopContainerHeight] = useState(0)
-  const [topContainer, setTopContainer] = useState<HTMLDivElement | null>(null)
-
-  const isFavorite = domain ? favoriteDomains.includes(domain) : false
-
-  const topContainerRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      setTopContainer(node)
-    }
-  }, [])
 
   useEffect(() => {
+    console.log('[Nip05Community] Received domain:', domain)
     if (!domain) {
+      console.log('[Nip05Community] No domain provided')
       setIsLoading(false)
       setCommunity(null)
       return
     }
 
+    // Decode the domain in case it was URL encoded
+    const decodedDomain = decodeURIComponent(domain)
+    console.log('[Nip05Community] Decoded domain:', decodedDomain)
+
     setIsLoading(true)
-    getCommunity(domain)
+    getCommunity(decodedDomain)
       .then((data) => {
+        console.log('[Nip05Community] Got community data:', data)
         setCommunity(data || null)
+      })
+      .catch((error) => {
+        console.error('[Nip05Community] Error getting community:', error)
+        setCommunity(null)
       })
       .finally(() => {
         setIsLoading(false)
       })
   }, [domain, getCommunity])
 
-  useEffect(() => {
-    if (!topContainer) return
-
-    const checkHeight = () => {
-      setTopContainerHeight(topContainer.scrollHeight)
-    }
-
-    checkHeight()
-
-    const observer = new ResizeObserver(() => {
-      checkHeight()
-    })
-
-    observer.observe(topContainer)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [topContainer])
-
   if (isLoading) {
     return (
-      <div>
-        <div className="px-4 py-6">
-          <div className="flex items-start gap-4">
-            <Skeleton className="w-20 h-20 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-64" />
-            </div>
+      <div className="p-4 space-y-6">
+        <Skeleton className="h-48 w-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full" />
+            ))}
           </div>
         </div>
       </div>
@@ -89,80 +67,200 @@ export default function Nip05Community({ domain }: { domain?: string }) {
     return <NotFound />
   }
 
-  const { name, description, icon, memberCount, members } = community
+  const { name, icon, memberCount, members } = community
+
+  if (!members || members.length === 0) {
+    return (
+      <div className="p-8 text-center text-muted-foreground">
+        <Users className="mx-auto mb-4 w-12 h-12 opacity-50" />
+        <p className="text-lg mb-2">{t('Community Not Found')}</p>
+        <p className="text-sm">
+          {t('Could not load community data for')} {domain}
+        </p>
+      </div>
+    )
+  }
+
+  // First member is the admin
+  const adminPubkey = members[0]
+  const otherMembers = members.slice(1)
 
   return (
-    <>
-      <div ref={topContainerRef}>
-        <div className="px-4 py-6">
-          <div className="flex items-start gap-4">
-            {icon ? (
-              <Avatar className="w-20 h-20 shrink-0">
-                <AvatarImage src={icon} alt={name || domain} />
-                <AvatarFallback>
-                  <Globe className="size-10" />
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <div className="flex justify-center items-center w-20 h-20 shrink-0 rounded-full bg-muted">
-                <Globe className="size-10 text-muted-foreground" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl font-semibold truncate select-text">
-                    {name || domain}
-                  </h1>
-                  {name && <div className="text-sm text-muted-foreground truncate">{domain}</div>}
-                </div>
-                <Button
-                  variant={isFavorite ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    if (isFavorite) {
-                      deleteFavoriteDomains([domain])
-                    } else {
-                      addFavoriteDomains([domain])
-                    }
-                  }}
-                  className="shrink-0"
-                >
-                  <Heart className={`size-4 mr-1 ${isFavorite ? 'fill-current' : ''}`} />
-                  {isFavorite ? t('Favorited') : t('Favorite')}
-                </Button>
-              </div>
-              {description && (
-                <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap break-words select-text">
-                  {description}
-                </p>
-              )}
-              <div className="flex gap-4 items-center mt-3 text-sm">
-                <div className="flex gap-1 items-center text-muted-foreground">
-                  <Users className="size-4" />
-                  <span className="font-medium text-foreground">
-                    {memberCount || members.length}
-                  </span>
-                  <span>{t('members')}</span>
-                </div>
-              </div>
-            </div>
+    <div className="pb-4">
+      {/* Community Header */}
+      <div className="p-6 border-b">
+        <div className="flex items-start gap-4">
+          <CommunityAvatar domain={domain} icon={icon} name={name} />
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold mb-1">{name || domain}</h1>
+            {name && <div className="text-sm text-muted-foreground mb-1">{domain}</div>}
+            <p className="text-sm text-muted-foreground">
+              {memberCount || members.length} {t('members')}
+            </p>
           </div>
         </div>
-        <Tabs
-          value={tab}
-          tabs={[
-            { value: 'feed', label: t('Feed') },
-            { value: 'members', label: t('Members') }
-          ]}
-          onTabChange={(tab) => setTab(tab as TCommunityTabs)}
-        />
       </div>
-      {tab === 'feed' ? (
-        <CommunityFeed domain={domain} topSpace={topContainerHeight} />
-      ) : (
-        <CommunityMembers members={members} domain={domain} />
+
+      {/* Admin Profile */}
+      {adminPubkey && (
+        <div className="p-6 border-b">
+          <h2 className="text-lg font-semibold mb-4">{t('Community Admin')}</h2>
+          <AdminProfile pubkey={adminPubkey} domain={domain} />
+        </div>
       )}
-    </>
+
+      {/* Other Members */}
+      {otherMembers.length > 0 && (
+        <div className="p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {t('Members')} ({otherMembers.length})
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {otherMembers.map((pubkey) => (
+              <MemberCard key={pubkey} pubkey={pubkey} domain={domain} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CommunityAvatar({
+  domain,
+  icon,
+  name
+}: {
+  domain: string
+  icon?: string
+  name?: string
+}) {
+  const [faviconError, setFaviconError] = useState(false)
+  const [googleFaviconError, setGoogleFaviconError] = useState(false)
+
+  // Try multiple favicon sources in order of preference
+  const faviconUrl = icon || `https://${domain}/favicon.ico`
+  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+
+  // If all favicon sources fail, show globe
+  if (faviconError && googleFaviconError) {
+    return (
+      <div className="flex justify-center items-center w-20 h-20 shrink-0 rounded-full bg-muted">
+        <Globe className="size-10 text-muted-foreground" />
+      </div>
+    )
+  }
+
+  return (
+    <Avatar className="w-20 h-20 shrink-0">
+      {!faviconError ? (
+        <AvatarImage
+          src={faviconUrl}
+          alt={name || domain}
+          onError={() => setFaviconError(true)}
+        />
+      ) : !googleFaviconError ? (
+        <AvatarImage
+          src={googleFaviconUrl}
+          alt={name || domain}
+          onError={() => setGoogleFaviconError(true)}
+        />
+      ) : null}
+      <AvatarFallback>
+        <Globe className="size-10" />
+      </AvatarFallback>
+    </Avatar>
+  )
+}
+
+function AdminProfile({ pubkey, domain }: { pubkey: string; domain: string }) {
+  const { profile, isFetching } = useFetchProfile(pubkey)
+  const { push } = useSecondaryPage()
+
+  if (isFetching) {
+    return (
+      <div className="flex items-start gap-4 p-6 border rounded-lg">
+        <Skeleton className="w-24 h-24 rounded-full" />
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  const displayName = profile?.username || pubkey.slice(0, 8)
+  const nip05 = profile?.nip05
+  const lud16 = profile?.lud16
+  const about = profile?.about
+
+  return (
+    <div
+      className="flex items-start gap-4 p-6 border rounded-lg clickable hover:bg-muted/50 transition-colors"
+      onClick={() => push(toProfile(pubkey))}
+    >
+      <SimpleUserAvatar userId={pubkey} className="w-24 h-24" />
+      <div className="flex-1 min-w-0">
+        <div className="text-xl font-bold mb-1">{displayName}</div>
+        {nip05 && (
+          <div className="mb-2">
+            <Nip05 pubkey={pubkey} />
+          </div>
+        )}
+        {lud16 && (
+          <div className="text-sm text-muted-foreground mb-2 truncate">
+            ⚡ {lud16}
+          </div>
+        )}
+        {about && (
+          <ProfileAbout
+            about={about}
+            className="text-sm text-muted-foreground line-clamp-3 mt-2"
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function MemberCard({ pubkey, domain }: { pubkey: string; domain: string }) {
+  const { push } = useSecondaryPage()
+  const { profile, isFetching } = useFetchProfile(pubkey)
+
+  if (isFetching) {
+    return (
+      <div className="flex items-center gap-3 p-3 border rounded-lg">
+        <Skeleton className="w-12 h-12 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+    )
+  }
+
+  const displayName = profile?.username || pubkey.slice(0, 8)
+  const nip05 = profile?.nip05
+
+  return (
+    <div
+      className="flex items-center gap-3 p-3 border rounded-lg clickable hover:bg-muted/50 transition-colors"
+      onClick={() => push(toProfile(pubkey))}
+    >
+      <SimpleUserAvatar userId={pubkey} className="w-12 h-12" />
+      <div className="flex-1 min-w-0">
+        <div className="font-medium truncate">{displayName}</div>
+        {nip05 && (
+          <div className="text-xs text-muted-foreground truncate">
+            {nip05.endsWith(`@${domain}`) ? nip05.replace(`@${domain}`, '') : nip05}@{domain}
+          </div>
+        )}
+        {!nip05 && (
+          <div className="text-xs text-muted-foreground truncate">{pubkey.slice(0, 16)}...</div>
+        )}
+      </div>
+    </div>
   )
 }

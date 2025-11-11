@@ -300,7 +300,7 @@ class Nip05CommunityService {
   /**
    * Private: Add community to cache and storage
    */
-  private async addCommunity(community: TNip05Community): Promise<TNip05Community> {
+  async addCommunity(community: TNip05Community): Promise<TNip05Community> {
     this.communityMap.set(community.domain, community)
 
     await Promise.allSettled([

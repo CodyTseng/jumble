@@ -1,10 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TNip05Community } from '@/types'
-import { ChevronDown, Globe } from 'lucide-react'
+import { ChevronDown, Globe, Heart } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 import { useFetchProfile } from '@/hooks'
+import { useSecondaryPage } from '@/PageManager'
+import { toNip05Community } from '@/lib/link'
 
 export default function Nip05CommunityCard({
   community,
@@ -18,17 +20,27 @@ export default function Nip05CommunityCard({
   showMembers?: boolean
 }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const [expand, setExpand] = useState(false)
+
+  const handleCardClick = () => {
+    push(toNip05Community(community.domain))
+  }
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onSelectChange(!select)
+  }
 
   return (
     <div
-      className={`w-full border rounded-lg p-4 clickable ${select ? 'border-primary bg-primary/5' : ''}`}
-      onClick={() => onSelectChange(!select)}
+      className={`w-full border rounded-lg p-4 clickable hover:bg-muted/50 transition-colors ${select ? 'border-primary bg-primary/5' : ''}`}
+      onClick={handleCardClick}
     >
       <div className="flex justify-between items-center">
-        <div className="flex space-x-3 items-center cursor-pointer">
+        <div className="flex space-x-3 items-center flex-1 min-w-0">
           <CommunityAvatar community={community} />
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1 min-w-0">
             <div className="font-semibold select-none">
               {community.name || community.domain}
             </div>
@@ -42,13 +54,20 @@ export default function Nip05CommunityCard({
             )}
           </div>
         </div>
-        {showMembers && (
-          <div className="flex gap-1">
+        <div className="flex gap-2 items-center shrink-0">
+          <button
+            onClick={handleFavoriteClick}
+            className="p-2 hover:bg-accent rounded-md transition-colors"
+            title={select ? t('Unfavorite') : t('Favorite')}
+          >
+            <Heart className={`size-4 ${select ? 'fill-current text-primary' : 'text-muted-foreground'}`} />
+          </button>
+          {showMembers && (
             <MembersExpandToggle expand={expand} onExpandChange={setExpand}>
               {community.memberCount || community.members.length} {t('members')}
             </MembersExpandToggle>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {expand && showMembers && <MembersList members={community.members.slice(0, 20)} />}
     </div>
@@ -56,21 +75,41 @@ export default function Nip05CommunityCard({
 }
 
 function CommunityAvatar({ community }: { community: TNip05Community }) {
-  if (community.icon) {
+  const [faviconError, setFaviconError] = useState(false)
+  const [googleFaviconError, setGoogleFaviconError] = useState(false)
+
+  // Try multiple favicon sources in order of preference
+  const faviconUrl = community.icon || `https://${community.domain}/favicon.ico`
+  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`
+
+  // If all favicon sources fail, show globe
+  if (faviconError && googleFaviconError) {
     return (
-      <Avatar className="w-10 h-10 shrink-0">
-        <AvatarImage src={community.icon} alt={community.name || community.domain} />
-        <AvatarFallback>
-          <Globe className="size-5" />
-        </AvatarFallback>
-      </Avatar>
+      <div className="flex justify-center items-center w-10 h-10 shrink-0 rounded-full bg-muted">
+        <Globe className="size-5 text-muted-foreground" />
+      </div>
     )
   }
 
   return (
-    <div className="flex justify-center items-center w-10 h-10 shrink-0 rounded-full bg-muted">
-      <Globe className="size-5 text-muted-foreground" />
-    </div>
+    <Avatar className="w-10 h-10 shrink-0">
+      {!faviconError ? (
+        <AvatarImage
+          src={faviconUrl}
+          alt={community.name || community.domain}
+          onError={() => setFaviconError(true)}
+        />
+      ) : !googleFaviconError ? (
+        <AvatarImage
+          src={googleFaviconUrl}
+          alt={community.name || community.domain}
+          onError={() => setGoogleFaviconError(true)}
+        />
+      ) : null}
+      <AvatarFallback>
+        <Globe className="size-5" />
+      </AvatarFallback>
+    </Avatar>
   )
 }
 
