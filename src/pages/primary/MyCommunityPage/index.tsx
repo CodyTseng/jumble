@@ -130,7 +130,14 @@ function MyCommunityContent() {
       <div className="p-6 border-b">
         <div className="flex items-start gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-1">{domain}</h1>
+            <a
+              href={`https://${domain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xl font-bold mb-1 hover:underline hover:text-primary transition-colors inline-block"
+            >
+              {domain}
+            </a>
             <p className="text-sm text-muted-foreground">
               {members.length} {t('members')}
             </p>

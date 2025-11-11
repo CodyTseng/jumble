@@ -51,21 +51,45 @@ export function getWellKnownNip05Url(domain: string, name?: string): string {
 
 export async function fetchPubkeysFromDomain(domain: string): Promise<string[]> {
   try {
-    const res = await fetch(getWellKnownNip05Url(domain))
-    const json = await res.json()
-    const pubkeySet = new Set<string>()
-    return Object.values(json.names || {}).filter((pubkey) => {
-      if (typeof pubkey !== 'string' || !isValidPubkey(pubkey)) {
-        return false
+    // Validate domain before fetching
+    if (!domain || domain.includes('/') || domain.includes('?')) {
+      return []
+    }
+
+    // Create abort controller for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+    try {
+      const res = await fetch(getWellKnownNip05Url(domain), {
+        mode: 'cors',
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!res.ok) {
+        return []
       }
-      if (pubkeySet.has(pubkey)) {
-        return false
-      }
-      pubkeySet.add(pubkey)
-      return true
-    }) as string[]
+
+      const json = await res.json()
+      const pubkeySet = new Set<string>()
+      return Object.values(json.names || {}).filter((pubkey) => {
+        if (typeof pubkey !== 'string' || !isValidPubkey(pubkey)) {
+          return false
+        }
+        if (pubkeySet.has(pubkey)) {
+          return false
+        }
+        pubkeySet.add(pubkey)
+        return true
+      }) as string[]
+    } finally {
+      clearTimeout(timeoutId)
+    }
   } catch (error) {
-    console.error('Error fetching pubkeys from domain:', error)
+    // CORS errors and timeouts are expected for domains without proper headers
+    // Silently fail - this is expected behavior
     return []
   }
 }

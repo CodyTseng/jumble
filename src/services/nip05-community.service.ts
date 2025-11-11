@@ -69,7 +69,24 @@ class Nip05CommunityService {
    * Get community data for a single domain
    */
   async getCommunity(domain: string): Promise<TNip05Community | undefined> {
-    return this.fetchCommunityDataloader.load(domain)
+    // First check memory cache directly (no expiration check for immediate access)
+    const cached = this.communityMap.get(domain)
+    if (cached) {
+      console.log('[Nip05CommunityService] getCommunity returning cached data for:', domain)
+      return cached
+    }
+
+    // Then check IndexedDB
+    const stored = await indexDb.getNip05Community(domain)
+    if (stored) {
+      console.log('[Nip05CommunityService] getCommunity returning IndexedDB data for:', domain)
+      this.communityMap.set(domain, stored)
+      return stored
+    }
+
+    // Only fetch fresh if explicitly needed (not in this flow)
+    console.log('[Nip05CommunityService] getCommunity found no cached data for:', domain)
+    return undefined
   }
 
   /**
@@ -280,28 +297,39 @@ class Nip05CommunityService {
    * Private: Get community with caching and storage
    */
   private async _getCommunity(domain: string): Promise<TNip05Community | undefined> {
-    // Check memory cache
+    console.log('[Nip05CommunityService] _getCommunity called for:', domain)
+    console.log('[Nip05CommunityService] Current communityMap keys:', Array.from(this.communityMap.keys()))
+
+    // Check memory cache (ignore expiration for now to ensure data is available)
     const cached = this.communityMap.get(domain)
-    if (cached && Date.now() - cached.lastUpdated < CACHE_EXPIRATION) {
+    console.log('[Nip05CommunityService] Memory cache result:', cached ? `found (${cached.members?.length} members)` : 'not found')
+    if (cached) {
+      console.log('[Nip05CommunityService] Returning cached data (ignoring expiration)')
       return cached
     }
 
-    // Check IndexedDB
+    // Check IndexedDB (ignore expiration for now)
     const stored = await indexDb.getNip05Community(domain)
-    if (stored && Date.now() - stored.lastUpdated < CACHE_EXPIRATION) {
+    console.log('[Nip05CommunityService] IndexedDB result:', stored ? `found (${stored.members?.length} members)` : 'not found')
+    if (stored) {
       this.communityMap.set(domain, stored)
+      console.log('[Nip05CommunityService] Returning stored data from IndexedDB (ignoring expiration)')
       return stored
     }
 
     // Fetch fresh data
+    console.log('[Nip05CommunityService] No cached data, fetching fresh...')
     return await this.refreshCommunityMembers(domain)
   }
 
   /**
    * Private: Add community to cache and storage
    */
-  private async addCommunity(community: TNip05Community): Promise<TNip05Community> {
+  async addCommunity(community: TNip05Community): Promise<TNip05Community> {
     this.communityMap.set(community.domain, community)
+
+    // Prime the DataLoader cache to ensure getCommunity returns the new data immediately
+    this.fetchCommunityDataloader.prime(community.domain, community)
 
     await Promise.allSettled([
       this.communityIndex.addAsync(
