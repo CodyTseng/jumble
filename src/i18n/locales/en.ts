@@ -485,6 +485,10 @@ export default {
     'Encrypted Key': 'Encrypted Key',
     'Private Key': 'Private Key',
     'Active Community Members': 'Active Community Members',
-    'No active members found': 'No active members found'
+    'No active members found': 'No active members found',
+    'My Community': 'My Community',
+    'Community Admin': 'Community Admin',
+    Members: 'Members',
+    'showing first 20': 'showing first 20'
   }
 }
