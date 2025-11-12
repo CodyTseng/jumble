@@ -7,7 +7,7 @@ services:
       args:
         VITE_PROXY_SERVER: ${JUMBLE_PROXY_SERVER_URL:-http://localhost:8090}
     ports:
-      - "8089:80"
+      - '8089:80'
     restart: unless-stopped
     networks:
       - jumble
@@ -20,7 +20,7 @@ services:
       - ENABLE_PPROF=true
       - PORT=8080
     ports:
-      - "8090:8080"
+      - '8090:8080'
     networks:
       - jumble
 
@@ -28,7 +28,7 @@ services:
     image: scsibug/nostr-rs-relay:latest
     container_name: jumble-nostr-relay
     ports:
-      - "7000:8080"
+      - '7000:8080'
     environment:
       - RUST_LOG=warn,nostr_rs_relay=info
     volumes:

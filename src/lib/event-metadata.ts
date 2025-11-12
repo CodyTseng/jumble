@@ -355,11 +355,14 @@ export function getEmojisAndEmojiSetsFromEvent(event: Event) {
   return { emojis, emojiSetPointers }
 }
 
-export function getEmojisFromEvent(event: Event): TEmoji[] {
+export function getEmojiPackInfoFromEvent(event: Event) {
+  let title: string | undefined
   const emojis: TEmoji[] = []
 
   event.tags.forEach(([tagName, ...tagValues]) => {
-    if (tagName === 'emoji' && tagValues.length >= 2) {
+    if (tagName === 'title' && tagValues[0]) {
+      title = tagValues[0]
+    } else if (tagName === 'emoji' && tagValues.length >= 2) {
       emojis.push({
         shortcode: tagValues[0],
         url: tagValues[1]
@@ -367,7 +370,12 @@ export function getEmojisFromEvent(event: Event): TEmoji[] {
     }
   })
 
-  return emojis
+  return { title, emojis }
+}
+
+export function getEmojisFromEvent(event: Event): TEmoji[] {
+  const info = getEmojiPackInfoFromEvent(event)
+  return info.emojis
 }
 
 export function getStarsFromRelayReviewEvent(event: Event): number {

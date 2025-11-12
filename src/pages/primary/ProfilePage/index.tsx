@@ -1,11 +1,12 @@
 import Profile from '@/components/Profile'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useNostr } from '@/providers/NostrProvider'
+import { TPageRef } from '@/types'
 import { UserRound } from 'lucide-react'
 import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const ProfilePage = forwardRef((_, ref) => {
+const ProfilePage = forwardRef<TPageRef>((_, ref) => {
   const { pubkey } = useNostr()
 
   return (

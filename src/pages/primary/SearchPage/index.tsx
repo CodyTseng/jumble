@@ -2,10 +2,10 @@ import SearchBar, { TSearchBarRef } from '@/components/SearchBar'
 import SearchResult from '@/components/SearchResult'
 import PrimaryPageLayout, { TPrimaryPageLayoutRef } from '@/layouts/PrimaryPageLayout'
 import { usePrimaryPage } from '@/PageManager'
-import { TSearchParams } from '@/types'
+import { TPageRef, TSearchParams } from '@/types'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
-const SearchPage = forwardRef((_, ref) => {
+const SearchPage = forwardRef<TPageRef>((_, ref) => {
   const { current, display } = usePrimaryPage()
   const [input, setInput] = useState('')
   const [searchParams, setSearchParams] = useState<TSearchParams | null>(null)

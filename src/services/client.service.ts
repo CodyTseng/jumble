@@ -7,6 +7,7 @@ import {
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
+import { filterOutBigRelays } from '@/lib/relay'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
@@ -38,6 +39,7 @@ class ClientService extends EventTarget {
 
   signer?: ISigner
   pubkey?: string
+  currentRelays: string[] = []
   private pool: SimplePool
 
   private timelines: Record<
@@ -757,6 +759,11 @@ class ClientService extends EventTarget {
         if (cache) {
           return cache
         }
+        const indexedDbCache = await indexedDb.getReplaceableEventByCoordinate(coordinate)
+        if (indexedDbCache) {
+          this.replaceableEventCacheMap.set(coordinate, indexedDbCache)
+          return indexedDbCache
+        }
       } else if (eventId) {
         const cache = this.eventCacheMap.get(eventId)
         if (cache) {
@@ -817,7 +824,7 @@ class ClientService extends EventTarget {
       return event
     }
 
-    return this.tryHarderToFetchEvent(relayUrls, { ids: [id], limit: 1 }, true)
+    return this.fetchEventFromRelays(filterOutBigRelays(relayUrls), { ids: [id], limit: 1 })
   }
 
   private async _fetchEvent(id: string): Promise<NEvent | undefined> {
@@ -861,7 +868,7 @@ class ClientService extends EventTarget {
 
     if (!event && author) {
       const relayList = await this.fetchRelayList(author)
-      event = await this.tryHarderToFetchEvent(relayList.write.slice(0, 5), filter)
+      event = await this.fetchEventFromRelays(relayList.write.slice(0, 5), filter)
     }
 
     if (event && event.id !== id) {
@@ -871,19 +878,7 @@ class ClientService extends EventTarget {
     return event
   }
 
-  private async tryHarderToFetchEvent(
-    relayUrls: string[],
-    filter: Filter,
-    alreadyFetchedFromBigRelays = false
-  ) {
-    if (!relayUrls.length && filter.authors?.length) {
-      const relayList = await this.fetchRelayList(filter.authors[0])
-      relayUrls = alreadyFetchedFromBigRelays
-        ? relayList.write.filter((url) => !BIG_RELAY_URLS.includes(url)).slice(0, 4)
-        : relayList.write.slice(0, 4)
-    } else if (!relayUrls.length && !alreadyFetchedFromBigRelays) {
-      relayUrls = BIG_RELAY_URLS
-    }
+  private async fetchEventFromRelays(relayUrls: string[], filter: Filter) {
     if (!relayUrls.length) return
 
     const events = await this.query(relayUrls, filter)
@@ -968,11 +963,13 @@ class ClientService extends EventTarget {
   /** =========== Followings =========== */
 
   async initUserIndexFromFollowings(pubkey: string, signal: AbortSignal) {
-    const followings = await this.fetchFollowings(pubkey)
+    const followings = await this.fetchFollowings(pubkey, false)
     for (let i = 0; i * 20 < followings.length; i++) {
       if (signal.aborted) return
       await Promise.all(
-        followings.slice(i * 20, (i + 1) * 20).map((pubkey) => this.fetchProfileEvent(pubkey))
+        followings
+          .slice(i * 20, (i + 1) * 20)
+          .map((pubkey) => this.fetchProfile(pubkey, false, false))
       )
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }
@@ -1022,7 +1019,7 @@ class ClientService extends EventTarget {
     }
   }
 
-  async fetchProfileEvent(id: string, skipCache: boolean = false): Promise<NEvent | undefined> {
+  private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
     let pubkey: string | undefined
     let relays: string[] = []
     if (/^[0-9a-f]{64}$/.test(id)) {
@@ -1043,12 +1040,7 @@ class ClientService extends EventTarget {
     if (!pubkey) {
       throw new Error('Invalid id')
     }
-    if (!skipCache) {
-      const localProfile = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
-      if (localProfile) {
-        return localProfile
-      }
-    }
+
     const profileFromBigRelays = await this.replaceableEventFromBigRelaysDataloader.load({
       pubkey,
       kind: kinds.Metadata
@@ -1058,19 +1050,22 @@ class ClientService extends EventTarget {
       return profileFromBigRelays
     }
 
+    // If the user has a relay list, try those relays first
     if (!relays.length) {
-      return undefined
+      const relayList = await this.fetchRelayList(pubkey)
+      relays = filterOutBigRelays(relayList.write).slice(0, 5)
     }
 
-    const profileEvent = await this.tryHarderToFetchEvent(
-      relays,
-      {
-        authors: [pubkey],
-        kinds: [kinds.Metadata],
-        limit: 1
-      },
-      true
-    )
+    // If the user has no relay list, try current relays
+    if (!relays.length) {
+      relays = filterOutBigRelays(this.currentRelays)
+    }
+
+    const profileEvent = await this.fetchEventFromRelays(relays, {
+      authors: [pubkey],
+      kinds: [kinds.Metadata],
+      limit: 1
+    })
 
     if (profileEvent) {
       this.addUsernameToIndex(profileEvent)
@@ -1080,8 +1075,34 @@ class ClientService extends EventTarget {
     return profileEvent
   }
 
-  async fetchProfile(id: string, skipCache: boolean = false): Promise<TProfile | undefined> {
-    const profileEvent = await this.fetchProfileEvent(id, skipCache)
+  private profileDataloader = new DataLoader<string, TProfile | null, string>(async (ids) => {
+    const results = await Promise.allSettled(ids.map((id) => this._fetchProfile(id)))
+    return results.map((res) => (res.status === 'fulfilled' ? res.value : null))
+  })
+
+  async fetchProfile(
+    id: string,
+    skipCache = false,
+    updateCacheInBackground = true
+  ): Promise<TProfile | null> {
+    if (skipCache) {
+      return this._fetchProfile(id)
+    }
+
+    const pubkey = userIdToPubkey(id, true)
+    const localProfileEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
+    if (localProfileEvent) {
+      if (updateCacheInBackground) {
+        this.profileDataloader.load(id) // update cache in background
+      }
+      const localProfile = getProfileFromEvent(localProfileEvent)
+      return localProfile
+    }
+    return await this.profileDataloader.load(id)
+  }
+
+  private async _fetchProfile(id: string): Promise<TProfile | null> {
+    const profileEvent = await this._fetchProfileEvent(id)
     if (profileEvent) {
       return getProfileFromEvent(profileEvent)
     }
@@ -1090,7 +1111,7 @@ class ClientService extends EventTarget {
       const pubkey = userIdToPubkey(id)
       return { pubkey, npub: pubkeyToNpub(pubkey) ?? '', username: formatPubkey(pubkey) }
     } catch {
-      return undefined
+      return null
     }
   }
 
@@ -1099,11 +1120,6 @@ class ClientService extends EventTarget {
   }
 
   /** =========== Relay list =========== */
-
-  async fetchRelayListEvent(pubkey: string) {
-    const [relayEvent] = await this.fetchReplaceableEventsFromBigRelays([pubkey], kinds.RelayList)
-    return relayEvent ?? null
-  }
 
   async fetchRelayList(pubkey: string): Promise<TRelayList> {
     const [relayList] = await this.fetchRelayLists([pubkey])
@@ -1126,11 +1142,11 @@ class ClientService extends EventTarget {
   }
 
   async forceUpdateRelayListEvent(pubkey: string) {
-    await this.replaceableEventBatchLoadFn([{ pubkey, kind: kinds.RelayList }])
+    await this.replaceableEventFromBigRelaysBatchLoadFn([{ pubkey, kind: kinds.RelayList }])
   }
 
   async updateRelayListCache(event: NEvent) {
-    await this.updateReplaceableEventFromBigRelaysCache(event)
+    return await this.updateReplaceableEventFromBigRelaysCache(event)
   }
 
   /** =========== Replaceable event from big relays dataloader =========== */
@@ -1190,9 +1206,12 @@ class ClientService extends EventTarget {
   private async fetchReplaceableEventsFromBigRelays(pubkeys: string[], kind: number) {
     const events = await indexedDb.getManyReplaceableEvents(pubkeys, kind)
     const nonExistingPubkeyIndexMap = new Map<string, number>()
+    const existingPubkeys: string[] = []
     pubkeys.forEach((pubkey, i) => {
       if (events[i] === undefined) {
         nonExistingPubkeyIndexMap.set(pubkey, i)
+      } else {
+        existingPubkeys.push(pubkey)
       }
     })
     const newEvents = await this.replaceableEventFromBigRelaysDataloader.loadMany(
@@ -1207,16 +1226,25 @@ class ClientService extends EventTarget {
       }
     })
 
+    this.replaceableEventFromBigRelaysDataloader.loadMany(
+      existingPubkeys.map((pubkey) => ({ pubkey, kind }))
+    ) // update cache in background
+
     return events
   }
 
   private async updateReplaceableEventFromBigRelaysCache(event: NEvent) {
+    const newEvent = await indexedDb.putReplaceableEvent(event)
+    if (newEvent.id !== event.id) {
+      return newEvent
+    }
+
     this.replaceableEventFromBigRelaysDataloader.clear({ pubkey: event.pubkey, kind: event.kind })
     this.replaceableEventFromBigRelaysDataloader.prime(
       { pubkey: event.pubkey, kind: event.kind },
       Promise.resolve(event)
     )
-    await indexedDb.putReplaceableEvent(event)
+    return newEvent
   }
 
   /** =========== Replaceable event dataloader =========== */
@@ -1262,7 +1290,9 @@ class ClientService extends EventTarget {
                 }
               : { authors: [pubkey], kinds: [kind] }) as Filter
         )
-        const events = await this.query(BIG_RELAY_URLS, filters)
+        const relayList = await this.fetchRelayList(pubkey)
+        const relays = relayList.write.concat(BIG_RELAY_URLS).slice(0, 5)
+        const events = await this.query(relays, filters)
 
         for (const event of events) {
           const key = getReplaceableCoordinateFromEvent(event)
@@ -1289,9 +1319,17 @@ class ClientService extends EventTarget {
     })
   }
 
-  private async fetchReplaceableEvent(pubkey: string, kind: number, d?: string) {
+  private async fetchReplaceableEvent(
+    pubkey: string,
+    kind: number,
+    d?: string,
+    updateCache = true
+  ) {
     const storedEvent = await indexedDb.getReplaceableEvent(pubkey, kind, d)
     if (storedEvent !== undefined) {
+      if (updateCache) {
+        this.replaceableEventDataLoader.load({ pubkey, kind, d }) // update cache in background
+      }
       return storedEvent
     }
 
@@ -1299,22 +1337,26 @@ class ClientService extends EventTarget {
   }
 
   private async updateReplaceableEventCache(event: NEvent) {
+    const newEvent = await indexedDb.putReplaceableEvent(event)
+    if (newEvent.id !== event.id) {
+      return
+    }
+
     this.replaceableEventDataLoader.clear({ pubkey: event.pubkey, kind: event.kind })
     this.replaceableEventDataLoader.prime(
       { pubkey: event.pubkey, kind: event.kind },
       Promise.resolve(event)
     )
-    await indexedDb.putReplaceableEvent(event)
   }
 
   /** =========== Replaceable event =========== */
 
-  async fetchFollowListEvent(pubkey: string) {
-    return await this.fetchReplaceableEvent(pubkey, kinds.Contacts)
+  async fetchFollowListEvent(pubkey: string, updateCache = true) {
+    return await this.fetchReplaceableEvent(pubkey, kinds.Contacts, undefined, updateCache)
   }
 
-  async fetchFollowings(pubkey: string) {
-    const followListEvent = await this.fetchFollowListEvent(pubkey)
+  async fetchFollowings(pubkey: string, updateCache = true) {
+    const followListEvent = await this.fetchFollowListEvent(pubkey, updateCache)
     return followListEvent ? getPubkeysFromPTags(followListEvent.tags) : []
   }
 
@@ -1343,11 +1385,15 @@ class ClientService extends EventTarget {
     return this.fetchReplaceableEvent(pubkey, kinds.Pinlist)
   }
 
+  async fetchUserEmojiListEvent(pubkey: string) {
+    return this.fetchReplaceableEvent(pubkey, kinds.UserEmojiList)
+  }
+
   async updateBlossomServerListEventCache(evt: NEvent) {
     await this.updateReplaceableEventCache(evt)
   }
 
-  async fetchEmojiSetEvents(pointers: string[]) {
+  async fetchEmojiSetEvents(pointers: string[], updateCacheInBackground = true) {
     const params = pointers
       .map((pointer) => {
         const [kindStr, pubkey, d = ''] = pointer.split(':')
@@ -1359,7 +1405,11 @@ class ClientService extends EventTarget {
         return { pubkey, kind, d }
       })
       .filter(Boolean) as { pubkey: string; kind: number; d: string }[]
-    return await this.replaceableEventDataLoader.loadMany(params)
+    return await Promise.all(
+      params.map(({ pubkey, kind, d }) =>
+        this.fetchReplaceableEvent(pubkey, kind, d, updateCacheInBackground)
+      )
+    )
   }
 
   // ================= Utils =================

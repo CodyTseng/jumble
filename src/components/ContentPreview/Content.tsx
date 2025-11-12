@@ -24,9 +24,9 @@ export default function Content({
   const { t } = useTranslation()
   const nodes = useMemo(() => {
     return parseContent(content, [
-      EmbeddedUrlParser,
       EmbeddedEventParser,
       EmbeddedMentionParser,
+      EmbeddedUrlParser,
       EmbeddedEmojiParser
     ])
   }, [content])

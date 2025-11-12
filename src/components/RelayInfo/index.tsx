@@ -2,15 +2,17 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useFetchRelayInfo } from '@/hooks'
+import { checkNip43Support } from '@/lib/relay'
 import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { Check, Copy, GitBranch, Link, Mail, SquareCode } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import PostEditor from '../PostEditor'
 import RelayIcon from '../RelayIcon'
+import RelayMembershipControl from '../RelayMembershipControl'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
@@ -21,6 +23,9 @@ export default function RelayInfo({ url, className }: { url: string; className?:
   const { checkLogin } = useNostr()
   const { relayInfo, isFetching } = useFetchRelayInfo(url)
   const [open, setOpen] = useState(false)
+  const [isMember, setIsMember] = useState(false)
+  const supportsNip43 = useMemo(() => checkNip43Support(relayInfo), [relayInfo])
+  const shouldShowPostButton = useMemo(() => !supportsNip43 || isMember, [supportsNip43, isMember])
 
   if (isFetching || !relayInfo) {
     return null
@@ -105,14 +110,19 @@ export default function RelayInfo({ url, className }: { url: string; className?:
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={() => checkLogin(() => setOpen(true))}
-        >
-          {t('Share something on this Relay')}
-        </Button>
-        <PostEditor open={open} setOpen={setOpen} openFrom={[relayInfo.url]} />
+        <RelayMembershipControl relayInfo={relayInfo} onMembershipStatusChange={setIsMember} />
+        {shouldShowPostButton && (
+          <>
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => checkLogin(() => setOpen(true))}
+            >
+              {t('Share something on this Relay')}
+            </Button>
+            <PostEditor open={open} setOpen={setOpen} openFrom={[relayInfo.url]} />
+          </>
+        )}
       </div>
       <RelayReviewsPreview relayUrl={url} />
     </div>

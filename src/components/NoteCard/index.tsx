@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { isMentioningMutedUsers } from '@/lib/event'
+import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event, kinds } from 'nostr-tools'
@@ -46,9 +47,9 @@ export default function NoteCard({
   return <MainNoteCard event={event} className={className} pinned={pinned} reposters={reposters} />
 }
 
-export function NoteCardLoadingSkeleton() {
+export function NoteCardLoadingSkeleton({ className }: { className?: string }) {
   return (
-    <div className="px-4 py-3">
+    <div className={cn('px-4 py-3', className)}>
       <div className="flex items-center space-x-2">
         <Skeleton className="w-10 h-10 rounded-full" />
         <div className={`flex-1 w-0`}>

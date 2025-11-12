@@ -41,7 +41,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
     if (!currentPubkey) return
 
     const initWoT = async () => {
-      const followings = await client.fetchFollowings(currentPubkey)
+      const followings = await client.fetchFollowings(currentPubkey, false)
       followings.forEach((pubkey) => wotSet.add(pubkey))
 
       const batchSize = 20
@@ -49,7 +49,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
         const batch = followings.slice(i, i + batchSize)
         await Promise.allSettled(
           batch.map(async (pubkey) => {
-            const _followings = await client.fetchFollowings(pubkey)
+            const _followings = await client.fetchFollowings(pubkey, false)
             _followings.forEach((following) => {
               wotSet.add(following)
             })

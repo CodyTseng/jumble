@@ -1,10 +1,11 @@
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { TPrimaryPageName, usePrimaryPage } from '@/PageManager'
+import { usePrimaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
+import { TPrimaryPageName } from '@/routes/primary'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
 const PrimaryPageLayout = forwardRef(

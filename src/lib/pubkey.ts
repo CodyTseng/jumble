@@ -38,7 +38,7 @@ export function pubkeyToNpub(pubkey: string) {
   }
 }
 
-export function userIdToPubkey(userId: string) {
+export function userIdToPubkey(userId: string, throwOnInvalid = false): string {
   if (userId.startsWith('npub1') || userId.startsWith('nprofile1')) {
     try {
       const { type, data } = nip19.decode(userId)
@@ -48,6 +48,9 @@ export function userIdToPubkey(userId: string) {
         return data.pubkey
       }
     } catch (error) {
+      if (throwOnInvalid) {
+        throw new Error('Invalid id')
+      }
       console.error('Error decoding userId:', userId, 'error:', error)
     }
   }

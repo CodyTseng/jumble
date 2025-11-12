@@ -2,6 +2,7 @@ import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
 import {
   toAppearanceSettings,
+  toEmojiPackSettings,
   toGeneralSettings,
   toPostSettings,
   toRelaySettings,
@@ -22,6 +23,7 @@ import {
   PencilLine,
   Server,
   Settings2,
+  Smile,
   Wallet
 } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
@@ -80,6 +82,15 @@ export default function Settings() {
           <div className="flex items-center gap-4">
             <PencilLine />
             <div>{t('Post settings')}</div>
+          </div>
+          <ChevronRight />
+        </SettingItem>
+      )}
+      {!!pubkey && (
+        <SettingItem className="clickable" onClick={() => push(toEmojiPackSettings())}>
+          <div className="flex items-center gap-4">
+            <Smile />
+            <div>{t('Emoji Packs')}</div>
           </div>
           <ChevronRight />
         </SettingItem>

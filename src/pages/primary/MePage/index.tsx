@@ -13,6 +13,7 @@ import { toBookmarks, toProfile, toRelaySettings, toSettings, toWallet } from '@
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { TPageRef } from '@/types'
 import {
   ArrowDownUp,
   Bookmark,
@@ -26,7 +27,7 @@ import {
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const MePage = forwardRef((_, ref) => {
+const MePage = forwardRef<TPageRef>((_, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()

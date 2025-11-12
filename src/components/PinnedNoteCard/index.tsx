@@ -11,7 +11,7 @@ export default function PinnedNoteCard({
   const { event, isFetching } = useFetchEvent(eventId)
 
   if (isFetching) {
-    return <NoteCardLoadingSkeleton />
+    return <NoteCardLoadingSkeleton className="border-b" />
   }
 
   if (!event) {

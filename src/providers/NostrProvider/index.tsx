@@ -88,6 +88,7 @@ type TNostrContext = {
   updateMuteListEvent: (muteListEvent: Event, privateTags: string[][]) => Promise<void>
   updateBookmarkListEvent: (bookmarkListEvent: Event) => Promise<void>
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
+  updateUserEmojiListEvent: (userEmojiListEvent: Event) => Promise<void>
   updatePinListEvent: (pinListEvent: Event) => Promise<void>
   updateNotificationsSeenAt: (skipPublish?: boolean) => Promise<void>
 }
@@ -713,7 +714,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const updateRelayListEvent = async (relayListEvent: Event) => {
-    const newRelayList = await indexedDb.putReplaceableEvent(relayListEvent)
+    const newRelayList = await client.updateRelayListCache(relayListEvent)
     setRelayList(getRelayListFromEvent(newRelayList))
   }
 
@@ -751,6 +752,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     if (newFavoriteRelaysEvent.id !== favoriteRelaysEvent.id) return
 
     setFavoriteRelaysEvent(newFavoriteRelaysEvent)
+  }
+
+  const updateUserEmojiListEvent = async (userEmojiListEvent: Event) => {
+    const newUserEmojiListEvent = await indexedDb.putReplaceableEvent(userEmojiListEvent)
+    if (newUserEmojiListEvent.id !== userEmojiListEvent.id) return
+
+    setUserEmojiListEvent(newUserEmojiListEvent)
   }
 
   const updatePinListEvent = async (pinListEvent: Event) => {
@@ -825,6 +833,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         updateMuteListEvent,
         updateBookmarkListEvent,
         updateFavoriteRelaysEvent,
+        updateUserEmojiListEvent,
         updatePinListEvent,
         updateNotificationsSeenAt
       }}

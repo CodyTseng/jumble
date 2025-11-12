@@ -341,6 +341,15 @@ export function createPinListDraftEvent(tags: string[][], content = ''): TDraftE
   }
 }
 
+export function createUserEmojiListDraftEvent(tags: string[][], content = ''): TDraftEvent {
+  return {
+    kind: kinds.UserEmojiList,
+    content,
+    tags,
+    created_at: dayjs().unix()
+  }
+}
+
 export function createBlossomServerListDraftEvent(servers: string[]): TDraftEvent {
   return {
     kind: ExtendedKind.BLOSSOM_SERVER_LIST,
@@ -481,6 +490,25 @@ export function createRelayReviewDraftEvent(
       ['rating', (stars / 5).toString()]
     ],
     created_at: dayjs().unix()
+  }
+}
+
+// https://github.com/nostr-protocol/nips/blob/master/43.md
+export function createJoinDraftEvent(inviteCode: string): TDraftEvent {
+  return {
+    kind: 28934,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [['claim', inviteCode], ['-']],
+    content: ''
+  }
+}
+
+export function createLeaveDraftEvent(): TDraftEvent {
+  return {
+    kind: 28936,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [['-']],
+    content: ''
   }
 }
 

@@ -363,3 +363,8 @@ export function getRetainedEvent(a: Event, b: Event): Event {
   }
   return b
 }
+
+// Descending sort
+export function sortEventsDesc(events: Event[]): Event[] {
+  return events.sort((a, b) => compareEvents(b, a))
+}

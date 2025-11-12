@@ -1,6 +1,5 @@
 import Sidebar from '@/components/Sidebar'
 import { cn } from '@/lib/utils'
-import NoteListPage from '@/pages/primary/NoteListPage'
 import { CurrentRelaysProvider } from '@/providers/CurrentRelaysProvider'
 import { TPageRef } from '@/types'
 import {
@@ -19,22 +18,13 @@ import BottomNavigationBar from './components/BottomNavigationBar'
 import CreateWalletGuideToast from './components/CreateWalletGuideToast'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
 import { normalizeUrl } from './lib/url'
-import BookmarkPage from './pages/primary/BookmarkPage'
-import ExplorePage from './pages/primary/ExplorePage'
-import MePage from './pages/primary/MePage'
-import NotificationListPage from './pages/primary/NotificationListPage'
-import ProfilePage from './pages/primary/ProfilePage'
-import RelayPage from './pages/primary/RelayPage'
-import SearchPage from './pages/primary/SearchPage'
-import SettingsPage from './pages/primary/SettingsPage'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { useTheme } from './providers/ThemeProvider'
 import { useUserPreferences } from './providers/UserPreferencesProvider'
-import { routes } from './routes'
+import { PRIMARY_PAGE_MAP, PRIMARY_PAGE_REF_MAP, TPrimaryPageName } from './routes/primary'
+import { SECONDARY_ROUTES } from './routes/secondary'
 import modalManager from './services/modal-manager.service'
-
-export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP
 
 type TPrimaryPageContext = {
   navigate: (page: TPrimaryPageName, props?: object) => void
@@ -51,32 +41,8 @@ type TSecondaryPageContext = {
 type TStackItem = {
   index: number
   url: string
-  component: React.ReactElement | null
+  element: React.ReactElement | null
   ref: RefObject<TPageRef> | null
-}
-
-const PRIMARY_PAGE_REF_MAP = {
-  home: createRef<TPageRef>(),
-  explore: createRef<TPageRef>(),
-  notifications: createRef<TPageRef>(),
-  me: createRef<TPageRef>(),
-  profile: createRef<TPageRef>(),
-  relay: createRef<TPageRef>(),
-  search: createRef<TPageRef>(),
-  bookmark: createRef<TPageRef>(),
-  settings: createRef<TPageRef>()
-}
-
-const PRIMARY_PAGE_MAP = {
-  home: <NoteListPage ref={PRIMARY_PAGE_REF_MAP.home} />,
-  explore: <ExplorePage ref={PRIMARY_PAGE_REF_MAP.explore} />,
-  notifications: <NotificationListPage ref={PRIMARY_PAGE_REF_MAP.notifications} />,
-  me: <MePage ref={PRIMARY_PAGE_REF_MAP.me} />,
-  profile: <ProfilePage ref={PRIMARY_PAGE_REF_MAP.profile} />,
-  relay: <RelayPage ref={PRIMARY_PAGE_REF_MAP.relay} />,
-  search: <SearchPage ref={PRIMARY_PAGE_REF_MAP.search} />,
-  bookmark: <BookmarkPage ref={PRIMARY_PAGE_REF_MAP.bookmark} />,
-  settings: <SettingsPage ref={PRIMARY_PAGE_REF_MAP.settings} />
 }
 
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)
@@ -203,20 +169,20 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         const topItem = newStack[newStack.length - 1] as TStackItem | undefined
         if (!topItem) {
           // Create a new stack item if it's not exist (e.g. when the user refreshes the page, the stack will be empty)
-          const { component, ref } = findAndCreateComponent(state.url, state.index)
-          if (component) {
+          const { element, ref } = findAndCloneElement(state.url, state.index)
+          if (element) {
             newStack.push({
               index: state.index,
               url: state.url,
-              component,
+              element,
               ref
             })
           }
-        } else if (!topItem.component) {
-          // Load the component if it's not cached
-          const { component, ref } = findAndCreateComponent(topItem.url, state.index)
-          if (component) {
-            topItem.component = component
+        } else if (!topItem.element) {
+          // Load the element if it's not cached
+          const { element, ref } = findAndCloneElement(topItem.url, state.index)
+          if (element) {
+            topItem.element = element
             topItem.ref = ref
           }
         }
@@ -316,7 +282,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                       display: index === secondaryStack.length - 1 ? 'block' : 'none'
                     }}
                   >
-                    {item.component}
+                    {item.element}
                   </div>
                 ))}
               {primaryPages.map(({ name, element, props }) => (
@@ -373,7 +339,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                           display: index === secondaryStack.length - 1 ? 'block' : 'none'
                         }}
                       >
-                        {item.component}
+                        {item.element}
                       </div>
                     ))}
                   {primaryPages.map(({ name, element, props }) => (
@@ -454,7 +420,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     className={cn(
                       'bg-background overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg',
+                      themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
                       secondaryStack.length === 0 ? 'bg-surface' : ''
                     )}
                   >
@@ -464,7 +431,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                         className="flex flex-col h-full w-full"
                         style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
                       >
-                        {item.component}
+                        {item.element}
                       </div>
                     ))}
                   </div>
@@ -516,15 +483,15 @@ function isCurrentPage(stack: TStackItem[], url: string) {
   return currentPage.url === url
 }
 
-function findAndCreateComponent(url: string, index: number) {
+function findAndCloneElement(url: string, index: number) {
   const path = url.split('?')[0].split('#')[0]
-  for (const { matcher, element } of routes) {
+  for (const { matcher, element } of SECONDARY_ROUTES) {
     const match = matcher(path)
     if (!match) continue
 
     if (!element) return {}
     const ref = createRef<TPageRef>()
-    return { component: cloneElement(element, { ...match.params, index, ref } as any), ref }
+    return { element: cloneElement(element, { ...match.params, index, ref } as any), ref }
   }
   return {}
 }
@@ -538,15 +505,15 @@ function pushNewPageToStack(
   const currentItem = stack[stack.length - 1]
   const currentIndex = specificIndex ?? (currentItem ? currentItem.index + 1 : 0)
 
-  const { component, ref } = findAndCreateComponent(url, currentIndex)
-  if (!component) return { newStack: stack, newItem: null }
+  const { element, ref } = findAndCloneElement(url, currentIndex)
+  if (!element) return { newStack: stack, newItem: null }
 
-  const newItem = { component, ref, url, index: currentIndex }
+  const newItem = { element, ref, url, index: currentIndex }
   const newStack = [...stack, newItem]
-  const lastCachedIndex = newStack.findIndex((stack) => stack.component)
-  // Clear the oldest cached component if there are too many cached components
+  const lastCachedIndex = newStack.findIndex((stack) => stack.element)
+  // Clear the oldest cached element if there are too many cached elements
   if (newStack.length - lastCachedIndex > maxStackSize) {
-    newStack[lastCachedIndex].component = null
+    newStack[lastCachedIndex].element = null
   }
   return { newStack, newItem }
 }

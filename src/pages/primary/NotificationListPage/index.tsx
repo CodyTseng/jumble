@@ -2,11 +2,12 @@ import HideUntrustedContentButton from '@/components/HideUntrustedContentButton'
 import NotificationList from '@/components/NotificationList'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { usePrimaryPage } from '@/PageManager'
+import { TPageRef } from '@/types'
 import { Bell } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const NotificationListPage = forwardRef((_, ref) => {
+const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
   const { current } = usePrimaryPage()
   const firstRenderRef = useRef(true)
   const notificationListRef = useRef<{ refresh: () => void }>(null)

@@ -33,6 +33,11 @@
     user-select: none;
   }
 
+  body,
+  html {
+    overscroll-behavior-y: none;
+  }
+
   .clickable {
     cursor: pointer;
     transition: background-color 0.2s ease;

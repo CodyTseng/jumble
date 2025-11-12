@@ -9,7 +9,6 @@ import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { TMediaAutoLoadPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
-import { ExternalLink } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -108,22 +107,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             {t('Show NSFW content by default')}
           </Label>
           <Switch id="show-nsfw" checked={defaultShowNsfw} onCheckedChange={setDefaultShowNsfw} />
-        </SettingItem>
-        <SettingItem>
-          <div>
-            <a
-              className="flex items-center gap-1 cursor-pointer hover:underline"
-              href="https://emojito.meme/browse"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('Custom emoji management')}
-              <ExternalLink />
-            </a>
-            <div className="text-muted-foreground">
-              {t('After changing emojis, you may need to refresh the page')}
-            </div>
-          </div>
         </SettingItem>
       </div>
     </SecondaryPageLayout>

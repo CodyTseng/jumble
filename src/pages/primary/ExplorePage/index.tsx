@@ -7,16 +7,18 @@ import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { TPageRef } from '@/types'
 import { Compass, Plus } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
-import { forwardRef, useCallback, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type TExploreTabs = 'following' | 'explore' | 'reviews'
 
-const ExplorePage = forwardRef((_, ref) => {
+const ExplorePage = forwardRef<TPageRef>((_, ref) => {
   const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TExploreTabs>('explore')
+  const topRef = useRef<HTMLDivElement | null>(null)
 
   const relayReviewFilterFn = useCallback((evt: NostrEvent) => {
     const d = getReplaceableEventIdentifier(evt)
@@ -60,8 +62,12 @@ const ExplorePage = forwardRef((_, ref) => {
           { value: 'reviews', label: 'Reviews' },
           { value: 'following', label: "Following's Favorites" }
         ]}
-        onTabChange={(tab) => setTab(tab as TExploreTabs)}
+        onTabChange={(tab) => {
+          setTab(tab as TExploreTabs)
+          topRef.current?.scrollIntoView({ behavior: 'instant' })
+        }}
       />
+      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
       {content}
     </PrimaryPageLayout>
   )

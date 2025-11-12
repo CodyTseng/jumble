@@ -71,6 +71,7 @@ export const toPostSettings = () => '/settings/posts'
 export const toGeneralSettings = () => '/settings/general'
 export const toAppearanceSettings = () => '/settings/appearance'
 export const toTranslation = () => '/settings/translation'
+export const toEmojiPackSettings = () => '/settings/emoji-packs'
 export const toProfileEditor = () => '/profile-editor'
 export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toRelayReviews = (url: string) => `/relays/${encodeURIComponent(url)}/reviews`

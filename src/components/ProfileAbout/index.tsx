@@ -28,10 +28,10 @@ export default function ProfileAbout({ about, className }: { about?: string; cla
     if (!about) return null
 
     const nodes = parseContent(translatedAbout ?? about, [
+      EmbeddedMentionParser,
       EmbeddedWebsocketUrlParser,
       EmbeddedUrlParser,
-      EmbeddedHashtagParser,
-      EmbeddedMentionParser
+      EmbeddedHashtagParser
     ])
     return nodes.map((node, index) => {
       if (node.type === 'url') {

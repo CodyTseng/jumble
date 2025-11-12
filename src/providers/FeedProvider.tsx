@@ -52,23 +52,20 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      if (!feedInfo) {
-        setIsReady(true)
-        return
-      }
-
-      if (feedInfo.feedType === 'relays') {
+      if (feedInfo?.feedType === 'relays') {
         return await switchFeed('relays', { activeRelaySetId: feedInfo.id })
       }
 
-      if (feedInfo.feedType === 'relay') {
+      if (feedInfo?.feedType === 'relay') {
         return await switchFeed('relay', { relay: feedInfo.id })
       }
 
       // update following feed if pubkey changes
-      if (feedInfo.feedType === 'following' && pubkey) {
+      if (feedInfo?.feedType === 'following' && pubkey) {
         return await switchFeed('following', { pubkey })
       }
+
+      setIsReady(true)
     }
 
     init()

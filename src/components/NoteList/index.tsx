@@ -47,7 +47,7 @@ const NoteList = forwardRef(
       hideUntrustedNotes = false,
       areAlgoRelays = false,
       showRelayCloseReason = false,
-      pinnedEventIds = [],
+      pinnedEventIds,
       filterFn
     }: {
       subRequests: TFeedSubRequest[]
@@ -82,7 +82,7 @@ const NoteList = forwardRef(
     const shouldHideEvent = useCallback(
       (evt: Event) => {
         const pinnedEventHexIdSet = new Set()
-        pinnedEventIds.forEach((id) => {
+        pinnedEventIds?.forEach((id) => {
           try {
             const { type, data } = decode(id)
             if (type === 'nevent') {
@@ -95,7 +95,6 @@ const NoteList = forwardRef(
 
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
-        if (hideReplies && isReplyNoteEvent(evt)) return true
         if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
         if (
@@ -111,7 +110,7 @@ const NoteList = forwardRef(
 
         return false
       },
-      [hideReplies, hideUntrustedNotes, mutePubkeySet, pinnedEventIds, isEventDeleted, filterFn]
+      [hideUntrustedNotes, mutePubkeySet, JSON.stringify(pinnedEventIds), isEventDeleted, filterFn]
     )
 
     const filteredNotes = useMemo(() => {
@@ -128,12 +127,20 @@ const NoteList = forwardRef(
         keySet.add(key)
 
         if (shouldHideEvent(evt)) return
+        if (hideReplies && isReplyNoteEvent(evt)) return
         if (evt.kind !== kinds.Repost) {
           filteredEvents.push(evt)
           return
         }
 
-        const eventFromContent = evt.content ? (JSON.parse(evt.content) as Event) : null
+        let eventFromContent: Event | null = null
+        if (evt.content) {
+          try {
+            eventFromContent = JSON.parse(evt.content) as Event
+          } catch {
+            eventFromContent = null
+          }
+        }
         if (eventFromContent && verifyEvent(eventFromContent)) {
           if (eventFromContent.kind === kinds.Repost) {
             return
@@ -190,13 +197,14 @@ const NoteList = forwardRef(
         const key = getEventKey(evt)
         return { key, event: evt, reposters: Array.from(repostersMap.get(key) ?? []) }
       })
-    }, [events, showCount, shouldHideEvent])
+    }, [events, showCount, shouldHideEvent, hideReplies])
 
     const filteredNewEvents = useMemo(() => {
       const keySet = new Set<string>()
 
       return newEvents.filter((event: Event) => {
         if (shouldHideEvent(event)) return false
+        if (hideReplies && isReplyNoteEvent(event)) return false
 
         const key = getEventKey(event)
         if (keySet.has(key)) {
@@ -303,7 +311,7 @@ const NoteList = forwardRef(
       return () => {
         promise.then((closer) => closer())
       }
-    }, [JSON.stringify(subRequests), refreshCount, showKinds])
+    }, [JSON.stringify(subRequests), refreshCount, JSON.stringify(showKinds)])
 
     useEffect(() => {
       const options = {
@@ -365,9 +373,7 @@ const NoteList = forwardRef(
 
     const list = (
       <div className="min-h-screen">
-        {pinnedEventIds.map((id) => (
-          <PinnedNoteCard key={id} eventId={id} className="w-full" />
-        ))}
+        {pinnedEventIds?.map((id) => <PinnedNoteCard key={id} eventId={id} className="w-full" />)}
         {filteredNotes.map(({ key, event, reposters }) => (
           <NoteCard
             key={key}
@@ -386,7 +392,7 @@ const NoteList = forwardRef(
         ) : (
           <div className="flex justify-center w-full mt-2">
             <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
-              {t('reload notes')}
+              {t('Reload')}
             </Button>
           </div>
         )}

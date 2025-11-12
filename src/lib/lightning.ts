@@ -7,6 +7,14 @@ export function getAmountFromInvoice(invoice: string): number {
   return _invoice.satoshi
 }
 
+export function getInvoiceDetails(invoice: string): { amount: number; description: string | null } {
+  const _invoice = new Invoice({ pr: invoice }) // TODO: need to validate
+  return {
+    amount: _invoice.satoshi,
+    description: _invoice.description
+  }
+}
+
 export function formatAmount(amount: number) {
   if (amount < 1000) return amount
   if (amount < 1000000) return `${Math.round(amount / 100) / 10}k`

@@ -33,44 +33,47 @@ export default function RepostNoteCard({
   }, [targetEvent, filterMutedNotes, hideContentMentioningMutedUsers, mutePubkeySet])
   useEffect(() => {
     const fetch = async () => {
-      try {
-        const eventFromContent = event.content ? (JSON.parse(event.content) as Event) : null
-        if (eventFromContent && verifyEvent(eventFromContent)) {
-          if (eventFromContent.kind === kinds.Repost) {
-            return
-          }
-          client.addEventToCache(eventFromContent)
-          const targetSeenOn = client.getSeenEventRelays(eventFromContent.id)
-          if (targetSeenOn.length === 0) {
-            const seenOn = client.getSeenEventRelays(event.id)
-            seenOn.forEach((relay) => {
-              client.trackEventSeenOn(eventFromContent.id, relay)
-            })
-          }
-          setTargetEvent(eventFromContent)
+      let eventFromContent: Event | null = null
+      if (event.content) {
+        try {
+          eventFromContent = JSON.parse(event.content) as Event
+        } catch {
+          eventFromContent = null
+        }
+      }
+      if (eventFromContent && verifyEvent(eventFromContent)) {
+        if (eventFromContent.kind === kinds.Repost) {
           return
         }
+        client.addEventToCache(eventFromContent)
+        const targetSeenOn = client.getSeenEventRelays(eventFromContent.id)
+        if (targetSeenOn.length === 0) {
+          const seenOn = client.getSeenEventRelays(event.id)
+          seenOn.forEach((relay) => {
+            client.trackEventSeenOn(eventFromContent.id, relay)
+          })
+        }
+        setTargetEvent(eventFromContent)
+        return
+      }
 
-        let targetEventId: string | undefined
-        const aTag = event.tags.find(tagNameEquals('a'))
-        if (aTag) {
-          targetEventId = generateBech32IdFromATag(aTag)
-        } else {
-          const eTag = event.tags.find(tagNameEquals('e'))
-          if (eTag) {
-            targetEventId = generateBech32IdFromETag(eTag)
-          }
+      let targetEventId: string | undefined
+      const aTag = event.tags.find(tagNameEquals('a'))
+      if (aTag) {
+        targetEventId = generateBech32IdFromATag(aTag)
+      } else {
+        const eTag = event.tags.find(tagNameEquals('e'))
+        if (eTag) {
+          targetEventId = generateBech32IdFromETag(eTag)
         }
-        if (!targetEventId) {
-          return
-        }
+      }
+      if (!targetEventId) {
+        return
+      }
 
-        const targetEvent = await client.fetchEvent(targetEventId)
-        if (targetEvent) {
-          setTargetEvent(targetEvent)
-        }
-      } catch {
-        // ignore
+      const targetEvent = await client.fetchEvent(targetEventId)
+      if (targetEvent) {
+        setTargetEvent(targetEvent)
       }
     }
     fetch()

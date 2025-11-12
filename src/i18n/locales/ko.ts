@@ -494,6 +494,47 @@ export default {
       'Jumble은 릴레이 탐색에 중점을 둔 클라이언트입니다. 흥미로운 릴레이를 탐색하거나 로그인하여 팔로잉 피드를 확인하세요.',
     'Explore Relays': '릴레이 탐색',
     'Choose a feed': '피드 선택',
-    'and {{x}} others': '및 기타 {{x}}명'
+    'and {{x}} others': '및 기타 {{x}}명',
+    selfZapWarning:
+      'Jumble은 자신에게 Zap을 보낼 때 발생하는 일에 대해 책임을 지지 않습니다. 본인의 책임 하에 진행하세요. 😉⚡',
+    'Emoji Pack': '이모지 팩',
+    'Emoji pack added': '이모지 팩이 추가되었습니다',
+    'Add emoji pack failed': '이모지 팩 추가 실패',
+    'Emoji pack removed': '이모지 팩이 제거되었습니다',
+    'Remove emoji pack failed': '이모지 팩 제거 실패',
+    Added: '추가됨',
+    'Emoji Packs': '이모지 팩',
+    'My Packs': '내 팩',
+    'Adding...': '추가 중...',
+    'Removing...': '제거 중...',
+    Reload: '다시 불러오기',
+    'Request to Join Relay': '릴레이 가입 요청',
+    'Leave Relay': '릴레이 떠나기',
+    Leave: '나가기',
+    'Are you sure you want to leave this relay?': '이 릴레이를 떠나시겠습니까?',
+    'Join request sent successfully': '가입 요청을 성공적으로 보냈습니다',
+    'Failed to send join request': '가입 요청 전송 실패',
+    'Leave request sent successfully': '떠나기 요청을 성공적으로 보냈습니다',
+    'Failed to send leave request': '떠나기 요청 전송 실패',
+    'Enter an invite code if you have one. Otherwise, leave it blank to send a request.':
+      '초대 코드가 있으면 입력하세요. 그렇지 않으면 비워두고 요청을 보내세요.',
+    'Invite Code (Optional)': '초대 코드 (선택 사항)',
+    'Enter invite code': '초대 코드 입력',
+    'Sending...': '전송 중...',
+    'Send Request': '요청 보내기',
+    'You can get an invite code from a relay member.': '릴레이 회원으로부터 초대 코드를 받을 수 있습니다.',
+    'Enter the invite code you received from a relay member.': '릴레이 회원으로부터 받은 초대 코드를 입력하세요.',
+    'Get Invite Code': '초대 코드 받기',
+    'Share this invite code with others to invite them to join this relay.':
+      '이 초대 코드를 다른 사람과 공유하여 이 릴레이에 초대하세요.',
+    'Invite Code': '초대 코드',
+    Copy: '복사',
+    'This invite code can be used by others to join the relay.':
+      '이 초대 코드는 다른 사람이 릴레이에 가입하는 데 사용할 수 있습니다.',
+    'No invite code available from this relay.': '이 릴레이에서 사용 가능한 초대 코드가 없습니다.',
+    Close: '닫기',
+    'Failed to get invite code from relay': '릴레이에서 초대 코드 가져오기 실패',
+    'Failed to get invite code': '초대 코드 가져오기 실패',
+    'Invite code copied to clipboard': '초대 코드가 클립보드에 복사되었습니다'
   }
 }

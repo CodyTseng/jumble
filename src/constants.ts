@@ -94,7 +94,8 @@ export const SUPPORTED_KINDS = [
   ExtendedKind.VOICE_COMMENT,
   kinds.Highlights,
   kinds.LongFormArticle,
-  ExtendedKind.RELAY_REVIEW
+  ExtendedKind.RELAY_REVIEW,
+  kinds.Emojisets
 ]
 
 export const URL_REGEX =

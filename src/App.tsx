@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
 import { DeletedEventProvider } from '@/providers/DeletedEventProvider'
+import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
 import { FavoriteRelaysProvider } from '@/providers/FavoriteRelaysProvider'
 import { FeedProvider } from '@/providers/FeedProvider'
 import { FollowListProvider } from '@/providers/FollowListProvider'
@@ -39,18 +40,20 @@ export default function App(): JSX.Element {
                           <MuteListProvider>
                             <UserTrustProvider>
                               <BookmarksProvider>
-                                <PinListProvider>
-                                  <FeedProvider>
-                                    <ReplyProvider>
-                                      <MediaUploadServiceProvider>
-                                        <KindFilterProvider>
-                                          <PageManager />
-                                          <Toaster />
-                                        </KindFilterProvider>
-                                      </MediaUploadServiceProvider>
-                                    </ReplyProvider>
-                                  </FeedProvider>
-                                </PinListProvider>
+                                <EmojiPackProvider>
+                                  <PinListProvider>
+                                    <FeedProvider>
+                                      <ReplyProvider>
+                                        <MediaUploadServiceProvider>
+                                          <KindFilterProvider>
+                                            <PageManager />
+                                            <Toaster />
+                                          </KindFilterProvider>
+                                        </MediaUploadServiceProvider>
+                                      </ReplyProvider>
+                                    </FeedProvider>
+                                  </PinListProvider>
+                                </EmojiPackProvider>
                               </BookmarksProvider>
                             </UserTrustProvider>
                           </MuteListProvider>

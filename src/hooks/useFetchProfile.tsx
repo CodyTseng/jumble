@@ -4,7 +4,7 @@ import client from '@/services/client.service'
 import { TProfile } from '@/types'
 import { useEffect, useState } from 'react'
 
-export function useFetchProfile(id?: string, skipCache = false) {
+export function useFetchProfile(id?: string) {
   const { profile: currentAccountProfile } = useNostr()
   const [isFetching, setIsFetching] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -25,7 +25,7 @@ export function useFetchProfile(id?: string, skipCache = false) {
 
         const pubkey = userIdToPubkey(id)
         setPubkey(pubkey)
-        const profile = await client.fetchProfile(id, skipCache)
+        const profile = await client.fetchProfile(id)
         if (profile) {
           setProfile(profile)
         }

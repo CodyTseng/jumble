@@ -6,7 +6,7 @@ export function useFetchWebMetadata(url: string) {
   const [metadata, setMetadata] = useState<TWebMetadata>({})
   const proxyServer = import.meta.env.VITE_PROXY_SERVER
   if (proxyServer) {
-    url = `${proxyServer}/sites/${encodeURIComponent(url)}` 
+    url = `${proxyServer}/sites/${encodeURIComponent(url)}`
   }
 
   useEffect(() => {

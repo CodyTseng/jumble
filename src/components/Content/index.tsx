@@ -47,11 +47,11 @@ export default function Content({
     if (!_content) return {}
 
     const nodes = parseContent(_content, [
+      EmbeddedEventParser,
+      EmbeddedMentionParser,
       EmbeddedUrlParser,
       EmbeddedLNInvoiceParser,
       EmbeddedWebsocketUrlParser,
-      EmbeddedEventParser,
-      EmbeddedMentionParser,
       EmbeddedHashtagParser,
       EmbeddedEmojiParser
     ])

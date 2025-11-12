@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import client from '@/services/client.service'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 type TCurrentRelaysContext = {
   relayUrls: string[]
@@ -19,6 +20,10 @@ export const useCurrentRelays = () => {
 export function CurrentRelaysProvider({ children }: { children: React.ReactNode }) {
   const [relayRefCount, setRelayRefCount] = useState<Record<string, number>>({})
   const relayUrls = useMemo(() => Object.keys(relayRefCount), [relayRefCount])
+
+  useEffect(() => {
+    client.currentRelays = relayUrls
+  }, [relayUrls])
 
   const addRelayUrls = useCallback((urls: string[]) => {
     setRelayRefCount((prev) => {

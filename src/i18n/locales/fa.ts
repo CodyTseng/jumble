@@ -493,6 +493,49 @@ export default {
       'Jumble یک کلاینت متمرکز بر مرور رله‌هاست. با کاوش در رله‌های جالب شروع کنید یا وارد شوید تا فید دنبال‌کننده‌های خود را مشاهده کنید.',
     'Explore Relays': 'کاوش در رله‌ها',
     'Choose a feed': 'یک فید انتخاب کنید',
-    'and {{x}} others': 'و {{x}} دیگر'
+    'and {{x}} others': 'و {{x}} دیگر',
+    selfZapWarning:
+      'Jumble مسئولیتی در قبال اتفاقاتی که در صورت ارسال zap به خودتان می‌افتد ندارد. با مسئولیت خود ادامه دهید. 😉⚡',
+    'Emoji Pack': 'بسته ایموجی',
+    'Emoji pack added': 'بسته ایموجی اضافه شد',
+    'Add emoji pack failed': 'افزودن بسته ایموجی ناموفق بود',
+    'Emoji pack removed': 'بسته ایموجی حذف شد',
+    'Remove emoji pack failed': 'حذف بسته ایموجی ناموفق بود',
+    Added: 'اضافه شد',
+    'Emoji Packs': 'بسته‌های ایموجی',
+    'My Packs': 'بسته‌های من',
+    'Adding...': 'در حال افزودن...',
+    'Removing...': 'در حال حذف...',
+    Reload: 'بازخوانی',
+    'Request to Join Relay': 'درخواست عضویت در رله',
+    'Leave Relay': 'خروج از رله',
+    Leave: 'خروج',
+    'Are you sure you want to leave this relay?': 'آیا مطمئن هستید که می‌خواهید از این رله خارج شوید؟',
+    'Join request sent successfully': 'درخواست عضویت با موفقیت ارسال شد',
+    'Failed to send join request': 'ارسال درخواست عضویت ناموفق بود',
+    'Leave request sent successfully': 'درخواست خروج با موفقیت ارسال شد',
+    'Failed to send leave request': 'ارسال درخواست خروج ناموفق بود',
+    'Enter an invite code if you have one. Otherwise, leave it blank to send a request.':
+      'اگر کد دعوت دارید وارد کنید. در غیر این صورت، آن را خالی بگذارید تا درخواست ارسال شود.',
+    'Invite Code (Optional)': 'کد دعوت (اختیاری)',
+    'Enter invite code': 'کد دعوت را وارد کنید',
+    'Sending...': 'در حال ارسال...',
+    'Send Request': 'ارسال درخواست',
+    'You can get an invite code from a relay member.':
+      'می‌توانید کد دعوت را از یک عضو رله دریافت کنید.',
+    'Enter the invite code you received from a relay member.':
+      'کد دعوتی را که از یک عضو رله دریافت کرده‌اید وارد کنید.',
+    'Get Invite Code': 'دریافت کد دعوت',
+    'Share this invite code with others to invite them to join this relay.':
+      'این کد دعوت را با دیگران به اشتراک بگذارید تا آنها را به پیوستن به این رله دعوت کنید.',
+    'Invite Code': 'کد دعوت',
+    Copy: 'کپی',
+    'This invite code can be used by others to join the relay.':
+      'این کد دعوت می‌تواند توسط دیگران برای پیوستن به رله استفاده شود.',
+    'No invite code available from this relay.': 'هیچ کد دعوتی از این رله در دسترس نیست.',
+    Close: 'بستن',
+    'Failed to get invite code from relay': 'دریافت کد دعوت از رله ناموفق بود',
+    'Failed to get invite code': 'دریافت کد دعوت ناموفق بود',
+    'Invite code copied to clipboard': 'کد دعوت در کلیپ‌بورد کپی شد'
   }
 }

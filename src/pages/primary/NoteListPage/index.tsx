@@ -24,14 +24,15 @@ import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
 
-const NoteListPage = forwardRef((_, ref) => {
+const NoteListPage = forwardRef<TPageRef>((_, ref) => {
   const { t } = useTranslation()
   const { addRelayUrls, removeRelayUrls } = useCurrentRelays()
   const layoutRef = useRef<TPageRef>(null)
   const { pubkey } = useNostr()
   const { feedInfo, relayUrls, isReady, switchFeed } = useFeed()
   const [showRelayDetails, setShowRelayDetails] = useState(false)
-  useImperativeHandle(ref, () => layoutRef.current)
+
+  useImperativeHandle(ref, () => layoutRef.current as TPageRef)
 
   useEffect(() => {
     if (layoutRef.current) {
@@ -50,7 +51,9 @@ const NoteListPage = forwardRef((_, ref) => {
 
   let content: React.ReactNode = null
   if (!isReady) {
-    content = <div className="text-center text-sm text-muted-foreground">{t('loading...')}</div>
+    content = (
+      <div className="text-center text-sm text-muted-foreground pt-3">{t('loading...')}</div>
+    )
   } else if (!feedInfo) {
     content = <WelcomeGuide />
   } else if (feedInfo.feedType === 'following' && !pubkey) {

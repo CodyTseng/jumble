@@ -189,6 +189,12 @@ class IndexedDbService {
     })
   }
 
+  async getReplaceableEventByCoordinate(coordinate: string): Promise<Event | undefined | null> {
+    const [kind, pubkey, ...rest] = coordinate.split(':')
+    const d = rest.length > 0 ? rest.join(':') : undefined
+    return this.getReplaceableEvent(pubkey, parseInt(kind), d)
+  }
+
   async getReplaceableEvent(
     pubkey: string,
     kind: number,
@@ -196,7 +202,7 @@ class IndexedDbService {
   ): Promise<Event | undefined | null> {
     const storeName = this.getStoreNameByKind(kind)
     if (!storeName) {
-      return Promise.reject('store name not found')
+      return undefined
     }
     await this.initPromise
     return new Promise((resolve, reject) => {
@@ -485,19 +491,25 @@ class IndexedDbService {
     }
 
     const stores = [
-      { name: StoreNames.PROFILE_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
-      { name: StoreNames.RELAY_LIST_EVENTS, expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 }, // 1 day
+      {
+        name: StoreNames.PROFILE_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
+      },
+      {
+        name: StoreNames.RELAY_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
+      },
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 day
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
       },
       {
         name: StoreNames.BLOSSOM_SERVER_LIST_EVENTS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 days
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
       },
       {
         name: StoreNames.RELAY_INFOS,
-        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 // 1 days
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
       },
       {
         name: StoreNames.PIN_LIST_EVENTS,

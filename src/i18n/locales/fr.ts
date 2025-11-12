@@ -503,6 +503,49 @@ export default {
       "Jumble est un client axé sur la navigation des relais. Commencez par explorer des relais intéressants ou connectez-vous pour voir votre fil d'abonnements.",
     'Explore Relays': 'Explorer les relais',
     'Choose a feed': 'Choisir un fil',
-    'and {{x}} others': 'et {{x}} autres'
+    'and {{x}} others': 'et {{x}} autres',
+    selfZapWarning:
+      "Jumble n'est pas responsable de ce qui se passe si vous vous zappez vous-même. Procédez à vos risques et périls. 😉⚡",
+    'Emoji Pack': "Pack d'Emojis",
+    'Emoji pack added': "Pack d'emojis ajouté",
+    'Add emoji pack failed': "Échec de l'ajout du pack d'emojis",
+    'Emoji pack removed': "Pack d'emojis supprimé",
+    'Remove emoji pack failed': "Échec de la suppression du pack d'emojis",
+    Added: 'Ajouté',
+    'Emoji Packs': "Packs d'Emojis",
+    'My Packs': 'Mes Packs',
+    'Adding...': 'Ajout...',
+    'Removing...': 'Suppression...',
+    Reload: 'Recharger',
+    'Request to Join Relay': 'Demander à rejoindre le Relay',
+    'Leave Relay': 'Quitter le Relay',
+    Leave: 'Quitter',
+    'Are you sure you want to leave this relay?': 'Êtes-vous sûr de vouloir quitter ce relay ?',
+    'Join request sent successfully': "Demande d'adhésion envoyée avec succès",
+    'Failed to send join request': "Échec de l'envoi de la demande d'adhésion",
+    'Leave request sent successfully': 'Demande de départ envoyée avec succès',
+    'Failed to send leave request': "Échec de l'envoi de la demande de départ",
+    'Enter an invite code if you have one. Otherwise, leave it blank to send a request.':
+      "Entrez un code d'invitation si vous en avez un. Sinon, laissez-le vide pour envoyer une demande.",
+    'Invite Code (Optional)': "Code d'Invitation (Optionnel)",
+    'Enter invite code': "Entrez le code d'invitation",
+    'Sending...': 'Envoi...',
+    'Send Request': 'Envoyer la Demande',
+    'You can get an invite code from a relay member.':
+      "Vous pouvez obtenir un code d'invitation auprès d'un membre du relay.",
+    'Enter the invite code you received from a relay member.':
+      "Entrez le code d'invitation que vous avez reçu d'un membre du relay.",
+    'Get Invite Code': "Obtenir un Code d'Invitation",
+    'Share this invite code with others to invite them to join this relay.':
+      "Partagez ce code d'invitation avec d'autres pour les inviter à rejoindre ce relay.",
+    'Invite Code': "Code d'Invitation",
+    Copy: 'Copier',
+    'This invite code can be used by others to join the relay.':
+      "Ce code d'invitation peut être utilisé par d'autres pour rejoindre le relay.",
+    'No invite code available from this relay.': "Aucun code d'invitation disponible de ce relay.",
+    Close: 'Fermer',
+    'Failed to get invite code from relay': "Échec de l'obtention du code d'invitation du relay",
+    'Failed to get invite code': "Échec de l'obtention du code d'invitation",
+    'Invite code copied to clipboard': "Code d'invitation copié dans le presse-papiers"
   }
 }

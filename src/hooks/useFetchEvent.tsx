@@ -20,23 +20,21 @@ export function useFetchEvent(eventId?: string) {
         return
       }
 
-      try {
-        const event = await client.fetchEvent(eventId)
-        if (event && !isEventDeleted(event)) {
-          setEvent(event)
-          addReplies([event])
-        }
-      } catch (error) {
-        setError(error as Error)
-      } finally {
-        setIsFetching(false)
+      const event = await client.fetchEvent(eventId)
+      if (event && !isEventDeleted(event)) {
+        setEvent(event)
+        addReplies([event])
       }
     }
 
-    fetchEvent().catch((err) => {
-      setError(err as Error)
-      setIsFetching(false)
-    })
+    fetchEvent()
+      .catch((err) => {
+        console.error('Error fetching event in useFetchEvent:', eventId, error)
+        setError(err as Error)
+      })
+      .finally(() => {
+        setIsFetching(false)
+      })
   }, [eventId])
 
   useEffect(() => {

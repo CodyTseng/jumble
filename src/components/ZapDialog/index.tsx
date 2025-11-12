@@ -139,6 +139,7 @@ function ZapDialogContent({
   const { defaultZapSats, defaultZapComment } = useZap()
   const [sats, setSats] = useState(defaultAmount ?? defaultZapSats)
   const [comment, setComment] = useState(defaultComment ?? defaultZapComment)
+  const isSelfZap = useMemo(() => pubkey === recipient, [pubkey, recipient])
   const [zapping, setZapping] = useState(false)
   const presetAmounts = useMemo(() => {
     if (i18n.language.startsWith('zh')) {
@@ -228,6 +229,13 @@ function ZapDialogContent({
         </div>
         <Label htmlFor="sats">{t('Sats')}</Label>
       </div>
+
+      {/* Self-zap easter egg warning */}
+      {isSelfZap && (
+        <div className="text-sm text-yellow-600 dark:text-yellow-400 text-center px-4 py-2 bg-yellow-50 dark:bg-yellow-950/30 rounded-md border border-yellow-200 dark:border-yellow-900">
+          {t('selfZapWarning')}
+        </div>
+      )}
 
       {/* Preset sats buttons */}
       <div className="grid grid-cols-6 gap-2">
