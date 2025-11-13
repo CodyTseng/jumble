@@ -13,7 +13,7 @@ export default function ProfileCard({ userId }: { userId: string }) {
 
   return (
     <div className="w-full flex flex-col gap-2 not-prose">
-      <div className="flex space-x-2 w-full items-start justify-between">
+      <div className="flex gap-2 w-full items-start justify-between">
         <SimpleUserAvatar userId={pubkey} className="w-12 h-12" />
         <FollowButton pubkey={pubkey} />
       </div>

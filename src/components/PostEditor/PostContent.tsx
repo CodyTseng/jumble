@@ -12,7 +12,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useReply } from '@/providers/ReplyProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
 import { TPollCreateData } from '@/types'
-import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
+import { AlignLeft, AlignRight, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -40,6 +40,7 @@ export default function PostContent({
   const { pubkey, publish, checkLogin } = useNostr()
   const { addReplies } = useReply()
   const [text, setText] = useState('')
+  const [textDirection, setTextDirection] = useState<'ltr' | 'rtl'>('ltr')
   const textareaRef = useRef<TPostTextareaHandle>(null)
   const [posting, setPosting] = useState(false)
   const [uploadProgresses, setUploadProgresses] = useState<
@@ -198,6 +199,7 @@ export default function PostContent({
         ref={textareaRef}
         text={text}
         setText={setText}
+        textDirection={textDirection}
         defaultContent={defaultContent}
         parentEvent={parentEvent}
         onSubmit={() => post()}
@@ -278,6 +280,14 @@ export default function PostContent({
               </Button>
             </EmojiPickerDialog>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            title={textDirection === 'ltr' ? 'Switch to RTL' : 'Switch to LTR'}
+            onClick={() => setTextDirection(textDirection === 'ltr' ? 'rtl' : 'ltr')}
+          >
+            {textDirection === 'ltr' ? <AlignRight /> : <AlignLeft />}
+          </Button>
           {!parentEvent && (
             <Button
               variant="ghost"

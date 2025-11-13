@@ -57,7 +57,7 @@ export default function ReplyNote({
       onClick={() => push(toNote(event))}
     >
       <Collapsible>
-        <div className="flex space-x-2 items-start px-4 pt-3">
+        <div className="flex gap-2 items-start px-4 pt-3">
           <UserAvatar userId={event.pubkey} size="medium" className="shrink-0 mt-0.5" />
           <div className="w-full overflow-hidden">
             <div className="flex items-start justify-between gap-2">
@@ -111,14 +111,14 @@ export default function ReplyNote({
           </div>
         </div>
       </Collapsible>
-      {show && <NoteStats className="ml-14 pl-1 mr-4 mt-2" event={event} displayTopZapsAndLikes />}
+      {show && <NoteStats className="ms-14 ps-1 me-4 mt-2" event={event} displayTopZapsAndLikes />}
     </div>
   )
 }
 
 export function ReplyNoteSkeleton() {
   return (
-    <div className="px-4 py-3 flex items-start space-x-2 w-full">
+    <div className="px-4 py-3 flex items-start gap-2 w-full">
       <Skeleton className="w-9 h-9 rounded-full shrink-0 mt-0.5" />
       <div className="w-full">
         <div className="py-1">

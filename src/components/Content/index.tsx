@@ -96,7 +96,10 @@ export default function Content({
 
   let imageIndex = 0
   return (
-    <div className={cn('text-wrap break-words whitespace-pre-wrap', className)}>
+    <div
+      className={cn('text-wrap break-words whitespace-pre-wrap', className)}
+      dir="auto"
+    >
       {nodes.map((node, index) => {
         if (node.type === 'text') {
           return node.data

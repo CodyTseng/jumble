@@ -13,7 +13,7 @@ import Text from '@tiptap/extension-text'
 import { TextSelection } from '@tiptap/pm/state'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { Event } from 'nostr-tools'
-import { Dispatch, forwardRef, SetStateAction, useImperativeHandle, useState } from 'react'
+import { Dispatch, forwardRef, SetStateAction, useEffect, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
 import Emoji from './Emoji'
@@ -33,6 +33,7 @@ const PostTextarea = forwardRef<
   {
     text: string
     setText: Dispatch<SetStateAction<string>>
+    textDirection: 'ltr' | 'rtl'
     defaultContent?: string
     parentEvent?: Event
     onSubmit?: () => void
@@ -46,6 +47,7 @@ const PostTextarea = forwardRef<
     {
       text = '',
       setText,
+      textDirection,
       defaultContent,
       parentEvent,
       onSubmit,
@@ -58,6 +60,7 @@ const PostTextarea = forwardRef<
   ) => {
     const { t } = useTranslation()
     const [tabValue, setTabValue] = useState('edit')
+
     const editor = useEditor({
       extensions: [
         Document,
@@ -105,13 +108,23 @@ const PostTextarea = forwardRef<
       },
       content: postEditorCache.getPostContentCache({ defaultContent, parentEvent }),
       onUpdate(props) {
-        setText(parseEditorJsonToText(props.editor.getJSON()))
+        const newText = parseEditorJsonToText(props.editor.getJSON())
+        setText(newText)
         postEditorCache.setPostContentCache({ defaultContent, parentEvent }, props.editor.getJSON())
       },
       onCreate(props) {
-        setText(parseEditorJsonToText(props.editor.getJSON()))
+        const newText = parseEditorJsonToText(props.editor.getJSON())
+        setText(newText)
       }
     })
+
+    // Update editor direction when text direction changes
+    useEffect(() => {
+      if (editor) {
+        const editorElement = editor.view.dom
+        editorElement.setAttribute('dir', textDirection)
+      }
+    }, [editor, textDirection])
 
     useImperativeHandle(ref, () => ({
       appendText: (text: string, addNewline = false) => {

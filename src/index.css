@@ -188,3 +188,51 @@
     transform: translate(-1px, -1px) rotate(-1deg);
   }
 }
+
+/* RTL Support */
+@layer base {
+  /* Browser-based auto-detection for note content using Unicode Bidirectional Algorithm */
+  .text-wrap[dir='auto'] {
+    unicode-bidi: plaintext;
+    text-align: start;
+  }
+
+  /* UI-level RTL for when the entire app is in RTL mode */
+  html[dir='rtl'] {
+    direction: rtl;
+  }
+
+  html[dir='ltr'] {
+    direction: ltr;
+  }
+
+  /* Maintain LTR for specific elements that should not flip */
+  [dir='rtl'] code,
+  [dir='rtl'] pre,
+  [dir='auto'] code,
+  [dir='auto'] pre {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: embed;
+  }
+
+  /* TipTap editor direction support - manual control via toggle button */
+  .tiptap.ProseMirror[dir='rtl'] {
+    direction: rtl;
+    text-align: start;
+  }
+
+  .tiptap.ProseMirror[dir='ltr'] {
+    direction: ltr;
+    text-align: start;
+  }
+
+  /* Ensure placeholder text respects direction */
+  .tiptap.ProseMirror[dir='rtl'] p.is-editor-empty:first-child::before {
+    float: right;
+  }
+
+  .tiptap.ProseMirror[dir='ltr'] p.is-editor-empty:first-child::before {
+    float: left;
+  }
+}
