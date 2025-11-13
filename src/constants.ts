@@ -36,7 +36,9 @@ export const StorageKey = {
   NOTIFICATION_LIST_STYLE: 'notificationListStyle',
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
   SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS: 'shownCreateWalletGuideToastPubkeys',
+  SPARK_WALLET_ENABLED: 'sparkWalletEnabled',
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
+  SHOW_WALLET_IN_SIDEBAR: 'showWalletInSidebar',
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated

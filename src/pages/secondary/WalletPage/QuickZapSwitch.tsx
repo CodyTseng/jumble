@@ -10,7 +10,7 @@ export default function QuickZapSwitch() {
   return (
     <div className="w-full flex justify-between items-center">
       <Label htmlFor="quick-zap-switch">
-        <div className="text-base font-medium">{t('Quick zap')}</div>
+        <div className="text-base font-medium">{t('Quick Zap')}</div>
         <div className="text-muted-foreground text-sm">
           {t('If enabled, you can zap with a single click. Click and hold for custom amounts')}
         </div>
