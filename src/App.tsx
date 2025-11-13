@@ -15,6 +15,7 @@ import { Nip05CommunitiesProvider } from '@/providers/Nip05CommunitiesProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
 import { ReplyProvider } from '@/providers/ReplyProvider'
+import { RTLProvider } from '@/providers/RTLProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
@@ -27,42 +28,44 @@ export default function App(): JSX.Element {
   return (
     <ScreenSizeProvider>
       <UserPreferencesProvider>
-        <ThemeProvider>
-          <ContentPolicyProvider>
-            <DeletedEventProvider>
-              <NostrProvider>
-                <ZapProvider>
-                  <TranslationServiceProvider>
-                    <FavoriteRelaysProvider>
-                      <Nip05CommunitiesProvider>
-                        <FollowListProvider>
-                          <MuteListProvider>
-                            <UserTrustProvider>
-                              <BookmarksProvider>
-                                <PinListProvider>
-                                  <FeedProvider>
-                                  <ReplyProvider>
-                                    <MediaUploadServiceProvider>
-                                      <KindFilterProvider>
-                                        <PageManager />
-                                        <Toaster />
-                                      </KindFilterProvider>
-                                    </MediaUploadServiceProvider>
-                                  </ReplyProvider>
-                                  </FeedProvider>
-                                </PinListProvider>
-                              </BookmarksProvider>
-                            </UserTrustProvider>
-                          </MuteListProvider>
-                        </FollowListProvider>
-                      </Nip05CommunitiesProvider>
-                    </FavoriteRelaysProvider>
-                  </TranslationServiceProvider>
-                </ZapProvider>
-              </NostrProvider>
-            </DeletedEventProvider>
-          </ContentPolicyProvider>
-        </ThemeProvider>
+        <RTLProvider>
+          <ThemeProvider>
+            <ContentPolicyProvider>
+              <DeletedEventProvider>
+                <NostrProvider>
+                  <ZapProvider>
+                    <TranslationServiceProvider>
+                      <FavoriteRelaysProvider>
+                        <Nip05CommunitiesProvider>
+                          <FollowListProvider>
+                            <MuteListProvider>
+                              <UserTrustProvider>
+                                <BookmarksProvider>
+                                  <PinListProvider>
+                                    <FeedProvider>
+                                      <ReplyProvider>
+                                        <MediaUploadServiceProvider>
+                                          <KindFilterProvider>
+                                            <PageManager />
+                                            <Toaster />
+                                          </KindFilterProvider>
+                                        </MediaUploadServiceProvider>
+                                      </ReplyProvider>
+                                    </FeedProvider>
+                                  </PinListProvider>
+                                </BookmarksProvider>
+                              </UserTrustProvider>
+                            </MuteListProvider>
+                          </FollowListProvider>
+                        </Nip05CommunitiesProvider>
+                      </FavoriteRelaysProvider>
+                    </TranslationServiceProvider>
+                  </ZapProvider>
+                </NostrProvider>
+              </DeletedEventProvider>
+            </ContentPolicyProvider>
+          </ThemeProvider>
+        </RTLProvider>
       </UserPreferencesProvider>
     </ScreenSizeProvider>
   )
