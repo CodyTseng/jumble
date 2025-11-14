@@ -6,6 +6,7 @@ import {
   toGeneralSettings,
   toPostSettings,
   toRelaySettings,
+  toSystemSettings,
   toTranslation,
   toWallet
 } from '@/lib/link'
@@ -15,6 +16,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import {
   Check,
   ChevronRight,
+  Cog,
   Copy,
   Info,
   KeyRound,
@@ -141,6 +143,13 @@ export default function Settings() {
           </div>
         </SettingItem>
       </AboutInfoDialog>
+      <SettingItem className="clickable" onClick={() => push(toSystemSettings())}>
+        <div className="flex items-center gap-4">
+          <Cog />
+          <div>{t('System')}</div>
+        </div>
+        <ChevronRight />
+      </SettingItem>
       <div className="px-4 mt-4">
         <Donation />
       </div>

@@ -541,6 +541,7 @@ export default {
     Close: 'Chiudi',
     'Failed to get invite code from relay': 'Impossibile ottenere il codice di invito dal relay',
     'Failed to get invite code': 'Impossibile ottenere il codice di invito',
-    'Invite code copied to clipboard': 'Codice di invito copiato negli appunti'
+    'Invite code copied to clipboard': 'Codice di invito copiato negli appunti',
+    'Favicon URL': 'URL Favicon'
   }
 }

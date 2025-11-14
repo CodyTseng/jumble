@@ -1,4 +1,5 @@
 import {
+  DEFAULT_FAVICON_URL_TEMPLATE,
   DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
@@ -52,6 +53,7 @@ class LocalStorageService {
   private sidebarCollapse: boolean = false
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
+  private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -204,6 +206,9 @@ class LocalStorageService {
 
     this.enableSingleColumnLayout =
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
+
+    this.faviconUrlTemplate =
+      window.localStorage.getItem(StorageKey.FAVICON_URL_TEMPLATE) ?? DEFAULT_FAVICON_URL_TEMPLATE
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -514,6 +519,15 @@ class LocalStorageService {
   setEnableSingleColumnLayout(enable: boolean) {
     this.enableSingleColumnLayout = enable
     window.localStorage.setItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT, enable.toString())
+  }
+
+  getFaviconUrlTemplate() {
+    return this.faviconUrlTemplate
+  }
+
+  setFaviconUrlTemplate(template: string) {
+    this.faviconUrlTemplate = template
+    window.localStorage.setItem(StorageKey.FAVICON_URL_TEMPLATE, template)
   }
 }
 

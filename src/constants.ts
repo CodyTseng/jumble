@@ -39,6 +39,7 @@ export const StorageKey = {
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
+  FAVICON_URL_TEMPLATE: 'faviconUrlTemplate',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -129,6 +130,8 @@ export const DEFAULT_NOSTRCONNECT_RELAY = [
   'wss://bucket.coracle.social/',
   'wss://relay.primal.net/'
 ]
+
+export const DEFAULT_FAVICON_URL_TEMPLATE = 'https://{hostname}/favicon.ico'
 
 export const POLL_TYPE = {
   MULTIPLE_CHOICE: 'multiplechoice',

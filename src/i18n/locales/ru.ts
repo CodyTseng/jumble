@@ -543,6 +543,7 @@ export default {
     Close: 'Закрыть',
     'Failed to get invite code from relay': 'Не удалось получить код приглашения от релея',
     'Failed to get invite code': 'Не удалось получить код приглашения',
-    'Invite code copied to clipboard': 'Код приглашения скопирован в буфер обмена'
+    'Invite code copied to clipboard': 'Код приглашения скопирован в буфер обмена',
+    'Favicon URL': 'URL фавикона'
   }
 }

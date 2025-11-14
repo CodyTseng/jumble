@@ -535,6 +535,7 @@ export default {
     Close: '닫기',
     'Failed to get invite code from relay': '릴레이에서 초대 코드 가져오기 실패',
     'Failed to get invite code': '초대 코드 가져오기 실패',
-    'Invite code copied to clipboard': '초대 코드가 클립보드에 복사되었습니다'
+    'Invite code copied to clipboard': '초대 코드가 클립보드에 복사되었습니다',
+    'Favicon URL': '파비콘 URL'
   }
 }

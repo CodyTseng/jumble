@@ -536,6 +536,7 @@ export default {
     Close: 'بستن',
     'Failed to get invite code from relay': 'دریافت کد دعوت از رله ناموفق بود',
     'Failed to get invite code': 'دریافت کد دعوت ناموفق بود',
-    'Invite code copied to clipboard': 'کد دعوت در کلیپ‌بورد کپی شد'
+    'Invite code copied to clipboard': 'کد دعوت در کلیپ‌بورد کپی شد',
+    'Favicon URL': 'آدرس نماد سایت'
   }
 }
