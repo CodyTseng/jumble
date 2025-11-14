@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Copy, ExternalLink, Loader2, RefreshCw } from 'lucide-react'
+import { ChevronDown, ChevronRight, Copy, Loader2, RefreshCw } from 'lucide-react'
 import { Payment } from '@breeztech/breez-sdk-spark/web'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -203,21 +203,6 @@ export default function SparkPaymentsList({ payments, loading, onRefreshPayment 
                         <Copy className="size-3" />
                       </Button>
                     </div>
-                  </div>
-
-                  {/* Sparkscan Link */}
-                  <div className="flex items-center justify-between gap-2 min-h-6">
-                    <span className="text-muted-foreground font-medium">View on Explorer:</span>
-                    <a
-                      href={`https://www.sparkscan.io/tx/${payment.id}?network=mainnet`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-primary hover:underline flex items-center gap-1"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      sparkscan.io
-                      <ExternalLink className="size-3" />
-                    </a>
                   </div>
 
                   {/* Payment Method */}
