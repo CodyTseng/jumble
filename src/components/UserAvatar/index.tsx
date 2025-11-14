@@ -3,9 +3,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchProfile } from '@/hooks'
 import { toProfile } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
+import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
-import { useMemo } from 'react'
+import modalManager from '@/services/modal-manager.service'
+import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
+import Lightbox from 'yet-another-react-lightbox'
+import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import Image from '../Image'
 import ProfileCard from '../ProfileCard'
 
@@ -77,5 +82,73 @@ export function SimpleUserAvatar({
       }}
       onClick={onClick}
     />
+  )
+}
+
+export function AvatarWithLightbox({
+  userId,
+  size = 'normal',
+  className
+}: {
+  userId: string
+  size?: 'large' | 'big' | 'semiBig' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
+  className?: string
+}) {
+  const id = useMemo(() => `user-avatar-lightbox-${randomString()}`, [])
+  const { profile } = useFetchProfile(userId)
+  const defaultAvatar = useMemo(
+    () => (profile?.pubkey ? generateImageByPubkey(profile.pubkey) : ''),
+    [profile]
+  )
+  const [index, setIndex] = useState(-1)
+
+  useEffect(() => {
+    if (index >= 0) {
+      modalManager.register(id, () => {
+        setIndex(-1)
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [index, id])
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    setIndex(0)
+  }
+
+  const imageUrl = profile?.avatar ?? defaultAvatar
+
+  return (
+    <>
+      <SimpleUserAvatar
+        userId={userId}
+        size={size}
+        className={cn('cursor-zoom-in', className)}
+        onClick={handleClick}
+      />
+      {index >= 0 &&
+        createPortal(
+          <div onClick={(e) => e.stopPropagation()}>
+            <Lightbox
+              index={index}
+              slides={[{ src: imageUrl }]}
+              plugins={[Zoom]}
+              open={index >= 0}
+              close={() => setIndex(-1)}
+              controller={{
+                closeOnBackdropClick: true,
+                closeOnPullUp: true,
+                closeOnPullDown: true
+              }}
+              styles={{
+                toolbar: { paddingTop: '2.25rem' }
+              }}
+            />
+          </div>,
+          document.body
+        )}
+    </>
   )
 }
