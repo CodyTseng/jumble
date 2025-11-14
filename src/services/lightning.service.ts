@@ -73,8 +73,9 @@ class LightningService {
       comment
     })
     const zapRequest = await client.signer.signEvent(zapRequestDraft)
+    const separator = callback.includes('?') ? '&' : '?'
     const zapRequestRes = await fetch(
-      `${callback}?amount=${amount}&nostr=${encodeURI(JSON.stringify(zapRequest))}&lnurl=${lnurl}`
+      `${callback}${separator}amount=${amount}&nostr=${encodeURI(JSON.stringify(zapRequest))}&lnurl=${lnurl}`
     )
     const zapRequestResBody = await zapRequestRes.json()
     if (zapRequestResBody.error) {
