@@ -22,6 +22,7 @@ export type TProfile = {
   lud16?: string
   lightningAddress?: string
   created_at?: number
+  emojis?: TEmoji[]
 }
 export type TMailboxRelayScope = 'read' | 'write' | 'both'
 export type TMailboxRelay = {

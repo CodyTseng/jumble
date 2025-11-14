@@ -109,7 +109,7 @@ export default function Profile({ id }: { id?: string }) {
   }
   if (!profile) return <NotFound />
 
-  const { banner, username, about, pubkey, website, lightningAddress } = profile
+  const { banner, username, about, pubkey, website, lightningAddress, emojis } = profile
   return (
     <>
       <div ref={topContainerRef}>
@@ -161,6 +161,7 @@ export default function Profile({ id }: { id?: string }) {
             <Collapsible>
               <ProfileAbout
                 about={about}
+                emojis={emojis}
                 className="text-wrap break-words whitespace-pre-wrap mt-2 select-text"
               />
             </Collapsible>

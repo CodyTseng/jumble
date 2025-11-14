@@ -5,7 +5,7 @@ import { buildATag } from './draft-event'
 import { getReplaceableEventIdentifier } from './event'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey, pubkeyToNpub } from './pubkey'
-import { generateBech32IdFromETag, tagNameEquals } from './tag'
+import { getEmojiInfosFromEmojiTags, generateBech32IdFromETag, tagNameEquals } from './tag'
 import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 import { isTorBrowser } from './utils'
 
@@ -54,6 +54,10 @@ export function getProfileFromEvent(event: Event) {
       profileObj.display_name?.trim() ||
       profileObj.name?.trim() ||
       profileObj.nip05?.split('@')[0]?.trim()
+
+    // Extract emojis from emoji tags according to NIP-30
+    const emojis = getEmojiInfosFromEmojiTags(event.tags)
+
     return {
       pubkey: event.pubkey,
       npub: pubkeyToNpub(event.pubkey) ?? '',
@@ -67,7 +71,8 @@ export function getProfileFromEvent(event: Event) {
       lud06: profileObj.lud06,
       lud16: profileObj.lud16,
       lightningAddress: getLightningAddressFromProfile(profileObj),
-      created_at: event.created_at
+      created_at: event.created_at,
+      emojis: emojis.length > 0 ? emojis : undefined
     }
   } catch (err) {
     console.error(event.content, err)

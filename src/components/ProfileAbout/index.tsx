@@ -1,4 +1,5 @@
 import {
+  EmbeddedEmojiParser,
   EmbeddedHashtagParser,
   EmbeddedMentionParser,
   EmbeddedUrlParser,
@@ -7,13 +8,23 @@ import {
 } from '@/lib/content-parser'
 import { detectLanguage } from '@/lib/utils'
 import { useTranslationService } from '@/providers/TranslationServiceProvider'
+import { TEmoji } from '@/types'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { EmbeddedHashtag, EmbeddedMention, EmbeddedWebsocketUrl } from '../Embedded'
+import Emoji from '../Emoji'
 import ExternalLink from '../ExternalLink'
 
-export default function ProfileAbout({ about, className }: { about?: string; className?: string }) {
+export default function ProfileAbout({
+  about,
+  emojis,
+  className
+}: {
+  about?: string
+  emojis?: TEmoji[]
+  className?: string
+}) {
   const { t, i18n } = useTranslation()
   const { translateText } = useTranslationService()
   const needTranslation = useMemo(() => {
@@ -31,8 +42,16 @@ export default function ProfileAbout({ about, className }: { about?: string; cla
       EmbeddedMentionParser,
       EmbeddedWebsocketUrlParser,
       EmbeddedUrlParser,
-      EmbeddedHashtagParser
+      EmbeddedHashtagParser,
+      EmbeddedEmojiParser
     ])
+
+    // Create emoji map for quick lookup
+    const emojiMap = new Map<string, TEmoji>()
+    emojis?.forEach((emoji) => {
+      emojiMap.set(emoji.shortcode, emoji)
+    })
+
     return nodes.map((node, index) => {
       if (node.type === 'url') {
         return <ExternalLink key={index} url={node.data} />
@@ -46,9 +65,15 @@ export default function ProfileAbout({ about, className }: { about?: string; cla
       if (node.type === 'mention') {
         return <EmbeddedMention key={index} userId={node.data.split(':')[1]} />
       }
+      if (node.type === 'emoji') {
+        const shortcode = node.data.split(':')[1]
+        const emoji = emojiMap.get(shortcode)
+        if (!emoji) return node.data
+        return <Emoji classNames={{ img: 'mb-1' }} emoji={emoji} key={index} />
+      }
       return node.data
     })
-  }, [about, translatedAbout])
+  }, [about, translatedAbout, emojis])
 
   const handleTranslate = async () => {
     if (translating || translatedAbout) return

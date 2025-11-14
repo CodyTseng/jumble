@@ -5,6 +5,7 @@ import { toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
 import ProfileCard from '../ProfileCard'
+import TextWithEmojis from '../TextWithEmojis'
 
 export default function Username({
   userId,
@@ -39,7 +40,7 @@ export default function Username({
             onClick={(e) => e.stopPropagation()}
           >
             {showAt && '@'}
-            {profile.username}
+            <TextWithEmojis text={profile.username} emojis={profile.emojis} emojiClassName="mb-1" />
           </SecondaryPageLink>
         </div>
       </HoverCardTrigger>
@@ -73,12 +74,12 @@ export function SimpleUsername({
   }
   if (!profile) return null
 
-  const { username } = profile
+  const { username, emojis } = profile
 
   return (
     <div className={className}>
       {showAt && '@'}
-      {username}
+      <TextWithEmojis text={username} emojis={emojis} emojiClassName="mb-1" />
     </div>
   )
 }
