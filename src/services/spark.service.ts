@@ -99,10 +99,12 @@ class SparkService {
       console.log('[SparkService] Creating configuration...')
       this.config = defaultConfig(network)
       this.config.apiKey = apiKey
+      this.config.privateEnabledDefault = true
       console.log('[SparkService] Config created:', {
         network: this.config.network,
         syncIntervalSecs: this.config.syncIntervalSecs,
-        preferSparkOverLightning: this.config.preferSparkOverLightning
+        preferSparkOverLightning: this.config.preferSparkOverLightning,
+        privateEnabledDefault: this.config.privateEnabledDefault
       })
 
       // Prepare seed
