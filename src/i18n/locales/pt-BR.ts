@@ -549,6 +549,6 @@ export default {
     'Go to relay': 'Ir para relay',
     'View discussions about this': 'Ver discussões sobre este conteúdo',
     'Open link': 'Abrir link',
-    'View Nostr discussions': 'Ver discussões do Nostr'
+    'View Nostr discussions': 'Ver comentários'
   }
 }
