@@ -497,7 +497,7 @@ export default {
     'Choose a feed': 'Escolha um feed',
     'and {{x}} others': 'e {{x}} outros',
     selfZapWarning:
-      'Jumble não é responsável pelo que acontece se você zap a si mesmo. Prossiga por sua conta e risco. 😉⚡',
+      'Jumble não é responsável pelo que acontece se você zapear a si mesmo. Prossiga por sua conta e risco. 😉⚡',
     'Emoji Pack': 'Pacote de Emojis',
     'Emoji pack added': 'Pacote de emojis adicionado',
     'Add emoji pack failed': 'Falha ao adicionar pacote de emojis',
@@ -542,13 +542,13 @@ export default {
     'Favicon URL': 'URL do Favicon',
     'Filter out onion relays': 'Filtrar relays onion',
     'Click to load X post': 'Clique para carregar a postagem do X',
-    'View Nostr comments': 'Ver comentários do Nostr',
+    'View Nostr comments': 'Ver comentários',
     'Search for notes': 'Buscar notas',
     'Search for hashtag': 'Buscar hashtag',
     'Go to note': 'Ir para nota',
     'Go to relay': 'Ir para relay',
     'View discussions about this': 'Ver discussões sobre este conteúdo',
     'Open link': 'Abrir link',
-    'View Nostr discussions': 'Ver discussões do Nostr'
+    'View Nostr discussions': 'Ver comentários'
   }
 }
