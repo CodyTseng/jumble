@@ -542,7 +542,7 @@ export default {
     'Favicon URL': 'URL do Favicon',
     'Filter out onion relays': 'Filtrar relays onion',
     'Click to load X post': 'Clique para carregar a postagem do X',
-    'View Nostr comments': 'Ver comentários do Nostr',
+    'View Nostr comments': 'Ver comentários',
     'Search for notes': 'Buscar notas',
     'Search for hashtag': 'Buscar hashtag',
     'Go to note': 'Ir para nota',
