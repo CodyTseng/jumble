@@ -168,14 +168,19 @@ class LocalStorageService {
     } else {
       const showKindsVersionStr = window.localStorage.getItem(StorageKey.SHOW_KINDS_VERSION)
       const showKindsVersion = showKindsVersionStr ? parseInt(showKindsVersionStr) : 0
-      const showKinds = JSON.parse(showKindsStr) as number[]
+      const showKindSet = new Set(JSON.parse(showKindsStr) as number[])
       if (showKindsVersion < 1) {
-        showKinds.push(ExtendedKind.VIDEO, ExtendedKind.SHORT_VIDEO)
+        showKindSet.add(ExtendedKind.VIDEO)
+        showKindSet.add(ExtendedKind.SHORT_VIDEO)
       }
-      this.showKinds = showKinds
+      if (showKindsVersion < 2 && showKindSet.has(ExtendedKind.VIDEO)) {
+        showKindSet.add(ExtendedKind.ADDRESSABLE_NORMAL_VIDEO)
+        showKindSet.add(ExtendedKind.ADDRESSABLE_SHORT_VIDEO)
+      }
+      this.showKinds = Array.from(showKindSet)
     }
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(this.showKinds))
-    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '1')
+    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '2')
 
     this.hideContentMentioningMutedUsers =
       window.localStorage.getItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS) === 'true'

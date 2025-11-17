@@ -97,7 +97,12 @@ export default function Note({
     content = <AudioPlayer className="mt-2" src={event.content} />
   } else if (event.kind === ExtendedKind.PICTURE) {
     content = <PictureNote className="mt-2" event={event} />
-  } else if (event.kind === ExtendedKind.VIDEO || event.kind === ExtendedKind.SHORT_VIDEO) {
+  } else if (
+    event.kind === ExtendedKind.VIDEO ||
+    event.kind === ExtendedKind.SHORT_VIDEO ||
+    event.kind === ExtendedKind.ADDRESSABLE_NORMAL_VIDEO ||
+    event.kind === ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+  ) {
     content = <VideoNote className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.RELAY_REVIEW) {
     content = <RelayReview className="mt-2" event={event} />

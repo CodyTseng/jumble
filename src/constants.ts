@@ -80,7 +80,9 @@ export const ExtendedKind = {
   FAVORITE_RELAYS: 10012,
   BLOSSOM_SERVER_LIST: 10063,
   RELAY_REVIEW: 31987,
-  GROUP_METADATA: 39000
+  GROUP_METADATA: 39000,
+  ADDRESSABLE_NORMAL_VIDEO: 34235,
+  ADDRESSABLE_SHORT_VIDEO: 24236
 }
 
 export const SUPPORTED_KINDS = [
@@ -96,7 +98,9 @@ export const SUPPORTED_KINDS = [
   kinds.Highlights,
   kinds.LongFormArticle,
   ExtendedKind.RELAY_REVIEW,
-  kinds.Emojisets
+  kinds.Emojisets,
+  ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+  ExtendedKind.ADDRESSABLE_SHORT_VIDEO
 ]
 
 export const URL_REGEX =
