@@ -555,7 +555,7 @@ export default {
       'Republicado com sucesso nos relays ideais (seus relays de escrita e os relays de leitura dos usuários mencionados)',
     'Failed to republish to optimal relays: {{error}}': 'Falha ao republicar nos relays ideais: {{error}}',
     'External Content': 'Conteúdo externo',
-    Highlight: 'Destacar',
+    Highlight: 'Marcação',
     'Optimal relays and {{count}} other relays': 'Relays ideais e {{count}} outros relays'
   }
 }
