@@ -4,6 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
+import { CurrencyPreferencesProvider } from '@/providers/CurrencyPreferencesProvider'
 import { DeletedEventProvider } from '@/providers/DeletedEventProvider'
 import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
 import { FavoriteRelaysProvider } from '@/providers/FavoriteRelaysProvider'
@@ -34,32 +35,34 @@ export default function App(): JSX.Element {
               <NostrProvider>
                 <SparkWalletProvider>
                   <ZapProvider>
-                    <TranslationServiceProvider>
-                      <FavoriteRelaysProvider>
-                        <FollowListProvider>
-                          <MuteListProvider>
-                            <UserTrustProvider>
-                              <BookmarksProvider>
-                                <EmojiPackProvider>
-                                  <PinListProvider>
-                                    <FeedProvider>
-                                      <ReplyProvider>
-                                        <MediaUploadServiceProvider>
-                                          <KindFilterProvider>
-                                            <PageManager />
-                                            <Toaster />
-                                          </KindFilterProvider>
-                                        </MediaUploadServiceProvider>
-                                      </ReplyProvider>
-                                    </FeedProvider>
-                                  </PinListProvider>
-                                </EmojiPackProvider>
-                              </BookmarksProvider>
-                            </UserTrustProvider>
-                          </MuteListProvider>
-                        </FollowListProvider>
-                      </FavoriteRelaysProvider>
-                    </TranslationServiceProvider>
+                    <CurrencyPreferencesProvider>
+                      <TranslationServiceProvider>
+                        <FavoriteRelaysProvider>
+                          <FollowListProvider>
+                            <MuteListProvider>
+                              <UserTrustProvider>
+                                <BookmarksProvider>
+                                  <EmojiPackProvider>
+                                    <PinListProvider>
+                                      <FeedProvider>
+                                        <ReplyProvider>
+                                          <MediaUploadServiceProvider>
+                                            <KindFilterProvider>
+                                              <PageManager />
+                                              <Toaster />
+                                            </KindFilterProvider>
+                                          </MediaUploadServiceProvider>
+                                        </ReplyProvider>
+                                      </FeedProvider>
+                                    </PinListProvider>
+                                  </EmojiPackProvider>
+                                </BookmarksProvider>
+                              </UserTrustProvider>
+                            </MuteListProvider>
+                          </FollowListProvider>
+                        </FavoriteRelaysProvider>
+                      </TranslationServiceProvider>
+                    </CurrencyPreferencesProvider>
                   </ZapProvider>
                 </SparkWalletProvider>
               </NostrProvider>

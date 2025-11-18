@@ -80,12 +80,15 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           <div>
             <div className="flex items-center gap-1">
               <Button
-                className="bg-foreground hover:bg-foreground/90 flex items-center gap-2"
+                className="bg-foreground hover:bg-foreground/90 flex items-center gap-2 font-bold"
                 onClick={() => push(toSparkTest())}
               >
                 <img src="/spark-logo.svg" alt="Spark" className="w-5 h-5" />
                 {sparkConnecting ? 'Setting up Spark...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
               </Button>
+              {!sparkConnecting && !sparkConnected && (
+                <img src="/breez-logo.svg" alt="Breez" className="h-5 ml-3" />
+              )}
               <Button
                 variant="link"
                 size="icon"
@@ -105,7 +108,7 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           </div>
           <div className="pt-4 border-t">
             <div className="flex items-center gap-2">
-              <Button variant="secondary" onClick={() => push(toRizful())}>
+              <Button variant="secondary" className="font-normal" onClick={() => push(toRizful())}>
                 {t('Start with a Rizful Vault')}
               </Button>
               <Button
