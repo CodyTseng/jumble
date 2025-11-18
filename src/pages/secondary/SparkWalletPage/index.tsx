@@ -1592,6 +1592,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     payments={payments}
                     loading={loadingPayments}
                     onRefreshPayment={refreshPayment}
+                    isBalanceHidden={isBalanceHidden}
                   />
 
                   {/* Load More Button */}
