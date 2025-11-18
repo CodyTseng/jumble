@@ -85,10 +85,10 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
               >
                 <img src="/spark-logo.svg" alt="Spark" className="w-5 h-5" />
                 {sparkConnecting ? 'Setting up Spark...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
-                {!sparkConnecting && !sparkConnected && (
-                  <img src="/breez-logo.svg" alt="Breez" className="w-4 h-4" />
-                )}
               </Button>
+              {!sparkConnecting && !sparkConnected && (
+                <img src="/breez-logo.svg" alt="Breez" className="w-5 h-5" />
+              )}
               <Button
                 variant="link"
                 size="icon"
