@@ -8,12 +8,13 @@ interface SparkPaymentsListProps {
   payments: Payment[]
   loading: boolean
   onRefreshPayment?: (paymentId: string) => Promise<void>
+  isBalanceHidden?: boolean
 }
 
 const SentIcon = () => <img src="/sent_icon.svg" alt="Sent" className="size-5" />
 const ReceivedIcon = () => <img src="/received_icon.svg" alt="Received" className="size-5" />
 
-export default function SparkPaymentsList({ payments, loading, onRefreshPayment }: SparkPaymentsListProps) {
+export default function SparkPaymentsList({ payments, loading, onRefreshPayment, isBalanceHidden = false }: SparkPaymentsListProps) {
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set())
   const [refreshingPayments, setRefreshingPayments] = useState<Set<string>>(new Set())
 
@@ -104,6 +105,10 @@ export default function SparkPaymentsList({ payments, loading, onRefreshPayment 
   }
 
   const formatAmount = (amount: bigint | undefined, fees: bigint | undefined, paymentType: string) => {
+    if (isBalanceHidden) {
+      return <span className="text-muted-foreground">••••</span>
+    }
+
     const amountSats = amount ? Number(amount) : 0
     const feeSats = fees ? Number(fees) : 0
     const prefix = paymentType === 'send' ? '-' : '+'

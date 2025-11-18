@@ -56,9 +56,9 @@ export default function WalletButton({ collapse }: { collapse: boolean }) {
           title={isBalanceHidden ? 'Show balance' : 'Hide balance'}
         >
           {isBalanceHidden ? (
-            <EyeOff className="size-3.5 text-muted-foreground" />
-          ) : (
             <Eye className="size-3.5 text-muted-foreground" />
+          ) : (
+            <EyeOff className="size-3.5 text-muted-foreground" />
           )}
         </button>
       </div>
