@@ -1,6 +1,6 @@
 import ContentPreview from '@/components/ContentPreview'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
-import NoteStats from '@/components/NoteStats'
+import StuffStats from '@/components/StuffStats'
 import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
@@ -120,7 +120,7 @@ export default function Notification({
           />
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-muted-foreground text-sm" />
-        {showStats && targetEvent && <NoteStats event={targetEvent} className="mt-1" />}
+        {showStats && targetEvent && <StuffStats stuff={targetEvent} className="mt-1" />}
       </div>
     </div>
   )

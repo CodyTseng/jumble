@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useStuff } from '@/hooks/useStuff'
 import { toRelay } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -19,24 +20,29 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 
-export default function SeenOnButton({ event }: { event: Event }) {
+export default function SeenOnButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
+  const { event } = useStuff(stuff)
   const [relays, setRelays] = useState<string[]>([])
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
+    if (!event) return
+
     const seenOn = client.getSeenEventRelayUrls(event.id)
     setRelays(seenOn)
   }, [])
 
   const trigger = (
     <button
-      className="flex gap-1 items-center text-muted-foreground enabled:hover:text-primary pl-3 h-full"
+      className="flex gap-1 items-center text-muted-foreground enabled:hover:text-primary pl-3 h-full disabled:text-muted-foreground/40"
       title={t('Seen on')}
       disabled={relays.length === 0}
       onClick={() => {
+        if (!event) return
+
         if (isSmallScreen) {
           setIsDrawerOpen(true)
         }
@@ -46,6 +52,10 @@ export default function SeenOnButton({ event }: { event: Event }) {
       {relays.length > 0 && <div className="text-sm">{relays.length}</div>}
     </button>
   )
+
+  if (relays.length === 0) {
+    return trigger
+  }
 
   if (isSmallScreen) {
     return (
@@ -76,6 +86,7 @@ export default function SeenOnButton({ event }: { event: Event }) {
       </>
     )
   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>

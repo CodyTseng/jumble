@@ -19,7 +19,7 @@ import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import {
   ISigner,
   TAccount,
@@ -209,7 +209,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist)
       ])
       if (storedRelayListEvent) {
-        setRelayList(getRelayListFromEvent(storedRelayListEvent))
+        setRelayList(getRelayListFromEvent(storedRelayListEvent, storage.getFilterOutOnionRelays()))
       }
       if (storedProfileEvent) {
         setProfileEvent(storedProfileEvent)
@@ -239,7 +239,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         authors: [account.pubkey]
       })
       const relayListEvent = getLatestEvent(relayListEvents) ?? storedRelayListEvent
-      const relayList = getRelayListFromEvent(relayListEvent)
+      const relayList = getRelayListFromEvent(relayListEvent, storage.getFilterOutOnionRelays())
       if (relayListEvent) {
         client.updateRelayListCache(relayListEvent)
         await indexedDb.putReplaceableEvent(relayListEvent)
@@ -371,7 +371,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
           limit: 100
         }
       ])
-      noteStatsService.updateNoteStatsByEvents(events)
+      stuffStatsService.updateStuffStatsByEvents(events)
     }
     initInteractions()
   }, [account])
@@ -715,7 +715,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   const updateRelayListEvent = async (relayListEvent: Event) => {
     const newRelayList = await client.updateRelayListCache(relayListEvent)
-    setRelayList(getRelayListFromEvent(newRelayList))
+    setRelayList(getRelayListFromEvent(newRelayList, storage.getFilterOutOnionRelays()))
   }
 
   const updateProfileEvent = async (profileEvent: Event) => {

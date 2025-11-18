@@ -3,7 +3,6 @@ import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
 import NpubQrCode from '@/components/NpubQrCode'
 import ProfileAbout from '@/components/ProfileAbout'
-import ProfileBanner from '@/components/ProfileBanner'
 import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
@@ -20,11 +19,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 import SearchInput from '../SearchInput'
-import { SimpleUserAvatar } from '../UserAvatar'
 import FollowedBy from './FollowedBy'
 import Followings from './Followings'
 import ProfileFeed from './ProfileFeed'
 import Relays from './Relays'
+import TextWithEmojis from '../TextWithEmojis'
+import AvatarWithLightbox from './AvatarWithLightbox'
+import BannerWithLightbox from './BannerWithLightbox'
 
 export default function Profile({ id }: { id?: string }) {
   const { t } = useTranslation()
@@ -109,16 +110,13 @@ export default function Profile({ id }: { id?: string }) {
   }
   if (!profile) return <NotFound />
 
-  const { banner, username, about, pubkey, website, lightningAddress } = profile
+  const { banner, username, about, pubkey, website, lightningAddress, emojis } = profile
   return (
     <>
       <div ref={topContainerRef}>
         <div className="relative bg-cover bg-center mb-2">
-          <ProfileBanner banner={banner} pubkey={pubkey} className="w-full aspect-[3/1]" />
-          <SimpleUserAvatar
-            userId={pubkey}
-            className="w-24 h-24 absolute left-3 bottom-0 translate-y-1/2 border-4 border-background rounded-full"
-          />
+          <BannerWithLightbox banner={banner} pubkey={pubkey} />
+          <AvatarWithLightbox userId={pubkey} />
         </div>
         <div className="px-4">
           <div className="flex justify-end h-8 gap-2 items-center">
@@ -140,7 +138,11 @@ export default function Profile({ id }: { id?: string }) {
           </div>
           <div className="pt-2">
             <div className="flex gap-2 items-center">
-              <div className="text-xl font-semibold truncate select-text">{username}</div>
+              <TextWithEmojis
+                text={username}
+                emojis={emojis}
+                className="text-xl font-semibold truncate select-text"
+              />
               {isFollowingYou && (
                 <div className="text-muted-foreground rounded-full bg-muted text-xs h-fit px-2 shrink-0">
                   {t('Follows you')}
@@ -161,6 +163,7 @@ export default function Profile({ id }: { id?: string }) {
             <Collapsible>
               <ProfileAbout
                 about={about}
+                emojis={emojis}
                 className="text-wrap break-words whitespace-pre-wrap mt-2 select-text"
               />
             </Collapsible>

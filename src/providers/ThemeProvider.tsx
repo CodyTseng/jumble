@@ -4,6 +4,7 @@ import { TTheme, TThemeSetting } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 type ThemeProviderState = {
+  theme: TTheme
   themeSetting: TThemeSetting
   setThemeSetting: (themeSetting: TThemeSetting) => void
   primaryColor: TPrimaryColor
@@ -83,6 +84,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProviderContext.Provider
       value={{
+        theme,
         themeSetting,
         setThemeSetting: updateThemeSetting,
         primaryColor,

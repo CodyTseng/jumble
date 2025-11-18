@@ -1,3 +1,4 @@
+import TextWithEmojis from '@/components/TextWithEmojis'
 import { useFetchProfile } from '@/hooks'
 import { formatUserId } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
@@ -11,7 +12,11 @@ export default function MentionNode(props: NodeViewRendererProps & { selected: b
       className={cn('inline text-primary', props.selected ? 'bg-primary/20 rounded-sm' : '')}
     >
       {'@'}
-      {profile ? profile.username : formatUserId(props.node.attrs.id)}
+      {profile ? (
+        <TextWithEmojis text={profile.username} emojis={profile.emojis} emojiClassName="mb-1" />
+      ) : (
+        formatUserId(props.node.attrs.id)
+      )}
     </NodeViewWrapper>
   )
 }

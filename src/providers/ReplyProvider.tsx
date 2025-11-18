@@ -1,4 +1,4 @@
-import { getEventKey, getEventKeyFromTag, getParentTag } from '@/lib/event'
+import { getEventKey, getKeyFromTag, getParentTag } from '@/lib/event'
 import { Event } from 'nostr-tools'
 import { createContext, useCallback, useContext, useState } from 'react'
 
@@ -32,7 +32,7 @@ export function ReplyProvider({ children }: { children: React.ReactNode }) {
 
       const parentTag = getParentTag(reply)
       if (parentTag) {
-        const parentKey = getEventKeyFromTag(parentTag.tag)
+        const parentKey = getKeyFromTag(parentTag.tag)
         if (parentKey) {
           newReplyEventMap.set(parentKey, [...(newReplyEventMap.get(parentKey) || []), reply])
         }

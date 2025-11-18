@@ -41,6 +41,8 @@ export const StorageKey = {
   SHOW_WALLET_IN_SIDEBAR: 'showWalletInSidebar',
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
+  FAVICON_URL_TEMPLATE: 'faviconUrlTemplate',
+  FILTER_OUT_ONION_RELAYS: 'filterOutOnionRelays',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -68,6 +70,7 @@ export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.n
 export const GROUP_METADATA_EVENT_KIND = 39000
 
 export const ExtendedKind = {
+  EXTERNAL_CONTENT_REACTION: 17,
   PICTURE: 20,
   VIDEO: 21,
   SHORT_VIDEO: 22,
@@ -79,7 +82,9 @@ export const ExtendedKind = {
   FAVORITE_RELAYS: 10012,
   BLOSSOM_SERVER_LIST: 10063,
   RELAY_REVIEW: 31987,
-  GROUP_METADATA: 39000
+  GROUP_METADATA: 39000,
+  ADDRESSABLE_NORMAL_VIDEO: 34235,
+  ADDRESSABLE_SHORT_VIDEO: 24236
 }
 
 export const SUPPORTED_KINDS = [
@@ -95,7 +100,9 @@ export const SUPPORTED_KINDS = [
   kinds.Highlights,
   kinds.LongFormArticle,
   ExtendedKind.RELAY_REVIEW,
-  kinds.Emojisets
+  kinds.Emojisets,
+  ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+  ExtendedKind.ADDRESSABLE_SHORT_VIDEO
 ]
 
 export const URL_REGEX =
@@ -112,6 +119,8 @@ export const EMOJI_REGEX =
   /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]|[\u{1F004}]|[\u{1F0CF}]|[\u{1F18E}]|[\u{3030}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{3297}]|[\u{3299}]|[\u{303D}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{23E9}-\u{23EF}]|[\u{23F0}]|[\u{23F3}]|[\u{FE00}-\u{FE0F}]|[\u{200D}]/gu
 export const YOUTUBE_URL_REGEX =
   /https?:\/\/(?:(?:www|m)\.)?(?:youtube\.com\/(?:watch\?[^#\s]*|embed\/[\w-]+|shorts\/[\w-]+|live\/[\w-]+)|youtu\.be\/[\w-]+)(?:\?[^#\s]*)?(?:#[^\s]*)?/gi
+export const X_URL_REGEX =
+  /https?:\/\/(?:www\.)?(twitter\.com|x\.com)\/(?:#!\/)?(\w+)\/status(?:es)?\/(\d+)(?:[?#].*)?/gi
 
 export const JUMBLE_PUBKEY = 'f4eb8e62add1340b9cadcd9861e669b2e907cea534e0f7f3ac974c11c758a51a'
 export const CODY_PUBKEY = '8125b911ed0e94dbe3008a0be48cfe5cd0c0b05923cfff917ae7e87da8400883'
@@ -131,6 +140,8 @@ export const DEFAULT_NOSTRCONNECT_RELAY = [
   'wss://bucket.coracle.social/',
   'wss://relay.primal.net/'
 ]
+
+export const DEFAULT_FAVICON_URL_TEMPLATE = 'https://{hostname}/favicon.ico'
 
 export const POLL_TYPE = {
   MULTIPLE_CHOICE: 'multiplechoice',

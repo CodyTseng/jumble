@@ -1,5 +1,6 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { useStuff } from '@/hooks/useStuff'
 import { formatAmount } from '@/lib/lightning'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -7,14 +8,15 @@ import { useMemo, useState } from 'react'
 import { SimpleUserAvatar } from '../UserAvatar'
 import ZapDialog from '../ZapDialog'
 
-export default function TopZaps({ event }: { event: Event }) {
-  const noteStats = useNoteStatsById(event.id)
+export default function TopZaps({ stuff }: { stuff: Event | string }) {
+  const { event, stuffKey } = useStuff(stuff)
+  const noteStats = useStuffStatsById(stuffKey)
   const [zapIndex, setZapIndex] = useState(-1)
   const topZaps = useMemo(() => {
     return noteStats?.zaps?.sort((a, b) => b.amount - a.amount).slice(0, 10) || []
   }, [noteStats])
 
-  if (!topZaps.length) return null
+  if (!topZaps.length || !event) return null
 
   return (
     <ScrollArea className="pb-2 mb-1">

@@ -74,7 +74,7 @@ export function useMenuActions({
     const items = []
     if (pubkey && event.pubkey === pubkey) {
       items.push({
-        label: <div className="text-left"> {t('Write relays')}</div>,
+        label: <div className="text-left"> {t('Optimal relays')}</div>,
         onClick: async () => {
           closeDrawer()
           const promise = async () => {
@@ -86,10 +86,12 @@ export function useMenuActions({
           toast.promise(promise, {
             loading: t('Republishing...'),
             success: () => {
-              return t('Successfully republish to your write relays')
+              return t(
+                "Successfully republish to optimal relays (your write relays and mentioned users' read relays)"
+              )
             },
             error: (err) => {
-              return t('Failed to republish to your write relays: {{error}}', {
+              return t('Failed to republish to optimal relays: {{error}}', {
                 error: err.message
               })
             }

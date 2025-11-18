@@ -6,14 +6,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { useStuff } from '@/hooks/useStuff'
 import { createRepostDraftEvent } from '@/lib/draft-event'
 import { getNoteBech32Id } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -21,24 +22,28 @@ import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 
-export default function RepostButton({ event }: { event: Event }) {
+export default function RepostButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { publish, checkLogin, pubkey } = useNostr()
-  const noteStats = useNoteStatsById(event.id)
+  const { event, stuffKey } = useStuff(stuff)
+  const noteStats = useStuffStatsById(stuffKey)
   const [reposting, setReposting] = useState(false)
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { repostCount, hasReposted } = useMemo(() => {
+    // external content
+    if (!event) return { repostCount: 0, hasReposted: false }
+
     return {
       repostCount: hideUntrustedInteractions
         ? noteStats?.reposts?.filter((repost) => isUserTrusted(repost.pubkey)).length
         : noteStats?.reposts?.length,
       hasReposted: pubkey ? noteStats?.repostPubkeySet?.has(pubkey) : false
     }
-  }, [noteStats, event.id, hideUntrustedInteractions])
-  const canRepost = !hasReposted && !reposting
+  }, [noteStats, event, hideUntrustedInteractions])
+  const canRepost = !hasReposted && !reposting && !!event
 
   const repost = async () => {
     checkLogin(async () => {
@@ -51,7 +56,7 @@ export default function RepostButton({ event }: { event: Event }) {
         const hasReposted = noteStats?.repostPubkeySet?.has(pubkey)
         if (hasReposted) return
         if (!noteStats?.updatedAt) {
-          const noteStats = await noteStatsService.fetchNoteStats(event, pubkey)
+          const noteStats = await stuffStatsService.fetchStuffStats(stuff, pubkey)
           if (noteStats.repostPubkeySet?.has(pubkey)) {
             return
           }
@@ -59,7 +64,7 @@ export default function RepostButton({ event }: { event: Event }) {
 
         const repost = createRepostDraftEvent(event)
         const evt = await publish(repost)
-        noteStatsService.updateNoteStatsByEvents([evt])
+        stuffStatsService.updateStuffStatsByEvents([evt])
       } catch (error) {
         console.error('repost failed', error)
       } finally {
@@ -72,11 +77,14 @@ export default function RepostButton({ event }: { event: Event }) {
   const trigger = (
     <button
       className={cn(
-        'flex gap-1 items-center enabled:hover:text-lime-500 px-3 h-full',
+        'flex gap-1 items-center px-3 h-full enabled:hover:text-lime-500 disabled:text-muted-foreground/40',
         hasReposted ? 'text-lime-500' : 'text-muted-foreground'
       )}
+      disabled={!event}
       title={t('Repost')}
       onClick={() => {
+        if (!event) return
+
         if (isSmallScreen) {
           setIsDrawerOpen(true)
         }
@@ -86,6 +94,10 @@ export default function RepostButton({ event }: { event: Event }) {
       {!!repostCount && <div className="text-sm">{formatCount(repostCount)}</div>}
     </button>
   )
+
+  if (!event) {
+    return trigger
+  }
 
   const postEditor = (
     <PostEditor

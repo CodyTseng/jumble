@@ -169,6 +169,7 @@ export default function ProfileFeed({
         hideReplies={listMode === 'posts'}
         filterMutedNotes={false}
         pinnedEventIds={listMode === 'you' || !!search ? [] : pinnedEventIds}
+        showNewNotesDirectly={myPubkey === pubkey}
       />
     </>
   )

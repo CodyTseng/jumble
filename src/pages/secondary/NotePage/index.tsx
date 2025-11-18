@@ -2,7 +2,7 @@ import { useSecondaryPage } from '@/PageManager'
 import ContentPreview from '@/components/ContentPreview'
 import Note from '@/components/Note'
 import NoteInteractions from '@/components/NoteInteractions'
-import NoteStats from '@/components/NoteStats'
+import StuffStats from '@/components/StuffStats'
 import UserAvatar from '@/components/UserAvatar'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -12,12 +12,12 @@ import { useFetchEvent } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import {
   getEventKey,
-  getEventKeyFromTag,
+  getKeyFromTag,
   getParentBech32Id,
   getParentTag,
   getRootBech32Id
 } from '@/lib/event'
-import { toNote, toNoteList } from '@/lib/link'
+import { toExternalContent, toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { Ellipsis } from 'lucide-react'
@@ -102,7 +102,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           originalNoteId={id}
           showFull
         />
-        <NoteStats className="mt-3" event={event} fetchIfNotExisting displayTopZapsAndLikes />
+        <StuffStats className="mt-3" stuff={event} fetchIfNotExisting displayTopZapsAndLikes />
       </div>
       <Separator className="mt-4" />
       <NoteInteractions key={`note-interactions-${event.id}`} pageIndex={index} event={event} />
@@ -119,7 +119,7 @@ function ExternalRoot({ value }: { value: string }) {
     <div>
       <Card
         className="flex space-x-1 px-1.5 py-1 items-center clickable text-sm text-muted-foreground hover:text-foreground"
-        onClick={() => push(toNoteList({ externalContentId: value }))}
+        onClick={() => push(toExternalContent(value))}
       >
         <div className="truncate">{value}</div>
       </Card>
@@ -184,5 +184,5 @@ function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
   const tag = getParentTag(parentEvent)
   if (!tag) return false
 
-  return getEventKey(rootEvent) === getEventKeyFromTag(tag.tag)
+  return getEventKey(rootEvent) === getKeyFromTag(tag.tag)
 }

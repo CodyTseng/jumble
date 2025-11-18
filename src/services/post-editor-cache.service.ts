@@ -24,49 +24,53 @@ class PostEditorCacheService {
 
   getPostContentCache({
     defaultContent,
-    parentEvent
-  }: { defaultContent?: string; parentEvent?: Event } = {}) {
+    parentStuff
+  }: { defaultContent?: string; parentStuff?: Event | string } = {}) {
     return (
-      this.postContentCache.get(this.generateCacheKey(defaultContent, parentEvent)) ??
+      this.postContentCache.get(this.generateCacheKey(defaultContent, parentStuff)) ??
       defaultContent
     )
   }
 
   setPostContentCache(
-    { defaultContent, parentEvent }: { defaultContent?: string; parentEvent?: Event },
+    { defaultContent, parentStuff }: { defaultContent?: string; parentStuff?: Event | string },
     content: Content
   ) {
-    this.postContentCache.set(this.generateCacheKey(defaultContent, parentEvent), content)
+    this.postContentCache.set(this.generateCacheKey(defaultContent, parentStuff), content)
   }
 
   getPostSettingsCache({
     defaultContent,
-    parentEvent
-  }: { defaultContent?: string; parentEvent?: Event } = {}): TPostSettings | undefined {
-    return this.postSettingsCache.get(this.generateCacheKey(defaultContent, parentEvent))
+    parentStuff
+  }: { defaultContent?: string; parentStuff?: Event | string } = {}): TPostSettings | undefined {
+    return this.postSettingsCache.get(this.generateCacheKey(defaultContent, parentStuff))
   }
 
   setPostSettingsCache(
-    { defaultContent, parentEvent }: { defaultContent?: string; parentEvent?: Event },
+    { defaultContent, parentStuff }: { defaultContent?: string; parentStuff?: Event | string },
     settings: TPostSettings
   ) {
-    this.postSettingsCache.set(this.generateCacheKey(defaultContent, parentEvent), settings)
+    this.postSettingsCache.set(this.generateCacheKey(defaultContent, parentStuff), settings)
   }
 
   clearPostCache({
     defaultContent,
-    parentEvent
+    parentStuff
   }: {
     defaultContent?: string
-    parentEvent?: Event
+    parentStuff?: Event | string
   }) {
-    const cacheKey = this.generateCacheKey(defaultContent, parentEvent)
+    const cacheKey = this.generateCacheKey(defaultContent, parentStuff)
     this.postContentCache.delete(cacheKey)
     this.postSettingsCache.delete(cacheKey)
   }
 
-  generateCacheKey(defaultContent: string = '', parentEvent?: Event): string {
-    return parentEvent ? parentEvent.id : defaultContent
+  generateCacheKey(defaultContent: string = '', parentStuff?: Event | string): string {
+    return parentStuff
+      ? typeof parentStuff === 'string'
+        ? parentStuff
+        : parentStuff.id
+      : defaultContent
   }
 }
 

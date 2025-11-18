@@ -1,4 +1,5 @@
 import {
+  DEFAULT_FAVICON_URL_TEMPLATE,
   DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
@@ -9,6 +10,7 @@ import {
 } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
+import { isTorBrowser } from '@/lib/utils'
 import {
   TAccount,
   TAccountPointer,
@@ -53,6 +55,8 @@ class LocalStorageService {
   private showWalletInSidebar: boolean = true
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
+  private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
+  private filterOutOnionRelays: boolean = !isTorBrowser()
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -165,14 +169,19 @@ class LocalStorageService {
     } else {
       const showKindsVersionStr = window.localStorage.getItem(StorageKey.SHOW_KINDS_VERSION)
       const showKindsVersion = showKindsVersionStr ? parseInt(showKindsVersionStr) : 0
-      const showKinds = JSON.parse(showKindsStr) as number[]
+      const showKindSet = new Set(JSON.parse(showKindsStr) as number[])
       if (showKindsVersion < 1) {
-        showKinds.push(ExtendedKind.VIDEO, ExtendedKind.SHORT_VIDEO)
+        showKindSet.add(ExtendedKind.VIDEO)
+        showKindSet.add(ExtendedKind.SHORT_VIDEO)
       }
-      this.showKinds = showKinds
+      if (showKindsVersion < 2 && showKindSet.has(ExtendedKind.VIDEO)) {
+        showKindSet.add(ExtendedKind.ADDRESSABLE_NORMAL_VIDEO)
+        showKindSet.add(ExtendedKind.ADDRESSABLE_SHORT_VIDEO)
+      }
+      this.showKinds = Array.from(showKindSet)
     }
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(this.showKinds))
-    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '1')
+    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '2')
 
     this.hideContentMentioningMutedUsers =
       window.localStorage.getItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS) === 'true'
@@ -208,6 +217,14 @@ class LocalStorageService {
 
     this.enableSingleColumnLayout =
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
+
+    this.faviconUrlTemplate =
+      window.localStorage.getItem(StorageKey.FAVICON_URL_TEMPLATE) ?? DEFAULT_FAVICON_URL_TEMPLATE
+
+    const filterOutOnionRelaysStr = window.localStorage.getItem(StorageKey.FILTER_OUT_ONION_RELAYS)
+    if (filterOutOnionRelaysStr) {
+      this.filterOutOnionRelays = filterOutOnionRelaysStr !== 'false'
+    }
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -527,6 +544,24 @@ class LocalStorageService {
   setEnableSingleColumnLayout(enable: boolean) {
     this.enableSingleColumnLayout = enable
     window.localStorage.setItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT, enable.toString())
+  }
+
+  getFaviconUrlTemplate() {
+    return this.faviconUrlTemplate
+  }
+
+  setFaviconUrlTemplate(template: string) {
+    this.faviconUrlTemplate = template
+    window.localStorage.setItem(StorageKey.FAVICON_URL_TEMPLATE, template)
+  }
+
+  getFilterOutOnionRelays() {
+    return this.filterOutOnionRelays
+  }
+
+  setFilterOutOnionRelays(filterOut: boolean) {
+    this.filterOutOnionRelays = filterOut
+    window.localStorage.setItem(StorageKey.FILTER_OUT_ONION_RELAYS, filterOut.toString())
   }
 }
 

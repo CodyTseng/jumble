@@ -1,7 +1,8 @@
+import { useStuff } from '@/hooks/useStuff'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import BookmarkButton from '../BookmarkButton'
@@ -13,14 +14,14 @@ import SeenOnButton from './SeenOnButton'
 import TopZaps from './TopZaps'
 import ZapButton from './ZapButton'
 
-export default function NoteStats({
-  event,
+export default function StuffStats({
+  stuff,
   className,
   classNames,
   fetchIfNotExisting = false,
   displayTopZapsAndLikes = false
 }: {
-  event: Event
+  stuff: Event | string
   className?: string
   classNames?: {
     buttonBar?: string
@@ -31,11 +32,12 @@ export default function NoteStats({
   const { isSmallScreen } = useScreenSize()
   const { pubkey } = useNostr()
   const [loading, setLoading] = useState(false)
+  const { event } = useStuff(stuff)
 
   useEffect(() => {
     if (!fetchIfNotExisting) return
     setLoading(true)
-    noteStatsService.fetchNoteStats(event, pubkey).finally(() => setLoading(false))
+    stuffStatsService.fetchStuffStats(stuff, pubkey).finally(() => setLoading(false))
   }, [event, fetchIfNotExisting])
 
   if (isSmallScreen) {
@@ -43,8 +45,8 @@ export default function NoteStats({
       <div className={cn('select-none', className)}>
         {displayTopZapsAndLikes && (
           <>
-            <TopZaps event={event} />
-            <Likes event={event} />
+            <TopZaps stuff={stuff} />
+            <Likes stuff={stuff} />
           </>
         )}
         <div
@@ -55,12 +57,12 @@ export default function NoteStats({
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          <ReplyButton event={event} />
-          <RepostButton event={event} />
-          <LikeButton event={event} />
-          <ZapButton event={event} />
-          <BookmarkButton event={event} />
-          <SeenOnButton event={event} />
+          <ReplyButton stuff={stuff} />
+          <RepostButton stuff={stuff} />
+          <LikeButton stuff={stuff} />
+          <ZapButton stuff={stuff} />
+          <BookmarkButton stuff={stuff} />
+          <SeenOnButton stuff={stuff} />
         </div>
       </div>
     )
@@ -70,8 +72,8 @@ export default function NoteStats({
     <div className={cn('select-none', className)}>
       {displayTopZapsAndLikes && (
         <>
-          <TopZaps event={event} />
-          <Likes event={event} />
+          <TopZaps stuff={stuff} />
+          <Likes stuff={stuff} />
         </>
       )}
       <div className="flex justify-between h-5 [&_svg]:size-4">
@@ -79,14 +81,14 @@ export default function NoteStats({
           className={cn('flex items-center', loading ? 'animate-pulse' : '')}
           onClick={(e) => e.stopPropagation()}
         >
-          <ReplyButton event={event} />
-          <RepostButton event={event} />
-          <LikeButton event={event} />
-          <ZapButton event={event} />
+          <ReplyButton stuff={stuff} />
+          <RepostButton stuff={stuff} />
+          <LikeButton stuff={stuff} />
+          <ZapButton stuff={stuff} />
         </div>
         <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-          <BookmarkButton event={event} />
-          <SeenOnButton event={event} />
+          <BookmarkButton stuff={stuff} />
+          <SeenOnButton stuff={stuff} />
         </div>
       </div>
     </div>

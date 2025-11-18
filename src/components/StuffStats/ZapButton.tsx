@@ -1,12 +1,13 @@
 import { LONG_PRESS_THRESHOLD } from '@/constants'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { useStuff } from '@/hooks/useStuff'
 import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useZap } from '@/providers/ZapProvider'
 import client from '@/services/client.service'
 import lightning from '@/services/lightning.service'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader, Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { MouseEvent, TouchEvent, useEffect, useMemo, useRef, useState } from 'react'
@@ -14,10 +15,11 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ZapDialog from '../ZapDialog'
 
-export default function ZapButton({ event }: { event: Event }) {
+export default function ZapButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { checkLogin, pubkey } = useNostr()
-  const noteStats = useNoteStatsById(event.id)
+  const { event, stuffKey } = useStuff(stuff)
+  const noteStats = useStuffStatsById(stuffKey)
   const { defaultZapSats, defaultZapComment, quickZap } = useZap()
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
@@ -33,6 +35,11 @@ export default function ZapButton({ event }: { event: Event }) {
   const isLongPressRef = useRef(false)
 
   useEffect(() => {
+    if (!event) {
+      setDisable(true)
+      return
+    }
+
     client.fetchProfile(event.pubkey).then((profile) => {
       if (!profile) return
       const lightningAddress = getLightningAddressFromProfile(profile)
@@ -45,7 +52,7 @@ export default function ZapButton({ event }: { event: Event }) {
       if (!pubkey) {
         throw new Error('You need to be logged in to zap')
       }
-      if (zapping) return
+      if (zapping || !event) return
 
       setZapping(true)
       const zapResult = await lightning.zap(pubkey, event, defaultZapSats, defaultZapComment)
@@ -53,7 +60,7 @@ export default function ZapButton({ event }: { event: Event }) {
       if (!zapResult) {
         return
       }
-      noteStatsService.addZap(
+      stuffStatsService.addZap(
         pubkey,
         event.id,
         zapResult.invoice,
@@ -128,11 +135,8 @@ export default function ZapButton({ event }: { event: Event }) {
     <>
       <button
         className={cn(
-          'flex items-center gap-1 select-none px-3 h-full',
-          hasZapped ? 'text-yellow-400' : 'text-muted-foreground',
-          disable
-            ? 'cursor-not-allowed text-muted-foreground/40'
-            : 'cursor-pointer enabled:hover:text-yellow-400'
+          'flex items-center gap-1 select-none px-3 h-full cursor-pointer enabled:hover:text-yellow-400 disabled:text-muted-foreground/40 disabled:cursor-default',
+          hasZapped ? 'text-yellow-400' : 'text-muted-foreground'
         )}
         title={t('Zap')}
         disabled={disable || zapping}
@@ -149,15 +153,17 @@ export default function ZapButton({ event }: { event: Event }) {
         )}
         {!!zapAmount && <div className="text-sm">{formatAmount(zapAmount)}</div>}
       </button>
-      <ZapDialog
-        open={openZapDialog}
-        setOpen={(open) => {
-          setOpenZapDialog(open)
-          setZapping(open)
-        }}
-        pubkey={event.pubkey}
-        event={event}
-      />
+      {event && (
+        <ZapDialog
+          open={openZapDialog}
+          setOpen={(open) => {
+            setOpenZapDialog(open)
+            setZapping(open)
+          }}
+          pubkey={event.pubkey}
+          event={event}
+        />
+      )}
     </>
   )
 }

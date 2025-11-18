@@ -1,11 +1,6 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
-import {
-  getEventKey,
-  getEventKeyFromTag,
-  isMentioningMutedUsers,
-  isReplyNoteEvent
-} from '@/lib/event'
+import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { isTouchDevice } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -48,10 +43,11 @@ const NoteList = forwardRef(
       areAlgoRelays = false,
       showRelayCloseReason = false,
       pinnedEventIds,
-      filterFn
+      filterFn,
+      showNewNotesDirectly = false
     }: {
       subRequests: TFeedSubRequest[]
-      showKinds: number[]
+      showKinds?: number[]
       filterMutedNotes?: boolean
       hideReplies?: boolean
       hideUntrustedNotes?: boolean
@@ -59,11 +55,12 @@ const NoteList = forwardRef(
       showRelayCloseReason?: boolean
       pinnedEventIds?: string[]
       filterFn?: (event: Event) => boolean
+      showNewNotesDirectly?: boolean
     },
     ref
   ) => {
     const { t } = useTranslation()
-    const { startLogin, pubkey } = useNostr()
+    const { startLogin } = useNostr()
     const { isUserTrusted } = useUserTrust()
     const { mutePubkeySet } = useMuteList()
     const { hideContentMentioningMutedUsers } = useContentPolicy()
@@ -173,7 +170,7 @@ const NoteList = forwardRef(
 
         const targetTag = evt.tags.find(tagNameEquals('a')) ?? evt.tags.find(tagNameEquals('e'))
         if (targetTag) {
-          const targetEventKey = getEventKeyFromTag(targetTag)
+          const targetEventKey = getKeyFromTag(targetTag)
           if (targetEventKey) {
             // Add to reposters map
             const reposters = repostersMap.get(targetEventKey)
@@ -239,7 +236,7 @@ const NoteList = forwardRef(
         setNewEvents([])
         setHasMore(true)
 
-        if (showKinds.length === 0) {
+        if (showKinds?.length === 0 && subRequests.every(({ filter }) => !filter.kinds)) {
           setLoading(false)
           setHasMore(false)
           return () => {}
@@ -249,7 +246,7 @@ const NoteList = forwardRef(
           subRequests.map(({ urls, filter }) => ({
             urls,
             filter: {
-              kinds: showKinds,
+              kinds: showKinds ?? [],
               ...filter,
               limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
             }
@@ -268,13 +265,11 @@ const NoteList = forwardRef(
               }
             },
             onNew: (event) => {
-              if (pubkey && event.pubkey === pubkey) {
-                // If the new event is from the current user, insert it directly into the feed
+              if (showNewNotesDirectly) {
                 setEvents((oldEvents) =>
                   oldEvents.some((e) => e.id === event.id) ? oldEvents : [event, ...oldEvents]
                 )
               } else {
-                // Otherwise, buffer it and show the New Notes button
                 setNewEvents((oldEvents) =>
                   [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
                 )

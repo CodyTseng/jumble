@@ -5,7 +5,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
 import { NostrEvent, kinds, matchFilter } from 'nostr-tools'
@@ -94,7 +94,7 @@ const NotificationList = forwardRef((_, ref) => {
           return oldEvents
         }
 
-        noteStatsService.updateNoteStatsByEvents([event])
+        stuffStatsService.updateStuffStatsByEvents([event])
         if (index === -1) {
           return [...oldEvents, event]
         }
@@ -138,7 +138,7 @@ const NotificationList = forwardRef((_, ref) => {
             if (eosed) {
               setLoading(false)
               setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
-              noteStatsService.updateNoteStatsByEvents(events)
+              stuffStatsService.updateStuffStatsByEvents(events)
             }
           },
           onNew: (event) => {

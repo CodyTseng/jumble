@@ -518,8 +518,7 @@ export default {
     'Enter invite code': 'Írja be a meghívókódot',
     'Sending...': 'Küldés...',
     'Send Request': 'Kérelem küldése',
-    'You can get an invite code from a relay member.':
-      'Meghívókódot kaphat egy relay tagtól.',
+    'You can get an invite code from a relay member.': 'Meghívókódot kaphat egy relay tagtól.',
     'Enter the invite code you received from a relay member.':
       'Írja be a relay tagtól kapott meghívókódot.',
     'Get Invite Code': 'Meghívókód Lekérése',
@@ -533,6 +532,25 @@ export default {
     Close: 'Bezárás',
     'Failed to get invite code from relay': 'Nem sikerült lekérni a meghívókódot a relay-től',
     'Failed to get invite code': 'Nem sikerült lekérni a meghívókódot',
-    'Invite code copied to clipboard': 'Meghívókód vágólapra másolva'
+    'Invite code copied to clipboard': 'Meghívókód vágólapra másolva',
+    'Favicon URL': 'Favicon URL',
+    'Filter out onion relays': 'Onion relay-ek kiszűrése',
+    'Click to load X post': 'Kattintson az X bejegyzés betöltéséhez',
+    'View Nostr comments': 'Nostr megjegyzések megtekintése',
+    'Search for notes': 'Jegyzetek keresése',
+    'Search for hashtag': 'Hashtag keresése',
+    'Go to note': 'Ugrás a jegyzethez',
+    'Go to relay': 'Ugrás a relay-hez',
+    'View discussions about this': 'Beszélgetések megtekintése erről a tartalomról',
+    'Open link': 'Link megnyitása',
+    'View Nostr discussions': 'Nostr beszélgetések megtekintése',
+    'Optimal relays': 'Optimális relay-ek',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'Sikeresen újra közzétéve az optimális relay-eken (az Ön írási relay-ei és az említett felhasználók olvasási relay-ei)',
+    'Failed to republish to optimal relays: {{error}}':
+      'Nem sikerült újra közzétenni az optimális relay-eken: {{error}}',
+    'External Content': 'Külső tartalom',
+    Highlight: 'Kiemelés',
+    'Optimal relays and {{count}} other relays': 'Optimális relay-ek és {{count}} másik relay'
   }
 }

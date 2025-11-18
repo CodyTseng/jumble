@@ -20,7 +20,15 @@ const KIND_FILTER_OPTIONS = [
   { kindGroup: [ExtendedKind.POLL], label: 'Polls' },
   { kindGroup: [ExtendedKind.VOICE, ExtendedKind.VOICE_COMMENT], label: 'Voice Posts' },
   { kindGroup: [ExtendedKind.PICTURE], label: 'Photo Posts' },
-  { kindGroup: [ExtendedKind.VIDEO, ExtendedKind.SHORT_VIDEO], label: 'Video Posts' }
+  {
+    kindGroup: [
+      ExtendedKind.VIDEO,
+      ExtendedKind.SHORT_VIDEO,
+      ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+      ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+    ],
+    label: 'Video Posts'
+  }
 ]
 const ALL_KINDS = KIND_FILTER_OPTIONS.flatMap(({ kindGroup }) => kindGroup)
 

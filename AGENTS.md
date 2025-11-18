@@ -386,6 +386,10 @@ Secondary pages appear in the right column (or full screen on mobile) and suppor
 
 On mobile devices or single-column layouts, primary pages occupy the full screen, while secondary pages are accessed via stack navigation. When navigating to another primary page, it will clear the secondary page stack.
 
+### How to Parse and Render Content
+
+First, use the `parseContent` method in `src/lib/content-parser.ts` to parse the content. It supports passing different parsers to parse only the needed content for different scenarios. You will get an array of `TEmbeddedNode[]`, and render the content according to the type of these nodes in order. If you need to support new node types, you can add new parsing methods in `src/lib/content-parser.ts`. If you want to recognize specific URLs as special types of nodes, you can extend the `EmbeddedUrlParser` method in `src/lib/content-parser.ts`. A complete usage example can be found in `src/components/Content/index.tsx`.
+
 ### Adding New State Management
 
 1. For global state, create a new Provider in `src/providers/`

@@ -1,7 +1,7 @@
 import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import {
   getEventKey,
-  getEventKeyFromTag,
+  getKeyFromTag,
   getParentTag,
   getReplaceableCoordinateFromEvent,
   getRootTag,
@@ -11,7 +11,7 @@ import {
   isReplyNoteEvent
 } from '@/lib/event'
 import { toNote } from '@/lib/link'
-import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
+import { generateBech32IdFromATag, generateBech32IdFromETag } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -23,16 +23,23 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoadingBar } from '../LoadingBar'
 import ReplyNote, { ReplyNoteSkeleton } from '../ReplyNote'
+import { useStuff } from '@/hooks/useStuff'
 
 type TRootInfo =
   | { type: 'E'; id: string; pubkey: string }
-  | { type: 'A'; id: string; eventId: string; pubkey: string; relay?: string }
+  | { type: 'A'; id: string; pubkey: string; relay?: string }
   | { type: 'I'; id: string }
 
 const LIMIT = 100
 const SHOW_COUNT = 10
 
-export default function ReplyNoteList({ index, event }: { index?: number; event: NEvent }) {
+export default function ReplyNoteList({
+  stuff,
+  index
+}: {
+  stuff: NEvent | string
+  index?: number
+}) {
   const { t } = useTranslation()
   const { push, currentIndex } = useSecondaryPage()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
@@ -40,13 +47,14 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [rootInfo, setRootInfo] = useState<TRootInfo | undefined>(undefined)
   const { repliesMap, addReplies } = useReply()
+  const { event, externalContent, stuffKey } = useStuff(stuff)
   const replies = useMemo(() => {
     const replyKeySet = new Set<string>()
     const replyEvents: NEvent[] = []
-    const currentEventKey = getEventKey(event)
-    let parentEventKeys = [currentEventKey]
-    while (parentEventKeys.length > 0) {
-      const events = parentEventKeys.flatMap((key) => repliesMap.get(key)?.events || [])
+
+    let parentKeys = [stuffKey]
+    while (parentKeys.length > 0) {
+      const events = parentKeys.flatMap((key) => repliesMap.get(key)?.events || [])
       events.forEach((evt) => {
         const key = getEventKey(evt)
         if (replyKeySet.has(key)) return
@@ -56,10 +64,10 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
         replyKeySet.add(key)
         replyEvents.push(evt)
       })
-      parentEventKeys = events.map((evt) => getEventKey(evt))
+      parentKeys = events.map((evt) => getEventKey(evt))
     }
     return replyEvents.sort((a, b) => a.created_at - b.created_at)
-  }, [event.id, repliesMap])
+  }, [stuffKey, repliesMap])
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [until, setUntil] = useState<number | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(false)
@@ -70,15 +78,18 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
 
   useEffect(() => {
     const fetchRootEvent = async () => {
-      let root: TRootInfo = isReplaceableEvent(event.kind)
-        ? {
-            type: 'A',
-            id: getReplaceableCoordinateFromEvent(event),
-            eventId: event.id,
-            pubkey: event.pubkey,
-            relay: client.getEventHint(event.id)
-          }
-        : { type: 'E', id: event.id, pubkey: event.pubkey }
+      if (!event && !externalContent) return
+
+      let root: TRootInfo = event
+        ? isReplaceableEvent(event.kind)
+          ? {
+              type: 'A',
+              id: getReplaceableCoordinateFromEvent(event),
+              pubkey: event.pubkey,
+              relay: client.getEventHint(event.id)
+            }
+          : { type: 'E', id: event.id, pubkey: event.pubkey }
+        : { type: 'I', id: externalContent! }
 
       const rootTag = getRootTag(event)
       if (rootTag?.type === 'e') {
@@ -97,12 +108,9 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       } else if (rootTag?.type === 'a') {
         const [, coordinate, relay] = rootTag.tag
         const [, pubkey] = coordinate.split(':')
-        root = { type: 'A', id: coordinate, eventId: event.id, pubkey, relay }
-      } else {
-        const rootITag = event.tags.find(tagNameEquals('I'))
-        if (rootITag) {
-          root = { type: 'I', id: rootITag[1] }
-        }
+        root = { type: 'A', id: coordinate, pubkey, relay }
+      } else if (rootTag?.type === 'i') {
+        root = { type: 'I', id: rootTag.tag[1] }
       }
       setRootInfo(root)
     }
@@ -116,13 +124,16 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
       setLoading(true)
 
       try {
-        const relayList = await client.fetchRelayList(
-          (rootInfo as { pubkey?: string }).pubkey ?? event.pubkey
-        )
-        const relayUrls = relayList.read.concat(BIG_RELAY_URLS).slice(0, 4)
+        let relayUrls: string[] = []
+        const rootPubkey = (rootInfo as { pubkey?: string }).pubkey ?? event?.pubkey
+        if (rootPubkey) {
+          const relayList = await client.fetchRelayList(rootPubkey)
+          relayUrls = relayList.read
+        }
+        relayUrls = relayUrls.concat(BIG_RELAY_URLS).slice(0, 4)
 
         // If current event is protected, we can assume its replies are also protected and stored on the same relays
-        if (isProtectedEvent(event)) {
+        if (event && isProtectedEvent(event)) {
           const seenOn = client.getSeenEventRelayUrls(event.id)
           relayUrls.concat(...seenOn)
         }
@@ -136,7 +147,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             kinds: [kinds.ShortTextNote],
             limit: LIMIT
           })
-          if (event.kind !== kinds.ShortTextNote) {
+          if (event?.kind !== kinds.ShortTextNote) {
             filters.push({
               '#E': [rootInfo.id],
               kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
@@ -269,7 +280,7 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
   return (
     <div className="min-h-[80vh]">
       {loading && <LoadingBar />}
-      {!loading && until && until > event.created_at && (
+      {!loading && until && (!event || until > event.created_at) && (
         <div
           className={`text-sm text-center text-muted-foreground border-b py-2 ${!loading ? 'hover:text-foreground cursor-pointer' : ''}`}
           onClick={loadMore}
@@ -291,14 +302,16 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             }
           }
 
-          const rootEventKey = getEventKey(event)
+          const rootKey = event ? getEventKey(event) : externalContent!
           const currentReplyKey = getEventKey(reply)
           const parentTag = getParentTag(reply)
-          const parentEventKey = parentTag ? getEventKeyFromTag(parentTag.tag) : undefined
+          const parentKey = parentTag ? getKeyFromTag(parentTag.tag) : undefined
           const parentEventId = parentTag
             ? parentTag.type === 'e'
               ? generateBech32IdFromETag(parentTag.tag)
-              : generateBech32IdFromATag(parentTag.tag)
+              : parentTag.type === 'a'
+                ? generateBech32IdFromATag(parentTag.tag)
+                : undefined
             : undefined
           return (
             <div
@@ -308,10 +321,10 @@ export default function ReplyNoteList({ index, event }: { index?: number; event:
             >
               <ReplyNote
                 event={reply}
-                parentEventId={rootEventKey !== parentEventKey ? parentEventId : undefined}
+                parentEventId={rootKey !== parentKey ? parentEventId : undefined}
                 onClickParent={() => {
-                  if (!parentEventKey) return
-                  highlightReply(parentEventKey, parentEventId)
+                  if (!parentKey) return
+                  highlightReply(parentKey, parentEventId)
                 }}
                 highlight={highlightReplyKey === currentReplyKey}
               />

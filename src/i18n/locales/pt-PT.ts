@@ -541,6 +541,24 @@ export default {
     Close: 'Fechar',
     'Failed to get invite code from relay': 'Falha ao obter código de convite do relay',
     'Failed to get invite code': 'Falha ao obter código de convite',
-    'Invite code copied to clipboard': 'Código de convite copiado para a área de transferência'
+    'Invite code copied to clipboard': 'Código de convite copiado para a área de transferência',
+    'Favicon URL': 'URL do Favicon',
+    'Filter out onion relays': 'Filtrar relays onion',
+    'Click to load X post': 'Clique para carregar a publicação do X',
+    'View Nostr comments': 'Ver comentários do Nostr',
+    'Search for notes': 'Pesquisar notas',
+    'Search for hashtag': 'Pesquisar hashtag',
+    'Go to note': 'Ir para nota',
+    'Go to relay': 'Ir para relay',
+    'View discussions about this': 'Ver discussões sobre este conteúdo',
+    'Open link': 'Abrir ligação',
+    'View Nostr discussions': 'Ver discussões do Nostr',
+    'Optimal relays': 'Relays ideais',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'Republicado com sucesso nos relays ideais (os seus relays de escrita e os relays de leitura dos utilizadores mencionados)',
+    'Failed to republish to optimal relays: {{error}}': 'Falha ao republicar nos relays ideais: {{error}}',
+    'External Content': 'Conteúdo externo',
+    Highlight: 'Destacar',
+    'Optimal relays and {{count}} other relays': 'Relays ideais e {{count}} outros relays'
   }
 }

@@ -538,6 +538,24 @@ export default {
     Close: 'बंद करें',
     'Failed to get invite code from relay': 'रिले से निमंत्रण कोड प्राप्त करने में विफल',
     'Failed to get invite code': 'निमंत्रण कोड प्राप्त करने में विफल',
-    'Invite code copied to clipboard': 'निमंत्रण कोड क्लिपबोर्ड पर कॉपी किया गया'
+    'Invite code copied to clipboard': 'निमंत्रण कोड क्लिपबोर्ड पर कॉपी किया गया',
+    'Favicon URL': 'फ़ेविकॉन URL',
+    'Filter out onion relays': 'ओनियन रिले फ़िल्टर करें',
+    'Click to load X post': 'X पोस्ट लोड करने के लिए क्लिक करें',
+    'View Nostr comments': 'Nostr टिप्पणियाँ देखें',
+    'Search for notes': 'नोट्स खोजें',
+    'Search for hashtag': 'हैशटैग खोजें',
+    'Go to note': 'नोट पर जाएं',
+    'Go to relay': 'रिले पर जाएं',
+    'View discussions about this': 'इस सामग्री के बारे में चर्चाएँ देखें',
+    'Open link': 'लिंक खोलें',
+    'View Nostr discussions': 'Nostr चर्चाएँ देखें',
+    'Optimal relays': 'इष्टतम रिले',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'इष्टतम रिले पर सफलतापूर्वक पुनः प्रकाशित (आपके लेखन रिले और उल्लिखित उपयोगकर्ताओं के पठन रिले)',
+    'Failed to republish to optimal relays: {{error}}': 'इष्टतम रिले पर पुनः प्रकाशित करने में विफल: {{error}}',
+    'External Content': 'बाहरी सामग्री',
+    Highlight: 'हाइलाइट',
+    'Optimal relays and {{count}} other relays': 'इष्टतम रिले और {{count}} अन्य रिले'
   }
 }

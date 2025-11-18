@@ -13,18 +13,22 @@ import Image from '../Image'
 export default function ImageWithLightbox({
   image,
   className,
-  classNames = {}
+  classNames = {},
+  errorPlaceholder,
+  ignoreAutoLoadPolicy = false
 }: {
   image: TImetaInfo
   className?: string
   classNames?: {
     wrapper?: string
   }
+  errorPlaceholder?: string
+  ignoreAutoLoadPolicy?: boolean
 }) {
   const id = useMemo(() => `image-with-lightbox-${randomString()}`, [])
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
-  const [display, setDisplay] = useState(autoLoadMedia)
+  const [display, setDisplay] = useState(ignoreAutoLoadPolicy ? true : autoLoadMedia)
   const [index, setIndex] = useState(-1)
   useEffect(() => {
     if (index >= 0) {
@@ -67,6 +71,7 @@ export default function ImageWithLightbox({
         }}
         image={image}
         onClick={(e) => handlePhotoClick(e)}
+        errorPlaceholder={errorPlaceholder}
       />
       {index >= 0 &&
         createPortal(

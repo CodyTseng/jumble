@@ -517,7 +517,8 @@ export default {
     'Sending...': 'กำลังส่ง...',
     'Send Request': 'ส่งคำขอ',
     'You can get an invite code from a relay member.': 'คุณสามารถรับรหัสเชิญจากสมาชิกรีเลย์',
-    'Enter the invite code you received from a relay member.': 'ป้อนรหัสเชิญที่คุณได้รับจากสมาชิกรีเลย์',
+    'Enter the invite code you received from a relay member.':
+      'ป้อนรหัสเชิญที่คุณได้รับจากสมาชิกรีเลย์',
     'Get Invite Code': 'รับรหัสเชิญ',
     'Share this invite code with others to invite them to join this relay.':
       'แชร์รหัสเชิญนี้กับผู้อื่นเพื่อเชิญพวกเขาเข้าร่วมรีเลย์นี้',
@@ -529,6 +530,24 @@ export default {
     Close: 'ปิด',
     'Failed to get invite code from relay': 'ไม่สามารถรับรหัสเชิญจากรีเลย์',
     'Failed to get invite code': 'ไม่สามารถรับรหัสเชิญ',
-    'Invite code copied to clipboard': 'คัดลอกรหัสเชิญไปยังคลิปบอร์ดแล้ว'
+    'Invite code copied to clipboard': 'คัดลอกรหัสเชิญไปยังคลิปบอร์ดแล้ว',
+    'Favicon URL': 'URL ไอคอน',
+    'Filter out onion relays': 'กรองรีเลย์ onion',
+    'Click to load X post': 'คลิกเพื่อโหลดโพสต์ X',
+    'View Nostr comments': 'ดูความคิดเห็น Nostr',
+    'Search for notes': 'ค้นหาโน้ต',
+    'Search for hashtag': 'ค้นหาแฮชแท็ก',
+    'Go to note': 'ไปที่โน้ต',
+    'Go to relay': 'ไปที่รีเลย์',
+    'View discussions about this': 'ดูการสนทนาเกี่ยวกับเนื้อหานี้',
+    'Open link': 'เปิดลิงก์',
+    'View Nostr discussions': 'ดูการสนทนา Nostr',
+    'Optimal relays': 'รีเลย์ที่เหมาะสม',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'เผยแพร่ซ้ำไปยังรีเลย์ที่เหมาะสมสำเร็จ (รีเลย์เขียนของคุณและรีเลย์อ่านของผู้ใช้ที่กล่าวถึง)',
+    'Failed to republish to optimal relays: {{error}}': 'เผยแพร่ซ้ำไปยังรีเลย์ที่เหมาะสมล้มเหลว: {{error}}',
+    'External Content': 'เนื้อหาภายนอก',
+    Highlight: 'ไฮไลต์',
+    'Optimal relays and {{count}} other relays': 'รีเลย์ที่เหมาะสมและรีเลย์อื่น {{count}} รายการ'
   }
 }

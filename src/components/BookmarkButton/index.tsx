@@ -1,3 +1,4 @@
+import { useStuff } from '@/hooks/useStuff'
 import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
 import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -7,12 +8,15 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-export default function BookmarkButton({ event }: { event: Event }) {
+export default function BookmarkButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { pubkey: accountPubkey, bookmarkListEvent, checkLogin } = useNostr()
   const { addBookmark, removeBookmark } = useBookmarks()
   const [updating, setUpdating] = useState(false)
+  const { event } = useStuff(stuff)
   const isBookmarked = useMemo(() => {
+    if (!event) return false
+
     const isReplaceable = isReplaceableEvent(event.kind)
     const eventKey = isReplaceable ? getReplaceableCoordinateFromEvent(event) : event.id
 
@@ -26,7 +30,7 @@ export default function BookmarkButton({ event }: { event: Event }) {
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation()
     checkLogin(async () => {
-      if (isBookmarked) return
+      if (isBookmarked || !event) return
 
       setUpdating(true)
       try {
@@ -42,7 +46,7 @@ export default function BookmarkButton({ event }: { event: Event }) {
   const handleRemoveBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation()
     checkLogin(async () => {
-      if (!isBookmarked) return
+      if (!isBookmarked || !event) return
 
       setUpdating(true)
       try {
@@ -59,9 +63,9 @@ export default function BookmarkButton({ event }: { event: Event }) {
     <button
       className={`flex items-center gap-1 ${
         isBookmarked ? 'text-rose-400' : 'text-muted-foreground'
-      } enabled:hover:text-rose-400 px-3 h-full`}
+      } enabled:hover:text-rose-400 px-3 h-full disabled:text-muted-foreground/40 disabled:cursor-default`}
       onClick={isBookmarked ? handleRemoveBookmark : handleBookmark}
-      disabled={updating}
+      disabled={!event || updating}
       title={isBookmarked ? t('Remove bookmark') : t('Bookmark')}
     >
       {updating ? (

@@ -1,6 +1,7 @@
 import AppearanceSettingsPage from '@/pages/secondary/AppearanceSettingsPage'
 import BookmarkPage from '@/pages/secondary/BookmarkPage'
 import EmojiPackSettingsPage from '@/pages/secondary/EmojiPackSettingsPage'
+import ExternalContentPage from '@/pages/secondary/ExternalContentPage'
 import FollowingListPage from '@/pages/secondary/FollowingListPage'
 import GeneralSettingsPage from '@/pages/secondary/GeneralSettingsPage'
 import MuteListPage from '@/pages/secondary/MuteListPage'
@@ -18,6 +19,7 @@ import RizfulPage from '@/pages/secondary/RizfulPage'
 import SearchPage from '@/pages/secondary/SearchPage'
 import SettingsPage from '@/pages/secondary/SettingsPage'
 import SparkWalletPage from '@/pages/secondary/SparkWalletPage'
+import SystemSettingsPage from '@/pages/secondary/SystemSettingsPage'
 import TranslationPage from '@/pages/secondary/TranslationPage'
 import WalletPage from '@/pages/secondary/WalletPage'
 import { match } from 'path-to-regexp'
@@ -34,6 +36,7 @@ const SECONDARY_ROUTE_CONFIGS = [
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
   { path: '/search', element: <SearchPage /> },
+  { path: '/external-content', element: <ExternalContentPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/settings/relays', element: <RelaySettingsPage /> },
   { path: '/settings/wallet', element: <WalletPage /> },
@@ -42,6 +45,7 @@ const SECONDARY_ROUTE_CONFIGS = [
   { path: '/settings/appearance', element: <AppearanceSettingsPage /> },
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/settings/emoji-packs', element: <EmojiPackSettingsPage /> },
+  { path: '/settings/system', element: <SystemSettingsPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },

@@ -79,9 +79,13 @@ class LightningService {
       comment
     })
     const zapRequest = await client.signer.signEvent(zapRequestDraft)
-    const zapRequestRes = await fetch(
-      `${callback}?amount=${amount}&nostr=${encodeURI(JSON.stringify(zapRequest))}&lnurl=${lnurl}`
-    )
+
+    const zapRequestUrl = new URL(callback)
+    zapRequestUrl.searchParams.append('amount', amount.toString())
+    zapRequestUrl.searchParams.append('nostr', JSON.stringify(zapRequest))
+    zapRequestUrl.searchParams.append('lnurl', lnurl)
+
+    const zapRequestRes = await fetch(zapRequestUrl.toString())
     const zapRequestResBody = await zapRequestRes.json()
     if (zapRequestResBody.error) {
       throw new Error(zapRequestResBody.message)

@@ -34,7 +34,7 @@ const PostTextarea = forwardRef<
     text: string
     setText: Dispatch<SetStateAction<string>>
     defaultContent?: string
-    parentEvent?: Event
+    parentStuff?: Event | string
     onSubmit?: () => void
     className?: string
     onUploadStart?: (file: File, cancel: () => void) => void
@@ -47,7 +47,7 @@ const PostTextarea = forwardRef<
       text = '',
       setText,
       defaultContent,
-      parentEvent,
+      parentStuff,
       onSubmit,
       className,
       onUploadStart,
@@ -103,10 +103,10 @@ const PostTextarea = forwardRef<
           return parseEditorJsonToText(content.toJSON())
         }
       },
-      content: postEditorCache.getPostContentCache({ defaultContent, parentEvent }),
+      content: postEditorCache.getPostContentCache({ defaultContent, parentStuff }),
       onUpdate(props) {
         setText(parseEditorJsonToText(props.editor.getJSON()))
-        postEditorCache.setPostContentCache({ defaultContent, parentEvent }, props.editor.getJSON())
+        postEditorCache.setPostContentCache({ defaultContent, parentStuff }, props.editor.getJSON())
       },
       onCreate(props) {
         setText(parseEditorJsonToText(props.editor.getJSON()))

@@ -6,6 +6,7 @@ import {
   LN_INVOICE_REGEX,
   URL_REGEX,
   WS_URL_REGEX,
+  X_URL_REGEX,
   YOUTUBE_URL_REGEX
 } from '@/constants'
 import { isImage, isMedia } from './url'
@@ -24,6 +25,7 @@ export type TEmbeddedNodeType =
   | 'emoji'
   | 'invoice'
   | 'youtube'
+  | 'x-post'
 
 export type TEmbeddedNode =
   | {
@@ -96,6 +98,8 @@ export const EmbeddedUrlParser: TContentParser = (content: string) => {
       type = 'media'
     } else if (url.match(YOUTUBE_URL_REGEX)) {
       type = 'youtube'
+    } else if (url.match(X_URL_REGEX)) {
+      type = 'x-post'
     }
 
     // Add the match as specific type

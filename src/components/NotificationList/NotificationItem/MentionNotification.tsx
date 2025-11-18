@@ -1,7 +1,7 @@
 import ParentNotePreview from '@/components/ParentNotePreview'
 import { NOTIFICATION_LIST_STYLE } from '@/constants'
-import { getEmbeddedPubkeys, getParentBech32Id } from '@/lib/event'
-import { toNote } from '@/lib/link'
+import { getEmbeddedPubkeys, getParentStuff } from '@/lib/event'
+import { toExternalContent, toNote } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -27,7 +27,9 @@ export function MentionNotification({
     const mentions = getEmbeddedPubkeys(notification)
     return mentions.includes(pubkey)
   }, [pubkey, notification])
-  const parentEventId = useMemo(() => getParentBech32Id(notification), [notification])
+  const { parentEventId, parentExternalContent } = useMemo(() => {
+    return getParentStuff(notification)
+  }, [notification])
 
   return (
     <Notification
@@ -45,14 +47,18 @@ export function MentionNotification({
       sentAt={notification.created_at}
       targetEvent={notification}
       middle={
-        notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED &&
-        parentEventId && (
+        notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED && (
           <ParentNotePreview
             eventId={parentEventId}
+            externalContent={parentExternalContent}
             className=""
             onClick={(e) => {
               e.stopPropagation()
-              push(toNote(parentEventId))
+              if (parentExternalContent) {
+                push(toExternalContent(parentExternalContent))
+              } else if (parentEventId) {
+                push(toNote(parentEventId))
+              }
             }}
           />
         )

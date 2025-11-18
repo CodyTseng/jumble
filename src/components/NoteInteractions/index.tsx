@@ -21,13 +21,13 @@ export default function NoteInteractions({
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList index={pageIndex} event={event} />
+      list = <ReplyNoteList index={pageIndex} stuff={event} />
       break
     case 'quotes':
-      list = <QuoteList event={event} />
+      list = <QuoteList stuff={event} />
       break
     case 'reactions':
-      list = <ReactionList event={event} />
+      list = <ReactionList stuff={event} />
       break
     case 'reposts':
       list = <RepostList event={event} />

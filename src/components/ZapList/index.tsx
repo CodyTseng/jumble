@@ -1,5 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { formatAmount } from '@/lib/lightning'
 import { toProfile } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -19,7 +19,7 @@ export default function ZapList({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const noteStats = useNoteStatsById(event.id)
+  const noteStats = useStuffStatsById(event.id)
   const filteredZaps = useMemo(() => {
     return (noteStats?.zaps ?? []).sort((a, b) => b.amount - a.amount)
   }, [noteStats, event.id])

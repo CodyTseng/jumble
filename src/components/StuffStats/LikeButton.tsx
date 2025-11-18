@@ -4,13 +4,18 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
-import { createReactionDraftEvent } from '@/lib/draft-event'
+import { BIG_RELAY_URLS } from '@/constants'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { useStuff } from '@/hooks/useStuff'
+import {
+  createExternalContentReactionDraftEvent,
+  createReactionDraftEvent
+} from '@/lib/draft-event'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { TEmoji } from '@/types'
 import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -21,15 +26,16 @@ import EmojiPicker from '../EmojiPicker'
 import SuggestedEmojis from '../SuggestedEmojis'
 import { formatCount } from './utils'
 
-export default function LikeButton({ event }: { event: Event }) {
+export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { event, externalContent, stuffKey } = useStuff(stuff)
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const noteStats = useNoteStatsById(event.id)
+  const noteStats = useStuffStatsById(stuffKey)
   const { myLastEmoji, likeCount } = useMemo(() => {
     const stats = noteStats || {}
     const myLike = stats.likes?.find((like) => like.pubkey === pubkey)
@@ -48,13 +54,15 @@ export default function LikeButton({ event }: { event: Event }) {
 
       try {
         if (!noteStats?.updatedAt) {
-          await noteStatsService.fetchNoteStats(event, pubkey)
+          await stuffStatsService.fetchStuffStats(stuffKey, pubkey)
         }
 
-        const reaction = createReactionDraftEvent(event, emoji)
-        const seenOn = client.getSeenEventRelayUrls(event.id)
+        const reaction = event
+          ? createReactionDraftEvent(event, emoji)
+          : createExternalContentReactionDraftEvent(externalContent, emoji)
+        const seenOn = event ? client.getSeenEventRelayUrls(event.id) : BIG_RELAY_URLS
         const evt = await publish(reaction, { additionalRelayUrls: seenOn })
-        noteStatsService.updateNoteStatsByEvents([evt])
+        stuffStatsService.updateStuffStatsByEvents([evt])
       } catch (error) {
         console.error('like failed', error)
       } finally {

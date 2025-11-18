@@ -537,10 +537,30 @@ export default {
     Copy: 'Kopiuj',
     'This invite code can be used by others to join the relay.':
       'Ten kod zaproszenia może być używany przez innych do dołączenia do przekaźnika.',
-    'No invite code available from this relay.': 'Brak dostępnego kodu zaproszenia z tego przekaźnika.',
+    'No invite code available from this relay.':
+      'Brak dostępnego kodu zaproszenia z tego przekaźnika.',
     Close: 'Zamknij',
     'Failed to get invite code from relay': 'Nie udało się uzyskać kodu zaproszenia z przekaźnika',
     'Failed to get invite code': 'Nie udało się uzyskać kodu zaproszenia',
-    'Invite code copied to clipboard': 'Kod zaproszenia skopiowany do schowka'
+    'Invite code copied to clipboard': 'Kod zaproszenia skopiowany do schowka',
+    'Favicon URL': 'URL Favicon',
+    'Filter out onion relays': 'Filtruj przekaźniki onion',
+    'Click to load X post': 'Kliknij, aby załadować post X',
+    'View Nostr comments': 'Wyświetl komentarze Nostr',
+    'Search for notes': 'Szukaj notatek',
+    'Search for hashtag': 'Szukaj hashtaga',
+    'Go to note': 'Przejdź do notatki',
+    'Go to relay': 'Przejdź do przekaźnika',
+    'View discussions about this': 'Zobacz dyskusje o tej treści',
+    'Open link': 'Otwórz link',
+    'View Nostr discussions': 'Zobacz dyskusje Nostr',
+    'Optimal relays': 'Optymalne przekaźniki',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'Pomyślnie opublikowano ponownie na optymalnych przekaźnikach (Twoje przekaźniki zapisu i przekaźniki odczytu wspomnianych użytkowników)',
+    'Failed to republish to optimal relays: {{error}}':
+      'Nie udało się opublikować ponownie na optymalnych przekaźnikach: {{error}}',
+    'External Content': 'Treść zewnętrzna',
+    Highlight: 'Podświetl',
+    'Optimal relays and {{count}} other relays': 'Optymalne przekaźniki i {{count}} innych przekaźników'
   }
 }

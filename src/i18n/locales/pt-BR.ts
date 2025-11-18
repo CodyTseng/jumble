@@ -497,7 +497,7 @@ export default {
     'Choose a feed': 'Escolha um feed',
     'and {{x}} others': 'e {{x}} outros',
     selfZapWarning:
-      'Jumble não é responsável pelo que acontece se você zap a si mesmo. Prossiga por sua conta e risco. 😉⚡',
+      'Jumble não é responsável pelo que acontece se você zapear a si mesmo. Prossiga por sua conta e risco. 😉⚡',
     'Emoji Pack': 'Pacote de Emojis',
     'Emoji pack added': 'Pacote de emojis adicionado',
     'Add emoji pack failed': 'Falha ao adicionar pacote de emojis',
@@ -538,6 +538,24 @@ export default {
     Close: 'Fechar',
     'Failed to get invite code from relay': 'Falha ao obter código de convite do relay',
     'Failed to get invite code': 'Falha ao obter código de convite',
-    'Invite code copied to clipboard': 'Código de convite copiado para a área de transferência'
+    'Invite code copied to clipboard': 'Código de convite copiado para a área de transferência',
+    'Favicon URL': 'URL do Favicon',
+    'Filter out onion relays': 'Filtrar relays onion',
+    'Click to load X post': 'Clique para carregar a postagem do X',
+    'View Nostr comments': 'Comentários do link',
+    'Search for notes': 'Buscar notas',
+    'Search for hashtag': 'Buscar hashtag',
+    'Go to note': 'Ir para nota',
+    'Go to relay': 'Ir para relay',
+    'View discussions about this': 'Ver discussões sobre este conteúdo',
+    'Open link': 'Abrir link',
+    'View Nostr discussions': 'Comentários do link',
+    'Optimal relays': 'Relays ideais',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'Republicado com sucesso nos relays ideais (seus relays de escrita e os relays de leitura dos usuários mencionados)',
+    'Failed to republish to optimal relays: {{error}}': 'Falha ao republicar nos relays ideais: {{error}}',
+    'External Content': 'Conteúdo externo',
+    Highlight: 'Marcação',
+    'Optimal relays and {{count}} other relays': 'Relays ideais e {{count}} outros relays'
   }
 }

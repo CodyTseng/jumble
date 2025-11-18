@@ -520,12 +520,29 @@ export default {
       '将此邀请码分享给他人以邀请他们加入此中继器。',
     'Invite Code': '邀请码',
     Copy: '复制',
-    'This invite code can be used by others to join the relay.':
-      '此邀请码可供他人用于加入中继器。',
+    'This invite code can be used by others to join the relay.': '此邀请码可供他人用于加入中继器。',
     'No invite code available from this relay.': '此中继器没有可用的邀请码。',
     Close: '关闭',
     'Failed to get invite code from relay': '从中继器获取邀请码失败',
     'Failed to get invite code': '获取邀请码失败',
-    'Invite code copied to clipboard': '邀请码已复制到剪贴板'
+    'Invite code copied to clipboard': '邀请码已复制到剪贴板',
+    'Favicon URL': '网站图标 URL',
+    'Filter out onion relays': '过滤洋葱中继',
+    'Click to load X post': '点击加载 X 帖子',
+    'View Nostr comments': '查看 Nostr 评论',
+    'Search for notes': '搜索笔记',
+    'Search for hashtag': '搜索话题标签',
+    'Go to note': '跳转到笔记',
+    'Go to relay': '跳转到中继器',
+    'View discussions about this': '查看关于此内容的讨论',
+    'Open link': '打开链接',
+    'View Nostr discussions': '查看 Nostr 讨论',
+    'Optimal relays': '最佳中继器',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      '成功重新发布到最佳中继器（你的写入中继器和被提及用户的读取中继器）',
+    'Failed to republish to optimal relays: {{error}}': '重新发布到最佳中继器失败：{{error}}',
+    'External Content': '外部内容',
+    Highlight: '高亮',
+    'Optimal relays and {{count}} other relays': '最佳中继器和其他 {{count}} 个中继器'
   }
 }

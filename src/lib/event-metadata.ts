@@ -5,16 +5,17 @@ import { buildATag } from './draft-event'
 import { getReplaceableEventIdentifier } from './event'
 import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
 import { formatPubkey, pubkeyToNpub } from './pubkey'
-import { generateBech32IdFromETag, tagNameEquals } from './tag'
-import { isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
-import { isTorBrowser } from './utils'
+import { generateBech32IdFromETag, getEmojiInfosFromEmojiTags, tagNameEquals } from './tag'
+import { isOnionUrl, isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 
-export function getRelayListFromEvent(event?: Event | null) {
+export function getRelayListFromEvent(
+  event?: Event | null,
+  filterOutOnionRelays: boolean = true
+): TRelayList {
   if (!event) {
     return { write: BIG_RELAY_URLS, read: BIG_RELAY_URLS, originalRelays: [] }
   }
 
-  const torBrowserDetected = isTorBrowser()
   const relayList = { write: [], read: [], originalRelays: [] } as TRelayList
   event.tags.filter(tagNameEquals('r')).forEach(([, url, type]) => {
     if (!url || !isWebsocketUrl(url)) return
@@ -25,8 +26,7 @@ export function getRelayListFromEvent(event?: Event | null) {
     const scope = type === 'read' ? 'read' : type === 'write' ? 'write' : 'both'
     relayList.originalRelays.push({ url: normalizedUrl, scope })
 
-    // Filter out .onion URLs if not using Tor browser
-    if (normalizedUrl.endsWith('.onion/') && !torBrowserDetected) return
+    if (filterOutOnionRelays && isOnionUrl(normalizedUrl)) return
 
     if (type === 'write') {
       relayList.write.push(normalizedUrl)
@@ -54,6 +54,10 @@ export function getProfileFromEvent(event: Event) {
       profileObj.display_name?.trim() ||
       profileObj.name?.trim() ||
       profileObj.nip05?.split('@')[0]?.trim()
+
+    // Extract emojis from emoji tags according to NIP-30
+    const emojis = getEmojiInfosFromEmojiTags(event.tags)
+
     return {
       pubkey: event.pubkey,
       npub: pubkeyToNpub(event.pubkey) ?? '',
@@ -67,7 +71,8 @@ export function getProfileFromEvent(event: Event) {
       lud06: profileObj.lud06,
       lud16: profileObj.lud16,
       lightningAddress: getLightningAddressFromProfile(profileObj),
-      created_at: event.created_at
+      created_at: event.created_at,
+      emojis: emojis.length > 0 ? emojis : undefined
     }
   } catch (err) {
     console.error(event.content, err)

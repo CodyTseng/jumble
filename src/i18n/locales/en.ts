@@ -407,6 +407,7 @@ export default {
     'Click to load image': 'Click to load image',
     'Click to load media': 'Click to load media',
     'Click to load YouTube video': 'Click to load YouTube video',
+    'Click to load X post': 'Click to load X post',
     '{{count}} reviews': '{{count}} reviews',
     'Write a review': 'Write a review',
     'No reviews yet. Be the first to write one!': 'No reviews yet. Be the first to write one!',
@@ -532,6 +533,23 @@ export default {
     Close: 'Close',
     'Failed to get invite code from relay': 'Failed to get invite code from relay',
     'Failed to get invite code': 'Failed to get invite code',
-    'Invite code copied to clipboard': 'Invite code copied to clipboard'
+    'Invite code copied to clipboard': 'Invite code copied to clipboard',
+    'Favicon URL': 'Favicon URL',
+    'Filter out onion relays': 'Filter out onion relays',
+    'View Nostr comments': 'View Nostr comments',
+    'Search for notes': 'Search for notes',
+    'Search for hashtag': 'Search for hashtag',
+    'Go to note': 'Go to note',
+    'Go to relay': 'Go to relay',
+    'View discussions about this': 'View discussions about this',
+    'Open link': 'Open link',
+    'View Nostr discussions': 'View Nostr discussions',
+    'Optimal relays': 'Optimal relays',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      "Successfully republish to optimal relays (your write relays and mentioned users' read relays)",
+    'Failed to republish to optimal relays: {{error}}': 'Failed to republish to optimal relays: {{error}}',
+    'External Content': 'External Content',
+    Highlight: 'Highlight',
+    'Optimal relays and {{count}} other relays': 'Optimal relays and {{count}} other relays'
   }
 }

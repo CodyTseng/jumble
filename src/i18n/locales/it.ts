@@ -517,11 +517,11 @@ export default {
     Leave: 'Esci',
     'Are you sure you want to leave this relay?': 'Sei sicuro di voler lasciare questo relay?',
     'Join request sent successfully': 'Richiesta di adesione inviata con successo',
-    'Failed to send join request': "Impossibile inviare la richiesta di adesione",
+    'Failed to send join request': 'Impossibile inviare la richiesta di adesione',
     'Leave request sent successfully': 'Richiesta di uscita inviata con successo',
-    'Failed to send leave request': "Impossibile inviare la richiesta di uscita",
+    'Failed to send leave request': 'Impossibile inviare la richiesta di uscita',
     'Enter an invite code if you have one. Otherwise, leave it blank to send a request.':
-      "Inserisci un codice di invito se ne hai uno. Altrimenti, lascialo vuoto per inviare una richiesta.",
+      'Inserisci un codice di invito se ne hai uno. Altrimenti, lascialo vuoto per inviare una richiesta.',
     'Invite Code (Optional)': 'Codice di Invito (Opzionale)',
     'Enter invite code': 'Inserisci il codice di invito',
     'Sending...': 'Invio...',
@@ -537,10 +537,29 @@ export default {
     Copy: 'Copia',
     'This invite code can be used by others to join the relay.':
       'Questo codice di invito può essere utilizzato da altri per unirsi al relay.',
-    'No invite code available from this relay.': 'Nessun codice di invito disponibile da questo relay.',
+    'No invite code available from this relay.':
+      'Nessun codice di invito disponibile da questo relay.',
     Close: 'Chiudi',
     'Failed to get invite code from relay': 'Impossibile ottenere il codice di invito dal relay',
     'Failed to get invite code': 'Impossibile ottenere il codice di invito',
-    'Invite code copied to clipboard': 'Codice di invito copiato negli appunti'
+    'Invite code copied to clipboard': 'Codice di invito copiato negli appunti',
+    'Favicon URL': 'URL Favicon',
+    'Filter out onion relays': 'Filtra relay onion',
+    'Click to load X post': 'Clicca per caricare il post X',
+    'View Nostr comments': 'Visualizza commenti Nostr',
+    'Search for notes': 'Cerca note',
+    'Search for hashtag': 'Cerca hashtag',
+    'Go to note': 'Vai alla nota',
+    'Go to relay': 'Vai al relay',
+    'View discussions about this': 'Visualizza discussioni su questo contenuto',
+    'Open link': 'Apri link',
+    'View Nostr discussions': 'Visualizza discussioni Nostr',
+    'Optimal relays': 'Relay ottimali',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'Ripubblicato con successo sui relay ottimali (i tuoi relay di scrittura e i relay di lettura degli utenti menzionati)',
+    'Failed to republish to optimal relays: {{error}}': 'Errore nella ripubblicazione sui relay ottimali: {{error}}',
+    'External Content': 'Contenuto esterno',
+    Highlight: 'Evidenzia',
+    'Optimal relays and {{count}} other relays': 'Relay ottimali e {{count}} altri relay'
   }
 }

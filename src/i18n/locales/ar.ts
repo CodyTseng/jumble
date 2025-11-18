@@ -519,7 +519,8 @@ export default {
     'Sending...': 'جاري الإرسال...',
     'Send Request': 'إرسال الطلب',
     'You can get an invite code from a relay member.': 'يمكنك الحصول على رمز دعوة من عضو المرحل.',
-    'Enter the invite code you received from a relay member.': 'أدخل رمز الدعوة الذي تلقيته من عضو المرحل.',
+    'Enter the invite code you received from a relay member.':
+      'أدخل رمز الدعوة الذي تلقيته من عضو المرحل.',
     'Get Invite Code': 'الحصول على رمز الدعوة',
     'Share this invite code with others to invite them to join this relay.':
       'شارك رمز الدعوة هذا مع الآخرين لدعوتهم للانضمام إلى هذا المرحل.',
@@ -531,6 +532,24 @@ export default {
     Close: 'إغلاق',
     'Failed to get invite code from relay': 'فشل الحصول على رمز الدعوة من المرحل',
     'Failed to get invite code': 'فشل الحصول على رمز الدعوة',
-    'Invite code copied to clipboard': 'تم نسخ رمز الدعوة إلى الحافظة'
+    'Invite code copied to clipboard': 'تم نسخ رمز الدعوة إلى الحافظة',
+    'Favicon URL': 'رابط الأيقونة المفضلة',
+    'Filter out onion relays': 'تصفية مرحلات onion',
+    'Click to load X post': 'انقر لتحميل منشور X',
+    'View Nostr comments': 'عرض تعليقات Nostr',
+    'Search for notes': 'البحث عن الملاحظات',
+    'Search for hashtag': 'البحث عن الوسم',
+    'Go to note': 'الانتقال إلى الملاحظة',
+    'Go to relay': 'الانتقال إلى المرحل',
+    'View discussions about this': 'عرض المناقشات حول هذا المحتوى',
+    'Open link': 'فتح الرابط',
+    'View Nostr discussions': 'عرض مناقشات Nostr',
+    'Optimal relays': 'المرحلات المثلى',
+    "Successfully republish to optimal relays (your write relays and mentioned users' read relays)":
+      'تم إعادة النشر بنجاح إلى المرحلات المثلى (مرحلات الكتابة الخاصة بك ومرحلات القراءة للمستخدمين المذكورين)',
+    'Failed to republish to optimal relays: {{error}}': 'فشل إعادة النشر إلى المرحلات المثلى: {{error}}',
+    'External Content': 'محتوى خارجي',
+    Highlight: 'تسليط الضوء',
+    'Optimal relays and {{count}} other relays': 'المرحلات المثلى و {{count}} مرحلات أخرى'
   }
 }

@@ -1,5 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { toProfile } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -11,20 +11,22 @@ import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
+import { useStuff } from '@/hooks/useStuff'
 
 const SHOW_COUNT = 20
 
-export default function ReactionList({ event }: { event: Event }) {
+export default function ReactionList({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
-  const noteStats = useNoteStatsById(event.id)
+  const { stuffKey } = useStuff(stuff)
+  const noteStats = useStuffStatsById(stuffKey)
   const filteredLikes = useMemo(() => {
     return (noteStats?.likes ?? [])
       .filter((like) => !hideUntrustedInteractions || isUserTrusted(like.pubkey))
       .sort((a, b) => b.created_at - a.created_at)
-  }, [noteStats, event.id, hideUntrustedInteractions, isUserTrusted])
+  }, [noteStats, stuffKey, hideUntrustedInteractions, isUserTrusted])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const bottomRef = useRef<HTMLDivElement | null>(null)

@@ -4,8 +4,17 @@ import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useMemo } from 'react'
 import Image from '../Image'
+import ExternalLink from '../ExternalLink'
 
-export default function WebPreview({ url, className }: { url: string; className?: string }) {
+export default function WebPreview({
+  url,
+  className,
+  mustLoad
+}: {
+  url: string
+  className?: string
+  mustLoad?: boolean
+}) {
   const { autoLoadMedia } = useContentPolicy()
   const { isSmallScreen } = useScreenSize()
   const { title, description, image } = useFetchWebMetadata(url)
@@ -18,12 +27,16 @@ export default function WebPreview({ url, className }: { url: string; className?
     }
   }, [url])
 
-  if (!autoLoadMedia) {
+  if (!autoLoadMedia && !mustLoad) {
     return null
   }
 
   if (!title) {
-    return null
+    if (mustLoad) {
+      return <ExternalLink url={url} justOpenLink />
+    } else {
+      return null
+    }
   }
 
   if (isSmallScreen && image) {

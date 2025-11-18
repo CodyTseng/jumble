@@ -1,19 +1,25 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { useNoteStatsById } from '@/hooks/useNoteStatsById'
-import { createReactionDraftEvent } from '@/lib/draft-event'
+import { BIG_RELAY_URLS } from '@/constants'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { useStuff } from '@/hooks/useStuff'
+import {
+  createExternalContentReactionDraftEvent,
+  createReactionDraftEvent
+} from '@/lib/draft-event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import noteStatsService from '@/services/note-stats.service'
+import stuffStatsService from '@/services/stuff-stats.service'
 import { TEmoji } from '@/types'
 import { Loader } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
 import Emoji from '../Emoji'
 
-export default function Likes({ event }: { event: Event }) {
+export default function Likes({ stuff }: { stuff: Event | string }) {
   const { pubkey, checkLogin, publish } = useNostr()
-  const noteStats = useNoteStatsById(event.id)
+  const { event, externalContent, stuffKey } = useStuff(stuff)
+  const noteStats = useStuffStatsById(stuffKey)
   const [liking, setLiking] = useState<string | null>(null)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [isLongPressing, setIsLongPressing] = useState<string | null>(null)
@@ -44,10 +50,12 @@ export default function Likes({ event }: { event: Event }) {
       const timer = setTimeout(() => setLiking((prev) => (prev === key ? null : prev)), 5000)
 
       try {
-        const reaction = createReactionDraftEvent(event, emoji)
-        const seenOn = client.getSeenEventRelayUrls(event.id)
+        const reaction = event
+          ? createReactionDraftEvent(event, emoji)
+          : createExternalContentReactionDraftEvent(externalContent, emoji)
+        const seenOn = event ? client.getSeenEventRelayUrls(event.id) : BIG_RELAY_URLS
         const evt = await publish(reaction, { additionalRelayUrls: seenOn })
-        noteStatsService.updateNoteStatsByEvents([evt])
+        stuffStatsService.updateStuffStatsByEvents([evt])
       } catch (error) {
         console.error('like failed', error)
       } finally {

@@ -15,7 +15,7 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
-import NoteStats from '../NoteStats'
+import StuffStats from '../StuffStats'
 import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
 import UserAvatar from '../UserAvatar'
@@ -111,7 +111,7 @@ export default function ReplyNote({
           </div>
         </div>
       </Collapsible>
-      {show && <NoteStats className="ml-14 pl-1 mr-4 mt-2" event={event} displayTopZapsAndLikes />}
+      {show && <StuffStats className="ml-14 pl-1 mr-4 mt-2" stuff={event} displayTopZapsAndLikes />}
     </div>
   )
 }

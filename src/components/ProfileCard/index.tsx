@@ -9,7 +9,7 @@ import { SimpleUserAvatar } from '../UserAvatar'
 export default function ProfileCard({ userId }: { userId: string }) {
   const pubkey = useMemo(() => userIdToPubkey(userId), [userId])
   const { profile } = useFetchProfile(userId)
-  const { username, about } = profile || {}
+  const { username, about, emojis } = profile || {}
 
   return (
     <div className="w-full flex flex-col gap-2 not-prose">
@@ -24,6 +24,7 @@ export default function ProfileCard({ userId }: { userId: string }) {
       {about && (
         <ProfileAbout
           about={about}
+          emojis={emojis}
           className="text-sm text-wrap break-words w-full overflow-hidden text-ellipsis line-clamp-6"
         />
       )}

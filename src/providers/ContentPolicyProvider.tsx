@@ -16,6 +16,9 @@ type TContentPolicyContext = {
   autoLoadMedia: boolean
   mediaAutoLoadPolicy: TMediaAutoLoadPolicy
   setMediaAutoLoadPolicy: (policy: TMediaAutoLoadPolicy) => void
+
+  faviconUrlTemplate: string
+  setFaviconUrlTemplate: (template: string) => void
 }
 
 const ContentPolicyContext = createContext<TContentPolicyContext | undefined>(undefined)
@@ -35,6 +38,7 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     storage.getHideContentMentioningMutedUsers()
   )
   const [mediaAutoLoadPolicy, setMediaAutoLoadPolicy] = useState(storage.getMediaAutoLoadPolicy())
+  const [faviconUrlTemplate, setFaviconUrlTemplate] = useState(storage.getFaviconUrlTemplate())
   const [connectionType, setConnectionType] = useState((navigator as any).connection?.type)
 
   useEffect(() => {
@@ -83,6 +87,11 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setMediaAutoLoadPolicy(policy)
   }
 
+  const updateFaviconUrlTemplate = (template: string) => {
+    storage.setFaviconUrlTemplate(template)
+    setFaviconUrlTemplate(template)
+  }
+
   return (
     <ContentPolicyContext.Provider
       value={{
@@ -94,7 +103,9 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
         setHideContentMentioningMutedUsers: updateHideContentMentioningMutedUsers,
         autoLoadMedia,
         mediaAutoLoadPolicy,
-        setMediaAutoLoadPolicy: updateMediaAutoLoadPolicy
+        setMediaAutoLoadPolicy: updateMediaAutoLoadPolicy,
+        faviconUrlTemplate,
+        setFaviconUrlTemplate: updateFaviconUrlTemplate
       }}
     >
       {children}

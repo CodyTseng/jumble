@@ -7,15 +7,36 @@ import UserAvatar from '../UserAvatar'
 
 export default function ParentNotePreview({
   eventId,
+  externalContent,
   className,
   onClick
 }: {
-  eventId: string
+  eventId?: string
+  externalContent?: string
   className?: string
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
 }) {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(eventId)
+
+  if (externalContent) {
+    return (
+      <div
+        className={cn(
+          'flex gap-1 items-center text-sm rounded-full px-2 bg-muted w-fit max-w-full text-muted-foreground hover:text-foreground cursor-pointer',
+          className
+        )}
+        onClick={onClick}
+      >
+        <div className="shrink-0">{t('reply to')}</div>
+        <div className="truncate">{externalContent}</div>
+      </div>
+    )
+  }
+
+  if (!eventId) {
+    return null
+  }
 
   if (isFetching) {
     return (

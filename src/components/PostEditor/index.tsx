@@ -22,13 +22,13 @@ import Title from './Title'
 
 export default function PostEditor({
   defaultContent = '',
-  parentEvent,
+  parentStuff,
   open,
   setOpen,
   openFrom
 }: {
   defaultContent?: string
-  parentEvent?: Event
+  parentStuff?: Event | string
   open: boolean
   setOpen: Dispatch<boolean>
   openFrom?: string[]
@@ -39,7 +39,7 @@ export default function PostEditor({
     return (
       <PostContent
         defaultContent={defaultContent}
-        parentEvent={parentEvent}
+        parentStuff={parentStuff}
         close={() => setOpen(false)}
         openFrom={openFrom}
       />
@@ -64,7 +64,7 @@ export default function PostEditor({
             <div className="space-y-4 px-2 py-6">
               <SheetHeader>
                 <SheetTitle className="text-start">
-                  <Title parentEvent={parentEvent} />
+                  <Title parentStuff={parentStuff} />
                 </SheetTitle>
                 <SheetDescription className="hidden" />
               </SheetHeader>
@@ -92,7 +92,7 @@ export default function PostEditor({
           <div className="space-y-4 px-2 py-6">
             <DialogHeader>
               <DialogTitle>
-                <Title parentEvent={parentEvent} />
+                <Title parentStuff={parentStuff} />
               </DialogTitle>
               <DialogDescription className="hidden" />
             </DialogHeader>

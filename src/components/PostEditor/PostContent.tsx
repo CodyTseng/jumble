@@ -24,15 +24,16 @@ import PostOptions from './PostOptions'
 import PostRelaySelector from './PostRelaySelector'
 import PostTextarea, { TPostTextareaHandle } from './PostTextarea'
 import Uploader from './Uploader'
+import { BIG_RELAY_URLS } from '@/constants'
 
 export default function PostContent({
   defaultContent = '',
-  parentEvent,
+  parentStuff,
   close,
   openFrom
 }: {
   defaultContent?: string
-  parentEvent?: Event
+  parentStuff?: Event | string
   close: () => void
   openFrom?: string[]
 }) {
@@ -45,6 +46,10 @@ export default function PostContent({
   const [uploadProgresses, setUploadProgresses] = useState<
     { file: File; progress: number; cancel: () => void }[]
   >([])
+  const parentEvent = useMemo(
+    () => (parentStuff && typeof parentStuff !== 'string' ? parentStuff : undefined),
+    [parentStuff]
+  )
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [addClientTag, setAddClientTag] = useState(false)
   const [mentions, setMentions] = useState<string[]>([])
@@ -85,7 +90,7 @@ export default function PostContent({
       isFirstRender.current = false
       const cachedSettings = postEditorCache.getPostSettingsCache({
         defaultContent,
-        parentEvent
+        parentStuff
       })
       if (cachedSettings) {
         setIsNsfw(cachedSettings.isNsfw ?? false)
@@ -103,7 +108,7 @@ export default function PostContent({
       return
     }
     postEditorCache.setPostSettingsCache(
-      { defaultContent, parentEvent },
+      { defaultContent, parentStuff },
       {
         isNsfw,
         isPoll,
@@ -111,7 +116,7 @@ export default function PostContent({
         addClientTag
       }
     )
-  }, [defaultContent, parentEvent, isNsfw, isPoll, pollCreateData, addClientTag])
+  }, [defaultContent, parentStuff, isNsfw, isPoll, pollCreateData, addClientTag])
 
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
@@ -121,8 +126,9 @@ export default function PostContent({
       setPosting(true)
       try {
         const draftEvent =
-          parentEvent && parentEvent.kind !== kinds.ShortTextNote
-            ? await createCommentDraftEvent(text, parentEvent, mentions, {
+          parentStuff &&
+          (typeof parentStuff === 'string' || parentStuff.kind !== kinds.ShortTextNote)
+            ? await createCommentDraftEvent(text, parentStuff, mentions, {
                 addClientTag,
                 protectedEvent: isProtectedEvent,
                 isNsfw
@@ -139,12 +145,17 @@ export default function PostContent({
                   isNsfw
                 })
 
+        const _additionalRelayUrls = [...additionalRelayUrls]
+        if (parentStuff && typeof parentStuff === 'string') {
+          _additionalRelayUrls.push(...BIG_RELAY_URLS)
+        }
+
         const newEvent = await publish(draftEvent, {
           specifiedRelayUrls: isProtectedEvent ? additionalRelayUrls : undefined,
-          additionalRelayUrls: isPoll ? pollCreateData.relays : additionalRelayUrls,
+          additionalRelayUrls: isPoll ? pollCreateData.relays : _additionalRelayUrls,
           minPow
         })
-        postEditorCache.clearPostCache({ defaultContent, parentEvent })
+        postEditorCache.clearPostCache({ defaultContent, parentStuff })
         deleteDraftEventCache(draftEvent)
         addReplies([newEvent])
         close()
@@ -166,7 +177,7 @@ export default function PostContent({
   }
 
   const handlePollToggle = () => {
-    if (parentEvent) return
+    if (parentStuff) return
 
     setIsPoll((prev) => !prev)
   }
@@ -199,7 +210,7 @@ export default function PostContent({
         text={text}
         setText={setText}
         defaultContent={defaultContent}
-        parentEvent={parentEvent}
+        parentStuff={parentStuff}
         onSubmit={() => post()}
         className={isPoll ? 'min-h-20' : 'min-h-52'}
         onUploadStart={handleUploadStart}
@@ -278,7 +289,7 @@ export default function PostContent({
               </Button>
             </EmojiPickerDialog>
           )}
-          {!parentEvent && (
+          {!parentStuff && (
             <Button
               variant="ghost"
               size="icon"
@@ -317,7 +328,7 @@ export default function PostContent({
             </Button>
             <Button type="submit" disabled={!canPost} onClick={post}>
               {posting && <LoaderCircle className="animate-spin" />}
-              {parentEvent ? t('Reply') : t('Post')}
+              {parentStuff ? t('Reply') : t('Post')}
             </Button>
           </div>
         </div>
@@ -345,7 +356,7 @@ export default function PostContent({
         </Button>
         <Button className="w-full" type="submit" disabled={!canPost} onClick={post}>
           {posting && <LoaderCircle className="animate-spin" />}
-          {parentEvent ? t('Reply') : t('Post')}
+          {parentStuff ? t('Reply') : t('Post')}
         </Button>
       </div>
     </div>

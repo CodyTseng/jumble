@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { isProtectedEvent } from '@/lib/event'
 import { simplifyUrl } from '@/lib/url'
@@ -67,7 +68,7 @@ export default function PostRelaySelector({
     if (postTargetItems.length === 1) {
       const item = postTargetItems[0]
       if (item.type === 'writeRelays') {
-        return t('Write relays')
+        return t('Optimal relays')
       }
       if (item.type === 'relay') {
         return simplifyUrl(item.url)
@@ -89,7 +90,7 @@ export default function PostRelaySelector({
       return count
     }, 0)
     if (hasWriteRelays) {
-      return t('Write relays and {{count}} other relays', { count: relayCount })
+      return t('Optimal relays and {{count}} other relays', { count: relayCount })
     }
     return t('{{count}} relays', { count: relayCount })
   }, [postTargetItems])
@@ -207,7 +208,7 @@ export default function PostRelaySelector({
     return (
       <>
         <div className="flex items-center gap-2">
-          {t('Post to')}
+          <Label>{t('Post to')}</Label>
           <Button
             variant="outline"
             className="px-2 flex-1 max-w-fit justify-start"
@@ -234,7 +235,7 @@ export default function PostRelaySelector({
   return (
     <DropdownMenu>
       <div className="flex items-center gap-2">
-        {t('Post to')}
+        <Label>{t('Post to')}</Label>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="px-2 flex-1 max-w-fit justify-start">
             <div className="truncate">{description}</div>

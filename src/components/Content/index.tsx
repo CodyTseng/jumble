@@ -28,6 +28,7 @@ import ExternalLink from '../ExternalLink'
 import ImageGallery from '../ImageGallery'
 import MediaPlayer from '../MediaPlayer'
 import WebPreview from '../WebPreview'
+import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
 
 export default function Content({
@@ -149,6 +150,16 @@ export default function Content({
         if (node.type === 'youtube') {
           return (
             <YoutubeEmbeddedPlayer
+              key={index}
+              url={node.data}
+              className="mt-2"
+              mustLoad={mustLoadMedia}
+            />
+          )
+        }
+        if (node.type === 'x-post') {
+          return (
+            <XEmbeddedPost
               key={index}
               url={node.data}
               className="mt-2"

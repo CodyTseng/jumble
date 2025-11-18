@@ -1,3 +1,4 @@
+import { useStuff } from '@/hooks/useStuff'
 import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -12,21 +13,21 @@ import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 
-export default function ReplyButton({ event }: { event: Event }) {
+export default function ReplyButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { pubkey, checkLogin } = useNostr()
+  const { event, stuffKey } = useStuff(stuff)
   const { repliesMap } = useReply()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { replyCount, hasReplied } = useMemo(() => {
-    const key = getEventKey(event)
     const hasReplied = pubkey
-      ? repliesMap.get(key)?.events.some((evt) => evt.pubkey === pubkey)
+      ? repliesMap.get(stuffKey)?.events.some((evt) => evt.pubkey === pubkey)
       : false
 
     let replyCount = 0
-    const replies = [...(repliesMap.get(key)?.events || [])]
+    const replies = [...(repliesMap.get(stuffKey)?.events || [])]
     while (replies.length > 0) {
       const reply = replies.pop()
       if (!reply) break
@@ -48,7 +49,7 @@ export default function ReplyButton({ event }: { event: Event }) {
     }
 
     return { replyCount, hasReplied }
-  }, [repliesMap, event, hideUntrustedInteractions])
+  }, [repliesMap, event, stuffKey, hideUntrustedInteractions])
   const [open, setOpen] = useState(false)
 
   return (
@@ -69,7 +70,7 @@ export default function ReplyButton({ event }: { event: Event }) {
         <MessageCircle />
         {!!replyCount && <div className="text-sm">{formatCount(replyCount)}</div>}
       </button>
-      <PostEditor parentEvent={event} open={open} setOpen={setOpen} />
+      <PostEditor parentStuff={stuff} open={open} setOpen={setOpen} />
     </>
   )
 }
