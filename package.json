@@ -25,6 +25,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@getalby/bitcoin-connect-react": "^3.10.0",
+    "@getalby/lightning-tools": "^6.0.0",
     "@noble/ciphers": "^2.0.1",
     "@noble/hashes": "^1.6.1",
     "@radix-ui/react-alert-dialog": "^1.1.4",
