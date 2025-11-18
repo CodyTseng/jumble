@@ -77,27 +77,14 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
       ) : (
         <div className="px-4 pt-3 space-y-4">
-          <div className="flex items-center gap-2">
-            <Button className="bg-foreground hover:bg-foreground/90" onClick={() => push(toRizful())}>
-              {t('Start with a Rizful Vault')}
-            </Button>
-            <Button
-              variant="link"
-              className="text-muted-foreground hover:text-foreground px-0"
-              onClick={() => {
-                launchModal()
-              }}
-            >
-              {t('or other wallets')}
-            </Button>
-          </div>
-          <div className="pt-4 border-t">
+          <div>
             <div className="flex items-center gap-1">
               <Button
-                className="bg-foreground hover:bg-foreground/90"
+                className="bg-foreground hover:bg-foreground/90 flex items-center gap-2"
                 onClick={() => push(toSparkTest())}
               >
-                {sparkConnecting ? 'Setting up...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
+                <img src="/spark-logo.svg" alt="Spark" className="w-5 h-5" />
+                {sparkConnecting ? 'Setting up Spark...' : sparkConnected ? 'Open Spark Wallet ✓' : 'Try Breez SDK + Spark'}
               </Button>
               <Button
                 variant="link"
@@ -115,6 +102,22 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   ? 'Your Spark wallet is ready'
                   : 'Experimental Spark wallet integration'}
             </p>
+          </div>
+          <div className="pt-4 border-t">
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" onClick={() => push(toRizful())}>
+                {t('Start with a Rizful Vault')}
+              </Button>
+              <Button
+                variant="link"
+                className="text-muted-foreground hover:text-foreground px-0"
+                onClick={() => {
+                  launchModal()
+                }}
+              >
+                {t('or other wallets')}
+              </Button>
+            </div>
           </div>
         </div>
       )}
