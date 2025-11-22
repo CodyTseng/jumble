@@ -45,7 +45,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true
       },
       devOptions: {
-        enabled: true
+        enabled: false
       },
       manifest: {
         name: 'Jumble',
