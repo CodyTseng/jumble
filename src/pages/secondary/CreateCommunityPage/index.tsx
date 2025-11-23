@@ -82,6 +82,7 @@ function GithubPagesInstructions() {
     nostrJson?: any
     faviconUrl?: string
     error?: string
+    details?: string
   } | null>(null)
 
   const handleCopyText = (text: string) => {
@@ -128,14 +129,25 @@ function GithubPagesInstructions() {
       const nostrJsonResponse = await fetch(nostrJsonUrl)
       let nostrJson = null
       let nostrJsonOk = false
+      let nostrJsonError = ''
 
       if (nostrJsonResponse.ok) {
         try {
-          nostrJson = await nostrJsonResponse.json()
-          nostrJsonOk = !!nostrJson.names
-        } catch {
-          nostrJsonOk = false
+          const text = await nostrJsonResponse.text()
+          nostrJson = JSON.parse(text)
+
+          if (!nostrJson.names) {
+            nostrJsonError = 'File is missing the "names" property'
+          } else if (Object.keys(nostrJson.names).length === 0) {
+            nostrJsonError = 'The "names" object is empty. Add at least one member.'
+          } else {
+            nostrJsonOk = true
+          }
+        } catch (e) {
+          nostrJsonError = 'Invalid JSON format: ' + (e as Error).message
         }
+      } else {
+        nostrJsonError = `HTTP ${nostrJsonResponse.status}: File not accessible at ${nostrJsonUrl}`
       }
 
       if (faviconUrl && nostrJsonOk) {
@@ -152,7 +164,9 @@ function GithubPagesInstructions() {
 
         setVerificationResult({
           success: false,
-          error: `Could not access: ${errors.join(', ')}`
+          error: `Could not access: ${errors.join(', ')}`,
+          details: nostrJsonError,
+          faviconUrl: faviconUrl || undefined // Show favicon even if nostr.json fails
         })
       }
     } catch (error) {
@@ -434,11 +448,40 @@ function GithubPagesInstructions() {
                     </AlertDescription>
                   </Alert>
 
+                  {/* Show detailed error */}
+                  {verificationResult.details && (
+                    <div className="p-4 border border-yellow-500/50 bg-yellow-500/10 rounded-lg">
+                      <p className="text-sm font-medium mb-2 text-yellow-700 dark:text-yellow-400">{t('Details:')}</p>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-300">{verificationResult.details}</p>
+                    </div>
+                  )}
+
+                  {/* Display favicon if found, even with errors */}
+                  {verificationResult.faviconUrl && (
+                    <div className="space-y-2">
+                      <Label className="text-green-600 dark:text-green-400">✓ {t('Favicon Found')}</Label>
+                      <div className="flex items-center gap-3 p-3 border border-green-500/50 bg-green-500/10 rounded-lg">
+                        <img
+                          src={verificationResult.faviconUrl}
+                          alt="Community favicon"
+                          className="w-8 h-8"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {t('Favicon is accessible')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
                     <p className="text-sm font-medium">{t('Troubleshooting tips:')}</p>
                     <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
                       <li>{t('Make sure GitHub Pages is enabled and deployed')}</li>
                       <li>{t('Check that your files are in the correct location')}</li>
+                      <li>{t('Ensure nostr.json has valid JSON with a "names" object')}</li>
                       <li>{t('Wait a few minutes for GitHub Pages to update')}</li>
                       <li>{t('Verify your domain is spelled correctly')}</li>
                       <li>{t('Review the setup steps above')}</li>
