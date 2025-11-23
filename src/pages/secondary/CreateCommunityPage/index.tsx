@@ -247,13 +247,6 @@ function GithubPagesInstructions() {
             </div>
           </div>
 
-          <Alert className="border-yellow-500/50 bg-yellow-500/10">
-            <Info className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-              <strong>{t('Important')}:</strong> {t('You must add a .nojekyll file to the root of your repository. GitHub Pages uses Jekyll by default, which ignores directories starting with a dot (like .well-known). Create an empty file named .nojekyll to disable Jekyll processing.')}
-            </AlertDescription>
-          </Alert>
-
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label>{t('nostr.json Template')}</Label>
@@ -310,11 +303,42 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 4: Enable GitHub Pages */}
+      {/* Step 4: Add .nojekyll File */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">4</span>
+            <CardTitle className="text-lg">{t('Add .nojekyll File')}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="border-yellow-500/50 bg-yellow-500/10">
+            <Info className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+              <strong>{t('Critical Step')}:</strong> {t('GitHub Pages uses Jekyll by default, which ignores directories starting with a dot (like .well-known). You must disable Jekyll to make your community accessible.')}
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-3">
+            <Label className="text-base">{t('How to add .nojekyll file:')}</Label>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+              <li>{t('Go to your repository on GitHub')}</li>
+              <li>{t('Click "Add file" → "Create new file"')}</li>
+              <li>
+                {t('In the file name box, type')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">.nojekyll</code>
+              </li>
+              <li>{t('Leave the file content empty (no text needed)')}</li>
+              <li>{t('Click "Commit changes" at the bottom')}</li>
+            </ol>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step 5: Enable GitHub Pages */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">5</span>
             <CardTitle className="text-lg">{t('Enable GitHub Pages')}</CardTitle>
           </div>
         </CardHeader>
@@ -330,11 +354,11 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 5: Custom Domain (Optional) */}
+      {/* Step 6: Custom Domain (Optional) */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">5</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">6</span>
             <CardTitle className="text-lg">{t('Custom Domain (Optional)')}</CardTitle>
           </div>
         </CardHeader>
@@ -369,11 +393,11 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 6: Verify Setup */}
+      {/* Step 7: Verify Setup */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">6</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">7</span>
             <CardTitle className="text-lg">{t('Verify Your Setup')}</CardTitle>
           </div>
         </CardHeader>
