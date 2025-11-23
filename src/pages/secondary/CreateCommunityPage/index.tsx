@@ -102,31 +102,43 @@ function GithubPagesInstructions() {
       // Clean the domain (remove protocol if present)
       const cleanDomain = verifyDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
-      // Test favicon
-      const faviconUrl = `https://${cleanDomain}/favicon.ico`
+      // Try multiple favicon formats
+      const faviconFormats = ['favicon.svg', 'favicon.png', 'favicon.ico', 'apple-touch-icon.png']
+      const faviconUrls = faviconFormats.map(format => `https://${cleanDomain}/${format}`)
 
       // Test nostr.json
       const nostrJsonUrl = `https://${cleanDomain}/.well-known/nostr.json`
 
-      const [faviconResponse, nostrJsonResponse] = await Promise.allSettled([
-        fetch(faviconUrl, { method: 'HEAD' }),
-        fetch(nostrJsonUrl)
-      ])
+      // Fetch all favicon formats in parallel
+      const faviconResponses = await Promise.allSettled(
+        faviconUrls.map(url => fetch(url, { method: 'HEAD' }))
+      )
 
-      const faviconOk = faviconResponse.status === 'fulfilled' && faviconResponse.value.ok
+      // Find first successful favicon
+      let faviconUrl = null
+      for (let i = 0; i < faviconResponses.length; i++) {
+        const response = faviconResponses[i]
+        if (response.status === 'fulfilled' && response.value.ok) {
+          faviconUrl = faviconUrls[i]
+          break
+        }
+      }
+
+      // Fetch nostr.json
+      const nostrJsonResponse = await fetch(nostrJsonUrl)
       let nostrJson = null
       let nostrJsonOk = false
 
-      if (nostrJsonResponse.status === 'fulfilled' && nostrJsonResponse.value.ok) {
+      if (nostrJsonResponse.ok) {
         try {
-          nostrJson = await nostrJsonResponse.value.json()
+          nostrJson = await nostrJsonResponse.json()
           nostrJsonOk = !!nostrJson.names
         } catch {
           nostrJsonOk = false
         }
       }
 
-      if (faviconOk && nostrJsonOk) {
+      if (faviconUrl && nostrJsonOk) {
         setVerificationResult({
           success: true,
           nostrJson,
@@ -135,7 +147,7 @@ function GithubPagesInstructions() {
         toast(t('Verification successful!'))
       } else {
         const errors = []
-        if (!faviconOk) errors.push('favicon.ico')
+        if (!faviconUrl) errors.push('favicon (tried: svg, png, ico)')
         if (!nostrJsonOk) errors.push('.well-known/nostr.json')
 
         setVerificationResult({
@@ -216,7 +228,7 @@ function GithubPagesInstructions() {
               <div>your-repo/</div>
               <div className="ml-4">├── .well-known/</div>
               <div className="ml-8">│   └── nostr.json</div>
-              <div className="ml-4">└── favicon.ico</div>
+              <div className="ml-4">└── favicon.png (or .svg, .ico)</div>
             </div>
           </div>
 
@@ -261,11 +273,14 @@ function GithubPagesInstructions() {
           <Alert>
             <ImageIcon className="h-4 w-4" />
             <AlertDescription>
-              {t('Add a favicon.ico file to the root of your repository. This will be used as your community icon.')}
+              {t('Add a favicon file to the root of your repository. This will be used as your community icon.')}
             </AlertDescription>
           </Alert>
 
           <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('Supported formats')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.svg</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.png</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.ico</code>
+            </p>
             <p className="text-sm text-muted-foreground">
               {t('You can create a favicon using online tools like')} <a href="https://favicon.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">favicon.io</a>
             </p>
