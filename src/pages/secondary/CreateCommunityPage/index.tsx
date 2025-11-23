@@ -450,9 +450,21 @@ function GithubPagesInstructions() {
 
                   {/* Show detailed error */}
                   {verificationResult.details && (
-                    <div className="p-4 border border-yellow-500/50 bg-yellow-500/10 rounded-lg">
-                      <p className="text-sm font-medium mb-2 text-yellow-700 dark:text-yellow-400">{t('Details:')}</p>
+                    <div className="p-4 border border-yellow-500/50 bg-yellow-500/10 rounded-lg space-y-2">
+                      <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">{t('Details:')}</p>
                       <p className="text-sm text-yellow-600 dark:text-yellow-300">{verificationResult.details}</p>
+                      {verificationResult.details.includes('HTTP') && (
+                        <div className="pt-2">
+                          <a
+                            href={`https://${verifyDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/.well-known/nostr.json`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            {t('Open nostr.json in new tab to debug')} →
+                          </a>
+                        </div>
+                      )}
                     </div>
                   )}
 
