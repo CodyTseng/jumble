@@ -1,6 +1,6 @@
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { TPageRef } from '@/types'
-import { Users } from 'lucide-react'
+import { Users, PlusCircle } from 'lucide-react'
 import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFeed } from '@/providers/FeedProvider'
@@ -13,6 +13,7 @@ import { useSecondaryPage } from '@/PageManager'
 import ProfileAbout from '@/components/ProfileAbout'
 import Nip05 from '@/components/Nip05'
 import nip05CommunityService from '@/services/nip05-community.service'
+import { Button } from '@/components/ui/button'
 
 const MyCommunityPage = forwardRef((_, ref) => {
   const layoutRef = useRef<TPageRef>(null)
@@ -34,11 +35,24 @@ export default MyCommunityPage
 
 function MyCommunityPageTitlebar() {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
+  const { checkLogin } = useNostr()
 
   return (
-    <div className="flex gap-2 items-center h-full pl-3">
-      <Users />
-      <div className="text-lg font-semibold">{t('My Community')}</div>
+    <div className="flex gap-2 items-center justify-between h-full pl-3 pr-3 w-full">
+      <div className="flex gap-2 items-center">
+        <Users />
+        <div className="text-lg font-semibold">{t('My Community')}</div>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => checkLogin(() => push('/communities/create'))}
+        className="gap-2 text-base font-semibold"
+      >
+        <PlusCircle className="w-4 h-4" />
+        {t('Create')}
+      </Button>
     </div>
   )
 }

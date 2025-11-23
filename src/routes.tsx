@@ -2,6 +2,7 @@ import { match } from 'path-to-regexp'
 import { isValidElement } from 'react'
 import AppearanceSettingsPage from './pages/secondary/AppearanceSettingsPage'
 import BookmarkPage from './pages/secondary/BookmarkPage'
+import CreateCommunityPage from './pages/secondary/CreateCommunityPage'
 import FollowingListPage from './pages/secondary/FollowingListPage'
 import GeneralSettingsPage from './pages/secondary/GeneralSettingsPage'
 import MuteListPage from './pages/secondary/MuteListPage'
@@ -31,6 +32,7 @@ const ROUTES = [
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
+  { path: '/communities/create', element: <CreateCommunityPage /> },
   { path: '/communities/:domain', element: <Nip05CommunityPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/settings', element: <SettingsPage /> },
