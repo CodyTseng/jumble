@@ -75,12 +75,82 @@ export default CreateCommunityPage
 
 function GithubPagesInstructions() {
   const { t } = useTranslation()
-  const [domain, setDomain] = useState('')
-  const [githubRepo, setGithubRepo] = useState('')
+  const [verifyDomain, setVerifyDomain] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<{
+    success: boolean
+    nostrJson?: any
+    faviconUrl?: string
+    error?: string
+  } | null>(null)
 
   const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text)
     toast(t('Copied to clipboard'))
+  }
+
+  const handleVerify = async () => {
+    if (!verifyDomain) {
+      toast(t('Please enter a domain to verify'))
+      return
+    }
+
+    setIsVerifying(true)
+    setVerificationResult(null)
+
+    try {
+      // Clean the domain (remove protocol if present)
+      const cleanDomain = verifyDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')
+
+      // Test favicon
+      const faviconUrl = `https://${cleanDomain}/favicon.ico`
+
+      // Test nostr.json
+      const nostrJsonUrl = `https://${cleanDomain}/.well-known/nostr.json`
+
+      const [faviconResponse, nostrJsonResponse] = await Promise.allSettled([
+        fetch(faviconUrl, { method: 'HEAD' }),
+        fetch(nostrJsonUrl)
+      ])
+
+      const faviconOk = faviconResponse.status === 'fulfilled' && faviconResponse.value.ok
+      let nostrJson = null
+      let nostrJsonOk = false
+
+      if (nostrJsonResponse.status === 'fulfilled' && nostrJsonResponse.value.ok) {
+        try {
+          nostrJson = await nostrJsonResponse.value.json()
+          nostrJsonOk = !!nostrJson.names
+        } catch {
+          nostrJsonOk = false
+        }
+      }
+
+      if (faviconOk && nostrJsonOk) {
+        setVerificationResult({
+          success: true,
+          nostrJson,
+          faviconUrl
+        })
+        toast(t('Verification successful!'))
+      } else {
+        const errors = []
+        if (!faviconOk) errors.push('favicon.ico')
+        if (!nostrJsonOk) errors.push('.well-known/nostr.json')
+
+        setVerificationResult({
+          success: false,
+          error: `Could not access: ${errors.join(', ')}`
+        })
+      }
+    } catch (error) {
+      setVerificationResult({
+        success: false,
+        error: 'Failed to verify domain. Please check the domain and try again.'
+      })
+    } finally {
+      setIsVerifying(false)
+    }
   }
 
   return (
@@ -94,34 +164,17 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              {t('Create a new GitHub repository for your community. The repository name will become part of your domain.')}
-            </p>
-            <div className="space-y-2">
-              <Label htmlFor="github-repo">{t('GitHub Repository Name')}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="github-repo"
-                  placeholder="my-community"
-                  value={githubRepo}
-                  onChange={(e) => setGithubRepo(e.target.value)}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => window.open('https://github.com/new', '_blank')}
-                >
-                  <Github className="w-4 h-4" />
-                </Button>
-              </div>
-              {githubRepo && (
-                <p className="text-xs text-muted-foreground">
-                  {t('Your domain will be')}: <code className="bg-muted px-1 py-0.5 rounded">{githubRepo}.github.io</code>
-                </p>
-              )}
-            </div>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            {t('Create a new GitHub repository for your community. The repository name will become part of your domain (e.g., "my-community" becomes "my-community.github.io").')}
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => window.open('https://github.com/new', '_blank')}
+          >
+            <Github className="w-4 h-4 mr-2" />
+            {t('Create New Repository on GitHub')}
+          </Button>
         </CardContent>
       </Card>
 
@@ -141,8 +194,24 @@ function GithubPagesInstructions() {
             </AlertDescription>
           </Alert>
 
+          <div className="space-y-3">
+            <Label className="text-base">{t('How to create the .well-known directory on GitHub:')}</Label>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+              <li>{t('Go to your repository on GitHub')}</li>
+              <li>{t('Click "Add file" → "Create new file"')}</li>
+              <li>
+                {t('In the file name box, type')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">.well-known/nostr.json</code>
+                <div className="text-xs mt-1 ml-6 text-muted-foreground/80">
+                  {t('GitHub will automatically create the .well-known directory when you include the / in the filename')}
+                </div>
+              </li>
+              <li>{t('Paste the nostr.json content below into the file editor')}</li>
+              <li>{t('Click "Commit changes" at the bottom')}</li>
+            </ol>
+          </div>
+
           <div className="space-y-2">
-            <Label>{t('File Structure')}</Label>
+            <Label>{t('Expected File Structure')}</Label>
             <div className="bg-muted p-4 rounded-lg space-y-2 font-mono text-xs">
               <div>your-repo/</div>
               <div className="ml-4">├── .well-known/</div>
@@ -213,23 +282,14 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ol className="list-decimal list-inside space-y-2 text-sm">
+          <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
             <li>{t('Go to your repository settings on GitHub')}</li>
-            <li>{t('Scroll down to the "Pages" section')}</li>
+            <li>{t('Scroll down to the "Pages" section in the left sidebar')}</li>
             <li>{t('Under "Source", select the branch you want to deploy (usually "main" or "master")')}</li>
             <li>{t('Click "Save"')}</li>
             <li>{t('Wait a few minutes for GitHub to deploy your site')}</li>
+            <li>{t('Your community will be available at: your-username.github.io/your-repo-name')}</li>
           </ol>
-
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => githubRepo && window.open(`https://github.com/${githubRepo}/settings/pages`, '_blank')}
-            disabled={!githubRepo}
-          >
-            <Github className="w-4 h-4 mr-2" />
-            {t('Open GitHub Pages Settings')}
-          </Button>
         </CardContent>
       </Card>
 
@@ -242,18 +302,137 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="custom-domain">{t('Custom Domain')}</Label>
-            <Input
-              id="custom-domain"
-              placeholder="community.example.com"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('If you have a custom domain, you can configure it in GitHub Pages settings. Add a CNAME record pointing to')}: <code className="bg-muted px-1 py-0.5 rounded">&lt;username&gt;.github.io</code>
+          <p className="text-sm text-muted-foreground">
+            {t('If you own a custom domain, you can use it instead of the default github.io domain.')}
+          </p>
+          <div className="space-y-3">
+            <Label className="text-base">{t('How to set up a custom domain:')}</Label>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+              <li>{t('In your repository\'s GitHub Pages settings, enter your custom domain (e.g., community.example.com)')}</li>
+              <li>
+                {t('Add a CNAME record in your domain\'s DNS settings pointing to')}:
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs ml-1">&lt;username&gt;.github.io</code>
+              </li>
+              <li>{t('Wait for DNS propagation (this can take up to 24-48 hours)')}</li>
+              <li>{t('Enable "Enforce HTTPS" in GitHub Pages settings once the domain is verified')}</li>
+            </ol>
+            <p className="text-sm text-muted-foreground mt-3">
+              {t('For more detailed instructions, see GitHub\'s official documentation on')}{' '}
+              <a
+                href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages#using-an-apex-domain-for-your-github-pages-site"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                {t('setting up custom domains')}
+              </a>
+              .
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Step 6: Verify Setup */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">6</span>
+            <CardTitle className="text-lg">{t('Verify Your Setup')}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {t('Test your community setup by entering your domain. We\'ll check if your files are accessible.')}
+          </p>
+
+          <div className="space-y-2">
+            <Label htmlFor="verify-domain">{t('Your Domain')}</Label>
+            <div className="flex gap-2">
+              <Input
+                id="verify-domain"
+                placeholder="my-community.github.io or community.example.com"
+                value={verifyDomain}
+                onChange={(e) => setVerifyDomain(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
+              />
+              <Button onClick={handleVerify} disabled={isVerifying || !verifyDomain}>
+                {isVerifying ? t('Verifying...') : t('Verify')}
+              </Button>
+            </div>
+          </div>
+
+          {verificationResult && (
+            <div className="mt-4">
+              {verificationResult.success ? (
+                <div className="space-y-4">
+                  <Alert className="border-green-500/50 bg-green-500/10">
+                    <Info className="h-4 w-4 text-green-500" />
+                    <AlertDescription className="text-green-700 dark:text-green-400">
+                      <strong>{t('Success!')}:</strong> {t('Your community is set up correctly!')}
+                    </AlertDescription>
+                  </Alert>
+
+                  {/* Display Favicon */}
+                  {verificationResult.faviconUrl && (
+                    <div className="space-y-2">
+                      <Label>{t('Favicon')}</Label>
+                      <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
+                        <img
+                          src={verificationResult.faviconUrl}
+                          alt="Community favicon"
+                          className="w-8 h-8"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {t('Favicon found and accessible')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Display nostr.json */}
+                  {verificationResult.nostrJson && (
+                    <div className="space-y-2">
+                      <Label>{t('Community Members')}</Label>
+                      <div className="p-3 border rounded-lg bg-muted/50">
+                        <div className="text-sm space-y-1">
+                          {Object.entries(verificationResult.nostrJson.names || {}).map(([name, pubkey]) => (
+                            <div key={name} className="flex items-center gap-2">
+                              <span className="font-medium">{name}</span>
+                              <span className="text-muted-foreground">→</span>
+                              <code className="text-xs text-muted-foreground">{String(pubkey).slice(0, 16)}...</code>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Alert className="border-destructive/50 bg-destructive/10">
+                    <Info className="h-4 w-4 text-destructive" />
+                    <AlertDescription className="text-destructive">
+                      <strong>{t('Error')}:</strong> {verificationResult.error}
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
+                    <p className="text-sm font-medium">{t('Troubleshooting tips:')}</p>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                      <li>{t('Make sure GitHub Pages is enabled and deployed')}</li>
+                      <li>{t('Check that your files are in the correct location')}</li>
+                      <li>{t('Wait a few minutes for GitHub Pages to update')}</li>
+                      <li>{t('Verify your domain is spelled correctly')}</li>
+                      <li>{t('Review the setup steps above')}</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
