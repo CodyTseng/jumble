@@ -242,9 +242,17 @@ function GithubPagesInstructions() {
               <div>your-repo/</div>
               <div className="ml-4">├── .well-known/</div>
               <div className="ml-8">│   └── nostr.json</div>
+              <div className="ml-4">├── .nojekyll</div>
               <div className="ml-4">└── favicon.png (or .svg, .ico)</div>
             </div>
           </div>
+
+          <Alert className="border-yellow-500/50 bg-yellow-500/10">
+            <Info className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+              <strong>{t('Important')}:</strong> {t('You must add a .nojekyll file to the root of your repository. GitHub Pages uses Jekyll by default, which ignores directories starting with a dot (like .well-known). Create an empty file named .nojekyll to disable Jekyll processing.')}
+            </AlertDescription>
+          </Alert>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
