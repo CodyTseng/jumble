@@ -784,8 +784,8 @@ function buildPTag(pubkey: string, upperCase: boolean = false) {
   return [upperCase ? 'P' : 'p', pubkey]
 }
 
-function buildQTag(eventHexId: string) {
-  return trimTagEnd(['q', eventHexId, client.getEventHint(eventHexId)]) // TODO: pubkey
+function buildQTag(eventHexId: string, pubkey?: string) {
+  return trimTagEnd(['q', eventHexId, client.getEventHint(eventHexId), pubkey])
 }
 
 function buildReplaceableQTag(coordinate: string) {
