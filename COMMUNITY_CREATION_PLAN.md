@@ -46,67 +46,81 @@
 
 ---
 
-## Next Session: Manage Members Tab 🚧
+## ✅ Session 2 Complete: Manage Members Tab Redesign (Nov 24, 2025)
 
-### Current State
-The Manage Members tab has basic functionality but needs significant improvements:
-- ✅ Manual pubkey input (64-char hex validation)
-- ✅ nostr.json generation with copy/download
-- ✅ Member list display with remove functionality
-- ❌ **No username lookup** - users must paste pubkeys manually
-- ❌ **No profile preview** - can't verify before adding
-- ❌ **No npub support** - only accepts hex pubkeys
+### Implemented Features - Intake Form Design
 
-### Required Features for Next Session
+#### **Section 1: User Search & Selection** ✅
+- ✅ Search box supporting:
+  - Username search (uses `useSearchProfiles` hook)
+  - npub/nprofile input (auto-decodes)
+  - Hex pubkey input (64-char validation)
+  - NIP-05 identifier search
+- ✅ Live search results dropdown with user profiles
+- ✅ Click to add users to member table
+- ✅ Duplicate detection prevents adding same user twice
+- ✅ Auto-conversion from npub → hex pubkey
 
-#### 1. Username/Pubkey Lookup
-**Goal:** Allow searching for users by username/NIP-05 and automatically get their pubkey
+#### **Section 2: Member Intake Table** ✅
+- ✅ Table with columns: Username | Alias | Public Key | Remove
+- ✅ Username: Auto-populated from user's profile
+- ✅ Alias: Editable text field (pre-filled with username)
+- ✅ Public Key: Displays hex pubkey (truncated for readability)
+- ✅ Remove button for each member
+- ✅ Sequential member addition support
 
-**Implementation Plan:**
-- Add search input field for username lookup
-- Use existing `client.service.ts` user search functionality
-  - `userIndex` (FlexSearch) for local search
-  - Or search by NIP-05 identifier
-- Display search results with profile previews
-- Click to add user to member list
+#### **Section 3: Live nostr.json Preview** ✅
+- ✅ Fetches user's existing nostr.json from their NIP-05 domain
+- ✅ Merges existing members with newly added members
+- ✅ Real-time updates as members are added/removed
+- ✅ Shows complete JSON structure ready to deploy
+- ✅ Copy & Download buttons for easy export
 
-**Components to leverage:**
-- `/src/services/client.service.ts` - `searchUser()` method
-- `/src/hooks/useFetchProfile.ts` - Profile fetching
-- `/src/components/UserAvatar` - Avatar display
-- `/src/components/ProfileAbout` - Profile info display
+### Technical Implementation
 
-#### 2. Profile Preview Before Adding
-**Goal:** Show user's profile info before confirming addition
+**New Components:**
+- `MemberSearchInput` - Reusable search component with dropdown
+  - Integrates `useSearchProfiles` hook
+  - Handles npub/hex detection and conversion
+  - Shows `UserItem` components in results
 
-**Features:**
-- Display avatar, username, NIP-05, about
-- Preview what the NIP-05 identifier will be (username@domain)
-- Confirm button to add to list
+**Key Features:**
+- Debounced search (500ms delay)
+- Focus/blur state management for dropdown
+- Keyboard support (Enter to add direct npub/hex)
+- Toast notifications for feedback
+- Responsive table layout
 
-#### 3. npub Support
-**Goal:** Accept both hex pubkeys and npub addresses
+**Data Flow:**
+1. User searches → `useSearchProfiles` fetches from local + remote relays
+2. Click user → `userIdToPubkey` converts to hex → adds to members array
+3. Edit alias → updates members array → regenerates JSON
+4. Generate JSON → merges existing + new members → displays live preview
 
-**Implementation:**
-- Add npub to hex conversion using existing `/src/lib/pubkey.ts`
-- Auto-detect format and convert
-- Display both formats for user confirmation
+### Files Modified
+- `/src/pages/secondary/CreateCommunityPage/index.tsx`
+  - Completely redesigned `ManageMembersSection`
+  - Added `MemberSearchInput` component
+  - Removed manual pubkey input fields
+  - Added table-based member management
+  - Added existing nostr.json fetching
 
-#### 4. Enhanced Member Management UI
-**Features to add:**
-- Edit member username after adding
-- Bulk import from CSV/text
-- Duplicate detection
-- Member count display
-- Search/filter within added members
+### Code Quality
+- ✅ No TypeScript errors in CreateCommunityPage
+- ✅ Proper imports (removed unused)
+- ✅ Clean state management with React hooks
+- ✅ Reuses existing components (`UserItem`, `useSearchProfiles`)
+- ✅ Follows existing codebase patterns
 
-#### 5. Integration with User's Profile
-**Goal:** Auto-suggest logged-in user as admin
+---
 
-**Implementation:**
-- Pre-populate first member with current user's pubkey
-- Use `useNostr()` hook to get current user's profile
-- Suggest username from profile.username
+## Future Enhancements (Optional)
+
+### Deferred Features:
+1. **Bulk Import** - CSV/text file import for multiple members
+2. **Member Search** - Filter/search within added members table
+3. **Username Validation** - Check for conflicts in alias names
+4. **Profile Preview Modal** - Detailed profile view before adding
 
 ---
 

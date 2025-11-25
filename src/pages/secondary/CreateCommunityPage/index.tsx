@@ -1,10 +1,9 @@
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { forwardRef, useState } from 'react'
+import { forwardRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -13,15 +12,18 @@ import {
   Github,
   Copy,
   Download,
-  FileJson,
   Image as ImageIcon,
   Info,
-  Plus,
   Trash2,
-  Clock
+  Clock,
+  Search
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNostr } from '@/providers/NostrProvider'
+import { useSearchProfiles } from '@/hooks/useSearchProfiles'
+import { userIdToPubkey } from '@/lib/pubkey'
+import { nip19 } from 'nostr-tools'
+import UserItem from '@/components/UserItem'
 
 const CreateCommunityPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
@@ -549,34 +551,179 @@ function GithubPagesInstructions() {
   )
 }
 
+function MemberSearchInput({
+  searchInput,
+  setSearchInput,
+  debouncedSearch,
+  isSearching,
+  setIsSearching,
+  onSelectUser
+}: {
+  searchInput: string
+  setSearchInput: (input: string) => void
+  debouncedSearch: string
+  isSearching: boolean
+  setIsSearching: (searching: boolean) => void
+  onSelectUser: (userId: string, profile: any) => void
+}) {
+  const { t } = useTranslation()
+  const { profiles, isFetching } = useSearchProfiles(debouncedSearch, 10)
+  const [displayList, setDisplayList] = useState(false)
+
+  useEffect(() => {
+    setDisplayList(isSearching && !!searchInput)
+  }, [isSearching, searchInput])
+
+  const handleSelectProfile = (profile: any) => {
+    onSelectUser(profile.npub, profile)
+    setSearchInput('')
+    setDisplayList(false)
+  }
+
+  // Handle direct npub/hex input
+  const handleDirectInput = () => {
+    const trimmed = searchInput.trim()
+
+    // Check if it's a valid hex pubkey
+    if (/^[0-9a-f]{64}$/.test(trimmed)) {
+      onSelectUser(trimmed, { username: 'user', pubkey: trimmed })
+      return
+    }
+
+    // Try to decode npub/nprofile
+    try {
+      let id = trimmed
+      if (id.startsWith('nostr:')) {
+        id = id.slice(6)
+      }
+      const { type } = nip19.decode(id)
+      if (['nprofile', 'npub'].includes(type)) {
+        onSelectUser(id, { username: 'user' })
+        return
+      }
+    } catch {
+      // Not a valid identifier
+    }
+  }
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder={t('Search by name, npub, or NIP-05...')}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onFocus={() => setIsSearching(true)}
+          onBlur={() => setTimeout(() => setIsSearching(false), 200)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleDirectInput()
+            }
+          }}
+          className="pl-10"
+        />
+      </div>
+
+      {displayList && (debouncedSearch || profiles.length > 0) && (
+        <div className="absolute top-full mt-1 w-full bg-surface-background border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+          {isFetching && profiles.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              {t('Searching...')}
+            </div>
+          ) : profiles.length > 0 ? (
+            <div className="p-2">
+              {profiles.map((profile) => (
+                <div
+                  key={profile.pubkey}
+                  className="hover:bg-accent rounded-md cursor-pointer"
+                  onClick={() => handleSelectProfile(profile)}
+                >
+                  <UserItem
+                    userId={profile.npub}
+                    className="pointer-events-none"
+                    hideFollowButton
+                    showFollowingBadge
+                  />
+                </div>
+              ))}
+            </div>
+          ) : debouncedSearch ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              {t('No users found. Try entering a full npub or hex pubkey and press Enter.')}
+            </div>
+          ) : null}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ManageMembersSection() {
   const { t } = useTranslation()
-  const { pubkey } = useNostr()
-  const [members, setMembers] = useState<Array<{ name: string; pubkey: string }>>([
-    { name: 'admin', pubkey: pubkey || '' }
-  ])
-  const [newMemberName, setNewMemberName] = useState('')
-  const [newMemberPubkey, setNewMemberPubkey] = useState('')
+  const { profile } = useNostr()
+  const [members, setMembers] = useState<Array<{ username: string; alias: string; pubkey: string }>>([])
+  const [existingNostrJson, setExistingNostrJson] = useState<any>(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
 
-  const handleAddMember = () => {
-    if (!newMemberName || !newMemberPubkey) {
-      toast(t('Both name and pubkey are required'), {
-        description: t('Error')
-      })
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchInput)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [searchInput])
+
+  // Fetch current user's existing nostr.json if they have a NIP-05
+  useEffect(() => {
+    const fetchExistingNostrJson = async () => {
+      if (!profile?.nip05) return
+
+      try {
+        const [, domain] = profile.nip05.split('@')
+        if (!domain) return
+
+        const response = await fetch(`https://${domain}/.well-known/nostr.json`)
+        if (response.ok) {
+          const json = await response.json()
+          setExistingNostrJson(json)
+        }
+      } catch (error) {
+        // Silently fail - user may not have a nostr.json yet
+      }
+    }
+
+    fetchExistingNostrJson()
+  }, [profile])
+
+  const handleAddMember = (userId: string, userProfile: any) => {
+    const hexPubkey = userIdToPubkey(userId)
+
+    // Check for duplicates
+    if (members.some(m => m.pubkey === hexPubkey)) {
+      toast(t('This user is already in the member list'))
       return
     }
 
-    if (!newMemberPubkey.match(/^[0-9a-f]{64}$/)) {
-      toast(t('Invalid pubkey format. Must be 64 character hex string.'), {
-        description: t('Error')
-      })
-      return
-    }
+    const username = userProfile?.username || userProfile?.name || 'user'
 
-    setMembers([...members, { name: newMemberName, pubkey: newMemberPubkey }])
-    setNewMemberName('')
-    setNewMemberPubkey('')
+    setMembers([...members, {
+      username,
+      alias: username,
+      pubkey: hexPubkey
+    }])
+
+    setSearchInput('')
     toast(t('Member added successfully'))
+  }
+
+  const handleUpdateAlias = (index: number, newAlias: string) => {
+    const updated = [...members]
+    updated[index].alias = newAlias
+    setMembers(updated)
   }
 
   const handleRemoveMember = (index: number) => {
@@ -586,9 +733,17 @@ function ManageMembersSection() {
 
   const generateNostrJson = () => {
     const names: Record<string, string> = {}
+
+    // Merge existing names if available
+    if (existingNostrJson?.names) {
+      Object.assign(names, existingNostrJson.names)
+    }
+
+    // Add new members
     members.forEach(member => {
-      names[member.name] = member.pubkey
+      names[member.alias] = member.pubkey
     })
+
     return JSON.stringify({ names }, null, 2)
   }
 
@@ -604,89 +759,90 @@ function ManageMembersSection() {
 
   return (
     <div className="space-y-6">
-      {/* Add New Member */}
+      {/* User Search Intake */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('Add Community Member')}</CardTitle>
+          <CardTitle className="text-lg">{t('Add Community Members')}</CardTitle>
           <CardDescription>
-            {t('Add members to your community by providing their username and pubkey')}
+            {t('Search for users by name, npub, or NIP-05 identifier')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="member-name">{t('Username')}</Label>
-            <Input
-              id="member-name"
-              placeholder="alice"
-              value={newMemberName}
-              onChange={(e) => setNewMemberName(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('This will be the user\'s NIP-05 identifier')}: {newMemberName}@yourdomain.com
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="member-pubkey">{t('Public Key (hex)')}</Label>
-            <Textarea
-              id="member-pubkey"
-              placeholder="npub1... or hex pubkey"
-              value={newMemberPubkey}
-              onChange={(e) => setNewMemberPubkey(e.target.value)}
-              className="font-mono text-xs"
-              rows={2}
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('64 character hex public key')}
-            </p>
-          </div>
-
-          <Button onClick={handleAddMember} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            {t('Add Member')}
-          </Button>
+          <MemberSearchInput
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            debouncedSearch={debouncedSearch}
+            isSearching={isSearching}
+            setIsSearching={setIsSearching}
+            onSelectUser={handleAddMember}
+          />
         </CardContent>
       </Card>
 
-      {/* Current Members */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">{t('Current Members')} ({members.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {members.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium">{member.name}</div>
-                  <div className="text-xs text-muted-foreground font-mono truncate">
-                    {member.pubkey}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveMember(index)}
-                  disabled={index === 0} // Can't remove admin (first member)
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Member Intake Table */}
+      {members.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t('Members to Add')} ({members.length})</CardTitle>
+            <CardDescription>
+              {t('Review and edit member aliases before generating nostr.json')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left p-3 text-sm font-medium">{t('Username')}</th>
+                    <th className="text-left p-3 text-sm font-medium">{t('Alias')}</th>
+                    <th className="text-left p-3 text-sm font-medium">{t('Public Key')}</th>
+                    <th className="w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((member, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="p-3 text-sm">{member.username}</td>
+                      <td className="p-3">
+                        <Input
+                          value={member.alias}
+                          onChange={(e) => handleUpdateAlias(index, e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                      </td>
+                      <td className="p-3 text-xs font-mono text-muted-foreground truncate max-w-[200px]">
+                        {member.pubkey}
+                      </td>
+                      <td className="p-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveMember(index)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Generated nostr.json */}
+      {/* Live nostr.json Preview */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{t('Generated nostr.json')}</CardTitle>
+          <CardTitle className="text-lg">{t('Live nostr.json Preview')}</CardTitle>
           <CardDescription>
-            {t('Copy or download this file to .well-known/nostr.json in your repository')}
+            {existingNostrJson
+              ? t('Your existing nostr.json merged with new members')
+              : t('Generated nostr.json file - copy or download to .well-known/nostr.json')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+          <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto max-h-96">
             {generateNostrJson()}
           </pre>
           <div className="flex gap-2">
