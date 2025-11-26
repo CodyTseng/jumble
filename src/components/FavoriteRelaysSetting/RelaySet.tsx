@@ -1,14 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import {
+  ResponsiveMenu,
+  ResponsiveMenuContent,
+  ResponsiveMenuItem,
+  ResponsiveMenuTrigger
+} from '@/components/ui/responsive-menu'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TRelaySet } from '@/types'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -24,7 +22,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import DrawerMenuItem from '../DrawerMenuItem'
 import RelayUrls from './RelayUrl'
 import { useRelaySetsSettingComponent } from './provider'
 
@@ -139,15 +136,8 @@ function RelayUrlsExpandToggle({
 
 function RelaySetOptions({ relaySet }: { relaySet: TRelaySet }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
   const { deleteRelaySet } = useFavoriteRelays()
   const { setRenamingRelaySetId } = useRelaySetsSettingComponent()
-
-  const trigger = (
-    <Button variant="ghost" size="icon">
-      <EllipsisVertical />
-    </Button>
-  )
 
   const rename = () => {
     setRenamingRelaySetId(relaySet.id)
@@ -159,53 +149,30 @@ function RelaySetOptions({ relaySet }: { relaySet: TRelaySet }) {
     )
   }
 
-  if (isSmallScreen) {
-    return (
-      <Drawer>
-        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent>
-          <div className="py-2">
-            <DrawerMenuItem onClick={rename}>
-              <Edit />
-              {t('Rename')}
-            </DrawerMenuItem>
-            <DrawerMenuItem onClick={copyShareLink}>
-              <Link />
-              {t('Copy share link')}
-            </DrawerMenuItem>
-            <DrawerMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={() => deleteRelaySet(relaySet.id)}
-            >
-              <Trash2 />
-              {t('Delete')}
-            </DrawerMenuItem>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={rename}>
+    <ResponsiveMenu>
+      <ResponsiveMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <EllipsisVertical />
+        </Button>
+      </ResponsiveMenuTrigger>
+      <ResponsiveMenuContent>
+        <ResponsiveMenuItem onClick={rename}>
           <Edit />
           {t('Rename')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={copyShareLink}>
+        </ResponsiveMenuItem>
+        <ResponsiveMenuItem onClick={copyShareLink}>
           <Link />
           {t('Copy share link')}
-        </DropdownMenuItem>
-        <DropdownMenuItem
+        </ResponsiveMenuItem>
+        <ResponsiveMenuItem
           className="text-destructive focus:text-destructive"
           onClick={() => deleteRelaySet(relaySet.id)}
         >
           <Trash2 />
           {t('Delete')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </ResponsiveMenuItem>
+      </ResponsiveMenuContent>
+    </ResponsiveMenu>
   )
 }

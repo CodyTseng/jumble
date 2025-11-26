@@ -1,21 +1,17 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
+import {
+  ResponsiveMenu,
+  ResponsiveMenuCheckboxItem,
+  ResponsiveMenuContent,
+  ResponsiveMenuSeparator,
+  ResponsiveMenuTrigger
+} from '@/components/ui/responsive-menu'
 import { isProtectedEvent } from '@/lib/event'
 import { simplifyUrl } from '@/lib/url'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
-import { Check } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -47,8 +43,6 @@ export default function PostRelaySelector({
   setAdditionalRelayUrls: Dispatch<SetStateAction<string[]>>
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { relayUrls } = useCurrentRelays()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const [postTargetItems, setPostTargetItems] = useState<TPostTargetItem[]>([])
@@ -79,8 +73,10 @@ export default function PostRelaySelector({
           : simplifyUrl(item.urls[0])
       }
     }
-    const hasWriteRelays = postTargetItems.some((item) => item.type === 'writeRelays')
-    const relayCount = postTargetItems.reduce((count, item) => {
+    const hasWriteRelays = postTargetItems.some(
+      (item: TPostTargetItem) => item.type === 'writeRelays'
+    )
+    const relayCount = postTargetItems.reduce((count: number, item: TPostTargetItem) => {
       if (item.type === 'relay') {
         return count + 1
       }
@@ -93,7 +89,7 @@ export default function PostRelaySelector({
       return t('Optimal relays and {{count}} other relays', { count: relayCount })
     }
     return t('{{count}} relays', { count: relayCount })
-  }, [postTargetItems])
+  }, [postTargetItems, t])
 
   useEffect(() => {
     if (openFrom && openFrom.length) {
@@ -108,8 +104,10 @@ export default function PostRelaySelector({
   }, [openFrom, parentEventSeenOnRelays])
 
   useEffect(() => {
-    const isProtectedEvent = postTargetItems.every((item) => item.type !== 'writeRelays')
-    const relayUrls = postTargetItems.flatMap((item) => {
+    const isProtected = postTargetItems.every(
+      (item: TPostTargetItem) => item.type !== 'writeRelays'
+    )
+    const relayUrls = postTargetItems.flatMap((item: TPostTargetItem) => {
       if (item.type === 'relay') {
         return [item.url]
       }
@@ -119,24 +117,26 @@ export default function PostRelaySelector({
       return []
     })
 
-    setIsProtectedEvent(isProtectedEvent)
+    setIsProtectedEvent(isProtected)
     setAdditionalRelayUrls(relayUrls)
-  }, [postTargetItems])
+  }, [postTargetItems, setIsProtectedEvent, setAdditionalRelayUrls])
 
   const handleWriteRelaysCheckedChange = useCallback((checked: boolean) => {
     if (checked) {
-      setPostTargetItems((prev) => [...prev, { type: 'writeRelays' }])
+      setPostTargetItems((prev: TPostTargetItem[]) => [...prev, { type: 'writeRelays' }])
     } else {
-      setPostTargetItems((prev) => prev.filter((item) => item.type !== 'writeRelays'))
+      setPostTargetItems((prev: TPostTargetItem[]) =>
+        prev.filter((item: TPostTargetItem) => item.type !== 'writeRelays')
+      )
     }
   }, [])
 
   const handleRelayCheckedChange = useCallback((checked: boolean, url: string) => {
     if (checked) {
-      setPostTargetItems((prev) => [...prev, { type: 'relay', url }])
+      setPostTargetItems((prev: TPostTargetItem[]) => [...prev, { type: 'relay', url }])
     } else {
-      setPostTargetItems((prev) =>
-        prev.filter((item) => !(item.type === 'relay' && item.url === url))
+      setPostTargetItems((prev: TPostTargetItem[]) =>
+        prev.filter((item: TPostTargetItem) => !(item.type === 'relay' && item.url === url))
       )
     }
   }, [])
@@ -144,152 +144,74 @@ export default function PostRelaySelector({
   const handleRelaySetCheckedChange = useCallback(
     (checked: boolean, id: string, urls: string[]) => {
       if (checked) {
-        setPostTargetItems((prev) => [...prev, { type: 'relaySet', id, urls }])
+        setPostTargetItems((prev: TPostTargetItem[]) => [...prev, { type: 'relaySet', id, urls }])
       } else {
-        setPostTargetItems((prev) =>
-          prev.filter((item) => !(item.type === 'relaySet' && item.id === id))
+        setPostTargetItems((prev: TPostTargetItem[]) =>
+          prev.filter((item: TPostTargetItem) => !(item.type === 'relaySet' && item.id === id))
         )
       }
     },
     []
   )
 
-  const content = useMemo(() => {
-    return (
-      <>
-        <MenuItem
-          checked={postTargetItems.some((item) => item.type === 'writeRelays')}
+  return (
+    <ResponsiveMenu>
+      <ResponsiveMenuTrigger asChild>
+        <div className="flex items-center gap-2 w-fit">
+          <Label>{t('Post to')}</Label>
+          <Button variant="outline" className="px-2 flex-1 max-w-fit justify-start">
+            <div className="truncate">{description}</div>
+          </Button>
+        </div>
+      </ResponsiveMenuTrigger>
+
+      <ResponsiveMenuContent align="start" className="max-w-96" showScrollButtons>
+        <ResponsiveMenuCheckboxItem
+          checked={postTargetItems.some((item: TPostTargetItem) => item.type === 'writeRelays')}
           onCheckedChange={handleWriteRelaysCheckedChange}
         >
           {t('Write relays')}
-        </MenuItem>
+        </ResponsiveMenuCheckboxItem>
         {relaySets.length > 0 && (
           <>
-            <MenuSeparator />
+            <ResponsiveMenuSeparator />
             {relaySets
               .filter(({ relayUrls }) => relayUrls.length)
               .map(({ id, name, relayUrls }) => (
-                <MenuItem
+                <ResponsiveMenuCheckboxItem
                   key={id}
                   checked={postTargetItems.some(
-                    (item) => item.type === 'relaySet' && item.id === id
+                    (item: TPostTargetItem) => item.type === 'relaySet' && item.id === id
                   )}
                   onCheckedChange={(checked) => handleRelaySetCheckedChange(checked, id, relayUrls)}
                 >
                   <div className="truncate">
                     {name} ({relayUrls.length})
                   </div>
-                </MenuItem>
+                </ResponsiveMenuCheckboxItem>
               ))}
           </>
         )}
         {selectableRelays.length > 0 && (
           <>
-            <MenuSeparator />
+            <ResponsiveMenuSeparator />
             {selectableRelays.map((url) => (
-              <MenuItem
+              <ResponsiveMenuCheckboxItem
                 key={url}
-                checked={postTargetItems.some((item) => item.type === 'relay' && item.url === url)}
+                checked={postTargetItems.some(
+                  (item: TPostTargetItem) => item.type === 'relay' && item.url === url
+                )}
                 onCheckedChange={(checked) => handleRelayCheckedChange(checked, url)}
               >
                 <div className="flex items-center gap-2">
                   <RelayIcon url={url} />
                   <div className="truncate">{simplifyUrl(url)}</div>
                 </div>
-              </MenuItem>
+              </ResponsiveMenuCheckboxItem>
             ))}
           </>
         )}
-      </>
-    )
-  }, [postTargetItems, relaySets, selectableRelays])
-
-  if (isSmallScreen) {
-    return (
-      <>
-        <div className="flex items-center gap-2">
-          <Label>{t('Post to')}</Label>
-          <Button
-            variant="outline"
-            className="px-2 flex-1 max-w-fit justify-start"
-            onClick={() => setIsDrawerOpen(true)}
-          >
-            <div className="truncate">{description}</div>
-          </Button>
-        </div>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent className="max-h-[80vh]" hideOverlay>
-            <div
-              className="overflow-y-auto overscroll-contain py-2"
-              style={{ touchAction: 'pan-y' }}
-            >
-              {content}
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </>
-    )
-  }
-
-  return (
-    <DropdownMenu>
-      <div className="flex items-center gap-2">
-        <Label>{t('Post to')}</Label>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="px-2 flex-1 max-w-fit justify-start">
-            <div className="truncate">{description}</div>
-          </Button>
-        </DropdownMenuTrigger>
-      </div>
-      <DropdownMenuContent align="start" className="max-w-96 max-h-[50vh]" showScrollButtons>
-        {content}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
-function MenuSeparator() {
-  const { isSmallScreen } = useScreenSize()
-  if (isSmallScreen) {
-    return <Separator />
-  }
-  return <DropdownMenuSeparator />
-}
-
-function MenuItem({
-  children,
-  checked,
-  onCheckedChange
-}: {
-  children: React.ReactNode
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
-}) {
-  const { isSmallScreen } = useScreenSize()
-
-  if (isSmallScreen) {
-    return (
-      <div
-        onClick={() => onCheckedChange(!checked)}
-        className="flex items-center gap-2 px-4 py-3 clickable"
-      >
-        <div className="flex items-center justify-center size-4 shrink-0">
-          {checked && <Check className="size-4" />}
-        </div>
-        {children}
-      </div>
-    )
-  }
-
-  return (
-    <DropdownMenuCheckboxItem
-      checked={checked}
-      onSelect={(e) => e.preventDefault()}
-      onCheckedChange={onCheckedChange}
-      className="flex items-center gap-2"
-    >
-      {children}
-    </DropdownMenuCheckboxItem>
+      </ResponsiveMenuContent>
+    </ResponsiveMenu>
   )
 }

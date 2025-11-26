@@ -1,19 +1,15 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
+  ResponsiveMenu,
+  ResponsiveMenuCheckboxItem,
+  ResponsiveMenuContent,
+  ResponsiveMenuTrigger
+} from '@/components/ui/responsive-menu'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
-import { Check } from 'lucide-react'
 import { Event, nip19 } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
@@ -30,8 +26,6 @@ export default function Mentions({
   parentEvent?: Event
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { pubkey } = useNostr()
   const { mutePubkeySet } = useMuteList()
   const [potentialMentions, setPotentialMentions] = useState<string[]>([])
@@ -64,69 +58,11 @@ export default function Mentions({
   useEffect(() => {
     const newMentions = potentialMentions.filter((pubkey) => !removedPubkeys.includes(pubkey))
     setMentions(newMentions)
-  }, [potentialMentions, removedPubkeys])
-
-  const items = useMemo(() => {
-    return potentialMentions.map((_, index) => {
-      const pubkey = potentialMentions[potentialMentions.length - 1 - index]
-      const isParentPubkey = pubkey === parentEventPubkey
-      return (
-        <MenuItem
-          key={`${pubkey}-${index}`}
-          checked={isParentPubkey ? true : mentions.includes(pubkey)}
-          onCheckedChange={(checked) => {
-            if (isParentPubkey) {
-              return
-            }
-            if (checked) {
-              setRemovedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
-            } else {
-              setRemovedPubkeys((pubkeys) => [...pubkeys, pubkey])
-            }
-          }}
-          disabled={isParentPubkey}
-        >
-          <SimpleUserAvatar userId={pubkey} size="small" />
-          <SimpleUsername
-            userId={pubkey}
-            className="font-semibold text-sm truncate"
-            skeletonClassName="h-3"
-          />
-        </MenuItem>
-      )
-    })
-  }, [potentialMentions, parentEventPubkey, mentions])
-
-  if (isSmallScreen) {
-    return (
-      <>
-        <Button
-          className="px-3"
-          variant="ghost"
-          disabled={potentialMentions.length === 0}
-          onClick={() => setIsDrawerOpen(true)}
-        >
-          {t('Mentions')}{' '}
-          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
-        </Button>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent className="max-h-[80vh]" hideOverlay>
-            <div
-              className="overflow-y-auto overscroll-contain py-2"
-              style={{ touchAction: 'pan-y' }}
-            >
-              {items}
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </>
-    )
-  }
+  }, [potentialMentions, removedPubkeys, setMentions])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <ResponsiveMenu>
+      <ResponsiveMenuTrigger asChild>
         <Button
           className="px-3"
           variant="ghost"
@@ -136,57 +72,38 @@ export default function Mentions({
           {t('Mentions')}{' '}
           {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-w-96 max-h-[50vh]" showScrollButtons>
-        {items}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
-function MenuItem({
-  children,
-  checked,
-  disabled,
-  onCheckedChange
-}: {
-  children: React.ReactNode
-  checked: boolean
-  disabled?: boolean
-  onCheckedChange: (checked: boolean) => void
-}) {
-  const { isSmallScreen } = useScreenSize()
-
-  if (isSmallScreen) {
-    return (
-      <div
-        onClick={() => {
-          if (disabled) return
-          onCheckedChange(!checked)
-        }}
-        className={cn(
-          'flex items-center gap-2 px-4 py-3 clickable',
-          disabled ? 'opacity-50 pointer-events-none' : ''
-        )}
-      >
-        <div className="flex items-center justify-center size-4 shrink-0">
-          {checked && <Check className="size-4" />}
-        </div>
-        {children}
-      </div>
-    )
-  }
-
-  return (
-    <DropdownMenuCheckboxItem
-      checked={checked}
-      disabled={disabled}
-      onSelect={(e) => e.preventDefault()}
-      onCheckedChange={onCheckedChange}
-      className="flex items-center gap-2"
-    >
-      {children}
-    </DropdownMenuCheckboxItem>
+      </ResponsiveMenuTrigger>
+      <ResponsiveMenuContent align="start" className="max-w-96" showScrollButtons>
+        {potentialMentions.map((_, index) => {
+          const pubkey = potentialMentions[potentialMentions.length - 1 - index]
+          const isParentPubkey = pubkey === parentEventPubkey
+          return (
+            <ResponsiveMenuCheckboxItem
+              key={`${pubkey}-${index}`}
+              checked={isParentPubkey ? true : mentions.includes(pubkey)}
+              onCheckedChange={(checked) => {
+                if (isParentPubkey) {
+                  return
+                }
+                if (checked) {
+                  setRemovedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
+                } else {
+                  setRemovedPubkeys((pubkeys) => [...pubkeys, pubkey])
+                }
+              }}
+              disabled={isParentPubkey}
+            >
+              <SimpleUserAvatar userId={pubkey} size="small" />
+              <SimpleUsername
+                userId={pubkey}
+                className="font-semibold text-sm truncate"
+                skeletonClassName="h-3"
+              />
+            </ResponsiveMenuCheckboxItem>
+          )
+        })}
+      </ResponsiveMenuContent>
+    </ResponsiveMenu>
   )
 }
 

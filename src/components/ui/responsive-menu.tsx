@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from '@/components/ui/drawer'
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -13,7 +14,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Check } from 'lucide-react'
 import * as React from 'react'
 
 // ============================================================================
@@ -262,6 +263,61 @@ export function ResponsiveMenuItem({
     >
       {children}
     </DropdownMenuItem>
+  )
+}
+
+// ============================================================================
+// CheckboxItem Component
+// ============================================================================
+
+interface ResponsiveMenuCheckboxItemProps {
+  children: React.ReactNode
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+  className?: string
+  disabled?: boolean
+}
+
+export function ResponsiveMenuCheckboxItem({
+  children,
+  checked,
+  onCheckedChange,
+  className,
+  disabled
+}: ResponsiveMenuCheckboxItemProps) {
+  const { isSmallScreen } = useResponsiveMenuContext()
+
+  if (isSmallScreen) {
+    return (
+      <div
+        onClick={() => {
+          if (disabled) return
+          onCheckedChange(!checked)
+        }}
+        className={cn(
+          'flex items-center gap-2 px-4 py-3 clickable',
+          disabled && 'opacity-50 pointer-events-none',
+          className
+        )}
+      >
+        <div className="flex items-center justify-center size-4 shrink-0">
+          {checked && <Check className="size-4" />}
+        </div>
+        {children}
+      </div>
+    )
+  }
+
+  return (
+    <DropdownMenuCheckboxItem
+      checked={checked}
+      onSelect={(e) => e.preventDefault()}
+      onCheckedChange={onCheckedChange}
+      disabled={disabled}
+      className={cn('flex items-center gap-2', className)}
+    >
+      {children}
+    </DropdownMenuCheckboxItem>
   )
 }
 
