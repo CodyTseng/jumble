@@ -206,7 +206,7 @@ export function ResponsiveMenuContent({
 
   return (
     <DropdownMenuContent
-      className={className}
+      className={cn('max-h-[50vh]', className)}
       align={align}
       side={side}
       sideOffset={sideOffset}
