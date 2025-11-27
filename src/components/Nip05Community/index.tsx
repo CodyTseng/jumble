@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 import { TNip05Community } from '@/types'
-import { Globe, Users } from 'lucide-react'
+import { Globe, Users, UserPlus, Check } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNip05Communities } from '@/providers/Nip05CommunitiesProvider'
@@ -12,6 +13,10 @@ import { useSecondaryPage } from '@/PageManager'
 import { SimpleUserAvatar } from '../UserAvatar'
 import ProfileAbout from '../ProfileAbout'
 import Nip05 from '../Nip05'
+import { useNostr } from '@/providers/NostrProvider'
+import { createCommunityJoinRequestDraftEvent } from '@/lib/draft-event'
+import { toast } from 'sonner'
+import client from '@/services/client.service'
 
 export default function Nip05Community({ domain }: { domain?: string }) {
   const { t } = useTranslation()
@@ -121,6 +126,7 @@ export default function Nip05Community({ domain }: { domain?: string }) {
               {memberCount || members.length} {t('members')}
             </p>
           </div>
+          <RequestToJoinButton domain={domain} adminPubkey={adminPubkey} />
         </div>
       </div>
 
@@ -285,5 +291,109 @@ function MemberCard({ pubkey, domain }: { pubkey: string; domain: string }) {
         )}
       </div>
     </div>
+  )
+}
+
+function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPubkey: string }) {
+  const { t } = useTranslation()
+  const { account, signer, checkLogin, profile } = useNostr()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasRequested, setHasRequested] = useState(false)
+
+  // Check if user is already a member
+  const userNip05Domain = profile?.nip05?.split('@')[1]
+  const isAlreadyMember = userNip05Domain === domain
+
+  useEffect(() => {
+    // Check if user has already sent a request
+    const checkExistingRequest = async () => {
+      if (!account) return
+
+      try {
+        // Query for existing join request from this user for this domain
+        const events = await client.fetchEvents({
+          kinds: [39457],
+          authors: [account.pubkey],
+          '#d': [domain]
+        })
+
+        if (events && events.length > 0) {
+          setHasRequested(true)
+        }
+      } catch (error) {
+        console.error('Error checking existing request:', error)
+      }
+    }
+
+    checkExistingRequest()
+  }, [account, domain])
+
+  const handleRequestToJoin = async () => {
+    checkLogin(async () => {
+      if (!signer || !account) {
+        toast.error(t('Please login first'))
+        return
+      }
+
+      setIsSubmitting(true)
+      try {
+        // Create the join request draft event
+        const draftEvent = createCommunityJoinRequestDraftEvent(
+          domain,
+          adminPubkey,
+          `I would like to join the ${domain} community`
+        )
+
+        // Sign the event
+        const signedEvent = await signer.signEvent(draftEvent)
+
+        // Publish to admin's write relays and big relays
+        const adminRelayList = await client.fetchRelayList(adminPubkey)
+        const targetRelays = [
+          ...(adminRelayList?.write || []),
+          'wss://relay.damus.io',
+          'wss://relay.primal.net',
+          'wss://nos.lol'
+        ]
+
+        await client.publishEvent(signedEvent, {
+          specifiedRelayUrls: targetRelays
+        })
+
+        setHasRequested(true)
+        toast.success(t('Join request sent!'))
+        toast.info(t('Make sure the admin follows you to see your request'))
+      } catch (error) {
+        console.error('Error sending join request:', error)
+        toast.error(t('Failed to send join request'))
+      } finally {
+        setIsSubmitting(false)
+      }
+    })
+  }
+
+  if (isAlreadyMember) {
+    return (
+      <Button variant="outline" disabled className="gap-2">
+        <Check className="w-4 h-4" />
+        {t('Member')}
+      </Button>
+    )
+  }
+
+  if (hasRequested) {
+    return (
+      <Button variant="outline" disabled className="gap-2">
+        <Check className="w-4 h-4" />
+        {t('Request Sent')}
+      </Button>
+    )
+  }
+
+  return (
+    <Button onClick={handleRequestToJoin} disabled={isSubmitting} className="gap-2">
+      <UserPlus className="w-4 h-4" />
+      {isSubmitting ? t('Sending...') : t('Request to Join')}
+    </Button>
   )
 }

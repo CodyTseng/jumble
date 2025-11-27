@@ -97,6 +97,16 @@ export type TNip05DomainInfo = {
   lastChecked: number // timestamp of last verification check
 }
 
+export type TCommunityJoinRequest = {
+  id: string // event id
+  pubkey: string // requester's pubkey
+  domain: string // target domain (from d-tag)
+  adminPubkey: string // admin who receives the request (from p-tag)
+  message?: string // optional message from requester
+  created_at: number // timestamp of request
+  status?: 'pending' | 'approved' // auto-detected based on nostr.json
+}
+
 export type TConfig = {
   relayGroups: TRelaySet[]
   theme: TThemeSetting

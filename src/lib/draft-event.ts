@@ -743,3 +743,33 @@ function trimTagEnd(tag: string[]) {
 
   return tag.slice(0, endIndex + 1)
 }
+
+/**
+ * Create a community join request event (kind 39457)
+ * This is an addressable event that allows users to request joining a NIP-05 community
+ *
+ * @param domain - The NIP-05 domain community to join (e.g., "nostr.build")
+ * @param adminPubkey - The pubkey of the community admin (first member in nostr.json)
+ * @param message - Optional message to the admin
+ * @returns Draft event for the join request
+ */
+export function createCommunityJoinRequestDraftEvent(
+  domain: string,
+  adminPubkey: string,
+  message?: string
+): TDraftEvent {
+  const content = message || `I would like to join the ${domain} community`
+
+  const tags: string[][] = [
+    ['d', domain], // addressable identifier - one request per domain per user
+    ['p', adminPubkey], // tag the admin who will receive this request
+    ['t', 'community-join-request'], // helpful for filtering
+    ['domain', domain] // explicit domain tag for easier querying
+  ]
+
+  return setDraftEventCache({
+    content,
+    kind: ExtendedKind.COMMUNITY_JOIN_REQUEST,
+    tags
+  })
+}
