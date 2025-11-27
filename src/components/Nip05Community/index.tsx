@@ -175,15 +175,30 @@ function CommunityAvatar({
   icon?: string
   name?: string
 }) {
-  const [faviconError, setFaviconError] = useState(false)
-  const [googleFaviconError, setGoogleFaviconError] = useState(false)
+  const [currentFormatIndex, setCurrentFormatIndex] = useState(0)
+  const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
-  // Try multiple favicon sources in order of preference
-  const faviconUrl = icon || `https://${domain}/favicon.ico`
-  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+  // Try multiple favicon formats in order of preference
+  const faviconFormats = [
+    icon, // Use provided icon first if available
+    `https://${domain}/favicon.svg`,
+    `https://${domain}/favicon.png`,
+    `https://${domain}/favicon.ico`,
+    `https://${domain}/apple-touch-icon.png`,
+    `https://${domain}/android-chrome-192x192.png`,
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+  ].filter(Boolean) // Remove null/undefined values
+
+  const handleError = () => {
+    if (currentFormatIndex < faviconFormats.length - 1) {
+      setCurrentFormatIndex(currentFormatIndex + 1)
+    } else {
+      setAllFormatsExhausted(true)
+    }
+  }
 
   // If all favicon sources fail, show globe
-  if (faviconError && googleFaviconError) {
+  if (allFormatsExhausted) {
     return (
       <div className="flex justify-center items-center w-20 h-20 shrink-0 rounded-full bg-muted">
         <Globe className="size-10 text-muted-foreground" />
@@ -193,19 +208,11 @@ function CommunityAvatar({
 
   return (
     <Avatar className="w-20 h-20 shrink-0">
-      {!faviconError ? (
-        <AvatarImage
-          src={faviconUrl}
-          alt={name || domain}
-          onError={() => setFaviconError(true)}
-        />
-      ) : !googleFaviconError ? (
-        <AvatarImage
-          src={googleFaviconUrl}
-          alt={name || domain}
-          onError={() => setGoogleFaviconError(true)}
-        />
-      ) : null}
+      <AvatarImage
+        src={faviconFormats[currentFormatIndex]}
+        alt={name || domain}
+        onError={handleError}
+      />
       <AvatarFallback>
         <Globe className="size-10" />
       </AvatarFallback>

@@ -75,15 +75,30 @@ export default function Nip05CommunityCard({
 }
 
 function CommunityAvatar({ community }: { community: TNip05Community }) {
-  const [faviconError, setFaviconError] = useState(false)
-  const [googleFaviconError, setGoogleFaviconError] = useState(false)
+  const [currentFormatIndex, setCurrentFormatIndex] = useState(0)
+  const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
-  // Try multiple favicon sources in order of preference
-  const faviconUrl = community.icon || `https://${community.domain}/favicon.ico`
-  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`
+  // Try multiple favicon formats in order of preference
+  const faviconFormats = [
+    community.icon, // Use provided icon first if available
+    `https://${community.domain}/favicon.svg`,
+    `https://${community.domain}/favicon.png`,
+    `https://${community.domain}/favicon.ico`,
+    `https://${community.domain}/apple-touch-icon.png`,
+    `https://${community.domain}/android-chrome-192x192.png`,
+    `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`
+  ].filter(Boolean) // Remove null/undefined values
+
+  const handleError = () => {
+    if (currentFormatIndex < faviconFormats.length - 1) {
+      setCurrentFormatIndex(currentFormatIndex + 1)
+    } else {
+      setAllFormatsExhausted(true)
+    }
+  }
 
   // If all favicon sources fail, show globe
-  if (faviconError && googleFaviconError) {
+  if (allFormatsExhausted) {
     return (
       <div className="flex justify-center items-center w-10 h-10 shrink-0 rounded-full bg-muted">
         <Globe className="size-5 text-muted-foreground" />
@@ -93,19 +108,11 @@ function CommunityAvatar({ community }: { community: TNip05Community }) {
 
   return (
     <Avatar className="w-10 h-10 shrink-0">
-      {!faviconError ? (
-        <AvatarImage
-          src={faviconUrl}
-          alt={community.name || community.domain}
-          onError={() => setFaviconError(true)}
-        />
-      ) : !googleFaviconError ? (
-        <AvatarImage
-          src={googleFaviconUrl}
-          alt={community.name || community.domain}
-          onError={() => setGoogleFaviconError(true)}
-        />
-      ) : null}
+      <AvatarImage
+        src={faviconFormats[currentFormatIndex]}
+        alt={community.name || community.domain}
+        onError={handleError}
+      />
       <AvatarFallback>
         <Globe className="size-5" />
       </AvatarFallback>
