@@ -53,17 +53,17 @@ export default function NormalFeed({
         tabs={[
           { value: 'posts', label: 'Notes' },
           { value: 'postsAndReplies', label: 'Replies' },
-          { value: 'byUser', label: 'By User' }
+          { value: '24h', label: '24h Pulse' }
         ]}
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
         }}
         options={
           <>
-            {!supportTouch && listMode !== 'byUser' && (
+            {!supportTouch && listMode !== '24h' && (
               <RefreshButton onClick={() => noteListRef.current?.refresh()} />
             )}
-            {listMode !== 'byUser' && (
+            {listMode !== '24h' && (
               <KindFilter
                 showKinds={temporaryShowKinds}
                 onShowKindsChange={handleShowKindsChange}
@@ -72,7 +72,7 @@ export default function NormalFeed({
           </>
         }
       />
-      {listMode === 'byUser' ? (
+      {listMode === '24h' ? (
         <UserAggregationList
           feedId={feedId || 'default'}
           showKinds={temporaryShowKinds}
