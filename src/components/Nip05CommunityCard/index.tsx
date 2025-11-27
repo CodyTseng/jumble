@@ -79,13 +79,13 @@ function CommunityAvatar({ community }: { community: TNip05Community }) {
   const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
   // Try multiple favicon formats in order of preference
-  // Try direct domain paths first to catch real favicons before falling back to services
+  // Best practice 2025: Prioritize favicon services to avoid CORS errors
   const faviconFormats = [
     community.icon, // Use provided icon first if available
+    `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`, // Google S2 API (no CORS, fast, cached)
+    `https://icons.duckduckgo.com/ip3/${community.domain}.ico`, // DuckDuckGo fallback
     `https://${community.domain}/favicon.svg`, // Try direct SVG (modern)
-    `https://${community.domain}/favicon.ico`, // Try direct ICO
-    `https://${community.domain}/favicon.png`, // Try PNG
-    `https://icons.duckduckgo.com/ip3/${community.domain}.ico` // DuckDuckGo service as last resort
+    `https://${community.domain}/favicon.ico` // Legacy ICO fallback
   ].filter(Boolean) // Remove null/undefined values
 
   // Reset state when domain changes

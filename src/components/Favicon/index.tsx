@@ -15,12 +15,12 @@ export function Favicon({
   const [currentFormat, setCurrentFormat] = useState(0)
 
   // Try multiple favicon formats in order of preference
-  // Try direct domain paths first to catch real favicons before falling back to services
+  // Best practice 2025: Prioritize favicon services to avoid CORS errors
   const faviconFormats = [
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`, // Google S2 API (no CORS, fast, cached)
+    `https://icons.duckduckgo.com/ip3/${domain}.ico`, // DuckDuckGo fallback
     `https://${domain}/favicon.svg`, // Try direct SVG (modern)
-    `https://${domain}/favicon.ico`, // Try direct ICO
-    `https://${domain}/favicon.png`, // Try PNG
-    `https://icons.duckduckgo.com/ip3/${domain}.ico` // DuckDuckGo service as last resort
+    `https://${domain}/favicon.ico` // Legacy ICO fallback
   ]
 
   if (error) return fallback
