@@ -10,18 +10,18 @@ import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import { UserRound } from 'lucide-react'
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { relayList, pubkey } = useNostr()
+  const { pubkey } = useNostr()
   const [title, setTitle] = useState<React.ReactNode>(null)
   const [controls, setControls] = useState<React.ReactNode>(null)
   const [data, setData] = useState<
     | {
-        type: 'hashtag' | 'search' | 'externalContent'
+        type: 'hashtag' | 'search'
         kinds?: number[]
       }
     | {
@@ -32,6 +32,13 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     | null
   >(null)
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
+
+  const feedId = useMemo(() => {
+    if (data?.type === 'domain') {
+      return `domain-${data.domain}`
+    }
+    return undefined
+  }, [data])
 
   useEffect(() => {
     const init = async () => {
@@ -60,18 +67,6 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
           {
             filter: { search, ...(kinds.length > 0 ? { kinds } : {}) },
             urls: SEARCHABLE_RELAY_URLS
-          }
-        ])
-        return
-      }
-      const externalContentId = searchParams.get('i')
-      if (externalContentId) {
-        setData({ type: 'externalContent' })
-        setTitle(externalContentId)
-        setSubRequests([
-          {
-            filter: { '#I': [externalContentId], ...(kinds.length > 0 ? { kinds } : {}) },
-            urls: BIG_RELAY_URLS.concat(relayList?.write || [])
           }
         ])
         return
@@ -108,17 +103,6 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     }
     init()
   }, [])
-
-  const feedId =
-    data?.type === 'hashtag'
-      ? `hashtag-${new URLSearchParams(window.location.search).get('t')}`
-      : data?.type === 'search'
-        ? `search-${new URLSearchParams(window.location.search).get('s')}`
-        : data?.type === 'externalContent'
-          ? `external-${new URLSearchParams(window.location.search).get('i')}`
-          : data?.type === 'domain'
-            ? `domain-${data.domain}`
-            : 'notes'
 
   let content: React.ReactNode = null
   if (data?.type === 'domain' && subRequests.length === 0) {

@@ -2,12 +2,24 @@ import NormalFeed from '@/components/NormalFeed'
 import { checkAlgoRelay } from '@/lib/relay'
 import { useFeed } from '@/providers/FeedProvider'
 import relayInfoService from '@/services/relay-info.service'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function RelaysFeed() {
   const { feedInfo, relayUrls } = useFeed()
   const [isReady, setIsReady] = useState(false)
   const [areAlgoRelays, setAreAlgoRelays] = useState(false)
+  const feedId = useMemo(() => {
+    if (!feedInfo || !feedInfo.id) {
+      return undefined
+    }
+    if (feedInfo.feedType === 'relay') {
+      return feedInfo.id
+    }
+    if (feedInfo.feedType === 'relays') {
+      return `relays-${feedInfo.id}`
+    }
+    return undefined
+  }, [feedInfo, relayUrls])
 
   useEffect(() => {
     const init = async () => {
@@ -25,13 +37,6 @@ export default function RelaysFeed() {
   if (!feedInfo || (feedInfo.feedType !== 'relay' && feedInfo.feedType !== 'relays')) {
     return null
   }
-
-  const feedId =
-    feedInfo.feedType === 'relay' && feedInfo.id
-      ? feedInfo.id
-      : feedInfo.feedType === 'relays' && feedInfo.id
-        ? `relaySet-${feedInfo.id}`
-        : relayUrls[0] || 'relay'
 
   return (
     <NormalFeed

@@ -13,9 +13,9 @@ import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
-  const feedId = id ? `follow-pack-${id}` : 'follow-pack'
   const { t } = useTranslation()
   const [tab, setTab] = useState<'users' | 'feed'>('users')
+  const feedId = id ? `follow-pack-${id}` : 'follow-pack'
 
   const { event, isFetching } = useFetchEvent(id)
 

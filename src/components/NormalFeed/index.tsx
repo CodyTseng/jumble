@@ -33,6 +33,9 @@ export default function NormalFeed({
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
   const userAggregationListRef = useRef<TUserAggregationListRef>(null)
+  const showKindsFilter = useMemo(() => {
+    return subRequests.every((req) => !req.filter.kinds?.length)
+  }, [subRequests])
 
   const handleListModeChange = (mode: TNoteListMode) => {
     setListMode(mode)
@@ -72,7 +75,12 @@ export default function NormalFeed({
                 }}
               />
             )}
-            <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />
+            {showKindsFilter && (
+              <KindFilter
+                showKinds={temporaryShowKinds}
+                onShowKindsChange={handleShowKindsChange}
+              />
+            )}
           </>
         }
       />
