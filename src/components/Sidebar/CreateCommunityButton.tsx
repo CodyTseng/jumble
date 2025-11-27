@@ -3,7 +3,6 @@ import { useNostr } from '@/providers/NostrProvider'
 import { PlusCircle, Settings } from 'lucide-react'
 import SidebarItem from './SidebarItem'
 import { useFeed } from '@/providers/FeedProvider'
-import { useNip05Communities } from '@/providers/Nip05CommunitiesProvider'
 import { useEffect, useState } from 'react'
 import nip05CommunityService from '@/services/nip05-community.service'
 

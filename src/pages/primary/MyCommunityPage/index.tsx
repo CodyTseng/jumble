@@ -198,7 +198,7 @@ function MyCommunityContent() {
       {adminPubkey && (
         <div className="p-6 border-b">
           <h2 className="text-lg font-semibold mb-4">{t('Community Admin')}</h2>
-          <AdminProfile pubkey={adminPubkey} domain={domain} />
+          <AdminProfile pubkey={adminPubkey} />
         </div>
       )}
 
@@ -219,7 +219,7 @@ function MyCommunityContent() {
   )
 }
 
-function AdminProfile({ pubkey, domain }: { pubkey: string; domain: string }) {
+function AdminProfile({ pubkey }: { pubkey: string }) {
   const { profile, isFetching } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
 

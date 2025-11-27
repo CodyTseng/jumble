@@ -130,17 +130,10 @@ export default function FollowingFavoriteDomainList({
                   throw new Error('Empty nostr.json')
                 }
               } catch (fetchError) {
-                // Fetch failed (CORS, network, etc.), use followed users as fallback
-                // Silently handle - CORS errors are expected for many domains
-                community = {
-                  id: domain,
-                  domain,
-                  members: followedPubkeys,
-                  memberCount: followedPubkeys.length,
-                  lastUpdated: Date.now()
-                }
-                // Save fallback data to cache immediately
-                await nip05CommunityService.addCommunity(community)
+                // Fetch failed (CORS, network, etc.) - drop this community from the list
+                // We don't want to show communities without proper nostr.json
+                console.log('[FollowingDomains] Dropping community (nostr.json fetch failed):', domain)
+                return { domain, community: undefined }
               }
 
               return { domain, community }

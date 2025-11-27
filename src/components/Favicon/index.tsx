@@ -15,12 +15,12 @@ export function Favicon({
   const [currentFormat, setCurrentFormat] = useState(0)
 
   // Try multiple favicon formats in order of preference
+  // Best practice 2025: Prioritize favicon services to avoid CORS errors
   const faviconFormats = [
-    `/favicon.ico`,
-    `/favicon.png`,
-    `/favicon.svg`,
-    `/apple-touch-icon.png`,
-    `/android-chrome-192x192.png`
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`, // Google S2 API (no CORS, fast, cached)
+    `https://icons.duckduckgo.com/ip3/${domain}.ico`, // DuckDuckGo fallback
+    `https://${domain}/favicon.svg`, // Try direct SVG (modern)
+    `https://${domain}/favicon.ico` // Legacy ICO fallback
   ]
 
   if (error) return fallback
@@ -39,7 +39,7 @@ export function Favicon({
     <div className={cn('relative', className)}>
       {loading && <div className={cn('absolute inset-0', className)}>{fallback}</div>}
       <img
-        src={`https://${domain}${faviconFormats[currentFormat]}`}
+        src={faviconFormats[currentFormat]}
         alt={domain}
         className={cn('absolute inset-0', loading && 'opacity-0', className)}
         onError={handleError}

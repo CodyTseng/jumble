@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TNip05Community } from '@/types'
 import { ChevronDown, Globe, Heart } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import UserAvatar from '../UserAvatar'
 import { useFetchProfile } from '@/hooks'
@@ -79,15 +79,20 @@ function CommunityAvatar({ community }: { community: TNip05Community }) {
   const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
   // Try multiple favicon formats in order of preference
+  // Best practice 2025: Prioritize favicon services to avoid CORS errors
   const faviconFormats = [
     community.icon, // Use provided icon first if available
-    `https://${community.domain}/favicon.svg`,
-    `https://${community.domain}/favicon.png`,
-    `https://${community.domain}/favicon.ico`,
-    `https://${community.domain}/apple-touch-icon.png`,
-    `https://${community.domain}/android-chrome-192x192.png`,
-    `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`
+    `https://www.google.com/s2/favicons?domain=${community.domain}&sz=64`, // Google S2 API (no CORS, fast, cached)
+    `https://icons.duckduckgo.com/ip3/${community.domain}.ico`, // DuckDuckGo fallback
+    `https://${community.domain}/favicon.svg`, // Try direct SVG (modern)
+    `https://${community.domain}/favicon.ico` // Legacy ICO fallback
   ].filter(Boolean) // Remove null/undefined values
+
+  // Reset state when domain changes
+  useEffect(() => {
+    setCurrentFormatIndex(0)
+    setAllFormatsExhausted(false)
+  }, [community.domain])
 
   const handleError = () => {
     if (currentFormatIndex < faviconFormats.length - 1) {
@@ -109,6 +114,7 @@ function CommunityAvatar({ community }: { community: TNip05Community }) {
   return (
     <Avatar className="w-10 h-10 shrink-0">
       <AvatarImage
+        key={`${community.domain}-${currentFormatIndex}`}
         src={faviconFormats[currentFormatIndex]}
         alt={community.name || community.domain}
         onError={handleError}

@@ -145,7 +145,7 @@ export default function Nip05Community({ domain }: { domain?: string }) {
       {adminPubkey && (
         <div className="p-6 border-b">
           <h2 className="text-lg font-semibold mb-4">{t('Community Admin')}</h2>
-          <AdminProfile pubkey={adminPubkey} domain={domain} />
+          <AdminProfile pubkey={adminPubkey} />
         </div>
       )}
 
@@ -179,15 +179,20 @@ function CommunityAvatar({
   const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
   // Try multiple favicon formats in order of preference
+  // Best practice 2025: Prioritize favicon services to avoid CORS errors
   const faviconFormats = [
     icon, // Use provided icon first if available
-    `https://${domain}/favicon.svg`,
-    `https://${domain}/favicon.png`,
-    `https://${domain}/favicon.ico`,
-    `https://${domain}/apple-touch-icon.png`,
-    `https://${domain}/android-chrome-192x192.png`,
-    `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=128`, // Google S2 API (no CORS, fast, cached)
+    `https://icons.duckduckgo.com/ip3/${domain}.ico`, // DuckDuckGo fallback
+    `https://${domain}/favicon.svg`, // Try direct SVG (modern)
+    `https://${domain}/favicon.ico` // Legacy ICO fallback
   ].filter(Boolean) // Remove null/undefined values
+
+  // Reset state when domain changes
+  useEffect(() => {
+    setCurrentFormatIndex(0)
+    setAllFormatsExhausted(false)
+  }, [domain])
 
   const handleError = () => {
     if (currentFormatIndex < faviconFormats.length - 1) {
@@ -209,6 +214,7 @@ function CommunityAvatar({
   return (
     <Avatar className="w-20 h-20 shrink-0">
       <AvatarImage
+        key={`${domain}-${currentFormatIndex}`}
         src={faviconFormats[currentFormatIndex]}
         alt={name || domain}
         onError={handleError}
@@ -220,7 +226,7 @@ function CommunityAvatar({
   )
 }
 
-function AdminProfile({ pubkey, domain }: { pubkey: string; domain: string }) {
+function AdminProfile({ pubkey }: { pubkey: string }) {
   const { profile, isFetching } = useFetchProfile(pubkey)
   const { push } = useSecondaryPage()
 

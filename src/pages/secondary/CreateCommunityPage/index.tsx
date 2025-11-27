@@ -871,7 +871,7 @@ function JoinRequestsSection() {
   const { account } = useNostr()
   const [requests, setRequests] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [followingList, setFollowingList] = useState<Set<string>>(new Set())
+  const [, setFollowingList] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const fetchJoinRequests = async () => {
