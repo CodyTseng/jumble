@@ -1006,6 +1006,16 @@ function JoinRequestCard({ request }: { request: any }) {
         const members = await nip05CommunityService.getDomainMembers(domain)
         if (members.includes(request.pubkey)) {
           setIsApproved(true)
+
+          // TODO: Phase 5 - Notification System
+          // When request is approved, we should notify the requester
+          // Possible implementations:
+          // 1. Send a DM (NIP-04) to the requester notifying them of approval
+          // 2. Publish a kind 1 reply/mention to their join request event
+          // 3. Use a notification relay (NIP-51 or custom)
+          // For now, the user can check their request status manually or receive
+          // the periodic auto-check notification in the UI
+          console.log('[TODO] Send approval notification to requester:', request.pubkey)
         }
       } catch (error) {
         console.error('Error checking approval status:', error)

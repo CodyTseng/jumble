@@ -326,6 +326,11 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
 
         if (events && events.length > 0) {
           setHasRequested(true)
+
+          // TODO: Phase 5 - Check if request has been approved
+          // We could periodically check if the user now appears in nostr.json
+          // and show a notification/badge when they've been approved
+          // For now, users can manually check the community page
         }
       } catch (error) {
         console.error('Error checking existing request:', error)
