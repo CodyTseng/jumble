@@ -490,6 +490,27 @@ export default {
     'My Community': 'مجتمعي',
     'Community Admin': 'المشرف',
     Members: 'الأعضاء',
-    'showing first 20': 'عرض أول 20'
+    'showing first 20': 'عرض أول 20',
+    // Community Join Requests
+    'Request to Join': 'طلب الانضمام',
+    'Request Sent': 'تم إرسال الطلب',
+    'Sending...': 'جاري الإرسال...',
+    Member: 'عضو',
+    'Join request sent!': 'تم إرسال طلب الانضمام!',
+    'Make sure the admin follows you to see your request': 'تأكد من أن المشرف يتابعك ليرى طلبك',
+    'Failed to send join request': 'فشل إرسال طلب الانضمام',
+    'Incoming Join Requests': 'طلبات الانضمام الواردة',
+    'Review and approve requests from users who want to join your community': 'راجع واقبل الطلبات من المستخدمين الذين يريدون الانضمام إلى مجتمعك',
+    'Review requests from users who want to join your community. Add them to your nostr.json file to approve.': 'راجع طلبات المستخدمين الذين يريدون الانضمام إلى مجتمعك. أضفهم إلى ملف nostr.json للموافقة.',
+    'Please login to view join requests for your community': 'يرجى تسجيل الدخول لعرض طلبات الانضمام لمجتمعك',
+    'Only requests from users you follow are shown here. This helps maintain a well-connected community and filters out spam.': 'يتم عرض الطلبات من المستخدمين الذين تتابعهم فقط هنا. يساعد هذا في الحفاظ على مجتمع متصل جيدًا وتصفية الرسائل غير المرغوب فيها.',
+    'No Pending Requests': 'لا توجد طلبات معلقة',
+    'You have no pending join requests from users you follow. When users request to join, they will appear here.': 'ليس لديك طلبات انضمام معلقة من المستخدمين الذين تتابعهم. عندما يطلب المستخدمون الانضمام، سيظهرون هنا.',
+    'How to approve': 'كيفية الموافقة',
+    'To approve a request, add the user\'s pubkey to your domain\'s .well-known/nostr.json file. Once they appear in the file, the request will automatically be marked as approved.': 'للموافقة على طلب، أضف المفتاح العام للمستخدم إلى ملف .well-known/nostr.json الخاص بنطاقك. بمجرد ظهورهم في الملف، سيتم وضع علامة على الطلب تلقائيًا على أنه تمت الموافقة عليه.',
+    'Requesting to join': 'طلب الانضمام إلى',
+    Approved: 'تمت الموافقة',
+    'Copy Pubkey': 'نسخ المفتاح العام',
+    'Pubkey copied to clipboard': 'تم نسخ المفتاح العام إلى الحافظة'
   }
 }

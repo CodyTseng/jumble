@@ -489,6 +489,27 @@ export default {
     'My Community': 'My Community',
     'Community Admin': 'Community Admin',
     Members: 'Members',
-    'showing first 20': 'showing first 20'
+    'showing first 20': 'showing first 20',
+    // Community Join Requests
+    'Request to Join': 'Request to Join',
+    'Request Sent': 'Request Sent',
+    'Sending...': 'Sending...',
+    Member: 'Member',
+    'Join request sent!': 'Join request sent!',
+    'Make sure the admin follows you to see your request': 'Make sure the admin follows you to see your request',
+    'Failed to send join request': 'Failed to send join request',
+    'Incoming Join Requests': 'Incoming Join Requests',
+    'Review and approve requests from users who want to join your community': 'Review and approve requests from users who want to join your community',
+    'Review requests from users who want to join your community. Add them to your nostr.json file to approve.': 'Review requests from users who want to join your community. Add them to your nostr.json file to approve.',
+    'Please login to view join requests for your community': 'Please login to view join requests for your community',
+    'Only requests from users you follow are shown here. This helps maintain a well-connected community and filters out spam.': 'Only requests from users you follow are shown here. This helps maintain a well-connected community and filters out spam.',
+    'No Pending Requests': 'No Pending Requests',
+    'You have no pending join requests from users you follow. When users request to join, they will appear here.': 'You have no pending join requests from users you follow. When users request to join, they will appear here.',
+    'How to approve': 'How to approve',
+    'To approve a request, add the user\'s pubkey to your domain\'s .well-known/nostr.json file. Once they appear in the file, the request will automatically be marked as approved.': 'To approve a request, add the user\'s pubkey to your domain\'s .well-known/nostr.json file. Once they appear in the file, the request will automatically be marked as approved.',
+    'Requesting to join': 'Requesting to join',
+    Approved: 'Approved',
+    'Copy Pubkey': 'Copy Pubkey',
+    'Pubkey copied to clipboard': 'Pubkey copied to clipboard'
   }
 }
