@@ -16,14 +16,18 @@ import {
   Info,
   Trash2,
   Clock,
-  Search
+  Search,
+  Check
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNostr } from '@/providers/NostrProvider'
 import { useSearchProfiles } from '@/hooks/useSearchProfiles'
+import { useFetchProfile } from '@/hooks'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { nip19 } from 'nostr-tools'
 import UserItem from '@/components/UserItem'
+import client from '@/services/client.service'
+import nip05CommunityService from '@/services/nip05-community.service'
 
 const CreateCommunityPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
@@ -863,33 +867,196 @@ function ManageMembersSection() {
 
 function JoinRequestsSection() {
   const { t } = useTranslation()
+  const { account } = useNostr()
+  const [requests, setRequests] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [followingList, setFollowingList] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    const fetchJoinRequests = async () => {
+      if (!account) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        setIsLoading(true)
+
+        // First, fetch the user's following list
+        const followList = await client.fetchFollowList(account.pubkey)
+        const followingSet = new Set(followList || [])
+        setFollowingList(followingSet)
+
+        // Fetch join requests where the current user is tagged as admin
+        const events = await client.fetchEvents({
+          kinds: [39457], // COMMUNITY_JOIN_REQUEST
+          '#p': [account.pubkey]
+        })
+
+        if (events && events.length > 0) {
+          // Filter to only show requests from users we follow
+          const filteredRequests = events.filter((event) => followingSet.has(event.pubkey))
+
+          // Sort by newest first
+          filteredRequests.sort((a, b) => b.created_at - a.created_at)
+
+          setRequests(filteredRequests)
+        }
+      } catch (error) {
+        console.error('Error fetching join requests:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchJoinRequests()
+  }, [account])
+
+  if (!account) {
+    return (
+      <div className="space-y-6">
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            {t('Please login to view join requests for your community')}
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>{t('Important')}:</strong> {t('Only requests from users you follow are shown here. This helps maintain a well-connected community and filters out spam.')}
+        </AlertDescription>
+      </Alert>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">{t('Incoming Join Requests')}</CardTitle>
           <CardDescription>
-            {t('Review and approve requests from users who want to join your community')}
+            {t('Review requests from users who want to join your community. Add them to your nostr.json file to approve.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Clock className="w-12 h-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">{t('Coming Soon')}</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
-              {t('This feature will allow users to request to join your community. You\'ll be able to review requests and add approved members directly from this interface.')}
-            </p>
-          </div>
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 border rounded-lg">
+                  <div className="w-12 h-12 bg-muted rounded-full animate-pulse" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-muted rounded animate-pulse w-32" />
+                    <div className="h-3 bg-muted rounded animate-pulse w-48" />
+                    <div className="h-3 bg-muted rounded animate-pulse w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : requests.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Users className="w-12 h-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">{t('No Pending Requests')}</h3>
+              <p className="text-sm text-muted-foreground max-w-md">
+                {t('You have no pending join requests from users you follow. When users request to join, they will appear here.')}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {requests.map((request) => (
+                <JoinRequestCard key={request.id} request={request} />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          {t('In the meantime, users can contact you directly to request joining your community. You can add them manually in the "Manage Members" tab.')}
+          <strong>{t('How to approve')}:</strong> {t('To approve a request, add the user\'s pubkey to your domain\'s .well-known/nostr.json file. Once they appear in the file, the request will automatically be marked as approved.')}
         </AlertDescription>
       </Alert>
+    </div>
+  )
+}
+
+function JoinRequestCard({ request }: { request: any }) {
+  const { t } = useTranslation()
+  const { profile } = useFetchProfile(request.pubkey)
+  const [isApproved, setIsApproved] = useState(false)
+
+  // Extract domain from d-tag
+  const domainTag = request.tags.find((tag: string[]) => tag[0] === 'd')
+  const domain = domainTag?.[1]
+
+  // Check if user is already in nostr.json
+  useEffect(() => {
+    const checkApproval = async () => {
+      if (!domain) return
+
+      try {
+        const members = await nip05CommunityService.getDomainMembers(domain)
+        if (members.includes(request.pubkey)) {
+          setIsApproved(true)
+        }
+      } catch (error) {
+        console.error('Error checking approval status:', error)
+      }
+    }
+
+    checkApproval()
+  }, [domain, request.pubkey])
+
+  const handleCopyPubkey = () => {
+    navigator.clipboard.writeText(request.pubkey)
+    toast(t('Pubkey copied to clipboard'))
+  }
+
+  const displayName = profile?.username || request.pubkey.slice(0, 8)
+  const nip05 = profile?.nip05
+  const about = profile?.about
+
+  return (
+    <div className={`p-4 border rounded-lg ${isApproved ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : ''}`}>
+      <div className="flex items-start gap-4">
+        <UserItem userId={request.pubkey} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="font-semibold">{displayName}</div>
+            {isApproved && (
+              <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                <Check className="w-3 h-3" />
+                {t('Approved')}
+              </div>
+            )}
+          </div>
+
+          {nip05 && <div className="text-sm text-muted-foreground mb-2">{nip05}</div>}
+
+          <div className="text-sm mb-3 p-3 bg-muted/50 rounded">
+            <strong>{t('Requesting to join')}:</strong> {domain}
+          </div>
+
+          {request.content && (
+            <div className="text-sm text-muted-foreground mb-3 italic">
+              "{request.content}"
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Clock className="w-3 h-3" />
+            {new Date(request.created_at * 1000).toLocaleString()}
+          </div>
+        </div>
+
+        <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
+          <Copy className="w-3 h-3" />
+          {t('Copy Pubkey')}
+        </Button>
+      </div>
     </div>
   )
 }
