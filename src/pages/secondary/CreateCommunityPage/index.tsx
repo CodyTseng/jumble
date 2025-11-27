@@ -883,28 +883,53 @@ function JoinRequestsSection() {
       try {
         setIsLoading(true)
 
+        console.log('[JoinRequests] Fetching join requests for admin:', account.pubkey)
+
         // First, fetch the user's following list
-        const followList = await client.fetchFollowList(account.pubkey)
-        const followingSet = new Set(followList || [])
+        const followings = await client.fetchFollowings(account.pubkey)
+        const followingSet = new Set(followings || [])
         setFollowingList(followingSet)
+        console.log('[JoinRequests] Following list size:', followingSet.size)
+
+        // Get admin's relay list to fetch from their relays
+        const relayList = await client.fetchRelayList(account.pubkey)
+        const targetRelays = [
+          ...(relayList?.write || []),
+          ...(relayList?.read || []),
+          'wss://relay.damus.io',
+          'wss://relay.primal.net',
+          'wss://nos.lol'
+        ]
+        console.log('[JoinRequests] Fetching from relays:', targetRelays)
 
         // Fetch join requests where the current user is tagged as admin
-        const events = await client.fetchEvents([], {
+        const events = await client.fetchEvents(targetRelays, {
           kinds: [39457], // COMMUNITY_JOIN_REQUEST
           '#p': [account.pubkey]
         })
 
+        console.log('[JoinRequests] Found events:', events?.length || 0)
+        console.log('[JoinRequests] Events:', events)
+
         if (events && events.length > 0) {
           // Filter to only show requests from users we follow
-          const filteredRequests = events.filter((event) => followingSet.has(event.pubkey))
+          const filteredRequests = events.filter((event) => {
+            const isFollowing = followingSet.has(event.pubkey)
+            console.log('[JoinRequests] Event from', event.pubkey.slice(0, 8), 'following:', isFollowing)
+            return isFollowing
+          })
+
+          console.log('[JoinRequests] Filtered requests:', filteredRequests.length)
 
           // Sort by newest first
           filteredRequests.sort((a, b) => b.created_at - a.created_at)
 
           setRequests(filteredRequests)
+        } else {
+          setRequests([])
         }
       } catch (error) {
-        console.error('Error fetching join requests:', error)
+        console.error('[JoinRequests] Error fetching join requests:', error)
       } finally {
         setIsLoading(false)
       }
@@ -1068,61 +1093,62 @@ function JoinRequestCard({ request }: { request: any }) {
   const about = profile?.about
 
   return (
-    <div className={`p-4 border rounded-lg ${isApproved ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : ''}`}>
-      <div className="flex items-start gap-4">
-        <UserItem userId={request.pubkey} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="font-semibold">{displayName}</div>
-            {isApproved && (
-              <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                <Check className="w-3 h-3" />
-                {t('Approved')}
-              </div>
-            )}
-            {isChecking && !isApproved && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <RefreshCw className="w-3 h-3 animate-spin" />
-                {t('Checking...')}
-              </div>
-            )}
-          </div>
-
-          {nip05 && <div className="text-sm text-muted-foreground mb-2">{nip05}</div>}
-
-          <div className="text-sm mb-3 p-3 bg-muted/50 rounded">
-            <strong>{t('Requesting to join')}:</strong> {domain}
-          </div>
-
-          {request.content && (
-            <div className="text-sm text-muted-foreground mb-3 italic">
-              "{request.content}"
+    <div className={`p-4 border rounded-lg space-y-3 ${isApproved ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : ''}`}>
+      {/* First Row: Profile Info + Status Badge */}
+      <div className="flex items-center gap-3">
+        <UserItem userId={request.pubkey} hideFollowButton showFollowingBadge />
+        <div className="flex items-center gap-2">
+          {isApproved && (
+            <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium">
+              <Check className="w-3 h-3" />
+              {t('Approved')}
             </div>
           )}
+          {isChecking && !isApproved && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              {t('Checking...')}
+            </div>
+          )}
+        </div>
+      </div>
 
+      {/* Second Row: Request Details */}
+      <div className="space-y-2">
+        <div className="text-sm p-2 bg-muted/50 rounded">
+          <strong>{t('Requesting to join')}:</strong> {domain}
+        </div>
+
+        {request.content && (
+          <div className="text-sm text-muted-foreground italic pl-2 border-l-2 border-muted">
+            "{request.content}"
+          </div>
+        )}
+
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="w-3 h-3" />
             {new Date(request.created_at * 1000).toLocaleString()}
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2">
-          <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
-            <Copy className="w-3 h-3" />
-            {t('Copy Pubkey')}
-          </Button>
-          {!isApproved && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefreshStatus}
-              disabled={isChecking}
-              className="gap-2"
-            >
-              <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
-              {t('Check Status')}
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
+              <Copy className="w-3 h-3" />
+              {t('Copy Pubkey')}
             </Button>
-          )}
+            {!isApproved && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshStatus}
+                disabled={isChecking}
+                className="gap-2"
+              >
+                <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
+                {t('Check Status')}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
