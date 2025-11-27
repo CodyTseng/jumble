@@ -61,7 +61,6 @@ const UserAggregationList = forwardRef<
   const [pinnedPubkeys, setPinnedPubkeys] = useState<Set<string>>(
     new Set(userAggregationService.getPinnedPubkeys())
   )
-  const [refreshKey, setRefreshKey] = useState(0)
   const topRef = useRef<HTMLDivElement | null>(null)
 
   const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
@@ -104,7 +103,6 @@ const UserAggregationList = forwardRef<
           onEvents: (events, eosed) => {
             if (events.length > 0) {
               setEvents(events)
-              userAggregationService.setCachedEvents(feedId, events)
             }
             if (eosed) {
               setLoading(false)
@@ -115,7 +113,6 @@ const UserAggregationList = forwardRef<
               const newEvents = oldEvents.some((e) => e.id === event.id)
                 ? oldEvents
                 : [event, ...oldEvents]
-              userAggregationService.setCachedEvents(feedId, newEvents)
               return newEvents
             })
           }
@@ -150,11 +147,7 @@ const UserAggregationList = forwardRef<
 
     setLoading(true)
     client.loadMoreTimeline(timelineKey, until, LIMIT).then((moreEvents) => {
-      setEvents((oldEvents) => {
-        const combinedEvents = [...oldEvents, ...moreEvents]
-        userAggregationService.setCachedEvents(feedId, combinedEvents)
-        return combinedEvents
-      })
+      setEvents((oldEvents) => [...oldEvents, ...moreEvents])
       setLoading(false)
     })
   }, [loading, timelineKey, events])
@@ -162,7 +155,6 @@ const UserAggregationList = forwardRef<
   useEffect(() => {
     const unsubscribe = userAggregationService.subscribe(() => {
       setPinnedPubkeys(new Set(userAggregationService.getPinnedPubkeys()))
-      setRefreshKey((prev) => prev + 1)
     })
 
     return unsubscribe
@@ -202,21 +194,23 @@ const UserAggregationList = forwardRef<
     [hideUntrustedNotes, mutePubkeySet, isEventDeleted, filterFn]
   )
 
+  const filteredEvents = useMemo(() => {
+    return events.filter((evt) => !shouldHideEvent(evt))
+  }, [events, shouldHideEvent])
+
   const aggregations = useMemo(() => {
-    let filteredEvents = events
-
-    filteredEvents = filteredEvents.filter((evt) => {
-      return !shouldHideEvent(evt)
-    })
-
     const aggs = userAggregationService.aggregateByUser(filteredEvents)
-    return userAggregationService.sortWithPinned(aggs)
-  }, [events, shouldHideEvent, refreshKey])
+    userAggregationService.setCachedEvents(feedId, aggs)
+    return aggs
+  }, [feedId, filteredEvents])
+
+  const sortedAggregations = useMemo(() => {
+    return userAggregationService.sortWithPinned(aggregations)
+  }, [aggregations, pinnedPubkeys])
 
   const handleTogglePin = (pubkey: string, e: React.MouseEvent) => {
     e.stopPropagation()
     userAggregationService.togglePin(pubkey)
-    setPinnedPubkeys(new Set(userAggregationService.getPinnedPubkeys()))
   }
 
   const handleViewUser = (agg: TUserAggregation) => {
@@ -227,7 +221,7 @@ const UserAggregationList = forwardRef<
     <div>
       <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
       {showLoadingBar && <LoadingBar />}
-      {aggregations.map((agg) => (
+      {sortedAggregations.map((agg) => (
         <UserAggregationItem
           key={agg.pubkey}
           aggregation={agg}
@@ -238,7 +232,7 @@ const UserAggregationList = forwardRef<
       ))}
       {loading && <UserAggregationItemSkeleton />}
       {!loading &&
-        (aggregations.length === 0 ? (
+        (sortedAggregations.length === 0 ? (
           <div className="flex justify-center w-full mt-2">
             <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
               {t('Reload')}

@@ -1,4 +1,5 @@
-import { StorageKey } from '@/constants'
+import { getEventKey } from '@/lib/event'
+import storage from '@/services/local-storage.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 
@@ -13,7 +14,7 @@ class UserAggregationService {
   static instance: UserAggregationService
 
   private pinnedPubkeys: Set<string> = new Set()
-  private cachedEventsMap: Map<string, Event[]> = new Map()
+  private feedUserEventsMap: Map<string, Map<string, Event[]>> = new Map()
   private listeners: Set<() => void> = new Set()
 
   constructor() {
@@ -21,7 +22,7 @@ class UserAggregationService {
       return UserAggregationService.instance
     }
     UserAggregationService.instance = this
-    this.loadFromStorage()
+    this.pinnedPubkeys = storage.getPinnedPubkeys()
   }
 
   subscribe(listener: () => void) {
@@ -35,25 +36,6 @@ class UserAggregationService {
     this.listeners.forEach((listener) => listener())
   }
 
-  private loadFromStorage() {
-    try {
-      const pinnedData = localStorage.getItem(StorageKey.PINNED_USERS)
-      if (pinnedData) {
-        this.pinnedPubkeys = new Set(JSON.parse(pinnedData))
-      }
-    } catch (error) {
-      console.error('Failed to load user aggregation data from storage', error)
-    }
-  }
-
-  private saveToStorage() {
-    try {
-      localStorage.setItem(StorageKey.PINNED_USERS, JSON.stringify([...this.pinnedPubkeys]))
-    } catch (error) {
-      console.error('Failed to save user aggregation data to storage', error)
-    }
-  }
-
   // Pinned users management
   getPinnedPubkeys(): string[] {
     return [...this.pinnedPubkeys]
@@ -65,13 +47,13 @@ class UserAggregationService {
 
   pinUser(pubkey: string) {
     this.pinnedPubkeys.add(pubkey)
-    this.saveToStorage()
+    storage.setPinnedPubkeys(this.pinnedPubkeys)
     this.notify()
   }
 
   unpinUser(pubkey: string) {
     this.pinnedPubkeys.delete(pubkey)
-    this.saveToStorage()
+    storage.setPinnedPubkeys(this.pinnedPubkeys)
     this.notify()
   }
 
@@ -86,8 +68,15 @@ class UserAggregationService {
   // Aggregate events by user
   aggregateByUser(events: Event[]): TUserAggregation[] {
     const userEventsMap = new Map<string, Event[]>()
+    const processedKeys = new Set<string>()
+    const since = dayjs().subtract(1, 'day').unix()
 
     events.forEach((event) => {
+      if (event.created_at < since) return
+      const key = getEventKey(event)
+      if (processedKeys.has(key)) return
+      processedKeys.add(key)
+
       const existing = userEventsMap.get(event.pubkey) || []
       existing.push(event)
       userEventsMap.set(event.pubkey, existing)
@@ -95,26 +84,23 @@ class UserAggregationService {
 
     const aggregations: TUserAggregation[] = []
     userEventsMap.forEach((events, pubkey) => {
-      const since = dayjs().subtract(1, 'day').unix()
-      const sortedEvents = events
-        .sort((a, b) => b.created_at - a.created_at)
-        .filter((event) => event.created_at >= since)
-      if (sortedEvents.length === 0) {
+      if (events.length === 0) {
         return
       }
 
       aggregations.push({
         pubkey,
-        events: sortedEvents,
-        count: sortedEvents.length,
-        lastEventTime: sortedEvents[0].created_at
+        events: events,
+        count: events.length,
+        lastEventTime: events[0].created_at
       })
     })
 
-    return aggregations.sort((a, b) => b.lastEventTime - a.lastEventTime)
+    return aggregations.sort((a, b) => {
+      return b.lastEventTime - a.lastEventTime
+    })
   }
 
-  // Sort aggregations with pinned users first
   sortWithPinned(aggregations: TUserAggregation[]): TUserAggregation[] {
     const pinned: TUserAggregation[] = []
     const unpinned: TUserAggregation[] = []
@@ -131,21 +117,14 @@ class UserAggregationService {
   }
 
   // Cache management for quick access
-  setCachedEvents(feedId: string, events: Event[]) {
-    const since = dayjs().subtract(1, 'day').unix()
-    this.cachedEventsMap.set(
-      feedId,
-      events.filter((event) => event.created_at >= since)
-    )
-  }
-
-  getCachedEvents(feedId: string): Event[] | undefined {
-    return this.cachedEventsMap.get(feedId)
+  setCachedEvents(feedId: string, aggregations: TUserAggregation[]) {
+    const map = new Map<string, Event[]>()
+    aggregations.forEach((agg) => map.set(agg.pubkey, agg.events))
+    this.feedUserEventsMap.set(feedId, map)
   }
 
   getUserEvents(feedId: string, pubkey: string): Event[] {
-    const allEvents = this.getCachedEvents(feedId) || []
-    return allEvents.filter((event) => event.pubkey === pubkey)
+    return this.feedUserEventsMap.get(feedId)?.get(pubkey) || []
   }
 }
 
