@@ -19,6 +19,7 @@ import { Pin, PinOff } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { LoadingBar } from '../LoadingBar'
 
 const LIMIT = 500
 
@@ -183,6 +184,7 @@ export default function UserAggregationList({
 
   return (
     <div>
+      {loading && <LoadingBar />}
       {aggregations.map((agg) => (
         <UserAggregationItem
           key={agg.pubkey}

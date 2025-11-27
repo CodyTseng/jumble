@@ -93,12 +93,12 @@ class UserAggregationService {
       userEventsMap.set(event.pubkey, existing)
     })
 
-    const since = dayjs().subtract(1, 'day').unix()
     const aggregations: TUserAggregation[] = []
     userEventsMap.forEach((events, pubkey) => {
+      const since = dayjs().subtract(1, 'day').unix()
       const sortedEvents = events
         .sort((a, b) => b.created_at - a.created_at)
-        .filter((evt) => evt.created_at > since)
+        .filter((event) => event.created_at >= since)
       if (sortedEvents.length === 0) {
         return
       }
@@ -106,7 +106,7 @@ class UserAggregationService {
       aggregations.push({
         pubkey,
         events: sortedEvents,
-        count: events.length,
+        count: sortedEvents.length,
         lastEventTime: sortedEvents[0].created_at
       })
     })
@@ -132,7 +132,11 @@ class UserAggregationService {
 
   // Cache management for quick access
   setCachedEvents(feedId: string, events: Event[]) {
-    this.cachedEventsMap.set(feedId, events)
+    const since = dayjs().subtract(1, 'day').unix()
+    this.cachedEventsMap.set(
+      feedId,
+      events.filter((event) => event.created_at >= since)
+    )
   }
 
   getCachedEvents(feedId: string): Event[] | undefined {
