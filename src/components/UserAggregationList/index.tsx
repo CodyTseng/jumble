@@ -17,25 +17,35 @@ import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
 import { Pin, PinOff } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoadingBar } from '../LoadingBar'
 
 const LIMIT = 500
 
-export default function UserAggregationList({
-  subRequests,
-  feedId,
-  showKinds,
-  filterFn,
-  filterMutedNotes = true
-}: {
-  subRequests: TFeedSubRequest[]
-  feedId: string
-  showKinds?: number[]
-  filterFn?: (event: Event) => boolean
-  filterMutedNotes?: boolean
-}) {
+export type TUserAggregationListRef = {
+  scrollToTop: (behavior?: ScrollBehavior) => void
+  refresh: () => void
+}
+
+const UserAggregationList = forwardRef<
+  TUserAggregationListRef,
+  {
+    subRequests: TFeedSubRequest[]
+    feedId: string
+    showKinds?: number[]
+    filterFn?: (event: Event) => boolean
+    filterMutedNotes?: boolean
+  }
+>(({ subRequests, feedId, showKinds, filterFn, filterMutedNotes = true }, ref) => {
   const { t } = useTranslation()
   const { startLogin } = useNostr()
   const { push } = useSecondaryPage()
@@ -46,10 +56,28 @@ export default function UserAggregationList({
   const [events, setEvents] = useState<Event[]>([])
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(true)
+  const [showLoadingBar, setShowLoadingBar] = useState(true)
+  const [refreshCount, setRefreshCount] = useState(0)
   const [pinnedPubkeys, setPinnedPubkeys] = useState<Set<string>>(
     new Set(userAggregationService.getPinnedPubkeys())
   )
   const [refreshKey, setRefreshKey] = useState(0)
+  const topRef = useRef<HTMLDivElement | null>(null)
+
+  const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
+    setTimeout(() => {
+      topRef.current?.scrollIntoView({ behavior, block: 'start' })
+    }, 20)
+  }
+
+  const refresh = () => {
+    scrollToTop()
+    setTimeout(() => {
+      setRefreshCount((count) => count + 1)
+    }, 500)
+  }
+
+  useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
 
   useEffect(() => {
     if (!subRequests.length) return
@@ -106,7 +134,7 @@ export default function UserAggregationList({
     return () => {
       promise.then((closer) => closer())
     }
-  }, [JSON.stringify(subRequests), JSON.stringify(showKinds), feedId])
+  }, [JSON.stringify(subRequests), JSON.stringify(showKinds), feedId, refreshCount])
 
   useEffect(() => {
     if (
@@ -139,6 +167,19 @@ export default function UserAggregationList({
 
     return unsubscribe
   }, [])
+
+  useEffect(() => {
+    if (loading) {
+      setShowLoadingBar(true)
+      return
+    }
+
+    const timeout = setTimeout(() => {
+      setShowLoadingBar(false)
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [loading])
 
   const shouldHideEvent = useCallback(
     (evt: Event) => {
@@ -184,7 +225,8 @@ export default function UserAggregationList({
 
   return (
     <div>
-      {loading && <LoadingBar />}
+      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
+      {showLoadingBar && <LoadingBar />}
       {aggregations.map((agg) => (
         <UserAggregationItem
           key={agg.pubkey}
@@ -194,15 +236,22 @@ export default function UserAggregationList({
           onClick={() => handleViewUser(agg)}
         />
       ))}
-      {loading && Array.from({ length: 5 }).map((_, i) => <UserAggregationItemSkeleton key={i} />)}
-      {!loading && aggregations.length === 0 && (
-        <div className="flex justify-center items-center h-40 text-muted-foreground">
-          {t('no notes')}
-        </div>
-      )}
+      {loading && <UserAggregationItemSkeleton />}
+      {!loading &&
+        (aggregations.length === 0 ? (
+          <div className="flex justify-center w-full mt-2">
+            <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
+              {t('Reload')}
+            </Button>
+          </div>
+        ) : (
+          <div className="text-center text-sm text-muted-foreground mt-2">{t('no more notes')}</div>
+        ))}
     </div>
   )
-}
+})
+UserAggregationList.displayName = 'UserAggregationList'
+export default UserAggregationList
 
 function UserAggregationItem({
   aggregation,
@@ -251,7 +300,7 @@ function UserAggregationItem({
 
 function UserAggregationItemSkeleton() {
   return (
-    <div className="flex items-center gap-3 p-4 border-b">
+    <div className="flex items-center gap-3 p-4">
       <Skeleton className="w-12 h-12 rounded-full" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-32" />

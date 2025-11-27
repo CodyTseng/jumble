@@ -33,7 +33,26 @@ const LIMIT = 200
 const ALGO_LIMIT = 500
 const SHOW_COUNT = 10
 
-const NoteList = forwardRef(
+export type TNoteListRef = {
+  scrollToTop: (behavior?: ScrollBehavior) => void
+  refresh: () => void
+}
+
+const NoteList = forwardRef<
+  TNoteListRef,
+  {
+    subRequests: TFeedSubRequest[]
+    showKinds?: number[]
+    filterMutedNotes?: boolean
+    hideReplies?: boolean
+    hideUntrustedNotes?: boolean
+    areAlgoRelays?: boolean
+    showRelayCloseReason?: boolean
+    pinnedEventIds?: string[]
+    filterFn?: (event: Event) => boolean
+    showNewNotesDirectly?: boolean
+  }
+>(
   (
     {
       subRequests,
@@ -46,17 +65,6 @@ const NoteList = forwardRef(
       pinnedEventIds,
       filterFn,
       showNewNotesDirectly = false
-    }: {
-      subRequests: TFeedSubRequest[]
-      showKinds?: number[]
-      filterMutedNotes?: boolean
-      hideReplies?: boolean
-      hideUntrustedNotes?: boolean
-      areAlgoRelays?: boolean
-      showRelayCloseReason?: boolean
-      pinnedEventIds?: string[]
-      filterFn?: (event: Event) => boolean
-      showNewNotesDirectly?: boolean
     },
     ref
   ) => {
@@ -415,8 +423,3 @@ const NoteList = forwardRef(
 )
 NoteList.displayName = 'NoteList'
 export default NoteList
-
-export type TNoteListRef = {
-  scrollToTop: (behavior?: ScrollBehavior) => void
-  refresh: () => void
-}

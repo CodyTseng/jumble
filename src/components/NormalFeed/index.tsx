@@ -1,6 +1,6 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
-import UserAggregationList from '@/components/UserAggregationList'
+import UserAggregationList, { TUserAggregationListRef } from '@/components/UserAggregationList'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -32,6 +32,7 @@ export default function NormalFeed({
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
+  const userAggregationListRef = useRef<TUserAggregationListRef>(null)
 
   const handleListModeChange = (mode: TNoteListMode) => {
     setListMode(mode)
@@ -53,28 +54,32 @@ export default function NormalFeed({
         tabs={[
           { value: 'posts', label: 'Notes' },
           { value: 'postsAndReplies', label: 'Replies' },
-          { value: '24h', label: '24h Pulse' }
+          ...(feedId ? [{ value: '24h', label: '24h Pulse' }] : [])
         ]}
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
         }}
         options={
           <>
-            {!supportTouch && listMode !== '24h' && (
-              <RefreshButton onClick={() => noteListRef.current?.refresh()} />
-            )}
-            {listMode !== '24h' && (
-              <KindFilter
-                showKinds={temporaryShowKinds}
-                onShowKindsChange={handleShowKindsChange}
+            {!supportTouch && (
+              <RefreshButton
+                onClick={() => {
+                  if (listMode === '24h') {
+                    userAggregationListRef.current?.refresh()
+                  } else {
+                    noteListRef.current?.refresh()
+                  }
+                }}
               />
             )}
+            <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />
           </>
         }
       />
-      {listMode === '24h' ? (
+      {listMode === '24h' && feedId ? (
         <UserAggregationList
-          feedId={feedId || 'default'}
+          ref={userAggregationListRef}
+          feedId={feedId}
           showKinds={temporaryShowKinds}
           subRequests={subRequests}
           filterFn={filterFn}

@@ -55,15 +55,10 @@ const UserAggregationDetailPage = forwardRef(
         displayScrollToTopButton
       >
         <div className="min-h-screen">
-          {userEvents.length === 0 ? (
-            <div className="flex justify-center items-center h-40 text-muted-foreground">
-              {t('no notes')}
-            </div>
-          ) : (
-            userEvents.map((event) => (
-              <NoteCard key={event.id} className="w-full" event={event} filterMutedNotes={false} />
-            ))
-          )}
+          {userEvents.map((event) => (
+            <NoteCard key={event.id} className="w-full" event={event} filterMutedNotes={false} />
+          ))}
+          <div className="text-center text-sm text-muted-foreground mt-2">{t('no more notes')}</div>
         </div>
       </SecondaryPageLayout>
     )
