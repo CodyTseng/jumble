@@ -179,12 +179,13 @@ function CommunityAvatar({
   const [allFormatsExhausted, setAllFormatsExhausted] = useState(false)
 
   // Try multiple favicon formats in order of preference
-  // Skip Google S2 API - it returns blurry globe fallback icon
+  // Try direct domain paths first to catch real favicons before falling back to services
   const faviconFormats = [
     icon, // Use provided icon first if available
-    `https://icons.duckduckgo.com/ip3/${domain}.ico`, // DuckDuckGo (clean fallback)
     `https://${domain}/favicon.svg`, // Try direct SVG (modern)
-    `https://${domain}/favicon.ico` // Legacy ICO fallback
+    `https://${domain}/favicon.ico`, // Try direct ICO
+    `https://${domain}/favicon.png`, // Try PNG
+    `https://icons.duckduckgo.com/ip3/${domain}.ico` // DuckDuckGo service as last resort
   ].filter(Boolean) // Remove null/undefined values
 
   // Reset state when domain changes
