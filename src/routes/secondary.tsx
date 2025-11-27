@@ -21,6 +21,7 @@ import SearchPage from '@/pages/secondary/SearchPage'
 import SettingsPage from '@/pages/secondary/SettingsPage'
 import SystemSettingsPage from '@/pages/secondary/SystemSettingsPage'
 import TranslationPage from '@/pages/secondary/TranslationPage'
+import UserAggregationDetailPage from '@/pages/secondary/UserAggregationDetailPage'
 import WalletPage from '@/pages/secondary/WalletPage'
 import { match } from 'path-to-regexp'
 import { isValidElement } from 'react'
@@ -50,7 +51,8 @@ const SECONDARY_ROUTE_CONFIGS = [
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },
   { path: '/bookmarks', element: <BookmarkPage /> },
-  { path: '/follow-packs/:id', element: <FollowPackPage /> }
+  { path: '/follow-packs/:id', element: <FollowPackPage /> },
+  { path: '/user-aggregation/:feedId/:npub', element: <UserAggregationDetailPage /> }
 ]
 
 export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.map(({ path, element }) => ({

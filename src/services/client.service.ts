@@ -251,6 +251,7 @@ class ClientService extends EventTarget {
     Object.entries(filter)
       .sort()
       .forEach(([key, value]) => {
+        if (key === 'limit') return
         if (Array.isArray(value)) {
           stableFilter[key] = [...value].sort()
         }

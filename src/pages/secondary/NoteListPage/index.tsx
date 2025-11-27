@@ -109,6 +109,17 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     init()
   }, [])
 
+  const feedId =
+    data?.type === 'hashtag'
+      ? `hashtag-${new URLSearchParams(window.location.search).get('t')}`
+      : data?.type === 'search'
+        ? `search-${new URLSearchParams(window.location.search).get('s')}`
+        : data?.type === 'externalContent'
+          ? `external-${new URLSearchParams(window.location.search).get('i')}`
+          : data?.type === 'domain'
+            ? `domain-${data.domain}`
+            : 'notes'
+
   let content: React.ReactNode = null
   if (data?.type === 'domain' && subRequests.length === 0) {
     content = (
@@ -119,7 +130,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    content = <NormalFeed subRequests={subRequests} />
+    content = <NormalFeed subRequests={subRequests} feedId={feedId} />
   }
 
   return (

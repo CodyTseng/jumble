@@ -26,12 +26,20 @@ export default function RelaysFeed() {
     return null
   }
 
+  const feedId =
+    feedInfo.feedType === 'relay' && feedInfo.id
+      ? feedInfo.id
+      : feedInfo.feedType === 'relays' && feedInfo.id
+        ? `relaySet-${feedInfo.id}`
+        : relayUrls[0] || 'relay'
+
   return (
     <NormalFeed
       subRequests={[{ urls: relayUrls, filter: {} }]}
       areAlgoRelays={areAlgoRelays}
       isMainFeed
       showRelayCloseReason
+      feedId={feedId}
     />
   )
 }
