@@ -51,33 +51,36 @@ export default function FollowingFavoriteDomainList({
 
       console.log('[FollowingDomains] Found followings:', followings.length)
 
-      // Fetch profiles for all followings in batches
-      const batchSize = 20
-      const profiles = []
-      for (let i = 0; i < followings.length; i += batchSize) {
-        const batch = followings.slice(i, i + batchSize)
-        const batchProfiles = await Promise.all(
-          batch.map((followingPubkey) => client.fetchProfile(followingPubkey))
-        )
-        profiles.push(...batchProfiles)
-        console.log(`[FollowingDomains] Fetched ${profiles.length}/${followings.length} profiles`)
-      }
+      // Fetch all profiles in one batch using a single subscription
+      // This is much more efficient than individual fetches
+      console.log('[FollowingDomains] Fetching all profiles in batch...')
+      const profileEvents = await client.fetchEvents([], {
+        kinds: [0], // kind 0 = profile metadata
+        authors: followings
+      })
 
-      // Extract NIP-05 domains and count users per domain
+      console.log(`[FollowingDomains] Fetched ${profileEvents.length} profile events`)
+
+      // Parse profile events and extract NIP-05 domains
       const domainMap = new Map<string, Set<string>>()
-      profiles.forEach((profile) => {
-        if (profile?.nip05) {
-          const nip05 = profile.nip05
-          // Extract domain from NIP-05 identifier (e.g., "user@domain.com" -> "domain.com")
-          const parts = nip05.split('@')
-          if (parts.length === 2) {
-            const domain = parts[1].toLowerCase().trim()
-            if (domain) {
-              const pubkeys = domainMap.get(domain) || new Set()
-              pubkeys.add(profile.pubkey)
-              domainMap.set(domain, pubkeys)
+      profileEvents.forEach((event) => {
+        try {
+          const profile = JSON.parse(event.content)
+          if (profile?.nip05) {
+            const nip05 = profile.nip05
+            // Extract domain from NIP-05 identifier (e.g., "user@domain.com" -> "domain.com")
+            const parts = nip05.split('@')
+            if (parts.length === 2) {
+              const domain = parts[1].toLowerCase().trim()
+              if (domain) {
+                const pubkeys = domainMap.get(domain) || new Set()
+                pubkeys.add(event.pubkey)
+                domainMap.set(domain, pubkeys)
+              }
             }
           }
+        } catch (error) {
+          // Skip invalid profile JSON
         }
       })
 
