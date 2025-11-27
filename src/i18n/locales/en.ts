@@ -510,6 +510,11 @@ export default {
     'Requesting to join': 'Requesting to join',
     Approved: 'Approved',
     'Copy Pubkey': 'Copy Pubkey',
-    'Pubkey copied to clipboard': 'Pubkey copied to clipboard'
+    'Pubkey copied to clipboard': 'Pubkey copied to clipboard',
+    'Check Status': 'Check Status',
+    'Checking...': 'Checking...',
+    'Request has been approved!': 'Request has been approved!',
+    'User not yet added to nostr.json': 'User not yet added to nostr.json',
+    'Failed to check approval status': 'Failed to check approval status'
   }
 }

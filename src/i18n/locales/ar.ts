@@ -511,6 +511,11 @@ export default {
     'Requesting to join': 'طلب الانضمام إلى',
     Approved: 'تمت الموافقة',
     'Copy Pubkey': 'نسخ المفتاح العام',
-    'Pubkey copied to clipboard': 'تم نسخ المفتاح العام إلى الحافظة'
+    'Pubkey copied to clipboard': 'تم نسخ المفتاح العام إلى الحافظة',
+    'Check Status': 'فحص الحالة',
+    'Checking...': 'جاري الفحص...',
+    'Request has been approved!': 'تمت الموافقة على الطلب!',
+    'User not yet added to nostr.json': 'لم يتم إضافة المستخدم إلى nostr.json بعد',
+    'Failed to check approval status': 'فشل التحقق من حالة الموافقة'
   }
 }

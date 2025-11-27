@@ -17,7 +17,8 @@ import {
   Trash2,
   Clock,
   Search,
-  Check
+  Check,
+  RefreshCw
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNostr } from '@/providers/NostrProvider'
@@ -987,32 +988,69 @@ function JoinRequestCard({ request }: { request: any }) {
   const { t } = useTranslation()
   const { profile } = useFetchProfile(request.pubkey)
   const [isApproved, setIsApproved] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
 
   // Extract domain from d-tag
   const domainTag = request.tags.find((tag: string[]) => tag[0] === 'd')
   const domain = domainTag?.[1]
 
-  // Check if user is already in nostr.json
+  // Check if user is already in nostr.json (with periodic refresh)
   useEffect(() => {
     const checkApproval = async () => {
-      if (!domain) return
+      if (!domain || isApproved) return
 
+      setIsChecking(true)
       try {
+        // Force refresh the community members to check latest nostr.json
+        await nip05CommunityService.refreshCommunityMembers(domain)
         const members = await nip05CommunityService.getDomainMembers(domain)
         if (members.includes(request.pubkey)) {
           setIsApproved(true)
         }
       } catch (error) {
         console.error('Error checking approval status:', error)
+      } finally {
+        setIsChecking(false)
       }
     }
 
+    // Initial check
     checkApproval()
-  }, [domain, request.pubkey])
+
+    // Periodic check every 30 seconds (only if not yet approved)
+    const interval = setInterval(() => {
+      if (!isApproved) {
+        checkApproval()
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [domain, request.pubkey, isApproved])
 
   const handleCopyPubkey = () => {
     navigator.clipboard.writeText(request.pubkey)
     toast(t('Pubkey copied to clipboard'))
+  }
+
+  const handleRefreshStatus = async () => {
+    if (!domain || isApproved) return
+
+    setIsChecking(true)
+    try {
+      await nip05CommunityService.refreshCommunityMembers(domain)
+      const members = await nip05CommunityService.getDomainMembers(domain)
+      if (members.includes(request.pubkey)) {
+        setIsApproved(true)
+        toast.success(t('Request has been approved!'))
+      } else {
+        toast.info(t('User not yet added to nostr.json'))
+      }
+    } catch (error) {
+      console.error('Error refreshing approval status:', error)
+      toast.error(t('Failed to check approval status'))
+    } finally {
+      setIsChecking(false)
+    }
   }
 
   const displayName = profile?.username || request.pubkey.slice(0, 8)
@@ -1030,6 +1068,12 @@ function JoinRequestCard({ request }: { request: any }) {
               <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                 <Check className="w-3 h-3" />
                 {t('Approved')}
+              </div>
+            )}
+            {isChecking && !isApproved && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <RefreshCw className="w-3 h-3 animate-spin" />
+                {t('Checking...')}
               </div>
             )}
           </div>
@@ -1052,10 +1096,24 @@ function JoinRequestCard({ request }: { request: any }) {
           </div>
         </div>
 
-        <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
-          <Copy className="w-3 h-3" />
-          {t('Copy Pubkey')}
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
+            <Copy className="w-3 h-3" />
+            {t('Copy Pubkey')}
+          </Button>
+          {!isApproved && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshStatus}
+              disabled={isChecking}
+              className="gap-2"
+            >
+              <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
+              {t('Check Status')}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )
