@@ -234,7 +234,7 @@ function UserAggregationItem({
         variant="ghost"
         size="icon"
         onClick={(e) => onTogglePin(aggregation.pubkey, e)}
-        className="flex-shrink-0"
+        className="flex-shrink-0 text-muted-foreground hover:text-foreground"
       >
         {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
       </Button>

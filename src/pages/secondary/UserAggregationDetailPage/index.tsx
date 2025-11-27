@@ -48,7 +48,12 @@ const UserAggregationDetailPage = forwardRef(
     }
 
     return (
-      <SecondaryPageLayout ref={ref} index={index} title={<SimpleUsername userId={pubkey} />}>
+      <SecondaryPageLayout
+        ref={ref}
+        index={index}
+        title={<SimpleUsername userId={pubkey} />}
+        displayScrollToTopButton
+      >
         <div className="min-h-screen">
           {userEvents.length === 0 ? (
             <div className="flex justify-center items-center h-40 text-muted-foreground">
