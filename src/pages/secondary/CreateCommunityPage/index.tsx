@@ -889,7 +889,7 @@ function JoinRequestsSection() {
         setFollowingList(followingSet)
 
         // Fetch join requests where the current user is tagged as admin
-        const events = await client.fetchEvents({
+        const events = await client.fetchEvents([], {
           kinds: [39457], // COMMUNITY_JOIN_REQUEST
           '#p': [account.pubkey]
         })

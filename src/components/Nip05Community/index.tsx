@@ -2,6 +2,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
 import { TNip05Community } from '@/types'
 import { Globe, Users, UserPlus, Check, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -298,29 +307,30 @@ function MemberCard({ pubkey, domain }: { pubkey: string; domain: string }) {
 
 function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPubkey: string }) {
   const { t } = useTranslation()
-  const { account, signer, checkLogin, profile } = useNostr()
-  const { followingList } = useFollowList()
+  const { pubkey, checkLogin, profile, publish } = useNostr()
+  const { followingSet } = useFollowList()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasRequested, setHasRequested] = useState(false)
-  const [showFollowWarning, setShowFollowWarning] = useState(false)
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false)
+  const [requestMessage, setRequestMessage] = useState('')
 
   // Check if user is already a member
   const userNip05Domain = profile?.nip05?.split('@')[1]
   const isAlreadyMember = userNip05Domain === domain
 
   // Check if user follows the admin
-  const isFollowingAdmin = followingList.includes(adminPubkey)
+  const isFollowingAdmin = followingSet.has(adminPubkey)
 
   useEffect(() => {
     // Check if user has already sent a request
     const checkExistingRequest = async () => {
-      if (!account) return
+      if (!pubkey) return
 
       try {
         // Query for existing join request from this user for this domain
-        const events = await client.fetchEvents({
+        const events = await client.fetchEvents([], {
           kinds: [39457],
-          authors: [account.pubkey],
+          authors: [pubkey],
           '#d': [domain]
         })
 
@@ -338,50 +348,53 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
     }
 
     checkExistingRequest()
-  }, [account, domain])
+  }, [pubkey, domain])
 
-  const handleRequestToJoin = async () => {
-    checkLogin(async () => {
-      if (!signer || !account) {
-        toast.error(t('Please login first'))
-        return
-      }
-
-      setIsSubmitting(true)
-      try {
-        // Create the join request draft event
-        const draftEvent = createCommunityJoinRequestDraftEvent(
-          domain,
-          adminPubkey,
-          `I would like to join the ${domain} community`
-        )
-
-        // Sign the event
-        const signedEvent = await signer.signEvent(draftEvent)
-
-        // Publish to admin's write relays and big relays
-        const adminRelayList = await client.fetchRelayList(adminPubkey)
-        const targetRelays = [
-          ...(adminRelayList?.write || []),
-          'wss://relay.damus.io',
-          'wss://relay.primal.net',
-          'wss://nos.lol'
-        ]
-
-        await client.publishEvent(signedEvent, {
-          specifiedRelayUrls: targetRelays
-        })
-
-        setHasRequested(true)
-        toast.success(t('Join request sent!'))
-        toast.info(t('Make sure the admin follows you to see your request'))
-      } catch (error) {
-        console.error('Error sending join request:', error)
-        toast.error(t('Failed to send join request'))
-      } finally {
-        setIsSubmitting(false)
-      }
+  const handleRequestToJoinClick = () => {
+    checkLogin(() => {
+      // Show preview dialog
+      setRequestMessage(`I would like to join the ${domain} community`)
+      setShowPreviewDialog(true)
     })
+  }
+
+  const handleSendRequest = async () => {
+    setIsSubmitting(true)
+    setShowPreviewDialog(false)
+
+    try {
+      // Create the join request draft event
+      const draftEvent = createCommunityJoinRequestDraftEvent(
+        domain,
+        adminPubkey,
+        requestMessage
+      )
+
+      // Get admin's write relays for targeting
+      const adminRelayList = await client.fetchRelayList(adminPubkey)
+      const targetRelays = [
+        ...(adminRelayList?.write || []),
+        'wss://relay.damus.io',
+        'wss://relay.primal.net',
+        'wss://nos.lol'
+      ]
+
+      // Publish using NostrProvider's publish method (handles signing)
+      await publish(draftEvent, {
+        specifiedRelayUrls: targetRelays
+      })
+
+      setHasRequested(true)
+      toast.success(t('Join request sent!'))
+      if (!isFollowingAdmin) {
+        toast.info(t('Make sure the admin follows you to see your request'))
+      }
+    } catch (error) {
+      console.error('Error sending join request:', error)
+      toast.error(t('Failed to send join request'))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isAlreadyMember) {
@@ -413,23 +426,66 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
   }
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <Button
-        onClick={handleRequestToJoin}
-        disabled={isSubmitting}
-        className="gap-2"
-      >
-        <UserPlus className="w-4 h-4" />
-        {isSubmitting ? t('Sending...') : t('Request to Join')}
-      </Button>
-      {!isFollowingAdmin && showFollowWarning && (
-        <Alert className="max-w-sm">
-          <Info className="h-4 w-4" />
-          <AlertDescription className="text-xs">
-            {t('Tip: The admin needs to follow you to see your request. Consider following them first!')}
-          </AlertDescription>
-        </Alert>
-      )}
-    </div>
+    <>
+      <div className="flex flex-col items-end gap-2">
+        <Button
+          onClick={handleRequestToJoinClick}
+          disabled={isSubmitting}
+          className="gap-2"
+        >
+          <UserPlus className="w-4 h-4" />
+          {isSubmitting ? t('Sending...') : t('Request to Join')}
+        </Button>
+        {!isFollowingAdmin && (
+          <Alert className="max-w-sm">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {t('Tip: The admin needs to follow you to see your request. Consider following them first!')}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+
+      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Request to Join')} {domain}</DialogTitle>
+            <DialogDescription>
+              {t('Your request will be sent to the community admin. You can customize your message below.')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                {t('Message to Admin')}
+              </label>
+              <Textarea
+                value={requestMessage}
+                onChange={(e) => setRequestMessage(e.target.value)}
+                placeholder={t('Introduce yourself and explain why you want to join...')}
+                rows={4}
+                className="w-full"
+              />
+            </div>
+            {!isFollowingAdmin && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  {t('The admin needs to follow you to see your request. Make sure they follow you!')}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPreviewDialog(false)}>
+              {t('Cancel')}
+            </Button>
+            <Button onClick={handleSendRequest} disabled={!requestMessage.trim()}>
+              {t('Send Request')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
