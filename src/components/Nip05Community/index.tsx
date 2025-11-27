@@ -1,11 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { TNip05Community } from '@/types'
-import { Globe, Users, UserPlus, Check } from 'lucide-react'
+import { Globe, Users, UserPlus, Check, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNip05Communities } from '@/providers/Nip05CommunitiesProvider'
+import { useFollowList } from '@/providers/FollowListProvider'
 import NotFound from '../NotFound'
 import { useFetchProfile } from '@/hooks'
 import { toProfile } from '@/lib/link'
@@ -297,12 +299,17 @@ function MemberCard({ pubkey, domain }: { pubkey: string; domain: string }) {
 function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPubkey: string }) {
   const { t } = useTranslation()
   const { account, signer, checkLogin, profile } = useNostr()
+  const { followingList } = useFollowList()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasRequested, setHasRequested] = useState(false)
+  const [showFollowWarning, setShowFollowWarning] = useState(false)
 
   // Check if user is already a member
   const userNip05Domain = profile?.nip05?.split('@')[1]
   const isAlreadyMember = userNip05Domain === domain
+
+  // Check if user follows the admin
+  const isFollowingAdmin = followingList.includes(adminPubkey)
 
   useEffect(() => {
     // Check if user has already sent a request
@@ -383,17 +390,41 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
 
   if (hasRequested) {
     return (
-      <Button variant="outline" disabled className="gap-2">
-        <Check className="w-4 h-4" />
-        {t('Request Sent')}
-      </Button>
+      <div className="flex flex-col items-end gap-2">
+        <Button variant="outline" disabled className="gap-2">
+          <Check className="w-4 h-4" />
+          {t('Request Sent')}
+        </Button>
+        {!isFollowingAdmin && (
+          <Alert className="max-w-sm">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {t('The admin needs to follow you to see your request. Make sure they follow you!')}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
     )
   }
 
   return (
-    <Button onClick={handleRequestToJoin} disabled={isSubmitting} className="gap-2">
-      <UserPlus className="w-4 h-4" />
-      {isSubmitting ? t('Sending...') : t('Request to Join')}
-    </Button>
+    <div className="flex flex-col items-end gap-2">
+      <Button
+        onClick={handleRequestToJoin}
+        disabled={isSubmitting}
+        className="gap-2"
+      >
+        <UserPlus className="w-4 h-4" />
+        {isSubmitting ? t('Sending...') : t('Request to Join')}
+      </Button>
+      {!isFollowingAdmin && showFollowWarning && (
+        <Alert className="max-w-sm">
+          <Info className="h-4 w-4" />
+          <AlertDescription className="text-xs">
+            {t('Tip: The admin needs to follow you to see your request. Consider following them first!')}
+          </AlertDescription>
+        </Alert>
+      )}
+    </div>
   )
 }

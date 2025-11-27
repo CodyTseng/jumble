@@ -516,6 +516,8 @@ export default {
     'Checking...': 'جاري الفحص...',
     'Request has been approved!': 'تمت الموافقة على الطلب!',
     'User not yet added to nostr.json': 'لم يتم إضافة المستخدم إلى nostr.json بعد',
-    'Failed to check approval status': 'فشل التحقق من حالة الموافقة'
+    'Failed to check approval status': 'فشل التحقق من حالة الموافقة',
+    'The admin needs to follow you to see your request. Make sure they follow you!': 'يحتاج المشرف إلى متابعتك لرؤية طلبك. تأكد من أنه يتابعك!',
+    'Tip: The admin needs to follow you to see your request. Consider following them first!': 'نصيحة: يحتاج المشرف إلى متابعتك لرؤية طلبك. فكر في متابعته أولاً!'
   }
 }
