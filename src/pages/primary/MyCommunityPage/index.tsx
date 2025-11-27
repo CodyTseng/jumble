@@ -36,7 +36,33 @@ export default MyCommunityPage
 function MyCommunityPageTitlebar() {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { checkLogin } = useNostr()
+  const { checkLogin, pubkey } = useNostr()
+  const { feedInfo } = useFeed()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  const domain = feedInfo.feedType === 'nip05-domain' ? feedInfo.id : null
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!domain || !pubkey) {
+        setIsAdmin(false)
+        return
+      }
+
+      try {
+        // Get members from the domain (uses cache if available)
+        const members = await nip05CommunityService.getDomainMembers(domain)
+
+        // User is admin if they're the first member
+        setIsAdmin(members.length > 0 && members[0] === pubkey)
+      } catch (error) {
+        console.error('[MyCommunityPageTitlebar] Error checking admin status:', error)
+        setIsAdmin(false)
+      }
+    }
+
+    checkAdmin()
+  }, [domain, pubkey])
 
   return (
     <div className="flex gap-2 items-center justify-between h-full pl-3 pr-3 w-full">
@@ -50,8 +76,17 @@ function MyCommunityPageTitlebar() {
         onClick={() => checkLogin(() => push('/communities/create'))}
         className="gap-2 text-base font-semibold"
       >
-        <PlusCircle className="w-4 h-4" />
-        {t('Create')}
+        {isAdmin ? (
+          <>
+            <PlusCircle className="w-4 h-4" />
+            {t('Manage')}
+          </>
+        ) : (
+          <>
+            <PlusCircle className="w-4 h-4" />
+            {t('Create')}
+          </>
+        )}
       </Button>
     </div>
   )
