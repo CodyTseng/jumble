@@ -20,7 +20,6 @@ export default function TrendingNotes() {
       </div>
       <NormalFeed
         subRequests={[{ urls: TRENDING_NOTES_RELAY_URLS, filter: {} }]}
-        feedId="trending"
         showRelayCloseReason
       />
     </div>

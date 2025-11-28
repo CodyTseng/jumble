@@ -16,15 +16,15 @@ export default function NormalFeed({
   areAlgoRelays = false,
   isMainFeed = false,
   showRelayCloseReason = false,
-  feedId,
-  filterFn
+  filterFn,
+  disable24hMode = false
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
   isMainFeed?: boolean
   showRelayCloseReason?: boolean
-  feedId?: string
   filterFn?: (event: Event) => boolean
+  disable24hMode?: boolean
 }) {
   const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
@@ -54,11 +54,11 @@ export default function NormalFeed({
   return (
     <>
       <Tabs
-        value={listMode === '24h' && !feedId ? 'posts' : listMode}
+        value={listMode === '24h' && disable24hMode ? 'posts' : listMode}
         tabs={[
           { value: 'posts', label: 'Notes' },
           { value: 'postsAndReplies', label: 'Replies' },
-          ...(feedId ? [{ value: '24h', label: '24h Pulse' }] : [])
+          ...(!disable24hMode ? [{ value: '24h', label: '24h Pulse' }] : [])
         ]}
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
@@ -86,10 +86,9 @@ export default function NormalFeed({
         }
       />
       <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
-      {listMode === '24h' && feedId ? (
+      {listMode === '24h' && !disable24hMode ? (
         <UserAggregationList
           ref={userAggregationListRef}
-          feedId={feedId}
           showKinds={temporaryShowKinds}
           subRequests={subRequests}
           filterFn={filterFn}

@@ -5,6 +5,7 @@ import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
+import { randomString } from '@/lib/random'
 import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -42,12 +43,11 @@ const UserAggregationList = forwardRef<
   TUserAggregationListRef,
   {
     subRequests: TFeedSubRequest[]
-    feedId: string
     showKinds?: number[]
     filterFn?: (event: Event) => boolean
     filterMutedNotes?: boolean
   }
->(({ subRequests, feedId, showKinds, filterFn, filterMutedNotes = true }, ref) => {
+>(({ subRequests, showKinds, filterFn, filterMutedNotes = true }, ref) => {
   const { t } = useTranslation()
   const { startLogin } = useNostr()
   const { push } = useSecondaryPage()
@@ -56,6 +56,7 @@ const UserAggregationList = forwardRef<
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { isEventDeleted } = useDeletedEvent()
   const [events, setEvents] = useState<Event[]>([])
+  const [feedId, setFeedId] = useState<string>('')
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [showLoadingBar, setShowLoadingBar] = useState(true)
@@ -80,6 +81,15 @@ const UserAggregationList = forwardRef<
   }
 
   useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
+
+  useEffect(() => {
+    const feedId = randomString(8)
+    setFeedId(feedId)
+
+    return () => {
+      userAggregationService.clearAggregations(feedId)
+    }
+  }, [])
 
   useEffect(() => {
     if (!subRequests.length) return
@@ -134,7 +144,7 @@ const UserAggregationList = forwardRef<
     return () => {
       promise.then((closer) => closer())
     }
-  }, [JSON.stringify(subRequests), JSON.stringify(showKinds), feedId, refreshCount])
+  }, [JSON.stringify(subRequests), JSON.stringify(showKinds), refreshCount])
 
   useEffect(() => {
     if (
@@ -156,7 +166,7 @@ const UserAggregationList = forwardRef<
   }, [loading, timelineKey, events])
 
   useEffect(() => {
-    const unsubscribe = userAggregationService.subscribe(() => {
+    const unsubscribe = userAggregationService.subscribePinnedUsers(() => {
       setPinnedPubkeys(new Set(userAggregationService.getPinnedPubkeys()))
     })
 
@@ -203,7 +213,7 @@ const UserAggregationList = forwardRef<
 
   const aggregations = useMemo(() => {
     const aggs = userAggregationService.aggregateByUser(filteredEvents)
-    userAggregationService.setCachedEvents(feedId, aggs)
+    userAggregationService.saveAggregations(feedId, aggs)
     return aggs
   }, [feedId, filteredEvents])
 
@@ -311,10 +321,10 @@ function UserAggregationItem({
         variant="ghost"
         size="icon"
         onClick={(e) => onTogglePin(aggregation.pubkey, e)}
-        className={`flex-shrink-0 transition-all duration-200 ${
+        className={`flex-shrink-0 ${
           isPinned
-            ? 'opacity-100 text-primary hover:text-primary/80'
-            : 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground'
+            ? 'text-primary hover:text-primary/80'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
         title={isPinned ? t('Unpin') : t('Pin')}
       >

@@ -55,7 +55,6 @@ export default function Relay({ url, className }: { url?: string; className?: st
         subRequests={[
           { urls: [normalizedUrl], filter: debouncedInput ? { search: debouncedInput } : {} }
         ]}
-        feedId={url}
         showRelayCloseReason
       />
     </div>

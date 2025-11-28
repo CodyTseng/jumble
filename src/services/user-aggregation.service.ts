@@ -14,8 +14,8 @@ class UserAggregationService {
   static instance: UserAggregationService
 
   private pinnedPubkeys: Set<string> = new Set()
-  private feedUserEventsMap: Map<string, Map<string, Event[]>> = new Map()
-  private listeners: Set<() => void> = new Set()
+  private aggregationStore: Map<string, Map<string, Event[]>> = new Map()
+  private listenersMap: Map<string, Set<() => void>> = new Map()
 
   constructor() {
     if (UserAggregationService.instance) {
@@ -25,15 +25,41 @@ class UserAggregationService {
     this.pinnedPubkeys = storage.getPinnedPubkeys()
   }
 
-  subscribe(listener: () => void) {
-    this.listeners.add(listener)
+  subscribeAggregation(feedId: string, pubkey: string, listener: () => void) {
+    return this.subscribe(`${feedId}:${pubkey}`, listener)
+  }
+
+  private notifyAggregation(feedId: string, pubkey: string) {
+    this.notify(`${feedId}:${pubkey}`)
+  }
+
+  subscribePinnedUsers(listener: () => void) {
+    return this.subscribe('pin', listener)
+  }
+
+  private notifyPinnedUsers() {
+    this.notify('pin')
+  }
+
+  private subscribe(type: string, listener: () => void) {
+    if (!this.listenersMap.has(type)) {
+      this.listenersMap.set(type, new Set())
+    }
+    this.listenersMap.get(type)!.add(listener)
+
     return () => {
-      this.listeners.delete(listener)
+      this.listenersMap.get(type)?.delete(listener)
+      if (this.listenersMap.get(type)?.size === 0) {
+        this.listenersMap.delete(type)
+      }
     }
   }
 
-  private notify() {
-    this.listeners.forEach((listener) => listener())
+  private notify(type: string) {
+    const listeners = this.listenersMap.get(type)
+    if (listeners) {
+      listeners.forEach((listener) => listener())
+    }
   }
 
   // Pinned users management
@@ -48,13 +74,13 @@ class UserAggregationService {
   pinUser(pubkey: string) {
     this.pinnedPubkeys.add(pubkey)
     storage.setPinnedPubkeys(this.pinnedPubkeys)
-    this.notify()
+    this.notifyPinnedUsers()
   }
 
   unpinUser(pubkey: string) {
     this.pinnedPubkeys.delete(pubkey)
     storage.setPinnedPubkeys(this.pinnedPubkeys)
-    this.notify()
+    this.notifyPinnedUsers()
   }
 
   togglePin(pubkey: string) {
@@ -116,15 +142,21 @@ class UserAggregationService {
     return [...pinned, ...unpinned]
   }
 
-  // Cache management for quick access
-  setCachedEvents(feedId: string, aggregations: TUserAggregation[]) {
+  saveAggregations(feedId: string, aggregations: TUserAggregation[]) {
     const map = new Map<string, Event[]>()
     aggregations.forEach((agg) => map.set(agg.pubkey, agg.events))
-    this.feedUserEventsMap.set(feedId, map)
+    this.aggregationStore.set(feedId, map)
+    aggregations.forEach((agg) => {
+      this.notifyAggregation(feedId, agg.pubkey)
+    })
   }
 
-  getUserEvents(feedId: string, pubkey: string): Event[] {
-    return this.feedUserEventsMap.get(feedId)?.get(pubkey) || []
+  getAggregation(feedId: string, pubkey: string): Event[] {
+    return this.aggregationStore.get(feedId)?.get(pubkey) || []
+  }
+
+  clearAggregations(feedId: string) {
+    this.aggregationStore.delete(feedId)
   }
 }
 

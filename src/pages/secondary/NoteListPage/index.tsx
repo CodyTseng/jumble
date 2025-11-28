@@ -10,7 +10,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import { UserRound } from 'lucide-react'
-import React, { forwardRef, useEffect, useMemo, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
@@ -32,13 +32,6 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     | null
   >(null)
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
-
-  const feedId = useMemo(() => {
-    if (data?.type === 'domain') {
-      return `domain-${data.domain}`
-    }
-    return undefined
-  }, [data])
 
   useEffect(() => {
     const init = async () => {
@@ -114,7 +107,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    content = <NormalFeed subRequests={subRequests} feedId={feedId} />
+    content = <NormalFeed subRequests={subRequests} disable24hMode={data.type !== 'domain'} />
   }
 
   return (

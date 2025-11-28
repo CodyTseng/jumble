@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next'
 const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState<'users' | 'feed'>('users')
-  const feedId = id ? `follow-pack-${id}` : 'follow-pack'
 
   const { event, isFetching } = useFetchEvent(id)
 
@@ -97,7 +96,7 @@ const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number 
 
         {/* Content */}
         {tab === 'users' && <ProfileList pubkeys={pubkeys} />}
-        {tab === 'feed' && pubkeys.length > 0 && <Feed pubkeys={pubkeys} feedId={feedId} />}
+        {tab === 'feed' && pubkeys.length > 0 && <Feed pubkeys={pubkeys} />}
       </div>
     </SecondaryPageLayout>
   )
@@ -105,7 +104,7 @@ const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number 
 FollowPackPage.displayName = 'FollowPackPage'
 export default FollowPackPage
 
-function Feed({ pubkeys, feedId }: { pubkeys: string[]; feedId: string }) {
+function Feed({ pubkeys }: { pubkeys: string[] }) {
   const { pubkey: myPubkey } = useNostr()
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
 
@@ -113,5 +112,5 @@ function Feed({ pubkeys, feedId }: { pubkeys: string[]; feedId: string }) {
     client.generateSubRequestsForPubkeys(pubkeys, myPubkey).then(setSubRequests)
   }, [pubkeys, myPubkey])
 
-  return <NormalFeed subRequests={subRequests} feedId={feedId} />
+  return <NormalFeed subRequests={subRequests} />
 }

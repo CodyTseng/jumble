@@ -2,8 +2,8 @@ import NoteCard from '@/components/NoteCard'
 import { SimpleUsername } from '@/components/Username'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import userAggregationService from '@/services/user-aggregation.service'
-import { nip19 } from 'nostr-tools'
-import { forwardRef, useMemo } from 'react'
+import { nip19, NostrEvent } from 'nostr-tools'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const UserAggregationDetailPage = forwardRef(
@@ -20,6 +20,7 @@ const UserAggregationDetailPage = forwardRef(
     ref
   ) => {
     const { t } = useTranslation()
+    const [userEvents, setUserEvents] = useState<NostrEvent[]>([])
 
     const pubkey = useMemo(() => {
       if (!npub) return undefined
@@ -32,9 +33,24 @@ const UserAggregationDetailPage = forwardRef(
       }
     }, [npub])
 
-    const userEvents = useMemo(() => {
-      if (!feedId || !pubkey) return []
-      return userAggregationService.getUserEvents(feedId, pubkey)
+    useEffect(() => {
+      if (!feedId || !pubkey) {
+        setUserEvents([])
+        return
+      }
+
+      const updateEvents = () => {
+        const events = userAggregationService.getAggregation(feedId, pubkey)
+        setUserEvents(events)
+      }
+
+      const unSub = userAggregationService.subscribeAggregation(feedId, pubkey, () => {
+        updateEvents()
+      })
+
+      updateEvents()
+
+      return unSub
     }, [feedId, pubkey])
 
     if (!pubkey || !feedId) {

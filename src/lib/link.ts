@@ -89,5 +89,5 @@ export const toChachiChat = (relay: string, d: string) => {
 export const toNjump = (id: string) => `https://njump.me/${id}`
 export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
-  return `/user-aggregation/${encodeURIComponent(feedId)}/${npub}`
+  return `/user-aggregation/${feedId}/${npub}`
 }
