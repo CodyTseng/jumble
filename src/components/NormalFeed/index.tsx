@@ -1,7 +1,7 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import UserAggregationList, { TUserAggregationListRef } from '@/components/UserAggregationList'
-import VideoFeed from '@/components/VideoFeed'
+import { ExtendedKind } from '@/constants'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -11,6 +11,14 @@ import { Event } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
+
+// Video kinds for the Videos tab
+const VIDEO_KINDS = [
+  ExtendedKind.VIDEO,
+  ExtendedKind.SHORT_VIDEO,
+  ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+  ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+]
 
 export default function NormalFeed({
   subRequests,
@@ -66,33 +74,29 @@ export default function NormalFeed({
           handleListModeChange(listMode as TNoteListMode)
         }}
         options={
-          listMode !== 'videos' ? (
-            <>
-              {!supportTouch && (
-                <RefreshButton
-                  onClick={() => {
-                    if (listMode === '24h') {
-                      userAggregationListRef.current?.refresh()
-                    } else {
-                      noteListRef.current?.refresh()
-                    }
-                  }}
-                />
-              )}
-              {showKindsFilter && (
-                <KindFilter
-                  showKinds={temporaryShowKinds}
-                  onShowKindsChange={handleShowKindsChange}
-                />
-              )}
-            </>
-          ) : null
+          <>
+            {!supportTouch && (
+              <RefreshButton
+                onClick={() => {
+                  if (listMode === '24h') {
+                    userAggregationListRef.current?.refresh()
+                  } else {
+                    noteListRef.current?.refresh()
+                  }
+                }}
+              />
+            )}
+            {showKindsFilter && listMode !== 'videos' && (
+              <KindFilter
+                showKinds={temporaryShowKinds}
+                onShowKindsChange={handleShowKindsChange}
+              />
+            )}
+          </>
         }
       />
       <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
-      {listMode === 'videos' ? (
-        <VideoFeed followingSubRequests={subRequests} />
-      ) : listMode === '24h' && !disable24hMode ? (
+      {listMode === '24h' && !disable24hMode ? (
         <UserAggregationList
           ref={userAggregationListRef}
           showKinds={temporaryShowKinds}
@@ -102,7 +106,7 @@ export default function NormalFeed({
       ) : (
         <NoteList
           ref={noteListRef}
-          showKinds={temporaryShowKinds}
+          showKinds={listMode === 'videos' ? VIDEO_KINDS : temporaryShowKinds}
           subRequests={subRequests}
           hideReplies={listMode === 'posts'}
           hideUntrustedNotes={hideUntrustedNotes}

@@ -1,4 +1,5 @@
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
+import { DIVINE_RELAY_URL } from '@/lib/divine-video'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
@@ -58,6 +59,10 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
 
       if (feedInfo?.feedType === 'relay') {
         return await switchFeed('relay', { relay: feedInfo.id })
+      }
+
+      if (feedInfo?.feedType === 'divine') {
+        return await switchFeed('divine')
       }
 
       // update following feed if pubkey changes
@@ -144,6 +149,15 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       storage.setFeedInfo(newFeedInfo, pubkey)
 
       setRelayUrls([])
+      setIsReady(true)
+      return
+    }
+    if (feedType === 'divine') {
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
+      setRelayUrls([DIVINE_RELAY_URL])
+      storage.setFeedInfo(newFeedInfo, pubkey)
       setIsReady(true)
       return
     }

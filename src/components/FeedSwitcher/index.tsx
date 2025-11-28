@@ -5,7 +5,7 @@ import { SecondaryPageLink } from '@/PageManager'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { UsersRound } from 'lucide-react'
+import { Clapperboard, UsersRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 import RelaySetCard from '../RelaySetCard'
@@ -32,6 +32,21 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
             <UsersRound className="size-4" />
           </div>
           <div>{t('Following')}</div>
+        </div>
+      </FeedSwitcherItem>
+
+      <FeedSwitcherItem
+        isActive={feedInfo?.feedType === 'divine'}
+        onClick={() => {
+          switchFeed('divine')
+          close?.()
+        }}
+      >
+        <div className="flex gap-2 items-center">
+          <div className="flex justify-center items-center w-6 h-6 shrink-0">
+            <Clapperboard className="size-4" />
+          </div>
+          <div>{t('Divine Videos')}</div>
         </div>
       </FeedSwitcherItem>
 
