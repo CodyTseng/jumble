@@ -138,6 +138,10 @@ export function isImage(url: string) {
 
 export function isMedia(url: string) {
   try {
+    const urlObj = new URL(url)
+    const pathname = urlObj.pathname.toLowerCase()
+
+    // Check file extensions
     const mediaExtensions = [
       '.mp4',
       '.webm',
@@ -151,7 +155,17 @@ export function isMedia(url: string) {
       '.opus',
       '.wma'
     ]
-    return mediaExtensions.some((ext) => new URL(url).pathname.toLowerCase().endsWith(ext))
+    if (mediaExtensions.some((ext) => pathname.endsWith(ext))) {
+      return true
+    }
+
+    // Check known video streaming domains
+    const hostname = urlObj.hostname
+    if (hostname === 'stream.divine.video') {
+      return true
+    }
+
+    return false
   } catch {
     return false
   }
