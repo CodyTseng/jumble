@@ -153,15 +153,16 @@ export function isMedia(url: string) {
       '.aac',
       '.m4a',
       '.opus',
-      '.wma'
+      '.wma',
+      '.m3u8'
     ]
     if (mediaExtensions.some((ext) => pathname.endsWith(ext))) {
       return true
     }
 
     // Check known video streaming domains
-    const hostname = urlObj.hostname
-    if (hostname === 'stream.divine.video') {
+    const hostname = urlObj.hostname.replace(/^www\./, '')
+    if (hostname === 'stream.divine.video' || hostname === 'divine.video' || hostname.endsWith('.divine.video')) {
       return true
     }
 

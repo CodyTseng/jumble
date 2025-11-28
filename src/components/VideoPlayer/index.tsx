@@ -2,6 +2,7 @@ import { cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
+import Hls from 'hls.js'
 import { useEffect, useRef, useState } from 'react'
 import { Play, ExternalLink as ExternalLinkIcon } from 'lucide-react'
 
@@ -23,6 +24,46 @@ export default function VideoPlayer({
   const [error, setError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const hlsRef = useRef<Hls | null>(null)
+
+  // Check if the source is an HLS stream
+  const isHls = src.includes('.m3u8')
+
+  // Setup HLS.js for .m3u8 streams
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !isHls) return
+
+    // If native HLS is supported (Safari), use it directly
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src
+      return
+    }
+
+    // Use HLS.js for other browsers
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true
+      })
+      hlsRef.current = hls
+      hls.loadSource(src)
+      hls.attachMedia(video)
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          setError(true)
+        }
+      })
+
+      return () => {
+        hls.destroy()
+        hlsRef.current = null
+      }
+    } else {
+      // HLS not supported at all
+      setError(true)
+    }
+  }, [src, isHls])
 
   useEffect(() => {
     const video = videoRef.current
@@ -119,13 +160,13 @@ export default function VideoPlayer({
         playsInline
         loop={loop}
         className={cn('rounded-lg max-h-[80vh] sm:max-h-[60vh] border', className)}
-        src={src}
+        src={isHls ? undefined : src}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {
           mediaManager.play(event.currentTarget)
         }}
         muted={effectiveMuted}
-        onError={() => setError(true)}
+        onError={() => !isHls && setError(true)}
       />
     </div>
   )
