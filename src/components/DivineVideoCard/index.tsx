@@ -1,5 +1,5 @@
 import { useFetchProfile } from '@/hooks/useFetchProfile'
-import { ParsedVideoData, formatViewCount, formatDuration } from '@/lib/divine-video'
+import { ParsedVideoData, formatViewCount } from '@/lib/divine-video'
 import { toNote } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -7,9 +7,9 @@ import MediaPlayer from '../MediaPlayer'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import { Skeleton } from '../ui/skeleton'
-import { Eye, MessageCircle, Heart, Repeat2, Play, Clock } from 'lucide-react'
+import { Eye, MessageCircle, Heart, Repeat2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { nip19 } from 'nostr-tools'
 
 interface DivineVideoCardProps {
@@ -20,8 +20,6 @@ interface DivineVideoCardProps {
 export default function DivineVideoCard({ video, className }: DivineVideoCardProps) {
   const { push } = useSecondaryPage()
   const { profile } = useFetchProfile(video.pubkey)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [imageError, setImageError] = useState(false)
 
   // Use original Vine timestamp if available, otherwise use created_at
   const timestamp = video.originalVineTimestamp || video.createdAt
@@ -47,11 +45,6 @@ export default function DivineVideoCard({ video, className }: DivineVideoCardPro
     push(toNote(nip19.neventEncode({ id: video.id })))
   }
 
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsPlaying(true)
-  }
-
   const displayName = profile?.display_name || profile?.name || video.pubkey.slice(0, 8) + '...'
 
   return (
@@ -64,7 +57,7 @@ export default function DivineVideoCard({ video, className }: DivineVideoCardPro
     >
       {/* Author info */}
       <div className="flex items-center gap-3 p-3 pb-2">
-        <UserAvatar userId={video.pubkey} size="default" />
+        <UserAvatar userId={video.pubkey} size="normal" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <Username
@@ -95,45 +88,14 @@ export default function DivineVideoCard({ video, className }: DivineVideoCardPro
           <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{video.content}</p>
         )}
 
-        {/* Video player / thumbnail */}
-        <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-2">
-          {isPlaying ? (
-            <MediaPlayer
-              src={video.videoUrl}
-              className="w-full h-full object-contain"
-              mustLoad
-              loop
-              defaultMuted={false}
-            />
-          ) : (
-            <div className="relative w-full h-full" onClick={handlePlayClick}>
-              {video.thumbnailUrl && !imageError ? (
-                <img
-                  src={video.thumbnailUrl}
-                  alt={video.title || 'Video thumbnail'}
-                  className="w-full h-full object-cover"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <Play className="w-12 h-12 text-primary/50" />
-                </div>
-              )}
-              {/* Play overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
-                <div className="w-14 h-14 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm">
-                  <Play className="w-7 h-7 text-white fill-white ml-1" />
-                </div>
-              </div>
-              {/* Duration badge */}
-              {video.duration && video.duration > 0 && (
-                <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {formatDuration(video.duration)}
-                </div>
-              )}
-            </div>
-          )}
+        {/* Video player - autoplay with sound */}
+        <div className="relative aspect-video bg-black rounded-lg overflow-hidden mb-2">
+          <MediaPlayer
+            src={video.videoUrl}
+            className="w-full h-full object-contain"
+            loop
+            defaultMuted={false}
+          />
         </div>
 
         {/* Hashtags */}
