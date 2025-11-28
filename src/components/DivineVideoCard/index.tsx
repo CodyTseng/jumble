@@ -93,6 +93,7 @@ export default function DivineVideoCard({ video, className }: DivineVideoCardPro
           <MediaPlayer
             src={video.videoUrl}
             className="w-full h-full object-contain"
+            mustLoad
             loop
             defaultMuted={false}
           />
