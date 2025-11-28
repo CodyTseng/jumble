@@ -7,6 +7,43 @@ export const DIVINE_VIDEO_KIND = 34236
 export const DIVINE_RELAY_URL = 'wss://relay.divine.video'
 
 /**
+ * Check if a URL is an HLS stream (not directly playable in most browsers)
+ */
+function isHlsUrl(url: string): boolean {
+  return url.includes('.m3u8')
+}
+
+/**
+ * Check if a Divine video event has a playable video URL (non-HLS)
+ * Returns false if the video only has HLS streams which aren't well supported
+ */
+export function hasPlayableVideo(event: Event): boolean {
+  if (event.kind !== DIVINE_VIDEO_KIND) return true
+
+  const parsed = parseVideoEvents([event])
+  if (parsed.length === 0) return false
+
+  const video = parsed[0]
+
+  // Check if main video URL is playable (not HLS)
+  if (video.videoUrl && !isHlsUrl(video.videoUrl)) {
+    return true
+  }
+
+  // Check fallback URLs for a playable one
+  if (video.fallbackVideoUrls) {
+    for (const url of video.fallbackVideoUrls) {
+      if (!isHlsUrl(url)) {
+        return true
+      }
+    }
+  }
+
+  // Only HLS URLs available - not playable
+  return false
+}
+
+/**
  * NIP-50 sort modes for video feeds
  * These are used in the search filter to sort results
  *

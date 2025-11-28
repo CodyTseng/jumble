@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL, DivineSortMode, createSortSearch } from '@/lib/divine-video'
+import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL, DivineSortMode, createSortSearch, hasPlayableVideo } from '@/lib/divine-video'
 import { isTouchDevice } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -59,6 +59,8 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
       (evt: Event) => {
         if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
+        // Filter out videos that only have HLS streams (not playable in browser)
+        if (!hasPlayableVideo(evt)) return true
         return false
       },
       [hideUntrustedNotes, filterMutedNotes, mutePubkeySet, isUserTrusted]
