@@ -3,7 +3,7 @@ import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef, useState } from 'react'
-import ExternalLink from '../ExternalLink'
+import { Play, ExternalLink as ExternalLinkIcon } from 'lucide-react'
 
 export default function VideoPlayer({
   src,
@@ -88,7 +88,27 @@ export default function VideoPlayer({
   }, [muteMedia, defaultMuted])
 
   if (error) {
-    return <ExternalLink url={src} />
+    return (
+      <div
+        className={cn(
+          'rounded-lg border bg-muted/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/70 transition-colors',
+          className
+        )}
+        style={{ aspectRatio: '16/9' }}
+        onClick={(e) => {
+          e.stopPropagation()
+          window.open(src, '_blank', 'noreferrer')
+        }}
+      >
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+          <Play className="w-7 h-7 text-primary fill-primary ml-1" />
+        </div>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <ExternalLinkIcon className="w-3 h-3" />
+          <span>Open video externally</span>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -42,12 +42,16 @@ export default function MediaPlayer({
       return
     }
 
-    const url = new URL(src)
-    const extension = url.pathname.split('.').pop()?.toLowerCase()
+    try {
+      const url = new URL(src)
+      const extension = url.pathname.split('.').pop()?.toLowerCase()
 
-    if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
-      setMediaType('audio')
-      return
+      if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
+        setMediaType('audio')
+        return
+      }
+    } catch {
+      // Invalid URL - try to load as video anyway
     }
 
     const video = document.createElement('video')
