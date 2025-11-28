@@ -5,7 +5,6 @@ import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
-import { randomString } from '@/lib/random'
 import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -56,7 +55,6 @@ const UserAggregationList = forwardRef<
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { isEventDeleted } = useDeletedEvent()
   const [events, setEvents] = useState<Event[]>([])
-  const [feedId, setFeedId] = useState<string>('')
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [showLoadingBar, setShowLoadingBar] = useState(true)
@@ -65,6 +63,9 @@ const UserAggregationList = forwardRef<
   const [pinnedPubkeys, setPinnedPubkeys] = useState<Set<string>>(
     new Set(userAggregationService.getPinnedPubkeys())
   )
+  const feedId = useMemo(() => {
+    return userAggregationService.getFeedId(subRequests, showKinds)
+  }, [JSON.stringify(subRequests), JSON.stringify(showKinds)])
   const topRef = useRef<HTMLDivElement | null>(null)
 
   const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
@@ -83,13 +84,11 @@ const UserAggregationList = forwardRef<
   useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
 
   useEffect(() => {
-    const feedId = randomString(8)
-    setFeedId(feedId)
-
+    console.log('UserAggregationList mount', feedId)
     return () => {
       userAggregationService.clearAggregations(feedId)
     }
-  }, [])
+  }, [feedId])
 
   useEffect(() => {
     if (!subRequests.length) return
@@ -144,7 +143,7 @@ const UserAggregationList = forwardRef<
     return () => {
       promise.then((closer) => closer())
     }
-  }, [JSON.stringify(subRequests), JSON.stringify(showKinds), refreshCount])
+  }, [feedId, refreshCount])
 
   useEffect(() => {
     if (

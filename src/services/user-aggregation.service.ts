@@ -1,5 +1,6 @@
 import { getEventKey } from '@/lib/event'
 import storage from '@/services/local-storage.service'
+import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 
@@ -157,6 +158,32 @@ class UserAggregationService {
 
   clearAggregations(feedId: string) {
     this.aggregationStore.delete(feedId)
+  }
+
+  getFeedId(subRequests: TFeedSubRequest[], showKinds: number[] = []): string {
+    const requestStr = subRequests
+      .map((req) => {
+        const urls = req.urls.sort().join(',')
+        const filter = Object.entries(req.filter)
+          .filter(([key]) => !['since', 'until', 'limit'].includes(key))
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([key, value]) => `${key}:${JSON.stringify(value)}`)
+          .join('|')
+        return `${urls}#${filter}`
+      })
+      .join(';;')
+
+    const kindsStr = showKinds.sort((a, b) => a - b).join(',')
+    const input = `${requestStr}::${kindsStr}`
+
+    let hash = 0
+    for (let i = 0; i < input.length; i++) {
+      const char = input.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash
+    }
+
+    return Math.abs(hash).toString(36)
   }
 }
 
