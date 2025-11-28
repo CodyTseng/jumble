@@ -558,6 +558,12 @@ export default {
     'Load earlier': '加载更早',
     'Last 24 hours': '最近 24 小时',
     'Last {{count}} days': '最近 {{count}} 天',
-    notes: '笔记'
+    notes: '笔记',
+    Divine: 'Divine',
+    'Divine Videos': 'Divine 视频',
+    Hot: '热门',
+    Classic: '经典',
+    Rising: '上升',
+    New: '最新'
   }
 }

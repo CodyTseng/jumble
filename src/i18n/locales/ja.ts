@@ -572,6 +572,12 @@ export default {
     'Load earlier': '以前を読み込む',
     'Last 24 hours': '過去24時間',
     'Last {{count}} days': '過去{{count}}日間',
-    notes: 'ノート'
+    notes: 'ノート',
+    Divine: 'Divine',
+    'Divine Videos': 'Divine 動画',
+    Hot: '人気',
+    Classic: 'クラシック',
+    Rising: '急上昇',
+    New: '新着'
   }
 }

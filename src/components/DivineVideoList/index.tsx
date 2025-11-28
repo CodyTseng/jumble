@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL } from '@/lib/divine-video'
+import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL, DivineSortMode, createSortSearch } from '@/lib/divine-video'
 import { isTouchDevice } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -35,10 +35,11 @@ interface DivineVideoListProps {
   pubkey?: string
   hideUntrustedNotes?: boolean
   filterMutedNotes?: boolean
+  sortMode?: DivineSortMode
 }
 
 const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
-  ({ hashtag, pubkey, hideUntrustedNotes = false, filterMutedNotes = true }, ref) => {
+  ({ hashtag, pubkey, hideUntrustedNotes = false, filterMutedNotes = true, sortMode }, ref) => {
     const { t } = useTranslation()
     const { startLogin } = useNostr()
     const { isUserTrusted } = useUserTrust()
@@ -98,7 +99,7 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
         setNewEvents([])
         setHasMore(true)
 
-        const filter: { kinds: number[]; '#t'?: string[]; authors?: string[] } = {
+        const filter: { kinds: number[]; '#t'?: string[]; authors?: string[]; search?: string; '#platform'?: string[] } = {
           kinds: [DIVINE_VIDEO_KIND]
         }
 
@@ -108,6 +109,15 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
 
         if (pubkey) {
           filter.authors = [pubkey]
+        }
+
+        // Add NIP-50 search sort mode if provided
+        if (sortMode) {
+          filter.search = createSortSearch(sortMode)
+          // For 'top' mode, filter for Classic archived Vines only
+          if (sortMode === 'top') {
+            filter['#platform'] = ['vine']
+          }
         }
 
         const { closer, timelineKey } = await client.subscribeTimeline(
@@ -138,7 +148,8 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
           },
           {
             startLogin,
-            needSort: true
+            // When using NIP-50 sort modes, the relay handles sorting, so we don't need client-side sort
+            needSort: !sortMode
           }
         )
         setTimelineKey(timelineKey)
@@ -149,7 +160,7 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
       return () => {
         promise.then((closer) => closer())
       }
-    }, [hashtag, pubkey, refreshCount])
+    }, [hashtag, pubkey, refreshCount, sortMode])
 
     useEffect(() => {
       const options = {

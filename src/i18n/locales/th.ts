@@ -565,6 +565,12 @@ export default {
     'Load earlier': 'โหลดข้อมูลก่อนหน้า',
     'Last 24 hours': '24 ชั่วโมงที่แล้ว',
     'Last {{count}} days': '{{count}} วันที่แล้ว',
-    notes: 'โน้ต'
+    notes: 'โน้ต',
+    Divine: 'Divine',
+    'Divine Videos': 'วิดีโอ Divine',
+    Hot: 'ยอดนิยม',
+    Classic: 'คลาสสิก',
+    Rising: 'กำลังมา',
+    New: 'ใหม่'
   }
 }

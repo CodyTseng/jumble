@@ -571,6 +571,12 @@ export default {
     'Load earlier': '이전 데이터 로드',
     'Last 24 hours': '최근 24시간',
     'Last {{count}} days': '최근 {{count}}일',
-    notes: '노트'
+    notes: '노트',
+    Divine: 'Divine',
+    'Divine Videos': 'Divine 비디오',
+    Hot: '인기',
+    Classic: '클래식',
+    Rising: '급상승',
+    New: '최신'
   }
 }

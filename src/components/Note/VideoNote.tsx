@@ -1,5 +1,6 @@
 import { ExtendedKind } from '@/constants'
 import { getImetaInfosFromEvent } from '@/lib/event'
+import { DIVINE_VIDEO_KIND, parseVideoEvents } from '@/lib/divine-video'
 import { useVideoFeed } from '@/providers/VideoFeedProvider'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -20,8 +21,27 @@ export default function VideoNote({
   className?: string
 }) {
   const { isVideoFeed } = useVideoFeed()
-  const videoInfos = useMemo(() => getImetaInfosFromEvent(event), [event])
   const shouldLoop = LOOPING_VIDEO_KINDS.includes(event.kind)
+
+  // Get video URLs - use divine-video parser for Divine videos, standard parser for others
+  const videoUrls = useMemo(() => {
+    // For Divine videos (kind 34236), use the specialized parser
+    if (event.kind === DIVINE_VIDEO_KIND) {
+      const parsed = parseVideoEvents([event])
+      if (parsed.length > 0 && parsed[0].videoUrl) {
+        // Collect main URL and fallback URLs
+        const urls = [parsed[0].videoUrl]
+        if (parsed[0].fallbackVideoUrls) {
+          urls.push(...parsed[0].fallbackVideoUrls)
+        }
+        return urls
+      }
+    }
+
+    // Fall back to standard imeta parsing
+    const imetaInfos = getImetaInfosFromEvent(event)
+    return imetaInfos.map(info => info.url)
+  }, [event])
 
   // Unmute videos by default when viewing the video feed
   const defaultMuted = isVideoFeed ? false : undefined
@@ -29,10 +49,10 @@ export default function VideoNote({
   return (
     <div className={className}>
       <Content event={event} />
-      {videoInfos.map((video) => (
+      {videoUrls.map((url) => (
         <MediaPlayer
-          src={video.url}
-          key={video.url}
+          src={url}
+          key={url}
           className="mt-2"
           loop={shouldLoop}
           defaultMuted={defaultMuted}

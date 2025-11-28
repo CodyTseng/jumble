@@ -6,6 +6,24 @@ import { Event } from 'nostr-tools'
 export const DIVINE_VIDEO_KIND = 34236
 export const DIVINE_RELAY_URL = 'wss://relay.divine.video'
 
+/**
+ * NIP-50 sort modes for video feeds
+ * These are used in the search filter to sort results
+ *
+ * - hot: Recent events with high engagement (recency + popularity)
+ * - top: Most referenced events (all-time or within time range) - Classic archived Vines
+ * - rising: Recently created events gaining engagement quickly
+ * - controversial: Events with mixed positive/negative reactions
+ */
+export type DivineSortMode = 'hot' | 'top' | 'rising' | 'controversial'
+
+/**
+ * Creates a NIP-50 search string with the specified sort mode
+ */
+export function createSortSearch(sortMode: DivineSortMode): string {
+  return `sort:${sortMode}`
+}
+
 export interface ParsedVideoData {
   id: string
   pubkey: string
