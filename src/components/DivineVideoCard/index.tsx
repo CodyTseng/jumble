@@ -103,6 +103,7 @@ export default function DivineVideoCard({ video, className }: DivineVideoCardPro
               className="w-full h-full object-contain"
               mustLoad
               loop
+              defaultMuted={false}
             />
           ) : (
             <div className="relative w-full h-full" onClick={handlePlayClick}>

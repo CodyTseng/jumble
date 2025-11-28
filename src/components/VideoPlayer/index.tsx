@@ -8,14 +8,18 @@ import ExternalLink from '../ExternalLink'
 export default function VideoPlayer({
   src,
   className,
-  loop = false
+  loop = false,
+  defaultMuted
 }: {
   src: string
   className?: string
   loop?: boolean
+  defaultMuted?: boolean
 }) {
   const { autoplay } = useContentPolicy()
   const { muteMedia, updateMuteMedia } = useUserPreferences()
+  // Use defaultMuted if provided, otherwise fall back to global muteMedia setting
+  const effectiveMuted = defaultMuted !== undefined ? defaultMuted : muteMedia
   const [error, setError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -68,14 +72,13 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video || video.muted === muteMedia) return
+    if (!video) return
 
-    if (muteMedia) {
-      video.muted = true
-    } else {
-      video.muted = false
+    // Only sync with global muteMedia when defaultMuted is not set
+    if (defaultMuted === undefined && video.muted !== muteMedia) {
+      video.muted = muteMedia
     }
-  }, [muteMedia])
+  }, [muteMedia, defaultMuted])
 
   if (error) {
     return <ExternalLink url={src} />
@@ -94,7 +97,7 @@ export default function VideoPlayer({
         onPlay={(event) => {
           mediaManager.play(event.currentTarget)
         }}
-        muted={muteMedia}
+        muted={effectiveMuted}
         onError={() => setError(true)}
       />
     </div>

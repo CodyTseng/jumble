@@ -9,12 +9,14 @@ export default function MediaPlayer({
   src,
   className,
   mustLoad = false,
-  loop = false
+  loop = false,
+  defaultMuted
 }: {
   src: string
   className?: string
   mustLoad?: boolean
   loop?: boolean
+  defaultMuted?: boolean
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -90,7 +92,7 @@ export default function MediaPlayer({
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={className} loop={loop} />
+    return <VideoPlayer src={src} className={className} loop={loop} defaultMuted={defaultMuted} />
   }
 
   return <AudioPlayer src={src} className={className} />
