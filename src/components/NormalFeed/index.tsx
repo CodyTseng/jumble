@@ -5,6 +5,7 @@ import { ExtendedKind } from '@/constants'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { VideoFeedProvider } from '@/providers/VideoFeedProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { Event } from 'nostr-tools'
@@ -104,15 +105,17 @@ export default function NormalFeed({
           filterFn={filterFn}
         />
       ) : (
-        <NoteList
-          ref={noteListRef}
-          showKinds={listMode === 'videos' ? VIDEO_KINDS : temporaryShowKinds}
-          subRequests={subRequests}
-          hideReplies={listMode === 'posts'}
-          hideUntrustedNotes={hideUntrustedNotes}
-          areAlgoRelays={areAlgoRelays}
-          showRelayCloseReason={showRelayCloseReason}
-        />
+        <VideoFeedProvider isVideoFeed={listMode === 'videos'}>
+          <NoteList
+            ref={noteListRef}
+            showKinds={listMode === 'videos' ? VIDEO_KINDS : temporaryShowKinds}
+            subRequests={subRequests}
+            hideReplies={listMode === 'posts'}
+            hideUntrustedNotes={hideUntrustedNotes}
+            areAlgoRelays={areAlgoRelays}
+            showRelayCloseReason={showRelayCloseReason}
+          />
+        </VideoFeedProvider>
       )}
     </>
   )
