@@ -8,11 +8,13 @@ import ExternalLink from '../ExternalLink'
 export default function MediaPlayer({
   src,
   className,
-  mustLoad = false
+  mustLoad = false,
+  loop = false
 }: {
   src: string
   className?: string
   mustLoad?: boolean
+  loop?: boolean
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -88,7 +90,7 @@ export default function MediaPlayer({
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={className} />
+    return <VideoPlayer src={src} className={className} loop={loop} />
   }
 
   return <AudioPlayer src={src} className={className} />
