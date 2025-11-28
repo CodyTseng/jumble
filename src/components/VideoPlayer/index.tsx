@@ -60,7 +60,11 @@ export default function VideoPlayer({
     const video = videoRef.current
 
     const handleVolumeChange = () => {
-      updateMuteMedia(video.muted)
+      // Only sync to global state when defaultMuted is not explicitly set
+      // This allows videos with explicit defaultMuted to maintain their own state
+      if (defaultMuted === undefined) {
+        updateMuteMedia(video.muted)
+      }
     }
 
     video.addEventListener('volumechange', handleVolumeChange)
@@ -68,14 +72,17 @@ export default function VideoPlayer({
     return () => {
       video.removeEventListener('volumechange', handleVolumeChange)
     }
-  }, [])
+  }, [defaultMuted, updateMuteMedia])
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
-    // Only sync with global muteMedia when defaultMuted is not set
-    if (defaultMuted === undefined && video.muted !== muteMedia) {
+    if (defaultMuted !== undefined) {
+      // When defaultMuted is explicitly set, use that value
+      video.muted = defaultMuted
+    } else if (video.muted !== muteMedia) {
+      // Otherwise sync with global muteMedia
       video.muted = muteMedia
     }
   }, [muteMedia, defaultMuted])
