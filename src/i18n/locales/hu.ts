@@ -560,6 +560,7 @@ export default {
     'Follow pack not found': 'Követési csomag nem található',
     Users: 'Felhasználók',
     Feed: 'Hírfolyam',
-    'Follow Pack': 'Követési Csomag'
+    'Follow Pack': 'Követési Csomag',
+    '24h Pulse': '24h Pulse'
   }
 }

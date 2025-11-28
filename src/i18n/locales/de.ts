@@ -575,6 +575,7 @@ export default {
     'Follow pack not found': 'Follow-Pack nicht gefunden',
     Users: 'Benutzer',
     Feed: 'Feed',
-    'Follow Pack': 'Follow-Pack'
+    'Follow Pack': 'Follow-Pack',
+    '24h Pulse': '24h Pulse'
   }
 }

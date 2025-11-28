@@ -565,6 +565,7 @@ export default {
     'Follow pack not found': 'फॉलो पैक नहीं मिला',
     Users: 'उपयोगकर्ता',
     Feed: 'फ़ीड',
-    'Follow Pack': 'फॉलो पैक'
+    'Follow Pack': 'फॉलो पैक',
+    '24h Pulse': '24h पल्स'
   }
 }

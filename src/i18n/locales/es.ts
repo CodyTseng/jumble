@@ -570,6 +570,7 @@ export default {
     'Follow pack not found': 'Paquete de seguimiento no encontrado',
     Users: 'Usuarios',
     Feed: 'Feed',
-    'Follow Pack': 'Paquete de Seguimiento'
+    'Follow Pack': 'Paquete de Seguimiento',
+    '24h Pulse': 'Pulso 24h'
   }
 }

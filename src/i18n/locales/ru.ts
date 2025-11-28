@@ -570,6 +570,7 @@ export default {
     'Follow pack not found': 'Пакет подписок не найден',
     Users: 'Пользователи',
     Feed: 'Лента',
-    'Follow Pack': 'Пакет Подписок'
+    'Follow Pack': 'Пакет Подписок',
+    '24h Pulse': 'Пульс 24ч'
   }
 }

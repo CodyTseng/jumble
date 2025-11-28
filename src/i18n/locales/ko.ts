@@ -564,6 +564,7 @@ export default {
     'Follow pack not found': '팔로우 팩을 찾을 수 없습니다',
     Users: '사용자',
     Feed: '피드',
-    'Follow Pack': '팔로우 팩'
+    'Follow Pack': '팔로우 팩',
+    '24h Pulse': '24h 펄스'
   }
 }

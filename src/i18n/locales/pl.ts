@@ -570,6 +570,7 @@ export default {
     'Follow pack not found': 'Nie znaleziono pakietu obserwowanych',
     Users: 'Użytkownicy',
     Feed: 'Kanał',
-    'Follow Pack': 'Pakiet Obserwowanych'
+    'Follow Pack': 'Pakiet Obserwowanych',
+    '24h Pulse': '24h Pulse'
   }
 }

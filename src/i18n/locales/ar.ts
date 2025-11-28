@@ -559,6 +559,7 @@ export default {
     'Follow pack not found': 'لم يتم العثور على حزمة المتابعة',
     Users: 'المستخدمون',
     Feed: 'التغذية',
-    'Follow Pack': 'حزمة المتابعة'
+    'Follow Pack': 'حزمة المتابعة',
+    '24h Pulse': 'النبض 24 ساعة'
   }
 }

@@ -564,6 +564,7 @@ export default {
     'Follow pack not found': 'بسته دنبال‌کننده یافت نشد',
     Users: 'کاربران',
     Feed: 'فید',
-    'Follow Pack': 'بسته دنبال‌کننده'
+    'Follow Pack': 'بسته دنبال‌کننده',
+    '24h Pulse': 'نبض 24 ساعته'
   }
 }

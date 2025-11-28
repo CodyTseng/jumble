@@ -573,6 +573,7 @@ export default {
     'Follow pack not found': 'Pack de suivi introuvable',
     Users: 'Utilisateurs',
     Feed: 'Flux',
-    'Follow Pack': 'Pack de Suivi'
+    'Follow Pack': 'Pack de Suivi',
+    '24h Pulse': 'Pulse 24h'
   }
 }

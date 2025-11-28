@@ -564,6 +564,7 @@ export default {
     'Follow pack not found': 'フォローパックが見つかりません',
     Users: 'ユーザー',
     Feed: 'フィード',
-    'Follow Pack': 'フォローパック'
+    'Follow Pack': 'フォローパック',
+    '24h Pulse': '24h パルス'
   }
 }

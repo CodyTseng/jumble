@@ -552,6 +552,7 @@ export default {
     'Follow pack not found': '未找到关注包',
     Users: '用户',
     Feed: '动态',
-    'Follow Pack': '关注包'
+    'Follow Pack': '关注包',
+    '24h Pulse': '24h 动态'
   }
 }

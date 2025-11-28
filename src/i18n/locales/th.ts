@@ -557,6 +557,7 @@ export default {
     'Follow pack not found': 'ไม่พบแพ็คการติดตาม',
     Users: 'ผู้ใช้',
     Feed: 'ฟีด',
-    'Follow Pack': 'แพ็คการติดตาม'
+    'Follow Pack': 'แพ็คการติดตาม',
+    '24h Pulse': '24h พัลส์'
   }
 }
