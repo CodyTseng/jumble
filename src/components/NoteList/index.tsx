@@ -1,5 +1,6 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
+import { hasPlayableVideo } from '@/lib/divine-video'
 import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { isTouchDevice } from '@/lib/utils'
@@ -114,6 +115,8 @@ const NoteList = forwardRef<
         if (filterFn && !filterFn(evt)) {
           return true
         }
+        // Filter out videos that only have HLS streams (not playable in browser)
+        if (!hasPlayableVideo(evt)) return true
 
         return false
       },
