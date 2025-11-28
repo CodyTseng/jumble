@@ -17,7 +17,7 @@ import userAggregationService, { TUserAggregation } from '@/services/user-aggreg
 import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
 import { Pin, PinOff } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import {
   forwardRef,
   useCallback,
@@ -218,10 +218,14 @@ const UserAggregationList = forwardRef<
 
   const handleViewUser = (agg: TUserAggregation) => {
     if (agg.count === 1) {
-      push(toNote(agg.events[0]))
-    } else {
-      push(toUserAggregationDetail(feedId, agg.pubkey))
+      const evt = agg.events[0]
+      if (evt.kind !== kinds.Repost && evt.kind !== kinds.GenericRepost) {
+        push(toNote(agg.events[0]))
+        return
+      }
     }
+
+    push(toUserAggregationDetail(feedId, agg.pubkey))
   }
 
   const list = (
