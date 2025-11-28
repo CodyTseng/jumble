@@ -51,7 +51,7 @@ const UserAggregationDetailPage = forwardRef(
       <SecondaryPageLayout
         ref={ref}
         index={index}
-        title={<SimpleUsername userId={pubkey} />}
+        title={<SimpleUsername userId={pubkey} className="truncate" />}
         displayScrollToTopButton
       >
         <div className="min-h-screen">

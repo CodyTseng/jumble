@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
-import { toUserAggregationDetail } from '@/lib/link'
+import { toNote, toUserAggregationDetail } from '@/lib/link'
 import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -217,7 +217,11 @@ const UserAggregationList = forwardRef<
   }
 
   const handleViewUser = (agg: TUserAggregation) => {
-    push(toUserAggregationDetail(feedId, agg.pubkey))
+    if (agg.count === 1) {
+      push(toNote(agg.events[0]))
+    } else {
+      push(toUserAggregationDetail(feedId, agg.pubkey))
+    }
   }
 
   const list = (
@@ -279,35 +283,42 @@ function UserAggregationItem({
   onTogglePin: (pubkey: string, e: React.MouseEvent) => void
   onClick: () => void
 }) {
+  const { t } = useTranslation()
+
   return (
     <div
-      className="flex items-center gap-3 p-4 border-b hover:bg-accent/50 cursor-pointer transition-colors"
+      className="group relative flex items-center gap-4 px-4 py-3 border-b hover:bg-accent/30 cursor-pointer transition-all duration-200"
       onClick={onClick}
     >
-      <UserAvatar userId={aggregation.pubkey} className="w-12 h-12" />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <Username userId={aggregation.pubkey} className="font-semibold truncate" />
-          {isPinned && <Pin className="w-4 h-4 text-primary flex-shrink-0" />}
-        </div>
-        <div className="text-sm text-muted-foreground">
-          <FormattedTimestamp timestamp={aggregation.lastEventTime} />
-        </div>
+      <UserAvatar userId={aggregation.pubkey} className="size-12" />
+
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <Username
+          userId={aggregation.pubkey}
+          className="font-semibold text-base truncate max-w-fit"
+        />
+        <FormattedTimestamp
+          timestamp={aggregation.lastEventTime}
+          className="text-xs text-muted-foreground"
+        />
       </div>
+
       <Button
         variant="ghost"
         size="icon"
         onClick={(e) => onTogglePin(aggregation.pubkey, e)}
-        className="flex-shrink-0 text-muted-foreground hover:text-foreground"
+        className={`flex-shrink-0 transition-all duration-200 ${
+          isPinned
+            ? 'opacity-100 text-primary hover:text-primary/80'
+            : 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground'
+        }`}
+        title={isPinned ? t('Unpin') : t('Pin')}
       >
         {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
       </Button>
 
-      <div className="flex flex-col items-center justify-center size-12">
-        <div className="text-2xl font-bold text-primary">{aggregation.count}</div>
-        <div className="text-xs text-muted-foreground">
-          {aggregation.count === 1 ? 'post' : 'posts'}
-        </div>
+      <div className="flex-shrink-0 size-10 rounded-full border border-primary bg-primary/10 flex flex-col items-center justify-center">
+        <span className="text font-bold text-primary tabular-nums">{aggregation.count}</span>
       </div>
     </div>
   )
@@ -315,13 +326,13 @@ function UserAggregationItem({
 
 function UserAggregationItemSkeleton() {
   return (
-    <div className="flex items-center gap-3 p-4">
-      <Skeleton className="w-12 h-12 rounded-full" />
+    <div className="flex items-center gap-4 px-4 py-3">
+      <Skeleton className="size-12 rounded-full" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-36" />
         <Skeleton className="h-3 w-48" />
       </div>
-      <Skeleton className="size-12 rounded-md" />
+      <Skeleton className="size-10 rounded-full" />
     </div>
   )
 }
