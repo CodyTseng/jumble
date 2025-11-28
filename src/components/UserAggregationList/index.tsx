@@ -84,7 +84,6 @@ const UserAggregationList = forwardRef<
   useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
 
   useEffect(() => {
-    console.log('UserAggregationList mount', feedId)
     return () => {
       userAggregationService.clearAggregations(feedId)
     }
