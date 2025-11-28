@@ -299,7 +299,6 @@ class ClientService extends EventTarget {
     const newEventIdSet = new Set<string>()
     const requestCount = subRequests.length
     const threshold = Math.floor(requestCount / 2)
-    let eventIdSet = new Set<string>()
     let events: NEvent[] = []
     let eosedCount = 0
 
@@ -314,13 +313,7 @@ class ClientService extends EventTarget {
                 eosedCount++
               }
 
-              _events.forEach((evt) => {
-                if (eventIdSet.has(evt.id)) return
-                eventIdSet.add(evt.id)
-                events.push(evt)
-              })
-              events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
-              eventIdSet = new Set(events.map((evt) => evt.id))
+              events = this.mergeTimelines(events, _events)
 
               if (eosedCount >= threshold) {
                 onEvents(events, eosedCount >= requestCount)
@@ -351,6 +344,31 @@ class ClientService extends EventTarget {
       },
       timelineKey: key
     }
+  }
+
+  private mergeTimelines(a: NEvent[], b: NEvent[]): NEvent[] {
+    if (a.length === 0) return [...b]
+    if (b.length === 0) return [...a]
+
+    const result: NEvent[] = []
+    let i = 0
+    let j = 0
+    while (i < a.length && j < b.length) {
+      const cmp = compareEvents(a[i], b[j])
+      if (cmp > 0) {
+        result.push(a[i])
+        i++
+      } else if (cmp < 0) {
+        result.push(b[j])
+        j++
+      } else {
+        result.push(a[i])
+        i++
+        j++
+      }
+    }
+
+    return result
   }
 
   async loadMoreTimeline(key: string, until: number, limit: number) {
@@ -553,9 +571,9 @@ class ClientService extends EventTarget {
     let cachedEvents: NEvent[] = []
     let since: number | undefined
     if (timeline && !Array.isArray(timeline) && timeline.refs.length && needSort) {
-      cachedEvents = (
-        await this.eventDataLoader.loadMany(timeline.refs.slice(0, filter.limit).map(([id]) => id))
-      ).filter((evt) => !!evt && !(evt instanceof Error)) as NEvent[]
+      cachedEvents = (await this.eventDataLoader.loadMany(timeline.refs.map(([id]) => id))).filter(
+        (evt) => !!evt && !(evt instanceof Error)
+      ) as NEvent[]
       if (cachedEvents.length) {
         onEvents([...cachedEvents], false)
         since = cachedEvents[0].created_at + 1

@@ -322,7 +322,9 @@ function UserAggregationItem({
       </Button>
 
       <div className="flex-shrink-0 size-10 rounded-full border border-primary bg-primary/10 flex flex-col items-center justify-center">
-        <span className="text font-bold text-primary tabular-nums">{aggregation.count}</span>
+        <span className="text font-bold text-primary tabular-nums">
+          {aggregation.count > 99 ? '99+' : aggregation.count}
+        </span>
       </div>
     </div>
   )

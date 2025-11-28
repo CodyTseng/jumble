@@ -54,7 +54,7 @@ export default function NormalFeed({
   return (
     <>
       <Tabs
-        value={listMode}
+        value={listMode === '24h' && !feedId ? 'posts' : listMode}
         tabs={[
           { value: 'posts', label: 'Notes' },
           { value: 'postsAndReplies', label: 'Replies' },

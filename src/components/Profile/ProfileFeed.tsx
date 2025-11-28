@@ -26,7 +26,13 @@ export default function ProfileFeed({
   const { pubkey: myPubkey, pinListEvent: myPinListEvent } = useNostr()
   const { showKinds } = useKindFilter()
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
-  const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
+  const [listMode, setListMode] = useState<TNoteListMode>(() => {
+    const mode = storage.getNoteListMode()
+    if (mode === '24h') {
+      return 'posts'
+    }
+    return mode
+  })
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
   const [pinnedEventIds, setPinnedEventIds] = useState<string[]>([])
   const tabs = useMemo(() => {
