@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL, parseVideoEvents, ParsedVideoData } from '@/lib/divine-video'
+import { DIVINE_VIDEO_KIND, DIVINE_RELAY_URL } from '@/lib/divine-video'
 import { isTouchDevice } from '@/lib/utils'
-import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { VideoFeedProvider } from '@/providers/VideoFeedProvider'
 import client from '@/services/client.service'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
@@ -19,8 +19,8 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
-import DivineVideoCard, { DivineVideoCardSkeleton } from '../DivineVideoCard'
 import NewNotesButton from '../NewNotesButton'
+import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 
 const LIMIT = 50
 const SHOW_COUNT = 10
@@ -63,15 +63,14 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
       [hideUntrustedNotes, filterMutedNotes, mutePubkeySet, isUserTrusted]
     )
 
-    // Parse events into video data
-    const parsedVideos = useMemo(() => {
-      const filtered = events.filter((evt) => !shouldHideEvent(evt))
-      return parseVideoEvents(filtered)
+    // Filter events
+    const filteredEvents = useMemo(() => {
+      return events.filter((evt) => !shouldHideEvent(evt))
     }, [events, shouldHideEvent])
 
-    const slicedVideos = useMemo(() => {
-      return parsedVideos.slice(0, showCount)
-    }, [parsedVideos, showCount])
+    const slicedEvents = useMemo(() => {
+      return filteredEvents.slice(0, showCount)
+    }, [filteredEvents, showCount])
 
     const filteredNewEvents = useMemo(() => {
       return newEvents.filter((event) => !shouldHideEvent(event))
@@ -160,9 +159,9 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
       }
 
       const loadMore = async () => {
-        if (showCount < parsedVideos.length) {
+        if (showCount < filteredEvents.length) {
           setShowCount((prev) => prev + SHOW_COUNT)
-          if (parsedVideos.length - showCount > LIMIT / 2) {
+          if (filteredEvents.length - showCount > LIMIT / 2) {
             return
           }
         }
@@ -199,7 +198,7 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
           observerInstance.unobserve(currentBottomRef)
         }
       }
-    }, [loading, hasMore, events, parsedVideos, showCount, timelineKey])
+    }, [loading, hasMore, events, filteredEvents, showCount, timelineKey])
 
     const showNewEvents = () => {
       setEvents((oldEvents) => [...newEvents, ...oldEvents])
@@ -210,28 +209,30 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
     }
 
     const list = (
-      <div className="min-h-screen">
-        {slicedVideos.map((video) => (
-          <DivineVideoCard key={video.id} video={video} className="w-full" />
-        ))}
-        {hasMore || loading ? (
-          <div ref={bottomRef}>
-            <DivineVideoCardSkeleton />
-            <DivineVideoCardSkeleton />
-          </div>
-        ) : parsedVideos.length ? (
-          <div className="text-center text-sm text-muted-foreground py-4">
-            {t('no more notes')}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-muted-foreground mb-4">No videos found</p>
-            <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
-              {t('Reload')}
-            </Button>
-          </div>
-        )}
-      </div>
+      <VideoFeedProvider isVideoFeed={true}>
+        <div className="min-h-screen">
+          {slicedEvents.map((event) => (
+            <NoteCard key={event.id} event={event} className="w-full" />
+          ))}
+          {hasMore || loading ? (
+            <div ref={bottomRef}>
+              <NoteCardLoadingSkeleton />
+              <NoteCardLoadingSkeleton />
+            </div>
+          ) : filteredEvents.length ? (
+            <div className="text-center text-sm text-muted-foreground py-4">
+              {t('no more notes')}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-muted-foreground mb-4">No videos found</p>
+              <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
+                {t('Reload')}
+              </Button>
+            </div>
+          )}
+        </div>
+      </VideoFeedProvider>
     )
 
     return (
