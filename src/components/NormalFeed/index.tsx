@@ -33,6 +33,7 @@ export default function NormalFeed({
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
   const userAggregationListRef = useRef<TUserAggregationListRef>(null)
+  const topRef = useRef<HTMLDivElement>(null)
   const showKindsFilter = useMemo(() => {
     return subRequests.every((req) => !req.filter.kinds?.length)
   }, [subRequests])
@@ -42,7 +43,7 @@ export default function NormalFeed({
     if (isMainFeed) {
       storage.setNoteListMode(mode)
     }
-    noteListRef.current?.scrollToTop('smooth')
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const handleShowKindsChange = (newShowKinds: number[]) => {
@@ -84,6 +85,7 @@ export default function NormalFeed({
           </>
         }
       />
+      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
       {listMode === '24h' && feedId ? (
         <UserAggregationList
           ref={userAggregationListRef}

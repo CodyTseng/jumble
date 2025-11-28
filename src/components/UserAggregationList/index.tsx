@@ -5,6 +5,7 @@ import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toUserAggregationDetail } from '@/lib/link'
+import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
@@ -27,6 +28,7 @@ import {
   useState
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 import { LoadingBar } from '../LoadingBar'
 
 const LIMIT = 500
@@ -58,6 +60,7 @@ const UserAggregationList = forwardRef<
   const [loading, setLoading] = useState(true)
   const [showLoadingBar, setShowLoadingBar] = useState(true)
   const [refreshCount, setRefreshCount] = useState(0)
+  const supportTouch = useMemo(() => isTouchDevice(), [])
   const [pinnedPubkeys, setPinnedPubkeys] = useState<Set<string>>(
     new Set(userAggregationService.getPinnedPubkeys())
   )
@@ -217,10 +220,8 @@ const UserAggregationList = forwardRef<
     push(toUserAggregationDetail(feedId, agg.pubkey))
   }
 
-  return (
-    <div>
-      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
-      {showLoadingBar && <LoadingBar />}
+  const list = (
+    <div className="min-h-screen">
       {sortedAggregations.map((agg) => (
         <UserAggregationItem
           key={agg.pubkey}
@@ -241,6 +242,26 @@ const UserAggregationList = forwardRef<
         ) : (
           <div className="text-center text-sm text-muted-foreground mt-2">{t('no more notes')}</div>
         ))}
+    </div>
+  )
+
+  return (
+    <div>
+      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
+      {showLoadingBar && <LoadingBar />}
+      {supportTouch ? (
+        <PullToRefresh
+          onRefresh={async () => {
+            refresh()
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+          }}
+          pullingContent=""
+        >
+          {list}
+        </PullToRefresh>
+      ) : (
+        list
+      )}
     </div>
   )
 })
