@@ -17,6 +17,7 @@ class UserAggregationService {
   private pinnedPubkeys: Set<string> = new Set()
   private aggregationStore: Map<string, Map<string, Event[]>> = new Map()
   private listenersMap: Map<string, Set<() => void>> = new Map()
+  private lastViewedMap: Map<string, number> = new Map()
 
   constructor() {
     if (UserAggregationService.instance) {
@@ -26,19 +27,27 @@ class UserAggregationService {
     this.pinnedPubkeys = storage.getPinnedPubkeys()
   }
 
-  subscribeAggregation(feedId: string, pubkey: string, listener: () => void) {
-    return this.subscribe(`${feedId}:${pubkey}`, listener)
+  subscribeAggregationChange(feedId: string, pubkey: string, listener: () => void) {
+    return this.subscribe(`aggregation:${feedId}:${pubkey}`, listener)
   }
 
-  private notifyAggregation(feedId: string, pubkey: string) {
-    this.notify(`${feedId}:${pubkey}`)
+  private notifyAggregationChange(feedId: string, pubkey: string) {
+    this.notify(`aggregation:${feedId}:${pubkey}`)
   }
 
-  subscribePinnedUsers(listener: () => void) {
+  subscribeViewedTimeChange(feedId: string, pubkey: string, listener: () => void) {
+    return this.subscribe(`viewedTime:${feedId}:${pubkey}`, listener)
+  }
+
+  private notifyViewedTimeChange(feedId: string, pubkey: string) {
+    this.notify(`viewedTime:${feedId}:${pubkey}`)
+  }
+
+  subscribePinnedUsersChange(listener: () => void) {
     return this.subscribe('pin', listener)
   }
 
-  private notifyPinnedUsers() {
+  private notifyPinnedUsersChange() {
     this.notify('pin')
   }
 
@@ -75,13 +84,13 @@ class UserAggregationService {
   pinUser(pubkey: string) {
     this.pinnedPubkeys.add(pubkey)
     storage.setPinnedPubkeys(this.pinnedPubkeys)
-    this.notifyPinnedUsers()
+    this.notifyPinnedUsersChange()
   }
 
   unpinUser(pubkey: string) {
     this.pinnedPubkeys.delete(pubkey)
     storage.setPinnedPubkeys(this.pinnedPubkeys)
-    this.notifyPinnedUsers()
+    this.notifyPinnedUsersChange()
   }
 
   togglePin(pubkey: string) {
@@ -148,7 +157,7 @@ class UserAggregationService {
     aggregations.forEach((agg) => map.set(agg.pubkey, agg.events))
     this.aggregationStore.set(feedId, map)
     aggregations.forEach((agg) => {
-      this.notifyAggregation(feedId, agg.pubkey)
+      this.notifyAggregationChange(feedId, agg.pubkey)
     })
   }
 
@@ -184,6 +193,19 @@ class UserAggregationService {
     }
 
     return Math.abs(hash).toString(36)
+  }
+
+  markAsViewed(feedId: string, pubkey: string) {
+    const key = `${feedId}:${pubkey}`
+    this.lastViewedMap.set(key, dayjs().unix())
+    this.notifyViewedTimeChange(feedId, pubkey)
+  }
+
+  getLastViewedTime(feedId: string, pubkey: string): number {
+    const key = `${feedId}:${pubkey}`
+    const lastViewed = this.lastViewedMap.get(key)
+
+    return lastViewed ?? 0
   }
 }
 

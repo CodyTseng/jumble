@@ -5,7 +5,7 @@ import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
-import { isTouchDevice } from '@/lib/utils'
+import { cn, isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
@@ -164,7 +164,7 @@ const UserAggregationList = forwardRef<
   }, [loading, timelineKey, events])
 
   useEffect(() => {
-    const unsubscribe = userAggregationService.subscribePinnedUsers(() => {
+    const unsubscribe = userAggregationService.subscribePinnedUsersChange(() => {
       setPinnedPubkeys(new Set(userAggregationService.getPinnedPubkeys()))
     })
 
@@ -225,6 +225,9 @@ const UserAggregationList = forwardRef<
   }
 
   const handleViewUser = (agg: TUserAggregation) => {
+    // Mark as viewed when user clicks
+    userAggregationService.markAsViewed(feedId, agg.pubkey)
+
     if (agg.count === 1) {
       const evt = agg.events[0]
       if (evt.kind !== kinds.Repost && evt.kind !== kinds.GenericRepost) {
@@ -241,6 +244,7 @@ const UserAggregationList = forwardRef<
       {sortedAggregations.map((agg) => (
         <UserAggregationItem
           key={agg.pubkey}
+          feedId={feedId}
           aggregation={agg}
           isPinned={pinnedPubkeys.has(agg.pubkey)}
           onTogglePin={handleTogglePin}
@@ -285,29 +289,52 @@ UserAggregationList.displayName = 'UserAggregationList'
 export default UserAggregationList
 
 function UserAggregationItem({
+  feedId,
   aggregation,
   isPinned,
   onTogglePin,
   onClick
 }: {
+  feedId: string
   aggregation: TUserAggregation
   isPinned: boolean
   onTogglePin: (pubkey: string, e: React.MouseEvent) => void
   onClick: () => void
 }) {
   const { t } = useTranslation()
+  const [hasNewEvents, setHasNewEvents] = useState(true)
+
+  useEffect(() => {
+    const update = () => {
+      const lastViewedTime = userAggregationService.getLastViewedTime(feedId, aggregation.pubkey)
+      setHasNewEvents(aggregation.lastEventTime > lastViewedTime)
+    }
+
+    const unSub = userAggregationService.subscribeViewedTimeChange(
+      feedId,
+      aggregation.pubkey,
+      () => {
+        update()
+      }
+    )
+
+    update()
+
+    return unSub
+  }, [feedId, aggregation])
 
   return (
     <div
       className="group relative flex items-center gap-4 px-4 py-3 border-b hover:bg-accent/30 cursor-pointer transition-all duration-200"
       onClick={onClick}
     >
-      <UserAvatar userId={aggregation.pubkey} className="size-12" />
+      <UserAvatar userId={aggregation.pubkey} />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+      <div className="flex-1 min-w-0 flex flex-col">
         <Username
           userId={aggregation.pubkey}
           className="font-semibold text-base truncate max-w-fit"
+          skeletonClassName="h-4"
         />
         <FormattedTimestamp
           timestamp={aggregation.lastEventTime}
@@ -329,7 +356,12 @@ function UserAggregationItem({
         {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
       </Button>
 
-      <div className="flex-shrink-0 size-10 rounded-full border border-primary bg-primary/10 flex flex-col items-center justify-center">
+      <div
+        className={cn(
+          'flex-shrink-0 size-10 rounded-full border border-primary bg-primary/10 flex flex-col items-center justify-center',
+          !hasNewEvents && 'grayscale'
+        )}
+      >
         <span className="text font-bold text-primary tabular-nums">
           {aggregation.count > 99 ? '99+' : aggregation.count}
         </span>
@@ -341,10 +373,10 @@ function UserAggregationItem({
 function UserAggregationItemSkeleton() {
   return (
     <div className="flex items-center gap-4 px-4 py-3">
-      <Skeleton className="size-12 rounded-full" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-36" />
-        <Skeleton className="h-3 w-14" />
+      <Skeleton className="size-10 rounded-full" />
+      <div className="flex-1">
+        <Skeleton className="h-4 w-36 my-1" />
+        <Skeleton className="h-3 w-14 my-1" />
       </div>
       <Skeleton className="size-10 rounded-full" />
     </div>

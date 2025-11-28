@@ -44,7 +44,7 @@ const UserAggregationDetailPage = forwardRef(
         setUserEvents(events)
       }
 
-      const unSub = userAggregationService.subscribeAggregation(feedId, pubkey, () => {
+      const unSub = userAggregationService.subscribeAggregationChange(feedId, pubkey, () => {
         updateEvents()
       })
 
