@@ -1,7 +1,7 @@
 import KindFilter from '@/components/KindFilter'
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
-import { BIG_RELAY_URLS, MAX_PINNED_NOTES, SEARCHABLE_RELAY_URLS } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind, MAX_PINNED_NOTES, SEARCHABLE_RELAY_URLS } from '@/constants'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
@@ -13,6 +13,14 @@ import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { NostrEvent } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshButton } from '../RefreshButton'
+
+// Video kinds for the Videos tab filter
+const VIDEO_KINDS = [
+  ExtendedKind.VIDEO,
+  ExtendedKind.SHORT_VIDEO,
+  ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+  ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+]
 
 export default function ProfileFeed({
   pubkey,
