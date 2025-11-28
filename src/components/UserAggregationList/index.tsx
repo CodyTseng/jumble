@@ -299,7 +299,7 @@ function UserAggregationItem({
         />
         <FormattedTimestamp
           timestamp={aggregation.lastEventTime}
-          className="text-xs text-muted-foreground"
+          className="text-sm text-muted-foreground"
         />
       </div>
 
@@ -330,7 +330,7 @@ function UserAggregationItemSkeleton() {
       <Skeleton className="size-12 rounded-full" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-36" />
-        <Skeleton className="h-3 w-48" />
+        <Skeleton className="h-3 w-14" />
       </div>
       <Skeleton className="size-10 rounded-full" />
     </div>
