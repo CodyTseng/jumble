@@ -574,8 +574,6 @@ export default {
     'Divine Videos': 'Divine Videos',
     Discovery: 'Discovery',
     Trending: 'Trending',
-    Videos: 'Videos',
-    Global: 'Global',
-    Recent: 'Recent'
+    Videos: 'Videos'
   }
 }

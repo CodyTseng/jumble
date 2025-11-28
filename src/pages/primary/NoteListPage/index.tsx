@@ -20,7 +20,6 @@ import {
   useState
 } from 'react'
 import { useTranslation } from 'react-i18next'
-import DivineFeed from './DivineFeed'
 import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
@@ -62,8 +61,6 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
     return null
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
-  } else if (feedInfo.feedType === 'divine') {
-    content = <DivineFeed />
   } else {
     content = (
       <>
