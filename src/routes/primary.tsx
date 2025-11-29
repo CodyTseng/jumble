@@ -1,4 +1,5 @@
 import BookmarkPage from '@/pages/primary/BookmarkPage'
+import DivinePage from '@/pages/primary/DivinePage'
 import ExplorePage from '@/pages/primary/ExplorePage'
 import MePage from '@/pages/primary/MePage'
 import NoteListPage from '@/pages/primary/NoteListPage'
@@ -17,6 +18,7 @@ type RouteConfig = {
 
 const PRIMARY_ROUTE_CONFIGS: RouteConfig[] = [
   { key: 'home', component: NoteListPage },
+  { key: 'divine', component: DivinePage },
   { key: 'explore', component: ExplorePage },
   { key: 'notifications', component: NotificationListPage },
   { key: 'me', component: MePage },

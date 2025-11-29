@@ -578,6 +578,12 @@ export default {
     'Load earlier': 'Загрузить ранее',
     'Last 24 hours': 'Последние 24 часа',
     'Last {{count}} days': 'Последние {{count}} дней',
-    notes: 'заметки'
+    notes: 'заметки',
+    Divine: 'diVine',
+    'diVine Videos': 'Видео diVine',
+    Hot: 'Популярное',
+    Classic: 'Классика',
+    Rising: 'Набирает',
+    New: 'Новое'
   }
 }

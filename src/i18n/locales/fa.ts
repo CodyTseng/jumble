@@ -572,6 +572,12 @@ export default {
     'Load earlier': 'بارگذاری قدیمی‌تر',
     'Last 24 hours': '24 ساعت گذشته',
     'Last {{count}} days': '{{count}} روز گذشته',
-    notes: 'یادداشت‌ها'
+    notes: 'یادداشت‌ها',
+    Divine: 'diVine',
+    'diVine Videos': 'ویدیوهای diVine',
+    Hot: 'داغ',
+    Classic: 'کلاسیک',
+    Rising: 'در حال رشد',
+    New: 'جدید'
   }
 }

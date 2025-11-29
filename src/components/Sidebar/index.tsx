@@ -9,6 +9,7 @@ import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import AccountButton from './AccountButton'
 import BookmarkButton from './BookmarkButton'
+import DivineButton from './DivineButton'
 import RelaysButton from './ExploreButton'
 import HomeButton from './HomeButton'
 import LayoutSwitcher from './LayoutSwitcher'
@@ -53,6 +54,7 @@ export default function PrimaryPageSidebar() {
           </button>
         )}
         <HomeButton collapse={sidebarCollapse} />
+        <DivineButton collapse={sidebarCollapse} />
         <RelaysButton collapse={sidebarCollapse} />
         <NotificationsButton collapse={sidebarCollapse} />
         <SearchButton collapse={sidebarCollapse} />

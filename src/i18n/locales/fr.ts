@@ -581,6 +581,12 @@ export default {
     'Load earlier': 'Charger plus tôt',
     'Last 24 hours': 'Dernières 24 heures',
     'Last {{count}} days': 'Derniers {{count}} jours',
-    notes: 'notes'
+    notes: 'notes',
+    Divine: 'diVine',
+    'diVine Videos': 'Vidéos diVine',
+    Hot: 'Tendance',
+    Classic: 'Classique',
+    Rising: 'En hausse',
+    New: 'Nouveau'
   }
 }

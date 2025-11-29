@@ -569,6 +569,15 @@ export default {
     'Load earlier': 'Load earlier',
     'Last 24 hours': 'Last 24 hours',
     'Last {{count}} days': 'Last {{count}} days',
-    notes: 'notes'
+    notes: 'notes',
+    Divine: 'diVine',
+    'diVine Videos': 'diVine Videos',
+    Discovery: 'Discovery',
+    Trending: 'Trending',
+    Videos: 'Videos',
+    Hot: 'Hot',
+    Classic: 'Classic',
+    Rising: 'Rising',
+    New: 'New'
   }
 }

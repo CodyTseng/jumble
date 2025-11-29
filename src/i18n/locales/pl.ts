@@ -578,6 +578,12 @@ export default {
     'Load earlier': 'Załaduj wcześniejsze',
     'Last 24 hours': 'Ostatnie 24 godziny',
     'Last {{count}} days': 'Ostatnie {{count}} dni',
-    notes: 'notatki'
+    notes: 'notatki',
+    Divine: 'diVine',
+    'diVine Videos': 'Filmy diVine',
+    Hot: 'Popularne',
+    Classic: 'Klasyczne',
+    Rising: 'Zyskujące',
+    New: 'Nowe'
   }
 }

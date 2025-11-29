@@ -567,6 +567,12 @@ export default {
     'Load earlier': 'Korábbi betöltése',
     'Last 24 hours': 'Utolsó 24 óra',
     'Last {{count}} days': 'Utolsó {{count}} nap',
-    notes: 'jegyzetek'
+    notes: 'jegyzetek',
+    Divine: 'diVine',
+    'diVine Videos': 'diVine Videók',
+    Hot: 'Népszerű',
+    Classic: 'Klasszikus',
+    Rising: 'Felfutó',
+    New: 'Új'
   }
 }

@@ -125,7 +125,7 @@ export type TPublishOptions = {
   minPow?: number
 }
 
-export type TNoteListMode = 'posts' | 'postsAndReplies' | 'you' | '24h'
+export type TNoteListMode = 'posts' | 'postsAndReplies' | 'videos' | 'you' | '24h'
 
 export type TNotificationType = 'all' | 'mentions' | 'reactions' | 'zaps'
 
