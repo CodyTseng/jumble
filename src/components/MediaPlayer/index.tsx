@@ -1,4 +1,3 @@
-import { isDivineVideoUrl } from '@/lib/url'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,24 +12,12 @@ const AUDIO_EXTENSIONS = ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma']
 const VIDEO_EXTENSIONS = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'm3u8']
 
 /**
- * Check if a URL is an HLS stream or a known video streaming service
+ * Check if a URL is an HLS stream
  */
-function isVideoStreamUrl(url: string): boolean {
+function isHlsUrl(url: string): boolean {
   try {
     const urlObj = new URL(url)
-    const pathname = urlObj.pathname.toLowerCase()
-
-    // Check for HLS extension
-    if (pathname.endsWith('.m3u8')) {
-      return true
-    }
-
-    // Check for Divine video streaming service
-    if (isDivineVideoUrl(urlObj.hostname)) {
-      return true
-    }
-
-    return false
+    return urlObj.pathname.toLowerCase().endsWith('.m3u8')
   } catch {
     return url.toLowerCase().includes('.m3u8')
   }
@@ -93,9 +80,8 @@ export default function MediaPlayer({
       // Invalid URL - continue with detection
     }
 
-    // For HLS URLs or known video streaming services, always treat as video
-    // VideoPlayer handles HLS via hls.js
-    if (isVideoStreamUrl(src)) {
+    // For HLS URLs, always treat as video (VideoPlayer handles HLS via hls.js)
+    if (isHlsUrl(src)) {
       setMediaType('video')
       return
     }

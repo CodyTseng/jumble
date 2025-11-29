@@ -1,47 +1,10 @@
-import { isDivineVideoUrl } from '@/lib/url'
 import { cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import Hls from 'hls.js'
-import { useMemo, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Play, ExternalLink as ExternalLinkIcon } from 'lucide-react'
-
-/**
- * Check if a URL requires HLS playback
- */
-function requiresHls(url: string): boolean {
-  // Direct .m3u8 files always require HLS
-  if (url.includes('.m3u8')) {
-    return true
-  }
-
-  // Divine video URLs serve HLS content
-  if (isDivineVideoUrl(url)) {
-    return true
-  }
-
-  return false
-}
-
-/**
- * Get the HLS manifest URL for a source
- * For Divine videos, append /index.m3u8 if not already present
- */
-function getHlsUrl(url: string): string {
-  if (url.includes('.m3u8')) {
-    return url
-  }
-
-  // For Divine video URLs, append the HLS manifest path
-  if (isDivineVideoUrl(url)) {
-    // Remove trailing slash if present
-    const baseUrl = url.replace(/\/$/, '')
-    return `${baseUrl}/index.m3u8`
-  }
-
-  return url
-}
 
 export default function VideoPlayer({
   src,
@@ -63,20 +26,17 @@ export default function VideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
-  // Check if the source requires HLS playback
-  const isHls = useMemo(() => requiresHls(src), [src])
+  // Check if the source is an HLS stream (only .m3u8 files)
+  const isHls = src.includes('.m3u8')
 
-  // Get the actual HLS URL (may need to append /index.m3u8 for some services)
-  const hlsUrl = useMemo(() => getHlsUrl(src), [src])
-
-  // Setup HLS.js for HLS streams
+  // Setup HLS.js for .m3u8 streams
   useEffect(() => {
     const video = videoRef.current
     if (!video || !isHls) return
 
     // If native HLS is supported (Safari), use it directly
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = hlsUrl
+      video.src = src
       return
     }
 
@@ -87,7 +47,7 @@ export default function VideoPlayer({
         lowLatencyMode: true
       })
       hlsRef.current = hls
-      hls.loadSource(hlsUrl)
+      hls.loadSource(src)
       hls.attachMedia(video)
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
@@ -103,7 +63,7 @@ export default function VideoPlayer({
       // HLS not supported at all
       setError(true)
     }
-  }, [hlsUrl, isHls])
+  }, [src, isHls])
 
   useEffect(() => {
     const video = videoRef.current
