@@ -162,7 +162,7 @@ export function isMedia(url: string) {
 
     // Check known video streaming domains
     const hostname = urlObj.hostname.replace(/^www\./, '')
-    if (hostname === 'stream.divine.video' || hostname === 'divine.video' || hostname.endsWith('.divine.video')) {
+    if (isDivineVideoUrl(hostname)) {
       return true
     }
 
@@ -170,6 +170,26 @@ export function isMedia(url: string) {
   } catch {
     return false
   }
+}
+
+/**
+ * Check if a hostname belongs to Divine video streaming service
+ */
+export function isDivineVideoUrl(hostnameOrUrl: string): boolean {
+  let hostname = hostnameOrUrl
+
+  // If it looks like a URL, extract the hostname
+  if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
+    try {
+      hostname = new URL(hostnameOrUrl).hostname.replace(/^www\./, '')
+    } catch {
+      return false
+    }
+  }
+
+  return hostname === 'stream.divine.video' ||
+         hostname === 'divine.video' ||
+         hostname.endsWith('.divine.video')
 }
 
 export const truncateUrl = (url: string, maxLength: number = 40) => {

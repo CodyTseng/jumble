@@ -1,9 +1,40 @@
+import { isDivineVideoUrl } from '@/lib/url'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AudioPlayer from '../AudioPlayer'
 import VideoPlayer from '../VideoPlayer'
 import ExternalLink from '../ExternalLink'
+
+// Audio file extensions
+const AUDIO_EXTENSIONS = ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma']
+
+// Video file extensions (including HLS)
+const VIDEO_EXTENSIONS = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'm3u8']
+
+/**
+ * Check if a URL is an HLS stream or a known video streaming service
+ */
+function isVideoStreamUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url)
+    const pathname = urlObj.pathname.toLowerCase()
+
+    // Check for HLS extension
+    if (pathname.endsWith('.m3u8')) {
+      return true
+    }
+
+    // Check for Divine video streaming service
+    if (isDivineVideoUrl(urlObj.hostname)) {
+      return true
+    }
+
+    return false
+  } catch {
+    return url.toLowerCase().includes('.m3u8')
+  }
+}
 
 export default function MediaPlayer({
   src,
@@ -46,14 +77,30 @@ export default function MediaPlayer({
       const url = new URL(src)
       const extension = url.pathname.split('.').pop()?.toLowerCase()
 
-      if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
+      // Check for audio extensions
+      if (extension && AUDIO_EXTENSIONS.includes(extension)) {
         setMediaType('audio')
         return
       }
+
+      // Check for video extensions (including HLS .m3u8)
+      // HLS streams need special handling - they can't be detected via video element
+      if (extension && VIDEO_EXTENSIONS.includes(extension)) {
+        setMediaType('video')
+        return
+      }
     } catch {
-      // Invalid URL - try to load as video anyway
+      // Invalid URL - continue with detection
     }
 
+    // For HLS URLs or known video streaming services, always treat as video
+    // VideoPlayer handles HLS via hls.js
+    if (isVideoStreamUrl(src)) {
+      setMediaType('video')
+      return
+    }
+
+    // For unknown extensions, try to detect via video element metadata
     const video = document.createElement('video')
     video.src = src
     video.preload = 'metadata'
