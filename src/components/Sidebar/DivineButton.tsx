@@ -7,7 +7,7 @@ export default function DivineButton({ collapse }: { collapse: boolean }) {
 
   return (
     <SidebarItem
-      title="Divine"
+      title="diVine"
       onClick={() => navigate('divine')}
       active={display && current === 'divine'}
       collapse={collapse}

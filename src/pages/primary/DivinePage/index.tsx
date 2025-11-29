@@ -78,7 +78,7 @@ function DivinePageTitlebar() {
     <div className="flex gap-2 justify-between h-full">
       <div className="flex gap-2 items-center h-full pl-3">
         <Clapperboard />
-        <div className="text-lg font-semibold">{t('Divine Videos')}</div>
+        <div className="text-lg font-semibold">{t('diVine Videos')}</div>
       </div>
     </div>
   )
