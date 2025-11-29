@@ -59,7 +59,7 @@ const DivineVideoList = forwardRef<TDivineVideoListRef, DivineVideoListProps>(
       (evt: Event) => {
         if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
-        // Filter out videos that only have HLS streams (not playable in browser)
+        // Filter out videos that don't have any playable URLs
         if (!hasPlayableVideo(evt)) return true
         return false
       },

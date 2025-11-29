@@ -115,7 +115,7 @@ const NoteList = forwardRef<
         if (filterFn && !filterFn(evt)) {
           return true
         }
-        // Filter out videos that only have HLS streams (not playable in browser)
+        // Filter out videos that don't have any playable URLs
         if (!hasPlayableVideo(evt)) return true
 
         return false

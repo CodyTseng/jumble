@@ -7,15 +7,35 @@ export const DIVINE_VIDEO_KIND = 34236
 export const DIVINE_RELAY_URL = 'wss://relay.divine.video'
 
 /**
- * Check if a URL is an HLS stream (not directly playable in most browsers)
+ * Check if a URL is an HLS stream
  */
 function isHlsUrl(url: string): boolean {
   return url.includes('.m3u8')
 }
 
 /**
- * Check if a Divine video event has a playable video URL (non-HLS)
- * Returns false if the video only has HLS streams which aren't well supported
+ * Check if HLS playback is supported in the current browser
+ * Returns true if either native HLS (Safari) or hls.js is supported
+ */
+function isHlsSupported(): boolean {
+  // Check for native HLS support (Safari)
+  const video = document.createElement('video')
+  if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    return true
+  }
+
+  // Check for MediaSource Extensions (required by hls.js)
+  // This is a simplified check - hls.js has Hls.isSupported() but we don't want to import it here
+  if (typeof MediaSource !== 'undefined') {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Check if a Divine video event has a playable video URL
+ * Now supports HLS streams via hls.js in addition to direct video URLs
  */
 export function hasPlayableVideo(event: Event): boolean {
   if (event.kind !== DIVINE_VIDEO_KIND) return true
@@ -25,9 +45,16 @@ export function hasPlayableVideo(event: Event): boolean {
 
   const video = parsed[0]
 
-  // Check if main video URL is playable (not HLS)
-  if (video.videoUrl && !isHlsUrl(video.videoUrl)) {
-    return true
+  // Check if main video URL exists and is playable
+  if (video.videoUrl) {
+    // Non-HLS URLs are always playable
+    if (!isHlsUrl(video.videoUrl)) {
+      return true
+    }
+    // HLS URLs are playable if HLS is supported
+    if (isHlsSupported()) {
+      return true
+    }
   }
 
   // Check fallback URLs for a playable one
@@ -36,10 +63,13 @@ export function hasPlayableVideo(event: Event): boolean {
       if (!isHlsUrl(url)) {
         return true
       }
+      if (isHlsSupported()) {
+        return true
+      }
     }
   }
 
-  // Only HLS URLs available - not playable
+  // No playable URLs available
   return false
 }
 
