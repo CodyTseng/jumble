@@ -467,7 +467,7 @@ class ClientService extends EventTarget {
             }
             return
           },
-          eoseTimeout: 1_500 // 1.5s - optimized for fast relay response
+          eoseTimeout: 10_000 // 10s
         })
       }
     })
