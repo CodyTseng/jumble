@@ -1,15 +1,25 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import UserAggregationList, { TUserAggregationListRef } from '@/components/UserAggregationList'
+import { ExtendedKind } from '@/constants'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { VideoFeedProvider } from '@/providers/VideoFeedProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { Event } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
+
+// Video kinds for the Videos tab
+const VIDEO_KINDS = [
+  ExtendedKind.VIDEO,
+  ExtendedKind.SHORT_VIDEO,
+  ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
+  ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+]
 
 export default function NormalFeed({
   subRequests,
@@ -58,6 +68,7 @@ export default function NormalFeed({
         tabs={[
           { value: 'posts', label: 'Notes' },
           { value: 'postsAndReplies', label: 'Replies' },
+          { value: 'videos', label: 'Videos' },
           ...(!disable24hMode ? [{ value: '24h', label: '24h Pulse' }] : [])
         ]}
         onTabChange={(listMode) => {
@@ -76,7 +87,7 @@ export default function NormalFeed({
                 }}
               />
             )}
-            {showKindsFilter && (
+            {showKindsFilter && listMode !== 'videos' && (
               <KindFilter
                 showKinds={temporaryShowKinds}
                 onShowKindsChange={handleShowKindsChange}
@@ -96,15 +107,17 @@ export default function NormalFeed({
           showRelayCloseReason={showRelayCloseReason}
         />
       ) : (
-        <NoteList
-          ref={noteListRef}
-          showKinds={temporaryShowKinds}
-          subRequests={subRequests}
-          hideReplies={listMode === 'posts'}
-          hideUntrustedNotes={hideUntrustedNotes}
-          areAlgoRelays={areAlgoRelays}
-          showRelayCloseReason={showRelayCloseReason}
-        />
+        <VideoFeedProvider isVideoFeed={listMode === 'videos'}>
+          <NoteList
+            ref={noteListRef}
+            showKinds={listMode === 'videos' ? VIDEO_KINDS : temporaryShowKinds}
+            subRequests={subRequests}
+            hideReplies={listMode === 'posts'}
+            hideUntrustedNotes={hideUntrustedNotes}
+            areAlgoRelays={areAlgoRelays}
+            showRelayCloseReason={showRelayCloseReason}
+          />
+        </VideoFeedProvider>
       )}
     </>
   )

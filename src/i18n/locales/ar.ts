@@ -566,6 +566,12 @@ export default {
     'Load earlier': 'تحميل سابق',
     'Last 24 hours': 'آخر 24 ساعة',
     'Last {{count}} days': 'آخر {{count}} أيام',
-    notes: 'ملاحظات'
+    notes: 'ملاحظات',
+    Divine: 'diVine',
+    'diVine Videos': 'فيديوهات diVine',
+    Hot: 'رائج',
+    Classic: 'كلاسيكي',
+    Rising: 'صاعد',
+    New: 'جديد'
   }
 }

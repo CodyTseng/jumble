@@ -5,14 +5,36 @@ import AudioPlayer from '../AudioPlayer'
 import VideoPlayer from '../VideoPlayer'
 import ExternalLink from '../ExternalLink'
 
+// Audio file extensions
+const AUDIO_EXTENSIONS = ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma']
+
+// Video file extensions (including HLS)
+const VIDEO_EXTENSIONS = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'm3u8']
+
+/**
+ * Check if a URL is an HLS stream
+ */
+function isHlsUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.pathname.toLowerCase().endsWith('.m3u8')
+  } catch {
+    return url.toLowerCase().includes('.m3u8')
+  }
+}
+
 export default function MediaPlayer({
   src,
   className,
-  mustLoad = false
+  mustLoad = false,
+  loop = false,
+  defaultMuted
 }: {
   src: string
   className?: string
   mustLoad?: boolean
+  loop?: boolean
+  defaultMuted?: boolean
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -38,14 +60,33 @@ export default function MediaPlayer({
       return
     }
 
-    const url = new URL(src)
-    const extension = url.pathname.split('.').pop()?.toLowerCase()
+    try {
+      const url = new URL(src)
+      const extension = url.pathname.split('.').pop()?.toLowerCase()
 
-    if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
-      setMediaType('audio')
+      // Check for audio extensions
+      if (extension && AUDIO_EXTENSIONS.includes(extension)) {
+        setMediaType('audio')
+        return
+      }
+
+      // Check for video extensions (including HLS .m3u8)
+      // HLS streams need special handling - they can't be detected via video element
+      if (extension && VIDEO_EXTENSIONS.includes(extension)) {
+        setMediaType('video')
+        return
+      }
+    } catch {
+      // Invalid URL - continue with detection
+    }
+
+    // For HLS URLs, always treat as video (VideoPlayer handles HLS via hls.js)
+    if (isHlsUrl(src)) {
+      setMediaType('video')
       return
     }
 
+    // For unknown extensions, try to detect via video element metadata
     const video = document.createElement('video')
     video.src = src
     video.preload = 'metadata'
@@ -88,7 +129,7 @@ export default function MediaPlayer({
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={className} />
+    return <VideoPlayer src={src} className={className} loop={loop} defaultMuted={defaultMuted} />
   }
 
   return <AudioPlayer src={src} className={className} />

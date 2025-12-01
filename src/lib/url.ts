@@ -138,6 +138,10 @@ export function isImage(url: string) {
 
 export function isMedia(url: string) {
   try {
+    const urlObj = new URL(url)
+    const pathname = urlObj.pathname.toLowerCase()
+
+    // Check file extensions
     const mediaExtensions = [
       '.mp4',
       '.webm',
@@ -149,12 +153,43 @@ export function isMedia(url: string) {
       '.aac',
       '.m4a',
       '.opus',
-      '.wma'
+      '.wma',
+      '.m3u8'
     ]
-    return mediaExtensions.some((ext) => new URL(url).pathname.toLowerCase().endsWith(ext))
+    if (mediaExtensions.some((ext) => pathname.endsWith(ext))) {
+      return true
+    }
+
+    // Check known video streaming domains
+    const hostname = urlObj.hostname.replace(/^www\./, '')
+    if (isDivineVideoUrl(hostname)) {
+      return true
+    }
+
+    return false
   } catch {
     return false
   }
+}
+
+/**
+ * Check if a hostname belongs to Divine video streaming service
+ */
+export function isDivineVideoUrl(hostnameOrUrl: string): boolean {
+  let hostname = hostnameOrUrl
+
+  // If it looks like a URL, extract the hostname
+  if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
+    try {
+      hostname = new URL(hostnameOrUrl).hostname.replace(/^www\./, '')
+    } catch {
+      return false
+    }
+  }
+
+  return hostname === 'stream.divine.video' ||
+         hostname === 'divine.video' ||
+         hostname.endsWith('.divine.video')
 }
 
 export const truncateUrl = (url: string, maxLength: number = 40) => {

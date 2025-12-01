@@ -573,6 +573,12 @@ export default {
     'Load earlier': 'पहले लोड करें',
     'Last 24 hours': 'पिछले 24 घंटे',
     'Last {{count}} days': 'पिछले {{count}} दिन',
-    notes: 'नोट्स'
+    notes: 'नोट्स',
+    Divine: 'diVine',
+    'diVine Videos': 'diVine वीडियो',
+    Hot: 'लोकप्रिय',
+    Classic: 'क्लासिक',
+    Rising: 'बढ़ते हुए',
+    New: 'नया'
   }
 }
