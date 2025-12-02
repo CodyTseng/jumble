@@ -1088,8 +1088,6 @@ class ClientService extends EventTarget {
     this.addUsernameToIndex(profileEvent)
     indexedDb.putReplaceableEvent(profileEvent)
     return profileEvent
-
-    return undefined
   }
 
   private profileDataloader = new DataLoader<string, TProfile | null, string>(async (ids) => {
