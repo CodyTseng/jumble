@@ -25,7 +25,8 @@ import {
   Event as NEvent,
   nip19,
   SimplePool,
-  VerifiedEvent
+  VerifiedEvent,
+  verifyEvent
 } from 'nostr-tools'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import indexedDb from './indexed-db.service'
@@ -1009,6 +1010,8 @@ class ClientService extends EventTarget {
   }
 
   private async addUsernameToIndex(profileEvent: NEvent) {
+    // Skip indexing invalid/unsigned profile events to avoid polluting search
+    if (!this.isValidProfileEvent(profileEvent)) return
     try {
       const profileObj = JSON.parse(profileEvent.content)
       const text = [
@@ -1025,6 +1028,11 @@ class ClientService extends EventTarget {
     } catch {
       return
     }
+  }
+
+  private isValidProfileEvent(event: NEvent) {
+    // Accept only signed, kind-0 metadata events
+    return event.kind === kinds.Metadata && verifyEvent(event)
   }
 
   private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
@@ -1054,6 +1062,7 @@ class ClientService extends EventTarget {
       kind: kinds.Metadata
     })
     if (profileFromBigRelays) {
+      if (!this.isValidProfileEvent(profileFromBigRelays)) return undefined
       this.addUsernameToIndex(profileFromBigRelays)
       return profileFromBigRelays
     }
@@ -1074,13 +1083,13 @@ class ClientService extends EventTarget {
       kinds: [kinds.Metadata],
       limit: 1
     })
-
-    if (profileEvent) {
-      this.addUsernameToIndex(profileEvent)
-      indexedDb.putReplaceableEvent(profileEvent)
-    }
-
+    if (!profileEvent) return undefined
+    if (!this.isValidProfileEvent(profileEvent)) return undefined
+    this.addUsernameToIndex(profileEvent)
+    indexedDb.putReplaceableEvent(profileEvent)
     return profileEvent
+
+    return undefined
   }
 
   private profileDataloader = new DataLoader<string, TProfile | null, string>(async (ids) => {
@@ -1099,14 +1108,15 @@ class ClientService extends EventTarget {
 
     const pubkey = userIdToPubkey(id, true)
     const localProfileEvent = await indexedDb.getReplaceableEvent(pubkey, kinds.Metadata)
-    if (localProfileEvent) {
-      if (updateCacheInBackground) {
-        this.profileDataloader.load(id) // update cache in background
-      }
-      const localProfile = getProfileFromEvent(localProfileEvent)
-      return localProfile
+    if (!localProfileEvent || !this.isValidProfileEvent(localProfileEvent)) {
+      return await this.profileDataloader.load(id)
     }
-    return await this.profileDataloader.load(id)
+
+    if (updateCacheInBackground) {
+      this.profileDataloader.load(id) // update cache in background
+    }
+    const localProfile = getProfileFromEvent(localProfileEvent)
+    return localProfile
   }
 
   private async _fetchProfile(id: string): Promise<TProfile | null> {
@@ -1189,6 +1199,7 @@ class ClientService extends EventTarget {
         })
 
         for (const event of events) {
+          if (kind === kinds.Metadata && !verifyEvent(event)) continue
           const key = `${event.pubkey}:${event.kind}`
           const existing = eventsMap.get(key)
           if (!existing || existing.created_at < event.created_at) {
@@ -1242,6 +1253,9 @@ class ClientService extends EventTarget {
   }
 
   private async updateReplaceableEventFromBigRelaysCache(event: NEvent) {
+    // Never cache invalid metadata events
+    if (event.kind === kinds.Metadata && !verifyEvent(event)) return event
+
     const newEvent = await indexedDb.putReplaceableEvent(event)
     if (newEvent.id !== event.id) {
       return newEvent
