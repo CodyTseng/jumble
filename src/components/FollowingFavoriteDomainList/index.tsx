@@ -26,6 +26,8 @@ export default function FollowingFavoriteDomainList({
   const [allDomains, setAllDomains] = useState<[string, string[]][]>([])
   const [communities, setCommunities] = useState<Map<string, TNip05Community>>(new Map())
   const [showCount, setShowCount] = useState(SHOW_COUNT)
+  const [secondDegreeDomains, setSecondDegreeDomains] = useState<Set<string>>(new Set())
+  const [firstFollowingPubkey, setFirstFollowingPubkey] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,18 +53,53 @@ export default function FollowingFavoriteDomainList({
 
       console.log('[FollowingDomains] Found followings:', followings.length)
 
+      // If user follows ≤5 people, supplement with 2nd degree connections
+      let allAuthors = followings
+      let secondDegreeAuthors: string[] = []
+
+      if (followings.length <= 5 && followings.length > 0) {
+        console.log('[FollowingDomains] Few followings detected, fetching 2nd degree connections...')
+
+        // Use the first person they follow (likely someone they know/trust)
+        const firstFollowing = followings[0]
+        setFirstFollowingPubkey(firstFollowing)
+        console.log('[FollowingDomains] Fetching followings of first connection:', firstFollowing)
+
+        // Fetch their follow list
+        const secondDegreeFollowings = await client.fetchFollowings(firstFollowing)
+
+        if (secondDegreeFollowings && secondDegreeFollowings.length > 0) {
+          // Limit to first 50 to avoid performance issues
+          const limitedSecondDegree = secondDegreeFollowings.slice(0, 50)
+          console.log(`[FollowingDomains] Found ${secondDegreeFollowings.length} 2nd degree connections, using first ${limitedSecondDegree.length}`)
+
+          // Remove duplicates (people already in 1st degree)
+          secondDegreeAuthors = limitedSecondDegree.filter(pubkey => !followings.includes(pubkey))
+          console.log(`[FollowingDomains] After deduplication: ${secondDegreeAuthors.length} unique 2nd degree connections`)
+
+          // Combine 1st and 2nd degree
+          allAuthors = [...followings, ...secondDegreeAuthors]
+          console.log(`[FollowingDomains] Total authors to fetch: ${allAuthors.length}`)
+        }
+      } else {
+        // Reset 2nd degree tracking if not applicable
+        setFirstFollowingPubkey(null)
+      }
+
       // Fetch all profiles in one batch using a single subscription
       // This is much more efficient than individual fetches
       console.log('[FollowingDomains] Fetching all profiles in batch...')
       const profileEvents = await client.fetchEvents([], {
         kinds: [0], // kind 0 = profile metadata
-        authors: followings
+        authors: allAuthors
       })
 
       console.log(`[FollowingDomains] Fetched ${profileEvents.length} profile events`)
 
       // Parse profile events and extract NIP-05 domains
       const domainMap = new Map<string, Set<string>>()
+      const secondDegreeDomainsSet = new Set<string>()
+
       profileEvents.forEach((event) => {
         try {
           const profile = JSON.parse(event.content)
@@ -76,6 +113,11 @@ export default function FollowingFavoriteDomainList({
                 const pubkeys = domainMap.get(domain) || new Set()
                 pubkeys.add(event.pubkey)
                 domainMap.set(domain, pubkeys)
+
+                // Track if this domain came from a 2nd degree connection
+                if (secondDegreeAuthors.includes(event.pubkey)) {
+                  secondDegreeDomainsSet.add(domain)
+                }
               }
             }
           }
@@ -84,7 +126,10 @@ export default function FollowingFavoriteDomainList({
         }
       })
 
+      // Update state with 2nd degree domains
+      setSecondDegreeDomains(secondDegreeDomainsSet)
       console.log('[FollowingDomains] Found unique domains:', domainMap.size)
+      console.log('[FollowingDomains] 2nd degree domains:', secondDegreeDomainsSet.size)
 
       // Convert to sorted array (by user count descending) - this is just initial grouping
       const sortedDomains = Array.from(domainMap.entries())
@@ -273,6 +318,8 @@ export default function FollowingFavoriteDomainList({
           key={domain}
           community={communities.get(domain)}
           isFavorite={favoriteDomains.includes(domain)}
+          isSecondDegree={secondDegreeDomains.has(domain)}
+          firstFollowingPubkey={firstFollowingPubkey}
           onFavoriteChange={(select) => {
             if (select) {
               addFavoriteDomains([domain])
@@ -288,11 +335,22 @@ export default function FollowingFavoriteDomainList({
         <div className="text-center text-muted-foreground text-sm mt-2 p-4">
           {domains.length === 0 ? (
             <div>
-              <p>{t('no communities found')}</p>
-              {allDomains.length > 0 && (
-                <p className="mt-1 text-xs">
-                  {t('Try a different size filter. Total communities')}: {allDomains.length}
-                </p>
+              {allDomains.length > 0 ? (
+                // User has followings with communities, just wrong size filter
+                <>
+                  <p>{t('no communities found')}</p>
+                  <p className="mt-1 text-xs">
+                    {t('Try a different size filter. Total communities')}: {allDomains.length}
+                  </p>
+                </>
+              ) : (
+                // New user with no followings - encourage them to follow others
+                <>
+                  <p className="text-base mb-2">{t('No communities to show yet')}</p>
+                  <p className="text-xs">
+                    {t('Follow others to discover their communities and see them here')}
+                  </p>
+                </>
               )}
             </div>
           ) : (
@@ -307,17 +365,36 @@ export default function FollowingFavoriteDomainList({
 function DomainItem({
   community,
   isFavorite,
+  isSecondDegree,
+  firstFollowingPubkey,
   onFavoriteChange
 }: {
   community?: TNip05Community
   isFavorite: boolean
+  isSecondDegree: boolean
+  firstFollowingPubkey: string | null
   onFavoriteChange: (select: boolean) => void
 }) {
+  const [firstFollowingProfile, setFirstFollowingProfile] = useState<any>(null)
+
+  // Fetch the first following's profile to show their name
+  useEffect(() => {
+    if (isSecondDegree && firstFollowingPubkey) {
+      client.fetchProfile(firstFollowingPubkey).then((profile) => {
+        if (profile) {
+          setFirstFollowingProfile(profile)
+        }
+      })
+    }
+  }, [isSecondDegree, firstFollowingPubkey])
+
   // Community should always exist since we filter for valid nostr.json
   // But provide fallback for type safety
   if (!community) {
     return null
   }
+
+  const firstFollowingName = firstFollowingProfile?.displayName || firstFollowingProfile?.name || 'someone you follow'
 
   return (
     <div className="p-4 border-b">
@@ -327,6 +404,11 @@ function DomainItem({
         onSelectChange={onFavoriteChange}
         showMembers
       />
+      {isSecondDegree && (
+        <div className="mt-2 text-xs text-muted-foreground italic">
+          From {firstFollowingName}'s network
+        </div>
+      )}
     </div>
   )
 }
