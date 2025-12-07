@@ -11,9 +11,9 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
 
   const content = (
     <>
-      <div className="text-xl font-semibold">Jumble</div>
+      <div className="text-xl font-semibold">Nostrhood</div>
       <div className="text-muted-foreground">
-        A user-friendly Nostr client for exploring relay feeds
+        A user-friendly Nostr client for exploring communities
       </div>
       <div>
         Made by <Username userId={CODY_PUBKEY} className="inline-block text-primary" showAt />
@@ -29,7 +29,7 @@ export default function AboutInfoDialog({ children }: { children: React.ReactNod
           GitHub
         </a>
         <div className="text-sm text-muted-foreground">
-          If you like Jumble, please consider giving it a star ⭐
+          If you like Nostrhood, please consider giving it a star ⭐
         </div>
       </div>
     </>

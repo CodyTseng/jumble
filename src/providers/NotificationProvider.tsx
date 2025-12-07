@@ -192,9 +192,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
     // Update title
     if (newNotificationCount > 0) {
-      document.title = `(${newNotificationCount >= 10 ? '9+' : newNotificationCount}) Seewaan`
+      document.title = `(${newNotificationCount >= 10 ? '9+' : newNotificationCount}) Nostrhood`
     } else {
-      document.title = 'Seewaan'
+      document.title = 'Nostrhood'
     }
 
     // Update favicons

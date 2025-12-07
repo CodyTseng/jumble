@@ -98,7 +98,9 @@ export default function PrimaryPageSidebar() {
             {hasCommunity ? (
               <CommunityFavicon key={feedInfo.id} domain={feedInfo.id!} size={8} />
             ) : (
-              <Icon />
+              <div className="w-8 h-8 flex items-center justify-center font-bold text-xl text-primary">
+                N
+              </div>
             )}
           </button>
         ) : (
@@ -110,7 +112,9 @@ export default function PrimaryPageSidebar() {
             {hasCommunity ? (
               <CommunityFavicon key={feedInfo.id} domain={feedInfo.id!} size={12} />
             ) : (
-              <Logo />
+              <div className="font-bold text-2xl text-primary">
+                Nostrhood
+              </div>
             )}
           </button>
         )}

@@ -1,7 +1,7 @@
 {
   "name": "jumble",
   "version": "0.1.0",
-  "description": "A user-friendly Nostr client for exploring relay feeds",
+  "description": "Nostrhood: A user-friendly Nostr client for exploring communities",
   "private": true,
   "type": "module",
   "author": "codytseng",
