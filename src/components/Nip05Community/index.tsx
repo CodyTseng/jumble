@@ -137,7 +137,7 @@ export default function Nip05Community({ domain }: { domain?: string }) {
               {memberCount || members.length} {t('members')}
             </p>
           </div>
-          <RequestToJoinButton domain={domain} adminPubkey={adminPubkey} />
+          <RequestToJoinButton domain={domain} adminPubkey={adminPubkey} members={members} />
         </div>
       </div>
 
@@ -318,7 +318,7 @@ function MemberCard({ pubkey, domain }: { pubkey: string; domain: string }) {
   )
 }
 
-function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPubkey: string }) {
+function RequestToJoinButton({ domain, adminPubkey, members }: { domain: string; adminPubkey: string; members: string[] }) {
   const { t } = useTranslation()
   const { pubkey, checkLogin, profile, publish } = useNostr()
   const { followingSet } = useFollowList()
@@ -327,9 +327,15 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
   const [showPreviewDialog, setShowPreviewDialog] = useState(false)
   const [requestMessage, setRequestMessage] = useState('')
 
-  // Check if user is already a member
+  // Check if user is the admin (first pubkey in members list)
+  const isAdmin = pubkey === adminPubkey
+
+  // Check if user is already a member (by pubkey in nostr.json)
+  const isAlreadyMember = pubkey ? members.includes(pubkey) : false
+
+  // Check if user has set their NIP-05 to this domain
   const userNip05Domain = profile?.nip05?.split('@')[1]
-  const isAlreadyMember = userNip05Domain === domain
+  const hasNip05Set = userNip05Domain === domain
 
   // Check if user follows the admin
   const isFollowingAdmin = followingSet.has(adminPubkey)
@@ -412,10 +418,20 @@ function RequestToJoinButton({ domain, adminPubkey }: { domain: string; adminPub
 
   if (isAlreadyMember) {
     return (
-      <Button variant="outline" disabled className="gap-2">
-        <Check className="w-4 h-4" />
-        {t('Member')}
-      </Button>
+      <div className="flex flex-col items-end gap-2">
+        <Button variant="outline" disabled className="gap-2">
+          <Check className="w-4 h-4" />
+          {isAdmin ? t('Manage') : t('Member')}
+        </Button>
+        {!hasNip05Set && (
+          <Alert className="max-w-sm">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {t('Add this community to your profile as your NIP-05 address to show your membership!')}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
     )
   }
 

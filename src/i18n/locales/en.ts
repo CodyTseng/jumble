@@ -495,6 +495,8 @@ export default {
     'Request Sent': 'Request Sent',
     'Sending...': 'Sending...',
     Member: 'Member',
+    Manage: 'Manage',
+    'Add this community to your profile as your NIP-05 address to show your membership!': 'Add this community to your profile as your NIP-05 address to show your membership!',
     'Join request sent!': 'Join request sent!',
     'Make sure the admin follows you to see your request': 'Make sure the admin follows you to see your request',
     'Failed to send join request': 'Failed to send join request',

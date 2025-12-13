@@ -496,6 +496,8 @@ export default {
     'Request Sent': 'تم إرسال الطلب',
     'Sending...': 'جاري الإرسال...',
     Member: 'عضو',
+    Manage: 'إدارة',
+    'Add this community to your profile as your NIP-05 address to show your membership!': 'أضف هذا المجتمع إلى ملفك الشخصي كعنوان NIP-05 لإظهار عضويتك!',
     'Join request sent!': 'تم إرسال طلب الانضمام!',
     'Make sure the admin follows you to see your request': 'تأكد من أن المشرف يتابعك ليرى طلبك',
     'Failed to send join request': 'فشل إرسال طلب الانضمام',
