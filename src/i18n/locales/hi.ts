@@ -588,6 +588,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'विशेष फ़ॉलो',
-    'Unfollow Special': 'विशेष अनफ़ॉलो'
+    'Unfollow Special': 'विशेष अनफ़ॉलो',
+    'Personal Feeds': 'व्यक्तिगत फ़ीड',
+    'Relay Feeds': 'रिले फ़ीड'
   }
 }

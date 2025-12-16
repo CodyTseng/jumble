@@ -573,6 +573,8 @@ export default {
     'Show directly': '直接显示',
     'Click to view': '点击查看',
     'Special Follow': '特别关注',
-    'Unfollow Special': '取消特别关注'
+    'Unfollow Special': '取消特别关注',
+    'Personal Feeds': '个人订阅',
+    'Relay Feeds': '中继订阅'
   }
 }

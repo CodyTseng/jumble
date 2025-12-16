@@ -586,6 +586,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': '특별 팔로우',
-    'Unfollow Special': '특별 팔로우 해제'
+    'Unfollow Special': '특별 팔로우 해제',
+    'Personal Feeds': '개인 피드',
+    'Relay Feeds': '릴레이 피드'
   }
 }

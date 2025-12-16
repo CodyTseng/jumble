@@ -593,6 +593,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'Seguir Especial',
-    'Unfollow Special': 'Dejar de Seguir Especial'
+    'Unfollow Special': 'Dejar de Seguir Especial',
+    'Personal Feeds': 'Feeds Personales',
+    'Relay Feeds': 'Feeds de Relays'
   }
 }

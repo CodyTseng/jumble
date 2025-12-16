@@ -587,6 +587,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'دنبال کردن ویژه',
-    'Unfollow Special': 'لغو دنبال کردن ویژه'
+    'Unfollow Special': 'لغو دنبال کردن ویژه',
+    'Personal Feeds': 'فیدهای شخصی',
+    'Relay Feeds': 'فیدهای رله'
   }
 }

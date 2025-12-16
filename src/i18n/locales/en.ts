@@ -584,6 +584,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'Special Follow',
-    'Unfollow Special': 'Unfollow Special'
+    'Unfollow Special': 'Unfollow Special',
+    'Personal Feeds': 'Personal Feeds',
+    'Relay Feeds': 'Relay Feeds'
   }
 }

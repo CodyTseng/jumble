@@ -1,4 +1,5 @@
 import FeedSwitcher from '@/components/FeedSwitcher'
+import RelayIcon from '@/components/RelayIcon'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { simplifyUrl } from '@/lib/url'
@@ -19,10 +20,13 @@ export default function FeedButton({ className }: { className?: string }) {
       <>
         <FeedSwitcherTrigger className={className} onClick={() => setOpen(true)} />
         <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent className="max-h-[80vh]">
+          <DrawerContent className="max-h-[85vh]">
             <div
-              className="overflow-y-auto overscroll-contain py-2 px-4"
-              style={{ touchAction: 'pan-y' }}
+              className="flex-1 overflow-y-auto overscroll-contain py-3 px-4"
+              style={{
+                touchAction: 'pan-y',
+                WebkitOverflowScrolling: 'touch'
+              }}
             >
               <FeedSwitcher close={() => setOpen(false)} />
             </div>
@@ -37,12 +41,14 @@ export default function FeedButton({ className }: { className?: string }) {
       <PopoverTrigger asChild>
         <FeedSwitcherTrigger className={className} />
       </PopoverTrigger>
-      <PopoverContent
-        sideOffset={0}
-        side="bottom"
-        className="w-96 p-4 max-h-[80vh] overflow-auto scrollbar-hide"
-      >
-        <FeedSwitcher close={() => setOpen(false)} />
+      <PopoverContent sideOffset={0} side="bottom" className="w-[400px] p-0 overflow-hidden">
+        <div
+          className="max-h-[calc(100vh-16rem)] overflow-y-auto overscroll-contain py-3 px-4"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          <FeedSwitcher close={() => setOpen(false)} />
+        </div>
       </PopoverContent>
     </Popover>
   )
@@ -79,6 +85,10 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
     const icon = useMemo(() => {
       if (feedInfo?.feedType === 'following') return <UsersRound />
       if (feedInfo?.feedType === 'pinned') return <Star />
+      if (feedInfo?.feedType === 'relay' && feedInfo.id) {
+        return <RelayIcon url={feedInfo.id} />
+      }
+
       return <Server />
     }, [feedInfo])
 

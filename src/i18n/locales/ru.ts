@@ -593,6 +593,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'Особая Подписка',
-    'Unfollow Special': 'Отменить Особую Подписку'
+    'Unfollow Special': 'Отменить Особую Подписку',
+    'Personal Feeds': 'Личные Ленты',
+    'Relay Feeds': 'Ленты Релеев'
   }
 }

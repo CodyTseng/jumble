@@ -593,6 +593,8 @@ export default {
     'Show directly': 'Pokaż bezpośrednio',
     'Click to view': 'Wyświetl',
     'Special Follow': 'Specjalne Śledzenie',
-    'Unfollow Special': 'Cofnij Specjalne Śledzenie'
+    'Unfollow Special': 'Cofnij Specjalne Śledzenie',
+    'Personal Feeds': 'Osobiste Kanały',
+    'Relay Feeds': 'Kanały Przekaźników'
   }
 }

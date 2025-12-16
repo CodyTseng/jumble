@@ -581,6 +581,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'متابعة خاصة',
-    'Unfollow Special': 'إلغاء المتابعة الخاصة'
+    'Unfollow Special': 'إلغاء المتابعة الخاصة',
+    'Personal Feeds': 'التدفقات الشخصية',
+    'Relay Feeds': 'تدفقات الترحيل'
   }
 }

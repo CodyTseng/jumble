@@ -1,17 +1,19 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useFetchRelayInfo } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { Server } from 'lucide-react'
 import { useMemo } from 'react'
+import Image from '../Image'
 
 export default function RelayIcon({
   url,
   className,
-  iconSize = 14
+  classNames
 }: {
   url?: string
   className?: string
-  iconSize?: number
+  classNames?: {
+    fallback?: string
+  }
 }) {
   const { relayInfo } = useFetchRelayInfo(url)
   const iconUrl = useMemo(() => {
@@ -23,12 +25,21 @@ export default function RelayIcon({
     return `${u.protocol === 'wss:' ? 'https:' : 'http:'}//${u.host}/favicon.ico`
   }, [url, relayInfo])
 
+  const fallback = <Server className={cn('size-5 bg-transparent', classNames?.fallback)} />
+
+  if (!iconUrl) {
+    return fallback
+  }
+
   return (
-    <Avatar className={cn('w-6 h-6', className)}>
-      <AvatarImage src={iconUrl} className="object-cover object-center" />
-      <AvatarFallback>
-        <Server size={iconSize} />
-      </AvatarFallback>
-    </Avatar>
+    <Image
+      image={{ url: iconUrl, dim: { width: 20, height: 20 } }}
+      className={cn('size-6 rounded-full', className)}
+      classNames={{
+        skeleton: cn('size-6 rounded-full', className),
+        errorPlaceholder: 'bg-transparent rounded-none shrink-0'
+      }}
+      errorPlaceholder={fallback}
+    />
   )
 }

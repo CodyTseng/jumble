@@ -596,6 +596,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'Suivre Spécial',
-    'Unfollow Special': 'Ne Plus Suivre Spécial'
+    'Unfollow Special': 'Ne Plus Suivre Spécial',
+    'Personal Feeds': 'Flux Personnels',
+    'Relay Feeds': 'Flux de Relais'
   }
 }

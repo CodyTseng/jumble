@@ -580,6 +580,8 @@ export default {
     'Show directly': 'Show directly',
     'Click to view': 'Click to view',
     'Special Follow': 'ติดตามพิเศษ',
-    'Unfollow Special': 'ยกเลิกติดตามพิเศษ'
+    'Unfollow Special': 'ยกเลิกติดตามพิเศษ',
+    'Personal Feeds': 'ฟีดส่วนตัว',
+    'Relay Feeds': 'ฟีดรีเลย์'
   }
 }

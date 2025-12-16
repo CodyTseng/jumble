@@ -587,6 +587,8 @@ export default {
     'Show directly': '直接表示',
     'Click to view': 'クリックして表示',
     'Special Follow': '特別フォロー',
-    'Unfollow Special': '特別フォロー解除'
+    'Unfollow Special': '特別フォロー解除',
+    'Personal Feeds': '個人フィード',
+    'Relay Feeds': 'リレーフィード'
   }
 }
