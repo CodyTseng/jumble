@@ -587,9 +587,9 @@ export default {
     'Show but hide content': 'Mostrar, mas ocultar conteúdo',
     'Show directly': 'Mostrar diretamente',
     'Click to view': 'Clique para ver',
-    'Special Follow': 'Usuários favoritos',
+    'Special Follow': 'Perfis favoritados',
     'Unfollow Special': 'Desfavoritar',
-    'Personal Feeds': 'Feeds pessoais',
+    'Personal Feeds': 'Meus feeds',
     'Relay Feeds': 'Feeds de relays'
   }
 }
