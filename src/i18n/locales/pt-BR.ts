@@ -582,14 +582,14 @@ export default {
       'Se ativado, você pode reagir com um único clique. Clique e segure para mais opções',
     'Quick reaction emoji': 'Emoji de reação rápida',
     'Select emoji': 'Selecionar emoji',
-    'NSFW content display': 'NSFW content display',
-    'Hide completely': 'Hide completely',
-    'Show but hide content': 'Show but hide content',
-    'Show directly': 'Show directly',
-    'Click to view': 'Click to view',
-    'Special Follow': 'Seguir Especial',
-    'Unfollow Special': 'Deixar de Seguir Especial',
-    'Personal Feeds': 'Feeds Pessoais',
-    'Relay Feeds': 'Feeds de Relays'
+    'NSFW content display': 'Exibição de conteúdo NSFW',
+    'Hide completely': 'Ocultar completamente',
+    'Show but hide content': 'Mostrar, mas ocultar conteúdo',
+    'Show directly': 'Mostrar diretamente',
+    'Click to view': 'Clique para ver',
+    'Special Follow': 'Usuários favoritos',
+    'Unfollow Special': 'Desfavoritar',
+    'Personal Feeds': 'Feeds pessoais',
+    'Relay Feeds': 'Feeds de relays'
   }
 }
