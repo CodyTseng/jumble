@@ -47,7 +47,7 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
 
         // Position button above the selection area, centered horizontally
         setPosition({
-          top: rect.top + scrollTop - 36, // 36px above the selection
+          top: rect.top + scrollTop - 48, // 48px above the selection
           left: rect.left + scrollLeft + rect.width / 2 // Center of the selection
         })
         setSelectedText(text)
