@@ -161,7 +161,7 @@ export default {
     'calculating...': 'Calculando...',
     'Calculate optimal read relays': 'Calcular relays de leitura ideais',
     'Login to set': 'Entrar no conjunto',
-    'Please login to view following feed': 'Por favor, faça login para ver o feed de seguidores',
+    'Please login to view following feed': 'Por favor, faça login para ver o conteúdo das pessoas que você segue',
     'Send only to r': 'Enviar apenas para {{r}}',
     'Send only to these relays': 'Enviar apenas para estes relays',
     Explore: 'Explorar',
@@ -496,7 +496,7 @@ export default {
     'Private Key': 'Chave Privada',
     'Welcome to Jumble': 'Bem-vindo ao Jumble',
     'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
-      'Jumble é um cliente focado em navegar relays. Comece explorando relays interessantes ou faça login para ver seu feed de seguidos.',
+      'Jumble é um cliente focado em navegar relays. Comece explorando relays interessantes ou faça login para ver o conteúdo das pessoas que você segue.',
     'Explore Relays': 'Explorar Relays',
     'Choose a feed': 'Escolha um feed',
     'and {{x}} others': 'e {{x}} outros',
