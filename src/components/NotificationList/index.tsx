@@ -55,6 +55,7 @@ const NotificationList = forwardRef((_, ref) => {
       case 'mentions':
         return [
           kinds.ShortTextNote,
+          kinds.Highlights,
           ExtendedKind.COMMENT,
           ExtendedKind.VOICE_COMMENT,
           ExtendedKind.POLL
@@ -70,6 +71,7 @@ const NotificationList = forwardRef((_, ref) => {
           kinds.GenericRepost,
           kinds.Reaction,
           kinds.Zap,
+          kinds.Highlights,
           ExtendedKind.COMMENT,
           ExtendedKind.POLL_RESPONSE,
           ExtendedKind.VOICE_COMMENT,

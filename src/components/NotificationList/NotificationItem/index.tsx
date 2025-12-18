@@ -6,6 +6,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
+import { HighlightNotification } from './HighlightNotification'
 import { MentionNotification } from './MentionNotification'
 import { PollResponseNotification } from './PollResponseNotification'
 import { ReactionNotification } from './ReactionNotification'
@@ -59,6 +60,9 @@ export function NotificationItem({
   }
   if (notification.kind === ExtendedKind.POLL_RESPONSE) {
     return <PollResponseNotification notification={notification} isNew={isNew} />
+  }
+  if (notification.kind === kinds.Highlights) {
+    return <HighlightNotification notification={notification} isNew={isNew} />
   }
   return null
 }

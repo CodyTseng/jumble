@@ -390,6 +390,7 @@ export default {
     'reacted to your note': 'zareagował na twój wpis',
     'reposted your note': 'repostował twój wpis',
     'zapped your note': 'zappował twój wpis',
+    'highlighted your note': 'wyróżnił twój wpis',
     'zapped you': 'zappował cię',
     'Mark as read': 'Oznacz jako przeczytane',
     Report: 'Zgłoś',

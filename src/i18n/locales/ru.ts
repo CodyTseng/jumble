@@ -390,6 +390,7 @@ export default {
     'reacted to your note': 'отреагировал на вашу заметку',
     'reposted your note': 'репостнул вашу заметку',
     'zapped your note': 'заппил вашу заметку',
+    'highlighted your note': 'выделил вашу заметку',
     'zapped you': 'заппил вас',
     'Mark as read': 'Отметить как прочитанное',
     Report: 'Пожаловаться',

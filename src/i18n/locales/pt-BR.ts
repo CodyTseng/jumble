@@ -386,6 +386,7 @@ export default {
     'reacted to your note': 'reagiu à sua nota',
     'reposted your note': 'republicou sua nota',
     'zapped your note': 'zappeou sua nota',
+    'highlighted your note': 'destacou sua nota',
     'zapped you': 'zappeou você',
     'Mark as read': 'Marcar como lida',
     Report: 'Denunciar',

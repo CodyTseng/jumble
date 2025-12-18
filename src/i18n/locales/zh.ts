@@ -380,6 +380,7 @@ export default {
     'reacted to your note': '对您的笔记做出了反应',
     'reposted your note': '转发了您的笔记',
     'zapped your note': '打闪了您的笔记',
+    'highlighted your note': '高亮了您的笔记',
     'zapped you': '给您打闪',
     'Mark as read': '标记为已读',
     Report: '举报',

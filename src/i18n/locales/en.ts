@@ -383,6 +383,7 @@ export default {
     'reacted to your note': 'reacted to your note',
     'reposted your note': 'reposted your note',
     'zapped your note': 'zapped your note',
+    'highlighted your note': 'highlighted your note',
     'zapped you': 'zapped you',
     'Mark as read': 'Mark as read',
     Report: 'Report',

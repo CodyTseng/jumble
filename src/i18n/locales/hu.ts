@@ -385,6 +385,7 @@ export default {
     'reacted to your note': 'reagált a posztodra',
     'reposted your note': 'újraposztolta a posztodat',
     'zapped your note': 'zappolta a posztodat',
+    'highlighted your note': 'kiemelte a posztodat',
     'zapped you': 'zappolt téged',
     'Mark as read': 'Megjelölés olvasottként',
     Report: 'Jelentés',

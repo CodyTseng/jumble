@@ -389,6 +389,7 @@ export default {
     'reacted to your note': 'ha reagito alla tua nota',
     'reposted your note': 'ha ricondiviso la tua nota',
     'zapped your note': 'ha zappato la tua nota',
+    'highlighted your note': 'ha evidenziato la tua nota',
     'zapped you': 'ti ha zappato',
     'Mark as read': 'Segna come letto',
     Report: 'Segnala',

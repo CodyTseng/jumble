@@ -393,6 +393,7 @@ export default {
     'reacted to your note': 'hat auf Ihre Notiz reagiert',
     'reposted your note': 'hat Ihre Notiz geteilt',
     'zapped your note': 'hat Ihre Notiz gezappt',
+    'highlighted your note': 'hat Ihre Notiz hervorgehoben',
     'zapped you': 'hat Sie gezappt',
     'Mark as read': 'Als gelesen markieren',
     Report: 'Melden',

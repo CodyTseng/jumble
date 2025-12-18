@@ -388,6 +388,7 @@ export default {
     'reacted to your note': 'ने आपके नोट पर प्रतिक्रिया दी',
     'reposted your note': 'ने आपके नोट को रीपोस्ट किया',
     'zapped your note': 'ने आपके नोट को जैप किया',
+    'highlighted your note': 'ने आपके नोट को हाइलाइट किया',
     'zapped you': 'ने आपको जैप किया',
     'Mark as read': 'पढ़ा हुआ मार्क करें',
     Report: 'रिपोर्ट करें',

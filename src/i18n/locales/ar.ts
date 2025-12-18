@@ -384,6 +384,7 @@ export default {
     'reacted to your note': 'تفاعل مع ملاحظتك',
     'reposted your note': 'أعاد نشر ملاحظتك',
     'zapped your note': 'زاب ملاحظتك',
+    'highlighted your note': 'أبرز ملاحظتك',
     'zapped you': 'زابك',
     'Mark as read': 'تعليم كمقروء',
     Report: 'تبليغ',
