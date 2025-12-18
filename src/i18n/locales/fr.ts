@@ -598,6 +598,9 @@ export default {
     'Special Follow': 'Suivre Spécial',
     'Unfollow Special': 'Ne Plus Suivre Spécial',
     'Personal Feeds': 'Flux Personnels',
-    'Relay Feeds': 'Flux de Relais'
+    'Relay Feeds': 'Flux de Relais',
+    'Create Highlight': 'Créer un Surlignage',
+    'Write your thoughts about this highlight...': 'Écrivez vos pensées sur ce surlignage...',
+    'Publish Highlight': 'Publier le Surlignage'
   }
 }

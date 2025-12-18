@@ -588,6 +588,9 @@ export default {
     'Special Follow': '특별 팔로우',
     'Unfollow Special': '특별 팔로우 해제',
     'Personal Feeds': '개인 피드',
-    'Relay Feeds': '릴레이 피드'
+    'Relay Feeds': '릴레이 피드',
+    'Create Highlight': '하이라이트 만들기',
+    'Write your thoughts about this highlight...': '이 하이라이트에 대한 생각을 작성하세요...',
+    'Publish Highlight': '하이라이트 게시'
   }
 }

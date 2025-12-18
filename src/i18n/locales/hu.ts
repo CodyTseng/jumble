@@ -584,6 +584,9 @@ export default {
     'Special Follow': 'Különleges Követés',
     'Unfollow Special': 'Különleges Követés Megszüntetése',
     'Personal Feeds': 'Személyes Feedek',
-    'Relay Feeds': 'Relay Feedek'
+    'Relay Feeds': 'Relay Feedek',
+    'Create Highlight': 'Kiemelés Létrehozása',
+    'Write your thoughts about this highlight...': 'Írd le a gondolataidat erről a kiemelésről...',
+    'Publish Highlight': 'Kiemelés Közzététele'
   }
 }

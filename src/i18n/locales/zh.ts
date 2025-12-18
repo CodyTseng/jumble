@@ -575,6 +575,9 @@ export default {
     'Special Follow': '特别关注',
     'Unfollow Special': '取消特别关注',
     'Personal Feeds': '个人订阅',
-    'Relay Feeds': '中继订阅'
+    'Relay Feeds': '中继订阅',
+    'Create Highlight': '创建高亮',
+    'Write your thoughts about this highlight...': '写下你对这段高亮的想法...',
+    'Publish Highlight': '发布高亮'
   }
 }

@@ -590,6 +590,10 @@ export default {
     'Special Follow': 'Favoritos',
     'Unfollow Special': 'Desfavoritar',
     'Personal Feeds': 'Meus feeds',
-    'Relay Feeds': 'Feeds de relays'
+    'Relay Feeds': 'Feeds de relays',
+    'Create Highlight': 'Criar Destaque',
+    'Write your thoughts about this highlight...':
+      'Escreva seus pensamentos sobre este destaque...',
+    'Publish Highlight': 'Publicar Destaque'
   }
 }

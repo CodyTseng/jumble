@@ -595,6 +595,10 @@ export default {
     'Special Follow': 'Specjalne Śledzenie',
     'Unfollow Special': 'Cofnij Specjalne Śledzenie',
     'Personal Feeds': 'Osobiste Kanały',
-    'Relay Feeds': 'Kanały Przekaźników'
+    'Relay Feeds': 'Kanały Przekaźników',
+    'Create Highlight': 'Utwórz Podświetlenie',
+    'Write your thoughts about this highlight...':
+      'Napisz swoje przemyślenia na temat tego podświetlenia...',
+    'Publish Highlight': 'Opublikuj Podświetlenie'
   }
 }

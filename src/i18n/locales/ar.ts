@@ -583,6 +583,9 @@ export default {
     'Special Follow': 'متابعة خاصة',
     'Unfollow Special': 'إلغاء المتابعة الخاصة',
     'Personal Feeds': 'التدفقات الشخصية',
-    'Relay Feeds': 'تدفقات الترحيل'
+    'Relay Feeds': 'تدفقات الترحيل',
+    'Create Highlight': 'إنشاء تمييز',
+    'Write your thoughts about this highlight...': 'اكتب أفكارك حول هذا التمييز...',
+    'Publish Highlight': 'نشر التمييز'
   }
 }

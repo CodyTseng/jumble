@@ -582,6 +582,9 @@ export default {
     'Special Follow': 'ติดตามพิเศษ',
     'Unfollow Special': 'ยกเลิกติดตามพิเศษ',
     'Personal Feeds': 'ฟีดส่วนตัว',
-    'Relay Feeds': 'ฟีดรีเลย์'
+    'Relay Feeds': 'ฟีดรีเลย์',
+    'Create Highlight': 'สร้างไฮไลท์',
+    'Write your thoughts about this highlight...': 'เขียนความคิดของคุณเกี่ยวกับไฮไลท์นี้...',
+    'Publish Highlight': 'เผยแพร่ไฮไลท์'
   }
 }

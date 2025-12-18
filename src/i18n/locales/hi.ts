@@ -590,6 +590,9 @@ export default {
     'Special Follow': 'विशेष फ़ॉलो',
     'Unfollow Special': 'विशेष अनफ़ॉलो',
     'Personal Feeds': 'व्यक्तिगत फ़ीड',
-    'Relay Feeds': 'रिले फ़ीड'
+    'Relay Feeds': 'रिले फ़ीड',
+    'Create Highlight': 'हाइलाइट बनाएं',
+    'Write your thoughts about this highlight...': 'इस हाइलाइट के बारे में अपने विचार लिखें...',
+    'Publish Highlight': 'हाइलाइट प्रकाशित करें'
   }
 }

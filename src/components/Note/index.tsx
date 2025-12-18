@@ -117,7 +117,7 @@ export default function Note({
   } else if (event.kind === ExtendedKind.FOLLOW_PACK) {
     content = <FollowPack className="mt-2" event={event} />
   } else {
-    content = <Content className="mt-2" event={event} />
+    content = <Content className="mt-2" event={event} enableHighlight />
   }
 
   return (

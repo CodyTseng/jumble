@@ -307,6 +307,74 @@ export async function createCommentDraftEvent(
   return setDraftEventCache(baseDraft)
 }
 
+// https://github.com/nostr-protocol/nips/blob/master/84.md
+export function createHighlightDraftEvent(
+  highlightedText: string,
+  comment: string = '',
+  sourceEvent: Event,
+  mentions: string[],
+  options: {
+    addClientTag?: boolean
+    protectedEvent?: boolean
+    isNsfw?: boolean
+  } = {}
+): TDraftEvent {
+  const { content: transformedEmojisContent, emojiTags } = transformCustomEmojisInContent(comment)
+  const quoteTags = extractQuoteTags(comment)
+  const hashtags = extractHashtags(transformedEmojisContent)
+
+  const tags = emojiTags.concat(hashtags.map((hashtag) => buildTTag(hashtag)))
+
+  // imeta tags
+  const images = extractImagesFromContent(transformedEmojisContent)
+  if (images && images.length) {
+    tags.push(...generateImetaTags(images))
+  }
+
+  // q tags
+  tags.push(...quoteTags)
+
+  // p tags
+  tags.push(
+    ...mentions
+      .filter((pubkey) => pubkey !== sourceEvent.pubkey)
+      .map((pubkey) => ['p', pubkey, '', 'mention'])
+  )
+
+  // Add comment tag if comment exists
+  if (transformedEmojisContent) {
+    tags.push(['comment', transformedEmojisContent])
+  }
+
+  // Add source reference
+  const hint = client.getEventHint(sourceEvent.id)
+  if (isReplaceableEvent(sourceEvent.kind)) {
+    tags.push(['a', getReplaceableCoordinateFromEvent(sourceEvent), hint, 'source'])
+  } else {
+    tags.push(['e', sourceEvent.id, hint, 'source'])
+  }
+  tags.push(['p', sourceEvent.pubkey, '', 'author'])
+
+  if (options.addClientTag) {
+    tags.push(buildClientTag())
+  }
+
+  if (options.isNsfw) {
+    tags.push(buildNsfwTag())
+  }
+
+  if (options.protectedEvent) {
+    tags.push(buildProtectedTag())
+  }
+
+  const baseDraft = {
+    kind: kinds.Highlights,
+    content: highlightedText,
+    tags
+  }
+  return setDraftEventCache(baseDraft)
+}
+
 export function createRelayListDraftEvent(mailboxRelays: TMailboxRelay[]): TDraftEvent {
   return {
     kind: kinds.RelayList,

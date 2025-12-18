@@ -594,6 +594,10 @@ export default {
     'Special Follow': 'Segui Speciale',
     'Unfollow Special': 'Smetti di Seguire Speciale',
     'Personal Feeds': 'Feed Personali',
-    'Relay Feeds': 'Feed di Relay'
+    'Relay Feeds': 'Feed di Relay',
+    'Create Highlight': 'Crea Evidenziazione',
+    'Write your thoughts about this highlight...':
+      'Scrivi i tuoi pensieri su questa evidenziazione...',
+    'Publish Highlight': 'Pubblica Evidenziazione'
   }
 }

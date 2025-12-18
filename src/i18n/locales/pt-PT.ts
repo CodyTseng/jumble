@@ -593,6 +593,10 @@ export default {
     'Special Follow': 'Seguir Especial',
     'Unfollow Special': 'Deixar de Seguir Especial',
     'Personal Feeds': 'Feeds Pessoais',
-    'Relay Feeds': 'Feeds de Relays'
+    'Relay Feeds': 'Feeds de Relays',
+    'Create Highlight': 'Criar Destaque',
+    'Write your thoughts about this highlight...':
+      'Escreva os seus pensamentos sobre este destaque...',
+    'Publish Highlight': 'Publicar Destaque'
   }
 }

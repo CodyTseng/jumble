@@ -589,6 +589,9 @@ export default {
     'Special Follow': 'دنبال کردن ویژه',
     'Unfollow Special': 'لغو دنبال کردن ویژه',
     'Personal Feeds': 'فیدهای شخصی',
-    'Relay Feeds': 'فیدهای رله'
+    'Relay Feeds': 'فیدهای رله',
+    'Create Highlight': 'ایجاد برجسته‌سازی',
+    'Write your thoughts about this highlight...': 'نظرات خود را درباره این برجسته‌سازی بنویسید...',
+    'Publish Highlight': 'انتشار برجسته‌سازی'
   }
 }

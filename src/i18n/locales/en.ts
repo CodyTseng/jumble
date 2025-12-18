@@ -586,6 +586,9 @@ export default {
     'Special Follow': 'Special Follow',
     'Unfollow Special': 'Unfollow Special',
     'Personal Feeds': 'Personal Feeds',
-    'Relay Feeds': 'Relay Feeds'
+    'Relay Feeds': 'Relay Feeds',
+    'Create Highlight': 'Create Highlight',
+    'Write your thoughts about this highlight...': 'Write your thoughts about this highlight...',
+    'Publish Highlight': 'Publish Highlight'
   }
 }
