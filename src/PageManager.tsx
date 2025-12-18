@@ -311,7 +311,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   {props ? cloneElement(element as React.ReactElement, props) : element}
                 </div>
               ))}
-              <BottomNavigationBar />
+              {/* Only show BottomNavigationBar when no secondary pages are active */}
+              {secondaryStack.length === 0 && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
               <CreateWalletGuideToast />
             </NotificationProvider>
