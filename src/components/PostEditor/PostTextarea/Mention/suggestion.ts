@@ -6,9 +6,49 @@ import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
 import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
 
+import client from '@/services/client.service'
+import nostrListsService from '@/services/nostr-lists.service'
+import postEditor from '@/services/post-editor.service'
+import type { Editor } from '@tiptap/core'
+import { ReactRenderer } from '@tiptap/react'
+import { SuggestionKeyDownProps } from '@tiptap/suggestion'
+import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
+import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
+
 const suggestion = {
-  items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+  items: async ({ query, editor }: { query: string; editor: Editor }) => {
+    const results: Array<{ type: 'user' | 'list'; id: string; data?: any }> = []
+    
+    // Search users
+    const users = await client.searchNpubsFromLocal(query, 15)
+    users.forEach(userId => {
+      results.push({ type: 'user', id: userId })
+    })
+    
+    // Search lists if query length > 1
+    if (query.length > 1) {
+      try {
+        const pubkey = (editor as any).storage?.nostr?.pubkey
+        if (pubkey) {
+          const userLists = await nostrListsService.fetchUserLists(pubkey)
+          const matchingLists = userLists.filter(list => 
+            list.name.toLowerCase().includes(query.toLowerCase())
+          ).slice(0, 5)
+          
+          matchingLists.forEach(list => {
+            results.push({ 
+              type: 'list', 
+              id: `list:${list.id}`, 
+              data: list 
+            })
+          })
+        }
+      } catch (error) {
+        console.error('Error searching lists:', error)
+      }
+    }
+    
+    return results.slice(0, 20)
   },
 
   render: () => {

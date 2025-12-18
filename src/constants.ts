@@ -86,6 +86,7 @@ export const ExtendedKind = {
   PINNED_USERS: 10010,
   FAVORITE_RELAYS: 10012,
   BLOSSOM_SERVER_LIST: 10063,
+  PEOPLE_LIST: 30000, // Nostr lists (kind 30000)
   FOLLOW_PACK: 39089,
   RELAY_REVIEW: 31987,
   GROUP_METADATA: 39000,
@@ -114,7 +115,8 @@ export const SUPPORTED_KINDS = [
   ...ALLOWED_FILTER_KINDS,
   ExtendedKind.RELAY_REVIEW,
   kinds.Emojisets,
-  ExtendedKind.FOLLOW_PACK
+  ExtendedKind.FOLLOW_PACK,
+  ExtendedKind.PEOPLE_LIST
 ]
 
 export const URL_REGEX =

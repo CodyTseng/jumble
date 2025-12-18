@@ -11,7 +11,8 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
-import { Check } from 'lucide-react'
+import nostrListsService, { NostrList } from '@/services/nostr-lists.service'
+import { Check, Users } from 'lucide-react'
 import { Event, nip19 } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -37,9 +38,17 @@ export default function Mentions({
   const [potentialMentions, setPotentialMentions] = useState<string[]>([])
   const [parentEventPubkey, setParentEventPubkey] = useState<string | undefined>()
   const [removedPubkeys, setRemovedPubkeys] = useState<string[]>([])
+  const [userLists, setUserLists] = useState<NostrList[]>([])
+  const [potentialLists, setPotentialLists] = useState<NostrList[]>([])
 
   useEffect(() => {
-    extractMentions(content, parentEvent).then(({ pubkeys, relatedPubkeys, parentEventPubkey }) => {
+    if (pubkey) {
+      nostrListsService.fetchUserLists(pubkey).then(setUserLists)
+    }
+  }, [pubkey])
+
+  useEffect(() => {
+    extractMentions(content, parentEvent).then(({ pubkeys, relatedPubkeys, parentEventPubkey, lists }) => {
       const _parentEventPubkey = parentEventPubkey !== pubkey ? parentEventPubkey : undefined
       setParentEventPubkey(_parentEventPubkey)
       const potentialMentions = [...pubkeys, ...relatedPubkeys].filter((p) => p !== pubkey)
@@ -47,6 +56,7 @@ export default function Mentions({
         potentialMentions.push(_parentEventPubkey)
       }
       setPotentialMentions(potentialMentions)
+      setPotentialLists(lists)
       setRemovedPubkeys((pubkeys) => {
         return Array.from(
           new Set(
@@ -67,12 +77,12 @@ export default function Mentions({
   }, [potentialMentions, removedPubkeys])
 
   const items = useMemo(() => {
-    return potentialMentions.map((_, index) => {
+    const userItems = potentialMentions.map((_, index) => {
       const pubkey = potentialMentions[potentialMentions.length - 1 - index]
       const isParentPubkey = pubkey === parentEventPubkey
       return (
         <MenuItem
-          key={`${pubkey}-${index}`}
+          key={`user-${pubkey}-${index}`}
           checked={isParentPubkey ? true : mentions.includes(pubkey)}
           onCheckedChange={(checked) => {
             if (isParentPubkey) {
@@ -95,7 +105,24 @@ export default function Mentions({
         </MenuItem>
       )
     })
-  }, [potentialMentions, parentEventPubkey, mentions])
+
+    const listItems = potentialLists.map((list, index) => (
+      <MenuItem
+        key={`list-${list.id}-${index}`}
+        checked={true}
+        onCheckedChange={() => {}}
+        disabled={true}
+      >
+        <div className="flex items-center justify-center size-6 shrink-0 bg-muted rounded-full">
+          <Users className="size-3" />
+        </div>
+        <span className="font-semibold text-sm truncate">{list.name}</span>
+        <span className="text-xs text-muted-foreground">({list.pubkeys.length} users)</span>
+      </MenuItem>
+    ))
+
+    return [...listItems, ...userItems]
+  }, [potentialMentions, potentialLists, parentEventPubkey, mentions])
 
   if (isSmallScreen) {
     return (
@@ -103,11 +130,12 @@ export default function Mentions({
         <Button
           className="px-3"
           variant="ghost"
-          disabled={potentialMentions.length === 0}
+          disabled={potentialMentions.length === 0 && potentialLists.length === 0}
           onClick={() => setIsDrawerOpen(true)}
         >
           {t('Mentions')}{' '}
-          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
+          {(potentialMentions.length > 0 || potentialLists.length > 0) && 
+            `(${mentions.length + potentialLists.length}/${potentialMentions.length + potentialLists.length})`}
         </Button>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
@@ -130,11 +158,12 @@ export default function Mentions({
         <Button
           className="px-3"
           variant="ghost"
-          disabled={potentialMentions.length === 0}
+          disabled={potentialMentions.length === 0 && potentialLists.length === 0}
           onClick={(e) => e.stopPropagation()}
         >
           {t('Mentions')}{' '}
-          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
+          {(potentialMentions.length > 0 || potentialLists.length > 0) && 
+            `(${mentions.length + potentialLists.length}/${potentialMentions.length + potentialLists.length})`}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-w-96 max-h-[50vh]" showScrollButtons>
@@ -194,8 +223,9 @@ async function extractMentions(content: string, parentEvent?: Event) {
   const parentEventPubkey = parentEvent ? parentEvent.pubkey : undefined
   const pubkeys: string[] = []
   const relatedPubkeys: string[] = []
+  const lists: NostrList[] = []
   const matches = content.match(
-    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
+    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
   )
 
   const addToSet = (arr: string[], pubkey: string) => {
@@ -216,6 +246,20 @@ async function extractMentions(content: string, parentEvent?: Event) {
         if (event) {
           addToSet(pubkeys, event.pubkey)
         }
+      } else if (type === 'naddr') {
+        // Handle list mentions
+        const event = await client.fetchEvent(id)
+        if (event && event.kind === 30000) {
+          const list = nostrListsService.parseListEvent ? 
+            nostrListsService.parseListEvent(event) : 
+            {
+              id: event.tags.find(t => t[0] === 'd')?.[1] || event.id,
+              name: event.tags.find(t => t[0] === 'name')?.[1] || 'List',
+              pubkeys: event.tags.filter(t => t[0] === 'p').map(t => t[1]),
+              event
+            }
+          lists.push(list)
+        }
       }
     } catch (e) {
       console.error(e)
@@ -233,6 +277,7 @@ async function extractMentions(content: string, parentEvent?: Event) {
   return {
     pubkeys,
     relatedPubkeys: relatedPubkeys.filter((p) => !pubkeys.includes(p)),
-    parentEventPubkey
+    parentEventPubkey,
+    lists
   }
 }

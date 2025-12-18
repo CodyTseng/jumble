@@ -2,14 +2,16 @@ import FollowingBadge from '@/components/FollowingBadge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatNpub, userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
+import nostrListsService from '@/services/nostr-lists.service'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
+import { Users } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import Nip05 from '../../../Nip05'
 import { SimpleUserAvatar } from '../../../UserAvatar'
 import { SimpleUsername } from '../../../Username'
 
 export interface MentionListProps {
-  items: string[]
+  items: Array<{ type: 'user' | 'list'; id: string; data?: any }>
   command: (payload: { id: string; label?: string }) => void
 }
 
@@ -24,7 +26,12 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
     const item = props.items[index]
 
     if (item) {
-      props.command({ id: item, label: formatNpub(item) })
+      if (item.type === 'list' && item.data) {
+        const listMention = nostrListsService.generateListMention(item.data)
+        props.command({ id: item.id, label: listMention })
+      } else {
+        props.command({ id: item.id, label: formatNpub(item.id) })
+      }
     }
   }
 
@@ -81,19 +88,35 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
             'cursor-pointer text-start items-center m-1 p-2 outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 rounded-md',
             selectedIndex === index && 'bg-accent text-accent-foreground'
           )}
-          key={item}
+          key={`${item.type}-${item.id}`}
           onClick={() => selectItem(index)}
           onMouseEnter={() => setSelectedIndex(index)}
         >
           <div className="flex gap-2 w-80 items-center truncate pointer-events-none">
-            <SimpleUserAvatar userId={item} />
-            <div className="flex-1 w-0">
-              <div className="flex items-center gap-2">
-                <SimpleUsername userId={item} className="font-semibold truncate" />
-                <FollowingBadge userId={item} />
-              </div>
-              <Nip05 pubkey={userIdToPubkey(item)} />
-            </div>
+            {item.type === 'list' ? (
+              <>
+                <div className="flex items-center justify-center size-8 shrink-0 bg-muted rounded-full">
+                  <Users className="size-4" />
+                </div>
+                <div className="flex-1 w-0">
+                  <div className="font-semibold truncate">{item.data?.name || 'List'}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {item.data?.pubkeys?.length || 0} users
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <SimpleUserAvatar userId={item.id} />
+                <div className="flex-1 w-0">
+                  <div className="flex items-center gap-2">
+                    <SimpleUsername userId={item.id} className="font-semibold truncate" />
+                    <FollowingBadge userId={item.id} />
+                  </div>
+                  <Nip05 pubkey={userIdToPubkey(item.id)} />
+                </div>
+              </>
+            )}
           </div>
         </button>
       ))}
