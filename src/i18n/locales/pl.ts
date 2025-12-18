@@ -243,7 +243,7 @@ export default {
     'Hide content from untrusted users': 'Ukryj treści od nieznanych użytkowników',
     'Only show content from your followed users and the users they follow':
       'Pokaż tylko treści od użytkowników, których obserwujesz i ich obserwowanych',
-    'Followed by': 'Obserwowany przez',
+    'Followed by': 'Obserwujący',
     'Mute user privately': 'Zablokuj użytkownika prywatnie',
     'Mute user publicly': 'Zablokuj użytkownika publicznie',
     Quotes: 'Cytaty',
@@ -554,7 +554,7 @@ export default {
     'Search for notes': 'Szukaj wpisów',
     'Search for hashtag': 'Szukaj hashtaga',
     'Go to note': 'Przejdź do wpisu',
-    'Go to relay': 'Przejdź do przekaźnika',
+    'Go to relay': 'Przejdź do transmitera',
     'View discussions about this': 'Zobacz dyskusje o tej treści',
     'Open link': 'Otwórz link',
     'View Nostr discussions': 'Zobacz dyskusje Nostr',
@@ -593,13 +593,13 @@ export default {
     'Show but hide content': 'Pokaż, ale ukryj treść',
     'Show directly': 'Pokaż bezpośrednio',
     'Click to view': 'Wyświetl',
-    'Special Follow': 'Specjalne Śledzenie',
-    'Unfollow Special': 'Cofnij Specjalne Śledzenie',
-    'Personal Feeds': 'Osobiste Kanały',
-    'Relay Feeds': 'Kanały Przekaźników',
-    'Create Highlight': 'Utwórz Podświetlenie',
+    'Special Follow': 'Specjalna obserwacja',
+    'Unfollow Special': 'Cofnij obserwację specjalną',
+    'Personal Feeds': 'Kanały osobiste',
+    'Relay Feeds': 'Kanały Transmiterów',
+    'Create Highlight': 'Utwórz wyróżnienie',
     'Write your thoughts about this highlight...':
-      'Napisz swoje przemyślenia na temat tego podświetlenia...',
-    'Publish Highlight': 'Opublikuj Podświetlenie'
+      'Napisz swoje przemyślenia na temat tego wyróżnienienia...',
+    'Publish Highlight': 'Opublikuj wyróżnienie'
   }
 }
