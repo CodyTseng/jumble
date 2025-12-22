@@ -599,6 +599,8 @@ export default {
     'Create Highlight': 'Crea Evidenziazione',
     'Write your thoughts about this highlight...':
       'Scrivi i tuoi pensieri su questa evidenziazione...',
-    'Publish Highlight': 'Pubblica Evidenziazione'
+    'Publish Highlight': 'Pubblica Evidenziazione',
+    'Show replies': 'Mostra risposte',
+    'Hide replies': 'Nascondi risposte'
   }
 }

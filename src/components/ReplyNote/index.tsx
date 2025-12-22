@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -15,9 +16,10 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
-import StuffStats from '../StuffStats'
 import ParentNotePreview from '../ParentNotePreview'
+import StuffStats from '../StuffStats'
 import TranslateButton from '../TranslateButton'
+import TrustScoreBadge from '../TrustScoreBadge'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
@@ -25,12 +27,14 @@ export default function ReplyNote({
   event,
   parentEventId,
   onClickParent = () => {},
-  highlight = false
+  highlight = false,
+  className = ''
 }: {
   event: Event
   parentEventId?: string
   onClickParent?: () => void
   highlight?: boolean
+  className?: string
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
@@ -53,7 +57,11 @@ export default function ReplyNote({
 
   return (
     <div
-      className={`pb-3 border-b transition-colors duration-500 clickable ${highlight ? 'bg-primary/50' : ''}`}
+      className={cn(
+        'pb-3 transition-colors duration-500 clickable',
+        highlight ? 'bg-primary/40' : '',
+        className
+      )}
       onClick={() => push(toNote(event))}
     >
       <Collapsible>
@@ -68,6 +76,7 @@ export default function ReplyNote({
                     className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
                     skeletonClassName="h-3"
                   />
+                  <TrustScoreBadge pubkey={event.pubkey} className="!size-3.5" />
                   <ClientTag event={event} />
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">

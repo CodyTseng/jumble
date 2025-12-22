@@ -2,16 +2,13 @@ import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { useStuff } from '@/hooks/useStuff'
 import {
   getEventKey,
-  getKeyFromTag,
-  getParentTag,
   getReplaceableCoordinateFromEvent,
   getRootTag,
   isMentioningMutedUsers,
   isProtectedEvent,
   isReplaceableEvent
 } from '@/lib/event'
-import { toNote } from '@/lib/link'
-import { generateBech32IdFromATag, generateBech32IdFromETag } from '@/lib/tag'
+import { generateBech32IdFromETag } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -23,6 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoadingBar } from '../LoadingBar'
 import ReplyNote, { ReplyNoteSkeleton } from '../ReplyNote'
+import SubReplies from './SubReplies'
 
 type TRootInfo =
   | { type: 'E'; id: string; pubkey: string }
@@ -40,7 +38,7 @@ export default function ReplyNoteList({
   index?: number
 }) {
   const { t } = useTranslation()
-  const { push, currentIndex } = useSecondaryPage()
+  const { currentIndex } = useSecondaryPage()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
@@ -49,30 +47,40 @@ export default function ReplyNoteList({
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const replies = useMemo(() => {
     const replyKeySet = new Set<string>()
-    const replyEvents: NEvent[] = []
+    const replyEvents = (repliesMap.get(stuffKey)?.events || []).filter((evt) => {
+      const key = getEventKey(evt)
+      if (replyKeySet.has(key)) return false
+      if (mutePubkeySet.has(evt.pubkey)) return false
+      if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) {
+        return false
+      }
+      if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
+        const replyKey = getEventKey(evt)
+        const repliesForThisReply = repliesMap.get(replyKey)
+        // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
+        if (
+          !repliesForThisReply ||
+          repliesForThisReply.events.every((evt) => !isUserTrusted(evt.pubkey))
+        ) {
+          return false
+        }
+      }
 
-    let parentKeys = [stuffKey]
-    while (parentKeys.length > 0) {
-      const events = parentKeys.flatMap((key) => repliesMap.get(key)?.events || [])
-      events.forEach((evt) => {
-        const key = getEventKey(evt)
-        if (replyKeySet.has(key)) return
-        if (mutePubkeySet.has(evt.pubkey)) return
-        if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) return
-
-        replyKeySet.add(key)
-        replyEvents.push(evt)
-      })
-      parentKeys = events.map((evt) => getEventKey(evt))
-    }
+      replyKeySet.add(key)
+      return true
+    })
     return replyEvents.sort((a, b) => a.created_at - b.created_at)
-  }, [stuffKey, repliesMap])
+  }, [
+    stuffKey,
+    repliesMap,
+    mutePubkeySet,
+    hideContentMentioningMutedUsers,
+    hideUntrustedInteractions
+  ])
   const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
   const [until, setUntil] = useState<number | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(false)
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [highlightReplyKey, setHighlightReplyKey] = useState<string | undefined>(undefined)
-  const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -252,26 +260,6 @@ export default function ReplyNoteList({
     setLoading(false)
   }, [loading, until, timelineKey])
 
-  const highlightReply = useCallback((key: string, eventId?: string, scrollTo = true) => {
-    let found = false
-    if (scrollTo) {
-      const ref = replyRefs.current[key]
-      if (ref) {
-        found = true
-        ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      }
-    }
-    if (!found) {
-      if (eventId) push(toNote(eventId))
-      return
-    }
-
-    setHighlightReplyKey(key)
-    setTimeout(() => {
-      setHighlightReplyKey((pre) => (pre === key ? undefined : pre))
-    }, 1500)
-  }, [])
-
   return (
     <div className="min-h-[80vh]">
       {loading && <LoadingBar />}
@@ -285,44 +273,11 @@ export default function ReplyNoteList({
       )}
       <div>
         {replies.slice(0, showCount).map((reply) => {
-          if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
-            const replyKey = getEventKey(reply)
-            const repliesForThisReply = repliesMap.get(replyKey)
-            // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
-            if (
-              !repliesForThisReply ||
-              repliesForThisReply.events.every((evt) => !isUserTrusted(evt.pubkey))
-            ) {
-              return null
-            }
-          }
-
-          const rootKey = event ? getEventKey(event) : externalContent!
-          const currentReplyKey = getEventKey(reply)
-          const parentTag = getParentTag(reply)
-          const parentKey = parentTag ? getKeyFromTag(parentTag.tag) : undefined
-          const parentEventId = parentTag
-            ? parentTag.type === 'e'
-              ? generateBech32IdFromETag(parentTag.tag)
-              : parentTag.type === 'a'
-                ? generateBech32IdFromATag(parentTag.tag)
-                : undefined
-            : undefined
+          const key = getEventKey(reply)
           return (
-            <div
-              ref={(el) => (replyRefs.current[currentReplyKey] = el)}
-              key={currentReplyKey}
-              className="scroll-mt-12"
-            >
-              <ReplyNote
-                event={reply}
-                parentEventId={rootKey !== parentKey ? parentEventId : undefined}
-                onClickParent={() => {
-                  if (!parentKey) return
-                  highlightReply(parentKey, parentEventId)
-                }}
-                highlight={highlightReplyKey === currentReplyKey}
-              />
+            <div key={key}>
+              <ReplyNote event={reply} />
+              <SubReplies parentKey={key} />
             </div>
           )
         })}

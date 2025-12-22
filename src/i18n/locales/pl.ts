@@ -600,6 +600,8 @@ export default {
     'Create Highlight': 'Utwórz wyróżnienie',
     'Write your thoughts about this highlight...':
       'Napisz swoje przemyślenia na temat tego wyróżnienienia...',
-    'Publish Highlight': 'Opublikuj wyróżnienie'
+    'Publish Highlight': 'Opublikuj wyróżnienie',
+    'Show replies': 'Pokaż odpowiedzi',
+    'Hide replies': 'Ukryj odpowiedzi'
   }
 }

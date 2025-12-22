@@ -586,6 +586,8 @@ export default {
     'Relay Feeds': 'ฟีดรีเลย์',
     'Create Highlight': 'สร้างไฮไลท์',
     'Write your thoughts about this highlight...': 'เขียนความคิดของคุณเกี่ยวกับไฮไลท์นี้...',
-    'Publish Highlight': 'เผยแพร่ไฮไลท์'
+    'Publish Highlight': 'เผยแพร่ไฮไลท์',
+    'Show replies': 'แสดงการตอบกลับ',
+    'Hide replies': 'ซ่อนการตอบกลับ'
   }
 }

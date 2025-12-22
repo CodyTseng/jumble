@@ -579,6 +579,8 @@ export default {
     'Relay Feeds': '中继订阅',
     'Create Highlight': '创建高亮',
     'Write your thoughts about this highlight...': '写下你对这段高亮的想法...',
-    'Publish Highlight': '发布高亮'
+    'Publish Highlight': '发布高亮',
+    'Show replies': '显示回复',
+    'Hide replies': '隐藏回复'
   }
 }

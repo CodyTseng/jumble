@@ -590,6 +590,8 @@ export default {
     'Relay Feeds': 'Relay Feeds',
     'Create Highlight': 'Create Highlight',
     'Write your thoughts about this highlight...': 'Write your thoughts about this highlight...',
-    'Publish Highlight': 'Publish Highlight'
+    'Publish Highlight': 'Publish Highlight',
+    'Show replies': 'Show replies',
+    'Hide replies': 'Hide replies'
   }
 }

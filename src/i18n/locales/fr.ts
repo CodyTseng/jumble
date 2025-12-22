@@ -602,6 +602,8 @@ export default {
     'Relay Feeds': 'Flux de Relais',
     'Create Highlight': 'Créer un Surlignage',
     'Write your thoughts about this highlight...': 'Écrivez vos pensées sur ce surlignage...',
-    'Publish Highlight': 'Publier le Surlignage'
+    'Publish Highlight': 'Publier le Surlignage',
+    'Show replies': 'Afficher les réponses',
+    'Hide replies': 'Masquer les réponses'
   }
 }

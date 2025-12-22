@@ -118,7 +118,7 @@ class ClientService extends EventTarget {
         if (mentions.length > 0) {
           const relayLists = await this.fetchRelayLists(mentions)
           relayLists.forEach((relayList) => {
-            relayList.read.slice(0, 4).forEach((url) => relaySet.add(url))
+            relayList.read.slice(0, 5).forEach((url) => relaySet.add(url))
           })
         }
       }

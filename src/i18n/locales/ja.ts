@@ -594,6 +594,8 @@ export default {
     'Create Highlight': 'ハイライトを作成',
     'Write your thoughts about this highlight...':
       'このハイライトについての考えを書いてください...',
-    'Publish Highlight': 'ハイライトを公開'
+    'Publish Highlight': 'ハイライトを公開',
+    'Show replies': '返信を表示',
+    'Hide replies': '返信を非表示'
   }
 }

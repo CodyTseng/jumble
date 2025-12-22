@@ -604,6 +604,8 @@ export default {
     'Create Highlight': 'Markierung Erstellen',
     'Write your thoughts about this highlight...':
       'Schreiben Sie Ihre Gedanken zu dieser Markierung...',
-    'Publish Highlight': 'Markierung Veröffentlichen'
+    'Publish Highlight': 'Markierung Veröffentlichen',
+    'Show replies': 'Antworten anzeigen',
+    'Hide replies': 'Antworten ausblenden'
   }
 }

@@ -587,6 +587,8 @@ export default {
     'Relay Feeds': 'تدفقات الترحيل',
     'Create Highlight': 'إنشاء تمييز',
     'Write your thoughts about this highlight...': 'اكتب أفكارك حول هذا التمييز...',
-    'Publish Highlight': 'نشر التمييز'
+    'Publish Highlight': 'نشر التمييز',
+    'Show replies': 'إظهار الردود',
+    'Hide replies': 'إخفاء الردود'
   }
 }

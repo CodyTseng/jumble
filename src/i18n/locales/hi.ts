@@ -594,6 +594,8 @@ export default {
     'Relay Feeds': 'रिले फ़ीड',
     'Create Highlight': 'हाइलाइट बनाएं',
     'Write your thoughts about this highlight...': 'इस हाइलाइट के बारे में अपने विचार लिखें...',
-    'Publish Highlight': 'हाइलाइट प्रकाशित करें'
+    'Publish Highlight': 'हाइलाइट प्रकाशित करें',
+    'Show replies': 'जवाब दिखाएं',
+    'Hide replies': 'जवाब छुपाएं'
   }
 }

@@ -595,6 +595,8 @@ export default {
     'Create Highlight': 'Criar Destaque',
     'Write your thoughts about this highlight...':
       'Escreva seus pensamentos sobre este destaque...',
-    'Publish Highlight': 'Publicar Destaque'
+    'Publish Highlight': 'Publicar Destaque',
+    'Show replies': 'Mostrar respostas',
+    'Hide replies': 'Ocultar respostas'
   }
 }

@@ -592,6 +592,8 @@ export default {
     'Relay Feeds': '릴레이 피드',
     'Create Highlight': '하이라이트 만들기',
     'Write your thoughts about this highlight...': '이 하이라이트에 대한 생각을 작성하세요...',
-    'Publish Highlight': '하이라이트 게시'
+    'Publish Highlight': '하이라이트 게시',
+    'Show replies': '답글 표시',
+    'Hide replies': '답글 숨기기'
   }
 }

@@ -593,6 +593,8 @@ export default {
     'Relay Feeds': 'فیدهای رله',
     'Create Highlight': 'ایجاد برجسته‌سازی',
     'Write your thoughts about this highlight...': 'نظرات خود را درباره این برجسته‌سازی بنویسید...',
-    'Publish Highlight': 'انتشار برجسته‌سازی'
+    'Publish Highlight': 'انتشار برجسته‌سازی',
+    'Show replies': 'نمایش پاسخ‌ها',
+    'Hide replies': 'پنهان کردن پاسخ‌ها'
   }
 }

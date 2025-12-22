@@ -588,6 +588,8 @@ export default {
     'Relay Feeds': 'Relay Feedek',
     'Create Highlight': 'Kiemelés Létrehozása',
     'Write your thoughts about this highlight...': 'Írd le a gondolataidat erről a kiemelésről...',
-    'Publish Highlight': 'Kiemelés Közzététele'
+    'Publish Highlight': 'Kiemelés Közzététele',
+    'Show replies': 'Válaszok megjelenítése',
+    'Hide replies': 'Válaszok elrejtése'
   }
 }

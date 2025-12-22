@@ -600,6 +600,8 @@ export default {
     'Create Highlight': 'Crear Resaltado',
     'Write your thoughts about this highlight...':
       'Escribe tus pensamientos sobre este resaltado...',
-    'Publish Highlight': 'Publicar Resaltado'
+    'Publish Highlight': 'Publicar Resaltado',
+    'Show replies': 'Mostrar respuestas',
+    'Hide replies': 'Ocultar respuestas'
   }
 }

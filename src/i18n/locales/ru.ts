@@ -599,6 +599,8 @@ export default {
     'Relay Feeds': 'Ленты Релеев',
     'Create Highlight': 'Создать Выделение',
     'Write your thoughts about this highlight...': 'Напишите свои мысли об этом выделении...',
-    'Publish Highlight': 'Опубликовать Выделение'
+    'Publish Highlight': 'Опубликовать Выделение',
+    'Show replies': 'Показать ответы',
+    'Hide replies': 'Скрыть ответы'
   }
 }
