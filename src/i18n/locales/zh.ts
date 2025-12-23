@@ -581,6 +581,9 @@ export default {
     'Write your thoughts about this highlight...': '写下你对这段高亮的想法...',
     'Publish Highlight': '发布高亮',
     'Show replies': '显示回复',
-    'Hide replies': '隐藏回复'
+    'Hide replies': '隐藏回复',
+    'Welcome to Jumble!': '欢迎来到 Jumble！',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的动态是空的，因为你还没有关注任何人。开始探索有趣的内容并关注你喜欢的用户吧！',
+    'Search Users': '搜索用户'
   }
 }

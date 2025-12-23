@@ -606,6 +606,9 @@ export default {
       'Schreiben Sie Ihre Gedanken zu dieser Markierung...',
     'Publish Highlight': 'Markierung Veröffentlichen',
     'Show replies': 'Antworten anzeigen',
-    'Hide replies': 'Antworten ausblenden'
+    'Hide replies': 'Antworten ausblenden',
+    'Welcome to Jumble!': 'Willkommen bei Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Ihr Feed ist leer, weil Sie noch niemandem folgen. Beginnen Sie damit, interessante Inhalte zu erkunden und Benutzern zu folgen, die Ihnen gefallen!',
+    'Search Users': 'Benutzer suchen'
   }
 }

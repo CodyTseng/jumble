@@ -601,6 +601,9 @@ export default {
       'Scrivi i tuoi pensieri su questa evidenziazione...',
     'Publish Highlight': 'Pubblica Evidenziazione',
     'Show replies': 'Mostra risposte',
-    'Hide replies': 'Nascondi risposte'
+    'Hide replies': 'Nascondi risposte',
+    'Welcome to Jumble!': 'Benvenuto su Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Il tuo feed è vuoto perché non stai ancora seguendo nessuno. Inizia esplorando contenuti interessanti e seguendo gli utenti che ti piacciono!',
+    'Search Users': 'Cerca Utenti'
   }
 }

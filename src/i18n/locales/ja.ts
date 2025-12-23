@@ -596,6 +596,9 @@ export default {
       'このハイライトについての考えを書いてください...',
     'Publish Highlight': 'ハイライトを公開',
     'Show replies': '返信を表示',
-    'Hide replies': '返信を非表示'
+    'Hide replies': '返信を非表示',
+    'Welcome to Jumble!': 'Jumbleへようこそ！',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'まだ誰もフォローしていないため、フィードが空です。興味深いコンテンツを探索して、好きなユーザーをフォローしてみましょう！',
+    'Search Users': 'ユーザーを検索'
   }
 }

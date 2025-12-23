@@ -601,6 +601,9 @@ export default {
     'Write your thoughts about this highlight...': 'Напишите свои мысли об этом выделении...',
     'Publish Highlight': 'Опубликовать Выделение',
     'Show replies': 'Показать ответы',
-    'Hide replies': 'Скрыть ответы'
+    'Hide replies': 'Скрыть ответы',
+    'Welcome to Jumble!': 'Добро пожаловать в Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Ваша лента пуста, потому что вы еще ни на кого не подписаны. Начните с изучения интересного контента и подписки на понравившихся пользователей!',
+    'Search Users': 'Поиск пользователей'
   }
 }

@@ -575,6 +575,9 @@ export default {
     'Special Follow': '特別關注',
     'Unfollow Special': '取消特別關注',
     'Personal Feeds': '個人訂閱',
-    'Relay Feeds': '中繼訂閱'
+    'Relay Feeds': '中繼訂閱',
+    'Welcome to Jumble!': '歡迎來到 Jumble！',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的動態是空的，因為你還沒有關注任何人。開始探索有趣的內容並關注你喜歡的用戶吧！',
+    'Search Users': '搜尋用戶'
   }
 }

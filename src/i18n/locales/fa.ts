@@ -595,6 +595,9 @@ export default {
     'Write your thoughts about this highlight...': 'نظرات خود را درباره این برجسته‌سازی بنویسید...',
     'Publish Highlight': 'انتشار برجسته‌سازی',
     'Show replies': 'نمایش پاسخ‌ها',
-    'Hide replies': 'پنهان کردن پاسخ‌ها'
+    'Hide replies': 'پنهان کردن پاسخ‌ها',
+    'Welcome to Jumble!': 'به Jumble خوش آمدید!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'فید شما خالی است زیرا هنوز کسی را دنبال نمی‌کنید. با کاوش محتوای جالب و دنبال کردن کاربرانی که دوست دارید شروع کنید!',
+    'Search Users': 'جستجوی کاربران'
   }
 }

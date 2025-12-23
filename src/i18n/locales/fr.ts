@@ -604,6 +604,9 @@ export default {
     'Write your thoughts about this highlight...': 'Écrivez vos pensées sur ce surlignage...',
     'Publish Highlight': 'Publier le Surlignage',
     'Show replies': 'Afficher les réponses',
-    'Hide replies': 'Masquer les réponses'
+    'Hide replies': 'Masquer les réponses',
+    'Welcome to Jumble!': 'Bienvenue sur Jumble !',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Votre flux est vide car vous ne suivez personne pour le moment. Commencez par explorer du contenu intéressant et suivez les utilisateurs que vous aimez !',
+    'Search Users': 'Rechercher des utilisateurs'
   }
 }

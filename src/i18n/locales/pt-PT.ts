@@ -600,6 +600,9 @@ export default {
       'Escreva os seus pensamentos sobre este destaque...',
     'Publish Highlight': 'Publicar Destaque',
     'Show replies': 'Mostrar respostas',
-    'Hide replies': 'Ocultar respostas'
+    'Hide replies': 'Ocultar respostas',
+    'Welcome to Jumble!': 'Bem-vindo ao Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'O seu feed está vazio porque ainda não está a seguir ninguém. Comece por explorar conteúdo interessante e siga utilizadores de que gosta!',
+    'Search Users': 'Procurar Utilizadores'
   }
 }

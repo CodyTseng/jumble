@@ -588,6 +588,9 @@ export default {
     'Write your thoughts about this highlight...': 'เขียนความคิดของคุณเกี่ยวกับไฮไลท์นี้...',
     'Publish Highlight': 'เผยแพร่ไฮไลท์',
     'Show replies': 'แสดงการตอบกลับ',
-    'Hide replies': 'ซ่อนการตอบกลับ'
+    'Hide replies': 'ซ่อนการตอบกลับ',
+    'Welcome to Jumble!': 'ยินดีต้อนรับสู่ Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'ฟีดของคุณว่างเปล่าเพราะคุณยังไม่ได้ติดตามใครเลย เริ่มต้นด้วยการสำรวจเนื้อหาที่น่าสนใจและติดตามผู้ใช้ที่คุณชอบ!',
+    'Search Users': 'ค้นหาผู้ใช้'
   }
 }

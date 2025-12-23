@@ -1,5 +1,4 @@
 import NormalFeed from '@/components/NormalFeed'
-import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinnedUsers } from '@/providers/PinnedUsersProvider'
 import client from '@/services/client.service'
@@ -8,7 +7,6 @@ import { useEffect, useRef, useState } from 'react'
 
 export default function PinnedFeed() {
   const { pubkey } = useNostr()
-  const { feedInfo } = useFeed()
   const { pinnedPubkeySet } = usePinnedUsers()
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
   const initializedRef = useRef(false)
@@ -17,7 +15,7 @@ export default function PinnedFeed() {
     if (initializedRef.current) return
 
     async function init() {
-      if (feedInfo?.feedType !== 'pinned' || !pubkey || pinnedPubkeySet.size === 0) {
+      if (!pubkey || pinnedPubkeySet.size === 0) {
         setSubRequests([])
         return
       }
@@ -28,7 +26,7 @@ export default function PinnedFeed() {
     }
 
     init()
-  }, [feedInfo?.feedType, pubkey, pinnedPubkeySet])
+  }, [pubkey, pinnedPubkeySet])
 
   return <NormalFeed subRequests={subRequests} isMainFeed />
 }

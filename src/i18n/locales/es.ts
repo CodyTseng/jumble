@@ -602,6 +602,9 @@ export default {
       'Escribe tus pensamientos sobre este resaltado...',
     'Publish Highlight': 'Publicar Resaltado',
     'Show replies': 'Mostrar respuestas',
-    'Hide replies': 'Ocultar respuestas'
+    'Hide replies': 'Ocultar respuestas',
+    'Welcome to Jumble!': '¡Bienvenido a Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Tu feed está vacío porque aún no sigues a nadie. ¡Comienza explorando contenido interesante y siguiendo a los usuarios que te gusten!',
+    'Search Users': 'Buscar Usuarios'
   }
 }

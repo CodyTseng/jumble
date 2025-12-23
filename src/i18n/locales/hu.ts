@@ -590,6 +590,9 @@ export default {
     'Write your thoughts about this highlight...': 'Írd le a gondolataidat erről a kiemelésről...',
     'Publish Highlight': 'Kiemelés Közzététele',
     'Show replies': 'Válaszok megjelenítése',
-    'Hide replies': 'Válaszok elrejtése'
+    'Hide replies': 'Válaszok elrejtése',
+    'Welcome to Jumble!': 'Üdvözlünk a Jumble-ban!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'A hírcsatornád üres, mert még nem követsz senkit. Kezdd el érdekes tartalmak felfedezésével és kövesd azokat a felhasználókat, akik tetszenek!',
+    'Search Users': 'Felhasználók keresése'
   }
 }

@@ -602,6 +602,9 @@ export default {
       'Napisz swoje przemyślenia na temat tego wyróżnienienia...',
     'Publish Highlight': 'Opublikuj wyróżnienie',
     'Show replies': 'Pokaż odpowiedzi',
-    'Hide replies': 'Ukryj odpowiedzi'
+    'Hide replies': 'Ukryj odpowiedzi',
+    'Welcome to Jumble!': 'Witamy w Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Twój kanał jest pusty, ponieważ jeszcze nikogo nie obserwujesz. Zacznij od odkrywania ciekawych treści i obserwowania użytkowników, którzy Ci się podobają!',
+    'Search Users': 'Szukaj użytkowników'
   }
 }

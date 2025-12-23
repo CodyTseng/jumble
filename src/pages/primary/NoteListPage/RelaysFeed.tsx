@@ -5,7 +5,7 @@ import relayInfoService from '@/services/relay-info.service'
 import { useEffect, useState } from 'react'
 
 export default function RelaysFeed() {
-  const { feedInfo, relayUrls } = useFeed()
+  const { relayUrls } = useFeed()
   const [isReady, setIsReady] = useState(false)
   const [areAlgoRelays, setAreAlgoRelays] = useState(false)
 
@@ -19,10 +19,6 @@ export default function RelaysFeed() {
   }, [relayUrls])
 
   if (!isReady) {
-    return null
-  }
-
-  if (!feedInfo || (feedInfo.feedType !== 'relay' && feedInfo.feedType !== 'relays')) {
     return null
   }
 

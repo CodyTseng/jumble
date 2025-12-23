@@ -596,6 +596,9 @@ export default {
     'Write your thoughts about this highlight...': 'इस हाइलाइट के बारे में अपने विचार लिखें...',
     'Publish Highlight': 'हाइलाइट प्रकाशित करें',
     'Show replies': 'जवाब दिखाएं',
-    'Hide replies': 'जवाब छुपाएं'
+    'Hide replies': 'जवाब छुपाएं',
+    'Welcome to Jumble!': 'Jumble में आपका स्वागत है!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'आपका फ़ीड खाली है क्योंकि आप अभी तक किसी को फ़ॉलो नहीं कर रहे हैं। दिलचस्प सामग्री का अन्वेषण करके और अपनी पसंद के उपयोगकर्ताओं को फ़ॉलो करके शुरू करें!',
+    'Search Users': 'उपयोगकर्ता खोजें'
   }
 }

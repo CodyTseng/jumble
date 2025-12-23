@@ -592,6 +592,9 @@ export default {
     'Write your thoughts about this highlight...': 'Write your thoughts about this highlight...',
     'Publish Highlight': 'Publish Highlight',
     'Show replies': 'Show replies',
-    'Hide replies': 'Hide replies'
+    'Hide replies': 'Hide replies',
+    'Welcome to Jumble!': 'Welcome to Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!',
+    'Search Users': 'Search Users'
   }
 }

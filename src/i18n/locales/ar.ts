@@ -589,6 +589,9 @@ export default {
     'Write your thoughts about this highlight...': 'اكتب أفكارك حول هذا التمييز...',
     'Publish Highlight': 'نشر التمييز',
     'Show replies': 'إظهار الردود',
-    'Hide replies': 'إخفاء الردود'
+    'Hide replies': 'إخفاء الردود',
+    'Welcome to Jumble!': 'مرحبًا بك في Jumble!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'خلاصتك فارغة لأنك لا تتابع أي شخص بعد. ابدأ باستكشاف محتوى مثير للاهتمام ومتابعة المستخدمين الذين تحبهم!',
+    'Search Users': 'البحث عن المستخدمين'
   }
 }

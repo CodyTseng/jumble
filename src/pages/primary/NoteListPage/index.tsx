@@ -199,7 +199,7 @@ function WelcomeGuide() {
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
         <Button size="lg" className="w-full" onClick={() => navigate('explore')}>
           <Compass className="size-5" />
-          {t('Explore Relays')}
+          {t('Explore')}
         </Button>
 
         <Button size="lg" className="w-full" variant="outline" onClick={() => checkLogin()}>
