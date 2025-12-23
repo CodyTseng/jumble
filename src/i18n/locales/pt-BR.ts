@@ -612,9 +612,9 @@ export default {
       'No Nostr, sua chave privada É sua conta. Se você perder sua chave privada, perderá sua conta para sempre.',
     'Your Private Key': 'Sua chave privada',
     'Generate new key': 'Gerar nova chave',
-    'Download Backup File': 'Baixar arquivo de backup',
+    'Download Backup File': 'Baixar backup',
     'Copied to Clipboard': 'Copiado para a área de transferência',
-    'Copy to Clipboard': 'Copiar para a área de transferência',
+    'Copy to Clipboard': 'Copiar texto',
     'I already saved my private key securely.': 'Já salvei minha chave privada com segurança.',
     'Almost Done!': 'Quase pronto!',
     'Set a password to encrypt your key, or skip to finish':
@@ -632,9 +632,9 @@ export default {
     'Create Your Nostr Account': 'Crie sua conta Nostr',
     'Generate your unique private key. This is your digital identity.':
       'Gere sua chave privada única. Esta é sua identidade digital.',
-    'Critical: Save Your Private Key': 'Crítico: Salve sua chave privada',
+    'Critical: Save Your Private Key': 'Importante: Salve a sua chave privada.',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
-      'Sua chave privada É sua conta. Não há recuperação de senha. Se você perdê-la, perderá sua conta para sempre. Por favor, salve-a em um local seguro.',
+      'Sua chave privada é a sua conta. Não há recuperação de senha, se você perdê-la, perderá sua conta para sempre. Por favor, salve-a em um local seguro.',
     'I have safely backed up my private key': 'Fiz backup seguro da minha chave privada',
     'Secure Your Account': 'Proteja sua conta',
     'Add an extra layer of protection with a password':
