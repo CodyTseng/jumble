@@ -601,7 +601,7 @@ export default {
     'Generate Your Account': 'Generate Your Account',
     'Your private key IS your account. Keep it safe!': 'Your private key IS your account. Keep it safe!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
-      'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.',
+      'In Nostr, your private key IS your account. If you lose your account forever.',
     'Your Private Key': 'Your Private Key',
     'Generate new key': 'Generate new key',
     'Download Backup File': 'Download Backup File',
@@ -619,6 +619,23 @@ export default {
     'Confirm Password': 'Confirm Password',
     'Re-enter password': 'Re-enter password',
     'Passwords do not match': 'Passwords do not match',
-    'Finish Signup': 'Finish Signup'
+    'Finish Signup': 'Finish Signup',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Create Your Nostr Account',
+    'Generate your unique private key. This is your digital identity.':
+      'Generate your unique private key. This is your digital identity.',
+    'Critical: Save Your Private Key': 'Critical: Save Your Private Key',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.',
+    'I have safely backed up my private key': 'I have safely backed up my private key',
+    'Secure Your Account': 'Secure Your Account',
+    'Add an extra layer of protection with a password':
+      'Add an extra layer of protection with a password',
+    'Password Protection (Recommended)': 'Password Protection (Recommended)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.',
+    'Create a strong password (or skip)': 'Create a strong password (or skip)',
+    'Enter your password again': 'Enter your password again',
+    'Complete Signup': 'Complete Signup'
   }
 }

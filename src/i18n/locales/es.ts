@@ -629,6 +629,23 @@ export default {
     'Confirm Password': 'Confirmar contraseña',
     'Re-enter password': 'Vuelve a ingresar la contraseña',
     'Passwords do not match': 'Las contraseñas no coinciden',
-    'Finish Signup': 'Finalizar registro'
+    'Finish Signup': 'Finalizar registro',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Crea tu cuenta de Nostr',
+    'Generate your unique private key. This is your digital identity.':
+      'Genera tu clave privada única. Esta es tu identidad digital.',
+    'Critical: Save Your Private Key': 'Crítico: Guarda tu clave privada',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'Tu clave privada ES tu cuenta. No hay recuperación de contraseña. Si la pierdes, perderás tu cuenta para siempre. Por favor, guárdala en un lugar seguro.',
+    'I have safely backed up my private key': 'He respaldado mi clave privada de forma segura',
+    'Secure Your Account': 'Asegura tu cuenta',
+    'Add an extra layer of protection with a password':
+      'Añade una capa adicional de protección con una contraseña',
+    'Password Protection (Recommended)': 'Protección con contraseña (recomendado)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'Añade una contraseña para cifrar tu clave privada en este navegador. Esto es opcional pero muy recomendado para mayor seguridad.',
+    'Create a strong password (or skip)': 'Crea una contraseña fuerte (o omitir)',
+    'Enter your password again': 'Ingresa tu contraseña nuevamente',
+    'Complete Signup': 'Completar registro'
   }
 }

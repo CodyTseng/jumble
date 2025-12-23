@@ -615,6 +615,23 @@ export default {
     'Confirm Password': 'ยืนยันรหัสผ่าน',
     'Re-enter password': 'ป้อนรหัสผ่านอีกครั้ง',
     'Passwords do not match': 'รหัสผ่านไม่ตรงกัน',
-    'Finish Signup': 'เสร็จสิ้นการลงทะเบียน'
+    'Finish Signup': 'เสร็จสิ้นการลงทะเบียน',
+    // New improved signup copy
+    'Create Your Nostr Account': 'สร้างบัญชี Nostr ของคุณ',
+    'Generate your unique private key. This is your digital identity.':
+      'สร้างคีย์ส่วนตัวที่ไม่ซ้ำของคุณ นี่คือตัวตนดิจิทัลของคุณ',
+    'Critical: Save Your Private Key': 'สำคัญมาก: บันทึกคีย์ส่วนตัวของคุณ',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'คีย์ส่วนตัวของคุณคือบัญชีของคุณ ไม่มีการกู้คืนรหัสผ่าน หากคุณทำหาย คุณจะสูญเสียบัญชีของคุณตลอดไป โปรดบันทึกไว้ในที่ปลอดภัย',
+    'I have safely backed up my private key': 'ฉันได้สำรองคีย์ส่วนตัวของฉันอย่างปลอดภัยแล้ว',
+    'Secure Your Account': 'รักษาความปลอดภัยบัญชีของคุณ',
+    'Add an extra layer of protection with a password':
+      'เพิ่มชั้นความปลอดภัยเพิ่มเติมด้วยรหัสผ่าน',
+    'Password Protection (Recommended)': 'การป้องกันด้วยรหัสผ่าน (แนะนำ)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'เพิ่มรหัสผ่านเพื่อเข้ารหัสคีย์ส่วนตัวของคุณในเบราว์เซอร์นี้ เป็นตัวเลือก แต่แนะนำอย่างยิ่งเพื่อความปลอดภัยที่ดีขึ้น',
+    'Create a strong password (or skip)': 'สร้างรหัสผ่านที่แข็งแกร่ง (หรือข้าม)',
+    'Enter your password again': 'ป้อนรหัสผ่านของคุณอีกครั้ง',
+    'Complete Signup': 'เสร็จสิ้นการลงทะเบียน'
   }
 }

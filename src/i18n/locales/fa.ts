@@ -622,6 +622,23 @@ export default {
     'Confirm Password': 'تأیید رمز عبور',
     'Re-enter password': 'رمز عبور را دوباره وارد کنید',
     'Passwords do not match': 'رمزهای عبور مطابقت ندارند',
-    'Finish Signup': 'پایان ثبت‌نام'
+    'Finish Signup': 'پایان ثبت‌نام',
+    // New improved signup copy
+    'Create Your Nostr Account': 'حساب Nostr خود را ایجاد کنید',
+    'Generate your unique private key. This is your digital identity.':
+      'کلید خصوصی منحصر به فرد خود را ایجاد کنید. این هویت دیجیتال شماست.',
+    'Critical: Save Your Private Key': 'حیاتی: کلید خصوصی خود را ذخیره کنید',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'کلید خصوصی شما حساب شماست. بازیابی رمز عبور وجود ندارد. اگر آن را گم کنید، حساب خود را برای همیشه از دست خواهید داد. لطفاً آن را در مکانی امن ذخیره کنید.',
+    'I have safely backed up my private key': 'من به طور ایمن از کلید خصوصی خود نسخه پشتیبان تهیه کرده‌ام',
+    'Secure Your Account': 'حساب خود را ایمن کنید',
+    'Add an extra layer of protection with a password':
+      'یک لایه حفاظتی اضافی با رمز عبور اضافه کنید',
+    'Password Protection (Recommended)': 'حفاظت با رمز عبور (توصیه شده)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'یک رمز عبور برای رمزگذاری کلید خصوصی خود در این مرورگر اضافه کنید. این اختیاری است اما برای امنیت بهتر به شدت توصیه می‌شود.',
+    'Create a strong password (or skip)': 'یک رمز عبور قوی ایجاد کنید (یا رد کنید)',
+    'Enter your password again': 'رمز عبور خود را دوباره وارد کنید',
+    'Complete Signup': 'تکمیل ثبت‌نام'
   }
 }

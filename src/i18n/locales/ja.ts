@@ -623,6 +623,22 @@ export default {
     'Confirm Password': 'パスワードを確認',
     'Re-enter password': 'パスワードを再入力',
     'Passwords do not match': 'パスワードが一致しません',
-    'Finish Signup': '登録を完了'
+    'Finish Signup': '登録を完了',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Nostrアカウントを作成',
+    'Generate your unique private key. This is your digital identity.':
+      'あなた専用の秘密鍵を生成します。これがあなたのデジタルアイデンティティです。',
+    'Critical: Save Your Private Key': '重要：秘密鍵を保存してください',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'あなたの秘密鍵があなたのアカウントそのものです。パスワード復旧機能はありません。紛失すると、アカウントを永久に失います。安全な場所に保存してください。',
+    'I have safely backed up my private key': '秘密鍵を安全にバックアップしました',
+    'Secure Your Account': 'アカウントを保護',
+    'Add an extra layer of protection with a password': 'パスワードで追加の保護層を追加',
+    'Password Protection (Recommended)': 'パスワード保護（推奨）',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'このブラウザで秘密鍵を暗号化するパスワードを追加します。オプションですが、より良いセキュリティのために強くお勧めします。',
+    'Create a strong password (or skip)': '強力なパスワードを作成（またはスキップ）',
+    'Enter your password again': 'パスワードをもう一度入力',
+    'Complete Signup': '登録を完了'
   }
 }

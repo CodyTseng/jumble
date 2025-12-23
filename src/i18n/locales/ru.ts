@@ -628,6 +628,23 @@ export default {
     'Confirm Password': 'Подтвердите пароль',
     'Re-enter password': 'Введите пароль повторно',
     'Passwords do not match': 'Пароли не совпадают',
-    'Finish Signup': 'Завершить регистрацию'
+    'Finish Signup': 'Завершить регистрацию',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Создайте свой аккаунт Nostr',
+    'Generate your unique private key. This is your digital identity.':
+      'Сгенерируйте ваш уникальный приватный ключ. Это ваша цифровая личность.',
+    'Critical: Save Your Private Key': 'Критично: Сохраните ваш приватный ключ',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'Ваш приватный ключ И ЕСТЬ ваш аккаунт. Восстановление пароля невозможно. Если вы его потеряете, вы навсегда потеряете свой аккаунт. Пожалуйста, сохраните его в безопасном месте.',
+    'I have safely backed up my private key': 'Я безопасно сохранил свой приватный ключ',
+    'Secure Your Account': 'Защитите ваш аккаунт',
+    'Add an extra layer of protection with a password':
+      'Добавьте дополнительный уровень защиты с помощью пароля',
+    'Password Protection (Recommended)': 'Защита паролем (рекомендуется)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'Добавьте пароль для шифрования вашего приватного ключа в этом браузере. Это необязательно, но настоятельно рекомендуется для лучшей безопасности.',
+    'Create a strong password (or skip)': 'Создайте надежный пароль (или пропустите)',
+    'Enter your password again': 'Введите пароль еще раз',
+    'Complete Signup': 'Завершить регистрацию'
   }
 }

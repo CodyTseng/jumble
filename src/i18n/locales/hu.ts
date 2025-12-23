@@ -617,6 +617,23 @@ export default {
     'Confirm Password': 'Jelszó megerősítése',
     'Re-enter password': 'Jelszó újbóli megadása',
     'Passwords do not match': 'A jelszavak nem egyeznek',
-    'Finish Signup': 'Regisztráció befejezése'
+    'Finish Signup': 'Regisztráció befejezése',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Hozd létre Nostr fiókodat',
+    'Generate your unique private key. This is your digital identity.':
+      'Generáld le egyedi privát kulcsodat. Ez a digitális identitásod.',
+    'Critical: Save Your Private Key': 'Kritikus: Mentsd el a privát kulcsodat',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'A privát kulcsod A fiókod. Nincs jelszó-visszaállítás. Ha elveszíted, örökre elveszíted a fiókodat. Kérjük, mentsd el biztonságos helyre.',
+    'I have safely backed up my private key': 'Biztonságosan elmentettem a privát kulcsomat',
+    'Secure Your Account': 'Védd meg a fiókodat',
+    'Add an extra layer of protection with a password':
+      'Adj hozzá egy extra védelmi réteget jelszóval',
+    'Password Protection (Recommended)': 'Jelszavas védelem (ajánlott)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'Adj hozzá jelszót a privát kulcsod titkosításához ebben a böngészőben. Ez opcionális, de erősen ajánlott a jobb biztonság érdekében.',
+    'Create a strong password (or skip)': 'Hozz létre erős jelszót (vagy hagyd ki)',
+    'Enter your password again': 'Add meg újra a jelszavad',
+    'Complete Signup': 'Regisztráció befejezése'
   }
 }

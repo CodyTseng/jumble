@@ -621,6 +621,22 @@ export default {
     'Confirm Password': '비밀번호 확인',
     'Re-enter password': '비밀번호 재입력',
     'Passwords do not match': '비밀번호가 일치하지 않습니다',
-    'Finish Signup': '가입 완료'
+    'Finish Signup': '가입 완료',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Nostr 계정 만들기',
+    'Generate your unique private key. This is your digital identity.':
+      '고유한 개인 키를 생성합니다. 이것이 당신의 디지털 신원입니다.',
+    'Critical: Save Your Private Key': '중요: 개인 키를 저장하세요',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      '개인 키가 곧 계정 그 자체입니다. 비밀번호 복구 기능이 없습니다. 분실하면 계정을 영구적으로 잃게 됩니다. 안전한 곳에 저장하세요.',
+    'I have safely backed up my private key': '개인 키를 안전하게 백업했습니다',
+    'Secure Your Account': '계정 보호하기',
+    'Add an extra layer of protection with a password': '비밀번호로 추가 보호 계층 추가',
+    'Password Protection (Recommended)': '비밀번호 보호 (권장)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      '이 브라우저에서 개인 키를 암호화할 비밀번호를 추가합니다. 선택사항이지만 더 나은 보안을 위해 강력히 권장합니다.',
+    'Create a strong password (or skip)': '강력한 비밀번호 만들기 (또는 건너뛰기)',
+    'Enter your password again': '비밀번호를 다시 입력하세요',
+    'Complete Signup': '가입 완료'
   }
 }

@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useNostr } from '@/providers/NostrProvider'
-import { ArrowLeft, Check, Copy, Download, RefreshCcw } from 'lucide-react'
+import { Check, Copy, Download, RefreshCcw } from 'lucide-react'
 import { generateSecretKey } from 'nostr-tools'
 import { nsecEncode } from 'nostr-tools/nip19'
 import { useState } from 'react'
@@ -75,17 +75,17 @@ export default function Signup({
         {renderStepIndicator()}
 
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">{t('Generate Your Account')}</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('Create Your Nostr Account')}</h3>
           <p className="text-sm text-muted-foreground">
-            {t('Your private key IS your account. Keep it safe!')}
+            {t('Generate your unique private key. This is your digital identity.')}
           </p>
         </div>
 
         <InfoCard
           variant="alert"
-          title={t('Important')}
+          title={t('Critical: Save Your Private Key')}
           content={t(
-            'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.'
+            'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.'
           )}
         />
 
@@ -136,13 +136,12 @@ export default function Signup({
             onCheckedChange={(c) => setCheckedSaveKey(!!c)}
           />
           <Label htmlFor="acknowledge-checkbox" className="cursor-pointer">
-            {t('I already saved my private key securely.')}
+            {t('I have safely backed up my private key')}
           </Label>
         </div>
 
         <div className="flex gap-2">
           <Button variant="secondary" onClick={back} className="w-fit px-6">
-            <ArrowLeft />
             {t('Back')}
           </Button>
 
@@ -160,16 +159,16 @@ export default function Signup({
       {renderStepIndicator()}
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">{t('Almost Done!')}</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('Secure Your Account')}</h3>
         <p className="text-sm text-muted-foreground">
-          {t('Set a password to encrypt your key, or skip to finish')}
+          {t('Add an extra layer of protection with a password')}
         </p>
       </div>
 
       <InfoCard
-        title={t('Password Protection (Optional)')}
+        title={t('Password Protection (Recommended)')}
         content={t(
-          'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.'
+          'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.'
         )}
       />
 
@@ -179,7 +178,7 @@ export default function Signup({
           <Input
             id="password-input"
             type="password"
-            placeholder={t('Enter password or leave empty to skip')}
+            placeholder={t('Create a strong password (or skip)')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -191,7 +190,7 @@ export default function Signup({
             <Input
               id="confirm-password-input"
               type="password"
-              placeholder={t('Re-enter password')}
+              placeholder={t('Enter your password again')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
@@ -212,11 +211,10 @@ export default function Signup({
           }}
           className="w-fit px-6"
         >
-          <ArrowLeft />
           {t('Back')}
         </Button>
         <Button onClick={handleSignup} className="flex-1" disabled={!canSubmit}>
-          {t('Finish Signup')}
+          {t('Complete Signup')}
         </Button>
       </div>
     </div>

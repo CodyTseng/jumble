@@ -616,6 +616,23 @@ export default {
     'Confirm Password': 'تأكيد كلمة المرور',
     'Re-enter password': 'أعد إدخال كلمة المرور',
     'Passwords do not match': 'كلمات المرور غير متطابقة',
-    'Finish Signup': 'إنهاء التسجيل'
+    'Finish Signup': 'إنهاء التسجيل',
+    // New improved signup copy
+    'Create Your Nostr Account': 'أنشئ حساب Nostr الخاص بك',
+    'Generate your unique private key. This is your digital identity.':
+      'أنشئ مفتاحك الخاص الفريد. هذه هي هويتك الرقمية.',
+    'Critical: Save Your Private Key': 'حرج: احفظ مفتاحك الخاص',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'مفتاحك الخاص هو حسابك. لا يوجد استرداد لكلمة المرور. إذا فقدته، ستفقد حسابك للأبد. يرجى حفظه في مكان آمن.',
+    'I have safely backed up my private key': 'لقد قمت بعمل نسخة احتياطية آمنة لمفتاحي الخاص',
+    'Secure Your Account': 'أمّن حسابك',
+    'Add an extra layer of protection with a password':
+      'أضف طبقة إضافية من الحماية بكلمة مرور',
+    'Password Protection (Recommended)': 'الحماية بكلمة مرور (موصى به)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'أضف كلمة مرور لتشفير مفتاحك الخاص في هذا المتصفح. هذا اختياري لكنه موصى به بشدة لأمان أفضل.',
+    'Create a strong password (or skip)': 'أنشئ كلمة مرور قوية (أو تخطى)',
+    'Enter your password again': 'أدخل كلمة المرور مرة أخرى',
+    'Complete Signup': 'إكمال التسجيل'
   }
 }

@@ -623,6 +623,23 @@ export default {
     'Confirm Password': 'पासवर्ड की पुष्टि करें',
     'Re-enter password': 'पासवर्ड फिर से दर्ज करें',
     'Passwords do not match': 'पासवर्ड मेल नहीं खाते',
-    'Finish Signup': 'साइनअप समाप्त करें'
+    'Finish Signup': 'साइनअप समाप्त करें',
+    // New improved signup copy
+    'Create Your Nostr Account': 'अपना Nostr खाता बनाएं',
+    'Generate your unique private key. This is your digital identity.':
+      'अपनी अद्वितीय निजी कुंजी उत्पन्न करें। यह आपकी डिजिटल पहचान है।',
+    'Critical: Save Your Private Key': 'महत्वपूर्ण: अपनी निजी कुंजी सहेजें',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'आपकी निजी कुंजी आपका खाता है। कोई पासवर्ड पुनर्प्राप्ति नहीं है। यदि आप इसे खो देते हैं, तो आप हमेशा के लिए अपना खाता खो देंगे। कृपया इसे सुरक्षित स्थान पर सहेजें।',
+    'I have safely backed up my private key': 'मैंने अपनी निजी कुंजी को सुरक्षित रूप से बैकअप कर लिया है',
+    'Secure Your Account': 'अपने खाते को सुरक्षित करें',
+    'Add an extra layer of protection with a password':
+      'पासवर्ड के साथ सुरक्षा की एक अतिरिक्त परत जोड़ें',
+    'Password Protection (Recommended)': 'पासवर्ड सुरक्षा (अनुशंसित)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'इस ब्राउज़र में अपनी निजी कुंजी को एन्क्रिप्ट करने के लिए पासवर्ड जोड़ें। यह वैकल्पिक है लेकिन बेहतर सुरक्षा के लिए दृढ़ता से अनुशंसित है।',
+    'Create a strong password (or skip)': 'एक मजबूत पासवर्ड बनाएं (या छोड़ें)',
+    'Enter your password again': 'अपना पासवर्ड फिर से दर्ज करें',
+    'Complete Signup': 'साइनअप पूर्ण करें'
   }
 }

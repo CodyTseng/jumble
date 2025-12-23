@@ -629,6 +629,23 @@ export default {
     'Confirm Password': 'Potwierdź hasło',
     'Re-enter password': 'Wprowadź hasło ponownie',
     'Passwords do not match': 'Hasła nie pasują do siebie',
-    'Finish Signup': 'Zakończ rejestrację'
+    'Finish Signup': 'Zakończ rejestrację',
+    // New improved signup copy
+    'Create Your Nostr Account': 'Utwórz swoje konto Nostr',
+    'Generate your unique private key. This is your digital identity.':
+      'Wygeneruj swój unikalny klucz prywatny. To jest twoja cyfrowa tożsamość.',
+    'Critical: Save Your Private Key': 'Krytyczne: Zapisz swój klucz prywatny',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      'Twój klucz prywatny TO JEST twoje konto. Nie ma odzyskiwania hasła. Jeśli go stracisz, na zawsze stracisz swoje konto. Proszę zapisać go w bezpiecznym miejscu.',
+    'I have safely backed up my private key': 'Bezpiecznie wykonałem kopię zapasową mojego klucza prywatnego',
+    'Secure Your Account': 'Zabezpiecz swoje konto',
+    'Add an extra layer of protection with a password':
+      'Dodaj dodatkową warstwę ochrony za pomocą hasła',
+    'Password Protection (Recommended)': 'Ochrona hasłem (zalecane)',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      'Dodaj hasło, aby zaszyfrować swój klucz prywatny w tej przeglądarce. Jest to opcjonalne, ale zdecydowanie zalecane dla lepszego bezpieczeństwa.',
+    'Create a strong password (or skip)': 'Utwórz silne hasło (lub pomiń)',
+    'Enter your password again': 'Wprowadź hasło ponownie',
+    'Complete Signup': 'Zakończ rejestrację'
   }
 }

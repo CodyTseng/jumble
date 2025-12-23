@@ -601,6 +601,22 @@ export default {
     'Confirm Password': '確認密碼',
     'Re-enter password': '重新輸入密碼',
     'Passwords do not match': '密碼不符合',
-    'Finish Signup': '完成註冊'
+    'Finish Signup': '完成註冊',
+    // New improved signup copy
+    'Create Your Nostr Account': '建立你的 Nostr 帳戶',
+    'Generate your unique private key. This is your digital identity.':
+      '生成你的專屬私鑰。這是你的數位身份。',
+    'Critical: Save Your Private Key': '重要：儲存你的私鑰',
+    'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
+      '你的私鑰就是你的帳戶。沒有密碼找回功能。如果遺失，你將永遠失去你的帳戶。請將其儲存在安全的地方。',
+    'I have safely backed up my private key': '我已安全備份我的私鑰',
+    'Secure Your Account': '保護你的帳戶',
+    'Add an extra layer of protection with a password': '使用密碼新增額外的保護層',
+    'Password Protection (Recommended)': '密碼保護（推薦）',
+    'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
+      '新增密碼以在此瀏覽器中加密你的私鑰。這是可選的，但強烈建議設定以獲得更好的安全性。',
+    'Create a strong password (or skip)': '建立一個強密碼（或跳過）',
+    'Enter your password again': '再次輸入你的密碼',
+    'Complete Signup': '完成註冊'
   }
 }
