@@ -602,12 +602,14 @@ export default {
     'Show replies': 'Mostrar respostas',
     'Hide replies': 'Ocultar respostas',
     'Welcome to Jumble!': 'Bem-vindo ao Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'O seu feed está vazio porque ainda não está a seguir ninguém. Comece por explorar conteúdo interessante e siga utilizadores de que gosta!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'O seu feed está vazio porque ainda não está a seguir ninguém. Comece por explorar conteúdo interessante e siga utilizadores de que gosta!',
     'Search Users': 'Procurar Utilizadores',
     'Create New Account': 'Criar nova conta',
     Important: 'Importante',
     'Generate Your Account': 'Gerar a sua conta',
-    'Your private key IS your account. Keep it safe!': 'A sua chave privada É a sua conta. Mantenha-a segura!',
+    'Your private key IS your account. Keep it safe!':
+      'A sua chave privada É a sua conta. Mantenha-a segura!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'No Nostr, a sua chave privada É a sua conta. Se perder a sua chave privada, perde a sua conta para sempre.',
     'Your Private Key': 'A sua chave privada',
@@ -623,7 +625,8 @@ export default {
     'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
       'Definir uma palavra-passe encripta a sua chave privada neste navegador. Pode ignorar este passo, mas recomendamos que defina uma para maior segurança.',
     'Password (Optional)': 'Palavra-passe (opcional)',
-    'Enter password or leave empty to skip': 'Introduza a palavra-passe ou deixe vazio para ignorar',
+    'Enter password or leave empty to skip':
+      'Introduza a palavra-passe ou deixe vazio para ignorar',
     'Confirm Password': 'Confirmar palavra-passe',
     'Re-enter password': 'Introduza novamente a palavra-passe',
     'Passwords do not match': 'As palavras-passe não coincidem',
@@ -642,7 +645,7 @@ export default {
     'Password Protection (Recommended)': 'Proteção por palavra-passe (recomendado)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Adicione uma palavra-passe para encriptar a sua chave privada neste navegador. Isto é opcional, mas fortemente recomendado para melhor segurança.',
-    'Create a strong password (or skip)': 'Crie uma palavra-passe forte (ou ignore)',
+    'Create a password (or skip)': 'Crie uma palavra-passe (ou ignore)',
     'Enter your password again': 'Introduza novamente a sua palavra-passe',
     'Complete Signup': 'Concluir registo'
   }

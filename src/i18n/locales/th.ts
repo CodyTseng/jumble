@@ -590,12 +590,14 @@ export default {
     'Show replies': 'แสดงการตอบกลับ',
     'Hide replies': 'ซ่อนการตอบกลับ',
     'Welcome to Jumble!': 'ยินดีต้อนรับสู่ Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'ฟีดของคุณว่างเปล่าเพราะคุณยังไม่ได้ติดตามใครเลย เริ่มต้นด้วยการสำรวจเนื้อหาที่น่าสนใจและติดตามผู้ใช้ที่คุณชอบ!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'ฟีดของคุณว่างเปล่าเพราะคุณยังไม่ได้ติดตามใครเลย เริ่มต้นด้วยการสำรวจเนื้อหาที่น่าสนใจและติดตามผู้ใช้ที่คุณชอบ!',
     'Search Users': 'ค้นหาผู้ใช้',
     'Create New Account': 'สร้างบัญชีใหม่',
     Important: 'สำคัญ',
     'Generate Your Account': 'สร้างบัญชีของคุณ',
-    'Your private key IS your account. Keep it safe!': 'คีย์ส่วนตัวของคุณคือบัญชีของคุณ เก็บไว้ให้ปลอดภัย!',
+    'Your private key IS your account. Keep it safe!':
+      'คีย์ส่วนตัวของคุณคือบัญชีของคุณ เก็บไว้ให้ปลอดภัย!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'ใน Nostr คีย์ส่วนตัวของคุณคือบัญชีของคุณ หากคุณสูญเสียคีย์ส่วนตัว คุณจะสูญเสียบัญชีของคุณตลอดไป',
     'Your Private Key': 'คีย์ส่วนตัวของคุณ',
@@ -625,12 +627,11 @@ export default {
       'คีย์ส่วนตัวของคุณคือบัญชีของคุณ ไม่มีการกู้คืนรหัสผ่าน หากคุณทำหาย คุณจะสูญเสียบัญชีของคุณตลอดไป โปรดบันทึกไว้ในที่ปลอดภัย',
     'I have safely backed up my private key': 'ฉันได้สำรองคีย์ส่วนตัวของฉันอย่างปลอดภัยแล้ว',
     'Secure Your Account': 'รักษาความปลอดภัยบัญชีของคุณ',
-    'Add an extra layer of protection with a password':
-      'เพิ่มชั้นความปลอดภัยเพิ่มเติมด้วยรหัสผ่าน',
+    'Add an extra layer of protection with a password': 'เพิ่มชั้นความปลอดภัยเพิ่มเติมด้วยรหัสผ่าน',
     'Password Protection (Recommended)': 'การป้องกันด้วยรหัสผ่าน (แนะนำ)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'เพิ่มรหัสผ่านเพื่อเข้ารหัสคีย์ส่วนตัวของคุณในเบราว์เซอร์นี้ เป็นตัวเลือก แต่แนะนำอย่างยิ่งเพื่อความปลอดภัยที่ดีขึ้น',
-    'Create a strong password (or skip)': 'สร้างรหัสผ่านที่แข็งแกร่ง (หรือข้าม)',
+    'Create a password (or skip)': 'สร้างรหัสผ่าน (หรือข้าม)',
     'Enter your password again': 'ป้อนรหัสผ่านของคุณอีกครั้ง',
     'Complete Signup': 'เสร็จสิ้นการลงทะเบียน'
   }

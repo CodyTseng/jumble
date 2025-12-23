@@ -603,12 +603,14 @@ export default {
     'Show replies': 'Mostra risposte',
     'Hide replies': 'Nascondi risposte',
     'Welcome to Jumble!': 'Benvenuto su Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Il tuo feed è vuoto perché non stai ancora seguendo nessuno. Inizia esplorando contenuti interessanti e seguendo gli utenti che ti piacciono!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Il tuo feed è vuoto perché non stai ancora seguendo nessuno. Inizia esplorando contenuti interessanti e seguendo gli utenti che ti piacciono!',
     'Search Users': 'Cerca Utenti',
     'Create New Account': 'Crea nuovo account',
     Important: 'Importante',
     'Generate Your Account': 'Genera il tuo account',
-    'Your private key IS your account. Keep it safe!': 'La tua chiave privata È il tuo account. Tienila al sicuro!',
+    'Your private key IS your account. Keep it safe!':
+      'La tua chiave privata È il tuo account. Tienila al sicuro!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'In Nostr, la tua chiave privata È il tuo account. Se perdi la tua chiave privata, perdi il tuo account per sempre.',
     'Your Private Key': 'La tua chiave privata',
@@ -616,7 +618,8 @@ export default {
     'Download Backup File': 'Scarica file di backup',
     'Copied to Clipboard': 'Copiato negli appunti',
     'Copy to Clipboard': 'Copia negli appunti',
-    'I already saved my private key securely.': 'Ho già salvato la mia chiave privata in modo sicuro.',
+    'I already saved my private key securely.':
+      'Ho già salvato la mia chiave privata in modo sicuro.',
     'Almost Done!': 'Quasi fatto!',
     'Set a password to encrypt your key, or skip to finish':
       'Imposta una password per crittografare la tua chiave, o salta per finire',
@@ -635,7 +638,7 @@ export default {
       'Genera la tua chiave privata unica. Questa è la tua identità digitale.',
     'Critical: Save Your Private Key': 'Critico: Salva la tua chiave privata',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
-      'La tua chiave privata È il tuo account. Non c\'è recupero password. Se la perdi, perderai il tuo account per sempre. Per favore salvala in un luogo sicuro.',
+      "La tua chiave privata È il tuo account. Non c'è recupero password. Se la perdi, perderai il tuo account per sempre. Per favore salvala in un luogo sicuro.",
     'I have safely backed up my private key': 'Ho salvato in modo sicuro la mia chiave privata',
     'Secure Your Account': 'Proteggi il tuo account',
     'Add an extra layer of protection with a password':
@@ -643,7 +646,7 @@ export default {
     'Password Protection (Recommended)': 'Protezione con password (consigliato)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Aggiungi una password per crittografare la tua chiave privata in questo browser. È facoltativo ma fortemente consigliato per una migliore sicurezza.',
-    'Create a strong password (or skip)': 'Crea una password forte (o salta)',
+    'Create a password (or skip)': 'Crea una password (o salta)',
     'Enter your password again': 'Inserisci di nuovo la tua password',
     'Complete Signup': 'Completa registrazione'
   }

@@ -594,12 +594,14 @@ export default {
     'Show replies': 'Show replies',
     'Hide replies': 'Hide replies',
     'Welcome to Jumble!': 'Welcome to Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!',
     'Search Users': 'Search Users',
     'Create New Account': 'Create New Account',
     Important: 'Important',
     'Generate Your Account': 'Generate Your Account',
-    'Your private key IS your account. Keep it safe!': 'Your private key IS your account. Keep it safe!',
+    'Your private key IS your account. Keep it safe!':
+      'Your private key IS your account. Keep it safe!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'In Nostr, your private key IS your account. If you lose your account forever.',
     'Your Private Key': 'Your Private Key',
@@ -634,7 +636,7 @@ export default {
     'Password Protection (Recommended)': 'Password Protection (Recommended)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.',
-    'Create a strong password (or skip)': 'Create a strong password (or skip)',
+    'Create a password (or skip)': 'Create a password (or skip)',
     'Enter your password again': 'Enter your password again',
     'Complete Signup': 'Complete Signup'
   }

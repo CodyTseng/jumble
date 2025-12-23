@@ -596,12 +596,14 @@ export default {
     'Show replies': '답글 표시',
     'Hide replies': '답글 숨기기',
     'Welcome to Jumble!': 'Jumble에 오신 것을 환영합니다!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '아직 아무도 팔로우하지 않아서 피드가 비어 있습니다. 흥미로운 콘텐츠를 탐색하고 마음에 드는 사용자를 팔로우해보세요!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      '아직 아무도 팔로우하지 않아서 피드가 비어 있습니다. 흥미로운 콘텐츠를 탐색하고 마음에 드는 사용자를 팔로우해보세요!',
     'Search Users': '사용자 검색',
     'Create New Account': '새 계정 만들기',
     Important: '중요',
     'Generate Your Account': '계정 생성',
-    'Your private key IS your account. Keep it safe!': '개인 키가 바로 당신의 계정입니다. 안전하게 보관하세요!',
+    'Your private key IS your account. Keep it safe!':
+      '개인 키가 바로 당신의 계정입니다. 안전하게 보관하세요!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'Nostr에서는 개인 키가 바로 당신의 계정입니다. 개인 키를 잃으면 계정을 영구적으로 잃게 됩니다.',
     'Your Private Key': '개인 키',
@@ -635,7 +637,7 @@ export default {
     'Password Protection (Recommended)': '비밀번호 보호 (권장)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       '이 브라우저에서 개인 키를 암호화할 비밀번호를 추가합니다. 선택사항이지만 더 나은 보안을 위해 강력히 권장합니다.',
-    'Create a strong password (or skip)': '강력한 비밀번호 만들기 (또는 건너뛰기)',
+    'Create a password (or skip)': '비밀번호 생성(또는 건너뛰기)',
     'Enter your password again': '비밀번호를 다시 입력하세요',
     'Complete Signup': '가입 완료'
   }

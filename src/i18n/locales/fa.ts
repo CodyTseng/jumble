@@ -597,12 +597,14 @@ export default {
     'Show replies': 'نمایش پاسخ‌ها',
     'Hide replies': 'پنهان کردن پاسخ‌ها',
     'Welcome to Jumble!': 'به Jumble خوش آمدید!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'فید شما خالی است زیرا هنوز کسی را دنبال نمی‌کنید. با کاوش محتوای جالب و دنبال کردن کاربرانی که دوست دارید شروع کنید!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'فید شما خالی است زیرا هنوز کسی را دنبال نمی‌کنید. با کاوش محتوای جالب و دنبال کردن کاربرانی که دوست دارید شروع کنید!',
     'Search Users': 'جستجوی کاربران',
     'Create New Account': 'ایجاد حساب کاربری جدید',
     Important: 'مهم',
     'Generate Your Account': 'ایجاد حساب کاربری',
-    'Your private key IS your account. Keep it safe!': 'کلید خصوصی شما همان حساب کاربری شماست. آن را ایمن نگه دارید!',
+    'Your private key IS your account. Keep it safe!':
+      'کلید خصوصی شما همان حساب کاربری شماست. آن را ایمن نگه دارید!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'در Nostr، کلید خصوصی شما همان حساب کاربری شماست. اگر کلید خصوصی خود را گم کنید، برای همیشه حساب خود را از دست می‌دهید.',
     'Your Private Key': 'کلید خصوصی شما',
@@ -610,7 +612,8 @@ export default {
     'Download Backup File': 'دانلود فایل پشتیبان',
     'Copied to Clipboard': 'در کلیپ‌بورد کپی شد',
     'Copy to Clipboard': 'کپی در کلیپ‌بورد',
-    'I already saved my private key securely.': 'من قبلاً کلید خصوصی خود را به طور ایمن ذخیره کرده‌ام.',
+    'I already saved my private key securely.':
+      'من قبلاً کلید خصوصی خود را به طور ایمن ذخیره کرده‌ام.',
     'Almost Done!': 'تقریباً تمام شد!',
     'Set a password to encrypt your key, or skip to finish':
       'یک رمز عبور برای رمزگذاری کلید خود تنظیم کنید، یا برای پایان دادن رد کنید',
@@ -630,14 +633,15 @@ export default {
     'Critical: Save Your Private Key': 'حیاتی: کلید خصوصی خود را ذخیره کنید',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
       'کلید خصوصی شما حساب شماست. بازیابی رمز عبور وجود ندارد. اگر آن را گم کنید، حساب خود را برای همیشه از دست خواهید داد. لطفاً آن را در مکانی امن ذخیره کنید.',
-    'I have safely backed up my private key': 'من به طور ایمن از کلید خصوصی خود نسخه پشتیبان تهیه کرده‌ام',
+    'I have safely backed up my private key':
+      'من به طور ایمن از کلید خصوصی خود نسخه پشتیبان تهیه کرده‌ام',
     'Secure Your Account': 'حساب خود را ایمن کنید',
     'Add an extra layer of protection with a password':
       'یک لایه حفاظتی اضافی با رمز عبور اضافه کنید',
     'Password Protection (Recommended)': 'حفاظت با رمز عبور (توصیه شده)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'یک رمز عبور برای رمزگذاری کلید خصوصی خود در این مرورگر اضافه کنید. این اختیاری است اما برای امنیت بهتر به شدت توصیه می‌شود.',
-    'Create a strong password (or skip)': 'یک رمز عبور قوی ایجاد کنید (یا رد کنید)',
+    'Create a password (or skip)': 'یک رمز عبور ایجاد کنید (یا رد کنید)',
     'Enter your password again': 'رمز عبور خود را دوباره وارد کنید',
     'Complete Signup': 'تکمیل ثبت‌نام'
   }

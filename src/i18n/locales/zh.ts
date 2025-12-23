@@ -583,7 +583,8 @@ export default {
     'Show replies': '显示回复',
     'Hide replies': '隐藏回复',
     'Welcome to Jumble!': '欢迎来到 Jumble！',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的动态是空的，因为你还没有关注任何人。开始探索有趣的内容并关注你喜欢的用户吧！',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      '你的动态是空的，因为你还没有关注任何人。开始探索有趣的内容并关注你喜欢的用户吧！',
     'Search Users': '搜索用户',
     'Create New Account': '创建新账户',
     Important: '重要',
@@ -621,7 +622,7 @@ export default {
     'Password Protection (Recommended)': '密码保护（推荐）',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       '添加密码以在此浏览器中加密你的私钥。这是可选的，但强烈建议设置以获得更好的安全性。',
-    'Create a strong password (or skip)': '创建一个强密码（或跳过）',
+    'Create a password (or skip)': '创建密码（或跳过）',
     'Enter your password again': '再次输入你的密码',
     'Complete Signup': '完成注册'
   }

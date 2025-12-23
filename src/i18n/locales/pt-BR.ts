@@ -161,7 +161,8 @@ export default {
     'calculating...': 'Calculando...',
     'Calculate optimal read relays': 'Calcular relays de leitura ideais',
     'Login to set': 'Entrar no conjunto',
-    'Please login to view following feed': 'Por favor, faça login para ver o conteúdo das pessoas que você segue',
+    'Please login to view following feed':
+      'Por favor, faça login para ver o conteúdo das pessoas que você segue',
     'Send only to r': 'Enviar apenas para {{r}}',
     'Send only to these relays': 'Enviar apenas para estes relays',
     Explore: 'Explorar',
@@ -599,12 +600,14 @@ export default {
     'Show replies': 'Mostrar respostas',
     'Hide replies': 'Ocultar respostas',
     'Welcome to Jumble!': 'Bem-vindo ao Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Seu feed está vazio porque você ainda não está seguindo ninguém. Comece explorando conteúdo interessante e seguindo usuários que você gosta!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Seu feed está vazio porque você ainda não está seguindo ninguém. Comece explorando conteúdo interessante e seguindo usuários que você gosta!',
     'Search Users': 'Buscar Usuários',
     'Create New Account': 'Criar nova conta',
     Important: 'Importante',
     'Generate Your Account': 'Gerar sua conta',
-    'Your private key IS your account. Keep it safe!': 'Sua chave privada É sua conta. Mantenha-a segura!',
+    'Your private key IS your account. Keep it safe!':
+      'Sua chave privada É sua conta. Mantenha-a segura!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'No Nostr, sua chave privada É sua conta. Se você perder sua chave privada, perderá sua conta para sempre.',
     'Your Private Key': 'Sua chave privada',
@@ -639,7 +642,7 @@ export default {
     'Password Protection (Recommended)': 'Proteção por senha (recomendado)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Adicione uma senha para criptografar sua chave privada neste navegador. Isso é opcional, mas fortemente recomendado para melhor segurança.',
-    'Create a strong password (or skip)': 'Crie uma senha forte (ou pular)',
+    'Create a password (or skip)': 'Crie uma senha (ou pule)',
     'Enter your password again': 'Digite sua senha novamente',
     'Complete Signup': 'Concluir cadastro'
   }

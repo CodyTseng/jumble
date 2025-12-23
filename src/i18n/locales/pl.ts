@@ -604,12 +604,14 @@ export default {
     'Show replies': 'Pokaż odpowiedzi',
     'Hide replies': 'Ukryj odpowiedzi',
     'Welcome to Jumble!': 'Witamy w Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Twój kanał jest pusty, ponieważ jeszcze nikogo nie obserwujesz. Zacznij od odkrywania ciekawych treści i obserwowania użytkowników, którzy Ci się podobają!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Twój kanał jest pusty, ponieważ jeszcze nikogo nie obserwujesz. Zacznij od odkrywania ciekawych treści i obserwowania użytkowników, którzy Ci się podobają!',
     'Search Users': 'Szukaj użytkowników',
     'Create New Account': 'Utwórz nowe konto',
     Important: 'Ważne',
     'Generate Your Account': 'Wygeneruj swoje konto',
-    'Your private key IS your account. Keep it safe!': 'Twój klucz prywatny TO twoje konto. Przechowuj go bezpiecznie!',
+    'Your private key IS your account. Keep it safe!':
+      'Twój klucz prywatny TO twoje konto. Przechowuj go bezpiecznie!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'W Nostr twój klucz prywatny TO twoje konto. Jeśli stracisz swój klucz prywatny, stracisz swoje konto na zawsze.',
     'Your Private Key': 'Twój klucz prywatny',
@@ -637,14 +639,15 @@ export default {
     'Critical: Save Your Private Key': 'Krytyczne: Zapisz swój klucz prywatny',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
       'Twój klucz prywatny TO JEST twoje konto. Nie ma odzyskiwania hasła. Jeśli go stracisz, na zawsze stracisz swoje konto. Proszę zapisać go w bezpiecznym miejscu.',
-    'I have safely backed up my private key': 'Bezpiecznie wykonałem kopię zapasową mojego klucza prywatnego',
+    'I have safely backed up my private key':
+      'Bezpiecznie wykonałem kopię zapasową mojego klucza prywatnego',
     'Secure Your Account': 'Zabezpiecz swoje konto',
     'Add an extra layer of protection with a password':
       'Dodaj dodatkową warstwę ochrony za pomocą hasła',
     'Password Protection (Recommended)': 'Ochrona hasłem (zalecane)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Dodaj hasło, aby zaszyfrować swój klucz prywatny w tej przeglądarce. Jest to opcjonalne, ale zdecydowanie zalecane dla lepszego bezpieczeństwa.',
-    'Create a strong password (or skip)': 'Utwórz silne hasło (lub pomiń)',
+    'Create a password (or skip)': 'Utwórz hasło (lub pomiń)',
     'Enter your password again': 'Wprowadź hasło ponownie',
     'Complete Signup': 'Zakończ rejestrację'
   }

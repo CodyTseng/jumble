@@ -592,12 +592,14 @@ export default {
     'Show replies': 'Válaszok megjelenítése',
     'Hide replies': 'Válaszok elrejtése',
     'Welcome to Jumble!': 'Üdvözlünk a Jumble-ban!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'A hírcsatornád üres, mert még nem követsz senkit. Kezdd el érdekes tartalmak felfedezésével és kövesd azokat a felhasználókat, akik tetszenek!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'A hírcsatornád üres, mert még nem követsz senkit. Kezdd el érdekes tartalmak felfedezésével és kövesd azokat a felhasználókat, akik tetszenek!',
     'Search Users': 'Felhasználók keresése',
     'Create New Account': 'Új fiók létrehozása',
     Important: 'Fontos',
     'Generate Your Account': 'Fiók létrehozása',
-    'Your private key IS your account. Keep it safe!': 'A privát kulcsod A fiókodat jelenti. Tartsd biztonságban!',
+    'Your private key IS your account. Keep it safe!':
+      'A privát kulcsod A fiókodat jelenti. Tartsd biztonságban!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'A Nostr-ban a privát kulcsod A fiókodat jelenti. Ha elveszíted a privát kulcsodat, örökre elveszíted a fiókodat.',
     'Your Private Key': 'Privát kulcsod',
@@ -632,7 +634,7 @@ export default {
     'Password Protection (Recommended)': 'Jelszavas védelem (ajánlott)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Adj hozzá jelszót a privát kulcsod titkosításához ebben a böngészőben. Ez opcionális, de erősen ajánlott a jobb biztonság érdekében.',
-    'Create a strong password (or skip)': 'Hozz létre erős jelszót (vagy hagyd ki)',
+    'Create a password (or skip)': 'Hozz létre jelszót (vagy hagyd ki)',
     'Enter your password again': 'Add meg újra a jelszavad',
     'Complete Signup': 'Regisztráció befejezése'
   }

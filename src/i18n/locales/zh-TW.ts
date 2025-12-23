@@ -320,7 +320,8 @@ export default {
     Media: '媒體',
     'Republish to ...': '重新發布到 ...',
     'Successfully republish to your write relays': '成功重新發布到您的寫入伺服器',
-    'Failed to republish to your write relays: {{error}}': '重新發布到您的寫入伺服器失敗：{{error}}',
+    'Failed to republish to your write relays: {{error}}':
+      '重新發布到您的寫入伺服器失敗：{{error}}',
     'Successfully republish to relay set: {{name}}': '成功重新發布到伺服器組：{{name}}',
     'Failed to republish to relay set: {{name}}. Error: {{error}}':
       '重新發布到伺服器組：{{name}} 失敗。錯誤：{{error}}',
@@ -577,7 +578,8 @@ export default {
     'Personal Feeds': '個人訂閱',
     'Relay Feeds': '中繼訂閱',
     'Welcome to Jumble!': '歡迎來到 Jumble！',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的動態是空的，因為你還沒有關注任何人。開始探索有趣的內容並關注你喜歡的用戶吧！',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      '你的動態是空的，因為你還沒有關注任何人。開始探索有趣的內容並關注你喜歡的用戶吧！',
     'Search Users': '搜尋用戶',
     'Create New Account': '建立新帳戶',
     Important: '重要',
@@ -615,7 +617,7 @@ export default {
     'Password Protection (Recommended)': '密碼保護（推薦）',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       '新增密碼以在此瀏覽器中加密你的私鑰。這是可選的，但強烈建議設定以獲得更好的安全性。',
-    'Create a strong password (or skip)': '建立一個強密碼（或跳過）',
+    'Create a password (or skip)': '建立密碼（或跳過）',
     'Enter your password again': '再次輸入你的密碼',
     'Complete Signup': '完成註冊'
   }

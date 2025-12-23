@@ -591,7 +591,8 @@ export default {
     'Show replies': 'إظهار الردود',
     'Hide replies': 'إخفاء الردود',
     'Welcome to Jumble!': 'مرحبًا بك في Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'خلاصتك فارغة لأنك لا تتابع أي شخص بعد. ابدأ باستكشاف محتوى مثير للاهتمام ومتابعة المستخدمين الذين تحبهم!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'خلاصتك فارغة لأنك لا تتابع أي شخص بعد. ابدأ باستكشاف محتوى مثير للاهتمام ومتابعة المستخدمين الذين تحبهم!',
     'Search Users': 'البحث عن المستخدمين',
     'Create New Account': 'إنشاء حساب جديد',
     Important: 'مهم',
@@ -626,12 +627,11 @@ export default {
       'مفتاحك الخاص هو حسابك. لا يوجد استرداد لكلمة المرور. إذا فقدته، ستفقد حسابك للأبد. يرجى حفظه في مكان آمن.',
     'I have safely backed up my private key': 'لقد قمت بعمل نسخة احتياطية آمنة لمفتاحي الخاص',
     'Secure Your Account': 'أمّن حسابك',
-    'Add an extra layer of protection with a password':
-      'أضف طبقة إضافية من الحماية بكلمة مرور',
+    'Add an extra layer of protection with a password': 'أضف طبقة إضافية من الحماية بكلمة مرور',
     'Password Protection (Recommended)': 'الحماية بكلمة مرور (موصى به)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'أضف كلمة مرور لتشفير مفتاحك الخاص في هذا المتصفح. هذا اختياري لكنه موصى به بشدة لأمان أفضل.',
-    'Create a strong password (or skip)': 'أنشئ كلمة مرور قوية (أو تخطى)',
+    'Create a password (or skip)': 'أنشئ كلمة مرور (أو تخطى)',
     'Enter your password again': 'أدخل كلمة المرور مرة أخرى',
     'Complete Signup': 'إكمال التسجيل'
   }

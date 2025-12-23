@@ -178,7 +178,7 @@ export default function Signup({
           <Input
             id="password-input"
             type="password"
-            placeholder={t('Create a strong password (or skip)')}
+            placeholder={t('Create a password (or skip)')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

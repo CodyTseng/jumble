@@ -598,12 +598,14 @@ export default {
     'Show replies': 'जवाब दिखाएं',
     'Hide replies': 'जवाब छुपाएं',
     'Welcome to Jumble!': 'Jumble में आपका स्वागत है!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'आपका फ़ीड खाली है क्योंकि आप अभी तक किसी को फ़ॉलो नहीं कर रहे हैं। दिलचस्प सामग्री का अन्वेषण करके और अपनी पसंद के उपयोगकर्ताओं को फ़ॉलो करके शुरू करें!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'आपका फ़ीड खाली है क्योंकि आप अभी तक किसी को फ़ॉलो नहीं कर रहे हैं। दिलचस्प सामग्री का अन्वेषण करके और अपनी पसंद के उपयोगकर्ताओं को फ़ॉलो करके शुरू करें!',
     'Search Users': 'उपयोगकर्ता खोजें',
     'Create New Account': 'नया खाता बनाएं',
     Important: 'महत्वपूर्ण',
     'Generate Your Account': 'अपना खाता बनाएं',
-    'Your private key IS your account. Keep it safe!': 'आपकी निजी कुंजी ही आपका खाता है। इसे सुरक्षित रखें!',
+    'Your private key IS your account. Keep it safe!':
+      'आपकी निजी कुंजी ही आपका खाता है। इसे सुरक्षित रखें!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'Nostr में, आपकी निजी कुंजी ही आपका खाता है। यदि आप अपनी निजी कुंजी खो देते हैं, तो आप अपना खाता हमेशा के लिए खो देते हैं।',
     'Your Private Key': 'आपकी निजी कुंजी',
@@ -611,7 +613,8 @@ export default {
     'Download Backup File': 'बैकअप फ़ाइल डाउनलोड करें',
     'Copied to Clipboard': 'क्लिपबोर्ड पर कॉपी किया गया',
     'Copy to Clipboard': 'क्लिपबोर्ड पर कॉपी करें',
-    'I already saved my private key securely.': 'मैंने पहले ही अपनी निजी कुंजी को सुरक्षित रूप से सहेज लिया है।',
+    'I already saved my private key securely.':
+      'मैंने पहले ही अपनी निजी कुंजी को सुरक्षित रूप से सहेज लिया है।',
     'Almost Done!': 'लगभग हो गया!',
     'Set a password to encrypt your key, or skip to finish':
       'अपनी कुंजी को एन्क्रिप्ट करने के लिए पासवर्ड सेट करें, या समाप्त करने के लिए छोड़ें',
@@ -631,14 +634,15 @@ export default {
     'Critical: Save Your Private Key': 'महत्वपूर्ण: अपनी निजी कुंजी सहेजें',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
       'आपकी निजी कुंजी आपका खाता है। कोई पासवर्ड पुनर्प्राप्ति नहीं है। यदि आप इसे खो देते हैं, तो आप हमेशा के लिए अपना खाता खो देंगे। कृपया इसे सुरक्षित स्थान पर सहेजें।',
-    'I have safely backed up my private key': 'मैंने अपनी निजी कुंजी को सुरक्षित रूप से बैकअप कर लिया है',
+    'I have safely backed up my private key':
+      'मैंने अपनी निजी कुंजी को सुरक्षित रूप से बैकअप कर लिया है',
     'Secure Your Account': 'अपने खाते को सुरक्षित करें',
     'Add an extra layer of protection with a password':
       'पासवर्ड के साथ सुरक्षा की एक अतिरिक्त परत जोड़ें',
     'Password Protection (Recommended)': 'पासवर्ड सुरक्षा (अनुशंसित)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'इस ब्राउज़र में अपनी निजी कुंजी को एन्क्रिप्ट करने के लिए पासवर्ड जोड़ें। यह वैकल्पिक है लेकिन बेहतर सुरक्षा के लिए दृढ़ता से अनुशंसित है।',
-    'Create a strong password (or skip)': 'एक मजबूत पासवर्ड बनाएं (या छोड़ें)',
+    'Create a password (or skip)': 'एक पासवर्ड बनाएं (या छोड़ें)',
     'Enter your password again': 'अपना पासवर्ड फिर से दर्ज करें',
     'Complete Signup': 'साइनअप पूर्ण करें'
   }

@@ -603,12 +603,14 @@ export default {
     'Show replies': 'Показать ответы',
     'Hide replies': 'Скрыть ответы',
     'Welcome to Jumble!': 'Добро пожаловать в Jumble!',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Ваша лента пуста, потому что вы еще ни на кого не подписаны. Начните с изучения интересного контента и подписки на понравившихся пользователей!',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Ваша лента пуста, потому что вы еще ни на кого не подписаны. Начните с изучения интересного контента и подписки на понравившихся пользователей!',
     'Search Users': 'Поиск пользователей',
     'Create New Account': 'Создать новый аккаунт',
     Important: 'Важно',
     'Generate Your Account': 'Создать аккаунт',
-    'Your private key IS your account. Keep it safe!': 'Ваш приватный ключ — это ваш аккаунт. Храните его в безопасности!',
+    'Your private key IS your account. Keep it safe!':
+      'Ваш приватный ключ — это ваш аккаунт. Храните его в безопасности!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'В Nostr ваш приватный ключ — это ваш аккаунт. Если вы потеряете приватный ключ, вы навсегда потеряете свой аккаунт.',
     'Your Private Key': 'Ваш приватный ключ',
@@ -616,7 +618,8 @@ export default {
     'Download Backup File': 'Скачать файл резервной копии',
     'Copied to Clipboard': 'Скопировано в буфер обмена',
     'Copy to Clipboard': 'Копировать в буфер обмена',
-    'I already saved my private key securely.': 'Я уже сохранил свой приватный ключ в безопасном месте.',
+    'I already saved my private key securely.':
+      'Я уже сохранил свой приватный ключ в безопасном месте.',
     'Almost Done!': 'Почти готово!',
     'Set a password to encrypt your key, or skip to finish':
       'Установите пароль для шифрования ключа или пропустите, чтобы завершить',
@@ -643,7 +646,7 @@ export default {
     'Password Protection (Recommended)': 'Защита паролем (рекомендуется)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Добавьте пароль для шифрования вашего приватного ключа в этом браузере. Это необязательно, но настоятельно рекомендуется для лучшей безопасности.',
-    'Create a strong password (or skip)': 'Создайте надежный пароль (или пропустите)',
+    'Create a password (or skip)': 'Создайте пароль (или пропустите)',
     'Enter your password again': 'Введите пароль еще раз',
     'Complete Signup': 'Завершить регистрацию'
   }

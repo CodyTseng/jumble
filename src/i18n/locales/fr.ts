@@ -606,12 +606,14 @@ export default {
     'Show replies': 'Afficher les réponses',
     'Hide replies': 'Masquer les réponses',
     'Welcome to Jumble!': 'Bienvenue sur Jumble !',
-    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Votre flux est vide car vous ne suivez personne pour le moment. Commencez par explorer du contenu intéressant et suivez les utilisateurs que vous aimez !',
+    'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
+      'Votre flux est vide car vous ne suivez personne pour le moment. Commencez par explorer du contenu intéressant et suivez les utilisateurs que vous aimez !',
     'Search Users': 'Rechercher des utilisateurs',
     'Create New Account': 'Créer un nouveau compte',
     Important: 'Important',
     'Generate Your Account': 'Générer votre compte',
-    'Your private key IS your account. Keep it safe!': 'Votre clé privée EST votre compte. Gardez-la en sécurité !',
+    'Your private key IS your account. Keep it safe!':
+      'Votre clé privée EST votre compte. Gardez-la en sécurité !',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
       'Dans Nostr, votre clé privée EST votre compte. Si vous perdez votre clé privée, vous perdez votre compte pour toujours.',
     'Your Private Key': 'Votre clé privée',
@@ -619,35 +621,36 @@ export default {
     'Download Backup File': 'Télécharger le fichier de sauvegarde',
     'Copied to Clipboard': 'Copié dans le presse-papiers',
     'Copy to Clipboard': 'Copier dans le presse-papiers',
-    'I already saved my private key securely.': 'J\'ai déjà sauvegardé ma clé privée en toute sécurité.',
+    'I already saved my private key securely.':
+      "J'ai déjà sauvegardé ma clé privée en toute sécurité.",
     'Almost Done!': 'Presque terminé !',
     'Set a password to encrypt your key, or skip to finish':
       'Définissez un mot de passe pour chiffrer votre clé, ou ignorez pour terminer',
     'Password Protection (Optional)': 'Protection par mot de passe (facultatif)',
     'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
-      'Définir un mot de passe chiffre votre clé privée dans ce navigateur. Vous pouvez ignorer cette étape, mais nous recommandons d\'en définir un pour plus de sécurité.',
+      "Définir un mot de passe chiffre votre clé privée dans ce navigateur. Vous pouvez ignorer cette étape, mais nous recommandons d'en définir un pour plus de sécurité.",
     'Password (Optional)': 'Mot de passe (facultatif)',
     'Enter password or leave empty to skip': 'Entrez un mot de passe ou laissez vide pour ignorer',
     'Confirm Password': 'Confirmer le mot de passe',
     'Re-enter password': 'Ressaisissez le mot de passe',
     'Passwords do not match': 'Les mots de passe ne correspondent pas',
-    'Finish Signup': 'Terminer l\'inscription',
+    'Finish Signup': "Terminer l'inscription",
     // New improved signup copy
     'Create Your Nostr Account': 'Créez votre compte Nostr',
     'Generate your unique private key. This is your digital identity.':
-      'Générez votre clé privée unique. C\'est votre identité numérique.',
+      "Générez votre clé privée unique. C'est votre identité numérique.",
     'Critical: Save Your Private Key': 'Critique : Sauvegardez votre clé privée',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
-      'Votre clé privée EST votre compte. Il n\'y a pas de récupération de mot de passe. Si vous la perdez, vous perdrez votre compte pour toujours. Veuillez la sauvegarder dans un endroit sécurisé.',
-    'I have safely backed up my private key': 'J\'ai sauvegardé ma clé privée en toute sécurité',
+      "Votre clé privée EST votre compte. Il n'y a pas de récupération de mot de passe. Si vous la perdez, vous perdrez votre compte pour toujours. Veuillez la sauvegarder dans un endroit sécurisé.",
+    'I have safely backed up my private key': "J'ai sauvegardé ma clé privée en toute sécurité",
     'Secure Your Account': 'Sécurisez votre compte',
     'Add an extra layer of protection with a password':
       'Ajoutez une couche de protection supplémentaire avec un mot de passe',
     'Password Protection (Recommended)': 'Protection par mot de passe (recommandé)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
-      'Ajoutez un mot de passe pour chiffrer votre clé privée dans ce navigateur. C\'est facultatif mais fortement recommandé pour une meilleure sécurité.',
-    'Create a strong password (or skip)': 'Créez un mot de passe fort (ou ignorer)',
+      "Ajoutez un mot de passe pour chiffrer votre clé privée dans ce navigateur. C'est facultatif mais fortement recommandé pour une meilleure sécurité.",
+    'Create a password (or skip)': 'Créez un mot de passe (ou ignorez)',
     'Enter your password again': 'Entrez à nouveau votre mot de passe',
-    'Complete Signup': 'Terminer l\'inscription'
+    'Complete Signup': "Terminer l'inscription"
   }
 }
