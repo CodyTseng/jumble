@@ -584,6 +584,29 @@ export default {
     'Hide replies': '隐藏回复',
     'Welcome to Jumble!': '欢迎来到 Jumble！',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的动态是空的，因为你还没有关注任何人。开始探索有趣的内容并关注你喜欢的用户吧！',
-    'Search Users': '搜索用户'
+    'Search Users': '搜索用户',
+    'Create New Account': '创建新账户',
+    Important: '重要',
+    'Generate Your Account': '生成你的账户',
+    'Your private key IS your account. Keep it safe!': '你的私钥就是你的账户。请妥善保管！',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      '在 Nostr 中，你的私钥就是你的账户。如果你丢失了私钥，你将永远失去你的账户。',
+    'Your Private Key': '你的私钥',
+    'Generate new key': '生成新密钥',
+    'Download Backup File': '下载备份文件',
+    'Copied to Clipboard': '已复制到剪贴板',
+    'Copy to Clipboard': '复制到剪贴板',
+    'I already saved my private key securely.': '我已经安全地保存了我的私钥。',
+    'Almost Done!': '即将完成！',
+    'Set a password to encrypt your key, or skip to finish': '设置密码来加密你的密钥，或跳过以完成',
+    'Password Protection (Optional)': '密码保护（可选）',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      '设置密码会在此浏览器中加密你的私钥。你可以跳过此步骤，但我们建议设置密码以增强安全性。',
+    'Password (Optional)': '密码（可选）',
+    'Enter password or leave empty to skip': '输入密码或留空以跳过',
+    'Confirm Password': '确认密码',
+    'Re-enter password': '重新输入密码',
+    'Passwords do not match': '密码不匹配',
+    'Finish Signup': '完成注册'
   }
 }

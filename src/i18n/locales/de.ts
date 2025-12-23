@@ -609,6 +609,30 @@ export default {
     'Hide replies': 'Antworten ausblenden',
     'Welcome to Jumble!': 'Willkommen bei Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Ihr Feed ist leer, weil Sie noch niemandem folgen. Beginnen Sie damit, interessante Inhalte zu erkunden und Benutzern zu folgen, die Ihnen gefallen!',
-    'Search Users': 'Benutzer suchen'
+    'Search Users': 'Benutzer suchen',
+    'Create New Account': 'Neues Konto erstellen',
+    Important: 'Wichtig',
+    'Generate Your Account': 'Konto generieren',
+    'Your private key IS your account. Keep it safe!': 'Ihr privater Schlüssel IST Ihr Konto. Bewahren Sie ihn sicher auf!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'In Nostr IST Ihr privater Schlüssel Ihr Konto. Wenn Sie Ihren privaten Schlüssel verlieren, verlieren Sie Ihr Konto für immer.',
+    'Your Private Key': 'Ihr privater Schlüssel',
+    'Generate new key': 'Neuen Schlüssel generieren',
+    'Download Backup File': 'Sicherungsdatei herunterladen',
+    'Copied to Clipboard': 'In Zwischenablage kopiert',
+    'Copy to Clipboard': 'In Zwischenablage kopieren',
+    'I already saved my private key securely.': 'Ich habe meinen privaten Schlüssel bereits sicher gespeichert.',
+    'Almost Done!': 'Fast fertig!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Legen Sie ein Passwort fest, um Ihren Schlüssel zu verschlüsseln, oder überspringen Sie, um fertig zu werden',
+    'Password Protection (Optional)': 'Passwortschutz (optional)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Das Festlegen eines Passworts verschlüsselt Ihren privaten Schlüssel in diesem Browser. Sie können diesen Schritt überspringen, aber wir empfehlen, eines für zusätzliche Sicherheit festzulegen.',
+    'Password (Optional)': 'Passwort (optional)',
+    'Enter password or leave empty to skip': 'Passwort eingeben oder leer lassen, um zu überspringen',
+    'Confirm Password': 'Passwort bestätigen',
+    'Re-enter password': 'Passwort erneut eingeben',
+    'Passwords do not match': 'Passwörter stimmen nicht überein',
+    'Finish Signup': 'Registrierung abschließen'
   }
 }

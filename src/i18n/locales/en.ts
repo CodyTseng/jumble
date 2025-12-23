@@ -595,6 +595,30 @@ export default {
     'Hide replies': 'Hide replies',
     'Welcome to Jumble!': 'Welcome to Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!',
-    'Search Users': 'Search Users'
+    'Search Users': 'Search Users',
+    'Create New Account': 'Create New Account',
+    Important: 'Important',
+    'Generate Your Account': 'Generate Your Account',
+    'Your private key IS your account. Keep it safe!': 'Your private key IS your account. Keep it safe!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.',
+    'Your Private Key': 'Your Private Key',
+    'Generate new key': 'Generate new key',
+    'Download Backup File': 'Download Backup File',
+    'Copied to Clipboard': 'Copied to Clipboard',
+    'Copy to Clipboard': 'Copy to Clipboard',
+    'I already saved my private key securely.': 'I already saved my private key securely.',
+    'Almost Done!': 'Almost Done!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Set a password to encrypt your key, or skip to finish',
+    'Password Protection (Optional)': 'Password Protection (Optional)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.',
+    'Password (Optional)': 'Password (Optional)',
+    'Enter password or leave empty to skip': 'Enter password or leave empty to skip',
+    'Confirm Password': 'Confirm Password',
+    'Re-enter password': 'Re-enter password',
+    'Passwords do not match': 'Passwords do not match',
+    'Finish Signup': 'Finish Signup'
   }
 }

@@ -604,6 +604,30 @@ export default {
     'Hide replies': 'Скрыть ответы',
     'Welcome to Jumble!': 'Добро пожаловать в Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Ваша лента пуста, потому что вы еще ни на кого не подписаны. Начните с изучения интересного контента и подписки на понравившихся пользователей!',
-    'Search Users': 'Поиск пользователей'
+    'Search Users': 'Поиск пользователей',
+    'Create New Account': 'Создать новый аккаунт',
+    Important: 'Важно',
+    'Generate Your Account': 'Создать аккаунт',
+    'Your private key IS your account. Keep it safe!': 'Ваш приватный ключ — это ваш аккаунт. Храните его в безопасности!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'В Nostr ваш приватный ключ — это ваш аккаунт. Если вы потеряете приватный ключ, вы навсегда потеряете свой аккаунт.',
+    'Your Private Key': 'Ваш приватный ключ',
+    'Generate new key': 'Создать новый ключ',
+    'Download Backup File': 'Скачать файл резервной копии',
+    'Copied to Clipboard': 'Скопировано в буфер обмена',
+    'Copy to Clipboard': 'Копировать в буфер обмена',
+    'I already saved my private key securely.': 'Я уже сохранил свой приватный ключ в безопасном месте.',
+    'Almost Done!': 'Почти готово!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Установите пароль для шифрования ключа или пропустите, чтобы завершить',
+    'Password Protection (Optional)': 'Защита паролем (необязательно)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Установка пароля шифрует ваш приватный ключ в этом браузере. Вы можете пропустить этот шаг, но мы рекомендуем установить пароль для дополнительной безопасности.',
+    'Password (Optional)': 'Пароль (необязательно)',
+    'Enter password or leave empty to skip': 'Введите пароль или оставьте пустым, чтобы пропустить',
+    'Confirm Password': 'Подтвердите пароль',
+    'Re-enter password': 'Введите пароль повторно',
+    'Passwords do not match': 'Пароли не совпадают',
+    'Finish Signup': 'Завершить регистрацию'
   }
 }

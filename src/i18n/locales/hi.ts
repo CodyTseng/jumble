@@ -599,6 +599,30 @@ export default {
     'Hide replies': 'जवाब छुपाएं',
     'Welcome to Jumble!': 'Jumble में आपका स्वागत है!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'आपका फ़ीड खाली है क्योंकि आप अभी तक किसी को फ़ॉलो नहीं कर रहे हैं। दिलचस्प सामग्री का अन्वेषण करके और अपनी पसंद के उपयोगकर्ताओं को फ़ॉलो करके शुरू करें!',
-    'Search Users': 'उपयोगकर्ता खोजें'
+    'Search Users': 'उपयोगकर्ता खोजें',
+    'Create New Account': 'नया खाता बनाएं',
+    Important: 'महत्वपूर्ण',
+    'Generate Your Account': 'अपना खाता बनाएं',
+    'Your private key IS your account. Keep it safe!': 'आपकी निजी कुंजी ही आपका खाता है। इसे सुरक्षित रखें!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'Nostr में, आपकी निजी कुंजी ही आपका खाता है। यदि आप अपनी निजी कुंजी खो देते हैं, तो आप अपना खाता हमेशा के लिए खो देते हैं।',
+    'Your Private Key': 'आपकी निजी कुंजी',
+    'Generate new key': 'नई कुंजी बनाएं',
+    'Download Backup File': 'बैकअप फ़ाइल डाउनलोड करें',
+    'Copied to Clipboard': 'क्लिपबोर्ड पर कॉपी किया गया',
+    'Copy to Clipboard': 'क्लिपबोर्ड पर कॉपी करें',
+    'I already saved my private key securely.': 'मैंने पहले ही अपनी निजी कुंजी को सुरक्षित रूप से सहेज लिया है।',
+    'Almost Done!': 'लगभग हो गया!',
+    'Set a password to encrypt your key, or skip to finish':
+      'अपनी कुंजी को एन्क्रिप्ट करने के लिए पासवर्ड सेट करें, या समाप्त करने के लिए छोड़ें',
+    'Password Protection (Optional)': 'पासवर्ड सुरक्षा (वैकल्पिक)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'पासवर्ड सेट करने से इस ब्राउज़र में आपकी निजी कुंजी एन्क्रिप्ट हो जाती है। आप इस चरण को छोड़ सकते हैं, लेकिन हम अतिरिक्त सुरक्षा के लिए एक सेट करने की सलाह देते हैं।',
+    'Password (Optional)': 'पासवर्ड (वैकल्पिक)',
+    'Enter password or leave empty to skip': 'पासवर्ड दर्ज करें या छोड़ने के लिए खाली छोड़ें',
+    'Confirm Password': 'पासवर्ड की पुष्टि करें',
+    'Re-enter password': 'पासवर्ड फिर से दर्ज करें',
+    'Passwords do not match': 'पासवर्ड मेल नहीं खाते',
+    'Finish Signup': 'साइनअप समाप्त करें'
   }
 }

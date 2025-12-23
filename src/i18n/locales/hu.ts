@@ -593,6 +593,30 @@ export default {
     'Hide replies': 'Válaszok elrejtése',
     'Welcome to Jumble!': 'Üdvözlünk a Jumble-ban!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'A hírcsatornád üres, mert még nem követsz senkit. Kezdd el érdekes tartalmak felfedezésével és kövesd azokat a felhasználókat, akik tetszenek!',
-    'Search Users': 'Felhasználók keresése'
+    'Search Users': 'Felhasználók keresése',
+    'Create New Account': 'Új fiók létrehozása',
+    Important: 'Fontos',
+    'Generate Your Account': 'Fiók létrehozása',
+    'Your private key IS your account. Keep it safe!': 'A privát kulcsod A fiókodat jelenti. Tartsd biztonságban!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'A Nostr-ban a privát kulcsod A fiókodat jelenti. Ha elveszíted a privát kulcsodat, örökre elveszíted a fiókodat.',
+    'Your Private Key': 'Privát kulcsod',
+    'Generate new key': 'Új kulcs generálása',
+    'Download Backup File': 'Biztonsági mentés letöltése',
+    'Copied to Clipboard': 'Vágólapra másolva',
+    'Copy to Clipboard': 'Másolás vágólapra',
+    'I already saved my private key securely.': 'Már biztonságosan elmentettem a privát kulcsomat.',
+    'Almost Done!': 'Majdnem kész!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Állíts be jelszót a kulcsod titkosításához, vagy hagyd ki a befejezéshez',
+    'Password Protection (Optional)': 'Jelszavas védelem (opcionális)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'A jelszó beállítása titkosítja a privát kulcsodat ebben a böngészőben. Kihagyhatod ezt a lépést, de javasoljuk a beállítását a nagyobb biztonság érdekében.',
+    'Password (Optional)': 'Jelszó (opcionális)',
+    'Enter password or leave empty to skip': 'Írj be jelszót, vagy hagyd üresen a kihagyáshoz',
+    'Confirm Password': 'Jelszó megerősítése',
+    'Re-enter password': 'Jelszó újbóli megadása',
+    'Passwords do not match': 'A jelszavak nem egyeznek',
+    'Finish Signup': 'Regisztráció befejezése'
   }
 }

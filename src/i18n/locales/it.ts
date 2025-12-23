@@ -604,6 +604,30 @@ export default {
     'Hide replies': 'Nascondi risposte',
     'Welcome to Jumble!': 'Benvenuto su Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Il tuo feed è vuoto perché non stai ancora seguendo nessuno. Inizia esplorando contenuti interessanti e seguendo gli utenti che ti piacciono!',
-    'Search Users': 'Cerca Utenti'
+    'Search Users': 'Cerca Utenti',
+    'Create New Account': 'Crea nuovo account',
+    Important: 'Importante',
+    'Generate Your Account': 'Genera il tuo account',
+    'Your private key IS your account. Keep it safe!': 'La tua chiave privata È il tuo account. Tienila al sicuro!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'In Nostr, la tua chiave privata È il tuo account. Se perdi la tua chiave privata, perdi il tuo account per sempre.',
+    'Your Private Key': 'La tua chiave privata',
+    'Generate new key': 'Genera nuova chiave',
+    'Download Backup File': 'Scarica file di backup',
+    'Copied to Clipboard': 'Copiato negli appunti',
+    'Copy to Clipboard': 'Copia negli appunti',
+    'I already saved my private key securely.': 'Ho già salvato la mia chiave privata in modo sicuro.',
+    'Almost Done!': 'Quasi fatto!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Imposta una password per crittografare la tua chiave, o salta per finire',
+    'Password Protection (Optional)': 'Protezione con password (facoltativo)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Impostare una password crittografa la tua chiave privata in questo browser. Puoi saltare questo passaggio, ma ti consigliamo di impostarne una per maggiore sicurezza.',
+    'Password (Optional)': 'Password (facoltativo)',
+    'Enter password or leave empty to skip': 'Inserisci la password o lascia vuoto per saltare',
+    'Confirm Password': 'Conferma password',
+    'Re-enter password': 'Reinserisci la password',
+    'Passwords do not match': 'Le password non corrispondono',
+    'Finish Signup': 'Completa registrazione'
   }
 }

@@ -598,6 +598,30 @@ export default {
     'Hide replies': 'پنهان کردن پاسخ‌ها',
     'Welcome to Jumble!': 'به Jumble خوش آمدید!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'فید شما خالی است زیرا هنوز کسی را دنبال نمی‌کنید. با کاوش محتوای جالب و دنبال کردن کاربرانی که دوست دارید شروع کنید!',
-    'Search Users': 'جستجوی کاربران'
+    'Search Users': 'جستجوی کاربران',
+    'Create New Account': 'ایجاد حساب کاربری جدید',
+    Important: 'مهم',
+    'Generate Your Account': 'ایجاد حساب کاربری',
+    'Your private key IS your account. Keep it safe!': 'کلید خصوصی شما همان حساب کاربری شماست. آن را ایمن نگه دارید!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'در Nostr، کلید خصوصی شما همان حساب کاربری شماست. اگر کلید خصوصی خود را گم کنید، برای همیشه حساب خود را از دست می‌دهید.',
+    'Your Private Key': 'کلید خصوصی شما',
+    'Generate new key': 'ایجاد کلید جدید',
+    'Download Backup File': 'دانلود فایل پشتیبان',
+    'Copied to Clipboard': 'در کلیپ‌بورد کپی شد',
+    'Copy to Clipboard': 'کپی در کلیپ‌بورد',
+    'I already saved my private key securely.': 'من قبلاً کلید خصوصی خود را به طور ایمن ذخیره کرده‌ام.',
+    'Almost Done!': 'تقریباً تمام شد!',
+    'Set a password to encrypt your key, or skip to finish':
+      'یک رمز عبور برای رمزگذاری کلید خود تنظیم کنید، یا برای پایان دادن رد کنید',
+    'Password Protection (Optional)': 'حفاظت با رمز عبور (اختیاری)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'تنظیم رمز عبور، کلید خصوصی شما را در این مرورگر رمزگذاری می‌کند. می‌توانید این مرحله را رد کنید، اما ما برای امنیت بیشتر توصیه می‌کنیم یکی تنظیم کنید.',
+    'Password (Optional)': 'رمز عبور (اختیاری)',
+    'Enter password or leave empty to skip': 'رمز عبور را وارد کنید یا برای رد کردن خالی بگذارید',
+    'Confirm Password': 'تأیید رمز عبور',
+    'Re-enter password': 'رمز عبور را دوباره وارد کنید',
+    'Passwords do not match': 'رمزهای عبور مطابقت ندارند',
+    'Finish Signup': 'پایان ثبت‌نام'
   }
 }

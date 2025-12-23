@@ -599,6 +599,30 @@ export default {
     'Hide replies': '返信を非表示',
     'Welcome to Jumble!': 'Jumbleへようこそ！',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'まだ誰もフォローしていないため、フィードが空です。興味深いコンテンツを探索して、好きなユーザーをフォローしてみましょう！',
-    'Search Users': 'ユーザーを検索'
+    'Search Users': 'ユーザーを検索',
+    'Create New Account': '新しいアカウントを作成',
+    Important: '重要',
+    'Generate Your Account': 'アカウントを生成',
+    'Your private key IS your account. Keep it safe!': '秘密鍵があなたのアカウントです。安全に保管してください！',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'Nostrでは、秘密鍵があなたのアカウントです。秘密鍵を紛失すると、アカウントを永久に失います。',
+    'Your Private Key': 'あなたの秘密鍵',
+    'Generate new key': '新しい鍵を生成',
+    'Download Backup File': 'バックアップファイルをダウンロード',
+    'Copied to Clipboard': 'クリップボードにコピーしました',
+    'Copy to Clipboard': 'クリップボードにコピー',
+    'I already saved my private key securely.': '秘密鍵を安全に保存しました。',
+    'Almost Done!': 'もう少しで完了です！',
+    'Set a password to encrypt your key, or skip to finish':
+      '鍵を暗号化するためのパスワードを設定するか、スキップして完了してください',
+    'Password Protection (Optional)': 'パスワード保護（オプション）',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'パスワードを設定すると、このブラウザで秘密鍵が暗号化されます。この手順はスキップできますが、セキュリティ強化のために設定することをお勧めします。',
+    'Password (Optional)': 'パスワード（オプション）',
+    'Enter password or leave empty to skip': 'パスワードを入力するか、空のままにしてスキップしてください',
+    'Confirm Password': 'パスワードを確認',
+    'Re-enter password': 'パスワードを再入力',
+    'Passwords do not match': 'パスワードが一致しません',
+    'Finish Signup': '登録を完了'
   }
 }

@@ -600,6 +600,30 @@ export default {
     'Hide replies': 'Ocultar respostas',
     'Welcome to Jumble!': 'Bem-vindo ao Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Seu feed está vazio porque você ainda não está seguindo ninguém. Comece explorando conteúdo interessante e seguindo usuários que você gosta!',
-    'Search Users': 'Buscar Usuários'
+    'Search Users': 'Buscar Usuários',
+    'Create New Account': 'Criar nova conta',
+    Important: 'Importante',
+    'Generate Your Account': 'Gerar sua conta',
+    'Your private key IS your account. Keep it safe!': 'Sua chave privada É sua conta. Mantenha-a segura!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'No Nostr, sua chave privada É sua conta. Se você perder sua chave privada, perderá sua conta para sempre.',
+    'Your Private Key': 'Sua chave privada',
+    'Generate new key': 'Gerar nova chave',
+    'Download Backup File': 'Baixar arquivo de backup',
+    'Copied to Clipboard': 'Copiado para a área de transferência',
+    'Copy to Clipboard': 'Copiar para a área de transferência',
+    'I already saved my private key securely.': 'Já salvei minha chave privada com segurança.',
+    'Almost Done!': 'Quase pronto!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Defina uma senha para criptografar sua chave ou pule para finalizar',
+    'Password Protection (Optional)': 'Proteção por senha (opcional)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Definir uma senha criptografa sua chave privada neste navegador. Você pode pular esta etapa, mas recomendamos definir uma para maior segurança.',
+    'Password (Optional)': 'Senha (opcional)',
+    'Enter password or leave empty to skip': 'Digite a senha ou deixe em branco para pular',
+    'Confirm Password': 'Confirmar senha',
+    'Re-enter password': 'Digite a senha novamente',
+    'Passwords do not match': 'As senhas não coincidem',
+    'Finish Signup': 'Concluir cadastro'
   }
 }

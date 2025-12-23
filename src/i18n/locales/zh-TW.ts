@@ -578,6 +578,29 @@ export default {
     'Relay Feeds': '中繼訂閱',
     'Welcome to Jumble!': '歡迎來到 Jumble！',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': '你的動態是空的，因為你還沒有關注任何人。開始探索有趣的內容並關注你喜歡的用戶吧！',
-    'Search Users': '搜尋用戶'
+    'Search Users': '搜尋用戶',
+    'Create New Account': '建立新帳戶',
+    Important: '重要',
+    'Generate Your Account': '生成你的帳戶',
+    'Your private key IS your account. Keep it safe!': '你的私鑰就是你的帳戶。請妥善保管！',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      '在 Nostr 中，你的私鑰就是你的帳戶。如果你遺失了私鑰，你將永遠失去你的帳戶。',
+    'Your Private Key': '你的私鑰',
+    'Generate new key': '生成新金鑰',
+    'Download Backup File': '下載備份檔案',
+    'Copied to Clipboard': '已複製到剪貼簿',
+    'Copy to Clipboard': '複製到剪貼簿',
+    'I already saved my private key securely.': '我已經安全地儲存了我的私鑰。',
+    'Almost Done!': '即將完成！',
+    'Set a password to encrypt your key, or skip to finish': '設定密碼來加密你的金鑰，或跳過以完成',
+    'Password Protection (Optional)': '密碼保護（可選）',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      '設定密碼會在此瀏覽器中加密你的私鑰。你可以跳過此步驟，但我們建議設定密碼以增強安全性。',
+    'Password (Optional)': '密碼（可選）',
+    'Enter password or leave empty to skip': '輸入密碼或留空以跳過',
+    'Confirm Password': '確認密碼',
+    'Re-enter password': '重新輸入密碼',
+    'Passwords do not match': '密碼不符合',
+    'Finish Signup': '完成註冊'
   }
 }

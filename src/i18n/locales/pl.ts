@@ -605,6 +605,30 @@ export default {
     'Hide replies': 'Ukryj odpowiedzi',
     'Welcome to Jumble!': 'Witamy w Jumble!',
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!': 'Twój kanał jest pusty, ponieważ jeszcze nikogo nie obserwujesz. Zacznij od odkrywania ciekawych treści i obserwowania użytkowników, którzy Ci się podobają!',
-    'Search Users': 'Szukaj użytkowników'
+    'Search Users': 'Szukaj użytkowników',
+    'Create New Account': 'Utwórz nowe konto',
+    Important: 'Ważne',
+    'Generate Your Account': 'Wygeneruj swoje konto',
+    'Your private key IS your account. Keep it safe!': 'Twój klucz prywatny TO twoje konto. Przechowuj go bezpiecznie!',
+    'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
+      'W Nostr twój klucz prywatny TO twoje konto. Jeśli stracisz swój klucz prywatny, stracisz swoje konto na zawsze.',
+    'Your Private Key': 'Twój klucz prywatny',
+    'Generate new key': 'Wygeneruj nowy klucz',
+    'Download Backup File': 'Pobierz plik kopii zapasowej',
+    'Copied to Clipboard': 'Skopiowano do schowka',
+    'Copy to Clipboard': 'Kopiuj do schowka',
+    'I already saved my private key securely.': 'Już bezpiecznie zapisałem mój klucz prywatny.',
+    'Almost Done!': 'Prawie gotowe!',
+    'Set a password to encrypt your key, or skip to finish':
+      'Ustaw hasło, aby zaszyfrować swój klucz, lub pomiń, aby zakończyć',
+    'Password Protection (Optional)': 'Ochrona hasłem (opcjonalnie)',
+    'Setting a password encrypts your private key in this browser. You can skip this step, but we recommend setting one for added security.':
+      'Ustawienie hasła szyfruje twój klucz prywatny w tej przeglądarce. Możesz pominąć ten krok, ale zalecamy ustawienie hasła dla dodatkowego bezpieczeństwa.',
+    'Password (Optional)': 'Hasło (opcjonalnie)',
+    'Enter password or leave empty to skip': 'Wprowadź hasło lub pozostaw puste, aby pominąć',
+    'Confirm Password': 'Potwierdź hasło',
+    'Re-enter password': 'Wprowadź hasło ponownie',
+    'Passwords do not match': 'Hasła nie pasują do siebie',
+    'Finish Signup': 'Zakończ rejestrację'
   }
 }
