@@ -15,13 +15,15 @@ export default function NormalFeed({
   areAlgoRelays = false,
   isMainFeed = false,
   showRelayCloseReason = false,
-  disable24hMode = false
+  disable24hMode = false,
+  onRefresh
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
   isMainFeed?: boolean
   showRelayCloseReason?: boolean
   disable24hMode?: boolean
+  onRefresh?: () => void
 }) {
   const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
@@ -65,6 +67,10 @@ export default function NormalFeed({
             {!supportTouch && (
               <RefreshButton
                 onClick={() => {
+                  if (onRefresh) {
+                    onRefresh()
+                    return
+                  }
                   if (listMode === '24h') {
                     userAggregationListRef.current?.refresh()
                   } else {

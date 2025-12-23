@@ -16,6 +16,7 @@ export default function FollowingFeed() {
   const { navigate } = usePrimaryPage()
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
   const [hasFollowings, setHasFollowings] = useState<boolean | null>(null)
+  const [refreshCount, setRefreshCount] = useState(0)
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function FollowingFeed() {
     }
 
     init()
-  }, [pubkey, followingSet])
+  }, [pubkey, followingSet, refreshCount])
 
   // Show empty state when user has no followings
   if (hasFollowings === false && subRequests.length > 0) {
@@ -65,5 +66,14 @@ export default function FollowingFeed() {
     )
   }
 
-  return <NormalFeed subRequests={subRequests} isMainFeed />
+  return (
+    <NormalFeed
+      subRequests={subRequests}
+      onRefresh={() => {
+        initializedRef.current = false
+        setRefreshCount((count) => count + 1)
+      }}
+      isMainFeed
+    />
+  )
 }
