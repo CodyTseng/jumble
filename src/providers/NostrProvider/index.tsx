@@ -1,5 +1,5 @@
 import LoginDialog from '@/components/LoginDialog'
-import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind, NEW_USER_RELAY_LIST } from '@/constants'
 import {
   createDeletionRequestDraftEvent,
   createFollowListDraftEvent,
@@ -614,14 +614,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const setupNewUser = async (signer: ISigner) => {
+    const relays = NEW_USER_RELAY_LIST.map((item) => item.url)
     await Promise.allSettled([
-      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createFollowListDraftEvent([]))),
-      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createMuteListDraftEvent([]))),
+      client.publishEvent(relays, await signer.signEvent(createFollowListDraftEvent([]))),
+      client.publishEvent(relays, await signer.signEvent(createMuteListDraftEvent([]))),
       client.publishEvent(
-        BIG_RELAY_URLS,
-        await signer.signEvent(
-          createRelayListDraftEvent(BIG_RELAY_URLS.map((url) => ({ url, scope: 'both' })))
-        )
+        relays.concat(BIG_RELAY_URLS),
+        await signer.signEvent(createRelayListDraftEvent(NEW_USER_RELAY_LIST))
       )
     ])
   }

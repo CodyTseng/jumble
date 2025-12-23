@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 import { Eraser, X } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import AlertCard from '../AlertCard'
+import InfoCard from '../InfoCard'
 
 export default function PollEditor({
   pollCreateData,
@@ -125,7 +125,8 @@ export default function PollEditor({
       </div>
 
       <div className="grid gap-2">
-        <AlertCard
+        <InfoCard
+          variant="alert"
           title={t('This is a poll note.')}
           content={t(
             'Unlike regular notes, polls are not widely supported and may not display on other clients.'

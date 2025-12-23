@@ -2,17 +2,15 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { isDevEnv } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useTheme } from '@/providers/ThemeProvider'
-import { NstartModal } from 'nstart-modal'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
-import GenerateNewAccount from './GenerateNewAccount'
 import NostrConnectLogin from './NostrConnectionLogin'
 import NpubLogin from './NpubLogin'
 import PrivateKeyLogin from './PrivateKeyLogin'
+import Signup from './Signup'
 
-type TAccountManagerPage = 'nsec' | 'bunker' | 'generate' | 'npub' | null
+type TAccountManagerPage = 'nsec' | 'bunker' | 'npub' | 'signup' | null
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
@@ -23,10 +21,10 @@ export default function AccountManager({ close }: { close?: () => void }) {
         <PrivateKeyLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'bunker' ? (
         <NostrConnectLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
-      ) : page === 'generate' ? (
-        <GenerateNewAccount back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'npub' ? (
         <NpubLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
+      ) : page === 'signup' ? (
+        <Signup back={() => setPage(null)} onSignupSuccess={() => close?.()} />
       ) : (
         <AccountManagerNav setPage={setPage} close={close} />
       )}
@@ -41,9 +39,8 @@ function AccountManagerNav({
   setPage: (page: TAccountManagerPage) => void
   close?: () => void
 }) {
-  const { t, i18n } = useTranslation()
-  const { themeSetting } = useTheme()
-  const { nip07Login, bunkerLogin, nsecLogin, ncryptsecLogin, accounts } = useNostr()
+  const { t } = useTranslation()
+  const { nip07Login, accounts } = useNostr()
 
   return (
     <div onClick={(e) => e.stopPropagation()} className="flex flex-col gap-8">
@@ -75,38 +72,8 @@ function AccountManagerNav({
         <div className="text-center text-muted-foreground text-sm font-semibold">
           {t("Don't have an account yet?")}
         </div>
-        <Button
-          onClick={() => {
-            const wizard = new NstartModal({
-              baseUrl: 'https://nstart.me',
-              an: 'Jumble',
-              am: themeSetting === 'pure-black' ? 'dark' : themeSetting,
-              al: i18n.language.slice(0, 2),
-              onComplete: ({ nostrLogin }) => {
-                if (!nostrLogin) return
-
-                if (nostrLogin.startsWith('bunker://')) {
-                  bunkerLogin(nostrLogin)
-                } else if (nostrLogin.startsWith('ncryptsec')) {
-                  ncryptsecLogin(nostrLogin)
-                } else if (nostrLogin.startsWith('nsec')) {
-                  nsecLogin(nostrLogin)
-                }
-              }
-            })
-            close?.()
-            wizard.open()
-          }}
-          className="w-full mt-4"
-        >
-          {t('Sign up')}
-        </Button>
-        <Button
-          variant="link"
-          onClick={() => setPage('generate')}
-          className="w-full text-muted-foreground py-0 h-fit mt-1"
-        >
-          {t('or simply generate a private key')}
+        <Button onClick={() => setPage('signup')} className="w-full mt-4">
+          {t('Create New Account')}
         </Button>
       </div>
       {accounts.length > 0 && (
