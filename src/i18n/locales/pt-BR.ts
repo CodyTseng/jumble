@@ -629,9 +629,9 @@ export default {
     'Passwords do not match': 'As senhas não coincidem',
     'Finish Signup': 'Concluir cadastro',
     // New improved signup copy
-    'Create Your Nostr Account': 'Crie sua conta Nostr',
+    'Create Your Nostr Account': 'Criando sua conta Nostr',
     'Generate your unique private key. This is your digital identity.':
-      'Gere sua chave privada única. Esta é sua identidade digital.',
+      'Sua chave privada única foi gerada. Ela é sua identidade digital.',
     'Critical: Save Your Private Key': 'Importante: Salve a sua chave privada.',
     'Your private key IS your account. There is no password recovery. If you lose it, you lose your account forever. Please save it in a secure location.':
       'Sua chave privada é a sua conta. Não há recuperação de senha, se você perdê-la, perderá sua conta para sempre. Por favor, salve-a em um local seguro.',
