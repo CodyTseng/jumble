@@ -642,7 +642,7 @@ export default {
     'Password Protection (Recommended)': 'Proteção por senha (recomendado)',
     'Add a password to encrypt your private key in this browser. This is optional but strongly recommended for better security.':
       'Adicione uma senha para criptografar sua chave privada neste navegador. Isso é opcional, mas fortemente recomendado para melhor segurança.',
-    'Create a password (or skip)': 'Crie uma senha (ou pule)',
+    'Create a password (or skip)': 'Crie uma senha (opcional)',
     'Enter your password again': 'Digite sua senha novamente',
     'Complete Signup': 'Concluir cadastro',
     Recommended: 'Recomendado'
