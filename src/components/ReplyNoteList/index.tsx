@@ -6,7 +6,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import threadService from '@/services/thread.service'
 import { Event as NEvent } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoadingBar } from '../LoadingBar'
 import ReplyNote, { ReplyNoteSkeleton } from '../ReplyNote'
@@ -57,15 +57,15 @@ export default function ReplyNoteList({ stuff }: { stuff: NEvent | string }) {
   ])
   const [hasMore, setHasMore] = useState(true)
   const [showCount, setShowCount] = useState(SHOW_COUNT)
-  const [loading, setLoading] = useState<boolean>(false)
-  const loadingRef = useRef(false)
+  const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  const stateRef = useRef({ loading, hasMore, showCount, repliesLength: replies.length })
+  stateRef.current = { loading, hasMore, showCount, repliesLength: replies.length }
 
+  // Initial subscription
   useEffect(() => {
-    loadingRef.current = true
     setLoading(true)
     threadService.subscribe(stuff, LIMIT).finally(() => {
-      loadingRef.current = false
       setLoading(false)
     })
 
@@ -74,52 +74,50 @@ export default function ReplyNoteList({ stuff }: { stuff: NEvent | string }) {
     }
   }, [stuff])
 
+  const loadMore = useCallback(async () => {
+    const { loading, hasMore, showCount, repliesLength } = stateRef.current
+
+    if (loading || !hasMore) return
+
+    // If there are more items to show, increase showCount first
+    if (showCount < repliesLength) {
+      setShowCount((prev) => prev + SHOW_COUNT)
+      // Only fetch more data when remaining items are running low
+      if (repliesLength - showCount > LIMIT / 2) {
+        return
+      }
+    }
+
+    setLoading(true)
+    const newHasMore = await threadService.loadMore(stuff, LIMIT)
+    setHasMore(newHasMore)
+    setLoading(false)
+  }, [stuff])
+
+  // IntersectionObserver setup
   useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '10px',
-      threshold: 0.1
-    }
-
-    const loadMore = async () => {
-      if (showCount < replies.length) {
-        setShowCount((prev) => prev + SHOW_COUNT)
-        // preload more
-        if (replies.length - showCount > LIMIT / 2) {
-          return
-        }
-      }
-
-      if (loadingRef.current) return
-
-      loadingRef.current = true
-      setLoading(true)
-
-      const newHasMore = await threadService.loadMore(stuff, LIMIT)
-
-      setHasMore(newHasMore)
-      loadingRef.current = false
-      setLoading(false)
-    }
-
-    const observerInstance = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMore()
-      }
-    }, options)
-
     const currentBottomRef = bottomRef.current
+    if (!currentBottomRef) return
 
-    if (currentBottomRef) {
-      observerInstance.observe(currentBottomRef)
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore()
+        }
+      },
+      {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0
+      }
+    )
+
+    observer.observe(currentBottomRef)
 
     return () => {
-      if (observerInstance && currentBottomRef) {
-        observerInstance.unobserve(currentBottomRef)
-      }
+      observer.disconnect()
     }
-  }, [replies, showCount, loading, stuff, hasMore])
+  }, [loadMore])
 
   return (
     <div className="min-h-[80vh]">

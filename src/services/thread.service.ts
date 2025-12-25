@@ -26,8 +26,10 @@ class ThreadService {
   private subscriptions = new Map<
     string,
     {
-      closer?: () => void
-      timelineKey?: string
+      promise: Promise<{
+        closer: () => void
+        timelineKey: string
+      }>
       count: number
       until?: number
     }
@@ -54,101 +56,99 @@ class ThreadService {
     const rootInfo = await this.parseRootInfo(stuff)
     if (!rootInfo) return
 
-    let subscription = this.subscriptions.get(rootInfo.id)
+    const subscription = this.subscriptions.get(rootInfo.id)
     if (subscription) {
       subscription.count += 1
       return
     }
 
-    subscription = { count: 1, until: dayjs().unix() }
-    this.subscriptions.set(rootInfo.id, subscription)
-
-    let relayUrls: string[] = []
-    const rootPubkey = (rootInfo as { pubkey?: string }).pubkey ?? event?.pubkey
-    if (rootPubkey) {
-      const relayList = await client.fetchRelayList(rootPubkey)
-      relayUrls = relayList.read
-    }
-    relayUrls = relayUrls.concat(BIG_RELAY_URLS).slice(0, 4)
-
-    // If current event is protected, we can assume its replies are also protected and stored on the same relays
-    if (event && isProtectedEvent(event)) {
-      const seenOn = client.getSeenEventRelayUrls(event.id)
-      relayUrls.concat(...seenOn)
-    }
-
-    const filters: (Omit<Filter, 'since' | 'until'> & {
-      limit: number
-    })[] = []
-    if (rootInfo.type === 'E') {
-      filters.push({
-        '#e': [rootInfo.id],
-        kinds: [kinds.ShortTextNote],
-        limit
-      })
-      if (event?.kind !== kinds.ShortTextNote) {
-        filters.push({
-          '#E': [rootInfo.id],
-          kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-          limit
-        })
+    const _subscribe = async () => {
+      let relayUrls: string[] = []
+      const rootPubkey = (rootInfo as { pubkey?: string }).pubkey ?? event?.pubkey
+      if (rootPubkey) {
+        const relayList = await client.fetchRelayList(rootPubkey)
+        relayUrls = relayList.read
       }
-    } else if (rootInfo.type === 'A') {
-      filters.push(
-        {
-          '#a': [rootInfo.id],
+      relayUrls = relayUrls.concat(BIG_RELAY_URLS).slice(0, 4)
+
+      // If current event is protected, we can assume its replies are also protected and stored on the same relays
+      if (event && isProtectedEvent(event)) {
+        const seenOn = client.getSeenEventRelayUrls(event.id)
+        relayUrls.concat(...seenOn)
+      }
+
+      const filters: (Omit<Filter, 'since' | 'until'> & {
+        limit: number
+      })[] = []
+      if (rootInfo.type === 'E') {
+        filters.push({
+          '#e': [rootInfo.id],
           kinds: [kinds.ShortTextNote],
           limit
-        },
-        {
-          '#A': [rootInfo.id],
-          kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-          limit
+        })
+        if (event?.kind !== kinds.ShortTextNote) {
+          filters.push({
+            '#E': [rootInfo.id],
+            kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
+            limit
+          })
         }
-      )
-      if (rootInfo.relay) {
-        relayUrls.push(rootInfo.relay)
-      }
-    } else {
-      filters.push({
-        '#I': [rootInfo.id],
-        kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-        limit
-      })
-    }
-
-    return new Promise<void>((resolve) => {
-      client
-        .subscribeTimeline(
-          filters.map((filter) => ({
-            urls: relayUrls.slice(0, 8),
-            filter
-          })),
+      } else if (rootInfo.type === 'A') {
+        filters.push(
           {
-            onEvents: (events, eosed) => {
-              if (events.length > 0) {
-                this.addRepliesToThread(events)
-              }
-              if (eosed) {
-                subscription.until =
-                  events.length >= limit ? events[events.length - 1].created_at - 1 : undefined
-                resolve()
-              }
-            },
-            onNew: (evt) => {
-              this.addRepliesToThread([evt])
-            }
+            '#a': [rootInfo.id],
+            kinds: [kinds.ShortTextNote],
+            limit
+          },
+          {
+            '#A': [rootInfo.id],
+            kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
+            limit
           }
         )
-        .then(({ closer, timelineKey }) => {
-          subscription.closer = closer
-          subscription.timelineKey = timelineKey
+        if (rootInfo.relay) {
+          relayUrls.push(rootInfo.relay)
+        }
+      } else {
+        filters.push({
+          '#I': [rootInfo.id],
+          kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
+          limit
         })
-        .catch(() => {
-          this.subscriptions.delete(rootInfo.id)
-          resolve()
-        })
+      }
+      const { closer, timelineKey } = await client.subscribeTimeline(
+        filters.map((filter) => ({
+          urls: relayUrls.slice(0, 8),
+          filter
+        })),
+        {
+          onEvents: (events, eosed) => {
+            if (events.length > 0) {
+              this.addRepliesToThread(events)
+            }
+            if (eosed) {
+              const subscription = this.subscriptions.get(rootInfo.id)
+              if (subscription) {
+                subscription.until =
+                  events.length >= limit ? events[events.length - 1].created_at - 1 : undefined
+              }
+            }
+          },
+          onNew: (evt) => {
+            this.addRepliesToThread([evt])
+          }
+        }
+      )
+      return { closer, timelineKey }
+    }
+
+    const promise = _subscribe()
+    this.subscriptions.set(rootInfo.id, {
+      promise,
+      count: 1,
+      until: dayjs().unix()
     })
+    await promise
   }
 
   async unsubscribe(stuff: NostrEvent | string) {
@@ -162,7 +162,9 @@ class ThreadService {
       subscription.count -= 1
       if (subscription.count <= 0) {
         this.subscriptions.delete(rootInfo.id)
-        subscription.closer?.()
+        subscription.promise.then(({ closer }) => {
+          closer()
+        })
       }
     }, 2000)
   }
@@ -172,12 +174,13 @@ class ThreadService {
     if (!rootInfo) return false
 
     const subscription = this.subscriptions.get(rootInfo.id)
-    if (!subscription) return false
+    if (!subscription || !subscription.until) return false
 
-    const { timelineKey, until } = subscription
-    if (!timelineKey || !until) return false
+    const { timelineKey } = await subscription.promise
+    console.log('loadMore', { timelineKey, until: subscription.until })
+    if (!timelineKey) return false
 
-    const events = await client.loadMoreTimeline(timelineKey, until, limit)
+    const events = await client.loadMoreTimeline(timelineKey, subscription.until, limit)
     this.addRepliesToThread(events)
 
     const { event } = this.resolveStuff(stuff)
