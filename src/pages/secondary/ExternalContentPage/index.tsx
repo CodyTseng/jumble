@@ -33,7 +33,7 @@ const ExternalContentPage = forwardRef(({ index }: { index?: number }, ref) => {
         <StuffStats className="mt-3" stuff={id} fetchIfNotExisting displayTopZapsAndLikes />
       </div>
       <Separator className="mt-4" />
-      <ExternalContentInteractions pageIndex={index} externalContent={id} />
+      <ExternalContentInteractions externalContent={id} />
     </SecondaryPageLayout>
   )
 })

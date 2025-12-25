@@ -12,9 +12,9 @@ import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinnedUsers } from '@/providers/PinnedUsersProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
+import threadService from '@/services/thread.service'
 import userAggregationService, { TUserAggregation } from '@/services/user-aggregation.service'
 import { TFeedSubRequest } from '@/types'
 import dayjs from 'dayjs'
@@ -71,7 +71,6 @@ const UserAggregationList = forwardRef<
     const { pinnedPubkeySet } = usePinnedUsers()
     const { hideContentMentioningMutedUsers } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
-    const { addReplies } = useReply()
     const [since, setSince] = useState(() => dayjs().subtract(1, 'day').unix())
     const [events, setEvents] = useState<Event[]>([])
     const [newEvents, setNewEvents] = useState<Event[]>([])
@@ -156,14 +155,14 @@ const UserAggregationList = forwardRef<
               if (eosed) {
                 setLoading(false)
                 setHasMore(events.length > 0)
-                addReplies(events)
+                threadService.addRepliesToThread(events)
               }
             },
             onNew: (event) => {
               setNewEvents((oldEvents) =>
                 [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
               )
-              addReplies([event])
+              threadService.addRepliesToThread([event])
             },
             onClose: (url, reason) => {
               if (!showRelayCloseReason) return

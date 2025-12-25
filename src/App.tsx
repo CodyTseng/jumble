@@ -15,7 +15,6 @@ import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
 import { PinnedUsersProvider } from '@/providers/PinnedUsersProvider'
-import { ReplyProvider } from '@/providers/ReplyProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
@@ -43,14 +42,12 @@ export default function App(): JSX.Element {
                                 <PinListProvider>
                                   <PinnedUsersProvider>
                                     <FeedProvider>
-                                      <ReplyProvider>
-                                        <MediaUploadServiceProvider>
-                                          <KindFilterProvider>
-                                            <PageManager />
-                                            <Toaster />
-                                          </KindFilterProvider>
-                                        </MediaUploadServiceProvider>
-                                      </ReplyProvider>
+                                      <MediaUploadServiceProvider>
+                                        <KindFilterProvider>
+                                          <PageManager />
+                                          <Toaster />
+                                        </KindFilterProvider>
+                                      </MediaUploadServiceProvider>
                                     </FeedProvider>
                                   </PinnedUsersProvider>
                                 </PinListProvider>

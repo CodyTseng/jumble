@@ -10,18 +10,12 @@ import RepostList from '../RepostList'
 import ZapList from '../ZapList'
 import { Tabs, TTabValue } from './Tabs'
 
-export default function NoteInteractions({
-  pageIndex,
-  event
-}: {
-  pageIndex?: number
-  event: Event
-}) {
+export default function NoteInteractions({ event }: { event: Event }) {
   const [type, setType] = useState<TTabValue>('replies')
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList index={pageIndex} stuff={event} />
+      list = <ReplyNoteList stuff={event} />
       break
     case 'quotes':
       list = <QuoteList stuff={event} />

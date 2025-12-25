@@ -1,53 +1,31 @@
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { useStuff } from '@/hooks/useStuff'
-import {
-  getEventKey,
-  getReplaceableCoordinateFromEvent,
-  getRootTag,
-  isMentioningMutedUsers,
-  isProtectedEvent,
-  isReplaceableEvent
-} from '@/lib/event'
-import { generateBech32IdFromETag } from '@/lib/tag'
-import { useSecondaryPage } from '@/PageManager'
+import { useAllDescendantThreads } from '@/hooks/useThread'
+import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
-import client from '@/services/client.service'
-import { Filter, Event as NEvent, kinds } from 'nostr-tools'
+import threadService from '@/services/thread.service'
+import { Event as NEvent } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoadingBar } from '../LoadingBar'
 import ReplyNote, { ReplyNoteSkeleton } from '../ReplyNote'
 import SubReplies from './SubReplies'
 
-type TRootInfo =
-  | { type: 'E'; id: string; pubkey: string }
-  | { type: 'A'; id: string; pubkey: string; relay?: string }
-  | { type: 'I'; id: string }
-
 const LIMIT = 100
 const SHOW_COUNT = 10
 
-export default function ReplyNoteList({
-  stuff,
-  index
-}: {
-  stuff: NEvent | string
-  index?: number
-}) {
+export default function ReplyNoteList({ stuff }: { stuff: NEvent | string }) {
   const { t } = useTranslation()
-  const { currentIndex } = useSecondaryPage()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
-  const [rootInfo, setRootInfo] = useState<TRootInfo | undefined>(undefined)
-  const { repliesMap, addReplies } = useReply()
-  const { event, externalContent, stuffKey } = useStuff(stuff)
+  const { stuffKey } = useStuff(stuff)
+  const allThreads = useAllDescendantThreads(stuffKey)
   const replies = useMemo(() => {
     const replyKeySet = new Set<string>()
-    const replyEvents = (repliesMap.get(stuffKey)?.events || []).filter((evt) => {
+    const thread = allThreads.get(stuffKey) || []
+    const replyEvents = thread.filter((evt) => {
       const key = getEventKey(evt)
       if (replyKeySet.has(key)) return false
       if (mutePubkeySet.has(evt.pubkey)) return false
@@ -56,11 +34,11 @@ export default function ReplyNoteList({
       }
       if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
         const replyKey = getEventKey(evt)
-        const repliesForThisReply = repliesMap.get(replyKey)
+        const repliesForThisReply = allThreads.get(replyKey)
         // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
         if (
           !repliesForThisReply ||
-          repliesForThisReply.events.every((evt) => !isUserTrusted(evt.pubkey))
+          repliesForThisReply.every((evt) => !isUserTrusted(evt.pubkey))
         ) {
           return false
         }
@@ -72,155 +50,29 @@ export default function ReplyNoteList({
     return replyEvents.sort((a, b) => b.created_at - a.created_at)
   }, [
     stuffKey,
-    repliesMap,
+    allThreads,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
     hideUntrustedInteractions
   ])
-  const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
-  const [until, setUntil] = useState<number | undefined>(undefined)
+  const [hasMore, setHasMore] = useState(true)
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const [loading, setLoading] = useState<boolean>(false)
   const loadingRef = useRef(false)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const fetchRootEvent = async () => {
-      if (!event && !externalContent) return
+    loadingRef.current = true
+    setLoading(true)
+    threadService.subscribe(stuff, LIMIT).finally(() => {
+      loadingRef.current = false
+      setLoading(false)
+    })
 
-      let root: TRootInfo = event
-        ? isReplaceableEvent(event.kind)
-          ? {
-              type: 'A',
-              id: getReplaceableCoordinateFromEvent(event),
-              pubkey: event.pubkey,
-              relay: client.getEventHint(event.id)
-            }
-          : { type: 'E', id: event.id, pubkey: event.pubkey }
-        : { type: 'I', id: externalContent! }
-
-      const rootTag = getRootTag(event)
-      if (rootTag?.type === 'e') {
-        const [, rootEventHexId, , , rootEventPubkey] = rootTag.tag
-        if (rootEventHexId && rootEventPubkey) {
-          root = { type: 'E', id: rootEventHexId, pubkey: rootEventPubkey }
-        } else {
-          const rootEventId = generateBech32IdFromETag(rootTag.tag)
-          if (rootEventId) {
-            const rootEvent = await client.fetchEvent(rootEventId)
-            if (rootEvent) {
-              root = { type: 'E', id: rootEvent.id, pubkey: rootEvent.pubkey }
-            }
-          }
-        }
-      } else if (rootTag?.type === 'a') {
-        const [, coordinate, relay] = rootTag.tag
-        const [, pubkey] = coordinate.split(':')
-        root = { type: 'A', id: coordinate, pubkey, relay }
-      } else if (rootTag?.type === 'i') {
-        root = { type: 'I', id: rootTag.tag[1] }
-      }
-      setRootInfo(root)
-    }
-    fetchRootEvent()
-  }, [event])
-
-  useEffect(() => {
-    if (loadingRef.current || !rootInfo || currentIndex !== index) return
-
-    const init = async () => {
-      loadingRef.current = true
-      setLoading(true)
-
-      try {
-        let relayUrls: string[] = []
-        const rootPubkey = (rootInfo as { pubkey?: string }).pubkey ?? event?.pubkey
-        if (rootPubkey) {
-          const relayList = await client.fetchRelayList(rootPubkey)
-          relayUrls = relayList.read
-        }
-        relayUrls = relayUrls.concat(BIG_RELAY_URLS).slice(0, 4)
-
-        // If current event is protected, we can assume its replies are also protected and stored on the same relays
-        if (event && isProtectedEvent(event)) {
-          const seenOn = client.getSeenEventRelayUrls(event.id)
-          relayUrls.concat(...seenOn)
-        }
-
-        const filters: (Omit<Filter, 'since' | 'until'> & {
-          limit: number
-        })[] = []
-        if (rootInfo.type === 'E') {
-          filters.push({
-            '#e': [rootInfo.id],
-            kinds: [kinds.ShortTextNote],
-            limit: LIMIT
-          })
-          if (event?.kind !== kinds.ShortTextNote) {
-            filters.push({
-              '#E': [rootInfo.id],
-              kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-              limit: LIMIT
-            })
-          }
-        } else if (rootInfo.type === 'A') {
-          filters.push(
-            {
-              '#a': [rootInfo.id],
-              kinds: [kinds.ShortTextNote],
-              limit: LIMIT
-            },
-            {
-              '#A': [rootInfo.id],
-              kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-              limit: LIMIT
-            }
-          )
-          if (rootInfo.relay) {
-            relayUrls.push(rootInfo.relay)
-          }
-        } else {
-          filters.push({
-            '#I': [rootInfo.id],
-            kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-            limit: LIMIT
-          })
-        }
-        const { closer, timelineKey } = await client.subscribeTimeline(
-          filters.map((filter) => ({
-            urls: relayUrls.slice(0, 8),
-            filter
-          })),
-          {
-            onEvents: (evts, eosed) => {
-              if (evts.length > 0) {
-                addReplies(evts)
-              }
-              if (eosed) {
-                loadingRef.current = false
-                setUntil(evts.length >= LIMIT ? evts[evts.length - 1].created_at - 1 : undefined)
-                setLoading(false)
-              }
-            },
-            onNew: (evt) => {
-              addReplies([evt])
-            }
-          }
-        )
-        setTimelineKey(timelineKey)
-        return closer
-      } catch {
-        loadingRef.current = false
-        setLoading(false)
-      }
-      return
-    }
-
-    const promise = init()
     return () => {
-      promise.then((closer) => closer?.())
+      threadService.unsubscribe(stuff)
     }
-  }, [rootInfo, currentIndex, index])
+  }, [stuff])
 
   useEffect(() => {
     const options = {
@@ -238,23 +90,20 @@ export default function ReplyNoteList({
         }
       }
 
-      if (loadingRef.current || !until || !timelineKey) return
+      if (loadingRef.current) return
+
       loadingRef.current = true
       setLoading(true)
-      const events = await client.loadMoreTimeline(timelineKey, until, LIMIT)
-      addReplies(events)
 
-      let newUntil = events.length ? events[events.length - 1].created_at - 1 : undefined
-      if (newUntil && event && newUntil < event.created_at) {
-        newUntil = undefined
-      }
-      setUntil(newUntil)
+      const newHasMore = await threadService.loadMore(stuff, LIMIT)
+
+      setHasMore(newHasMore)
       loadingRef.current = false
       setLoading(false)
     }
 
     const observerInstance = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !!until) {
+      if (entries[0].isIntersecting && hasMore) {
         loadMore()
       }
     }, options)
@@ -270,7 +119,7 @@ export default function ReplyNoteList({
         observerInstance.unobserve(currentBottomRef)
       }
     }
-  }, [replies, showCount, until, timelineKey, loading, event])
+  }, [replies, showCount, loading, stuff, hasMore])
 
   return (
     <div className="min-h-[80vh]">
@@ -280,7 +129,7 @@ export default function ReplyNoteList({
           <Item key={reply.id} reply={reply} />
         ))}
       </div>
-      {!!until || showCount < replies.length || loading ? (
+      {hasMore || showCount < replies.length || loading ? (
         <ReplyNoteSkeleton />
       ) : (
         <div className="text-sm mt-2 mb-3 text-center text-muted-foreground">

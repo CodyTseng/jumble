@@ -1,10 +1,10 @@
 import { useStuff } from '@/hooks/useStuff'
+import { useAllDescendantThreads } from '@/hooks/useThread'
 import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { MessageCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -17,23 +17,23 @@ export default function ReplyButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { pubkey, checkLogin } = useNostr()
   const { event, stuffKey } = useStuff(stuff)
-  const { repliesMap } = useReply()
+  const allThreads = useAllDescendantThreads(stuffKey)
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const { replyCount, hasReplied } = useMemo(() => {
     const hasReplied = pubkey
-      ? repliesMap.get(stuffKey)?.events.some((evt) => evt.pubkey === pubkey)
+      ? allThreads.get(stuffKey)?.some((evt) => evt.pubkey === pubkey)
       : false
 
     let replyCount = 0
-    const replies = [...(repliesMap.get(stuffKey)?.events || [])]
+    const replies = [...(allThreads.get(stuffKey) ?? [])]
     while (replies.length > 0) {
       const reply = replies.pop()
       if (!reply) break
 
       const replyKey = getEventKey(reply)
-      const nestedReplies = repliesMap.get(replyKey)?.events ?? []
+      const nestedReplies = allThreads.get(replyKey) ?? []
       replies.push(...nestedReplies)
 
       if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
@@ -49,7 +49,7 @@ export default function ReplyButton({ stuff }: { stuff: Event | string }) {
     }
 
     return { replyCount, hasReplied }
-  }, [repliesMap, event, stuffKey, hideUntrustedInteractions])
+  }, [allThreads, event, stuffKey, hideUntrustedInteractions])
   const [open, setOpen] = useState(false)
 
   return (

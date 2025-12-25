@@ -4,10 +4,10 @@ import { isTouchDevice } from '@/lib/utils'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
 import stuffStatsService from '@/services/stuff-stats.service'
+import threadService from '@/services/thread.service'
 import { TNotificationType } from '@/types'
 import dayjs from 'dayjs'
 import { NostrEvent, kinds, matchFilter } from 'nostr-tools'
@@ -37,7 +37,6 @@ const NotificationList = forwardRef((_, ref) => {
   const { pubkey } = useNostr()
   const { getNotificationsSeenAt } = useNotification()
   const { notificationListStyle } = useUserPreferences()
-  const { addReplies } = useReply()
   const [notificationType, setNotificationType] = useState<TNotificationType>('all')
   const [lastReadTime, setLastReadTime] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
@@ -143,13 +142,13 @@ const NotificationList = forwardRef((_, ref) => {
             if (eosed) {
               setLoading(false)
               setUntil(events.length > 0 ? events[events.length - 1].created_at - 1 : undefined)
-              addReplies(events)
+              threadService.addRepliesToThread(events)
               stuffStatsService.updateStuffStatsByEvents(events)
             }
           },
           onNew: (event) => {
             handleNewEvent(event)
-            addReplies([event])
+            threadService.addRepliesToThread([event])
           }
         }
       )

@@ -1,11 +1,11 @@
 import { useSecondaryPage } from '@/PageManager'
+import { useAllDescendantThreads } from '@/hooks/useThread'
 import { getEventKey, getKeyFromTag, getParentTag, isMentioningMutedUsers } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
@@ -16,7 +16,7 @@ import ReplyNote from '../ReplyNote'
 export default function SubReplies({ parentKey }: { parentKey: string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { repliesMap } = useReply()
+  const allThreads = useAllDescendantThreads(parentKey)
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
@@ -27,7 +27,7 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
 
     let parentKeys = [parentKey]
     while (parentKeys.length > 0) {
-      const events = parentKeys.flatMap((key) => repliesMap.get(key)?.events || [])
+      const events = parentKeys.flatMap((key) => allThreads.get(key) ?? [])
       events.forEach((evt) => {
         const key = getEventKey(evt)
         if (replyKeySet.has(key)) return
@@ -35,11 +35,11 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
         if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) return
         if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
           const replyKey = getEventKey(evt)
-          const repliesForThisReply = repliesMap.get(replyKey)
+          const repliesForThisReply = allThreads.get(replyKey)
           // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
           if (
             !repliesForThisReply ||
-            repliesForThisReply.events.every((evt) => !isUserTrusted(evt.pubkey))
+            repliesForThisReply.every((evt) => !isUserTrusted(evt.pubkey))
           ) {
             return
           }
@@ -53,7 +53,7 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
     return replyEvents.sort((a, b) => a.created_at - b.created_at)
   }, [
     parentKey,
-    repliesMap,
+    allThreads,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
     hideUntrustedInteractions

@@ -1,12 +1,12 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useThread } from '@/hooks/useThread'
 import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event } from 'nostr-tools'
@@ -44,7 +44,8 @@ export default function ReplyNote({
   const { mutePubkeySet } = useMuteList()
   const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
-  const { repliesMap } = useReply()
+  const eventKey = useMemo(() => getEventKey(event), [event])
+  const replies = useThread(eventKey)
   const [showMuted, setShowMuted] = useState(false)
   const show = useMemo(() => {
     if (showMuted) {
@@ -59,8 +60,6 @@ export default function ReplyNote({
     return true
   }, [showMuted, mutePubkeySet, event, hideContentMentioningMutedUsers])
   const hasReplies = useMemo(() => {
-    const key = getEventKey(event)
-    const replies = repliesMap.get(key)?.events
     if (!replies || replies.length === 0) {
       return false
     }
@@ -77,7 +76,7 @@ export default function ReplyNote({
       }
       return true
     }
-  }, [event, repliesMap])
+  }, [replies])
 
   return (
     <div

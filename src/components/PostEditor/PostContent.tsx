@@ -11,8 +11,8 @@ import {
 } from '@/lib/draft-event'
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
+import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
 import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
@@ -42,7 +42,6 @@ export default function PostContent({
 }) {
   const { t } = useTranslation()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { addReplies } = useReply()
   const [text, setText] = useState('')
   const textareaRef = useRef<TPostTextareaHandle>(null)
   const [posting, setPosting] = useState(false)
@@ -157,7 +156,7 @@ export default function PostContent({
         })
         postEditorCache.clearPostCache({ defaultContent, parentStuff })
         deleteDraftEventCache(draftEvent)
-        addReplies([newEvent])
+        threadService.addRepliesToThread([newEvent])
         toast.success(t('Post successful'), { duration: 2000 })
         close()
       } catch (error) {

@@ -8,17 +8,15 @@ import ReplyNoteList from '../ReplyNoteList'
 import { Tabs, TTabValue } from './Tabs'
 
 export default function ExternalContentInteractions({
-  pageIndex,
   externalContent
 }: {
-  pageIndex?: number
   externalContent: string
 }) {
   const [type, setType] = useState<TTabValue>('replies')
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList index={pageIndex} stuff={externalContent} />
+      list = <ReplyNoteList stuff={externalContent} />
       break
     case 'reactions':
       list = <ReactionList stuff={externalContent} />
