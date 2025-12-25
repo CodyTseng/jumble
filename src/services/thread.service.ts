@@ -116,6 +116,10 @@ class ThreadService {
           limit
         })
       }
+      let resolve: () => void
+      const _promise = new Promise<void>((res) => {
+        resolve = res
+      })
       const { closer, timelineKey } = await client.subscribeTimeline(
         filters.map((filter) => ({
           urls: relayUrls.slice(0, 8),
@@ -132,6 +136,7 @@ class ThreadService {
                 subscription.until =
                   events.length >= limit ? events[events.length - 1].created_at - 1 : undefined
               }
+              resolve()
             }
           },
           onNew: (evt) => {
@@ -139,6 +144,7 @@ class ThreadService {
           }
         }
       )
+      await _promise
       return { closer, timelineKey }
     }
 
@@ -174,11 +180,12 @@ class ThreadService {
     if (!rootInfo) return false
 
     const subscription = this.subscriptions.get(rootInfo.id)
-    if (!subscription || !subscription.until) return false
+    if (!subscription) return false
 
     const { timelineKey } = await subscription.promise
-    console.log('loadMore', { timelineKey, until: subscription.until })
     if (!timelineKey) return false
+
+    if (!subscription.until) return false
 
     const events = await client.loadMoreTimeline(timelineKey, subscription.until, limit)
     this.addRepliesToThread(events)
