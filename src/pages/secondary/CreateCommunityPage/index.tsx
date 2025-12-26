@@ -197,7 +197,7 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground" dir="auto">
             {t('Create a new GitHub repository for your community. The repository name will become part of your domain (e.g., "my-community" becomes "my-community.github.io").')}
           </p>
           <Button
@@ -205,7 +205,7 @@ function GithubPagesInstructions() {
             className="w-full"
             onClick={() => window.open('https://github.com/new', '_blank')}
           >
-            <Github className="w-4 h-4 mr-2" />
+            <Github className="w-4 h-4 me-2" />
             {t('Create New Repository on GitHub')}
           </Button>
         </CardContent>
@@ -229,12 +229,12 @@ function GithubPagesInstructions() {
 
           <div className="space-y-3">
             <Label className="text-base">{t('How to create the .well-known directory on GitHub:')}</Label>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ms-2" dir="auto">
               <li>{t('Go to your repository on GitHub')}</li>
               <li>{t('Click "Add file" → "Create new file"')}</li>
               <li>
                 {t('In the file name box, type')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">.well-known/nostr.json</code>
-                <div className="text-xs mt-1 ml-6 text-muted-foreground/80">
+                <div className="text-xs mt-1 ms-6 text-muted-foreground/80">
                   {t('GitHub will automatically create the .well-known directory when you include the / in the filename')}
                 </div>
               </li>
@@ -247,10 +247,10 @@ function GithubPagesInstructions() {
             <Label>{t('Expected File Structure')}</Label>
             <div className="bg-muted p-4 rounded-lg space-y-2 font-mono text-xs">
               <div>your-repo/</div>
-              <div className="ml-4">├── .well-known/</div>
-              <div className="ml-8">│   └── nostr.json</div>
-              <div className="ml-4">├── .nojekyll</div>
-              <div className="ml-4">└── favicon.png (or .svg, .ico)</div>
+              <div className="ms-4">├── .well-known/</div>
+              <div className="ms-8">│   └── nostr.json</div>
+              <div className="ms-4">├── .nojekyll</div>
+              <div className="ms-4">└── favicon.png (or .svg, .ico)</div>
             </div>
           </div>
 
@@ -263,7 +263,7 @@ function GithubPagesInstructions() {
                   size="sm"
                   onClick={() => handleCopyText(getNostrJsonTemplate())}
                 >
-                  <Copy className="w-4 h-4 mr-2" />
+                  <Copy className="w-4 h-4 me-2" />
                   {t('Copy')}
                 </Button>
                 <Button
@@ -271,7 +271,7 @@ function GithubPagesInstructions() {
                   size="sm"
                   onClick={() => downloadFile('nostr.json', getNostrJsonTemplate())}
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 me-2" />
                   {t('Download')}
                 </Button>
               </div>
@@ -300,10 +300,10 @@ function GithubPagesInstructions() {
           </Alert>
 
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" dir="auto">
               {t('Supported formats')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.svg</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.png</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">favicon.ico</code>
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" dir="auto">
               {t('You can create a favicon using online tools like')} <a href="https://favicon.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">favicon.io</a>
             </p>
           </div>
@@ -327,10 +327,10 @@ function GithubPagesInstructions() {
           </Alert>
 
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" dir="auto">
               {t('The theme.json file allows you to set:')}
             </p>
-            <ul className="list-disc list-inside text-sm text-muted-foreground ml-2 space-y-1">
+            <ul className="list-disc list-inside text-sm text-muted-foreground ms-2 space-y-1" dir="auto">
               <li>{t('Theme setting: light, dark, pure-black, or system')}</li>
               <li>{t('Primary color: from a preset palette of colors')}</li>
             </ul>
@@ -345,7 +345,7 @@ function GithubPagesInstructions() {
                   size="sm"
                   onClick={() => handleCopyText(getThemeJsonTemplate())}
                 >
-                  <Copy className="w-4 h-4 mr-2" />
+                  <Copy className="w-4 h-4 me-2" />
                   {t('Copy')}
                 </Button>
                 <Button
@@ -353,7 +353,7 @@ function GithubPagesInstructions() {
                   size="sm"
                   onClick={() => downloadFile('theme.json', getThemeJsonTemplate())}
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 me-2" />
                   {t('Download')}
                 </Button>
               </div>
@@ -365,7 +365,7 @@ function GithubPagesInstructions() {
 
           <div className="space-y-2">
             <Label>{t('Available Options')}</Label>
-            <div className="text-sm space-y-2">
+            <div className="text-sm space-y-2" dir="auto">
               <div>
                 <strong>{t('Theme Setting')}:</strong> <code className="bg-muted px-1.5 py-0.5 rounded text-xs">light</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">dark</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">pure-black</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">system</code>
               </div>
@@ -377,7 +377,7 @@ function GithubPagesInstructions() {
 
           <div className="space-y-3">
             <Label className="text-base">{t('How to add theme.json:')}</Label>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ms-2" dir="auto">
               <li>{t('Go to your repository on GitHub')}</li>
               <li>{t('Click "Add file" → "Create new file"')}</li>
               <li>
@@ -408,7 +408,7 @@ function GithubPagesInstructions() {
 
           <div className="space-y-3">
             <Label className="text-base">{t('How to add .nojekyll file:')}</Label>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ms-2" dir="auto">
               <li>{t('Go to your repository on GitHub')}</li>
               <li>{t('Click "Add file" → "Create new file"')}</li>
               <li>
@@ -430,7 +430,7 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+          <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground" dir="auto">
             <li>{t('Go to your repository settings on GitHub')}</li>
             <li>{t('Scroll down to the "Pages" section in the left sidebar')}</li>
             <li>{t('Under "Source", select the branch you want to deploy (usually "main" or "master")')}</li>
@@ -450,16 +450,16 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground" dir="auto">
             {t('If you own a custom domain, you can use it instead of the default github.io domain.')}
           </p>
           <div className="space-y-3">
             <Label className="text-base">{t('How to set up a custom domain:')}</Label>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ms-2" dir="auto">
               <li>{t('In your repository\'s GitHub Pages settings, enter your custom domain (e.g., community.example.com)')}</li>
               <li>
                 {t('Add a CNAME record in your domain\'s DNS settings pointing to')}:
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs ml-1">&lt;username&gt;.github.io</code>
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs ms-1">&lt;username&gt;.github.io</code>
               </li>
               <li>{t('Wait for DNS propagation (this can take up to 24-48 hours)')}</li>
               <li>{t('Enable "Enforce HTTPS" in GitHub Pages settings once the domain is verified')}</li>
@@ -489,7 +489,7 @@ function GithubPagesInstructions() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground" dir="auto">
             {t('Test your community setup by entering your domain. We\'ll check if your files are accessible.')}
           </p>
 
@@ -609,7 +609,7 @@ function GithubPagesInstructions() {
 
                   <div className="p-4 border rounded-lg bg-muted/50 space-y-2">
                     <p className="text-sm font-medium">{t('Troubleshooting tips:')}</p>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ms-2" dir="auto">
                       <li>{t('Make sure GitHub Pages is enabled and deployed')}</li>
                       <li>{t('Check that your files are in the correct location')}</li>
                       <li>{t('Ensure nostr.json has valid JSON with a "names" object')}</li>
@@ -694,7 +694,7 @@ function MemberSearchInput({
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder={t('Search by name, npub, or NIP-05...')}
           value={searchInput}
@@ -707,7 +707,7 @@ function MemberSearchInput({
               handleDirectInput()
             }
           }}
-          className="pl-10"
+          className="ps-10"
         />
       </div>
 
@@ -932,11 +932,11 @@ function ManageMembersSection() {
           </pre>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCopyJson} className="flex-1">
-              <Copy className="w-4 h-4 mr-2" />
+              <Copy className="w-4 h-4 me-2" />
               {t('Copy')}
             </Button>
             <Button variant="outline" onClick={handleDownloadJson} className="flex-1">
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4 me-2" />
               {t('Download')}
             </Button>
           </div>
@@ -1200,7 +1200,7 @@ function JoinRequestCard({ request }: { request: any }) {
         </div>
 
         {request.content && (
-          <div className="text-sm text-muted-foreground italic pl-2 border-l-2 border-muted">
+          <div className="text-sm text-muted-foreground italic ps-2 border-s-2 border-muted">
             "{request.content}"
           </div>
         )}
@@ -1214,7 +1214,7 @@ function JoinRequestCard({ request }: { request: any }) {
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleCopyPubkey} className="gap-2">
               <Copy className="w-3 h-3" />
-              {t('Copy Pubkey')}
+              <span>{t('Copy Pubkey')}</span>
             </Button>
             {!isApproved && (
               <Button
@@ -1225,7 +1225,7 @@ function JoinRequestCard({ request }: { request: any }) {
                 className="gap-2"
               >
                 <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} />
-                {t('Check Status')}
+                <span>{t('Check Status')}</span>
               </Button>
             )}
           </div>
