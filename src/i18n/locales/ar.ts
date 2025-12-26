@@ -526,6 +526,116 @@ export default {
     'Last 24 hours': 'آخر 24 ساعة',
     'Last {{count}} days': 'آخر {{count}} أيام',
     notes: 'ملاحظات',
-    'User Posts': 'منشورات المستخدم'
+    'User Posts': 'منشورات المستخدم',
+
+    // Create A Community Page Translations
+    'Create A Community': 'إنشاء مجتمع',
+    'Community Setup': 'إعداد المجتمع',
+    Instructions: 'التعليمات',
+    'Manage Members': 'إدارة الأعضاء',
+    'Join Requests': 'طلبات الانضمام',
+
+    // Step 1: Create GitHub Repository
+    'Create GitHub Repository': 'إنشاء مستودع GitHub',
+    'Create a new GitHub repository for your community. The repository name will become part of your domain (e.g., "my-community" becomes "my-community.github.io").': 'قم بإنشاء مستودع GitHub جديد لمجتمعك. سيصبح اسم المستودع جزءًا من نطاقك (مثل "my-community" يصبح "my-community.github.io").',
+    'Create New Repository on GitHub': 'إنشاء مستودع جديد على GitHub',
+
+    // Step 2: Create nostr.json File
+    'Create nostr.json File': 'إنشاء ملف nostr.json',
+    'Create a .well-known directory in your repository and add a nostr.json file with your community members.': 'قم بإنشاء دليل .well-known في مستودعك وأضف ملف nostr.json مع أعضاء مجتمعك.',
+    'How to create the .well-known directory on GitHub:': 'كيفية إنشاء دليل .well-known على GitHub:',
+    'Go to your repository on GitHub': 'انتقل إلى مستودعك على GitHub',
+    'Click "Add file" → "Create new file"': 'انقر على "Add file" ← "Create new file"',
+    'In the file name box, type': 'في مربع اسم الملف، اكتب',
+    'GitHub will automatically create the .well-known directory when you include the / in the filename': 'سيقوم GitHub تلقائيًا بإنشاء دليل .well-known عند تضمين / في اسم الملف',
+    'Paste the nostr.json content below into the file editor': 'الصق محتوى nostr.json أدناه في محرر الملف',
+    'Click "Commit changes" at the bottom': 'انقر على "Commit changes" في الأسفل',
+    'Expected File Structure': 'بنية الملف المتوقعة',
+    'nostr.json Template': 'قالب nostr.json',
+
+    // Step 3: Add Favicon
+    'Add Community Favicon': 'إضافة أيقونة المجتمع',
+    'Add a favicon file to the root of your repository. This will be used as your community icon.': 'أضف ملف أيقونة إلى جذر مستودعك. سيتم استخدامه كرمز لمجتمعك.',
+    'Supported formats': 'التنسيقات المدعومة',
+    'You can create a favicon using online tools like': 'يمكنك إنشاء أيقونة باستخدام أدوات عبر الإنترنت مثل',
+
+    // Step 4: Add Theme (Optional)
+    'How to add theme.json:': 'كيفية إضافة theme.json:',
+
+    // Step 5: Add .nojekyll
+    'Add .nojekyll File': 'إضافة ملف .nojekyll',
+    'Critical Step': 'خطوة مهمة',
+    'GitHub Pages uses Jekyll by default, which ignores directories starting with a dot (like .well-known). You must disable Jekyll to make your community accessible.': 'يستخدم GitHub Pages Jekyll افتراضيًا، والذي يتجاهل الدلائل التي تبدأ بنقطة (مثل .well-known). يجب عليك تعطيل Jekyll لجعل مجتمعك متاحًا.',
+    'How to add .nojekyll file:': 'كيفية إضافة ملف .nojekyll:',
+    'Leave the file content empty (no text needed)': 'اترك محتوى الملف فارغًا (لا حاجة لنص)',
+
+    // Step 6: Enable GitHub Pages
+    'Enable GitHub Pages': 'تفعيل GitHub Pages',
+    'Go to your repository settings on GitHub': 'انتقل إلى إعدادات مستودعك على GitHub',
+    'Scroll down to the "Pages" section in the left sidebar': 'قم بالتمرير لأسفل إلى قسم "Pages" في الشريط الجانبي الأيسر',
+    'Under "Source", select the branch you want to deploy (usually "main" or "master")': 'ضمن "Source"، حدد الفرع الذي تريد نشره (عادةً "main" أو "master")',
+    'Click "Save"': 'انقر على "Save"',
+    'Wait a few minutes for GitHub to deploy your site': 'انتظر بضع دقائق حتى يقوم GitHub بنشر موقعك',
+    'Your community will be available at: your-username.github.io/your-repo-name': 'سيكون مجتمعك متاحًا على: your-username.github.io/your-repo-name',
+
+    // Step 7: Custom Domain (Optional)
+    'Custom Domain (Optional)': 'نطاق مخصص (اختياري)',
+    'If you own a custom domain, you can use it instead of the default github.io domain.': 'إذا كنت تمتلك نطاقًا مخصصًا، يمكنك استخدامه بدلاً من نطاق github.io الافتراضي.',
+    'How to set up a custom domain:': 'كيفية إعداد نطاق مخصص:',
+    'In your repository\'s GitHub Pages settings, enter your custom domain (e.g., community.example.com)': 'في إعدادات GitHub Pages لمستودعك، أدخل نطاقك المخصص (مثل community.example.com)',
+    'Add a CNAME record in your domain\'s DNS settings pointing to': 'أضف سجل CNAME في إعدادات DNS لنطاقك يشير إلى',
+    'Wait for DNS propagation (this can take up to 24-48 hours)': 'انتظر نشر DNS (قد يستغرق ذلك ما يصل إلى 24-48 ساعة)',
+    'Enable "Enforce HTTPS" in GitHub Pages settings once the domain is verified': 'قم بتفعيل "Enforce HTTPS" في إعدادات GitHub Pages بمجرد التحقق من النطاق',
+    'For more detailed instructions, see GitHub\'s official documentation on': 'لمزيد من التعليمات التفصيلية، راجع توثيق GitHub الرسمي حول',
+    'setting up custom domains': 'إعداد النطاقات المخصصة',
+
+    // Step 8: Verify Setup
+    'Verify Your Setup': 'التحقق من الإعداد',
+    'Test your community setup by entering your domain. We\'ll check if your files are accessible.': 'اختبر إعداد مجتمعك عن طريق إدخال نطاقك. سنتحقق مما إذا كانت ملفاتك قابلة للوصول.',
+    'Your Domain': 'نطاقك',
+    'Verifying...': 'جارٍ التحقق...',
+    Verify: 'تحقق',
+    'Success!': 'نجح!',
+    'Your community is set up correctly!': 'تم إعداد مجتمعك بشكل صحيح!',
+    Favicon: 'الأيقونة',
+    'Favicon found and accessible': 'تم العثور على الأيقونة وهي قابلة للوصول',
+    'Community Members': 'أعضاء المجتمع',
+    'Error': 'خطأ',
+    'Details:': 'التفاصيل:',
+    'Open nostr.json in new tab to debug': 'افتح nostr.json في علامة تبويب جديدة للتصحيح',
+    'Favicon Found': 'تم العثور على الأيقونة',
+    'Favicon is accessible': 'الأيقونة قابلة للوصول',
+    'Troubleshooting tips:': 'نصائح استكشاف الأخطاء:',
+    'Make sure GitHub Pages is enabled and deployed': 'تأكد من تفعيل ونشر GitHub Pages',
+    'Check that your files are in the correct location': 'تحقق من أن ملفاتك في الموقع الصحيح',
+    'Ensure nostr.json has valid JSON with a "names" object': 'تأكد من أن nostr.json يحتوي على JSON صالح مع كائن "names"',
+    'Wait a few minutes for GitHub Pages to update': 'انتظر بضع دقائق حتى يتم تحديث GitHub Pages',
+    'Verify your domain is spelled correctly': 'تحقق من كتابة نطاقك بشكل صحيح',
+    'Review the setup steps above': 'راجع خطوات الإعداد أعلاه',
+
+    // GitHub Integration
+    'Coming Soon': 'قريبًا',
+    'Direct GitHub integration to automatically create and update these files from this page.': 'التكامل المباشر مع GitHub لإنشاء وتحديث هذه الملفات تلقائيًا من هذه الصفحة.',
+
+    // Manage Members Section
+    'Add Community Members': 'إضافة أعضاء المجتمع',
+    'Search for users by name, npub, or NIP-05 identifier': 'ابحث عن المستخدمين بالاسم أو npub أو معرف NIP-05',
+    'Search by name, npub, or NIP-05...': 'البحث بالاسم أو npub أو NIP-05...',
+    'Searching...': 'جارٍ البحث...',
+    'No users found. Try entering a full npub or hex pubkey and press Enter.': 'لم يتم العثور على مستخدمين. حاول إدخال npub كامل أو مفتاح عام بصيغة hex واضغط Enter.',
+    'This user is already in the member list': 'هذا المستخدم موجود بالفعل في قائمة الأعضاء',
+    'Member added successfully': 'تمت إضافة العضو بنجاح',
+    'Member removed': 'تمت إزالة العضو',
+    'Members to Add': 'الأعضاء المراد إضافتهم',
+    'Review and edit member aliases before generating nostr.json': 'راجع وعدّل الأسماء المستعارة للأعضاء قبل إنشاء nostr.json',
+    Username: 'اسم المستخدم',
+    Alias: 'الاسم المستعار',
+    'Public Key': 'المفتاح العام',
+    'Live nostr.json Preview': 'معاينة nostr.json المباشرة',
+    'Your existing nostr.json merged with new members': 'تم دمج nostr.json الموجود مع الأعضاء الجدد',
+    'Generated nostr.json file - copy or download to .well-known/nostr.json': 'ملف nostr.json المُنشأ - انسخه أو قم بتنزيله إلى .well-known/nostr.json',
+    'Copied to clipboard': 'تم النسخ إلى الحافظة',
+    'File downloaded': 'تم تنزيل الملف',
+    Important: 'مهم'
   }
 }
