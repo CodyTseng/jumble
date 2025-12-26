@@ -650,6 +650,9 @@ export default {
     'Create a password (or skip)': 'Utwórz hasło (lub pomiń)',
     'Enter your password again': 'Wprowadź hasło ponownie',
     'Complete Signup': 'Zakończ rejestrację',
-    Recommended: 'Polecane'
+    Recommended: 'Polecane',
+    'Enter Password': 'Wprowadź hasło',
+    Password: 'Hasło',
+    Confirm: 'Potwierdź'
   }
 }

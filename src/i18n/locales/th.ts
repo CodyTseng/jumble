@@ -634,6 +634,9 @@ export default {
     'Create a password (or skip)': 'สร้างรหัสผ่าน (หรือข้าม)',
     'Enter your password again': 'ป้อนรหัสผ่านของคุณอีกครั้ง',
     'Complete Signup': 'เสร็จสิ้นการลงทะเบียน',
-    Recommended: 'แนะนำ'
+    Recommended: 'แนะนำ',
+    'Enter Password': 'ป้อนรหัสผ่าน',
+    Password: 'รหัสผ่าน',
+    Confirm: 'ยืนยัน'
   }
 }

@@ -625,6 +625,9 @@ export default {
     'Create a password (or skip)': '创建密码（或跳过）',
     'Enter your password again': '再次输入你的密码',
     'Complete Signup': '完成注册',
-    Recommended: '推荐'
+    Recommended: '推荐',
+    'Enter Password': '输入密码',
+    Password: '密码',
+    Confirm: '确认'
   }
 }

@@ -640,6 +640,9 @@ export default {
     'Create a password (or skip)': '비밀번호 생성(또는 건너뛰기)',
     'Enter your password again': '비밀번호를 다시 입력하세요',
     'Complete Signup': '가입 완료',
-    Recommended: '추천'
+    Recommended: '추천',
+    'Enter Password': '비밀번호 입력',
+    Password: '비밀번호',
+    Confirm: '확인'
   }
 }

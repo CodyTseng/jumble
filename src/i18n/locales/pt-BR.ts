@@ -645,6 +645,9 @@ export default {
     'Create a password (or skip)': 'Crie uma senha (opcional)',
     'Enter your password again': 'Digite sua senha novamente',
     'Complete Signup': 'Concluir cadastro',
-    Recommended: 'Recomendado'
+    Recommended: 'Recomendado',
+    'Enter Password': 'Digite a senha',
+    Password: 'Senha',
+    Confirm: 'Confirmar'
   }
 }

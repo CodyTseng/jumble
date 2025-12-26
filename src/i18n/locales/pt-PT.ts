@@ -648,6 +648,9 @@ export default {
     'Create a password (or skip)': 'Crie uma palavra-passe (ou ignore)',
     'Enter your password again': 'Introduza novamente a sua palavra-passe',
     'Complete Signup': 'Concluir registo',
-    Recommended: 'Recomendado'
+    Recommended: 'Recomendado',
+    'Enter Password': 'Introduza a palavra-passe',
+    Password: 'Palavra-passe',
+    Confirm: 'Confirmar'
   }
 }

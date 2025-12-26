@@ -634,6 +634,9 @@ export default {
     'Create a password (or skip)': 'أنشئ كلمة مرور (أو تخطى)',
     'Enter your password again': 'أدخل كلمة المرور مرة أخرى',
     'Complete Signup': 'إكمال التسجيل',
-    Recommended: 'موصى به'
+    Recommended: 'موصى به',
+    'Enter Password': 'أدخل كلمة المرور',
+    Password: 'كلمة المرور',
+    Confirm: 'تأكيد'
   }
 }

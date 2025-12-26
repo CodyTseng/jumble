@@ -620,6 +620,9 @@ export default {
     'Create a password (or skip)': '建立密碼（或跳過）',
     'Enter your password again': '再次輸入你的密碼',
     'Complete Signup': '完成註冊',
-    Recommended: '推薦'
+    Recommended: '推薦',
+    'Enter Password': '輸入密碼',
+    Password: '密碼',
+    Confirm: '確認'
   }
 }

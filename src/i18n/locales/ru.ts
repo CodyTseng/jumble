@@ -649,6 +649,9 @@ export default {
     'Create a password (or skip)': 'Создайте пароль (или пропустите)',
     'Enter your password again': 'Введите пароль еще раз',
     'Complete Signup': 'Завершить регистрацию',
-    Recommended: 'Рекомендуемые'
+    Recommended: 'Рекомендуемые',
+    'Enter Password': 'Введите пароль',
+    Password: 'Пароль',
+    Confirm: 'Подтвердить'
   }
 }

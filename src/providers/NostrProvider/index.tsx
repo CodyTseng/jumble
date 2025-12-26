@@ -1,4 +1,5 @@
 import LoginDialog from '@/components/LoginDialog'
+import PasswordInputDialog from '@/components/PasswordInputDialog'
 import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import {
   createDeletionRequestDraftEvent,
@@ -34,7 +35,7 @@ import dayjs from 'dayjs'
 import { Event, kinds, VerifiedEvent } from 'nostr-tools'
 import * as nip19 from 'nostr-tools/nip19'
 import * as nip49 from 'nostr-tools/nip49'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useDeletedEvent } from '../DeletedEventProvider'
@@ -128,6 +129,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [pinListEvent, setPinListEvent] = useState<Event | null>(null)
   const [notificationsSeenAt, setNotificationsSeenAt] = useState(-1)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
+  const passwordPromiseRef = useRef<{
+    resolve: (password: string) => void
+    reject: () => void
+  } | null>(null)
 
   useEffect(() => {
     const init = async () => {
@@ -411,6 +417,25 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     customEmojiService.init(userEmojiListEvent)
   }, [userEmojiListEvent])
 
+  const requestPassword = (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      passwordPromiseRef.current = { resolve, reject }
+      setPasswordDialogOpen(true)
+    })
+  }
+
+  const handlePasswordConfirm = (password: string) => {
+    passwordPromiseRef.current?.resolve(password)
+    passwordPromiseRef.current = null
+    setPasswordDialogOpen(false)
+  }
+
+  const handlePasswordCancel = () => {
+    passwordPromiseRef.current?.reject()
+    passwordPromiseRef.current = null
+    setPasswordDialogOpen(false)
+  }
+
   const hasNostrLoginHash = () => {
     return window.location.hash && window.location.hash.startsWith('#nostr-login')
   }
@@ -485,10 +510,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const ncryptsecLogin = async (ncryptsec: string) => {
-    const password = prompt(t('Enter the password to decrypt your ncryptsec'))
-    if (!password) {
-      throw new Error('Password is required')
-    }
+    const password = await requestPassword()
     const privkey = nip49.decrypt(ncryptsec, password)
     const browserNsecSigner = new NsecSigner()
     const pubkey = browserNsecSigner.login(privkey)
@@ -567,14 +589,15 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     } else if (account.signerType === 'ncryptsec') {
       if (account.ncryptsec) {
-        const password = prompt(t('Enter the password to decrypt your ncryptsec'))
-        if (!password) {
+        try {
+          const password = await requestPassword()
+          const privkey = nip49.decrypt(account.ncryptsec, password)
+          const browserNsecSigner = new NsecSigner()
+          browserNsecSigner.login(privkey)
+          return login(browserNsecSigner, account)
+        } catch {
           return null
         }
-        const privkey = nip49.decrypt(account.ncryptsec, password)
-        const browserNsecSigner = new NsecSigner()
-        browserNsecSigner.login(privkey)
-        return login(browserNsecSigner, account)
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
@@ -857,6 +880,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
       <LoginDialog open={openLoginDialog} setOpen={setOpenLoginDialog} />
+      <PasswordInputDialog
+        open={passwordDialogOpen}
+        title={t('Enter Password')}
+        description={t('Enter the password to decrypt your ncryptsec')}
+        onConfirm={handlePasswordConfirm}
+        onCancel={handlePasswordCancel}
+      />
     </NostrContext.Provider>
   )
 }

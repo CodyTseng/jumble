@@ -639,6 +639,9 @@ export default {
     'Create a password (or skip)': 'Create a password (or skip)',
     'Enter your password again': 'Enter your password again',
     'Complete Signup': 'Complete Signup',
-    Recommended: 'Recommended'
+    Recommended: 'Recommended',
+    'Enter Password': 'Enter Password',
+    Password: 'Password',
+    Confirm: 'Confirm'
   }
 }

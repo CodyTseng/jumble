@@ -655,6 +655,9 @@ export default {
     'Create a password (or skip)': 'Erstellen Sie ein Passwort (oder überspringen)',
     'Enter your password again': 'Geben Sie Ihr Passwort erneut ein',
     'Complete Signup': 'Registrierung abschließen',
-    Recommended: 'Empfohlen'
+    Recommended: 'Empfohlen',
+    'Enter Password': 'Passwort eingeben',
+    Password: 'Passwort',
+    Confirm: 'Bestätigen'
   }
 }

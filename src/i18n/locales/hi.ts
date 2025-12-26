@@ -645,6 +645,9 @@ export default {
     'Create a password (or skip)': 'एक पासवर्ड बनाएं (या छोड़ें)',
     'Enter your password again': 'अपना पासवर्ड फिर से दर्ज करें',
     'Complete Signup': 'साइनअप पूर्ण करें',
-    Recommended: 'अनुशंसित'
+    Recommended: 'अनुशंसित',
+    'Enter Password': 'पासवर्ड दर्ज करें',
+    Password: 'पासवर्ड',
+    Confirm: 'पुष्टि करें'
   }
 }

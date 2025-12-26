@@ -643,6 +643,9 @@ export default {
     'Create a password (or skip)': 'パスワードを作成（またはスキップ）',
     'Enter your password again': 'パスワードをもう一度入力',
     'Complete Signup': '登録を完了',
-    Recommended: 'おすすめ'
+    Recommended: 'おすすめ',
+    'Enter Password': 'パスワードを入力',
+    Password: 'パスワード',
+    Confirm: '確認'
   }
 }

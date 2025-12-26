@@ -637,6 +637,9 @@ export default {
     'Create a password (or skip)': 'Hozz létre jelszót (vagy hagyd ki)',
     'Enter your password again': 'Add meg újra a jelszavad',
     'Complete Signup': 'Regisztráció befejezése',
-    Recommended: 'Ajánlott'
+    Recommended: 'Ajánlott',
+    'Enter Password': 'Jelszó megadása',
+    Password: 'Jelszó',
+    Confirm: 'Megerősítés'
   }
 }

@@ -644,6 +644,9 @@ export default {
     'Create a password (or skip)': 'یک رمز عبور ایجاد کنید (یا رد کنید)',
     'Enter your password again': 'رمز عبور خود را دوباره وارد کنید',
     'Complete Signup': 'تکمیل ثبت‌نام',
-    Recommended: 'توصیه شده'
+    Recommended: 'توصیه شده',
+    'Enter Password': 'رمز عبور را وارد کنید',
+    Password: 'رمز عبور',
+    Confirm: 'تأیید'
   }
 }
