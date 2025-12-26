@@ -492,6 +492,12 @@ export default {
     Extension: 'Rozszerzenie',
     Remote: 'Zdalne',
     'Encrypted Key': 'Zaszyfrowany Klucz',
-    'Private Key': 'Zaszyfrowany Klucz'
+    'Private Key': 'Zaszyfrowany Klucz',
+    '24h Pulse': 'Puls 24h',
+    'Load earlier': 'Załaduj wcześniejsze',
+    'Last 24 hours': 'Ostatnie 24 godziny',
+    'Last {{count}} days': 'Ostatnie {{count}} dni',
+    notes: 'notatki',
+    'User Posts': 'Posty użytkownika'
   }
 }

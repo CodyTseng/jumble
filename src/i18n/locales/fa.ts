@@ -487,6 +487,12 @@ export default {
     Extension: 'افزونه',
     Remote: 'از راه دور',
     'Encrypted Key': 'رمزگذاری شده کلید',
-    'Private Key': 'کلید خصوصی'
+    'Private Key': 'کلید خصوصی',
+    '24h Pulse': 'نبض ۲۴ ساعته',
+    'Load earlier': 'بارگذاری قبلی‌ها',
+    'Last 24 hours': '۲۴ ساعت گذشته',
+    'Last {{count}} days': '{{count}} روز گذشته',
+    notes: 'یادداشت‌ها',
+    'User Posts': 'پست‌های کاربر'
   }
 }

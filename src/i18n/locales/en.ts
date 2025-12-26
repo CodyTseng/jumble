@@ -519,6 +519,12 @@ export default {
     'User not yet added to nostr.json': 'User not yet added to nostr.json',
     'Failed to check approval status': 'Failed to check approval status',
     'The admin needs to follow you to see your request. Make sure they follow you!': 'The admin needs to follow you to see your request. Make sure they follow you!',
-    'Tip: The admin needs to follow you to see your request. Consider following them first!': 'Tip: The admin needs to follow you to see your request. Consider following them first!'
+    'Tip: The admin needs to follow you to see your request. Consider following them first!': 'Tip: The admin needs to follow you to see your request. Consider following them first!',
+    '24h Pulse': '24h Pulse',
+    'Load earlier': 'Load earlier',
+    'Last 24 hours': 'Last 24 hours',
+    'Last {{count}} days': 'Last {{count}} days',
+    notes: 'notes',
+    'User Posts': 'User Posts'
   }
 }

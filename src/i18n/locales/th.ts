@@ -482,6 +482,12 @@ export default {
     Extension: 'ส่วนขยาย',
     Remote: 'ระยะไกล',
     'Encrypted Key': 'คีย์ที่เข้ารหัส',
-    'Private Key': 'คีย์ส่วนตัว'
+    'Private Key': 'คีย์ส่วนตัว',
+    '24h Pulse': 'พัลส์ 24 ชั่วโมง',
+    'Load earlier': 'โหลดก่อนหน้า',
+    'Last 24 hours': '24 ชั่วโมงที่แล้ว',
+    'Last {{count}} days': '{{count}} วันที่แล้ว',
+    notes: 'โน้ต',
+    'User Posts': 'โพสต์ของผู้ใช้'
   }
 }

@@ -480,6 +480,12 @@ export default {
     Extension: '扩展',
     Remote: '远程',
     'Encrypted Key': '加密私钥',
-    'Private Key': '私钥'
+    'Private Key': '私钥',
+    '24h Pulse': '24小时脉冲',
+    'Load earlier': '加载更早',
+    'Last 24 hours': '过去24小时',
+    'Last {{count}} days': '过去{{count}}天',
+    notes: '笔记',
+    'User Posts': '用户帖子'
   }
 }

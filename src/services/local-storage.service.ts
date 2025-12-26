@@ -58,6 +58,7 @@ class LocalStorageService {
   private enableSingleColumnLayout: boolean = true
   private hasSeenCommunitiesOnboarding: boolean = false
   private accountNip05Map: Record<string, string | undefined> = {}
+  private pinnedPubkeys: Set<string> = new Set()
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -76,7 +77,7 @@ class LocalStorageService {
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
     this.noteListMode =
-      noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
+      noteListModeStr && ['posts', 'postsAndReplies', '24h'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
     const lastReadNotificationTimeMapStr =
@@ -226,6 +227,11 @@ class LocalStorageService {
     )
     this.shownCreateWalletGuideToastPubkeys = shownCreateWalletGuideToastPubkeysStr
       ? new Set(JSON.parse(shownCreateWalletGuideToastPubkeysStr))
+      : new Set()
+
+    const pinnedPubkeysStr = window.localStorage.getItem(StorageKey.PINNED_PUBKEYS)
+    this.pinnedPubkeys = pinnedPubkeysStr
+      ? new Set(JSON.parse(pinnedPubkeysStr))
       : new Set()
 
     this.sidebarCollapse = window.localStorage.getItem(StorageKey.SIDEBAR_COLLAPSE) === 'true'
@@ -589,6 +595,18 @@ class LocalStorageService {
   setHasSeenCommunitiesOnboarding(value: boolean) {
     this.hasSeenCommunitiesOnboarding = value
     window.localStorage.setItem(StorageKey.HAS_SEEN_COMMUNITIES_ONBOARDING, value ? 'true' : 'false')
+  }
+
+  getPinnedPubkeys(): Set<string> {
+    return this.pinnedPubkeys
+  }
+
+  setPinnedPubkeys(pinnedPubkeys: Set<string>) {
+    this.pinnedPubkeys = pinnedPubkeys
+    window.localStorage.setItem(
+      StorageKey.PINNED_PUBKEYS,
+      JSON.stringify(Array.from(this.pinnedPubkeys))
+    )
   }
 }
 

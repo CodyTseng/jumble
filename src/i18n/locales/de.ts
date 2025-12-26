@@ -498,6 +498,12 @@ export default {
     Extension: 'Erweiterung',
     Remote: 'Remote',
     'Encrypted Key': 'Verschlüsselter Schlüssel',
-    'Private Key': 'Privater Schlüssel'
+    'Private Key': 'Privater Schlüssel',
+    '24h Pulse': '24h Puls',
+    'Load earlier': 'Frühere laden',
+    'Last 24 hours': 'Letzte 24 Stunden',
+    'Last {{count}} days': 'Letzte {{count}} Tage',
+    notes: 'Notizen',
+    'User Posts': 'Benutzerbeiträge'
   }
 }

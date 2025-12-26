@@ -488,6 +488,12 @@ export default {
     Extension: '확장 프로그램',
     Remote: '원격',
     'Encrypted Key': '암호화된 키',
-    'Private Key': '개인 키'
+    'Private Key': '개인 키',
+    '24h Pulse': '24시간 펄스',
+    'Load earlier': '이전 불러오기',
+    'Last 24 hours': '지난 24시간',
+    'Last {{count}} days': '지난 {{count}}일',
+    notes: '노트',
+    'User Posts': '사용자 게시물'
   }
 }

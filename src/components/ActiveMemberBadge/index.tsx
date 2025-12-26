@@ -39,10 +39,14 @@ export default function ActiveMemberBadge({
         {/* User info */}
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-sm truncate">{displayedName}</div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MessageSquare className="w-3 h-3" />
-            <span>{activity.noteCount.toLocaleString()} notes</span>
-          </div>
+          {activity.noteCount > 0 ? (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <MessageSquare className="w-3 h-3" />
+              <span>{activity.noteCount.toLocaleString()} notes</span>
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground">Community Member</div>
+          )}
         </div>
       </div>
     </SecondaryPageLink>

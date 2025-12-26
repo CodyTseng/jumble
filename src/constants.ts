@@ -61,6 +61,7 @@ export const StorageKey = {
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
   SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS: 'shownCreateWalletGuideToastPubkeys',
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
+  PINNED_PUBKEYS: 'pinnedPubkeys',
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated

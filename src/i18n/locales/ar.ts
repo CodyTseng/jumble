@@ -520,6 +520,12 @@ export default {
     'User not yet added to nostr.json': 'لم يتم إضافة المستخدم إلى nostr.json بعد',
     'Failed to check approval status': 'فشل التحقق من حالة الموافقة',
     'The admin needs to follow you to see your request. Make sure they follow you!': 'يحتاج المشرف إلى متابعتك لرؤية طلبك. تأكد من أنه يتابعك!',
-    'Tip: The admin needs to follow you to see your request. Consider following them first!': 'نصيحة: يحتاج المشرف إلى متابعتك لرؤية طلبك. فكر في متابعته أولاً!'
+    'Tip: The admin needs to follow you to see your request. Consider following them first!': 'نصيحة: يحتاج المشرف إلى متابعتك لرؤية طلبك. فكر في متابعته أولاً!',
+    '24h Pulse': 'نبض 24 ساعة',
+    'Load earlier': 'تحميل الأقدم',
+    'Last 24 hours': 'آخر 24 ساعة',
+    'Last {{count}} days': 'آخر {{count}} أيام',
+    notes: 'ملاحظات',
+    'User Posts': 'منشورات المستخدم'
   }
 }

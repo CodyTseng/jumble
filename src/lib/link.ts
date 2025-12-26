@@ -79,6 +79,11 @@ export const toMuteList = () => '/mutes'
 export const toRizful = () => '/rizful'
 export const toBookmarks = () => '/bookmarks'
 
+export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
+  const npub = nip19.npubEncode(pubkey)
+  return `/user-aggregation/${feedId}/${npub}`
+}
+
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
 }

@@ -21,6 +21,7 @@ import RizfulPage from './pages/secondary/RizfulPage'
 import SearchPage from './pages/secondary/SearchPage'
 import SettingsPage from './pages/secondary/SettingsPage'
 import TranslationPage from './pages/secondary/TranslationPage'
+import UserAggregationDetailPage from './pages/secondary/UserAggregationDetailPage'
 import WalletPage from './pages/secondary/WalletPage'
 
 const ROUTES = [
@@ -30,6 +31,7 @@ const ROUTES = [
   { path: '/users/:id', element: <ProfilePage /> },
   { path: '/users/:id/following', element: <FollowingListPage /> },
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
+  { path: '/user-aggregation/:feedId/:pubkey', element: <UserAggregationDetailPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
   { path: '/communities/create', element: <CreateCommunityPage /> },

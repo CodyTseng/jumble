@@ -492,6 +492,12 @@ export default {
     Extension: 'Estensione',
     Remote: 'Remoto',
     'Encrypted Key': 'Chiave Crittografata',
-    'Private Key': 'Chiave Privata'
+    'Private Key': 'Chiave Privata',
+    '24h Pulse': 'Pulse 24h',
+    'Load earlier': 'Carica precedenti',
+    'Last 24 hours': 'Ultime 24 ore',
+    'Last {{count}} days': 'Ultimi {{count}} giorni',
+    notes: 'note',
+    'User Posts': 'Post dell\'utente'
   }
 }

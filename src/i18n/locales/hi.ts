@@ -489,6 +489,12 @@ export default {
     Extension: 'एक्सटेंशन',
     Remote: 'रिमोट',
     'Encrypted Key': 'एन्क्रिप्टेड की',
-    'Private Key': 'प्राइवेट की'
+    'Private Key': 'प्राइवेट की',
+    '24h Pulse': '24 घंटे की नब्ज',
+    'Load earlier': 'पहले लोड करें',
+    'Last 24 hours': 'पिछले 24 घंटे',
+    'Last {{count}} days': 'पिछले {{count}} दिन',
+    notes: 'नोट्स',
+    'User Posts': 'उपयोगकर्ता पोस्ट'
   }
 }

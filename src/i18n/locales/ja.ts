@@ -488,6 +488,12 @@ export default {
     Extension: '拡張機能',
     Remote: 'リモート',
     'Encrypted Key': '暗号化キー',
-    'Private Key': '暗号化されたキー'
+    'Private Key': '暗号化されたキー',
+    '24h Pulse': '24時間パルス',
+    'Load earlier': '以前を読み込む',
+    'Last 24 hours': '過去24時間',
+    'Last {{count}} days': '過去{{count}}日間',
+    notes: 'ノート',
+    'User Posts': 'ユーザー投稿'
   }
 }

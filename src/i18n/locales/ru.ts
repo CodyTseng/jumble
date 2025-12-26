@@ -494,6 +494,12 @@ export default {
     Extension: 'Расширение',
     Remote: 'Удалённый',
     'Encrypted Key': 'Зашифрованный ключ',
-    'Private Key': 'Приватный ключ'
+    'Private Key': 'Приватный ключ',
+    '24h Pulse': 'Пульс 24ч',
+    'Load earlier': 'Загрузить ранние',
+    'Last 24 hours': 'Последние 24 часа',
+    'Last {{count}} days': 'Последние {{count}} дней',
+    notes: 'заметки',
+    'User Posts': 'Посты пользователя'
   }
 }
