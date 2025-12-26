@@ -48,7 +48,7 @@ const CreateCommunityPage = forwardRef(({ index }: { index?: number }, ref) => {
               <CardTitle>{t('Community Setup')}</CardTitle>
             </div>
             <CardDescription>
-              {t('Set up your NIP-05 community using GitHub Pages. Your community needs two files: a .well-known/nostr.json file and a favicon.')}
+              {t('Set up your NIP-05 community using GitHub Pages. Your community needs: a .well-known/nostr.json file, a favicon, and optionally a theme.json for custom styling.')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -310,11 +310,91 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 4: Add .nojekyll File */}
+      {/* Step 4: Add Community Theme (Optional) */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">4</span>
+            <CardTitle className="text-lg">{t('Add Community Theme (Optional)')}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <ImageIcon className="h-4 w-4" />
+            <AlertDescription>
+              {t('Create a theme.json file to customize your community\'s appearance. Users can choose to use your community theme in their settings.')}
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('The theme.json file allows you to set:')}
+            </p>
+            <ul className="list-disc list-inside text-sm text-muted-foreground ml-2 space-y-1">
+              <li>{t('Theme setting: light, dark, pure-black, or system')}</li>
+              <li>{t('Primary color: from a preset palette of colors')}</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>{t('theme.json Template')}</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopyText(getThemeJsonTemplate())}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  {t('Copy')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadFile('theme.json', getThemeJsonTemplate())}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {t('Download')}
+                </Button>
+              </div>
+            </div>
+            <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+              {getThemeJsonTemplate()}
+            </pre>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('Available Options')}</Label>
+            <div className="text-sm space-y-2">
+              <div>
+                <strong>{t('Theme Setting')}:</strong> <code className="bg-muted px-1.5 py-0.5 rounded text-xs">light</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">dark</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">pure-black</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">system</code>
+              </div>
+              <div>
+                <strong>{t('Primary Color')}:</strong> <code className="bg-muted px-1.5 py-0.5 rounded text-xs">DEFAULT</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">RED</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">ORANGE</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">BLUE</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">GREEN</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-xs">PURPLE</code>, {t('and more...')}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base">{t('How to add theme.json:')}</Label>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground ml-2">
+              <li>{t('Go to your repository on GitHub')}</li>
+              <li>{t('Click "Add file" → "Create new file"')}</li>
+              <li>
+                {t('In the file name box, type')}: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">theme.json</code>
+              </li>
+              <li>{t('Paste the template above and customize the values')}</li>
+              <li>{t('Click "Commit changes" at the bottom')}</li>
+            </ol>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step 5: Add .nojekyll File */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">5</span>
             <CardTitle className="text-lg">{t('Add .nojekyll File')}</CardTitle>
           </div>
         </CardHeader>
@@ -341,11 +421,11 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 5: Enable GitHub Pages */}
+      {/* Step 6: Enable GitHub Pages */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">5</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">6</span>
             <CardTitle className="text-lg">{t('Enable GitHub Pages')}</CardTitle>
           </div>
         </CardHeader>
@@ -361,11 +441,11 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 6: Custom Domain (Optional) */}
+      {/* Step 7: Custom Domain (Optional) */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">6</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">7</span>
             <CardTitle className="text-lg">{t('Custom Domain (Optional)')}</CardTitle>
           </div>
         </CardHeader>
@@ -400,11 +480,11 @@ function GithubPagesInstructions() {
         </CardContent>
       </Card>
 
-      {/* Step 7: Verify Setup */}
+      {/* Step 8: Verify Setup */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">7</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">8</span>
             <CardTitle className="text-lg">{t('Verify Your Setup')}</CardTitle>
           </div>
         </CardHeader>
@@ -1163,6 +1243,13 @@ function getNostrJsonTemplate(): string {
     "alice": "alice-pubkey-here",
     "bob": "bob-pubkey-here"
   }
+}`
+}
+
+function getThemeJsonTemplate(): string {
+  return `{
+  "themeSetting": "dark",
+  "primaryColor": "PURPLE"
 }`
 }
 

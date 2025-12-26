@@ -525,6 +525,24 @@ export default {
     'Last 24 hours': 'Last 24 hours',
     'Last {{count}} days': 'Last {{count}} days',
     notes: 'notes',
-    'User Posts': 'User Posts'
+    'User Posts': 'User Posts',
+    'Community Theme': 'Community Theme',
+    'Loading community theme...': 'Loading community theme...',
+    'Using theme from': 'Using theme from',
+    'No theme.json found for': 'No theme.json found for',
+    'Community theme requires a NIP-05 address. Add one in your profile settings.': 'Community theme requires a NIP-05 address. Add one in your profile settings.',
+    'Add Community Theme (Optional)': 'Add Community Theme (Optional)',
+    'Create a theme.json file to customize your community\'s appearance. Users can choose to use your community theme in their settings.': 'Create a theme.json file to customize your community\'s appearance. Users can choose to use your community theme in their settings.',
+    'The theme.json file allows you to set:': 'The theme.json file allows you to set:',
+    'Theme setting: light, dark, pure-black, or system': 'Theme setting: light, dark, pure-black, or system',
+    'Primary color: from a preset palette of colors': 'Primary color: from a preset palette of colors',
+    'theme.json Template': 'theme.json Template',
+    'Available Options': 'Available Options',
+    'Theme Setting': 'Theme Setting',
+    'Primary Color': 'Primary Color',
+    'and more...': 'and more...',
+    'How to add theme.json:': 'How to add theme.json:',
+    'Paste the template above and customize the values': 'Paste the template above and customize the values',
+    'Set up your NIP-05 community using GitHub Pages. Your community needs: a .well-known/nostr.json file, a favicon, and optionally a theme.json for custom styling.': 'Set up your NIP-05 community using GitHub Pages. Your community needs: a .well-known/nostr.json file, a favicon, and optionally a theme.json for custom styling.'
   }
 }

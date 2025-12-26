@@ -63,6 +63,7 @@ export const StorageKey = {
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
   PINNED_PUBKEYS: 'pinnedPubkeys',
   PRIMARY_COLOR: 'primaryColor',
+  COMMUNITY_THEME_DOMAIN: 'communityThemeDomain',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated

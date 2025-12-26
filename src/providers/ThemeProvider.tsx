@@ -2,12 +2,17 @@ import { PRIMARY_COLORS, StorageKey, TPrimaryColor } from '@/constants'
 import storage from '@/services/local-storage.service'
 import { TTheme, TThemeSetting } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
+import communityThemeService from '@/services/community-theme.service'
 
 type ThemeProviderState = {
   themeSetting: TThemeSetting
   setThemeSetting: (themeSetting: TThemeSetting) => void
   primaryColor: TPrimaryColor
   setPrimaryColor: (color: TPrimaryColor) => void
+  communityDomain: string | null
+  setCommunityDomain: (domain: string | null) => void
+  isCommunityThemeLoading: boolean
+  communityThemeAvailable: boolean
 }
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
@@ -32,8 +37,56 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [primaryColor, setPrimaryColor] = useState<TPrimaryColor>(
     (localStorage.getItem(StorageKey.PRIMARY_COLOR) as TPrimaryColor) ?? 'DEFAULT'
   )
+  const [communityDomain, setCommunityDomain] = useState<string | null>(
+    localStorage.getItem(StorageKey.COMMUNITY_THEME_DOMAIN)
+  )
+  const [isCommunityThemeLoading, setIsCommunityThemeLoading] = useState(false)
+  const [communityThemeAvailable, setCommunityThemeAvailable] = useState(false)
+  const [communityThemeSetting, setCommunityThemeSetting] = useState<TThemeSetting | null>(null)
+  const [communityPrimaryColor, setCommunityPrimaryColor] = useState<TPrimaryColor | null>(null)
+
+  // Fetch community theme when domain changes
+  useEffect(() => {
+    const fetchCommunityTheme = async () => {
+      if (!communityDomain) {
+        setCommunityThemeAvailable(false)
+        return
+      }
+
+      setIsCommunityThemeLoading(true)
+      try {
+        const theme = await communityThemeService.fetchCommunityTheme(communityDomain)
+        if (theme) {
+          setCommunityThemeSetting(theme.themeSetting)
+          setCommunityPrimaryColor(theme.primaryColor)
+          setCommunityThemeAvailable(true)
+        } else {
+          setCommunityThemeAvailable(false)
+        }
+      } catch (error) {
+        console.error('[ThemeProvider] Error fetching community theme:', error)
+        setCommunityThemeAvailable(false)
+      } finally {
+        setIsCommunityThemeLoading(false)
+      }
+    }
+
+    fetchCommunityTheme()
+  }, [communityDomain])
 
   useEffect(() => {
+    if (themeSetting === 'community') {
+      // Use community theme if available
+      if (communityThemeSetting && communityThemeSetting !== 'community') {
+        setTheme(communityThemeSetting)
+      } else {
+        // Fallback to system if community theme not available
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+        setTheme(mediaQuery.matches ? 'dark' : 'light')
+      }
+      return
+    }
+
     if (themeSetting !== 'system') {
       setTheme(themeSetting)
       return
@@ -49,7 +102,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       mediaQuery.removeEventListener('change', handleChange)
     }
-  }, [themeSetting])
+  }, [themeSetting, communityThemeSetting])
 
   useEffect(() => {
     const updateTheme = async () => {
@@ -67,8 +120,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme])
 
   useEffect(() => {
-    updateCSSVariables(primaryColor, theme)
-  }, [theme, primaryColor])
+    // Use community primary color if theme setting is 'community' and community color is available
+    const effectiveColor = (themeSetting === 'community' && communityPrimaryColor)
+      ? communityPrimaryColor
+      : primaryColor
+    updateCSSVariables(effectiveColor, theme)
+  }, [theme, primaryColor, themeSetting, communityPrimaryColor])
 
   const updateThemeSetting = (themeSetting: TThemeSetting) => {
     storage.setThemeSetting(themeSetting)
@@ -80,13 +137,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setPrimaryColor(color)
   }
 
+  const updateCommunityDomain = (domain: string | null) => {
+    if (domain) {
+      localStorage.setItem(StorageKey.COMMUNITY_THEME_DOMAIN, domain)
+    } else {
+      localStorage.removeItem(StorageKey.COMMUNITY_THEME_DOMAIN)
+    }
+    setCommunityDomain(domain)
+  }
+
   return (
     <ThemeProviderContext.Provider
       value={{
         themeSetting,
         setThemeSetting: updateThemeSetting,
         primaryColor,
-        setPrimaryColor: updatePrimaryColor
+        setPrimaryColor: updatePrimaryColor,
+        communityDomain,
+        setCommunityDomain: updateCommunityDomain,
+        isCommunityThemeLoading,
+        communityThemeAvailable
       }}
     >
       {children}
