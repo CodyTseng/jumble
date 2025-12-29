@@ -66,6 +66,8 @@ class LocalStorageService {
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
+  private hideFollowedUsersPerRelay: Record<string, boolean> = {}
+
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -272,6 +274,13 @@ class LocalStorageService {
       this.quickReactionEmoji = JSON.parse(quickReactionEmojiStr) as TEmoji
     } else {
       this.quickReactionEmoji = quickReactionEmojiStr
+    }
+
+    const hideFollowedUsersPerRelayStr = window.localStorage.getItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_RELAY
+    )
+    if (hideFollowedUsersPerRelayStr) {
+      this.hideFollowedUsersPerRelay = JSON.parse(hideFollowedUsersPerRelayStr)
     }
 
     // Clean up deprecated data
@@ -632,6 +641,18 @@ class LocalStorageService {
   setNsfwDisplayPolicy(policy: TNsfwDisplayPolicy) {
     this.nsfwDisplayPolicy = policy
     window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, policy)
+  }
+
+  getHideFollowedUsersForRelay(url: string) {
+    return this.hideFollowedUsersPerRelay[url] ?? false
+  }
+
+  setHideFollowedUsersForRelay(url: string, hide: boolean) {
+    this.hideFollowedUsersPerRelay[url] = hide
+    window.localStorage.setItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_RELAY,
+      JSON.stringify(this.hideFollowedUsersPerRelay)
+    )
   }
 }
 

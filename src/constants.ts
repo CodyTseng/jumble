@@ -44,6 +44,7 @@ export const StorageKey = {
   QUICK_REACTION: 'quickReaction',
   QUICK_REACTION_EMOJI: 'quickReactionEmoji',
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
+  HIDE_FOLLOWED_USERS_PER_RELAY: 'hideFollowedUsersPerRelay',
   DEFAULT_SHOW_NSFW: 'defaultShowNsfw', // deprecated
   PINNED_PUBKEYS: 'pinnedPubkeys', // deprecated
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated

@@ -9,6 +9,7 @@ import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
+import { Event } from 'nostr-tools'
 
 export default function NormalFeed({
   subRequests,
@@ -16,7 +17,8 @@ export default function NormalFeed({
   isMainFeed = false,
   showRelayCloseReason = false,
   disable24hMode = false,
-  onRefresh
+  onRefresh,
+  filterFn,
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
@@ -24,6 +26,7 @@ export default function NormalFeed({
   showRelayCloseReason?: boolean
   disable24hMode?: boolean
   onRefresh?: () => void
+  filterFn?: (event: Event) => boolean
 }) {
   const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
@@ -106,6 +109,7 @@ export default function NormalFeed({
           hideUntrustedNotes={hideUntrustedNotes}
           areAlgoRelays={areAlgoRelays}
           showRelayCloseReason={showRelayCloseReason}
+          filterFn={filterFn} 
         />
       )}
     </>
