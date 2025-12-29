@@ -648,6 +648,7 @@ export default {
     Recommended: 'अनुशंसित',
     'Enter Password': 'पासवर्ड दर्ज करें',
     Password: 'पासवर्ड',
-    Confirm: 'पुष्टि करें'
+    Confirm: 'पुष्टि करें',
+    'Auto-load profile pictures': 'प्रोफ़ाइल चित्र स्वतः लोड करें'
   }
 }

@@ -4,14 +4,18 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { MEDIA_AUTO_LOAD_POLICY, NSFW_DISPLAY_POLICY } from '@/constants'
+import {
+  MEDIA_AUTO_LOAD_POLICY,
+  NSFW_DISPLAY_POLICY,
+  PROFILE_PICTURE_AUTO_LOAD_POLICY
+} from '@/constants'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn, isSupportCheckConnectionType } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
-import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
+import { TMediaAutoLoadPolicy, TProfilePictureAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
 import { RotateCcw } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
@@ -28,7 +32,9 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     hideContentMentioningMutedUsers,
     setHideContentMentioningMutedUsers,
     mediaAutoLoadPolicy,
-    setMediaAutoLoadPolicy
+    setMediaAutoLoadPolicy,
+    profilePictureAutoLoadPolicy,
+    setProfilePictureAutoLoadPolicy
   } = useContentPolicy()
   const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
   const { quickReaction, updateQuickReaction, quickReactionEmoji, updateQuickReactionEmoji } =
@@ -79,6 +85,31 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                 <SelectItem value={MEDIA_AUTO_LOAD_POLICY.WIFI_ONLY}>{t('Wi-Fi only')}</SelectItem>
               )}
               <SelectItem value={MEDIA_AUTO_LOAD_POLICY.NEVER}>{t('Never')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="profile-picture-auto-load-policy" className="text-base font-normal">
+            {t('Auto-load profile pictures')}
+          </Label>
+          <Select
+            defaultValue="always"
+            value={profilePictureAutoLoadPolicy}
+            onValueChange={(value: TProfilePictureAutoLoadPolicy) =>
+              setProfilePictureAutoLoadPolicy(value as TProfilePictureAutoLoadPolicy)
+            }
+          >
+            <SelectTrigger id="profile-picture-auto-load-policy" className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS}>{t('Always')}</SelectItem>
+              {isSupportCheckConnectionType() && (
+                <SelectItem value={PROFILE_PICTURE_AUTO_LOAD_POLICY.WIFI_ONLY}>
+                  {t('Wi-Fi only')}
+                </SelectItem>
+              )}
+              <SelectItem value={PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER}>{t('Never')}</SelectItem>
             </SelectContent>
           </Select>
         </SettingItem>

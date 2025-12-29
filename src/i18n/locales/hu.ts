@@ -640,6 +640,7 @@ export default {
     Recommended: 'Ajánlott',
     'Enter Password': 'Jelszó megadása',
     Password: 'Jelszó',
-    Confirm: 'Megerősítés'
+    Confirm: 'Megerősítés',
+    'Auto-load profile pictures': 'Profilképek automatikus betöltése'
   }
 }

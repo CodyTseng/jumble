@@ -637,6 +637,7 @@ export default {
     Recommended: 'แนะนำ',
     'Enter Password': 'ป้อนรหัสผ่าน',
     Password: 'รหัสผ่าน',
-    Confirm: 'ยืนยัน'
+    Confirm: 'ยืนยัน',
+    'Auto-load profile pictures': 'โหลดรูปโปรไฟล์อัตโนมัติ'
   }
 }

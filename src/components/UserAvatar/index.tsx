@@ -1,5 +1,6 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useFetchProfile } from '@/hooks'
 import { toProfile } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
@@ -63,6 +64,7 @@ export function SimpleUserAvatar({
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {
   const { profile } = useFetchProfile(userId)
+  const { autoLoadProfilePicture } = useContentPolicy()
   const defaultAvatar = useMemo(
     () => (profile?.pubkey ? generateImageByPubkey(profile.pubkey) : ''),
     [profile]
@@ -75,9 +77,11 @@ export function SimpleUserAvatar({
   }
   const { avatar, pubkey } = profile || {}
 
+  const imageUrl = autoLoadProfilePicture ? (avatar ?? defaultAvatar) : defaultAvatar
+
   return (
     <Image
-      image={{ url: avatar ?? defaultAvatar, pubkey }}
+      image={{ url: imageUrl, pubkey }}
       errorPlaceholder={defaultAvatar}
       className="object-cover object-center"
       classNames={{

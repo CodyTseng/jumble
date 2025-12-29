@@ -623,6 +623,7 @@ export default {
     Recommended: '推薦',
     'Enter Password': '輸入密碼',
     Password: '密碼',
-    Confirm: '確認'
+    Confirm: '確認',
+    'Auto-load profile pictures': '自動載入大頭照'
   }
 }

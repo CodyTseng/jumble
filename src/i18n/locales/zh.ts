@@ -628,6 +628,7 @@ export default {
     Recommended: '推荐',
     'Enter Password': '输入密码',
     Password: '密码',
-    Confirm: '确认'
+    Confirm: '确认',
+    'Auto-load profile pictures': '自动加载头像'
   }
 }

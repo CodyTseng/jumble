@@ -647,6 +647,7 @@ export default {
     Recommended: 'توصیه شده',
     'Enter Password': 'رمز عبور را وارد کنید',
     Password: 'رمز عبور',
-    Confirm: 'تأیید'
+    Confirm: 'تأیید',
+    'Auto-load profile pictures': 'بارگذاری خودکار تصاویر پروفایل'
   }
 }

@@ -653,6 +653,7 @@ export default {
     Recommended: 'Polecane',
     'Enter Password': 'Wprowadź hasło',
     Password: 'Hasło',
-    Confirm: 'Potwierdź'
+    Confirm: 'Potwierdź',
+    'Auto-load profile pictures': 'Automatyczne ładowanie zdjęć profilowych'
   }
 }

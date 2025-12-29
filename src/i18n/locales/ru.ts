@@ -652,6 +652,7 @@ export default {
     Recommended: 'Рекомендуемые',
     'Enter Password': 'Введите пароль',
     Password: 'Пароль',
-    Confirm: 'Подтвердить'
+    Confirm: 'Подтвердить',
+    'Auto-load profile pictures': 'Автозагрузка аватаров'
   }
 }

@@ -1,6 +1,6 @@
-import { MEDIA_AUTO_LOAD_POLICY } from '@/constants'
+import { MEDIA_AUTO_LOAD_POLICY, PROFILE_PICTURE_AUTO_LOAD_POLICY } from '@/constants'
 import storage from '@/services/local-storage.service'
-import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
+import { TMediaAutoLoadPolicy, TProfilePictureAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 type TContentPolicyContext = {
@@ -16,6 +16,10 @@ type TContentPolicyContext = {
   autoLoadMedia: boolean
   mediaAutoLoadPolicy: TMediaAutoLoadPolicy
   setMediaAutoLoadPolicy: (policy: TMediaAutoLoadPolicy) => void
+
+  autoLoadProfilePicture: boolean
+  profilePictureAutoLoadPolicy: TProfilePictureAutoLoadPolicy
+  setProfilePictureAutoLoadPolicy: (policy: TProfilePictureAutoLoadPolicy) => void
 
   faviconUrlTemplate: string
   setFaviconUrlTemplate: (template: string) => void
@@ -38,6 +42,9 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     storage.getHideContentMentioningMutedUsers()
   )
   const [mediaAutoLoadPolicy, setMediaAutoLoadPolicy] = useState(storage.getMediaAutoLoadPolicy())
+  const [profilePictureAutoLoadPolicy, setProfilePictureAutoLoadPolicy] = useState(
+    storage.getProfilePictureAutoLoadPolicy()
+  )
   const [faviconUrlTemplate, setFaviconUrlTemplate] = useState(storage.getFaviconUrlTemplate())
   const [connectionType, setConnectionType] = useState((navigator as any).connection?.type)
 
@@ -67,6 +74,17 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     return connectionType === 'wifi' || connectionType === 'ethernet'
   }, [mediaAutoLoadPolicy, connectionType])
 
+  const autoLoadProfilePicture = useMemo(() => {
+    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS) {
+      return true
+    }
+    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER) {
+      return false
+    }
+    // WIFI_ONLY
+    return connectionType === 'wifi' || connectionType === 'ethernet'
+  }, [profilePictureAutoLoadPolicy, connectionType])
+
   const updateAutoplay = (autoplay: boolean) => {
     storage.setAutoplay(autoplay)
     setAutoplay(autoplay)
@@ -87,6 +105,11 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setMediaAutoLoadPolicy(policy)
   }
 
+  const updateProfilePictureAutoLoadPolicy = (policy: TProfilePictureAutoLoadPolicy) => {
+    storage.setProfilePictureAutoLoadPolicy(policy)
+    setProfilePictureAutoLoadPolicy(policy)
+  }
+
   const updateFaviconUrlTemplate = (template: string) => {
     storage.setFaviconUrlTemplate(template)
     setFaviconUrlTemplate(template)
@@ -104,6 +127,9 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
         autoLoadMedia,
         mediaAutoLoadPolicy,
         setMediaAutoLoadPolicy: updateMediaAutoLoadPolicy,
+        autoLoadProfilePicture,
+        profilePictureAutoLoadPolicy,
+        setProfilePictureAutoLoadPolicy: updateProfilePictureAutoLoadPolicy,
         faviconUrlTemplate,
         setFaviconUrlTemplate: updateFaviconUrlTemplate
       }}

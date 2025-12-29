@@ -652,6 +652,7 @@ export default {
     Recommended: 'Recomendado',
     'Enter Password': 'Ingresar contraseña',
     Password: 'Contraseña',
-    Confirm: 'Confirmar'
+    Confirm: 'Confirmar',
+    'Auto-load profile pictures': 'Cargar imágenes de perfil automáticamente'
   }
 }

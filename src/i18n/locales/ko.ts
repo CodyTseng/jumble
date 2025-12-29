@@ -643,6 +643,7 @@ export default {
     Recommended: '추천',
     'Enter Password': '비밀번호 입력',
     Password: '비밀번호',
-    Confirm: '확인'
+    Confirm: '확인',
+    'Auto-load profile pictures': '프로필 사진 자동 로드'
   }
 }

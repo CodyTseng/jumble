@@ -637,6 +637,7 @@ export default {
     Recommended: 'موصى به',
     'Enter Password': 'أدخل كلمة المرور',
     Password: 'كلمة المرور',
-    Confirm: 'تأكيد'
+    Confirm: 'تأكيد',
+    'Auto-load profile pictures': 'تحميل صور الملف الشخصي تلقائيًا'
   }
 }

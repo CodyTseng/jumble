@@ -646,6 +646,7 @@ export default {
     Recommended: 'おすすめ',
     'Enter Password': 'パスワードを入力',
     Password: 'パスワード',
-    Confirm: '確認'
+    Confirm: '確認',
+    'Auto-load profile pictures': 'プロフィール画像を自動読み込み'
   }
 }

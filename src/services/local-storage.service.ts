@@ -6,6 +6,7 @@ import {
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   NSFW_DISPLAY_POLICY,
+  PROFILE_PICTURE_AUTO_LOAD_POLICY,
   StorageKey,
   TPrimaryColor
 } from '@/constants'
@@ -20,6 +21,7 @@ import {
   TMediaAutoLoadPolicy,
   TMediaUploadServiceConfig,
   TNoteListMode,
+  TProfilePictureAutoLoadPolicy,
   TNsfwDisplayPolicy,
   TNotificationStyle,
   TRelaySet,
@@ -53,6 +55,8 @@ class LocalStorageService {
   private hideContentMentioningMutedUsers: boolean = false
   private notificationListStyle: TNotificationStyle = NOTIFICATION_LIST_STYLE.DETAILED
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
+  private profilePictureAutoLoadPolicy: TProfilePictureAutoLoadPolicy =
+    PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS
   private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
   private sidebarCollapse: boolean = false
   private primaryColor: TPrimaryColor = 'DEFAULT'
@@ -223,6 +227,19 @@ class LocalStorageService {
       Object.values(MEDIA_AUTO_LOAD_POLICY).includes(mediaAutoLoadPolicy as TMediaAutoLoadPolicy)
     ) {
       this.mediaAutoLoadPolicy = mediaAutoLoadPolicy as TMediaAutoLoadPolicy
+    }
+
+    const profilePictureAutoLoadPolicy = window.localStorage.getItem(
+      StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY
+    )
+    if (
+      profilePictureAutoLoadPolicy &&
+      Object.values(PROFILE_PICTURE_AUTO_LOAD_POLICY).includes(
+        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
+      )
+    ) {
+      this.profilePictureAutoLoadPolicy =
+        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
     }
 
     const shownCreateWalletGuideToastPubkeysStr = window.localStorage.getItem(
@@ -516,6 +533,15 @@ class LocalStorageService {
   setMediaAutoLoadPolicy(policy: TMediaAutoLoadPolicy) {
     this.mediaAutoLoadPolicy = policy
     window.localStorage.setItem(StorageKey.MEDIA_AUTO_LOAD_POLICY, policy)
+  }
+
+  getProfilePictureAutoLoadPolicy() {
+    return this.profilePictureAutoLoadPolicy
+  }
+
+  setProfilePictureAutoLoadPolicy(policy: TProfilePictureAutoLoadPolicy) {
+    this.profilePictureAutoLoadPolicy = policy
+    window.localStorage.setItem(StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY, policy)
   }
 
   hasShownCreateWalletGuideToast(pubkey: string) {

@@ -3,7 +3,8 @@ import {
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   NSFW_DISPLAY_POLICY,
-  POLL_TYPE
+  POLL_TYPE,
+  PROFILE_PICTURE_AUTO_LOAD_POLICY
 } from '../constants'
 
 export type TSubRequestFilter = Omit<Filter, 'since' | 'until'> & { limit: number }
@@ -210,5 +211,8 @@ export type TAwesomeRelayCollection = {
 
 export type TMediaAutoLoadPolicy =
   (typeof MEDIA_AUTO_LOAD_POLICY)[keyof typeof MEDIA_AUTO_LOAD_POLICY]
+
+export type TProfilePictureAutoLoadPolicy =
+  (typeof PROFILE_PICTURE_AUTO_LOAD_POLICY)[keyof typeof PROFILE_PICTURE_AUTO_LOAD_POLICY]
 
 export type TNsfwDisplayPolicy = (typeof NSFW_DISPLAY_POLICY)[keyof typeof NSFW_DISPLAY_POLICY]
