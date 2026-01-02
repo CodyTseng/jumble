@@ -629,6 +629,18 @@ export default {
     'Enter Password': '输入密码',
     Password: '密码',
     Confirm: '确认',
+    'trust-filter.title': '信任分数过滤器',
+    'trust-filter.off': '关闭',
+    'trust-filter.low': '低',
+    'trust-filter.medium': '中',
+    'trust-filter.high': '高',
+    'trust-filter.wot': '信任网络',
+    'trust-filter.filter-threshold': '过滤阈值',
+    'trust-filter.quick-presets': '快速预设',
+    'trust-filter.show-all-content': '显示所有内容',
+    'trust-filter.only-show-wot': '仅显示你的信任网络（关注的人 + 他们关注的人）',
+    'trust-filter.hide-bottom-percent': '过滤掉信任度排名后 {{score}}% 的用户',
+    'trust-filter.trust-score-description': '基于用户的声誉和社交网络计算信任度百分位',
     'Auto-load profile pictures': '自动加载头像'
   }
 }

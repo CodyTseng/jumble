@@ -33,42 +33,47 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { current } = usePrimaryPage()
   const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
-  const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
+  const { meetsMinTrustScore } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
-  const filteredNewNotifications = useMemo(() => {
+  const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
+
+  useEffect(() => {
     if (active || notificationsSeenAt < 0) {
-      return []
+      setFilteredNewNotifications([])
+      return
     }
-    const filtered: NostrEvent[] = []
-    for (const notification of newNotifications) {
-      if (notification.created_at <= notificationsSeenAt || filtered.length >= 10) {
-        break
-      }
-      if (
-        !notificationFilter(notification, {
-          pubkey,
-          mutePubkeySet,
-          hideContentMentioningMutedUsers,
-          hideUntrustedNotifications,
-          isUserTrusted
+    const filterNotifications = async () => {
+      const filtered: NostrEvent[] = []
+      await Promise.allSettled(
+        newNotifications.map(async (notification) => {
+          if (notification.created_at <= notificationsSeenAt || filtered.length >= 10) {
+            return
+          }
+          if (
+            !(await notificationFilter(notification, {
+              pubkey,
+              mutePubkeySet,
+              hideContentMentioningMutedUsers,
+              meetsMinTrustScore
+            }))
+          ) {
+            return
+          }
+          filtered.push(notification)
         })
-      ) {
-        continue
-      }
-      filtered.push(notification)
+      )
+      setFilteredNewNotifications(filtered)
     }
-    return filtered
+    filterNotifications()
   }, [
     newNotifications,
     notificationsSeenAt,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
-    hideUntrustedNotifications,
-    isUserTrusted,
-    active
+    meetsMinTrustScore
   ])
 
   useEffect(() => {

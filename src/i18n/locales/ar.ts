@@ -638,6 +638,19 @@ export default {
     'Enter Password': 'أدخل كلمة المرور',
     Password: 'كلمة المرور',
     Confirm: 'تأكيد',
+    'trust-filter.title': 'مرشح درجة الثقة',
+    'trust-filter.off': 'إيقاف',
+    'trust-filter.low': 'منخفض',
+    'trust-filter.medium': 'متوسط',
+    'trust-filter.high': 'عالي',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'عتبة التصفية',
+    'trust-filter.quick-presets': 'إعدادات سريعة',
+    'trust-filter.show-all-content': 'إظهار جميع المحتويات',
+    'trust-filter.only-show-wot': 'إظهار شبكة الثقة الخاصة بك فقط (المتابَعون + متابَعوهم)',
+    'trust-filter.hide-bottom-percent':
+      'تصفية أدنى {{score}}٪ من المستخدمين حسب تصنيف الثقة',
+    'trust-filter.trust-score-description': 'محسوبة بناءً على سمعة المستخدم والنسبة المئوية للشبكة الاجتماعية',
     'Auto-load profile pictures': 'تحميل صور الملف الشخصي تلقائيًا'
   }
 }

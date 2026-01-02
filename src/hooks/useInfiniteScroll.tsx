@@ -65,8 +65,6 @@ export function useInfiniteScroll<T>({
   const loadMore = useCallback(async () => {
     const { loading, hasMore, showCount, itemsLength, initialLoading } = stateRef.current
 
-    if (initialLoading || loading) return
-
     // If there are more items to show, increase showCount first
     if (showCount < itemsLength) {
       setShowCount((prev) => prev + initialShowCount)
@@ -75,6 +73,8 @@ export function useInfiniteScroll<T>({
         return
       }
     }
+
+    if (initialLoading || loading) return
 
     if (!hasMore) return
     setLoading(true)
@@ -114,6 +114,7 @@ export function useInfiniteScroll<T>({
     shouldShowLoadingIndicator,
     bottomRef,
     setHasMore,
-    setLoading
+    setLoading,
+    setShowCount
   }
 }

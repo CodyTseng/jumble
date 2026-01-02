@@ -647,6 +647,21 @@ export default {
     'Enter Password': 'パスワードを入力',
     Password: 'パスワード',
     Confirm: '確認',
+    'trust-filter.title': '信頼スコアフィルター',
+    'trust-filter.off': 'オフ',
+    'trust-filter.low': '低',
+    'trust-filter.medium': '中',
+    'trust-filter.high': '高',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'フィルター閾値',
+    'trust-filter.quick-presets': 'クイックプリセット',
+    'trust-filter.show-all-content': 'すべてのコンテンツを表示',
+    'trust-filter.only-show-wot':
+      'あなたの信頼ネットワークのみを表示（フォロー + フォローのフォロー）',
+    'trust-filter.hide-bottom-percent':
+      '信頼ランク下位 {{score}}% のユーザーをフィルタリング',
+    'trust-filter.trust-score-description':
+      'ユーザーの評判とソーシャルネットワークに基づいて信頼度パーセンタイルを計算',
     'Auto-load profile pictures': 'プロフィール画像を自動読み込み'
   }
 }

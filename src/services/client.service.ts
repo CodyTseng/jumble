@@ -9,6 +9,7 @@ import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { filterOutBigRelays } from '@/lib/relay'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
+import { mergeTimelines } from '@/lib/timeline'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
 import { ISigner, TProfile, TPublishOptions, TRelayList, TSubRequestFilter } from '@/types'
@@ -40,6 +41,7 @@ class ClientService extends EventTarget {
   pubkey?: string
   currentRelays: string[] = []
   private pool: SimplePool
+  private externalSeenOn = new Map<string, Set<string>>()
 
   private timelines: Record<
     string,
@@ -293,6 +295,17 @@ class ClientService extends EventTarget {
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }
 
+  async getEventsFromIndexed(filter: Filter) {
+    const items = await indexedDb.getEvents(filter)
+    const storedEvents: NEvent[] = []
+    items.forEach((item) => {
+      storedEvents.push(item.event)
+      this.trackEventExternalSeenOn(item.event.id, item.relays)
+      this.addEventToCache(item.event)
+    })
+    return storedEvents
+  }
+
   async subscribeTimeline(
     subRequests: { urls: string[]; filter: TSubRequestFilter }[],
     {
@@ -306,20 +319,22 @@ class ClientService extends EventTarget {
     },
     {
       startLogin,
-      needSort = true
+      needSort = true,
+      needSaveToDb = false
     }: {
       startLogin?: () => void
       needSort?: boolean
+      needSaveToDb?: boolean
     } = {}
   ) {
     const newEventIdSet = new Set<string>()
     const requestCount = subRequests.length
     const threshold = Math.floor(requestCount / 2)
-    let events: NEvent[] = []
+    const timelines: NEvent[][] = new Array(requestCount).fill(0).map(() => [])
     let eosedCount = 0
 
     const subs = await Promise.all(
-      subRequests.map(({ urls, filter }) => {
+      subRequests.map(({ urls, filter }, i) => {
         return this._subscribeTimeline(
           urls,
           filter,
@@ -329,9 +344,9 @@ class ClientService extends EventTarget {
                 eosedCount++
               }
 
-              events = this.mergeTimelines(events, _events)
-
+              timelines[i] = _events
               if (eosedCount >= threshold) {
+                const events = mergeTimelines(timelines, filter.limit)
                 onEvents(events, eosedCount >= requestCount)
               }
             },
@@ -342,7 +357,7 @@ class ClientService extends EventTarget {
             },
             onClose
           },
-          { startLogin, needSort }
+          { startLogin, needSort, needSaveToDb }
         )
       })
     )
@@ -360,31 +375,6 @@ class ClientService extends EventTarget {
       },
       timelineKey: key
     }
-  }
-
-  private mergeTimelines(a: NEvent[], b: NEvent[]): NEvent[] {
-    if (a.length === 0) return [...b]
-    if (b.length === 0) return [...a]
-
-    const result: NEvent[] = []
-    let i = 0
-    let j = 0
-    while (i < a.length && j < b.length) {
-      const cmp = compareEvents(a[i], b[j])
-      if (cmp > 0) {
-        result.push(a[i])
-        i++
-      } else if (cmp < 0) {
-        result.push(b[j])
-        j++
-      } else {
-        result.push(a[i])
-        i++
-        j++
-      }
-    }
-
-    return result
   }
 
   async loadMoreTimeline(key: string, until: number, limit: number) {
@@ -579,10 +569,12 @@ class ClientService extends EventTarget {
     },
     {
       startLogin,
-      needSort = true
+      needSort = true,
+      needSaveToDb = false
     }: {
       startLogin?: () => void
       needSort?: boolean
+      needSaveToDb?: boolean
     } = {}
   ) {
     const relays = Array.from(new Set(urls))
@@ -615,6 +607,9 @@ class ClientService extends EventTarget {
         // new event
         if (evt.created_at > eosedAt) {
           onNew(evt)
+          if (needSaveToDb) {
+            indexedDb.putEvents([{ event: evt, relays: that.getEventHints(evt.id) }])
+          }
         }
 
         const timeline = that.timelines[key]
@@ -654,6 +649,11 @@ class ClientService extends EventTarget {
         }
 
         events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
+        if (needSaveToDb) {
+          indexedDb.putEvents(
+            events.map((evt) => ({ event: evt, relays: this.getEventHints(evt.id) }))
+          )
+        }
         const timeline = that.timelines[key]
         // no cache yet
         if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
@@ -675,6 +675,9 @@ class ClientService extends EventTarget {
           // if new refs are more than limit, means old refs are too old, replace them
           timeline.refs = newRefs
           onEvents([...events], true)
+          if (needSaveToDb) {
+            indexedDb.deleteEvents({ ...filter, until: events[events.length - 1].created_at })
+          }
         } else {
           // merge new refs with old refs
           timeline.refs = newRefs.concat(timeline.refs)
@@ -737,7 +740,12 @@ class ClientService extends EventTarget {
   }
 
   getSeenEventRelayUrls(eventId: string) {
-    return this.getSeenEventRelays(eventId).map((relay) => relay.url)
+    return Array.from(
+      new Set([
+        ...this.getSeenEventRelays(eventId).map((relay) => relay.url),
+        ...(this.externalSeenOn.get(eventId) || [])
+      ])
+    )
   }
 
   getEventHints(eventId: string) {
@@ -755,6 +763,15 @@ class ClientService extends EventTarget {
       this.pool.seenOn.set(eventId, set)
     }
     set.add(relay)
+  }
+
+  trackEventExternalSeenOn(eventId: string, relayUrls: string[]) {
+    let set = this.externalSeenOn.get(eventId)
+    if (!set) {
+      set = new Set()
+      this.externalSeenOn.set(eventId, set)
+    }
+    relayUrls.forEach((url) => set.add(url))
   }
 
   private async query(urls: string[], filter: Filter | Filter[], onevent?: (evt: NEvent) => void) {

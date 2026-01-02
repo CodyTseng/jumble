@@ -6,7 +6,7 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
@@ -19,13 +19,33 @@ export default function RepostList({ event }: { event: Event }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { minTrustScore, meetsMinTrustScore } = useUserTrust()
   const noteStats = useStuffStatsById(getEventKey(event))
-  const filteredReposts = useMemo(() => {
-    return (noteStats?.reposts ?? [])
-      .filter((repost) => !hideUntrustedInteractions || isUserTrusted(repost.pubkey))
-      .sort((a, b) => b.created_at - a.created_at)
-  }, [noteStats, event.id, hideUntrustedInteractions, isUserTrusted])
+  const [filteredReposts, setFilteredReposts] = useState<
+    Array<{ id: string; pubkey: string; created_at: number }>
+  >([])
+
+  useEffect(() => {
+    const filterReposts = async () => {
+      const reposts = noteStats?.reposts ?? []
+      const filtered = (
+        await Promise.all(
+          reposts.map(async (repost) => {
+            if (await meetsMinTrustScore(repost.pubkey)) {
+              return repost
+            }
+          })
+        )
+      ).filter(Boolean) as {
+        id: string
+        pubkey: string
+        created_at: number
+      }[]
+      filtered.sort((a, b) => b.created_at - a.created_at)
+      setFilteredReposts(filtered)
+    }
+    filterReposts()
+  }, [noteStats, event.id, minTrustScore, meetsMinTrustScore])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const bottomRef = useRef<HTMLDivElement | null>(null)

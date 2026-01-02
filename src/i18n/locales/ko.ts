@@ -644,6 +644,18 @@ export default {
     'Enter Password': '비밀번호 입력',
     Password: '비밀번호',
     Confirm: '확인',
+    'trust-filter.title': '신뢰 점수 필터',
+    'trust-filter.off': '끄기',
+    'trust-filter.low': '낮음',
+    'trust-filter.medium': '중간',
+    'trust-filter.high': '높음',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': '필터 임계값',
+    'trust-filter.quick-presets': '빠른 프리셋',
+    'trust-filter.show-all-content': '모든 콘텐츠 표시',
+    'trust-filter.only-show-wot': '신뢰 네트워크만 표시 (팔로우 + 팔로우의 팔로우)',
+    'trust-filter.hide-bottom-percent': '신뢰도 하위 {{score}}% 사용자 필터링',
+    'trust-filter.trust-score-description': '사용자의 평판과 소셜 네트워크를 기반으로 신뢰도 백분위수 계산',
     'Auto-load profile pictures': '프로필 사진 자동 로드'
   }
 }

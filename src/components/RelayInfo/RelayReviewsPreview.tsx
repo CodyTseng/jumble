@@ -29,7 +29,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey, checkLogin } = useNostr()
-  const { hideUntrustedNotes, isUserTrusted, isSpammer } = useUserTrust()
+  const { isSpammer } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const [showEditor, setShowEditor] = useState(false)
   const [myReview, setMyReview] = useState<NostrEvent | null>(null)
@@ -103,7 +103,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       setInitialized(true)
     }
     init()
-  }, [relayUrl, pubkey, mutePubkeySet, hideUntrustedNotes, isUserTrusted])
+  }, [relayUrl, pubkey, mutePubkeySet])
 
   const handleReviewed = (evt: NostrEvent) => {
     setMyReview(evt)

@@ -1,9 +1,9 @@
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
+import TrustScoreFilter from '@/components/TrustScoreFilter'
 import UserAggregationList, { TUserAggregationListRef } from '@/components/UserAggregationList'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
 import { useMemo, useRef, useState } from 'react'
@@ -19,6 +19,7 @@ export default function NormalFeed({
   disable24hMode = false,
   onRefresh,
   filterFn,
+  isPubkeyFeed = false
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
@@ -27,8 +28,8 @@ export default function NormalFeed({
   disable24hMode?: boolean
   onRefresh?: () => void
   filterFn?: (event: Event) => boolean
+  isPubkeyFeed?: boolean
 }) {
-  const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
   const [listMode, setListMode] = useState<TNoteListMode>(() => storage.getNoteListMode())
@@ -39,6 +40,7 @@ export default function NormalFeed({
   const showKindsFilter = useMemo(() => {
     return subRequests.every((req) => !req.filter.kinds?.length)
   }, [subRequests])
+  const [trustFilterOpen, setTrustFilterOpen] = useState(false)
 
   const handleListModeChange = (mode: TNoteListMode) => {
     setListMode(mode)
@@ -51,6 +53,10 @@ export default function NormalFeed({
   const handleShowKindsChange = (newShowKinds: number[]) => {
     setTemporaryShowKinds(newShowKinds)
     noteListRef.current?.scrollToTop()
+  }
+
+  const handleTrustFilterOpenChange = (open: boolean) => {
+    setTrustFilterOpen(open)
   }
 
   return (
@@ -82,6 +88,7 @@ export default function NormalFeed({
                 }}
               />
             )}
+            <TrustScoreFilter onOpenChange={handleTrustFilterOpenChange} />
             {showKindsFilter && (
               <KindFilter
                 showKinds={temporaryShowKinds}
@@ -90,6 +97,7 @@ export default function NormalFeed({
             )}
           </>
         }
+        active={trustFilterOpen}
       />
       <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
       {listMode === '24h' && !disable24hMode ? (
@@ -99,6 +107,7 @@ export default function NormalFeed({
           subRequests={subRequests}
           areAlgoRelays={areAlgoRelays}
           showRelayCloseReason={showRelayCloseReason}
+          isPubkeyFeed={isPubkeyFeed}
         />
       ) : (
         <NoteList
@@ -106,10 +115,10 @@ export default function NormalFeed({
           showKinds={temporaryShowKinds}
           subRequests={subRequests}
           hideReplies={listMode === 'posts'}
-          hideUntrustedNotes={hideUntrustedNotes}
           areAlgoRelays={areAlgoRelays}
           showRelayCloseReason={showRelayCloseReason}
           filterFn={filterFn} 
+          isPubkeyFeed={isPubkeyFeed}
         />
       )}
     </>

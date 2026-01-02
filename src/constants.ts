@@ -23,11 +23,8 @@ export const StorageKey = {
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
   AUTOPLAY: 'autoplay',
-  HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions',
-  HIDE_UNTRUSTED_NOTIFICATIONS: 'hideUntrustedNotifications',
   TRANSLATION_SERVICE_CONFIG_MAP: 'translationServiceConfigMap',
   MEDIA_UPLOAD_SERVICE_CONFIG_MAP: 'mediaUploadServiceConfigMap',
-  HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes',
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
   SHOW_KINDS: 'showKinds',
   SHOW_KINDS_VERSION: 'showKindsVersion',
@@ -45,6 +42,10 @@ export const StorageKey = {
   QUICK_REACTION_EMOJI: 'quickReactionEmoji',
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
   HIDE_FOLLOWED_USERS_PER_RELAY: 'hideFollowedUsersPerRelay',
+  MIN_TRUST_SCORE: 'minTrustScore',
+  HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
+  HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions', // deprecated
+  HIDE_UNTRUSTED_NOTIFICATIONS: 'hideUntrustedNotifications', // deprecated
   DEFAULT_SHOW_NSFW: 'defaultShowNsfw', // deprecated
   PINNED_PUBKEYS: 'pinnedPubkeys', // deprecated
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
@@ -467,3 +468,5 @@ export const PRIMARY_COLORS = {
 export type TPrimaryColor = keyof typeof PRIMARY_COLORS
 
 export const LONG_PRESS_THRESHOLD = 400
+
+export const SPAMMER_PERCENTILE_THRESHOLD = 60

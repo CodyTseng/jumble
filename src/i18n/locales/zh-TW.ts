@@ -624,6 +624,18 @@ export default {
     'Enter Password': '輸入密碼',
     Password: '密碼',
     Confirm: '確認',
+    'trust-filter.title': '信任分數過濾器',
+    'trust-filter.off': '關閉',
+    'trust-filter.low': '低',
+    'trust-filter.medium': '中',
+    'trust-filter.high': '高',
+    'trust-filter.wot': '信任網路',
+    'trust-filter.filter-threshold': '過濾閾值',
+    'trust-filter.quick-presets': '快速預設',
+    'trust-filter.show-all-content': '顯示所有內容',
+    'trust-filter.only-show-wot': '僅顯示你的信任網路（關注的人 + 他們關注的人）',
+    'trust-filter.hide-bottom-percent': '過濾掉信任度排名後 {{score}}% 的使用者',
+    'trust-filter.trust-score-description': '基於使用者的聲譽和社交網路計算信任度百分位',
     'Auto-load profile pictures': '自動載入大頭照'
   }
 }

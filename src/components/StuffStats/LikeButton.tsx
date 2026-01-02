@@ -27,23 +27,38 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { meetsMinTrustScore } = useUserTrust()
   const { quickReaction, quickReactionEmoji } = useUserPreferences()
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
+  const [likeCount, setLikeCount] = useState(0)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const isLongPressRef = useRef(false)
   const noteStats = useStuffStatsById(stuffKey)
-  const { myLastEmoji, likeCount } = useMemo(() => {
+  const myLastEmoji = useMemo(() => {
     const stats = noteStats || {}
     const myLike = stats.likes?.find((like) => like.pubkey === pubkey)
-    const likes = hideUntrustedInteractions
-      ? stats.likes?.filter((like) => isUserTrusted(like.pubkey))
-      : stats.likes
-    return { myLastEmoji: myLike?.emoji, likeCount: likes?.length }
-  }, [noteStats, pubkey, hideUntrustedInteractions])
+    return myLike?.emoji
+  }, [noteStats, pubkey])
+
+  useEffect(() => {
+    const filterLikes = async () => {
+      const stats = noteStats || {}
+      const likes = stats.likes || []
+      let count = 0
+      await Promise.all(
+        likes.map(async (like) => {
+          if (await meetsMinTrustScore(like.pubkey)) {
+            count++
+          }
+        })
+      )
+      setLikeCount(count)
+    }
+    filterLikes()
+  }, [noteStats, meetsMinTrustScore])
 
   useEffect(() => {
     setTimeout(() => setIsPickerOpen(false), 100)

@@ -643,6 +643,19 @@ export default {
     'Enter Password': 'Enter Password',
     Password: 'Password',
     Confirm: 'Confirm',
+    'trust-filter.title': 'Trust Score Filter',
+    'trust-filter.off': 'Off',
+    'trust-filter.low': 'Low',
+    'trust-filter.medium': 'Medium',
+    'trust-filter.high': 'High',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'Filter Threshold',
+    'trust-filter.quick-presets': 'Quick presets',
+    'trust-filter.show-all-content': 'Show all content',
+    'trust-filter.only-show-wot': 'Only show your Web of Trust (follows + their follows)',
+    'trust-filter.hide-bottom-percent':
+      'Filter out bottom {{score}}% of users by trust rank',
+    'trust-filter.trust-score-description': 'Calculated based on user reputation and social network percentile',
     'Auto-load profile pictures': 'Auto-load profile pictures'
   }
 }

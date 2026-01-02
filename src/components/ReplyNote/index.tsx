@@ -10,7 +10,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ClientTag from '../ClientTag'
 import Collapsible from '../Collapsible'
@@ -42,11 +42,13 @@ export default function ReplyNote({
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
   const { mutePubkeySet } = useMuteList()
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { minTrustScore, meetsMinTrustScore } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const eventKey = useMemo(() => getEventKey(event), [event])
   const replies = useThread(eventKey)
   const [showMuted, setShowMuted] = useState(false)
+  const [hasReplies, setHasReplies] = useState(false)
+
   const show = useMemo(() => {
     if (showMuted) {
       return true
@@ -59,24 +61,32 @@ export default function ReplyNote({
     }
     return true
   }, [showMuted, mutePubkeySet, event, hideContentMentioningMutedUsers])
-  const hasReplies = useMemo(() => {
-    if (!replies || replies.length === 0) {
-      return false
+
+  useEffect(() => {
+    const checkHasReplies = async () => {
+      if (!replies || replies.length === 0) {
+        setHasReplies(false)
+        return
+      }
+
+      for (const reply of replies) {
+        if (mutePubkeySet.has(reply.pubkey)) {
+          continue
+        }
+        if (hideContentMentioningMutedUsers && isMentioningMutedUsers(reply, mutePubkeySet)) {
+          continue
+        }
+        if (!(await meetsMinTrustScore(reply.pubkey))) {
+          continue
+        }
+        setHasReplies(true)
+        return
+      }
+      setHasReplies(false)
     }
 
-    for (const reply of replies) {
-      if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
-        continue
-      }
-      if (mutePubkeySet.has(reply.pubkey)) {
-        continue
-      }
-      if (hideContentMentioningMutedUsers && isMentioningMutedUsers(reply, mutePubkeySet)) {
-        continue
-      }
-      return true
-    }
-  }, [replies])
+    checkHasReplies()
+  }, [replies, minTrustScore, meetsMinTrustScore, mutePubkeySet, hideContentMentioningMutedUsers])
 
   return (
     <div

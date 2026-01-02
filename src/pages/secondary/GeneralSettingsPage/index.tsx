@@ -14,8 +14,7 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn, isSupportCheckConnectionType } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
-import { TMediaAutoLoadPolicy, TProfilePictureAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
+import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy, TProfilePictureAutoLoadPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
 import { RotateCcw } from 'lucide-react'
 import { forwardRef, HTMLProps, useState } from 'react'
@@ -36,7 +35,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     profilePictureAutoLoadPolicy,
     setProfilePictureAutoLoadPolicy
   } = useContentPolicy()
-  const { hideUntrustedNotes, updateHideUntrustedNotes } = useUserTrust()
   const { quickReaction, updateQuickReaction, quickReactionEmoji, updateQuickReactionEmoji } =
     useUserPreferences()
 
@@ -119,16 +117,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             <div className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
           </Label>
           <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
-        </SettingItem>
-        <SettingItem>
-          <Label htmlFor="hide-untrusted-notes" className="text-base font-normal">
-            {t('Hide untrusted notes')}
-          </Label>
-          <Switch
-            id="hide-untrusted-notes"
-            checked={hideUntrustedNotes}
-            onCheckedChange={updateHideUntrustedNotes}
-          />
         </SettingItem>
         <SettingItem>
           <Label htmlFor="hide-content-mentioning-muted-users" className="text-base font-normal">

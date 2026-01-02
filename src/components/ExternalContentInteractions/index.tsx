@@ -1,10 +1,10 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useState } from 'react'
-import HideUntrustedContentButton from '../HideUntrustedContentButton'
 import QuoteList from '../QuoteList'
 import ReactionList from '../ReactionList'
 import ReplyNoteList from '../ReplyNoteList'
+import TrustScoreFilter from '../TrustScoreFilter'
 import { Tabs, TTabValue } from './Tabs'
 
 export default function ExternalContentInteractions({
@@ -37,7 +37,7 @@ export default function ExternalContentInteractions({
         </ScrollArea>
         <Separator orientation="vertical" className="h-6" />
         <div className="size-10 flex items-center justify-center">
-          <HideUntrustedContentButton type="interactions" />
+          <TrustScoreFilter />
         </div>
       </div>
       <Separator />

@@ -58,7 +58,7 @@ class StuffStatsService {
         },
         {
           '#e': [event.id],
-          kinds: [kinds.Repost],
+          kinds: [kinds.Repost, kinds.GenericRepost],
           limit: 100
         }
       )
@@ -79,7 +79,7 @@ class StuffStatsService {
         },
         {
           '#a': [replaceableCoordinate],
-          kinds: [kinds.Repost],
+          kinds: [kinds.Repost, kinds.GenericRepost],
           limit: 100
         }
       )

@@ -74,6 +74,7 @@ export default function FollowingFeed() {
         setRefreshCount((count) => count + 1)
       }}
       isMainFeed
+      isPubkeyFeed
     />
   )
 }

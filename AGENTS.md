@@ -149,6 +149,8 @@ And some Providers are placed in `PageManager.tsx` because they need to use the 
 
 Jumble is a multi-language application. When you add new text content, please ensure to add translations for all supported languages as much as possible. Append new translations to the end of each translation file without modifying or removing existing keys.
 
+At the trial stage, you can skip translation first. After the feature is completed and confirmed satisfactory, you can add translation content later.
+
 - Translation files located in `src/i18n/locales/`
 - Using `react-i18next` for internationalization
 - Supported languages: ar, de, en, es, fa, fr, hi, hu, it, ja, ko, pl, pt-BR, pt-PT, ru, th, zh, zh-TW

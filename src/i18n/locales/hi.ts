@@ -649,6 +649,20 @@ export default {
     'Enter Password': 'पासवर्ड दर्ज करें',
     Password: 'पासवर्ड',
     Confirm: 'पुष्टि करें',
+    'trust-filter.title': 'विश्वास स्कोर फ़िल्टर',
+    'trust-filter.off': 'बंद',
+    'trust-filter.low': 'कम',
+    'trust-filter.medium': 'मध्यम',
+    'trust-filter.high': 'उच्च',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'फ़िल्टर सीमा',
+    'trust-filter.quick-presets': 'त्वरित प्रीसेट',
+    'trust-filter.show-all-content': 'सभी सामग्री दिखाएं',
+    'trust-filter.only-show-wot': 'केवल अपना विश्वास नेटवर्क दिखाएं (फ़ॉलो + उनके फ़ॉलो)',
+    'trust-filter.hide-bottom-percent':
+      'विश्वास रैंक द्वारा निचले {{score}}% उपयोगकर्ताओं को फ़िल्टर करें',
+    'trust-filter.trust-score-description':
+      'उपयोगकर्ता की प्रतिष्ठा और सामाजिक नेटवर्क प्रतिशतक के आधार पर गणना की गई',
     'Auto-load profile pictures': 'प्रोफ़ाइल चित्र स्वतः लोड करें'
   }
 }

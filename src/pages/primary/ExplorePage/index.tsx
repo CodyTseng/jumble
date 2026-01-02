@@ -7,7 +7,6 @@ import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { isLocalNetworkUrl, isOnionUrl, isWebsocketUrl } from '@/lib/url'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
 import { TPageRef } from '@/types'
 import { Compass, Plus } from 'lucide-react'
@@ -18,7 +17,6 @@ import { useTranslation } from 'react-i18next'
 type TExploreTabs = 'following' | 'explore' | 'reviews'
 
 const ExplorePage = forwardRef<TPageRef>((_, ref) => {
-  const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TExploreTabs>('explore')
   const topRef = useRef<HTMLDivElement | null>(null)
 
@@ -52,7 +50,7 @@ const ExplorePage = forwardRef<TPageRef>((_, ref) => {
     ) : (
       <FollowingFavoriteRelayList />
     )
-  }, [tab, relayReviewFilterFn, hideUntrustedNotes])
+  }, [tab, relayReviewFilterFn])
 
   return (
     <PrimaryPageLayout

@@ -641,6 +641,21 @@ export default {
     'Enter Password': 'Jelszó megadása',
     Password: 'Jelszó',
     Confirm: 'Megerősítés',
+    'trust-filter.title': 'Bizalmi pontszám szűrő',
+    'trust-filter.off': 'Ki',
+    'trust-filter.low': 'Alacsony',
+    'trust-filter.medium': 'Közepes',
+    'trust-filter.high': 'Magas',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'Szűrési küszöb',
+    'trust-filter.quick-presets': 'Gyors beállítások',
+    'trust-filter.show-all-content': 'Minden tartalom megjelenítése',
+    'trust-filter.only-show-wot':
+      'Csak a bizalmi hálózatod megjelenítése (követettek + követetteik)',
+    'trust-filter.hide-bottom-percent':
+      'Alsó {{score}}% felhasználók szűrése bizalmi rangsor szerint',
+    'trust-filter.trust-score-description':
+      'A felhasználó hírneve és a közösségi hálózat percentilise alapján számítva',
     'Auto-load profile pictures': 'Profilképek automatikus betöltése'
   }
 }

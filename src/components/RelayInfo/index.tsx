@@ -6,7 +6,7 @@ import { checkNip43Support } from '@/lib/relay'
 import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { Check, Copy, GitBranch, Link, Mail, SquareCode } from 'lucide-react'
+import { Check, Copy, GitBranch, Mail, Share2, SquareCode } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -154,7 +154,7 @@ function RelayControls({ url }: { url: string }) {
   return (
     <div className="flex items-center gap-1">
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyShareableUrl}>
-        {copiedShareableUrl ? <Check /> : <Link />}
+        {copiedShareableUrl ? <Check /> : <Share2 />}
       </Button>
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyUrl}>
         {copiedUrl ? <Check /> : <Copy />}

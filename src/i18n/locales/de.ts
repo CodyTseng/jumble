@@ -659,6 +659,20 @@ export default {
     'Enter Password': 'Passwort eingeben',
     Password: 'Passwort',
     Confirm: 'Bestätigen',
+    'trust-filter.title': 'Vertrauenswert-Filter',
+    'trust-filter.off': 'Aus',
+    'trust-filter.low': 'Niedrig',
+    'trust-filter.medium': 'Mittel',
+    'trust-filter.high': 'Hoch',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'Filterschwelle',
+    'trust-filter.quick-presets': 'Schnellvoreinstellungen',
+    'trust-filter.show-all-content': 'Alle Inhalte anzeigen',
+    'trust-filter.only-show-wot': 'Nur Ihr Vertrauensnetzwerk anzeigen (Folgende + deren Folgende)',
+    'trust-filter.hide-bottom-percent':
+      'Untere {{score}}% der Benutzer nach Vertrauensrang filtern',
+    'trust-filter.trust-score-description':
+      'Berechnet basierend auf Benutzerreputation und sozialem Netzwerk-Perzentil',
     'Auto-load profile pictures': 'Profilbilder automatisch laden'
   }
 }

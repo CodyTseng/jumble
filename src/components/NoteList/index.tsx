@@ -1,8 +1,10 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
+import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
+import { mergeTimelines } from '@/lib/timeline'
 import { isTouchDevice } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
@@ -27,6 +29,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { toast } from 'sonner'
+import { LoadingBar } from '../LoadingBar'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 import PinnedNoteCard from '../PinnedNoteCard'
 
@@ -46,13 +49,13 @@ const NoteList = forwardRef<
     showKinds?: number[]
     filterMutedNotes?: boolean
     hideReplies?: boolean
-    hideUntrustedNotes?: boolean
     hideSpam?: boolean
     areAlgoRelays?: boolean
     showRelayCloseReason?: boolean
     pinnedEventIds?: string[]
     filterFn?: (event: Event) => boolean
     showNewNotesDirectly?: boolean
+    isPubkeyFeed?: boolean
   }
 >(
   (
@@ -61,25 +64,26 @@ const NoteList = forwardRef<
       showKinds,
       filterMutedNotes = true,
       hideReplies = false,
-      hideUntrustedNotes = false,
       hideSpam = false,
       areAlgoRelays = false,
       showRelayCloseReason = false,
       pinnedEventIds,
       filterFn,
-      showNewNotesDirectly = false
+      showNewNotesDirectly = false,
+      isPubkeyFeed = false
     },
     ref
   ) => {
     const { t } = useTranslation()
     const { startLogin } = useNostr()
-    const { isUserTrusted, isSpammer } = useUserTrust()
+    const { isSpammer, meetsMinTrustScore } = useUserTrust()
     const { mutePubkeySet } = useMuteList()
     const { hideContentMentioningMutedUsers } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
+    const [storedEvents, setStoredEvents] = useState<Event[]>([])
     const [events, setEvents] = useState<Event[]>([])
     const [newEvents, setNewEvents] = useState<Event[]>([])
-    const [initialLoading, setInitialLoading] = useState(false)
+    const [initialLoading, setInitialLoading] = useState(true)
     const [filtering, setFiltering] = useState(false)
     const [timelineKey, setTimelineKey] = useState<string | undefined>(undefined)
     const [filteredNotes, setFilteredNotes] = useState<
@@ -106,7 +110,6 @@ const NoteList = forwardRef<
 
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
-        if (hideUntrustedNotes && !isUserTrusted(evt.pubkey)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
         if (
           filterMutedNotes &&
@@ -121,7 +124,7 @@ const NoteList = forwardRef<
 
         return false
       },
-      [hideUntrustedNotes, mutePubkeySet, JSON.stringify(pinnedEventIds), isEventDeleted, filterFn]
+      [mutePubkeySet, JSON.stringify(pinnedEventIds), isEventDeleted, filterFn]
     )
 
     useEffect(() => {
@@ -134,7 +137,14 @@ const NoteList = forwardRef<
         const filteredEvents: Event[] = []
         const keys: string[] = []
 
-        events.forEach((evt) => {
+        let mergedEvents: Event[] = events
+        if (
+          storedEvents.length &&
+          (!events.length || storedEvents[0].created_at >= events[events.length - 1].created_at)
+        ) {
+          mergedEvents = mergeTimelines([storedEvents, events])
+        }
+        mergedEvents.forEach((evt) => {
           const key = getEventKey(evt)
           if (keySet.has(key)) return
           keySet.add(key)
@@ -195,7 +205,13 @@ const NoteList = forwardRef<
         const _filteredNotes = (
           await Promise.all(
             filteredEvents.map(async (evt, i) => {
-              if (hideSpam && (await isSpammer(evt.pubkey))) {
+              // Check trust score filter
+              if (
+                !(await meetsMinTrustScore(
+                  evt.pubkey,
+                  hideSpam ? SPAMMER_PERCENTILE_THRESHOLD : undefined
+                ))
+              ) {
                 return null
               }
               const key = keys[i]
@@ -213,7 +229,7 @@ const NoteList = forwardRef<
 
       setFiltering(true)
       processEvents().finally(() => setFiltering(false))
-    }, [events, shouldHideEvent, hideReplies, isSpammer, hideSpam])
+    }, [events, storedEvents, shouldHideEvent, hideReplies, hideSpam, meetsMinTrustScore])
 
     useEffect(() => {
       const processNewEvents = async () => {
@@ -238,6 +254,10 @@ const NoteList = forwardRef<
               if (hideSpam && (await isSpammer(evt.pubkey))) {
                 return null
               }
+              // Check trust score filter
+              if (!(await meetsMinTrustScore(evt.pubkey))) {
+                return null
+              }
               return evt
             })
           )
@@ -245,7 +265,7 @@ const NoteList = forwardRef<
         setFilteredNewEvents(_filteredNotes)
       }
       processNewEvents()
-    }, [newEvents, shouldHideEvent, isSpammer, hideSpam])
+    }, [newEvents, shouldHideEvent, isSpammer, hideSpam, meetsMinTrustScore])
 
     const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {
@@ -268,10 +288,20 @@ const NoteList = forwardRef<
       async function init() {
         setInitialLoading(true)
         setEvents([])
+        setStoredEvents([])
         setNewEvents([])
 
         if (showKinds?.length === 0 && subRequests.every(({ filter }) => !filter.kinds)) {
           return () => {}
+        }
+
+        if (isPubkeyFeed) {
+          const storedEvents = await client.getEventsFromIndexed({
+            authors: subRequests.flatMap(({ filter }) => filter.authors ?? []),
+            kinds: showKinds,
+            limit: LIMIT
+          })
+          setStoredEvents(storedEvents)
         }
 
         const preprocessedSubRequests = await Promise.all(
@@ -332,7 +362,8 @@ const NoteList = forwardRef<
           },
           {
             startLogin,
-            needSort: !areAlgoRelays
+            needSort: !areAlgoRelays,
+            needSaveToDb: isPubkeyFeed
           }
         )
         setTimelineKey(timelineKey)
@@ -376,6 +407,7 @@ const NoteList = forwardRef<
 
     const list = (
       <div className="min-h-screen">
+        {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
         {pinnedEventIds?.map((id) => <PinnedNoteCard key={id} eventId={id} className="w-full" />)}
         {visibleItems.map(({ key, event, reposters }) => (
           <NoteCard

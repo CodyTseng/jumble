@@ -653,6 +653,20 @@ export default {
     'Enter Password': 'Введите пароль',
     Password: 'Пароль',
     Confirm: 'Подтвердить',
+    'trust-filter.title': 'Фильтр доверия',
+    'trust-filter.off': 'Выкл',
+    'trust-filter.low': 'Низкий',
+    'trust-filter.medium': 'Средний',
+    'trust-filter.high': 'Высокий',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'Порог фильтрации',
+    'trust-filter.quick-presets': 'Быстрые предустановки',
+    'trust-filter.show-all-content': 'Показать весь контент',
+    'trust-filter.only-show-wot': 'Показывать только вашу сеть доверия (подписки + их подписки)',
+    'trust-filter.hide-bottom-percent':
+      'Отфильтровать нижние {{score}}% пользователей по рейтингу доверия',
+    'trust-filter.trust-score-description':
+      'Рассчитывается на основе репутации пользователя и процентиля социальной сети',
     'Auto-load profile pictures': 'Автозагрузка аватаров'
   }
 }

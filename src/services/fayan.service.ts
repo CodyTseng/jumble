@@ -1,3 +1,4 @@
+import { userIdToPubkey } from '@/lib/pubkey'
 import DataLoader from 'dataloader'
 
 class FayanService {
@@ -22,7 +23,12 @@ class FayanService {
         return new Array(pubkeys.length).fill(null)
       }
     },
-    { maxBatchSize: 50 }
+    {
+      maxBatchSize: 50,
+      cacheKeyFn: (userId) => {
+        return userIdToPubkey(userId)
+      }
+    }
   )
 
   constructor() {

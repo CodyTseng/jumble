@@ -638,6 +638,21 @@ export default {
     'Enter Password': 'ป้อนรหัสผ่าน',
     Password: 'รหัสผ่าน',
     Confirm: 'ยืนยัน',
+    'trust-filter.title': 'ตัวกรองคะแนนความไว้วางใจ',
+    'trust-filter.off': 'ปิด',
+    'trust-filter.low': 'ต่ำ',
+    'trust-filter.medium': 'ปานกลาง',
+    'trust-filter.high': 'สูง',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'เกณฑ์การกรอง',
+    'trust-filter.quick-presets': 'ค่าที่ตั้งไว้ล่วงหน้าแบบเร็ว',
+    'trust-filter.show-all-content': 'แสดงเนื้อหาทั้งหมด',
+    'trust-filter.only-show-wot':
+      'แสดงเฉพาะเครือข่ายความไว้วางใจของคุณ (ผู้ติดตาม + ผู้ติดตามของพวกเขา)',
+    'trust-filter.hide-bottom-percent':
+      'กรอง {{score}}% ล่างสุดของผู้ใช้ตามอันดับความไว้วางใจ',
+    'trust-filter.trust-score-description':
+      'คำนวณจากชื่อเสียงของผู้ใช้และเปอร์เซ็นไทล์ของเครือข่ายสังคม',
     'Auto-load profile pictures': 'โหลดรูปโปรไฟล์อัตโนมัติ'
   }
 }

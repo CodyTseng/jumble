@@ -34,11 +34,11 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       {nip05IsVerified ? (
         <Favicon
           domain={nip05Domain}
-          className="w-3.5 h-3.5 rounded-full"
-          fallback={<BadgeCheck className="text-primary" />}
+          className="w-3.5 h-3.5 rounded-full shrink-0"
+          fallback={<BadgeCheck className="text-primary shrink-0" />}
         />
       ) : (
-        <BadgeAlert className="text-muted-foreground" />
+        <BadgeAlert className="text-muted-foreground shrink-0" />
       )}
       <SecondaryPageLink
         to={toNoteList({ domain: nip05Domain })}

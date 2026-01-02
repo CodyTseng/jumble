@@ -3,7 +3,6 @@ import NoteList from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import { BIG_RELAY_URLS } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import { kinds } from 'nostr-tools'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +11,6 @@ type TTab = 'my-packs' | 'explore'
 
 const EmojiPackSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TTab>('my-packs')
 
   return (
@@ -33,7 +31,6 @@ const EmojiPackSettingsPage = forwardRef(({ index }: { index?: number }, ref) =>
         <NoteList
           showKinds={[kinds.Emojisets]}
           subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
-          hideUntrustedNotes={hideUntrustedNotes}
         />
       )}
     </SecondaryPageLayout>

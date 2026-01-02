@@ -648,6 +648,21 @@ export default {
     'Enter Password': 'رمز عبور را وارد کنید',
     Password: 'رمز عبور',
     Confirm: 'تأیید',
+    'trust-filter.title': 'فیلتر امتیاز اعتماد',
+    'trust-filter.off': 'خاموش',
+    'trust-filter.low': 'پایین',
+    'trust-filter.medium': 'متوسط',
+    'trust-filter.high': 'بالا',
+    'trust-filter.wot': 'WoT',
+    'trust-filter.filter-threshold': 'آستانه فیلتر',
+    'trust-filter.quick-presets': 'تنظیمات سریع',
+    'trust-filter.show-all-content': 'نمایش همه محتوا',
+    'trust-filter.only-show-wot':
+      'فقط شبکه اعتماد شما را نشان دهید (دنبال‌شوندگان + دنبال‌شوندگان آنها)',
+    'trust-filter.hide-bottom-percent':
+      'فیلتر کردن {{score}}٪ پایین‌ترین کاربران بر اساس رتبه اعتماد',
+    'trust-filter.trust-score-description':
+      'بر اساس شهرت کاربر و صدک شبکه اجتماعی محاسبه می‌شود',
     'Auto-load profile pictures': 'بارگذاری خودکار تصاویر پروفایل'
   }
 }

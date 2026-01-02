@@ -45,9 +45,6 @@ class LocalStorageService {
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
   private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
   private autoplay: boolean = true
-  private hideUntrustedInteractions: boolean = false
-  private hideUntrustedNotifications: boolean = false
-  private hideUntrustedNotes: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private dismissedTooManyRelaysAlert: boolean = false
@@ -68,6 +65,7 @@ class LocalStorageService {
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
   private hideFollowedUsersPerRelay: Record<string, boolean> = {}
 
+  private minTrustScore: number = 40
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -135,25 +133,6 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
-
-    const hideUntrustedEvents =
-      window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_EVENTS) === 'true'
-    const storedHideUntrustedInteractions = window.localStorage.getItem(
-      StorageKey.HIDE_UNTRUSTED_INTERACTIONS
-    )
-    const storedHideUntrustedNotifications = window.localStorage.getItem(
-      StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS
-    )
-    const storedHideUntrustedNotes = window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTES)
-    this.hideUntrustedInteractions = storedHideUntrustedInteractions
-      ? storedHideUntrustedInteractions === 'true'
-      : hideUntrustedEvents
-    this.hideUntrustedNotifications = storedHideUntrustedNotifications
-      ? storedHideUntrustedNotifications === 'true'
-      : hideUntrustedEvents
-    this.hideUntrustedNotes = storedHideUntrustedNotes
-      ? storedHideUntrustedNotes === 'true'
-      : hideUntrustedEvents
 
     const translationServiceConfigMapStr = window.localStorage.getItem(
       StorageKey.TRANSLATION_SERVICE_CONFIG_MAP
@@ -281,6 +260,26 @@ class LocalStorageService {
     )
     if (hideFollowedUsersPerRelayStr) {
       this.hideFollowedUsersPerRelay = JSON.parse(hideFollowedUsersPerRelayStr)
+    const minTrustScoreStr = window.localStorage.getItem(StorageKey.MIN_TRUST_SCORE)
+    if (minTrustScoreStr) {
+      const score = parseInt(minTrustScoreStr, 10)
+      if (!isNaN(score) && score >= 0 && score <= 100) {
+        this.minTrustScore = score
+      }
+    } else {
+      const storedHideUntrustedInteractions =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_INTERACTIONS) === 'true'
+      const storedHideUntrustedNotifications =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS) === 'true'
+      const storedHideUntrustedNotes =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTES) === 'true'
+      if (
+        storedHideUntrustedInteractions ||
+        storedHideUntrustedNotifications ||
+        storedHideUntrustedNotes
+      ) {
+        this.minTrustScore = 100 // set to max if any of the old settings were true
+      }
     }
 
     // Clean up deprecated data
@@ -432,39 +431,6 @@ class LocalStorageService {
   setAutoplay(autoplay: boolean) {
     this.autoplay = autoplay
     window.localStorage.setItem(StorageKey.AUTOPLAY, autoplay.toString())
-  }
-
-  getHideUntrustedInteractions() {
-    return this.hideUntrustedInteractions
-  }
-
-  setHideUntrustedInteractions(hideUntrustedInteractions: boolean) {
-    this.hideUntrustedInteractions = hideUntrustedInteractions
-    window.localStorage.setItem(
-      StorageKey.HIDE_UNTRUSTED_INTERACTIONS,
-      hideUntrustedInteractions.toString()
-    )
-  }
-
-  getHideUntrustedNotifications() {
-    return this.hideUntrustedNotifications
-  }
-
-  setHideUntrustedNotifications(hideUntrustedNotifications: boolean) {
-    this.hideUntrustedNotifications = hideUntrustedNotifications
-    window.localStorage.setItem(
-      StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS,
-      hideUntrustedNotifications.toString()
-    )
-  }
-
-  getHideUntrustedNotes() {
-    return this.hideUntrustedNotes
-  }
-
-  setHideUntrustedNotes(hideUntrustedNotes: boolean) {
-    this.hideUntrustedNotes = hideUntrustedNotes
-    window.localStorage.setItem(StorageKey.HIDE_UNTRUSTED_NOTES, hideUntrustedNotes.toString())
   }
 
   getTranslationServiceConfig(pubkey?: string | null) {
@@ -653,6 +619,15 @@ class LocalStorageService {
       StorageKey.HIDE_FOLLOWED_USERS_PER_RELAY,
       JSON.stringify(this.hideFollowedUsersPerRelay)
     )
+  getMinTrustScore() {
+    return this.minTrustScore
+  }
+
+  setMinTrustScore(score: number) {
+    if (score >= 0 && score <= 100) {
+      this.minTrustScore = score
+      window.localStorage.setItem(StorageKey.MIN_TRUST_SCORE, score.toString())
+    }
   }
 }
 

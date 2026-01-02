@@ -1,63 +1,19 @@
 import { useSecondaryPage } from '@/PageManager'
-import { useAllDescendantThreads } from '@/hooks/useThread'
-import { getEventKey, getKeyFromTag, getParentTag, isMentioningMutedUsers } from '@/lib/event'
+import { useFilteredAllReplies } from '@/hooks'
+import { getEventKey, getKeyFromTag, getParentTag } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
-import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useMuteList } from '@/providers/MuteListProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { NostrEvent } from 'nostr-tools'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReplyNote from '../ReplyNote'
 
 export default function SubReplies({ parentKey }: { parentKey: string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const allThreads = useAllDescendantThreads(parentKey)
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
-  const { mutePubkeySet } = useMuteList()
-  const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [isExpanded, setIsExpanded] = useState(false)
-  const replies = useMemo(() => {
-    const replyKeySet = new Set<string>()
-    const replyEvents: NostrEvent[] = []
-
-    let parentKeys = [parentKey]
-    while (parentKeys.length > 0) {
-      const events = parentKeys.flatMap((key) => allThreads.get(key) ?? [])
-      events.forEach((evt) => {
-        const key = getEventKey(evt)
-        if (replyKeySet.has(key)) return
-        if (mutePubkeySet.has(evt.pubkey)) return
-        if (hideContentMentioningMutedUsers && isMentioningMutedUsers(evt, mutePubkeySet)) return
-        if (hideUntrustedInteractions && !isUserTrusted(evt.pubkey)) {
-          const replyKey = getEventKey(evt)
-          const repliesForThisReply = allThreads.get(replyKey)
-          // If the reply is not trusted and there are no trusted replies for this reply, skip rendering
-          if (
-            !repliesForThisReply ||
-            repliesForThisReply.every((evt) => !isUserTrusted(evt.pubkey))
-          ) {
-            return
-          }
-        }
-
-        replyKeySet.add(key)
-        replyEvents.push(evt)
-      })
-      parentKeys = events.map((evt) => getEventKey(evt))
-    }
-    return replyEvents.sort((a, b) => a.created_at - b.created_at)
-  }, [
-    parentKey,
-    allThreads,
-    mutePubkeySet,
-    hideContentMentioningMutedUsers,
-    hideUntrustedInteractions
-  ])
+  const { replies } = useFilteredAllReplies(parentKey)
   const [highlightReplyKey, setHighlightReplyKey] = useState<string | undefined>(undefined)
   const replyRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
