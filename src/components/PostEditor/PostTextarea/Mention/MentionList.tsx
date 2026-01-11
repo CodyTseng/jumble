@@ -19,6 +19,7 @@ export interface MentionListHandle {
 
 const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+const [activeTab, setActiveTab] = useState<'profiles' | 'lists'>('profiles')
 
   const selectItem = (index: number) => {
     const item = props.items[index]
@@ -75,6 +76,21 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
       onWheel={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
+      {/* Tab buttons */}
+      <div className="flex border-b mb-2">
+        <button 
+          className={activeTab === 'profiles' ? 'font-bold' : ''}
+          onClick={() => setActiveTab('profiles')}
+        >
+          Profiles
+        </button>
+        <button 
+          className={activeTab === 'lists' ? 'font-bold' : ''}
+          onClick={() => setActiveTab('lists')}
+        >
+          Lists
+        </button>
+      </div>
       {props.items.map((item, index) => (
         <button
           className={cn(
