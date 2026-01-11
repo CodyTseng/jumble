@@ -8,7 +8,21 @@ import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
 
 const suggestion = {
   items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+    const profiles = await client.searchNpubsFromLocal(query, 20)
+    
+    // Fetch lists (kind 30000)
+    const lists = await client.fetchEvents({
+      kinds: [30000],
+      search: query,
+      limit: 10
+    })
+    // Format lists
+    const formattedLists = lists.map(list => ({
+      pubkey: list.id,
+      type: 'list',
+      listName: list.tags.find(t => t[0] === 'd')?.[1] || 'Untitled List'
+    }))
+    return [...profiles, ...formattedLists]
   },
 
   render: () => {
