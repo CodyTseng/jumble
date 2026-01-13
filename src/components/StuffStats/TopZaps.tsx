@@ -25,7 +25,7 @@ export default function TopZaps({ stuff }: { stuff: Event | string }) {
       <div className="flex gap-1">
         {topZaps.map((zap, index) => {
           const hasImage = zap.comment && IMAGE_REGEX.test(zap.comment)
-          const displayText = hasImage ? zap.comment.replace(IMAGE_REGEX, '').trim() : zap.comment
+          const displayText = hasImage ? zap.comment?.replace(IMAGE_REGEX, '').trim() : zap.comment
 
           return (
             <div
