@@ -90,7 +90,17 @@ export const EmbeddedUrlParser: TContentParser = (content: string) => {
       })
     }
 
-    const url = match[0]
+    let url = match[0]
+    if (url.endsWith(')')) {
+      // Handle case where URL is wrapped in parentheses
+      const openParens = (url.match(/\(/g) || []).length
+      const closeParens = (url.match(/\)/g) || []).length
+      if (closeParens > openParens) {
+        // More closing parens than opening, likely the last char is not part of URL
+        url = url.slice(0, -1)
+      }
+    }
+
     let type: TEmbeddedNodeType = 'url'
     if (isImage(url)) {
       type = 'image'

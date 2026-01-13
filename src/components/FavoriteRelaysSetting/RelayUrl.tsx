@@ -82,7 +82,7 @@ function RelayUrl({ url, onRemove }: { url: string; onRemove: () => void }) {
   return (
     <div className="flex items-center justify-between pl-1 pr-3">
       <div className="flex gap-3 items-center flex-1 w-0">
-        <RelayIcon url={url} className="w-4 h-4" iconSize={10} />
+        <RelayIcon url={url} className="w-4 h-4" />
         <div className="text-muted-foreground text-sm truncate">{url}</div>
       </div>
       <div className="shrink-0">

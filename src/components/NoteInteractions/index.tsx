@@ -2,26 +2,21 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Event } from 'nostr-tools'
 import { useState } from 'react'
-import HideUntrustedContentButton from '../HideUntrustedContentButton'
 import QuoteList from '../QuoteList'
 import ReactionList from '../ReactionList'
 import ReplyNoteList from '../ReplyNoteList'
 import RepostList from '../RepostList'
+import TrustScoreFilter from '../TrustScoreFilter'
 import ZapList from '../ZapList'
 import { Tabs, TTabValue } from './Tabs'
 
-export default function NoteInteractions({
-  pageIndex,
-  event
-}: {
-  pageIndex?: number
-  event: Event
-}) {
+export default function NoteInteractions({ event }: { event: Event }) {
   const [type, setType] = useState<TTabValue>('replies')
+
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList index={pageIndex} stuff={event} />
+      list = <ReplyNoteList stuff={event} />
       break
     case 'quotes':
       list = <QuoteList stuff={event} />
@@ -47,9 +42,7 @@ export default function NoteInteractions({
           <ScrollBar orientation="horizontal" className="opacity-0 pointer-events-none" />
         </ScrollArea>
         <Separator orientation="vertical" className="h-6" />
-        <div className="size-10 flex items-center justify-center">
-          <HideUntrustedContentButton type="interactions" />
-        </div>
+        <TrustScoreFilter />
       </div>
       <Separator />
       {list}

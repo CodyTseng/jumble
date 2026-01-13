@@ -7,6 +7,7 @@ import { userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
 import FollowingBadge from '../FollowingBadge'
+import TrustScoreBadge from '../TrustScoreBadge'
 
 export default function UserItem({
   userId,
@@ -32,6 +33,7 @@ export default function UserItem({
             skeletonClassName="h-4"
           />
           {showFollowingBadge && <FollowingBadge pubkey={pubkey} />}
+          <TrustScoreBadge pubkey={pubkey} />
         </div>
         <Nip05 pubkey={userId} />
       </div>

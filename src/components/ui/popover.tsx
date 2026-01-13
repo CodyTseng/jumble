@@ -2,8 +2,47 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 
 import { cn } from '@/lib/utils'
+import { createPortal } from 'react-dom'
 
-const Popover = PopoverPrimitive.Root
+const Popover = ({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>) => {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : uncontrolledOpen
+  const backdropRef = React.useRef<HTMLDivElement>(null)
+
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(newOpen)
+      }
+      controlledOnOpenChange?.(newOpen)
+    },
+    [isControlled, controlledOnOpenChange]
+  )
+
+  return (
+    <>
+      {open &&
+        createPortal(
+          <div
+            ref={backdropRef}
+            className="fixed inset-0 z-40 pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleOpenChange(false)
+            }}
+          />,
+          document.body
+        )}
+      <PopoverPrimitive.Root {...props} open={open} onOpenChange={handleOpenChange} modal={false} />
+    </>
+  )
+}
+Popover.displayName = 'Popover'
 
 const PopoverTrigger = PopoverPrimitive.Trigger
 
@@ -20,7 +59,7 @@ const PopoverContent = React.forwardRef<
       sideOffset={sideOffset}
       collisionPadding={10}
       className={cn(
-        'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        'z-50 w-72 rounded-xl border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
         className
       )}
       onOpenAutoFocus={(e) => e.preventDefault()}

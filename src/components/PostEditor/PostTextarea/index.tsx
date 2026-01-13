@@ -40,6 +40,7 @@ const PostTextarea = forwardRef<
     onUploadStart?: (file: File, cancel: () => void) => void
     onUploadProgress?: (file: File, progress: number) => void
     onUploadEnd?: (file: File) => void
+    placeholder?: string
   }
 >(
   (
@@ -52,7 +53,8 @@ const PostTextarea = forwardRef<
       className,
       onUploadStart,
       onUploadProgress,
-      onUploadEnd
+      onUploadEnd,
+      placeholder
     },
     ref
   ) => {
@@ -67,6 +69,7 @@ const PostTextarea = forwardRef<
         HardBreak,
         Placeholder.configure({
           placeholder:
+            placeholder ??
             t('Write something...') + ' (' + t('Paste or drop media files to upload') + ')'
         }),
         Emoji.configure({

@@ -1,3 +1,4 @@
+import DefaultRelaysSetting from '@/components/DefaultRelaysSetting'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -42,6 +43,9 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
               setFilterOutOnionRelays(checked)
             }}
           />
+        </div>
+        <div className="px-4 space-y-2">
+          <DefaultRelaysSetting />
         </div>
       </div>
     </SecondaryPageLayout>

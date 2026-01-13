@@ -1,8 +1,8 @@
-import { BIG_RELAY_URLS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { randomString } from '@/lib/random'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
@@ -94,7 +94,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
       setRelaySetEvents(storedRelaySetEvents.filter(Boolean) as Event[])
 
       const newRelaySetEvents = await client.fetchEvents(
-        (relayList?.write ?? []).concat(BIG_RELAY_URLS).slice(0, 5),
+        (relayList?.write ?? []).concat(getDefaultRelayUrls()).slice(0, 5),
         {
           kinds: [kinds.Relaysets],
           authors: [pubkey],

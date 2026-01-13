@@ -35,17 +35,17 @@ function FormattedTimestampContent({
 
   const diffDay = now.diff(time, 'day')
   if (diffDay >= 1) {
-    return short ? t('n d', { n: diffDay }) : t('n days ago', { n: diffDay })
+    return short ? t('n d', { n: diffDay }) : t('day ago', { count: diffDay })
   }
 
   const diffHour = now.diff(time, 'hour')
   if (diffHour >= 1) {
-    return short ? t('n h', { n: diffHour }) : t('n hours ago', { n: diffHour })
+    return short ? t('n h', { n: diffHour }) : t('hour ago', { count: diffHour })
   }
 
   const diffMinute = now.diff(time, 'minute')
   if (diffMinute >= 1) {
-    return short ? t('n m', { n: diffMinute }) : t('n minutes ago', { n: diffMinute })
+    return short ? t('n m', { n: diffMinute }) : t('minute ago', { count: diffMinute })
   }
 
   return t('just now')

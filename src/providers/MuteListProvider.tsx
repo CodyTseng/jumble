@@ -54,25 +54,30 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   }, [publicMutePubkeySet, privateMutePubkeySet])
   const [changing, setChanging] = useState(false)
 
-  const getPrivateTags = async (muteListEvent: Event) => {
-    if (!muteListEvent.content) return []
+  const getPrivateTags = useCallback(
+    async (muteListEvent: Event) => {
+      if (!muteListEvent.content) return []
 
-    const storedDecryptedTags = await indexedDb.getMuteDecryptedTags(muteListEvent.id)
-
-    if (storedDecryptedTags) {
-      return storedDecryptedTags
-    } else {
       try {
-        const plainText = await nip04Decrypt(muteListEvent.pubkey, muteListEvent.content)
+        const storedPlainText = await indexedDb.getDecryptedContent(muteListEvent.id)
+
+        let plainText: string
+        if (storedPlainText) {
+          plainText = storedPlainText
+        } else {
+          plainText = await nip04Decrypt(muteListEvent.pubkey, muteListEvent.content)
+          await indexedDb.putDecryptedContent(muteListEvent.id, plainText)
+        }
+
         const privateTags = z.array(z.array(z.string())).parse(JSON.parse(plainText))
-        await indexedDb.putMuteDecryptedTags(muteListEvent.id, privateTags)
         return privateTags
       } catch (error) {
         console.error('Failed to decrypt mute list content', error)
         return []
       }
-    }
-  }
+    },
+    [nip04Decrypt]
+  )
 
   useEffect(() => {
     const updateMuteTags = async () => {

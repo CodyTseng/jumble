@@ -42,10 +42,10 @@ export default function AccountButton() {
           profile ? (
             <SimpleUserAvatar
               userId={pubkey}
-              className={cn('w-7 h-7', active ? 'ring-primary ring-1' : '')}
+              className={cn('size-6', active ? 'ring-primary ring-2' : '')}
             />
           ) : (
-            <Skeleton className={cn('w-7 h-7 rounded-full', active ? 'ring-primary ring-1' : '')} />
+            <Skeleton className={cn('size-6 rounded-full', active ? 'ring-primary ring-2' : '')} />
           )
         ) : (
           <UserRound />

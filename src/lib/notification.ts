@@ -2,26 +2,24 @@ import { kinds, NostrEvent } from 'nostr-tools'
 import { isMentioningMutedUsers } from './event'
 import { tagNameEquals } from './tag'
 
-export function notificationFilter(
+export async function notificationFilter(
   event: NostrEvent,
   {
     pubkey,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
-    hideUntrustedNotifications,
-    isUserTrusted
+    meetsMinTrustScore
   }: {
     pubkey?: string | null
     mutePubkeySet: Set<string>
     hideContentMentioningMutedUsers?: boolean
-    hideUntrustedNotifications?: boolean
-    isUserTrusted: (pubkey: string) => boolean
+    meetsMinTrustScore: (pubkey: string, minScore?: number) => Promise<boolean>
   }
-): boolean {
+): Promise<boolean> {
   if (
     mutePubkeySet.has(event.pubkey) ||
     (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) ||
-    (hideUntrustedNotifications && !isUserTrusted(event.pubkey))
+    !(await meetsMinTrustScore(event.pubkey))
   ) {
     return false
   }

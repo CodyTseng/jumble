@@ -1,5 +1,10 @@
 export function isWebsocketUrl(url: string): boolean {
-  return /^wss?:\/\/.+$/.test(url)
+  try {
+    const protocol = new URL(url).protocol
+    return protocol === 'ws:' || protocol === 'wss:'
+  } catch {
+    return false
+  }
 }
 
 export function isOnionUrl(url: string): boolean {
@@ -123,30 +128,46 @@ export function isLocalNetworkUrl(urlString: string): boolean {
 }
 
 export function isImage(url: string) {
-  try {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.svg']
-    return imageExtensions.some((ext) => new URL(url).pathname.toLowerCase().endsWith(ext))
-  } catch {
-    return false
-  }
+  return checkFileExtension(url, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.svg'])
 }
 
 export function isMedia(url: string) {
+  return checkFileExtension(url, [
+    '.mp4',
+    '.webm',
+    '.ogg',
+    '.mov',
+    '.mp3',
+    '.wav',
+    '.flac',
+    '.aac',
+    '.m4a',
+    '.opus',
+    '.wma',
+    '.3gp'
+  ])
+}
+
+function checkFileExtension(url: string, extensions: string[]): boolean {
   try {
-    const mediaExtensions = [
-      '.mp4',
-      '.webm',
-      '.ogg',
-      '.mov',
-      '.mp3',
-      '.wav',
-      '.flac',
-      '.aac',
-      '.m4a',
-      '.opus',
-      '.wma'
-    ]
-    return mediaExtensions.some((ext) => new URL(url).pathname.toLowerCase().endsWith(ext))
+    const lowerCaseUrl = url.toLowerCase()
+    const endsWithImageExtion = extensions.some((ext) => lowerCaseUrl.endsWith(ext))
+    if (endsWithImageExtion) {
+      return true
+    }
+
+    const u = new URL(lowerCaseUrl)
+    const hasImageExtension = extensions.some((ext) => u.pathname.endsWith(ext))
+    if (hasImageExtension) {
+      return true
+    }
+
+    const fileNameParam = u.searchParams.get('filename')
+    if (fileNameParam) {
+      return extensions.some((ext) => fileNameParam.endsWith(ext))
+    }
+
+    return false
   } catch {
     return false
   }

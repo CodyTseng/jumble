@@ -1,5 +1,6 @@
-import { BIG_RELAY_URLS, CODY_PUBKEY, JUMBLE_PUBKEY } from '@/constants'
+import { CODY_PUBKEY, JUMBLE_PUBKEY } from '@/constants'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { TProfile } from '@/types'
 import { init, launchPaymentModal } from '@getalby/bitcoin-connect-react'
 import { Invoice } from '@getalby/lightning-tools'
@@ -54,11 +55,11 @@ class LightningService {
         : { recipient: recipientOrEvent.pubkey, event: recipientOrEvent }
 
     const [profile, receiptRelayList, senderRelayList] = await Promise.all([
-      client.fetchProfile(recipient, true),
+      client.fetchProfile(recipient),
       client.fetchRelayList(recipient),
       sender
         ? client.fetchRelayList(sender)
-        : Promise.resolve({ read: BIG_RELAY_URLS, write: BIG_RELAY_URLS })
+        : Promise.resolve({ read: getDefaultRelayUrls(), write: getDefaultRelayUrls() })
     ])
     if (!profile) {
       throw new Error('Recipient not found')
@@ -75,7 +76,7 @@ class LightningService {
       relays: receiptRelayList.read
         .slice(0, 4)
         .concat(senderRelayList.write.slice(0, 3))
-        .concat(BIG_RELAY_URLS),
+        .concat(getDefaultRelayUrls()),
       comment
     })
     const zapRequest = await client.signer.signEvent(zapRequestDraft)
@@ -162,7 +163,7 @@ class LightningService {
           filter['#e'] = [event.id]
         }
         subCloser = client.subscribe(
-          senderRelayList.write.concat(BIG_RELAY_URLS).slice(0, 4),
+          senderRelayList.write.concat(getDefaultRelayUrls()).slice(0, 4),
           filter,
           {
             onevent: (evt) => {
@@ -267,6 +268,7 @@ class LightningService {
 
       // Some clients have incorrectly filled in the positions for lud06 and lud16
       if (!profile.lightningAddress) {
+        console.warn('Profile has no lightning address', profile)
         return null
       }
 
@@ -282,6 +284,7 @@ class LightningService {
       const res = await fetch(lnurl)
       const body = await res.json()
 
+      console.log('Zap endpoint:', body)
       if (body.allowsNostr !== false && body.callback) {
         return {
           callback: body.callback,

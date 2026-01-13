@@ -67,7 +67,7 @@ export default function LongFormArticlePreview({
         {metadata.image && autoLoadMedia && (
           <Image
             image={{ url: metadata.image, pubkey: event.pubkey }}
-            className="rounded-lg aspect-[4/3] xl:aspect-video object-cover bg-foreground h-44"
+            className="aspect-[4/3] xl:aspect-video object-cover bg-foreground h-44"
             hideIfError
           />
         )}

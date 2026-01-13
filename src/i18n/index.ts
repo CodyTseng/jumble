@@ -19,6 +19,7 @@ import pt_PT from './locales/pt-PT'
 import ru from './locales/ru'
 import th from './locales/th'
 import zh from './locales/zh'
+import zh_TW from './locales/zh-TW'
 
 const languages = {
   ar: { resource: ar, name: 'العربية' },
@@ -37,7 +38,8 @@ const languages = {
   'pt-PT': { resource: pt_PT, name: 'Português (Portugal)' },
   ru: { resource: ru, name: 'Русский' },
   th: { resource: th, name: 'ไทย' },
-  zh: { resource: zh, name: '简体中文' }
+  zh: { resource: zh, name: '简体中文' },
+  'zh-TW': { resource: zh_TW, name: '繁體中文' }
 } as const
 
 export type TLanguage = keyof typeof languages
@@ -62,6 +64,10 @@ i18n
     },
     detection: {
       convertDetectedLanguage: (lng) => {
+        console.log('Detected language:', lng)
+        if (lng.startsWith('zh')) {
+          return ['zh', 'zh-CN', 'zh-SG'].includes(lng) ? 'zh' : 'zh-TW'
+        }
         const supported = supportedLanguages.find((supported) => lng.startsWith(supported))
         return supported || 'en'
       }
@@ -71,6 +77,7 @@ i18n
 i18n.services.formatter?.add('date', (timestamp, lng) => {
   switch (lng) {
     case 'zh':
+    case 'zh-TW':
     case 'ja':
       return dayjs(timestamp).format('YYYY年MM月DD日')
     case 'pl':

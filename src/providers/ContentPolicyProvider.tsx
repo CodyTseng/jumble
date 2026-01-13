@@ -1,14 +1,14 @@
-import { MEDIA_AUTO_LOAD_POLICY } from '@/constants'
+import { MEDIA_AUTO_LOAD_POLICY, PROFILE_PICTURE_AUTO_LOAD_POLICY } from '@/constants'
 import storage from '@/services/local-storage.service'
-import { TMediaAutoLoadPolicy } from '@/types'
+import { TMediaAutoLoadPolicy, TProfilePictureAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 type TContentPolicyContext = {
   autoplay: boolean
   setAutoplay: (autoplay: boolean) => void
 
-  defaultShowNsfw: boolean
-  setDefaultShowNsfw: (showNsfw: boolean) => void
+  nsfwDisplayPolicy: TNsfwDisplayPolicy
+  setNsfwDisplayPolicy: (policy: TNsfwDisplayPolicy) => void
 
   hideContentMentioningMutedUsers?: boolean
   setHideContentMentioningMutedUsers?: (hide: boolean) => void
@@ -17,8 +17,15 @@ type TContentPolicyContext = {
   mediaAutoLoadPolicy: TMediaAutoLoadPolicy
   setMediaAutoLoadPolicy: (policy: TMediaAutoLoadPolicy) => void
 
+  autoLoadProfilePicture: boolean
+  profilePictureAutoLoadPolicy: TProfilePictureAutoLoadPolicy
+  setProfilePictureAutoLoadPolicy: (policy: TProfilePictureAutoLoadPolicy) => void
+
   faviconUrlTemplate: string
   setFaviconUrlTemplate: (template: string) => void
+
+  mutedWords: string[]
+  setMutedWords: (words: string[]) => void
 }
 
 const ContentPolicyContext = createContext<TContentPolicyContext | undefined>(undefined)
@@ -33,12 +40,16 @@ export const useContentPolicy = () => {
 
 export function ContentPolicyProvider({ children }: { children: React.ReactNode }) {
   const [autoplay, setAutoplay] = useState(storage.getAutoplay())
-  const [defaultShowNsfw, setDefaultShowNsfw] = useState(storage.getDefaultShowNsfw())
+  const [nsfwDisplayPolicy, setNsfwDisplayPolicy] = useState(storage.getNsfwDisplayPolicy())
   const [hideContentMentioningMutedUsers, setHideContentMentioningMutedUsers] = useState(
     storage.getHideContentMentioningMutedUsers()
   )
   const [mediaAutoLoadPolicy, setMediaAutoLoadPolicy] = useState(storage.getMediaAutoLoadPolicy())
+  const [profilePictureAutoLoadPolicy, setProfilePictureAutoLoadPolicy] = useState(
+    storage.getProfilePictureAutoLoadPolicy()
+  )
   const [faviconUrlTemplate, setFaviconUrlTemplate] = useState(storage.getFaviconUrlTemplate())
+  const [mutedWords, setMutedWords] = useState(storage.getMutedWords())
   const [connectionType, setConnectionType] = useState((navigator as any).connection?.type)
 
   useEffect(() => {
@@ -67,14 +78,25 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     return connectionType === 'wifi' || connectionType === 'ethernet'
   }, [mediaAutoLoadPolicy, connectionType])
 
+  const autoLoadProfilePicture = useMemo(() => {
+    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS) {
+      return true
+    }
+    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER) {
+      return false
+    }
+    // WIFI_ONLY
+    return connectionType === 'wifi' || connectionType === 'ethernet'
+  }, [profilePictureAutoLoadPolicy, connectionType])
+
   const updateAutoplay = (autoplay: boolean) => {
     storage.setAutoplay(autoplay)
     setAutoplay(autoplay)
   }
 
-  const updateDefaultShowNsfw = (defaultShowNsfw: boolean) => {
-    storage.setDefaultShowNsfw(defaultShowNsfw)
-    setDefaultShowNsfw(defaultShowNsfw)
+  const updateNsfwDisplayPolicy = (policy: TNsfwDisplayPolicy) => {
+    storage.setNsfwDisplayPolicy(policy)
+    setNsfwDisplayPolicy(policy)
   }
 
   const updateHideContentMentioningMutedUsers = (hide: boolean) => {
@@ -87,9 +109,19 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setMediaAutoLoadPolicy(policy)
   }
 
+  const updateProfilePictureAutoLoadPolicy = (policy: TProfilePictureAutoLoadPolicy) => {
+    storage.setProfilePictureAutoLoadPolicy(policy)
+    setProfilePictureAutoLoadPolicy(policy)
+  }
+
   const updateFaviconUrlTemplate = (template: string) => {
     storage.setFaviconUrlTemplate(template)
     setFaviconUrlTemplate(template)
+  }
+
+  const updateMutedWords = (words: string[]) => {
+    storage.setMutedWords(words)
+    setMutedWords(words)
   }
 
   return (
@@ -97,15 +129,20 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
       value={{
         autoplay,
         setAutoplay: updateAutoplay,
-        defaultShowNsfw,
-        setDefaultShowNsfw: updateDefaultShowNsfw,
+        nsfwDisplayPolicy,
+        setNsfwDisplayPolicy: updateNsfwDisplayPolicy,
         hideContentMentioningMutedUsers,
         setHideContentMentioningMutedUsers: updateHideContentMentioningMutedUsers,
         autoLoadMedia,
         mediaAutoLoadPolicy,
         setMediaAutoLoadPolicy: updateMediaAutoLoadPolicy,
+        autoLoadProfilePicture,
+        profilePictureAutoLoadPolicy,
+        setProfilePictureAutoLoadPolicy: updateProfilePictureAutoLoadPolicy,
         faviconUrlTemplate,
-        setFaviconUrlTemplate: updateFaviconUrlTemplate
+        setFaviconUrlTemplate: updateFaviconUrlTemplate,
+        mutedWords,
+        setMutedWords: updateMutedWords
       }}
     >
       {children}

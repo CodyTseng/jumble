@@ -1,55 +1,19 @@
+import { useFilteredAllReplies } from '@/hooks'
 import { useStuff } from '@/hooks/useStuff'
-import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
-import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useReply } from '@/providers/ReplyProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import { MessageCircle } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
 
 export default function ReplyButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
-  const { pubkey, checkLogin } = useNostr()
-  const { event, stuffKey } = useStuff(stuff)
-  const { repliesMap } = useReply()
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
-  const { mutePubkeySet } = useMuteList()
-  const { hideContentMentioningMutedUsers } = useContentPolicy()
-  const { replyCount, hasReplied } = useMemo(() => {
-    const hasReplied = pubkey
-      ? repliesMap.get(stuffKey)?.events.some((evt) => evt.pubkey === pubkey)
-      : false
-
-    let replyCount = 0
-    const replies = [...(repliesMap.get(stuffKey)?.events || [])]
-    while (replies.length > 0) {
-      const reply = replies.pop()
-      if (!reply) break
-
-      const replyKey = getEventKey(reply)
-      const nestedReplies = repliesMap.get(replyKey)?.events ?? []
-      replies.push(...nestedReplies)
-
-      if (hideUntrustedInteractions && !isUserTrusted(reply.pubkey)) {
-        continue
-      }
-      if (mutePubkeySet.has(reply.pubkey)) {
-        continue
-      }
-      if (hideContentMentioningMutedUsers && isMentioningMutedUsers(reply, mutePubkeySet)) {
-        continue
-      }
-      replyCount++
-    }
-
-    return { replyCount, hasReplied }
-  }, [repliesMap, event, stuffKey, hideUntrustedInteractions])
+  const { checkLogin } = useNostr()
+  const { stuffKey } = useStuff(stuff)
+  const { replies, hasReplied } = useFilteredAllReplies(stuffKey)
   const [open, setOpen] = useState(false)
 
   return (
@@ -68,7 +32,7 @@ export default function ReplyButton({ stuff }: { stuff: Event | string }) {
         title={t('Reply')}
       >
         <MessageCircle />
-        {!!replyCount && <div className="text-sm">{formatCount(replyCount)}</div>}
+        {!!replies.length && <div className="text-sm">{formatCount(replies.length)}</div>}
       </button>
       <PostEditor parentStuff={stuff} open={open} setOpen={setOpen} />
     </>

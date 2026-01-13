@@ -1,10 +1,13 @@
 import {
+  ALLOWED_FILTER_KINDS,
+  BIG_RELAY_URLS,
   DEFAULT_FAVICON_URL_TEMPLATE,
   DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
-  SUPPORTED_KINDS,
+  NSFW_DISPLAY_POLICY,
+  PROFILE_PICTURE_AUTO_LOAD_POLICY,
   StorageKey,
   TPrimaryColor
 } from '@/constants'
@@ -14,15 +17,19 @@ import { isTorBrowser } from '@/lib/utils'
 import {
   TAccount,
   TAccountPointer,
+  TEmoji,
   TFeedInfo,
   TMediaAutoLoadPolicy,
   TMediaUploadServiceConfig,
   TNoteListMode,
   TNotificationStyle,
+  TNsfwDisplayPolicy,
+  TProfilePictureAutoLoadPolicy,
   TRelaySet,
   TThemeSetting,
   TTranslationServiceConfig
 } from '@/types'
+import { kinds } from 'nostr-tools'
 
 class LocalStorageService {
   static instance: LocalStorageService
@@ -39,17 +46,15 @@ class LocalStorageService {
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
   private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
   private autoplay: boolean = true
-  private hideUntrustedInteractions: boolean = false
-  private hideUntrustedNotifications: boolean = false
-  private hideUntrustedNotes: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
-  private defaultShowNsfw: boolean = false
   private dismissedTooManyRelaysAlert: boolean = false
   private showKinds: number[] = []
   private hideContentMentioningMutedUsers: boolean = false
   private notificationListStyle: TNotificationStyle = NOTIFICATION_LIST_STYLE.DETAILED
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
+  private profilePictureAutoLoadPolicy: TProfilePictureAutoLoadPolicy =
+    PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS
   private shownCreateWalletGuideToastPubkeys: Set<string> = new Set()
   private sidebarCollapse: boolean = false
   private showWalletInSidebar: boolean = true
@@ -57,6 +62,12 @@ class LocalStorageService {
   private enableSingleColumnLayout: boolean = true
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
   private filterOutOnionRelays: boolean = !isTorBrowser()
+  private quickReaction: boolean = false
+  private quickReactionEmoji: string | TEmoji = '+'
+  private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
+  private minTrustScore: number = 40
+  private defaultRelayUrls: string[] = BIG_RELAY_URLS
+  private mutedWords: string[] = []
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -75,7 +86,7 @@ class LocalStorageService {
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
     this.noteListMode =
-      noteListModeStr && ['posts', 'postsAndReplies', 'pictures'].includes(noteListModeStr)
+      noteListModeStr && ['posts', 'postsAndReplies', '24h'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
     const lastReadNotificationTimeMapStr =
@@ -125,25 +136,6 @@ class LocalStorageService {
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
 
-    const hideUntrustedEvents =
-      window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_EVENTS) === 'true'
-    const storedHideUntrustedInteractions = window.localStorage.getItem(
-      StorageKey.HIDE_UNTRUSTED_INTERACTIONS
-    )
-    const storedHideUntrustedNotifications = window.localStorage.getItem(
-      StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS
-    )
-    const storedHideUntrustedNotes = window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTES)
-    this.hideUntrustedInteractions = storedHideUntrustedInteractions
-      ? storedHideUntrustedInteractions === 'true'
-      : hideUntrustedEvents
-    this.hideUntrustedNotifications = storedHideUntrustedNotifications
-      ? storedHideUntrustedNotifications === 'true'
-      : hideUntrustedEvents
-    this.hideUntrustedNotes = storedHideUntrustedNotes
-      ? storedHideUntrustedNotes === 'true'
-      : hideUntrustedEvents
-
     const translationServiceConfigMapStr = window.localStorage.getItem(
       StorageKey.TRANSLATION_SERVICE_CONFIG_MAP
     )
@@ -158,14 +150,27 @@ class LocalStorageService {
       this.mediaUploadServiceConfigMap = JSON.parse(mediaUploadServiceConfigMapStr)
     }
 
-    this.defaultShowNsfw = window.localStorage.getItem(StorageKey.DEFAULT_SHOW_NSFW) === 'true'
+    // Migrate old boolean setting to new policy
+    const nsfwDisplayPolicyStr = window.localStorage.getItem(StorageKey.NSFW_DISPLAY_POLICY)
+    if (
+      nsfwDisplayPolicyStr &&
+      Object.values(NSFW_DISPLAY_POLICY).includes(nsfwDisplayPolicyStr as TNsfwDisplayPolicy)
+    ) {
+      this.nsfwDisplayPolicy = nsfwDisplayPolicyStr as TNsfwDisplayPolicy
+    } else {
+      // Migration: convert old boolean to new policy
+      const defaultShowNsfwStr = window.localStorage.getItem(StorageKey.DEFAULT_SHOW_NSFW)
+      this.nsfwDisplayPolicy =
+        defaultShowNsfwStr === 'true' ? NSFW_DISPLAY_POLICY.SHOW : NSFW_DISPLAY_POLICY.HIDE_CONTENT
+      window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, this.nsfwDisplayPolicy)
+    }
 
     this.dismissedTooManyRelaysAlert =
       window.localStorage.getItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT) === 'true'
 
     const showKindsStr = window.localStorage.getItem(StorageKey.SHOW_KINDS)
     if (!showKindsStr) {
-      this.showKinds = SUPPORTED_KINDS
+      this.showKinds = ALLOWED_FILTER_KINDS
     } else {
       const showKindsVersionStr = window.localStorage.getItem(StorageKey.SHOW_KINDS_VERSION)
       const showKindsVersion = showKindsVersionStr ? parseInt(showKindsVersionStr) : 0
@@ -178,10 +183,17 @@ class LocalStorageService {
         showKindSet.add(ExtendedKind.ADDRESSABLE_NORMAL_VIDEO)
         showKindSet.add(ExtendedKind.ADDRESSABLE_SHORT_VIDEO)
       }
+      if (showKindsVersion < 3 && showKindSet.has(24236)) {
+        showKindSet.delete(24236) // remove typo kind
+        showKindSet.add(ExtendedKind.ADDRESSABLE_SHORT_VIDEO)
+      }
+      if (showKindsVersion < 4 && showKindSet.has(kinds.Repost)) {
+        showKindSet.add(kinds.GenericRepost)
+      }
       this.showKinds = Array.from(showKindSet)
     }
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(this.showKinds))
-    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '2')
+    window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '4')
 
     this.hideContentMentioningMutedUsers =
       window.localStorage.getItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS) === 'true'
@@ -198,6 +210,19 @@ class LocalStorageService {
       Object.values(MEDIA_AUTO_LOAD_POLICY).includes(mediaAutoLoadPolicy as TMediaAutoLoadPolicy)
     ) {
       this.mediaAutoLoadPolicy = mediaAutoLoadPolicy as TMediaAutoLoadPolicy
+    }
+
+    const profilePictureAutoLoadPolicy = window.localStorage.getItem(
+      StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY
+    )
+    if (
+      profilePictureAutoLoadPolicy &&
+      Object.values(PROFILE_PICTURE_AUTO_LOAD_POLICY).includes(
+        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
+      )
+    ) {
+      this.profilePictureAutoLoadPolicy =
+        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
     }
 
     const shownCreateWalletGuideToastPubkeysStr = window.localStorage.getItem(
@@ -226,7 +251,67 @@ class LocalStorageService {
       this.filterOutOnionRelays = filterOutOnionRelaysStr !== 'false'
     }
 
+    this.quickReaction = window.localStorage.getItem(StorageKey.QUICK_REACTION) === 'true'
+    const quickReactionEmojiStr =
+      window.localStorage.getItem(StorageKey.QUICK_REACTION_EMOJI) ?? '+'
+    if (quickReactionEmojiStr.startsWith('{')) {
+      this.quickReactionEmoji = JSON.parse(quickReactionEmojiStr) as TEmoji
+    } else {
+      this.quickReactionEmoji = quickReactionEmojiStr
+    }
+
+    const minTrustScoreStr = window.localStorage.getItem(StorageKey.MIN_TRUST_SCORE)
+    if (minTrustScoreStr) {
+      const score = parseInt(minTrustScoreStr, 10)
+      if (!isNaN(score) && score >= 0 && score <= 100) {
+        this.minTrustScore = score
+      }
+    } else {
+      const storedHideUntrustedInteractions =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_INTERACTIONS) === 'true'
+      const storedHideUntrustedNotifications =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS) === 'true'
+      const storedHideUntrustedNotes =
+        window.localStorage.getItem(StorageKey.HIDE_UNTRUSTED_NOTES) === 'true'
+      if (
+        storedHideUntrustedInteractions ||
+        storedHideUntrustedNotifications ||
+        storedHideUntrustedNotes
+      ) {
+        this.minTrustScore = 100 // set to max if any of the old settings were true
+      }
+    }
+
+    const defaultRelayUrlsStr = window.localStorage.getItem(StorageKey.DEFAULT_RELAY_URLS)
+    if (defaultRelayUrlsStr) {
+      try {
+        const urls = JSON.parse(defaultRelayUrlsStr)
+        if (
+          Array.isArray(urls) &&
+          urls.length > 0 &&
+          urls.every((url) => typeof url === 'string')
+        ) {
+          this.defaultRelayUrls = urls
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const mutedWordsStr = window.localStorage.getItem(StorageKey.MUTED_WORDS)
+    if (mutedWordsStr) {
+      try {
+        const words = JSON.parse(mutedWordsStr)
+        if (Array.isArray(words) && words.every((word) => typeof word === 'string')) {
+          this.mutedWords = words
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
     // Clean up deprecated data
+    window.localStorage.removeItem(StorageKey.PINNED_PUBKEYS)
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_FOLLOW_LIST_EVENT_MAP)
     window.localStorage.removeItem(StorageKey.ACCOUNT_RELAY_LIST_EVENT_MAP)
@@ -234,6 +319,7 @@ class LocalStorageService {
     window.localStorage.removeItem(StorageKey.ACCOUNT_MUTE_DECRYPTED_TAGS_MAP)
     window.localStorage.removeItem(StorageKey.ACTIVE_RELAY_SET_ID)
     window.localStorage.removeItem(StorageKey.FEED_TYPE)
+    window.localStorage.removeItem(StorageKey.ENABLE_LIVE_FEED)
   }
 
   getRelaySets() {
@@ -376,39 +462,6 @@ class LocalStorageService {
     window.localStorage.setItem(StorageKey.AUTOPLAY, autoplay.toString())
   }
 
-  getHideUntrustedInteractions() {
-    return this.hideUntrustedInteractions
-  }
-
-  setHideUntrustedInteractions(hideUntrustedInteractions: boolean) {
-    this.hideUntrustedInteractions = hideUntrustedInteractions
-    window.localStorage.setItem(
-      StorageKey.HIDE_UNTRUSTED_INTERACTIONS,
-      hideUntrustedInteractions.toString()
-    )
-  }
-
-  getHideUntrustedNotifications() {
-    return this.hideUntrustedNotifications
-  }
-
-  setHideUntrustedNotifications(hideUntrustedNotifications: boolean) {
-    this.hideUntrustedNotifications = hideUntrustedNotifications
-    window.localStorage.setItem(
-      StorageKey.HIDE_UNTRUSTED_NOTIFICATIONS,
-      hideUntrustedNotifications.toString()
-    )
-  }
-
-  getHideUntrustedNotes() {
-    return this.hideUntrustedNotes
-  }
-
-  setHideUntrustedNotes(hideUntrustedNotes: boolean) {
-    this.hideUntrustedNotes = hideUntrustedNotes
-    window.localStorage.setItem(StorageKey.HIDE_UNTRUSTED_NOTES, hideUntrustedNotes.toString())
-  }
-
   getTranslationServiceConfig(pubkey?: string | null) {
     return this.translationServiceConfigMap[pubkey ?? '_'] ?? { service: 'jumble' }
   }
@@ -439,15 +492,6 @@ class LocalStorageService {
       JSON.stringify(this.mediaUploadServiceConfigMap)
     )
     return config
-  }
-
-  getDefaultShowNsfw() {
-    return this.defaultShowNsfw
-  }
-
-  setDefaultShowNsfw(defaultShowNsfw: boolean) {
-    this.defaultShowNsfw = defaultShowNsfw
-    window.localStorage.setItem(StorageKey.DEFAULT_SHOW_NSFW, defaultShowNsfw.toString())
   }
 
   getDismissedTooManyRelaysAlert() {
@@ -493,6 +537,15 @@ class LocalStorageService {
   setMediaAutoLoadPolicy(policy: TMediaAutoLoadPolicy) {
     this.mediaAutoLoadPolicy = policy
     window.localStorage.setItem(StorageKey.MEDIA_AUTO_LOAD_POLICY, policy)
+  }
+
+  getProfilePictureAutoLoadPolicy() {
+    return this.profilePictureAutoLoadPolicy
+  }
+
+  setProfilePictureAutoLoadPolicy(policy: TProfilePictureAutoLoadPolicy) {
+    this.profilePictureAutoLoadPolicy = policy
+    window.localStorage.setItem(StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY, policy)
   }
 
   hasShownCreateWalletGuideToast(pubkey: string) {
@@ -562,6 +615,65 @@ class LocalStorageService {
   setFilterOutOnionRelays(filterOut: boolean) {
     this.filterOutOnionRelays = filterOut
     window.localStorage.setItem(StorageKey.FILTER_OUT_ONION_RELAYS, filterOut.toString())
+  }
+
+  getQuickReaction() {
+    return this.quickReaction
+  }
+
+  setQuickReaction(quickReaction: boolean) {
+    this.quickReaction = quickReaction
+    window.localStorage.setItem(StorageKey.QUICK_REACTION, quickReaction.toString())
+  }
+
+  getQuickReactionEmoji() {
+    return this.quickReactionEmoji
+  }
+
+  setQuickReactionEmoji(emoji: string | TEmoji) {
+    this.quickReactionEmoji = emoji
+    window.localStorage.setItem(
+      StorageKey.QUICK_REACTION_EMOJI,
+      typeof emoji === 'string' ? emoji : JSON.stringify(emoji)
+    )
+  }
+
+  getNsfwDisplayPolicy() {
+    return this.nsfwDisplayPolicy
+  }
+
+  setNsfwDisplayPolicy(policy: TNsfwDisplayPolicy) {
+    this.nsfwDisplayPolicy = policy
+    window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, policy)
+  }
+
+  getMinTrustScore() {
+    return this.minTrustScore
+  }
+
+  setMinTrustScore(score: number) {
+    if (score >= 0 && score <= 100) {
+      this.minTrustScore = score
+      window.localStorage.setItem(StorageKey.MIN_TRUST_SCORE, score.toString())
+    }
+  }
+
+  getDefaultRelayUrls() {
+    return this.defaultRelayUrls
+  }
+
+  setDefaultRelayUrls(urls: string[]) {
+    this.defaultRelayUrls = urls
+    window.localStorage.setItem(StorageKey.DEFAULT_RELAY_URLS, JSON.stringify(urls))
+  }
+
+  getMutedWords() {
+    return this.mutedWords
+  }
+
+  setMutedWords(words: string[]) {
+    this.mutedWords = words
+    window.localStorage.setItem(StorageKey.MUTED_WORDS, JSON.stringify(this.mutedWords))
   }
 }
 

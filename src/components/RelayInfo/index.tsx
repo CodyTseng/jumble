@@ -6,7 +6,7 @@ import { checkNip43Support } from '@/lib/relay'
 import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { Check, Copy, GitBranch, Link, Mail, SquareCode } from 'lucide-react'
+import { Check, Copy, GitBranch, Mail, Share2, SquareCode } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -36,9 +36,9 @@ export default function RelayInfo({ url, className }: { url: string; className?:
       <div className="px-4 space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2 justify-between">
-            <div className="flex gap-2 items-center truncate">
+            <div className="flex gap-2 items-center flex-1">
               <RelayIcon url={url} className="w-8 h-8" />
-              <div className="text-2xl font-semibold truncate select-text">
+              <div className="text-2xl font-semibold truncate select-text flex-1 w-0">
                 {relayInfo.name || relayInfo.shortUrl}
               </div>
             </div>
@@ -154,7 +154,7 @@ function RelayControls({ url }: { url: string }) {
   return (
     <div className="flex items-center gap-1">
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyShareableUrl}>
-        {copiedShareableUrl ? <Check /> : <Link />}
+        {copiedShareableUrl ? <Check /> : <Share2 />}
       </Button>
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyUrl}>
         {copiedUrl ? <Check /> : <Copy />}

@@ -1,4 +1,5 @@
-import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
+import { SEARCHABLE_RELAY_URLS } from '@/constants'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { TSearchParams } from '@/types'
 import NormalFeed from '../NormalFeed'
 import Profile from '../Profile'
@@ -27,10 +28,13 @@ export default function SearchResult({ searchParams }: { searchParams: TSearchPa
   if (searchParams.type === 'hashtag') {
     return (
       <NormalFeed
-        subRequests={[{ urls: BIG_RELAY_URLS, filter: { '#t': [searchParams.search] } }]}
+        subRequests={[{ urls: getDefaultRelayUrls(), filter: { '#t': [searchParams.search] } }]}
         showRelayCloseReason
       />
     )
+  }
+  if (searchParams.type === 'nak') {
+    return <NormalFeed subRequests={[searchParams.request]} showRelayCloseReason />
   }
   return <Relay url={searchParams.search} />
 }

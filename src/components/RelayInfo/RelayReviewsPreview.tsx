@@ -7,10 +7,11 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { getStarsFromRelayReviewEvent } from '@/lib/event-metadata'
 import { toRelayReviews } from '@/lib/link'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { cn, isTouchDevice } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -29,7 +30,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey, checkLogin } = useNostr()
-  const { hideUntrustedNotes, isUserTrusted } = useUserTrust()
+  const { isSpammer } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
   const [showEditor, setShowEditor] = useState(false)
   const [myReview, setMyReview] = useState<NostrEvent | null>(null)
@@ -60,7 +61,7 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       if (pubkey) {
         filters.push({ kinds: [ExtendedKind.RELAY_REVIEW], authors: [pubkey], '#d': [relayUrl] })
       }
-      const events = await client.fetchEvents([relayUrl, ...BIG_RELAY_URLS], filters, {
+      const events = await client.fetchEvents([relayUrl, ...getDefaultRelayUrls()], filters, {
         cache: true
       })
 
@@ -69,12 +70,9 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
       let myReview: NostrEvent | null = null
 
       events.sort((a, b) => compareEvents(b, a))
+
       for (const evt of events) {
-        if (
-          mutePubkeySet.has(evt.pubkey) ||
-          pubkeySet.has(evt.pubkey) ||
-          (hideUntrustedNotes && !isUserTrusted(evt.pubkey))
-        ) {
+        if (mutePubkeySet.has(evt.pubkey) || pubkeySet.has(evt.pubkey)) {
           continue
         }
         const stars = getStarsFromRelayReviewEvent(evt)
@@ -90,12 +88,23 @@ export default function RelayReviewsPreview({ relayUrl }: { relayUrl: string }) 
         }
       }
 
+      const filteredReviews = (
+        await Promise.all(
+          reviews.map(async (evt) => {
+            if (await isSpammer(evt.pubkey)) {
+              return null
+            }
+            return evt
+          })
+        )
+      ).filter(Boolean) as NostrEvent[]
+
       setMyReview(myReview)
-      setReviews(reviews)
+      setReviews(filteredReviews)
       setInitialized(true)
     }
     init()
-  }, [relayUrl, pubkey, mutePubkeySet, hideUntrustedNotes, isUserTrusted])
+  }, [relayUrl, pubkey, mutePubkeySet])
 
   const handleReviewed = (evt: NostrEvent) => {
     setMyReview(evt)

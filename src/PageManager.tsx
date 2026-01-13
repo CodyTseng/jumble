@@ -82,6 +82,21 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const ignorePopStateRef = useRef(false)
 
   useEffect(() => {
+    if (isSmallScreen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        navigatePrimaryPage('search')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isSmallScreen])
+
+  useEffect(() => {
     if (['/npub1', '/nprofile1'].some((prefix) => window.location.pathname.startsWith(prefix))) {
       window.history.replaceState(
         null,
@@ -402,7 +417,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     className={cn(
                       'bg-background overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg shadow-lg'
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-2xl shadow-lg'
                     )}
                   >
                     {primaryPages.map(({ name, element, props }) => (
@@ -420,7 +435,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     className={cn(
                       'bg-background overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-lg',
+                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-2xl',
                       themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
                       secondaryStack.length === 0 ? 'bg-surface' : ''
                     )}

@@ -40,10 +40,11 @@
 
   .clickable {
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 
     &:active {
-      background-color: hsl(var(--muted) / 0.3);
+      background-color: hsl(var(--muted) / 0.4);
     }
   }
 
@@ -63,9 +64,29 @@
     display: none; /* Safari and Chrome */
   }
 
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted) / 0.5);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted) / 0.7);
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .clickable:hover {
-      background-color: hsl(var(--muted) / 0.3);
+      background-color: hsl(var(--muted) / 0.4);
     }
   }
 
@@ -101,7 +122,7 @@
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
+    --border: 240 5.9% 92%;
     --input: 240 5.9% 90%;
     --ring: 259 43% 56%;
     --chart-1: 12 76% 61%;
@@ -109,15 +130,15 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
   .dark {
     --surface-background: 240 10% 3.9%;
     --background: 0 0% 9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 9%;
+    --card: 0 0% 12%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 9%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
     --primary: 259 43% 56%;
     --primary-hover: 259 43% 65%;
@@ -130,7 +151,7 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
+    --border: 240 3.7% 18%;
     --input: 240 3.7% 15.9%;
     --ring: 259 43% 56%;
     --chart-1: 220 70% 50%;
@@ -138,12 +159,13 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --radius: 0.75rem;
   }
   .dark.pure-black {
     --surface-background: 0 0% 0%;
     --background: 0 0% 0%;
-    --card: 0 0% 0%;
-    --popover: 0 0% 0%;
+    --card: 0 0% 5%;
+    --popover: 0 0% 5%;
   }
 
   .dark input[type='datetime-local']::-webkit-calendar-picker-indicator {

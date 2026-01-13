@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { TRelaySet } from '@/types'
 import { ChevronDown, FolderClosed } from 'lucide-react'
 import { useState } from 'react'
@@ -18,17 +19,22 @@ export default function RelaySetCard({
 
   return (
     <div
-      className={`w-full border rounded-lg p-4 clickable ${select ? 'border-primary bg-primary/5' : ''}`}
+      className={cn(
+        'group relative w-full border rounded-lg px-3 py-2.5 transition-all duration-200',
+        select
+          ? 'border-primary bg-primary/5 shadow-sm'
+          : 'border-border hover:border-primary/50 hover:bg-accent/50 clickable'
+      )}
       onClick={() => onSelectChange(!select)}
     >
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-2 items-center cursor-pointer">
-          <div className="flex justify-center items-center w-6 h-6 shrink-0">
-            <FolderClosed className="size-4" />
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex gap-3 items-center flex-1 min-w-0">
+          <div className="flex justify-center items-center size-6 shrink-0">
+            <FolderClosed className="size-5" />
           </div>
-          <div className="h-8 font-semibold flex items-center select-none">{relaySet.name}</div>
+          <div className="font-medium select-none truncate">{relaySet.name}</div>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 items-center shrink-0">
           <RelayUrlsExpandToggle expand={expand} onExpandChange={setExpand}>
             {t('n relays', { n: relaySet.relayUrls.length })}
           </RelayUrlsExpandToggle>
@@ -50,16 +56,16 @@ function RelayUrlsExpandToggle({
 }) {
   return (
     <div
-      className="text-sm text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-foreground"
+      className="text-xs text-muted-foreground flex items-center gap-0.5 cursor-pointer hover:text-foreground transition-colors"
       onClick={(e) => {
         e.stopPropagation()
         onExpandChange(!expand)
       }}
     >
-      <div className="select-none">{children}</div>
+      <div className="select-none font-medium">{children}</div>
       <ChevronDown
-        size={16}
-        className={`transition-transform duration-200 ${expand ? 'rotate-180' : ''}`}
+        size={14}
+        className={cn('transition-transform duration-200', expand && 'rotate-180')}
       />
     </div>
   )
@@ -69,11 +75,11 @@ function RelayUrls({ urls }: { urls: string[] }) {
   if (!urls) return null
 
   return (
-    <div className="pl-1 space-y-1">
+    <div className="mt-2.5 pt-2.5 border-t space-y-1.5">
       {urls.map((url) => (
-        <div key={url} className="flex items-center gap-3">
-          <RelayIcon url={url} className="w-4 h-4" iconSize={10} />
-          <div className="text-muted-foreground text-sm truncate">{url}</div>
+        <div key={url} className="flex items-center gap-2.5 pl-1">
+          <RelayIcon url={url} className="size-4 shrink-0" classNames={{ fallback: 'size-3' }} />
+          <div className="text-muted-foreground text-xs truncate">{url}</div>
         </div>
       ))}
     </div>

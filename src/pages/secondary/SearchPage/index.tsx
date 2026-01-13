@@ -3,6 +3,7 @@ import SearchResult from '@/components/SearchResult'
 import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toSearch } from '@/lib/link'
+import { parseNakReqCommand } from '@/lib/nak-parser'
 import { useSecondaryPage } from '@/PageManager'
 import { TSearchParams } from '@/types'
 import { ChevronLeft } from 'lucide-react'
@@ -20,7 +21,8 @@ const SearchPage = forwardRef(({ index }: { index?: number }, ref) => {
       type !== 'profiles' &&
       type !== 'notes' &&
       type !== 'hashtag' &&
-      type !== 'relay'
+      type !== 'relay' &&
+      type !== 'nak'
     ) {
       return null
     }
@@ -29,8 +31,16 @@ const SearchPage = forwardRef(({ index }: { index?: number }, ref) => {
       return null
     }
     const input = params.get('i') ?? ''
+    let request = undefined
+    if (type === 'nak') {
+      try {
+        request = parseNakReqCommand(input)
+      } catch {
+        // ignore invalid request param
+      }
+    }
     setInput(input || search)
-    return { type, search, input } as TSearchParams
+    return { type, search, input, request } as TSearchParams
   }, [])
 
   useEffect(() => {

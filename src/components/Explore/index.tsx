@@ -1,22 +1,30 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchRelayInfo } from '@/hooks'
 import { toRelay } from '@/lib/link'
+import { recommendRelaysByLanguage } from '@/lib/relay'
+import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
+import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import relayInfoService from '@/services/relay-info.service'
 import { TAwesomeRelayCollection } from '@/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import RelaySimpleInfo, { RelaySimpleInfoSkeleton } from '../RelaySimpleInfo'
-import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
-import { cn } from '@/lib/utils'
 
 export default function Explore() {
+  const { t, i18n } = useTranslation()
   const [collections, setCollections] = useState<TAwesomeRelayCollection[] | null>(null)
+  const recommendedRelays = useMemo(() => {
+    const lang = i18n.language
+    const relays = recommendRelaysByLanguage(lang)
+    return relays
+  }, [i18n.language])
 
   useEffect(() => {
     relayInfoService.getAwesomeRelayCollections().then(setCollections)
   }, [])
 
-  if (!collections) {
+  if (!collections && recommendedRelays.length === 0) {
     return (
       <div>
         <div className="p-4 max-md:border-b">
@@ -31,9 +39,19 @@ export default function Explore() {
 
   return (
     <div className="space-y-6">
-      {collections.map((collection) => (
-        <RelayCollection key={collection.id} collection={collection} />
-      ))}
+      {recommendedRelays.length > 0 && (
+        <RelayCollection
+          collection={{
+            id: 'recommended',
+            name: t('Recommended'),
+            relays: recommendedRelays
+          }}
+        />
+      )}
+      {collections &&
+        collections.map((collection) => (
+          <RelayCollection key={collection.id} collection={collection} />
+        ))}
     </div>
   )
 }

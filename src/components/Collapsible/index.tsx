@@ -57,8 +57,8 @@ export default function Collapsible({
     >
       {children}
       {shouldCollapse && !expanded && (
-        <div className="absolute bottom-0 h-40 w-full bg-gradient-to-b from-transparent to-background/90 flex items-end justify-center pb-4">
-          <div className="bg-background rounded-md">
+        <div className="absolute bottom-0 h-40 w-full z-10 bg-gradient-to-b from-transparent to-background/90 flex items-end justify-center pb-4">
+          <div className="bg-background rounded-lg">
             <Button
               className="bg-foreground hover:bg-foreground/80"
               onClick={(e) => {

@@ -17,6 +17,7 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import postEditor from '@/services/post-editor.service'
 import { Event } from 'nostr-tools'
 import { Dispatch, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import PostContent from './PostContent'
 import Title from './Title'
 
@@ -25,14 +26,17 @@ export default function PostEditor({
   parentStuff,
   open,
   setOpen,
-  openFrom
+  openFrom,
+  highlightedText
 }: {
   defaultContent?: string
   parentStuff?: Event | string
   open: boolean
   setOpen: Dispatch<boolean>
   openFrom?: string[]
+  highlightedText?: string
 }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
 
   const content = useMemo(() => {
@@ -42,9 +46,10 @@ export default function PostEditor({
         parentStuff={parentStuff}
         close={() => setOpen(false)}
         openFrom={openFrom}
+        highlightedText={highlightedText}
       />
     )
-  }, [])
+  }, [highlightedText])
 
   if (isSmallScreen) {
     return (
@@ -64,7 +69,7 @@ export default function PostEditor({
             <div className="space-y-4 px-2 py-6">
               <SheetHeader>
                 <SheetTitle className="text-start">
-                  <Title parentStuff={parentStuff} />
+                  {highlightedText ? t('Create Highlight') : <Title parentStuff={parentStuff} />}
                 </SheetTitle>
                 <SheetDescription className="hidden" />
               </SheetHeader>
@@ -92,7 +97,7 @@ export default function PostEditor({
           <div className="space-y-4 px-2 py-6">
             <DialogHeader>
               <DialogTitle>
-                <Title parentStuff={parentStuff} />
+                {highlightedText ? t('Create Highlight') : <Title parentStuff={parentStuff} />}
               </DialogTitle>
               <DialogDescription className="hidden" />
             </DialogHeader>

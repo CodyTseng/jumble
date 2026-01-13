@@ -41,16 +41,19 @@ export function ReactionNotification({
             image={{ url: emojiUrl, pubkey: notification.pubkey }}
             alt={emojiName}
             className="w-6 h-6"
-            classNames={{ errorPlaceholder: 'bg-transparent' }}
+            classNames={{ errorPlaceholder: 'bg-transparent', wrapper: 'rounded-md' }}
             errorPlaceholder={<Heart size={24} className="text-red-400" />}
           />
         )
       }
     }
+    if (notification.content.length > 4) {
+      return null
+    }
     return notification.content
   }, [notification])
 
-  if (!event || !eventId) {
+  if (!event || !eventId || !reaction) {
     return null
   }
 

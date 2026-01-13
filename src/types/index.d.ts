@@ -1,5 +1,11 @@
 import { Event, Filter, VerifiedEvent } from 'nostr-tools'
-import { MEDIA_AUTO_LOAD_POLICY, NOTIFICATION_LIST_STYLE, POLL_TYPE } from '../constants'
+import {
+  MEDIA_AUTO_LOAD_POLICY,
+  NOTIFICATION_LIST_STYLE,
+  NSFW_DISPLAY_POLICY,
+  POLL_TYPE,
+  PROFILE_PICTURE_AUTO_LOAD_POLICY
+} from '../constants'
 
 export type TSubRequestFilter = Omit<Filter, 'since' | 'until'> & { limit: number }
 
@@ -113,7 +119,7 @@ export type TAccount = {
 
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>
 
-export type TFeedType = 'following' | 'relays' | 'relay'
+export type TFeedType = 'following' | 'pinned' | 'relays' | 'relay'
 export type TFeedInfo = { feedType: TFeedType; id?: string } | null
 
 export type TLanguage = 'en' | 'zh' | 'pl'
@@ -121,6 +127,7 @@ export type TLanguage = 'en' | 'zh' | 'pl'
 export type TImetaInfo = {
   url: string
   blurHash?: string
+  thumbHash?: Uint8Array
   dim?: { width: number; height: number }
   pubkey?: string
 }
@@ -131,7 +138,7 @@ export type TPublishOptions = {
   minPow?: number
 }
 
-export type TNoteListMode = 'posts' | 'postsAndReplies' | 'you'
+export type TNoteListMode = 'posts' | 'postsAndReplies' | 'you' | '24h'
 
 export type TNotificationType = 'all' | 'mentions' | 'reactions' | 'zaps'
 
@@ -184,12 +191,20 @@ export type TSearchType =
   | 'hashtag'
   | 'relay'
   | 'externalContent'
+  | 'nak'
 
-export type TSearchParams = {
-  type: TSearchType
-  search: string
-  input?: string
-}
+export type TSearchParams =
+  | {
+      type: Exclude<TSearchType, 'nak'>
+      search: string
+      input?: string
+    }
+  | {
+      type: 'nak'
+      search: string
+      request: TFeedSubRequest
+      input?: string
+    }
 
 export type TNotificationStyle =
   (typeof NOTIFICATION_LIST_STYLE)[keyof typeof NOTIFICATION_LIST_STYLE]
@@ -197,9 +212,13 @@ export type TNotificationStyle =
 export type TAwesomeRelayCollection = {
   id: string
   name: string
-  description: string
   relays: string[]
 }
 
 export type TMediaAutoLoadPolicy =
   (typeof MEDIA_AUTO_LOAD_POLICY)[keyof typeof MEDIA_AUTO_LOAD_POLICY]
+
+export type TProfilePictureAutoLoadPolicy =
+  (typeof PROFILE_PICTURE_AUTO_LOAD_POLICY)[keyof typeof PROFILE_PICTURE_AUTO_LOAD_POLICY]
+
+export type TNsfwDisplayPolicy = (typeof NSFW_DISPLAY_POLICY)[keyof typeof NSFW_DISPLAY_POLICY]

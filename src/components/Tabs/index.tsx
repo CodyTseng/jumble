@@ -1,8 +1,9 @@
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 
 type TabDefinition = {
   value: string
@@ -14,13 +15,15 @@ export default function Tabs({
   value,
   onTabChange,
   threshold = 800,
-  options = null
+  options = null,
+  active = false
 }: {
   tabs: TabDefinition[]
   value: string
   onTabChange?: (tab: string) => void
   threshold?: number
   options?: ReactNode
+  active?: boolean
 }) {
   const { t } = useTranslation()
   const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
@@ -87,8 +90,10 @@ export default function Tabs({
     <div
       ref={containerRef}
       className={cn(
-        'sticky flex justify-between top-12 bg-background z-30 px-1 w-full transition-transform border-b',
-        deepBrowsing && lastScrollTop > threshold ? '-translate-y-[calc(100%+12rem)]' : ''
+        'sticky flex justify-between top-12 bg-background z-30 px-1 w-full transition-all duration-300 border-b',
+        deepBrowsing && lastScrollTop > threshold && !active
+          ? '-translate-y-[calc(100%+12rem)]'
+          : ''
       )}
     >
       <ScrollArea className="flex-1 w-0">
@@ -98,8 +103,10 @@ export default function Tabs({
               key={tab.value}
               ref={(el) => (tabRefs.current[index] = el)}
               className={cn(
-                `w-fit text-center py-2 px-6 my-1 font-semibold whitespace-nowrap clickable cursor-pointer rounded-lg`,
-                value === tab.value ? '' : 'text-muted-foreground'
+                `w-fit text-center py-2 px-6 my-1 font-semibold whitespace-nowrap clickable cursor-pointer rounded-xl transition-all duration-200`,
+                value === tab.value
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
               onClick={() => {
                 onTabChange?.(tab.value)
@@ -109,7 +116,7 @@ export default function Tabs({
             </div>
           ))}
           <div
-            className="absolute bottom-0 h-1 bg-primary rounded-full transition-all duration-500"
+            className="absolute bottom-0 h-1 bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-300"
             style={{
               width: `${indicatorStyle.width}px`,
               left: `${indicatorStyle.left}px`
@@ -118,7 +125,12 @@ export default function Tabs({
         </div>
         <ScrollBar orientation="horizontal" className="opacity-0 pointer-events-none" />
       </ScrollArea>
-      {options && <div className="py-1 flex items-center">{options}</div>}
+      {options && (
+        <div className="py-1 flex items-center gap-1">
+          <Separator orientation="vertical" className="h-8" />
+          {options}
+        </div>
+      )}
     </div>
   )
 }

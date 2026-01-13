@@ -33,7 +33,7 @@ const Slider = React.forwardRef<
       {!hideThumb && (
         <SliderPrimitive.Thumb
           className={cn(
-            'block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
+            'block h-4 w-4 rounded-full border-2 border-primary bg-background transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
           )}
         />
       )}

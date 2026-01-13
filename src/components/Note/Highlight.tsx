@@ -22,10 +22,15 @@ export default function Highlight({ event, className }: { event: Event; classNam
 
   return (
     <div className={cn('text-wrap break-words whitespace-pre-wrap space-y-4', className)}>
-      {comment && <Content event={createFakeEvent({ content: comment })} />}
+      {comment && <Content event={createFakeEvent({ content: comment, tags: event.tags })} />}
       <div className="flex gap-4">
         <div className="w-1 flex-shrink-0 my-1 bg-primary/60 rounded-md" />
-        <div className="italic whitespace-pre-line">
+        <div
+          className="italic whitespace-pre-line"
+          style={{
+            overflowWrap: 'anywhere'
+          }}
+        >
           {translatedEvent?.content ?? event.content}
         </div>
       </div>

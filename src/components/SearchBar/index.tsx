@@ -1,6 +1,7 @@
 import SearchInput from '@/components/SearchInput'
 import { useSearchProfiles } from '@/hooks'
 import { toExternalContent, toNote } from '@/lib/link'
+import { formatFeedRequest, parseNakReqCommand } from '@/lib/nak-parser'
 import { randomString } from '@/lib/random'
 import { normalizeUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -8,7 +9,7 @@ import { useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import modalManager from '@/services/modal-manager.service'
 import { TSearchParams } from '@/types'
-import { Hash, MessageSquare, Notebook, Search, Server } from 'lucide-react'
+import { Hash, MessageSquare, Notebook, Search, Server, Terminal } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import {
   forwardRef,
@@ -102,6 +103,20 @@ const SearchBar = forwardRef<
   useEffect(() => {
     const search = input.trim()
     if (!search) return
+
+    // Check if input is a nak req command
+    const request = parseNakReqCommand(search)
+    if (request) {
+      setSelectableOptions([
+        {
+          type: 'nak',
+          search: formatFeedRequest(request),
+          request,
+          input: search
+        }
+      ])
+      return
+    }
 
     if (/^[0-9a-f]{64}$/.test(search)) {
       setSelectableOptions([
@@ -213,6 +228,16 @@ const SearchBar = forwardRef<
               />
             )
           }
+          if (option.type === 'nak') {
+            return (
+              <NakItem
+                key={index}
+                selected={selectedIndex === index}
+                description={option.search}
+                onClick={() => updateSearch(option)}
+              />
+            )
+          }
           if (option.type === 'profiles') {
             return (
               <Item
@@ -296,7 +321,7 @@ const SearchBar = forwardRef<
               'bg-surface-background rounded-b-lg shadow-lg z-50',
               isSmallScreen
                 ? 'fixed top-12 inset-x-0'
-                : 'absolute top-full -translate-y-1 inset-x-0 pt-1 '
+                : 'absolute top-full -translate-y-2 inset-x-0 pt-3.5 pb-1 border px-1'
             )}
             onMouseDown={(e) => e.preventDefault()}
           >
@@ -308,7 +333,7 @@ const SearchBar = forwardRef<
       <SearchInput
         ref={searchInputRef}
         className={cn(
-          'bg-surface-background shadow-inner h-full border-none',
+          'bg-surface-background shadow-inner h-full border-transparent',
           searching ? 'z-50' : ''
         )}
         placeholder={t('People, keywords, or relays')}
@@ -468,6 +493,28 @@ function ExternalContentItem({
   )
 }
 
+function NakItem({
+  description,
+  onClick,
+  selected
+}: {
+  description: string
+  onClick?: () => void
+  selected?: boolean
+}) {
+  return (
+    <Item onClick={onClick} selected={selected}>
+      <div className="size-10 flex justify-center items-center">
+        <Terminal className="text-muted-foreground flex-shrink-0" />
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <div className="font-semibold truncate">REQ</div>
+        <div className="text-sm text-muted-foreground truncate">{description}</div>
+      </div>
+    </Item>
+  )
+}
+
 function Item({
   className,
   children,
@@ -477,7 +524,7 @@ function Item({
   return (
     <div
       className={cn(
-        'flex gap-2 items-center px-2 py-3 hover:bg-accent rounded-md cursor-pointer',
+        'flex gap-2 items-center px-2 py-1.5 hover:bg-accent rounded-md cursor-pointer',
         selected ? 'bg-accent' : '',
         className
       )}

@@ -4,6 +4,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { TMailboxRelay } from '@/types'
 import { CloudUpload, Loader } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 export default function SaveButton({
@@ -15,6 +16,7 @@ export default function SaveButton({
   hasChange: boolean
   setHasChange: (hasChange: boolean) => void
 }) {
+  const { t } = useTranslation()
   const { pubkey, publish, updateRelayListEvent } = useNostr()
   const [pushing, setPushing] = useState(false)
 
@@ -33,7 +35,7 @@ export default function SaveButton({
   return (
     <Button className="w-full" disabled={!pubkey || pushing || !hasChange} onClick={save}>
       {pushing ? <Loader className="animate-spin" /> : <CloudUpload />}
-      Save
+      {t('Save')}
     </Button>
   )
 }

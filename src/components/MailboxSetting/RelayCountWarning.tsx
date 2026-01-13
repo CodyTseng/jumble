@@ -1,7 +1,7 @@
 import { TMailboxRelay } from '@/types'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import AlertCard from '../AlertCard'
+import InfoCard from '../InfoCard'
 
 export default function RelayCountWarning({ relays }: { relays: TMailboxRelay[] }) {
   const { t } = useTranslation()
@@ -19,7 +19,8 @@ export default function RelayCountWarning({ relays }: { relays: TMailboxRelay[] 
   }
 
   return (
-    <AlertCard
+    <InfoCard
+      variant="alert"
       title={showReadWarning ? t('Too many read relays') : t('Too many write relays')}
       content={
         showReadWarning

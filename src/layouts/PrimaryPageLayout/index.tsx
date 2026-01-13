@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { usePrimaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TPrimaryPageName } from '@/routes/primary'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
@@ -76,38 +77,45 @@ const PrimaryPageLayout = forwardRef(
 
     if (enableSingleColumnLayout) {
       return (
-        <DeepBrowsingProvider active={current === pageName && display}>
-          <div
-            ref={smallScreenScrollAreaRef}
-            style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-            }}
+        <PageActiveContext.Provider value={current === pageName && display}>
+          <DeepBrowsingProvider active={current === pageName && display}>
+            <div
+              ref={smallScreenScrollAreaRef}
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+              }}
+            >
+              <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
+                {titlebar}
+              </PrimaryPageTitlebar>
+              {children}
+            </div>
+            {displayScrollToTopButton && <ScrollToTopButton />}
+          </DeepBrowsingProvider>
+        </PageActiveContext.Provider>
+      )
+    }
+
+    return (
+      <PageActiveContext.Provider value={current === pageName && display}>
+        <DeepBrowsingProvider
+          active={current === pageName && display}
+          scrollAreaRef={scrollAreaRef}
+        >
+          <ScrollArea
+            className="h-full overflow-auto"
+            scrollBarClassName="z-30 pt-12"
+            ref={scrollAreaRef}
           >
             <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
               {titlebar}
             </PrimaryPageTitlebar>
             {children}
-          </div>
-          {displayScrollToTopButton && <ScrollToTopButton />}
+            <div className="h-4" />
+          </ScrollArea>
+          {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
         </DeepBrowsingProvider>
-      )
-    }
-
-    return (
-      <DeepBrowsingProvider active={current === pageName && display} scrollAreaRef={scrollAreaRef}>
-        <ScrollArea
-          className="h-full overflow-auto"
-          scrollBarClassName="z-50 pt-12"
-          ref={scrollAreaRef}
-        >
-          <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
-            {titlebar}
-          </PrimaryPageTitlebar>
-          {children}
-          <div className="h-4" />
-        </ScrollArea>
-        {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
-      </DeepBrowsingProvider>
+      </PageActiveContext.Provider>
     )
   }
 )

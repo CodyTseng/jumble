@@ -22,6 +22,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
+import PinnedFeed from './PinnedFeed'
 import RelaysFeed from './RelaysFeed'
 
 const NoteListPage = forwardRef<TPageRef>((_, ref) => {
@@ -59,8 +60,13 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
   } else if (feedInfo.feedType === 'following' && !pubkey) {
     switchFeed(null)
     return null
+  } else if (feedInfo.feedType === 'pinned' && !pubkey) {
+    switchFeed(null)
+    return null
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
+  } else if (feedInfo.feedType === 'pinned') {
+    content = <PinnedFeed />
   } else {
     content = (
       <>
@@ -193,7 +199,7 @@ function WelcomeGuide() {
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
         <Button size="lg" className="w-full" onClick={() => navigate('explore')}>
           <Compass className="size-5" />
-          {t('Explore Relays')}
+          {t('Explore')}
         </Button>
 
         <Button size="lg" className="w-full" variant="outline" onClick={() => checkLogin()}>

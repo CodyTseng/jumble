@@ -1,6 +1,7 @@
 import ContentPreview from '@/components/ContentPreview'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import StuffStats from '@/components/StuffStats'
+import TrustScoreBadge from '@/components/TrustScoreBadge'
 import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
@@ -62,7 +63,16 @@ export default function Notification({
         onClick={handleClick}
       >
         <div className="flex gap-2 items-center flex-1 w-0">
-          <UserAvatar userId={sender} size="small" />
+          <div className="relative">
+            <UserAvatar userId={sender} size="small" />
+            <TrustScoreBadge
+              pubkey={sender}
+              classNames={{
+                container:
+                  'absolute inset-0 w-full h-full rounded-full bg-background/60 backdrop-blur-sm flex flex-col justify-center items-center pointer-events-none'
+              }}
+            />
+          </div>
           {icon}
           {middle}
           {targetEvent && (
@@ -99,6 +109,7 @@ export default function Notification({
               className="flex-1 max-w-fit truncate font-semibold"
               skeletonClassName="h-4"
             />
+            <TrustScoreBadge pubkey={sender} />
             <div className="shrink-0 text-muted-foreground text-sm">{description}</div>
           </div>
           {unread && (

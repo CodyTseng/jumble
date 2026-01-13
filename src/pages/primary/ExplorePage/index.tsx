@@ -3,10 +3,12 @@ import FollowingFavoriteRelayList from '@/components/FollowingFavoriteRelayList'
 import NoteList from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
 import { Button } from '@/components/ui/button'
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { getReplaceableEventIdentifier } from '@/lib/event'
-import { useUserTrust } from '@/providers/UserTrustProvider'
+import { getDefaultRelayUrls } from '@/lib/relay'
+import { isLocalNetworkUrl, isOnionUrl, isWebsocketUrl } from '@/lib/url'
+import storage from '@/services/local-storage.service'
 import { TPageRef } from '@/types'
 import { Compass, Plus } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
@@ -16,7 +18,6 @@ import { useTranslation } from 'react-i18next'
 type TExploreTabs = 'following' | 'explore' | 'reviews'
 
 const ExplorePage = forwardRef<TPageRef>((_, ref) => {
-  const { hideUntrustedNotes } = useUserTrust()
   const [tab, setTab] = useState<TExploreTabs>('explore')
   const topRef = useRef<HTMLDivElement | null>(null)
 
@@ -24,12 +25,16 @@ const ExplorePage = forwardRef<TPageRef>((_, ref) => {
     const d = getReplaceableEventIdentifier(evt)
     if (!d) return false
 
-    try {
-      const url = new URL(d)
-      return url.hostname !== 'localhost'
-    } catch {
+    if (!isWebsocketUrl(d)) {
       return false
     }
+    if (isLocalNetworkUrl(d)) {
+      return false
+    }
+    if (storage.getFilterOutOnionRelays() && isOnionUrl(d)) {
+      return false
+    }
+    return true
   }, [])
 
   const content = useMemo(() => {
@@ -38,15 +43,15 @@ const ExplorePage = forwardRef<TPageRef>((_, ref) => {
     ) : tab === 'reviews' ? (
       <NoteList
         showKinds={[ExtendedKind.RELAY_REVIEW]}
-        subRequests={[{ urls: BIG_RELAY_URLS, filter: {} }]}
-        filterMutedNotes
-        hideUntrustedNotes={hideUntrustedNotes}
+        subRequests={[{ urls: getDefaultRelayUrls(), filter: {} }]}
         filterFn={relayReviewFilterFn}
+        filterMutedNotes
+        hideSpam
       />
     ) : (
       <FollowingFavoriteRelayList />
     )
-  }, [tab, relayReviewFilterFn, hideUntrustedNotes])
+  }, [tab, relayReviewFilterFn])
 
   return (
     <PrimaryPageLayout

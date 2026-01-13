@@ -23,18 +23,15 @@ export const StorageKey = {
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
   AUTOPLAY: 'autoplay',
-  HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions',
-  HIDE_UNTRUSTED_NOTIFICATIONS: 'hideUntrustedNotifications',
   TRANSLATION_SERVICE_CONFIG_MAP: 'translationServiceConfigMap',
   MEDIA_UPLOAD_SERVICE_CONFIG_MAP: 'mediaUploadServiceConfigMap',
-  HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes',
-  DEFAULT_SHOW_NSFW: 'defaultShowNsfw',
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
   SHOW_KINDS: 'showKinds',
   SHOW_KINDS_VERSION: 'showKindsVersion',
   HIDE_CONTENT_MENTIONING_MUTED_USERS: 'hideContentMentioningMutedUsers',
   NOTIFICATION_LIST_STYLE: 'notificationListStyle',
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
+  PROFILE_PICTURE_AUTO_LOAD_POLICY: 'profilePictureAutoLoadPolicy',
   SHOWN_CREATE_WALLET_GUIDE_TOAST_PUBKEYS: 'shownCreateWalletGuideToastPubkeys',
   SPARK_WALLET_ENABLED: 'sparkWalletEnabled',
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
@@ -43,6 +40,18 @@ export const StorageKey = {
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
   FAVICON_URL_TEMPLATE: 'faviconUrlTemplate',
   FILTER_OUT_ONION_RELAYS: 'filterOutOnionRelays',
+  QUICK_REACTION: 'quickReaction',
+  QUICK_REACTION_EMOJI: 'quickReactionEmoji',
+  NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
+  MIN_TRUST_SCORE: 'minTrustScore',
+  DEFAULT_RELAY_URLS: 'defaultRelayUrls',
+  MUTED_WORDS: 'mutedWords',
+  ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
+  HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
+  HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions', // deprecated
+  HIDE_UNTRUSTED_NOTIFICATIONS: 'hideUntrustedNotifications', // deprecated
+  DEFAULT_SHOW_NSFW: 'defaultShowNsfw', // deprecated
+  PINNED_PUBKEYS: 'pinnedPubkeys', // deprecated
   MEDIA_UPLOAD_SERVICE: 'mediaUploadService', // deprecated
   HIDE_UNTRUSTED_EVENTS: 'hideUntrustedEvents', // deprecated
   ACCOUNT_RELAY_LIST_EVENT_MAP: 'accountRelayListEventMap', // deprecated
@@ -60,12 +69,19 @@ export const ApplicationDataKey = {
 
 export const BIG_RELAY_URLS = [
   'wss://relay.damus.io/',
-  'wss://relay.nostr.band/',
+  'wss://nos.lol/',
   'wss://relay.primal.net/',
-  'wss://nos.lol/'
+  'wss://offchain.pub/'
 ]
 
-export const SEARCHABLE_RELAY_URLS = ['wss://relay.nostr.band/', 'wss://search.nos.today/']
+export const SEARCHABLE_RELAY_URLS = [
+  'wss://search.nos.today/',
+  'wss://relay.ditto.pub/',
+  'wss://relay.nostrcheck.me/',
+  'wss://relay.nostr.band/'
+]
+
+export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 
 export const GROUP_METADATA_EVENT_KIND = 39000
 
@@ -79,17 +95,20 @@ export const ExtendedKind = {
   COMMENT: 1111,
   VOICE: 1222,
   VOICE_COMMENT: 1244,
+  PINNED_USERS: 10010,
   FAVORITE_RELAYS: 10012,
   BLOSSOM_SERVER_LIST: 10063,
+  FOLLOW_PACK: 39089,
   RELAY_REVIEW: 31987,
   GROUP_METADATA: 39000,
   ADDRESSABLE_NORMAL_VIDEO: 34235,
-  ADDRESSABLE_SHORT_VIDEO: 24236
+  ADDRESSABLE_SHORT_VIDEO: 34236
 }
 
-export const SUPPORTED_KINDS = [
+export const ALLOWED_FILTER_KINDS = [
   kinds.ShortTextNote,
   kinds.Repost,
+  kinds.GenericRepost,
   ExtendedKind.PICTURE,
   ExtendedKind.VIDEO,
   ExtendedKind.SHORT_VIDEO,
@@ -99,16 +118,21 @@ export const SUPPORTED_KINDS = [
   ExtendedKind.VOICE_COMMENT,
   kinds.Highlights,
   kinds.LongFormArticle,
-  ExtendedKind.RELAY_REVIEW,
-  kinds.Emojisets,
   ExtendedKind.ADDRESSABLE_NORMAL_VIDEO,
   ExtendedKind.ADDRESSABLE_SHORT_VIDEO
 ]
 
+export const SUPPORTED_KINDS = [
+  ...ALLOWED_FILTER_KINDS,
+  ExtendedKind.RELAY_REVIEW,
+  kinds.Emojisets,
+  ExtendedKind.FOLLOW_PACK
+]
+
 export const URL_REGEX =
-  /https?:\/\/[\w\p{L}\p{N}\p{M}&.\-/?=#@%+_:!~*]+[^\s.,;:'")\]}!?，。；："'！？】）]/giu
+  /https?:\/\/[\w\p{L}\p{N}\p{M}&.\-/?=#@%+_:!~*()]+[^\s.,;:'"(\]}!?，。；："'！？】）]/giu
 export const WS_URL_REGEX =
-  /wss?:\/\/[\w\p{L}\p{N}\p{M}&.\-/?=#@%+_:!~*]+[^\s.,;:'")\]}!?，。；："'！？】）]/giu
+  /wss?:\/\/[\w\p{L}\p{N}\p{M}&.\-/?=#@%+_:!~*()]+[^\s.,;:'"(\]}!?，。；："'！？】）]/giu
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 export const EMOJI_SHORT_CODE_REGEX = /:[a-zA-Z0-9_-]+:/g
 export const EMBEDDED_EVENT_REGEX = /nostr:(note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
@@ -157,6 +181,18 @@ export const MEDIA_AUTO_LOAD_POLICY = {
   ALWAYS: 'always',
   WIFI_ONLY: 'wifi-only',
   NEVER: 'never'
+} as const
+
+export const PROFILE_PICTURE_AUTO_LOAD_POLICY = {
+  ALWAYS: 'always',
+  WIFI_ONLY: 'wifi-only',
+  NEVER: 'never'
+} as const
+
+export const NSFW_DISPLAY_POLICY = {
+  HIDE: 'hide',
+  HIDE_CONTENT: 'hide_content',
+  SHOW: 'show'
 } as const
 
 export const MAX_PINNED_NOTES = 10
@@ -435,4 +471,6 @@ export const PRIMARY_COLORS = {
 } as const
 export type TPrimaryColor = keyof typeof PRIMARY_COLORS
 
-export const LONG_PRESS_THRESHOLD = 500
+export const LONG_PRESS_THRESHOLD = 400
+
+export const SPAMMER_PERCENTILE_THRESHOLD = 60

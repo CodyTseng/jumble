@@ -83,6 +83,14 @@ export function getParentETag(event?: Event) {
   return tag
 }
 
+function getLegacyParentATag(event?: Event) {
+  if (!event || event.kind !== kinds.ShortTextNote) {
+    return undefined
+  }
+
+  return event.tags.find(([tagName, , , marker]) => tagName === 'a' && marker === 'reply')
+}
+
 export function getParentATag(event?: Event) {
   if (
     !event ||
@@ -114,8 +122,9 @@ export function getParentTag(event?: Event): { type: 'e' | 'a' | 'i'; tag: strin
   if (!event) return undefined
 
   if (event.kind === kinds.ShortTextNote) {
-    const tag = getParentETag(event)
-    return tag ? { type: 'e', tag } : undefined
+    const tag = getLegacyParentATag(event) ?? getParentETag(event) ?? getLegacyRootATag(event)
+    if (!tag) return undefined
+    return { type: tag[0] === 'e' ? 'e' : 'a', tag }
   }
 
   // NIP-22
@@ -164,6 +173,14 @@ export function getRootETag(event?: Event) {
   return tag
 }
 
+function getLegacyRootATag(event?: Event) {
+  if (!event || event.kind !== kinds.ShortTextNote) {
+    return undefined
+  }
+
+  return event.tags.find(([tagName, , , marker]) => tagName === 'a' && marker === 'root')
+}
+
 export function getRootATag(event?: Event) {
   if (
     !event ||
@@ -195,8 +212,9 @@ export function getRootTag(event?: Event): { type: 'e' | 'a' | 'i'; tag: string[
   if (!event) return undefined
 
   if (event.kind === kinds.ShortTextNote) {
-    const tag = getRootETag(event)
-    return tag ? { type: 'e', tag } : undefined
+    const tag = getLegacyRootATag(event) ?? getRootETag(event)
+    if (!tag) return undefined
+    return { type: tag[0] === 'e' ? 'e' : 'a', tag }
   }
 
   // NIP-22

@@ -1,6 +1,7 @@
 import NoteList from '@/components/NoteList'
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { normalizeUrl, simplifyUrl } from '@/lib/url'
 import { forwardRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -24,10 +25,11 @@ const RelayReviewsPage = forwardRef(({ url, index }: { url?: string; index?: num
         showKinds={[ExtendedKind.RELAY_REVIEW]}
         subRequests={[
           {
-            urls: [normalizedUrl, ...BIG_RELAY_URLS],
+            urls: [normalizedUrl, ...getDefaultRelayUrls()],
             filter: { '#d': [normalizedUrl] }
           }
         ]}
+        hideSpam
       />
     </SecondaryPageLayout>
   )

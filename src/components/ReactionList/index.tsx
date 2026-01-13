@@ -1,17 +1,18 @@
 import { useSecondaryPage } from '@/PageManager'
+import { useStuff } from '@/hooks/useStuff'
 import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { toProfile } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import { TEmoji } from '@/types'
 import { Event } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Emoji from '../Emoji'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import { useStuff } from '@/hooks/useStuff'
 
 const SHOW_COUNT = 20
 
@@ -19,14 +20,39 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const { hideUntrustedInteractions, isUserTrusted } = useUserTrust()
+  const { minTrustScore, meetsMinTrustScore } = useUserTrust()
   const { stuffKey } = useStuff(stuff)
   const noteStats = useStuffStatsById(stuffKey)
-  const filteredLikes = useMemo(() => {
-    return (noteStats?.likes ?? [])
-      .filter((like) => !hideUntrustedInteractions || isUserTrusted(like.pubkey))
-      .sort((a, b) => b.created_at - a.created_at)
-  }, [noteStats, stuffKey, hideUntrustedInteractions, isUserTrusted])
+  const [filteredLikes, setFilteredLikes] = useState<
+    Array<{
+      id: string
+      pubkey: string
+      emoji: string | TEmoji
+      created_at: number
+    }>
+  >([])
+
+  useEffect(() => {
+    const filterLikes = async () => {
+      const likes = noteStats?.likes ?? []
+      const filtered: {
+        id: string
+        pubkey: string
+        created_at: number
+        emoji: string | TEmoji
+      }[] = []
+      await Promise.all(
+        likes.map(async (like) => {
+          if (await meetsMinTrustScore(like.pubkey)) {
+            filtered.push(like)
+          }
+        })
+      )
+      filtered.sort((a, b) => b.created_at - a.created_at)
+      setFilteredLikes(filtered)
+    }
+    filterLikes()
+  }, [noteStats, stuffKey, minTrustScore, meetsMinTrustScore])
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const bottomRef = useRef<HTMLDivElement | null>(null)

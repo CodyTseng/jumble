@@ -1,11 +1,11 @@
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { notificationFilter } from '@/lib/notification'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { usePrimaryPage } from '@/PageManager'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import { kinds, NostrEvent } from 'nostr-tools'
-import { SubCloser } from 'nostr-tools/abstract-pool'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useContentPolicy } from './ContentPolicyProvider'
 import { useMuteList } from './MuteListProvider'
@@ -33,42 +33,47 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { current } = usePrimaryPage()
   const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
-  const { hideUntrustedNotifications, isUserTrusted } = useUserTrust()
   const { mutePubkeySet } = useMuteList()
+  const { meetsMinTrustScore } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
-  const filteredNewNotifications = useMemo(() => {
+  const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
+
+  useEffect(() => {
     if (active || notificationsSeenAt < 0) {
-      return []
+      setFilteredNewNotifications([])
+      return
     }
-    const filtered: NostrEvent[] = []
-    for (const notification of newNotifications) {
-      if (notification.created_at <= notificationsSeenAt || filtered.length >= 10) {
-        break
-      }
-      if (
-        !notificationFilter(notification, {
-          pubkey,
-          mutePubkeySet,
-          hideContentMentioningMutedUsers,
-          hideUntrustedNotifications,
-          isUserTrusted
+    const filterNotifications = async () => {
+      const filtered: NostrEvent[] = []
+      await Promise.allSettled(
+        newNotifications.map(async (notification) => {
+          if (notification.created_at <= notificationsSeenAt || filtered.length >= 10) {
+            return
+          }
+          if (
+            !(await notificationFilter(notification, {
+              pubkey,
+              mutePubkeySet,
+              hideContentMentioningMutedUsers,
+              meetsMinTrustScore
+            }))
+          ) {
+            return
+          }
+          filtered.push(notification)
         })
-      ) {
-        continue
-      }
-      filtered.push(notification)
+      )
+      setFilteredNewNotifications(filtered)
     }
-    return filtered
+    filterNotifications()
   }, [
     newNotifications,
     notificationsSeenAt,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
-    hideUntrustedNotifications,
-    isUserTrusted,
-    active
+    meetsMinTrustScore
   ])
 
   useEffect(() => {
@@ -82,108 +87,61 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setNewNotifications([])
     setReadNotificationIdSet(new Set())
 
-    // Track if component is mounted
-    const isMountedRef = { current: true }
-    const subCloserRef: {
-      current: SubCloser | null
-    } = { current: null }
-
     const subscribe = async () => {
-      if (subCloserRef.current) {
-        subCloserRef.current.close()
-        subCloserRef.current = null
-      }
-      if (!isMountedRef.current) return null
-
-      try {
-        let eosed = false
-        const relayList = await client.fetchRelayList(pubkey)
-        const subCloser = client.subscribe(
-          relayList.read.length > 0 ? relayList.read.slice(0, 5) : BIG_RELAY_URLS,
-          [
-            {
-              kinds: [
-                kinds.ShortTextNote,
-                kinds.Repost,
-                kinds.Reaction,
-                kinds.Zap,
-                ExtendedKind.COMMENT,
-                ExtendedKind.POLL_RESPONSE,
-                ExtendedKind.VOICE_COMMENT,
-                ExtendedKind.POLL
-              ],
-              '#p': [pubkey],
-              limit: 20
-            }
-          ],
+      let eosed = false
+      const relayList = await client.fetchRelayList(pubkey)
+      const relays = relayList.read.length > 0 ? relayList.read.slice(0, 5) : getDefaultRelayUrls()
+      return client.subscribe(
+        relays,
+        [
           {
-            oneose: (e) => {
-              if (e) {
-                eosed = e
-                setNewNotifications((prev) => {
-                  return [...prev.sort((a, b) => compareEvents(b, a))]
-                })
-              }
-            },
-            onevent: (evt) => {
-              if (evt.pubkey !== pubkey) {
-                setNewNotifications((prev) => {
-                  if (!eosed) {
-                    return [evt, ...prev]
-                  }
-                  if (prev.length && compareEvents(prev[0], evt) >= 0) {
-                    return prev
-                  }
-
-                  client.emitNewEvent(evt)
+            kinds: [
+              kinds.ShortTextNote,
+              kinds.Repost,
+              kinds.GenericRepost,
+              kinds.Reaction,
+              kinds.Zap,
+              kinds.Highlights,
+              ExtendedKind.COMMENT,
+              ExtendedKind.POLL_RESPONSE,
+              ExtendedKind.VOICE_COMMENT,
+              ExtendedKind.POLL
+            ],
+            '#p': [pubkey],
+            limit: 20
+          }
+        ],
+        {
+          oneose: (e) => {
+            if (e) {
+              eosed = e
+              setNewNotifications((prev) => {
+                return [...prev.sort((a, b) => compareEvents(b, a))]
+              })
+            }
+          },
+          onevent: (evt) => {
+            if (evt.pubkey !== pubkey) {
+              setNewNotifications((prev) => {
+                if (!eosed) {
                   return [evt, ...prev]
-                })
-              }
-            },
-            onAllClose: (reasons) => {
-              if (reasons.every((reason) => reason === 'closed by caller')) {
-                return
-              }
+                }
+                if (prev.length && compareEvents(prev[0], evt) >= 0) {
+                  return prev
+                }
 
-              // Only reconnect if still mounted and not a manual close
-              if (isMountedRef.current) {
-                setTimeout(() => {
-                  if (isMountedRef.current) {
-                    subscribe()
-                  }
-                }, 5_000)
-              }
+                client.emitNewEvent(evt, relays)
+                return [evt, ...prev]
+              })
             }
           }
-        )
-
-        subCloserRef.current = subCloser
-        return subCloser
-      } catch (error) {
-        console.error('Subscription error:', error)
-
-        // Retry on error if still mounted
-        if (isMountedRef.current) {
-          setTimeout(() => {
-            if (isMountedRef.current) {
-              subscribe()
-            }
-          }, 5_000)
         }
-        return null
-      }
+      )
     }
 
-    // Initial subscription
-    subscribe()
-
-    // Cleanup function
+    const promise = subscribe()
     return () => {
-      isMountedRef.current = false
-      if (subCloserRef.current) {
-        subCloserRef.current.close()
-        subCloserRef.current = null
-      }
+      promise.then((closer) => closer.close())
     }
   }, [pubkey])
 

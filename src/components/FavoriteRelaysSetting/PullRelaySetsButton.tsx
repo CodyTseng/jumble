@@ -15,8 +15,9 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from '@/components/ui/drawer'
-import { BIG_RELAY_URLS } from '@/constants'
+import { buildATag } from '@/lib/draft-event'
 import { getReplaceableEventIdentifier } from '@/lib/event'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { tagNameEquals } from '@/lib/tag'
 import { isWebsocketUrl, simplifyUrl } from '@/lib/url'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -29,7 +30,6 @@ import { Event, kinds } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelaySetCard from '../RelaySetCard'
-import { buildATag } from '@/lib/draft-event'
 
 export default function PullRelaySetsButton() {
   const { t } = useTranslation()
@@ -94,7 +94,7 @@ function RemoteRelaySets({ close }: { close?: () => void }) {
     const init = async () => {
       setInitialed(false)
       const events = await client.fetchEvents(
-        (relayList?.write ?? []).concat(BIG_RELAY_URLS).slice(0, 4),
+        (relayList?.write ?? []).concat(getDefaultRelayUrls()).slice(0, 4),
         {
           kinds: [kinds.Relaysets],
           authors: [pubkey],

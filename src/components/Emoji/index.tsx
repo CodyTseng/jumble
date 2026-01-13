@@ -34,7 +34,7 @@ export default function Emoji({
       src={emoji.url}
       alt={emoji.shortcode}
       draggable={false}
-      className={cn('inline-block size-5 rounded-sm pointer-events-none', classNames?.img)}
+      className={cn('inline-block size-5 pointer-events-none', classNames?.img)}
       onLoad={() => {
         setHasError(false)
       }}

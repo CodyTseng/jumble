@@ -1,11 +1,11 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { BIG_RELAY_URLS } from '@/constants'
-import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { useStuff } from '@/hooks/useStuff'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import {
   createExternalContentReactionDraftEvent,
   createReactionDraftEvent
 } from '@/lib/draft-event'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
@@ -53,7 +53,7 @@ export default function Likes({ stuff }: { stuff: Event | string }) {
         const reaction = event
           ? createReactionDraftEvent(event, emoji)
           : createExternalContentReactionDraftEvent(externalContent, emoji)
-        const seenOn = event ? client.getSeenEventRelayUrls(event.id) : BIG_RELAY_URLS
+        const seenOn = event ? client.getSeenEventRelayUrls(event.id) : getDefaultRelayUrls()
         const evt = await publish(reaction, { additionalRelayUrls: seenOn })
         stuffStatsService.updateStuffStatsByEvents([evt])
       } catch (error) {

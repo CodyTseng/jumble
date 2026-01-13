@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import FollowButton from '../FollowButton'
 import Nip05 from '../Nip05'
 import ProfileAbout from '../ProfileAbout'
+import TextWithEmojis from '../TextWithEmojis'
+import TrustScoreBadge from '../TrustScoreBadge'
 import { SimpleUserAvatar } from '../UserAvatar'
 
 export default function ProfileCard({ userId }: { userId: string }) {
@@ -18,7 +20,14 @@ export default function ProfileCard({ userId }: { userId: string }) {
         <FollowButton pubkey={pubkey} />
       </div>
       <div>
-        <div className="text-lg font-semibold truncate">{username}</div>
+        <div className="flex gap-2 items-center">
+          <TextWithEmojis
+            text={username || ''}
+            emojis={emojis}
+            className="text-lg font-semibold truncate"
+          />
+          <TrustScoreBadge pubkey={pubkey} />
+        </div>
         <Nip05 pubkey={pubkey} />
       </div>
       {about && (

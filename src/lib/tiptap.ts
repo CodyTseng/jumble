@@ -7,25 +7,27 @@ export function parseEditorJsonToText(node?: JSONContent) {
   const text = _parseEditorJsonToText(node)
   const regex = /(^|\s+|@)(nostr:)?(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g
 
-  return text.replace(regex, (match, leadingWhitespace) => {
-    let bech32 = match.trim()
-    const whitespace = leadingWhitespace || ''
+  return text
+    .replace(regex, (match, leadingWhitespace) => {
+      let bech32 = match.trim()
+      const whitespace = leadingWhitespace || ''
 
-    if (bech32.startsWith('@nostr:')) {
-      bech32 = bech32.slice(7)
-    } else if (bech32.startsWith('@')) {
-      bech32 = bech32.slice(1)
-    } else if (bech32.startsWith('nostr:')) {
-      bech32 = bech32.slice(6)
-    }
+      if (bech32.startsWith('@nostr:')) {
+        bech32 = bech32.slice(7)
+      } else if (bech32.startsWith('@')) {
+        bech32 = bech32.slice(1)
+      } else if (bech32.startsWith('nostr:')) {
+        bech32 = bech32.slice(6)
+      }
 
-    try {
-      nip19.decode(bech32)
-      return `${whitespace}nostr:${bech32}`
-    } catch {
-      return match
-    }
-  }).trim()
+      try {
+        nip19.decode(bech32)
+        return `${whitespace}nostr:${bech32}`
+      } catch {
+        return match
+      }
+    })
+    .trim()
 }
 
 function _parseEditorJsonToText(node?: JSONContent): string {

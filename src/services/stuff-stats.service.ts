@@ -1,6 +1,7 @@
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { getEventKey, getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
 import { TEmoji } from '@/types'
@@ -58,7 +59,7 @@ class StuffStatsService {
         },
         {
           '#e': [event.id],
-          kinds: [kinds.Repost],
+          kinds: [kinds.Repost, kinds.GenericRepost],
           limit: 100
         }
       )
@@ -79,7 +80,7 @@ class StuffStatsService {
         },
         {
           '#a': [replaceableCoordinate],
-          kinds: [kinds.Repost],
+          kinds: [kinds.Repost, kinds.GenericRepost],
           limit: 100
         }
       )
@@ -107,7 +108,10 @@ class StuffStatsService {
           ? {
               '#e': [event.id],
               authors: [pubkey],
-              kinds: [kinds.Reaction, kinds.Repost]
+              kinds:
+                event.kind === kinds.ShortTextNote
+                  ? [kinds.Reaction, kinds.Repost]
+                  : [kinds.Reaction, kinds.Repost, kinds.GenericRepost]
             }
           : {
               '#i': [externalContent],
@@ -120,7 +124,7 @@ class StuffStatsService {
         filters.push({
           '#a': [replaceableCoordinate],
           authors: [pubkey],
-          kinds: [kinds.Reaction, kinds.Repost]
+          kinds: [kinds.Reaction, kinds.Repost, kinds.GenericRepost]
         })
       }
 
@@ -147,7 +151,9 @@ class StuffStatsService {
       })
     }
 
-    const relays = relayList ? relayList.read.concat(BIG_RELAY_URLS).slice(0, 5) : BIG_RELAY_URLS
+    const relays = relayList
+      ? relayList.read.concat(getDefaultRelayUrls()).slice(0, 5)
+      : getDefaultRelayUrls()
 
     const events: Event[] = []
     await client.fetchEvents(relays, filters, {
@@ -218,7 +224,7 @@ class StuffStatsService {
         targetKey = this.addLikeByEvent(evt)
       } else if (evt.kind === ExtendedKind.EXTERNAL_CONTENT_REACTION) {
         targetKey = this.addExternalContentLikeByEvent(evt)
-      } else if (evt.kind === kinds.Repost) {
+      } else if (evt.kind === kinds.Repost || evt.kind === kinds.GenericRepost) {
         targetKey = this.addRepostByEvent(evt)
       } else if (evt.kind === kinds.Zap) {
         targetKey = this.addZapByEvent(evt)
@@ -233,10 +239,17 @@ class StuffStatsService {
   }
 
   private addLikeByEvent(evt: Event) {
-    const targetEventId = evt.tags.findLast(tagNameEquals('e'))?.[1]
-    if (!targetEventId) return
+    let targetEventKey
+    targetEventKey = evt.tags.findLast(tagNameEquals('a'))?.[1]
+    if (!targetEventKey) {
+      targetEventKey = evt.tags.findLast(tagNameEquals('e'))?.[1]
+    }
 
-    const old = this.stuffStatsMap.get(targetEventId) || {}
+    if (!targetEventKey) {
+      return
+    }
+
+    const old = this.stuffStatsMap.get(targetEventKey) || {}
     const likeIdSet = old.likeIdSet || new Set()
     const likes = old.likes || []
     if (likeIdSet.has(evt.id)) return
@@ -257,8 +270,8 @@ class StuffStatsService {
 
     likeIdSet.add(evt.id)
     likes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
-    this.stuffStatsMap.set(targetEventId, { ...old, likeIdSet, likes })
-    return targetEventId
+    this.stuffStatsMap.set(targetEventKey, { ...old, likeIdSet, likes })
+    return targetEventKey
   }
 
   private addExternalContentLikeByEvent(evt: Event) {
@@ -291,18 +304,25 @@ class StuffStatsService {
   }
 
   private addRepostByEvent(evt: Event) {
-    const eventId = evt.tags.find(tagNameEquals('e'))?.[1]
-    if (!eventId) return
+    let targetEventKey
+    targetEventKey = evt.tags.find(tagNameEquals('a'))?.[1]
+    if (!targetEventKey) {
+      targetEventKey = evt.tags.find(tagNameEquals('e'))?.[1]
+    }
 
-    const old = this.stuffStatsMap.get(eventId) || {}
+    if (!targetEventKey) {
+      return
+    }
+
+    const old = this.stuffStatsMap.get(targetEventKey) || {}
     const repostPubkeySet = old.repostPubkeySet || new Set()
     const reposts = old.reposts || []
     if (repostPubkeySet.has(evt.pubkey)) return
 
     repostPubkeySet.add(evt.pubkey)
     reposts.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at })
-    this.stuffStatsMap.set(eventId, { ...old, repostPubkeySet, reposts })
-    return eventId
+    this.stuffStatsMap.set(targetEventKey, { ...old, repostPubkeySet, reposts })
+    return targetEventKey
   }
 
   private addZapByEvent(evt: Event) {

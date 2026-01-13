@@ -1,4 +1,5 @@
 import { TEmoji, TImetaInfo } from '@/types'
+import { base64 } from '@scure/base'
 import { isBlurhashValid } from 'blurhash'
 import { nip19 } from 'nostr-tools'
 import { isValidPubkey } from './pubkey'
@@ -49,28 +50,40 @@ export function generateBech32IdFromATag(tag: string[]) {
 
 export function getImetaInfoFromImetaTag(tag: string[], pubkey?: string): TImetaInfo | null {
   if (tag[0] !== 'imeta') return null
-  const urlItem = tag.find((item) => item.startsWith('url '))
-  const url = urlItem?.slice(4)
-  if (!url) return null
+  const imeta: Partial<TImetaInfo> = { pubkey }
 
-  const imeta: TImetaInfo = { url, pubkey }
-  const blurHashItem = tag.find((item) => item.startsWith('blurhash '))
-  const blurHash = blurHashItem?.slice(9)
-  if (blurHash) {
-    const validRes = isBlurhashValid(blurHash)
-    if (validRes.result) {
-      imeta.blurHash = blurHash
+  for (let i = 1; i < tag.length; i++) {
+    const [k, v] = tag[i].split(' ')
+    switch (k) {
+      case 'url':
+        imeta.url = v
+        break
+      case 'thumbhash':
+        try {
+          imeta.thumbHash = base64.decode(v)
+        } catch {
+          /***/
+        }
+        break
+      case 'blurhash': {
+        const validRes = isBlurhashValid(v)
+        if (validRes.result) {
+          imeta.blurHash = v
+        }
+        break
+      }
+      case 'dim': {
+        const [width, height] = v.split('x').map(Number)
+        if (width && height) {
+          imeta.dim = { width, height }
+        }
+        break
+      }
     }
   }
-  const dimItem = tag.find((item) => item.startsWith('dim '))
-  const dim = dimItem?.slice(4)
-  if (dim) {
-    const [width, height] = dim.split('x').map(Number)
-    if (width && height) {
-      imeta.dim = { width, height }
-    }
-  }
-  return imeta
+
+  if (!imeta.url) return null
+  return imeta as TImetaInfo
 }
 
 export function getPubkeysFromPTags(tags: string[][]) {

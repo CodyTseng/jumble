@@ -150,7 +150,7 @@ export default function Settings() {
           </div>
         </SettingItem>
       </AboutInfoDialog>
-      <div className="px-4 mt-4">
+      <div className="p-4">
         <Donation />
       </div>
     </div>

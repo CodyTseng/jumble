@@ -78,8 +78,17 @@ export const toMuteList = () => '/mutes'
 export const toRizful = () => '/rizful'
 export const toSparkTest = () => '/spark'
 export const toBookmarks = () => '/bookmarks'
+export const toFollowPack = (eventOrId: Event | string) => {
+  if (typeof eventOrId === 'string') return `/follow-packs/${eventOrId}`
+  const naddr = getNoteBech32Id(eventOrId)
+  return `/follow-packs/${naddr}`
+}
 
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
 }
 export const toNjump = (id: string) => `https://njump.me/${id}`
+export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
+  const npub = nip19.npubEncode(pubkey)
+  return `/user-aggregation/${feedId}/${npub}`
+}

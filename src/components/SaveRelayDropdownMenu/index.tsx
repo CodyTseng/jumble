@@ -108,6 +108,7 @@ export default function SaveRelayDropdownMenu({
 function RelayItem({ urls }: { urls: string[] }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const { checkLogin } = useNostr()
   const { favoriteRelays, addFavoriteRelays, deleteFavoriteRelays } = useFavoriteRelays()
   const saved = useMemo(
     () => urls.every((url) => favoriteRelays.includes(url)),
@@ -115,6 +116,7 @@ function RelayItem({ urls }: { urls: string[] }) {
   )
 
   const handleClick = async () => {
+    checkLogin()
     if (saved) {
       await deleteFavoriteRelays(urls)
     } else {

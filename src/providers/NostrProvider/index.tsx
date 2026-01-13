@@ -1,5 +1,6 @@
 import LoginDialog from '@/components/LoginDialog'
-import { ApplicationDataKey, BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import PasswordInputDialog from '@/components/PasswordInputDialog'
+import { ApplicationDataKey, ExtendedKind } from '@/constants'
 import {
   createDeletionRequestDraftEvent,
   createFollowListDraftEvent,
@@ -15,6 +16,7 @@ import {
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import indexedDb from '@/services/indexed-db.service'
@@ -34,7 +36,7 @@ import dayjs from 'dayjs'
 import { Event, kinds, VerifiedEvent } from 'nostr-tools'
 import * as nip19 from 'nostr-tools/nip19'
 import * as nip49 from 'nostr-tools/nip49'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useDeletedEvent } from '../DeletedEventProvider'
@@ -56,6 +58,7 @@ type TNostrContext = {
   favoriteRelaysEvent: Event | null
   userEmojiListEvent: Event | null
   pinListEvent: Event | null
+  pinnedUsersEvent: Event | null
   notificationsSeenAt: number
   account: TAccountPointer | null
   accounts: TAccountPointer[]
@@ -90,6 +93,7 @@ type TNostrContext = {
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
   updateUserEmojiListEvent: (userEmojiListEvent: Event) => Promise<void>
   updatePinListEvent: (pinListEvent: Event) => Promise<void>
+  updatePinnedUsersEvent: (pinnedUsersEvent: Event, privateTags?: string[][]) => Promise<void>
   updateNotificationsSeenAt: (skipPublish?: boolean) => Promise<void>
 }
 
@@ -121,12 +125,18 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followListEvent, setFollowListEvent] = useState<Event | null>(null)
   const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
+  const [pinnedUsersEvent, setPinnedUsersEvent] = useState<Event | null>(null)
   const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | null>(null)
   const [favoriteRelaysEvent, setFavoriteRelaysEvent] = useState<Event | null>(null)
   const [userEmojiListEvent, setUserEmojiListEvent] = useState<Event | null>(null)
   const [pinListEvent, setPinListEvent] = useState<Event | null>(null)
   const [notificationsSeenAt, setNotificationsSeenAt] = useState(-1)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
+  const passwordPromiseRef = useRef<{
+    resolve: (password: string) => void
+    reject: () => void
+  } | null>(null)
 
   useEffect(() => {
     const init = async () => {
@@ -197,7 +207,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedBookmarkListEvent,
         storedFavoriteRelaysEvent,
         storedUserEmojiListEvent,
-        storedPinListEvent
+        storedPinListEvent,
+        storedPinnedUsersEvent
       ] = await Promise.all([
         indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
@@ -206,7 +217,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.BookmarkList),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.UserEmojiList),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist)
+        indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
+        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS)
       ])
       if (storedRelayListEvent) {
         setRelayList(getRelayListFromEvent(storedRelayListEvent, storage.getFilterOutOnionRelays()))
@@ -233,8 +245,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (storedPinListEvent) {
         setPinListEvent(storedPinListEvent)
       }
+      if (storedPinnedUsersEvent) {
+        setPinnedUsersEvent(storedPinnedUsersEvent)
+      }
 
-      const relayListEvents = await client.fetchEvents(BIG_RELAY_URLS, {
+      const defaultRelays = getDefaultRelayUrls()
+      const relayListEvents = await client.fetchEvents(defaultRelays, {
         kinds: [kinds.RelayList],
         authors: [account.pubkey]
       })
@@ -246,7 +262,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
       setRelayList(relayList)
 
-      const events = await client.fetchEvents(relayList.write.concat(BIG_RELAY_URLS).slice(0, 4), [
+      const events = await client.fetchEvents(relayList.write.concat(defaultRelays).slice(0, 4), [
         {
           kinds: [
             kinds.Metadata,
@@ -256,7 +272,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             ExtendedKind.FAVORITE_RELAYS,
             ExtendedKind.BLOSSOM_SERVER_LIST,
             kinds.UserEmojiList,
-            kinds.Pinlist
+            kinds.Pinlist,
+            ExtendedKind.PINNED_USERS
           ],
           authors: [account.pubkey]
         },
@@ -282,6 +299,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
           getReplaceableEventIdentifier(e) === ApplicationDataKey.NOTIFICATIONS_SEEN_AT
       )
       const pinnedNotesEvent = sortedEvents.find((e) => e.kind === kinds.Pinlist)
+      const pinnedUsersEvent = sortedEvents.find((e) => e.kind === ExtendedKind.PINNED_USERS)
+
       if (profileEvent) {
         const updatedProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
         if (updatedProfileEvent.id === profileEvent.id) {
@@ -332,6 +351,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         const updatedPinnedNotesEvent = await indexedDb.putReplaceableEvent(pinnedNotesEvent)
         if (updatedPinnedNotesEvent.id === pinnedNotesEvent.id) {
           setPinListEvent(updatedPinnedNotesEvent)
+        }
+      }
+      if (pinnedUsersEvent) {
+        const updatedPinnedUsersEvent = await indexedDb.putReplaceableEvent(pinnedUsersEvent)
+        if (updatedPinnedUsersEvent.id === pinnedUsersEvent.id) {
+          setPinnedUsersEvent(updatedPinnedUsersEvent)
         }
       }
 
@@ -395,6 +420,25 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     customEmojiService.init(userEmojiListEvent)
   }, [userEmojiListEvent])
+
+  const requestPassword = (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      passwordPromiseRef.current = { resolve, reject }
+      setPasswordDialogOpen(true)
+    })
+  }
+
+  const handlePasswordConfirm = (password: string) => {
+    passwordPromiseRef.current?.resolve(password)
+    passwordPromiseRef.current = null
+    setPasswordDialogOpen(false)
+  }
+
+  const handlePasswordCancel = () => {
+    passwordPromiseRef.current?.reject()
+    passwordPromiseRef.current = null
+    setPasswordDialogOpen(false)
+  }
 
   const hasNostrLoginHash = () => {
     return window.location.hash && window.location.hash.startsWith('#nostr-login')
@@ -470,10 +514,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const ncryptsecLogin = async (ncryptsec: string) => {
-    const password = prompt(t('Enter the password to decrypt your ncryptsec'))
-    if (!password) {
-      throw new Error('Password is required')
-    }
+    const password = await requestPassword()
     const privkey = nip49.decrypt(ncryptsec, password)
     const browserNsecSigner = new NsecSigner()
     const pubkey = browserNsecSigner.login(privkey)
@@ -552,14 +593,15 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     } else if (account.signerType === 'ncryptsec') {
       if (account.ncryptsec) {
-        const password = prompt(t('Enter the password to decrypt your ncryptsec'))
-        if (!password) {
+        try {
+          const password = await requestPassword()
+          const privkey = nip49.decrypt(account.ncryptsec, password)
+          const browserNsecSigner = new NsecSigner()
+          browserNsecSigner.login(privkey)
+          return login(browserNsecSigner, account)
+        } catch {
           return null
         }
-        const privkey = nip49.decrypt(account.ncryptsec, password)
-        const browserNsecSigner = new NsecSigner()
-        browserNsecSigner.login(privkey)
-        return login(browserNsecSigner, account)
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
@@ -599,13 +641,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const setupNewUser = async (signer: ISigner) => {
+    const defaultRelays = getDefaultRelayUrls()
     await Promise.allSettled([
-      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createFollowListDraftEvent([]))),
-      client.publishEvent(BIG_RELAY_URLS, await signer.signEvent(createMuteListDraftEvent([]))),
+      client.publishEvent(defaultRelays, await signer.signEvent(createFollowListDraftEvent([]))),
+      client.publishEvent(defaultRelays, await signer.signEvent(createMuteListDraftEvent([]))),
       client.publishEvent(
-        BIG_RELAY_URLS,
+        defaultRelays,
         await signer.signEvent(
-          createRelayListDraftEvent(BIG_RELAY_URLS.map((url) => ({ url, scope: 'both' })))
+          createRelayListDraftEvent(defaultRelays.map((url) => ({ url, scope: 'both' })))
         )
       )
     ])
@@ -736,7 +779,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     const newMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
     if (newMuteListEvent.id !== muteListEvent.id) return
 
-    await indexedDb.putMuteDecryptedTags(muteListEvent.id, privateTags)
+    await indexedDb.putDecryptedContent(muteListEvent.id, JSON.stringify(privateTags))
     setMuteListEvent(muteListEvent)
   }
 
@@ -766,6 +809,16 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     if (newPinListEvent.id !== pinListEvent.id) return
 
     setPinListEvent(newPinListEvent)
+  }
+
+  const updatePinnedUsersEvent = async (pinnedUsersEvent: Event, privateTags?: string[][]) => {
+    const newPinnedUsersEvent = await indexedDb.putReplaceableEvent(pinnedUsersEvent)
+    if (newPinnedUsersEvent.id !== pinnedUsersEvent.id) return
+
+    if (privateTags) {
+      await indexedDb.putDecryptedContent(pinnedUsersEvent.id, JSON.stringify(privateTags))
+    }
+    setPinnedUsersEvent(newPinnedUsersEvent)
   }
 
   const updateNotificationsSeenAt = async (skipPublish = false) => {
@@ -804,6 +857,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         favoriteRelaysEvent,
         userEmojiListEvent,
         pinListEvent,
+        pinnedUsersEvent,
         notificationsSeenAt,
         account,
         accounts,
@@ -835,11 +889,19 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         updateFavoriteRelaysEvent,
         updateUserEmojiListEvent,
         updatePinListEvent,
+        updatePinnedUsersEvent,
         updateNotificationsSeenAt
       }}
     >
       {children}
       <LoginDialog open={openLoginDialog} setOpen={setOpenLoginDialog} />
+      <PasswordInputDialog
+        open={passwordDialogOpen}
+        title={t('Enter Password')}
+        description={t('Enter the password to decrypt your ncryptsec')}
+        onConfirm={handlePasswordConfirm}
+        onCancel={handlePasswordCancel}
+      />
     </NostrContext.Provider>
   )
 }

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSecondaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
+import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronLeft } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
@@ -60,11 +61,35 @@ const SecondaryPageLayout = forwardRef(
 
     if (enableSingleColumnLayout) {
       return (
-        <DeepBrowsingProvider active={currentIndex === index}>
-          <div
-            style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-            }}
+        <PageActiveContext.Provider value={currentIndex === index}>
+          <DeepBrowsingProvider active={currentIndex === index}>
+            <div
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+              }}
+            >
+              <SecondaryPageTitlebar
+                title={title}
+                controls={controls}
+                hideBackButton={hideBackButton}
+                hideBottomBorder={hideTitlebarBottomBorder}
+                titlebar={titlebar}
+              />
+              {children}
+            </div>
+            {displayScrollToTopButton && <ScrollToTopButton />}
+          </DeepBrowsingProvider>
+        </PageActiveContext.Provider>
+      )
+    }
+
+    return (
+      <PageActiveContext.Provider value={currentIndex === index}>
+        <DeepBrowsingProvider active={currentIndex === index} scrollAreaRef={scrollAreaRef}>
+          <ScrollArea
+            className="h-full overflow-auto"
+            scrollBarClassName="z-30 pt-12"
+            ref={scrollAreaRef}
           >
             <SecondaryPageTitlebar
               title={title}
@@ -74,31 +99,11 @@ const SecondaryPageLayout = forwardRef(
               titlebar={titlebar}
             />
             {children}
-          </div>
-          {displayScrollToTopButton && <ScrollToTopButton />}
+            <div className="h-4" />
+          </ScrollArea>
+          {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
         </DeepBrowsingProvider>
-      )
-    }
-
-    return (
-      <DeepBrowsingProvider active={currentIndex === index} scrollAreaRef={scrollAreaRef}>
-        <ScrollArea
-          className="h-full overflow-auto"
-          scrollBarClassName="z-50 pt-12"
-          ref={scrollAreaRef}
-        >
-          <SecondaryPageTitlebar
-            title={title}
-            controls={controls}
-            hideBackButton={hideBackButton}
-            hideBottomBorder={hideTitlebarBottomBorder}
-            titlebar={titlebar}
-          />
-          {children}
-          <div className="h-4" />
-        </ScrollArea>
-        {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
-      </DeepBrowsingProvider>
+      </PageActiveContext.Provider>
     )
   }
 )

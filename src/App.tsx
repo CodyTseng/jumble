@@ -15,7 +15,7 @@ import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvid
 import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
-import { ReplyProvider } from '@/providers/ReplyProvider'
+import { PinnedUsersProvider } from '@/providers/PinnedUsersProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { SparkWalletProvider } from '@/providers/SparkWalletProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
@@ -44,16 +44,16 @@ export default function App(): JSX.Element {
                                 <BookmarksProvider>
                                   <EmojiPackProvider>
                                     <PinListProvider>
-                                      <FeedProvider>
-                                        <ReplyProvider>
+                                      <PinnedUsersProvider>
+                                        <FeedProvider>
                                           <MediaUploadServiceProvider>
                                             <KindFilterProvider>
                                               <PageManager />
                                               <Toaster />
                                             </KindFilterProvider>
                                           </MediaUploadServiceProvider>
-                                        </ReplyProvider>
-                                      </FeedProvider>
+                                        </FeedProvider>
+                                      </PinnedUsersProvider>
                                     </PinListProvider>
                                   </EmojiPackProvider>
                                 </BookmarksProvider>

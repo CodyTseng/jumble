@@ -34,7 +34,7 @@ export default function TooManyRelaysAlertDialog() {
     const dismissed = storage.getDismissedTooManyRelaysAlert()
     if (dismissed) return
 
-    if (relayList && (relayList.read.length > 4 || relayList.write.length > 4)) {
+    if (relayList && (relayList.read.length > 5 || relayList.write.length > 5)) {
       setOpen(true)
     } else {
       setOpen(false)

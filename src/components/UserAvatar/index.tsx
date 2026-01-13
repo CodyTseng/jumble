@@ -1,9 +1,10 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useFetchProfile } from '@/hooks'
 import { toProfile } from '@/lib/link'
 import { generateImageByPubkey } from '@/lib/pubkey'
-import { cn } from '@/lib/utils'
+import { cn, isTouchDevice } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
 import { useMemo } from 'react'
 import Image from '../Image'
@@ -29,13 +30,21 @@ export default function UserAvatar({
   className?: string
   size?: 'large' | 'big' | 'semiBig' | 'normal' | 'medium' | 'small' | 'xSmall' | 'tiny'
 }) {
+  const supportTouch = useMemo(() => isTouchDevice(), [])
+
+  const trigger = (
+    <SecondaryPageLink to={toProfile(userId)} onClick={(e) => e.stopPropagation()}>
+      <SimpleUserAvatar userId={userId} size={size} className={className} />
+    </SecondaryPageLink>
+  )
+
+  if (supportTouch) {
+    return trigger
+  }
+
   return (
     <HoverCard>
-      <HoverCardTrigger>
-        <SecondaryPageLink to={toProfile(userId)} onClick={(e) => e.stopPropagation()}>
-          <SimpleUserAvatar userId={userId} size={size} className={className} />
-        </SecondaryPageLink>
-      </HoverCardTrigger>
+      <HoverCardTrigger>{trigger}</HoverCardTrigger>
       <HoverCardContent className="w-72">
         <ProfileCard userId={userId} />
       </HoverCardContent>
@@ -55,6 +64,7 @@ export function SimpleUserAvatar({
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }) {
   const { profile } = useFetchProfile(userId)
+  const { autoLoadProfilePicture } = useContentPolicy()
   const defaultAvatar = useMemo(
     () => (profile?.pubkey ? generateImageByPubkey(profile.pubkey) : ''),
     [profile]
@@ -67,9 +77,11 @@ export function SimpleUserAvatar({
   }
   const { avatar, pubkey } = profile || {}
 
+  const imageUrl = autoLoadProfilePicture ? (avatar ?? defaultAvatar) : defaultAvatar
+
   return (
     <Image
-      image={{ url: avatar ?? defaultAvatar, pubkey }}
+      image={{ url: imageUrl, pubkey }}
       errorPlaceholder={defaultAvatar}
       className="object-cover object-center"
       classNames={{

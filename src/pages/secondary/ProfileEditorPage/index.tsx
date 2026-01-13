@@ -70,7 +70,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       ...oldProfileContent,
       display_name: username,
       displayName: username,
-      name: oldProfileContent.name ?? username,
+      name: username,
       about,
       website,
       nip05,

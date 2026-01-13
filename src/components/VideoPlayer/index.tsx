@@ -79,7 +79,7 @@ export default function VideoPlayer({ src, className }: { src: string; className
         ref={videoRef}
         controls
         playsInline
-        className={cn('rounded-lg max-h-[80vh] sm:max-h-[60vh] border', className)}
+        className={cn('rounded-xl max-h-[80vh] sm:max-h-[60vh] border', className)}
         src={src}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {

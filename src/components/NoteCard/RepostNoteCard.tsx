@@ -11,12 +11,14 @@ export default function RepostNoteCard({
   event,
   className,
   filterMutedNotes = true,
-  pinned = false
+  pinned = false,
+  reposters
 }: {
   event: Event
   className?: string
   filterMutedNotes?: boolean
   pinned?: boolean
+  reposters?: string[]
 }) {
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
@@ -42,7 +44,10 @@ export default function RepostNoteCard({
         }
       }
       if (eventFromContent && verifyEvent(eventFromContent)) {
-        if (eventFromContent.kind === kinds.Repost) {
+        if (
+          eventFromContent.kind === kinds.Repost ||
+          eventFromContent.kind === kinds.GenericRepost
+        ) {
           return
         }
         client.addEventToCache(eventFromContent)
@@ -84,7 +89,7 @@ export default function RepostNoteCard({
   return (
     <MainNoteCard
       className={className}
-      reposters={[event.pubkey]}
+      reposters={reposters?.includes(event.pubkey) ? reposters : [event.pubkey]}
       event={targetEvent}
       pinned={pinned}
     />

@@ -3,14 +3,16 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   createCommentDraftEvent,
+  createHighlightDraftEvent,
   createPollDraftEvent,
   createShortTextNoteDraftEvent,
   deleteDraftEventCache
 } from '@/lib/draft-event'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { isTouchDevice } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { useReply } from '@/providers/ReplyProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
+import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
 import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
@@ -24,22 +26,22 @@ import PostOptions from './PostOptions'
 import PostRelaySelector from './PostRelaySelector'
 import PostTextarea, { TPostTextareaHandle } from './PostTextarea'
 import Uploader from './Uploader'
-import { BIG_RELAY_URLS } from '@/constants'
 
 export default function PostContent({
   defaultContent = '',
   parentStuff,
   close,
-  openFrom
+  openFrom,
+  highlightedText
 }: {
   defaultContent?: string
   parentStuff?: Event | string
   close: () => void
   openFrom?: string[]
+  highlightedText?: string
 }) {
   const { t } = useTranslation()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { addReplies } = useReply()
   const [text, setText] = useState('')
   const textareaRef = useRef<TPostTextareaHandle>(null)
   const [posting, setPosting] = useState(false)
@@ -68,7 +70,7 @@ export default function PostContent({
   const canPost = useMemo(() => {
     return (
       !!pubkey &&
-      !!text &&
+      (!!text || !!highlightedText) &&
       !posting &&
       !uploadProgresses.length &&
       (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2) &&
@@ -77,6 +79,7 @@ export default function PostContent({
   }, [
     pubkey,
     text,
+    highlightedText,
     posting,
     uploadProgresses,
     isPoll,
@@ -118,36 +121,32 @@ export default function PostContent({
     )
   }, [defaultContent, parentStuff, isNsfw, isPoll, pollCreateData, addClientTag])
 
+  const postingRef = useRef(false)
+
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
     checkLogin(async () => {
-      if (!canPost) return
+      if (!canPost || !pubkey || postingRef.current) return
 
+      postingRef.current = true
       setPosting(true)
       try {
-        const draftEvent =
-          parentStuff &&
-          (typeof parentStuff === 'string' || parentStuff.kind !== kinds.ShortTextNote)
-            ? await createCommentDraftEvent(text, parentStuff, mentions, {
-                addClientTag,
-                protectedEvent: isProtectedEvent,
-                isNsfw
-              })
-            : isPoll
-              ? await createPollDraftEvent(pubkey!, text, mentions, pollCreateData, {
-                  addClientTag,
-                  isNsfw
-                })
-              : await createShortTextNoteDraftEvent(text, mentions, {
-                  parentEvent,
-                  addClientTag,
-                  protectedEvent: isProtectedEvent,
-                  isNsfw
-                })
+        const draftEvent = await createDraftEvent({
+          parentStuff,
+          highlightedText,
+          text,
+          mentions,
+          isPoll,
+          pollCreateData,
+          pubkey,
+          addClientTag,
+          isProtectedEvent,
+          isNsfw
+        })
 
         const _additionalRelayUrls = [...additionalRelayUrls]
         if (parentStuff && typeof parentStuff === 'string') {
-          _additionalRelayUrls.push(...BIG_RELAY_URLS)
+          _additionalRelayUrls.push(...getDefaultRelayUrls())
         }
 
         const newEvent = await publish(draftEvent, {
@@ -157,7 +156,8 @@ export default function PostContent({
         })
         postEditorCache.clearPostCache({ defaultContent, parentStuff })
         deleteDraftEventCache(draftEvent)
-        addReplies([newEvent])
+        threadService.addRepliesToThread([newEvent])
+        toast.success(t('Post successful'), { duration: 2000 })
         close()
       } catch (error) {
         const errors = error instanceof AggregateError ? error.errors : [error]
@@ -171,8 +171,8 @@ export default function PostContent({
         return
       } finally {
         setPosting(false)
+        postingRef.current = false
       }
-      toast.success(t('Post successful'), { duration: 2000 })
     })
   }
 
@@ -201,7 +201,14 @@ export default function PostContent({
       {parentEvent && (
         <ScrollArea className="flex max-h-48 flex-col overflow-y-auto rounded-lg border bg-muted/40">
           <div className="p-2 sm:p-3 pointer-events-none">
-            <Note size="small" event={parentEvent} hideParentNotePreview />
+            {highlightedText ? (
+              <div className="flex gap-4">
+                <div className="w-1 flex-shrink-0 my-1 bg-primary/60 rounded-md" />
+                <div className="italic whitespace-pre-line">{highlightedText}</div>
+              </div>
+            ) : (
+              <Note size="small" event={parentEvent} hideParentNotePreview />
+            )}
           </div>
         </ScrollArea>
       )}
@@ -216,6 +223,7 @@ export default function PostContent({
         onUploadStart={handleUploadStart}
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
+        placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
       />
       {isPoll && (
         <PollEditor
@@ -328,7 +336,7 @@ export default function PostContent({
             </Button>
             <Button type="submit" disabled={!canPost} onClick={post}>
               {posting && <LoaderCircle className="animate-spin" />}
-              {parentStuff ? t('Reply') : t('Post')}
+              {parentStuff ? (highlightedText ? t('Publish Highlight') : t('Reply')) : t('Post')}
             </Button>
           </div>
         </div>
@@ -361,4 +369,63 @@ export default function PostContent({
       </div>
     </div>
   )
+}
+
+async function createDraftEvent({
+  parentStuff,
+  text,
+  mentions,
+  isPoll,
+  pollCreateData,
+  pubkey,
+  addClientTag,
+  isProtectedEvent,
+  isNsfw,
+  highlightedText
+}: {
+  parentStuff: Event | string | undefined
+  text: string
+  mentions: string[]
+  isPoll: boolean
+  pollCreateData: TPollCreateData
+  pubkey: string
+  addClientTag: boolean
+  isProtectedEvent: boolean
+  isNsfw: boolean
+  highlightedText?: string
+}) {
+  const { parentEvent, externalContent } =
+    typeof parentStuff === 'string'
+      ? { parentEvent: undefined, externalContent: parentStuff }
+      : { parentEvent: parentStuff, externalContent: undefined }
+
+  if (highlightedText && parentEvent) {
+    return createHighlightDraftEvent(highlightedText, text, parentEvent, mentions, {
+      addClientTag,
+      protectedEvent: isProtectedEvent,
+      isNsfw
+    })
+  }
+
+  if (parentStuff && (externalContent || parentEvent?.kind !== kinds.ShortTextNote)) {
+    return await createCommentDraftEvent(text, parentStuff, mentions, {
+      addClientTag,
+      protectedEvent: isProtectedEvent,
+      isNsfw
+    })
+  }
+
+  if (isPoll) {
+    return await createPollDraftEvent(pubkey, text, mentions, pollCreateData, {
+      addClientTag,
+      isNsfw
+    })
+  }
+
+  return await createShortTextNoteDraftEvent(text, mentions, {
+    parentEvent,
+    addClientTag,
+    protectedEvent: isProtectedEvent,
+    isNsfw
+  })
 }

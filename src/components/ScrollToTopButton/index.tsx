@@ -52,8 +52,8 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        'sticky z-30 flex justify-end w-full pr-3 pointer-events-none transition-opacity duration-700',
-        visible ? '' : 'opacity-0',
+        'sticky z-30 flex justify-end w-full pr-3 pointer-events-none transition-all duration-700',
+        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
         className
       )}
       style={{
@@ -64,7 +64,7 @@ export default function ScrollToTopButton({
     >
       <Button
         variant="secondary-2"
-        className="rounded-full w-12 h-12 p-0 hover:text-background pointer-events-auto disabled:pointer-events-none"
+        className="rounded-full size-12 p-0 hover:text-background pointer-events-auto disabled:pointer-events-none transition-all duration-200"
         onClick={handleScrollToTop}
         disabled={!visible}
       >

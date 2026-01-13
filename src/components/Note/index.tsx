@@ -1,5 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
-import { ExtendedKind, SUPPORTED_KINDS } from '@/constants'
+import { ExtendedKind, NSFW_DISPLAY_POLICY, SUPPORTED_KINDS } from '@/constants'
 import { getParentStuff, isNsfwEvent } from '@/lib/event'
 import { toExternalContent, toNote } from '@/lib/link'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -16,10 +16,12 @@ import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
 import ParentNotePreview from '../ParentNotePreview'
 import TranslateButton from '../TranslateButton'
+import TrustScoreBadge from '../TrustScoreBadge'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import CommunityDefinition from './CommunityDefinition'
 import EmojiPack from './EmojiPack'
+import FollowPack from './FollowPack'
 import GroupMetadata from './GroupMetadata'
 import Highlight from './Highlight'
 import LiveEvent from './LiveEvent'
@@ -53,10 +55,14 @@ export default function Note({
   const { parentEventId, parentExternalContent } = useMemo(() => {
     return getParentStuff(event)
   }, [event])
-  const { defaultShowNsfw } = useContentPolicy()
+  const { nsfwDisplayPolicy } = useContentPolicy()
   const [showNsfw, setShowNsfw] = useState(false)
   const { mutePubkeySet } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
+  const isNsfw = useMemo(
+    () => (nsfwDisplayPolicy === NSFW_DISPLAY_POLICY.SHOW ? false : isNsfwEvent(event)),
+    [event, nsfwDisplayPolicy]
+  )
 
   let content: React.ReactNode
   if (
@@ -70,7 +76,7 @@ export default function Note({
     content = <UnknownNote className="mt-2" event={event} />
   } else if (mutePubkeySet.has(event.pubkey) && !showMuted) {
     content = <MutedNote show={() => setShowMuted(true)} />
-  } else if (!defaultShowNsfw && isNsfwEvent(event) && !showNsfw) {
+  } else if (isNsfw && !showNsfw) {
     content = <NsfwNote show={() => setShowNsfw(true)} />
   } else if (event.kind === kinds.Highlights) {
     content = <Highlight className="mt-2" event={event} />
@@ -108,8 +114,10 @@ export default function Note({
     content = <RelayReview className="mt-2" event={event} />
   } else if (event.kind === kinds.Emojisets) {
     content = <EmojiPack className="mt-2" event={event} />
+  } else if (event.kind === ExtendedKind.FOLLOW_PACK) {
+    content = <FollowPack className="mt-2" event={event} />
   } else {
-    content = <Content className="mt-2" event={event} />
+    content = <Content className="mt-2" event={event} enableHighlight />
   }
 
   return (
@@ -125,6 +133,7 @@ export default function Note({
                 skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
               />
               <FollowingBadge pubkey={event.pubkey} />
+              <TrustScoreBadge pubkey={event.pubkey} />
               <ClientTag event={event} />
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">

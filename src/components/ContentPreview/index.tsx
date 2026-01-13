@@ -8,6 +8,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import CommunityDefinitionPreview from './CommunityDefinitionPreview'
 import EmojiPackPreview from './EmojiPackPreview'
+import FollowPackPreview from './FollowPackPreview'
 import GroupMetadataPreview from './GroupMetadataPreview'
 import HighlightPreview from './HighlightPreview'
 import LiveEventPreview from './LiveEventPreview'
@@ -103,6 +104,10 @@ export default function ContentPreview({
 
   if (event.kind === kinds.Emojisets) {
     return <EmojiPackPreview event={event} className={className} />
+  }
+
+  if (event.kind === ExtendedKind.FOLLOW_PACK) {
+    return <FollowPackPreview event={event} className={className} />
   }
 
   return <div className={className}>[{t('Cannot handle event of kind k', { k: event.kind })}]</div>

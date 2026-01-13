@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { isMentioningMutedUsers } from '@/lib/event'
+import { NSFW_DISPLAY_POLICY } from '@/constants'
+import { isMentioningMutedUsers, isNsfwEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -22,7 +23,7 @@ export default function NoteCard({
   reposters?: string[]
 }) {
   const { mutePubkeySet } = useMuteList()
-  const { hideContentMentioningMutedUsers } = useContentPolicy()
+  const { hideContentMentioningMutedUsers, nsfwDisplayPolicy } = useContentPolicy()
   const shouldHide = useMemo(() => {
     if (filterMutedNotes && mutePubkeySet.has(event.pubkey)) {
       return true
@@ -30,17 +31,21 @@ export default function NoteCard({
     if (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) {
       return true
     }
+    if (nsfwDisplayPolicy === NSFW_DISPLAY_POLICY.HIDE && isNsfwEvent(event)) {
+      return true
+    }
     return false
-  }, [event, filterMutedNotes, mutePubkeySet])
+  }, [event, filterMutedNotes, mutePubkeySet, nsfwDisplayPolicy])
   if (shouldHide) return null
 
-  if (event.kind === kinds.Repost) {
+  if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
     return (
       <RepostNoteCard
         event={event}
         className={className}
         filterMutedNotes={filterMutedNotes}
         pinned={pinned}
+        reposters={reposters}
       />
     )
   }
@@ -57,7 +62,7 @@ export function NoteCardLoadingSkeleton({ className }: { className?: string }) {
             <Skeleton className="h-4 w-16" />
           </div>
           <div className="py-0.5">
-            <Skeleton className="h-3 w-12" />
+            <Skeleton className="h-4 w-12" />
           </div>
         </div>
       </div>

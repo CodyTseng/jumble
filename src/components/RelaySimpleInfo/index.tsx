@@ -32,7 +32,16 @@ export default function RelaySimpleInfo({
         </div>
         {relayInfo && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
       </div>
-      {!!relayInfo?.description && <div className="line-clamp-3">{relayInfo.description}</div>}
+      {!!relayInfo?.description && (
+        <div
+          className="line-clamp-3 break-words whitespace-pre-wrap"
+          style={{
+            overflowWrap: 'anywhere'
+          }}
+        >
+          {relayInfo.description}
+        </div>
+      )}
       {!!users?.length && (
         <div className="flex items-center gap-2">
           <div className="text-muted-foreground">{t('Favorited by')} </div>

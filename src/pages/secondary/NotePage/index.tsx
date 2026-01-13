@@ -49,7 +49,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
                 <Skeleton className="h-4 w-16" />
               </div>
               <div className="py-0.5">
-                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-4 w-12" />
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
         <StuffStats className="mt-3" stuff={event} fetchIfNotExisting displayTopZapsAndLikes />
       </div>
       <Separator className="mt-4" />
-      <NoteInteractions key={`note-interactions-${event.id}`} pageIndex={index} event={event} />
+      <NoteInteractions key={`note-interactions-${event.id}`} event={event} />
     </SecondaryPageLayout>
   )
 })

@@ -1,6 +1,7 @@
-import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import { useStuff } from '@/hooks/useStuff'
 import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
 import { Event, Filter, kinds } from 'nostr-tools'
@@ -13,7 +14,7 @@ export default function QuoteList({ stuff }: { stuff: Event | string }) {
 
   useEffect(() => {
     async function init() {
-      const relaySet = new Set(BIG_RELAY_URLS)
+      const relaySet = new Set(getDefaultRelayUrls())
       const filters: Filter[] = []
       if (event) {
         const relayList = await client.fetchRelayList(event.pubkey)

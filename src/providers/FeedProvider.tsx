@@ -65,6 +65,11 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return await switchFeed('following', { pubkey })
       }
 
+      // update pinned feed if pubkey changes
+      if (feedInfo?.feedType === 'pinned' && pubkey) {
+        return await switchFeed('pinned', { pubkey })
+      }
+
       setIsReady(true)
     }
 
@@ -134,6 +139,20 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       return
     }
     if (feedType === 'following') {
+      if (!options.pubkey) {
+        setIsReady(true)
+        return
+      }
+      const newFeedInfo = { feedType }
+      setFeedInfo(newFeedInfo)
+      feedInfoRef.current = newFeedInfo
+      storage.setFeedInfo(newFeedInfo, pubkey)
+
+      setRelayUrls([])
+      setIsReady(true)
+      return
+    }
+    if (feedType === 'pinned') {
       if (!options.pubkey) {
         setIsReady(true)
         return

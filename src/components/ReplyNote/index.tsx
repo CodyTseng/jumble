@@ -1,13 +1,16 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { isMentioningMutedUsers } from '@/lib/event'
+import { useThread } from '@/hooks/useThread'
+import { getEventKey, isMentioningMutedUsers } from '@/lib/event'
 import { toNote } from '@/lib/link'
+import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ClientTag from '../ClientTag'
 import Collapsible from '../Collapsible'
@@ -15,9 +18,10 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
-import StuffStats from '../StuffStats'
 import ParentNotePreview from '../ParentNotePreview'
+import StuffStats from '../StuffStats'
 import TranslateButton from '../TranslateButton'
+import TrustScoreBadge from '../TrustScoreBadge'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
@@ -25,19 +29,26 @@ export default function ReplyNote({
   event,
   parentEventId,
   onClickParent = () => {},
-  highlight = false
+  highlight = false,
+  className = ''
 }: {
   event: Event
   parentEventId?: string
   onClickParent?: () => void
   highlight?: boolean
+  className?: string
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
   const { mutePubkeySet } = useMuteList()
+  const { minTrustScore, meetsMinTrustScore } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
+  const eventKey = useMemo(() => getEventKey(event), [event])
+  const replies = useThread(eventKey)
   const [showMuted, setShowMuted] = useState(false)
+  const [hasReplies, setHasReplies] = useState(false)
+
   const show = useMemo(() => {
     if (showMuted) {
       return true
@@ -51,11 +62,42 @@ export default function ReplyNote({
     return true
   }, [showMuted, mutePubkeySet, event, hideContentMentioningMutedUsers])
 
+  useEffect(() => {
+    const checkHasReplies = async () => {
+      if (!replies || replies.length === 0) {
+        setHasReplies(false)
+        return
+      }
+
+      for (const reply of replies) {
+        if (mutePubkeySet.has(reply.pubkey)) {
+          continue
+        }
+        if (hideContentMentioningMutedUsers && isMentioningMutedUsers(reply, mutePubkeySet)) {
+          continue
+        }
+        if (!(await meetsMinTrustScore(reply.pubkey))) {
+          continue
+        }
+        setHasReplies(true)
+        return
+      }
+      setHasReplies(false)
+    }
+
+    checkHasReplies()
+  }, [replies, minTrustScore, meetsMinTrustScore, mutePubkeySet, hideContentMentioningMutedUsers])
+
   return (
     <div
-      className={`pb-3 border-b transition-colors duration-500 clickable ${highlight ? 'bg-primary/50' : ''}`}
+      className={cn(
+        'relative pb-3 transition-colors duration-500 clickable',
+        highlight ? 'bg-primary/40' : '',
+        className
+      )}
       onClick={() => push(toNote(event))}
     >
+      {hasReplies && <div className="absolute left-[34px] top-14 bottom-0 border-l z-20" />}
       <Collapsible>
         <div className="flex space-x-2 items-start px-4 pt-3">
           <UserAvatar userId={event.pubkey} size="medium" className="shrink-0 mt-0.5" />
@@ -68,6 +110,7 @@ export default function ReplyNote({
                     className="text-sm font-semibold text-muted-foreground hover:text-foreground truncate"
                     skeletonClassName="h-3"
                   />
+                  <TrustScoreBadge pubkey={event.pubkey} className="!size-3.5" />
                   <ClientTag event={event} />
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">

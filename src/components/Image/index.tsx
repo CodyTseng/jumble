@@ -5,9 +5,10 @@ import { TImetaInfo } from '@/types'
 import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
+import { thumbHashToDataURL } from 'thumbhash'
 
 export default function Image({
-  image: { url, blurHash, pubkey, dim },
+  image: { url, blurHash, thumbHash, pubkey, dim },
   alt,
   className = '',
   classNames = {},
@@ -18,6 +19,7 @@ export default function Image({
   classNames?: {
     wrapper?: string
     errorPlaceholder?: string
+    skeleton?: string
   }
   image: TImetaInfo
   alt?: string
@@ -71,22 +73,42 @@ export default function Image({
   }
 
   return (
-    <div className={cn('relative overflow-hidden', classNames.wrapper)} {...props}>
+    <div className={cn('relative overflow-hidden rounded-xl', classNames.wrapper)} {...props}>
+      {/* Spacer: transparent image to maintain dimensions when image is loading */}
+      {isLoading && dim?.width && dim?.height && (
+        <img
+          src={`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${dim.width}' height='${dim.height}'%3E%3C/svg%3E`}
+          className={cn(
+            'object-cover transition-opacity pointer-events-none w-full h-full',
+            className
+          )}
+          alt=""
+        />
+      )}
       {displaySkeleton && (
         <div className="absolute inset-0 z-10">
-          {blurHash ? (
+          {thumbHash ? (
+            <ThumbHashPlaceholder
+              thumbHash={thumbHash}
+              className={cn(
+                'w-full h-full transition-opacity',
+                isLoading ? 'opacity-100' : 'opacity-0'
+              )}
+            />
+          ) : blurHash ? (
             <BlurHashCanvas
               blurHash={blurHash}
               className={cn(
-                'absolute inset-0 transition-opacity rounded-lg',
+                'w-full h-full transition-opacity',
                 isLoading ? 'opacity-100' : 'opacity-0'
               )}
             />
           ) : (
             <Skeleton
               className={cn(
-                'absolute inset-0 transition-opacity rounded-lg',
-                isLoading ? 'opacity-100' : 'opacity-0'
+                'w-full h-full transition-opacity',
+                isLoading ? 'opacity-100' : 'opacity-0',
+                classNames.skeleton
               )}
             />
           )}
@@ -102,12 +124,10 @@ export default function Image({
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
-            'object-cover rounded-lg w-full h-full transition-opacity pointer-events-none',
-            isLoading ? 'opacity-0' : 'opacity-100',
+            'object-cover transition-opacity pointer-events-none w-full h-full',
+            isLoading ? 'opacity-0 absolute inset-0' : '',
             className
           )}
-          width={dim?.width}
-          height={dim?.height}
         />
       )}
       {hasError &&
@@ -117,7 +137,7 @@ export default function Image({
             alt={alt}
             decoding="async"
             loading="lazy"
-            className={cn('object-cover rounded-lg w-full h-full transition-opacity', className)}
+            className={cn('object-cover w-full h-full transition-opacity', className)}
           />
         ) : (
           <div
@@ -168,10 +188,42 @@ function BlurHashCanvas({ blurHash, className = '' }: { blurHash: string; classN
       ref={canvasRef}
       width={blurHashWidth}
       height={blurHashHeight}
-      className={cn('w-full h-full object-cover rounded-lg', className)}
+      className={cn('w-full h-full object-cover rounded-xl', className)}
       style={{
         imageRendering: 'auto',
         filter: 'blur(0.5px)'
+      }}
+    />
+  )
+}
+
+function ThumbHashPlaceholder({
+  thumbHash,
+  className = ''
+}: {
+  thumbHash: Uint8Array
+  className?: string
+}) {
+  const dataUrl = useMemo(() => {
+    if (!thumbHash) return null
+    try {
+      return thumbHashToDataURL(thumbHash)
+    } catch (error) {
+      console.warn('failed to decode thumbhash:', error)
+      return null
+    }
+  }, [thumbHash])
+
+  if (!dataUrl) return null
+
+  return (
+    <div
+      className={cn('w-full h-full object-cover rounded-lg', className)}
+      style={{
+        backgroundImage: `url(${dataUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        filter: 'blur(1px)'
       }}
     />
   )

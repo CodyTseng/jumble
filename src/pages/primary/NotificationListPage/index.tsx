@@ -1,5 +1,5 @@
-import HideUntrustedContentButton from '@/components/HideUntrustedContentButton'
 import NotificationList from '@/components/NotificationList'
+import TrustScoreFilter from '@/components/TrustScoreFilter'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { usePrimaryPage } from '@/PageManager'
 import { TPageRef } from '@/types'
@@ -42,7 +42,7 @@ function NotificationListPageTitlebar() {
         <Bell />
         <div className="text-lg font-semibold">{t('Notifications')}</div>
       </div>
-      <HideUntrustedContentButton type="notifications" size="titlebar-icon" />
+      <TrustScoreFilter />
     </div>
   )
 }

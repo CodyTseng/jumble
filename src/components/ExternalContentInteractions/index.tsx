@@ -1,24 +1,22 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useState } from 'react'
-import HideUntrustedContentButton from '../HideUntrustedContentButton'
 import QuoteList from '../QuoteList'
 import ReactionList from '../ReactionList'
 import ReplyNoteList from '../ReplyNoteList'
+import TrustScoreFilter from '../TrustScoreFilter'
 import { Tabs, TTabValue } from './Tabs'
 
 export default function ExternalContentInteractions({
-  pageIndex,
   externalContent
 }: {
-  pageIndex?: number
   externalContent: string
 }) {
   const [type, setType] = useState<TTabValue>('replies')
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList index={pageIndex} stuff={externalContent} />
+      list = <ReplyNoteList stuff={externalContent} />
       break
     case 'reactions':
       list = <ReactionList stuff={externalContent} />
@@ -39,7 +37,7 @@ export default function ExternalContentInteractions({
         </ScrollArea>
         <Separator orientation="vertical" className="h-6" />
         <div className="size-10 flex items-center justify-center">
-          <HideUntrustedContentButton type="interactions" />
+          <TrustScoreFilter />
         </div>
       </div>
       <Separator />

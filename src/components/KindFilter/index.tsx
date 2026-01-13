@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 
 const KIND_FILTER_OPTIONS = [
   { kindGroup: [kinds.ShortTextNote, ExtendedKind.COMMENT], label: 'Posts' },
-  { kindGroup: [kinds.Repost], label: 'Reposts' },
+  { kindGroup: [kinds.Repost, kinds.GenericRepost], label: 'Reposts' },
   { kindGroup: [kinds.LongFormArticle], label: 'Articles' },
   { kindGroup: [kinds.Highlights], label: 'Highlights' },
   { kindGroup: [ExtendedKind.POLL], label: 'Polls' },
@@ -84,7 +84,7 @@ export default function KindFilter({
       variant="ghost"
       size="titlebar-icon"
       className={cn(
-        'relative w-fit px-3 focus:text-foreground',
+        'relative hover:text-foreground',
         !isDifferentFromSaved && 'text-muted-foreground'
       )}
       onClick={() => {
@@ -94,7 +94,6 @@ export default function KindFilter({
       }}
     >
       <ListFilter size={16} />
-      {t('Filter')}
       {isDifferentFromSaved && (
         <div className="absolute size-2 rounded-full bg-primary left-7 top-2 ring-2 ring-background" />
       )}

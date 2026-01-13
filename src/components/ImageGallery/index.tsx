@@ -96,7 +96,7 @@ export default function ImageGallery({
         image={image}
         className="max-h-[80vh] sm:max-h-[50vh] object-contain"
         classNames={{
-          wrapper: cn('w-fit max-w-full', className)
+          wrapper: cn('w-fit max-w-full border', className)
         }}
       />
     ))
@@ -110,7 +110,7 @@ export default function ImageGallery({
         className="max-h-[80vh] sm:max-h-[50vh] object-contain"
         classNames={{
           errorPlaceholder: 'aspect-square h-[30vh]',
-          wrapper: 'cursor-zoom-in'
+          wrapper: 'cursor-zoom-in border'
         }}
         image={displayImages[0]}
         onClick={(e) => handlePhotoClick(e, 0)}
@@ -123,7 +123,7 @@ export default function ImageGallery({
           <Image
             key={i}
             className="aspect-square w-full"
-            classNames={{ wrapper: 'cursor-zoom-in' }}
+            classNames={{ wrapper: 'cursor-zoom-in border' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -137,7 +137,7 @@ export default function ImageGallery({
           <Image
             key={i}
             className="aspect-square w-full"
-            classNames={{ wrapper: 'cursor-zoom-in' }}
+            classNames={{ wrapper: 'cursor-zoom-in border' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />

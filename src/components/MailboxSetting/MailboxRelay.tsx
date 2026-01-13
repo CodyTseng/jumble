@@ -52,7 +52,7 @@ export default function MailboxRelay({
           onClick={() => push(toRelay(mailboxRelay.url))}
         >
           <RelayIcon url={mailboxRelay.url} />
-          <div className="truncate">{mailboxRelay.url}</div>
+          <div className="truncate flex-1 w-0">{mailboxRelay.url}</div>
         </div>
       </div>
       <div className="flex items-center gap-4">

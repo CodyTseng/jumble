@@ -1,10 +1,11 @@
 import { Favicon } from '@/components/Favicon'
 import NormalFeed from '@/components/NormalFeed'
 import { Button } from '@/components/ui/button'
-import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
+import { SEARCHABLE_RELAY_URLS } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toProfileList } from '@/lib/link'
 import { fetchPubkeysFromDomain, getWellKnownNip05Url } from '@/lib/nip05'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
@@ -16,12 +17,12 @@ import { useTranslation } from 'react-i18next'
 const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
-  const { relayList, pubkey } = useNostr()
+  const { pubkey } = useNostr()
   const [title, setTitle] = useState<React.ReactNode>(null)
   const [controls, setControls] = useState<React.ReactNode>(null)
   const [data, setData] = useState<
     | {
-        type: 'hashtag' | 'search' | 'externalContent'
+        type: 'hashtag' | 'search'
         kinds?: number[]
       }
     | {
@@ -47,7 +48,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
         setSubRequests([
           {
             filter: { '#t': [hashtag], ...(kinds.length > 0 ? { kinds } : {}) },
-            urls: BIG_RELAY_URLS
+            urls: getDefaultRelayUrls()
           }
         ])
         return
@@ -60,18 +61,6 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
           {
             filter: { search, ...(kinds.length > 0 ? { kinds } : {}) },
             urls: SEARCHABLE_RELAY_URLS
-          }
-        ])
-        return
-      }
-      const externalContentId = searchParams.get('i')
-      if (externalContentId) {
-        setData({ type: 'externalContent' })
-        setTitle(externalContentId)
-        setSubRequests([
-          {
-            filter: { '#I': [externalContentId], ...(kinds.length > 0 ? { kinds } : {}) },
-            urls: BIG_RELAY_URLS.concat(relayList?.write || [])
           }
         ])
         return
@@ -119,7 +108,7 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    content = <NormalFeed subRequests={subRequests} />
+    content = <NormalFeed subRequests={subRequests} disable24hMode={data.type !== 'domain'} />
   }
 
   return (
