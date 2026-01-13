@@ -667,6 +667,7 @@ export default {
       'Warning: Please do not modify these settings casually, as it may affect your basic experience.',
     'Invalid relay URL': 'Invalid relay URL',
     'Muted words': 'Muted words',
-    'Add muted word': 'Add muted word'
+    'Add muted word': 'Add muted word',
+    'Zap Details': 'Zap Details'
   }
 }
