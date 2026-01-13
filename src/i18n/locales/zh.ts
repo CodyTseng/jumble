@@ -651,6 +651,7 @@ export default {
     'Default relays warning': '警告：请不要随意修改这些设置，可能会影响您的基本体验。',
     'Invalid relay URL': '无效的中继地址',
     'Muted words': '屏蔽词',
-    'Add muted word': '添加屏蔽词'
+    'Add muted word': '添加屏蔽词',
+    'Zap Details': '打闪详情'
   }
 }

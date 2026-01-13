@@ -678,6 +678,7 @@ export default {
       'Advertencia: No modifiques estas configuraciones a la ligera, ya que puede afectar tu experiencia básica.',
     'Invalid relay URL': 'URL de relé no válida',
     'Muted words': 'Palabras silenciadas',
-    'Add muted word': 'Agregar palabra silenciada'
+    'Add muted word': 'Agregar palabra silenciada',
+    'Zap Details': 'Detalles del Zap'
   }
 }

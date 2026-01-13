@@ -329,7 +329,7 @@ class StuffStatsService {
     const info = getZapInfoFromEvent(evt)
     if (!info) return
     const { originalEventId, senderPubkey, invoice, amount, comment } = info
-    if (!originalEventId || !senderPubkey) return
+    if (!originalEventId || !senderPubkey || amount <= 0) return
 
     return this.addZap(
       senderPubkey,

@@ -672,6 +672,7 @@ export default {
       '警告：これらの設定を無闇に変更しないでください。基本的な体験に影響を与える可能性があります。',
     'Invalid relay URL': '無効なリレーURL',
     'Muted words': 'ミュートワード',
-    'Add muted word': 'ミュートワードを追加'
+    'Add muted word': 'ミュートワードを追加',
+    'Zap Details': 'Zapの詳細'
   }
 }

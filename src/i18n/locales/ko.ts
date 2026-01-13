@@ -668,6 +668,7 @@ export default {
       '경고: 이러한 설정을 임의로 수정하지 마십시오. 기본 경험에 영향을 줄 수 있습니다.',
     'Invalid relay URL': '유효하지 않은 릴레이 URL',
     'Muted words': '차단 단어',
-    'Add muted word': '차단 단어 추가'
+    'Add muted word': '차단 단어 추가',
+    'Zap Details': '잽 세부 정보'
   }
 }

@@ -1,14 +1,14 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { useStuff } from '@/hooks/useStuff'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
+import { createFakeEvent } from '@/lib/event'
 import { formatAmount } from '@/lib/lightning'
-import { Zap, Eye } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
+import ContentPreview from '../ContentPreview'
 import { SimpleUserAvatar } from '../UserAvatar'
 import ZapDetailDialog from '../ZapDetailDialog'
-
-const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/gi
 
 export default function TopZaps({ stuff }: { stuff: Event | string }) {
   const { event, stuffKey } = useStuff(stuff)
@@ -23,13 +23,9 @@ export default function TopZaps({ stuff }: { stuff: Event | string }) {
   return (
     <ScrollArea className="pb-2 mb-1">
       <div className="flex gap-1">
-        {topZaps.map((zap, index) => {
-          const hasImage = zap.comment && IMAGE_REGEX.test(zap.comment)
-          const displayText = hasImage ? zap.comment?.replace(IMAGE_REGEX, '').trim() : zap.comment
-
-          return (
+        {topZaps.map((zap, index) => (
+          <div key={zap.pr}>
             <div
-              key={zap.pr}
               className="flex gap-1 py-1 pl-1 pr-2 text-sm max-w-72 rounded-full bg-muted/80 items-center text-yellow-400 border border-yellow-400 hover:bg-yellow-400/20 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation()
@@ -39,22 +35,26 @@ export default function TopZaps({ stuff }: { stuff: Event | string }) {
               <SimpleUserAvatar userId={zap.pubkey} size="xSmall" />
               <Zap className="size-3 fill-yellow-400 shrink-0" />
               <div className="font-semibold">{formatAmount(zap.amount)}</div>
-              {hasImage && <Eye className="size-3 shrink-0" />}
-              {displayText && <div className="truncate">{displayText}</div>}
-              <ZapDetailDialog
-                open={zapIndex === index}
-                setOpen={(open) => {
-                  if (open) {
-                    setZapIndex(index)
-                  } else {
-                    setZapIndex(-1)
-                  }
-                }}
-                zap={zap}
+              <ContentPreview
+                className="truncate"
+                event={createFakeEvent({
+                  content: zap.comment
+                })}
               />
             </div>
-          )
-        })}
+            <ZapDetailDialog
+              open={zapIndex === index}
+              setOpen={(open) => {
+                if (open) {
+                  setZapIndex(index)
+                } else {
+                  setZapIndex(-1)
+                }
+              }}
+              zap={zap}
+            />
+          </div>
+        ))}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

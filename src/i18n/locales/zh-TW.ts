@@ -646,6 +646,7 @@ export default {
     'Default relays warning': '警告：請不要隨意修改這些設定，可能會影響基礎體驗。',
     'Invalid relay URL': '無效的中繼地址',
     'Muted words': '屏蔽詞',
-    'Add muted word': '添加屏蔽詞'
+    'Add muted word': '添加屏蔽詞',
+    'Zap Details': '打閃詳情'
   }
 }

@@ -682,6 +682,7 @@ export default {
       'Attention : Ne modifiez pas ces paramètres à la légère, car cela pourrait affecter votre expérience de base.',
     'Invalid relay URL': 'URL de relais non valide',
     'Muted words': 'Mots masqués',
-    'Add muted word': 'Ajouter un mot masqué'
+    'Add muted word': 'Ajouter un mot masqué',
+    'Zap Details': 'Détails du Zap'
   }
 }

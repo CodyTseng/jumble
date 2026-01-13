@@ -1,15 +1,5 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { formatAmount } from '@/lib/lightning'
 import { Zap } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
@@ -36,7 +26,7 @@ export default function ZapDetailDialog({ open, setOpen, zap }: ZapDetailDialogP
   const { isSmallScreen } = useScreenSize()
 
   const content = (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <UserAvatar userId={zap.pubkey} size="medium" />
         <div className="flex-1">
@@ -50,11 +40,7 @@ export default function ZapDetailDialog({ open, setOpen, zap }: ZapDetailDialogP
           <span className="text-lg font-bold">{formatAmount(zap.amount)}</span>
         </div>
       </div>
-      {zap.comment && (
-        <div className="border-t pt-4">
-          <Content content={zap.comment} />
-        </div>
-      )}
+      {zap.comment && <Content content={zap.comment} />}
     </div>
   )
 

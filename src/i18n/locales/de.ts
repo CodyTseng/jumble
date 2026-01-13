@@ -684,6 +684,7 @@ export default {
       'Warnung: Ändern Sie diese Einstellungen nicht leichtfertig, da dies Ihre grundlegende Erfahrung beeinträchtigen kann.',
     'Invalid relay URL': 'Ungültige Relay-URL',
     'Muted words': 'Stummgeschaltete Wörter',
-    'Add muted word': 'Stummgeschaltetes Wort hinzufügen'
+    'Add muted word': 'Stummgeschaltetes Wort hinzufügen',
+    'Zap Details': 'Zap-Details'
   }
 }

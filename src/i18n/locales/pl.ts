@@ -679,6 +679,7 @@ export default {
       'Ostrzeżenie: Nie modyfikuj tych ustawień pochopnie, może to wpłynąć na podstawowe doświadczenie.',
     'Invalid relay URL': 'Nieprawidłowy adres URL przekaźnika',
     'Muted words': 'Wyciszone słowa',
-    'Add muted word': 'Dodaj wyciszone słowo'
+    'Add muted word': 'Dodaj wyciszone słowo',
+    'Zap Details': 'Szczegóły zapu'
   }
 }

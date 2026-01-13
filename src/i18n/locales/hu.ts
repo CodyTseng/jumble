@@ -667,6 +667,7 @@ export default {
       'Figyelmeztetés: Ne módosítsa ezeket a beállításokat meggondolatlanul, mert ez befolyásolhatja az alapvető élményt.',
     'Invalid relay URL': 'Érvénytelen továbbító URL',
     'Muted words': 'Némított szavak',
-    'Add muted word': 'Némított szó hozzáadása'
+    'Add muted word': 'Némított szó hozzáadása',
+    'Zap Details': 'Zap Részletek'
   }
 }

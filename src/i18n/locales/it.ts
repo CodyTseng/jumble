@@ -678,6 +678,7 @@ export default {
       "Attenzione: Non modificare queste impostazioni alla leggera, potrebbe influire sull'esperienza di base.",
     'Invalid relay URL': 'URL relay non valido',
     'Muted words': 'Parole silenziate',
-    'Add muted word': 'Aggiungi parola silenziata'
+    'Add muted word': 'Aggiungi parola silenziata',
+    'Zap Details': 'Dettagli Zap'
   }
 }

@@ -675,6 +675,7 @@ export default {
       'Aviso: Não modifique essas configurações casualmente, pois pode afetar sua experiência básica.',
     'Invalid relay URL': 'URL de relé inválida',
     'Muted words': 'Palavras silenciadas',
-    'Add muted word': 'Adicionar palavra silenciada'
+    'Add muted word': 'Adicionar palavra silenciada',
+    'Zap Details': 'Detalhes do Zap'
   }
 }
