@@ -6,6 +6,11 @@ import { normalizeUrl } from '@/lib/url'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Event } from 'nostr-tools'  // ADD THIS
+import { Switch } from '@/components/ui/switch'  // ADD THIS
+import { Label } from '@/components/ui/label'  // ADD THIS
+import { useFollowList } from '@/providers/FollowListProvider'  // ADD THIS
+import storage from '@/services/local-storage.service'  
 import NotFound from '../NotFound'
 
 export default function Relay({ url, className }: { url?: string; className?: string }) {
@@ -15,6 +20,22 @@ export default function Relay({ url, className }: { url?: string; className?: st
   const { relayInfo } = useFetchRelayInfo(normalizedUrl)
   const [searchInput, setSearchInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(searchInput)
+
+  const { followingSet } = useFollowList()
+  const [hideFollowedUsers, setHideFollowedUsers] = useState(() =>
+    normalizedUrl ? storage.getHideFollowedUsersForRelay(normalizedUrl) : false
+  )
+
+  const handleToggleChange = (checked: boolean) => {
+    if (!normalizedUrl) return
+    setHideFollowedUsers(checked)
+    storage.setHideFollowedUsersForRelay(normalizedUrl, checked)
+  }
+
+  const filterFn = useMemo(() => {
+    if (!hideFollowedUsers) return undefined
+    return (event: Event) => !followingSet.has(event.pubkey)
+  }, [hideFollowedUsers, followingSet])
 
   useEffect(() => {
     if (normalizedUrl) {
@@ -42,6 +63,18 @@ export default function Relay({ url, className }: { url?: string; className?: st
   return (
     <div className={className}>
       <RelayInfo url={normalizedUrl} className="pt-3" />
+
+      <div className="px-4 py-3 flex items-center justify-between border-b">
+        <Label htmlFor="hide-followed" className="text-sm font-medium cursor-pointer">
+          {t('Hide posts from followed users')}
+        </Label>
+        <Switch
+          id="hide-followed"
+          checked={hideFollowedUsers}
+          onCheckedChange={handleToggleChange}
+        />
+      </div>
+
       {relayInfo?.supported_nips?.includes(50) && (
         <div className="px-4 py-2">
           <SearchInput
@@ -56,6 +89,7 @@ export default function Relay({ url, className }: { url?: string; className?: st
           { urls: [normalizedUrl], filter: debouncedInput ? { search: debouncedInput } : {} }
         ]}
         showRelayCloseReason
+        filterFn={filterFn}
       />
     </div>
   )

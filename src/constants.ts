@@ -41,6 +41,7 @@ export const StorageKey = {
   QUICK_REACTION: 'quickReaction',
   QUICK_REACTION_EMOJI: 'quickReactionEmoji',
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
+  HIDE_FOLLOWED_USERS_PER_RELAY: 'hideFollowedUsersPerRelay',
   MIN_TRUST_SCORE: 'minTrustScore',
   DEFAULT_RELAY_URLS: 'defaultRelayUrls',
   MUTED_WORDS: 'mutedWords',

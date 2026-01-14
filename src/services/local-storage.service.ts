@@ -64,6 +64,8 @@ class LocalStorageService {
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
+  private hideFollowedUsersPerRelay: Record<string, boolean> = {}
+
   private minTrustScore: number = 40
   private defaultRelayUrls: string[] = BIG_RELAY_URLS
   private mutedWords: string[] = []
@@ -256,6 +258,11 @@ class LocalStorageService {
       this.quickReactionEmoji = quickReactionEmojiStr
     }
 
+    const hideFollowedUsersPerRelayStr = window.localStorage.getItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_RELAY
+    )
+    if (hideFollowedUsersPerRelayStr) {
+      this.hideFollowedUsersPerRelay = JSON.parse(hideFollowedUsersPerRelayStr)
     const minTrustScoreStr = window.localStorage.getItem(StorageKey.MIN_TRUST_SCORE)
     if (minTrustScoreStr) {
       const score = parseInt(minTrustScoreStr, 10)
@@ -634,6 +641,16 @@ class LocalStorageService {
     window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, policy)
   }
 
+  getHideFollowedUsersForRelay(url: string) {
+    return this.hideFollowedUsersPerRelay[url] ?? false
+  }
+
+  setHideFollowedUsersForRelay(url: string, hide: boolean) {
+    this.hideFollowedUsersPerRelay[url] = hide
+    window.localStorage.setItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_RELAY,
+      JSON.stringify(this.hideFollowedUsersPerRelay)
+    )
   getMinTrustScore() {
     return this.minTrustScore
   }
