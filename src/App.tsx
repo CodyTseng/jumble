@@ -4,6 +4,7 @@ import './index.css'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
+import { CurrencyPreferencesProvider } from '@/providers/CurrencyPreferencesProvider'
 import { DeletedEventProvider } from '@/providers/DeletedEventProvider'
 import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
 import { FavoriteRelaysProvider } from '@/providers/FavoriteRelaysProvider'
@@ -16,6 +17,7 @@ import { NostrProvider } from '@/providers/NostrProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
 import { PinnedUsersProvider } from '@/providers/PinnedUsersProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
+import { SparkWalletProvider } from '@/providers/SparkWalletProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
 import { UserPreferencesProvider } from '@/providers/UserPreferencesProvider'
@@ -31,34 +33,38 @@ export default function App(): JSX.Element {
           <ContentPolicyProvider>
             <DeletedEventProvider>
               <NostrProvider>
-                <ZapProvider>
-                  <TranslationServiceProvider>
-                    <FavoriteRelaysProvider>
-                      <FollowListProvider>
-                        <MuteListProvider>
-                          <UserTrustProvider>
-                            <BookmarksProvider>
-                              <EmojiPackProvider>
-                                <PinListProvider>
-                                  <PinnedUsersProvider>
-                                    <FeedProvider>
-                                      <MediaUploadServiceProvider>
-                                        <KindFilterProvider>
-                                          <PageManager />
-                                          <Toaster />
-                                        </KindFilterProvider>
-                                      </MediaUploadServiceProvider>
-                                    </FeedProvider>
-                                  </PinnedUsersProvider>
-                                </PinListProvider>
-                              </EmojiPackProvider>
-                            </BookmarksProvider>
-                          </UserTrustProvider>
-                        </MuteListProvider>
-                      </FollowListProvider>
-                    </FavoriteRelaysProvider>
-                  </TranslationServiceProvider>
-                </ZapProvider>
+                <SparkWalletProvider>
+                  <ZapProvider>
+                    <CurrencyPreferencesProvider>
+                      <TranslationServiceProvider>
+                        <FavoriteRelaysProvider>
+                          <FollowListProvider>
+                            <MuteListProvider>
+                              <UserTrustProvider>
+                                <BookmarksProvider>
+                                  <EmojiPackProvider>
+                                    <PinListProvider>
+                                      <PinnedUsersProvider>
+                                        <FeedProvider>
+                                          <MediaUploadServiceProvider>
+                                            <KindFilterProvider>
+                                              <PageManager />
+                                              <Toaster />
+                                            </KindFilterProvider>
+                                          </MediaUploadServiceProvider>
+                                        </FeedProvider>
+                                      </PinnedUsersProvider>
+                                    </PinListProvider>
+                                  </EmojiPackProvider>
+                                </BookmarksProvider>
+                              </UserTrustProvider>
+                            </MuteListProvider>
+                          </FollowListProvider>
+                        </FavoriteRelaysProvider>
+                      </TranslationServiceProvider>
+                    </CurrencyPreferencesProvider>
+                  </ZapProvider>
+                </SparkWalletProvider>
               </NostrProvider>
             </DeletedEventProvider>
           </ContentPolicyProvider>

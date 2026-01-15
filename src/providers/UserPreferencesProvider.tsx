@@ -13,6 +13,9 @@ type TUserPreferencesContext = {
   sidebarCollapse: boolean
   updateSidebarCollapse: (collapse: boolean) => void
 
+  showWalletInSidebar: boolean
+  updateShowWalletInSidebar: (show: boolean) => void
+
   enableSingleColumnLayout: boolean
   updateEnableSingleColumnLayout: (enable: boolean) => void
 
@@ -40,6 +43,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   )
   const [muteMedia, setMuteMedia] = useState(true)
   const [sidebarCollapse, setSidebarCollapse] = useState(storage.getSidebarCollapse())
+  const [showWalletInSidebar, setShowWalletInSidebar] = useState(storage.getShowWalletInSidebar())
   const [enableSingleColumnLayout, setEnableSingleColumnLayout] = useState(
     storage.getEnableSingleColumnLayout()
   )
@@ -62,6 +66,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const updateSidebarCollapse = (collapse: boolean) => {
     setSidebarCollapse(collapse)
     storage.setSidebarCollapse(collapse)
+  }
+
+  const updateShowWalletInSidebar = (show: boolean) => {
+    setShowWalletInSidebar(show)
+    storage.setShowWalletInSidebar(show)
   }
 
   const updateEnableSingleColumnLayout = (enable: boolean) => {
@@ -88,6 +97,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         updateMuteMedia: setMuteMedia,
         sidebarCollapse,
         updateSidebarCollapse,
+        showWalletInSidebar,
+        updateShowWalletInSidebar,
         enableSingleColumnLayout: isSmallScreen ? true : enableSingleColumnLayout,
         updateEnableSingleColumnLayout,
         quickReaction,
