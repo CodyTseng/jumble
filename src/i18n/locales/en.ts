@@ -672,6 +672,66 @@ export default {
       'Default trust score filter threshold ({{n}}%)',
     'No notes found': 'No notes found',
     'Try again later or check your connection': 'Try again later or check your connection',
-    'Hide indirect': 'Hide indirect'
+    'Hide indirect': 'Hide indirect',
+    Messages: 'Messages',
+    Message: 'Message',
+    'Configure DM Relays': 'Configure DM Relays',
+    'Select relays to use for direct messages. These relays will receive your encrypted messages.':
+      'Select relays to use for direct messages. These relays will receive your encrypted messages.',
+    'Your DM Relays': 'Your DM Relays',
+    'No relays configured': 'No relays configured',
+    'wss://relay.example.com': 'wss://relay.example.com',
+    'Suggested Relays': 'Suggested Relays',
+    'Save and Continue': 'Save and Continue',
+    'Saving...': 'Saving...',
+    'Please add at least one relay': 'Please add at least one relay',
+    'DM relays saved': 'DM relays saved',
+    'Failed to save DM relays': 'Failed to save DM relays',
+    'Relay already added': 'Relay already added',
+    'Sync Encryption Key': 'Sync Encryption Key',
+    'An encryption key was found for your account. Open Jumble on another device where you have already set up DMs to sync the key.':
+      'An encryption key was found for your account. Open Jumble on another device where you have already set up DMs to sync the key.',
+    'Checking encryption key...': 'Checking encryption key...',
+    'Encryption key synced!': 'Encryption key synced!',
+    'Encryption key synced successfully': 'Encryption key synced successfully',
+    'Failed to import encryption key': 'Failed to import encryption key',
+    'Publishing sync request...': 'Publishing sync request...',
+    'Waiting for key from another device...': 'Waiting for key from another device...',
+    'Open your other device and go to Messages to send the encryption key to this device.':
+      'Open your other device and go to Messages to send the encryption key to this device.',
+    "Don't have access to another device? You can generate a new key, but you won't be able to read old messages.":
+      "Don't have access to another device? You can generate a new key, but you won't be able to read old messages.",
+    'Generate New Key': 'Generate New Key',
+    'New encryption key generated': 'New encryption key generated',
+    'Failed to generate encryption key': 'Failed to generate encryption key',
+    'Try Again': 'Try Again',
+    'No conversations yet': 'No conversations yet',
+    "Start a conversation by visiting someone's profile and clicking the message button.":
+      "Start a conversation by visiting someone's profile and clicking the message button.",
+    'No messages yet. Send one!': 'No messages yet. Send one!',
+    'Type a message...': 'Type a message...',
+    'Press Ctrl+Enter or Cmd+Enter to send': 'Press Ctrl+Enter or Cmd+Enter to send',
+    'Failed to send message': 'Failed to send message',
+    'Encryption key not found': 'Encryption key not found',
+    Conversation: 'Conversation',
+    'Invalid user': 'Invalid user',
+    'This user has not set up direct messages yet.':
+      'This user has not set up direct messages yet.',
+    'Sign in to use Messages': 'Sign in to use Messages',
+    'You need to be signed in to send and receive direct messages.':
+      'You need to be signed in to send and receive direct messages.',
+    'Sign In': 'Sign In',
+    'Pending sync requests': 'Pending sync requests',
+    'Unknown device': 'Unknown device',
+    'Send Key': 'Send Key',
+    'Encryption key sent to other device': 'Encryption key sent to other device',
+    'Failed to send encryption key': 'Failed to send encryption key',
+    'Enable Direct Messages': 'Enable Direct Messages',
+    'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.':
+      'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.',
+    'Publish Encryption Key': 'Publish Encryption Key',
+    'Publishing...': 'Publishing...',
+    'Encryption key published': 'Encryption key published',
+    'Failed to publish encryption key': 'Failed to publish encryption key'
   }
 }

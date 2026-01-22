@@ -97,6 +97,8 @@ export interface ISigner {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
+  nip44Encrypt?: (privkey: Uint8Array, pubkey: string, plainText: string) => Promise<string>
+  nip44Decrypt?: (privkey: Uint8Array, pubkey: string, cipherText: string) => Promise<string>
 }
 
 export type TSignerType = 'nsec' | 'nip-07' | 'bunker' | 'browser-nsec' | 'ncryptsec' | 'npub'
@@ -216,3 +218,26 @@ export type TProfilePictureAutoLoadPolicy =
   (typeof PROFILE_PICTURE_AUTO_LOAD_POLICY)[keyof typeof PROFILE_PICTURE_AUTO_LOAD_POLICY]
 
 export type TNsfwDisplayPolicy = (typeof NSFW_DISPLAY_POLICY)[keyof typeof NSFW_DISPLAY_POLICY]
+
+export type TDmConversation = {
+  key: string
+  pubkey: string
+  lastMessageAt: number
+  lastMessageContent: string
+  unreadCount: number
+}
+
+export type TDmMessage = {
+  id: string
+  conversationKey: string
+  senderPubkey: string
+  content: string
+  createdAt: number
+  originalEvent: Event
+  decryptedRumor: Event
+}
+
+export type TEncryptionKeypair = {
+  privkey: Uint8Array
+  pubkey: string
+}

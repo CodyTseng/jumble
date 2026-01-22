@@ -1,4 +1,5 @@
 import { ISigner, TDraftEvent, TNip07 } from '@/types'
+import * as nip44 from 'nostr-tools/nip44'
 
 export class Nip07Signer implements ISigner {
   private signer: TNip07 | undefined
@@ -56,5 +57,15 @@ export class Nip07Signer implements ISigner {
       throw new Error('The extension you are using does not support nip04 decryption')
     }
     return await this.signer.nip04.decrypt(pubkey, cipherText)
+  }
+
+  async nip44Encrypt(privkey: Uint8Array, pubkey: string, plainText: string) {
+    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
+    return nip44.v2.encrypt(plainText, conversationKey)
+  }
+
+  async nip44Decrypt(privkey: Uint8Array, pubkey: string, cipherText: string) {
+    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
+    return nip44.v2.decrypt(cipherText, conversationKey)
   }
 }

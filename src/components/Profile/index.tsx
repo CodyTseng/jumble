@@ -8,13 +8,13 @@ import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useFetchFollowings, useFetchProfile } from '@/hooks'
-import { toMuteList, toProfileEditor } from '@/lib/link'
+import { useDmSupport, useFetchFollowings, useFetchProfile } from '@/hooks'
+import { toDmConversation, toMuteList, toProfileEditor } from '@/lib/link'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Link, Zap } from 'lucide-react'
+import { Link, MessageSquare, Zap } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
@@ -38,6 +38,7 @@ export default function Profile({ id }: { id?: string }) {
   const [searchInput, setSearchInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(searchInput)
   const { followings } = useFetchFollowings(profile?.pubkey)
+  const { canStartDm } = useDmSupport(profile?.pubkey)
   const isFollowingYou = useMemo(() => {
     return (
       !!accountPubkey && accountPubkey !== profile?.pubkey && followings.includes(accountPubkey)
@@ -134,6 +135,17 @@ export default function Profile({ id }: { id?: string }) {
             ) : (
               <>
                 {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
+                {canStartDm && (
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={() => push(toDmConversation(pubkey))}
+                    title={t('Message')}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                )}
                 <SpecialFollowButton pubkey={pubkey} />
                 <FollowButton pubkey={pubkey} />
               </>

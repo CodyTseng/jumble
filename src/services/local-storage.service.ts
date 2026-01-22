@@ -69,6 +69,9 @@ class LocalStorageService {
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
   private hideIndirectNotifications: boolean = false
+  private encryptionKeyPrivkeyMap: Record<string, string> = {}
+  private clientKeyPrivkeyMap: Record<string, string> = {}
+  private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -286,6 +289,44 @@ class LocalStorageService {
         const map = JSON.parse(minTrustScoreMapStr)
         if (typeof map === 'object' && map !== null) {
           this.minTrustScoreMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const encryptionKeyPrivkeyMapStr = window.localStorage.getItem(
+      StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP
+    )
+    if (encryptionKeyPrivkeyMapStr) {
+      try {
+        const map = JSON.parse(encryptionKeyPrivkeyMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.encryptionKeyPrivkeyMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const clientKeyPrivkeyMapStr = window.localStorage.getItem(StorageKey.CLIENT_KEY_PRIVKEY_MAP)
+    if (clientKeyPrivkeyMapStr) {
+      try {
+        const map = JSON.parse(clientKeyPrivkeyMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.clientKeyPrivkeyMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const lastReadDmTimeMapStr = window.localStorage.getItem(StorageKey.LAST_READ_DM_TIME_MAP)
+    if (lastReadDmTimeMapStr) {
+      try {
+        const map = JSON.parse(lastReadDmTimeMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.lastReadDmTimeMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -696,6 +737,45 @@ class LocalStorageService {
   setHideIndirectNotifications(onlyShow: boolean) {
     this.hideIndirectNotifications = onlyShow
     window.localStorage.setItem(StorageKey.HIDE_INDIRECT_NOTIFICATIONS, onlyShow.toString())
+  }
+
+  getEncryptionKeyPrivkey(accountPubkey: string): string | null {
+    return this.encryptionKeyPrivkeyMap[accountPubkey] ?? null
+  }
+
+  setEncryptionKeyPrivkey(accountPubkey: string, privkey: string) {
+    this.encryptionKeyPrivkeyMap[accountPubkey] = privkey
+    window.localStorage.setItem(
+      StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP,
+      JSON.stringify(this.encryptionKeyPrivkeyMap)
+    )
+  }
+
+  getClientKeyPrivkey(accountPubkey: string): string | null {
+    return this.clientKeyPrivkeyMap[accountPubkey] ?? null
+  }
+
+  setClientKeyPrivkey(accountPubkey: string, privkey: string) {
+    this.clientKeyPrivkeyMap[accountPubkey] = privkey
+    window.localStorage.setItem(
+      StorageKey.CLIENT_KEY_PRIVKEY_MAP,
+      JSON.stringify(this.clientKeyPrivkeyMap)
+    )
+  }
+
+  getLastReadDmTime(accountPubkey: string, conversationPubkey: string): number {
+    return this.lastReadDmTimeMap[accountPubkey]?.[conversationPubkey] ?? 0
+  }
+
+  setLastReadDmTime(accountPubkey: string, conversationPubkey: string, time: number) {
+    if (!this.lastReadDmTimeMap[accountPubkey]) {
+      this.lastReadDmTimeMap[accountPubkey] = {}
+    }
+    this.lastReadDmTimeMap[accountPubkey][conversationPubkey] = time
+    window.localStorage.setItem(
+      StorageKey.LAST_READ_DM_TIME_MAP,
+      JSON.stringify(this.lastReadDmTimeMap)
+    )
   }
 }
 

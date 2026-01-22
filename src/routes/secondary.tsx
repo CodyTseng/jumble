@@ -1,5 +1,6 @@
 import AppearanceSettingsPage from '@/pages/secondary/AppearanceSettingsPage'
 import BookmarkPage from '@/pages/secondary/BookmarkPage'
+import DmConversationPage from '@/pages/secondary/DmConversationPage'
 import EmojiPackSettingsPage from '@/pages/secondary/EmojiPackSettingsPage'
 import ExternalContentPage from '@/pages/secondary/ExternalContentPage'
 import FollowingListPage from '@/pages/secondary/FollowingListPage'
@@ -52,7 +53,8 @@ const SECONDARY_ROUTE_CONFIGS = [
   { path: '/rizful', element: <RizfulPage /> },
   { path: '/bookmarks', element: <BookmarkPage /> },
   { path: '/follow-packs/:id', element: <FollowPackPage /> },
-  { path: '/user-aggregation/:feedId/:npub', element: <UserAggregationDetailPage /> }
+  { path: '/user-aggregation/:feedId/:npub', element: <UserAggregationDetailPage /> },
+  { path: '/dms/:pubkey', element: <DmConversationPage /> }
 ]
 
 export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.map(({ path, element }) => ({
