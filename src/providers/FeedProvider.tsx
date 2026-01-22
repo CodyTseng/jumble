@@ -1,8 +1,9 @@
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
+import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
-import { TFeedInfo, TFeedType } from '@/types'
+import { TFeedInfo, TFeedType, TRelaySet } from '@/types'
 import { kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useFavoriteRelays } from './FavoriteRelaysProvider'
@@ -47,6 +48,16 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
         if (storedFeedInfo) {
           feedInfo = storedFeedInfo
+        } else {
+          feedInfo = { feedType: 'following' }
+        }
+      } else {
+        if (VITE_DEFAULT_RELAY_SETS.length > 0) {
+          feedInfo = {
+            feedType: 'relays',
+            id: VITE_DEFAULT_RELAY_SETS[0].id,
+            name: VITE_DEFAULT_RELAY_SETS[0].name
+          }
         } else {
           feedInfo = { feedType: 'following' }
         }
@@ -108,8 +119,14 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       return
     }
     if (feedType === 'relays') {
-      const relaySetId = options.activeRelaySetId ?? (relaySets.length > 0 ? relaySets[0].id : null)
-      if (!relaySetId || !pubkey) {
+      const relaySetId =
+        options.activeRelaySetId ??
+        (relaySets.length > 0
+          ? relaySets[0].id
+          : VITE_DEFAULT_RELAY_SETS.length > 0
+            ? VITE_DEFAULT_RELAY_SETS[0].id
+            : null)
+      if (!relaySetId) {
         setIsReady(true)
         return
       }
@@ -117,7 +134,12 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       let relaySet =
         relaySets.find((set) => set.id === relaySetId) ??
         (relaySets.length > 0 ? relaySets[0] : null)
+
       if (!relaySet) {
+        relaySet = VITE_DEFAULT_RELAY_SETS.find((set: TRelaySet) => set.id === relaySetId) ?? null
+      }
+
+      if (!relaySet && pubkey) {
         const storedRelaySetEvent = await indexedDb.getReplaceableEvent(
           pubkey,
           kinds.Relaysets,
@@ -128,7 +150,7 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         }
       }
       if (relaySet) {
-        const newFeedInfo = { feedType, id: relaySet.id }
+        const newFeedInfo = { feedType, id: relaySet.id, name: relaySet.name }
         setFeedInfo(newFeedInfo)
         feedInfoRef.current = newFeedInfo
         setRelayUrls(relaySet.relayUrls)

@@ -78,7 +78,7 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
         return simplifyUrl(feedInfo?.id ?? '')
       }
       if (feedInfo?.feedType === 'relays') {
-        return activeRelaySet?.name ?? activeRelaySet?.id
+        return feedInfo.name ?? activeRelaySet?.name ?? activeRelaySet?.id
       }
     }, [feedInfo, activeRelaySet])
 

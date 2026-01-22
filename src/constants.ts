@@ -483,3 +483,25 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   NAK: 'nak',
   TRENDING: 'trending'
 }
+
+let defaultRelaySets: {
+  id: string
+  name: string
+  relayUrls: string[]
+  aTag: string[]
+}[] = []
+
+const _rawRelaySets = import.meta.env.VITE_DEFAULT_RELAY_SETS as string | undefined
+
+if (_rawRelaySets) {
+  try {
+    const parsed = JSON.parse(_rawRelaySets)
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      defaultRelaySets = parsed
+    }
+  } catch (e) {
+    console.error('Failed to parse VITE_DEFAULT_RELAY_SETS', e)
+  }
+}
+
+export const VITE_DEFAULT_RELAY_SETS = defaultRelaySets

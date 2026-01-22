@@ -1,3 +1,4 @@
+import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getReplaceableEventIdentifier } from '@/lib/event'
@@ -133,9 +134,19 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
   }, [favoriteRelaysEvent])
 
   useEffect(() => {
-    setRelaySets(
-      relaySetEvents.map((evt) => getRelaySetFromEvent(evt)).filter(Boolean) as TRelaySet[]
-    )
+    const userRelaySets = relaySetEvents
+      .map((evt) => getRelaySetFromEvent(evt))
+      .filter(Boolean) as TRelaySet[]
+
+    // Merge user-defined relay sets with default relay sets
+    // User sets take priority, default sets are appended if their id doesn't exist in user sets
+    const userSetIds = new Set(userRelaySets.map((set) => set.id))
+    const mergedRelaySets = [
+      ...userRelaySets,
+      ...VITE_DEFAULT_RELAY_SETS.filter((defaultSet) => !userSetIds.has(defaultSet.id))
+    ]
+
+    setRelaySets(mergedRelaySets)
   }, [relaySetEvents])
 
   const addFavoriteRelays = async (relayUrls: string[]) => {
