@@ -3,6 +3,7 @@ import BackgroundAudio from '../BackgroundAudio'
 import AccountButton from './AccountButton'
 import ExploreButton from './ExploreButton'
 import HomeButton from './HomeButton'
+import MessagesButton from './MessagesButton'
 import NotificationsButton from './NotificationsButton'
 
 export default function BottomNavigationBar() {
@@ -18,6 +19,7 @@ export default function BottomNavigationBar() {
         <HomeButton />
         <ExploreButton />
         <NotificationsButton />
+        <MessagesButton />
         <AccountButton />
       </div>
     </div>

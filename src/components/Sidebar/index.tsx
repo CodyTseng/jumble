@@ -12,6 +12,7 @@ import BookmarkButton from './BookmarkButton'
 import RelaysButton from './ExploreButton'
 import HomeButton from './HomeButton'
 import LayoutSwitcher from './LayoutSwitcher'
+import MessagesButton from './MessagesButton'
 import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
 import ProfileButton from './ProfileButton'
@@ -55,6 +56,7 @@ export default function PrimaryPageSidebar() {
         <HomeButton collapse={sidebarCollapse} />
         <RelaysButton collapse={sidebarCollapse} />
         <NotificationsButton collapse={sidebarCollapse} />
+        <MessagesButton collapse={sidebarCollapse} />
         <SearchButton collapse={sidebarCollapse} />
         <ProfileButton collapse={sidebarCollapse} />
         {pubkey && <BookmarkButton collapse={sidebarCollapse} />}

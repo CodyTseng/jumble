@@ -1,4 +1,5 @@
 import BookmarkPage from '@/pages/primary/BookmarkPage'
+import DmPage from '@/pages/primary/DmPage'
 import ExplorePage from '@/pages/primary/ExplorePage'
 import MePage from '@/pages/primary/MePage'
 import NoteListPage from '@/pages/primary/NoteListPage'
@@ -14,6 +15,7 @@ const PRIMARY_ROUTE_CONFIGS = [
   { key: 'home', component: NoteListPage },
   { key: 'explore', component: ExplorePage },
   { key: 'notifications', component: NotificationListPage },
+  { key: 'dms', component: DmPage },
   { key: 'me', component: MePage },
   { key: 'profile', component: ProfilePage },
   { key: 'relay', component: RelayPage },
