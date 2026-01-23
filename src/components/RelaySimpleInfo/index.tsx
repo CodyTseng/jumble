@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
+import { IS_COMMUNITY_MODE } from '@/constants'
 import { cn } from '@/lib/utils'
 import { TRelayInfo } from '@/types'
 import { HTMLProps } from 'react'
@@ -30,7 +31,7 @@ export default function RelaySimpleInfo({
             )}
           </div>
         </div>
-        {relayInfo && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
+        {relayInfo && !IS_COMMUNITY_MODE && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
       </div>
       {!!relayInfo?.description && (
         <div

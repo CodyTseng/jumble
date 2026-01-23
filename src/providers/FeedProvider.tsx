@@ -1,5 +1,5 @@
+import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS } from '@/constants'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
-import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
@@ -49,17 +49,16 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         if (storedFeedInfo) {
           feedInfo = storedFeedInfo
         } else {
-          feedInfo = { feedType: 'following' }
-        }
-      } else {
-        if (VITE_DEFAULT_RELAY_SETS.length > 0) {
-          feedInfo = {
-            feedType: 'relays',
-            id: VITE_DEFAULT_RELAY_SETS[0].id,
-            name: VITE_DEFAULT_RELAY_SETS[0].name
+          if (!IS_COMMUNITY_MODE) {
+            feedInfo = { feedType: 'following' }
           }
-        } else {
-          feedInfo = { feedType: 'following' }
+        }
+      }
+      if (!feedInfo && VITE_COMMUNITY_RELAY_SETS.length > 0) {
+        feedInfo = {
+          feedType: 'relays',
+          id: VITE_COMMUNITY_RELAY_SETS[0].id,
+          name: VITE_COMMUNITY_RELAY_SETS[0].name
         }
       }
 
@@ -119,38 +118,36 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       return
     }
     if (feedType === 'relays') {
-      const relaySetId =
-        options.activeRelaySetId ??
-        (relaySets.length > 0
-          ? relaySets[0].id
-          : VITE_DEFAULT_RELAY_SETS.length > 0
-            ? VITE_DEFAULT_RELAY_SETS[0].id
-            : null)
-      if (!relaySetId) {
-        setIsReady(true)
-        return
-      }
+      const relaySetId = options.activeRelaySetId ?? (relaySets.length > 0 ? relaySets[0].id : null)
+      let relaySet: TRelaySet | null = null
+      if (IS_COMMUNITY_MODE) {
+        relaySet =
+          VITE_COMMUNITY_RELAY_SETS.find((set) => set.id === relaySetId) ??
+          (VITE_COMMUNITY_RELAY_SETS.length > 0 ? VITE_COMMUNITY_RELAY_SETS[0] : null)
+      } else {
+        if (!relaySetId || !pubkey) {
+          setIsReady(true)
+          return
+        }
 
-      let relaySet =
-        relaySets.find((set) => set.id === relaySetId) ??
-        (relaySets.length > 0 ? relaySets[0] : null)
+        relaySet =
+          relaySets.find((set) => set.id === relaySetId) ??
+          (relaySets.length > 0 ? relaySets[0] : null)
 
-      if (!relaySet) {
-        relaySet = VITE_DEFAULT_RELAY_SETS.find((set: TRelaySet) => set.id === relaySetId) ?? null
-      }
-
-      if (!relaySet && pubkey) {
-        const storedRelaySetEvent = await indexedDb.getReplaceableEvent(
-          pubkey,
-          kinds.Relaysets,
-          relaySetId
-        )
-        if (storedRelaySetEvent) {
-          relaySet = getRelaySetFromEvent(storedRelaySetEvent)
+        if (!relaySet) {
+          const storedRelaySetEvent = await indexedDb.getReplaceableEvent(
+            pubkey,
+            kinds.Relaysets,
+            relaySetId
+          )
+          if (storedRelaySetEvent) {
+            relaySet = getRelaySetFromEvent(storedRelaySetEvent)
+          }
         }
       }
+
       if (relaySet) {
-        const newFeedInfo = { feedType, id: relaySet.id, name: relaySet.name }
+        const newFeedInfo = { feedType, id: relaySet.id }
         setFeedInfo(newFeedInfo)
         feedInfoRef.current = newFeedInfo
         setRelayUrls(relaySet.relayUrls)

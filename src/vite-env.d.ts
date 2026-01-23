@@ -7,10 +7,6 @@ declare global {
   }
 }
 
-interface ImportMetaEnv {
-  readonly VITE_DEFAULT_RELAY_SETS: string
-}
-
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }

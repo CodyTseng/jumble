@@ -2,6 +2,7 @@ import FeedSwitcher from '@/components/FeedSwitcher'
 import RelayIcon from '@/components/RelayIcon'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS, VITE_COMMUNITY_RELAYS } from '@/constants'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -14,6 +15,10 @@ import { useTranslation } from 'react-i18next'
 export default function FeedButton({ className }: { className?: string }) {
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
+
+  if (IS_COMMUNITY_MODE && VITE_COMMUNITY_RELAY_SETS.length + VITE_COMMUNITY_RELAYS.length <= 1) {
+    return <FeedSwitcherTrigger className={className} />
+  }
 
   if (isSmallScreen) {
     return (
@@ -61,7 +66,8 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
     const { relaySets } = useFavoriteRelays()
     const activeRelaySet = useMemo(() => {
       return feedInfo?.feedType === 'relays' && feedInfo.id
-        ? relaySets.find((set) => set.id === feedInfo.id)
+        ? (relaySets.find((set) => set.id === feedInfo.id) ??
+            VITE_COMMUNITY_RELAY_SETS.find((set) => set.id === feedInfo.id))
         : undefined
     }, [feedInfo, relaySets])
     const title = useMemo(() => {
@@ -92,15 +98,22 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
       return <Server />
     }, [feedInfo])
 
+    const clickable =
+      !IS_COMMUNITY_MODE || VITE_COMMUNITY_RELAY_SETS.length + VITE_COMMUNITY_RELAYS.length > 1
+
     return (
       <div
-        className={cn('clickable flex h-full items-center gap-2 rounded-xl px-3', className)}
+        className={cn(
+          'flex h-full items-center gap-2 rounded-xl px-3',
+          clickable && 'clickable',
+          className
+        )}
         ref={ref}
         {...props}
       >
         {icon}
         <div className="truncate text-lg font-semibold">{title}</div>
-        <ChevronDown />
+        {clickable && <ChevronDown />}
       </div>
     )
   }

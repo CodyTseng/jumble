@@ -1,4 +1,5 @@
 import { kinds } from 'nostr-tools'
+import { TRelaySet } from './types'
 
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
@@ -484,24 +485,8 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   TRENDING: 'trending'
 }
 
-let defaultRelaySets: {
-  id: string
-  name: string
-  relayUrls: string[]
-  aTag: string[]
-}[] = []
+export const VITE_COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]
+export const VITE_COMMUNITY_RELAYS = import.meta.env.VITE_COMMUNITY_RELAYS as string[]
 
-const _rawRelaySets = import.meta.env.VITE_DEFAULT_RELAY_SETS as string | undefined
-
-if (_rawRelaySets) {
-  try {
-    const parsed = JSON.parse(_rawRelaySets)
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      defaultRelaySets = parsed
-    }
-  } catch (e) {
-    console.error('Failed to parse VITE_DEFAULT_RELAY_SETS', e)
-  }
-}
-
-export const VITE_DEFAULT_RELAY_SETS = defaultRelaySets
+export const IS_COMMUNITY_MODE =
+  VITE_COMMUNITY_RELAY_SETS.length > 0 || VITE_COMMUNITY_RELAYS.length > 0

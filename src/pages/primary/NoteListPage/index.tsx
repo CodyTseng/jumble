@@ -1,4 +1,5 @@
 import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import FollowingFeed from '@/components/FollowingFeed'
 import PostEditor from '@/components/PostEditor'
 import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,6 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
-import FollowingFeed from './FollowingFeed'
 import PinnedFeed from './PinnedFeed'
 import RelaysFeed from './RelaysFeed'
 

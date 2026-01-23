@@ -1,7 +1,9 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { IS_COMMUNITY_MODE } from '@/constants'
 import { useFetchRelayInfo } from '@/hooks'
+import { createFakeEvent } from '@/lib/event'
 import { checkNip43Support } from '@/lib/relay'
 import { normalizeHttpUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -10,6 +12,7 @@ import { Check, Copy, GitBranch, Mail, Share2, SquareCode } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import Content from '../Content'
 import PostEditor from '../PostEditor'
 import RelayIcon from '../RelayIcon'
 import RelayMembershipControl from '../RelayMembershipControl'
@@ -17,8 +20,6 @@ import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 import RelayReviewsPreview from './RelayReviewsPreview'
-import Content from '../Content'
-import { createFakeEvent } from '@/lib/event'
 
 export default function RelayInfo({ url, className }: { url: string; className?: string }) {
   const { t } = useTranslation()
@@ -161,7 +162,7 @@ function RelayControls({ url }: { url: string }) {
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyUrl}>
         {copiedUrl ? <Check /> : <Copy />}
       </Button>
-      <SaveRelayDropdownMenu urls={[url]} bigButton />
+      {!IS_COMMUNITY_MODE && <SaveRelayDropdownMenu urls={[url]} bigButton />}
     </div>
   )
 }

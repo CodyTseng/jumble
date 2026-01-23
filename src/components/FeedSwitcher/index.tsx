@@ -1,4 +1,4 @@
-import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
+import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS, VITE_COMMUNITY_RELAYS } from '@/constants'
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -20,12 +20,43 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { feedInfo, switchFeed } = useFeed()
   const { pinnedPubkeySet } = usePinnedUsers()
   const filteredRelaySets = useMemo(() => {
-    if (relaySets.length === 0 && VITE_DEFAULT_RELAY_SETS.length > 0) {
-      return [...VITE_DEFAULT_RELAY_SETS]
-    }
     return relaySets.filter((set) => set.relayUrls.length > 0)
   }, [relaySets])
   const hasRelays = filteredRelaySets.length > 0 || favoriteRelays.length > 0
+
+  if (IS_COMMUNITY_MODE) {
+    return (
+      <div className="space-y-1.5">
+        {VITE_COMMUNITY_RELAY_SETS.map((set) => (
+          <RelaySetCard
+            key={set.id}
+            relaySet={set}
+            select={feedInfo?.feedType === 'relays' && set.id === feedInfo.id}
+            onSelectChange={(select) => {
+              if (!select) return
+              switchFeed('relays', { activeRelaySetId: set.id })
+              close?.()
+            }}
+          />
+        ))}
+        {VITE_COMMUNITY_RELAYS.map((relay) => (
+          <FeedSwitcherItem
+            key={relay}
+            isActive={feedInfo?.feedType === 'relay' && feedInfo.id === relay}
+            onClick={() => {
+              switchFeed('relay', { relay })
+              close?.()
+            }}
+          >
+            <div className="flex w-full items-center gap-3">
+              <RelayIcon url={relay} className="shrink-0" />
+              <div className="w-0 flex-1 truncate">{simplifyUrl(relay)}</div>
+            </div>
+          </FeedSwitcherItem>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
