@@ -1,3 +1,4 @@
+import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -18,10 +19,12 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const { feedInfo, switchFeed } = useFeed()
   const { pinnedPubkeySet } = usePinnedUsers()
-  const filteredRelaySets = useMemo(
-    () => relaySets.filter((set) => set.relayUrls.length > 0),
-    [relaySets]
-  )
+  const filteredRelaySets = useMemo(() => {
+    if (relaySets.length === 0 && VITE_DEFAULT_RELAY_SETS.length > 0) {
+      return [...VITE_DEFAULT_RELAY_SETS]
+    }
+    return relaySets.filter((set) => set.relayUrls.length > 0)
+  }, [relaySets])
   const hasRelays = filteredRelaySets.length > 0 || favoriteRelays.length > 0
 
   return (

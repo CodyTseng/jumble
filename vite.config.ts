@@ -27,7 +27,11 @@ const getAppVersion = () => {
 export default defineConfig({
   define: {
     'import.meta.env.GIT_COMMIT': getGitHash(),
-    'import.meta.env.APP_VERSION': getAppVersion()
+    'import.meta.env.APP_VERSION': getAppVersion(),
+    // Only inject VITE_ prefixed env var (recommended)
+    'import.meta.env.VITE_DEFAULT_RELAY_SETS': JSON.stringify(
+      process.env.VITE_DEFAULT_RELAY_SETS || ''
+    )
   },
   resolve: {
     alias: {

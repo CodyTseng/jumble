@@ -11,6 +11,7 @@ import {
   StorageKey,
   TPrimaryColor
 } from '@/constants'
+import { VITE_DEFAULT_RELAY_SETS } from '@/constants'
 import { isSameAccount } from '@/lib/account'
 import { randomString } from '@/lib/random'
 import { isTorBrowser } from '@/lib/utils'
@@ -108,8 +109,8 @@ class LocalStorageService {
           }
         })
       }
-      if (!relaySets.length) {
-        relaySets = []
+      if (!relaySets.length && VITE_DEFAULT_RELAY_SETS.length > 0) {
+        relaySets = [...VITE_DEFAULT_RELAY_SETS]
       }
       window.localStorage.setItem(StorageKey.RELAY_SETS, JSON.stringify(relaySets))
       this.relaySets = relaySets
