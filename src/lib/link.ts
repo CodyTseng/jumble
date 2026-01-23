@@ -8,6 +8,9 @@ export const toNote = (eventOrId: Event | string) => {
   const nevent = getNoteBech32Id(eventOrId)
   return `/notes/${nevent}`
 }
+export const toJumbleNote = (eventOrId: Event | string) => {
+  return `https://jumble.social${toNote(eventOrId)}`
+}
 export const toNoteList = ({
   hashtag,
   search,
@@ -86,7 +89,6 @@ export const toFollowPack = (eventOrId: Event | string) => {
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
 }
-export const toNjump = (id: string) => `https://njump.me/${id}`
 export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/user-aggregation/${feedId}/${npub}`

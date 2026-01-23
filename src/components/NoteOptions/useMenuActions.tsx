@@ -1,6 +1,6 @@
 import { formatError } from '@/lib/error'
 import { getNoteBech32Id, isProtectedEvent } from '@/lib/event'
-import { toNjump } from '@/lib/link'
+import { toJumbleNote } from '@/lib/link'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { simplifyUrl } from '@/lib/url'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
@@ -183,7 +183,7 @@ export function useMenuActions({
         icon: Link,
         label: t('Copy share link'),
         onClick: () => {
-          navigator.clipboard.writeText(toNjump(getNoteBech32Id(event)))
+          navigator.clipboard.writeText(toJumbleNote(event))
           closeDrawer()
         }
       },
