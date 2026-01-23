@@ -92,16 +92,23 @@ class LightningService {
     }
 
     // Try Spark wallet first if connected
-    if (sparkService.isConnected()) {
+    const isSparkConnected = sparkService.isConnected()
+    console.log('[LightningService] Spark wallet connected:', isSparkConnected)
+
+    if (isSparkConnected) {
       try {
-        console.log('[LightningService] Paying zap with Spark wallet')
+        console.log('[LightningService] Paying zap with Spark wallet, amount:', sats, 'sats')
         const response = await sparkService.sendPayment(pr)
+        console.log('[LightningService] Spark zap successful!')
         closeOuterModel?.()
         return { preimage: response.preimage || '', invoice: pr }
       } catch (error) {
-        console.error('[LightningService] Spark payment failed, falling back to WebLN:', error)
+        console.error('[LightningService] ❌ Spark zap payment failed:', error)
+        console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))
         // Fall through to WebLN provider
       }
+    } else {
+      console.log('[LightningService] Spark wallet not connected, skipping to WebLN/modal')
     }
 
     // Try WebLN provider next
@@ -172,16 +179,23 @@ class LightningService {
     closeOuterModel?: () => void
   ): Promise<{ preimage: string; invoice: string } | null> {
     // Try Spark wallet first if connected
-    if (sparkService.isConnected()) {
+    const isSparkConnected = sparkService.isConnected()
+    console.log('[LightningService] Spark wallet connected:', isSparkConnected)
+
+    if (isSparkConnected) {
       try {
         console.log('[LightningService] Paying invoice with Spark wallet')
         const response = await sparkService.sendPayment(invoice)
+        console.log('[LightningService] Spark invoice payment successful!')
         closeOuterModel?.()
         return { preimage: response.preimage || '', invoice }
       } catch (error) {
-        console.error('[LightningService] Spark payment failed, falling back to WebLN:', error)
+        console.error('[LightningService] ❌ Spark invoice payment failed:', error)
+        console.error('[LightningService] Error details:', error instanceof Error ? error.message : String(error))
         // Fall through to WebLN provider
       }
+    } else {
+      console.log('[LightningService] Spark wallet not connected, skipping to WebLN/modal')
     }
 
     // Try WebLN provider next
