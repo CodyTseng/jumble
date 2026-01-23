@@ -942,7 +942,12 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title="Spark SDK Test (POC)">
+    <SecondaryPageLayout ref={ref} index={index} title={
+      <div className="flex items-center gap-2">
+        <span>Spark Wallet</span>
+        <span className="text-sm text-muted-foreground font-normal">powered by Breez SDK</span>
+      </div>
+    }>
       {/* Lightning animation overlay */}
       {showLightning && <CodepenLightning duration={1000} active={showLightning} />}
 
@@ -1806,10 +1811,10 @@ const SparkTestPage = forwardRef(({ index }: { index?: number }, ref) => {
         ) : null}
 
         <div className="text-xs text-muted-foreground space-y-1 pt-4 border-t">
-          <p>🧪 This is a POC test page for Spark SDK integration</p>
+          <p>⚡️ Breez SDK + Spark wallet integration</p>
           <p>🔐 Recovery phrase encrypted with XChaCha20-Poly1305 using your Nostr pubkey</p>
           <p>💾 Saved locally on this device</p>
-          <p>⚠️ Do not use with large amounts - testing only!</p>
+          <p>⚠️ Experimental - do not use with large amounts!</p>
         </div>
       </div>
     </SecondaryPageLayout>
