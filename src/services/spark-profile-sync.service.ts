@@ -79,7 +79,7 @@ class SparkProfileSyncService {
       console.log('[SparkProfileSync] Profile updated successfully with Lightning address')
     } catch (error) {
       console.error('[SparkProfileSync] Failed to sync Lightning address to profile:', error)
-      // Don't throw - this is a non-critical enhancement
+      throw error // Re-throw so caller can handle it
     }
   }
 }

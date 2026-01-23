@@ -431,7 +431,7 @@ class SparkService {
     try {
       const response = await this.sdk.registerLightningAddress({
         username,
-        description: description || 'Jumble Spark Wallet'
+        description: description || 'Pay breez.tips user'
       })
       console.log('[SparkService] Lightning address registered:', response.lightningAddress)
       return response
