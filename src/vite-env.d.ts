@@ -6,3 +6,7 @@ declare global {
     nostr?: TNip07
   }
 }
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

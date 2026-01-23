@@ -1,5 +1,6 @@
 import Icon from '@/assets/Icon'
 import Logo from '@/assets/Logo'
+import { IS_COMMUNITY_MODE } from '@/constants'
 import { cn } from '@/lib/utils'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -10,6 +11,7 @@ import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import AccountButton from './AccountButton'
 import BookmarkButton from './BookmarkButton'
 import RelaysButton from './ExploreButton'
+import FollowingButton from './FollowingButton'
 import HomeButton from './HomeButton'
 import LayoutSwitcher from './LayoutSwitcher'
 import NotificationsButton from './NotificationButton'
@@ -53,7 +55,8 @@ export default function PrimaryPageSidebar() {
           </button>
         )}
         <HomeButton collapse={sidebarCollapse} />
-        <RelaysButton collapse={sidebarCollapse} />
+        {!IS_COMMUNITY_MODE && <RelaysButton collapse={sidebarCollapse} />}
+        {IS_COMMUNITY_MODE && <FollowingButton collapse={sidebarCollapse} />}
         <NotificationsButton collapse={sidebarCollapse} />
         <SearchButton collapse={sidebarCollapse} />
         <ProfileButton collapse={sidebarCollapse} />

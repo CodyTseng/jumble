@@ -1,4 +1,5 @@
 import { kinds } from 'nostr-tools'
+import { TRelaySet } from './types'
 
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
@@ -483,3 +484,8 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   NAK: 'nak',
   TRENDING: 'trending'
 }
+
+export const COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]
+export const COMMUNITY_RELAYS = import.meta.env.VITE_COMMUNITY_RELAYS as string[]
+
+export const IS_COMMUNITY_MODE = COMMUNITY_RELAY_SETS.length > 0 || COMMUNITY_RELAYS.length > 0

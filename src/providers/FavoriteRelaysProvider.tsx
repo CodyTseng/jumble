@@ -1,3 +1,4 @@
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getReplaceableEventIdentifier } from '@/lib/event'
@@ -44,6 +45,10 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
   const [relaySets, setRelaySets] = useState<TRelaySet[]>([])
 
   useEffect(() => {
+    if (IS_COMMUNITY_MODE) {
+      setRelaySets(COMMUNITY_RELAY_SETS)
+      return
+    }
     if (!favoriteRelaysEvent) {
       const favoriteRelays: string[] = []
       const storedRelaySets = storage.getRelaySets()

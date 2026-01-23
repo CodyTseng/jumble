@@ -50,6 +50,22 @@ docker compose up --build -d
 
 After finishing, access: http://localhost:8089
 
+## Community mode (Optional)
+
+If you want to run Jumble in community mode (with pre-configured relay sets and relays), you can set the following environment variables in a `.env` file at the root of the project:
+
+- `VITE_COMMUNITY_RELAY_SETS`: Environment variable. Set the default relay sets for Jumble. Multiple relay sets can be configured. If configured, the first preset group will be displayed to visitors by default upon opening. Visitors cannot delete relay sets preset by administrators. This is ideal for communities wishing to host their own Jumble instances or for setting default feeds for family members. Examples:
+
+```
+VITE_COMMUNITY_RELAY_SETS=[{"id": "example.com", "name": "The Example Feed", "relayUrls": ["wss://relay.example.com/", "wss://relay.example.org/"]},{"id": "dailynews", "name": "News", "relayUrls": ["wss://news.example.com/", "wss://news.example.org/"]}]
+```
+
+- `VITE_COMMUNITY_RELAYS`: Environment variable. Set additional default relays for Jumble. Multiple relays can be configured, separated by commas. These relays will be added to the preset relay sets and cannot be removed by visitors. Examples:
+
+```
+VITE_COMMUNITY_RELAYS="wss://relay.example.com/,wss://relay.example.org/"
+```
+
 ## Sponsors
 
 <a target="_blank" href="https://opensats.org/">
