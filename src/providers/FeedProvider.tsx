@@ -1,4 +1,4 @@
-import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS } from '@/constants'
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS } from '@/constants'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
@@ -54,12 +54,15 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }
-      if (!feedInfo && COMMUNITY_RELAY_SETS.length > 0) {
-        feedInfo = {
-          feedType: 'relays',
-          id: COMMUNITY_RELAY_SETS[0].id,
-          name: COMMUNITY_RELAY_SETS[0].name
-        }
+      if (!feedInfo && IS_COMMUNITY_MODE) {
+        feedInfo =
+          COMMUNITY_RELAY_SETS.length > 0
+            ? {
+                feedType: 'relays',
+                id: COMMUNITY_RELAY_SETS[0].id,
+                name: COMMUNITY_RELAY_SETS[0].name
+              }
+            : { feedType: 'relay', id: COMMUNITY_RELAYS[0] }
       }
 
       if (feedInfo?.feedType === 'relays') {

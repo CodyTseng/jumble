@@ -37,10 +37,7 @@ export default defineConfig(({ mode }) => {
       ),
       'import.meta.env.VITE_COMMUNITY_RELAYS': (env.VITE_COMMUNITY_RELAYS ?? '')
         .split(',')
-        .map((url) => {
-          console.log('Normalizing URL:', url)
-          return normalizeUrl(url)
-        })
+        .map((url) => normalizeUrl(url))
         .filter(Boolean)
     },
     resolve: {

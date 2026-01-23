@@ -109,7 +109,7 @@ class LocalStorageService {
         })
       }
       if (!relaySets.length) {
-        return []
+        relaySets = []
       }
       window.localStorage.setItem(StorageKey.RELAY_SETS, JSON.stringify(relaySets))
       this.relaySets = relaySets
