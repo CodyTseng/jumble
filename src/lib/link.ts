@@ -76,6 +76,7 @@ export const toRelay = (url: string) => `/relays/${encodeURIComponent(url)}`
 export const toRelayReviews = (url: string) => `/relays/${encodeURIComponent(url)}/reviews`
 export const toMuteList = () => '/mutes'
 export const toRizful = () => '/rizful'
+export const toSparkTest = () => '/spark'
 export const toBookmarks = () => '/bookmarks'
 export const toFollowPack = (eventOrId: Event | string) => {
   if (typeof eventOrId === 'string') return `/follow-packs/${eventOrId}`
