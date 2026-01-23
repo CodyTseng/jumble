@@ -50,6 +50,32 @@ docker compose up --build -d
 
 After finishing, access: http://localhost:8089
 
+## Configuration (Optional)
+
+* `VITE_DEFAULT_RELAY_SETS`: Environment variables. Set the default relay sets for Jumble. Multiple relay sets can be configured. If configured, the first preset group will be displayed to visitors by default upon opening. Visitors cannot delete relay sets preset by administrators. This is ideal for communities wishing to host their own Jumble instances or for setting default feeds for family members. Examples:
+  ```json
+  [
+    {
+      "id": "example.com",
+      "name": "The Example Feed",
+      "relayUrls": [
+        "wss://relay.example.com/",
+        "wss://relay.example.org/"
+      ],
+      "aTag": []
+    },
+    {
+      "id": "dailynews",
+      "name": "News",
+      "relayUrls": [
+        "wss://news.example.com/",
+        "wss://news.example.org/"
+      ],
+      "aTag": []
+    }
+  ]
+  ```
+
 ## Sponsors
 
 <a target="_blank" href="https://opensats.org/">
