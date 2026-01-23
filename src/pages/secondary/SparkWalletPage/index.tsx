@@ -21,6 +21,17 @@ import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
 import { toWallet } from '@/lib/link'
+import { useCurrencyPreferences } from '@/providers/CurrencyPreferencesProvider'
+import { useCurrencyConversion } from '@/hooks/useCurrencyConversion'
+import { currencySymbols, formatFiatAmount, popularCurrencies } from '@/lib/currency'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
 /**
  * Spark Wallet - Lightning wallet powered by Breez Spark SDK
@@ -43,6 +54,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     lightningAddress: providerLightningAddress,
     refreshWalletState
   } = useSparkWallet()
+
+  const { displayCurrency, setDisplayCurrency, isBalanceHidden, toggleBalanceVisibility } = useCurrencyPreferences()
+  const { fiatValue, isLoading: isLoadingConversion } = useCurrencyConversion(providerBalance || 0, displayCurrency)
 
   const [apiKey] = useState(import.meta.env.VITE_BREEZ_SPARK_API_KEY || '')
   const [mnemonic, setMnemonic] = useState('')
@@ -1351,13 +1365,82 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm">Balance</Label>
-                <Button variant="ghost" size="sm" onClick={handleRefreshBalance} disabled={loading} className="h-auto py-1 px-2 text-xs">
-                  {loading ? <Loader2 className="animate-spin size-3" /> : 'Sync'}
+                <div className="flex items-center gap-1">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-auto py-1 px-2 text-xs">
+                        {displayCurrency} <ChevronDown className="ml-1 size-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 max-h-[400px] overflow-y-auto">
+                      <DropdownMenuLabel>Currency</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+
+                      {popularCurrencies.map((currency) => (
+                        <DropdownMenuItem
+                          key={currency}
+                          onClick={() => setDisplayCurrency(currency)}
+                          className={displayCurrency === currency ? 'bg-accent' : ''}
+                        >
+                          <span className="font-mono mr-2">{currencySymbols[currency].symbol}</span>
+                          {currency}
+                        </DropdownMenuItem>
+                      ))}
+
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>Other Currencies</DropdownMenuLabel>
+
+                      {Object.keys(currencySymbols)
+                        .filter(c => !popularCurrencies.includes(c))
+                        .sort()
+                        .map((currency) => (
+                          <DropdownMenuItem
+                            key={currency}
+                            onClick={() => setDisplayCurrency(currency)}
+                            className={displayCurrency === currency ? 'bg-accent' : ''}
+                          >
+                            <span className="font-mono mr-2 text-xs">{currencySymbols[currency].symbol}</span>
+                            {currency}
+                          </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Button variant="ghost" size="sm" onClick={handleRefreshBalance} disabled={loading} className="h-auto py-1 px-2 text-xs">
+                    {loading ? <Loader2 className="animate-spin size-3" /> : 'Sync'}
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-3xl font-bold">
+                  {isBalanceHidden ? (
+                    '••••••'
+                  ) : providerBalance !== null ? (
+                    displayCurrency === 'SATS' ? (
+                      `${providerBalance.toLocaleString()} sats`
+                    ) : isLoadingConversion || fiatValue === null ? (
+                      'Loading...'
+                    ) : (
+                      <>
+                        {formatFiatAmount(fiatValue, displayCurrency)}
+                        <span className="text-sm text-muted-foreground ml-2">
+                          {providerBalance.toLocaleString()} sats
+                        </span>
+                      </>
+                    )
+                  ) : (
+                    'Loading...'
+                  )}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleBalanceVisibility}
+                  className="h-auto p-2"
+                  title={isBalanceHidden ? "Show balance" : "Hide balance"}
+                >
+                  {isBalanceHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                 </Button>
               </div>
-              <p className="text-3xl font-bold">
-                {providerBalance !== null ? `${providerBalance.toLocaleString()} sats` : 'Loading...'}
-              </p>
 
               {/* Show Lightning address if registered, otherwise show link to register */}
               {providerLightningAddress ? (

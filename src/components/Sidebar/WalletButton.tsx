@@ -2,18 +2,20 @@ import { Button } from '@/components/ui/button'
 import { toWallet } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useSparkWallet } from '@/providers/SparkWalletProvider'
+import { useCurrencyPreferences } from '@/providers/CurrencyPreferencesProvider'
+import { useCurrencyConversion } from '@/hooks/useCurrencyConversion'
+import { formatFiatAmount } from '@/lib/currency'
 import { Eye, EyeOff, Wallet } from 'lucide-react'
-import { useState } from 'react'
 
 export default function WalletButton({ collapse }: { collapse: boolean }) {
   const { push } = useSecondaryPage()
   const { connected, balance } = useSparkWallet()
-  const [hideBalance, setHideBalance] = useState(false)
+  const { displayCurrency, isBalanceHidden, toggleBalanceVisibility } = useCurrencyPreferences()
+  const { fiatValue, isLoading } = useCurrencyConversion(balance || 0, displayCurrency)
 
   if (!connected) return null
 
   const balanceSats = balance || 0
-  const balanceUsd = (balanceSats * 0.001217).toFixed(2) // Rough BTC price estimation
 
   const handleWalletClick = () => {
     push(toWallet())
@@ -21,7 +23,7 @@ export default function WalletButton({ collapse }: { collapse: boolean }) {
 
   const toggleHideBalance = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setHideBalance(!hideBalance)
+    toggleBalanceVisibility()
   }
 
   if (collapse) {
@@ -51,9 +53,9 @@ export default function WalletButton({ collapse }: { collapse: boolean }) {
         <button
           onClick={toggleHideBalance}
           className="p-1 hover:bg-background rounded transition-colors"
-          title={hideBalance ? 'Show balance' : 'Hide balance'}
+          title={isBalanceHidden ? 'Show balance' : 'Hide balance'}
         >
-          {hideBalance ? (
+          {isBalanceHidden ? (
             <EyeOff className="size-3.5 text-muted-foreground" />
           ) : (
             <Eye className="size-3.5 text-muted-foreground" />
@@ -61,12 +63,20 @@ export default function WalletButton({ collapse }: { collapse: boolean }) {
         </button>
       </div>
       <div className="flex flex-col items-start w-full">
-        {hideBalance ? (
+        {isBalanceHidden ? (
           <span className="text-lg font-bold">••••</span>
         ) : (
           <>
-            <span className="text-lg font-bold">{balanceSats.toLocaleString()} sats</span>
-            <span className="text-xs text-muted-foreground">${balanceUsd}</span>
+            {displayCurrency === 'SATS' ? (
+              <span className="text-lg font-bold">{balanceSats.toLocaleString()} sats</span>
+            ) : isLoading || fiatValue === null ? (
+              <span className="text-lg font-bold">...</span>
+            ) : (
+              <>
+                <span className="text-lg font-bold">{formatFiatAmount(fiatValue, displayCurrency)}</span>
+                <span className="text-xs text-muted-foreground">{balanceSats.toLocaleString()} sats</span>
+              </>
+            )}
           </>
         )}
       </div>
