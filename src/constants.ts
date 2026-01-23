@@ -485,8 +485,7 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   TRENDING: 'trending'
 }
 
-export const VITE_COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]
-export const VITE_COMMUNITY_RELAYS = import.meta.env.VITE_COMMUNITY_RELAYS as string[]
+export const COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]
+export const COMMUNITY_RELAYS = import.meta.env.VITE_COMMUNITY_RELAYS as string[]
 
-export const IS_COMMUNITY_MODE =
-  VITE_COMMUNITY_RELAY_SETS.length > 0 || VITE_COMMUNITY_RELAYS.length > 0
+export const IS_COMMUNITY_MODE = COMMUNITY_RELAY_SETS.length > 0 || COMMUNITY_RELAYS.length > 0

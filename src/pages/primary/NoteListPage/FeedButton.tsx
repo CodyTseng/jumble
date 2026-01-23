@@ -2,7 +2,7 @@ import FeedSwitcher from '@/components/FeedSwitcher'
 import RelayIcon from '@/components/RelayIcon'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS, VITE_COMMUNITY_RELAYS } from '@/constants'
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS } from '@/constants'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -16,7 +16,7 @@ export default function FeedButton({ className }: { className?: string }) {
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
 
-  if (IS_COMMUNITY_MODE && VITE_COMMUNITY_RELAY_SETS.length + VITE_COMMUNITY_RELAYS.length <= 1) {
+  if (IS_COMMUNITY_MODE && COMMUNITY_RELAY_SETS.length + COMMUNITY_RELAYS.length <= 1) {
     return <FeedSwitcherTrigger className={className} />
   }
 
@@ -67,7 +67,7 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
     const activeRelaySet = useMemo(() => {
       return feedInfo?.feedType === 'relays' && feedInfo.id
         ? (relaySets.find((set) => set.id === feedInfo.id) ??
-            VITE_COMMUNITY_RELAY_SETS.find((set) => set.id === feedInfo.id))
+            COMMUNITY_RELAY_SETS.find((set) => set.id === feedInfo.id))
         : undefined
     }, [feedInfo, relaySets])
     const title = useMemo(() => {
@@ -99,7 +99,7 @@ const FeedSwitcherTrigger = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEle
     }, [feedInfo])
 
     const clickable =
-      !IS_COMMUNITY_MODE || VITE_COMMUNITY_RELAY_SETS.length + VITE_COMMUNITY_RELAYS.length > 1
+      !IS_COMMUNITY_MODE || COMMUNITY_RELAY_SETS.length + COMMUNITY_RELAYS.length > 1
 
     return (
       <div

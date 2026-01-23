@@ -1,4 +1,4 @@
-import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS } from '@/constants'
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS } from '@/constants'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import indexedDb from '@/services/indexed-db.service'
@@ -54,11 +54,11 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }
-      if (!feedInfo && VITE_COMMUNITY_RELAY_SETS.length > 0) {
+      if (!feedInfo && COMMUNITY_RELAY_SETS.length > 0) {
         feedInfo = {
           feedType: 'relays',
-          id: VITE_COMMUNITY_RELAY_SETS[0].id,
-          name: VITE_COMMUNITY_RELAY_SETS[0].name
+          id: COMMUNITY_RELAY_SETS[0].id,
+          name: COMMUNITY_RELAY_SETS[0].name
         }
       }
 
@@ -122,8 +122,8 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       let relaySet: TRelaySet | null = null
       if (IS_COMMUNITY_MODE) {
         relaySet =
-          VITE_COMMUNITY_RELAY_SETS.find((set) => set.id === relaySetId) ??
-          (VITE_COMMUNITY_RELAY_SETS.length > 0 ? VITE_COMMUNITY_RELAY_SETS[0] : null)
+          COMMUNITY_RELAY_SETS.find((set) => set.id === relaySetId) ??
+          (COMMUNITY_RELAY_SETS.length > 0 ? COMMUNITY_RELAY_SETS[0] : null)
       } else {
         if (!relaySetId || !pubkey) {
           setIsReady(true)

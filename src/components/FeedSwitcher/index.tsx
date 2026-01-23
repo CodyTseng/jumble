@@ -1,4 +1,4 @@
-import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS, VITE_COMMUNITY_RELAYS } from '@/constants'
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS } from '@/constants'
 import { toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -27,7 +27,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
   if (IS_COMMUNITY_MODE) {
     return (
       <div className="space-y-1.5">
-        {VITE_COMMUNITY_RELAY_SETS.map((set) => (
+        {COMMUNITY_RELAY_SETS.map((set) => (
           <RelaySetCard
             key={set.id}
             relaySet={set}
@@ -39,7 +39,7 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
             }}
           />
         ))}
-        {VITE_COMMUNITY_RELAYS.map((relay) => (
+        {COMMUNITY_RELAYS.map((relay) => (
           <FeedSwitcherItem
             key={relay}
             isActive={feedInfo?.feedType === 'relay' && feedInfo.id === relay}

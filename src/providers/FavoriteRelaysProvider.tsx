@@ -1,4 +1,4 @@
-import { IS_COMMUNITY_MODE, VITE_COMMUNITY_RELAY_SETS } from '@/constants'
+import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getReplaceableEventIdentifier } from '@/lib/event'
@@ -46,7 +46,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     if (IS_COMMUNITY_MODE) {
-      setRelaySets(VITE_COMMUNITY_RELAY_SETS)
+      setRelaySets(COMMUNITY_RELAY_SETS)
       return
     }
     if (!favoriteRelaysEvent) {
