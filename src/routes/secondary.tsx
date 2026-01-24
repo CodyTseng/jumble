@@ -19,6 +19,7 @@ import RelaySettingsPage from '@/pages/secondary/RelaySettingsPage'
 import RizfulPage from '@/pages/secondary/RizfulPage'
 import SearchPage from '@/pages/secondary/SearchPage'
 import SettingsPage from '@/pages/secondary/SettingsPage'
+import SparkWalletPage from '@/pages/secondary/SparkWalletPage'
 import SystemSettingsPage from '@/pages/secondary/SystemSettingsPage'
 import TranslationPage from '@/pages/secondary/TranslationPage'
 import UserAggregationDetailPage from '@/pages/secondary/UserAggregationDetailPage'
@@ -50,6 +51,7 @@ const SECONDARY_ROUTE_CONFIGS = [
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },
+  { path: '/spark', element: <SparkWalletPage /> },
   { path: '/bookmarks', element: <BookmarkPage /> },
   { path: '/follow-packs/:id', element: <FollowPackPage /> },
   { path: '/user-aggregation/:feedId/:npub', element: <UserAggregationDetailPage /> }

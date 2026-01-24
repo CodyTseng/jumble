@@ -95,9 +95,15 @@ const WalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                 variant="link"
                 size="icon"
                 className="text-muted-foreground hover:text-foreground px-0"
-                onClick={() => window.open('https://breez.technology/spark/', '_blank')}
+                asChild
               >
-                <Info className="h-4 w-4" />
+                <a
+                  href="https://breez.technology/spark/"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Info className="h-4 w-4" />
+                </a>
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
