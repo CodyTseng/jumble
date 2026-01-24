@@ -32,6 +32,8 @@ export default function RelaysFeed() {
       areAlgoRelays={areAlgoRelays}
       isMainFeed
       showRelayCloseReason
+      useProgressiveLoading
+      eosePreset="DISCOVERY"
     />
   )
 }

@@ -14,6 +14,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
+import { TEosePreset } from '@/services/eose-timeout-manager'
 import dayjs from 'dayjs'
 import { Event } from 'nostr-tools'
 import { decode } from 'nostr-tools/nip19'
@@ -47,7 +48,9 @@ const NoteList = forwardRef(
       areAlgoRelays = false,
       showRelayCloseReason = false,
       pinnedEventIds = [],
-      filterFn
+      filterFn,
+      useProgressiveLoading = false,
+      eosePreset = 'DEFAULT'
     }: {
       subRequests: TFeedSubRequest[]
       showKinds: number[]
@@ -58,6 +61,10 @@ const NoteList = forwardRef(
       showRelayCloseReason?: boolean
       pinnedEventIds?: string[]
       filterFn?: (event: Event) => boolean
+      /** Enable progressive loading for faster perceived performance */
+      useProgressiveLoading?: boolean
+      /** EOSE timeout preset to use when progressive loading is enabled */
+      eosePreset?: TEosePreset
     },
     ref
   ) => {
@@ -175,15 +182,95 @@ const NoteList = forwardRef(
           return () => {}
         }
 
-        const { closer, timelineKey } = await client.subscribeTimeline(
-          subRequests.map(({ urls, filter }) => ({
-            urls,
-            filter: {
-              kinds: showKinds,
-              ...filter,
-              limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
+        const subRequestsWithKinds = subRequests.map(({ urls, filter }) => ({
+          urls,
+          filter: {
+            kinds: showKinds,
+            ...filter,
+            limit: areAlgoRelays ? ALGO_LIMIT : LIMIT
+          }
+        }))
+
+        const handleClose = (url: string, reason: string) => {
+          if (!showRelayCloseReason) return
+          // ignore reasons from nostr-tools
+          if (
+            [
+              'closed by caller',
+              'relay connection errored',
+              'relay connection closed',
+              'pingpong timed out',
+              'relay connection closed by us'
+            ].includes(reason)
+          ) {
+            return
+          }
+
+          toast.error(`${url}: ${reason}`)
+        }
+
+        const handleNewEvent = (event: Event) => {
+          if (pubkey && event.pubkey === pubkey) {
+            // If the new event is from the current user, insert it directly into the feed
+            setEvents((oldEvents) =>
+              oldEvents.some((e) => e.id === event.id) ? oldEvents : [event, ...oldEvents]
+            )
+          } else {
+            // Otherwise, buffer it and show the New Notes button
+            setNewEvents((oldEvents) =>
+              [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
+            )
+          }
+        }
+
+        // Use progressive loading for faster perceived performance
+        if (useProgressiveLoading) {
+          const { closer, timelineKey } = await client.subscribeTimelineProgressive(
+            subRequestsWithKinds,
+            {
+              onEvent: (event) => {
+                // Events are shown immediately as they arrive
+                setEvents((oldEvents) => {
+                  if (oldEvents.some((e) => e.id === event.id)) return oldEvents
+                  const newEvents = [...oldEvents, event]
+                    .sort((a, b) => b.created_at - a.created_at)
+                    .slice(0, areAlgoRelays ? ALGO_LIMIT : LIMIT)
+                  return newEvents
+                })
+              },
+              onInitialBatch: (events) => {
+                // Hide spinner after initial batch
+                setEvents(events)
+                setLoading(false)
+                if (areAlgoRelays) {
+                  setHasMore(false)
+                } else {
+                  setHasMore(events.length > 0)
+                }
+              },
+              onComplete: (events) => {
+                // Final update with all events
+                setEvents(events)
+                if (!areAlgoRelays) {
+                  setHasMore(events.length > 0)
+                }
+              },
+              onNew: handleNewEvent,
+              onClose: handleClose
+            },
+            {
+              preset: eosePreset,
+              startLogin,
+              needSort: !areAlgoRelays
             }
-          })),
+          )
+          setTimelineKey(timelineKey)
+          return closer
+        }
+
+        // Original non-progressive loading
+        const { closer, timelineKey } = await client.subscribeTimeline(
+          subRequestsWithKinds,
           {
             onEvents: (events, eosed) => {
               if (events.length > 0) {
@@ -197,36 +284,8 @@ const NoteList = forwardRef(
                 setHasMore(events.length > 0)
               }
             },
-            onNew: (event) => {
-              if (pubkey && event.pubkey === pubkey) {
-                // If the new event is from the current user, insert it directly into the feed
-                setEvents((oldEvents) =>
-                  oldEvents.some((e) => e.id === event.id) ? oldEvents : [event, ...oldEvents]
-                )
-              } else {
-                // Otherwise, buffer it and show the New Notes button
-                setNewEvents((oldEvents) =>
-                  [event, ...oldEvents].sort((a, b) => b.created_at - a.created_at)
-                )
-              }
-            },
-            onClose: (url, reason) => {
-              if (!showRelayCloseReason) return
-              // ignore reasons from nostr-tools
-              if (
-                [
-                  'closed by caller',
-                  'relay connection errored',
-                  'relay connection closed',
-                  'pingpong timed out',
-                  'relay connection closed by us'
-                ].includes(reason)
-              ) {
-                return
-              }
-
-              toast.error(`${url}: ${reason}`)
-            }
+            onNew: handleNewEvent,
+            onClose: handleClose
           },
           {
             startLogin,
@@ -241,7 +300,7 @@ const NoteList = forwardRef(
       return () => {
         promise.then((closer) => closer())
       }
-    }, [JSON.stringify(subRequests), refreshCount, showKinds])
+    }, [JSON.stringify(subRequests), refreshCount, showKinds, useProgressiveLoading, eosePreset])
 
     useEffect(() => {
       const options = {

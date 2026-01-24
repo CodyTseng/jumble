@@ -27,5 +27,12 @@ export default function FollowingFeed({ forceLoad = false }: { forceLoad?: boole
     init()
   }, [feedInfo.feedType, pubkey, forceLoad])
 
-  return <NormalFeed subRequests={subRequests} isMainFeed />
+  return (
+    <NormalFeed
+      subRequests={subRequests}
+      isMainFeed
+      useProgressiveLoading
+      eosePreset="DEFAULT"
+    />
+  )
 }

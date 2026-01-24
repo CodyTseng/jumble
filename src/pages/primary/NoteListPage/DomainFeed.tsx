@@ -47,5 +47,13 @@ export default function DomainFeed() {
     init()
   }, [feedInfo, pubkey, communitySets])
 
-  return <NormalFeed subRequests={subRequests} isMainFeed showRelayCloseReason />
+  return (
+    <NormalFeed
+      subRequests={subRequests}
+      isMainFeed
+      showRelayCloseReason
+      useProgressiveLoading
+      eosePreset="DISCOVERY"
+    />
+  )
 }

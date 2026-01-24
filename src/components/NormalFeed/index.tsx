@@ -6,6 +6,7 @@ import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
+import { TEosePreset } from '@/services/eose-timeout-manager'
 import { Event } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
@@ -17,7 +18,9 @@ export default function NormalFeed({
   isMainFeed = false,
   showRelayCloseReason = false,
   filterFn,
-  disable24hMode = false
+  disable24hMode = false,
+  useProgressiveLoading = false,
+  eosePreset = 'DEFAULT'
 }: {
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
@@ -25,6 +28,10 @@ export default function NormalFeed({
   showRelayCloseReason?: boolean
   filterFn?: (event: Event) => boolean
   disable24hMode?: boolean
+  /** Enable progressive loading for faster perceived performance */
+  useProgressiveLoading?: boolean
+  /** EOSE timeout preset to use when progressive loading is enabled */
+  eosePreset?: TEosePreset
 }) {
   const { hideUntrustedNotes } = useUserTrust()
   const { showKinds } = useKindFilter()
@@ -102,6 +109,8 @@ export default function NormalFeed({
           hideUntrustedNotes={hideUntrustedNotes}
           areAlgoRelays={areAlgoRelays}
           showRelayCloseReason={showRelayCloseReason}
+          useProgressiveLoading={useProgressiveLoading}
+          eosePreset={eosePreset}
         />
       )}
     </>

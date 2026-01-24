@@ -11,6 +11,7 @@ import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
 import { ISigner, TProfile, TPublishOptions, TRelayList, TSubRequestFilter } from '@/types'
+import eoseTimeoutManager, { EOSE_PRESETS, TEosePreset } from './eose-timeout-manager'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import dayjs from 'dayjs'
@@ -326,6 +327,253 @@ class ClientService extends EventTarget {
         })
       },
       timelineKey: key
+    }
+  }
+
+  /**
+   * Progressive timeline subscription that emits events immediately as they arrive
+   * and triggers initial batch callback after a short timeout following first EOSE.
+   *
+   * This provides better perceived performance by rendering content based on
+   * fastest relays rather than waiting for N/2 threshold.
+   *
+   * @param subRequests - Array of subscription requests with relay URLs and filters
+   * @param callbacks - Event callbacks for progressive loading
+   * @param options - Configuration options including EOSE preset
+   */
+  async subscribeTimelineProgressive(
+    subRequests: { urls: string[]; filter: TSubRequestFilter }[],
+    callbacks: {
+      /** Called immediately for each event as it arrives */
+      onEvent?: (event: NEvent) => void
+      /** Called after EOSE timeout with collected events - this is when spinner should hide */
+      onInitialBatch?: (events: NEvent[]) => void
+      /** Called when all relays have completed */
+      onComplete?: (events: NEvent[]) => void
+      /** Called for new events after initial batch is emitted */
+      onNew?: (event: NEvent) => void
+      /** Called when a relay closes */
+      onClose?: (url: string, reason: string) => void
+    },
+    options: {
+      preset?: TEosePreset
+      startLogin?: () => void
+      needSort?: boolean
+    } = {}
+  ): Promise<{ closer: () => void; timelineKey: string }> {
+    const { preset = 'DEFAULT', startLogin, needSort = true } = options
+    const config = EOSE_PRESETS[preset]
+
+    const newEventIdSet = new Set<string>()
+    const requestCount = subRequests.length
+    let eventIdSet = new Set<string>()
+    let events: NEvent[] = []
+
+    const key = this.generateMultipleTimelinesKey(subRequests)
+
+    // Initialize query state for tracking
+    const queryState = eoseTimeoutManager.initQuery(key, requestCount)
+
+    // Set max wait timeout - this fires regardless of EOSE status
+    eoseTimeoutManager.setMaxWaitTimeout(key, config, () => {
+      if (!queryState.initialBatchEmitted) {
+        queryState.initialBatchEmitted = true
+        eoseTimeoutManager.markInitialBatchEmitted(key)
+        const sortedEvents = [...events].sort((a, b) => b.created_at - a.created_at)
+        callbacks.onInitialBatch?.(sortedEvents)
+      }
+    })
+
+    const subs = await Promise.all(
+      subRequests.map(({ urls, filter }) => {
+        return this._subscribeTimelineProgressive(
+          urls,
+          filter,
+          {
+            onEvent: (evt) => {
+              if (eventIdSet.has(evt.id)) return
+              eventIdSet.add(evt.id)
+              events.push(evt)
+
+              // Emit event immediately
+              callbacks.onEvent?.(evt)
+
+              // Keep events sorted and limited
+              events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
+              eventIdSet = new Set(events.map((e) => e.id))
+            },
+            onEose: () => {
+              const state = eoseTimeoutManager.recordEose(key)
+              if (!state) return
+
+              // Check if we should start the EOSE timeout
+              if (eoseTimeoutManager.shouldEmitInitialBatch(key, config)) {
+                if (state.allComplete) {
+                  // All relays done - emit immediately
+                  if (!state.initialBatchEmitted) {
+                    state.initialBatchEmitted = true
+                    eoseTimeoutManager.markInitialBatchEmitted(key)
+                    const sortedEvents = [...events].sort((a, b) => b.created_at - a.created_at)
+                    callbacks.onInitialBatch?.(sortedEvents)
+                    callbacks.onComplete?.(sortedEvents)
+                  }
+                } else if (state.eosedCount === config.minRelaysBeforeTimeout) {
+                  // First time hitting threshold - start EOSE timeout
+                  eoseTimeoutManager.setEoseTimeout(key, config, () => {
+                    if (!state.initialBatchEmitted) {
+                      state.initialBatchEmitted = true
+                      eoseTimeoutManager.markInitialBatchEmitted(key)
+                      const sortedEvents = [...events].sort((a, b) => b.created_at - a.created_at)
+                      callbacks.onInitialBatch?.(sortedEvents)
+                    }
+                  })
+                }
+              }
+
+              // Check if all complete after initial batch
+              if (state.allComplete && state.initialBatchEmitted) {
+                const sortedEvents = [...events].sort((a, b) => b.created_at - a.created_at)
+                callbacks.onComplete?.(sortedEvents)
+              }
+            },
+            onNew: (evt) => {
+              if (newEventIdSet.has(evt.id)) return
+              newEventIdSet.add(evt.id)
+              callbacks.onNew?.(evt)
+            },
+            onClose: callbacks.onClose
+          },
+          { startLogin, needSort }
+        )
+      })
+    )
+
+    this.timelines[key] = subs.map((sub) => sub.timelineKey)
+
+    return {
+      closer: () => {
+        eoseTimeoutManager.cleanupQuery(key, preset)
+        subs.forEach((sub) => sub.closer())
+      },
+      timelineKey: key
+    }
+  }
+
+  /**
+   * Internal progressive subscription for a single relay group
+   */
+  private async _subscribeTimelineProgressive(
+    urls: string[],
+    filter: TSubRequestFilter,
+    callbacks: {
+      onEvent: (evt: NEvent) => void
+      onEose: () => void
+      onNew: (evt: NEvent) => void
+      onClose?: (url: string, reason: string) => void
+    },
+    options: {
+      startLogin?: () => void
+      needSort?: boolean
+    } = {}
+  ) {
+    const { startLogin, needSort = true } = options
+    const relays = Array.from(new Set(urls))
+    const key = this.generateTimelineKey(relays, filter)
+
+    // Check for cached events
+    const timeline = this.timelines[key]
+    let since: number | undefined
+    if (timeline && !Array.isArray(timeline) && timeline.refs.length && needSort) {
+      const cachedEvents = (
+        await this.eventDataLoader.loadMany(timeline.refs.slice(0, filter.limit).map(([id]) => id))
+      ).filter((evt) => !!evt && !(evt instanceof Error)) as NEvent[]
+      if (cachedEvents.length) {
+        cachedEvents.forEach((evt) => callbacks.onEvent(evt))
+        since = cachedEvents[0].created_at + 1
+      }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const that = this
+    let events: NEvent[] = []
+    let eosedAt: number | null = null
+
+    const subCloser = this.subscribe(relays, since ? { ...filter, since } : filter, {
+      startLogin,
+      onevent: (evt: NEvent) => {
+        that.addEventToCache(evt)
+
+        if (!eosedAt) {
+          events.push(evt)
+          callbacks.onEvent(evt)
+          return
+        }
+
+        // New event after EOSE
+        if (evt.created_at > eosedAt) {
+          callbacks.onNew(evt)
+        }
+
+        // Update timeline refs
+        const timeline = that.timelines[key]
+        if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
+          return
+        }
+
+        let idx = 0
+        for (const ref of timeline.refs) {
+          if (evt.created_at > ref[1] || (evt.created_at === ref[1] && evt.id < ref[0])) {
+            break
+          }
+          if (evt.created_at === ref[1] && evt.id === ref[0]) {
+            return
+          }
+          idx++
+        }
+        if (idx >= timeline.refs.length) return
+        timeline.refs.splice(idx, 0, [evt.id, evt.created_at])
+      },
+      oneose: (eosed) => {
+        if (eosed && !eosedAt) {
+          eosedAt = dayjs().unix()
+        }
+
+        callbacks.onEose()
+
+        // Update timeline cache on final EOSE
+        if (eosed && needSort) {
+          events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
+          const timeline = that.timelines[key]
+
+          if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
+            that.timelines[key] = {
+              refs: events.map((evt) => [evt.id, evt.created_at]),
+              filter,
+              urls
+            }
+            return
+          }
+
+          const firstRefCreatedAt = timeline.refs[0][1]
+          const newRefs = events
+            .filter((evt) => evt.created_at > firstRefCreatedAt)
+            .map((evt) => [evt.id, evt.created_at] as TTimelineRef)
+
+          if (events.length >= filter.limit) {
+            timeline.refs = newRefs
+          } else {
+            timeline.refs = newRefs.concat(timeline.refs)
+          }
+        }
+      },
+      onclose: callbacks.onClose
+    })
+
+    return {
+      timelineKey: key,
+      closer: () => {
+        subCloser.close()
+      }
     }
   }
 
