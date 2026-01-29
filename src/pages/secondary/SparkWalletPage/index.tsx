@@ -16,7 +16,25 @@ import SparkPaymentsList from '@/components/SparkPaymentsList'
 import DefaultZapAmountInput from '@/pages/secondary/WalletPage/DefaultZapAmountInput'
 import DefaultZapCommentInput from '@/pages/secondary/WalletPage/DefaultZapCommentInput'
 import QuickZapSwitch from '@/pages/secondary/WalletPage/QuickZapSwitch'
-import { Eye, EyeOff, Loader2, CheckCircle, ChevronDown, ChevronUp, PlusCircle, Cloud, FolderOpen, AlertTriangle, Zap, Settings, XCircle, Key, HardDrive, Download, Pencil } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  PlusCircle,
+  Cloud,
+  FolderOpen,
+  AlertTriangle,
+  Zap,
+  Settings,
+  XCircle,
+  Key,
+  HardDrive,
+  Download,
+  Pencil
+} from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCodeStyling from 'qr-code-styling'
@@ -46,17 +64,30 @@ import {
  * - Nostr relay sync
  */
 const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
-  const { pubkey, profileEvent, publish, updateProfileEvent, nip44Encrypt, nip44Decrypt, nip04Decrypt } = useNostr()
+  const {
+    pubkey,
+    profileEvent,
+    publish,
+    updateProfileEvent,
+    nip44Encrypt,
+    nip44Decrypt,
+    nip04Decrypt
+  } = useNostr()
   const { showWalletInSidebar, updateShowWalletInSidebar } = useUserPreferences()
   const {
     connected,
     balance: providerBalance,
     lightningAddress: providerLightningAddress,
+    lightningAddressLoading,
     refreshWalletState
   } = useSparkWallet()
 
-  const { displayCurrency, setDisplayCurrency, isBalanceHidden, toggleBalanceVisibility } = useCurrencyPreferences()
-  const { fiatValue, isLoading: isLoadingConversion } = useCurrencyConversion(providerBalance || 0, displayCurrency)
+  const { displayCurrency, setDisplayCurrency, isBalanceHidden, toggleBalanceVisibility } =
+    useCurrencyPreferences()
+  const { fiatValue, isLoading: isLoadingConversion } = useCurrencyConversion(
+    providerBalance || 0,
+    displayCurrency
+  )
 
   const [apiKey] = useState(import.meta.env.VITE_BREEZ_SPARK_API_KEY || '')
   const [mnemonic, setMnemonic] = useState('')
@@ -85,7 +116,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [checkingUsername, setCheckingUsername] = useState(false)
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [showLightningAddressQR, setShowLightningAddressQR] = useState(false)
-  const [setupMode, setSetupMode] = useState<'choose' | 'create' | 'restore-file' | 'restore-relays' | 'manual'>('choose')
+  const [setupMode, setSetupMode] = useState<
+    'choose' | 'create' | 'restore-file' | 'restore-relays' | 'manual'
+  >('choose')
   const [backingUp, setBackingUp] = useState(false)
   const [revealedMnemonic, setRevealedMnemonic] = useState('')
   const [showRevealedMnemonic, setShowRevealedMnemonic] = useState(false)
@@ -96,7 +129,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [checkingBackupLocations, setCheckingBackupLocations] = useState(false)
   const [backupLocations, setBackupLocations] = useState<Record<string, boolean>>({})
   const [showBackupLocations, setShowBackupLocations] = useState(false)
-  const [backupEncryptionVersion, setBackupEncryptionVersion] = useState<'nip44' | 'nip04' | null>(null)
+  const [backupEncryptionVersion, setBackupEncryptionVersion] = useState<'nip44' | 'nip04' | null>(
+    null
+  )
   const qrCodeRef = useRef<HTMLDivElement>(null)
   const lightningAddressQRRef = useRef<HTMLDivElement>(null)
   const lightningAddressSectionRef = useRef<HTMLDivElement>(null)
@@ -163,14 +198,19 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         setPayments(paymentList)
         setPaymentsOffset(paymentList.length)
       } else {
-        setPayments(prev => [...prev, ...paymentList])
-        setPaymentsOffset(prev => prev + paymentList.length)
+        setPayments((prev) => [...prev, ...paymentList])
+        setPaymentsOffset((prev) => prev + paymentList.length)
       }
 
       // If we got fewer payments than requested, there are no more
       setHasMorePayments(paymentList.length >= limit)
 
-      console.log('[SparkWallet] Loaded payments:', paymentList.length, 'Total:', reset ? paymentList.length : payments.length + paymentList.length)
+      console.log(
+        '[SparkWallet] Loaded payments:',
+        paymentList.length,
+        'Total:',
+        reset ? paymentList.length : payments.length + paymentList.length
+      )
     } catch (error) {
       console.error('[SparkWallet] Failed to load payments:', error)
     } finally {
@@ -192,7 +232,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       setPayments(paymentList)
 
       // Find the updated payment to check if status changed
-      const updatedPayment = paymentList.find(p => p.id === paymentId)
+      const updatedPayment = paymentList.find((p) => p.id === paymentId)
       if (updatedPayment) {
         console.log('[SparkWallet] Payment refreshed:', paymentId, 'Status:', updatedPayment.status)
       }
@@ -230,7 +270,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     // Check for pending payments and poll for updates
     const checkPendingPayments = () => {
-      const hasPending = payments.some(p => p.status === 'pending')
+      const hasPending = payments.some((p) => p.status === 'pending')
       if (hasPending) {
         console.log('[SparkWallet] Pending payments detected, refreshing silently...')
         loadPayments(true, true) // Silent refresh - no loading indicator
@@ -250,7 +290,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     const unsubscribe = sparkService.onEvent(async (event) => {
       console.log('[SparkWallet] Received event:', event.type)
 
-      if (event.type === 'paymentSucceeded' || event.type === 'paymentFailed' || event.type === 'synced') {
+      if (
+        event.type === 'paymentSucceeded' ||
+        event.type === 'paymentFailed' ||
+        event.type === 'synced'
+      ) {
         // Refresh balance from provider
         try {
           await refreshWalletState()
@@ -364,7 +408,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   // Generate QR code for Lightning address
   useEffect(() => {
-    if (!showLightningAddressQR || !providerLightningAddress || !lightningAddressQRRef.current) return
+    if (!showLightningAddressQR || !providerLightningAddress || !lightningAddressQRRef.current)
+      return
 
     lightningAddressQRRef.current.innerHTML = ''
 
@@ -437,8 +482,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       console.log('[SparkWallet] Lightning address result:', addr)
       if (addr) {
         // Ask user if they want to update their Nostr profile with this Lightning address
-        if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${addr.lightningAddress}?`)) {
-          console.log('[SparkWallet] User confirmed - syncing Lightning address to Nostr profile...')
+        if (
+          publish &&
+          profileEvent &&
+          window.confirm(
+            `Update your Nostr profile with Lightning address ${addr.lightningAddress}?`
+          )
+        ) {
+          console.log(
+            '[SparkWallet] User confirmed - syncing Lightning address to Nostr profile...'
+          )
           try {
             await sparkProfileSync.syncLightningAddressToProfile(
               addr.lightningAddress,
@@ -452,11 +505,15 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             console.error('[SparkWallet] Failed to sync to Nostr profile:', syncError)
             const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
             console.error('[SparkWallet] Sync error details:', errorMessage)
-            toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually sync it in Settings.`)
+            toast.warning(
+              `Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually sync it in Settings.`
+            )
           }
         } else {
           console.log('[SparkWallet] User declined to sync Lightning address to profile')
-          toast.info(`Lightning address ${addr.lightningAddress} is active. You can sync it to your profile later in Settings.`)
+          toast.info(
+            `Lightning address ${addr.lightningAddress} is active. You can sync it to your profile later in Settings.`
+          )
         }
       } else {
         console.log('[SparkWallet] No Lightning address found for this wallet')
@@ -486,7 +543,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       return
     }
 
-    if (!confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+    if (
+      !confirm(
+        '⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?'
+      )
+    ) {
       return
     }
 
@@ -548,16 +609,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     const confirmed = confirm(
       '♻️ Remove wallet from device\n\n' +
-      (hasBackup
-        ? '✅ Your relay backup will be preserved (you synced it earlier)\n✅ You can restore it later from relays\n'
-        : '⚠️ No relay backup found - you never synced to relays\n⚠️ Make sure you have a backup file or recovery phrase!\n') +
-      '✅ Your Lightning address and funds remain safe\n' +
-      '✅ Only removes wallet from this device\n\n' +
-      (hasBackup
-        ? '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n'
-        : '⚠️ Without a relay backup, you can only restore from backup file or recovery phrase!\n\n') +
-      'Click OK to remove wallet from this device.\n' +
-      'Click Cancel to go back safely.'
+        (hasBackup
+          ? '✅ Your relay backup will be preserved (you synced it earlier)\n✅ You can restore it later from relays\n'
+          : '⚠️ No relay backup found - you never synced to relays\n⚠️ Make sure you have a backup file or recovery phrase!\n') +
+        '✅ Your Lightning address and funds remain safe\n' +
+        '✅ Only removes wallet from this device\n\n' +
+        (hasBackup
+          ? '⚠️ Make sure you can still access your Nostr profile to restore later!\n\n'
+          : '⚠️ Without a relay backup, you can only restore from backup file or recovery phrase!\n\n') +
+        'Click OK to remove wallet from this device.\n' +
+        'Click Cancel to go back safely.'
     )
 
     if (!confirmed) {
@@ -600,20 +661,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
     const confirmed = confirm(
       '⚠️ PERMANENTLY REMOVE WALLET\n\n' +
-      '🚨 This will:\n' +
-      '❌ Remove the wallet from this device\n' +
-      (hasBackup
-        ? '❌ DELETE the backup from your Nostr relays\n'
-        : '• No relay backup exists (you never synced to relays)\n') +
-      '❌ Make restoration impossible without a backup file or recovery phrase\n\n' +
-      '✅ Your Lightning address will still work\n' +
-      '✅ Your funds remain safe in your Spark wallet\n\n' +
-      '⚠️ ONLY DO THIS IF:\n' +
-      '• You have downloaded your backup file, OR\n' +
-      '• You have written down your 12-word recovery phrase, OR\n' +
-      '• You are intentionally removing this wallet completely\n\n' +
-      'Click OK to permanently remove wallet' + (hasBackup ? ' and delete relay backup' : '') + '.\n' +
-      'Click Cancel to go back safely.'
+        '🚨 This will:\n' +
+        '❌ Remove the wallet from this device\n' +
+        (hasBackup
+          ? '❌ DELETE the backup from your Nostr relays\n'
+          : '• No relay backup exists (you never synced to relays)\n') +
+        '❌ Make restoration impossible without a backup file or recovery phrase\n\n' +
+        '✅ Your Lightning address will still work\n' +
+        '✅ Your funds remain safe in your Spark wallet\n\n' +
+        '⚠️ ONLY DO THIS IF:\n' +
+        '• You have downloaded your backup file, OR\n' +
+        '• You have written down your 12-word recovery phrase, OR\n' +
+        '• You are intentionally removing this wallet completely\n\n' +
+        'Click OK to permanently remove wallet' +
+        (hasBackup ? ' and delete relay backup' : '') +
+        '.\n' +
+        'Click Cancel to go back safely.'
     )
 
     if (!confirmed) {
@@ -624,11 +687,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     if (hasBackup) {
       const doubleCheck = confirm(
         '⚠️ FINAL CONFIRMATION\n\n' +
-        'Are you absolutely sure?\n\n' +
-        'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
-        'Have you saved your backup file or recovery phrase?\n\n' +
-        'Click OK to proceed with permanent removal.\n' +
-        'Click Cancel to go back safely.'
+          'Are you absolutely sure?\n\n' +
+          'This will DELETE the relay backup and you will NOT be able to restore from relays.\n\n' +
+          'Have you saved your backup file or recovery phrase?\n\n' +
+          'Click OK to proceed with permanent removal.\n' +
+          'Click Cancel to go back safely.'
       )
 
       if (!doubleCheck) {
@@ -681,7 +744,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   const handleGenerateInvoice = async (amount: number) => {
     setLoading(true)
     try {
-      const response = await sparkService.receivePayment(amount, `Payment requested: ${amount} sats`)
+      const response = await sparkService.receivePayment(
+        amount,
+        `Payment requested: ${amount} sats`
+      )
       setInvoice(response.paymentRequest)
       setShowTopUpDialog(true)
       toast.success('Invoice generated - scan to top up')
@@ -733,7 +799,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
           // Get updated payment list to check status
           const updatedPayments = await sparkService.listPayments(0, 20)
-          const sentPayment = updatedPayments.find(p => p.id === paymentId)
+          const sentPayment = updatedPayments.find((p) => p.id === paymentId)
 
           if (sentPayment) {
             console.log(`[SparkWallet] Payment status: ${sentPayment.status}`)
@@ -807,7 +873,13 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
       toast.success(`Lightning address updated to ${result.lightningAddress}`)
 
       // Sync to Nostr profile with confirmation
-      if (publish && profileEvent && window.confirm(`Update your Nostr profile with Lightning address ${result.lightningAddress}?`)) {
+      if (
+        publish &&
+        profileEvent &&
+        window.confirm(
+          `Update your Nostr profile with Lightning address ${result.lightningAddress}?`
+        )
+      ) {
         console.log('[SparkWallet] Syncing Lightning address to Nostr profile...')
         try {
           await sparkProfileSync.syncLightningAddressToProfile(
@@ -821,7 +893,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           console.error('[SparkWallet] Failed to sync to Nostr profile:', syncError)
           const errorMessage = syncError instanceof Error ? syncError.message : String(syncError)
           console.error('[SparkWallet] Sync error details:', errorMessage)
-          toast.warning(`Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually add it to your profile later.`)
+          toast.warning(
+            `Lightning address is active, but couldn't update your Nostr profile: ${errorMessage}. You can manually add it to your profile later.`
+          )
         }
       }
     } catch (error) {
@@ -860,7 +934,12 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   const handleDeleteLightningAddress = async () => {
-    if (!window.confirm('⚠️ Delete your Lightning address from Breez?\n\nThis will unregister your Lightning address. You can register a new one later, but this username may become available to others.\n\nYour wallet and funds will not be affected.')) return
+    if (
+      !window.confirm(
+        '⚠️ Delete your Lightning address from Breez?\n\nThis will unregister your Lightning address. You can register a new one later, but this username may become available to others.\n\nYour wallet and funds will not be affected.'
+      )
+    )
+      return
 
     setLoading(true)
     try {
@@ -888,19 +967,19 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
     if (hasRelayBackup) {
       const confirmed = confirm(
         '⚠️ WARNING: Existing Wallet Backup Found\n\n' +
-        '🔍 We found a wallet backup on your Nostr relays.\n\n' +
-        '❌ Creating a NEW wallet will:\n' +
-        '• Generate a completely different wallet\n' +
-        '• Create new Lightning addresses\n' +
-        '• NOT have access to funds from your existing wallet\n\n' +
-        '⚠️ If you later sync this NEW wallet to relays:\n' +
-        '• It will OVERWRITE your existing backup\n' +
-        '• Your old wallet will be harder to recover\n\n' +
-        '💡 RECOMMENDED: Click "Restore from Relays" instead\n' +
-        'to access your existing wallet and funds.\n\n' +
-        '❓ Are you SURE you want to create a NEW wallet?\n\n' +
-        'Click OK only if you want to start fresh.\n' +
-        'Click Cancel to go back and restore your existing wallet.'
+          '🔍 We found a wallet backup on your Nostr relays.\n\n' +
+          '❌ Creating a NEW wallet will:\n' +
+          '• Generate a completely different wallet\n' +
+          '• Create new Lightning addresses\n' +
+          '• NOT have access to funds from your existing wallet\n\n' +
+          '⚠️ If you later sync this NEW wallet to relays:\n' +
+          '• It will OVERWRITE your existing backup\n' +
+          '• Your old wallet will be harder to recover\n\n' +
+          '💡 RECOMMENDED: Click "Restore from Relays" instead\n' +
+          'to access your existing wallet and funds.\n\n' +
+          '❓ Are you SURE you want to create a NEW wallet?\n\n' +
+          'Click OK only if you want to start fresh.\n' +
+          'Click Cancel to go back and restore your existing wallet.'
       )
 
       if (!confirmed) {
@@ -1135,18 +1214,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title={
-      <div className="flex items-center gap-2">
-        <span>Spark Wallet</span>
-        <span className="text-sm text-muted-foreground font-normal">powered by Breez SDK</span>
-      </div>
-    }>
+    <SecondaryPageLayout
+      ref={ref}
+      index={index}
+      title={
+        <div className="flex items-center gap-2">
+          <span>Spark Wallet</span>
+          <span className="text-sm font-normal text-muted-foreground">powered by Breez SDK</span>
+        </div>
+      }
+    >
       {/* Lightning animation overlay */}
       {showLightning && <CodepenLightning duration={1000} active={showLightning} />}
 
-      <div className="px-4 pt-3 space-y-6">
+      <div className="space-y-6 px-4 pt-3">
         {!pubkey && (
-          <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg">
+          <div className="rounded-lg border border-yellow-400 bg-yellow-100 p-4 dark:bg-yellow-900/20">
             <p className="text-sm text-yellow-900 dark:text-yellow-200">
               Please sign in with your Nostr profile first to use Spark wallet
             </p>
@@ -1154,9 +1237,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         )}
 
         {pubkey && hasSavedWallet && !connected && connecting && (
-          <div className="p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 rounded-lg space-y-2">
-            <p className="font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
-              <Loader2 className="animate-spin size-4" />
+          <div className="space-y-2 rounded-lg border border-blue-400 bg-blue-100 p-4 dark:bg-blue-900/20">
+            <p className="flex items-center gap-2 font-semibold text-blue-900 dark:text-blue-200">
+              <Loader2 className="size-4 animate-spin" />
               Connecting wallet...
             </p>
             <p className="text-sm text-blue-800 dark:text-blue-300">
@@ -1169,8 +1252,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           <div className="space-y-4">
             {setupMode === 'choose' && (
               <>
-                <div className="p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 rounded-lg">
-                  <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Set up your Spark Wallet</p>
+                <div className="rounded-lg border border-blue-400 bg-blue-100 p-4 dark:bg-blue-900/20">
+                  <p className="mb-2 font-semibold text-blue-900 dark:text-blue-200">
+                    Set up your Spark Wallet
+                  </p>
                   <p className="text-sm text-blue-800 dark:text-blue-300">
                     Choose how you'd like to set up your wallet
                   </p>
@@ -1178,21 +1263,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                 {/* Show notification if relay backup is found */}
                 {checkingRelayBackup && (
-                  <div className="p-3 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg">
-                    <p className="text-sm text-yellow-900 dark:text-yellow-200 flex items-center gap-2">
-                      <Loader2 className="animate-spin size-4" />
+                  <div className="rounded-lg border border-yellow-400 bg-yellow-100 p-3 dark:bg-yellow-900/20">
+                    <p className="flex items-center gap-2 text-sm text-yellow-900 dark:text-yellow-200">
+                      <Loader2 className="size-4 animate-spin" />
                       Checking for existing wallet backup...
                     </p>
                   </div>
                 )}
 
                 {!checkingRelayBackup && hasRelayBackup && (
-                  <div className="p-3 bg-green-100 dark:bg-green-900/20 border border-green-400 rounded-lg">
-                    <p className="font-semibold text-green-900 dark:text-green-200 mb-1 flex items-center gap-2">
+                  <div className="rounded-lg border border-green-400 bg-green-100 p-3 dark:bg-green-900/20">
+                    <p className="mb-1 flex items-center gap-2 font-semibold text-green-900 dark:text-green-200">
                       <CheckCircle className="size-4" /> Wallet Backup Found!
                     </p>
                     <p className="text-sm text-green-800 dark:text-green-300">
-                      We found an existing wallet backup on your Nostr relays. Click "Restore from Relays" below to access your wallet.
+                      We found an existing wallet backup on your Nostr relays. Click "Restore from
+                      Relays" below to access your wallet.
                     </p>
                   </div>
                 )}
@@ -1200,50 +1286,82 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                 <div className="space-y-3">
                   {/* If relay backup exists, show it first with primary styling */}
                   {hasRelayBackup && (
-                    <Button onClick={handleRestoreFromRelays} disabled={connecting} className="w-full h-auto py-3 flex-col items-start bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
-                      <span className="font-semibold flex items-center gap-2 text-white">
+                    <Button
+                      onClick={handleRestoreFromRelays}
+                      disabled={connecting}
+                      className="h-auto w-full flex-col items-start bg-green-600 py-3 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                    >
+                      <span className="flex items-center gap-2 font-semibold text-white">
                         <Cloud className="size-4" /> Restore from Relays ✓
                       </span>
-                      <span className="text-xs opacity-90 text-white">
+                      <span className="text-xs text-white opacity-90">
                         Backup found on your relays!
                       </span>
                     </Button>
                   )}
 
                   {/* Wallet setup options */}
-                  <Button onClick={handleCreateNewWallet} disabled={connecting || backingUp} variant={hasRelayBackup ? "outline" : "default"} className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold flex items-center gap-2"><PlusCircle className="size-4" /> Create New Wallet</span>
-                    <span className="text-xs opacity-80">Generates new wallet with encrypted backups</span>
+                  <Button
+                    onClick={handleCreateNewWallet}
+                    disabled={connecting || backingUp}
+                    variant={hasRelayBackup ? 'outline' : 'default'}
+                    className="h-auto w-full flex-col items-start py-3"
+                  >
+                    <span className="flex items-center gap-2 font-semibold">
+                      <PlusCircle className="size-4" /> Create New Wallet
+                    </span>
+                    <span className="text-xs opacity-80">
+                      Generates new wallet with encrypted backups
+                    </span>
                   </Button>
 
-                  <Button onClick={handleRestoreFromFile} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                    <span className="font-semibold flex items-center gap-2"><FolderOpen className="size-4" /> Restore from Backup File</span>
+                  <Button
+                    onClick={handleRestoreFromFile}
+                    disabled={connecting}
+                    variant="outline"
+                    className="h-auto w-full flex-col items-start py-3"
+                  >
+                    <span className="flex items-center gap-2 font-semibold">
+                      <FolderOpen className="size-4" /> Restore from Backup File
+                    </span>
                     <span className="text-xs opacity-80">Use your encrypted backup.json file</span>
                   </Button>
 
                   {/* Show restore from relays if no backup found */}
                   {!hasRelayBackup && (
-                    <Button onClick={handleRestoreFromRelays} disabled={connecting} variant="outline" className="w-full h-auto py-3 flex-col items-start">
-                      <span className="font-semibold flex items-center gap-2">
+                    <Button
+                      onClick={handleRestoreFromRelays}
+                      disabled={connecting}
+                      variant="outline"
+                      className="h-auto w-full flex-col items-start py-3"
+                    >
+                      <span className="flex items-center gap-2 font-semibold">
                         <Cloud className="size-4" /> Restore from Relays
                       </span>
-                      <span className="text-xs opacity-80">
-                        Fetch backup from Nostr relays
-                      </span>
+                      <span className="text-xs opacity-80">Fetch backup from Nostr relays</span>
                     </Button>
                   )}
 
-                  <Button onClick={() => setSetupMode('manual')} disabled={connecting} variant="ghost" className="w-full h-auto py-3 flex-col items-start border border-dashed">
-                    <span className="font-semibold text-yellow-600 dark:text-yellow-500 flex items-center gap-2"><AlertTriangle className="size-4" /> Manual Seed Phrase Entry</span>
-                    <span className="text-xs opacity-80">Less secure - be sure no one is watching</span>
+                  <Button
+                    onClick={() => setSetupMode('manual')}
+                    disabled={connecting}
+                    variant="ghost"
+                    className="h-auto w-full flex-col items-start border border-dashed py-3"
+                  >
+                    <span className="flex items-center gap-2 font-semibold text-yellow-600 dark:text-yellow-500">
+                      <AlertTriangle className="size-4" /> Manual Seed Phrase Entry
+                    </span>
+                    <span className="text-xs opacity-80">
+                      Less secure - be sure no one is watching
+                    </span>
                   </Button>
                 </div>
 
                 {(connecting || backingUp) && (
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 rounded-lg">
+                  <div className="rounded-lg border border-blue-400 bg-blue-100 p-3 dark:bg-blue-900/20">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm text-blue-900 dark:text-blue-200 flex items-center gap-2">
-                        <Loader2 className="animate-spin size-4" />
+                      <p className="flex items-center gap-2 text-sm text-blue-900 dark:text-blue-200">
+                        <Loader2 className="size-4 animate-spin" />
                         {backingUp
                           ? 'Creating encrypted backups...'
                           : waitingForFileSelection
@@ -1255,7 +1373,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           variant="ghost"
                           size="sm"
                           onClick={handleCancelFileSelection}
-                          className="h-auto py-1 px-2 text-xs text-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800"
+                          className="h-auto px-2 py-1 text-xs text-blue-900 hover:bg-blue-200 dark:text-blue-200 dark:hover:bg-blue-800"
                         >
                           Cancel
                         </Button>
@@ -1268,17 +1386,25 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
             {setupMode === 'manual' && (
               <>
-                <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg">
-                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1 flex items-center gap-1.5"><AlertTriangle className="size-4" /> Security Warning</p>
+                <div className="rounded-lg border border-yellow-400 bg-yellow-100 p-4 dark:bg-yellow-900/20">
+                  <p className="mb-1 flex items-center gap-1.5 font-semibold text-yellow-900 dark:text-yellow-200">
+                    <AlertTriangle className="size-4" /> Security Warning
+                  </p>
                   <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                    Entering your seed phrase into a website is not recommended. Use backup files or relay backups instead.
+                    Entering your seed phrase into a website is not recommended. Use backup files or
+                    relay backups instead.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="mnemonic">Recovery Phrase</Label>
-                    <Button variant="ghost" size="sm" onClick={() => setShowMnemonic(!showMnemonic)} className="h-auto p-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowMnemonic(!showMnemonic)}
+                      className="h-auto p-1"
+                    >
                       {showMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </Button>
                   </div>
@@ -1287,17 +1413,29 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     placeholder="Enter your 12 or 24 word recovery phrase"
                     value={mnemonic}
                     onChange={(e) => setMnemonic(e.target.value)}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-                    style={{ WebkitTextSecurity: showMnemonic ? 'none' : 'disc' } as React.CSSProperties}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    style={
+                      { WebkitTextSecurity: showMnemonic ? 'none' : 'disc' } as React.CSSProperties
+                    }
                   />
-                  <p className="text-xs text-muted-foreground">Words should be separated by spaces</p>
+                  <p className="text-xs text-muted-foreground">
+                    Words should be separated by spaces
+                  </p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button onClick={() => setSetupMode('choose')} variant="outline" className="flex-1">
+                  <Button
+                    onClick={() => setSetupMode('choose')}
+                    variant="outline"
+                    className="flex-1"
+                  >
                     Back
                   </Button>
-                  <Button onClick={() => handleConnect()} disabled={connecting || !mnemonic.trim()} className="flex-1">
+                  <Button
+                    onClick={() => handleConnect()}
+                    disabled={connecting || !mnemonic.trim()}
+                    className="flex-1"
+                  >
                     {connecting && <Loader2 className="animate-spin" />}
                     Connect
                   </Button>
@@ -1308,9 +1446,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
         ) : connected ? (
           <>
             {generatedMnemonic && (
-              <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg space-y-2">
+              <div className="space-y-2 rounded-lg border border-yellow-400 bg-yellow-100 p-4 dark:bg-yellow-900/20">
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 flex items-center gap-1.5">
+                  <p className="flex items-center gap-1.5 font-semibold text-yellow-900 dark:text-yellow-200">
                     <AlertTriangle className="size-4" /> Save Your Recovery Phrase!
                   </p>
                   <div className="flex items-center gap-1">
@@ -1320,7 +1458,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       onClick={() => {
                         // Show warning when revealing, just toggle when hiding
                         if (!showGeneratedMnemonic) {
-                          if (confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+                          if (
+                            confirm(
+                              '⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?'
+                            )
+                          ) {
                             setShowGeneratedMnemonic(true)
                           }
                         } else {
@@ -1329,13 +1471,21 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       }}
                       className="h-auto p-1"
                     >
-                      {showGeneratedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      {showGeneratedMnemonic ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        if (confirm('⚠️ Have you safely stored your recovery phrase?\n\nWithout it, you cannot recover your wallet if you lose access to this device or your backup files.\n\nMake sure you have either:\n- Written down the 12 words\n- Downloaded the encrypted backup file\n- Saved the backup to your Nostr relays')) {
+                        if (
+                          confirm(
+                            '⚠️ Have you safely stored your recovery phrase?\n\nWithout it, you cannot recover your wallet if you lose access to this device or your backup files.\n\nMake sure you have either:\n- Written down the 12 words\n- Downloaded the encrypted backup file\n- Saved the backup to your Nostr relays'
+                          )
+                        ) {
                           setGeneratedMnemonic('')
                         }
                       }}
@@ -1347,7 +1497,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </div>
                 </div>
                 {showGeneratedMnemonic ? (
-                  <p className="text-sm text-yellow-800 dark:text-yellow-300 font-mono break-words whitespace-pre-wrap">
+                  <p className="whitespace-pre-wrap break-words font-mono text-sm text-yellow-800 dark:text-yellow-300">
                     {generatedMnemonic}
                   </p>
                 ) : (
@@ -1356,7 +1506,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </p>
                 )}
                 <p className="text-xs text-yellow-700 dark:text-yellow-400">
-                  Write this down securely. You'll need it to recover your wallet if you lose your backup files.
+                  Write this down securely. You'll need it to recover your wallet if you lose your
+                  backup files.
                 </p>
               </div>
             )}
@@ -1368,11 +1519,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                 <div className="flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-auto py-1 px-2 text-xs">
+                      <Button variant="ghost" size="sm" className="h-auto px-2 py-1 text-xs">
                         {displayCurrency} <ChevronDown className="ml-1 size-3" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 max-h-[400px] overflow-y-auto">
+                    <DropdownMenuContent align="end" className="max-h-[400px] w-48 overflow-y-auto">
                       <DropdownMenuLabel>Currency</DropdownMenuLabel>
                       <DropdownMenuSeparator />
 
@@ -1382,7 +1533,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           onClick={() => setDisplayCurrency(currency)}
                           className={displayCurrency === currency ? 'bg-accent' : ''}
                         >
-                          <span className="font-mono mr-2">{currencySymbols[currency].symbol}</span>
+                          <span className="mr-2 font-mono">{currencySymbols[currency].symbol}</span>
                           {currency}
                         </DropdownMenuItem>
                       ))}
@@ -1391,7 +1542,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       <DropdownMenuLabel>Other Currencies</DropdownMenuLabel>
 
                       {Object.keys(currencySymbols)
-                        .filter(c => !popularCurrencies.includes(c))
+                        .filter((c) => !popularCurrencies.includes(c))
                         .sort()
                         .map((currency) => (
                           <DropdownMenuItem
@@ -1399,14 +1550,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                             onClick={() => setDisplayCurrency(currency)}
                             className={displayCurrency === currency ? 'bg-accent' : ''}
                           >
-                            <span className="font-mono mr-2 text-xs">{currencySymbols[currency].symbol}</span>
+                            <span className="mr-2 font-mono text-xs">
+                              {currencySymbols[currency].symbol}
+                            </span>
                             {currency}
                           </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <Button variant="ghost" size="sm" onClick={handleRefreshBalance} disabled={loading} className="h-auto py-1 px-2 text-xs">
-                    {loading ? <Loader2 className="animate-spin size-3" /> : 'Sync'}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRefreshBalance}
+                    disabled={loading}
+                    className="h-auto px-2 py-1 text-xs"
+                  >
+                    {loading ? <Loader2 className="size-3 animate-spin" /> : 'Sync'}
                   </Button>
                 </div>
               </div>
@@ -1422,7 +1581,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     ) : (
                       <>
                         {formatFiatAmount(fiatValue, displayCurrency)}
-                        <span className="text-sm text-muted-foreground ml-2">
+                        <span className="ml-2 text-sm text-muted-foreground">
                           {providerBalance.toLocaleString()} sats
                         </span>
                       </>
@@ -1436,17 +1595,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   size="sm"
                   onClick={toggleBalanceVisibility}
                   className="h-auto p-2"
-                  title={isBalanceHidden ? "Show balance" : "Hide balance"}
+                  title={isBalanceHidden ? 'Show balance' : 'Hide balance'}
                 >
                   {isBalanceHidden ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                 </Button>
               </div>
 
-              {/* Show Lightning address if registered, otherwise show link to register */}
-              {providerLightningAddress ? (
+              {/* Show Lightning address if registered, loading state, or link to register */}
+              {lightningAddressLoading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin" />
+                  Loading Lightning address...
+                </div>
+              ) : providerLightningAddress ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 text-base font-mono break-all text-foreground">
+                    <div className="flex-1 break-all font-mono text-base text-foreground">
                       {providerLightningAddress}
                     </div>
                     <Button
@@ -1456,53 +1620,86 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         navigator.clipboard.writeText(providerLightningAddress)
                         toast.success('Lightning address copied!')
                       }}
-                      className="h-auto p-1 shrink-0"
+                      className="h-auto shrink-0 p-1"
                       title="Copy Lightning address"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                       </svg>
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowLightningAddressQR(!showLightningAddressQR)}
-                      className="h-auto p-1 shrink-0"
+                      className="h-auto shrink-0 p-1"
                       title="Show QR code"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect width="5" height="5" x="3" y="3" rx="1"/>
-                        <rect width="5" height="5" x="16" y="3" rx="1"/>
-                        <rect width="5" height="5" x="3" y="16" rx="1"/>
-                        <path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
-                        <path d="M21 21v.01"/>
-                        <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
-                        <path d="M3 12h.01"/>
-                        <path d="M12 3h.01"/>
-                        <path d="M12 16v.01"/>
-                        <path d="M16 12h1"/>
-                        <path d="M21 12v.01"/>
-                        <path d="M12 21v-1"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect width="5" height="5" x="3" y="3" rx="1" />
+                        <rect width="5" height="5" x="16" y="3" rx="1" />
+                        <rect width="5" height="5" x="3" y="16" rx="1" />
+                        <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                        <path d="M21 21v.01" />
+                        <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                        <path d="M3 12h.01" />
+                        <path d="M12 3h.01" />
+                        <path d="M12 16v.01" />
+                        <path d="M16 12h1" />
+                        <path d="M21 12v.01" />
+                        <path d="M12 21v-1" />
                       </svg>
                     </Button>
                   </div>
                   {showLightningAddressQR && (
-                    <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border relative">
+                    <div className="relative rounded-lg border bg-white p-4 dark:bg-gray-900">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setShowLightningAddressQR(false)}
-                        className="absolute top-2 right-2 h-auto p-1"
+                        className="absolute right-2 top-2 h-auto p-1"
                         title="Close QR code"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"/>
-                          <line x1="6" y1="6" x2="18" y2="18"/>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
                         </svg>
                       </Button>
                       <div className="flex justify-center">
-                        <div ref={lightningAddressQRRef} className="flex items-center justify-center" />
+                        <div
+                          ref={lightningAddressQRRef}
+                          className="flex items-center justify-center"
+                        />
                       </div>
                     </div>
                   )}
@@ -1521,11 +1718,13 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         })
                       }, 100)
                     }}
-                    className="h-auto p-0 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    className="h-auto p-0 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   >
-                    <span className="flex items-center gap-1.5"><Zap className="size-3.5" /> Get a Lightning Address</span>
+                    <span className="flex items-center gap-1.5">
+                      <Zap className="size-3.5" /> Get a Lightning Address
+                    </span>
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Set up a Lightning address to receive payments easily
                   </p>
                 </div>
@@ -1533,17 +1732,23 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             </div>
 
             {/* Tabbed Interface */}
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'payments' | 'topup')} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as 'payments' | 'topup')}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="payments">Payments</TabsTrigger>
                 <TabsTrigger value="topup">Top Up</TabsTrigger>
               </TabsList>
 
               {/* Payments Tab */}
-              <TabsContent value="payments" className="space-y-4 mt-4">
+              <TabsContent value="payments" className="mt-4 space-y-4">
                 {/* Send Payment */}
                 <div className="space-y-2">
-                  <Label htmlFor="paymentRequest" className="text-sm">Send Payment</Label>
+                  <Label htmlFor="paymentRequest" className="text-sm">
+                    Send Payment
+                  </Label>
                   <Input
                     id="paymentRequest"
                     placeholder="Paste invoice or Lightning address"
@@ -1568,14 +1773,18 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     </div>
                   )}
 
-                  <Button onClick={handleSendPayment} disabled={loading || !paymentRequest} className="w-full">
+                  <Button
+                    onClick={handleSendPayment}
+                    disabled={loading || !paymentRequest}
+                    className="w-full"
+                  >
                     {loading && <Loader2 className="animate-spin" />}
                     Send Payment
                   </Button>
                 </div>
 
                 {/* Payment History */}
-                <div className="space-y-2 pt-2 border-t">
+                <div className="space-y-2 border-t pt-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm">Recent Payments</Label>
                     <Button
@@ -1583,9 +1792,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       size="sm"
                       onClick={() => loadPayments(true)}
                       disabled={loadingPayments}
-                      className="h-auto py-1 px-2 text-xs"
+                      className="h-auto px-2 py-1 text-xs"
                     >
-                      {loadingPayments ? <Loader2 className="animate-spin size-3" /> : 'Refresh'}
+                      {loadingPayments ? <Loader2 className="size-3 animate-spin" /> : 'Refresh'}
                     </Button>
                   </div>
                   <SparkPaymentsList
@@ -1610,13 +1819,13 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   {/* Loading indicator for load more */}
                   {loadingPayments && payments.length > 0 && (
                     <div className="flex justify-center py-2">
-                      <Loader2 className="animate-spin size-4 text-muted-foreground" />
+                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
                     </div>
                   )}
 
                   {/* End of list indicator */}
                   {!hasMorePayments && payments.length > 0 && (
-                    <p className="text-center text-xs text-muted-foreground py-2">
+                    <p className="py-2 text-center text-xs text-muted-foreground">
                       No more payments
                     </p>
                   )}
@@ -1624,7 +1833,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
               </TabsContent>
 
               {/* Top-Up Tab */}
-              <TabsContent value="topup" className="space-y-4 mt-4">
+              <TabsContent value="topup" className="mt-4 space-y-4">
                 {/* Wallet Top-Up Section */}
                 <div className="space-y-4">
                   {!showTopUpDialog && (
@@ -1632,7 +1841,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       <div className="flex items-center justify-between">
                         <Label className="text-lg font-semibold">Choose an amount to deposit</Label>
                         {(providerBalance || 0) + topUpAmount > 100000 && (
-                          <span className="text-xs text-amber-600 dark:text-amber-500 flex items-center gap-1">
+                          <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-500">
                             <AlertTriangle className="size-3" /> Hot wallet
                           </span>
                         )}
@@ -1653,10 +1862,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                               size="lg"
                               onClick={() => setTopUpAmount(amount)}
                               disabled={wouldExceedLimit}
-                              className="h-auto py-4 flex flex-col items-start gap-1"
-                              title={wouldExceedLimit ? `Would exceed 500k limit (current: ${currentBalance.toLocaleString()})` : undefined}
+                              className="flex h-auto flex-col items-start gap-1 py-4"
+                              title={
+                                wouldExceedLimit
+                                  ? `Would exceed 500k limit (current: ${currentBalance.toLocaleString()})`
+                                  : undefined
+                              }
                             >
-                              <span className={`text-lg font-bold ${wouldExceedLimit ? 'text-muted-foreground' : ''}`}>
+                              <span
+                                className={`text-lg font-bold ${wouldExceedLimit ? 'text-muted-foreground' : ''}`}
+                              >
                                 {amount.toLocaleString()} sats
                               </span>
                               <span className="text-xs text-muted-foreground">
@@ -1675,7 +1890,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         variant={showCustomInput ? 'default' : 'outline'}
                         size="lg"
                         onClick={() => setShowCustomInput(!showCustomInput)}
-                        className="w-full h-auto py-4 flex items-center justify-between"
+                        className="flex h-auto w-full items-center justify-between py-4"
                       >
                         <span className="text-lg">Custom</span>
                         <Pencil className="size-4 text-muted-foreground" />
@@ -1683,7 +1898,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                       {/* Custom Amount Input - Inline */}
                       {showCustomInput && (
-                        <div className="p-4 bg-muted/50 rounded-lg space-y-2 animate-in slide-in-from-top-2">
+                        <div className="space-y-2 rounded-lg bg-muted/50 p-4 animate-in slide-in-from-top-2">
                           <Label className="text-sm">Enter custom amount</Label>
                           <div className="flex gap-2">
                             <Input
@@ -1717,33 +1932,39 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                       {/* Safety Warning */}
                       {(providerBalance || 0) + topUpAmount > 100000 && (
-                        <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-700 rounded text-xs">
-                          <p className="font-semibold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                        <div className="rounded border border-amber-300 bg-amber-50 p-3 text-xs dark:border-amber-700 dark:bg-amber-950/20">
+                          <p className="flex items-center gap-1.5 font-semibold text-amber-900 dark:text-amber-200">
                             <AlertTriangle className="size-3.5" /> Hot Wallet Warning
                           </p>
-                          <p className="text-amber-800 dark:text-amber-300 mt-1">
-                            Hot wallets should not contain large balances. Consider keeping less than 100k sats for daily use.
+                          <p className="mt-1 text-amber-800 dark:text-amber-300">
+                            Hot wallets should not contain large balances. Consider keeping less
+                            than 100k sats for daily use.
                           </p>
                         </div>
                       )}
 
                       {/* Balance Limit Warning */}
                       {(providerBalance || 0) + topUpAmount > 500000 && (
-                        <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-300 dark:border-red-700 rounded text-xs">
+                        <div className="rounded border border-red-300 bg-red-50 p-3 text-xs dark:border-red-700 dark:bg-red-950/20">
                           <p className="font-semibold text-red-900 dark:text-red-200">
                             Maximum Balance Exceeded
                           </p>
-                          <p className="text-red-800 dark:text-red-300 mt-1">
-                            Total balance would be {((providerBalance || 0) + topUpAmount).toLocaleString()} sats.
-                            Maximum allowed is 500,000 sats.
+                          <p className="mt-1 text-red-800 dark:text-red-300">
+                            Total balance would be{' '}
+                            {((providerBalance || 0) + topUpAmount).toLocaleString()} sats. Maximum
+                            allowed is 500,000 sats.
                           </p>
                         </div>
                       )}
 
                       <Button
                         onClick={() => handleGenerateInvoice(topUpAmount)}
-                        disabled={loading || topUpAmount === 0 || (providerBalance || 0) + topUpAmount > 500000}
-                        className="w-full h-12 text-base"
+                        disabled={
+                          loading ||
+                          topUpAmount === 0 ||
+                          (providerBalance || 0) + topUpAmount > 500000
+                        }
+                        className="h-12 w-full text-base"
                         size="lg"
                       >
                         {loading && <Loader2 className="animate-spin" />}
@@ -1754,7 +1975,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
 
                   {/* Invoice Display Dialog */}
                   {showTopUpDialog && invoice && (
-                    <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-700 rounded">
+                    <div className="space-y-3 rounded border border-blue-400 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-900/20">
                       <div className="flex items-center justify-between">
                         <Label className="font-semibold text-blue-900 dark:text-blue-200">
                           Invoice Generated
@@ -1778,18 +1999,20 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       )}
 
                       {/* QR Code or Success Animation */}
-                      <div className={`flex justify-center p-4 rounded-lg overflow-hidden min-h-[280px] relative ${showSuccess ? 'bg-transparent' : 'bg-white'}`}>
+                      <div
+                        className={`relative flex min-h-[280px] justify-center overflow-hidden rounded-lg p-4 ${showSuccess ? 'bg-transparent' : 'bg-white'}`}
+                      >
                         {/* QR Code Container - hidden when success is showing */}
                         <div
                           ref={qrCodeRef}
-                          className={`flex items-center justify-center max-w-full ${showSuccess ? 'hidden' : ''}`}
+                          className={`flex max-w-full items-center justify-center ${showSuccess ? 'hidden' : ''}`}
                         />
 
                         {/* Success Animation - shown when payment succeeds */}
                         {showSuccess && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-green-500 rounded-full p-8 animate-in fade-in zoom-in duration-300">
-                              <CheckCircle className="w-32 h-32 text-white" strokeWidth={2} />
+                            <div className="rounded-full bg-green-500 p-8 duration-300 animate-in fade-in zoom-in">
+                              <CheckCircle className="h-32 w-32 text-white" strokeWidth={2} />
                             </div>
                           </div>
                         )}
@@ -1799,8 +2022,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       {!showSuccess && (
                         <>
                           <div className="space-y-2">
-                            <Label className="text-xs text-blue-900 dark:text-blue-200">Lightning Invoice</Label>
-                            <div className="p-2 bg-white dark:bg-gray-900 rounded text-xs font-mono break-all border max-h-24 overflow-y-auto">
+                            <Label className="text-xs text-blue-900 dark:text-blue-200">
+                              Lightning Invoice
+                            </Label>
+                            <div className="max-h-24 overflow-y-auto break-all rounded border bg-white p-2 font-mono text-xs dark:bg-gray-900">
                               {invoice}
                             </div>
                           </div>
@@ -1825,15 +2050,21 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
             </Tabs>
 
             {/* Collapsible Settings Section */}
-            <div className="border-t pt-4 space-y-3">
+            <div className="space-y-3 border-t pt-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowSettings(!showSettings)}
-                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
+                className="flex w-full items-center justify-between text-muted-foreground hover:text-foreground"
               >
-                <span className="text-sm flex items-center gap-1.5"><Settings className="size-4" /> Wallet Settings</span>
-                {showSettings ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                <span className="flex items-center gap-1.5 text-sm">
+                  <Settings className="size-4" /> Wallet Settings
+                </span>
+                {showSettings ? (
+                  <ChevronUp className="size-4" />
+                ) : (
+                  <ChevronDown className="size-4" />
+                )}
               </Button>
 
               {showSettings && (
@@ -1843,9 +2074,14 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <Label className="text-sm">Lightning Address</Label>
                     {!editingLightningAddress ? (
                       <div className="flex items-center gap-2">
-                        {providerLightningAddress ? (
+                        {lightningAddressLoading ? (
+                          <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+                            <Loader2 className="size-4 animate-spin" />
+                            Loading...
+                          </div>
+                        ) : providerLightningAddress ? (
                           <>
-                            <div className="flex-1 p-2 bg-muted rounded text-sm font-mono">
+                            <div className="flex-1 rounded bg-muted p-2 font-mono text-sm">
                               {providerLightningAddress}
                             </div>
                             <Button
@@ -1881,9 +2117,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                             variant="outline"
                             size="sm"
                             onClick={() => setEditingLightningAddress(true)}
-                            className="w-full relative bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-300 dark:border-blue-700 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 before:absolute before:inset-0 before:rounded-md before:animate-pulse before:border-2 before:border-blue-400 dark:before:border-blue-500 before:pointer-events-none"
+                            className="relative w-full border-blue-300 bg-gradient-to-r from-blue-50 to-purple-50 before:pointer-events-none before:absolute before:inset-0 before:animate-pulse before:rounded-md before:border-2 before:border-blue-400 hover:from-blue-100 hover:to-purple-100 dark:border-blue-700 dark:from-blue-950/20 dark:to-purple-950/20 dark:before:border-blue-500 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30"
                           >
-                            <span className="flex items-center gap-1.5"><Zap className="size-4" /> Get Lightning Address</span>
+                            <span className="flex items-center gap-1.5">
+                              <Zap className="size-4" /> Get Lightning Address
+                            </span>
                           </Button>
                         )}
                       </div>
@@ -1895,7 +2133,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                             value={newLightningUsername}
                             onChange={(e) => {
                               // Only allow valid LUD-16 username characters: lowercase letters, numbers, hyphen, underscore, period
-                              const sanitized = e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, '')
+                              const sanitized = e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9._-]/g, '')
                               setNewLightningUsername(sanitized)
                             }}
                             className="flex-1"
@@ -1903,7 +2143,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           <span className="text-sm text-muted-foreground">@breez.tips</span>
                         </div>
                         {checkingUsername && (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <p className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Loader2 className="size-3 animate-spin" />
                             Checking availability...
                           </p>
@@ -1921,7 +2161,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                             disabled={!usernameAvailable || loading}
                             className="flex-1"
                           >
-                            {loading ? <Loader2 className="animate-spin size-4" /> : 'Save'}
+                            {loading ? <Loader2 className="size-4 animate-spin" /> : 'Save'}
                           </Button>
                           <Button
                             variant="outline"
@@ -1940,7 +2180,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </div>
 
                   {/* Zap Settings */}
-                  <div className="space-y-4 pt-2 border-t">
+                  <div className="space-y-4 border-t pt-2">
                     <Label className="text-sm">Zap Settings</Label>
                     <DefaultZapAmountInput />
                     <DefaultZapCommentInput />
@@ -1948,9 +2188,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </div>
 
                   {/* Wallet Sidebar Settings */}
-                  <div className="space-y-2 pt-2 border-t">
+                  <div className="space-y-2 border-t pt-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="wallet-sidebar" className="text-sm cursor-pointer">Show Wallet in Sidebar</Label>
+                      <Label htmlFor="wallet-sidebar" className="cursor-pointer text-sm">
+                        Show Wallet in Sidebar
+                      </Label>
                       <Switch
                         id="wallet-sidebar"
                         checked={showWalletInSidebar}
@@ -1963,20 +2205,16 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </div>
 
                   {/* Nostr Wallet Connect */}
-                  <div className="space-y-2 pt-2 border-t">
+                  <div className="space-y-2 border-t pt-2">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Nostr Wallet Connect</Label>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium">
+                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                         Coming Soon
                       </span>
                     </div>
-                    <div className="p-4 bg-muted/50 rounded-lg border border-dashed space-y-3">
+                    <div className="space-y-3 rounded-lg border border-dashed bg-muted/50 p-4">
                       <div className="flex items-center gap-3">
-                        <img
-                          src="/nwc-icon.svg"
-                          alt="NWC"
-                          className="size-8"
-                        />
+                        <img src="/nwc-icon.svg" alt="NWC" className="size-8" />
                         <div className="flex-1">
                           <p className="text-sm font-medium">Create Wallet Connections</p>
                           <p className="text-xs text-muted-foreground">
@@ -1988,7 +2226,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         href="https://nwc.dev/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline dark:text-blue-400"
                       >
                         Learn more about Nostr Wallet Connect →
                       </a>
@@ -1996,8 +2234,10 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                   </div>
 
                   {/* Backup & Remove Wallet */}
-                  <div className="space-y-2 pt-2 border-t">
-                    <Label className="text-xs text-muted-foreground">Wallet Backup & Recovery</Label>
+                  <div className="space-y-2 border-t pt-2">
+                    <Label className="text-xs text-muted-foreground">
+                      Wallet Backup & Recovery
+                    </Label>
 
                     <Button
                       onClick={handleRevealRecoveryPhrase}
@@ -2006,16 +2246,19 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       size="sm"
                       disabled={loading}
                     >
-                      <span className="flex items-center gap-1.5"><Key className="size-4" /> Reveal Recovery Phrase</span>
+                      <span className="flex items-center gap-1.5">
+                        <Key className="size-4" /> Reveal Recovery Phrase
+                      </span>
                     </Button>
                     <p className="text-xs text-muted-foreground">
-                      Show your 12-word recovery phrase. Write it down and store it securely offline.
+                      Show your 12-word recovery phrase. Write it down and store it securely
+                      offline.
                     </p>
 
                     {revealedMnemonic && (
-                      <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 rounded-lg space-y-2">
+                      <div className="space-y-2 rounded-lg border border-yellow-400 bg-yellow-100 p-4 dark:bg-yellow-900/20">
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-yellow-900 dark:text-yellow-200 flex items-center gap-1.5">
+                          <p className="flex items-center gap-1.5 font-semibold text-yellow-900 dark:text-yellow-200">
                             <AlertTriangle className="size-4" /> Your Recovery Phrase
                           </p>
                           <div className="flex items-center gap-1">
@@ -2025,7 +2268,11 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                               onClick={() => {
                                 // Show warning when revealing, just toggle when hiding
                                 if (!showRevealedMnemonic) {
-                                  if (confirm('⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?')) {
+                                  if (
+                                    confirm(
+                                      '⚠️ Warning: Your recovery phrase gives full access to your wallet!\n\nOnly reveal this in a secure, private location.\n\nAnyone with these 12 words can access your funds.\n\nDo you want to continue?'
+                                    )
+                                  ) {
                                     setShowRevealedMnemonic(true)
                                   }
                                 } else {
@@ -2034,13 +2281,21 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                               }}
                               className="h-auto p-1"
                             >
-                              {showRevealedMnemonic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                              {showRevealedMnemonic ? (
+                                <EyeOff className="size-4" />
+                              ) : (
+                                <Eye className="size-4" />
+                              )}
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => {
-                                if (confirm('⚠️ Hide recovery phrase?\n\nMake sure you have written it down or stored it safely before hiding.')) {
+                                if (
+                                  confirm(
+                                    '⚠️ Hide recovery phrase?\n\nMake sure you have written it down or stored it safely before hiding.'
+                                  )
+                                ) {
                                   setRevealedMnemonic('')
                                   setShowRevealedMnemonic(false)
                                 }
@@ -2053,7 +2308,7 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           </div>
                         </div>
                         {showRevealedMnemonic ? (
-                          <p className="text-sm text-yellow-800 dark:text-yellow-300 font-mono break-words whitespace-pre-wrap">
+                          <p className="whitespace-pre-wrap break-words font-mono text-sm text-yellow-800 dark:text-yellow-300">
                             {revealedMnemonic}
                           </p>
                         ) : (
@@ -2062,7 +2317,8 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                           </p>
                         )}
                         <p className="text-xs text-yellow-700 dark:text-yellow-400">
-                          Write this down and store it securely. Anyone with these words can access your funds.
+                          Write this down and store it securely. Anyone with these words can access
+                          your funds.
                         </p>
                       </div>
                     )}
@@ -2074,7 +2330,9 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       size="sm"
                       disabled={loading}
                     >
-                      <span className="flex items-center gap-1.5"><Download className="size-4" /> Download Encrypted Backup File</span>
+                      <span className="flex items-center gap-1.5">
+                        <Download className="size-4" /> Download Encrypted Backup File
+                      </span>
                     </Button>
                     <p className="text-xs text-muted-foreground">
                       Download an encrypted backup file. Easier to store than writing down 12 words.
@@ -2084,16 +2342,22 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <div className="space-y-2 pt-2">
                       {/* Encryption Version Indicator */}
                       {backupEncryptionVersion && (
-                        <div className={`flex items-center gap-2 text-xs p-2 rounded ${
-                          backupEncryptionVersion === 'nip44'
-                            ? 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400'
-                            : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400'
-                        }`}>
+                        <div
+                          className={`flex items-center gap-2 rounded p-2 text-xs ${
+                            backupEncryptionVersion === 'nip44'
+                              ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
+                          }`}
+                        >
                           <span className="font-medium">
-                            {backupEncryptionVersion === 'nip44' ? '✓ NIP-44 Encryption' : '⚠️ NIP-04 (Legacy)'}
+                            {backupEncryptionVersion === 'nip44'
+                              ? '✓ NIP-44 Encryption'
+                              : '⚠️ NIP-04 (Legacy)'}
                           </span>
                           {backupEncryptionVersion === 'nip04' && (
-                            <span className="text-xs opacity-80">Will auto-upgrade on next load</span>
+                            <span className="text-xs opacity-80">
+                              Will auto-upgrade on next load
+                            </span>
                           )}
                         </div>
                       )}
@@ -2107,15 +2371,18 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                       >
                         {resyncingBackup ? (
                           <>
-                            <Loader2 className="animate-spin size-4 mr-2" />
+                            <Loader2 className="mr-2 size-4 animate-spin" />
                             Syncing...
                           </>
                         ) : (
-                          <span className="flex items-center gap-1.5"><Cloud className="size-4" /> Sync Backup to Relays</span>
+                          <span className="flex items-center gap-1.5">
+                            <Cloud className="size-4" /> Sync Backup to Relays
+                          </span>
                         )}
                       </Button>
                       <p className="text-xs text-muted-foreground">
-                        Optional: Upload encrypted backup to Nostr relays for multi-device access. Syncs to your current relay list.
+                        Optional: Upload encrypted backup to Nostr relays for multi-device access.
+                        Syncs to your current relay list.
                       </p>
 
                       {/* Expandable backup locations section */}
@@ -2130,51 +2397,56 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                               setShowBackupLocations(false)
                             }
                           }}
-                          className="w-full flex items-center justify-between text-xs text-muted-foreground hover:text-foreground"
+                          className="flex w-full items-center justify-between text-xs text-muted-foreground hover:text-foreground"
                           disabled={checkingBackupLocations}
                         >
                           <span>
                             {checkingBackupLocations ? (
                               <>
-                                <Loader2 className="inline-block animate-spin size-3 mr-1" />
+                                <Loader2 className="mr-1 inline-block size-3 animate-spin" />
                                 Checking backup locations...
                               </>
                             ) : (
                               'Show which relays have backup'
                             )}
                           </span>
-                          {!checkingBackupLocations && (
-                            showBackupLocations ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />
-                          )}
+                          {!checkingBackupLocations &&
+                            (showBackupLocations ? (
+                              <ChevronUp className="size-3" />
+                            ) : (
+                              <ChevronDown className="size-3" />
+                            ))}
                         </Button>
 
                         {showBackupLocations && Object.keys(backupLocations).length > 0 && (
-                          <div className="mt-2 p-3 bg-muted/50 rounded-lg border space-y-2">
-                            <p className="text-xs font-medium text-muted-foreground mb-2">Backup Status by Relay:</p>
-                            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                          <div className="mt-2 space-y-2 rounded-lg border bg-muted/50 p-3">
+                            <p className="mb-2 text-xs font-medium text-muted-foreground">
+                              Backup Status by Relay:
+                            </p>
+                            <div className="max-h-48 space-y-1.5 overflow-y-auto">
                               {Object.entries(backupLocations).map(([relayUrl, hasBackup]) => (
-                                <div
-                                  key={relayUrl}
-                                  className="flex items-start gap-2 text-xs"
-                                >
-                                  <span className={`mt-0.5 ${hasBackup ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                <div key={relayUrl} className="flex items-start gap-2 text-xs">
+                                  <span
+                                    className={`mt-0.5 ${hasBackup ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                                  >
                                     {hasBackup ? '✓' : '✗'}
                                   </span>
-                                  <span className="flex-1 font-mono text-[10px] break-all leading-relaxed">
+                                  <span className="flex-1 break-all font-mono text-[10px] leading-relaxed">
                                     {relayUrl}
                                   </span>
                                 </div>
                               ))}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
-                              {Object.values(backupLocations).filter(Boolean).length} of {Object.keys(backupLocations).length} relays have your backup
+                            <p className="mt-2 border-t pt-2 text-xs text-muted-foreground">
+                              {Object.values(backupLocations).filter(Boolean).length} of{' '}
+                              {Object.keys(backupLocations).length} relays have your backup
                             </p>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t space-y-3">
+                    <div className="space-y-3 border-t pt-2">
                       <Label className="text-xs text-muted-foreground">Remove Wallet</Label>
 
                       {/* Option 1: Keep relay backup (safer) */}
@@ -2182,14 +2454,17 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         <Button
                           onClick={handleRemoveWalletKeepBackup}
                           variant="outline"
-                          className="w-full text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 border-orange-300 dark:border-orange-700"
+                          className="w-full border-orange-300 text-orange-600 hover:text-orange-700 dark:border-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                           size="sm"
                           disabled={loading}
                         >
-                          <span className="flex items-center gap-1.5"><XCircle className="size-4" /> Remove from Device</span>
+                          <span className="flex items-center gap-1.5">
+                            <XCircle className="size-4" /> Remove from Device
+                          </span>
                         </Button>
                         <p className="text-xs text-muted-foreground">
-                          Removes wallet from this device only. If you synced to relays, that backup will be preserved.
+                          Removes wallet from this device only. If you synced to relays, that backup
+                          will be preserved.
                         </p>
                       </div>
 
@@ -2198,14 +2473,17 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
                         <Button
                           onClick={handleRemoveWalletDeleteBackup}
                           variant="outline"
-                          className="w-full text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border-red-400 dark:border-red-600"
+                          className="w-full border-red-400 text-red-600 hover:text-red-700 dark:border-red-600 dark:text-red-400 dark:hover:text-red-300"
                           size="sm"
                           disabled={loading}
                         >
-                          <span className="flex items-center gap-1.5"><AlertTriangle className="size-4" /> Remove & Delete Relay Backup</span>
+                          <span className="flex items-center gap-1.5">
+                            <AlertTriangle className="size-4" /> Remove & Delete Relay Backup
+                          </span>
                         </Button>
                         <p className="text-xs text-red-600 dark:text-red-400">
-                          <strong>Caution:</strong> If you synced to relays, this deletes that backup. You can only restore from backup file or recovery phrase.
+                          <strong>Caution:</strong> If you synced to relays, this deletes that
+                          backup. You can only restore from backup file or recovery phrase.
                         </p>
                       </div>
                     </div>
@@ -2216,11 +2494,19 @@ const SparkWalletPage = forwardRef(({ index }: { index?: number }, ref) => {
           </>
         ) : null}
 
-        <div className="text-xs text-muted-foreground space-y-1 pt-4 border-t">
-          <p className="flex items-center gap-1.5"><Zap className="size-3" /> Breez SDK + Spark wallet integration</p>
-          <p className="flex items-center gap-1.5"><Key className="size-3" /> Recovery phrase encrypted with XChaCha20-Poly1305</p>
-          <p className="flex items-center gap-1.5"><HardDrive className="size-3" /> Saved locally on this device</p>
-          <p className="flex items-center gap-1.5"><AlertTriangle className="size-3" /> Experimental - do not use with large amounts!</p>
+        <div className="space-y-1 border-t pt-4 text-xs text-muted-foreground">
+          <p className="flex items-center gap-1.5">
+            <Zap className="size-3" /> Breez SDK + Spark wallet integration
+          </p>
+          <p className="flex items-center gap-1.5">
+            <Key className="size-3" /> Recovery phrase encrypted with XChaCha20-Poly1305
+          </p>
+          <p className="flex items-center gap-1.5">
+            <HardDrive className="size-3" /> Saved locally on this device
+          </p>
+          <p className="flex items-center gap-1.5">
+            <AlertTriangle className="size-3" /> Experimental - do not use with large amounts!
+          </p>
         </div>
       </div>
     </SecondaryPageLayout>

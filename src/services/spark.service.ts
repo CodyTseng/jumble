@@ -84,7 +84,9 @@ class SparkService {
     }
 
     if (this.connecting) {
-      console.warn('[SparkService] Connection already in progress, but no SDK instance. Resetting...')
+      console.warn(
+        '[SparkService] Connection already in progress, but no SDK instance. Resetting...'
+      )
       // Reset the flag if we're stuck (e.g., from a previous failed attempt)
       this.connecting = false
     }
@@ -122,9 +124,7 @@ class SparkService {
         seed = { type: 'mnemonic', mnemonic: cleanMnemonic }
         this.currentMnemonic = cleanMnemonic
       } else {
-        throw new Error(
-          'Mnemonic is required. Please provide a 12 or 24 word BIP39 mnemonic.'
-        )
+        throw new Error('Mnemonic is required. Please provide a 12 or 24 word BIP39 mnemonic.')
       }
 
       // Prepare connect request
@@ -145,16 +145,18 @@ class SparkService {
       // Set up event listener
       await this.setupEventListener()
 
-      // Initial sync
-      console.log('[SparkService] Starting initial wallet sync...')
-      await this.syncWallet()
+      // Start background sync (non-blocking for fast UI)
+      this.syncInBackground()
 
       console.log('[SparkService] ✅ Connection complete!')
       return { sdk: this.sdk, mnemonic: this.currentMnemonic }
     } catch (error) {
       console.error('[SparkService] ❌ Connection failed with error:')
       console.error('[SparkService] Error type:', error?.constructor?.name)
-      console.error('[SparkService] Error message:', error instanceof Error ? error.message : String(error))
+      console.error(
+        '[SparkService] Error message:',
+        error instanceof Error ? error.message : String(error)
+      )
       console.error('[SparkService] Full error:', error)
 
       // Re-throw with more context
@@ -167,7 +169,6 @@ class SparkService {
       this.connecting = false
     }
   }
-
 
   /**
    * Disconnect and cleanup
@@ -268,6 +269,32 @@ class SparkService {
   }
 
   /**
+   * Start background sync without blocking
+   * Used during initialization for fast UI loading
+   */
+  private syncInBackground(): void {
+    if (!this.sdk) return
+
+    console.log('[SparkService] Starting background sync...')
+
+    const syncTimeout = setTimeout(() => {
+      console.warn('[SparkService] Sync timeout - sync taking longer than 20s')
+    }, 20000)
+
+    this.sdk
+      .syncWallet({})
+      .then(() => {
+        console.log('[SparkService] Background sync completed')
+      })
+      .catch((error) => {
+        console.warn('[SparkService] Background sync failed:', error)
+      })
+      .finally(() => {
+        clearTimeout(syncTimeout)
+      })
+  }
+
+  /**
    * Get wallet info (balance, etc.)
    */
   async getInfo(ensureSynced = true): Promise<GetInfoResponse> {
@@ -317,10 +344,7 @@ class SparkService {
    * @param paymentRequest - Bolt11 invoice or Lightning address
    * @param amountSats - Amount (required for Lightning addresses and zero-amount invoices)
    */
-  async sendPayment(
-    paymentRequest: string,
-    amountSats?: number
-  ): Promise<SendPaymentResponse> {
+  async sendPayment(paymentRequest: string, amountSats?: number): Promise<SendPaymentResponse> {
     if (!this.sdk) throw new Error('SDK not connected')
 
     try {
@@ -426,7 +450,10 @@ class SparkService {
    * Register a Lightning address
    * Format: username@domain
    */
-  async registerLightningAddress(username: string, description?: string): Promise<LightningAddressInfo> {
+  async registerLightningAddress(
+    username: string,
+    description?: string
+  ): Promise<LightningAddressInfo> {
     if (!this.sdk) throw new Error('SDK not connected')
 
     try {
@@ -547,7 +574,10 @@ class SparkService {
       const existing = await this.getLightningAddress()
 
       if (existing) {
-        console.log('[SparkService] Deleting existing Lightning address:', existing.lightningAddress)
+        console.log(
+          '[SparkService] Deleting existing Lightning address:',
+          existing.lightningAddress
+        )
         await this.deleteLightningAddress()
       }
 

@@ -10,6 +10,7 @@ type TSparkWalletContext = {
   connecting: boolean
   balance: number | null
   lightningAddress: string | null
+  lightningAddressLoading: boolean
   refreshWalletState: () => Promise<void>
   deleteWallet: () => Promise<void>
 }
@@ -24,12 +25,13 @@ export const useSparkWallet = () => {
   return context
 }
 
-export function SparkWalletProvider({ children }: { children: React.ReactNode}) {
+export function SparkWalletProvider({ children }: { children: React.ReactNode }) {
   const { pubkey, publish } = useNostr()
   const [connected, setConnected] = useState(false)
   const [connecting, setConnecting] = useState(false)
   const [balance, setBalance] = useState<number | null>(null)
   const [lightningAddress, setLightningAddress] = useState<string | null>(null)
+  const [lightningAddressLoading, setLightningAddressLoading] = useState(false)
 
   // Auto-connect Spark wallet when user is logged in
   useEffect(() => {
@@ -112,26 +114,38 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
           return
         }
 
-        // Connect to Spark (this will initialize WASM automatically if needed)
+        // Connect to Spark (returns quickly, sync runs in background)
         console.log('[SparkWalletProvider] Connecting to Spark SDK...')
         await sparkService.connect(apiKey, mnemonic, 'mainnet')
         console.log('[SparkWalletProvider] ✅ Spark SDK connected')
 
         setConnected(true)
 
-        // Get wallet info
-        console.log('[SparkWalletProvider] Getting wallet info...')
-        const info = await sparkService.getInfo(true)
-        setBalance(info.balanceSats)
+        // Get cached wallet info immediately (no sync wait)
+        console.log('[SparkWalletProvider] Getting cached wallet info...')
+        sparkService
+          .getInfo(false)
+          .then((info) => {
+            setBalance(info.balanceSats)
+            console.log('[SparkWalletProvider] Cached balance loaded:', info.balanceSats, 'sats')
+          })
+          .catch((err) => console.error('[SparkWalletProvider] Failed to get cached info:', err))
 
-        // Get Lightning address
-        console.log('[SparkWalletProvider] Getting Lightning address...')
-        const address = await sparkService.getLightningAddress()
-        setLightningAddress(address?.lightningAddress || null)
+        // Get Lightning address in background
+        setLightningAddressLoading(true)
+        sparkService
+          .getLightningAddress()
+          .then((address) => {
+            setLightningAddress(address?.lightningAddress || null)
+            console.log(
+              '[SparkWalletProvider] Lightning address:',
+              address?.lightningAddress || 'not registered'
+            )
+          })
+          .catch((err) => console.error('[SparkWalletProvider] Failed to get address:', err))
+          .finally(() => setLightningAddressLoading(false))
 
-        console.log('[SparkWalletProvider] ✅ Wallet auto-connected successfully')
-        console.log('[SparkWalletProvider] Balance:', info.balanceSats, 'sats')
-        console.log('[SparkWalletProvider] Lightning address:', address?.lightningAddress)
+        console.log('[SparkWalletProvider] ✅ Wallet connected (sync running in background)')
 
         // NOTE: Auto-sync disabled until Breez adds NIP-57 support
         // The Breez Lightning address works for regular payments but does not support
@@ -170,7 +184,10 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
         clearTimeout(timeoutId)
       } catch (error) {
         console.error('[SparkWalletProvider] ❌ Auto-connect failed:', error)
-        console.error('[SparkWalletProvider] Error details:', error instanceof Error ? error.message : String(error))
+        console.error(
+          '[SparkWalletProvider] Error details:',
+          error instanceof Error ? error.message : String(error)
+        )
         setConnected(false)
         clearTimeout(timeoutId)
       } finally {
@@ -207,7 +224,8 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
                 await sparkZapReceipt.publishZapReceipt(payment, publish)
               } else {
                 console.log('[SparkWalletProvider] Regular payment, not a zap')
-                const description = payment.details?.type === 'lightning' ? payment.details.description : undefined
+                const description =
+                  payment.details?.type === 'lightning' ? payment.details.description : undefined
                 console.log('[SparkWalletProvider] Payment description:', description)
               }
             }
@@ -241,7 +259,10 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
 
       const address = await sparkService.getLightningAddress()
       setLightningAddress(address?.lightningAddress || null)
-      console.log('[SparkWalletProvider] Lightning address:', address?.lightningAddress || 'not registered')
+      console.log(
+        '[SparkWalletProvider] Lightning address:',
+        address?.lightningAddress || 'not registered'
+      )
 
       console.log('[SparkWalletProvider] Wallet state refreshed')
     } catch (error) {
@@ -284,6 +305,7 @@ export function SparkWalletProvider({ children }: { children: React.ReactNode}) 
         connecting,
         balance,
         lightningAddress,
+        lightningAddressLoading,
         refreshWalletState,
         deleteWallet
       }}
