@@ -23,7 +23,7 @@ import RelayIcon from '../RelayIcon'
 
 type TPostTargetItem =
   | {
-      type: 'writeRelays'
+      type: 'optimalRelays'
     }
   | {
       type: 'relay'
@@ -67,7 +67,7 @@ export default function PostRelaySelector({
     }
     if (postTargetItems.length === 1) {
       const item = postTargetItems[0]
-      if (item.type === 'writeRelays') {
+      if (item.type === 'optimalRelays') {
         return t('Optimal relays')
       }
       if (item.type === 'relay') {
@@ -79,7 +79,7 @@ export default function PostRelaySelector({
           : simplifyUrl(item.urls[0])
       }
     }
-    const hasWriteRelays = postTargetItems.some((item) => item.type === 'writeRelays')
+    const hasOptimalRelays = postTargetItems.some((item) => item.type === 'optimalRelays')
     const relayCount = postTargetItems.reduce((count, item) => {
       if (item.type === 'relay') {
         return count + 1
@@ -89,7 +89,7 @@ export default function PostRelaySelector({
       }
       return count
     }, 0)
-    if (hasWriteRelays) {
+    if (hasOptimalRelays) {
       return t('Optimal relays and {{count}} other relays', { count: relayCount })
     }
     return t('{{count}} relays', { count: relayCount })
@@ -104,11 +104,11 @@ export default function PostRelaySelector({
       setPostTargetItems(parentEventSeenOnRelays.map((url) => ({ type: 'relay', url })))
       return
     }
-    setPostTargetItems([{ type: 'writeRelays' }])
+    setPostTargetItems([{ type: 'optimalRelays' }])
   }, [openFrom, parentEventSeenOnRelays])
 
   useEffect(() => {
-    const isProtectedEvent = postTargetItems.every((item) => item.type !== 'writeRelays')
+    const isProtectedEvent = postTargetItems.every((item) => item.type !== 'optimalRelays')
     const relayUrls = postTargetItems.flatMap((item) => {
       if (item.type === 'relay') {
         return [item.url]
@@ -123,11 +123,11 @@ export default function PostRelaySelector({
     setAdditionalRelayUrls(relayUrls)
   }, [postTargetItems])
 
-  const handleWriteRelaysCheckedChange = useCallback((checked: boolean) => {
+  const handleOptimalRelaysCheckedChange = useCallback((checked: boolean) => {
     if (checked) {
-      setPostTargetItems((prev) => [...prev, { type: 'writeRelays' }])
+      setPostTargetItems((prev) => [...prev, { type: 'optimalRelays' }])
     } else {
-      setPostTargetItems((prev) => prev.filter((item) => item.type !== 'writeRelays'))
+      setPostTargetItems((prev) => prev.filter((item) => item.type !== 'optimalRelays'))
     }
   }, [])
 
@@ -158,10 +158,10 @@ export default function PostRelaySelector({
     return (
       <>
         <MenuItem
-          checked={postTargetItems.some((item) => item.type === 'writeRelays')}
-          onCheckedChange={handleWriteRelaysCheckedChange}
+          checked={postTargetItems.some((item) => item.type === 'optimalRelays')}
+          onCheckedChange={handleOptimalRelaysCheckedChange}
         >
-          {t('Write relays')}
+          {t('Optimal relays')}
         </MenuItem>
         {relaySets.length > 0 && (
           <>

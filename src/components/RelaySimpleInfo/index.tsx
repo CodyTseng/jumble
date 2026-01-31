@@ -1,9 +1,11 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { IS_COMMUNITY_MODE } from '@/constants'
+import { createFakeEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { TRelayInfo } from '@/types'
 import { HTMLProps } from 'react'
 import { useTranslation } from 'react-i18next'
+import ContentPreview from '../ContentPreview'
 import RelayIcon from '../RelayIcon'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import { SimpleUserAvatar } from '../UserAvatar'
@@ -34,13 +36,8 @@ export default function RelaySimpleInfo({
         {relayInfo && !IS_COMMUNITY_MODE && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
       </div>
       {!!relayInfo?.description && (
-        <div
-          className="line-clamp-3 whitespace-pre-wrap break-words"
-          style={{
-            overflowWrap: 'anywhere'
-          }}
-        >
-          {relayInfo.description}
+        <div className="line-clamp-3 whitespace-pre-wrap break-words">
+          <ContentPreview event={createFakeEvent({ content: relayInfo.description })} />
         </div>
       )}
       {!!users?.length && (
