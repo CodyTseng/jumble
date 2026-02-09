@@ -4,6 +4,30 @@ import mediaManager from '@/services/media-manager.service'
 import { YouTubePlayer } from '@/types/youtube'
 import { memo, useEffect, useRef, useState } from 'react'
 
+let ytApiReady = false
+const ytApiCallbacks: (() => void)[] = []
+
+function ensureYTApi(callback: () => void) {
+  if (ytApiReady && window.YT?.Player) {
+    callback()
+    return
+  }
+
+  ytApiCallbacks.push(callback)
+
+  if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+    const script = document.createElement('script')
+    script.src = 'https://www.youtube.com/iframe_api'
+    document.body.appendChild(script)
+
+    window.onYouTubeIframeAPIReady = () => {
+      ytApiReady = true
+      ytApiCallbacks.forEach((cb) => cb())
+      ytApiCallbacks.length = 0
+    }
+  }
+}
+
 interface PlayerProps {
   videoId: string
   isShort: boolean
@@ -25,19 +49,11 @@ const Player = memo(({ videoId, isShort, className }: PlayerProps) => {
 
     if (!videoId || !containerRef.current) return
 
-    if (!window.YT) {
-      const script = document.createElement('script')
-      script.src = 'https://www.youtube.com/iframe_api'
-      document.body.appendChild(script)
-
-      window.onYouTubeIframeAPIReady = () => {
-        if (!unmountedRef.current) {
-          initPlayer()
-        }
+    ensureYTApi(() => {
+      if (!unmountedRef.current) {
+        initPlayer()
       }
-    } else {
-      initPlayer()
-    }
+    })
 
     let checkMutedInterval: NodeJS.Timeout | null = null
     function initPlayer() {
