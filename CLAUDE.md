@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This document is designed to help AI Agents better understand and modify the Jumble project.
 
@@ -66,8 +66,6 @@ jumble/
 ```
 
 ## Development Guide
-
-### Environment Setup
 
 ### Environment Setup
 
@@ -147,7 +145,11 @@ And some Providers are placed in `PageManager.tsx` because they need to use the 
 
 ### Internationalization (i18n)
 
-Jumble is a multi-language application. When you add new text content, please ensure to add translations for all supported languages as much as possible. Append new translations to the end of each translation file without modifying or removing existing keys.
+Jumble is a multi-language application. When you add new text content, please ensure to add translations for all supported languages as much as possible.
+
+**IMPORTANT: New translation keys must be appended to the end of each locale file (`src/i18n/locales/*.ts`). Never insert new keys in the middle of the file.**
+
+Do not modify or remove existing keys.
 
 At the trial stage, you can skip translation first. After the feature is completed and confirmed satisfactory, you can add translation content later.
 

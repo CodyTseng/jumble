@@ -678,6 +678,7 @@ export default {
     'Default trust score filter threshold ({{n}}%)': 'डिफ़ॉल्ट विश्वास स्कोर फ़िल्टर सीमा ({{n}}%)',
     'No notes found': 'कोई नोट्स नहीं मिले',
     'Try again later or check your connection': 'बाद में पुनः प्रयास करें या अपना कनेक्शन जाँचें',
-    'Hide indirect': 'अप्रत्यक्ष छुपाएं'
+    'Hide indirect': 'अप्रत्यक्ष छुपाएं',
+    'Copy note content': 'नोट सामग्री कॉपी करें'
   }
 }

@@ -690,6 +690,7 @@ export default {
     'No notes found': 'Keine Notizen gefunden',
     'Try again later or check your connection':
       'Versuchen Sie es später erneut oder überprüfen Sie Ihre Verbindung',
-    'Hide indirect': 'Indirekte ausblenden'
+    'Hide indirect': 'Indirekte ausblenden',
+    'Copy note content': 'Notizinhalt kopieren'
   }
 }

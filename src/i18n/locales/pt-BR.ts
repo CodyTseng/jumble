@@ -681,6 +681,7 @@ export default {
     'No notes found': 'Nenhuma nota encontrada',
     'Try again later or check your connection':
       'Tente novamente mais tarde ou verifique sua conexão',
-    'Hide indirect': 'Ocultar indiretas'
+    'Hide indirect': 'Ocultar indiretas',
+    'Copy note content': 'Copiar conteúdo da nota'
   }
 }

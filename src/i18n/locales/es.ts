@@ -683,6 +683,7 @@ export default {
       'Umbral predeterminado del filtro de puntuación de confianza ({{n}}%)',
     'No notes found': 'No se encontraron notas',
     'Try again later or check your connection': 'Inténtalo más tarde o verifica tu conexión',
-    'Hide indirect': 'Ocultar indirectas'
+    'Hide indirect': 'Ocultar indirectas',
+    'Copy note content': 'Copiar contenido de la nota'
   }
 }

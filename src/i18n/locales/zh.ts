@@ -655,6 +655,7 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '默认信任分数过滤阈值 ({{n}}%)',
     'No notes found': '没有找到笔记',
     'Try again later or check your connection': '请稍后重试或检查网络连接',
-    'Hide indirect': '隐藏间接通知'
+    'Hide indirect': '隐藏间接通知',
+    'Copy note content': '复制笔记内容'
   }
 }

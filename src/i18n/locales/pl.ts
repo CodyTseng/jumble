@@ -684,6 +684,7 @@ export default {
       'Domyślny próg filtra wyniku zaufania ({{n}}%)',
     'No notes found': 'Nie znaleziono notatek',
     'Try again later or check your connection': 'Spróbuj ponownie później lub sprawdź połączenie',
-    'Hide indirect': 'Ukryj pośrednie'
+    'Hide indirect': 'Ukryj pośrednie',
+    'Copy note content': 'Kopiuj treść notatki'
   }
 }

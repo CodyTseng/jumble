@@ -678,6 +678,7 @@ export default {
     'No notes found': 'ノートが見つかりません',
     'Try again later or check your connection':
       '後でもう一度お試しいただくか、接続を確認してください',
-    'Hide indirect': '間接通知を非表示'
+    'Hide indirect': '間接通知を非表示',
+    'Copy note content': 'ノート内容をコピー'
   }
 }

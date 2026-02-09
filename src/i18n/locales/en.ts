@@ -672,6 +672,7 @@ export default {
       'Default trust score filter threshold ({{n}}%)',
     'No notes found': 'No notes found',
     'Try again later or check your connection': 'Try again later or check your connection',
-    'Hide indirect': 'Hide indirect'
+    'Hide indirect': 'Hide indirect',
+    'Copy note content': 'Copy note content'
   }
 }

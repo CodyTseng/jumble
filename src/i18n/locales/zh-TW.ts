@@ -650,6 +650,7 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '預設信任分數過濾閾值 ({{n}}%)',
     'No notes found': '沒有找到筆記',
     'Try again later or check your connection': '請稍後重試或檢查網路連接',
-    'Hide indirect': '隱藏間接通知'
+    'Hide indirect': '隱藏間接通知',
+    'Copy note content': '複製筆記內容'
   }
 }

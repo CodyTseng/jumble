@@ -672,6 +672,7 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '기본 신뢰 점수 필터 임계값 ({{n}}%)',
     'No notes found': '노트를 찾을 수 없습니다',
     'Try again later or check your connection': '나중에 다시 시도하거나 연결을 확인하세요',
-    'Hide indirect': '간접 숨기기'
+    'Hide indirect': '간접 숨기기',
+    'Copy note content': '노트 내용 복사'
   }
 }

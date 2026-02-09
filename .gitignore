@@ -26,3 +26,5 @@ dev-dist
 *.sw?
 
 .vercel
+
+.claude/

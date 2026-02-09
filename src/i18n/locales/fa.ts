@@ -678,6 +678,7 @@ export default {
     'No notes found': 'یادداشتی یافت نشد',
     'Try again later or check your connection':
       'بعداً دوباره امتحان کنید یا اتصال خود را بررسی کنید',
-    'Hide indirect': 'پنهان کردن غیرمستقیم'
+    'Hide indirect': 'پنهان کردن غیرمستقیم',
+    'Copy note content': 'کپی محتوای یادداشت'
   }
 }

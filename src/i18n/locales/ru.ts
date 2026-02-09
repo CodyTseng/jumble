@@ -683,6 +683,7 @@ export default {
       'Порог фильтра рейтинга доверия по умолчанию ({{n}}%)',
     'No notes found': 'Заметки не найдены',
     'Try again later or check your connection': 'Попробуйте позже или проверьте подключение',
-    'Hide indirect': 'Скрыть косвенные'
+    'Hide indirect': 'Скрыть косвенные',
+    'Copy note content': 'Скопировать содержимое заметки'
   }
 }
