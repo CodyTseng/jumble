@@ -42,6 +42,7 @@ class ClientService extends EventTarget {
   currentRelays: string[] = []
   private pool: SmartPool
   private externalSeenOn = new Map<string, Set<string>>()
+  private peopleListsLoadedAt: number | null = null
 
   private timelines: Record<
     string,
@@ -1048,6 +1049,64 @@ class ClientService extends EventTarget {
     const npubs = await this.searchNpubsFromLocal(query, limit)
     const profiles = await Promise.all(npubs.map((npub) => this.fetchProfile(npub)))
     return profiles.filter((profile) => !!profile) as TProfile[]
+  }
+
+  /** =========== NIP-51 People Lists (kind:30000) =========== */
+
+  private async refreshPeopleListEvents(pubkey: string) {
+    const relayList = await this.fetchRelayList(pubkey)
+    const urls = Array.from(new Set(relayList.read.concat(getDefaultRelayUrls()))).slice(0, 5)
+    const events = await this.query(urls, { authors: [pubkey], kinds: [30000], limit: 200 })
+
+    // Store (addressable replaceable); indexedDb will de-dupe by created_at.
+    await Promise.allSettled(events.map((evt) => indexedDb.putReplaceableEvent(evt)))
+    return events
+  }
+
+  private async ensurePeopleListsLoaded(pubkey: string) {
+    // Avoid refetching frequently; lists don't change often.
+    if (this.peopleListsLoadedAt && Date.now() - this.peopleListsLoadedAt < 1000 * 60 * 60) {
+      return
+    }
+    await this.refreshPeopleListEvents(pubkey).catch(() => undefined)
+    this.peopleListsLoadedAt = Date.now()
+  }
+
+  private getPeopleListName(evt: NEvent): string {
+    const name =
+      evt.tags.find(tagNameEquals('name'))?.[1] ??
+      evt.tags.find(tagNameEquals('title'))?.[1] ??
+      evt.tags.find(tagNameEquals('d'))?.[1] ??
+      ''
+    return (name || '').trim()
+  }
+
+  private getPeopleListMembersNpubs(evt: NEvent): string[] {
+    const pubkeys = getPubkeysFromPTags(evt.tags)
+    const npubs = pubkeys
+      .map((p) => (p ? pubkeyToNpub(p) : null))
+      .filter(Boolean) as string[]
+    return Array.from(new Set(npubs))
+  }
+
+  async searchPeopleListsFromLocal(query: string, limit: number = 20) {
+    if (!this.pubkey) return []
+    await this.ensurePeopleListsLoaded(this.pubkey)
+
+    const q = query.trim().toLowerCase()
+    const events = await indexedDb.getPeopleListEvents(this.pubkey)
+    const items = events
+      .map((evt) => {
+        const name = this.getPeopleListName(evt)
+        const members = this.getPeopleListMembersNpubs(evt)
+        const identifier = evt.tags.find(tagNameEquals('d'))?.[1] ?? ''
+        const naddr = identifier ? nip19.naddrEncode({ kind: evt.kind, pubkey: evt.pubkey, identifier }) : ''
+        return { kind: 'list' as const, name, members, naddr }
+      })
+      .filter((item) => item.name.length > 0 && (q.length === 0 || item.name.toLowerCase().includes(q)))
+      .sort((a, b) => a.name.localeCompare(b.name))
+
+    return items.slice(0, limit)
   }
 
   private async addUsernameToIndex(profileEvent: NEvent) {

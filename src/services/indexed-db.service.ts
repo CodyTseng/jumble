@@ -15,6 +15,7 @@ const StoreNames = {
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
+  PEOPLE_LIST_EVENTS: 'peopleListEvents', // NIP-51 kind:30000 (addressable)
   BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
   BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
   USER_EMOJI_LIST_EVENTS: 'userEmojiListEvents',
@@ -47,7 +48,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 11)
+        const request = window.indexedDB.open('jumble', 12)
 
         request.onerror = (event) => {
           reject(event)
@@ -71,6 +72,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.MUTE_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.MUTE_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.PEOPLE_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.PEOPLE_LIST_EVENTS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.BOOKMARK_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.BOOKMARK_LIST_EVENTS, { keyPath: 'key' })
@@ -570,6 +574,8 @@ class IndexedDbService {
         return StoreNames.FOLLOW_LIST_EVENTS
       case kinds.Mutelist:
         return StoreNames.MUTE_LIST_EVENTS
+      case 30000: // NIP-51 lists (addressable)
+        return StoreNames.PEOPLE_LIST_EVENTS
       case ExtendedKind.BLOSSOM_SERVER_LIST:
         return StoreNames.BLOSSOM_SERVER_LIST_EVENTS
       case kinds.Relaysets:
@@ -589,6 +595,40 @@ class IndexedDbService {
       default:
         return undefined
     }
+  }
+
+  async getPeopleListEvents(pubkey: string): Promise<Event[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.PEOPLE_LIST_EVENTS, 'readonly')
+      const store = transaction.objectStore(StoreNames.PEOPLE_LIST_EVENTS)
+      const request = store.openCursor()
+      const results: Event[] = []
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const item = cursor.value as TValue<Event | null>
+          const key = item.key
+          const value = item.value
+          if (value && (key === pubkey || key.startsWith(`${pubkey}:`))) {
+            results.push(value)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve(results)
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
   }
 
   private formatValue<T>(key: string, value: T): TValue<T> {

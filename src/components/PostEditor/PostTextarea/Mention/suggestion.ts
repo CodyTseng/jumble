@@ -1,14 +1,53 @@
 import client from '@/services/client.service'
 import postEditor from '@/services/post-editor.service'
+import { formatNpub } from '@/lib/pubkey'
 import type { Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
 import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
 
-const suggestion = {
-  items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+export type TMentionSuggestionItem =
+  | { kind: 'profile'; id: string }
+  | { kind: 'list'; name: string; members: string[]; naddr?: string }
+
+const suggestion: any = {
+  items: async ({ query }: { query: string }): Promise<TMentionSuggestionItem[]> => {
+    const [profiles, lists] = await Promise.all([
+      client.searchNpubsFromLocal(query, 20),
+      client.searchPeopleListsFromLocal(query, 20)
+    ])
+
+    return [
+      ...profiles.map((id) => ({ kind: 'profile' as const, id })),
+      ...(lists as TMentionSuggestionItem[])
+    ]
+  },
+
+  command: ({ editor, range, props }: { editor: Editor; range: { from: number; to: number }; props: any }) => {
+    const item = props as TMentionSuggestionItem
+    if (item.kind === 'profile') {
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(range, [
+          { type: 'mention', attrs: { id: item.id, label: formatNpub(item.id) } },
+          { type: 'text', text: ' ' }
+        ])
+        .run()
+      return
+    }
+
+    // Insert a visible list marker plus the expanded mentions.
+    const nodes: Array<{ type: string; attrs?: Record<string, unknown>; text?: string }> = [
+      { type: 'text', text: `@${item.name} ` }
+    ]
+    Array.from(new Set(item.members)).forEach((member) => {
+      nodes.push({ type: 'mention', attrs: { id: member, label: formatNpub(member) } })
+      nodes.push({ type: 'text', text: ' ' })
+    })
+
+    editor.chain().focus().insertContentAt(range, nodes).run()
   },
 
   render: () => {
