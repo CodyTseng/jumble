@@ -36,7 +36,7 @@ import dayjs from 'dayjs'
 import { Event, kinds, VerifiedEvent } from 'nostr-tools'
 import * as nip19 from 'nostr-tools/nip19'
 import * as nip49 from 'nostr-tools/nip49'
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useDeletedEvent } from '../DeletedEventProvider'
@@ -757,13 +757,40 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setProfile(getProfileFromEvent(newProfileEvent))
   }
 
-  const updateFollowListEvent = async (followListEvent: Event) => {
+  const updateFollowListEvent = useCallback(async (followListEvent: Event) => {
     const newFollowListEvent = await indexedDb.putReplaceableEvent(followListEvent)
     if (newFollowListEvent.id !== followListEvent.id) return
 
     setFollowListEvent(newFollowListEvent)
     await client.updateFollowListCache(newFollowListEvent)
-  }
+  }, [])
+
+  // Keep follow/unfollow state in sync across multiple open tabs (and other clients) by
+  // listening for the user's own kind:3 updates and applying the latest replaceable event.
+  useEffect(() => {
+    if (!account || !relayList) return
+
+    const urls = relayList.write.concat(getDefaultRelayUrls()).slice(0, 4)
+    const sub = client.subscribe(
+      urls,
+      {
+        kinds: [kinds.Contacts],
+        authors: [account.pubkey]
+      },
+      {
+        onevent: (evt) => {
+          if (evt.kind !== kinds.Contacts) return
+          updateFollowListEvent(evt).catch(() => {
+            // ignore; replaceable event write can fail transiently (e.g. IndexedDB)
+          })
+        }
+      }
+    )
+
+    return () => {
+      sub.close()
+    }
+  }, [account, relayList, updateFollowListEvent])
 
   const updateMuteListEvent = async (muteListEvent: Event, privateTags: string[][]) => {
     const newMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
