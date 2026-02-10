@@ -12,6 +12,7 @@ export default {
     Profile: 'Perfil',
     Logout: 'Sair',
     Following: 'Seguindo',
+    'Hide people you follow': 'Ocultar pessoas que você segue',
     followings: 'Seguidos',
     reposted: 'Repostado',
     'just now': 'agora mesmo',

@@ -68,6 +68,7 @@ class LocalStorageService {
   private mutedWords: string[] = []
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
+  private hideFollowingInRelaySetMap: Record<string, boolean> = {}
   private hideIndirectNotifications: boolean = false
 
   constructor() {
@@ -286,6 +287,20 @@ class LocalStorageService {
         const map = JSON.parse(minTrustScoreMapStr)
         if (typeof map === 'object' && map !== null) {
           this.minTrustScoreMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const hideFollowingInRelaySetMapStr = window.localStorage.getItem(
+      StorageKey.HIDE_FOLLOWING_IN_RELAY_SET_MAP
+    )
+    if (hideFollowingInRelaySetMapStr) {
+      try {
+        const map = JSON.parse(hideFollowingInRelaySetMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.hideFollowingInRelaySetMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -669,6 +684,18 @@ class LocalStorageService {
   setMinTrustScoreMap(map: Record<string, number>) {
     this.minTrustScoreMap = map
     window.localStorage.setItem(StorageKey.MIN_TRUST_SCORE_MAP, JSON.stringify(map))
+  }
+
+  getHideFollowingInRelaySet(relaySetId: string) {
+    return this.hideFollowingInRelaySetMap[relaySetId] === true
+  }
+
+  setHideFollowingInRelaySet(relaySetId: string, hide: boolean) {
+    this.hideFollowingInRelaySetMap[relaySetId] = hide
+    window.localStorage.setItem(
+      StorageKey.HIDE_FOLLOWING_IN_RELAY_SET_MAP,
+      JSON.stringify(this.hideFollowingInRelaySetMap)
+    )
   }
 
   getDefaultRelayUrls() {

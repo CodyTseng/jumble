@@ -7,7 +7,8 @@ import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
-import { useMemo, useRef, useState } from 'react'
+import { Event } from 'nostr-tools'
+import { ReactNode, useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
 
@@ -19,7 +20,9 @@ export default function NormalFeed({
   showRelayCloseReason = false,
   disable24hMode = false,
   onRefresh,
-  isPubkeyFeed = false
+  isPubkeyFeed = false,
+  noteFilterFn,
+  extraOptions
 }: {
   trustScoreFilterId?: string
   subRequests: TFeedSubRequest[]
@@ -29,6 +32,8 @@ export default function NormalFeed({
   disable24hMode?: boolean
   onRefresh?: () => void
   isPubkeyFeed?: boolean
+  noteFilterFn?: (event: Event) => boolean
+  extraOptions?: ReactNode
 }) {
   const { showKinds } = useKindFilter()
   const { getMinTrustScore } = useUserTrust()
@@ -104,6 +109,7 @@ export default function NormalFeed({
                 onShowKindsChange={handleShowKindsChange}
               />
             )}
+            {extraOptions}
           </>
         }
         active={trustFilterOpen}
@@ -118,6 +124,7 @@ export default function NormalFeed({
           showRelayCloseReason={showRelayCloseReason}
           isPubkeyFeed={isPubkeyFeed}
           trustScoreThreshold={trustScoreThreshold}
+          filterFn={noteFilterFn}
         />
       ) : (
         <NoteList
@@ -129,6 +136,7 @@ export default function NormalFeed({
           showRelayCloseReason={showRelayCloseReason}
           isPubkeyFeed={isPubkeyFeed}
           trustScoreThreshold={trustScoreThreshold}
+          filterFn={noteFilterFn}
         />
       )}
     </>

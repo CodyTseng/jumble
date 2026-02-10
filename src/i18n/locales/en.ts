@@ -12,6 +12,7 @@ export default {
     Profile: 'Profile',
     Logout: 'Logout',
     Following: 'Following',
+    'Hide people you follow': 'Hide people you follow',
     followings: 'followings',
     reposted: 'reposted',
     'just now': 'just now',

@@ -56,6 +56,7 @@ const UserAggregationList = forwardRef<
     showRelayCloseReason?: boolean
     isPubkeyFeed?: boolean
     trustScoreThreshold?: number
+    filterFn?: (event: Event) => boolean
   }
 >(
   (
@@ -66,7 +67,8 @@ const UserAggregationList = forwardRef<
       areAlgoRelays = false,
       showRelayCloseReason = false,
       isPubkeyFeed = false,
-      trustScoreThreshold
+      trustScoreThreshold,
+      filterFn
     },
     ref
   ) => {
@@ -284,6 +286,7 @@ const UserAggregationList = forwardRef<
             ) {
               return null
             }
+            if (filterFn && !filterFn(evt)) return null
             if (
               trustScoreThreshold &&
               !(await meetsMinTrustScore(evt.pubkey, trustScoreThreshold))
@@ -305,6 +308,7 @@ const UserAggregationList = forwardRef<
         filterMutedNotes,
         hideContentMentioningMutedUsers,
         isMentioningMutedUsers,
+        filterFn,
         meetsMinTrustScore,
         trustScoreThreshold
       ]

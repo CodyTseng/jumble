@@ -18,6 +18,7 @@ export const StorageKey = {
   ADD_CLIENT_TAG: 'addClientTag',
   NOTE_LIST_MODE: 'noteListMode',
   NOTIFICATION_TYPE: 'notificationType',
+  HIDE_FOLLOWING_IN_RELAY_SET_MAP: 'hideFollowingInRelaySetMap',
   DEFAULT_ZAP_SATS: 'defaultZapSats',
   DEFAULT_ZAP_COMMENT: 'defaultZapComment',
   QUICK_ZAP: 'quickZap',
