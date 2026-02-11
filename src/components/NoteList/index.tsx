@@ -37,6 +37,7 @@ import PinnedNoteCard from '../PinnedNoteCard'
 const LIMIT = 200
 const ALGO_LIMIT = 500
 const SHOW_COUNT = 10
+const AUTO_REFRESH_HIDDEN_MIN_MS = 60 * 1000 // 1 minute
 
 export type TNoteListRef = {
   scrollToTop: (behavior?: ScrollBehavior) => void
@@ -97,6 +98,7 @@ const NoteList = forwardRef<
     const [refreshCount, setRefreshCount] = useState(0)
     const supportTouch = useMemo(() => isTouchDevice(), [])
     const topRef = useRef<HTMLDivElement | null>(null)
+    const lastHiddenAtRef = useRef<number | null>(null)
     const sinceRef = useRef<number | undefined>(undefined)
     sinceRef.current = newEvents.length
       ? newEvents[0].created_at + 1
@@ -105,6 +107,41 @@ const NoteList = forwardRef<
         : undefined
     const showNewNotesDirectlyRef = useRef(showNewNotesDirectly)
     showNewNotesDirectlyRef.current = showNewNotesDirectly
+
+    // When a laptop lid closes / app backgrounds, websocket subscriptions can go stale.
+    // On resume, trigger a refresh so feeds catch up without requiring a manual reload.
+    useEffect(() => {
+      const maybeRefresh = () => {
+        if (!active) return
+        if (document.visibilityState !== 'visible') return
+
+        const lastHiddenAt = lastHiddenAtRef.current
+        if (!lastHiddenAt) return
+        if (Date.now() - lastHiddenAt < AUTO_REFRESH_HIDDEN_MIN_MS) return
+
+        lastHiddenAtRef.current = null
+        setRefreshCount((count) => count + 1)
+      }
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') {
+          lastHiddenAtRef.current = Date.now()
+          return
+        }
+        maybeRefresh()
+      }
+
+      const handleFocus = () => {
+        maybeRefresh()
+      }
+
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      window.addEventListener('focus', handleFocus)
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+        window.removeEventListener('focus', handleFocus)
+      }
+    }, [active])
 
     const pinnedEventHexIdSet = useMemo(() => {
       const set = new Set<string>()
