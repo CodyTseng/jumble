@@ -1,4 +1,4 @@
-import { ExtendedKind } from '@/constants'
+import { ExtendedKind, NIP51_LIST_KIND_FOLLOW_SET } from '@/constants'
 import { tagNameEquals } from '@/lib/tag'
 import { TRelayInfo } from '@/types'
 import dayjs from 'dayjs'
@@ -16,6 +16,7 @@ const StoreNames = {
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
   BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
+  NIP51_LIST_EVENTS: 'nip51ListEvents',
   BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
   USER_EMOJI_LIST_EVENTS: 'userEmojiListEvents',
   EMOJI_SET_EVENTS: 'emojiSetEvents',
@@ -47,7 +48,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 11)
+        const request = window.indexedDB.open('jumble', 12)
 
         request.onerror = (event) => {
           reject(event)
@@ -74,6 +75,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.BOOKMARK_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.BOOKMARK_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP51_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.NIP51_LIST_EVENTS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.DECRYPTED_CONTENTS)) {
             db.createObjectStore(StoreNames.DECRYPTED_CONTENTS, { keyPath: 'key' })
@@ -363,6 +367,37 @@ class IndexedDbService {
     })
   }
 
+  async iterateNip51ListEvents(callback: (event: Event) => Promise<void>): Promise<void> {
+    await this.initPromise
+    if (!this.db) {
+      return
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(StoreNames.NIP51_LIST_EVENTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP51_LIST_EVENTS)
+      const request = store.openCursor()
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const value = (cursor.value as TValue<Event>).value
+          if (value) {
+            callback(value)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve()
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   async putFollowingFavoriteRelays(pubkey: string, relays: [string, string[]][]): Promise<void> {
     await this.initPromise
     return new Promise((resolve, reject) => {
@@ -578,6 +613,8 @@ class IndexedDbService {
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
+      case NIP51_LIST_KIND_FOLLOW_SET:
+        return StoreNames.NIP51_LIST_EVENTS
       case kinds.UserEmojiList:
         return StoreNames.USER_EMOJI_LIST_EVENTS
       case kinds.Emojisets:

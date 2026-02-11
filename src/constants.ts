@@ -85,6 +85,10 @@ export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 
 export const GROUP_METADATA_EVENT_KIND = 39000
 
+// NIP-51 Lists: https://github.com/nostr-protocol/nips/blob/master/51.md
+// Coracle “Nostr list” uses kind 30000 for follow sets.
+export const NIP51_LIST_KIND_FOLLOW_SET = 30000
+
 export const ExtendedKind = {
   EXTERNAL_CONTENT_REACTION: 17,
   PICTURE: 20,

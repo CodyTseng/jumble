@@ -1,4 +1,4 @@
-import { ExtendedKind } from '@/constants'
+import { ExtendedKind, NIP51_LIST_KIND_FOLLOW_SET } from '@/constants'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -14,6 +14,7 @@ import HighlightPreview from './HighlightPreview'
 import LiveEventPreview from './LiveEventPreview'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import NormalContentPreview from './NormalContentPreview'
+import Nip51ListPreview from './Nip51ListPreview'
 import PictureNotePreview from './PictureNotePreview'
 import PollPreview from './PollPreview'
 import VideoNotePreview from './VideoNotePreview'
@@ -108,6 +109,10 @@ export default function ContentPreview({
 
   if (event.kind === ExtendedKind.FOLLOW_PACK) {
     return <FollowPackPreview event={event} className={className} />
+  }
+
+  if (event.kind === NIP51_LIST_KIND_FOLLOW_SET) {
+    return <Nip51ListPreview event={event} className={className} />
   }
 
   return <div className={className}>[{t('Cannot handle event of kind k', { k: event.kind })}]</div>

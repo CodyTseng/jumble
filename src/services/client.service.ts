@@ -1,11 +1,15 @@
-import { ExtendedKind, SEARCHABLE_RELAY_URLS } from '@/constants'
+import { ExtendedKind, NIP51_LIST_KIND_FOLLOW_SET, SEARCHABLE_RELAY_URLS } from '@/constants'
 import {
   compareEvents,
   getReplaceableCoordinate,
   getReplaceableCoordinateFromEvent,
   isReplaceableEvent
 } from '@/lib/event'
-import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
+import {
+  getNip51FollowSetInfoFromEvent,
+  getProfileFromEvent,
+  getRelayListFromEvent
+} from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { filterOutBigRelays, getDefaultRelayUrls } from '@/lib/relay'
 import { SmartPool } from '@/lib/smart-pool'
@@ -68,6 +72,10 @@ class ClientService extends EventTarget {
     tokenize: 'forward'
   })
 
+  private nip51FollowSetIndex = new FlexSearch.Index({
+    tokenize: 'forward'
+  })
+
   constructor() {
     super()
     this.pool = new SmartPool()
@@ -84,6 +92,7 @@ class ClientService extends EventTarget {
 
   async init() {
     await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
+    await indexedDb.iterateNip51ListEvents((evt) => this.addNip51FollowSetToIndex(evt))
   }
 
   async determineTargetRelays(
@@ -939,6 +948,11 @@ class ClientService extends EventTarget {
       this.addEventToCache(event)
     }
 
+    if (event && isReplaceableEvent(event.kind)) {
+      this.addNip51FollowSetToIndex(event)
+      indexedDb.putReplaceableEvent(event).catch(() => {})
+    }
+
     return event
   }
 
@@ -1067,6 +1081,45 @@ class ClientService extends EventTarget {
     } catch {
       return
     }
+  }
+
+  private async addNip51FollowSetToIndex(event: NEvent) {
+    if (event.kind !== NIP51_LIST_KIND_FOLLOW_SET) return
+    try {
+      const { title, description } = getNip51FollowSetInfoFromEvent(event)
+      const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
+      const text = [title, identifier, description ?? ''].join(' ').trim()
+      if (!text) return
+      const coordinate = getReplaceableCoordinateFromEvent(event)
+      await this.nip51FollowSetIndex.addAsync(coordinate, text)
+    } catch {
+      return
+    }
+  }
+
+  async searchNip51FollowSetMentionsFromLocal(
+    query: string,
+    limit: number = 50
+  ): Promise<{ id: string; title: string; count: number }[]> {
+    const results = (await this.nip51FollowSetIndex.searchAsync(query, { limit })) as string[]
+    const events = await Promise.all(results.map((c) => indexedDb.getReplaceableEventByCoordinate(c)))
+    const items: { id: string; title: string; count: number }[] = []
+
+    for (const event of events) {
+      if (!event || event.kind !== NIP51_LIST_KIND_FOLLOW_SET) continue
+      const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
+      if (!identifier) continue
+
+      const { title, pubkeys } = getNip51FollowSetInfoFromEvent(event)
+      const id = nip19.naddrEncode({
+        kind: event.kind,
+        pubkey: event.pubkey,
+        identifier
+      })
+      items.push({ id, title, count: pubkeys.length })
+    }
+
+    return items
   }
 
   private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
@@ -1244,7 +1297,8 @@ class ClientService extends EventTarget {
       const key = `${pubkey}:${kind}`
       const event = eventsMap.get(key)
       if (event) {
-        indexedDb.putReplaceableEvent(event)
+        this.addNip51FollowSetToIndex(event)
+        indexedDb.putReplaceableEvent(event).catch(() => {})
         return event
       } else {
         indexedDb.putNullReplaceableEvent(pubkey, kind)
@@ -1360,7 +1414,8 @@ class ClientService extends EventTarget {
       if (kind === kinds.Pinlist) return event ?? null
 
       if (event) {
-        indexedDb.putReplaceableEvent(event)
+        this.addNip51FollowSetToIndex(event)
+        indexedDb.putReplaceableEvent(event).catch(() => {})
         return event
       } else {
         indexedDb.putNullReplaceableEvent(pubkey, kind, d)

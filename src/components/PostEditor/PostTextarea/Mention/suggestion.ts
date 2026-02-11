@@ -5,10 +5,19 @@ import { ReactRenderer } from '@tiptap/react'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
 import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
+import { TMentionTarget } from './types'
 
 const suggestion = {
-  items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+  items: async ({ query }: { query: string }): Promise<TMentionTarget[]> => {
+    const [profiles, lists] = await Promise.all([
+      client.searchNpubsFromLocal(query, 20),
+      client.searchNip51FollowSetMentionsFromLocal(query, 20)
+    ])
+
+    return [
+      ...profiles.map((id) => ({ type: 'profile' as const, id })),
+      ...lists.map((l) => ({ type: 'list' as const, id: l.id, title: l.title, count: l.count }))
+    ]
   },
 
   render: () => {

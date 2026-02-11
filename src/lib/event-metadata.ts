@@ -431,3 +431,28 @@ export function getFollowPackInfoFromEvent(event: Event) {
 
   return { title, description, image, pubkeys }
 }
+
+// NIP-51 follow set list (kind 30000).
+// Coracle uses kind 30000 with p-tags for members and metadata in tags (title/name/description).
+export function getNip51FollowSetInfoFromEvent(event: Event) {
+  let title: string | undefined
+  let description: string | undefined
+  const pubkeys: string[] = []
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (!tagValue) return
+    if (tagName === 'title' || tagName === 'name') {
+      title = tagValue
+    } else if (tagName === 'description') {
+      description = tagValue
+    } else if (tagName === 'p' && isValidPubkey(tagValue)) {
+      pubkeys.push(tagValue)
+    }
+  })
+
+  if (!title) {
+    title = event.tags.find(tagNameEquals('d'))?.[1] ?? 'Untitled List'
+  }
+
+  return { title, description, pubkeys }
+}
