@@ -10,17 +10,19 @@ import Nip05 from '../../../Nip05'
 import { SimpleUserAvatar } from '../../../UserAvatar'
 import { SimpleUsername } from '../../../Username'
 
-export type TMentionSuggestionItem =
-  | {
-      type: 'profile'
-      id: string
-    }
-  | {
-      type: 'list'
-      id: string // naddr1...
-      title: string
-      count: number
-    }
+export interface TMentionSuggestionProfileItem {
+  type: 'profile'
+  id: string
+}
+
+export interface TMentionSuggestionListItem {
+  type: 'list'
+  id: string // naddr1...
+  title: string
+  count: number
+}
+
+export type TMentionSuggestionItem = TMentionSuggestionProfileItem | TMentionSuggestionListItem
 
 export interface MentionListProps {
   items: TMentionSuggestionItem[]
