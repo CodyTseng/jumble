@@ -195,7 +195,7 @@ async function extractMentions(content: string, parentEvent?: Event) {
   const pubkeys: string[] = []
   const relatedPubkeys: string[] = []
   const matches = content.match(
-    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
+    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
   )
 
   const addToSet = (arr: string[], pubkey: string) => {
@@ -216,6 +216,17 @@ async function extractMentions(content: string, parentEvent?: Event) {
         if (event) {
           addToSet(pubkeys, event.pubkey)
         }
+      } else if (type === 'naddr') {
+        // NIP-51 people lists (kind 30000): expand to include all list members as mention p-tags.
+        if (data.kind !== 30000) continue
+        const event = await client.fetchEvent(id)
+        if (!event) continue
+
+        event.tags.forEach(([tagName, tagValue]) => {
+          if (['p', 'P'].includes(tagName) && !!tagValue) {
+            addToSet(pubkeys, tagValue)
+          }
+        })
       }
     } catch (e) {
       console.error(e)
