@@ -110,5 +110,13 @@ export default function ContentPreview({
     return <FollowPackPreview event={event} className={className} />
   }
 
-  return <div className={className}>[{t('Cannot handle event of kind k', { k: event.kind })}]</div>
+  return (
+    <div className={className}>
+      [
+      {event.kind === 4
+        ? t('Encrypted direct messages not supported')
+        : t('Cannot handle event of kind k', { k: event.kind })}
+      ]
+    </div>
+  )
 }
