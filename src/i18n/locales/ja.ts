@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': '対応NIP',
     'Open in a': '{{a}}で開く',
     'Cannot handle event of kind k': '種類{{k}}のイベントは処理できません',
+    'Encrypted direct messages not supported': '',
     'Sorry! The note cannot be found 😔': '申し訳ありません！ノートが見つかりません 😔',
     'This user has been muted': 'このユーザーはミュートされています',
     Wallet: 'ウォレット',

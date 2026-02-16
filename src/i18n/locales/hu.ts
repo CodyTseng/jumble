@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': 'Támogatott NIP-ek',
     'Open in a': 'Megnyitás itt: {{a}}',
     'Cannot handle event of kind k': 'Nem támogatott ez a fajta esemény: {{k}}',
+    'Encrypted direct messages not supported': '',
     'Sorry! The note cannot be found 😔': 'Ejj! A poszt nem található 😔',
     'This user has been muted': 'Ez a felhasználó némítva van',
     Wallet: 'Tárca',

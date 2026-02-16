@@ -13,7 +13,11 @@ export default function UnknownNote({ event, className }: { event: Event; classN
         className
       )}
     >
-      <div>{t('Cannot handle event of kind k', { k: event.kind })}</div>
+      <div>
+        {event.kind === 4
+          ? t('Encrypted direct messages not supported')
+          : t('Cannot handle event of kind k', { k: event.kind })}
+      </div>
       <ClientSelect event={event} />
     </div>
   )
