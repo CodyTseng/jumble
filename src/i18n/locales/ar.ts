@@ -178,6 +178,7 @@ export default {
     'Supported NIPs': 'NIPs المدعومة',
     'Open in a': 'فتح في {{a}}',
     'Cannot handle event of kind k': 'لا يمكن معالجة الحدث من النوع {{k}}',
+    'Encrypted direct messages not supported': '',
     'Sorry! The note cannot be found 😔': 'عذراً! لا يمكن العثور على الملاحظة 😔',
     'This user has been muted': 'تم كتم هذا المستخدم',
     Wallet: 'المحفظة',

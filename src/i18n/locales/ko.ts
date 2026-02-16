@@ -181,6 +181,7 @@ export default {
     'Supported NIPs': '지원 NIP',
     'Open in a': '{{a}}에서 열기',
     'Cannot handle event of kind k': '{{k}} 유형의 이벤트를 처리할 수 없습니다',
+    'Encrypted direct messages not supported': '',
     'Sorry! The note cannot be found 😔': '죄송합니다! 해당 노트를 찾을 수 없습니다 😔',
     'This user has been muted': '이 사용자는 차단되었습니다',
     Wallet: '지갑',
