@@ -52,7 +52,7 @@ export default function DmInput({
           onKeyDown={handleKeyDown}
           disabled={disabled}
           rows={1}
-          className="max-h-32 min-h-[36px] flex-1 select-text resize-none bg-transparent py-2 text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="max-h-32 min-h-[36px] flex-1 select-text resize-none bg-transparent py-2 text-base placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
         <button
           onClick={handleSend}

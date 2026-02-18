@@ -2,6 +2,7 @@ import DmInput from '@/components/DmInput'
 import DmMessageList from '@/components/DmMessageList'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { useBottomBar } from '@/PageManager'
 import dmService from '@/services/dm.service'
 import { Loader2 } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
@@ -13,6 +14,12 @@ const DmConversationPage = forwardRef(
     const { t } = useTranslation()
     const { profile } = useFetchProfile(pubkeyOrNpub)
     const [canSendDm, setCanSendDm] = useState<boolean | null>(null)
+    const { setHidden } = useBottomBar()
+
+    useEffect(() => {
+      setHidden(true)
+      return () => setHidden(false)
+    }, [setHidden])
     const pubkey = useMemo(() => {
       if (pubkeyOrNpub?.startsWith('npub')) {
         try {

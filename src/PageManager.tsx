@@ -8,6 +8,7 @@ import {
   createRef,
   ReactNode,
   RefObject,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -48,6 +49,13 @@ const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefi
 
 const SecondaryPageContext = createContext<TSecondaryPageContext | undefined>(undefined)
 
+type TBottomBarContext = {
+  hidden: boolean
+  setHidden: (hidden: boolean) => void
+}
+
+const BottomBarContext = createContext<TBottomBarContext>({ hidden: false, setHidden: () => {} })
+
 export function usePrimaryPage() {
   const context = useContext(PrimaryPageContext)
   if (!context) {
@@ -64,7 +72,16 @@ export function useSecondaryPage() {
   return context
 }
 
+export function useBottomBar() {
+  return useContext(BottomBarContext)
+}
+
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
+  const [bottomBarHidden, setBottomBarHidden] = useState(false)
+  const bottomBarContextValue = {
+    hidden: bottomBarHidden,
+    setHidden: useCallback((hidden: boolean) => setBottomBarHidden(hidden), [])
+  }
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -292,6 +309,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
+              <BottomBarContext.Provider value={bottomBarContextValue}>
               {!!secondaryStack.length &&
                 secondaryStack.map((item, index) => (
                   <div
@@ -314,8 +332,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   {props ? cloneElement(element as React.ReactElement, props) : element}
                 </div>
               ))}
-              <BottomNavigationBar />
+              {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
+              </BottomBarContext.Provider>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>

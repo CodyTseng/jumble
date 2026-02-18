@@ -228,7 +228,7 @@ function MessageBubble({
         <div className="flex min-w-0 max-w-full items-end gap-1">
           {sendingStatus && <SendingStatusIcon status={sendingStatus} />}
           <div className={bubbleClass}>
-            <p className="select-text whitespace-pre-wrap break-all text-sm">{message.content}</p>
+            <p className="select-text whitespace-pre-wrap break-all text-base">{message.content}</p>
           </div>
         </div>
       </div>
