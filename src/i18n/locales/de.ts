@@ -692,6 +692,8 @@ export default {
     'Try again later or check your connection':
       'Versuchen Sie es später erneut oder überprüfen Sie Ihre Verbindung',
     'Hide indirect': 'Indirekte ausblenden',
-    'Copy note content': 'Notizinhalt kopieren'
+    'Copy note content': 'Notizinhalt kopieren',
+    'Video loop': 'Video-Schleife',
+    'Automatically replay videos when they end': 'Videos automatisch wiederholen, wenn sie enden'
   }
 }

@@ -674,6 +674,8 @@ export default {
     'No notes found': '노트를 찾을 수 없습니다',
     'Try again later or check your connection': '나중에 다시 시도하거나 연결을 확인하세요',
     'Hide indirect': '간접 숨기기',
-    'Copy note content': '노트 내용 복사'
+    'Copy note content': '노트 내용 복사',
+    'Video loop': '비디오 반복',
+    'Automatically replay videos when they end': '비디오가 끝나면 자동으로 다시 재생'
   }
 }

@@ -680,6 +680,8 @@ export default {
     'Try again later or check your connection':
       'بعداً دوباره امتحان کنید یا اتصال خود را بررسی کنید',
     'Hide indirect': 'پنهان کردن غیرمستقیم',
-    'Copy note content': 'کپی محتوای یادداشت'
+    'Copy note content': 'کپی محتوای یادداشت',
+    'Video loop': 'تکرار ویدیو',
+    'Automatically replay videos when they end': 'پخش خودکار ویدیوها پس از پایان'
   }
 }

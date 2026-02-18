@@ -7,6 +7,9 @@ type TContentPolicyContext = {
   autoplay: boolean
   setAutoplay: (autoplay: boolean) => void
 
+  videoLoop: boolean
+  setVideoLoop: (videoLoop: boolean) => void
+
   nsfwDisplayPolicy: TNsfwDisplayPolicy
   setNsfwDisplayPolicy: (policy: TNsfwDisplayPolicy) => void
 
@@ -40,6 +43,7 @@ export const useContentPolicy = () => {
 
 export function ContentPolicyProvider({ children }: { children: React.ReactNode }) {
   const [autoplay, setAutoplay] = useState(storage.getAutoplay())
+  const [videoLoop, setVideoLoop] = useState(storage.getVideoLoop())
   const [nsfwDisplayPolicy, setNsfwDisplayPolicy] = useState(storage.getNsfwDisplayPolicy())
   const [hideContentMentioningMutedUsers, setHideContentMentioningMutedUsers] = useState(
     storage.getHideContentMentioningMutedUsers()
@@ -94,6 +98,11 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setAutoplay(autoplay)
   }
 
+  const updateVideoLoop = (videoLoop: boolean) => {
+    storage.setVideoLoop(videoLoop)
+    setVideoLoop(videoLoop)
+  }
+
   const updateNsfwDisplayPolicy = (policy: TNsfwDisplayPolicy) => {
     storage.setNsfwDisplayPolicy(policy)
     setNsfwDisplayPolicy(policy)
@@ -129,6 +138,8 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
       value={{
         autoplay,
         setAutoplay: updateAutoplay,
+        videoLoop,
+        setVideoLoop: updateVideoLoop,
         nsfwDisplayPolicy,
         setNsfwDisplayPolicy: updateNsfwDisplayPolicy,
         hideContentMentioningMutedUsers,

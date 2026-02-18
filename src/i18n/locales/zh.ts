@@ -657,6 +657,8 @@ export default {
     'No notes found': '没有找到笔记',
     'Try again later or check your connection': '请稍后重试或检查网络连接',
     'Hide indirect': '隐藏间接通知',
-    'Copy note content': '复制笔记内容'
+    'Copy note content': '复制笔记内容',
+    'Video loop': '视频循环',
+    'Automatically replay videos when they end': '视频播放结束后自动重新播放'
   }
 }

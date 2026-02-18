@@ -674,6 +674,8 @@ export default {
     'No notes found': 'No notes found',
     'Try again later or check your connection': 'Try again later or check your connection',
     'Hide indirect': 'Hide indirect',
-    'Copy note content': 'Copy note content'
+    'Copy note content': 'Copy note content',
+    'Video loop': 'Video loop',
+    'Automatically replay videos when they end': 'Automatically replay videos when they end'
   }
 }

@@ -680,6 +680,8 @@ export default {
     'No notes found': 'कोई नोट्स नहीं मिले',
     'Try again later or check your connection': 'बाद में पुनः प्रयास करें या अपना कनेक्शन जाँचें',
     'Hide indirect': 'अप्रत्यक्ष छुपाएं',
-    'Copy note content': 'नोट सामग्री कॉपी करें'
+    'Copy note content': 'नोट सामग्री कॉपी करें',
+    'Video loop': 'वीडियो लूप',
+    'Automatically replay videos when they end': 'वीडियो समाप्त होने पर स्वचालित रूप से दोबारा चलाएं'
   }
 }

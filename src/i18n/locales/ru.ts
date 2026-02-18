@@ -685,6 +685,8 @@ export default {
     'No notes found': 'Заметки не найдены',
     'Try again later or check your connection': 'Попробуйте позже или проверьте подключение',
     'Hide indirect': 'Скрыть косвенные',
-    'Copy note content': 'Скопировать содержимое заметки'
+    'Copy note content': 'Скопировать содержимое заметки',
+    'Video loop': 'Зацикливание видео',
+    'Automatically replay videos when they end': 'Автоматически воспроизводить видео заново после окончания'
   }
 }

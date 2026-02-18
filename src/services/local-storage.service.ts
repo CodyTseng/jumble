@@ -46,6 +46,7 @@ class LocalStorageService {
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
   private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
   private autoplay: boolean = true
+  private videoLoop: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private dismissedTooManyRelaysAlert: boolean = false
@@ -136,6 +137,7 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
+    this.videoLoop = window.localStorage.getItem(StorageKey.VIDEO_LOOP) === 'true'
 
     const translationServiceConfigMapStr = window.localStorage.getItem(
       StorageKey.TRANSLATION_SERVICE_CONFIG_MAP
@@ -473,6 +475,15 @@ class LocalStorageService {
   setAutoplay(autoplay: boolean) {
     this.autoplay = autoplay
     window.localStorage.setItem(StorageKey.AUTOPLAY, autoplay.toString())
+  }
+
+  getVideoLoop() {
+    return this.videoLoop
+  }
+
+  setVideoLoop(videoLoop: boolean) {
+    this.videoLoop = videoLoop
+    window.localStorage.setItem(StorageKey.VIDEO_LOOP, videoLoop.toString())
   }
 
   getTranslationServiceConfig(pubkey?: string | null) {

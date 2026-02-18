@@ -674,6 +674,8 @@ export default {
     'No notes found': 'Nem található jegyzet',
     'Try again later or check your connection': 'Próbáld újra később vagy ellenőrizd a kapcsolatot',
     'Hide indirect': 'Közvetettek elrejtése',
-    'Copy note content': 'Jegyzet tartalmának másolása'
+    'Copy note content': 'Jegyzet tartalmának másolása',
+    'Video loop': 'Videó ismétlése',
+    'Automatically replay videos when they end': 'Videók automatikus újrajátszása, amikor véget érnek'
   }
 }

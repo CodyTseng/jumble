@@ -689,6 +689,8 @@ export default {
     'No notes found': 'Aucune note trouvée',
     'Try again later or check your connection': 'Réessayez plus tard ou vérifiez votre connexion',
     'Hide indirect': 'Masquer indirects',
-    'Copy note content': 'Copier le contenu de la note'
+    'Copy note content': 'Copier le contenu de la note',
+    'Video loop': 'Boucle vidéo',
+    'Automatically replay videos when they end': 'Rejouer automatiquement les vidéos à la fin'
   }
 }

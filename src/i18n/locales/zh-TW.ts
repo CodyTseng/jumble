@@ -652,6 +652,8 @@ export default {
     'No notes found': '沒有找到筆記',
     'Try again later or check your connection': '請稍後重試或檢查網路連接',
     'Hide indirect': '隱藏間接通知',
-    'Copy note content': '複製筆記內容'
+    'Copy note content': '複製筆記內容',
+    'Video loop': '影片循環',
+    'Automatically replay videos when they end': '影片播放結束後自動重新播放'
   }
 }

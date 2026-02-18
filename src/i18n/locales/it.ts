@@ -685,6 +685,8 @@ export default {
     'No notes found': 'Nessuna nota trovata',
     'Try again later or check your connection': 'Riprova più tardi o controlla la connessione',
     'Hide indirect': 'Nascondi indirette',
-    'Copy note content': 'Copia contenuto della nota'
+    'Copy note content': 'Copia contenuto della nota',
+    'Video loop': 'Ripetizione video',
+    'Automatically replay videos when they end': 'Riprodurre automaticamente i video quando terminano'
   }
 }

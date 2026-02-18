@@ -683,6 +683,8 @@ export default {
     'Try again later or check your connection':
       'Tente novamente mais tarde ou verifique sua conexão',
     'Hide indirect': 'Ocultar indiretas',
-    'Copy note content': 'Copiar conteúdo da nota'
+    'Copy note content': 'Copiar conteúdo da nota',
+    'Video loop': 'Repetir vídeo',
+    'Automatically replay videos when they end': 'Reproduzir automaticamente os vídeos quando terminarem'
   }
 }

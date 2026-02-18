@@ -24,6 +24,7 @@ export const StorageKey = {
   LAST_READ_NOTIFICATION_TIME_MAP: 'lastReadNotificationTimeMap',
   ACCOUNT_FEED_INFO_MAP: 'accountFeedInfoMap',
   AUTOPLAY: 'autoplay',
+  VIDEO_LOOP: 'videoLoop',
   TRANSLATION_SERVICE_CONFIG_MAP: 'translationServiceConfigMap',
   MEDIA_UPLOAD_SERVICE_CONFIG_MAP: 'mediaUploadServiceConfigMap',
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
