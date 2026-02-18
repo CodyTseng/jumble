@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': '支援的 NIP',
     'Open in a': '在 {{a}} 中開啟',
     'Cannot handle event of kind k': '無法處理類型為 {{k}} 的事件',
+    'Encrypted direct messages not supported': '不支援加密私訊',
     'Sorry! The note cannot be found 😔': '抱歉！找不到該筆記 😔',
     'This user has been muted': '該使用者已被封鎖',
     Wallet: '錢包',

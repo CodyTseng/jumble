@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': 'NIPهای پشتیبانی شده',
     'Open in a': 'باز کردن در {{a}}',
     'Cannot handle event of kind k': 'نمی‌توان رویداد از نوع {{k}} را پردازش کرد',
+    'Encrypted direct messages not supported': 'پیام‌های مستقیم رمزگذاری‌شده پشتیبانی نمی‌شوند',
     'Sorry! The note cannot be found 😔': 'متأسفانه! یادداشت یافت نشد 😔',
     'This user has been muted': 'این کاربر بی‌صدا شده است',
     Wallet: 'کیف پول',

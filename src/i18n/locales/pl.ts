@@ -178,6 +178,7 @@ export default {
     'Supported NIPs': 'Obsługiwane NIP-y',
     'Open in a': 'Otwórz w {{a}}',
     'Cannot handle event of kind k': 'Nie można obsłużyć zdarzenia typu {{k}}',
+    'Encrypted direct messages not supported': 'Szyfrowane wiadomości bezpośrednie nie są obsługiwane',
     'Sorry! The note cannot be found 😔 ': 'Przepraszam! Nie można znaleźć wpisu 😔',
     'This user has been muted': 'Ten użytkownik został przyblokowany',
     Wallet: 'Portfel',
