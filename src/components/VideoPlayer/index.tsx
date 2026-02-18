@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
 export default function VideoPlayer({ src, className }: { src: string; className?: string }) {
-  const { autoplay } = useContentPolicy()
+  const { autoplay, videoLoop } = useContentPolicy()
   const { muteMedia, updateMuteMedia } = useUserPreferences()
   const [error, setError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -79,6 +79,7 @@ export default function VideoPlayer({ src, className }: { src: string; className
         ref={videoRef}
         controls
         playsInline
+        loop={videoLoop}
         className={cn('max-h-[80vh] rounded-xl border sm:max-h-[60vh]', className)}
         src={src}
         onClick={(e) => e.stopPropagation()}

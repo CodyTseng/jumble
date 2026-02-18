@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': 'Támogatott NIP-ek',
     'Open in a': 'Megnyitás itt: {{a}}',
     'Cannot handle event of kind k': 'Nem támogatott ez a fajta esemény: {{k}}',
+    'Encrypted direct messages not supported': 'A titkosított közvetlen üzenetek nem támogatottak',
     'Sorry! The note cannot be found 😔': 'Ejj! A poszt nem található 😔',
     'This user has been muted': 'Ez a felhasználó némítva van',
     Wallet: 'Tárca',
@@ -672,6 +673,9 @@ export default {
       'Alapértelmezett bizalmi pontszám szűrő küszöbérték ({{n}}%)',
     'No notes found': 'Nem található jegyzet',
     'Try again later or check your connection': 'Próbáld újra később vagy ellenőrizd a kapcsolatot',
-    'Hide indirect': 'Közvetettek elrejtése'
+    'Hide indirect': 'Közvetettek elrejtése',
+    'Copy note content': 'Jegyzet tartalmának másolása',
+    'Video loop': 'Videó ismétlése',
+    'Automatically replay videos when they end': 'Videók automatikus újrajátszása, amikor véget érnek'
   }
 }

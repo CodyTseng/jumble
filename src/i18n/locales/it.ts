@@ -181,6 +181,7 @@ export default {
     'Supported NIPs': 'NIP supportati',
     'Open in a': 'Apri in {{a}}',
     'Cannot handle event of kind k': 'Impossibile gestire un evento di tipo {{k}}',
+    'Encrypted direct messages not supported': 'Messaggi diretti crittografati non supportati',
     'Sorry! The note cannot be found 😔': 'Spiacente! La nota non può essere trovata 😔',
     'This user has been muted': 'Questo utente è stato zittito',
     Wallet: 'Wallet',
@@ -683,6 +684,9 @@ export default {
       'Soglia predefinita del filtro del punteggio di fiducia ({{n}}%)',
     'No notes found': 'Nessuna nota trovata',
     'Try again later or check your connection': 'Riprova più tardi o controlla la connessione',
-    'Hide indirect': 'Nascondi indirette'
+    'Hide indirect': 'Nascondi indirette',
+    'Copy note content': 'Copia contenuto della nota',
+    'Video loop': 'Ripetizione video',
+    'Automatically replay videos when they end': 'Riprodurre automaticamente i video quando terminano'
   }
 }

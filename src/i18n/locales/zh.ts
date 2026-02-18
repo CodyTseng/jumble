@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': '支持的 NIP',
     'Open in a': '在 {{a}} 中打开',
     'Cannot handle event of kind k': '无法处理类型为 {{k}} 的事件',
+    'Encrypted direct messages not supported': '不支持加密私信',
     'Sorry! The note cannot be found 😔': '抱歉！找不到该笔记 😔',
     'This user has been muted': '该用户已被屏蔽',
     Wallet: '钱包',
@@ -655,6 +656,9 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '默认信任分数过滤阈值 ({{n}}%)',
     'No notes found': '没有找到笔记',
     'Try again later or check your connection': '请稍后重试或检查网络连接',
-    'Hide indirect': '隐藏间接通知'
+    'Hide indirect': '隐藏间接通知',
+    'Copy note content': '复制笔记内容',
+    'Video loop': '视频循环',
+    'Automatically replay videos when they end': '视频播放结束后自动重新播放'
   }
 }

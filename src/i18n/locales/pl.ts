@@ -178,6 +178,7 @@ export default {
     'Supported NIPs': 'Obsługiwane NIP-y',
     'Open in a': 'Otwórz w {{a}}',
     'Cannot handle event of kind k': 'Nie można obsłużyć zdarzenia typu {{k}}',
+    'Encrypted direct messages not supported': 'Szyfrowane wiadomości bezpośrednie nie są obsługiwane',
     'Sorry! The note cannot be found 😔 ': 'Przepraszam! Nie można znaleźć wpisu 😔',
     'This user has been muted': 'Ten użytkownik został przyblokowany',
     Wallet: 'Portfel',
@@ -684,6 +685,9 @@ export default {
       'Domyślny próg filtra wyniku zaufania ({{n}}%)',
     'No notes found': 'Nie znaleziono notatek',
     'Try again later or check your connection': 'Spróbuj ponownie później lub sprawdź połączenie',
-    'Hide indirect': 'Ukryj pośrednie'
+    'Hide indirect': 'Ukryj pośrednie',
+    'Copy note content': 'Kopiuj treść notatki',
+    'Video loop': 'Zapętlanie wideo',
+    'Automatically replay videos when they end': 'Automatycznie powtarzaj filmy po zakończeniu'
   }
 }

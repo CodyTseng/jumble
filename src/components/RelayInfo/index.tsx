@@ -48,7 +48,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             <RelayControls url={relayInfo.url} />
           </div>
           {!!relayInfo.tags?.length && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {relayInfo.tags.map((tag) => (
                 <Badge variant="secondary">{tag}</Badge>
               ))}

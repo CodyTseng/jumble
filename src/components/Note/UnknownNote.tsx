@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { useTranslation } from 'react-i18next'
 import ClientSelect from '../ClientSelect'
 
@@ -13,7 +13,11 @@ export default function UnknownNote({ event, className }: { event: Event; classN
         className
       )}
     >
-      <div>{t('Cannot handle event of kind k', { k: event.kind })}</div>
+      <div>
+        {event.kind === kinds.EncryptedDirectMessage
+          ? t('Encrypted direct messages not supported')
+          : t('Cannot handle event of kind k', { k: event.kind })}
+      </div>
       <ClientSelect event={event} />
     </div>
   )

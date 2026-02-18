@@ -181,6 +181,7 @@ export default {
     'Supported NIPs': '지원 NIP',
     'Open in a': '{{a}}에서 열기',
     'Cannot handle event of kind k': '{{k}} 유형의 이벤트를 처리할 수 없습니다',
+    'Encrypted direct messages not supported': '암호화된 다이렉트 메시지는 지원되지 않습니다',
     'Sorry! The note cannot be found 😔': '죄송합니다! 해당 노트를 찾을 수 없습니다 😔',
     'This user has been muted': '이 사용자는 차단되었습니다',
     Wallet: '지갑',
@@ -672,6 +673,9 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '기본 신뢰 점수 필터 임계값 ({{n}}%)',
     'No notes found': '노트를 찾을 수 없습니다',
     'Try again later or check your connection': '나중에 다시 시도하거나 연결을 확인하세요',
-    'Hide indirect': '간접 숨기기'
+    'Hide indirect': '간접 숨기기',
+    'Copy note content': '노트 내용 복사',
+    'Video loop': '비디오 반복',
+    'Automatically replay videos when they end': '비디오가 끝나면 자동으로 다시 재생'
   }
 }

@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': '支援的 NIP',
     'Open in a': '在 {{a}} 中開啟',
     'Cannot handle event of kind k': '無法處理類型為 {{k}} 的事件',
+    'Encrypted direct messages not supported': '不支援加密私訊',
     'Sorry! The note cannot be found 😔': '抱歉！找不到該筆記 😔',
     'This user has been muted': '該使用者已被封鎖',
     Wallet: '錢包',
@@ -650,6 +651,9 @@ export default {
     'Default trust score filter threshold ({{n}}%)': '預設信任分數過濾閾值 ({{n}}%)',
     'No notes found': '沒有找到筆記',
     'Try again later or check your connection': '請稍後重試或檢查網路連接',
-    'Hide indirect': '隱藏間接通知'
+    'Hide indirect': '隱藏間接通知',
+    'Copy note content': '複製筆記內容',
+    'Video loop': '影片循環',
+    'Automatically replay videos when they end': '影片播放結束後自動重新播放'
   }
 }

@@ -188,6 +188,14 @@ export function useMenuActions({
         }
       },
       {
+        icon: Copy,
+        label: t('Copy note content'),
+        onClick: () => {
+          navigator.clipboard.writeText(event.content)
+          closeDrawer()
+        }
+      },
+      {
         icon: Code,
         label: t('View raw event'),
         onClick: () => {

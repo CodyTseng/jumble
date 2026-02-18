@@ -181,6 +181,7 @@ export default {
     'Supported NIPs': 'NIPs Suportados',
     'Open in a': 'Abrir em {{a}}',
     'Cannot handle event of kind k': 'Não é possível lidar com o evento do tipo {{k}}',
+    'Encrypted direct messages not supported': 'Mensagens diretas criptografadas não suportadas',
     'Sorry! The note cannot be found 😔': 'Desculpe! A nota não pode ser encontrada 😔',
     'This user has been muted': 'Este usuário foi silenciado',
     Wallet: 'Carteira',
@@ -681,6 +682,9 @@ export default {
     'No notes found': 'Nenhuma nota encontrada',
     'Try again later or check your connection':
       'Tente novamente mais tarde ou verifique sua conexão',
-    'Hide indirect': 'Ocultar indiretas'
+    'Hide indirect': 'Ocultar indiretas',
+    'Copy note content': 'Copiar conteúdo da nota',
+    'Video loop': 'Repetir vídeo',
+    'Automatically replay videos when they end': 'Reproduzir automaticamente os vídeos quando terminarem'
   }
 }

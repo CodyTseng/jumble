@@ -181,6 +181,7 @@ export default {
     'Supported NIPs': 'NIPs supportés',
     'Open in a': 'Ouvrir dans {{a}}',
     'Cannot handle event of kind k': "Impossible de traiter l'événement de type {{k}}",
+    'Encrypted direct messages not supported': 'Messages directs chiffrés non pris en charge',
     'Sorry! The note cannot be found 😔': 'Désolé ! La note est introuvable 😔',
     'This user has been muted': 'Cet utilisateur a été mis en sourdine',
     Wallet: 'Portefeuille',
@@ -687,6 +688,9 @@ export default {
       'Seuil par défaut du filtre de score de confiance ({{n}}%)',
     'No notes found': 'Aucune note trouvée',
     'Try again later or check your connection': 'Réessayez plus tard ou vérifiez votre connexion',
-    'Hide indirect': 'Masquer indirects'
+    'Hide indirect': 'Masquer indirects',
+    'Copy note content': 'Copier le contenu de la note',
+    'Video loop': 'Boucle vidéo',
+    'Automatically replay videos when they end': 'Rejouer automatiquement les vidéos à la fin'
   }
 }

@@ -178,6 +178,7 @@ export default {
     'Supported NIPs': 'NIPs المدعومة',
     'Open in a': 'فتح في {{a}}',
     'Cannot handle event of kind k': 'لا يمكن معالجة الحدث من النوع {{k}}',
+    'Encrypted direct messages not supported': 'الرسائل المباشرة المشفرة غير مدعومة',
     'Sorry! The note cannot be found 😔': 'عذراً! لا يمكن العثور على الملاحظة 😔',
     'This user has been muted': 'تم كتم هذا المستخدم',
     Wallet: 'المحفظة',
@@ -666,6 +667,9 @@ export default {
     'Default trust score filter threshold ({{n}}%)': 'عتبة مرشح درجة الثقة الافتراضية ({{n}}%)',
     'No notes found': 'لم يتم العثور على ملاحظات',
     'Try again later or check your connection': 'حاول مرة أخرى لاحقًا أو تحقق من اتصالك',
-    'Hide indirect': 'إخفاء غير المباشرة'
+    'Hide indirect': 'إخفاء غير المباشرة',
+    'Copy note content': 'نسخ محتوى الملاحظة',
+    'Video loop': 'تكرار الفيديو',
+    'Automatically replay videos when they end': 'إعادة تشغيل مقاطع الفيديو تلقائيًا عند انتهائها'
   }
 }

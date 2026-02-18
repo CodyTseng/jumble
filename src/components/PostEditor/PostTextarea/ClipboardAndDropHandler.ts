@@ -60,7 +60,7 @@ export const ClipboardAndDropHandler = Extension.create<ClipboardAndDropHandlerO
 
             const items = Array.from(event.dataTransfer?.files ?? [])
             const mediaFiles = items.filter(
-              (item) => item.type.includes('image') || item.type.includes('video')
+              (item) => item.type.includes('image') || item.type.includes('video') || item.type.includes('audio')
             )
             if (!mediaFiles.length) return false
 
@@ -74,7 +74,7 @@ export const ClipboardAndDropHandler = Extension.create<ClipboardAndDropHandlerO
             for (const item of items) {
               if (
                 item.kind === 'file' &&
-                (item.type.includes('image') || item.type.includes('video'))
+                (item.type.includes('image') || item.type.includes('video') || item.type.includes('audio'))
               ) {
                 const file = item.getAsFile()
                 if (file) {

@@ -180,6 +180,7 @@ export default {
     'Supported NIPs': '対応NIP',
     'Open in a': '{{a}}で開く',
     'Cannot handle event of kind k': '種類{{k}}のイベントは処理できません',
+    'Encrypted direct messages not supported': '暗号化ダイレクトメッセージには対応していません',
     'Sorry! The note cannot be found 😔': '申し訳ありません！ノートが見つかりません 😔',
     'This user has been muted': 'このユーザーはミュートされています',
     Wallet: 'ウォレット',
@@ -678,6 +679,9 @@ export default {
     'No notes found': 'ノートが見つかりません',
     'Try again later or check your connection':
       '後でもう一度お試しいただくか、接続を確認してください',
-    'Hide indirect': '間接通知を非表示'
+    'Hide indirect': '間接通知を非表示',
+    'Copy note content': 'ノート内容をコピー',
+    'Video loop': 'ビデオループ',
+    'Automatically replay videos when they end': 'ビデオ終了時に自動的にリプレイする'
   }
 }

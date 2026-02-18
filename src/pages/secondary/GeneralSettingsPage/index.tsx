@@ -29,6 +29,8 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const {
     autoplay,
     setAutoplay,
+    videoLoop,
+    setVideoLoop,
     nsfwDisplayPolicy,
     setNsfwDisplayPolicy,
     hideContentMentioningMutedUsers,
@@ -120,6 +122,15 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             <div className="text-muted-foreground">{t('Enable video autoplay on this device')}</div>
           </Label>
           <Switch id="autoplay" checked={autoplay} onCheckedChange={setAutoplay} />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="video-loop" className="text-base font-normal">
+            <div>{t('Video loop')}</div>
+            <div className="text-muted-foreground">
+              {t('Automatically replay videos when they end')}
+            </div>
+          </Label>
+          <Switch id="video-loop" checked={videoLoop} onCheckedChange={setVideoLoop} />
         </SettingItem>
         <SettingItem>
           <Label htmlFor="hide-content-mentioning-muted-users" className="text-base font-normal">

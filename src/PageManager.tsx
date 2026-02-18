@@ -139,6 +139,10 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           navigatePrimaryPage('relay', { url })
         }
       }
+      const page = searchParams.get('page')
+      if (page && page in PRIMARY_PAGE_MAP) {
+        navigatePrimaryPage(page as TPrimaryPageName)
+      }
     }
 
     const onPopState = (e: PopStateEvent) => {
