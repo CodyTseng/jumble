@@ -1401,6 +1401,33 @@ class ClientService extends EventTarget {
 
   /** =========== Replaceable event =========== */
 
+  async fetchDmRelaysEvent(pubkey: string, updateCache = true) {
+    return await this.fetchReplaceableEvent(pubkey, ExtendedKind.DM_RELAYS, undefined, updateCache)
+  }
+
+  async fetchDmRelays(pubkey: string, updateCache = true) {
+    const dmRelayListEvent = await this.fetchDmRelaysEvent(pubkey, updateCache)
+    return dmRelayListEvent
+      ? Array.from(
+          new Set(
+            dmRelayListEvent.tags
+              .filter((tag) => tag[0] === 'relay' && tag[1])
+              .map((tag) => normalizeUrl(tag[1]))
+              .filter(Boolean)
+          )
+        )
+      : []
+  }
+
+  async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true) {
+    return await this.fetchReplaceableEvent(
+      pubkey,
+      ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT,
+      undefined,
+      updateCache
+    )
+  }
+
   async fetchFollowListEvent(pubkey: string, updateCache = true) {
     return await this.fetchReplaceableEvent(pubkey, kinds.Contacts, undefined, updateCache)
   }

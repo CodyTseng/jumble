@@ -3,15 +3,16 @@ import { Input } from '@/components/ui/input'
 import { DEFAULT_DM_RELAYS } from '@/constants'
 import { normalizeUrl } from '@/lib/url'
 import { useNostr } from '@/providers/NostrProvider'
-import dmRelayService from '@/services/dm-relay.service'
+import client from '@/services/client.service'
 import { Plus, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { createDmRelaysDraftEvent } from '@/lib/draft-event'
 
 export default function DmRelayConfig({ onComplete }: { onComplete?: () => void }) {
   const { t } = useTranslation()
-  const { pubkey, signEvent } = useNostr()
+  const { pubkey, publish } = useNostr()
   const [relays, setRelays] = useState<string[]>([])
   const [newRelay, setNewRelay] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +24,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
     const loadRelays = async () => {
       setIsLoading(true)
       try {
-        const userRelays = await dmRelayService.getDmRelays(pubkey)
+        const userRelays = await client.fetchDmRelays(pubkey)
         setRelays(userRelays)
       } catch {
         setRelays([...DEFAULT_DM_RELAYS])
@@ -67,11 +68,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
 
     setIsSaving(true)
     try {
-      const signer = {
-        getPublicKey: async () => pubkey!,
-        signEvent
-      }
-      await dmRelayService.publishDmRelays(signer as any, relays)
+      await publish(createDmRelaysDraftEvent(relays))
       toast.success(t('DM relays saved'))
       onComplete?.()
     } catch {
@@ -94,7 +91,9 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
       <div>
         <h3 className="text-lg font-semibold mb-2">{t('Configure DM Relays')}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          {t('Select relays to use for direct messages. These relays will receive your encrypted messages.')}
+          {t(
+            'Select relays to use for direct messages. These relays will receive your encrypted messages.'
+          )}
         </p>
       </div>
 

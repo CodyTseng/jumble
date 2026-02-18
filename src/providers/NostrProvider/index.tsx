@@ -85,6 +85,7 @@ type TNostrContext = {
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   nip44Encrypt: (privkey: Uint8Array, pubkey: string, plainText: string) => Promise<string>
   nip44Decrypt: (privkey: Uint8Array, pubkey: string, cipherText: string) => Promise<string>
+  signer: ISigner | null
   hasEncryptionKey: () => boolean
   getEncryptionKeypair: () => TEncryptionKeypair | null
   ensureEncryptionKey: () => Promise<TEncryptionKeypair>
@@ -906,6 +907,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         nip04Decrypt,
         nip44Encrypt,
         nip44Decrypt,
+        signer,
         hasEncryptionKey,
         getEncryptionKeypair,
         ensureEncryptionKey,

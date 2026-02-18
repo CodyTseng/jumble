@@ -20,6 +20,7 @@ const SecondaryPageLayout = forwardRef(
       hideBackButton = false,
       hideTitlebarBottomBorder = false,
       displayScrollToTopButton = false,
+      noScrollArea = false,
       titlebar
     }: {
       children?: React.ReactNode
@@ -29,6 +30,7 @@ const SecondaryPageLayout = forwardRef(
       hideBackButton?: boolean
       hideTitlebarBottomBorder?: boolean
       displayScrollToTopButton?: boolean
+      noScrollArea?: boolean
       titlebar?: React.ReactNode
     },
     ref
@@ -64,9 +66,16 @@ const SecondaryPageLayout = forwardRef(
         <PageActiveContext.Provider value={currentIndex === index}>
           <DeepBrowsingProvider active={currentIndex === index}>
             <div
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-              }}
+              className={noScrollArea ? 'flex flex-col' : undefined}
+              style={
+                noScrollArea
+                  ? {
+                      height: 'calc(var(--vh) - env(safe-area-inset-bottom) - 3rem)'
+                    }
+                  : {
+                      paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+                    }
+              }
             >
               <SecondaryPageTitlebar
                 title={title}
@@ -75,9 +84,32 @@ const SecondaryPageLayout = forwardRef(
                 hideBottomBorder={hideTitlebarBottomBorder}
                 titlebar={titlebar}
               />
-              {children}
+              {noScrollArea ? (
+                <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+              ) : (
+                children
+              )}
             </div>
             {displayScrollToTopButton && <ScrollToTopButton />}
+          </DeepBrowsingProvider>
+        </PageActiveContext.Provider>
+      )
+    }
+
+    if (noScrollArea) {
+      return (
+        <PageActiveContext.Provider value={currentIndex === index}>
+          <DeepBrowsingProvider active={currentIndex === index}>
+            <div className="flex h-full flex-col">
+              <SecondaryPageTitlebar
+                title={title}
+                controls={controls}
+                hideBackButton={hideBackButton}
+                hideBottomBorder={hideTitlebarBottomBorder}
+                titlebar={titlebar}
+              />
+              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+            </div>
           </DeepBrowsingProvider>
         </PageActiveContext.Provider>
       )

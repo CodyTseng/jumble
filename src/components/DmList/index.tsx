@@ -1,16 +1,15 @@
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
+import { toDmConversation } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import dmMessageService from '@/services/dm-message.service'
-import encryptionKeyService from '@/services/encryption-key.service'
+import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { MessageSquare } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toDmConversation } from '@/lib/link'
 
 dayjs.extend(relativeTime)
 
@@ -25,7 +24,7 @@ export default function DmList() {
     if (!pubkey) return
 
     try {
-      const convs = await dmMessageService.getConversations(pubkey)
+      const convs = await dmService.getConversations(pubkey)
       setConversations(convs)
     } catch (error) {
       console.error('Failed to load conversations:', error)
@@ -41,18 +40,9 @@ export default function DmList() {
   useEffect(() => {
     if (!pubkey) return
 
-    const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
-    if (!encryptionKeypair) return
-
-    const handleNewMessage = () => {
+    const unsubscribe = dmService.onDataChanged(() => {
       loadConversations()
-    }
-
-    const unsubscribe = dmMessageService.subscribeToMessages(
-      pubkey,
-      encryptionKeypair,
-      handleNewMessage
-    )
+    })
 
     return () => {
       unsubscribe()
@@ -66,19 +56,21 @@ export default function DmList() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
 
   if (conversations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4 text-center">
+      <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
         <MessageSquare className="h-16 w-16 text-muted-foreground" />
         <div className="space-y-2">
           <h3 className="font-medium">{t('No conversations yet')}</h3>
-          <p className="text-sm text-muted-foreground max-w-sm">
-            {t('Start a conversation by visiting someone\'s profile and clicking the message button.')}
+          <p className="max-w-sm text-sm text-muted-foreground">
+            {t(
+              "Start a conversation by visiting someone's profile and clicking the message button."
+            )}
           </p>
         </div>
       </div>
@@ -109,24 +101,21 @@ function ConversationItem({
 
   return (
     <button
-      className="w-full flex items-center gap-3 p-3 hover:bg-accent/50 transition-colors text-left"
+      className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-accent/50"
       onClick={onClick}
     >
       <UserAvatar userId={conversation.pubkey} size="normal" />
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <Username
-            userId={conversation.pubkey}
-            className="font-medium truncate"
-          />
-          <span className="text-xs text-muted-foreground shrink-0">{timeAgo}</span>
+          <Username userId={conversation.pubkey} className="truncate font-medium" />
+          <span className="shrink-0 text-xs text-muted-foreground">{timeAgo}</span>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm text-muted-foreground truncate">
+          <p className="truncate text-sm text-muted-foreground">
             {conversation.lastMessageContent}
           </p>
           {conversation.unreadCount > 0 && (
-            <span className="shrink-0 flex items-center justify-center h-5 min-w-[1.25rem] px-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">
+            <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-primary px-1 text-xs font-medium text-primary-foreground">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
             </span>
           )}

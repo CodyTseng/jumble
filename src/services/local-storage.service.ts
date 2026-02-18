@@ -72,6 +72,7 @@ class LocalStorageService {
   private encryptionKeyPrivkeyMap: Record<string, string> = {}
   private clientKeyPrivkeyMap: Record<string, string> = {}
   private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
+  private dmLastSyncedAtMap: Record<string, number> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -327,6 +328,18 @@ class LocalStorageService {
         const map = JSON.parse(lastReadDmTimeMapStr)
         if (typeof map === 'object' && map !== null) {
           this.lastReadDmTimeMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const dmLastSyncedAtMapStr = window.localStorage.getItem(StorageKey.DM_LAST_SYNCED_AT_MAP)
+    if (dmLastSyncedAtMapStr) {
+      try {
+        const map = JSON.parse(dmLastSyncedAtMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.dmLastSyncedAtMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -775,6 +788,18 @@ class LocalStorageService {
     window.localStorage.setItem(
       StorageKey.LAST_READ_DM_TIME_MAP,
       JSON.stringify(this.lastReadDmTimeMap)
+    )
+  }
+
+  getDmLastSyncedAt(accountPubkey: string): number {
+    return this.dmLastSyncedAtMap[accountPubkey] ?? 0
+  }
+
+  setDmLastSyncedAt(accountPubkey: string, time: number) {
+    this.dmLastSyncedAtMap[accountPubkey] = time
+    window.localStorage.setItem(
+      StorageKey.DM_LAST_SYNCED_AT_MAP,
+      JSON.stringify(this.dmLastSyncedAtMap)
     )
   }
 }

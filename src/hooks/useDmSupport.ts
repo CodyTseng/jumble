@@ -1,4 +1,4 @@
-import dmRelayService from '@/services/dm-relay.service'
+import dmService from '@/services/dm.service'
 import { useEffect, useState } from 'react'
 
 export function useDmSupport(pubkey: string | undefined) {
@@ -15,7 +15,7 @@ export function useDmSupport(pubkey: string | undefined) {
     const checkSupport = async () => {
       setIsLoading(true)
       try {
-        const { hasDmRelays, hasEncryptionKey } = await dmRelayService.checkDmSupport(pubkey)
+        const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey)
         setCanStartDm(hasDmRelays && hasEncryptionKey)
       } catch {
         setCanStartDm(false)

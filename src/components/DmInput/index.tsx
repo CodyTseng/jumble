@@ -1,9 +1,6 @@
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { useNostr } from '@/providers/NostrProvider'
-import dmMessageService from '@/services/dm-message.service'
-import encryptionKeyService from '@/services/encryption-key.service'
-import { Loader2, Send } from 'lucide-react'
+import dmService from '@/services/dm.service'
+import { ArrowUp } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -18,33 +15,20 @@ export default function DmInput({
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [content, setContent] = useState('')
-  const [isSending, setIsSending] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSend = async () => {
-    if (!pubkey || !content.trim() || isSending || disabled) return
+    if (!pubkey || !content.trim() || disabled) return
 
-    const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
-    if (!encryptionKeypair) {
-      toast.error(t('Encryption key not found'))
-      return
-    }
+    const messageContent = content.trim()
+    setContent('')
+    textareaRef.current?.focus()
 
-    setIsSending(true)
     try {
-      await dmMessageService.sendMessage(
-        pubkey,
-        recipientPubkey,
-        content.trim(),
-        encryptionKeypair
-      )
-      setContent('')
-      textareaRef.current?.focus()
+      await dmService.sendMessage(pubkey, recipientPubkey, messageContent)
     } catch (error) {
       console.error('Failed to send message:', error)
       toast.error(t('Failed to send message'))
-    } finally {
-      setIsSending(false)
     }
   }
 
@@ -55,34 +39,29 @@ export default function DmInput({
     }
   }
 
+  const hasContent = content.trim().length > 0
+
   return (
-    <div className="border-t p-3 bg-background">
-      <div className="flex gap-2 items-end">
-        <Textarea
+    <div className="border-t bg-background px-3 py-2">
+      <div className="flex items-end gap-2">
+        <textarea
           ref={textareaRef}
           placeholder={t('Type a message...')}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={disabled || isSending}
+          disabled={disabled}
           rows={1}
-          className="min-h-[40px] max-h-32 resize-none"
+          className="max-h-32 min-h-[36px] flex-1 select-text resize-none bg-transparent py-2 text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <Button
-          size="icon"
+        <button
           onClick={handleSend}
-          disabled={!content.trim() || isSending || disabled}
+          disabled={!hasContent || disabled}
+          className="mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
         >
-          {isSending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
+          <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+        </button>
       </div>
-      <p className="text-xs text-muted-foreground mt-1 text-center">
-        {t('Press Ctrl+Enter or Cmd+Enter to send')}
-      </p>
     </div>
   )
 }

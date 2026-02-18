@@ -68,4 +68,18 @@ export class Nip07Signer implements ISigner {
     const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
     return nip44.v2.decrypt(cipherText, conversationKey)
   }
+
+  async nip44SignerEncrypt(pubkey: string, plainText: string) {
+    if (!this.signer?.nip44?.encrypt) {
+      throw new Error('The extension you are using does not support nip44 encryption')
+    }
+    return await this.signer.nip44.encrypt(pubkey, plainText)
+  }
+
+  async nip44SignerDecrypt(pubkey: string, cipherText: string) {
+    if (!this.signer?.nip44?.decrypt) {
+      throw new Error('The extension you are using does not support nip44 decryption')
+    }
+    return await this.signer.nip44.decrypt(pubkey, cipherText)
+  }
 }

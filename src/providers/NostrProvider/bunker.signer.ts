@@ -74,4 +74,18 @@ export class BunkerSigner implements ISigner {
     const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
     return nip44.v2.decrypt(cipherText, conversationKey)
   }
+
+  async nip44SignerEncrypt(pubkey: string, plainText: string) {
+    if (!this.signer) {
+      throw new Error('Not logged in')
+    }
+    return await this.signer.nip44Encrypt(pubkey, plainText)
+  }
+
+  async nip44SignerDecrypt(pubkey: string, cipherText: string) {
+    if (!this.signer) {
+      throw new Error('Not logged in')
+    }
+    return await this.signer.nip44Decrypt(pubkey, cipherText)
+  }
 }

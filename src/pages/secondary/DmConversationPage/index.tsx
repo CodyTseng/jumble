@@ -1,36 +1,38 @@
 import DmInput from '@/components/DmInput'
 import DmMessageList from '@/components/DmMessageList'
-import Username from '@/components/Username'
+import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import dmRelayService from '@/services/dm-relay.service'
+import dmService from '@/services/dm.service'
 import { Loader2 } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const DmConversationPage = forwardRef(
   ({ pubkey: pubkeyOrNpub, index }: { pubkey?: string; index?: number }, ref) => {
     const { t } = useTranslation()
+    const { profile } = useFetchProfile(pubkeyOrNpub)
     const [canSendDm, setCanSendDm] = useState<boolean | null>(null)
-
-    let pubkey = pubkeyOrNpub
-    if (pubkeyOrNpub?.startsWith('npub')) {
-      try {
-        const decoded = nip19.decode(pubkeyOrNpub)
-        if (decoded.type === 'npub') {
-          pubkey = decoded.data
+    const pubkey = useMemo(() => {
+      if (pubkeyOrNpub?.startsWith('npub')) {
+        try {
+          const decoded = nip19.decode(pubkeyOrNpub)
+          if (decoded.type === 'npub') {
+            return decoded.data
+          }
+        } catch {
+          // Invalid npub, keep original
         }
-      } catch {
-        // Invalid npub, keep original
       }
-    }
+      return pubkeyOrNpub
+    }, [pubkeyOrNpub])
 
     useEffect(() => {
       if (!pubkey) return
 
       const checkDmSupport = async () => {
         try {
-          const { hasDmRelays, hasEncryptionKey } = await dmRelayService.checkDmSupport(pubkey!)
+          const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey!)
           setCanSendDm(hasDmRelays && hasEncryptionKey)
         } catch {
           setCanSendDm(false)
@@ -51,28 +53,21 @@ const DmConversationPage = forwardRef(
     }
 
     return (
-      <SecondaryPageLayout
-        index={index}
-        title={<Username userId={pubkey} className="truncate" />}
-        ref={ref}
-        hideTitlebarBottomBorder
-      >
-        <div className="flex flex-col h-[calc(100vh-3rem)]">
-          <DmMessageList otherPubkey={pubkey} />
-          {canSendDm === null ? (
-            <div className="border-t p-4 flex justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : canSendDm === false ? (
-            <div className="border-t p-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                {t('This user has not set up direct messages yet.')}
-              </p>
-            </div>
-          ) : (
-            <DmInput recipientPubkey={pubkey} disabled={!canSendDm} />
-          )}
-        </div>
+      <SecondaryPageLayout index={index} title={profile?.username} ref={ref} noScrollArea>
+        <DmMessageList otherPubkey={pubkey} />
+        {canSendDm === null ? (
+          <div className="flex justify-center border-t p-4">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : canSendDm === false ? (
+          <div className="border-t p-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              {t('This user has not set up direct messages yet.')}
+            </p>
+          </div>
+        ) : (
+          <DmInput recipientPubkey={pubkey} disabled={!canSendDm} />
+        )}
       </SecondaryPageLayout>
     )
   }

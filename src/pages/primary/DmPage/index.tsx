@@ -1,10 +1,11 @@
 import DmList from '@/components/DmList'
 import DmRelayConfig from '@/components/DmRelayConfig'
 import NewDeviceKeySync from '@/components/NewDeviceKeySync'
+import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import dmRelayService from '@/services/dm-relay.service'
+import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import { TPageRef } from '@/types'
 import { Key, Loader2, MessageSquare, Settings, Smartphone } from 'lucide-react'
@@ -12,9 +13,14 @@ import { Event } from 'nostr-tools'
 import { forwardRef, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 
-type TSetupState = 'loading' | 'need_login' | 'need_relays' | 'need_encryption_key' | 'need_sync' | 'ready'
+type TSetupState =
+  | 'loading'
+  | 'need_login'
+  | 'need_relays'
+  | 'need_encryption_key'
+  | 'need_sync'
+  | 'ready'
 
 const DmPage = forwardRef<TPageRef>((_, ref) => {
   const { t } = useTranslation()
@@ -33,7 +39,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     setSetupState('loading')
 
     try {
-      const hasDmRelays = await dmRelayService.hasDmRelays(pubkey)
+      const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey)
       if (!hasDmRelays) {
         setSetupState('need_relays')
         return
@@ -45,9 +51,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
         return
       }
 
-      const existingAnnouncement =
-        await encryptionKeyService.queryEncryptionKeyAnnouncement(pubkey)
-      if (existingAnnouncement) {
+      if (hasEncryptionKey) {
         setSetupState('need_sync')
         return
       }
@@ -65,6 +69,15 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       checkSetup()
     }
   }, [current, pubkey, checkSetup])
+
+  useEffect(() => {
+    if (setupState !== 'ready' || !pubkey) return
+
+    const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+    if (encryptionKeypair) {
+      dmService.init(pubkey, encryptionKeypair)
+    }
+  }, [setupState, pubkey])
 
   // Check for pending sync requests from other devices
   useEffect(() => {
@@ -122,8 +135,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       return
     }
 
-    const existingAnnouncement =
-      await encryptionKeyService.queryEncryptionKeyAnnouncement(pubkey)
+    const existingAnnouncement = await encryptionKeyService.queryEncryptionKeyAnnouncement(pubkey)
     if (existingAnnouncement) {
       setSetupState('need_sync')
     } else {
@@ -184,10 +196,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       {setupState === 'ready' && !showRelayConfig && (
         <>
           {pendingSyncRequests.length > 0 && (
-            <PendingSyncRequests
-              requests={pendingSyncRequests}
-              onSendKey={handleSendKeyToDevice}
-            />
+            <PendingSyncRequests requests={pendingSyncRequests} onSendKey={handleSendKeyToDevice} />
           )}
           <DmList />
         </>
@@ -259,7 +268,9 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
       <div className="space-y-2">
         <h3 className="font-medium">{t('Enable Direct Messages')}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          {t('To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.')}
+          {t(
+            'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.'
+          )}
         </p>
       </div>
       <Button onClick={handlePublish} disabled={isPublishing}>
