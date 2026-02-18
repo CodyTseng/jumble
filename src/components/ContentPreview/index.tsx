@@ -113,7 +113,7 @@ export default function ContentPreview({
   return (
     <div className={className}>
       [
-      {event.kind === 4
+      {event.kind === kinds.EncryptedDirectMessage
         ? t('Encrypted direct messages not supported')
         : t('Cannot handle event of kind k', { k: event.kind })}
       ]

@@ -182,7 +182,7 @@ export default {
     'Supported NIPs': 'Unterstützte NIPs',
     'Open in a': 'Öffnen in {{a}}',
     'Cannot handle event of kind k': 'Ereignis des Typs {{k}} kann nicht verarbeitet werden',
-    'Encrypted direct messages not supported': '',
+    'Encrypted direct messages not supported': 'Verschlüsselte Direktnachrichten werden nicht unterstützt',
     'Sorry! The note cannot be found 😔': 'Entschuldigung! Die Notiz wurde nicht gefunden 😔',
     'This user has been muted': 'Dieser Benutzer wurde stummgeschaltet',
     Wallet: 'Wallet',
