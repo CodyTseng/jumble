@@ -4,9 +4,10 @@ import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useBottomBar } from '@/PageManager'
 import dmService from '@/services/dm.service'
+import { TDmMessage } from '@/types'
 import { Loader2 } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
-import { forwardRef, useEffect, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const DmConversationPage = forwardRef(
@@ -14,7 +15,24 @@ const DmConversationPage = forwardRef(
     const { t } = useTranslation()
     const { profile } = useFetchProfile(pubkeyOrNpub)
     const [canSendDm, setCanSendDm] = useState<boolean | null>(null)
+    const [replyTo, setReplyTo] = useState<{
+      id: string
+      content: string
+      senderPubkey: string
+    } | null>(null)
     const { setHidden } = useBottomBar()
+
+    const handleReply = useCallback((message: TDmMessage) => {
+      setReplyTo({ id: message.id, content: message.content, senderPubkey: message.senderPubkey })
+    }, [])
+
+    const handleCancelReply = useCallback(() => {
+      setReplyTo(null)
+    }, [])
+
+    const handleSent = useCallback(() => {
+      setReplyTo(null)
+    }, [])
 
     useEffect(() => {
       setHidden(true)
@@ -61,7 +79,7 @@ const DmConversationPage = forwardRef(
 
     return (
       <SecondaryPageLayout index={index} title={profile?.username} ref={ref} noScrollArea>
-        <DmMessageList otherPubkey={pubkey} />
+        <DmMessageList otherPubkey={pubkey} onReply={handleReply} />
         {canSendDm === null ? (
           <div className="flex justify-center border-t p-4">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -73,7 +91,13 @@ const DmConversationPage = forwardRef(
             </p>
           </div>
         ) : (
-          <DmInput recipientPubkey={pubkey} disabled={!canSendDm} />
+          <DmInput
+            recipientPubkey={pubkey}
+            disabled={!canSendDm}
+            replyTo={replyTo}
+            onCancelReply={handleCancelReply}
+            onSent={handleSent}
+          />
         )}
       </SecondaryPageLayout>
     )

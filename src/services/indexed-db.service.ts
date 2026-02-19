@@ -721,6 +721,28 @@ class IndexedDbService {
     })
   }
 
+  async getDmMessageById(id: string): Promise<TDmMessage | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.get(id)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve(request.result ? (request.result as TDmMessage) : null)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   private getReplaceableEventKeyFromEvent(event: Event): string {
     if (
       [kinds.Metadata, kinds.Contacts].includes(event.kind) ||

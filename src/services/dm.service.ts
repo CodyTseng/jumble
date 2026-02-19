@@ -182,6 +182,7 @@ class DmService {
           giftWrap
         )
         if (message) {
+          await this.resolveReplyTo(message)
           messages.push(message)
           await this.saveMessage(accountPubkey, message)
         }
@@ -194,7 +195,8 @@ class DmService {
   async sendMessage(
     accountPubkey: string,
     recipientPubkey: string,
-    content: string
+    content: string,
+    replyTo?: { id: string; content: string; senderPubkey: string }
   ): Promise<TDmMessage | null> {
     const keypair =
       this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
@@ -209,12 +211,14 @@ class DmService {
 
     const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
 
+    const extraTags = replyTo ? [['e', replyTo.id, '', 'reply']] : undefined
     const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       content,
       accountPubkey,
       keypair.privkey,
       recipientPubkey,
-      recipientEncryptionPubkey
+      recipientEncryptionPubkey,
+      extraTags
     )
 
     const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
@@ -232,7 +236,8 @@ class DmService {
       content: rumor.content,
       createdAt: rumor.created_at,
       originalEvent: selfGiftWrap,
-      decryptedRumor: rumor as unknown as Event
+      decryptedRumor: rumor as unknown as Event,
+      ...(replyTo ? { replyTo } : {})
     }
 
     // Save and show immediately (optimistic UI)
@@ -292,6 +297,7 @@ class DmService {
             giftWrap
           )
           if (message) {
+            await this.resolveReplyTo(message)
             await this.saveMessage(accountPubkey, message)
 
             const fromMe = this.isFromMe(
@@ -379,6 +385,10 @@ class DmService {
     const otherPubkey = fromMe ? recipientPubkey : senderPubkey
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
 
+    // Parse reply tag
+    const replyTag = rumor.tags.find((t) => t[0] === 'e' && t[3] === 'reply')
+    const replyToId = replyTag?.[1]
+
     return {
       id: rumor.id,
       conversationKey,
@@ -386,8 +396,24 @@ class DmService {
       content: rumor.content,
       createdAt: rumor.created_at,
       originalEvent: giftWrap,
-      decryptedRumor: rumor as unknown as Event
+      decryptedRumor: rumor as unknown as Event,
+      ...(replyToId ? { replyTo: { id: replyToId, content: '', senderPubkey: '' } } : {})
     }
+  }
+
+  async resolveReplyTo(message: TDmMessage): Promise<TDmMessage> {
+    if (!message.replyTo || (message.replyTo.content && message.replyTo.senderPubkey)) {
+      return message
+    }
+    const replyMsg = await indexedDb.getDmMessageById(message.replyTo.id)
+    if (replyMsg) {
+      message.replyTo = {
+        id: replyMsg.id,
+        content: replyMsg.content,
+        senderPubkey: replyMsg.senderPubkey
+      }
+    }
+    return message
   }
 
   private async saveMessage(_accountPubkey: string, message: TDmMessage): Promise<void> {

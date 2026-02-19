@@ -244,6 +244,11 @@ export type TDmMessage = {
   createdAt: number
   originalEvent: Event
   decryptedRumor: Event
+  replyTo?: {
+    id: string
+    content: string
+    senderPubkey: string
+  }
 }
 
 export type TEncryptionKeypair = {

@@ -1,16 +1,23 @@
+import { SimpleUsername } from '@/components/Username'
 import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 export default function DmInput({
   recipientPubkey,
-  disabled = false
+  disabled = false,
+  replyTo,
+  onCancelReply,
+  onSent
 }: {
   recipientPubkey: string
   disabled?: boolean
+  replyTo?: { id: string; content: string; senderPubkey: string } | null
+  onCancelReply?: () => void
+  onSent?: () => void
 }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
@@ -28,6 +35,12 @@ export default function DmInput({
     adjustHeight()
   }, [content])
 
+  useEffect(() => {
+    if (replyTo) {
+      textareaRef.current?.focus()
+    }
+  }, [replyTo])
+
   const handleSend = async () => {
     if (!pubkey || !content.trim() || disabled) return
 
@@ -36,7 +49,13 @@ export default function DmInput({
     textareaRef.current?.focus()
 
     try {
-      await dmService.sendMessage(pubkey, recipientPubkey, messageContent)
+      await dmService.sendMessage(
+        pubkey,
+        recipientPubkey,
+        messageContent,
+        replyTo ?? undefined
+      )
+      onSent?.()
     } catch (error) {
       console.error('Failed to send message:', error)
       toast.error(t('Failed to send message'))
@@ -54,6 +73,26 @@ export default function DmInput({
 
   return (
     <div className="border-t bg-background px-4 py-2">
+      {replyTo && (
+        <div className="mb-2 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
+          <div className="min-w-0 flex-1 border-l-2 border-primary pl-2">
+            <SimpleUsername
+              userId={replyTo.senderPubkey}
+              className="text-xs font-medium text-primary"
+              withoutSkeleton
+            />
+            <p className="truncate text-xs text-muted-foreground">
+              {replyTo.content || '...'}
+            </p>
+          </div>
+          <button
+            onClick={onCancelReply}
+            className="shrink-0 rounded-full p-0.5 text-muted-foreground hover:bg-secondary"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
       <div className="flex items-end gap-2">
         <textarea
           ref={textareaRef}

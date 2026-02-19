@@ -1,14 +1,21 @@
 import UserAvatar from '@/components/UserAvatar'
+import { SimpleUsername } from '@/components/Username'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, Check, Clock, Loader2 } from 'lucide-react'
+import { AlertCircle, Check, Clock, Loader2, Reply } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function DmMessageList({ otherPubkey }: { otherPubkey: string }) {
+export default function DmMessageList({
+  otherPubkey,
+  onReply
+}: {
+  otherPubkey: string
+  onReply?: (message: TDmMessage) => void
+}) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [messages, setMessages] = useState<TDmMessage[]>([])
@@ -20,6 +27,20 @@ export default function DmMessageList({ otherPubkey }: { otherPubkey: string }) 
   const bottomRef = useRef<HTMLDivElement>(null)
   const isInitialLoad = useRef(true)
   const lastMessageIdRef = useRef<string | null>(null)
+  const messageRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
+  const [highlightedId, setHighlightedId] = useState<string | null>(null)
+  const [elevatedId, setElevatedId] = useState<string | null>(null)
+
+  const scrollToMessage = useCallback((id: string) => {
+    const el = messageRefsMap.current.get(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setHighlightedId(id)
+      setElevatedId(id)
+      setTimeout(() => setHighlightedId(null), 1500)
+      setTimeout(() => setElevatedId(null), 2000)
+    }
+  }, [])
 
   const loadMessages = useCallback(async () => {
     if (!pubkey) return
@@ -181,6 +202,17 @@ export default function DmMessageList({ otherPubkey }: { otherPubkey: string }) 
               isGroupEnd={isGroupEnd}
               sendingStatus={isOwn ? dmService.getSendingStatus(message.id) : undefined}
               className={showTime ? 'mt-1' : isGroupStart ? 'mt-3' : 'mt-0.5'}
+              onReply={onReply}
+              onScrollToMessage={scrollToMessage}
+              isHighlighted={highlightedId === message.id}
+              isElevated={elevatedId === message.id}
+              refCallback={(el) => {
+                if (el) {
+                  messageRefsMap.current.set(message.id, el)
+                } else {
+                  messageRefsMap.current.delete(message.id)
+                }
+              }}
             />
           </Fragment>
         )
@@ -196,7 +228,12 @@ function MessageBubble({
   isGroupStart,
   isGroupEnd,
   sendingStatus,
-  className
+  className,
+  onReply,
+  onScrollToMessage,
+  isHighlighted,
+  isElevated,
+  refCallback
 }: {
   message: TDmMessage
   isOwn: boolean
@@ -204,29 +241,72 @@ function MessageBubble({
   isGroupEnd: boolean
   sendingStatus?: 'sending' | 'sent' | 'failed'
   className?: string
+  onReply?: (message: TDmMessage) => void
+  onScrollToMessage?: (id: string) => void
+  isHighlighted?: boolean
+  isElevated?: boolean
+  refCallback?: (el: HTMLDivElement | null) => void
 }) {
   const bubbleClass = isOwn
     ? cn(
-        'break-words px-3 py-1 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground',
+        'break-words px-3 py-1 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
         isGroupStart ? 'rounded-tr-md' : 'rounded-tr-[2px]',
-        isGroupEnd && !isGroupStart ? 'rounded-br-md' : 'rounded-br-[2px]'
+        isGroupEnd && !isGroupStart ? 'rounded-br-md' : 'rounded-br-[2px]',
+        isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
       )
     : cn(
-        'break-words px-3 py-1 rounded-tr-md rounded-br-md bg-secondary',
+        'break-words px-3 py-1 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
         isGroupStart ? 'rounded-tl-md' : 'rounded-tl-[2px]',
-        isGroupEnd && !isGroupStart ? 'rounded-bl-md' : 'rounded-bl-[2px]'
+        isGroupEnd && !isGroupStart ? 'rounded-bl-md' : 'rounded-bl-[2px]',
+        isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
       )
 
   return (
-    <div className={cn('flex gap-2', isOwn ? 'flex-row-reverse' : 'flex-row', className)}>
+    <div
+      ref={refCallback}
+      className={cn(
+        'group/msg flex gap-2',
+        isOwn ? 'flex-row-reverse' : 'flex-row',
+        isElevated && 'relative z-10',
+        className
+      )}
+    >
       {!isOwn && (
         <div className="w-8 shrink-0">
           {isGroupStart && <UserAvatar userId={message.senderPubkey} size="small" />}
         </div>
       )}
-      <div className={cn('flex min-w-0 max-w-[75%] flex-col', isOwn ? 'items-end' : 'items-start')}>
-        <div className="flex min-w-0 max-w-full items-end gap-1">
-          {sendingStatus && <SendingStatusIcon status={sendingStatus} />}
+      <div className={cn('flex min-w-0 max-w-[75%]', isOwn ? 'flex-row' : 'flex-row-reverse')}>
+        {onReply && (
+          <button
+            onClick={() => onReply(message)}
+            className="mt-auto shrink-0 rounded-full p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-secondary group-hover/msg:opacity-100"
+          >
+            <Reply className="h-3.5 w-3.5" />
+          </button>
+        )}
+        {sendingStatus && (
+          <div className="mt-auto pb-1">
+            <SendingStatusIcon status={sendingStatus} />
+          </div>
+        )}
+        <div className={cn('flex min-w-0 flex-col', isOwn ? 'items-end' : 'items-start')}>
+          {message.replyTo && (
+            <button
+              onClick={() => onScrollToMessage?.(message.replyTo!.id)}
+              className="mb-0.5 flex min-w-0 max-w-full items-center overflow-hidden rounded py-0.5 pl-1.5 pr-2 text-[11px] text-muted-foreground hover:bg-muted"
+            >
+              <span className="mr-1.5 self-stretch border-l-2 border-muted-foreground/50" />
+              {message.replyTo.senderPubkey ? (
+                <SimpleUsername
+                  userId={message.replyTo.senderPubkey}
+                  className="mr-1 shrink-0 font-medium"
+                  withoutSkeleton
+                />
+              ) : null}
+              <span className="truncate">{message.replyTo.content || '...'}</span>
+            </button>
+          )}
           <div className={bubbleClass}>
             <p className="select-text whitespace-pre-wrap break-all text-base">{message.content}</p>
           </div>
