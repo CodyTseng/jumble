@@ -1,3 +1,5 @@
+import Content from '@/components/Content'
+import ContentPreviewContent from '@/components/ContentPreview/Content'
 import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import { cn } from '@/lib/utils'
@@ -247,15 +249,19 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
+  const hasEmbeddedContent = /https?:\/\/|nostr:|note1|nevent1/.test(message.content)
+
   const bubbleClass = isOwn
     ? cn(
-        'break-words px-3 py-1 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
+        'max-w-full overflow-hidden break-words px-3 py-1 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
+        hasEmbeddedContent ? 'w-full' : 'w-fit',
         isGroupStart ? 'rounded-tr-md' : 'rounded-tr-[2px]',
         isGroupEnd && !isGroupStart ? 'rounded-br-md' : 'rounded-br-[2px]',
         isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
       )
     : cn(
-        'break-words px-3 py-1 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
+        'max-w-full overflow-hidden break-words px-3 py-1 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
+        hasEmbeddedContent ? 'w-full' : 'w-fit',
         isGroupStart ? 'rounded-tl-md' : 'rounded-tl-[2px]',
         isGroupEnd && !isGroupStart ? 'rounded-bl-md' : 'rounded-bl-[2px]',
         isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
@@ -276,7 +282,7 @@ function MessageBubble({
           {isGroupStart && <UserAvatar userId={message.senderPubkey} size="small" />}
         </div>
       )}
-      <div className={cn('flex min-w-0 max-w-[75%]', isOwn ? 'flex-row' : 'flex-row-reverse')}>
+      <div className={cn('flex min-w-0 max-w-[75%]', hasEmbeddedContent && 'w-full', isOwn ? 'flex-row' : 'flex-row-reverse')}>
         {onReply && (
           <button
             onClick={() => onReply(message)}
@@ -290,7 +296,7 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        <div className={cn('flex min-w-0 flex-col', isOwn ? 'items-end' : 'items-start')}>
+        <div className={cn('flex min-w-0 flex-1 flex-col', isOwn ? 'items-end' : 'items-start')}>
           {message.replyTo && (
             <button
               onClick={() => onScrollToMessage?.(message.replyTo!.id)}
@@ -304,11 +310,21 @@ function MessageBubble({
                   withoutSkeleton
                 />
               ) : null}
-              <span className="truncate">{message.replyTo.content || '...'}</span>
+              <ContentPreviewContent
+                content={message.replyTo.content || '...'}
+                className="truncate"
+              />
             </button>
           )}
           <div className={bubbleClass}>
-            <p className="select-text whitespace-pre-wrap break-all text-base">{message.content}</p>
+            <Content
+              content={message.content}
+              className={cn(
+                'select-text text-base',
+                isOwn && '[&>div]:text-foreground',
+                '[&_.bg-card:hover]:bg-accent'
+              )}
+            />
           </div>
         </div>
       </div>
