@@ -211,7 +211,8 @@ class DmService {
 
     const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
 
-    const extraTags = replyTo ? [['e', replyTo.id, '', 'reply']] : undefined
+    const replyRelayHint = recipientDmRelays[0] ?? ''
+    const extraTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : undefined
     const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       content,
       accountPubkey,
@@ -385,8 +386,8 @@ class DmService {
     const otherPubkey = fromMe ? recipientPubkey : senderPubkey
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
 
-    // Parse reply tag
-    const replyTag = rumor.tags.find((t) => t[0] === 'e' && t[3] === 'reply')
+    // Parse reply tag: ['e', kind-14-id, relay-url]
+    const replyTag = rumor.tags.find((t) => t[0] === 'e')
     const replyToId = replyTag?.[1]
 
     return {
