@@ -1,3 +1,4 @@
+import Tabs from '@/components/Tabs'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { toDmConversation } from '@/lib/link'
@@ -8,10 +9,12 @@ import { TDmConversation } from '@/types'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { MessageSquare } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 dayjs.extend(relativeTime)
+
+type TDmTab = 'messages' | 'requests'
 
 export default function DmList() {
   const { t } = useTranslation()
@@ -19,6 +22,7 @@ export default function DmList() {
   const { push } = useSecondaryPage()
   const [conversations, setConversations] = useState<TDmConversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<TDmTab>('messages')
 
   const loadConversations = useCallback(async () => {
     if (!pubkey) return
@@ -49,6 +53,13 @@ export default function DmList() {
     }
   }, [pubkey, loadConversations])
 
+  const filteredConversations = useMemo(() => {
+    if (activeTab === 'messages') {
+      return conversations.filter((c) => c.hasReplied)
+    }
+    return conversations.filter((c) => !c.hasReplied)
+  }, [conversations, activeTab])
+
   const handleConversationClick = (conv: TDmConversation) => {
     push(toDmConversation(conv.pubkey))
   }
@@ -61,31 +72,50 @@ export default function DmList() {
     )
   }
 
-  if (conversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
-        <MessageSquare className="h-16 w-16 text-muted-foreground" />
-        <div className="space-y-2">
-          <h3 className="font-medium">{t('No conversations yet')}</h3>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            {t(
-              "Start a conversation by visiting someone's profile and clicking the message button."
-            )}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="divide-y">
-      {conversations.map((conv) => (
-        <ConversationItem
-          key={conv.key}
-          conversation={conv}
-          onClick={() => handleConversationClick(conv)}
-        />
-      ))}
+    <div>
+      <Tabs
+        tabs={[
+          { value: 'messages', label: 'Messages' },
+          { value: 'requests', label: 'Requests' }
+        ]}
+        value={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as TDmTab)}
+      />
+      {filteredConversations.length === 0 ? (
+        <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
+          <MessageSquare className="h-16 w-16 text-muted-foreground" />
+          <div className="space-y-2">
+            {activeTab === 'messages' ? (
+              <>
+                <h3 className="font-medium">{t('No conversations yet')}</h3>
+                <p className="max-w-sm text-sm text-muted-foreground">
+                  {t(
+                    "Start a conversation by visiting someone's profile and clicking the message button."
+                  )}
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="font-medium">{t('No message requests')}</h3>
+                <p className="max-w-sm text-sm text-muted-foreground">
+                  {t("Messages from people you haven't replied to will appear here.")}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="divide-y">
+          {filteredConversations.map((conv) => (
+            <ConversationItem
+              key={conv.key}
+              conversation={conv}
+              onClick={() => handleConversationClick(conv)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

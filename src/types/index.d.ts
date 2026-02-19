@@ -233,6 +233,7 @@ export type TDmConversation = {
   lastMessageAt: number
   lastMessageContent: string
   unreadCount: number
+  hasReplied: boolean
 }
 
 export type TDmMessage = {

@@ -413,7 +413,8 @@ class DmService {
         message.createdAt >= (existing?.lastMessageAt ?? 0)
           ? message.content
           : (existing?.lastMessageContent ?? ''),
-      unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0)
+      unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
+      hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey
     }
 
     await indexedDb.putDmConversation(conversation)
@@ -465,12 +466,19 @@ class DmService {
         (m) => m.senderPubkey !== accountPubkey && m.createdAt > lastReadTime
       ).length
 
+      // Check if the user has ever replied in this conversation
+      const existingConversation = await indexedDb.getDmConversation(conversationKey)
+      const hasReplied =
+        existingConversation?.hasReplied ||
+        allMessages.some((m) => m.senderPubkey === accountPubkey)
+
       const conversation: TDmConversation = {
         key: conversationKey,
         pubkey: otherPubkey,
         lastMessageAt: latestMessage?.createdAt ?? 0,
         lastMessageContent: latestMessage?.content ?? '',
-        unreadCount
+        unreadCount,
+        hasReplied
       }
 
       await indexedDb.putDmConversation(conversation)
