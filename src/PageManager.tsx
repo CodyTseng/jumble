@@ -55,6 +55,7 @@ type TBottomBarContext = {
 }
 
 const BottomBarContext = createContext<TBottomBarContext>({ hidden: false, setHidden: () => {} })
+const NO_BOTTOM_BAR: TBottomBarContext = { hidden: true, setHidden: () => {} }
 
 export function usePrimaryPage() {
   const context = useContext(PrimaryPageContext)
@@ -362,6 +363,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
+              <BottomBarContext.Provider value={NO_BOTTOM_BAR}>
               <div className="flex w-full lg:justify-around">
                 <div className="sticky top-0 flex h-[var(--vh)] justify-end self-start lg:w-full">
                   <Sidebar />
@@ -396,6 +398,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <TooManyRelaysAlertDialog />
               <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
+              </BottomBarContext.Provider>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
