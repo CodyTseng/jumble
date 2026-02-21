@@ -49,7 +49,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 12)
+        const request = window.indexedDB.open('jumble', 13)
 
         request.onerror = (event) => {
           reject(event)
@@ -123,8 +123,25 @@ class IndexedDbService {
             const dmMessagesStore = db.createObjectStore(StoreNames.DM_MESSAGES, {
               keyPath: 'id'
             })
-            dmMessagesStore.createIndex('conversationKeyIndex', 'conversationKey')
-            dmMessagesStore.createIndex('createdAtIndex', 'createdAt')
+            dmMessagesStore.createIndex('conversationCreatedAtIndex', [
+              'conversationKey',
+              'createdAt'
+            ])
+          } else {
+            const transaction = (request.transaction as IDBTransaction)!
+            const dmMessagesStore = transaction.objectStore(StoreNames.DM_MESSAGES)
+            if (!dmMessagesStore.indexNames.contains('conversationCreatedAtIndex')) {
+              dmMessagesStore.createIndex('conversationCreatedAtIndex', [
+                'conversationKey',
+                'createdAt'
+              ])
+            }
+            if (dmMessagesStore.indexNames.contains('conversationKeyIndex')) {
+              dmMessagesStore.deleteIndex('conversationKeyIndex')
+            }
+            if (dmMessagesStore.indexNames.contains('createdAtIndex')) {
+              dmMessagesStore.deleteIndex('createdAtIndex')
+            }
           }
 
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
@@ -636,6 +653,29 @@ class IndexedDbService {
     })
   }
 
+  async hasDmMessages(): Promise<boolean> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.openCursor()
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        transaction.commit()
+        resolve(!!cursor)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   async putDmMessage(message: TDmMessage): Promise<void> {
     await this.initPromise
     return new Promise((resolve, reject) => {
@@ -669,24 +709,27 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
       const store = transaction.objectStore(StoreNames.DM_MESSAGES)
-      const index = store.index('conversationKeyIndex')
-      const request = index.openCursor(IDBKeyRange.only(conversationKey), 'prev')
+      const index = store.index('conversationCreatedAtIndex')
 
-      const results: TDmMessage[] = []
       const limit = options?.limit ?? 50
       const before = options?.before
+      const range =
+        before !== undefined
+          ? IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, before], false, true)
+          : IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range, 'prev')
+
+      const results: TDmMessage[] = []
 
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result
         if (cursor && results.length < limit) {
-          const message = cursor.value as TDmMessage
-          if (before === undefined || message.createdAt < before) {
-            results.push(message)
-          }
+          results.push(cursor.value as TDmMessage)
           cursor.continue()
         } else {
           transaction.commit()
-          resolve(results.sort((a, b) => a.createdAt - b.createdAt))
+          results.reverse()
+          resolve(results)
         }
       }
 
@@ -705,8 +748,9 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
       const store = transaction.objectStore(StoreNames.DM_MESSAGES)
-      const index = store.index('conversationKeyIndex')
-      const request = index.openCursor(IDBKeyRange.only(conversationKey), 'prev')
+      const index = store.index('conversationCreatedAtIndex')
+      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range, 'prev')
 
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result

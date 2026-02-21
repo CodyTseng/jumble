@@ -44,7 +44,10 @@ class DmService {
     this.currentEncryptionKeypair = encryptionKeypair
 
     try {
-      const since = storage.getDmLastSyncedAt(accountPubkey)
+      let since = storage.getDmLastSyncedAt(accountPubkey)
+      if (since && !(await indexedDb.hasDmMessages())) {
+        since = 0
+      }
       await this.initMessages(accountPubkey, encryptionKeypair, since || undefined)
       storage.setDmLastSyncedAt(accountPubkey, Math.floor(Date.now() / 1000))
       this.emitDataChanged()
@@ -166,14 +169,22 @@ class DmService {
         received.add(evt.id)
         return true
       })
+      if (newEvents.length === 0) {
+        break
+      }
       newEvents.sort((a, b) => b.created_at - a.created_at)
 
       _since = newEvents[0].created_at + 1
 
       const messages: TDmMessage[] = []
+      let unwrapFailCount = 0
+      let parseFailCount = 0
       for (const giftWrap of newEvents) {
         const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
-        if (!unwrapped) continue
+        if (!unwrapped) {
+          unwrapFailCount++
+          continue
+        }
 
         const message = this.createMessageFromUnwrapped(
           accountPubkey,
@@ -185,8 +196,15 @@ class DmService {
           await this.resolveReplyTo(message)
           messages.push(message)
           await this.saveMessage(accountPubkey, message)
+        } else {
+          parseFailCount++
         }
       }
+      const sentCount = messages.filter((m) => m.senderPubkey === accountPubkey).length
+      const receivedCount = messages.length - sentCount
+      console.log(
+        `[DM sync] batch: ${newEvents.length} events, ${messages.length} messages (${sentCount} sent, ${receivedCount} received), ${unwrapFailCount} unwrap failed, ${parseFailCount} parse failed`
+      )
 
       await this.rebuildConversationsFromMessages(accountPubkey, messages)
     }
@@ -249,10 +267,16 @@ class DmService {
 
     try {
       const myDmRelays = await client.fetchDmRelays(accountPubkey)
-      await Promise.all([
+      const [recipientResult, selfResult] = await Promise.allSettled([
         client.publishEvent(recipientDmRelays, giftWrap),
         client.publishEvent(myDmRelays, selfGiftWrap)
       ])
+      if (selfResult.status === 'rejected') {
+        console.warn('[DM] selfGiftWrap publish failed:', selfResult.reason)
+      }
+      if (recipientResult.status === 'rejected') {
+        throw recipientResult.reason
+      }
 
       this.sendingStatuses.set(message.id, 'sent')
       this.emitSendingStatusChanged()

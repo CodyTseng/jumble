@@ -500,7 +500,6 @@ class ClientService extends EventTarget {
                   .then(() => {
                     hasAuthed = true
                     if (!eosed) {
-                      startedCount++
                       subPromises.push(startSub())
                     }
                   })
