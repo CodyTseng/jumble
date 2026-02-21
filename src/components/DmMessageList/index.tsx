@@ -171,54 +171,96 @@ export default function DmMessageList({
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       )}
-      {messages.map((message, index) => {
-        const isOwn = message.senderPubkey === pubkey
-        const showTime = index === 0 || message.createdAt - messages[index - 1].createdAt > 300
-        const nextShowTime =
-          index < messages.length - 1 &&
-          messages[index + 1].createdAt - message.createdAt > 300
+      {(() => {
+        const groups: {
+          isOwn: boolean
+          showTime: boolean
+          timeCreatedAt: number
+          isFirst: boolean
+          items: {
+            message: TDmMessage
+            isGroupStart: boolean
+            isGroupEnd: boolean
+          }[]
+        }[] = []
 
-        // Time breaks also break bubble grouping
-        const isGroupStart =
-          index === 0 ||
-          messages[index - 1].senderPubkey !== message.senderPubkey ||
-          showTime
-        const isGroupEnd =
-          index === messages.length - 1 ||
-          messages[index + 1].senderPubkey !== message.senderPubkey ||
-          nextShowTime
+        messages.forEach((message, index) => {
+          const isOwn = message.senderPubkey === pubkey
+          const showTime = index === 0 || message.createdAt - messages[index - 1].createdAt > 300
+          const nextShowTime =
+            index < messages.length - 1 && messages[index + 1].createdAt - message.createdAt > 300
+          const isGroupStart =
+            index === 0 || messages[index - 1].senderPubkey !== message.senderPubkey || showTime
+          const isGroupEnd =
+            index === messages.length - 1 ||
+            messages[index + 1].senderPubkey !== message.senderPubkey ||
+            nextShowTime
 
-        return (
-          <Fragment key={message.id}>
-            {showTime && (
-              <div className={cn('flex justify-center', index === 0 ? '' : 'mt-3')}>
+          if (isGroupStart) {
+            groups.push({
+              isOwn,
+              showTime,
+              timeCreatedAt: message.createdAt,
+              isFirst: index === 0,
+              items: []
+            })
+          }
+          groups[groups.length - 1].items.push({ message, isGroupStart, isGroupEnd })
+        })
+
+        return groups.map((group) => (
+          <Fragment key={group.items[0].message.id}>
+            {group.showTime && (
+              <div className={cn('flex justify-center', group.isFirst ? '' : 'mt-3')}>
                 <span className="text-xs text-muted-foreground">
-                  {dayjs.unix(message.createdAt).format('HH:mm')}
+                  {dayjs.unix(group.timeCreatedAt).format('HH:mm')}
                 </span>
               </div>
             )}
-            <MessageBubble
-              message={message}
-              isOwn={isOwn}
-              isGroupStart={isGroupStart}
-              isGroupEnd={isGroupEnd}
-              sendingStatus={isOwn ? dmService.getSendingStatus(message.id) : undefined}
-              className={showTime ? 'mt-1' : isGroupStart ? 'mt-3' : 'mt-0.5'}
-              onReply={onReply}
-              onScrollToMessage={scrollToMessage}
-              isHighlighted={highlightedId === message.id}
-              isElevated={elevatedId === message.id}
-              refCallback={(el) => {
-                if (el) {
-                  messageRefsMap.current.set(message.id, el)
-                } else {
-                  messageRefsMap.current.delete(message.id)
-                }
-              }}
-            />
+            <div
+              className={cn(
+                'flex gap-2',
+                group.isOwn ? 'flex-row-reverse' : 'flex-row',
+                group.showTime ? 'mt-1' : 'mt-3'
+              )}
+            >
+              {!group.isOwn && (
+                <div className="w-10 shrink-0 self-end">
+                  <UserAvatar userId={group.items[0].message.senderPubkey} />
+                </div>
+              )}
+              <div
+                className={cn(
+                  'flex min-w-0 max-w-[75%] flex-col gap-0.5 pt-0.5',
+                  group.isOwn ? 'items-end' : 'items-start'
+                )}
+              >
+                {group.items.map(({ message, isGroupStart, isGroupEnd }) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    isOwn={group.isOwn}
+                    isGroupStart={isGroupStart}
+                    isGroupEnd={isGroupEnd}
+                    sendingStatus={group.isOwn ? dmService.getSendingStatus(message.id) : undefined}
+                    onReply={onReply}
+                    onScrollToMessage={scrollToMessage}
+                    isHighlighted={highlightedId === message.id}
+                    isElevated={elevatedId === message.id}
+                    refCallback={(el) => {
+                      if (el) {
+                        messageRefsMap.current.set(message.id, el)
+                      } else {
+                        messageRefsMap.current.delete(message.id)
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </Fragment>
-        )
-      })}
+        ))
+      })()}
       <div ref={bottomRef} />
     </div>
   )
@@ -230,7 +272,6 @@ function MessageBubble({
   isGroupStart,
   isGroupEnd,
   sendingStatus,
-  className,
   onReply,
   onScrollToMessage,
   isHighlighted,
@@ -242,7 +283,6 @@ function MessageBubble({
   isGroupStart: boolean
   isGroupEnd: boolean
   sendingStatus?: 'sending' | 'sent' | 'failed'
-  className?: string
   onReply?: (message: TDmMessage) => void
   onScrollToMessage?: (id: string) => void
   isHighlighted?: boolean
@@ -253,14 +293,14 @@ function MessageBubble({
 
   const bubbleClass = isOwn
     ? cn(
-        'max-w-full overflow-hidden break-words px-3 py-1 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
+        'max-w-full overflow-hidden break-words px-3 py-1.5 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
         hasEmbeddedContent ? 'w-full' : 'w-fit',
         isGroupStart ? 'rounded-tr-md' : 'rounded-tr-[2px]',
         isGroupEnd && !isGroupStart ? 'rounded-br-md' : 'rounded-br-[2px]',
         isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
       )
     : cn(
-        'max-w-full overflow-hidden break-words px-3 py-1 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
+        'max-w-full overflow-hidden break-words px-3 py-1.5 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
         hasEmbeddedContent ? 'w-full' : 'w-fit',
         isGroupStart ? 'rounded-tl-md' : 'rounded-tl-[2px]',
         isGroupEnd && !isGroupStart ? 'rounded-bl-md' : 'rounded-bl-[2px]',
@@ -271,18 +311,34 @@ function MessageBubble({
     <div
       ref={refCallback}
       className={cn(
-        'group/msg flex gap-2',
-        isOwn ? 'flex-row-reverse' : 'flex-row',
-        isElevated && 'relative z-10',
-        className
+        'group/msg flex max-w-full flex-col',
+        hasEmbeddedContent && 'w-full',
+        isOwn ? 'items-end' : 'items-start',
+        isElevated && 'relative z-10'
       )}
     >
-      {!isOwn && (
-        <div className="w-8 shrink-0">
-          {isGroupStart && <UserAvatar userId={message.senderPubkey} size="small" />}
-        </div>
+      {message.replyTo && (
+        <button
+          onClick={() => onScrollToMessage?.(message.replyTo!.id)}
+          className="mb-0.5 flex min-w-0 max-w-full items-center overflow-hidden rounded py-0.5 pl-1.5 pr-2 text-[11px] text-muted-foreground hover:bg-muted"
+        >
+          <span className="mr-1.5 self-stretch border-l-2 border-muted-foreground/50" />
+          {message.replyTo.senderPubkey ? (
+            <SimpleUsername
+              userId={message.replyTo.senderPubkey}
+              className="mr-1 shrink-0 font-medium"
+              withoutSkeleton
+            />
+          ) : null}
+          <ContentPreviewContent
+            content={message.replyTo.content || '...'}
+            className="truncate"
+          />
+        </button>
       )}
-      <div className={cn('flex min-w-0 max-w-[75%]', hasEmbeddedContent && 'w-full', isOwn ? 'flex-row' : 'flex-row-reverse')}>
+      <div
+        className={cn('flex min-w-0 max-w-full gap-1', isOwn ? 'flex-row' : 'flex-row-reverse')}
+      >
         {onReply && (
           <button
             onClick={() => onReply(message)}
@@ -296,36 +352,15 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        <div className={cn('flex min-w-0 flex-1 flex-col', isOwn ? 'items-end' : 'items-start')}>
-          {message.replyTo && (
-            <button
-              onClick={() => onScrollToMessage?.(message.replyTo!.id)}
-              className="mb-0.5 flex min-w-0 max-w-full items-center overflow-hidden rounded py-0.5 pl-1.5 pr-2 text-[11px] text-muted-foreground hover:bg-muted"
-            >
-              <span className="mr-1.5 self-stretch border-l-2 border-muted-foreground/50" />
-              {message.replyTo.senderPubkey ? (
-                <SimpleUsername
-                  userId={message.replyTo.senderPubkey}
-                  className="mr-1 shrink-0 font-medium"
-                  withoutSkeleton
-                />
-              ) : null}
-              <ContentPreviewContent
-                content={message.replyTo.content || '...'}
-                className="truncate"
-              />
-            </button>
-          )}
-          <div className={bubbleClass}>
-            <Content
-              content={message.content}
-              className={cn(
-                'select-text text-base',
-                isOwn && '[&>div]:text-foreground',
-                '[&_.bg-card:hover]:bg-accent'
-              )}
-            />
-          </div>
+        <div className={bubbleClass}>
+          <Content
+            content={message.content}
+            className={cn(
+              'select-text text-base',
+              isOwn && '[&>div]:text-foreground',
+              '[&_.bg-card:hover]:bg-accent'
+            )}
+          />
         </div>
       </div>
     </div>
