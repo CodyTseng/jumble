@@ -7,7 +7,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, Check, Clock, Loader2, Reply } from 'lucide-react'
+import { AlertCircle, ArrowDown, Check, Clock, Loader2, Reply } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -32,6 +32,8 @@ export default function DmMessageList({
   const messageRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const [elevatedId, setElevatedId] = useState<string | null>(null)
+  const isAtBottomRef = useRef(true)
+  const [newMessageCount, setNewMessageCount] = useState(0)
 
   const scrollToMessage = useCallback((id: string) => {
     const el = messageRefsMap.current.get(id)
@@ -119,7 +121,7 @@ export default function DmMessageList({
     }
   }, [pubkey, otherPubkey, loadMessages])
 
-  // Auto-scroll: on initial load, and when own new message is appended
+  // Auto-scroll: on initial load, own messages always, incoming messages only if at bottom
   useEffect(() => {
     if (messages.length === 0) return
 
@@ -128,8 +130,14 @@ export default function DmMessageList({
     if (isInitialLoad.current) {
       bottomRef.current?.scrollIntoView()
       isInitialLoad.current = false
-    } else if (lastMessage.id !== lastMessageIdRef.current && lastMessage.senderPubkey === pubkey) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    } else if (lastMessage.id !== lastMessageIdRef.current) {
+      if (lastMessage.senderPubkey === pubkey) {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+      } else if (isAtBottomRef.current) {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        setNewMessageCount((c) => c + 1)
+      }
     }
 
     lastMessageIdRef.current = lastMessage.id
@@ -138,11 +146,22 @@ export default function DmMessageList({
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
 
-    const { scrollTop } = containerRef.current
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+    const atBottom = scrollHeight - scrollTop - clientHeight < 100
+    isAtBottomRef.current = atBottom
+    if (atBottom) {
+      setNewMessageCount(0)
+    }
+
     if (scrollTop < 100 && !isLoadingMore && hasMore) {
       loadMoreMessages()
     }
   }, [loadMoreMessages, isLoadingMore, hasMore])
+
+  const scrollToBottom = useCallback(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setNewMessageCount(0)
+  }, [])
 
   if (isLoading) {
     return (
@@ -161,11 +180,12 @@ export default function DmMessageList({
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="flex-1 select-text overflow-y-auto p-4"
-      onScroll={handleScroll}
-    >
+    <div className="relative flex-1 overflow-hidden">
+      <div
+        ref={containerRef}
+        className="h-full select-text overflow-y-auto p-4"
+        onScroll={handleScroll}
+      >
       {isLoadingMore && (
         <div className="flex justify-center py-2">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -261,7 +281,19 @@ export default function DmMessageList({
           </Fragment>
         ))
       })()}
-      <div ref={bottomRef} />
+        <div ref={bottomRef} />
+      </div>
+      {newMessageCount > 0 && (
+        <div className="pointer-events-none absolute bottom-3 flex w-full justify-center">
+          <button
+            onClick={scrollToBottom}
+            className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary-hover"
+          >
+            <ArrowDown className="h-4 w-4" />
+            {t('{{n}} new messages', { n: newMessageCount > 99 ? '99+' : newMessageCount })}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
