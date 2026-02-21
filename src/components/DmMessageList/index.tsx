@@ -27,13 +27,20 @@ export default function DmMessageList({
   const [, setStatusVersion] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const isInitialLoad = useRef(true)
-  const lastMessageIdRef = useRef<string | null>(null)
   const messageRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const [elevatedId, setElevatedId] = useState<string | null>(null)
-  const isAtBottomRef = useRef(true)
-  const [newMessageCount, setNewMessageCount] = useState(0)
+  const pendingMessagesRef = useRef<TDmMessage[]>([])
+  const [pendingCount, setPendingCount] = useState(0)
+
+  const checkIsAtBottom = useCallback(() => {
+    const container = containerRef.current
+    const bottom = bottomRef.current
+    if (!container || !bottom) return true
+    const containerRect = container.getBoundingClientRect()
+    const bottomRect = bottom.getBoundingClientRect()
+    return bottomRect.top - containerRect.bottom < 100
+  }, [])
 
   const scrollToMessage = useCallback((id: string) => {
     const el = messageRefsMap.current.get(id)
@@ -51,7 +58,9 @@ export default function DmMessageList({
 
     try {
       const msgs = await dmService.getMessages(pubkey, otherPubkey, { limit: 50 })
-      setMessages(msgs)
+      // Filter out messages that are in the pending buffer (not yet shown to user)
+      const pendingIds = new Set(pendingMessagesRef.current.map((m) => m.id))
+      setMessages(pendingIds.size > 0 ? msgs.filter((m) => !pendingIds.has(m.id)) : msgs)
       setHasMore(msgs.length >= 50)
     } catch (error) {
       console.error('Failed to load messages:', error)
@@ -98,10 +107,34 @@ export default function DmMessageList({
 
     const unsubMessage = dmService.onNewMessage((message: TDmMessage) => {
       if (message.conversationKey === conversationKey) {
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === message.id)) return prev
-          return [...prev, message]
-        })
+        const atBottom = checkIsAtBottom()
+        const isOwn = message.senderPubkey === pubkey
+
+        if (isOwn || atBottom) {
+          // Flush any pending messages + append new one
+          const pending = pendingMessagesRef.current
+          pendingMessagesRef.current = []
+          setPendingCount(0)
+
+          setMessages((prev) => {
+            const existing = new Set(prev.map((m) => m.id))
+            const newMsgs = [...pending, message].filter((m) => !existing.has(m.id))
+            return newMsgs.length > 0 ? [...prev, ...newMsgs] : prev
+          })
+          // Wait for React render + browser layout before scrolling
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+            })
+          })
+        } else {
+          // Buffer the message, don't touch DOM
+          if (!pendingMessagesRef.current.some((m) => m.id === message.id)) {
+            pendingMessagesRef.current.push(message)
+            setPendingCount((c) => c + 1)
+          }
+        }
+
         dmService.markConversationAsRead(pubkey, otherPubkey)
       }
     })
@@ -119,49 +152,45 @@ export default function DmMessageList({
       unsubData()
       unsubStatus()
     }
-  }, [pubkey, otherPubkey, loadMessages])
+  }, [pubkey, otherPubkey, loadMessages, checkIsAtBottom])
 
-  // Auto-scroll: on initial load, own messages always, incoming messages only if at bottom
-  useEffect(() => {
-    if (messages.length === 0) return
-
-    const lastMessage = messages[messages.length - 1]
-
-    if (isInitialLoad.current) {
-      bottomRef.current?.scrollIntoView()
-      isInitialLoad.current = false
-    } else if (lastMessage.id !== lastMessageIdRef.current) {
-      if (lastMessage.senderPubkey === pubkey) {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      } else if (isAtBottomRef.current) {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      } else {
-        setNewMessageCount((c) => c + 1)
-      }
-    }
-
-    lastMessageIdRef.current = lastMessage.id
-  }, [messages, pubkey])
+  const flushPendingMessages = useCallback(() => {
+    if (pendingMessagesRef.current.length === 0) return
+    const pending = pendingMessagesRef.current
+    pendingMessagesRef.current = []
+    setPendingCount(0)
+    setMessages((prev) => {
+      const existing = new Set(prev.map((m) => m.id))
+      const newMsgs = pending.filter((m) => !existing.has(m.id))
+      return newMsgs.length > 0 ? [...prev, ...newMsgs] : prev
+    })
+  }, [])
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
 
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
-    const atBottom = scrollHeight - scrollTop - clientHeight < 100
-    isAtBottomRef.current = atBottom
-    if (atBottom) {
-      setNewMessageCount(0)
+    if (checkIsAtBottom()) {
+      flushPendingMessages()
     }
 
-    if (scrollTop < 100 && !isLoadingMore && hasMore) {
+    // Load more when near the visual top
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+    // column-reverse: visual top is at scrollHeight - clientHeight
+    const distanceFromVisualTop = Math.min(
+      scrollTop,
+      scrollHeight - clientHeight - scrollTop
+    )
+    if (distanceFromVisualTop < 100 && scrollHeight > clientHeight && !isLoadingMore && hasMore) {
       loadMoreMessages()
     }
-  }, [loadMoreMessages, isLoadingMore, hasMore])
+  }, [loadMoreMessages, isLoadingMore, hasMore, flushPendingMessages, checkIsAtBottom])
 
   const scrollToBottom = useCallback(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    setNewMessageCount(0)
-  }, [])
+    flushPendingMessages()
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    })
+  }, [flushPendingMessages])
 
   if (isLoading) {
     return (
@@ -183,9 +212,10 @@ export default function DmMessageList({
     <div className="relative flex-1 overflow-hidden">
       <div
         ref={containerRef}
-        className="h-full select-text overflow-y-auto p-4"
+        className="flex h-full flex-col-reverse select-text overflow-y-auto p-4 [overflow-anchor:none]"
         onScroll={handleScroll}
       >
+      <div>
       {isLoadingMore && (
         <div className="flex justify-center py-2">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -283,14 +313,15 @@ export default function DmMessageList({
       })()}
         <div ref={bottomRef} />
       </div>
-      {newMessageCount > 0 && (
+      </div>
+      {pendingCount > 0 && (
         <div className="pointer-events-none absolute bottom-3 flex w-full justify-center">
           <button
             onClick={scrollToBottom}
             className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary-hover"
           >
             <ArrowDown className="h-4 w-4" />
-            {t('{{n}} new messages', { n: newMessageCount > 99 ? '99+' : newMessageCount })}
+            {t('{{n}} new messages', { n: pendingCount > 99 ? '99+' : pendingCount })}
           </button>
         </div>
       )}
