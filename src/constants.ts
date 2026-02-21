@@ -52,6 +52,7 @@ export const StorageKey = {
   CLIENT_KEY_PRIVKEY_MAP: 'clientKeyPrivkeyMap',
   LAST_READ_DM_TIME_MAP: 'lastReadDmTimeMap',
   DM_LAST_SYNCED_AT_MAP: 'dmLastSyncedAtMap',
+  DM_BACKWARD_CURSOR_MAP: 'dmBackwardCursorMap',
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
   HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions', // deprecated

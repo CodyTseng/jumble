@@ -74,6 +74,7 @@ class LocalStorageService {
   private clientKeyPrivkeyMap: Record<string, string> = {}
   private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
   private dmLastSyncedAtMap: Record<string, number> = {}
+  private dmBackwardCursorMap: Record<string, number> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -342,6 +343,20 @@ class LocalStorageService {
         const map = JSON.parse(dmLastSyncedAtMapStr)
         if (typeof map === 'object' && map !== null) {
           this.dmLastSyncedAtMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const dmBackwardCursorMapStr = window.localStorage.getItem(
+      StorageKey.DM_BACKWARD_CURSOR_MAP
+    )
+    if (dmBackwardCursorMapStr) {
+      try {
+        const map = JSON.parse(dmBackwardCursorMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.dmBackwardCursorMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -811,6 +826,18 @@ class LocalStorageService {
     window.localStorage.setItem(
       StorageKey.DM_LAST_SYNCED_AT_MAP,
       JSON.stringify(this.dmLastSyncedAtMap)
+    )
+  }
+
+  getDmBackwardCursor(accountPubkey: string): number | undefined {
+    return this.dmBackwardCursorMap[accountPubkey]
+  }
+
+  setDmBackwardCursor(accountPubkey: string, cursor: number) {
+    this.dmBackwardCursorMap[accountPubkey] = cursor
+    window.localStorage.setItem(
+      StorageKey.DM_BACKWARD_CURSOR_MAP,
+      JSON.stringify(this.dmBackwardCursorMap)
     )
   }
 }

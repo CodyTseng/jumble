@@ -47,6 +47,7 @@ class DmService {
       let since = storage.getDmLastSyncedAt(accountPubkey)
       if (since && !(await indexedDb.hasDmMessages())) {
         since = 0
+        storage.setDmBackwardCursor(accountPubkey, 0)
       }
       await this.initMessages(accountPubkey, encryptionKeypair, since || undefined)
       storage.setDmLastSyncedAt(accountPubkey, Math.floor(Date.now() / 1000))
@@ -141,73 +142,97 @@ class DmService {
   async initMessages(accountPubkey: string, encryptionKeypair: TEncryptionKeypair, since?: number) {
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
     if (myDmRelays.length === 0) {
-      return []
+      return
     }
 
-    const received = new Set<string>()
-    let _since = since ? since - DM_TIME_RANDOMIZATION_SECONDS : undefined
+    const BATCH_LIMIT = 1000
+
+    // Forward sync: fetch new messages since last sync
+    if (since) {
+      let _since = since - DM_TIME_RANDOMIZATION_SECONDS
+      while (true) {
+        const events = await client.fetchEvents(myDmRelays, {
+          kinds: [ExtendedKind.GIFT_WRAP],
+          '#p': [encryptionKeypair.pubkey],
+          since: _since,
+          limit: BATCH_LIMIT
+        })
+        if (events.length === 0) break
+
+        // events already sorted desc and trimmed by fetchEvents
+        _since = events[0].created_at + 1
+
+        await this.processGiftWrapBatch(accountPubkey, encryptionKeypair, events)
+      }
+    }
+
+    // Backward sync: paginate through historical messages
+    let backwardCursor = storage.getDmBackwardCursor(accountPubkey)
+    if (backwardCursor === 0) return // all history already fetched
+
     while (true) {
       const filter: Filter = {
         kinds: [ExtendedKind.GIFT_WRAP],
         '#p': [encryptionKeypair.pubkey],
-        limit: 1000
+        limit: BATCH_LIMIT
       }
-
-      if (_since !== undefined) {
-        filter.since = _since
+      if (backwardCursor && backwardCursor > 0) {
+        filter.until = backwardCursor
       }
 
       const events = await client.fetchEvents(myDmRelays, filter)
       if (events.length === 0) {
+        storage.setDmBackwardCursor(accountPubkey, 0)
         break
       }
 
-      const newEvents = events.filter((evt) => {
-        if (received.has(evt.id)) {
-          return false
-        }
-        received.add(evt.id)
-        return true
-      })
-      if (newEvents.length === 0) {
-        break
-      }
-      newEvents.sort((a, b) => b.created_at - a.created_at)
+      await this.processGiftWrapBatch(accountPubkey, encryptionKeypair, events)
+      this.emitDataChanged()
 
-      _since = newEvents[0].created_at + 1
-
-      const messages: TDmMessage[] = []
-      let unwrapFailCount = 0
-      let parseFailCount = 0
-      for (const giftWrap of newEvents) {
-        const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
-        if (!unwrapped) {
-          unwrapFailCount++
-          continue
-        }
-
-        const message = this.createMessageFromUnwrapped(
-          accountPubkey,
-          encryptionKeypair.pubkey,
-          unwrapped,
-          giftWrap
-        )
-        if (message) {
-          await this.resolveReplyTo(message)
-          messages.push(message)
-          await this.saveMessage(accountPubkey, message)
-        } else {
-          parseFailCount++
-        }
-      }
-      const sentCount = messages.filter((m) => m.senderPubkey === accountPubkey).length
-      const receivedCount = messages.length - sentCount
-      console.log(
-        `[DM sync] batch: ${newEvents.length} events, ${messages.length} messages (${sentCount} sent, ${receivedCount} received), ${unwrapFailCount} unwrap failed, ${parseFailCount} parse failed`
-      )
-
-      await this.rebuildConversationsFromMessages(accountPubkey, messages)
+      // events already sorted desc by fetchEvents, oldest is last
+      backwardCursor = events[events.length - 1].created_at
+      storage.setDmBackwardCursor(accountPubkey, backwardCursor)
     }
+  }
+
+  private async processGiftWrapBatch(
+    accountPubkey: string,
+    encryptionKeypair: TEncryptionKeypair,
+    events: Event[]
+  ) {
+    const messages: TDmMessage[] = []
+    let unwrapFailCount = 0
+    let parseFailCount = 0
+
+    for (const giftWrap of events) {
+      const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
+      if (!unwrapped) {
+        unwrapFailCount++
+        continue
+      }
+
+      const message = this.createMessageFromUnwrapped(
+        accountPubkey,
+        encryptionKeypair.pubkey,
+        unwrapped,
+        giftWrap
+      )
+      if (message) {
+        await this.resolveReplyTo(message)
+        messages.push(message)
+        await this.saveMessage(accountPubkey, message)
+      } else {
+        parseFailCount++
+      }
+    }
+
+    const sentCount = messages.filter((m) => m.senderPubkey === accountPubkey).length
+    const receivedCount = messages.length - sentCount
+    console.log(
+      `[DM sync] batch: ${events.length} events, ${messages.length} messages (${sentCount} sent, ${receivedCount} received), ${unwrapFailCount} unwrap failed, ${parseFailCount} parse failed`
+    )
+
+    await this.rebuildConversationsFromMessages(accountPubkey, messages)
   }
 
   async sendMessage(
