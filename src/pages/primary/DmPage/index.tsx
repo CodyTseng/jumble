@@ -70,15 +70,6 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     }
   }, [current, pubkey, checkSetup])
 
-  useEffect(() => {
-    if (setupState !== 'ready' || !pubkey) return
-
-    const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
-    if (encryptionKeypair) {
-      dmService.init(pubkey, encryptionKeypair)
-    }
-  }, [setupState, pubkey])
-
   // Check for pending sync requests from other devices
   useEffect(() => {
     if (setupState !== 'ready' || !pubkey) return
@@ -157,6 +148,10 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       await encryptionKeyService.publishEncryptionKeyAnnouncement(signer as any, pubkey)
       toast.success(t('Encryption key published'))
       setSetupState('ready')
+      const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+      if (encryptionKeypair) {
+        dmService.init(pubkey, encryptionKeypair)
+      }
     } catch (error) {
       console.error('Failed to publish encryption key:', error)
       toast.error(t('Failed to publish encryption key'))
@@ -165,6 +160,12 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
 
   const handleKeySyncComplete = () => {
     setSetupState('ready')
+    if (pubkey) {
+      const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+      if (encryptionKeypair) {
+        dmService.init(pubkey, encryptionKeypair)
+      }
+    }
   }
 
   return (

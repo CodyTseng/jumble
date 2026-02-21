@@ -19,6 +19,7 @@ import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
+import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
@@ -405,6 +406,26 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       stuffStatsService.updateStuffStatsByEvents(events)
     }
     initInteractions()
+  }, [account])
+
+  useEffect(() => {
+    if (!account) return
+
+    const initDm = async () => {
+      const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(account.pubkey)
+      if (!encryptionKeypair) return
+
+      try {
+        await dmService.init(account.pubkey, encryptionKeypair)
+      } catch (error) {
+        console.error('Failed to initialize DM service:', error)
+      }
+    }
+    initDm()
+
+    return () => {
+      dmService.destroy()
+    }
   }, [account])
 
   useEffect(() => {
