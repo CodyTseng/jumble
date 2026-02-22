@@ -75,6 +75,7 @@ class LocalStorageService {
   private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
   private dmLastSyncedAtMap: Record<string, number> = {}
   private dmBackwardCursorMap: Record<string, number> = {}
+  private processedSyncRequestIds: string[] = []
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -357,6 +358,20 @@ class LocalStorageService {
         const map = JSON.parse(dmBackwardCursorMapStr)
         if (typeof map === 'object' && map !== null) {
           this.dmBackwardCursorMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const processedSyncRequestIdsStr = window.localStorage.getItem(
+      StorageKey.PROCESSED_SYNC_REQUEST_IDS
+    )
+    if (processedSyncRequestIdsStr) {
+      try {
+        const arr = JSON.parse(processedSyncRequestIdsStr)
+        if (Array.isArray(arr)) {
+          this.processedSyncRequestIds = arr
         }
       } catch {
         // Invalid JSON, use default
@@ -790,6 +805,14 @@ class LocalStorageService {
     )
   }
 
+  removeEncryptionKeyPrivkey(accountPubkey: string) {
+    delete this.encryptionKeyPrivkeyMap[accountPubkey]
+    window.localStorage.setItem(
+      StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP,
+      JSON.stringify(this.encryptionKeyPrivkeyMap)
+    )
+  }
+
   getClientKeyPrivkey(accountPubkey: string): string | null {
     return this.clientKeyPrivkeyMap[accountPubkey] ?? null
   }
@@ -839,6 +862,20 @@ class LocalStorageService {
       StorageKey.DM_BACKWARD_CURSOR_MAP,
       JSON.stringify(this.dmBackwardCursorMap)
     )
+  }
+
+  getProcessedSyncRequestIds(): string[] {
+    return this.processedSyncRequestIds
+  }
+
+  addProcessedSyncRequestId(eventId: string) {
+    if (!this.processedSyncRequestIds.includes(eventId)) {
+      this.processedSyncRequestIds.push(eventId)
+      window.localStorage.setItem(
+        StorageKey.PROCESSED_SYNC_REQUEST_IDS,
+        JSON.stringify(this.processedSyncRequestIds)
+      )
+    }
   }
 }
 

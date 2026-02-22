@@ -21,6 +21,7 @@ class DmService {
   private dataChangedListeners = new Set<() => void>()
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
+  private syncRequestListeners = new Set<(event: Event) => void>()
 
   private constructor() {}
 
@@ -68,6 +69,7 @@ class DmService {
     this.dataChangedListeners.clear()
     this.sendingStatuses.clear()
     this.sendingStatusListeners.clear()
+    this.syncRequestListeners.clear()
     this.currentAccountPubkey = null
     this.currentEncryptionKeypair = null
     this.isInitialized = false
@@ -118,15 +120,36 @@ class DmService {
     }
   }
 
+  onSyncRequest(listener: (event: Event) => void): () => void {
+    this.syncRequestListeners.add(listener)
+    return () => {
+      this.syncRequestListeners.delete(listener)
+    }
+  }
+
+  private emitSyncRequest(event: Event): void {
+    for (const listener of this.syncRequestListeners) {
+      listener(event)
+    }
+  }
+
+  markSyncRequestProcessed(eventId: string): void {
+    storage.addProcessedSyncRequestId(eventId)
+  }
+
   async checkDmSupport(
     pubkey: string
-  ): Promise<{ hasDmRelays: boolean; hasEncryptionKey: boolean }> {
+  ): Promise<{ hasDmRelays: boolean; hasEncryptionKey: boolean; encryptionPubkey: string | null }> {
     const [dmRelaysEvent, encryptionKeyEvent] = await Promise.all([
       client.fetchDmRelaysEvent(pubkey),
       client.fetchEncryptionKeyAnnouncementEvent(pubkey)
     ])
 
-    return { hasDmRelays: !!dmRelaysEvent, hasEncryptionKey: !!encryptionKeyEvent }
+    const encryptionPubkey = encryptionKeyEvent
+      ? encryptionKeyService.getEncryptionPubkeyFromEvent(encryptionKeyEvent)
+      : null
+
+    return { hasDmRelays: !!dmRelaysEvent, hasEncryptionKey: !!encryptionKeyEvent, encryptionPubkey }
   }
 
   async getRecipientEncryptionPubkey(pubkey: string): Promise<string | null> {
@@ -325,15 +348,36 @@ class DmService {
   ): Promise<void> {
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
 
+    const myClientKeypair = encryptionKeyService.getClientKeypair(accountPubkey)
+    const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300
+
     const sub = client.subscribe(
       myDmRelays,
+      [
+        {
+          kinds: [ExtendedKind.GIFT_WRAP],
+          '#p': [encryptionKeypair.pubkey],
+          limit: 0
+        },
+        {
+          kinds: [ExtendedKind.CLIENT_KEY_ANNOUNCEMENT],
+          authors: [accountPubkey],
+          since: fiveMinutesAgo,
+          limit: 1
+        }
+      ],
       {
-        kinds: [ExtendedKind.GIFT_WRAP],
-        '#p': [encryptionKeypair.pubkey],
-        limit: 0
-      },
-      {
-        onevent: async (giftWrap) => {
+        onevent: async (event) => {
+          if (event.kind === ExtendedKind.CLIENT_KEY_ANNOUNCEMENT) {
+            const clientPubkey = encryptionKeyService.getClientPubkeyFromEvent(event)
+            if (!clientPubkey || clientPubkey === myClientKeypair.pubkey) return
+            if (storage.getProcessedSyncRequestIds().includes(event.id)) return
+            this.emitSyncRequest(event)
+            return
+          }
+
+          // GIFT_WRAP handling
+          const giftWrap = event
           const unwrapped = nip17GiftWrapService.unwrapGiftWrap(
             giftWrap,
             encryptionKeypair.privkey

@@ -1,6 +1,7 @@
 import 'yet-another-react-lightbox/styles.css'
 import './index.css'
 
+import KeySyncRequestHandler from '@/components/KeySyncRequestDialog'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
@@ -45,6 +46,7 @@ export default function App(): JSX.Element {
                                       <MediaUploadServiceProvider>
                                         <KindFilterProvider>
                                           <PageManager />
+                                          <KeySyncRequestHandler />
                                           <Toaster />
                                         </KindFilterProvider>
                                       </MediaUploadServiceProvider>

@@ -1,6 +1,7 @@
 import { DEFAULT_DM_RELAYS, ExtendedKind } from '@/constants'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { tagNameEquals } from '@/lib/tag'
+import { getClientDescription } from '@/lib/utils'
 import { ISigner, TEncryptionKeypair } from '@/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import dayjs from 'dayjs'
@@ -32,6 +33,10 @@ class EncryptionKeyService {
     const privkey = hexToBytes(privkeyHex)
     const pubkey = getPublicKey(privkey)
     return { privkey, pubkey }
+  }
+
+  removeEncryptionKey(accountPubkey: string): void {
+    storage.removeEncryptionKeyPrivkey(accountPubkey)
   }
 
   generateEncryptionKey(accountPubkey: string): TEncryptionKeypair {
@@ -86,7 +91,7 @@ class EncryptionKeyService {
   async publishClientKeyAnnouncement(
     signer: ISigner,
     accountPubkey: string,
-    clientName: string = 'Jumble'
+    clientName: string = getClientDescription()
   ): Promise<Event | null> {
     const clientKeypair = this.getClientKeypair(accountPubkey)
 
@@ -210,7 +215,7 @@ class EncryptionKeyService {
       {
         kinds: [ExtendedKind.KEY_TRANSFER],
         '#p': [clientKeypair.pubkey],
-        limit: 1
+        limit: 0
       },
       {
         onevent: async (event) => {

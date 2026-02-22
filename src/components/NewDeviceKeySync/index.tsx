@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { useNostr } from '@/providers/NostrProvider'
 import encryptionKeyService from '@/services/encryption-key.service'
+import { getClientDescription } from '@/lib/utils'
 import { CheckCircle, Loader2, Smartphone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -40,7 +41,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
           }
         }
 
-        await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey, 'Jumble')
+        await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey, getClientDescription())
         setState('waiting')
 
         unsubscribe = await encryptionKeyService.subscribeToKeyTransfer(

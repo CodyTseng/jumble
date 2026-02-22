@@ -8,8 +8,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import { TPageRef } from '@/types'
-import { Key, Loader2, MessageSquare, Settings, Smartphone } from 'lucide-react'
-import { Event } from 'nostr-tools'
+import { Key, Loader2, MessageSquare, Settings } from 'lucide-react'
 import { forwardRef, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -28,7 +27,6 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
   const { current } = usePrimaryPage()
   const [setupState, setSetupState] = useState<TSetupState>('loading')
   const [showRelayConfig, setShowRelayConfig] = useState(false)
-  const [pendingSyncRequests, setPendingSyncRequests] = useState<Event[]>([])
 
   const checkSetup = useCallback(async () => {
     if (!pubkey) {
@@ -39,14 +37,24 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     setSetupState('loading')
 
     try {
-      const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey)
+      const { hasDmRelays, hasEncryptionKey, encryptionPubkey } =
+        await dmService.checkDmSupport(pubkey)
       if (!hasDmRelays) {
         setSetupState('need_relays')
         return
       }
 
-      const hasLocalKey = encryptionKeyService.hasEncryptionKey(pubkey)
-      if (hasLocalKey) {
+      const localKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+      if (localKeypair) {
+        console.log('[DM setup] local encryptionPubkey:', localKeypair.pubkey)
+        console.log('[DM setup] remote encryptionPubkey:', encryptionPubkey)
+        if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
+          console.log('[DM setup] key mismatch, entering sync flow')
+          encryptionKeyService.removeEncryptionKey(pubkey)
+          dmService.destroy()
+          setSetupState('need_sync')
+          return
+        }
         setSetupState('ready')
         return
       }
@@ -69,52 +77,6 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       checkSetup()
     }
   }, [current, pubkey, checkSetup])
-
-  // Check for pending sync requests from other devices
-  useEffect(() => {
-    if (setupState !== 'ready' || !pubkey) return
-
-    const checkPendingSyncRequests = async () => {
-      try {
-        const clientKeyEvents = await encryptionKeyService.checkOtherDeviceClientKeys(pubkey)
-        // Filter out our own client key
-        const myClientKeypair = encryptionKeyService.getClientKeypair(pubkey)
-        const otherDeviceRequests = clientKeyEvents.filter((event) => {
-          const clientPubkey = encryptionKeyService.getClientPubkeyFromEvent(event)
-          return clientPubkey && clientPubkey !== myClientKeypair.pubkey
-        })
-        setPendingSyncRequests(otherDeviceRequests)
-      } catch (error) {
-        console.error('Failed to check pending sync requests:', error)
-      }
-    }
-
-    checkPendingSyncRequests()
-  }, [setupState, pubkey])
-
-  const handleSendKeyToDevice = async (clientKeyEvent: Event) => {
-    if (!pubkey) return
-
-    const clientPubkey = encryptionKeyService.getClientPubkeyFromEvent(clientKeyEvent)
-    if (!clientPubkey) return
-
-    try {
-      const signer = {
-        getPublicKey: async () => pubkey,
-        signEvent,
-        nip44Encrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-          return encryptionKeyService.encryptWithNip44(privkey, pk, text)
-        }
-      }
-
-      await encryptionKeyService.exportKeyForTransfer(signer as any, pubkey, clientPubkey)
-      toast.success(t('Encryption key sent to other device'))
-      setPendingSyncRequests((prev) => prev.filter((e) => e.id !== clientKeyEvent.id))
-    } catch (error) {
-      console.error('Failed to send key:', error)
-      toast.error(t('Failed to send encryption key'))
-    }
-  }
 
   const handleRelayConfigComplete = async () => {
     if (!pubkey) return
@@ -194,14 +156,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       {setupState === 'need_sync' && !showRelayConfig && (
         <NewDeviceKeySync onComplete={handleKeySyncComplete} />
       )}
-      {setupState === 'ready' && !showRelayConfig && (
-        <>
-          {pendingSyncRequests.length > 0 && (
-            <PendingSyncRequests requests={pendingSyncRequests} onSendKey={handleSendKeyToDevice} />
-          )}
-          <DmList />
-        </>
-      )}
+      {setupState === 'ready' && !showRelayConfig && <DmList />}
     </PrimaryPageLayout>
   )
 })
@@ -288,40 +243,3 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
   )
 }
 
-function PendingSyncRequests({
-  requests,
-  onSendKey
-}: {
-  requests: Event[]
-  onSendKey: (event: Event) => void
-}) {
-  const { t } = useTranslation()
-
-  if (requests.length === 0) return null
-
-  return (
-    <div className="border-b p-4 bg-muted/50">
-      <div className="flex items-center gap-2 mb-2">
-        <Smartphone className="h-4 w-4" />
-        <span className="text-sm font-medium">{t('Pending sync requests')}</span>
-      </div>
-      <div className="space-y-2">
-        {requests.map((request) => {
-          const clientTag = request.tags.find((t) => t[0] === 'client')
-          const clientName = clientTag?.[1] || t('Unknown device')
-          return (
-            <div
-              key={request.id}
-              className="flex items-center justify-between gap-2 p-2 bg-background rounded-lg"
-            >
-              <span className="text-sm truncate">{clientName}</span>
-              <Button size="sm" onClick={() => onSendKey(request)}>
-                {t('Send Key')}
-              </Button>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
