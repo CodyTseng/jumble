@@ -227,24 +227,14 @@ export default function DmMessageList({
           showTime: boolean
           timeCreatedAt: number
           isFirst: boolean
-          items: {
-            message: TDmMessage
-            isGroupStart: boolean
-            isGroupEnd: boolean
-          }[]
+          items: TDmMessage[]
         }[] = []
 
         messages.forEach((message, index) => {
           const isOwn = message.senderPubkey === pubkey
           const showTime = index === 0 || message.createdAt - messages[index - 1].createdAt > 300
-          const nextShowTime =
-            index < messages.length - 1 && messages[index + 1].createdAt - message.createdAt > 300
           const isGroupStart =
             index === 0 || messages[index - 1].senderPubkey !== message.senderPubkey || showTime
-          const isGroupEnd =
-            index === messages.length - 1 ||
-            messages[index + 1].senderPubkey !== message.senderPubkey ||
-            nextShowTime
 
           if (isGroupStart) {
             groups.push({
@@ -255,11 +245,11 @@ export default function DmMessageList({
               items: []
             })
           }
-          groups[groups.length - 1].items.push({ message, isGroupStart, isGroupEnd })
+          groups[groups.length - 1].items.push(message)
         })
 
         return groups.map((group) => (
-          <Fragment key={group.items[0].message.id}>
+          <Fragment key={group.items[0].id}>
             {group.showTime && (
               <div className={cn('flex justify-center', group.isFirst ? '' : 'mt-3')}>
                 <span className="text-xs text-muted-foreground">
@@ -276,7 +266,7 @@ export default function DmMessageList({
             >
               {!group.isOwn && (
                 <div className="w-10 shrink-0 self-end">
-                  <UserAvatar userId={group.items[0].message.senderPubkey} />
+                  <UserAvatar userId={group.items[0].senderPubkey} />
                 </div>
               )}
               <div
@@ -285,13 +275,11 @@ export default function DmMessageList({
                   group.isOwn ? 'items-end' : 'items-start'
                 )}
               >
-                {group.items.map(({ message, isGroupStart, isGroupEnd }) => (
+                {group.items.map((message) => (
                   <MessageBubble
                     key={message.id}
                     message={message}
                     isOwn={group.isOwn}
-                    isGroupStart={isGroupStart}
-                    isGroupEnd={isGroupEnd}
                     sendingStatus={group.isOwn ? dmService.getSendingStatus(message.id) : undefined}
                     onReply={onReply}
                     onScrollToMessage={scrollToMessage}
@@ -332,8 +320,6 @@ export default function DmMessageList({
 function MessageBubble({
   message,
   isOwn,
-  isGroupStart,
-  isGroupEnd,
   sendingStatus,
   onReply,
   onScrollToMessage,
@@ -343,8 +329,6 @@ function MessageBubble({
 }: {
   message: TDmMessage
   isOwn: boolean
-  isGroupStart: boolean
-  isGroupEnd: boolean
   sendingStatus?: 'sending' | 'sent' | 'failed'
   onReply?: (message: TDmMessage) => void
   onScrollToMessage?: (id: string) => void
@@ -354,21 +338,12 @@ function MessageBubble({
 }) {
   const hasEmbeddedContent = /https?:\/\/|nostr:|note1|nevent1/.test(message.content)
 
-  const bubbleClass = isOwn
-    ? cn(
-        'max-w-full overflow-hidden break-words px-3 py-1.5 rounded-tl-md rounded-bl-md bg-primary text-primary-foreground transition-all duration-500',
-        hasEmbeddedContent ? 'w-full' : 'w-fit',
-        isGroupStart ? 'rounded-tr-md' : 'rounded-tr-[2px]',
-        isGroupEnd && !isGroupStart ? 'rounded-br-md' : 'rounded-br-[2px]',
-        isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-      )
-    : cn(
-        'max-w-full overflow-hidden break-words px-3 py-1.5 rounded-tr-md rounded-br-md bg-secondary transition-all duration-500',
-        hasEmbeddedContent ? 'w-full' : 'w-fit',
-        isGroupStart ? 'rounded-tl-md' : 'rounded-tl-[2px]',
-        isGroupEnd && !isGroupStart ? 'rounded-bl-md' : 'rounded-bl-[2px]',
-        isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-      )
+  const bubbleClass = cn(
+    'max-w-full overflow-hidden break-words rounded-md px-3 py-1.5 transition-all duration-500',
+    hasEmbeddedContent ? 'w-full' : 'w-fit',
+    isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary',
+    isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+  )
 
   return (
     <div
