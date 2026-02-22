@@ -1,3 +1,4 @@
+import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import { Button } from '@/components/ui/button'
 import { useNostr } from '@/providers/NostrProvider'
 import encryptionKeyService from '@/services/encryption-key.service'
@@ -148,13 +149,11 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
         </div>
       )}
 
-      <div className="border-t pt-4 w-full">
-        <p className="text-xs text-muted-foreground text-center mb-3">
-          {t("Don't have access to another device? You can generate a new key, but you won't be able to read old messages.")}
+      <div className="border-t pt-4 w-full space-y-3">
+        <p className="text-xs text-muted-foreground text-center">
+          {t("Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.")}
         </p>
-        <Button variant="outline" className="w-full" onClick={handleGenerateNew}>
-          {t('Generate New Key')}
-        </Button>
+        <ResetEncryptionKeyButton onConfirm={handleGenerateNew} className="w-full" />
       </div>
     </div>
   )

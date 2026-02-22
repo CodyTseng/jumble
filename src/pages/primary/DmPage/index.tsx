@@ -1,6 +1,7 @@
 import DmList from '@/components/DmList'
 import DmRelayConfig from '@/components/DmRelayConfig'
 import NewDeviceKeySync from '@/components/NewDeviceKeySync'
+import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { usePrimaryPage } from '@/PageManager'
@@ -29,33 +30,37 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
   const [showRelayConfig, setShowRelayConfig] = useState(false)
 
   const checkSetup = useCallback(async () => {
+    setShowRelayConfig(false)
+
     if (!pubkey) {
       setSetupState('need_login')
+      return
+    }
+
+    // Fast path: if local encryption key exists, setup was already completed.
+    // Skip the network fetch which may return stale cached null from IndexedDB.
+    const localKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+    if (localKeypair) {
+      setSetupState('ready')
+      // Background check for key mismatch (e.g. key rotated on another device)
+      dmService.checkDmSupport(pubkey).then(({ encryptionPubkey }) => {
+        if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
+          console.log('[DM setup] key mismatch detected, entering sync flow')
+          encryptionKeyService.removeEncryptionKey(pubkey)
+          dmService.destroy()
+          setSetupState('need_sync')
+        }
+      }).catch(() => {})
       return
     }
 
     setSetupState('loading')
 
     try {
-      const { hasDmRelays, hasEncryptionKey, encryptionPubkey } =
+      const { hasDmRelays, hasEncryptionKey } =
         await dmService.checkDmSupport(pubkey)
       if (!hasDmRelays) {
         setSetupState('need_relays')
-        return
-      }
-
-      const localKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
-      if (localKeypair) {
-        console.log('[DM setup] local encryptionPubkey:', localKeypair.pubkey)
-        console.log('[DM setup] remote encryptionPubkey:', encryptionPubkey)
-        if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
-          console.log('[DM setup] key mismatch, entering sync flow')
-          encryptionKeyService.removeEncryptionKey(pubkey)
-          dmService.destroy()
-          setSetupState('need_sync')
-          return
-        }
-        setSetupState('ready')
         return
       }
 
@@ -130,6 +135,29 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     }
   }
 
+  const handleResetEncryptionKey = async () => {
+    if (!pubkey) return
+
+    try {
+      encryptionKeyService.removeEncryptionKey(pubkey)
+      dmService.destroy()
+      encryptionKeyService.generateEncryptionKey(pubkey)
+      const signer = {
+        getPublicKey: async () => pubkey,
+        signEvent
+      }
+      await encryptionKeyService.publishEncryptionKeyAnnouncement(signer as any, pubkey)
+      toast.success(t('Encryption key has been reset'))
+      const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
+      if (encryptionKeypair) {
+        dmService.init(pubkey, encryptionKeypair)
+      }
+    } catch (error) {
+      console.error('Failed to reset encryption key:', error)
+      toast.error(t('Failed to reset encryption key'))
+    }
+  }
+
   return (
     <PrimaryPageLayout
       ref={ref}
@@ -137,7 +165,8 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       titlebar={
         <DmPageTitlebar
           showSettings={setupState === 'ready'}
-          onSettingsClick={() => setShowRelayConfig(true)}
+          isSettingsActive={showRelayConfig}
+          onSettingsClick={() => setShowRelayConfig((prev) => !prev)}
         />
       }
     >
@@ -147,8 +176,12 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
         </div>
       )}
       {setupState === 'need_login' && <NeedLoginView />}
-      {(setupState === 'need_relays' || showRelayConfig) && (
-        <DmRelayConfig onComplete={handleRelayConfigComplete} />
+      {setupState === 'need_relays' && <DmRelayConfig onComplete={handleRelayConfigComplete} />}
+      {setupState === 'ready' && showRelayConfig && (
+        <>
+          <DmRelayConfig />
+          <ResetEncryptionKeySection onReset={handleResetEncryptionKey} />
+        </>
       )}
       {setupState === 'need_encryption_key' && !showRelayConfig && (
         <NeedEncryptionKeyView onPublish={handlePublishEncryptionKey} />
@@ -165,9 +198,11 @@ export default DmPage
 
 function DmPageTitlebar({
   showSettings,
+  isSettingsActive,
   onSettingsClick
 }: {
   showSettings: boolean
+  isSettingsActive: boolean
   onSettingsClick: () => void
 }) {
   const { t } = useTranslation()
@@ -179,7 +214,12 @@ function DmPageTitlebar({
         <div className="text-lg font-semibold">{t('Messages')}</div>
       </div>
       {showSettings && (
-        <Button variant="ghost" size="titlebar-icon" onClick={onSettingsClick}>
+        <Button
+          variant="ghost"
+          size="titlebar-icon"
+          onClick={onSettingsClick}
+          className={isSettingsActive ? 'bg-muted/40' : ''}
+        >
           <Settings className="h-5 w-5" />
         </Button>
       )}
@@ -239,6 +279,27 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
           t('Publish Encryption Key')
         )}
       </Button>
+    </div>
+  )
+}
+
+function ResetEncryptionKeySection({ onReset }: { onReset: () => Promise<void> }) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-2 border-t px-4 py-4">
+      <div className="text-sm font-medium">{t('Encryption Key')}</div>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          'Your encryption key is used to encrypt and decrypt direct messages. It is separate from your Nostr private key and is specific to this messaging feature.'
+        )}
+      </p>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          'Resetting will generate a new key. You will no longer be able to read old messages. Please export and backup your chat history before proceeding.'
+        )}
+      </p>
+      <ResetEncryptionKeyButton onConfirm={onReset} />
     </div>
   )
 }
