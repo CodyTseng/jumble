@@ -3,74 +3,99 @@ import { Button } from '@/components/ui/button'
 import { useNostr } from '@/providers/NostrProvider'
 import encryptionKeyService from '@/services/encryption-key.service'
 import { getClientDescription } from '@/lib/utils'
-import { CheckCircle, Loader2, Smartphone } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { CheckCircle, Loader2, RefreshCw, Smartphone } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 type TSetupState = 'loading' | 'publishing' | 'waiting' | 'success' | 'error'
+
+const RETRY_COOLDOWN = 60
 
 export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => void }) {
   const { t } = useTranslation()
   const { pubkey, signEvent } = useNostr()
   const [state, setState] = useState<TSetupState>('loading')
   const [error, setError] = useState<string | null>(null)
+  const [countdown, setCountdown] = useState(RETRY_COOLDOWN)
+  const unsubscribeRef = useRef<(() => void) | null>(null)
+
+  const publishAndSubscribe = useCallback(async () => {
+    if (!pubkey) return
+
+    try {
+      setState('publishing')
+
+      const signer = {
+        getPublicKey: async () => pubkey,
+        signEvent,
+        nip44Encrypt: async (privkey: Uint8Array, pk: string, text: string) => {
+          return encryptionKeyService.encryptWithNip44(privkey, pk, text)
+        },
+        nip44Decrypt: async (privkey: Uint8Array, pk: string, text: string) => {
+          return encryptionKeyService.decryptWithNip44(privkey, pk, text)
+        }
+      }
+
+      await encryptionKeyService.publishClientKeyAnnouncement(
+        signer as any,
+        pubkey,
+        getClientDescription()
+      )
+      setState('waiting')
+      setCountdown(RETRY_COOLDOWN)
+
+      unsubscribeRef.current?.()
+      unsubscribeRef.current = await encryptionKeyService.subscribeToKeyTransfer(
+        signer as any,
+        pubkey,
+        (success) => {
+          if (success) {
+            setState('success')
+            toast.success(t('Encryption key synced successfully'))
+            setTimeout(() => onComplete?.(), 1000)
+          } else {
+            setError(t('Failed to import encryption key'))
+            setState('error')
+          }
+        }
+      )
+    } catch (err) {
+      setError((err as Error).message)
+      setState('error')
+    }
+  }, [pubkey, signEvent, onComplete, t])
 
   useEffect(() => {
     if (!pubkey) return
 
-    let unsubscribe: (() => void) | null = null
-
-    const setup = async () => {
-      try {
-        if (encryptionKeyService.hasEncryptionKey(pubkey)) {
-          setState('success')
-          onComplete?.()
-          return
-        }
-
-        setState('publishing')
-
-        const signer = {
-          getPublicKey: async () => pubkey,
-          signEvent,
-          nip44Encrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-            return encryptionKeyService.encryptWithNip44(privkey, pk, text)
-          },
-          nip44Decrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-            return encryptionKeyService.decryptWithNip44(privkey, pk, text)
-          }
-        }
-
-        await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey, getClientDescription())
-        setState('waiting')
-
-        unsubscribe = await encryptionKeyService.subscribeToKeyTransfer(
-          signer as any,
-          pubkey,
-          (success) => {
-            if (success) {
-              setState('success')
-              toast.success(t('Encryption key synced successfully'))
-              setTimeout(() => onComplete?.(), 1000)
-            } else {
-              setError(t('Failed to import encryption key'))
-              setState('error')
-            }
-          }
-        )
-      } catch (err) {
-        setError((err as Error).message)
-        setState('error')
-      }
+    if (encryptionKeyService.hasEncryptionKey(pubkey)) {
+      setState('success')
+      onComplete?.()
+      return
     }
 
-    setup()
+    publishAndSubscribe()
 
     return () => {
-      unsubscribe?.()
+      unsubscribeRef.current?.()
     }
   }, [pubkey])
+
+  useEffect(() => {
+    if (state !== 'waiting' || countdown <= 0) return
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [state, countdown <= 0])
+
+  const handleRetry = () => {
+    unsubscribeRef.current?.()
+    publishAndSubscribe()
+  }
 
   const handleGenerateNew = async () => {
     if (!pubkey) return
@@ -125,7 +150,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
         <h3 className="text-lg font-semibold">{t('Sync Encryption Key')}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
           {t(
-            'An encryption key was found for your account. Open Jumble on another device where you have already set up DMs to sync the key.'
+            'An encryption key was found for your account. Please open a client that already has your DM encryption key set up to approve the sync request.'
           )}
         </p>
       </div>
@@ -143,15 +168,25 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
             <Loader2 className="h-4 w-4 animate-spin" />
             <span className="text-sm">{t('Waiting for key from another device...')}</span>
           </div>
-          <p className="text-xs text-muted-foreground text-center max-w-xs">
-            {t('Open your other device and go to Messages to send the encryption key to this device.')}
-          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={countdown > 0}
+            onClick={handleRetry}
+          >
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            {countdown > 0
+              ? t('Retry ({{seconds}}s)', { seconds: countdown })
+              : t('Retry')}
+          </Button>
         </div>
       )}
 
       <div className="border-t pt-4 w-full space-y-3">
-        <p className="text-xs text-muted-foreground text-center">
-          {t("Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.")}
+        <p className="text-sm text-muted-foreground text-center">
+          {t(
+            "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key."
+          )}
         </p>
         <ResetEncryptionKeyButton onConfirm={handleGenerateNew} className="w-full" />
       </div>
