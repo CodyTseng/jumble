@@ -96,7 +96,8 @@ class EncryptionKeyService {
       created_at: dayjs().unix(),
       tags: [
         ['client', clientName],
-        ['P', clientKeypair.pubkey]
+        ['pubkey', clientKeypair.pubkey], // coop uses 'pubkey' tag
+        ['P', clientKeypair.pubkey] // NIP defines 'P' tag
       ]
     }
 
@@ -191,8 +192,9 @@ class EncryptionKeyService {
   }
 
   getClientPubkeyFromEvent(event: Event): string | null {
-    const pTag = event.tags.find(tagNameEquals('P'))
-    return pTag?.[1] ?? null
+    // NIP defines 'P' tag, coop uses 'pubkey' tag
+    const tag = event.tags.find(tagNameEquals('P')) ?? event.tags.find(tagNameEquals('pubkey'))
+    return tag?.[1] ?? null
   }
 
   async subscribeToKeyTransfer(
