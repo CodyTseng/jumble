@@ -61,6 +61,22 @@ class DmService {
     }
   }
 
+  async reinit(): Promise<void> {
+    if (!this.currentAccountPubkey || !this.currentEncryptionKeypair) return
+
+    const pubkey = this.currentAccountPubkey
+    const keypair = this.currentEncryptionKeypair
+
+    if (this.relaySubscription) {
+      this.relaySubscription.close()
+      this.relaySubscription = null
+    }
+    this.isInitialized = false
+    this.isInitializing = false
+
+    await this.init(pubkey, keypair)
+  }
+
   destroy(): void {
     if (this.relaySubscription) {
       this.relaySubscription.close()

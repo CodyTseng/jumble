@@ -33,10 +33,12 @@ import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { RefreshButton } from '@/components/RefreshButton'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 
 dayjs.extend(relativeTime)
 
@@ -55,6 +57,11 @@ export default function DmList() {
   const [trustFilterOpen, setTrustFilterOpen] = useState(false)
   const [trustedPubkeys, setTrustedPubkeys] = useState<Set<string> | null>(null)
   const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.DM)
+  const supportTouch = useMemo(() => isTouchDevice(), [])
+
+  const refresh = useCallback(async () => {
+    await dmService.reinit()
+  }, [])
 
   const loadConversations = useCallback(async () => {
     if (!pubkey) return
@@ -178,49 +185,40 @@ export default function DmList() {
         value={activeTab}
         onTabChange={(tab) => setActiveTab(tab as TDmTab)}
         options={
-          activeTab === 'requests' ? (
-            <TrustScoreFilter
-              filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}
-              onOpenChange={setTrustFilterOpen}
-            />
-          ) : null
+          <>
+            {!supportTouch && <RefreshButton onClick={refresh} />}
+            {activeTab === 'requests' && (
+              <TrustScoreFilter
+                filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}
+                onOpenChange={setTrustFilterOpen}
+              />
+            )}
+          </>
         }
         active={trustFilterOpen}
       />
-      {filteredConversations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
-          <MessageSquare className="h-16 w-16 text-muted-foreground" />
-          <div className="space-y-2">
-            {activeTab === 'messages' ? (
-              <>
-                <h3 className="font-medium">{t('No conversations yet')}</h3>
-                <p className="max-w-sm text-sm text-muted-foreground">
-                  {t(
-                    "Start a conversation by visiting someone's profile and clicking the message button."
-                  )}
-                </p>
-              </>
-            ) : (
-              <>
-                <h3 className="font-medium">{t('No message requests')}</h3>
-                <p className="max-w-sm text-sm text-muted-foreground">
-                  {t("Messages from people you haven't replied to will appear here.")}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
+      {supportTouch ? (
+        <PullToRefresh
+          onRefresh={async () => {
+            await refresh()
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+          }}
+          pullingContent=""
+        >
+          <ConversationListContent
+            filteredConversations={filteredConversations}
+            activeTab={activeTab}
+            onConversationClick={handleConversationClick}
+            onDelete={(conv) => setDeleteTarget(conv)}
+          />
+        </PullToRefresh>
       ) : (
-        <div className="divide-y border-b">
-          {filteredConversations.map((conv) => (
-            <ConversationItem
-              key={conv.key}
-              conversation={conv}
-              onClick={() => handleConversationClick(conv)}
-              onDelete={() => setDeleteTarget(conv)}
-            />
-          ))}
-        </div>
+        <ConversationListContent
+          filteredConversations={filteredConversations}
+          activeTab={activeTab}
+          onConversationClick={handleConversationClick}
+          onDelete={(conv) => setDeleteTarget(conv)}
+        />
       )}
       <DeleteConversationConfirmation
         open={!!deleteTarget}
@@ -229,6 +227,60 @@ export default function DmList() {
         }}
         onConfirm={handleDelete}
       />
+    </div>
+  )
+}
+
+function ConversationListContent({
+  filteredConversations,
+  activeTab,
+  onConversationClick,
+  onDelete
+}: {
+  filteredConversations: TDmConversation[]
+  activeTab: TDmTab
+  onConversationClick: (conv: TDmConversation) => void
+  onDelete: (conv: TDmConversation) => void
+}) {
+  const { t } = useTranslation()
+
+  if (filteredConversations.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
+        <MessageSquare className="h-16 w-16 text-muted-foreground" />
+        <div className="space-y-2">
+          {activeTab === 'messages' ? (
+            <>
+              <h3 className="font-medium">{t('No conversations yet')}</h3>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                {t(
+                  "Start a conversation by visiting someone's profile and clicking the message button."
+                )}
+              </p>
+            </>
+          ) : (
+            <>
+              <h3 className="font-medium">{t('No message requests')}</h3>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                {t("Messages from people you haven't replied to will appear here.")}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y border-b">
+      {filteredConversations.map((conv) => (
+        <ConversationItem
+          key={conv.key}
+          conversation={conv}
+          onClick={() => onConversationClick(conv)}
+          onDelete={() => onDelete(conv)}
+        />
+      ))}
     </div>
   )
 }
