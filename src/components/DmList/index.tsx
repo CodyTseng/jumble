@@ -1,3 +1,5 @@
+import Tabs from '@/components/Tabs'
+import TrustScoreFilter from '@/components/TrustScoreFilter'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,13 +19,16 @@ import {
   DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
-import Tabs from '@/components/Tabs'
-import UserAvatar from '@/components/UserAvatar'
-import Username from '@/components/Username'
+import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
+import Username, { SimpleUsername } from '@/components/Username'
+import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import { toDmConversation } from '@/lib/link'
+import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
+import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserTrust } from '@/providers/UserTrustProvider'
 import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
 import dayjs from 'dayjs'
@@ -41,10 +46,15 @@ export default function DmList() {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const { push } = useSecondaryPage()
+  const { mutePubkeySet } = useMuteList()
+  const { getMinTrustScore, meetsMinTrustScore } = useUserTrust()
   const [conversations, setConversations] = useState<TDmConversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TDmTab>('messages')
   const [deleteTarget, setDeleteTarget] = useState<TDmConversation | null>(null)
+  const [trustFilterOpen, setTrustFilterOpen] = useState(false)
+  const [trustedPubkeys, setTrustedPubkeys] = useState<Set<string> | null>(null)
+  const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.DM)
 
   const loadConversations = useCallback(async () => {
     if (!pubkey) return
@@ -75,20 +85,64 @@ export default function DmList() {
     }
   }, [pubkey, loadConversations])
 
-  const filteredConversations = useMemo(() => {
-    if (activeTab === 'messages') {
-      return conversations.filter((c) => c.hasReplied)
+  useEffect(() => {
+    if (!trustScoreThreshold || trustScoreThreshold <= 0) {
+      setTrustedPubkeys(null)
+      return
     }
-    return conversations.filter((c) => !c.hasReplied)
-  }, [conversations, activeTab])
+
+    let cancelled = false
+    const checkTrust = async () => {
+      const pubkeys = [...new Set(conversations.map((c) => c.pubkey))]
+      const results = await Promise.allSettled(
+        pubkeys.map(async (pubkey) => ({
+          pubkey,
+          trusted: await meetsMinTrustScore(pubkey, trustScoreThreshold)
+        }))
+      )
+      if (!cancelled) {
+        setTrustedPubkeys(
+          new Set(
+            results
+              .filter((r) => r.status === 'fulfilled' && r.value.trusted)
+              .map((r) => (r.status === 'fulfilled' ? r.value.pubkey : ''))
+          )
+        )
+      }
+    }
+    checkTrust()
+    return () => {
+      cancelled = true
+    }
+  }, [conversations, trustScoreThreshold, meetsMinTrustScore])
+
+  const filteredConversations = useMemo(() => {
+    const filtered = conversations.filter((c) => !mutePubkeySet.has(c.pubkey))
+    if (activeTab === 'messages') {
+      return filtered.filter((c) => c.hasReplied)
+    }
+    let requests = filtered.filter((c) => !c.hasReplied)
+    if (trustedPubkeys) {
+      requests = requests.filter((c) => trustedPubkeys.has(c.pubkey))
+    }
+    return requests
+  }, [conversations, activeTab, mutePubkeySet, trustedPubkeys])
 
   const hasUnreadMessages = useMemo(() => {
-    return conversations.some((c) => c.hasReplied && c.unreadCount > 0)
-  }, [conversations])
+    return conversations.some(
+      (c) => c.hasReplied && c.unreadCount > 0 && !mutePubkeySet.has(c.pubkey)
+    )
+  }, [conversations, mutePubkeySet])
 
   const hasUnreadRequests = useMemo(() => {
-    return conversations.some((c) => !c.hasReplied && c.unreadCount > 0)
-  }, [conversations])
+    return conversations.some(
+      (c) =>
+        !c.hasReplied &&
+        c.unreadCount > 0 &&
+        !mutePubkeySet.has(c.pubkey) &&
+        (!trustedPubkeys || trustedPubkeys.has(c.pubkey))
+    )
+  }, [conversations, mutePubkeySet, trustedPubkeys])
 
   const handleConversationClick = (conv: TDmConversation) => {
     push(toDmConversation(conv.pubkey))
@@ -123,6 +177,15 @@ export default function DmList() {
         ]}
         value={activeTab}
         onTabChange={(tab) => setActiveTab(tab as TDmTab)}
+        options={
+          activeTab === 'requests' ? (
+            <TrustScoreFilter
+              filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}
+              onOpenChange={setTrustFilterOpen}
+            />
+          ) : null
+        }
+        active={trustFilterOpen}
       />
       {filteredConversations.length === 0 ? (
         <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
@@ -340,10 +403,7 @@ function SwipeableConversationItem({
 
   return (
     <div className="relative overflow-hidden">
-      <div
-        className="absolute inset-y-0 right-0 flex items-center"
-        style={{ width: THRESHOLD }}
-      >
+      <div className="absolute inset-y-0 right-0 flex items-center" style={{ width: THRESHOLD }}>
         <button
           className="flex h-full w-full items-center justify-center bg-destructive text-destructive-foreground"
           onClick={(e) => {
@@ -382,12 +442,30 @@ function ConversationItemContent({
   conversation: TDmConversation
   timeAgo: string
 }) {
+  const supportTouch = useMemo(() => isTouchDevice(), [])
+
   return (
     <>
-      <UserAvatar userId={conversation.pubkey} size="normal" />
+      {supportTouch ? (
+        <SimpleUserAvatar userId={conversation.pubkey} />
+      ) : (
+        <UserAvatar userId={conversation.pubkey} size="normal" />
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <Username userId={conversation.pubkey} className="truncate font-medium" />
+          {supportTouch ? (
+            <SimpleUsername
+              userId={conversation.pubkey}
+              className="truncate font-medium"
+              skeletonClassName="h-4"
+            />
+          ) : (
+            <Username
+              userId={conversation.pubkey}
+              className="truncate font-medium"
+              skeletonClassName="h-4"
+            />
+          )}
           <span className="shrink-0 text-xs text-muted-foreground">{timeAgo}</span>
         </div>
         <div className="flex items-center justify-between gap-2">

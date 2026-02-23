@@ -498,7 +498,8 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   SEARCH: 'search',
   HASHTAG: 'hashtag',
   NAK: 'nak',
-  TRENDING: 'trending'
+  TRENDING: 'trending',
+  DM: 'dm'
 }
 
 export const COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]
