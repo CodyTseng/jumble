@@ -491,8 +491,15 @@ class DmService {
     this.activeConversationKey = this.getConversationKey(accountPubkey, otherPubkey)
   }
 
-  clearActiveConversation(): void {
-    this.activeConversationKey = null
+  clearActiveConversation(accountPubkey: string, otherPubkey: string): void {
+    const key = this.getConversationKey(accountPubkey, otherPubkey)
+    if (this.activeConversationKey === key) {
+      this.activeConversationKey = null
+    }
+  }
+
+  isActiveConversation(accountPubkey: string, otherPubkey: string): boolean {
+    return this.activeConversationKey === this.getConversationKey(accountPubkey, otherPubkey)
   }
 
   getConversationKey(accountPubkey: string, otherPubkey: string): string {

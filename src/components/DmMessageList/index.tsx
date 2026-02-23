@@ -4,6 +4,7 @@ import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
+import { usePageActive } from '@/providers/PageActiveProvider'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import dayjs from 'dayjs'
@@ -20,6 +21,7 @@ export default function DmMessageList({
 }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
+  const active = usePageActive()
   const [messages, setMessages] = useState<TDmMessage[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -97,13 +99,17 @@ export default function DmMessageList({
   useEffect(() => {
     if (!pubkey) return
 
-    dmService.setActiveConversation(pubkey, otherPubkey)
-    dmService.markConversationAsRead(pubkey, otherPubkey)
+    if (active) {
+      dmService.setActiveConversation(pubkey, otherPubkey)
+      dmService.markConversationAsRead(pubkey, otherPubkey)
+    } else {
+      dmService.clearActiveConversation(pubkey, otherPubkey)
+    }
 
     return () => {
-      dmService.clearActiveConversation()
+      dmService.clearActiveConversation(pubkey, otherPubkey)
     }
-  }, [pubkey, otherPubkey])
+  }, [pubkey, otherPubkey, active])
 
   useEffect(() => {
     if (!pubkey) return
@@ -140,7 +146,9 @@ export default function DmMessageList({
           }
         }
 
-        dmService.markConversationAsRead(pubkey, otherPubkey)
+        if (dmService.isActiveConversation(pubkey, otherPubkey)) {
+          dmService.markConversationAsRead(pubkey, otherPubkey)
+        }
       }
     })
 
