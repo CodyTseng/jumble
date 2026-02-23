@@ -284,7 +284,7 @@ export default function DmMessageList({
               )}
               <div
                 className={cn(
-                  'flex min-w-0 max-w-[75%] flex-col gap-0.5',
+                  'flex min-w-0 max-w-full sm:max-w-[80%] flex-col gap-0.5',
                   group.isOwn ? 'items-end' : 'items-start'
                 )}
               >
@@ -351,6 +351,8 @@ function MessageBubble({
 }) {
   const hasEmbeddedContent = /https?:\/\/|nostr:|note1|nevent1/.test(message.content)
   const [copied, setCopied] = useState(false)
+  const [showActions, setShowActions] = useState(false)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(message.content)
@@ -358,8 +360,14 @@ function MessageBubble({
     setTimeout(() => setCopied(false), 2000)
   }, [message.content])
 
+  const handleTap = useCallback(() => {
+    setShowActions(true)
+    clearTimeout(hideTimerRef.current)
+    hideTimerRef.current = setTimeout(() => setShowActions(false), 3000)
+  }, [])
+
   const bubbleClass = cn(
-    'max-w-full overflow-hidden break-words rounded-md px-3 py-1.5 transition-all duration-500',
+    'overflow-hidden break-words rounded-md px-3 py-1.5 transition-all duration-500',
     hasEmbeddedContent ? 'w-full' : 'w-fit',
     isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary',
     isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
@@ -368,6 +376,7 @@ function MessageBubble({
   return (
     <div
       ref={refCallback}
+      onClick={handleTap}
       className={cn(
         'group/msg flex max-w-full flex-col',
         hasEmbeddedContent && 'w-full',
@@ -397,7 +406,7 @@ function MessageBubble({
       <div
         className={cn('flex min-w-0 max-w-full items-center gap-2', isOwn ? 'flex-row' : 'flex-row-reverse')}
       >
-        <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover/msg:opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
+        <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100', showActions && 'opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
           <button
             onClick={handleCopy}
             className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
