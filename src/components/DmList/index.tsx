@@ -114,7 +114,7 @@ export default function DmList() {
           </div>
         </div>
       ) : (
-        <div className="divide-y">
+        <div className="divide-y border-b">
           {filteredConversations.map((conv) => (
             <ConversationItem
               key={conv.key}
