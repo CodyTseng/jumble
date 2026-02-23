@@ -8,9 +8,11 @@ import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
+import indexedDb from '@/services/indexed-db.service'
 import { TPageRef } from '@/types'
-import { Key, Loader2, MessageSquare, Settings } from 'lucide-react'
-import { forwardRef, useCallback, useEffect, useState } from 'react'
+import { Event } from 'nostr-tools'
+import { Key, Loader2, MessageSquare, Settings, Download, Upload } from 'lucide-react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -188,6 +190,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
           {showRelayConfig && (
             <>
               <DmRelayConfig />
+              <ChatHistorySection accountPubkey={pubkey!} />
               <ResetEncryptionKeySection onReset={handleResetEncryptionKey} />
             </>
           )}
@@ -283,6 +286,141 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
           t('Publish Encryption Key')
         )}
       </Button>
+    </div>
+  )
+}
+
+function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
+  const { t } = useTranslation()
+  const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleExport = async () => {
+    setIsExporting(true)
+    try {
+      const messages = await indexedDb.getAllDmMessagesForAccount(accountPubkey)
+      if (messages.length === 0) {
+        toast.info(t('No messages to export'))
+        return
+      }
+
+      const lines = messages.map((msg) => JSON.stringify(msg.decryptedRumor))
+      const blob = new Blob([lines.join('\n')], { type: 'application/jsonl' })
+
+      const date = new Date().toISOString().slice(0, 10)
+      const filename = `jumble-dm-${date}.jsonl`
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+
+      toast.success(t('Exported {{count}} messages', { count: messages.length }))
+    } catch (error) {
+      console.error('Failed to export chat history:', error)
+      toast.error(t('Failed to export chat history'))
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsImporting(true)
+    try {
+      const text = await file.text()
+      const lines = text.split('\n').filter((line) => line.trim())
+      const rumors: Event[] = []
+      const errors: number[] = []
+
+      for (let i = 0; i < lines.length; i++) {
+        try {
+          const parsed = JSON.parse(lines[i])
+          if (parsed.kind !== 14 && parsed.kind !== 15) {
+            errors.push(i + 1)
+            continue
+          }
+          if (!parsed.id || !parsed.pubkey || !parsed.created_at || !parsed.tags || parsed.content === undefined) {
+            errors.push(i + 1)
+            continue
+          }
+          rumors.push(parsed as Event)
+        } catch {
+          errors.push(i + 1)
+        }
+      }
+
+      if (rumors.length === 0) {
+        toast.error(t('No valid messages found in file'))
+        return
+      }
+
+      const count = await dmService.importMessages(accountPubkey, rumors)
+
+      if (errors.length > 0) {
+        toast.warning(
+          t('Imported {{count}} messages, {{errors}} lines skipped', {
+            count,
+            errors: errors.length
+          })
+        )
+      } else {
+        toast.success(t('Imported {{count}} messages', { count }))
+      }
+    } catch (error) {
+      console.error('Failed to import chat history:', error)
+      toast.error(t('Failed to import chat history'))
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-2 border-t px-4 py-4">
+      <div className="text-sm font-medium">{t('Chat History')}</div>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          'Export your chat history as a backup file, or import a previously exported file to restore messages.'
+        )}
+      </p>
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
+          {isExporting ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          {t('Export')}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isImporting}
+        >
+          {isImporting ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <Upload className="h-4 w-4 mr-2" />
+          )}
+          {t('Import')}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".jsonl"
+          className="hidden"
+          onChange={handleImport}
+        />
+      </div>
     </div>
   )
 }

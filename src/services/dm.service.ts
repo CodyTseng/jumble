@@ -137,6 +137,40 @@ class DmService {
     storage.addProcessedSyncRequestId(eventId)
   }
 
+  async importMessages(accountPubkey: string, rumors: Event[]): Promise<number> {
+    let importedCount = 0
+
+    for (const rumor of rumors) {
+      const recipientPubkey = rumor.tags.find((t) => t[0] === 'p')?.[1]
+      if (!recipientPubkey) continue
+
+      const isFromMe = rumor.pubkey === accountPubkey
+      const otherPubkey = isFromMe ? recipientPubkey : rumor.pubkey
+      const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
+
+      const replyTag = rumor.tags.find((t) => t[0] === 'e')
+      const replyToId = replyTag?.[1]
+
+      const message: TDmMessage = {
+        id: rumor.id,
+        conversationKey,
+        senderPubkey: rumor.pubkey,
+        content: rumor.content,
+        createdAt: rumor.created_at,
+        originalEvent: rumor,
+        decryptedRumor: rumor,
+        ...(replyToId ? { replyTo: { id: replyToId, content: '', senderPubkey: '' } } : {})
+      }
+
+      await this.saveMessage(accountPubkey, message)
+      await this.updateConversation(accountPubkey, otherPubkey, message)
+      importedCount++
+    }
+
+    this.emitDataChanged()
+    return importedCount
+  }
+
   async checkDmSupport(
     pubkey: string
   ): Promise<{ hasDmRelays: boolean; hasEncryptionKey: boolean; encryptionPubkey: string | null }> {

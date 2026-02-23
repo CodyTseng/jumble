@@ -765,6 +765,38 @@ class IndexedDbService {
     })
   }
 
+  async getAllDmMessagesForAccount(accountPubkey: string): Promise<TDmMessage[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.openCursor()
+
+      const results: TDmMessage[] = []
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const message = cursor.value as TDmMessage
+          if (message.conversationKey.includes(accountPubkey)) {
+            results.push(message)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve(results)
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   async getDmMessageById(id: string): Promise<TDmMessage | null> {
     await this.initPromise
     return new Promise((resolve, reject) => {

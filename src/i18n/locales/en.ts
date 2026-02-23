@@ -736,6 +736,19 @@ export default {
     'Publish Encryption Key': 'Publish Encryption Key',
     'Publishing...': 'Publishing...',
     'Encryption key published': 'Encryption key published',
-    'Failed to publish encryption key': 'Failed to publish encryption key'
+    'Failed to publish encryption key': 'Failed to publish encryption key',
+    'Chat History': 'Chat History',
+    'Export your chat history as a backup file, or import a previously exported file to restore messages.':
+      'Export your chat history as a backup file, or import a previously exported file to restore messages.',
+    Export: 'Export',
+    Import: 'Import',
+    'No messages to export': 'No messages to export',
+    'Exported {{count}} messages': 'Exported {{count}} messages',
+    'Failed to export chat history': 'Failed to export chat history',
+    'No valid messages found in file': 'No valid messages found in file',
+    'Imported {{count}} messages': 'Imported {{count}} messages',
+    'Imported {{count}} messages, {{errors}} lines skipped':
+      'Imported {{count}} messages, {{errors}} lines skipped',
+    'Failed to import chat history': 'Failed to import chat history'
   }
 }
