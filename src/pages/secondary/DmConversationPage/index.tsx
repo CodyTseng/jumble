@@ -2,7 +2,7 @@ import DmInput from '@/components/DmInput'
 import DmMessageList from '@/components/DmMessageList'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useBottomBar } from '@/PageManager'
+import { useBottomBar, useSecondaryPage } from '@/PageManager'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import { Loader2 } from 'lucide-react'
@@ -21,6 +21,8 @@ const DmConversationPage = forwardRef(
       senderPubkey: string
     } | null>(null)
     const { setHidden } = useBottomBar()
+    const { currentIndex } = useSecondaryPage()
+    const active = currentIndex === index
 
     const handleReply = useCallback((message: TDmMessage) => {
       setReplyTo({ id: message.id, content: message.content, senderPubkey: message.senderPubkey })
@@ -66,6 +68,18 @@ const DmConversationPage = forwardRef(
 
       checkDmSupport()
     }, [pubkey])
+
+    useEffect(() => {
+      if (!pubkey || !active) return
+
+      const promise = dmService.subscribeRecipientEncryptionKey(pubkey)
+
+      return () => {
+        promise.then((subscription) => {
+          subscription?.close()
+        })
+      }
+    }, [pubkey, active])
 
     if (!pubkey) {
       return (

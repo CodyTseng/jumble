@@ -1,9 +1,9 @@
+import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { isValidPubkey } from '@/lib/pubkey'
 import { tagNameEquals } from '@/lib/tag'
-import client from './client.service'
-import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { TDmConversation, TDmMessage, TEncryptionKeypair } from '@/types'
 import { Event, Filter } from 'nostr-tools'
+import client from './client.service'
 import encryptionKeyService from './encryption-key.service'
 import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
@@ -216,7 +216,11 @@ class DmService {
       ? encryptionKeyService.getEncryptionPubkeyFromEvent(encryptionKeyEvent)
       : null
 
-    return { hasDmRelays: !!dmRelaysEvent, hasEncryptionKey: !!encryptionKeyEvent, encryptionPubkey }
+    return {
+      hasDmRelays: !!dmRelaysEvent,
+      hasEncryptionKey: !!encryptionKeyEvent,
+      encryptionPubkey
+    }
   }
 
   async getRecipientEncryptionPubkey(pubkey: string): Promise<string | null> {
@@ -227,6 +231,31 @@ class DmService {
       return recipient
     }
     return null
+  }
+
+  async subscribeRecipientEncryptionKey(
+    recipientPubkey: string,
+    onChanged?: (newPubkey: string) => void
+  ) {
+    const relays = await client.fetchDmRelays(recipientPubkey)
+
+    return client.subscribe(
+      relays,
+      {
+        kinds: [ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT],
+        authors: [recipientPubkey],
+        limit: 0
+      },
+      {
+        onevent: async (event) => {
+          await client.updateEncryptionKeyAnnouncementCache(event)
+          const newPubkey = encryptionKeyService.getEncryptionPubkeyFromEvent(event)
+          if (newPubkey) {
+            onChanged?.(newPubkey)
+          }
+        }
+      }
+    )
   }
 
   async initMessages(accountPubkey: string, encryptionKeypair: TEncryptionKeypair, since?: number) {
@@ -425,7 +454,7 @@ class DmService {
       [
         {
           kinds: [ExtendedKind.GIFT_WRAP],
-          '#p': [encryptionKeypair.pubkey],
+          '#p': [encryptionKeypair.pubkey, accountPubkey],
           limit: 0
         },
         {
@@ -459,10 +488,7 @@ class DmService {
 
           // GIFT_WRAP handling
           const giftWrap = event
-          const unwrapped = nip17GiftWrapService.unwrapGiftWrap(
-            giftWrap,
-            encryptionKeypair.privkey
-          )
+          const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
           if (!unwrapped) return
 
           const message = this.createMessageFromUnwrapped(

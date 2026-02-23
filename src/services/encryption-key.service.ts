@@ -83,8 +83,9 @@ class EncryptionKeyService {
     }
 
     const event = await signer.signEvent(draftEvent)
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
+    const relays = await client.fetchDmRelays(accountPubkey)
     await client.publishEvent(relays, event)
+    await client.updateEncryptionKeyAnnouncementCache(event)
     return event
   }
 
@@ -136,8 +137,8 @@ class EncryptionKeyService {
       content: encrypted,
       created_at: dayjs().unix(),
       tags: [
-        ['P', senderClientKeypair.pubkey],  // Sender's client pubkey
-        ['p', recipientClientPubkey]         // Recipient's client pubkey
+        ['P', senderClientKeypair.pubkey], // Sender's client pubkey
+        ['p', recipientClientPubkey] // Recipient's client pubkey
       ]
     }
 

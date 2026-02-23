@@ -1443,6 +1443,10 @@ class ClientService extends EventTarget {
     )
   }
 
+  async updateEncryptionKeyAnnouncementCache(evt: NEvent) {
+    await this.updateReplaceableEventCache(evt)
+  }
+
   async fetchFollowListEvent(pubkey: string, updateCache = true) {
     return await this.fetchReplaceableEvent(pubkey, kinds.Contacts, undefined, updateCache)
   }

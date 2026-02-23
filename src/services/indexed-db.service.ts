@@ -29,6 +29,8 @@ const StoreNames = {
   EVENTS: 'events',
   DM_CONVERSATIONS: 'dmConversations',
   DM_MESSAGES: 'dmMessages',
+  DM_RELAYS_EVENTS: 'dmRelaysEvents',
+  ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS: 'encryptionKeyAnnouncementEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags', // deprecated
   RELAY_INFO_EVENTS: 'relayInfoEvents' // deprecated
 }
@@ -49,7 +51,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 14)
+        const request = window.indexedDB.open('jumble', 17)
 
         request.onerror = (event) => {
           reject(event)
@@ -142,6 +144,12 @@ class IndexedDbService {
             if (dmMessagesStore.indexNames.contains('createdAtIndex')) {
               dmMessagesStore.deleteIndex('createdAtIndex')
             }
+          }
+          if (!db.objectStoreNames.contains(StoreNames.DM_RELAYS_EVENTS)) {
+            db.createObjectStore(StoreNames.DM_RELAYS_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS)) {
+            db.createObjectStore(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS, { keyPath: 'key' })
           }
 
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
@@ -913,6 +921,10 @@ class IndexedDbService {
         return StoreNames.PIN_LIST_EVENTS
       case ExtendedKind.PINNED_USERS:
         return StoreNames.PINNED_USERS_EVENTS
+      case ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT:
+        return StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS
+      case ExtendedKind.DM_RELAYS:
+        return StoreNames.DM_RELAYS_EVENTS
       default:
         return undefined
     }
