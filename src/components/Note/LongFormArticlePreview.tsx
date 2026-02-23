@@ -39,7 +39,7 @@ export default function LongFormArticlePreview({
   )
 
   const summaryComponent = metadata.summary && (
-    <div className="line-clamp-4 text-sm text-muted-foreground">{metadata.summary}</div>
+    <div className="line-clamp-4 whitespace-pre-line text-sm text-muted-foreground">{metadata.summary}</div>
   )
 
   if (isSmallScreen) {
