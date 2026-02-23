@@ -278,13 +278,13 @@ export default function DmMessageList({
               )}
             >
               {!group.isOwn && (
-                <div className="w-10 shrink-0 self-end">
-                  <UserAvatar userId={group.items[0].senderPubkey} />
+                <div className="w-9 shrink-0 self-end">
+                  <UserAvatar userId={group.items[0].senderPubkey} size="medium" />
                 </div>
               )}
               <div
                 className={cn(
-                  'flex min-w-0 max-w-[75%] flex-col gap-0.5 pt-0.5',
+                  'flex min-w-0 max-w-[75%] flex-col gap-0.5',
                   group.isOwn ? 'items-end' : 'items-start'
                 )}
               >
