@@ -97,7 +97,12 @@ export default function DmMessageList({
   useEffect(() => {
     if (!pubkey) return
 
+    dmService.setActiveConversation(pubkey, otherPubkey)
     dmService.markConversationAsRead(pubkey, otherPubkey)
+
+    return () => {
+      dmService.clearActiveConversation()
+    }
   }, [pubkey, otherPubkey])
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 type TabDefinition = {
   value: string
   label: string
+  dot?: boolean
 }
 
 export default function Tabs({
@@ -103,7 +104,7 @@ export default function Tabs({
               key={tab.value}
               ref={(el) => (tabRefs.current[index] = el)}
               className={cn(
-                `clickable my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-4 py-2 text-center font-semibold transition-all duration-200`,
+                `clickable relative my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-4 py-2 text-center font-semibold transition-all duration-200`,
                 value === tab.value
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
@@ -113,6 +114,9 @@ export default function Tabs({
               }}
             >
               {t(tab.label)}
+              {tab.dot && (
+                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+              )}
             </div>
           ))}
           <div

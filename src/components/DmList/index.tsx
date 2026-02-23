@@ -60,6 +60,10 @@ export default function DmList() {
     return conversations.filter((c) => !c.hasReplied)
   }, [conversations, activeTab])
 
+  const hasUnreadRequests = useMemo(() => {
+    return conversations.some((c) => !c.hasReplied && c.unreadCount > 0)
+  }, [conversations])
+
   const handleConversationClick = (conv: TDmConversation) => {
     push(toDmConversation(conv.pubkey))
   }
@@ -77,7 +81,7 @@ export default function DmList() {
       <Tabs
         tabs={[
           { value: 'messages', label: 'Messages' },
-          { value: 'requests', label: 'Requests' }
+          { value: 'requests', label: 'Requests', dot: hasUnreadRequests }
         ]}
         value={activeTab}
         onTabChange={(tab) => setActiveTab(tab as TDmTab)}

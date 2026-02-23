@@ -22,6 +22,7 @@ class DmService {
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
   private syncRequestListeners = new Set<(event: Event) => void>()
+  private activeConversationKey: string | null = null
 
   private constructor() {}
 
@@ -70,6 +71,7 @@ class DmService {
     this.sendingStatuses.clear()
     this.sendingStatusListeners.clear()
     this.syncRequestListeners.clear()
+    this.activeConversationKey = null
     this.currentAccountPubkey = null
     this.currentEncryptionKeypair = null
     this.isInitialized = false
@@ -476,12 +478,21 @@ class DmService {
     storage.setLastReadDmTime(accountPubkey, otherPubkey, now)
 
     const conversation = await indexedDb.getDmConversation(conversationKey)
-    if (conversation) {
+    if (conversation && conversation.unreadCount > 0) {
       await indexedDb.putDmConversation({
         ...conversation,
         unreadCount: 0
       })
+      this.emitDataChanged()
     }
+  }
+
+  setActiveConversation(accountPubkey: string, otherPubkey: string): void {
+    this.activeConversationKey = this.getConversationKey(accountPubkey, otherPubkey)
+  }
+
+  clearActiveConversation(): void {
+    this.activeConversationKey = null
   }
 
   getConversationKey(accountPubkey: string, otherPubkey: string): string {
@@ -557,7 +568,9 @@ class DmService {
     const existing = await indexedDb.getDmConversation(conversationKey)
 
     const lastReadTime = storage.getLastReadDmTime(accountPubkey, otherPubkey)
-    const isUnread = message.senderPubkey !== accountPubkey && message.createdAt > lastReadTime
+    const isActive = this.activeConversationKey === conversationKey
+    const isUnread =
+      !isActive && message.senderPubkey !== accountPubkey && message.createdAt > lastReadTime
 
     const conversation: TDmConversation = {
       key: conversationKey,
