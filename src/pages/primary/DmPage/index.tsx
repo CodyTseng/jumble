@@ -177,19 +177,23 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       )}
       {setupState === 'need_login' && <NeedLoginView />}
       {setupState === 'need_relays' && <DmRelayConfig onComplete={handleRelayConfigComplete} />}
-      {setupState === 'ready' && showRelayConfig && (
-        <>
-          <DmRelayConfig />
-          <ResetEncryptionKeySection onReset={handleResetEncryptionKey} />
-        </>
-      )}
-      {setupState === 'need_encryption_key' && !showRelayConfig && (
+      {setupState === 'need_encryption_key' && (
         <NeedEncryptionKeyView onPublish={handlePublishEncryptionKey} />
       )}
-      {setupState === 'need_sync' && !showRelayConfig && (
+      {setupState === 'need_sync' && (
         <NewDeviceKeySync onComplete={handleKeySyncComplete} />
       )}
-      {setupState === 'ready' && !showRelayConfig && <DmList />}
+      {setupState === 'ready' && (
+        <>
+          {showRelayConfig && (
+            <>
+              <DmRelayConfig />
+              <ResetEncryptionKeySection onReset={handleResetEncryptionKey} />
+            </>
+          )}
+          <DmList />
+        </>
+      )}
     </PrimaryPageLayout>
   )
 })
@@ -208,7 +212,7 @@ function DmPageTitlebar({
   const { t } = useTranslation()
 
   return (
-    <div className="flex gap-2 items-center justify-between h-full pl-3 pr-1">
+    <div className="flex items-center justify-between h-full pl-3">
       <div className="flex items-center gap-2">
         <MessageSquare />
         <div className="text-lg font-semibold">{t('Messages')}</div>
