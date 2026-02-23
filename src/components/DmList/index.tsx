@@ -60,6 +60,10 @@ export default function DmList() {
     return conversations.filter((c) => !c.hasReplied)
   }, [conversations, activeTab])
 
+  const hasUnreadMessages = useMemo(() => {
+    return conversations.some((c) => c.hasReplied && c.unreadCount > 0)
+  }, [conversations])
+
   const hasUnreadRequests = useMemo(() => {
     return conversations.some((c) => !c.hasReplied && c.unreadCount > 0)
   }, [conversations])
@@ -80,7 +84,7 @@ export default function DmList() {
     <div>
       <Tabs
         tabs={[
-          { value: 'messages', label: 'Messages' },
+          { value: 'messages', label: 'Messages', dot: hasUnreadMessages },
           { value: 'requests', label: 'Requests', dot: hasUnreadRequests }
         ]}
         value={activeTab}
