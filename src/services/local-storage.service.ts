@@ -76,6 +76,7 @@ class LocalStorageService {
   private dmLastSyncedAtMap: Record<string, number> = {}
   private dmBackwardCursorMap: Record<string, number> = {}
   private processedSyncRequestIds: string[] = []
+  private dmDeletedConversationsMap: Record<string, number> = {}
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -372,6 +373,20 @@ class LocalStorageService {
         const arr = JSON.parse(processedSyncRequestIdsStr)
         if (Array.isArray(arr)) {
           this.processedSyncRequestIds = arr
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const dmDeletedConversationsMapStr = window.localStorage.getItem(
+      StorageKey.DM_DELETED_CONVERSATIONS_MAP
+    )
+    if (dmDeletedConversationsMapStr) {
+      try {
+        const map = JSON.parse(dmDeletedConversationsMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.dmDeletedConversationsMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -876,6 +891,18 @@ class LocalStorageService {
         JSON.stringify(this.processedSyncRequestIds)
       )
     }
+  }
+
+  getDmDeletedConversation(key: string): number | null {
+    return this.dmDeletedConversationsMap[key] ?? null
+  }
+
+  setDmDeletedConversation(key: string, deletedAt: number) {
+    this.dmDeletedConversationsMap[key] = deletedAt
+    window.localStorage.setItem(
+      StorageKey.DM_DELETED_CONVERSATIONS_MAP,
+      JSON.stringify(this.dmDeletedConversationsMap)
+    )
   }
 }
 

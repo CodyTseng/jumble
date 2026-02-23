@@ -49,7 +49,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 13)
+        const request = window.indexedDB.open('jumble', 14)
 
         request.onerror = (event) => {
           reject(event)
@@ -810,6 +810,58 @@ class IndexedDbService {
       request.onsuccess = () => {
         transaction.commit()
         resolve(request.result ? (request.result as TDmMessage) : null)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteDmConversation(key: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_CONVERSATIONS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_CONVERSATIONS)
+
+      const deleteRequest = store.delete(key)
+      deleteRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      deleteRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteDmMessagesByConversationKey(conversationKey: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const index = store.index('conversationCreatedAtIndex')
+      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range)
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          cursor.delete()
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve()
+        }
       }
 
       request.onerror = (event) => {

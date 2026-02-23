@@ -749,6 +749,9 @@ export default {
     'Imported {{count}} messages': 'Imported {{count}} messages',
     'Imported {{count}} messages, {{errors}} lines skipped':
       'Imported {{count}} messages, {{errors}} lines skipped',
-    'Failed to import chat history': 'Failed to import chat history'
+    'Failed to import chat history': 'Failed to import chat history',
+    'Delete conversation': 'Delete conversation',
+    'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
+      'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.'
   }
 }

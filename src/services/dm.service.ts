@@ -278,8 +278,10 @@ class DmService {
       )
       if (message) {
         await this.resolveReplyTo(message)
-        messages.push(message)
-        await this.saveMessage(accountPubkey, message)
+        const saved = await this.saveMessage(accountPubkey, message)
+        if (saved) {
+          messages.push(message)
+        }
       } else {
         parseFailCount++
       }
@@ -428,7 +430,8 @@ class DmService {
           )
           if (message) {
             await this.resolveReplyTo(message)
-            await this.saveMessage(accountPubkey, message)
+            const saved = await this.saveMessage(accountPubkey, message)
+            if (!saved) return
 
             const fromMe = this.isFromMe(
               unwrapped.senderPubkey,
@@ -449,6 +452,15 @@ class DmService {
     )
 
     this.relaySubscription = { close: () => sub.close() }
+  }
+
+  async deleteConversation(accountPubkey: string, otherPubkey: string): Promise<void> {
+    const key = this.getConversationKey(accountPubkey, otherPubkey)
+    const deletedAt = Math.floor(Date.now() / 1000)
+    storage.setDmDeletedConversation(key, deletedAt)
+    await indexedDb.deleteDmConversation(key)
+    await indexedDb.deleteDmMessagesByConversationKey(key)
+    this.emitDataChanged()
   }
 
   async getConversations(accountPubkey: string): Promise<TDmConversation[]> {
@@ -562,8 +574,13 @@ class DmService {
     return message
   }
 
-  private async saveMessage(_accountPubkey: string, message: TDmMessage): Promise<void> {
+  private async saveMessage(_accountPubkey: string, message: TDmMessage): Promise<boolean> {
+    const deletedAt = storage.getDmDeletedConversation(message.conversationKey)
+    if (deletedAt !== null && message.createdAt <= deletedAt) {
+      return false
+    }
     await indexedDb.putDmMessage(message)
+    return true
   }
 
   private async updateConversation(
