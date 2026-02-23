@@ -361,9 +361,11 @@ function MessageBubble({
   }, [message.content])
 
   const handleTap = useCallback(() => {
-    setShowActions(true)
-    clearTimeout(hideTimerRef.current)
-    hideTimerRef.current = setTimeout(() => setShowActions(false), 3000)
+    if (!window.matchMedia('(hover: hover)').matches) {
+      setShowActions(true)
+      clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = setTimeout(() => setShowActions(false), 1500)
+    }
   }, [])
 
   const bubbleClass = cn(
