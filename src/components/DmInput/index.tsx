@@ -117,7 +117,7 @@ export default function DmInput({
             />
             <ContentPreviewContent
               content={replyTo.content || '...'}
-              className="truncate text-xs text-muted-foreground"
+              className="block truncate text-xs text-muted-foreground"
             />
           </div>
           <button
