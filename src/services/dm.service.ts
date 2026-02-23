@@ -22,6 +22,7 @@ class DmService {
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
   private syncRequestListeners = new Set<(event: Event) => void>()
+  private encryptionKeyChangedListeners = new Set<(newPubkey: string) => void>()
   private activeConversationKey: string | null = null
 
   private constructor() {}
@@ -87,6 +88,7 @@ class DmService {
     this.sendingStatuses.clear()
     this.sendingStatusListeners.clear()
     this.syncRequestListeners.clear()
+    this.encryptionKeyChangedListeners.clear()
     this.activeConversationKey = null
     this.currentAccountPubkey = null
     this.currentEncryptionKeypair = null
@@ -148,6 +150,19 @@ class DmService {
   private emitSyncRequest(event: Event): void {
     for (const listener of this.syncRequestListeners) {
       listener(event)
+    }
+  }
+
+  onEncryptionKeyChanged(listener: (newPubkey: string) => void): () => void {
+    this.encryptionKeyChangedListeners.add(listener)
+    return () => {
+      this.encryptionKeyChangedListeners.delete(listener)
+    }
+  }
+
+  private emitEncryptionKeyChanged(newPubkey: string): void {
+    for (const listener of this.encryptionKeyChangedListeners) {
+      listener(newPubkey)
     }
   }
 
@@ -418,6 +433,11 @@ class DmService {
           authors: [accountPubkey],
           since: fiveMinutesAgo,
           limit: 1
+        },
+        {
+          kinds: [ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT],
+          authors: [accountPubkey],
+          limit: 0
         }
       ],
       {
@@ -427,6 +447,13 @@ class DmService {
             if (!clientPubkey || clientPubkey === myClientKeypair.pubkey) return
             if (storage.getProcessedSyncRequestIds().includes(event.id)) return
             this.emitSyncRequest(event)
+            return
+          }
+
+          if (event.kind === ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT) {
+            const newPubkey = encryptionKeyService.getEncryptionPubkeyFromEvent(event)
+            if (!newPubkey || newPubkey === encryptionKeypair.pubkey) return
+            this.emitEncryptionKeyChanged(newPubkey)
             return
           }
 

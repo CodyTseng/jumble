@@ -85,6 +85,18 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     }
   }, [current, pubkey, checkSetup])
 
+  useEffect(() => {
+    if (!pubkey) return
+
+    const unsub = dmService.onEncryptionKeyChanged(() => {
+      encryptionKeyService.removeEncryptionKey(pubkey)
+      dmService.destroy()
+      setSetupState('need_sync')
+    })
+
+    return unsub
+  }, [pubkey])
+
   const handleRelayConfigComplete = async () => {
     if (!pubkey) return
 
