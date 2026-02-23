@@ -49,7 +49,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
         if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
           console.log('[DM setup] key mismatch detected, entering sync flow')
           encryptionKeyService.removeEncryptionKey(pubkey)
-          dmService.destroy()
+          dmService.resetEncryption()
           setSetupState('need_sync')
         }
       }).catch(() => {})
@@ -90,7 +90,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
 
     const unsub = dmService.onEncryptionKeyChanged(() => {
       encryptionKeyService.removeEncryptionKey(pubkey)
-      dmService.destroy()
+      dmService.resetEncryption()
       setSetupState('need_sync')
     })
 
@@ -131,6 +131,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       setSetupState('ready')
       const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
       if (encryptionKeypair) {
+        dmService.resetEncryption()
         dmService.init(pubkey, encryptionKeypair)
       }
     } catch (error) {
@@ -144,6 +145,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     if (pubkey) {
       const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(pubkey)
       if (encryptionKeypair) {
+        dmService.resetEncryption()
         dmService.init(pubkey, encryptionKeypair)
       }
     }
@@ -154,7 +156,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
 
     try {
       encryptionKeyService.removeEncryptionKey(pubkey)
-      dmService.destroy()
+      dmService.resetEncryption()
       encryptionKeyService.generateEncryptionKey(pubkey)
       const signer = {
         getPublicKey: async () => pubkey,

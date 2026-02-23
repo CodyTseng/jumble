@@ -78,11 +78,18 @@ class DmService {
     await this.init(pubkey, keypair)
   }
 
-  destroy(): void {
+  resetEncryption(): void {
     if (this.relaySubscription) {
       this.relaySubscription.close()
       this.relaySubscription = null
     }
+    this.currentEncryptionKeypair = null
+    this.isInitialized = false
+    this.isInitializing = false
+  }
+
+  destroy(): void {
+    this.resetEncryption()
     this.messageListeners.clear()
     this.dataChangedListeners.clear()
     this.sendingStatuses.clear()
@@ -91,9 +98,6 @@ class DmService {
     this.encryptionKeyChangedListeners.clear()
     this.activeConversationKey = null
     this.currentAccountPubkey = null
-    this.currentEncryptionKeypair = null
-    this.isInitialized = false
-    this.isInitializing = false
   }
 
   onNewMessage(listener: (message: TDmMessage) => void): () => void {
