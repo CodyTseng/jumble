@@ -1,3 +1,4 @@
+import { RefreshButton } from '@/components/RefreshButton'
 import Tabs from '@/components/Tabs'
 import TrustScoreFilter from '@/components/TrustScoreFilter'
 import {
@@ -33,7 +34,6 @@ import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { RefreshButton } from '@/components/RefreshButton'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -45,7 +45,6 @@ dayjs.extend(relativeTime)
 type TDmTab = 'messages' | 'requests'
 
 export default function DmList() {
-  const { t } = useTranslation()
   const { pubkey } = useNostr()
   const { push } = useSecondaryPage()
   const { mutePubkeySet } = useMuteList()
