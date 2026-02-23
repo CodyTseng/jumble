@@ -8,7 +8,7 @@ import { usePageActive } from '@/providers/PageActiveProvider'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, ArrowDown, Check, Clock, Loader2, Reply } from 'lucide-react'
+import { AlertCircle, ArrowDown, Check, Clock, Copy, Loader2, Reply } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -350,6 +350,13 @@ function MessageBubble({
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
   const hasEmbeddedContent = /https?:\/\/|nostr:|note1|nevent1/.test(message.content)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(message.content)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [message.content])
 
   const bubbleClass = cn(
     'max-w-full overflow-hidden break-words rounded-md px-3 py-1.5 transition-all duration-500',
@@ -388,18 +395,26 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={cn('flex min-w-0 max-w-full gap-1', isOwn ? 'flex-row' : 'flex-row-reverse')}
+        className={cn('flex min-w-0 max-w-full items-center gap-2', isOwn ? 'flex-row' : 'flex-row-reverse')}
       >
-        {onReply && (
+        <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover/msg:opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
           <button
-            onClick={() => onReply(message)}
-            className="mt-auto shrink-0 rounded-full p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-secondary group-hover/msg:opacity-100"
+            onClick={handleCopy}
+            className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
           >
-            <Reply className="h-3.5 w-3.5" />
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-        )}
+          {onReply && (
+            <button
+              onClick={() => onReply(message)}
+              className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
+            >
+              <Reply className="h-4 w-4" />
+            </button>
+          )}
+        </div>
         {sendingStatus && (
-          <div className="mt-auto pb-1">
+          <div className="pb-1">
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
