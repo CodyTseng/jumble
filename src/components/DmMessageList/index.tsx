@@ -1,15 +1,37 @@
-import Content from '@/components/Content'
 import ContentPreviewContent from '@/components/ContentPreview/Content'
+import {
+  EmbeddedHashtag,
+  EmbeddedLNInvoice,
+  EmbeddedMention,
+  EmbeddedNote,
+  EmbeddedWebsocketUrl
+} from '@/components/Embedded'
+import ExternalLink from '@/components/ExternalLink'
+import ImageGallery from '@/components/ImageGallery'
+import MediaPlayer from '@/components/MediaPlayer'
 import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
+import XEmbeddedPost from '@/components/XEmbeddedPost'
+import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
+import {
+  EmbeddedEmojiParser,
+  EmbeddedEventParser,
+  EmbeddedHashtagParser,
+  EmbeddedLNInvoiceParser,
+  EmbeddedMentionParser,
+  EmbeddedUrlParser,
+  EmbeddedWebsocketUrlParser,
+  TEmbeddedNode,
+  parseContent
+} from '@/lib/content-parser'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
 import dmService from '@/services/dm.service'
-import { TDmMessage } from '@/types'
+import { TImetaInfo, TDmMessage } from '@/types'
 import dayjs from 'dayjs'
 import { AlertCircle, ArrowDown, Check, Clock, Copy, Loader2, Reply } from 'lucide-react'
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function DmMessageList({
@@ -349,7 +371,7 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
-  const hasEmbeddedContent = /https?:\/\/|nostr:|note1|nevent1/.test(message.content)
+  const hasBlocks = /https?:\/\/|nostr:|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
   const [showActions, setShowActions] = useState(false)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
@@ -369,10 +391,9 @@ function MessageBubble({
   }, [])
 
   const bubbleClass = cn(
-    'overflow-hidden break-words rounded-md px-3 py-1.5 transition-all duration-500',
-    hasEmbeddedContent ? 'w-full' : 'w-fit',
-    isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary',
-    isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+    'overflow-hidden break-words rounded-lg px-3 py-1.5',
+    'w-fit max-w-full',
+    isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
   )
 
   return (
@@ -380,8 +401,7 @@ function MessageBubble({
       ref={refCallback}
       onClick={handleTap}
       className={cn(
-        'group/msg flex max-w-full flex-col',
-        hasEmbeddedContent && 'w-full',
+        'group/msg flex w-full max-w-full flex-col',
         isOwn ? 'items-end' : 'items-start',
         isElevated && 'relative z-10'
       )}
@@ -406,7 +426,7 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={cn('flex min-w-0 max-w-full items-center gap-2', isOwn ? 'flex-row' : 'flex-row-reverse')}
+        className={cn('flex min-w-0 max-w-full items-end gap-2', hasBlocks && 'w-full', isOwn ? 'flex-row' : 'flex-row-reverse')}
       >
         <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100', showActions && 'opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
           <button
@@ -429,17 +449,169 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        <div className={bubbleClass}>
-          <Content
-            content={message.content}
-            className={cn(
-              'select-text text-base',
-              isOwn && '[&>div]:text-foreground',
-              '[&_.bg-card:hover]:bg-accent'
-            )}
-          />
-        </div>
+        <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} />
       </div>
+    </div>
+  )
+}
+
+type TDmSegment =
+  | { kind: 'text'; nodes: TEmbeddedNode[] }
+  | { kind: 'block'; node: TEmbeddedNode }
+
+const BLOCK_TYPES = new Set(['image', 'images', 'media', 'event', 'youtube', 'x-post', 'invoice'])
+
+function segmentDmContent(nodes: TEmbeddedNode[]): TDmSegment[] {
+  const segments: TDmSegment[] = []
+  let inlineAcc: TEmbeddedNode[] = []
+
+  const flushInline = () => {
+    if (inlineAcc.length === 0) return
+    // Trim leading whitespace from first text node
+    const first = inlineAcc[0]
+    if (first.type === 'text' && typeof first.data === 'string') {
+      const trimmed = first.data.replace(/^\s+/, '')
+      if (trimmed) {
+        inlineAcc[0] = { type: 'text', data: trimmed }
+      } else {
+        inlineAcc = inlineAcc.slice(1)
+      }
+    }
+    // Trim trailing whitespace from last text node
+    if (inlineAcc.length > 0) {
+      const last = inlineAcc[inlineAcc.length - 1]
+      if (last.type === 'text' && typeof last.data === 'string') {
+        const trimmed = last.data.replace(/\s+$/, '')
+        if (trimmed) {
+          inlineAcc[inlineAcc.length - 1] = { type: 'text', data: trimmed }
+        } else {
+          inlineAcc = inlineAcc.slice(0, -1)
+        }
+      }
+    }
+    // Discard whitespace-only segments
+    const hasContent = inlineAcc.some(
+      (n) => n.type !== 'text' || (typeof n.data === 'string' && n.data.trim() !== '')
+    )
+    if (hasContent) {
+      segments.push({ kind: 'text', nodes: inlineAcc })
+    }
+    inlineAcc = []
+  }
+
+  for (const node of nodes) {
+    if (BLOCK_TYPES.has(node.type)) {
+      flushInline()
+      segments.push({ kind: 'block', node })
+    } else {
+      inlineAcc.push(node)
+    }
+  }
+  flushInline()
+
+  return segments
+}
+
+function DmContent({
+  content,
+  isOwn,
+  bubbleClass,
+  isHighlighted
+}: {
+  content: string
+  isOwn: boolean
+  bubbleClass: string
+  isHighlighted?: boolean
+}) {
+  const { allImages, segments } = useMemo(() => {
+    if (!content) return { allImages: [], segments: [] }
+
+    const nodes = parseContent(content, [
+      EmbeddedEventParser,
+      EmbeddedMentionParser,
+      EmbeddedUrlParser,
+      EmbeddedLNInvoiceParser,
+      EmbeddedWebsocketUrlParser,
+      EmbeddedHashtagParser,
+      EmbeddedEmojiParser
+    ])
+
+    const allImages = nodes
+      .map((node) => {
+        if (node.type === 'image') return { url: node.data } as TImetaInfo
+        if (node.type === 'images') {
+          const urls = Array.isArray(node.data) ? node.data : [node.data]
+          return urls.map((url) => ({ url }) as TImetaInfo)
+        }
+        return null
+      })
+      .filter(Boolean)
+      .flat() as TImetaInfo[]
+
+    const segments = segmentDmContent(nodes)
+
+    return { allImages, segments }
+  }, [content])
+
+  if (segments.length === 0) return null
+
+  let imageIndex = 0
+
+  return (
+    <div className={cn('flex min-w-0 max-w-full flex-col gap-1 rounded-lg transition-all duration-500', segments.some((s) => s.kind === 'block') && 'flex-1', isOwn ? 'items-end' : 'items-start', isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
+      {segments.map((seg, si) => {
+        if (seg.kind === 'text') {
+          return (
+            <div key={si} className={bubbleClass}>
+              <div
+                className={cn(
+                  'whitespace-pre-wrap text-wrap break-words select-text text-base',
+                  isOwn && '[&>div]:text-foreground',
+                  '[&_.bg-card:hover]:bg-accent'
+                )}
+              >
+                {seg.nodes.map((node, ni) => {
+                  if (node.type === 'text') return node.data
+                  if (node.type === 'url') return <ExternalLink url={node.data} key={ni} />
+                  if (node.type === 'mention')
+                    return <EmbeddedMention key={ni} userId={node.data.split(':')[1]} />
+                  if (node.type === 'hashtag') return <EmbeddedHashtag hashtag={node.data} key={ni} />
+                  if (node.type === 'websocket-url')
+                    return <EmbeddedWebsocketUrl url={node.data} key={ni} />
+                  if (node.type === 'emoji') return node.data
+                  return null
+                })}
+              </div>
+            </div>
+          )
+        }
+
+        // Block segment
+        const { node } = seg
+        if (node.type === 'image' || node.type === 'images') {
+          const start = imageIndex
+          const end = imageIndex + (Array.isArray(node.data) ? node.data.length : 1)
+          imageIndex = end
+          return <ImageGallery key={si} images={allImages} start={start} end={end} />
+        }
+        if (node.type === 'media') {
+          return <MediaPlayer key={si} src={node.data} />
+        }
+        if (node.type === 'youtube') {
+          return <YoutubeEmbeddedPlayer key={si} url={node.data} />
+        }
+        if (node.type === 'x-post') {
+          return <XEmbeddedPost key={si} url={node.data} />
+        }
+        if (node.type === 'event') {
+          const id = node.data.split(':')[1]
+          return <EmbeddedNote key={si} noteId={id} />
+        }
+        if (node.type === 'invoice') {
+          return <EmbeddedLNInvoice key={si} invoice={node.data} />
+        }
+        return null
+      })}
     </div>
   )
 }
