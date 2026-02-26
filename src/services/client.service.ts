@@ -408,7 +408,7 @@ class ClientService extends EventTarget {
         events.push(evt)
       })
     })
-    return events.sort((a, b) => b.created_at - a.created_at).slice(0, limit)
+    return events.sort((a, b) => compareEvents(b, a)).slice(0, limit)
   }
 
   subscribe(
@@ -655,11 +655,11 @@ class ClientService extends EventTarget {
           return onEvents([...events], !!eosedAt)
         }
         if (!eosed) {
-          events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
+          events = events.sort((a, b) => compareEvents(b, a)).slice(0, filter.limit)
           return onEvents([...events.concat(cachedEvents).slice(0, filter.limit)], false)
         }
 
-        events = events.sort((a, b) => b.created_at - a.created_at).slice(0, filter.limit)
+        events = events.sort((a, b) => compareEvents(b, a)).slice(0, filter.limit)
         if (needSaveToDb) {
           indexedDb.putEvents(
             events.map((evt) => ({ event: evt, relays: this.getEventHints(evt.id) }))
@@ -732,7 +732,7 @@ class ClientService extends EventTarget {
     events.forEach((evt) => {
       this.addEventToCache(evt)
     })
-    events = events.sort((a, b) => b.created_at - a.created_at).slice(0, limit)
+    events = events.sort((a, b) => compareEvents(b, a)).slice(0, limit)
 
     // Prevent concurrent requests from duplicating the same event
     const lastRefCreatedAt = refs.length > 0 ? refs[refs.length - 1][1] : dayjs().unix()
