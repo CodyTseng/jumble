@@ -25,16 +25,24 @@ export class BunkerSigner implements ISigner {
     })
     if (isInitialConnection) {
       await this.signer.connect()
+      return await this.getPublicKey()
     }
-    return await this.signer.getPublicKey()
+    // For reconnection, skip getPublicKey - the caller already knows the pubkey
+    this.pubkey = bunkerPointer.pubkey
+    return this.pubkey
   }
 
-  async getPublicKey() {
+  async getPublicKey(timeout = 10_000) {
     if (!this.signer) {
       throw new Error('Not logged in')
     }
     if (!this.pubkey) {
-      this.pubkey = await this.signer.getPublicKey()
+      this.pubkey = await Promise.race([
+        this.signer.getPublicKey(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Bunker getPublicKey timeout')), timeout)
+        )
+      ])
     }
     return this.pubkey
   }

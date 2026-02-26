@@ -161,9 +161,9 @@ export const NIP_96_SERVICE = [
 export const DEFAULT_NIP_96_SERVICE = 'https://nostr.build'
 
 export const DEFAULT_NOSTRCONNECT_RELAY = [
-  'wss://relay.nsec.app/',
   'wss://bucket.coracle.social/',
-  'wss://relay.primal.net/'
+  'wss://relay.primal.net/',
+  'wss://relay.damus.io/'
 ]
 
 export const DEFAULT_FAVICON_URL_TEMPLATE = 'https://{hostname}/favicon.ico'

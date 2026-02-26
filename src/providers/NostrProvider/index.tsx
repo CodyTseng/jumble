@@ -608,16 +608,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     } else if (account.signerType === 'bunker') {
       if (account.bunker && account.bunkerClientSecretKey) {
         const bunkerSigner = new BunkerSigner(account.bunkerClientSecretKey)
-        const pubkey = await bunkerSigner.login(account.bunker, false)
-        if (!pubkey) {
-          storage.removeAccount(account)
-          return null
-        }
-        if (pubkey !== account.pubkey) {
-          storage.removeAccount(account)
-          account = { ...account, pubkey }
-          storage.addAccount(account)
-        }
+        await bunkerSigner.login(account.bunker, false)
         return login(bunkerSigner, account)
       }
     } else if (account.signerType === 'npub' && account.npub) {
