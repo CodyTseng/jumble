@@ -381,7 +381,7 @@ class DmService {
 
     const replyRelayHint = recipientDmRelays[0] ?? ''
     const extraTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : undefined
-    const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
+    const { giftWrap, seal, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       content,
       accountPubkey,
       keypair.privkey,
@@ -389,6 +389,9 @@ class DmService {
       recipientEncryptionPubkey,
       extraTags
     )
+    console.debug('[DM] rumor:', rumor)
+    console.debug('[DM] seal:', seal)
+    console.debug('[DM] giftWrap:', giftWrap)
 
     const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
       rumor,

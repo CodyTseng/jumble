@@ -1,8 +1,15 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
+import FollowingBadge from '@/components/FollowingBadge'
+import Nip05 from '@/components/Nip05'
 import Uploader from '@/components/PostEditor/Uploader'
+import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
+import { userIdToPubkey } from '@/lib/pubkey'
+import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
+import client from '@/services/client.service'
 import dmService from '@/services/dm.service'
+import { TProfile } from '@/types'
 import {
   closestCenter,
   DndContext,
@@ -140,6 +147,11 @@ export default function DmInput({
   const [content, setContent] = useState('')
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null)
+  const [mentionResults, setMentionResults] = useState<TProfile[]>([])
+  const [mentionIndex, setMentionIndex] = useState(0)
+  const [mentionStart, setMentionStart] = useState(0)
+  const mentionsRef = useRef<Map<string, string>>(new Map())
 
   const isUploading = mediaItems.some((item) => item.status === 'uploading')
   const doneItems = mediaItems.filter((item) => item.status === 'done')
@@ -173,12 +185,80 @@ export default function DmInput({
     }
   }, [])
 
+  const detectMention = useCallback(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const cursorPos = textarea.selectionStart
+    const textBeforeCursor = content.slice(0, cursorPos)
+    const atIndex = textBeforeCursor.lastIndexOf('@')
+    if (atIndex >= 0 && (atIndex === 0 || /\s/.test(textBeforeCursor[atIndex - 1]))) {
+      const query = textBeforeCursor.slice(atIndex + 1)
+      if (!/\s/.test(query)) {
+        setMentionQuery(query)
+        setMentionStart(atIndex)
+        return
+      }
+    }
+    setMentionQuery(null)
+  }, [content])
+
+  useEffect(() => {
+    if (mentionQuery === null) {
+      setMentionResults([])
+      return
+    }
+    if (mentionQuery === '') {
+      setMentionResults([])
+      return
+    }
+    let cancelled = false
+    client.searchProfilesFromLocal(mentionQuery, 10).then((results) => {
+      if (!cancelled) {
+        setMentionResults(results)
+        setMentionIndex(0)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [mentionQuery])
+
+  const insertMention = useCallback(
+    (profile: TProfile) => {
+      const displayText = profile.username
+      const before = content.slice(0, mentionStart)
+      const after = content.slice(
+        mentionStart + 1 + (mentionQuery?.length ?? 0)
+      )
+      const newContent = `${before}@${displayText} ${after}`
+      setContent(newContent)
+      mentionsRef.current.set(displayText, profile.npub)
+      setMentionQuery(null)
+      setMentionResults([])
+
+      const cursorPos = mentionStart + 1 + displayText.length + 1
+      requestAnimationFrame(() => {
+        const textarea = textareaRef.current
+        if (textarea) {
+          textarea.focus()
+          textarea.setSelectionRange(cursorPos, cursorPos)
+        }
+      })
+    },
+    [content, mentionStart, mentionQuery]
+  )
+
   const handleSend = async () => {
     if (!pubkey || (!content.trim() && doneItems.length === 0) || disabled || isUploading) return
 
-    const parts = [content.trim(), ...doneItems.map((a) => a.url!)].filter(Boolean)
+    let text = content.trim()
+    mentionsRef.current.forEach((npub, displayText) => {
+      text = text.replaceAll(`@${displayText}`, `nostr:${npub}`)
+    })
+    const parts = [text, ...doneItems.map((a) => a.url!)].filter(Boolean)
     const messageContent = parts.join('\n')
     setContent('')
+    mentionsRef.current.clear()
     mediaItems.forEach((item) => URL.revokeObjectURL(item.previewUrl))
     setMediaItems([])
     textareaRef.current?.focus()
@@ -198,6 +278,29 @@ export default function DmInput({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (mentionQuery !== null && mentionResults.length > 0) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setMentionIndex((prev) => (prev + mentionResults.length - 1) % mentionResults.length)
+        return
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setMentionIndex((prev) => (prev + 1) % mentionResults.length)
+        return
+      }
+      if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault()
+        insertMention(mentionResults[mentionIndex])
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setMentionQuery(null)
+        setMentionResults([])
+        return
+      }
+    }
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleSend()
@@ -269,7 +372,41 @@ export default function DmInput({
   const canSend = (content.trim().length > 0 || doneItems.length > 0) && !disabled && !isUploading
 
   return (
-    <div className="border-t bg-background px-4 py-2">
+    <div className="relative border-t bg-background px-4 py-2">
+      {mentionQuery !== null && mentionResults.length > 0 && (
+        <div
+          className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          {mentionResults.map((profile, index) => (
+            <button
+              key={profile.npub}
+              className={cn(
+                'flex w-full cursor-pointer items-center gap-2 rounded-md p-2 text-start outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+                mentionIndex === index && 'bg-accent text-accent-foreground'
+              )}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                insertMention(profile)
+              }}
+              onMouseEnter={() => setMentionIndex(index)}
+            >
+              <SimpleUserAvatar userId={profile.npub} size="small" />
+              <div className="w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <SimpleUsername
+                    userId={profile.npub}
+                    className="truncate font-semibold"
+                  />
+                  <FollowingBadge userId={profile.npub} />
+                </div>
+                <Nip05 pubkey={userIdToPubkey(profile.npub)} />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
       {replyTo && (
         <div className="mb-2 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
           <div className="min-w-0 flex-1 border-l-2 border-primary pl-2">
@@ -326,7 +463,11 @@ export default function DmInput({
           ref={textareaRef}
           placeholder={t('Type a message...')}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => {
+            setContent(e.target.value)
+            requestAnimationFrame(detectMention)
+          }}
+          onSelect={detectMention}
           onKeyDown={handleKeyDown}
           disabled={disabled}
           rows={1}
