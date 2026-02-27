@@ -3,15 +3,123 @@ import Uploader from '@/components/PostEditor/Uploader'
 import { SimpleUsername } from '@/components/Username'
 import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
-import { ArrowUp, ImageUp, X } from 'lucide-react'
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import { restrictToParentElement } from '@dnd-kit/modifiers'
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { ArrowUp, File as FileIcon, FileAudio, ImageUp, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-type UploadingFile = {
+type MediaItem = {
+  id: string
   file: File
+  previewUrl: string
+  mimeType: string
+  status: 'uploading' | 'done'
   progress: number
-  cancel: () => void
+  cancel?: () => void
+  url?: string
+  tags?: string[][]
+}
+
+function SortableMediaItem({
+  item,
+  onRemove
+}: {
+  item: MediaItem
+  onRemove: (id: string) => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1
+  }
+
+  const circumference = Math.PI * 24 // radius 12, diameter 24
+  const strokeDashoffset = circumference * (1 - item.progress / 100)
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group relative shrink-0 cursor-grab touch-none active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="h-16 w-16 overflow-hidden rounded-md border">
+        {item.mimeType.startsWith('image/') ? (
+          <img
+            src={item.status === 'done' && item.url ? item.url : item.previewUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : item.mimeType.startsWith('video/') ? (
+          <video src={item.previewUrl} className="h-full w-full object-cover" draggable={false} />
+        ) : item.mimeType.startsWith('audio/') ? (
+          <div className="flex h-full w-full items-center justify-center bg-secondary">
+            <FileAudio className="h-6 w-6 text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-secondary">
+            <FileIcon className="h-6 w-6 text-muted-foreground" />
+          </div>
+        )}
+      </div>
+      {item.status === 'uploading' && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40">
+          <svg className="h-7 w-7 -rotate-90" viewBox="0 0 28 28">
+            <circle
+              cx="14"
+              cy="14"
+              r="12"
+              fill="none"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="2"
+            />
+            <circle
+              cx="14"
+              cy="14"
+              r="12"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+            />
+          </svg>
+        </div>
+      )}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onRemove(item.id)
+        }}
+        className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+      >
+        <X className="h-2.5 w-2.5" />
+      </button>
+    </div>
+  )
 }
 
 export default function DmInput({
@@ -30,10 +138,17 @@ export default function DmInput({
   const { t } = useTranslation()
   const { pubkey } = useNostr()
   const [content, setContent] = useState('')
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const isUploading = uploadingFiles.length > 0
+  const isUploading = mediaItems.some((item) => item.status === 'uploading')
+  const doneItems = mediaItems.filter((item) => item.status === 'done')
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 }
+    })
+  )
 
   const adjustHeight = () => {
     const textarea = textareaRef.current
@@ -52,11 +167,20 @@ export default function DmInput({
     }
   }, [replyTo])
 
-  const handleSend = async () => {
-    if (!pubkey || !content.trim() || disabled || isUploading) return
+  useEffect(() => {
+    return () => {
+      mediaItems.forEach((item) => URL.revokeObjectURL(item.previewUrl))
+    }
+  }, [])
 
-    const messageContent = content.trim()
+  const handleSend = async () => {
+    if (!pubkey || (!content.trim() && doneItems.length === 0) || disabled || isUploading) return
+
+    const parts = [content.trim(), ...doneItems.map((a) => a.url!)].filter(Boolean)
+    const messageContent = parts.join('\n')
     setContent('')
+    mediaItems.forEach((item) => URL.revokeObjectURL(item.previewUrl))
+    setMediaItems([])
     textareaRef.current?.focus()
 
     try {
@@ -81,29 +205,68 @@ export default function DmInput({
   }
 
   const handleUploadStart = useCallback((file: File, cancel: () => void) => {
-    setUploadingFiles((prev) => [...prev, { file, progress: 0, cancel }])
+    const id = crypto.randomUUID()
+    const previewUrl = URL.createObjectURL(file)
+    setMediaItems((prev) => [
+      ...prev,
+      { id, file, previewUrl, mimeType: file.type, status: 'uploading', progress: 0, cancel }
+    ])
   }, [])
 
   const handleProgress = useCallback((file: File, progress: number) => {
-    setUploadingFiles((prev) =>
-      prev.map((u) => (u.file === file ? { ...u, progress } : u))
+    setMediaItems((prev) =>
+      prev.map((item) => (item.file === file ? { ...item, progress } : item))
     )
   }, [])
 
+  const handleUploadSuccess = useCallback(
+    ({ url, tags }: { url: string; tags: string[][] }, file: File) => {
+      setMediaItems((prev) =>
+        prev.map((item) =>
+          item.file === file ? { ...item, status: 'done' as const, url, tags } : item
+        )
+      )
+    },
+    []
+  )
+
   const handleUploadEnd = useCallback((file: File) => {
-    setUploadingFiles((prev) => prev.filter((u) => u.file !== file))
+    setMediaItems((prev) => {
+      const item = prev.find((i) => i.file === file)
+      if (item && item.status === 'uploading') {
+        // Upload failed or was cancelled — remove and revoke
+        URL.revokeObjectURL(item.previewUrl)
+        return prev.filter((i) => i.file !== file)
+      }
+      return prev
+    })
   }, [])
 
-  const handleUploadSuccess = useCallback(({ url }: { url: string; tags: string[][] }) => {
-    setContent((prev) => (prev ? prev + '\n' + url : url))
+  const handleRemoveItem = useCallback((id: string) => {
+    setMediaItems((prev) => {
+      const item = prev.find((i) => i.id === id)
+      if (item) {
+        if (item.status === 'uploading' && item.cancel) {
+          item.cancel()
+        }
+        URL.revokeObjectURL(item.previewUrl)
+      }
+      return prev.filter((i) => i.id !== id)
+    })
   }, [])
 
-  const handleCancelUpload = useCallback((uploading: UploadingFile) => {
-    uploading.cancel()
-    setUploadingFiles((prev) => prev.filter((u) => u.file !== uploading.file))
-  }, [])
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setMediaItems((prev) => {
+        const oldIndex = prev.findIndex((item) => item.id === active.id)
+        const newIndex = prev.findIndex((item) => item.id === over.id)
+        return arrayMove(prev, oldIndex, newIndex)
+      })
+    }
+  }
 
-  const hasContent = content.trim().length > 0
+  const canSend = (content.trim().length > 0 || doneItems.length > 0) && !disabled && !isUploading
 
   return (
     <div className="border-t bg-background px-4 py-2">
@@ -128,27 +291,23 @@ export default function DmInput({
           </button>
         </div>
       )}
-      {uploadingFiles.length > 0 && (
-        <div className="mb-2 space-y-1.5">
-          {uploadingFiles.map((uploading, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs text-muted-foreground">{uploading.file.name}</p>
-                <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${Math.round(uploading.progress * 100)}%` }}
-                  />
-                </div>
-              </div>
-              <button
-                onClick={() => handleCancelUpload(uploading)}
-                className="shrink-0 rounded-full p-0.5 text-muted-foreground hover:bg-secondary"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
+      {mediaItems.length > 0 && (
+        <div className="mb-2 flex gap-2 overflow-x-auto">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToParentElement]}
+          >
+            <SortableContext
+              items={mediaItems.map((item) => item.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              {mediaItems.map((item) => (
+                <SortableMediaItem key={item.id} item={item} onRemove={handleRemoveItem} />
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
       )}
       <div className="flex items-end gap-2">
@@ -175,7 +334,7 @@ export default function DmInput({
         />
         <button
           onClick={handleSend}
-          disabled={!hasContent || disabled || isUploading}
+          disabled={!canSend}
           className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
         >
           <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
