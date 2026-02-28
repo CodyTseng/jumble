@@ -1,5 +1,6 @@
 import DmInput from '@/components/DmInput'
 import DmMessageList from '@/components/DmMessageList'
+import { ExtendedKind } from '@/constants'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useBottomBar, useSecondaryPage } from '@/PageManager'
@@ -26,7 +27,15 @@ const DmConversationPage = forwardRef(
     const active = currentIndex === index
 
     const handleReply = useCallback((message: TDmMessage) => {
-      setReplyTo({ id: message.id, content: message.content, senderPubkey: message.senderPubkey, tags: message.decryptedRumor?.tags })
+      const isFile = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
+      setReplyTo({
+        id: message.id,
+        content: isFile
+          ? dmService.getFilePreviewContent(message.decryptedRumor?.tags)
+          : message.content,
+        senderPubkey: message.senderPubkey,
+        tags: message.decryptedRumor?.tags
+      })
     }, [])
 
     const handleCancelReply = useCallback(() => {

@@ -14,6 +14,7 @@ import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
+import { ExtendedKind } from '@/constants'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -29,10 +30,11 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
+import cryptoFileService from '@/services/crypto-file.service'
 import dmService from '@/services/dm.service'
 import { TImetaInfo, TDmMessage } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, ArrowDown, Check, Clock, Copy, Loader2, Reply } from 'lucide-react'
+import { AlertCircle, ArrowDown, Check, Clock, Copy, Download, Loader2, Reply } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -373,7 +375,8 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
-  const hasBlocks = /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
+  const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
+  const hasBlocks = isFileMessage || /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
   const [showActions, setShowActions] = useState(false)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
@@ -452,7 +455,11 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
+        {isFileMessage ? (
+          <EncryptedFileMessage message={message} isOwn={isOwn} isHighlighted={isHighlighted} />
+        ) : (
+          <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
+        )}
       </div>
     </div>
   )
@@ -624,6 +631,134 @@ function DmContent({
         }
         return null
       })}
+    </div>
+  )
+}
+
+const decryptedBlobCache = new Map<string, string>()
+
+function EncryptedFileMessage({
+  message,
+  isOwn,
+  isHighlighted
+}: {
+  message: TDmMessage
+  isOwn: boolean
+  isHighlighted?: boolean
+}) {
+  const { t } = useTranslation()
+  const [blobUrl, setBlobUrl] = useState<string | null>(
+    decryptedBlobCache.get(message.id) ?? null
+  )
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(!decryptedBlobCache.has(message.id))
+
+  const tags = message.decryptedRumor?.tags ?? []
+  const fileType = tags.find((t) => t[0] === 'file-type')?.[1] ?? ''
+  const hexKey = tags.find((t) => t[0] === 'decryption-key')?.[1]
+  const hexNonce = tags.find((t) => t[0] === 'decryption-nonce')?.[1]
+  const fileUrl = message.content
+
+  useEffect(() => {
+    if (decryptedBlobCache.has(message.id)) return
+    if (!hexKey || !hexNonce || !fileUrl) {
+      setError(true)
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+    const decrypt = async () => {
+      try {
+        const key = cryptoFileService.hexToBytes(hexKey)
+        const nonce = cryptoFileService.hexToBytes(hexNonce)
+        const response = await fetch(fileUrl)
+        if (!response.ok) throw new Error('Failed to fetch file')
+        const encryptedData = await response.arrayBuffer()
+        const decrypted = await cryptoFileService.decryptFile(encryptedData, key, nonce)
+        if (cancelled) return
+        const blob = new Blob([decrypted], { type: fileType || 'application/octet-stream' })
+        const url = URL.createObjectURL(blob)
+        decryptedBlobCache.set(message.id, url)
+        setBlobUrl(url)
+      } catch (e) {
+        console.error('Failed to decrypt file:', e)
+        if (!cancelled) setError(true)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    decrypt()
+    return () => {
+      cancelled = true
+    }
+  }, [message.id, hexKey, hexNonce, fileUrl, fileType])
+
+  const wrapperClass = cn(
+    'flex min-w-0 max-w-full flex-1 flex-col',
+    isOwn ? 'items-end' : 'items-start',
+    isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg'
+  )
+
+  if (loading) {
+    return (
+      <div className={wrapperClass}>
+        <div className={cn('flex h-40 w-40 items-center justify-center overflow-hidden rounded-lg', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !blobUrl) {
+    return (
+      <div className={wrapperClass}>
+        <div className={cn('flex h-20 w-40 items-center justify-center gap-2 overflow-hidden rounded-lg', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <span className="text-xs text-muted-foreground">{t('Failed to decrypt')}</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (fileType.startsWith('image/')) {
+    return (
+      <div className={wrapperClass}>
+        <ImageGallery images={[{ url: blobUrl }]} start={0} end={1} />
+      </div>
+    )
+  }
+
+  if (fileType.startsWith('video/')) {
+    return (
+      <div className={wrapperClass}>
+        <div className="overflow-hidden rounded-lg">
+          <video src={blobUrl} controls className="max-h-80 max-w-full rounded-lg" />
+        </div>
+      </div>
+    )
+  }
+
+  if (fileType.startsWith('audio/')) {
+    return (
+      <div className={wrapperClass}>
+        <div className={cn('overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+          <audio src={blobUrl} controls className="max-w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={wrapperClass}>
+      <a
+        href={blobUrl}
+        download
+        className={cn('flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
+      >
+        <Download className="h-4 w-4 shrink-0" />
+        <span className="truncate text-sm">{t('Download file')}</span>
+      </a>
     </div>
   )
 }

@@ -3,7 +3,6 @@ import Emoji from '@/components/Emoji'
 import EmojiPickerDialog from '@/components/EmojiPickerDialog'
 import FollowingBadge from '@/components/FollowingBadge'
 import Nip05 from '@/components/Nip05'
-import Uploader from '@/components/PostEditor/Uploader'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import { userIdToPubkey } from '@/lib/pubkey'
@@ -11,9 +10,13 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import cryptoFileService from '@/services/crypto-file.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import dmService from '@/services/dm.service'
+import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from '@/services/media-upload.service'
 import { TEmoji, TProfile } from '@/types'
+import { base64 } from '@scure/base'
+import { rgbaToThumbHash } from 'thumbhash'
 import {
   closestCenter,
   DndContext,
@@ -45,6 +48,69 @@ type MediaItem = {
   cancel?: () => void
   url?: string
   tags?: string[][]
+  encryptionKey?: Uint8Array
+  encryptionNonce?: Uint8Array
+  originalHash?: string
+  dim?: string
+  size?: number
+  thumbHash?: string
+}
+
+const THUMBHASH_MAX_SIZE = 100
+
+function getMediaMeta(
+  file: File
+): Promise<{ dim?: string; thumbHash?: string }> {
+  return new Promise((resolve) => {
+    if (file.type.startsWith('image/')) {
+      const img = new window.Image()
+      img.onload = () => {
+        const dim = `${img.naturalWidth}x${img.naturalHeight}`
+
+        // Generate thumbhash
+        const { naturalWidth: w, naturalHeight: h } = img
+        const scale = Math.min(THUMBHASH_MAX_SIZE / w, THUMBHASH_MAX_SIZE / h, 1)
+        const tw = Math.round(w * scale)
+        const th = Math.round(h * scale)
+        const canvas = document.createElement('canvas')
+        canvas.width = tw
+        canvas.height = th
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(img, 0, 0, tw, th)
+        const pixels = ctx.getImageData(0, 0, tw, th)
+        let thumbHash: string | undefined
+        try {
+          const hash = rgbaToThumbHash(tw, th, pixels.data)
+          thumbHash = base64.encode(hash)
+        } catch {
+          /***/
+        }
+
+        URL.revokeObjectURL(img.src)
+        resolve({ dim, thumbHash })
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(img.src)
+        resolve({})
+      }
+      img.src = URL.createObjectURL(file)
+    } else if (file.type.startsWith('video/')) {
+      const video = document.createElement('video')
+      video.preload = 'metadata'
+      video.onloadedmetadata = () => {
+        const dim = `${video.videoWidth}x${video.videoHeight}`
+        URL.revokeObjectURL(video.src)
+        resolve({ dim })
+      }
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src)
+        resolve({})
+      }
+      video.src = URL.createObjectURL(file)
+    } else {
+      resolve({})
+    }
+  })
 }
 
 function SortableMediaItem({
@@ -78,7 +144,7 @@ function SortableMediaItem({
       <div className="h-16 w-16 overflow-hidden rounded-md border">
         {item.mimeType.startsWith('image/') ? (
           <img
-            src={item.status === 'done' && item.url ? item.url : item.previewUrl}
+            src={item.previewUrl}
             alt=""
             className="h-full w-full object-cover"
             draggable={false}
@@ -151,6 +217,7 @@ export default function DmInput({
   const [content, setContent] = useState('')
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
   const editableRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<{ node: Text; offset: number } | null>(null)
   const [mentionQuery, setMentionQuery] = useState<string | null>(null)
   const [mentionResults, setMentionResults] = useState<TProfile[]>([])
@@ -382,8 +449,9 @@ export default function DmInput({
     emojisRef.current.forEach((url, shortcode) => {
       emojiTags.push(['emoji', shortcode, url])
     })
-    const parts = [text, ...doneItems.map((a) => a.url!)].filter(Boolean)
-    const messageContent = parts.join('\n')
+
+    const filesToSend = [...doneItems]
+
     if (editableRef.current) editableRef.current.innerHTML = ''
     setContent('')
     mentionsRef.current.clear()
@@ -393,13 +461,35 @@ export default function DmInput({
     editableRef.current?.focus()
 
     try {
-      await dmService.sendMessage(
-        pubkey,
-        recipientPubkey,
-        messageContent,
-        replyTo ?? undefined,
-        emojiTags.length > 0 ? emojiTags : undefined
-      )
+      // Send text as Kind 14 if present
+      if (text) {
+        await dmService.sendMessage(
+          pubkey,
+          recipientPubkey,
+          text,
+          replyTo ?? undefined,
+          emojiTags.length > 0 ? emojiTags : undefined
+        )
+      }
+
+      // Send each file as Kind 15
+      for (const item of filesToSend) {
+        if (item.url && item.encryptionKey && item.encryptionNonce && item.originalHash) {
+          await dmService.sendFileMessage(
+            pubkey,
+            recipientPubkey,
+            item.url,
+            item.mimeType,
+            item.encryptionKey,
+            item.encryptionNonce,
+            item.originalHash,
+            item.dim,
+            item.size,
+            item.thumbHash
+          )
+        }
+      }
+
       onSent?.()
     } catch (error) {
       console.error('Failed to send message:', error)
@@ -465,42 +555,80 @@ export default function DmInput({
     }
   }
 
-  const handleUploadStart = useCallback((file: File, cancel: () => void) => {
-    const id = crypto.randomUUID()
-    const previewUrl = URL.createObjectURL(file)
-    setMediaItems((prev) => [
-      ...prev,
-      { id, file, previewUrl, mimeType: file.type, status: 'uploading', progress: 0, cancel }
-    ])
-  }, [])
+  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return
 
-  const handleProgress = useCallback((file: File, progress: number) => {
-    setMediaItems((prev) =>
-      prev.map((item) => (item.file === file ? { ...item, progress } : item))
-    )
-  }, [])
+    for (const file of event.target.files) {
+      const id = crypto.randomUUID()
+      const previewUrl = URL.createObjectURL(file)
+      const abortController = new AbortController()
+      setMediaItems((prev) => [
+        ...prev,
+        {
+          id,
+          file,
+          previewUrl,
+          mimeType: file.type,
+          status: 'uploading',
+          progress: 0,
+          cancel: () => abortController.abort()
+        }
+      ])
 
-  const handleUploadSuccess = useCallback(
-    ({ url, tags }: { url: string; tags: string[][] }, file: File) => {
-      setMediaItems((prev) =>
-        prev.map((item) =>
-          item.file === file ? { ...item, status: 'done' as const, url, tags } : item
+      try {
+        // Read dimensions + thumbhash for image/video
+        const { dim, thumbHash } = await getMediaMeta(file)
+
+        // Encrypt the file
+        const { encryptedBlob, key, nonce, originalHash } =
+          await cryptoFileService.encryptFile(file)
+
+        // Upload the encrypted blob, preserving original MIME type for file extension
+        const encryptedFile = new File([encryptedBlob], file.name, {
+          type: 'application/octet-stream'
+        })
+        const result = await mediaUpload.upload(encryptedFile, {
+          onProgress: (p) => {
+            setMediaItems((prev) => prev.map((item) => (item.id === id ? { ...item, progress: p } : item)))
+          },
+          signal: abortController.signal
+        })
+
+        setMediaItems((prev) =>
+          prev.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  status: 'done' as const,
+                  url: result.url,
+                  tags: result.tags,
+                  encryptionKey: key,
+                  encryptionNonce: nonce,
+                  originalHash,
+                  dim,
+                  size: file.size,
+                  thumbHash
+                }
+              : item
+          )
         )
-      )
-    },
-    []
-  )
-
-  const handleUploadEnd = useCallback((file: File) => {
-    setMediaItems((prev) => {
-      const item = prev.find((i) => i.file === file)
-      if (item && item.status === 'uploading') {
-        // Upload failed or was cancelled — remove and revoke
-        URL.revokeObjectURL(item.previewUrl)
-        return prev.filter((i) => i.file !== file)
+      } catch (error) {
+        console.error('Error uploading file', error)
+        const message = (error as Error).message
+        if (message !== UPLOAD_ABORTED_ERROR_MSG) {
+          toast.error(`Failed to upload file: ${message}`)
+        }
+        setMediaItems((prev) => {
+          const item = prev.find((i) => i.id === id)
+          if (item) URL.revokeObjectURL(item.previewUrl)
+          return prev.filter((i) => i.id !== id)
+        })
       }
-      return prev
-    })
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }, [])
 
   const handleRemoveItem = useCallback((id: string) => {
@@ -683,17 +811,27 @@ export default function DmInput({
         </div>
       )}
       <div className="flex items-end gap-2">
-        <Uploader
-          accept="image/*,video/*,audio/*"
-          onUploadStart={handleUploadStart}
-          onProgress={handleProgress}
-          onUploadEnd={handleUploadEnd}
-          onUploadSuccess={handleUploadSuccess}
-        >
-          <button className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
+        <div>
+          <button
+            onClick={() => {
+              if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+                fileInputRef.current.click()
+              }
+            }}
+            className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary"
+          >
             <ImageUp className="h-5 w-5" />
           </button>
-        </Uploader>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+            accept="image/*,video/*,audio/*"
+            multiple
+          />
+        </div>
         <EmojiPickerDialog onEmojiClick={handlePickerEmoji}>
           <button className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
             <Smile className="h-5 w-5" />

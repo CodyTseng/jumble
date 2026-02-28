@@ -4,6 +4,7 @@ import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TEncryptionKeypair } from '@/types'
 import { Event, Filter } from 'nostr-tools'
 import client from './client.service'
+import cryptoFileService from './crypto-file.service'
 import encryptionKeyService from './encryption-key.service'
 import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
@@ -449,6 +450,116 @@ class DmService {
     return message
   }
 
+  async sendFileMessage(
+    accountPubkey: string,
+    recipientPubkey: string,
+    fileUrl: string,
+    mimeType: string,
+    encryptionKey: Uint8Array,
+    encryptionNonce: Uint8Array,
+    originalHash: string,
+    dim?: string,
+    size?: number,
+    thumbHash?: string
+  ): Promise<TDmMessage | null> {
+    const keypair =
+      this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
+    if (!keypair) {
+      throw new Error('Encryption keypair not available')
+    }
+
+    const recipientEncryptionPubkey = await this.getRecipientEncryptionPubkey(recipientPubkey)
+    if (!recipientEncryptionPubkey) {
+      throw new Error('Recipient does not have encryption key published')
+    }
+
+    const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
+
+    const hexKey = cryptoFileService.bytesToHex(encryptionKey)
+    const hexNonce = cryptoFileService.bytesToHex(encryptionNonce)
+
+    const fileTags: string[][] = [
+      ['file-type', mimeType],
+      ['encryption-algorithm', 'aes-gcm'],
+      ['decryption-key', hexKey],
+      ['decryption-nonce', hexNonce],
+      ['ox', originalHash]
+    ]
+    if (dim) {
+      fileTags.push(['dim', dim])
+    }
+    if (size !== undefined) {
+      fileTags.push(['size', String(size)])
+    }
+    if (thumbHash) {
+      fileTags.push(['thumbhash', thumbHash])
+    }
+
+    const { giftWrap, seal, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
+      fileUrl,
+      accountPubkey,
+      keypair.privkey,
+      recipientPubkey,
+      recipientEncryptionPubkey,
+      fileTags,
+      ExtendedKind.RUMOR_FILE
+    )
+    console.debug('[DM] file rumor:', rumor)
+    console.debug('[DM] file seal:', seal)
+    console.debug('[DM] file giftWrap:', giftWrap)
+
+    const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
+      rumor,
+      keypair.privkey,
+      keypair.pubkey,
+      accountPubkey
+    )
+
+    const conversationKey = this.getConversationKey(accountPubkey, recipientPubkey)
+    const message: TDmMessage = {
+      id: rumor.id,
+      conversationKey,
+      senderPubkey: accountPubkey,
+      content: rumor.content,
+      createdAt: rumor.created_at,
+      originalEvent: selfGiftWrap,
+      decryptedRumor: rumor as unknown as Event
+    }
+
+    await this.saveMessage(accountPubkey, message)
+    await this.updateConversation(accountPubkey, recipientPubkey, message)
+    this.sendingStatuses.set(message.id, 'sending')
+    this.emitNewMessage(message)
+
+    try {
+      const myDmRelays = await client.fetchDmRelays(accountPubkey)
+      const [recipientResult, selfResult] = await Promise.allSettled([
+        client.publishEvent(recipientDmRelays, giftWrap),
+        client.publishEvent(myDmRelays, selfGiftWrap)
+      ])
+      if (selfResult.status === 'rejected') {
+        console.warn('[DM] selfGiftWrap publish failed:', selfResult.reason)
+      }
+      if (recipientResult.status === 'rejected') {
+        throw recipientResult.reason
+      }
+
+      this.sendingStatuses.set(message.id, 'sent')
+      this.emitSendingStatusChanged()
+
+      setTimeout(() => {
+        this.sendingStatuses.delete(message.id)
+        this.emitSendingStatusChanged()
+      }, 3000)
+    } catch (error) {
+      this.sendingStatuses.set(message.id, 'failed')
+      this.emitSendingStatusChanged()
+      throw error
+    }
+
+    return message
+  }
+
   private async startRelaySubscription(
     accountPubkey: string,
     encryptionKeypair: TEncryptionKeypair
@@ -637,15 +748,26 @@ class DmService {
     }
   }
 
+  getFilePreviewContent(tags?: string[][]): string {
+    const fileType = tags?.find((t) => t[0] === 'file-type')?.[1] ?? ''
+    if (fileType.startsWith('image/')) return '[Image]'
+    if (fileType.startsWith('video/')) return '[Video]'
+    if (fileType.startsWith('audio/')) return '[Audio]'
+    return '[File]'
+  }
+
   async resolveReplyTo(message: TDmMessage): Promise<TDmMessage> {
     if (!message.replyTo || (message.replyTo.content && message.replyTo.senderPubkey)) {
       return message
     }
     const replyMsg = await indexedDb.getDmMessageById(message.replyTo.id)
     if (replyMsg) {
+      const isFile = replyMsg.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
       message.replyTo = {
         id: replyMsg.id,
-        content: replyMsg.content,
+        content: isFile
+          ? this.getFilePreviewContent(replyMsg.decryptedRumor?.tags)
+          : replyMsg.content,
         senderPubkey: replyMsg.senderPubkey,
         tags: replyMsg.decryptedRumor?.tags
       }
@@ -675,13 +797,18 @@ class DmService {
     const isUnread =
       !isActive && message.senderPubkey !== accountPubkey && message.createdAt > lastReadTime
 
+    const isFile = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
+    const displayContent = isFile
+      ? this.getFilePreviewContent(message.decryptedRumor?.tags)
+      : message.content
+
     const conversation: TDmConversation = {
       key: conversationKey,
       pubkey: otherPubkey,
       lastMessageAt: Math.max(existing?.lastMessageAt ?? 0, message.createdAt),
       lastMessageContent:
         message.createdAt >= (existing?.lastMessageAt ?? 0)
-          ? message.content
+          ? displayContent
           : (existing?.lastMessageContent ?? ''),
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey
@@ -746,7 +873,11 @@ class DmService {
         key: conversationKey,
         pubkey: otherPubkey,
         lastMessageAt: latestMessage?.createdAt ?? 0,
-        lastMessageContent: latestMessage?.content ?? '',
+        lastMessageContent: latestMessage
+          ? latestMessage.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
+            ? this.getFilePreviewContent(latestMessage.decryptedRumor?.tags)
+            : latestMessage.content
+          : '',
         unreadCount,
         hasReplied
       }

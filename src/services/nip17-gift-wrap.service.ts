@@ -34,11 +34,12 @@ class Nip17GiftWrapService {
     encryptionPrivkey: Uint8Array,
     recipientPubkey: string,
     recipientEncryptionPubkey: string,
-    extraTags?: string[][]
+    extraTags?: string[][],
+    kind?: number
   ): { giftWrap: Event; seal: Event; rumor: TRumor } {
     const rumorTemplate: UnsignedEvent = {
       created_at: dayjs().unix(),
-      kind: kinds.PrivateDirectMessage,
+      kind: kind ?? kinds.PrivateDirectMessage,
       tags: [['p', recipientPubkey], ...(extraTags ?? [])],
       content,
       pubkey: accountPubkey
