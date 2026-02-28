@@ -690,13 +690,13 @@ export default function DmInput({
           onUploadEnd={handleUploadEnd}
           onUploadSuccess={handleUploadSuccess}
         >
-          <button className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
-            <ImageUp className="h-4 w-4" />
+          <button className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
+            <ImageUp className="h-5 w-5" />
           </button>
         </Uploader>
         <EmojiPickerDialog onEmojiClick={handlePickerEmoji}>
-          <button className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
-            <Smile className="h-4 w-4" />
+          <button className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
+            <Smile className="h-5 w-5" />
           </button>
         </EmojiPickerDialog>
         <div
@@ -716,9 +716,9 @@ export default function DmInput({
         <button
           onClick={handleSend}
           disabled={!canSend}
-          className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
+          className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
         >
-          <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+          <ArrowUp className="h-5 w-5" strokeWidth={2.5} />
         </button>
       </div>
     </div>
