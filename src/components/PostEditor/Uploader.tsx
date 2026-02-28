@@ -12,7 +12,7 @@ export default function Uploader({
   accept = 'image/*'
 }: {
   children: React.ReactNode
-  onUploadSuccess: ({ url, tags }: { url: string; tags: string[][] }) => void
+  onUploadSuccess: ({ url, tags }: { url: string; tags: string[][] }, file: File) => void
   onUploadStart?: (file: File, cancel: () => void) => void
   onUploadEnd?: (file: File) => void
   onProgress?: (file: File, progress: number) => void
@@ -39,7 +39,7 @@ export default function Uploader({
           onProgress: (p) => onProgress?.(file, p),
           signal: abortController?.signal
         })
-        onUploadSuccess(result)
+        onUploadSuccess(result, file)
         onUploadEnd?.(file)
       } catch (error) {
         console.error('Error uploading file', error)
