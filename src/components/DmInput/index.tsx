@@ -1,5 +1,6 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
 import Emoji from '@/components/Emoji'
+import EmojiPickerDialog from '@/components/EmojiPickerDialog'
 import FollowingBadge from '@/components/FollowingBadge'
 import Nip05 from '@/components/Nip05'
 import Uploader from '@/components/PostEditor/Uploader'
@@ -28,7 +29,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowUp, File as FileIcon, FileAudio, ImageUp, X } from 'lucide-react'
+import { ArrowUp, File as FileIcon, FileAudio, ImageUp, Smile, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -516,6 +517,54 @@ export default function DmInput({
     }
   }
 
+  const handlePickerEmoji = useCallback(
+    (emoji: string | TEmoji | undefined) => {
+      if (!emoji) return
+      const div = editableRef.current
+      if (!div) return
+      div.focus()
+
+      const sel = window.getSelection()
+      if (!sel || !sel.rangeCount) {
+        // No selection — place cursor at end
+        const range = document.createRange()
+        range.selectNodeContents(div)
+        range.collapse(false)
+        sel?.removeAllRanges()
+        sel?.addRange(range)
+      }
+
+      if (typeof emoji === 'string') {
+        const textNode = document.createTextNode(emoji)
+        const range = sel!.getRangeAt(0)
+        range.deleteContents()
+        range.insertNode(textNode)
+        range.setStartAfter(textNode)
+        range.collapse(true)
+        sel!.removeAllRanges()
+        sel!.addRange(range)
+      } else {
+        const img = document.createElement('img')
+        img.src = emoji.url
+        img.alt = `:${emoji.shortcode}:`
+        img.dataset.shortcode = emoji.shortcode
+        img.dataset.url = emoji.url
+        img.className = 'inline-block size-5 align-text-bottom pointer-events-none'
+        img.draggable = false
+        const range = sel!.getRangeAt(0)
+        range.deleteContents()
+        range.insertNode(img)
+        range.setStartAfter(img)
+        range.collapse(true)
+        sel!.removeAllRanges()
+        sel!.addRange(range)
+        emojisRef.current.set(emoji.shortcode, emoji.url)
+      }
+      setContent(serializeContent())
+    },
+    [serializeContent]
+  )
+
   const canSend = (content.trim().length > 0 || doneItems.length > 0) && !disabled && !isUploading
 
   return (
@@ -634,6 +683,11 @@ export default function DmInput({
             <ImageUp className="h-4 w-4" />
           </button>
         </Uploader>
+        <EmojiPickerDialog onEmojiClick={handlePickerEmoji}>
+          <button className="mb-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
+            <Smile className="h-4 w-4" />
+          </button>
+        </EmojiPickerDialog>
         <div
           ref={editableRef}
           contentEditable={!disabled}
