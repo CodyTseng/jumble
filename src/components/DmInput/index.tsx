@@ -181,7 +181,9 @@ export default function DmInput({
       } else if (node instanceof HTMLImageElement && node.dataset.shortcode) {
         result += `:${node.dataset.shortcode}:`
       } else if (node.nodeType === Node.ELEMENT_NODE) {
-        if (isTopLevel && result.length > 0 && !result.endsWith('\n')) {
+        const el = node as HTMLElement
+        const isBlock = el.tagName === 'DIV' || el.tagName === 'P'
+        if (isBlock && result.length > 0 && !result.endsWith('\n')) {
           result += '\n'
         }
         node.childNodes.forEach((child) => walk(child, false))
@@ -345,9 +347,16 @@ export default function DmInput({
 
       const sel = window.getSelection()!
       const range = sel.getRangeAt(0)
-      const text = document.createTextNode(`@${profile.username} `)
-      range.insertNode(text)
-      range.setStartAfter(text)
+      const span = document.createElement('span')
+      span.className = 'text-primary'
+      span.contentEditable = 'false'
+      span.textContent = `@${profile.username}`
+      range.insertNode(span)
+      range.setStartAfter(span)
+      range.collapse(true)
+      const space = document.createTextNode('\u00A0')
+      range.insertNode(space)
+      range.setStartAfter(space)
       range.collapse(true)
       sel.removeAllRanges()
       sel.addRange(range)
