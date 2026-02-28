@@ -432,7 +432,7 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={cn('flex min-w-0 max-w-full items-end gap-2', hasBlocks && 'w-full', isOwn ? 'flex-row' : 'flex-row-reverse')}
+        className={cn('flex min-w-0 max-w-full items-end gap-2', hasBlocks && 'w-full', isFileMessage && 'justify-end', isOwn ? 'flex-row' : 'flex-row-reverse')}
       >
         <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100', showActions && 'opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
           <button
@@ -695,15 +695,43 @@ function EncryptedFileMessage({
   }, [message.id, hexKey, hexNonce, fileUrl, fileType])
 
   const wrapperClass = cn(
-    'flex min-w-0 max-w-full flex-1 flex-col',
-    isOwn ? 'items-end' : 'items-start',
+    'flex min-w-0 max-w-full flex-col',
     isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg'
   )
 
-  if (loading) {
+  const isImage = fileType.startsWith('image/')
+  const isVideo = fileType.startsWith('video/')
+  const isAudio = fileType.startsWith('audio/')
+  const isMedia = isImage || isVideo || isAudio
+  const ext = fileType.split('/')[1]?.split('+')[0] ?? ''
+
+  if (!isMedia && (loading || error || !blobUrl)) {
     return (
       <div className={wrapperClass}>
-        <div className={cn('flex h-40 w-40 items-center justify-center overflow-hidden rounded-lg', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+        <div className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+          <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isOwn ? 'bg-primary-foreground/20' : 'bg-background')}>
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-destructive" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-xs font-medium">{ext ? ext.toUpperCase() : t('File')}</div>
+            <div className={cn('text-[11px]', isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground')}>
+              {loading ? t('Decrypting...') : t('Failed to decrypt')}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    const placeholderShape = isImage ? 'h-40 w-40' : isVideo ? 'h-32 w-56' : 'h-12 w-48'
+    return (
+      <div className={wrapperClass}>
+        <div className={cn('flex items-center justify-center overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       </div>
@@ -711,9 +739,10 @@ function EncryptedFileMessage({
   }
 
   if (error || !blobUrl) {
+    const placeholderShape = isImage ? 'h-40 w-40' : isVideo ? 'h-32 w-56' : 'h-12 w-48'
     return (
       <div className={wrapperClass}>
-        <div className={cn('flex h-20 w-40 items-center justify-center gap-2 overflow-hidden rounded-lg', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+        <div className={cn('flex items-center justify-center gap-2 overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
           <AlertCircle className="h-4 w-4 text-destructive" />
           <span className="text-xs text-muted-foreground">{t('Failed to decrypt')}</span>
         </div>
@@ -753,11 +782,16 @@ function EncryptedFileMessage({
     <div className={wrapperClass}>
       <a
         href={blobUrl}
-        download
-        className={cn('flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
+        download={ext ? `file.${ext}` : true}
+        className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
       >
-        <Download className="h-4 w-4 shrink-0" />
-        <span className="truncate text-sm">{t('Download file')}</span>
+        <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isOwn ? 'bg-primary-foreground/20' : 'bg-background')}>
+          <Download className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-xs font-medium">{ext ? ext.toUpperCase() : t('File')}</div>
+          <div className={cn('text-[11px]', isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground')}>{t('Tap to download')}</div>
+        </div>
       </a>
     </div>
   )

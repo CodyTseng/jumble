@@ -59,7 +59,7 @@ class EncryptionKeyService {
   }
 
   async queryEncryptionKeyAnnouncement(pubkey: string): Promise<Event | null> {
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
+    const relays = await client.fetchDmRelays(pubkey)
     const events = await client.fetchEvents(relays, {
       kinds: [ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT],
       authors: [pubkey],

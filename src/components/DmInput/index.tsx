@@ -33,7 +33,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowUp, File as FileIcon, FileAudio, ImageUp, Smile, X } from 'lucide-react'
+import { ArrowUp, File as FileIcon, Paperclip, Smile, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -151,13 +151,12 @@ function SortableMediaItem({
           />
         ) : item.mimeType.startsWith('video/') ? (
           <video src={item.previewUrl} className="h-full w-full object-cover" draggable={false} />
-        ) : item.mimeType.startsWith('audio/') ? (
-          <div className="flex h-full w-full items-center justify-center bg-secondary">
-            <FileAudio className="h-6 w-6 text-muted-foreground" />
-          </div>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-secondary">
-            <FileIcon className="h-6 w-6 text-muted-foreground" />
+          <div className="flex h-full w-full flex-col items-center justify-center gap-0.5 bg-secondary">
+            <FileIcon className="h-5 w-5 text-muted-foreground" />
+            <span className="max-w-full truncate px-1 text-[10px] text-muted-foreground">
+              {item.mimeType.split('/')[1]?.split('+')[0]?.toUpperCase() || 'FILE'}
+            </span>
           </div>
         )}
       </div>
@@ -821,14 +820,13 @@ export default function DmInput({
             }}
             className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary"
           >
-            <ImageUp className="h-5 w-5" />
+            <Paperclip className="h-5 w-5" />
           </button>
           <input
             type="file"
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handleFileSelect}
-            accept="image/*,video/*,audio/*"
             multiple
           />
         </div>
