@@ -1,4 +1,5 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
+import Emoji from '@/components/Emoji'
 import FollowingBadge from '@/components/FollowingBadge'
 import Nip05 from '@/components/Nip05'
 import Uploader from '@/components/PostEditor/Uploader'
@@ -8,8 +9,9 @@ import { userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
+import customEmojiService from '@/services/custom-emoji.service'
 import dmService from '@/services/dm.service'
-import { TProfile } from '@/types'
+import { TEmoji, TProfile } from '@/types'
 import {
   closestCenter,
   DndContext,
@@ -146,12 +148,16 @@ export default function DmInput({
   const { pubkey } = useNostr()
   const [content, setContent] = useState('')
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const editableRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<{ node: Text; offset: number } | null>(null)
   const [mentionQuery, setMentionQuery] = useState<string | null>(null)
   const [mentionResults, setMentionResults] = useState<TProfile[]>([])
   const [mentionIndex, setMentionIndex] = useState(0)
-  const [mentionStart, setMentionStart] = useState(0)
   const mentionsRef = useRef<Map<string, string>>(new Map())
+  const [emojiQuery, setEmojiQuery] = useState<string | null>(null)
+  const [emojiResults, setEmojiResults] = useState<TEmoji[]>([])
+  const [emojiIndex, setEmojiIndex] = useState(0)
+  const emojisRef = useRef<Map<string, string>>(new Map())
 
   const isUploading = mediaItems.some((item) => item.status === 'uploading')
   const doneItems = mediaItems.filter((item) => item.status === 'done')
@@ -162,20 +168,31 @@ export default function DmInput({
     })
   )
 
-  const adjustHeight = () => {
-    const textarea = textareaRef.current
-    if (!textarea) return
-    textarea.style.height = 'auto'
-    textarea.style.height = `${textarea.scrollHeight}px`
-  }
-
-  useEffect(() => {
-    adjustHeight()
-  }, [content])
+  const serializeContent = useCallback(() => {
+    const div = editableRef.current
+    if (!div) return ''
+    let result = ''
+    const walk = (node: Node, isTopLevel: boolean) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        result += node.textContent || ''
+      } else if (node instanceof HTMLBRElement) {
+        result += '\n'
+      } else if (node instanceof HTMLImageElement && node.dataset.shortcode) {
+        result += `:${node.dataset.shortcode}:`
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (isTopLevel && result.length > 0 && !result.endsWith('\n')) {
+          result += '\n'
+        }
+        node.childNodes.forEach((child) => walk(child, false))
+      }
+    }
+    div.childNodes.forEach((child) => walk(child, true))
+    return result
+  }, [])
 
   useEffect(() => {
     if (replyTo) {
-      textareaRef.current?.focus()
+      editableRef.current?.focus()
     }
   }, [replyTo])
 
@@ -185,22 +202,56 @@ export default function DmInput({
     }
   }, [])
 
-  const detectMention = useCallback(() => {
-    const textarea = textareaRef.current
-    if (!textarea) return
-    const cursorPos = textarea.selectionStart
-    const textBeforeCursor = content.slice(0, cursorPos)
-    const atIndex = textBeforeCursor.lastIndexOf('@')
-    if (atIndex >= 0 && (atIndex === 0 || /\s/.test(textBeforeCursor[atIndex - 1]))) {
-      const query = textBeforeCursor.slice(atIndex + 1)
-      if (!/\s/.test(query)) {
-        setMentionQuery(query)
-        setMentionStart(atIndex)
-        return
+  const detectAutocomplete = useCallback(() => {
+    const sel = window.getSelection()
+    if (!sel || !sel.rangeCount || !sel.isCollapsed) {
+      setMentionQuery(null)
+      setEmojiQuery(null)
+      return
+    }
+    const range = sel.getRangeAt(0)
+    if (range.startContainer.nodeType !== Node.TEXT_NODE) {
+      setMentionQuery(null)
+      setEmojiQuery(null)
+      return
+    }
+    const textNode = range.startContainer as Text
+    const textBefore = (textNode.textContent || '').slice(0, range.startOffset)
+
+    let best: { type: 'mention' | 'emoji'; index: number; query: string } | null = null
+
+    const atIndex = textBefore.lastIndexOf('@')
+    if (atIndex >= 0 && (atIndex === 0 || /\s/.test(textBefore[atIndex - 1]))) {
+      const q = textBefore.slice(atIndex + 1)
+      if (!/\s/.test(q)) {
+        best = { type: 'mention', index: atIndex, query: q }
       }
     }
-    setMentionQuery(null)
-  }, [content])
+
+    const colonIndex = textBefore.lastIndexOf(':')
+    if (colonIndex >= 0 && (colonIndex === 0 || /\s/.test(textBefore[colonIndex - 1]))) {
+      const q = textBefore.slice(colonIndex + 1)
+      if (!/[\s:]/.test(q)) {
+        if (!best || colonIndex > best.index) {
+          best = { type: 'emoji', index: colonIndex, query: q }
+        }
+      }
+    }
+
+    if (best?.type === 'mention') {
+      setMentionQuery(best.query)
+      triggerRef.current = { node: textNode, offset: best.index }
+      setEmojiQuery(null)
+    } else if (best?.type === 'emoji') {
+      setEmojiQuery(best.query)
+      triggerRef.current = { node: textNode, offset: best.index }
+      setMentionQuery(null)
+    } else {
+      setMentionQuery(null)
+      setEmojiQuery(null)
+      triggerRef.current = null
+    }
+  }, [])
 
   useEffect(() => {
     if (mentionQuery === null) {
@@ -223,29 +274,90 @@ export default function DmInput({
     }
   }, [mentionQuery])
 
+  useEffect(() => {
+    if (emojiQuery === null) {
+      setEmojiResults([])
+      return
+    }
+    let cancelled = false
+    customEmojiService.searchEmojis(emojiQuery).then((ids) => {
+      if (!cancelled) {
+        const emojis = ids
+          .map((id) => customEmojiService.getEmojiById(id))
+          .filter(Boolean) as TEmoji[]
+        setEmojiResults(emojis)
+        setEmojiIndex(0)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [emojiQuery])
+
+  const replaceTriggeredText = useCallback(() => {
+    const trigger = triggerRef.current
+    if (!trigger) return false
+    const sel = window.getSelection()
+    if (!sel || !sel.rangeCount) return false
+    const range = sel.getRangeAt(0)
+    range.setStart(trigger.node, trigger.offset)
+    range.deleteContents()
+    return true
+  }, [])
+
+  const insertEmoji = useCallback(
+    (emoji: TEmoji) => {
+      if (!replaceTriggeredText()) return
+
+      const sel = window.getSelection()!
+      const range = sel.getRangeAt(0)
+      const img = document.createElement('img')
+      img.src = emoji.url
+      img.alt = `:${emoji.shortcode}:`
+      img.dataset.shortcode = emoji.shortcode
+      img.dataset.url = emoji.url
+      img.className = 'inline-block size-5 align-text-bottom pointer-events-none'
+      img.draggable = false
+      range.insertNode(img)
+      range.setStartAfter(img)
+      range.collapse(true)
+      const space = document.createTextNode(' ')
+      range.insertNode(space)
+      range.setStartAfter(space)
+      range.collapse(true)
+      sel.removeAllRanges()
+      sel.addRange(range)
+
+      emojisRef.current.set(emoji.shortcode, emoji.url)
+      customEmojiService.updateSuggested(customEmojiService.getEmojiId(emoji))
+      setEmojiQuery(null)
+      setEmojiResults([])
+      triggerRef.current = null
+      setContent(serializeContent())
+    },
+    [serializeContent, replaceTriggeredText]
+  )
+
   const insertMention = useCallback(
     (profile: TProfile) => {
-      const displayText = profile.username
-      const before = content.slice(0, mentionStart)
-      const after = content.slice(
-        mentionStart + 1 + (mentionQuery?.length ?? 0)
-      )
-      const newContent = `${before}@${displayText} ${after}`
-      setContent(newContent)
-      mentionsRef.current.set(displayText, profile.npub)
+      if (!replaceTriggeredText()) return
+
+      const sel = window.getSelection()!
+      const range = sel.getRangeAt(0)
+      const text = document.createTextNode(`@${profile.username} `)
+      range.insertNode(text)
+      range.setStartAfter(text)
+      range.collapse(true)
+      sel.removeAllRanges()
+      sel.addRange(range)
+
+      mentionsRef.current.set(profile.username, profile.npub)
       setMentionQuery(null)
       setMentionResults([])
-
-      const cursorPos = mentionStart + 1 + displayText.length + 1
-      requestAnimationFrame(() => {
-        const textarea = textareaRef.current
-        if (textarea) {
-          textarea.focus()
-          textarea.setSelectionRange(cursorPos, cursorPos)
-        }
-      })
+      triggerRef.current = null
+      setContent(serializeContent())
     },
-    [content, mentionStart, mentionQuery]
+    [serializeContent, replaceTriggeredText]
   )
 
   const handleSend = async () => {
@@ -255,20 +367,27 @@ export default function DmInput({
     mentionsRef.current.forEach((npub, displayText) => {
       text = text.replaceAll(`@${displayText}`, `nostr:${npub}`)
     })
+    const emojiTags: string[][] = []
+    emojisRef.current.forEach((url, shortcode) => {
+      emojiTags.push(['emoji', shortcode, url])
+    })
     const parts = [text, ...doneItems.map((a) => a.url!)].filter(Boolean)
     const messageContent = parts.join('\n')
+    if (editableRef.current) editableRef.current.innerHTML = ''
     setContent('')
     mentionsRef.current.clear()
+    emojisRef.current.clear()
     mediaItems.forEach((item) => URL.revokeObjectURL(item.previewUrl))
     setMediaItems([])
-    textareaRef.current?.focus()
+    editableRef.current?.focus()
 
     try {
       await dmService.sendMessage(
         pubkey,
         recipientPubkey,
         messageContent,
-        replyTo ?? undefined
+        replyTo ?? undefined,
+        emojiTags.length > 0 ? emojiTags : undefined
       )
       onSent?.()
     } catch (error) {
@@ -277,7 +396,12 @@ export default function DmInput({
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleInput = useCallback(() => {
+    setContent(serializeContent())
+    requestAnimationFrame(detectAutocomplete)
+  }, [serializeContent, detectAutocomplete])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (mentionQuery !== null && mentionResults.length > 0) {
       if (e.key === 'ArrowUp') {
         e.preventDefault()
@@ -298,6 +422,29 @@ export default function DmInput({
         e.preventDefault()
         setMentionQuery(null)
         setMentionResults([])
+        return
+      }
+    }
+    if (emojiQuery !== null && emojiResults.length > 0) {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setEmojiIndex((prev) => (prev + emojiResults.length - 1) % emojiResults.length)
+        return
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setEmojiIndex((prev) => (prev + 1) % emojiResults.length)
+        return
+      }
+      if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault()
+        insertEmoji(emojiResults[emojiIndex])
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setEmojiQuery(null)
+        setEmojiResults([])
         return
       }
     }
@@ -407,6 +554,34 @@ export default function DmInput({
           ))}
         </div>
       )}
+      {emojiQuery !== null && emojiResults.length > 0 && (
+        <div
+          className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          {emojiResults.map((emoji, index) => (
+            <button
+              key={`${emoji.shortcode}:${emoji.url}`}
+              className={cn(
+                'flex w-full cursor-pointer items-center gap-2 rounded-md p-1 text-start outline-none transition-colors',
+                emojiIndex === index && 'bg-accent text-accent-foreground'
+              )}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                insertEmoji(emoji)
+              }}
+              onMouseEnter={() => setEmojiIndex(index)}
+            >
+              <Emoji
+                emoji={emoji}
+                classNames={{ img: 'size-8 shrink-0 rounded-md', text: 'w-8 text-center shrink-0' }}
+              />
+              <span className="truncate">:{emoji.shortcode}:</span>
+            </button>
+          ))}
+        </div>
+      )}
       {replyTo && (
         <div className="mb-2 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
           <div className="min-w-0 flex-1 border-l-2 border-primary pl-2">
@@ -459,19 +634,19 @@ export default function DmInput({
             <ImageUp className="h-4 w-4" />
           </button>
         </Uploader>
-        <textarea
-          ref={textareaRef}
-          placeholder={t('Type a message...')}
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value)
-            requestAnimationFrame(detectMention)
-          }}
-          onSelect={detectMention}
+        <div
+          ref={editableRef}
+          contentEditable={!disabled}
+          onInput={handleInput}
           onKeyDown={handleKeyDown}
-          disabled={disabled}
-          rows={1}
-          className="max-h-40 min-h-[36px] flex-1 select-text resize-none overflow-y-auto bg-transparent py-2 text-base placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={detectAutocomplete}
+          onKeyUp={detectAutocomplete}
+          data-placeholder={t('Type a message...')}
+          className={cn(
+            'max-h-40 min-h-[36px] flex-1 select-text overflow-y-auto break-words bg-transparent py-2 text-base focus:outline-none',
+            disabled && 'cursor-not-allowed opacity-50',
+            'empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]'
+          )}
         />
         <button
           onClick={handleSend}

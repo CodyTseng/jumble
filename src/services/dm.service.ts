@@ -364,7 +364,8 @@ class DmService {
     accountPubkey: string,
     recipientPubkey: string,
     content: string,
-    replyTo?: { id: string; content: string; senderPubkey: string }
+    replyTo?: { id: string; content: string; senderPubkey: string },
+    additionalTags?: string[][]
   ): Promise<TDmMessage | null> {
     const keypair =
       this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
@@ -380,7 +381,8 @@ class DmService {
     const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
 
     const replyRelayHint = recipientDmRelays[0] ?? ''
-    const extraTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : undefined
+    const replyTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : []
+    const extraTags = [...replyTags, ...(additionalTags ?? [])]
     const { giftWrap, seal, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       content,
       accountPubkey,

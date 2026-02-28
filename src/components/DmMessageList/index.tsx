@@ -1,4 +1,5 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
+import Emoji from '@/components/Emoji'
 import {
   EmbeddedHashtag,
   EmbeddedLNInvoice,
@@ -24,6 +25,7 @@ import {
   TEmbeddedNode,
   parseContent
 } from '@/lib/content-parser'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -449,7 +451,7 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} />
+        <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
       </div>
     </div>
   )
@@ -516,12 +518,14 @@ function DmContent({
   content,
   isOwn,
   bubbleClass,
-  isHighlighted
+  isHighlighted,
+  tags
 }: {
   content: string
   isOwn: boolean
   bubbleClass: string
   isHighlighted?: boolean
+  tags?: string[][]
 }) {
   const { allImages, segments } = useMemo(() => {
     if (!content) return { allImages: [], segments: [] }
@@ -553,6 +557,8 @@ function DmContent({
     return { allImages, segments }
   }, [content])
 
+  const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(tags), [tags])
+
   if (segments.length === 0) return null
 
   let imageIndex = 0
@@ -578,7 +584,12 @@ function DmContent({
                   if (node.type === 'hashtag') return <EmbeddedHashtag hashtag={node.data} key={ni} />
                   if (node.type === 'websocket-url')
                     return <EmbeddedWebsocketUrl url={node.data} key={ni} />
-                  if (node.type === 'emoji') return node.data
+                  if (node.type === 'emoji') {
+                    const shortcode = node.data.split(':')[1]
+                    const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+                    if (!emoji) return node.data
+                    return <Emoji classNames={{ img: 'mb-1' }} emoji={emoji} key={ni} />
+                  }
                   return null
                 })}
               </div>
