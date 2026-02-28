@@ -373,7 +373,7 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
-  const hasBlocks = /https?:\/\/|nostr:|note1|nevent1|lnbc/i.test(message.content)
+  const hasBlocks = /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
   const [showActions, setShowActions] = useState(false)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
