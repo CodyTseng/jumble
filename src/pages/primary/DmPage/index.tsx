@@ -284,9 +284,9 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
       <Key className="h-16 w-16 text-muted-foreground" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Enable Direct Messages')}</h3>
-        <p className="text-sm text-muted-foreground max-w-sm">
+        <p className="text-sm text-muted-foreground max-w-md">
           {t(
-            'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.'
+            'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.'
           )}
         </p>
       </div>
@@ -447,7 +447,7 @@ function ResetEncryptionKeySection({ onReset }: { onReset: () => Promise<void> }
       <div className="text-sm font-medium">{t('Encryption Key')}</div>
       <p className="text-sm text-muted-foreground">
         {t(
-          'Your encryption key is used to encrypt and decrypt direct messages. It is separate from your Nostr private key and is specific to this messaging feature.'
+          'Your encryption key is a dedicated key pair used to encrypt and decrypt direct messages. It is separate from your Nostr identity key and stored locally on your device.'
         )}
       </p>
       <p className="text-sm text-muted-foreground">

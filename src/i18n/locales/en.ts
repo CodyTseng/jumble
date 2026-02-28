@@ -731,8 +731,8 @@ export default {
     'Encryption key sent to other device': 'Encryption key sent to other device',
     'Failed to send encryption key': 'Failed to send encryption key',
     'Enable Direct Messages': 'Enable Direct Messages',
-    'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.':
-      'To receive direct messages, you need to publish an encryption key. This allows others to send you encrypted messages.',
+    'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.':
+      'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.',
     'Publish Encryption Key': 'Publish Encryption Key',
     'Publishing...': 'Publishing...',
     'Encryption key published': 'Encryption key published',
