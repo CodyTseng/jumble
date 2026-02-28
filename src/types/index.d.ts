@@ -248,6 +248,7 @@ export type TDmMessage = {
     id: string
     content: string
     senderPubkey: string
+    tags?: string[][]
   }
 }
 

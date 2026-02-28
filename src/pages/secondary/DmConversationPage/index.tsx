@@ -19,13 +19,14 @@ const DmConversationPage = forwardRef(
       id: string
       content: string
       senderPubkey: string
+      tags?: string[][]
     } | null>(null)
     const { setHidden } = useBottomBar()
     const { currentIndex } = useSecondaryPage()
     const active = currentIndex === index
 
     const handleReply = useCallback((message: TDmMessage) => {
-      setReplyTo({ id: message.id, content: message.content, senderPubkey: message.senderPubkey })
+      setReplyTo({ id: message.id, content: message.content, senderPubkey: message.senderPubkey, tags: message.decryptedRumor?.tags })
     }, [])
 
     const handleCancelReply = useCallback(() => {

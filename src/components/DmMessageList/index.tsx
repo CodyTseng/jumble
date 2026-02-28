@@ -424,6 +424,7 @@ function MessageBubble({
           <ContentPreviewContent
             content={message.replyTo.content || '...'}
             className="truncate"
+            emojiInfos={getEmojiInfosFromEmojiTags(message.replyTo.tags)}
           />
         </button>
       )}

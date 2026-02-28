@@ -646,7 +646,8 @@ class DmService {
       message.replyTo = {
         id: replyMsg.id,
         content: replyMsg.content,
-        senderPubkey: replyMsg.senderPubkey
+        senderPubkey: replyMsg.senderPubkey,
+        tags: replyMsg.decryptedRumor?.tags
       }
     }
     return message

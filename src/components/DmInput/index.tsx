@@ -7,6 +7,7 @@ import Uploader from '@/components/PostEditor/Uploader'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import { userIdToPubkey } from '@/lib/pubkey'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
@@ -141,7 +142,7 @@ export default function DmInput({
 }: {
   recipientPubkey: string
   disabled?: boolean
-  replyTo?: { id: string; content: string; senderPubkey: string } | null
+  replyTo?: { id: string; content: string; senderPubkey: string; tags?: string[][] } | null
   onCancelReply?: () => void
   onSent?: () => void
 }) {
@@ -173,7 +174,7 @@ export default function DmInput({
     const div = editableRef.current
     if (!div) return ''
     let result = ''
-    const walk = (node: Node, isTopLevel: boolean) => {
+    const walk = (node: Node) => {
       if (node.nodeType === Node.TEXT_NODE) {
         result += node.textContent || ''
       } else if (node instanceof HTMLBRElement) {
@@ -186,10 +187,10 @@ export default function DmInput({
         if (isBlock && result.length > 0 && !result.endsWith('\n')) {
           result += '\n'
         }
-        node.childNodes.forEach((child) => walk(child, false))
+        node.childNodes.forEach((child) => walk(child))
       }
     }
-    div.childNodes.forEach((child) => walk(child, true))
+    div.childNodes.forEach((child) => walk(child))
     return result
   }, [])
 
@@ -651,6 +652,7 @@ export default function DmInput({
             <ContentPreviewContent
               content={replyTo.content || '...'}
               className="block truncate text-xs text-muted-foreground"
+              emojiInfos={getEmojiInfosFromEmojiTags(replyTo.tags)}
             />
           </div>
           <button
