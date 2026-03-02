@@ -442,7 +442,7 @@ export default function DmInput({
 
     let text = content.trim()
     mentionsRef.current.forEach((npub, displayText) => {
-      text = text.replaceAll(`@${displayText}`, `nostr:${npub}`)
+      text = text.split(`@${displayText}`).join(`nostr:${npub}`)
     })
     const emojiTags: string[][] = []
     emojisRef.current.forEach((url, shortcode) => {

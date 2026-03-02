@@ -659,6 +659,7 @@ export default {
     'Hide indirect': '隐藏间接通知',
     'Copy note content': '复制笔记内容',
     'Video loop': '视频循环',
-    'Automatically replay videos when they end': '视频播放结束后自动重新播放'
+    'Automatically replay videos when they end': '视频播放结束后自动重新播放',
+    'This user has not set up NIP-4e DMs': '该用户未设置 NIP-4e 私信'
   }
 }

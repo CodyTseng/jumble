@@ -752,6 +752,7 @@ export default {
     'Failed to import chat history': 'Failed to import chat history',
     'Delete conversation': 'Delete conversation',
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
-      'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.'
+      'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.',
+    'This user has not set up NIP-4e DMs': 'This user has not set up NIP-4e DMs'
   }
 }

@@ -11,6 +11,7 @@ export type TRumor = UnsignedEvent & {
 export type TUnwrappedMessage = {
   rumor: TRumor
   senderPubkey: string
+  senderEncryptionPubkey: string
   recipientPubkey: string
   giftWrapId: string
   giftWrapCreatedAt: number
@@ -136,6 +137,7 @@ class Nip17GiftWrapService {
       return {
         rumor,
         senderPubkey: rumor.pubkey,
+        senderEncryptionPubkey: seal.pubkey,
         recipientPubkey,
         giftWrapId: giftWrap.id,
         giftWrapCreatedAt: giftWrap.created_at

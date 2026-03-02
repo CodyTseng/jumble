@@ -234,6 +234,7 @@ export type TDmConversation = {
   lastMessageContent: string
   unreadCount: number
   hasReplied: boolean
+  encryptionPubkey?: string
 }
 
 export type TDmMessage = {

@@ -217,23 +217,37 @@ class DmService {
       client.fetchEncryptionKeyAnnouncementEvent(pubkey)
     ])
 
-    const encryptionPubkey = encryptionKeyEvent
+    let encryptionPubkey = encryptionKeyEvent
       ? encryptionKeyService.getEncryptionPubkeyFromEvent(encryptionKeyEvent)
       : null
+    let hasEncryptionKey = !!encryptionKeyEvent
+
+    // Fallback: if we've received messages from them, we already know their encryption pubkey
+    if (!hasEncryptionKey && this.currentAccountPubkey) {
+      const conversation = await this.getConversation(this.currentAccountPubkey, pubkey)
+      if (conversation?.encryptionPubkey) {
+        hasEncryptionKey = true
+        encryptionPubkey = conversation.encryptionPubkey
+      }
+    }
 
     return {
       hasDmRelays: !!dmRelaysEvent,
-      hasEncryptionKey: !!encryptionKeyEvent,
+      hasEncryptionKey,
       encryptionPubkey
     }
   }
 
   async getRecipientEncryptionPubkey(pubkey: string): Promise<string | null> {
     const event = await client.fetchEncryptionKeyAnnouncementEvent(pubkey)
-    if (!event) return null
-    const recipient = event.tags.find(tagNameEquals('n'))?.[1]
-    if (recipient && isValidPubkey(recipient)) {
-      return recipient
+    if (event) {
+      const recipient = event.tags.find(tagNameEquals('n'))?.[1]
+      if (recipient && isValidPubkey(recipient)) return recipient
+    }
+    // Fallback: use encryption pubkey learned from received messages
+    if (this.currentAccountPubkey) {
+      const conversation = await this.getConversation(this.currentAccountPubkey, pubkey)
+      if (conversation?.encryptionPubkey) return conversation.encryptionPubkey
     }
     return null
   }
@@ -630,8 +644,9 @@ class DmService {
             const otherPubkey = fromMe
               ? unwrapped.rumor.tags.find((t) => t[0] === 'p')?.[1]
               : unwrapped.senderPubkey
+            const otherEncryptionPubkey = fromMe ? undefined : unwrapped.senderEncryptionPubkey
             if (otherPubkey) {
-              await this.updateConversation(accountPubkey, otherPubkey, message)
+              await this.updateConversation(accountPubkey, otherPubkey, message, otherEncryptionPubkey)
             }
 
             this.emitNewMessage(message)
@@ -787,7 +802,8 @@ class DmService {
   private async updateConversation(
     accountPubkey: string,
     otherPubkey: string,
-    message: TDmMessage
+    message: TDmMessage,
+    otherEncryptionPubkey?: string
   ): Promise<void> {
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
     const existing = await indexedDb.getDmConversation(conversationKey)
@@ -811,7 +827,8 @@ class DmService {
           ? displayContent
           : (existing?.lastMessageContent ?? ''),
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
-      hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey
+      hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
+      encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey
     }
 
     await indexedDb.putDmConversation(conversation)
