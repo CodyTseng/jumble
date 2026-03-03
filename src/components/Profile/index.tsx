@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 import SearchInput from '../SearchInput'
+import SpQrCode from '../SpQrCode'
 import TextWithEmojis from '../TextWithEmojis'
 import TrustScoreBadge from '../TrustScoreBadge'
 import AvatarWithLightbox from './AvatarWithLightbox'
@@ -164,6 +165,7 @@ export default function Profile({ id }: { id?: string }) {
               <div className="flex select-text items-center gap-1 text-sm text-orange-500">
                 <Bitcoin className="size-4 shrink-0" />
                 <SpCopy sp={sp} />
+                <SpQrCode sp={sp} />
               </div>
             )}
             <div className="mt-1 flex gap-1">
