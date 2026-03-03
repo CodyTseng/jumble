@@ -1,5 +1,4 @@
-import { DEFAULT_DM_RELAYS, ExtendedKind } from '@/constants'
-import { getDefaultRelayUrls } from '@/lib/relay'
+import { ExtendedKind } from '@/constants'
 import { tagNameEquals } from '@/lib/tag'
 import { getClientDescription } from '@/lib/utils'
 import { ISigner, TEncryptionKeypair } from '@/types'
@@ -59,7 +58,7 @@ class EncryptionKeyService {
   }
 
   async queryEncryptionKeyAnnouncement(pubkey: string): Promise<Event | null> {
-    const relays = await client.fetchDmRelays(pubkey)
+    const { relays } = await this.getRelays(pubkey)
     const events = await client.fetchEvents(relays, {
       kinds: [ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT],
       authors: [pubkey],
@@ -72,6 +71,11 @@ class EncryptionKeyService {
     signer: ISigner,
     accountPubkey: string
   ): Promise<Event | null> {
+    const { dmRelays, relays } = await this.getRelays(accountPubkey)
+    if (dmRelays.length === 0) {
+      throw new Error('You should set up at least one DM relay before announcing encryption key')
+    }
+
     const keypair = this.getEncryptionKeypair(accountPubkey)
     if (!keypair) return null
 
@@ -83,7 +87,6 @@ class EncryptionKeyService {
     }
 
     const event = await signer.signEvent(draftEvent)
-    const relays = await client.fetchDmRelays(accountPubkey)
     await client.publishEvent(relays, event)
     await client.updateEncryptionKeyAnnouncementCache(event)
     return event
@@ -94,6 +97,8 @@ class EncryptionKeyService {
     accountPubkey: string,
     clientName: string = getClientDescription()
   ): Promise<Event | null> {
+    const { relays } = await this.getRelays(accountPubkey)
+
     const clientKeypair = this.getClientKeypair(accountPubkey)
 
     const draftEvent = {
@@ -108,7 +113,6 @@ class EncryptionKeyService {
     }
 
     const event = await signer.signEvent(draftEvent)
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
     await client.publishEvent(relays, event)
     return event
   }
@@ -118,6 +122,7 @@ class EncryptionKeyService {
     accountPubkey: string,
     recipientClientPubkey: string
   ): Promise<Event | null> {
+    const { relays } = await this.getRelays(accountPubkey)
     const encryptionKeypair = this.getEncryptionKeypair(accountPubkey)
     if (!encryptionKeypair || !signer.nip44Encrypt) return null
 
@@ -143,7 +148,6 @@ class EncryptionKeyService {
     }
 
     const event = await signer.signEvent(draftEvent)
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
     await client.publishEvent(relays, event)
     return event
   }
@@ -208,8 +212,8 @@ class EncryptionKeyService {
     accountPubkey: string,
     onTransfer: (success: boolean) => void
   ): Promise<() => void> {
+    const { relays } = await this.getRelays(accountPubkey)
     const clientKeypair = this.getClientKeypair(accountPubkey)
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
 
     const sub = client.subscribe(
       relays,
@@ -233,7 +237,7 @@ class EncryptionKeyService {
   }
 
   async checkOtherDeviceClientKeys(accountPubkey: string): Promise<Event[]> {
-    const relays = [...DEFAULT_DM_RELAYS, ...getDefaultRelayUrls()].slice(0, 6)
+    const { relays } = await this.getRelays(accountPubkey)
     const events = await client.fetchEvents(relays, {
       kinds: [ExtendedKind.CLIENT_KEY_ANNOUNCEMENT],
       authors: [accountPubkey]
@@ -249,6 +253,21 @@ class EncryptionKeyService {
   decryptWithNip44(privkey: Uint8Array, pubkey: string, cipherText: string): string {
     const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
     return nip44.v2.decrypt(cipherText, conversationKey)
+  }
+
+  private async getRelays(accountPubkey: string) {
+    const [dmRelays, relayList] = await Promise.all([
+      client.fetchDmRelays(accountPubkey),
+      client.fetchRelayList(accountPubkey)
+    ])
+    const writeRelays = relayList.write.slice(0, 5)
+    const relays = Array.from(new Set([...dmRelays, ...writeRelays]))
+
+    return {
+      dmRelays,
+      writeRelays,
+      relays
+    }
   }
 }
 

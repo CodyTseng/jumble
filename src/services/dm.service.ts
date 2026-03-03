@@ -588,7 +588,7 @@ class DmService {
       [
         {
           kinds: [ExtendedKind.GIFT_WRAP],
-          '#p': [encryptionKeypair.pubkey, accountPubkey],
+          '#p': [accountPubkey],
           limit: 0
         },
         {
@@ -646,7 +646,12 @@ class DmService {
               : unwrapped.senderPubkey
             const otherEncryptionPubkey = fromMe ? undefined : unwrapped.senderEncryptionPubkey
             if (otherPubkey) {
-              await this.updateConversation(accountPubkey, otherPubkey, message, otherEncryptionPubkey)
+              await this.updateConversation(
+                accountPubkey,
+                otherPubkey,
+                message,
+                otherEncryptionPubkey
+              )
             }
 
             this.emitNewMessage(message)

@@ -181,6 +181,15 @@ export const DEFAULT_NOSTRCONNECT_RELAY = [
   'wss://relay.primal.net/'
 ]
 
+export const DEFAULT_DM_RELAYS = [
+  'wss://nip17.com/',
+  'wss://relay.damus.io/',
+  'wss://nos.lol/',
+  'wss://relay.primal.net/'
+]
+
+export const DM_TIME_RANDOMIZATION_SECONDS = 2 * 24 * 60 * 60 // 2 days in seconds
+
 export const DEFAULT_FAVICON_URL_TEMPLATE = 'https://{hostname}/favicon.ico'
 
 export const POLL_TYPE = {
@@ -506,12 +515,3 @@ export const COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as
 export const COMMUNITY_RELAYS = import.meta.env.VITE_COMMUNITY_RELAYS as string[]
 
 export const IS_COMMUNITY_MODE = COMMUNITY_RELAY_SETS.length > 0 || COMMUNITY_RELAYS.length > 0
-
-export const DEFAULT_DM_RELAYS = [
-  'wss://relay.damus.io/',
-  'wss://nos.lol/',
-  'wss://relay.primal.net/',
-  'wss://offchain.pub/'
-]
-
-export const DM_TIME_RANDOMIZATION_SECONDS = 2 * 24 * 60 * 60 // 2 days in seconds
