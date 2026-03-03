@@ -14,7 +14,7 @@ import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Link, Zap } from 'lucide-react'
+import { Link, Zap, Bitcoin } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
@@ -112,7 +112,7 @@ export default function Profile({ id }: { id?: string }) {
   }
   if (!profile) return <NotFound />
 
-  const { banner, username, about, pubkey, website, lightningAddress, emojis } = profile
+  const { banner, username, about, pubkey, website, lightningAddress, sp, emojis } = profile
   return (
     <>
       <div ref={topContainerRef}>
@@ -158,6 +158,12 @@ export default function Profile({ id }: { id?: string }) {
               <div className="flex select-text items-center gap-1 text-sm text-yellow-400">
                 <Zap className="size-4 shrink-0" />
                 <div className="w-0 max-w-fit flex-1 truncate">{lightningAddress}</div>
+              </div>
+            )}
+            {sp && (
+              <div className="flex select-text items-center gap-1 text-sm text-orange-500">
+                <Bitcoin className="size-4 shrink-0" />
+                <div className="w-0 max-w-fit flex-1 truncate font-mono text-xs">{sp}</div>
               </div>
             )}
             <div className="mt-1 flex gap-1">
