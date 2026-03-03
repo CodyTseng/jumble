@@ -2,7 +2,7 @@ import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { isValidPubkey } from '@/lib/pubkey'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TEncryptionKeypair } from '@/types'
-import { Event, Filter } from 'nostr-tools'
+import { Event, Filter, kinds } from 'nostr-tools'
 import client from './client.service'
 import cryptoFileService from './crypto-file.service'
 import encryptionKeyService from './encryption-key.service'
@@ -19,6 +19,7 @@ class DmService {
   private isInitializing = false
   private relaySubscription: { close: () => void } | null = null
   private messageListeners = new Set<(message: TDmMessage) => void>()
+  private reactionListeners = new Set<(reaction: TDmMessage) => void>()
   private dataChangedListeners = new Set<() => void>()
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
@@ -92,6 +93,7 @@ class DmService {
   destroy(): void {
     this.resetEncryption()
     this.messageListeners.clear()
+    this.reactionListeners.clear()
     this.dataChangedListeners.clear()
     this.sendingStatuses.clear()
     this.sendingStatusListeners.clear()
@@ -131,6 +133,19 @@ class DmService {
       listener(message)
     }
     this.emitDataChanged()
+  }
+
+  onNewReaction(listener: (reaction: TDmMessage) => void): () => void {
+    this.reactionListeners.add(listener)
+    return () => {
+      this.reactionListeners.delete(listener)
+    }
+  }
+
+  private emitNewReaction(reaction: TDmMessage): void {
+    for (const listener of this.reactionListeners) {
+      listener(reaction)
+    }
   }
 
   private emitDataChanged(): void {
@@ -201,7 +216,9 @@ class DmService {
       }
 
       await this.saveMessage(accountPubkey, message)
-      await this.updateConversation(accountPubkey, otherPubkey, message)
+      if (rumor.kind !== kinds.Reaction) {
+        await this.updateConversation(accountPubkey, otherPubkey, message)
+      }
       importedCount++
     }
 
@@ -574,6 +591,72 @@ class DmService {
     return message
   }
 
+  async sendReaction(
+    accountPubkey: string,
+    recipientPubkey: string,
+    messageId: string,
+    emoji: string,
+    emojiTag?: string[]
+  ): Promise<TDmMessage | null> {
+    const keypair =
+      this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
+    if (!keypair) {
+      throw new Error('Encryption keypair not available')
+    }
+
+    const recipientEncryptionPubkey = await this.getRecipientEncryptionPubkey(recipientPubkey)
+    if (!recipientEncryptionPubkey) {
+      throw new Error('Recipient does not have encryption key published')
+    }
+
+    const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
+    const relayHint = recipientDmRelays[0] ?? ''
+
+    const extraTags: string[][] = [['e', messageId, relayHint]]
+    if (emojiTag) {
+      extraTags.push(emojiTag)
+    }
+
+    const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
+      emoji,
+      accountPubkey,
+      keypair.privkey,
+      recipientPubkey,
+      recipientEncryptionPubkey,
+      extraTags,
+      kinds.Reaction
+    )
+
+    const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
+      rumor,
+      keypair.privkey,
+      keypair.pubkey,
+      accountPubkey
+    )
+
+    const conversationKey = this.getConversationKey(accountPubkey, recipientPubkey)
+    const message: TDmMessage = {
+      id: rumor.id,
+      conversationKey,
+      senderPubkey: accountPubkey,
+      content: rumor.content,
+      createdAt: rumor.created_at,
+      originalEvent: selfGiftWrap,
+      decryptedRumor: rumor as unknown as Event
+    }
+
+    await this.saveMessage(accountPubkey, message)
+    this.emitNewReaction(message)
+
+    const myDmRelays = await client.fetchDmRelays(accountPubkey)
+    await Promise.allSettled([
+      client.publishEvent(recipientDmRelays, giftWrap),
+      client.publishEvent(myDmRelays, selfGiftWrap)
+    ])
+
+    return message
+  }
+
   private async startRelaySubscription(
     accountPubkey: string,
     encryptionKeypair: TEncryptionKeypair
@@ -632,29 +715,36 @@ class DmService {
             giftWrap
           )
           if (message) {
-            await this.resolveReplyTo(message)
+            const isReaction = unwrapped.rumor.kind === kinds.Reaction
+            if (!isReaction) {
+              await this.resolveReplyTo(message)
+            }
             const saved = await this.saveMessage(accountPubkey, message)
             if (!saved) return
 
-            const fromMe = this.isFromMe(
-              unwrapped.senderPubkey,
-              accountPubkey,
-              encryptionKeypair.pubkey
-            )
-            const otherPubkey = fromMe
-              ? unwrapped.rumor.tags.find((t) => t[0] === 'p')?.[1]
-              : unwrapped.senderPubkey
-            const otherEncryptionPubkey = fromMe ? undefined : unwrapped.senderEncryptionPubkey
-            if (otherPubkey) {
-              await this.updateConversation(
+            if (isReaction) {
+              this.emitNewReaction(message)
+            } else {
+              const fromMe = this.isFromMe(
+                unwrapped.senderPubkey,
                 accountPubkey,
-                otherPubkey,
-                message,
-                otherEncryptionPubkey
+                encryptionKeypair.pubkey
               )
-            }
+              const otherPubkey = fromMe
+                ? unwrapped.rumor.tags.find((t) => t[0] === 'p')?.[1]
+                : unwrapped.senderPubkey
+              const otherEncryptionPubkey = fromMe ? undefined : unwrapped.senderEncryptionPubkey
+              if (otherPubkey) {
+                await this.updateConversation(
+                  accountPubkey,
+                  otherPubkey,
+                  message,
+                  otherEncryptionPubkey
+                )
+              }
 
-            this.emitNewMessage(message)
+              this.emitNewMessage(message)
+            }
           }
         }
       }
@@ -740,7 +830,11 @@ class DmService {
   ): TDmMessage | null {
     const { rumor, senderPubkey } = unwrapped
 
-    if (rumor.kind !== ExtendedKind.RUMOR_CHAT && rumor.kind !== ExtendedKind.RUMOR_FILE) {
+    if (
+      rumor.kind !== ExtendedKind.RUMOR_CHAT &&
+      rumor.kind !== ExtendedKind.RUMOR_FILE &&
+      rumor.kind !== kinds.Reaction
+    ) {
       return null
     }
 
@@ -876,12 +970,17 @@ class DmService {
         }
       }
 
+      // Filter out reactions for conversation summary
+      const chatMessages = allMessages.filter(
+        (m) => m.decryptedRumor?.kind !== kinds.Reaction
+      )
+
       // Sort messages by time to find latest
-      const sortedMessages = allMessages.sort((a, b) => b.createdAt - a.createdAt)
+      const sortedMessages = chatMessages.sort((a, b) => b.createdAt - a.createdAt)
       const latestMessage = sortedMessages[0]
 
-      // Count unread messages (from other user, after last read time)
-      const unreadCount = allMessages.filter(
+      // Count unread messages (from other user, after last read time, excluding reactions)
+      const unreadCount = chatMessages.filter(
         (m) => m.senderPubkey !== accountPubkey && m.createdAt > lastReadTime
       ).length
 
@@ -889,7 +988,7 @@ class DmService {
       const existingConversation = await indexedDb.getDmConversation(conversationKey)
       const hasReplied =
         existingConversation?.hasReplied ||
-        allMessages.some((m) => m.senderPubkey === accountPubkey)
+        chatMessages.some((m) => m.senderPubkey === accountPubkey)
 
       const conversation: TDmConversation = {
         key: conversationKey,

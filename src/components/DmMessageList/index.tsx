@@ -1,5 +1,6 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
 import Emoji from '@/components/Emoji'
+import EmojiPicker from '@/components/EmojiPicker'
 import {
   EmbeddedHashtag,
   EmbeddedLNInvoice,
@@ -10,6 +11,9 @@ import {
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
+import SuggestedEmojis from '@/components/SuggestedEmojis'
+import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
@@ -30,11 +34,13 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import cryptoFileService from '@/services/crypto-file.service'
 import dmService from '@/services/dm.service'
-import { TImetaInfo, TDmMessage } from '@/types'
+import { TImetaInfo, TDmMessage, TEmoji } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, ArrowDown, Check, Clock, Copy, Download, Loader2, Reply } from 'lucide-react'
+import { AlertCircle, ArrowDown, Check, Clock, Copy, Download, Loader2, Reply, SmilePlus } from 'lucide-react'
+import { kinds } from 'nostr-tools'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -60,6 +66,7 @@ export default function DmMessageList({
   const [elevatedId, setElevatedId] = useState<string | null>(null)
   const pendingMessagesRef = useRef<TDmMessage[]>([])
   const [pendingCount, setPendingCount] = useState(0)
+  const [reactionsMap, setReactionsMap] = useState<Map<string, TDmMessage[]>>(new Map())
 
   const checkIsAtBottom = useCallback(() => {
     const container = containerRef.current
@@ -85,11 +92,32 @@ export default function DmMessageList({
     if (!pubkey) return
 
     try {
-      const msgs = await dmService.getMessages(pubkey, otherPubkey, { limit: 50 })
+      const allMsgs = await dmService.getMessages(pubkey, otherPubkey, { limit: 50 })
+      // Separate reactions from regular messages
+      const reactions: TDmMessage[] = []
+      const regularMsgs: TDmMessage[] = []
+      for (const msg of allMsgs) {
+        if (msg.decryptedRumor?.kind === kinds.Reaction) {
+          reactions.push(msg)
+        } else {
+          regularMsgs.push(msg)
+        }
+      }
+      // Build reactions map
+      const newMap = new Map<string, TDmMessage[]>()
+      for (const r of reactions) {
+        const targetId = r.decryptedRumor?.tags?.find((t: string[]) => t[0] === 'e')?.[1]
+        if (targetId) {
+          const existing = newMap.get(targetId) ?? []
+          existing.push(r)
+          newMap.set(targetId, existing)
+        }
+      }
+      setReactionsMap(newMap)
       // Filter out messages that are in the pending buffer (not yet shown to user)
       const pendingIds = new Set(pendingMessagesRef.current.map((m) => m.id))
-      setMessages(pendingIds.size > 0 ? msgs.filter((m) => !pendingIds.has(m.id)) : msgs)
-      setHasMore(msgs.length >= 50)
+      setMessages(pendingIds.size > 0 ? regularMsgs.filter((m) => !pendingIds.has(m.id)) : regularMsgs)
+      setHasMore(allMsgs.length >= 50)
     } catch (error) {
       console.error('Failed to load messages:', error)
     } finally {
@@ -110,7 +138,33 @@ export default function DmMessageList({
       if (olderMsgs.length < 50) {
         setHasMore(false)
       }
-      setMessages((prev) => [...olderMsgs, ...prev])
+      // Separate reactions from regular messages
+      const reactions: TDmMessage[] = []
+      const regularMsgs: TDmMessage[] = []
+      for (const msg of olderMsgs) {
+        if (msg.decryptedRumor?.kind === kinds.Reaction) {
+          reactions.push(msg)
+        } else {
+          regularMsgs.push(msg)
+        }
+      }
+      if (reactions.length > 0) {
+        setReactionsMap((prev) => {
+          const updated = new Map(prev)
+          for (const r of reactions) {
+            const targetId = r.decryptedRumor?.tags?.find((t: string[]) => t[0] === 'e')?.[1]
+            if (targetId) {
+              const existing = updated.get(targetId) ?? []
+              if (!existing.some((e) => e.id === r.id)) {
+                existing.push(r)
+                updated.set(targetId, existing)
+              }
+            }
+          }
+          return updated
+        })
+      }
+      setMessages((prev) => [...regularMsgs, ...prev])
     } catch (error) {
       console.error('Failed to load more messages:', error)
     } finally {
@@ -178,6 +232,22 @@ export default function DmMessageList({
       }
     })
 
+    const unsubReaction = dmService.onNewReaction((reaction: TDmMessage) => {
+      if (reaction.conversationKey === conversationKey) {
+        const targetId = reaction.decryptedRumor?.tags?.find((t: string[]) => t[0] === 'e')?.[1]
+        if (targetId) {
+          setReactionsMap((prev) => {
+            const updated = new Map(prev)
+            const existing = updated.get(targetId) ?? []
+            if (!existing.some((e) => e.id === reaction.id)) {
+              updated.set(targetId, [...existing, reaction])
+            }
+            return updated
+          })
+        }
+      }
+    })
+
     const unsubData = dmService.onDataChanged(() => {
       loadMessages()
     })
@@ -188,6 +258,7 @@ export default function DmMessageList({
 
     return () => {
       unsubMessage()
+      unsubReaction()
       unsubData()
       unsubStatus()
     }
@@ -230,6 +301,21 @@ export default function DmMessageList({
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     })
   }, [flushPendingMessages])
+
+  const handleReact = useCallback(
+    async (messageId: string, emoji: string | TEmoji) => {
+      if (!pubkey) return
+      const emojiContent = typeof emoji === 'string' ? emoji : `:${emoji.shortcode}:`
+      const emojiTag =
+        typeof emoji !== 'string' ? ['emoji', emoji.shortcode, emoji.url] : undefined
+      try {
+        await dmService.sendReaction(pubkey, otherPubkey, messageId, emojiContent, emojiTag)
+      } catch (error) {
+        console.error('Failed to send reaction:', error)
+      }
+    },
+    [pubkey, otherPubkey]
+  )
 
   if (isLoading) {
     return (
@@ -287,7 +373,10 @@ export default function DmMessageList({
           groups[groups.length - 1].items.push(message)
         })
 
-        return groups.map((group) => (
+        return groups.map((group) => {
+          const lastMsgId = group.items[group.items.length - 1].id
+          const lastMsgHasReactions = (reactionsMap.get(lastMsgId)?.length ?? 0) > 0
+          return (
           <Fragment key={group.items[0].id}>
             {group.showTime && (
               <div className={cn('flex justify-center', group.isFirst ? '' : 'mt-3')}>
@@ -300,7 +389,8 @@ export default function DmMessageList({
               className={cn(
                 'flex gap-2',
                 group.isOwn ? 'flex-row-reverse' : 'flex-row',
-                group.showTime ? 'mt-1' : 'mt-3'
+                group.showTime ? 'mt-1' : 'mt-3',
+                lastMsgHasReactions && 'pb-7'
               )}
             >
               {!group.isOwn && (
@@ -314,13 +404,17 @@ export default function DmMessageList({
                   group.isOwn ? 'items-end' : 'items-start'
                 )}
               >
-                {group.items.map((message) => (
+                {group.items.map((message, mi) => (
                   <MessageBubble
                     key={message.id}
                     message={message}
                     isOwn={group.isOwn}
+                    isLastInGroup={mi === group.items.length - 1}
                     sendingStatus={group.isOwn ? dmService.getSendingStatus(message.id) : undefined}
                     onReply={onReply}
+                    onReact={handleReact}
+                    reactions={reactionsMap.get(message.id)}
+                    currentUserPubkey={pubkey ?? undefined}
                     onScrollToMessage={scrollToMessage}
                     isHighlighted={highlightedId === message.id}
                     isElevated={elevatedId === message.id}
@@ -336,7 +430,7 @@ export default function DmMessageList({
               </div>
             </div>
           </Fragment>
-        ))
+        )})
       })()}
         <div ref={bottomRef} />
       </div>
@@ -359,8 +453,12 @@ export default function DmMessageList({
 function MessageBubble({
   message,
   isOwn,
+  isLastInGroup,
   sendingStatus,
   onReply,
+  onReact,
+  reactions,
+  currentUserPubkey,
   onScrollToMessage,
   isHighlighted,
   isElevated,
@@ -368,18 +466,29 @@ function MessageBubble({
 }: {
   message: TDmMessage
   isOwn: boolean
+  isLastInGroup?: boolean
   sendingStatus?: 'sending' | 'sent' | 'failed'
   onReply?: (message: TDmMessage) => void
+  onReact?: (messageId: string, emoji: string | TEmoji) => void
+  reactions?: TDmMessage[]
+  currentUserPubkey?: string
   onScrollToMessage?: (id: string) => void
   isHighlighted?: boolean
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
+  const { isSmallScreen } = useScreenSize()
   const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
   const hasBlocks = isFileMessage || /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
   const [showActions, setShowActions] = useState(false)
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false)
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => {
+    setTimeout(() => setIsPickerOpen(false), 100)
+  }, [isEmojiOpen])
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(message.content)
@@ -391,15 +500,105 @@ function MessageBubble({
     if (!window.matchMedia('(hover: hover)').matches) {
       setShowActions(true)
       clearTimeout(hideTimerRef.current)
-      hideTimerRef.current = setTimeout(() => setShowActions(false), 1500)
+      hideTimerRef.current = setTimeout(() => setShowActions(false), 3000)
     }
   }, [])
+
+  const handleEmojiSelect = useCallback(
+    (emoji: string | TEmoji) => {
+      setIsEmojiOpen(false)
+      onReact?.(message.id, emoji)
+    },
+    [message.id, onReact]
+  )
+
+  // Long-press on reaction chips with progress indicator (same as Likes component)
+  const chipLongPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [chipLongPressing, setChipLongPressing] = useState<string | null>(null)
+  const [chipCompleted, setChipCompleted] = useState<string | null>(null)
+
+  const handleChipMouseDown = useCallback(
+    (emoji: string) => {
+      setChipLongPressing(emoji)
+      chipLongPressTimerRef.current = setTimeout(() => {
+        setChipCompleted(emoji)
+        setChipLongPressing(null)
+      }, 800)
+    },
+    []
+  )
+
+  const handleChipMouseUp = useCallback(() => {
+    if (chipLongPressTimerRef.current) {
+      clearTimeout(chipLongPressTimerRef.current)
+      chipLongPressTimerRef.current = null
+    }
+    if (chipCompleted) {
+      onReact?.(message.id, chipCompleted)
+    }
+    setChipLongPressing(null)
+    setChipCompleted(null)
+  }, [chipCompleted, message.id, onReact])
+
+  const handleChipMouseLeave = useCallback(() => {
+    if (chipLongPressTimerRef.current) {
+      clearTimeout(chipLongPressTimerRef.current)
+      chipLongPressTimerRef.current = null
+    }
+    setChipLongPressing(null)
+    setChipCompleted(null)
+  }, [])
+
+  const handleChipTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const touch = e.touches[0]
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+      const isInside =
+        touch.clientX >= rect.left &&
+        touch.clientX <= rect.right &&
+        touch.clientY >= rect.top &&
+        touch.clientY <= rect.bottom
+      if (!isInside) {
+        handleChipMouseLeave()
+      }
+    },
+    [handleChipMouseLeave]
+  )
 
   const bubbleClass = cn(
     'overflow-hidden break-words rounded-lg px-3 py-1.5',
     'w-fit max-w-full',
     isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
   )
+
+  const groupedReactions = useMemo(() => {
+    if (!reactions || reactions.length === 0) return []
+    const groups = new Map<string, { emoji: string; count: number; hasOwn: boolean; emojiTag?: string[] }>()
+    for (const r of reactions) {
+      const content = r.content || '+'
+      const existing = groups.get(content)
+      const isMine = r.senderPubkey === currentUserPubkey
+      if (existing) {
+        existing.count++
+        if (isMine) existing.hasOwn = true
+      } else {
+        const emojiTag = r.decryptedRumor?.tags?.find((t: string[]) => t[0] === 'emoji')
+        groups.set(content, { emoji: content, count: 1, hasOwn: isMine, emojiTag })
+      }
+    }
+    return Array.from(groups.values())
+  }, [reactions, currentUserPubkey])
+
+  const reactButton = (
+    <button
+      onClick={() => setIsEmojiOpen(true)}
+      className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
+    >
+      <SmilePlus className="h-4 w-4" />
+    </button>
+  )
+
+  const hasReactions = groupedReactions.length > 0
 
   return (
     <div
@@ -408,7 +607,8 @@ function MessageBubble({
       className={cn(
         'group/msg flex w-full max-w-full flex-col',
         isOwn ? 'items-end' : 'items-start',
-        isElevated && 'relative z-10'
+        isElevated && 'relative z-10',
+        hasReactions && !isLastInGroup && 'mb-7'
       )}
     >
       {message.replyTo && (
@@ -441,6 +641,44 @@ function MessageBubble({
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
+          {onReact && (
+            isSmallScreen ? (
+              <>
+                {reactButton}
+                <Drawer open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
+                  <DrawerOverlay onClick={() => setIsEmojiOpen(false)} />
+                  <DrawerContent hideOverlay>
+                    <EmojiPicker
+                      onEmojiClick={(emoji) => {
+                        if (!emoji) return
+                        handleEmojiSelect(emoji)
+                      }}
+                    />
+                  </DrawerContent>
+                </Drawer>
+              </>
+            ) : (
+              <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
+                <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
+                <PopoverContent side="top" className="w-fit border-0 p-0 shadow-lg">
+                  {isPickerOpen ? (
+                    <EmojiPicker
+                      onEmojiClick={(emoji, e) => {
+                        e.stopPropagation()
+                        if (!emoji) return
+                        handleEmojiSelect(emoji)
+                      }}
+                    />
+                  ) : (
+                    <SuggestedEmojis
+                      onEmojiClick={handleEmojiSelect}
+                      onMoreButtonClick={() => setIsPickerOpen(true)}
+                    />
+                  )}
+                </PopoverContent>
+              </Popover>
+            )
+          )}
           {onReply && (
             <button
               onClick={() => onReply(message)}
@@ -455,11 +693,65 @@ function MessageBubble({
             <SendingStatusIcon status={sendingStatus} />
           </div>
         )}
-        {isFileMessage ? (
-          <EncryptedFileMessage message={message} isOwn={isOwn} isHighlighted={isHighlighted} />
-        ) : (
-          <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
-        )}
+        <div className={cn('relative min-w-0 max-w-full', hasBlocks && !isFileMessage && 'flex-1')}>
+          {isFileMessage ? (
+            <EncryptedFileMessage message={message} isOwn={isOwn} isHighlighted={isHighlighted} />
+          ) : (
+            <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
+          )}
+          {hasReactions && (
+            <div className={cn('absolute top-full z-[1] mt-1 flex flex-wrap gap-1', isOwn ? 'left-0' : 'right-0')}>
+              {groupedReactions.map((r) => (
+                <div
+                  key={r.emoji}
+                  className={cn(
+                    'relative flex h-6 cursor-pointer select-none items-center gap-1 overflow-hidden rounded-full border px-1.5 text-sm shadow-sm transition-all duration-200',
+                    r.hasOwn
+                      ? 'border-primary/50 bg-primary/10 hover:border-primary hover:bg-primary/20'
+                      : 'border-border bg-background hover:border-primary/30 hover:bg-primary/5',
+                    (chipLongPressing === r.emoji || chipCompleted === r.emoji) &&
+                      (r.hasOwn ? 'border-primary bg-primary/20' : 'border-foreground/30 bg-secondary')
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={() => handleChipMouseDown(r.emoji)}
+                  onMouseUp={handleChipMouseUp}
+                  onMouseLeave={handleChipMouseLeave}
+                  onTouchStart={() => handleChipMouseDown(r.emoji)}
+                  onTouchMove={handleChipTouchMove}
+                  onTouchEnd={handleChipMouseUp}
+                  onTouchCancel={handleChipMouseLeave}
+                >
+                  {(chipLongPressing === r.emoji || chipCompleted === r.emoji) && (
+                    <div className="absolute inset-0 overflow-hidden rounded-full">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary/40 via-primary/60 to-primary/80"
+                        style={{
+                          width: chipCompleted === r.emoji ? '100%' : '0%',
+                          animation:
+                            chipLongPressing === r.emoji ? 'progressFill 1000ms ease-out forwards' : 'none'
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="relative z-10 flex items-center gap-1">
+                    <div
+                      style={{
+                        animation: chipCompleted === r.emoji ? 'shake 0.5s ease-in-out infinite' : undefined
+                      }}
+                    >
+                      {r.emojiTag ? (
+                        <img src={r.emojiTag[2]} alt={r.emojiTag[1]} className="inline-block size-4" />
+                      ) : (
+                        <Emoji emoji={r.emoji} classNames={{ img: 'size-4', text: 'text-sm leading-none' }} />
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground">{r.count}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

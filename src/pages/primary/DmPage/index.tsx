@@ -10,7 +10,7 @@ import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import { TPageRef } from '@/types'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { Key, Loader2, MessageSquare, Settings, Download, Upload } from 'lucide-react'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -355,7 +355,7 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
       for (let i = 0; i < lines.length; i++) {
         try {
           const parsed = JSON.parse(lines[i])
-          if (parsed.kind !== 14 && parsed.kind !== 15) {
+          if (parsed.kind !== 14 && parsed.kind !== 15 && parsed.kind !== kinds.Reaction) {
             errors.push(i + 1)
             continue
           }
