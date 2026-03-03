@@ -14,7 +14,7 @@ import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Link, Zap, Bitcoin } from 'lucide-react'
+import { Link, Zap, Bitcoin, Check, Copy } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
@@ -163,9 +163,7 @@ export default function Profile({ id }: { id?: string }) {
             {sp && (
               <div className="flex select-text items-center gap-1 text-sm text-orange-500">
                 <Bitcoin className="size-4 shrink-0" />
-                <div className="w-0 max-w-fit flex-1 truncate font-mono text-xs">
-                  {sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp}
-                </div>
+                <SpCopy sp={sp} />
               </div>
             )}
             <div className="mt-1 flex gap-1">
@@ -216,5 +214,26 @@ export default function Profile({ id }: { id?: string }) {
       </div>
       <ProfileFeed pubkey={pubkey} topSpace={topContainerHeight + 100} search={debouncedInput} />
     </>
+  )
+}
+
+function SpCopy({ sp }: { sp: string }) {
+  const [copied, setCopied] = useState(false)
+  const truncated = sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp
+
+  const copy = () => {
+    navigator.clipboard.writeText(sp)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div
+      className="clickable flex w-fit items-center gap-1 font-mono text-xs"
+      onClick={copy}
+    >
+      <div>{truncated}</div>
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </div>
   )
 }
