@@ -647,11 +647,6 @@ function EncryptedFileMessage({
   isHighlighted?: boolean
 }) {
   const { t } = useTranslation()
-  const [blobUrl, setBlobUrl] = useState<string | null>(
-    decryptedBlobCache.get(message.id) ?? null
-  )
-  const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(!decryptedBlobCache.has(message.id))
 
   const tags = message.decryptedRumor?.tags ?? []
   const fileType = tags.find((t) => t[0] === 'file-type')?.[1] ?? ''
@@ -659,76 +654,101 @@ function EncryptedFileMessage({
   const hexNonce = tags.find((t) => t[0] === 'decryption-nonce')?.[1]
   const fileUrl = message.content
 
-  useEffect(() => {
-    if (decryptedBlobCache.has(message.id)) return
-    if (!hexKey || !hexNonce || !fileUrl) {
-      setError(true)
-      setLoading(false)
-      return
-    }
-
-    let cancelled = false
-    const decrypt = async () => {
-      try {
-        const key = cryptoFileService.hexToBytes(hexKey)
-        const nonce = cryptoFileService.hexToBytes(hexNonce)
-        const response = await fetch(fileUrl)
-        if (!response.ok) throw new Error('Failed to fetch file')
-        const encryptedData = await response.arrayBuffer()
-        const decrypted = await cryptoFileService.decryptFile(encryptedData, key, nonce)
-        if (cancelled) return
-        const blob = new Blob([decrypted], { type: fileType || 'application/octet-stream' })
-        const url = URL.createObjectURL(blob)
-        decryptedBlobCache.set(message.id, url)
-        setBlobUrl(url)
-      } catch (e) {
-        console.error('Failed to decrypt file:', e)
-        if (!cancelled) setError(true)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    decrypt()
-    return () => {
-      cancelled = true
-    }
-  }, [message.id, hexKey, hexNonce, fileUrl, fileType])
-
-  const wrapperClass = cn(
-    'flex min-w-0 max-w-full flex-col',
-    isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg'
-  )
-
   const isImage = fileType.startsWith('image/')
   const isVideo = fileType.startsWith('video/')
   const isAudio = fileType.startsWith('audio/')
   const isMedia = isImage || isVideo || isAudio
   const ext = fileType.split('/')[1]?.split('+')[0] ?? ''
 
-  if (!isMedia && (loading || error || !blobUrl)) {
+  const cached = decryptedBlobCache.has(message.id)
+  const [blobUrl, setBlobUrl] = useState<string | null>(cached ? decryptedBlobCache.get(message.id)! : null)
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(isMedia && !cached)
+
+  const decryptFile = useCallback(async () => {
+    if (decryptedBlobCache.has(message.id)) {
+      setBlobUrl(decryptedBlobCache.get(message.id)!)
+      return decryptedBlobCache.get(message.id)!
+    }
+    if (!hexKey || !hexNonce || !fileUrl) {
+      setError(true)
+      return null
+    }
+    setLoading(true)
+    setError(false)
+    try {
+      const key = cryptoFileService.hexToBytes(hexKey)
+      const nonce = cryptoFileService.hexToBytes(hexNonce)
+      const response = await fetch(fileUrl)
+      if (!response.ok) throw new Error('Failed to fetch file')
+      const encryptedData = await response.arrayBuffer()
+      const decrypted = await cryptoFileService.decryptFile(encryptedData, key, nonce)
+      const blob = new Blob([decrypted], { type: fileType || 'application/octet-stream' })
+      const url = URL.createObjectURL(blob)
+      decryptedBlobCache.set(message.id, url)
+      setBlobUrl(url)
+      return url
+    } catch (e) {
+      console.error('Failed to decrypt file:', e)
+      setError(true)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [message.id, hexKey, hexNonce, fileUrl, fileType])
+
+  // Auto-decrypt media files on mount
+  useEffect(() => {
+    if (!isMedia || decryptedBlobCache.has(message.id)) return
+    decryptFile()
+  }, [isMedia, message.id, decryptFile])
+
+  const handleFileDownload = useCallback(async () => {
+    if (loading) return
+    const url = blobUrl ?? (await decryptFile())
+    if (!url) return
+    const a = document.createElement('a')
+    a.href = url
+    a.download = ext ? `file.${ext}` : 'file'
+    a.click()
+  }, [loading, blobUrl, decryptFile, ext])
+
+  const wrapperClass = cn(
+    'flex min-w-0 max-w-full flex-col',
+    isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg'
+  )
+
+  // Non-media files: show card with on-click download
+  if (!isMedia) {
     return (
       <div className={wrapperClass}>
-        <div className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+        <button
+          onClick={handleFileDownload}
+          disabled={loading}
+          className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2 text-left transition-opacity hover:opacity-80', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
+        >
           <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isOwn ? 'bg-primary-foreground/20' : 'bg-background')}>
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            ) : (
+            ) : error ? (
               <AlertCircle className="h-4 w-4 text-destructive" />
+            ) : (
+              <Download className="h-4 w-4" />
             )}
           </div>
           <div className="min-w-0 flex-1">
             <div className="truncate text-xs font-medium">{ext ? ext.toUpperCase() : t('File')}</div>
             <div className={cn('text-[11px]', isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground')}>
-              {loading ? t('Decrypting...') : t('Failed to decrypt')}
+              {loading ? t('Decrypting...') : error ? t('Failed to decrypt') : t('Tap to download')}
             </div>
           </div>
-        </div>
+        </button>
       </div>
     )
   }
 
   if (loading) {
-    const placeholderShape = isImage ? 'h-40 w-40' : isVideo ? 'h-32 w-56' : 'h-12 w-48'
+    const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
       <div className={wrapperClass}>
         <div className={cn('flex items-center justify-center overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
@@ -739,7 +759,7 @@ function EncryptedFileMessage({
   }
 
   if (error || !blobUrl) {
-    const placeholderShape = isImage ? 'h-40 w-40' : isVideo ? 'h-32 w-56' : 'h-12 w-48'
+    const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
       <div className={wrapperClass}>
         <div className={cn('flex items-center justify-center gap-2 overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
@@ -750,7 +770,7 @@ function EncryptedFileMessage({
     )
   }
 
-  if (fileType.startsWith('image/')) {
+  if (isImage) {
     return (
       <div className={wrapperClass}>
         <ImageGallery images={[{ url: blobUrl }]} start={0} end={1} />
@@ -758,7 +778,7 @@ function EncryptedFileMessage({
     )
   }
 
-  if (fileType.startsWith('video/')) {
+  if (isVideo) {
     return (
       <div className={wrapperClass}>
         <div className="overflow-hidden rounded-lg">
@@ -768,31 +788,11 @@ function EncryptedFileMessage({
     )
   }
 
-  if (fileType.startsWith('audio/')) {
-    return (
-      <div className={wrapperClass}>
-        <div className={cn('overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
-          <audio src={blobUrl} controls className="max-w-full" />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className={wrapperClass}>
-      <a
-        href={blobUrl}
-        download={ext ? `file.${ext}` : true}
-        className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
-      >
-        <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isOwn ? 'bg-primary-foreground/20' : 'bg-background')}>
-          <Download className="h-4 w-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-xs font-medium">{ext ? ext.toUpperCase() : t('File')}</div>
-          <div className={cn('text-[11px]', isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground')}>{t('Tap to download')}</div>
-        </div>
-      </a>
+      <div className={cn('overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+        <audio src={blobUrl} controls className="max-w-full" />
+      </div>
     </div>
   )
 }
