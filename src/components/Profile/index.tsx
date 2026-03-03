@@ -163,7 +163,9 @@ export default function Profile({ id }: { id?: string }) {
             {sp && (
               <div className="flex select-text items-center gap-1 text-sm text-orange-500">
                 <Bitcoin className="size-4 shrink-0" />
-                <div className="w-0 max-w-fit flex-1 truncate font-mono text-xs">{sp}</div>
+                <div className="w-0 max-w-fit flex-1 truncate font-mono text-xs">
+                  {sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp}
+                </div>
               </div>
             )}
             <div className="mt-1 flex gap-1">
