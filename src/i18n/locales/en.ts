@@ -693,8 +693,8 @@ export default {
     'Failed to save DM relays': 'Failed to save DM relays',
     'Relay already added': 'Relay already added',
     'Sync Encryption Key': 'Sync Encryption Key',
-    'An encryption key was found for your account. Open Jumble on another device where you have already set up DMs to sync the key.':
-      'An encryption key was found for your account. Open Jumble on another device where you have already set up DMs to sync the key.',
+    'An encryption key was found for your account. Please open a client that already has your DM encryption key set up to approve the sync request.':
+      'An encryption key was found for your account. Please open a client that already has your DM encryption key set up to approve the sync request.',
     'Checking encryption key...': 'Checking encryption key...',
     'Encryption key synced!': 'Encryption key synced!',
     'Encryption key synced successfully': 'Encryption key synced successfully',
@@ -703,8 +703,8 @@ export default {
     'Waiting for key from another device...': 'Waiting for key from another device...',
     'Open your other device and go to Messages to send the encryption key to this device.':
       'Open your other device and go to Messages to send the encryption key to this device.',
-    "Don't have access to another device? You can generate a new key, but you won't be able to read old messages.":
-      "Don't have access to another device? You can generate a new key, but you won't be able to read old messages.",
+    "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.":
+      "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.",
     'Generate New Key': 'Generate New Key',
     'New encryption key generated': 'New encryption key generated',
     'Failed to generate encryption key': 'Failed to generate encryption key',
@@ -754,6 +754,31 @@ export default {
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
       'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.',
     'This user has not set up NIP-4e DMs': 'This user has not set up NIP-4e DMs',
+    'Encryption key has been reset': 'Encryption key has been reset',
+    'Failed to reset encryption key': 'Failed to reset encryption key',
+    'Encryption Key': 'Encryption Key',
+    'Your encryption key is a dedicated key pair used to encrypt and decrypt direct messages. It is separate from your Nostr identity key and stored locally on your device.':
+      'Your encryption key is a dedicated key pair used to encrypt and decrypt direct messages. It is separate from your Nostr identity key and stored locally on your device.',
+    'Resetting will generate a new key. You will no longer be able to read old messages. Please export and backup your chat history before proceeding.':
+      'Resetting will generate a new key. You will no longer be able to read old messages. Please export and backup your chat history before proceeding.',
+    'This action cannot be undone. After resetting, you will no longer be able to decrypt messages encrypted with the old key. It is strongly recommended to export and backup your chat history first.':
+      'This action cannot be undone. After resetting, you will no longer be able to decrypt messages encrypted with the old key. It is strongly recommended to export and backup your chat history first.',
+    'No message requests': 'No message requests',
+    "Messages from people you haven't replied to will appear here.":
+      "Messages from people you haven't replied to will appear here.",
+    'Key sync request': 'Key sync request',
+    'Another device is requesting your encryption key.':
+      'Another device is requesting your encryption key.',
+    Dismiss: 'Dismiss',
+    Retry: 'Retry',
+    'Retry ({{seconds}}s)': 'Retry ({{seconds}}s)',
+    'Reset Encryption Key': 'Reset Encryption Key',
+    'Resetting...': 'Resetting...',
+    File: 'File',
+    'Decrypting...': 'Decrypting...',
+    'Failed to decrypt': 'Failed to decrypt',
+    'Tap to download': 'Tap to download',
+    '{{n}} new messages': '{{n}} new messages',
     Yesterday: 'Yesterday',
     weekday_0: 'Sunday',
     weekday_1: 'Monday',
@@ -764,6 +789,7 @@ export default {
     weekday_6: 'Saturday',
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
+    Requests: 'Requests',
     'dm time date': '{{date}} {{time}}'
 
   }
