@@ -682,6 +682,18 @@ export default {
     'Hide indirect': '間接通知を非表示',
     'Copy note content': 'ノート内容をコピー',
     'Video loop': 'ビデオループ',
-    'Automatically replay videos when they end': 'ビデオ終了時に自動的にリプレイする'
+    'Automatically replay videos when they end': 'ビデオ終了時に自動的にリプレイする',
+    Yesterday: '昨日',
+    weekday_0: '日曜日',
+    weekday_1: '月曜日',
+    weekday_2: '火曜日',
+    weekday_3: '水曜日',
+    weekday_4: '木曜日',
+    weekday_5: '金曜日',
+    weekday_6: '土曜日',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

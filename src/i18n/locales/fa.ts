@@ -682,6 +682,18 @@ export default {
     'Hide indirect': 'پنهان کردن غیرمستقیم',
     'Copy note content': 'کپی محتوای یادداشت',
     'Video loop': 'تکرار ویدیو',
-    'Automatically replay videos when they end': 'پخش خودکار ویدیوها پس از پایان'
+    'Automatically replay videos when they end': 'پخش خودکار ویدیوها پس از پایان',
+    Yesterday: 'دیروز',
+    weekday_0: 'یکشنبه',
+    weekday_1: 'دوشنبه',
+    weekday_2: 'سه‌شنبه',
+    weekday_3: 'چهارشنبه',
+    weekday_4: 'پنجشنبه',
+    weekday_5: 'جمعه',
+    weekday_6: 'شنبه',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

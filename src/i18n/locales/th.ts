@@ -672,6 +672,18 @@ export default {
     'Hide indirect': 'ซ่อนทางอ้อม',
     'Copy note content': 'คัดลอกเนื้อหาโน้ต',
     'Video loop': 'เล่นวิดีโอซ้ำ',
-    'Automatically replay videos when they end': 'เล่นวิดีโอซ้ำอัตโนมัติเมื่อจบ'
+    'Automatically replay videos when they end': 'เล่นวิดีโอซ้ำอัตโนมัติเมื่อจบ',
+    Yesterday: 'เมื่อวาน',
+    weekday_0: 'วันอาทิตย์',
+    weekday_1: 'วันจันทร์',
+    weekday_2: 'วันอังคาร',
+    weekday_3: 'วันพุธ',
+    weekday_4: 'วันพฤหัสบดี',
+    weekday_5: 'วันศุกร์',
+    weekday_6: 'วันเสาร์',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

@@ -694,6 +694,18 @@ export default {
     'Hide indirect': 'Indirekte ausblenden',
     'Copy note content': 'Notizinhalt kopieren',
     'Video loop': 'Video-Schleife',
-    'Automatically replay videos when they end': 'Videos automatisch wiederholen, wenn sie enden'
+    'Automatically replay videos when they end': 'Videos automatisch wiederholen, wenn sie enden',
+    Yesterday: 'Gestern',
+    weekday_0: 'Sonntag',
+    weekday_1: 'Montag',
+    weekday_2: 'Dienstag',
+    weekday_3: 'Mittwoch',
+    weekday_4: 'Donnerstag',
+    weekday_5: 'Freitag',
+    weekday_6: 'Samstag',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

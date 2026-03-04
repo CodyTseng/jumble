@@ -682,6 +682,18 @@ export default {
     'Hide indirect': 'अप्रत्यक्ष छुपाएं',
     'Copy note content': 'नोट सामग्री कॉपी करें',
     'Video loop': 'वीडियो लूप',
-    'Automatically replay videos when they end': 'वीडियो समाप्त होने पर स्वचालित रूप से दोबारा चलाएं'
+    'Automatically replay videos when they end': 'वीडियो समाप्त होने पर स्वचालित रूप से दोबारा चलाएं',
+    Yesterday: 'कल',
+    weekday_0: 'रविवार',
+    weekday_1: 'सोमवार',
+    weekday_2: 'मंगलवार',
+    weekday_3: 'बुधवार',
+    weekday_4: 'गुरुवार',
+    weekday_5: 'शुक्रवार',
+    weekday_6: 'शनिवार',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

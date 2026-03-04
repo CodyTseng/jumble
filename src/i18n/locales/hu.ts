@@ -676,6 +676,18 @@ export default {
     'Hide indirect': 'Közvetettek elrejtése',
     'Copy note content': 'Jegyzet tartalmának másolása',
     'Video loop': 'Videó ismétlése',
-    'Automatically replay videos when they end': 'Videók automatikus újrajátszása, amikor véget érnek'
+    'Automatically replay videos when they end': 'Videók automatikus újrajátszása, amikor véget érnek',
+    Yesterday: 'Tegnap',
+    weekday_0: 'Vasárnap',
+    weekday_1: 'Hétfő',
+    weekday_2: 'Kedd',
+    weekday_3: 'Szerda',
+    weekday_4: 'Csütörtök',
+    weekday_5: 'Péntek',
+    weekday_6: 'Szombat',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

@@ -39,10 +39,47 @@ import cryptoFileService from '@/services/crypto-file.service'
 import dmService from '@/services/dm.service'
 import { TImetaInfo, TDmMessage, TEmoji } from '@/types'
 import dayjs from 'dayjs'
-import { AlertCircle, ArrowDown, Check, Clock, Copy, Download, Loader2, Reply, SmilePlus } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowDown,
+  Check,
+  Clock,
+  Copy,
+  Download,
+  Loader2,
+  Reply,
+  SmilePlus
+} from 'lucide-react'
 import { kinds } from 'nostr-tools'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+function formatDmTime(timestamp: number, t: ReturnType<typeof useTranslation>['t']): string {
+  const msgTime = dayjs.unix(timestamp)
+  const now = dayjs()
+  const time = msgTime.format('HH:mm')
+
+  if (msgTime.isSame(now, 'day')) {
+    return time
+  }
+
+  if (msgTime.isSame(now.subtract(1, 'day'), 'day')) {
+    return t('dm time yesterday', { yesterday: t('Yesterday'), time })
+  }
+
+  if (now.diff(msgTime, 'day') < 7) {
+    const weekday = t(`weekday_${msgTime.day()}`)
+    return t('dm time weekday', { weekday, time })
+  }
+
+  if (msgTime.isSame(now, 'year')) {
+    const date = t('{{val, date_short}}', { val: msgTime.toDate() })
+    return t('dm time date', { date, time })
+  }
+
+  const date = t('{{val, date}}', { val: msgTime.toDate() })
+  return t('dm time date', { date, time })
+}
 
 export default function DmMessageList({
   otherPubkey,
@@ -116,7 +153,9 @@ export default function DmMessageList({
       setReactionsMap(newMap)
       // Filter out messages that are in the pending buffer (not yet shown to user)
       const pendingIds = new Set(pendingMessagesRef.current.map((m) => m.id))
-      setMessages(pendingIds.size > 0 ? regularMsgs.filter((m) => !pendingIds.has(m.id)) : regularMsgs)
+      setMessages(
+        pendingIds.size > 0 ? regularMsgs.filter((m) => !pendingIds.has(m.id)) : regularMsgs
+      )
       setHasMore(allMsgs.length >= 50)
     } catch (error) {
       console.error('Failed to load messages:', error)
@@ -286,10 +325,7 @@ export default function DmMessageList({
     // Load more when near the visual top
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current
     // column-reverse: visual top is at scrollHeight - clientHeight
-    const distanceFromVisualTop = Math.min(
-      scrollTop,
-      scrollHeight - clientHeight - scrollTop
-    )
+    const distanceFromVisualTop = Math.min(scrollTop, scrollHeight - clientHeight - scrollTop)
     if (distanceFromVisualTop < 100 && scrollHeight > clientHeight && !isLoadingMore && hasMore) {
       loadMoreMessages()
     }
@@ -306,8 +342,7 @@ export default function DmMessageList({
     async (messageId: string, emoji: string | TEmoji) => {
       if (!pubkey) return
       const emojiContent = typeof emoji === 'string' ? emoji : `:${emoji.shortcode}:`
-      const emojiTag =
-        typeof emoji !== 'string' ? ['emoji', emoji.shortcode, emoji.url] : undefined
+      const emojiTag = typeof emoji !== 'string' ? ['emoji', emoji.shortcode, emoji.url] : undefined
       try {
         await dmService.sendReaction(pubkey, otherPubkey, messageId, emojiContent, emojiTag)
       } catch (error) {
@@ -337,103 +372,107 @@ export default function DmMessageList({
     <div className="relative flex-1 overflow-hidden">
       <div
         ref={containerRef}
-        className="flex h-full flex-col-reverse select-text overflow-y-auto p-4 [overflow-anchor:none]"
+        className="flex h-full select-text flex-col-reverse overflow-y-auto p-4 [overflow-anchor:none]"
         onScroll={handleScroll}
       >
-      <div>
-      {isLoadingMore && (
-        <div className="flex justify-center py-2">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      {(() => {
-        const groups: {
-          isOwn: boolean
-          showTime: boolean
-          timeCreatedAt: number
-          isFirst: boolean
-          items: TDmMessage[]
-        }[] = []
-
-        messages.forEach((message, index) => {
-          const isOwn = message.senderPubkey === pubkey
-          const showTime = index === 0 || message.createdAt - messages[index - 1].createdAt > 300
-          const isGroupStart =
-            index === 0 || messages[index - 1].senderPubkey !== message.senderPubkey || showTime
-
-          if (isGroupStart) {
-            groups.push({
-              isOwn,
-              showTime,
-              timeCreatedAt: message.createdAt,
-              isFirst: index === 0,
-              items: []
-            })
-          }
-          groups[groups.length - 1].items.push(message)
-        })
-
-        return groups.map((group) => {
-          const lastMsgId = group.items[group.items.length - 1].id
-          const lastMsgHasReactions = (reactionsMap.get(lastMsgId)?.length ?? 0) > 0
-          return (
-          <Fragment key={group.items[0].id}>
-            {group.showTime && (
-              <div className={cn('flex justify-center', group.isFirst ? '' : 'mt-3')}>
-                <span className="text-xs text-muted-foreground">
-                  {dayjs.unix(group.timeCreatedAt).format('HH:mm')}
-                </span>
-              </div>
-            )}
-            <div
-              className={cn(
-                'flex gap-2',
-                group.isOwn ? 'flex-row-reverse' : 'flex-row',
-                group.showTime ? 'mt-1' : 'mt-3',
-                lastMsgHasReactions && 'pb-7'
-              )}
-            >
-              {!group.isOwn && (
-                <div className="w-9 shrink-0 self-end">
-                  <UserAvatar userId={group.items[0].senderPubkey} size="medium" />
-                </div>
-              )}
-              <div
-                className={cn(
-                  'flex min-w-0 max-w-full sm:max-w-[80%] flex-col gap-0.5',
-                  group.isOwn ? 'items-end' : 'items-start'
-                )}
-              >
-                {group.items.map((message, mi) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isOwn={group.isOwn}
-                    isLastInGroup={mi === group.items.length - 1}
-                    sendingStatus={group.isOwn ? dmService.getSendingStatus(message.id) : undefined}
-                    onReply={onReply}
-                    onReact={handleReact}
-                    reactions={reactionsMap.get(message.id)}
-                    currentUserPubkey={pubkey ?? undefined}
-                    onScrollToMessage={scrollToMessage}
-                    isHighlighted={highlightedId === message.id}
-                    isElevated={elevatedId === message.id}
-                    refCallback={(el) => {
-                      if (el) {
-                        messageRefsMap.current.set(message.id, el)
-                      } else {
-                        messageRefsMap.current.delete(message.id)
-                      }
-                    }}
-                  />
-                ))}
-              </div>
+        <div>
+          {isLoadingMore && (
+            <div className="flex justify-center py-2">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-          </Fragment>
-        )})
-      })()}
-        <div ref={bottomRef} />
-      </div>
+          )}
+          {(() => {
+            const groups: {
+              isOwn: boolean
+              showTime: boolean
+              timeCreatedAt: number
+              isFirst: boolean
+              items: TDmMessage[]
+            }[] = []
+
+            messages.forEach((message, index) => {
+              const isOwn = message.senderPubkey === pubkey
+              const showTime =
+                index === 0 || message.createdAt - messages[index - 1].createdAt > 300
+              const isGroupStart =
+                index === 0 || messages[index - 1].senderPubkey !== message.senderPubkey || showTime
+
+              if (isGroupStart) {
+                groups.push({
+                  isOwn,
+                  showTime,
+                  timeCreatedAt: message.createdAt,
+                  isFirst: index === 0,
+                  items: []
+                })
+              }
+              groups[groups.length - 1].items.push(message)
+            })
+
+            return groups.map((group) => {
+              const lastMsgId = group.items[group.items.length - 1].id
+              const lastMsgHasReactions = (reactionsMap.get(lastMsgId)?.length ?? 0) > 0
+              return (
+                <Fragment key={group.items[0].id}>
+                  {group.showTime && (
+                    <div className={cn('flex justify-center', group.isFirst ? '' : 'mt-3')}>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDmTime(group.timeCreatedAt, t)}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      'flex gap-2',
+                      group.isOwn ? 'flex-row-reverse' : 'flex-row',
+                      group.showTime ? 'mt-1' : 'mt-3',
+                      lastMsgHasReactions && 'pb-7'
+                    )}
+                  >
+                    {!group.isOwn && (
+                      <div className="w-9 shrink-0 self-end">
+                        <UserAvatar userId={group.items[0].senderPubkey} size="medium" />
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        'flex min-w-0 max-w-full flex-col gap-0.5 sm:max-w-[80%]',
+                        group.isOwn ? 'items-end' : 'items-start'
+                      )}
+                    >
+                      {group.items.map((message, mi) => (
+                        <MessageBubble
+                          key={message.id}
+                          message={message}
+                          isOwn={group.isOwn}
+                          isLastInGroup={mi === group.items.length - 1}
+                          sendingStatus={
+                            group.isOwn ? dmService.getSendingStatus(message.id) : undefined
+                          }
+                          onReply={onReply}
+                          onReact={handleReact}
+                          reactions={reactionsMap.get(message.id)}
+                          currentUserPubkey={pubkey ?? undefined}
+                          onScrollToMessage={scrollToMessage}
+                          isHighlighted={highlightedId === message.id}
+                          isElevated={elevatedId === message.id}
+                          refCallback={(el) => {
+                            if (el) {
+                              messageRefsMap.current.set(message.id, el)
+                            } else {
+                              messageRefsMap.current.delete(message.id)
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </Fragment>
+              )
+            })
+          })()}
+          <div ref={bottomRef} />
+        </div>
       </div>
       {pendingCount > 0 && (
         <div className="pointer-events-none absolute bottom-3 flex w-full justify-center">
@@ -479,7 +518,9 @@ function MessageBubble({
 }) {
   const { isSmallScreen } = useScreenSize()
   const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
-  const hasBlocks = isFileMessage || /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
+  const hasBlocks =
+    isFileMessage ||
+    /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
   const [showActions, setShowActions] = useState(false)
   const [isEmojiOpen, setIsEmojiOpen] = useState(false)
@@ -517,16 +558,13 @@ function MessageBubble({
   const [chipLongPressing, setChipLongPressing] = useState<string | null>(null)
   const [chipCompleted, setChipCompleted] = useState<string | null>(null)
 
-  const handleChipMouseDown = useCallback(
-    (emoji: string) => {
-      setChipLongPressing(emoji)
-      chipLongPressTimerRef.current = setTimeout(() => {
-        setChipCompleted(emoji)
-        setChipLongPressing(null)
-      }, 800)
-    },
-    []
-  )
+  const handleChipMouseDown = useCallback((emoji: string) => {
+    setChipLongPressing(emoji)
+    chipLongPressTimerRef.current = setTimeout(() => {
+      setChipCompleted(emoji)
+      setChipLongPressing(null)
+    }, 800)
+  }, [])
 
   const handleChipMouseUp = useCallback(() => {
     if (chipLongPressTimerRef.current) {
@@ -573,7 +611,10 @@ function MessageBubble({
 
   const groupedReactions = useMemo(() => {
     if (!reactions || reactions.length === 0) return []
-    const groups = new Map<string, { emoji: string; count: number; hasOwn: boolean; emojiTag?: string[] }>()
+    const groups = new Map<
+      string,
+      { emoji: string; count: number; hasOwn: boolean; emojiTag?: string[] }
+    >()
     for (const r of reactions) {
       const content = r.content || '+'
       const existing = groups.get(content)
@@ -632,17 +673,28 @@ function MessageBubble({
         </button>
       )}
       <div
-        className={cn('flex min-w-0 max-w-full items-end gap-2', hasBlocks && 'w-full', isFileMessage && 'justify-end', isOwn ? 'flex-row' : 'flex-row-reverse')}
+        className={cn(
+          'flex min-w-0 max-w-full items-end gap-2',
+          hasBlocks && 'w-full',
+          isFileMessage && 'justify-end',
+          isOwn ? 'flex-row' : 'flex-row-reverse'
+        )}
       >
-        <div className={cn('flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100', showActions && 'opacity-100', isOwn ? 'flex-row' : 'flex-row-reverse')}>
+        <div
+          className={cn(
+            'flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100',
+            showActions && 'opacity-100',
+            isOwn ? 'flex-row' : 'flex-row-reverse'
+          )}
+        >
           <button
             onClick={handleCopy}
             className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-          {onReact && (
-            isSmallScreen ? (
+          {onReact &&
+            (isSmallScreen ? (
               <>
                 {reactButton}
                 <Drawer open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
@@ -677,8 +729,7 @@ function MessageBubble({
                   )}
                 </PopoverContent>
               </Popover>
-            )
-          )}
+            ))}
           {onReply && (
             <button
               onClick={() => onReply(message)}
@@ -697,10 +748,21 @@ function MessageBubble({
           {isFileMessage ? (
             <EncryptedFileMessage message={message} isOwn={isOwn} isHighlighted={isHighlighted} />
           ) : (
-            <DmContent content={message.content} isOwn={isOwn} bubbleClass={bubbleClass} isHighlighted={isHighlighted} tags={message.decryptedRumor?.tags} />
+            <DmContent
+              content={message.content}
+              isOwn={isOwn}
+              bubbleClass={bubbleClass}
+              isHighlighted={isHighlighted}
+              tags={message.decryptedRumor?.tags}
+            />
           )}
           {hasReactions && (
-            <div className={cn('absolute top-full z-[1] mt-1 flex flex-wrap gap-1', isOwn ? 'left-0' : 'right-0')}>
+            <div
+              className={cn(
+                'absolute top-full z-[1] mt-1 flex flex-wrap gap-1',
+                isOwn ? 'left-0' : 'right-0'
+              )}
+            >
               {groupedReactions.map((r) => (
                 <div
                   key={r.emoji}
@@ -710,7 +772,9 @@ function MessageBubble({
                       ? 'border-primary/50 bg-primary/10 hover:border-primary hover:bg-primary/20'
                       : 'border-border bg-background hover:border-primary/30 hover:bg-primary/5',
                     (chipLongPressing === r.emoji || chipCompleted === r.emoji) &&
-                      (r.hasOwn ? 'border-primary bg-primary/20' : 'border-foreground/30 bg-secondary')
+                      (r.hasOwn
+                        ? 'border-primary bg-primary/20'
+                        : 'border-foreground/30 bg-secondary')
                   )}
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={() => handleChipMouseDown(r.emoji)}
@@ -728,7 +792,9 @@ function MessageBubble({
                         style={{
                           width: chipCompleted === r.emoji ? '100%' : '0%',
                           animation:
-                            chipLongPressing === r.emoji ? 'progressFill 1000ms ease-out forwards' : 'none'
+                            chipLongPressing === r.emoji
+                              ? 'progressFill 1000ms ease-out forwards'
+                              : 'none'
                         }}
                       />
                     </div>
@@ -736,13 +802,21 @@ function MessageBubble({
                   <div className="relative z-10 flex items-center gap-1">
                     <div
                       style={{
-                        animation: chipCompleted === r.emoji ? 'shake 0.5s ease-in-out infinite' : undefined
+                        animation:
+                          chipCompleted === r.emoji ? 'shake 0.5s ease-in-out infinite' : undefined
                       }}
                     >
                       {r.emojiTag ? (
-                        <img src={r.emojiTag[2]} alt={r.emojiTag[1]} className="inline-block size-4" />
+                        <img
+                          src={r.emojiTag[2]}
+                          alt={r.emojiTag[1]}
+                          className="inline-block size-4"
+                        />
                       ) : (
-                        <Emoji emoji={r.emoji} classNames={{ img: 'size-4', text: 'text-sm leading-none' }} />
+                        <Emoji
+                          emoji={r.emoji}
+                          classNames={{ img: 'size-4', text: 'text-sm leading-none' }}
+                        />
                       )}
                     </div>
                     <span className="text-xs text-muted-foreground">{r.count}</span>
@@ -757,9 +831,7 @@ function MessageBubble({
   )
 }
 
-type TDmSegment =
-  | { kind: 'text'; nodes: TEmbeddedNode[] }
-  | { kind: 'block'; node: TEmbeddedNode }
+type TDmSegment = { kind: 'text'; nodes: TEmbeddedNode[] } | { kind: 'block'; node: TEmbeddedNode }
 
 const BLOCK_TYPES = new Set(['image', 'images', 'media', 'event', 'youtube', 'x-post', 'invoice'])
 
@@ -864,14 +936,21 @@ function DmContent({
   let imageIndex = 0
 
   return (
-    <div className={cn('flex min-w-0 max-w-full flex-col gap-1 rounded-lg transition-all duration-500', segments.some((s) => s.kind === 'block') && 'flex-1', isOwn ? 'items-end' : 'items-start', isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
+    <div
+      className={cn(
+        'flex min-w-0 max-w-full flex-col gap-1 rounded-lg transition-all duration-500',
+        segments.some((s) => s.kind === 'block') && 'flex-1',
+        isOwn ? 'items-end' : 'items-start',
+        isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+      )}
+    >
       {segments.map((seg, si) => {
         if (seg.kind === 'text') {
           return (
             <div key={si} className={bubbleClass}>
               <div
                 className={cn(
-                  'whitespace-pre-wrap text-wrap break-words select-text text-base',
+                  'select-text whitespace-pre-wrap text-wrap break-words text-base',
                   isOwn && '[&>div]:text-foreground',
                   '[&_.bg-card:hover]:bg-accent'
                 )}
@@ -881,7 +960,8 @@ function DmContent({
                   if (node.type === 'url') return <ExternalLink url={node.data} key={ni} />
                   if (node.type === 'mention')
                     return <EmbeddedMention key={ni} userId={node.data.split(':')[1]} />
-                  if (node.type === 'hashtag') return <EmbeddedHashtag hashtag={node.data} key={ni} />
+                  if (node.type === 'hashtag')
+                    return <EmbeddedHashtag hashtag={node.data} key={ni} />
                   if (node.type === 'websocket-url')
                     return <EmbeddedWebsocketUrl url={node.data} key={ni} />
                   if (node.type === 'emoji') {
@@ -953,7 +1033,9 @@ function EncryptedFileMessage({
   const ext = fileType.split('/')[1]?.split('+')[0] ?? ''
 
   const cached = decryptedBlobCache.has(message.id)
-  const [blobUrl, setBlobUrl] = useState<string | null>(cached ? decryptedBlobCache.get(message.id)! : null)
+  const [blobUrl, setBlobUrl] = useState<string | null>(
+    cached ? decryptedBlobCache.get(message.id)! : null
+  )
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(isMedia && !cached)
 
@@ -1017,9 +1099,17 @@ function EncryptedFileMessage({
         <button
           onClick={handleFileDownload}
           disabled={loading}
-          className={cn('flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2 text-left transition-opacity hover:opacity-80', isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary')}
+          className={cn(
+            'flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2 text-left transition-opacity hover:opacity-80',
+            isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+          )}
         >
-          <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isOwn ? 'bg-primary-foreground/20' : 'bg-background')}>
+          <div
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+              isOwn ? 'bg-primary-foreground/20' : 'bg-background'
+            )}
+          >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             ) : error ? (
@@ -1029,8 +1119,15 @@ function EncryptedFileMessage({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-xs font-medium">{ext ? ext.toUpperCase() : t('File')}</div>
-            <div className={cn('text-[11px]', isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground')}>
+            <div className="truncate text-xs font-medium">
+              {ext ? ext.toUpperCase() : t('File')}
+            </div>
+            <div
+              className={cn(
+                'text-[11px]',
+                isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
+              )}
+            >
               {loading ? t('Decrypting...') : error ? t('Failed to decrypt') : t('Tap to download')}
             </div>
           </div>
@@ -1043,7 +1140,13 @@ function EncryptedFileMessage({
     const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
       <div className={wrapperClass}>
-        <div className={cn('flex items-center justify-center overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-lg',
+            placeholderShape,
+            isOwn ? 'bg-primary/20' : 'bg-secondary'
+          )}
+        >
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       </div>
@@ -1054,7 +1157,13 @@ function EncryptedFileMessage({
     const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
       <div className={wrapperClass}>
-        <div className={cn('flex items-center justify-center gap-2 overflow-hidden rounded-lg', placeholderShape, isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+        <div
+          className={cn(
+            'flex items-center justify-center gap-2 overflow-hidden rounded-lg',
+            placeholderShape,
+            isOwn ? 'bg-primary/20' : 'bg-secondary'
+          )}
+        >
           <AlertCircle className="h-4 w-4 text-destructive" />
           <span className="text-xs text-muted-foreground">{t('Failed to decrypt')}</span>
         </div>
@@ -1082,7 +1191,12 @@ function EncryptedFileMessage({
 
   return (
     <div className={wrapperClass}>
-      <div className={cn('overflow-hidden rounded-lg px-3 py-2', isOwn ? 'bg-primary/20' : 'bg-secondary')}>
+      <div
+        className={cn(
+          'overflow-hidden rounded-lg px-3 py-2',
+          isOwn ? 'bg-primary/20' : 'bg-secondary'
+        )}
+      >
         <audio src={blobUrl} controls className="max-w-full" />
       </div>
     </div>

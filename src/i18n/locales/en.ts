@@ -753,6 +753,18 @@ export default {
     'Delete conversation': 'Delete conversation',
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
       'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.',
-    'This user has not set up NIP-4e DMs': 'This user has not set up NIP-4e DMs'
+    'This user has not set up NIP-4e DMs': 'This user has not set up NIP-4e DMs',
+    Yesterday: 'Yesterday',
+    weekday_0: 'Sunday',
+    weekday_1: 'Monday',
+    weekday_2: 'Tuesday',
+    weekday_3: 'Wednesday',
+    weekday_4: 'Thursday',
+    weekday_5: 'Friday',
+    weekday_6: 'Saturday',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

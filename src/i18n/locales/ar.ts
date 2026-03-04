@@ -670,6 +670,18 @@ export default {
     'Hide indirect': 'إخفاء غير المباشرة',
     'Copy note content': 'نسخ محتوى الملاحظة',
     'Video loop': 'تكرار الفيديو',
-    'Automatically replay videos when they end': 'إعادة تشغيل مقاطع الفيديو تلقائيًا عند انتهائها'
+    'Automatically replay videos when they end': 'إعادة تشغيل مقاطع الفيديو تلقائيًا عند انتهائها',
+    Yesterday: 'أمس',
+    weekday_0: 'الأحد',
+    weekday_1: 'الاثنين',
+    weekday_2: 'الثلاثاء',
+    weekday_3: 'الأربعاء',
+    weekday_4: 'الخميس',
+    weekday_5: 'الجمعة',
+    weekday_6: 'السبت',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

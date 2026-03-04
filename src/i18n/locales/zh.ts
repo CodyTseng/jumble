@@ -660,6 +660,18 @@ export default {
     'Copy note content': '复制笔记内容',
     'Video loop': '视频循环',
     'Automatically replay videos when they end': '视频播放结束后自动重新播放',
-    'This user has not set up NIP-4e DMs': '该用户未设置 NIP-4e 私信'
+    'This user has not set up NIP-4e DMs': '该用户未设置 NIP-4e 私信',
+    Yesterday: '昨天',
+    weekday_0: '星期日',
+    weekday_1: '星期一',
+    weekday_2: '星期二',
+    weekday_3: '星期三',
+    weekday_4: '星期四',
+    weekday_5: '星期五',
+    weekday_6: '星期六',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

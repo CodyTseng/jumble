@@ -676,6 +676,18 @@ export default {
     'Hide indirect': '간접 숨기기',
     'Copy note content': '노트 내용 복사',
     'Video loop': '비디오 반복',
-    'Automatically replay videos when they end': '비디오가 끝나면 자동으로 다시 재생'
+    'Automatically replay videos when they end': '비디오가 끝나면 자동으로 다시 재생',
+    Yesterday: '어제',
+    weekday_0: '일요일',
+    weekday_1: '월요일',
+    weekday_2: '화요일',
+    weekday_3: '수요일',
+    weekday_4: '목요일',
+    weekday_5: '금요일',
+    weekday_6: '토요일',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

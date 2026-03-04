@@ -687,6 +687,18 @@ export default {
     'Hide indirect': 'Скрыть косвенные',
     'Copy note content': 'Скопировать содержимое заметки',
     'Video loop': 'Зацикливание видео',
-    'Automatically replay videos when they end': 'Автоматически воспроизводить видео заново после окончания'
+    'Automatically replay videos when they end': 'Автоматически воспроизводить видео заново после окончания',
+    Yesterday: 'Вчера',
+    weekday_0: 'Воскресенье',
+    weekday_1: 'Понедельник',
+    weekday_2: 'Вторник',
+    weekday_3: 'Среда',
+    weekday_4: 'Четверг',
+    weekday_5: 'Пятница',
+    weekday_6: 'Суббота',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

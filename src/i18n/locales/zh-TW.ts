@@ -654,6 +654,18 @@ export default {
     'Hide indirect': '隱藏間接通知',
     'Copy note content': '複製筆記內容',
     'Video loop': '影片循環',
-    'Automatically replay videos when they end': '影片播放結束後自動重新播放'
+    'Automatically replay videos when they end': '影片播放結束後自動重新播放',
+    Yesterday: '昨天',
+    weekday_0: '星期日',
+    weekday_1: '星期一',
+    weekday_2: '星期二',
+    weekday_3: '星期三',
+    weekday_4: '星期四',
+    weekday_5: '星期五',
+    weekday_6: '星期六',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

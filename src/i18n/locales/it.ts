@@ -687,6 +687,18 @@ export default {
     'Hide indirect': 'Nascondi indirette',
     'Copy note content': 'Copia contenuto della nota',
     'Video loop': 'Ripetizione video',
-    'Automatically replay videos when they end': 'Riprodurre automaticamente i video quando terminano'
+    'Automatically replay videos when they end': 'Riprodurre automaticamente i video quando terminano',
+    Yesterday: 'Ieri',
+    weekday_0: 'Domenica',
+    weekday_1: 'Lunedì',
+    weekday_2: 'Martedì',
+    weekday_3: 'Mercoledì',
+    weekday_4: 'Giovedì',
+    weekday_5: 'Venerdì',
+    weekday_6: 'Sabato',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }

@@ -691,6 +691,18 @@ export default {
     'Hide indirect': 'Masquer indirects',
     'Copy note content': 'Copier le contenu de la note',
     'Video loop': 'Boucle vidéo',
-    'Automatically replay videos when they end': 'Rejouer automatiquement les vidéos à la fin'
+    'Automatically replay videos when they end': 'Rejouer automatiquement les vidéos à la fin',
+    Yesterday: 'Hier',
+    weekday_0: 'Dimanche',
+    weekday_1: 'Lundi',
+    weekday_2: 'Mardi',
+    weekday_3: 'Mercredi',
+    weekday_4: 'Jeudi',
+    weekday_5: 'Vendredi',
+    weekday_6: 'Samedi',
+    'dm time yesterday': '{{yesterday}} {{time}}',
+    'dm time weekday': '{{weekday}} {{time}}',
+    'dm time date': '{{date}} {{time}}'
+
   }
 }
