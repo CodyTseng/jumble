@@ -184,15 +184,17 @@ export default function DmList() {
         value={activeTab}
         onTabChange={(tab) => setActiveTab(tab as TDmTab)}
         options={
-          <>
-            {!supportTouch && <RefreshButton onClick={refresh} />}
-            {activeTab === 'requests' && (
-              <TrustScoreFilter
-                filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}
-                onOpenChange={setTrustFilterOpen}
-              />
-            )}
-          </>
+          !supportTouch || activeTab === 'requests' ? (
+            <>
+              {!supportTouch && <RefreshButton onClick={refresh} />}
+              {activeTab === 'requests' && (
+                <TrustScoreFilter
+                  filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}
+                  onOpenChange={setTrustFilterOpen}
+                />
+              )}
+            </>
+          ) : null
         }
         active={trustFilterOpen}
       />
