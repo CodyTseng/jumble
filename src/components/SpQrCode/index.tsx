@@ -3,9 +3,11 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Bitcoin, Check, Copy, QrCodeIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import QrCode from '../QrCode'
 
 export default function SpQrCode({ sp }: { sp: string }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const [copied, setCopied] = useState(false)
 
@@ -29,7 +31,7 @@ export default function SpQrCode({ sp }: { sp: string }) {
     <div className="flex w-full flex-col items-center gap-4 p-8">
       <div className="flex items-center gap-2 text-orange-500">
         <Bitcoin size={24} />
-        <div className="text-lg font-semibold">Silent Payment</div>
+        <div className="text-lg font-semibold">{t('Silent Payment')}</div>
       </div>
       <QrCode size={512} value={sp} />
       <div
