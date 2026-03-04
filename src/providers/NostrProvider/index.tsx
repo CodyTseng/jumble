@@ -19,6 +19,8 @@ import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
+import dmService from '@/services/dm.service'
+import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
 import stuffStatsService from '@/services/stuff-stats.service'
@@ -27,6 +29,7 @@ import {
   TAccount,
   TAccountPointer,
   TDraftEvent,
+  TEncryptionKeypair,
   TProfile,
   TPublishOptions,
   TRelayList
@@ -81,6 +84,12 @@ type TNostrContext = {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
+  nip44Encrypt: (privkey: Uint8Array, pubkey: string, plainText: string) => Promise<string>
+  nip44Decrypt: (privkey: Uint8Array, pubkey: string, cipherText: string) => Promise<string>
+  signer: ISigner | null
+  hasEncryptionKey: () => boolean
+  getEncryptionKeypair: () => TEncryptionKeypair | null
+  ensureEncryptionKey: () => Promise<TEncryptionKeypair>
   startLogin: () => void
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
   updateRelayListEvent: (relayListEvent: Event) => Promise<void>
@@ -397,6 +406,26 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       stuffStatsService.updateStuffStatsByEvents(events)
     }
     initInteractions()
+  }, [account])
+
+  useEffect(() => {
+    if (!account) return
+
+    const initDm = async () => {
+      const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(account.pubkey)
+      if (!encryptionKeypair) return
+
+      try {
+        await dmService.init(account.pubkey, encryptionKeypair)
+      } catch (error) {
+        console.error('Failed to initialize DM service:', error)
+      }
+    }
+    initDm()
+
+    return () => {
+      dmService.destroy()
+    }
   }, [account])
 
   useEffect(() => {
@@ -730,6 +759,37 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return signer?.nip04Decrypt(pubkey, cipherText) ?? ''
   }
 
+  const nip44Encrypt = async (privkey: Uint8Array, pubkey: string, plainText: string) => {
+    if (!signer?.nip44Encrypt) {
+      throw new Error('NIP-44 encryption not supported by this signer')
+    }
+    return signer.nip44Encrypt(privkey, pubkey, plainText)
+  }
+
+  const nip44Decrypt = async (privkey: Uint8Array, pubkey: string, cipherText: string) => {
+    if (!signer?.nip44Decrypt) {
+      throw new Error('NIP-44 decryption not supported by this signer')
+    }
+    return signer.nip44Decrypt(privkey, pubkey, cipherText)
+  }
+
+  const hasEncryptionKey = () => {
+    if (!account) return false
+    return encryptionKeyService.hasEncryptionKey(account.pubkey)
+  }
+
+  const getEncryptionKeypair = (): TEncryptionKeypair | null => {
+    if (!account) return null
+    return encryptionKeyService.getEncryptionKeypair(account.pubkey)
+  }
+
+  const ensureEncryptionKey = async (): Promise<TEncryptionKeypair> => {
+    if (!account || !signer) {
+      throw new Error('Not logged in')
+    }
+    return encryptionKeyService.initializeEncryption(signer, account.pubkey)
+  }
+
   const checkLogin = async <T,>(cb?: () => T): Promise<T | void> => {
     if (signer) {
       return cb && cb()
@@ -857,6 +917,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         signHttpAuth,
         nip04Encrypt,
         nip04Decrypt,
+        nip44Encrypt,
+        nip44Decrypt,
+        signer,
+        hasEncryptionKey,
+        getEncryptionKeypair,
+        ensureEncryptionKey,
         startLogin: () => setOpenLoginDialog(true),
         checkLogin,
         signEvent,

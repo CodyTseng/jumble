@@ -8,6 +8,7 @@ import {
   createRef,
   ReactNode,
   RefObject,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -48,6 +49,14 @@ const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefi
 
 const SecondaryPageContext = createContext<TSecondaryPageContext | undefined>(undefined)
 
+type TBottomBarContext = {
+  hidden: boolean
+  setHidden: (hidden: boolean) => void
+}
+
+const BottomBarContext = createContext<TBottomBarContext>({ hidden: false, setHidden: () => {} })
+const NO_BOTTOM_BAR: TBottomBarContext = { hidden: true, setHidden: () => {} }
+
 export function usePrimaryPage() {
   const context = useContext(PrimaryPageContext)
   if (!context) {
@@ -64,7 +73,16 @@ export function useSecondaryPage() {
   return context
 }
 
+export function useBottomBar() {
+  return useContext(BottomBarContext)
+}
+
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
+  const [bottomBarHidden, setBottomBarHidden] = useState(false)
+  const bottomBarContextValue = {
+    hidden: bottomBarHidden,
+    setHidden: useCallback((hidden: boolean) => setBottomBarHidden(hidden), [])
+  }
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -292,6 +310,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
+              <BottomBarContext.Provider value={bottomBarContextValue}>
               {!!secondaryStack.length &&
                 secondaryStack.map((item, index) => (
                   <div
@@ -314,8 +333,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   {props ? cloneElement(element as React.ReactElement, props) : element}
                 </div>
               ))}
-              <BottomNavigationBar />
+              {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
+              </BottomBarContext.Provider>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -343,6 +363,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
+              <BottomBarContext.Provider value={NO_BOTTOM_BAR}>
               <div className="flex w-full lg:justify-around">
                 <div className="sticky top-0 flex h-[var(--vh)] justify-end self-start lg:w-full">
                   <Sidebar />
@@ -377,6 +398,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <TooManyRelaysAlertDialog />
               <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
+              </BottomBarContext.Provider>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>

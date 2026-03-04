@@ -5,6 +5,7 @@ import AccountButton from './AccountButton'
 import ExploreButton from './ExploreButton'
 import FollowingButton from './FollowingButton'
 import HomeButton from './HomeButton'
+import MessagesButton from './MessagesButton'
 import NotificationsButton from './NotificationsButton'
 
 export default function BottomNavigationBar() {
@@ -21,6 +22,7 @@ export default function BottomNavigationBar() {
         {!IS_COMMUNITY_MODE && <ExploreButton />}
         {IS_COMMUNITY_MODE && <FollowingButton />}
         <NotificationsButton />
+        <MessagesButton />
         <AccountButton />
       </div>
     </div>

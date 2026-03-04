@@ -103,4 +103,33 @@ i18n.services.formatter?.add('date', (timestamp, lng) => {
   }
 })
 
+i18n.services.formatter?.add('date_short', (timestamp, lng) => {
+  switch (lng) {
+    case 'zh':
+    case 'zh-TW':
+    case 'ja':
+      return dayjs(timestamp).format('MM月DD日')
+    case 'pl':
+    case 'de':
+    case 'ru':
+      return dayjs(timestamp).format('DD.MM')
+    case 'fa':
+    case 'hu':
+      return dayjs(timestamp).format('MM/DD')
+    case 'it':
+    case 'es':
+    case 'fr':
+    case 'pt-BR':
+    case 'pt-PT':
+    case 'ar':
+    case 'hi':
+    case 'th':
+      return dayjs(timestamp).format('DD/MM')
+    case 'ko':
+      return dayjs(timestamp).format('MM월 DD일')
+    default:
+      return dayjs(timestamp).format('MMM D')
+  }
+})
+
 export default i18n

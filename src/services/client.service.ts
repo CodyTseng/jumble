@@ -434,7 +434,7 @@ class ClientService extends EventTarget {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this
     const _knownIds = new Set<string>()
-    let startedCount = relays.length
+    const startedCount = relays.length
     let eosedCount = 0
     let eosed = false
     let closedCount = 0
@@ -500,7 +500,6 @@ class ClientService extends EventTarget {
                   .then(() => {
                     hasAuthed = true
                     if (!eosed) {
-                      startedCount++
                       subPromises.push(startSub())
                     }
                   })
@@ -823,12 +822,28 @@ class ClientService extends EventTarget {
       filter,
       onevent
     )
+
+    // Dedup events from multiple relays
+    const seen = new Set<string>()
+    let deduped = events.filter((evt) => {
+      if (seen.has(evt.id)) return false
+      seen.add(evt.id)
+      return true
+    })
+
+    // Sort desc by created_at and trim to limit
+    const limit = Array.isArray(filter) ? undefined : filter.limit
+    if (limit) {
+      deduped.sort((a, b) => b.created_at - a.created_at)
+      deduped = deduped.slice(0, limit)
+    }
+
     if (cache) {
-      events.forEach((evt) => {
+      deduped.forEach((evt) => {
         this.addEventToCache(evt)
       })
     }
-    return events
+    return deduped
   }
 
   async fetchEvent(id: string): Promise<NEvent | undefined> {
@@ -1400,6 +1415,37 @@ class ClientService extends EventTarget {
   }
 
   /** =========== Replaceable event =========== */
+
+  async fetchDmRelaysEvent(pubkey: string, updateCache = true) {
+    return await this.fetchReplaceableEvent(pubkey, ExtendedKind.DM_RELAYS, undefined, updateCache)
+  }
+
+  async fetchDmRelays(pubkey: string, updateCache = true) {
+    const dmRelayListEvent = await this.fetchDmRelaysEvent(pubkey, updateCache)
+    return dmRelayListEvent
+      ? Array.from(
+          new Set(
+            dmRelayListEvent.tags
+              .filter((tag) => tag[0] === 'relay' && tag[1])
+              .map((tag) => normalizeUrl(tag[1]))
+              .filter(Boolean)
+          )
+        )
+      : []
+  }
+
+  async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true) {
+    return await this.fetchReplaceableEvent(
+      pubkey,
+      ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT,
+      undefined,
+      updateCache
+    )
+  }
+
+  async updateEncryptionKeyAnnouncementCache(evt: NEvent) {
+    await this.updateReplaceableEventCache(evt)
+  }
 
   async fetchFollowListEvent(pubkey: string, updateCache = true) {
     return await this.fetchReplaceableEvent(pubkey, kinds.Contacts, undefined, updateCache)
