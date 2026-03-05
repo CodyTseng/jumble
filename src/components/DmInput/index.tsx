@@ -558,7 +558,7 @@ export default function DmInput({
     if (!event.target.files) return
 
     for (const file of event.target.files) {
-      const id = crypto.randomUUID()
+      const id = Math.random().toString(36).slice(2) + Date.now().toString(36)
       const previewUrl = URL.createObjectURL(file)
       const abortController = new AbortController()
       setMediaItems((prev) => [
