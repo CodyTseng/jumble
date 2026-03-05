@@ -698,7 +698,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'flex shrink-0 items-center gap-1 px-1 opacity-0 pointer-events-none [@media(hover:hover)]:group-hover/msg:opacity-100 [@media(hover:hover)]:group-hover/msg:pointer-events-auto',
+            'pointer-events-none flex shrink-0 items-center gap-1 px-1 opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
@@ -811,7 +811,7 @@ function MessageBubble({
           {hasReactions && (
             <div
               className={cn(
-                'absolute top-full z-[1] mt-1 flex flex-wrap gap-1',
+                'absolute top-full z-[1] mt-0.5 flex flex-wrap gap-1',
                 isOwn ? 'left-0' : 'right-0'
               )}
             >
