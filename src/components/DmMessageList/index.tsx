@@ -690,7 +690,7 @@ function MessageBubble({
       )}
       <div
         className={cn(
-          'flex min-w-0 max-w-full items-end gap-2',
+          'flex min-w-0 max-w-full items-end gap-1',
           hasBlocks && 'w-full',
           isFileMessage && 'justify-end',
           isOwn ? 'flex-row' : 'flex-row-reverse'
@@ -698,7 +698,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'hidden shrink-0 items-center gap-1 [@media(hover:hover)]:group-hover/msg:flex',
+            'flex shrink-0 items-center gap-1 px-1 opacity-0 pointer-events-none [@media(hover:hover)]:group-hover/msg:opacity-100 [@media(hover:hover)]:group-hover/msg:pointer-events-auto',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
