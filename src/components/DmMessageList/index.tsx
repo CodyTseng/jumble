@@ -819,7 +819,9 @@ function MessageBubble({
                         />
                       )}
                     </div>
-                    <span className="text-xs text-muted-foreground">{r.count}</span>
+                    {r.count > 1 && (
+                      <span className="text-xs text-muted-foreground">{r.count}</span>
+                    )}
                   </div>
                 </div>
               ))}
