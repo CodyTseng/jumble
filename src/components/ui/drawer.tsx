@@ -21,6 +21,12 @@ const Drawer = ({
       })
     } else {
       modalManager.unregister(id)
+      // Ensure body scroll is restored after drawer drag-to-dismiss
+      requestAnimationFrame(() => {
+        if (!document.querySelector('[data-vaul-drawer][data-state="open"]')) {
+          document.body.style.overflow = ''
+        }
+      })
     }
   }, [open])
 
@@ -35,6 +41,11 @@ const Drawer = ({
       })
     } else {
       modalManager.unregister(id)
+      requestAnimationFrame(() => {
+        if (!document.querySelector('[data-vaul-drawer][data-state="open"]')) {
+          document.body.style.overflow = ''
+        }
+      })
     }
   }, [innerOpen])
 
