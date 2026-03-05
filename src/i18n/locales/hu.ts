@@ -788,7 +788,8 @@ export default {
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Kérelmek',
-    'dm time date': '{{date}} {{time}}'
+    'dm time date': '{{date}} {{time}}',
+    React: 'Reagálás'
 
   }
 }

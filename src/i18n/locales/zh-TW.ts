@@ -766,7 +766,8 @@ export default {
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: '請求',
-    'dm time date': '{{date}} {{time}}'
+    'dm time date': '{{date}} {{time}}',
+    React: '回應'
 
   }
 }

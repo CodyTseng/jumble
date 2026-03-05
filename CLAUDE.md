@@ -238,6 +238,10 @@ Properties:
 - `threshold`: `number` - Height threshold for hiding the tab bar on scroll down. Default is `800`. It should larger than the height of the area above the tab bar. Normally you don't need to change this value.
 - `options`: `React.ReactNode` - Additional options to display on the right side of the tab bar.
 
+## Feature Documentation
+
+- [DM (Direct Messages)](docs/dm-feature.md) - End-to-end encrypted messaging based on NIP-17
+
 ## Common Modification Scenarios
 
 ### Adding a New Component

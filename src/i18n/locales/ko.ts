@@ -788,7 +788,8 @@ export default {
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: '요청',
-    'dm time date': '{{date}} {{time}}'
+    'dm time date': '{{date}} {{time}}',
+    React: '반응'
 
   }
 }
