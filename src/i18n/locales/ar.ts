@@ -782,7 +782,8 @@ export default {
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'طلبات',
-    'dm time date': '{{date}} {{time}}'
+    'dm time date': '{{date}} {{time}}',
+    React: 'تفاعل'
 
   }
 }

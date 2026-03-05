@@ -794,7 +794,8 @@ export default {
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'अनुरोध',
-    'dm time date': '{{date}} {{time}}'
+    'dm time date': '{{date}} {{time}}',
+    React: 'प्रतिक्रिया'
 
   }
 }

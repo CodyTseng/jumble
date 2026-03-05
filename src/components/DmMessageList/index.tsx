@@ -516,16 +516,15 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
   const hasBlocks =
     isFileMessage ||
     /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
   const [copied, setCopied] = useState(false)
-  const [showActions, setShowActions] = useState(false)
   const [isEmojiOpen, setIsEmojiOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     setTimeout(() => setIsPickerOpen(false), 100)
@@ -537,12 +536,27 @@ function MessageBubble({
     setTimeout(() => setCopied(false), 2000)
   }, [message.content])
 
-  const handleTap = useCallback(() => {
-    if (!window.matchMedia('(hover: hover)').matches) {
-      setShowActions(true)
-      clearTimeout(hideTimerRef.current)
-      hideTimerRef.current = setTimeout(() => setShowActions(false), 3000)
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const longPressTriggeredRef = useRef(false)
+  const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
+
+  const handleTouchStart = useCallback(() => {
+    longPressTriggeredRef.current = false
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true
+      setIsActionDrawerOpen(true)
+    }, 500)
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    clearTimeout(longPressTimerRef.current)
+    if (longPressTriggeredRef.current) {
+      e.preventDefault()
     }
+  }, [])
+
+  const handleTouchMove = useCallback(() => {
+    clearTimeout(longPressTimerRef.current)
   }, [])
 
   const handleEmojiSelect = useCallback(
@@ -644,7 +658,9 @@ function MessageBubble({
   return (
     <div
       ref={refCallback}
-      onClick={handleTap}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
       className={cn(
         'group/msg flex w-full max-w-full flex-col',
         isOwn ? 'items-end' : 'items-start',
@@ -682,8 +698,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'flex shrink-0 items-center gap-1 opacity-0 transition-opacity [@media(hover:hover)]:group-hover/msg:opacity-100',
-            showActions && 'opacity-100',
+            'hidden shrink-0 items-center gap-1 [@media(hover:hover)]:group-hover/msg:flex',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
@@ -693,43 +708,27 @@ function MessageBubble({
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
-          {onReact &&
-            (isSmallScreen ? (
-              <>
-                {reactButton}
-                <Drawer open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
-                  <DrawerOverlay onClick={() => setIsEmojiOpen(false)} />
-                  <DrawerContent hideOverlay>
-                    <EmojiPicker
-                      onEmojiClick={(emoji) => {
-                        if (!emoji) return
-                        handleEmojiSelect(emoji)
-                      }}
-                    />
-                  </DrawerContent>
-                </Drawer>
-              </>
-            ) : (
-              <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
-                <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
-                <PopoverContent side="top" className="w-fit border-0 p-0 shadow-lg">
-                  {isPickerOpen ? (
-                    <EmojiPicker
-                      onEmojiClick={(emoji, e) => {
-                        e.stopPropagation()
-                        if (!emoji) return
-                        handleEmojiSelect(emoji)
-                      }}
-                    />
-                  ) : (
-                    <SuggestedEmojis
-                      onEmojiClick={handleEmojiSelect}
-                      onMoreButtonClick={() => setIsPickerOpen(true)}
-                    />
-                  )}
-                </PopoverContent>
-              </Popover>
-            ))}
+          {onReact && (
+            <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
+              <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
+              <PopoverContent side="top" className="w-fit border-0 p-0 shadow-lg">
+                {isPickerOpen ? (
+                  <EmojiPicker
+                    onEmojiClick={(emoji, e) => {
+                      e.stopPropagation()
+                      if (!emoji) return
+                      handleEmojiSelect(emoji)
+                    }}
+                  />
+                ) : (
+                  <SuggestedEmojis
+                    onEmojiClick={handleEmojiSelect}
+                    onMoreButtonClick={() => setIsPickerOpen(true)}
+                  />
+                )}
+              </PopoverContent>
+            </Popover>
+          )}
           {onReply && (
             <button
               onClick={() => onReply(message)}
@@ -739,6 +738,59 @@ function MessageBubble({
             </button>
           )}
         </div>
+        <Drawer open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
+          <DrawerContent>
+            <div className="flex flex-col pb-2">
+              {onReply && (
+                <button
+                  onClick={() => {
+                    setIsActionDrawerOpen(false)
+                    onReply(message)
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
+                >
+                  <Reply className="h-5 w-5 text-muted-foreground" />
+                  {t('Reply')}
+                </button>
+              )}
+              {onReact && (
+                <button
+                  onClick={() => {
+                    setIsActionDrawerOpen(false)
+                    setIsEmojiOpen(true)
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
+                >
+                  <SmilePlus className="h-5 w-5 text-muted-foreground" />
+                  {t('React')}
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  handleCopy()
+                  setIsActionDrawerOpen(false)
+                }}
+                className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
+              >
+                <Copy className="h-5 w-5 text-muted-foreground" />
+                {t('Copy')}
+              </button>
+            </div>
+          </DrawerContent>
+        </Drawer>
+        {isEmojiOpen && isSmallScreen && (
+          <Drawer open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
+            <DrawerOverlay onClick={() => setIsEmojiOpen(false)} />
+            <DrawerContent hideOverlay>
+              <EmojiPicker
+                onEmojiClick={(emoji) => {
+                  if (!emoji) return
+                  handleEmojiSelect(emoji)
+                }}
+              />
+            </DrawerContent>
+          </Drawer>
+        )}
         {sendingStatus && (
           <div className="pb-1">
             <SendingStatusIcon status={sendingStatus} />
