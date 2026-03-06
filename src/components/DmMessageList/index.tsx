@@ -662,7 +662,7 @@ function MessageBubble({
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
       className={cn(
-        'group/msg flex w-full max-w-full flex-col',
+        'group/msg flex w-full max-w-full select-none flex-col',
         isOwn ? 'items-end' : 'items-start',
         isElevated && 'relative z-10',
         hasReactions && !isLastInGroup && 'mb-7'
@@ -1004,7 +1004,7 @@ function DmContent({
             <div key={si} className={bubbleClass}>
               <div
                 className={cn(
-                  'select-text whitespace-pre-wrap text-wrap break-words text-base',
+                  'whitespace-pre-wrap text-wrap break-words text-base',
                   isOwn && '[&>div]:text-foreground',
                   '[&_.bg-card:hover]:bg-accent'
                 )}
