@@ -1,6 +1,4 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
-import Emoji from '@/components/Emoji'
-import EmojiPicker from '@/components/EmojiPicker'
 import {
   EmbeddedHashtag,
   EmbeddedLNInvoice,
@@ -8,11 +6,13 @@ import {
   EmbeddedNote,
   EmbeddedWebsocketUrl
 } from '@/components/Embedded'
+import Emoji from '@/components/Emoji'
+import EmojiPicker from '@/components/EmojiPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
 import SuggestedEmojis from '@/components/SuggestedEmojis'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
@@ -34,10 +34,9 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import cryptoFileService from '@/services/crypto-file.service'
 import dmService from '@/services/dm.service'
-import { TImetaInfo, TDmMessage, TEmoji } from '@/types'
+import { TDmMessage, TEmoji, TImetaInfo } from '@/types'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
@@ -517,7 +516,6 @@ function MessageBubble({
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
   const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
   const hasBlocks =
     isFileMessage ||
@@ -538,12 +536,16 @@ function MessageBubble({
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const longPressTriggeredRef = useRef(false)
+  const actionDrawerOpenTimeRef = useRef(0)
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
+  const [drawerMode, setDrawerMode] = useState<'actions' | 'emoji'>('actions')
 
   const handleTouchStart = useCallback(() => {
     longPressTriggeredRef.current = false
     longPressTimerRef.current = setTimeout(() => {
       longPressTriggeredRef.current = true
+      actionDrawerOpenTimeRef.current = Date.now()
+      setDrawerMode('actions')
       setIsActionDrawerOpen(true)
     }, 500)
   }, [])
@@ -740,57 +742,56 @@ function MessageBubble({
         </div>
         <Drawer open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
           <DrawerContent>
-            <div className="flex flex-col pb-2">
-              {onReply && (
+            {drawerMode === 'actions' ? (
+              <div className="flex flex-col pb-2">
+                {onReply && (
+                  <button
+                    onClick={() => {
+                      if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
+                      setIsActionDrawerOpen(false)
+                      onReply(message)
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
+                  >
+                    <Reply className="h-5 w-5 text-muted-foreground" />
+                    {t('Reply')}
+                  </button>
+                )}
+                {onReact && (
+                  <button
+                    onClick={() => {
+                      if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
+                      setDrawerMode('emoji')
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
+                  >
+                    <SmilePlus className="h-5 w-5 text-muted-foreground" />
+                    {t('React')}
+                  </button>
+                )}
                 <button
                   onClick={() => {
+                    if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
+                    handleCopy()
                     setIsActionDrawerOpen(false)
-                    onReply(message)
                   }}
                   className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
                 >
-                  <Reply className="h-5 w-5 text-muted-foreground" />
-                  {t('Reply')}
+                  <Copy className="h-5 w-5 text-muted-foreground" />
+                  {t('Copy')}
                 </button>
-              )}
-              {onReact && (
-                <button
-                  onClick={() => {
-                    setIsActionDrawerOpen(false)
-                    setIsEmojiOpen(true)
-                  }}
-                  className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
-                >
-                  <SmilePlus className="h-5 w-5 text-muted-foreground" />
-                  {t('React')}
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  handleCopy()
-                  setIsActionDrawerOpen(false)
-                }}
-                className="flex items-center gap-3 px-4 py-3 text-base active:bg-secondary"
-              >
-                <Copy className="h-5 w-5 text-muted-foreground" />
-                {t('Copy')}
-              </button>
-            </div>
-          </DrawerContent>
-        </Drawer>
-        {isEmojiOpen && isSmallScreen && (
-          <Drawer open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
-            <DrawerOverlay onClick={() => setIsEmojiOpen(false)} />
-            <DrawerContent hideOverlay>
+              </div>
+            ) : (
               <EmojiPicker
                 onEmojiClick={(emoji) => {
                   if (!emoji) return
                   handleEmojiSelect(emoji)
+                  setIsActionDrawerOpen(false)
                 }}
               />
-            </DrawerContent>
-          </Drawer>
-        )}
+            )}
+          </DrawerContent>
+        </Drawer>
         {sendingStatus && (
           <div className="pb-1">
             <SendingStatusIcon status={sendingStatus} />
