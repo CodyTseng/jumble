@@ -1,3 +1,4 @@
+export * from './useDmSupport'
 export * from './useFetchEvent'
 export * from './useFetchFollowings'
 export * from './useFetchNip05'
