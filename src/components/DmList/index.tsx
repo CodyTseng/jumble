@@ -247,7 +247,7 @@ function ConversationListContent({
 
   if (filteredConversations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-8 text-center">
         <MessageSquare className="h-16 w-16 text-muted-foreground" />
         <div className="space-y-2">
           {activeTab === 'messages' ? (
@@ -273,7 +273,7 @@ function ConversationListContent({
   }
 
   return (
-    <div className="divide-y border-b">
+    <div className="min-h-screen divide-y border-b">
       {filteredConversations.map((conv) => (
         <ConversationItem
           key={conv.key}
