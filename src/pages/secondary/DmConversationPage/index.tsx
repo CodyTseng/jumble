@@ -105,11 +105,11 @@ const DmConversationPage = forwardRef(
       <SecondaryPageLayout index={index} title={profile?.username} ref={ref} noScrollArea>
         <DmMessageList otherPubkey={pubkey} onReply={handleReply} />
         {canSendDm === null ? (
-          <div className="flex justify-center border-t p-4">
+          <div className="flex justify-center border-t p-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : canSendDm === false ? (
-          <div className="border-t p-4 text-center">
+          <div className="border-t p-4 text-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
             <p className="text-sm text-muted-foreground">
               {t('This user has not set up direct messages yet.')}
             </p>
