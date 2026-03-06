@@ -662,7 +662,7 @@ function MessageBubble({
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
       className={cn(
-        'group/msg flex w-full max-w-full flex-col',
+        'group/msg flex w-full max-w-full select-none flex-col',
         isOwn ? 'items-end' : 'items-start',
         isElevated && 'relative z-10',
         hasReactions && !isLastInGroup && 'mb-7'
@@ -698,7 +698,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'pointer-events-none flex shrink-0 items-center gap-1 px-1 opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
+            'hidden shrink-0 items-center gap-1 px-1 [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
@@ -1004,7 +1004,7 @@ function DmContent({
             <div key={si} className={bubbleClass}>
               <div
                 className={cn(
-                  'select-text whitespace-pre-wrap text-wrap break-words text-base',
+                  'whitespace-pre-wrap text-wrap break-words text-base',
                   isOwn && '[&>div]:text-foreground',
                   '[&_.bg-card:hover]:bg-accent'
                 )}

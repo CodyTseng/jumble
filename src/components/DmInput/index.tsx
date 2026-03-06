@@ -225,6 +225,7 @@ export default function DmInput({
   const [emojiQuery, setEmojiQuery] = useState<string | null>(null)
   const [emojiResults, setEmojiResults] = useState<TEmoji[]>([])
   const [emojiIndex, setEmojiIndex] = useState(0)
+  const [isFocused, setIsFocused] = useState(false)
   const emojisRef = useRef<Map<string, string>>(new Map())
 
   const isUploading = mediaItems.some((item) => item.status === 'uploading')
@@ -705,7 +706,7 @@ export default function DmInput({
   const canSend = (content.trim().length > 0 || doneItems.length > 0) && !disabled && !isUploading
 
   return (
-    <div className="relative border-t bg-background px-4 py-2">
+    <div className="relative border-t bg-background px-4 pt-2" style={!isFocused ? { paddingBottom: 'env(safe-area-inset-bottom)' } : undefined}>
       {mentionQuery !== null && mentionResults.length > 0 && (
         <div
           className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
@@ -842,6 +843,8 @@ export default function DmInput({
           onKeyDown={handleKeyDown}
           onClick={detectAutocomplete}
           onKeyUp={detectAutocomplete}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           data-placeholder={t('Type a message...')}
           className={cn(
             'max-h-40 min-h-[36px] flex-1 select-text overflow-y-auto break-words bg-transparent py-2 text-base focus:outline-none',

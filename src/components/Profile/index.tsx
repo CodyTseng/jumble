@@ -3,7 +3,6 @@ import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
 import NpubQrCode from '@/components/NpubQrCode'
 import ProfileAbout from '@/components/ProfileAbout'
-import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import { Button } from '@/components/ui/button'
@@ -123,7 +122,6 @@ export default function Profile({ id }: { id?: string }) {
         </div>
         <div className="px-4">
           <div className="flex h-8 items-center justify-end gap-2">
-            <ProfileOptions pubkey={pubkey} />
             {isSelf ? (
               <Button
                 className="w-20 min-w-20 rounded-full"

@@ -14,7 +14,15 @@ import { Bell, BellOff, Copy, Ellipsis } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function ProfileOptions({ pubkey }: { pubkey: string }) {
+export default function ProfileOptions({
+  pubkey,
+  variant = 'secondary',
+  size = 'icon'
+}: {
+  pubkey: string
+  variant?: 'secondary' | 'ghost'
+  size?: 'icon' | 'titlebar-icon'
+}) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey: accountPubkey } = useNostr()
@@ -26,9 +34,9 @@ export default function ProfileOptions({ pubkey }: { pubkey: string }) {
 
   const trigger = (
     <Button
-      variant="secondary"
-      size="icon"
-      className="rounded-full"
+      variant={variant}
+      size={size}
+      className={variant === 'secondary' ? 'rounded-full' : undefined}
       onClick={() => {
         if (isSmallScreen) {
           setIsDrawerOpen(true)
