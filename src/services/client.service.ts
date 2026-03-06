@@ -175,6 +175,7 @@ class ClientService extends EventTarget {
     await new Promise<void>((resolve, reject) => {
       let successCount = 0
       let finishedCount = 0
+      let resolved = false
       // If one third of the relays have accepted the event, consider it a success
       const successThreshold = uniqueRelayUrls.length / 3
       const errors: { url: string; error: any }[] = []
@@ -188,8 +189,15 @@ class ClientService extends EventTarget {
         }
         finishedCount++
 
-        if (successCount >= successThreshold) {
+        if (!resolved && successCount >= successThreshold) {
+          resolved = true
           this.emitNewEvent(event, uniqueRelayUrls)
+          if (
+            event.kind === ExtendedKind.DM_RELAYS ||
+            event.kind === ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT
+          ) {
+            this.updateReplaceableEventCache(event)
+          }
           resolve()
         }
         if (finishedCount >= uniqueRelayUrls.length) {
