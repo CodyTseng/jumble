@@ -729,7 +729,7 @@ export default {
     Conversation: 'Conversa',
     'Invalid user': 'Usuário inválido',
     'This user has not set up direct messages yet.': 'Este usuário ainda não configurou mensagens diretas.',
-    'Sign in to use Messages': 'Entre para usar o Bate-papo',
+    'Sign in to use Messages': 'Entre para acessar o Bate-papo',
     'You need to be signed in to send and receive direct messages.':
       'Você precisa estar conectado para enviar e receber mensagens diretas.',
     'Sign In': 'Entrar',
