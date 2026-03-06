@@ -686,7 +686,7 @@ export default {
     'Copy note content': 'Copiar conteúdo da nota',
     'Video loop': 'Repetir vídeo',
     'Automatically replay videos when they end': 'Reproduzir automaticamente os vídeos quando terminarem',
-    Messages: 'Mensagens',
+    Messages: 'Bate-papo',
     Message: 'Mensagem',
     'Configure DM Relays': 'Configurar relays de mensagens diretas',
     'Select relays to use for direct messages. These relays will receive your encrypted messages.':
