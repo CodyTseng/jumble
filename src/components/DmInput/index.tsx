@@ -15,6 +15,7 @@ import customEmojiService from '@/services/custom-emoji.service'
 import dmService from '@/services/dm.service'
 import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from '@/services/media-upload.service'
 import { TEmoji, TProfile } from '@/types'
+import { nip19 } from 'nostr-tools'
 import { base64 } from '@scure/base'
 import { rgbaToThumbHash } from 'thumbhash'
 import {
@@ -445,6 +446,29 @@ export default function DmInput({
     mentionsRef.current.forEach((npub, displayText) => {
       text = text.split(`@${displayText}`).join(`nostr:${npub}`)
     })
+    // Add nostr: prefix to bare nostr identifiers
+    text = text.replace(
+      /(^|\s+|@)(nostr:)?(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g,
+      (match, leadingWhitespace) => {
+        let bech32 = match.trim()
+        const whitespace = leadingWhitespace || ''
+
+        if (bech32.startsWith('@nostr:')) {
+          bech32 = bech32.slice(7)
+        } else if (bech32.startsWith('@')) {
+          bech32 = bech32.slice(1)
+        } else if (bech32.startsWith('nostr:')) {
+          bech32 = bech32.slice(6)
+        }
+
+        try {
+          nip19.decode(bech32)
+          return `${whitespace}nostr:${bech32}`
+        } catch {
+          return match
+        }
+      }
+    )
     const emojiTags: string[][] = []
     emojisRef.current.forEach((url, shortcode) => {
       emojiTags.push(['emoji', shortcode, url])
@@ -549,7 +573,7 @@ export default function DmInput({
         return
       }
     }
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
       e.preventDefault()
       handleSend()
     }
