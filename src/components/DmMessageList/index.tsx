@@ -691,14 +691,14 @@ function MessageBubble({
       <div
         className={cn(
           'flex min-w-0 max-w-full items-end gap-1',
-          hasBlocks && 'w-full',
+          hasBlocks && !isOwn && 'w-full',
           isFileMessage && 'justify-end',
           isOwn ? 'flex-row' : 'flex-row-reverse'
         )}
       >
         <div
           className={cn(
-            'hidden shrink-0 items-center gap-1 px-1 [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
+            'hidden shrink-0 items-center gap-1 px-1 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
@@ -992,7 +992,7 @@ function DmContent({
   return (
     <div
       className={cn(
-        'flex min-w-0 max-w-full flex-col gap-1 rounded-lg transition-all duration-500',
+        'flex min-w-0 max-w-full flex-col gap-0.5 rounded-lg transition-all duration-500',
         segments.some((s) => s.kind === 'block') && 'flex-1',
         isOwn ? 'items-end' : 'items-start',
         isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
@@ -1005,7 +1005,8 @@ function DmContent({
               <div
                 className={cn(
                   'whitespace-pre-wrap text-wrap break-words text-base',
-                  isOwn && '[&>div]:text-foreground',
+                  isOwn &&
+                    '[&>div]:text-foreground [&_.text-primary]:text-primary-foreground [&_.text-primary]:underline [&_.text-primary]:decoration-primary-foreground/50',
                   '[&_.bg-card:hover]:bg-accent'
                 )}
               >
