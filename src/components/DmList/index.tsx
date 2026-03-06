@@ -57,6 +57,7 @@ export default function DmList() {
   const [trustedPubkeys, setTrustedPubkeys] = useState<Set<string> | null>(null)
   const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.DM)
   const supportTouch = useMemo(() => isTouchDevice(), [])
+  const [isPullable, setIsPullable] = useState(true)
 
   const refresh = useCallback(async () => {
     await dmService.reinit()
@@ -200,6 +201,7 @@ export default function DmList() {
       />
       {supportTouch ? (
         <PullToRefresh
+          isPullable={isPullable}
           onRefresh={async () => {
             await refresh()
             await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -211,6 +213,7 @@ export default function DmList() {
             activeTab={activeTab}
             onConversationClick={handleConversationClick}
             onDelete={(conv) => setDeleteTarget(conv)}
+            onSwipeStateChange={setIsPullable}
           />
         </PullToRefresh>
       ) : (
@@ -236,12 +239,14 @@ function ConversationListContent({
   filteredConversations,
   activeTab,
   onConversationClick,
-  onDelete
+  onDelete,
+  onSwipeStateChange
 }: {
   filteredConversations: TDmConversation[]
   activeTab: TDmTab
   onConversationClick: (conv: TDmConversation) => void
   onDelete: (conv: TDmConversation) => void
+  onSwipeStateChange?: (pullable: boolean) => void
 }) {
   const { t } = useTranslation()
 
@@ -280,6 +285,7 @@ function ConversationListContent({
           conversation={conv}
           onClick={() => onConversationClick(conv)}
           onDelete={() => onDelete(conv)}
+          onSwipeStateChange={onSwipeStateChange}
         />
       ))}
     </div>
@@ -289,11 +295,13 @@ function ConversationListContent({
 function ConversationItem({
   conversation,
   onClick,
-  onDelete
+  onDelete,
+  onSwipeStateChange
 }: {
   conversation: TDmConversation
   onClick: () => void
   onDelete: () => void
+  onSwipeStateChange?: (pullable: boolean) => void
 }) {
   const { isSmallScreen } = useScreenSize()
   const timeAgo = dayjs.unix(conversation.lastMessageAt).fromNow()
@@ -305,6 +313,7 @@ function ConversationItem({
         timeAgo={timeAgo}
         onClick={onClick}
         onDelete={onDelete}
+        onSwipeStateChange={onSwipeStateChange}
       />
     )
   }
@@ -385,12 +394,14 @@ function SwipeableConversationItem({
   conversation,
   timeAgo,
   onClick,
-  onDelete
+  onDelete,
+  onSwipeStateChange
 }: {
   conversation: TDmConversation
   timeAgo: string
   onClick: () => void
   onDelete: () => void
+  onSwipeStateChange?: (pullable: boolean) => void
 }) {
   const { t } = useTranslation()
   const slideRef = useRef<HTMLDivElement>(null)
@@ -426,6 +437,9 @@ function SwipeableConversationItem({
       if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
         directionLockedRef.current = true
         isSwipingRef.current = Math.abs(deltaX) > Math.abs(deltaY)
+        if (isSwipingRef.current) {
+          onSwipeStateChange?.(false)
+        }
       }
       return
     }
@@ -437,6 +451,9 @@ function SwipeableConversationItem({
   }
 
   const handleTouchEnd = () => {
+    if (isSwipingRef.current) {
+      onSwipeStateChange?.(true)
+    }
     if (!isSwipingRef.current) return
 
     if (currentX.current < -THRESHOLD / 2) {
