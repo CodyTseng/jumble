@@ -698,7 +698,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'pointer-events-none flex shrink-0 items-center gap-1 px-1 opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
+            'hidden shrink-0 items-center gap-1 px-1 [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
