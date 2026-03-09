@@ -213,7 +213,13 @@ const NotificationList = forwardRef((_, ref) => {
   }, [timelineKey, until, pubkey, setEvents, setUntil])
 
   const notifications = useMemo(() => {
-    const filteredEvents = events.filter((evt) => evt.pubkey !== pubkey)
+    const idSet = new Set<string>()
+    const filteredEvents = events.filter((evt) => {
+      if (evt.pubkey === pubkey) return false
+      if (idSet.has(evt.id)) return false
+      idSet.add(evt.id)
+      return true
+    })
     if (storedEvents.length === 0) return filteredEvents
 
     const filteredStoredEvents = storedEvents.filter((evt) => evt.pubkey !== pubkey)

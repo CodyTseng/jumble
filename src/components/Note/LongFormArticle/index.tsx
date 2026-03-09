@@ -96,7 +96,7 @@ export default function LongFormArticle({
         <h1 className="break-words">{metadata.title}</h1>
         {metadata.summary && (
           <blockquote>
-            <p className="break-words">{metadata.summary}</p>
+            <p className="whitespace-pre-line break-words">{metadata.summary}</p>
           </blockquote>
         )}
         {metadata.image && (

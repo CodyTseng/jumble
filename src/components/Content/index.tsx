@@ -10,6 +10,7 @@ import {
   parseContent
 } from '@/lib/content-parser'
 import { getImetaInfosFromEvent } from '@/lib/event'
+import { containsMarkdown } from '@/lib/markdown'
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
 import mediaUpload from '@/services/media-upload.service'
@@ -27,6 +28,7 @@ import Emoji from '../Emoji'
 import ExternalLink from '../ExternalLink'
 import HighlightButton from '../HighlightButton'
 import ImageGallery from '../ImageGallery'
+import MarkdownContent from '../MarkdownContent'
 import MediaPlayer from '../MediaPlayer'
 import PostEditor from '../PostEditor'
 import WebPreview from '../WebPreview'
@@ -50,9 +52,11 @@ export default function Content({
   const [showHighlightEditor, setShowHighlightEditor] = useState(false)
   const [selectedText, setSelectedText] = useState('')
   const translatedEvent = useTranslatedEvent(event?.id)
+  const resolvedContent = translatedEvent?.content ?? event?.content ?? content
+  const isMarkdown = useMemo(() => resolvedContent ? containsMarkdown(resolvedContent) : false, [resolvedContent])
   const { nodes, allImages, lastNormalUrl, emojiInfos } = useMemo(() => {
-    const _content = translatedEvent?.content ?? event?.content ?? content
-    if (!_content) return {}
+    if (!resolvedContent || isMarkdown) return {}
+    const _content = resolvedContent
 
     const nodes = parseContent(_content, [
       EmbeddedEventParser,
@@ -96,15 +100,40 @@ export default function Content({
       typeof lastNormalUrlNode?.data === 'string' ? lastNormalUrlNode.data : undefined
 
     return { nodes, allImages, emojiInfos, lastNormalUrl }
-  }, [event, translatedEvent, content])
-
-  if (!nodes || nodes.length === 0) {
-    return null
-  }
+  }, [event, resolvedContent, isMarkdown])
 
   const handleHighlight = (text: string) => {
     setSelectedText(text)
     setShowHighlightEditor(true)
+  }
+
+  if (!resolvedContent) {
+    return null
+  }
+
+  if (isMarkdown) {
+    return (
+      <>
+        <div ref={contentRef} className={cn('text-wrap break-words', className)}>
+          <MarkdownContent content={resolvedContent} event={event} />
+        </div>
+        {enableHighlight && (
+          <HighlightButton onHighlight={handleHighlight} containerRef={contentRef} />
+        )}
+        {enableHighlight && (
+          <PostEditor
+            highlightedText={selectedText}
+            parentStuff={event}
+            open={showHighlightEditor}
+            setOpen={setShowHighlightEditor}
+          />
+        )}
+      </>
+    )
+  }
+
+  if (!nodes || nodes.length === 0) {
+    return null
   }
 
   let imageIndex = 0
