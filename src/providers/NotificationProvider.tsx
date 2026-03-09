@@ -1,3 +1,4 @@
+import { useDmUnread } from '@/hooks/useDmUnread'
 import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import { compareEvents } from '@/lib/event'
 import { notificationFilter } from '@/lib/notification'
@@ -39,6 +40,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
   const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
+  const { unreadCount: dmUnreadCount } = useDmUnread()
 
   useEffect(() => {
     if (active || notificationsSeenAt < 0) {
@@ -150,11 +152,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [pubkey])
 
   useEffect(() => {
-    const newNotificationCount = filteredNewNotifications.length
+    const totalBadgeCount = filteredNewNotifications.length + dmUnreadCount
 
     // Update title
-    if (newNotificationCount > 0) {
-      document.title = `(${newNotificationCount >= 10 ? '9+' : newNotificationCount}) Jumble`
+    if (totalBadgeCount > 0) {
+      document.title = `(${totalBadgeCount >= 10 ? '9+' : totalBadgeCount}) Jumble`
     } else {
       document.title = 'Jumble'
     }
@@ -163,7 +165,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const favicons = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']")
     if (!favicons.length) return
 
-    if (newNotificationCount === 0) {
+    if (totalBadgeCount === 0) {
       favicons.forEach((favicon) => {
         favicon.href = '/favicon.ico'
       })
@@ -188,7 +190,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         })
       }
     }
-  }, [filteredNewNotifications])
+  }, [filteredNewNotifications, dmUnreadCount])
 
   const getNotificationsSeenAt = () => {
     if (notificationsSeenAt >= 0) {

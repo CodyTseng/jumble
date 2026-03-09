@@ -2,7 +2,7 @@ import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useSecondaryPage } from '@/PageManager'
+import { useBottomBar, useSecondaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -20,6 +20,7 @@ const SecondaryPageLayout = forwardRef(
       hideBackButton = false,
       hideTitlebarBottomBorder = false,
       displayScrollToTopButton = false,
+      noScrollArea = false,
       titlebar
     }: {
       children?: React.ReactNode
@@ -29,6 +30,7 @@ const SecondaryPageLayout = forwardRef(
       hideBackButton?: boolean
       hideTitlebarBottomBorder?: boolean
       displayScrollToTopButton?: boolean
+      noScrollArea?: boolean
       titlebar?: React.ReactNode
     },
     ref
@@ -36,6 +38,7 @@ const SecondaryPageLayout = forwardRef(
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const { enableSingleColumnLayout } = useUserPreferences()
     const { currentIndex } = useSecondaryPage()
+    const { hidden: bottomBarHidden } = useBottomBar()
 
     useImperativeHandle(
       ref,
@@ -64,9 +67,20 @@ const SecondaryPageLayout = forwardRef(
         <PageActiveContext.Provider value={currentIndex === index}>
           <DeepBrowsingProvider active={currentIndex === index}>
             <div
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-              }}
+              className={noScrollArea ? 'flex flex-col' : undefined}
+              style={
+                noScrollArea
+                  ? {
+                      height: bottomBarHidden
+                        ? 'var(--vh)'
+                        : 'calc(var(--vh) - env(safe-area-inset-bottom) - 3rem)'
+                    }
+                  : bottomBarHidden
+                    ? undefined
+                    : {
+                        paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+                      }
+              }
             >
               <SecondaryPageTitlebar
                 title={title}
@@ -75,9 +89,32 @@ const SecondaryPageLayout = forwardRef(
                 hideBottomBorder={hideTitlebarBottomBorder}
                 titlebar={titlebar}
               />
-              {children}
+              {noScrollArea ? (
+                <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+              ) : (
+                children
+              )}
             </div>
             {displayScrollToTopButton && <ScrollToTopButton />}
+          </DeepBrowsingProvider>
+        </PageActiveContext.Provider>
+      )
+    }
+
+    if (noScrollArea) {
+      return (
+        <PageActiveContext.Provider value={currentIndex === index}>
+          <DeepBrowsingProvider active={currentIndex === index}>
+            <div className="flex h-full flex-col">
+              <SecondaryPageTitlebar
+                title={title}
+                controls={controls}
+                hideBackButton={hideBackButton}
+                hideBottomBorder={hideTitlebarBottomBorder}
+                titlebar={titlebar}
+              />
+              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+            </div>
           </DeepBrowsingProvider>
         </PageActiveContext.Provider>
       )
