@@ -855,6 +855,19 @@ class LocalStorageService {
     )
   }
 
+  clearDmSyncState(accountPubkey: string) {
+    delete this.dmLastSyncedAtMap[accountPubkey]
+    delete this.dmBackwardCursorMap[accountPubkey]
+    window.localStorage.setItem(
+      StorageKey.DM_LAST_SYNCED_AT_MAP,
+      JSON.stringify(this.dmLastSyncedAtMap)
+    )
+    window.localStorage.setItem(
+      StorageKey.DM_BACKWARD_CURSOR_MAP,
+      JSON.stringify(this.dmBackwardCursorMap)
+    )
+  }
+
   getDmLastSyncedAt(accountPubkey: string): number {
     return this.dmLastSyncedAtMap[accountPubkey] ?? 0
   }

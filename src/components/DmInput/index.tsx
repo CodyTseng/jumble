@@ -59,9 +59,7 @@ type MediaItem = {
 
 const THUMBHASH_MAX_SIZE = 100
 
-function getMediaMeta(
-  file: File
-): Promise<{ dim?: string; thumbHash?: string }> {
+function getMediaMeta(file: File): Promise<{ dim?: string; thumbHash?: string }> {
   return new Promise((resolve) => {
     if (file.type.startsWith('image/')) {
       const img = new window.Image()
@@ -613,7 +611,9 @@ export default function DmInput({
         })
         const result = await mediaUpload.upload(encryptedFile, {
           onProgress: (p) => {
-            setMediaItems((prev) => prev.map((item) => (item.id === id ? { ...item, progress: p } : item)))
+            setMediaItems((prev) =>
+              prev.map((item) => (item.id === id ? { ...item, progress: p } : item))
+            )
           },
           signal: abortController.signal
         })
@@ -730,7 +730,12 @@ export default function DmInput({
   const canSend = (content.trim().length > 0 || doneItems.length > 0) && !disabled && !isUploading
 
   return (
-    <div className="relative border-t bg-background px-4 pt-2" style={!isFocused ? { paddingBottom: 'env(safe-area-inset-bottom)' } : undefined}>
+    <div
+      className="relative border-t bg-background px-4 pt-1"
+      style={{
+        paddingBottom: !isFocused ? 'calc(env(safe-area-inset-bottom) + 0.25rem)' : '0.25rem'
+      }}
+    >
       {mentionQuery !== null && mentionResults.length > 0 && (
         <div
           className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
@@ -753,10 +758,7 @@ export default function DmInput({
               <SimpleUserAvatar userId={profile.npub} size="small" />
               <div className="w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <SimpleUsername
-                    userId={profile.npub}
-                    className="truncate font-semibold"
-                  />
+                  <SimpleUsername userId={profile.npub} className="truncate font-semibold" />
                   <FollowingBadge userId={profile.npub} />
                 </div>
                 <Nip05 pubkey={userIdToPubkey(profile.npub)} />
