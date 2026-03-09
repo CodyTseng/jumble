@@ -465,6 +465,7 @@ export default function DmMessageList({
                         />
                       ))}
                     </div>
+                    {group.isOwn && <div className="w-9 shrink-0" />}
                   </div>
                 </Fragment>
               )
