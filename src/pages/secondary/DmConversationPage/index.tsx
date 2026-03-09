@@ -47,9 +47,8 @@ const DmConversationPage = forwardRef(
     }, [])
 
     useEffect(() => {
-      setHidden(true)
-      return () => setHidden(false)
-    }, [setHidden])
+      setHidden(active)
+    }, [setHidden, active])
     const pubkey = useMemo(() => {
       if (pubkeyOrNpub?.startsWith('npub')) {
         try {
