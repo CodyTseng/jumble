@@ -51,8 +51,8 @@ class DmService {
     try {
       let since = storage.getDmLastSyncedAt(accountPubkey)
       if (since && !(await indexedDb.hasDmMessages())) {
+        storage.clearDmSyncState(accountPubkey)
         since = 0
-        storage.setDmBackwardCursor(accountPubkey, 0)
       }
       await this.initMessages(accountPubkey, encryptionKeypair, since || undefined)
       storage.setDmLastSyncedAt(accountPubkey, Math.floor(Date.now() / 1000))
@@ -308,7 +308,7 @@ class DmService {
       while (true) {
         const events = await client.fetchEvents(myDmRelays, {
           kinds: [ExtendedKind.GIFT_WRAP],
-          '#p': [encryptionKeypair.pubkey],
+          '#p': [accountPubkey],
           since: _since,
           limit: BATCH_LIMIT
         })
@@ -328,7 +328,7 @@ class DmService {
     while (true) {
       const filter: Filter = {
         kinds: [ExtendedKind.GIFT_WRAP],
-        '#p': [encryptionKeypair.pubkey],
+        '#p': [accountPubkey],
         limit: BATCH_LIMIT
       }
       if (backwardCursor && backwardCursor > 0) {
@@ -345,7 +345,12 @@ class DmService {
       this.emitDataChanged()
 
       // events already sorted desc by fetchEvents, oldest is last
-      backwardCursor = events[events.length - 1].created_at
+      const newCursor = events[events.length - 1].created_at - 1
+      if (newCursor >= (backwardCursor ?? Infinity)) {
+        storage.setDmBackwardCursor(accountPubkey, 0)
+        break
+      }
+      backwardCursor = newCursor
       storage.setDmBackwardCursor(accountPubkey, backwardCursor)
     }
   }
@@ -814,8 +819,7 @@ class DmService {
   }
 
   getConversationKey(accountPubkey: string, otherPubkey: string): string {
-    const sorted = [accountPubkey, otherPubkey].sort()
-    return `${sorted[0]}:${sorted[1]}`
+    return `${accountPubkey}:${otherPubkey}`
   }
 
   private isFromMe(senderPubkey: string, accountPubkey: string, encryptionPubkey: string): boolean {
@@ -971,9 +975,7 @@ class DmService {
       }
 
       // Filter out reactions for conversation summary
-      const chatMessages = allMessages.filter(
-        (m) => m.decryptedRumor?.kind !== kinds.Reaction
-      )
+      const chatMessages = allMessages.filter((m) => m.decryptedRumor?.kind !== kinds.Reaction)
 
       // Sort messages by time to find latest
       const sortedMessages = chatMessages.sort((a, b) => b.createdAt - a.createdAt)

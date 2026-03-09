@@ -51,7 +51,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 17)
+        const request = window.indexedDB.open('jumble', 19)
 
         request.onerror = (event) => {
           reject(event)
@@ -62,8 +62,9 @@ class IndexedDbService {
           resolve()
         }
 
-        request.onupgradeneeded = () => {
+        request.onupgradeneeded = (event) => {
           const db = request.result
+          const oldVersion = (event as IDBVersionChangeEvent).oldVersion
           if (!db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
             db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
           }
@@ -158,6 +159,20 @@ class IndexedDbService {
           if (db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
             db.deleteObjectStore(StoreNames.MUTE_DECRYPTED_TAGS)
           }
+
+          // v19: Clear DM data to re-sync with account-scoped conversation keys
+          if (oldVersion > 0 && oldVersion < 19) {
+            if (db.objectStoreNames.contains(StoreNames.DM_CONVERSATIONS)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.DM_CONVERSATIONS).clear()
+            }
+            if (db.objectStoreNames.contains(StoreNames.DM_MESSAGES)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.DM_MESSAGES).clear()
+            }
+            window.localStorage.removeItem('dmDeletedConversationsMap')
+          }
+
           this.db = db
         }
       })
@@ -644,7 +659,7 @@ class IndexedDbService {
         const cursor = (event.target as IDBRequest).result
         if (cursor) {
           const conversation = cursor.value as TDmConversation
-          if (conversation.key.includes(accountPubkey)) {
+          if (conversation.key.startsWith(accountPubkey + ':')) {
             results.push(conversation)
           }
           cursor.continue()
