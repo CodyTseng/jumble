@@ -47,9 +47,8 @@ const DmConversationPage = forwardRef(
     }, [])
 
     useEffect(() => {
-      setHidden(true)
-      return () => setHidden(false)
-    }, [setHidden])
+      setHidden(active)
+    }, [setHidden, active])
     const pubkey = useMemo(() => {
       if (pubkeyOrNpub?.startsWith('npub')) {
         try {
@@ -105,11 +104,23 @@ const DmConversationPage = forwardRef(
       <SecondaryPageLayout index={index} title={profile?.username} ref={ref} noScrollArea>
         <DmMessageList otherPubkey={pubkey} onReply={handleReply} />
         {canSendDm === null ? (
-          <div className="flex justify-center border-t p-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div
+            className="flex justify-center border-t"
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 14.5px)',
+              paddingTop: '14.5px'
+            }}
+          >
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : canSendDm === false ? (
-          <div className="border-t p-4 text-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div
+            className="border-t text-center"
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 14.5px)',
+              paddingTop: '14.5px'
+            }}
+          >
             <p className="text-sm text-muted-foreground">
               {t('This user has not set up direct messages yet.')}
             </p>
