@@ -200,14 +200,7 @@ export default function DmList() {
         active={trustFilterOpen}
       />
       {supportTouch ? (
-        <PullToRefresh
-          isPullable={isPullable}
-          onRefresh={async () => {
-            await refresh()
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-          }}
-          pullingContent=""
-        >
+        <PullToRefresh isPullable={isPullable} onRefresh={refresh} pullingContent="">
           <ConversationListContent
             filteredConversations={filteredConversations}
             activeTab={activeTab}
