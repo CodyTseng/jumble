@@ -577,10 +577,8 @@ export default function DmInput({
     }
   }
 
-  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return
-
-    for (const file of event.target.files) {
+  const uploadFiles = useCallback(async (files: File[]) => {
+    for (const file of files) {
       const id = Math.random().toString(36).slice(2) + Date.now().toString(36)
       const previewUrl = URL.createObjectURL(file)
       const abortController = new AbortController()
@@ -649,11 +647,29 @@ export default function DmInput({
         })
       }
     }
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
   }, [])
+
+  const handleFileSelect = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files) return
+      await uploadFiles(Array.from(event.target.files))
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    },
+    [uploadFiles]
+  )
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent) => {
+      const files = Array.from(e.clipboardData.files)
+      if (files.length > 0) {
+        e.preventDefault()
+        uploadFiles(files)
+      }
+    },
+    [uploadFiles]
+  )
 
   const handleRemoveItem = useCallback((id: string) => {
     setMediaItems((prev) => {
@@ -867,6 +883,7 @@ export default function DmInput({
           contentEditable={!disabled}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           onClick={detectAutocomplete}
           onKeyUp={detectAutocomplete}
           onFocus={() => setIsFocused(true)}
