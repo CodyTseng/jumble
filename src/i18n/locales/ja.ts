@@ -165,7 +165,7 @@ export default {
     'Send only to r': '{{r}} にのみ送信',
     'Send only to these relays': 'これらのリレイにのみ送信',
     Explore: '探索',
-    'Search relays': 'リレイを検索',
+    'Search relays': '検索リレー',
     relayInfoBadgeAuth: '認証',
     relayInfoBadgeSearch: '検索',
     relayInfoBadgePayment: '支払い',
@@ -795,7 +795,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'リクエスト',
     'dm time date': '{{date}} {{time}}',
-    React: 'リアクション'
-
+    React: 'リアクション',
+    'Relays used for searching notes (NIP-50)': 'ノート検索に使用するリレー (NIP-50)'
   }
 }

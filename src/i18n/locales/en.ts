@@ -791,7 +791,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Requests',
     'dm time date': '{{date}} {{time}}',
-    React: 'React'
-
+    React: 'React',
+    'Relays used for searching notes (NIP-50)': 'Relays used for searching notes (NIP-50)'
   }
 }

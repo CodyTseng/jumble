@@ -165,7 +165,7 @@ export default {
     'Send only to r': 'Küldés csak a {{r}} csomópontra',
     'Send only to these relays': 'Küldés csak ezekre a csomópontokra',
     Explore: 'Felderítés',
-    'Search relays': 'Csomópontok kereséshez',
+    'Search relays': 'Keresési csomópontok',
     relayInfoBadgeAuth: 'Auth',
     relayInfoBadgeSearch: 'Keresés',
     relayInfoBadgePayment: 'Fizetés',
@@ -789,7 +789,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Kérelmek',
     'dm time date': '{{date}} {{time}}',
-    React: 'Reagálás'
-
+    React: 'Reagálás',
+    'Relays used for searching notes (NIP-50)': 'Jegyzetek kereséséhez használt csomópontok (NIP-50)'
   }
 }

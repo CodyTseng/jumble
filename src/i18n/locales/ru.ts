@@ -168,7 +168,7 @@ export default {
     'Send only to r': 'Отправить только на {{r}}',
     'Send only to these relays': 'Отправить только на эти ретрансляторы',
     Explore: 'Обзор',
-    'Search relays': 'Поиск ретрансляторов',
+    'Search relays': 'Ретрансляторы для поиска',
     relayInfoBadgeAuth: 'Авторизация',
     relayInfoBadgeSearch: 'Поиск',
     relayInfoBadgePayment: 'Платежи',
@@ -800,7 +800,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Запросы',
     'dm time date': '{{date}} {{time}}',
-    React: 'Реакция'
-
+    React: 'Реакция',
+    'Relays used for searching notes (NIP-50)': 'Ретрансляторы для поиска заметок (NIP-50)'
   }
 }

@@ -166,7 +166,7 @@ export default {
     'Send only to r': 'Invia solo a {{r}}',
     'Send only to these relays': 'Invia solo a questi relay',
     Explore: 'Esplora',
-    'Search relays': 'Ricerca relay',
+    'Search relays': 'Relay di ricerca',
     relayInfoBadgeAuth: 'Autorizzazione',
     relayInfoBadgeSearch: 'Ricerca',
     relayInfoBadgePayment: 'Pagamento',
@@ -800,7 +800,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Richieste',
     'dm time date': '{{date}} {{time}}',
-    React: 'Reagisci'
-
+    React: 'Reagisci',
+    'Relays used for searching notes (NIP-50)': 'Relay utilizzati per cercare le note (NIP-50)'
   }
 }

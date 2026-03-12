@@ -1,4 +1,5 @@
 import DefaultRelaysSetting from '@/components/DefaultRelaysSetting'
+import SearchRelaysSetting from '@/components/SearchRelaysSetting'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -46,6 +47,9 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         </div>
         <div className="space-y-2 px-4">
           <DefaultRelaysSetting />
+        </div>
+        <div className="space-y-2 px-4">
+          <SearchRelaysSetting />
         </div>
       </div>
     </SecondaryPageLayout>

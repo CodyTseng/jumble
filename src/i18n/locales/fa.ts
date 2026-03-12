@@ -165,7 +165,7 @@ export default {
     'Send only to r': 'فقط به {{r}} ارسال شود',
     'Send only to these relays': 'فقط به این رله‌ها ارسال شود',
     Explore: 'کاوش',
-    'Search relays': 'جستجو رله‌ها',
+    'Search relays': 'رله‌های جستجو',
     relayInfoBadgeAuth: 'احراز هویت',
     relayInfoBadgeSearch: 'جستجو',
     relayInfoBadgePayment: 'پرداخت',
@@ -795,7 +795,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'درخواست‌ها',
     'dm time date': '{{date}} {{time}}',
-    React: 'واکنش'
-
+    React: 'واکنش',
+    'Relays used for searching notes (NIP-50)': 'رله‌هایی که برای جستجوی یادداشت‌ها استفاده می‌شوند (NIP-50)'
   }
 }

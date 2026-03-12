@@ -772,7 +772,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: '请求',
     'dm time date': '{{date}} {{time}}',
-    React: '回应'
-
+    React: '回应',
+    'Relays used for searching notes (NIP-50)': '用于搜索笔记的服务器 (NIP-50)'
   }
 }

@@ -166,7 +166,7 @@ export default {
     'Send only to r': '{{r}}에만 전송',
     'Send only to these relays': '이 릴레이에만 전송',
     Explore: '탐색',
-    'Search relays': '릴레이 검색',
+    'Search relays': '검색 릴레이',
     relayInfoBadgeAuth: '로그인 필요',
     relayInfoBadgeSearch: '검색 지원',
     relayInfoBadgePayment: '유료',
@@ -789,7 +789,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: '요청',
     'dm time date': '{{date}} {{time}}',
-    React: '반응'
-
+    React: '반응',
+    'Relays used for searching notes (NIP-50)': '노트 검색에 사용되는 릴레이 (NIP-50)'
   }
 }

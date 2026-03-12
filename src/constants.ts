@@ -47,6 +47,7 @@ export const StorageKey = {
   MUTED_WORDS: 'mutedWords',
   MIN_TRUST_SCORE: 'minTrustScore',
   MIN_TRUST_SCORE_MAP: 'minTrustScoreMap',
+  SEARCH_RELAY_URLS: 'searchRelayUrls',
   HIDE_INDIRECT_NOTIFICATIONS: 'hideIndirectNotifications',
   ENCRYPTION_KEY_PRIVKEY_MAP: 'encryptionKeyPrivkeyMap',
   CLIENT_KEY_PRIVKEY_MAP: 'clientKeyPrivkeyMap',
@@ -83,11 +84,7 @@ export const BIG_RELAY_URLS = [
   'wss://offchain.pub/'
 ]
 
-export const SEARCHABLE_RELAY_URLS = [
-  'wss://search.nos.today/',
-  'wss://relay.ditto.pub/',
-  'wss://relay.nostr.band/'
-]
+export const SEARCHABLE_RELAY_URLS = ['wss://search.nos.today/', 'wss://relay.nostr.band/']
 
 export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 

@@ -1,4 +1,4 @@
-import { ExtendedKind, SEARCHABLE_RELAY_URLS } from '@/constants'
+import { ExtendedKind } from '@/constants'
 import {
   compareEvents,
   getReplaceableCoordinate,
@@ -7,7 +7,7 @@ import {
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
-import { filterOutBigRelays, getDefaultRelayUrls } from '@/lib/relay'
+import { filterOutBigRelays, getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { SmartPool } from '@/lib/smart-pool'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
@@ -159,7 +159,7 @@ class ClientService extends EventTarget {
 
   async determineRelaysByFilter(filter: Filter) {
     if (filter.search) {
-      return SEARCHABLE_RELAY_URLS
+      return getSearchRelayUrls()
     } else if (filter.authors?.length) {
       const relayLists = await this.fetchRelayLists(filter.authors)
       return Array.from(new Set(relayLists.flatMap((list) => list.write.slice(0, 5))))

@@ -163,7 +163,7 @@ export default {
     'Send only to r': 'Wyślij tylko do {{r}}',
     'Send only to these relays': 'Wyślij tylko do tych transmiterów',
     Explore: 'Transmitery',
-    'Search relays': 'Wyszukaj transmiter',
+    'Search relays': 'Przekaźniki wyszukiwania',
     relayInfoBadgeAuth: '✔️',
     relayInfoBadgeSearch: 'Wyszukiwarka',
     relayInfoBadgePayment: 'Płatności',
@@ -801,7 +801,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Prośby',
     'dm time date': '{{date}} {{time}}',
-    React: 'Reaguj'
-
+    React: 'Reaguj',
+    'Relays used for searching notes (NIP-50)': 'Przekaźniki używane do wyszukiwania notatek (NIP-50)'
   }
 }

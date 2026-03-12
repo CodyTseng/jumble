@@ -166,7 +166,7 @@ export default {
     'Send only to r': 'केवल {{r}} को भेजें',
     'Send only to these relays': 'केवल इन रिले को भेजें',
     Explore: 'एक्सप्लोर करें',
-    'Search relays': 'रिले खोजें',
+    'Search relays': 'खोज रिले',
     relayInfoBadgeAuth: 'प्रमाणीकरण',
     relayInfoBadgeSearch: 'खोज',
     relayInfoBadgePayment: 'भुगतान',
@@ -795,7 +795,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'अनुरोध',
     'dm time date': '{{date}} {{time}}',
-    React: 'प्रतिक्रिया'
-
+    React: 'प्रतिक्रिया',
+    'Relays used for searching notes (NIP-50)': 'नोट्स खोजने के लिए उपयोग किए जाने वाले रिले (NIP-50)'
   }
 }

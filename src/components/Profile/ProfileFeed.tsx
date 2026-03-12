@@ -1,8 +1,8 @@
 import KindFilter from '@/components/KindFilter'
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
-import { MAX_PINNED_NOTES, SEARCHABLE_RELAY_URLS } from '@/constants'
-import { getDefaultRelayUrls } from '@/lib/relay'
+import { MAX_PINNED_NOTES } from '@/constants'
+import { getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
@@ -125,7 +125,7 @@ export default function ProfileFeed({
         )
         setSubRequests([
           {
-            urls: searchableRelays.concat(SEARCHABLE_RELAY_URLS).slice(0, 8),
+            urls: searchableRelays.concat(getSearchRelayUrls()).slice(0, 8),
             filter: { authors: [pubkey], search }
           }
         ])

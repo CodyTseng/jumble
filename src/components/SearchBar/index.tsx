@@ -36,7 +36,17 @@ const SearchBar = forwardRef<
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const [debouncedInput, setDebouncedInput] = useState(input)
-  const { profiles, isFetching: isFetchingProfiles } = useSearchProfiles(debouncedInput, 5)
+  const isIdSearch = useMemo(() => {
+    const search = debouncedInput.trim()
+    if (!search) return false
+    if (/^[0-9a-f]{64}$/.test(search)) return true
+    const id = search.startsWith('nostr:') ? search.slice(6) : search
+    return /^(npub1|nprofile1|note1|nevent1|naddr1)/.test(id)
+  }, [debouncedInput])
+  const { profiles, isFetching: isFetchingProfiles } = useSearchProfiles(
+    isIdSearch ? '' : debouncedInput,
+    5
+  )
   const [searching, setSearching] = useState(false)
   const [displayList, setDisplayList] = useState(false)
   const [selectableOptions, setSelectableOptions] = useState<TSearchParams[]>([])

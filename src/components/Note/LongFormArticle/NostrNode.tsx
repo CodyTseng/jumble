@@ -8,7 +8,7 @@ export default function NostrNode({ rawText, bech32Id }: ComponentProps<Componen
     if (!bech32Id) return { type: 'invalid', id: '' }
     try {
       const { type } = nip19.decode(bech32Id)
-      if (type === 'npub') {
+      if (type === 'npub' || type === 'nprofile') {
         return { type: 'mention', id: bech32Id }
       }
       if (type === 'nevent' || type === 'naddr' || type === 'note') {

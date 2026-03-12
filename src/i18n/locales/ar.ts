@@ -163,7 +163,7 @@ export default {
     'Send only to r': 'إرسال فقط إلى {{r}}',
     'Send only to these relays': 'إرسال فقط إلى هذه الريلايات',
     Explore: 'استكشاف',
-    'Search relays': 'البحث في الريلايات',
+    'Search relays': 'ريلايات البحث',
     relayInfoBadgeAuth: 'مصادقة',
     relayInfoBadgeSearch: 'بحث',
     relayInfoBadgePayment: 'دفع',
@@ -783,7 +783,7 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'طلبات',
     'dm time date': '{{date}} {{time}}',
-    React: 'تفاعل'
-
+    React: 'تفاعل',
+    'Relays used for searching notes (NIP-50)': 'الريلايات المستخدمة للبحث عن الملاحظات (NIP-50)'
   }
 }

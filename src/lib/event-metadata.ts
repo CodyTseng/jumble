@@ -74,6 +74,7 @@ export function getProfileFromEvent(event: Event) {
       lud06: profileObj.lud06,
       lud16: profileObj.lud16,
       lightningAddress: getLightningAddressFromProfile(profileObj),
+      sp: profileObj.sp,
       created_at: event.created_at,
       emojis: emojis.length > 0 ? emojis : undefined
     }
