@@ -26,8 +26,8 @@ const Popover = ({
 
   return (
     <>
-      {open &&
-        createPortal(
+      {createPortal(
+        open ? (
           <div
             ref={backdropRef}
             className="pointer-events-auto fixed inset-0 z-40"
@@ -35,9 +35,10 @@ const Popover = ({
               e.stopPropagation()
               handleOpenChange(false)
             }}
-          />,
-          document.body
-        )}
+          />
+        ) : null,
+        document.body
+      )}
       <PopoverPrimitive.Root {...props} open={open} onOpenChange={handleOpenChange} modal={false} />
     </>
   )
