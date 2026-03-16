@@ -55,7 +55,7 @@ const Player = memo(({ videoId, isShort, className }: PlayerProps) => {
       }
     })
 
-    let checkMutedInterval: NodeJS.Timeout | null = null
+    let checkMutedInterval: ReturnType<typeof setInterval> | null = null
     function initPlayer() {
       try {
         if (!videoId || !containerRef.current || !window.YT.Player || unmountedRef.current) return
@@ -87,20 +87,29 @@ const Player = memo(({ videoId, isShort, className }: PlayerProps) => {
               }
               setInitSuccess(true)
               checkMutedInterval = setInterval(() => {
-                if (playerRef.current && !unmountedRef.current) {
-                  const mute = playerRef.current.isMuted()
-                  if (mute !== currentMuteState) {
-                    currentMuteState = mute
+                if (
+                  !playerRef.current ||
+                  unmountedRef.current ||
+                  typeof playerRef.current.isMuted !== 'function'
+                ) {
+                  if (checkMutedInterval) {
+                    clearInterval(checkMutedInterval)
+                    checkMutedInterval = null
+                  }
+                  return
+                }
+                const mute = playerRef.current.isMuted()
+                if (mute !== currentMuteState) {
+                  currentMuteState = mute
 
-                    if (mute !== muteStateRef.current) {
-                      updateMuteMedia(currentMuteState)
-                    }
-                  } else if (muteStateRef.current !== mute) {
-                    if (muteStateRef.current) {
-                      playerRef.current.mute()
-                    } else {
-                      playerRef.current.unMute()
-                    }
+                  if (mute !== muteStateRef.current) {
+                    updateMuteMedia(currentMuteState)
+                  }
+                } else if (muteStateRef.current !== mute) {
+                  if (muteStateRef.current) {
+                    playerRef.current.mute()
+                  } else {
+                    playerRef.current.unMute()
                   }
                 }
               }, 200)
