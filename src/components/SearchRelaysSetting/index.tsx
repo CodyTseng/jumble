@@ -1,0 +1,103 @@
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { SEARCHABLE_RELAY_URLS } from '@/constants'
+import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
+import storage from '@/services/local-storage.service'
+import { CircleX } from 'lucide-react'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import RelayIcon from '../RelayIcon'
+
+export default function SearchRelaysSetting() {
+  const { t } = useTranslation()
+  const [relayUrls, setRelayUrls] = useState<string[]>(storage.getSearchRelayUrls())
+  const [newRelayUrl, setNewRelayUrl] = useState('')
+  const [newRelayUrlError, setNewRelayUrlError] = useState<string | null>(null)
+
+  const removeRelayUrl = (url: string) => {
+    const normalizedUrl = normalizeUrl(url)
+    if (!normalizedUrl) return
+    const newUrls = relayUrls.filter((u) => u !== normalizedUrl)
+    setRelayUrls(newUrls)
+    storage.setSearchRelayUrls(newUrls)
+  }
+
+  const saveNewRelayUrl = () => {
+    if (newRelayUrl === '') return
+    const normalizedUrl = normalizeUrl(newRelayUrl)
+    if (!normalizedUrl) {
+      return setNewRelayUrlError(t('Invalid relay URL'))
+    }
+    if (relayUrls.includes(normalizedUrl)) {
+      return setNewRelayUrlError(t('Relay already exists'))
+    }
+    if (!isWebsocketUrl(normalizedUrl)) {
+      return setNewRelayUrlError(t('invalid relay URL'))
+    }
+    const newUrls = [...relayUrls, normalizedUrl]
+    setRelayUrls(newUrls)
+    storage.setSearchRelayUrls(newUrls)
+    setNewRelayUrl('')
+  }
+
+  const handleRelayUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewRelayUrl(e.target.value)
+    setNewRelayUrlError(null)
+  }
+
+  const handleRelayUrlInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      saveNewRelayUrl()
+    }
+  }
+
+  const resetToDefault = () => {
+    setRelayUrls(SEARCHABLE_RELAY_URLS)
+    storage.setSearchRelayUrls(SEARCHABLE_RELAY_URLS)
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-base font-normal">{t('Search relays')}</Label>
+        <Button variant="outline" size="sm" onClick={resetToDefault}>
+          {t('Reset to default')}
+        </Button>
+      </div>
+      <div className="text-xs text-muted-foreground">
+        {t('Relays used for searching notes (NIP-50)')}
+      </div>
+      <div className="mt-1">
+        {relayUrls.map((url, index) => (
+          <div key={index} className="flex items-center justify-between py-1 pl-1 pr-3">
+            <div className="flex w-0 flex-1 items-center gap-3">
+              <RelayIcon url={url} className="h-4 w-4" />
+              <div className="truncate text-sm text-muted-foreground">{url}</div>
+            </div>
+            <div className="shrink-0">
+              <CircleX
+                size={16}
+                onClick={() => removeRelayUrl(url)}
+                className="cursor-pointer text-muted-foreground hover:text-destructive"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 flex gap-2">
+        <Input
+          className={newRelayUrlError ? 'border-destructive' : ''}
+          placeholder={t('Add a new relay')}
+          value={newRelayUrl}
+          onKeyDown={handleRelayUrlInputKeyDown}
+          onChange={handleRelayUrlInputChange}
+          onBlur={saveNewRelayUrl}
+        />
+        <Button onClick={saveNewRelayUrl}>{t('Add')}</Button>
+      </div>
+      {newRelayUrlError && <div className="mt-1 text-xs text-destructive">{newRelayUrlError}</div>}
+    </div>
+  )
+}

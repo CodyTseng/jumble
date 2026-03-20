@@ -1,5 +1,5 @@
-import { SEARCHABLE_RELAY_URLS, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
-import { getDefaultRelayUrls } from '@/lib/relay'
+import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import { getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { TSearchParams } from '@/types'
 import NormalFeed from '../NormalFeed'
 import Profile from '../Profile'
@@ -21,7 +21,7 @@ export default function SearchResult({ searchParams }: { searchParams: TSearchPa
     return (
       <NormalFeed
         trustScoreFilterId={SPECIAL_TRUST_SCORE_FILTER_ID.SEARCH}
-        subRequests={[{ urls: SEARCHABLE_RELAY_URLS, filter: { search: searchParams.search } }]}
+        subRequests={[{ urls: getSearchRelayUrls(), filter: { search: searchParams.search } }]}
         showRelayCloseReason
       />
     )

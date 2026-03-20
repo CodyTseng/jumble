@@ -166,7 +166,7 @@ export default {
     'Send only to r': 'Enviar apenas para {{r}}',
     'Send only to these relays': 'Enviar apenas para estes relays',
     Explore: 'Explorar',
-    'Search relays': 'Pesquisar relays',
+    'Search relays': 'Relays de busca',
     relayInfoBadgeAuth: 'Auth',
     relayInfoBadgeSearch: 'Pesquisar',
     relayInfoBadgePayment: 'Pagamento',
@@ -685,7 +685,8 @@ export default {
     'Hide indirect': 'Ocultar indiretas',
     'Copy note content': 'Copiar conteúdo da nota',
     'Video loop': 'Repetir vídeo',
-    'Automatically replay videos when they end': 'Reproduzir automaticamente os vídeos quando terminarem',
+    'Automatically replay videos when they end':
+      'Reproduzir automaticamente os vídeos quando terminarem',
     Messages: 'Bate-papo',
     Message: 'Mensagem',
     'Configure DM Relays': 'Configurar relays de mensagens diretas',
@@ -728,7 +729,8 @@ export default {
     'Encryption key not found': 'Chave de criptografia não encontrada',
     Conversation: 'Conversa',
     'Invalid user': 'Usuário inválido',
-    'This user has not set up direct messages yet.': 'Este usuário ainda não configurou mensagens diretas.',
+    'This user has not set up direct messages yet.':
+      'Este usuário ainda não configurou mensagens diretas.',
     'Sign in to use Messages': 'Entre para acessar o Bate-papo',
     'You need to be signed in to send and receive direct messages.':
       'Você precisa estar conectado para enviar e receber mensagens diretas.',
@@ -761,7 +763,8 @@ export default {
     'Delete conversation': 'Excluir conversa',
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
       'Tem certeza de que deseja excluir esta conversa? Todas as mensagens serão permanentemente removidas deste dispositivo.',
-    'This user has not set up NIP-4e DMs': 'Este usuário não configurou NIP-4e de mensagens diretas',
+    'This user has not set up NIP-4e DMs':
+      'Este usuário não configurou NIP-4e de mensagens diretas',
     'Encryption key has been reset': 'Chave de criptografia foi redefinida',
     'Failed to reset encryption key': 'Falha ao redefinir chave de criptografia',
     'Encryption Key': 'Chave de criptografia',
@@ -775,7 +778,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Mensagens de pessoas que você ainda não respondeu aparecerão aqui.',
     'Key sync request': 'Solicitação de sincronização de chave',
-    'Another device is requesting your encryption key.': 'Outro dispositivo está solicitando sua chave de criptografia.',
+    'Another device is requesting your encryption key.':
+      'Outro dispositivo está solicitando sua chave de criptografia.',
     Dismiss: 'Dispensar',
     Retry: 'Tentar novamente',
     'Retry ({{seconds}}s)': 'Tentar novamente ({{seconds}}s)',
@@ -798,7 +802,11 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Solicitações',
     'dm time date': '{{date}} {{time}}',
-    React: 'Reagir'
-
+    React: 'Reagir',
+    'Relays used for searching notes (NIP-50)': 'Relays usados para buscar notas (NIP-50)',
+    'Protected event (NIP-70)': 'Evento protegido (NIP-70)',
+    Protected: 'Protegido',
+    'Protected event hint':
+      'Eventos protegidos (NIP-70) só podem ser publicados pelo autor. Os relays rejeitarão esses eventos de terceiros, impedindo que outros retransmitam seu conteúdo. Nota: nem todos os relays suportam eventos protegidos.'
   }
 }

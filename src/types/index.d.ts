@@ -27,6 +27,7 @@ export type TProfile = {
   lud06?: string
   lud16?: string
   lightningAddress?: string
+  sp?: string
   created_at?: number
   emojis?: TEmoji[]
 }

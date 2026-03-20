@@ -165,7 +165,7 @@ export default {
     'Send only to r': 'Küldés csak a {{r}} csomópontra',
     'Send only to these relays': 'Küldés csak ezekre a csomópontokra',
     Explore: 'Felderítés',
-    'Search relays': 'Csomópontok kereséshez',
+    'Search relays': 'Keresési csomópontok',
     relayInfoBadgeAuth: 'Auth',
     relayInfoBadgeSearch: 'Keresés',
     relayInfoBadgePayment: 'Fizetés',
@@ -676,7 +676,8 @@ export default {
     'Hide indirect': 'Közvetettek elrejtése',
     'Copy note content': 'Jegyzet tartalmának másolása',
     'Video loop': 'Videó ismétlése',
-    'Automatically replay videos when they end': 'Videók automatikus újrajátszása, amikor véget érnek',
+    'Automatically replay videos when they end':
+      'Videók automatikus újrajátszása, amikor véget érnek',
     Messages: 'Üzenetek',
     Message: 'Üzenet',
     'Configure DM Relays': 'DM relék beállítása',
@@ -714,12 +715,14 @@ export default {
       'Kezdj beszélgetést valaki profiljának meglátogatásával és az üzenet gombra kattintással.',
     'No messages yet. Send one!': 'Még nincsenek üzenetek. Küldj egyet!',
     'Type a message...': 'Írj üzenetet...',
-    'Press Ctrl+Enter or Cmd+Enter to send': 'Nyomd meg a Ctrl+Enter vagy Cmd+Enter billentyűt a küldéshez',
+    'Press Ctrl+Enter or Cmd+Enter to send':
+      'Nyomd meg a Ctrl+Enter vagy Cmd+Enter billentyűt a küldéshez',
     'Failed to send message': 'Nem sikerült elküldeni az üzenetet',
     'Encryption key not found': 'Titkosítási kulcs nem található',
     Conversation: 'Beszélgetés',
     'Invalid user': 'Érvénytelen felhasználó',
-    'This user has not set up direct messages yet.': 'Ez a felhasználó még nem állította be a közvetlen üzeneteket.',
+    'This user has not set up direct messages yet.':
+      'Ez a felhasználó még nem állította be a közvetlen üzeneteket.',
     'Sign in to use Messages': 'Jelentkezz be az Üzenetek használatához',
     'You need to be signed in to send and receive direct messages.':
       'Be kell jelentkezned a közvetlen üzenetek küldéséhez és fogadásához.',
@@ -766,7 +769,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Azok üzenetei, akiknek még nem válaszoltál, itt jelennek meg.',
     'Key sync request': 'Kulcs szinkronizálási kérelem',
-    'Another device is requesting your encryption key.': 'Egy másik eszköz kéri a titkosítási kulcsodat.',
+    'Another device is requesting your encryption key.':
+      'Egy másik eszköz kéri a titkosítási kulcsodat.',
     Dismiss: 'Bezárás',
     Retry: 'Újra',
     'Retry ({{seconds}}s)': 'Újra ({{seconds}}s)',
@@ -789,7 +793,12 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Kérelmek',
     'dm time date': '{{date}} {{time}}',
-    React: 'Reagálás'
-
+    React: 'Reagálás',
+    'Relays used for searching notes (NIP-50)':
+      'Jegyzetek kereséséhez használt csomópontok (NIP-50)',
+    'Protected event (NIP-70)': 'Védett esemény (NIP-70)',
+    Protected: 'Védett',
+    'Protected event hint':
+      'A védett eseményeket (NIP-70) csak a szerző teheti közzé. A csomópontok elutasítják ezeket az eseményeket harmadik felektől, megakadályozva, hogy mások újraközvetítsék a tartalmadat. Megjegyzés: nem minden csomópont támogatja a védett eseményeket.'
   }
 }

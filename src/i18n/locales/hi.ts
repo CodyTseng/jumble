@@ -166,7 +166,7 @@ export default {
     'Send only to r': 'केवल {{r}} को भेजें',
     'Send only to these relays': 'केवल इन रिले को भेजें',
     Explore: 'एक्सप्लोर करें',
-    'Search relays': 'रिले खोजें',
+    'Search relays': 'खोज रिले',
     relayInfoBadgeAuth: 'प्रमाणीकरण',
     relayInfoBadgeSearch: 'खोज',
     relayInfoBadgePayment: 'भुगतान',
@@ -682,7 +682,8 @@ export default {
     'Hide indirect': 'अप्रत्यक्ष छुपाएं',
     'Copy note content': 'नोट सामग्री कॉपी करें',
     'Video loop': 'वीडियो लूप',
-    'Automatically replay videos when they end': 'वीडियो समाप्त होने पर स्वचालित रूप से दोबारा चलाएं',
+    'Automatically replay videos when they end':
+      'वीडियो समाप्त होने पर स्वचालित रूप से दोबारा चलाएं',
     Messages: 'संदेश',
     Message: 'संदेश',
     'Configure DM Relays': 'DM रिले कॉन्फ़िगर करें',
@@ -725,7 +726,8 @@ export default {
     'Encryption key not found': 'एन्क्रिप्शन कुंजी नहीं मिली',
     Conversation: 'वार्तालाप',
     'Invalid user': 'अमान्य उपयोगकर्ता',
-    'This user has not set up direct messages yet.': 'इस उपयोगकर्ता ने अभी तक सीधे संदेश सेट अप नहीं किए हैं।',
+    'This user has not set up direct messages yet.':
+      'इस उपयोगकर्ता ने अभी तक सीधे संदेश सेट अप नहीं किए हैं।',
     'Sign in to use Messages': 'संदेश उपयोग करने के लिए साइन इन करें',
     'You need to be signed in to send and receive direct messages.':
       'सीधे संदेश भेजने और प्राप्त करने के लिए आपको साइन इन होना चाहिए।',
@@ -772,7 +774,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'जिन लोगों को आपने अभी तक जवाब नहीं दिया है उनके संदेश यहाँ दिखाई देंगे।',
     'Key sync request': 'कुंजी सिंक अनुरोध',
-    'Another device is requesting your encryption key.': 'एक अन्य डिवाइस आपकी एन्क्रिप्शन कुंजी का अनुरोध कर रहा है।',
+    'Another device is requesting your encryption key.':
+      'एक अन्य डिवाइस आपकी एन्क्रिप्शन कुंजी का अनुरोध कर रहा है।',
     Dismiss: 'खारिज करें',
     Retry: 'पुनः प्रयास',
     'Retry ({{seconds}}s)': 'पुनः प्रयास ({{seconds}}s)',
@@ -795,7 +798,12 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'अनुरोध',
     'dm time date': '{{date}} {{time}}',
-    React: 'प्रतिक्रिया'
-
+    React: 'प्रतिक्रिया',
+    'Relays used for searching notes (NIP-50)':
+      'नोट्स खोजने के लिए उपयोग किए जाने वाले रिले (NIP-50)',
+    'Protected event (NIP-70)': 'संरक्षित इवेंट (NIP-70)',
+    Protected: 'संरक्षित',
+    'Protected event hint':
+      'संरक्षित इवेंट (NIP-70) केवल लेखक द्वारा प्रकाशित किए जा सकते हैं। रिले तीसरे पक्ष से इन इवेंट को अस्वीकार कर देंगे, जिससे दूसरों को आपकी सामग्री को पुनः प्रसारित करने से रोका जा सके। नोट: सभी रिले संरक्षित इवेंट का समर्थन नहीं करते।'
   }
 }

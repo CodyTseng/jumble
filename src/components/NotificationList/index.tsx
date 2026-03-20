@@ -222,7 +222,12 @@ const NotificationList = forwardRef((_, ref) => {
     })
     if (storedEvents.length === 0) return filteredEvents
 
-    const filteredStoredEvents = storedEvents.filter((evt) => evt.pubkey !== pubkey)
+    const filteredStoredEvents = storedEvents.filter((evt) => {
+      if (evt.pubkey === pubkey) return false
+      if (idSet.has(evt.id)) return false
+      idSet.add(evt.id)
+      return true
+    })
     if (!initialLoading) {
       return mergeTimelines([filteredEvents, filteredStoredEvents])
     }

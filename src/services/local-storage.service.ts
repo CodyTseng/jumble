@@ -8,6 +8,7 @@ import {
   NOTIFICATION_LIST_STYLE,
   NSFW_DISPLAY_POLICY,
   PROFILE_PICTURE_AUTO_LOAD_POLICY,
+  SEARCHABLE_RELAY_URLS,
   StorageKey,
   TPrimaryColor
 } from '@/constants'
@@ -66,6 +67,7 @@ class LocalStorageService {
   private quickReactionEmoji: string | TEmoji = '+'
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
   private defaultRelayUrls: string[] = BIG_RELAY_URLS
+  private searchRelayUrls: string[] = SEARCHABLE_RELAY_URLS
   private mutedWords: string[] = []
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
@@ -403,6 +405,22 @@ class LocalStorageService {
           urls.every((url) => typeof url === 'string')
         ) {
           this.defaultRelayUrls = urls
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const searchRelayUrlsStr = window.localStorage.getItem(StorageKey.SEARCH_RELAY_URLS)
+    if (searchRelayUrlsStr) {
+      try {
+        const urls = JSON.parse(searchRelayUrlsStr)
+        if (
+          Array.isArray(urls) &&
+          urls.length > 0 &&
+          urls.every((url) => typeof url === 'string')
+        ) {
+          this.searchRelayUrls = urls
         }
       } catch {
         // Invalid JSON, use default
@@ -788,6 +806,15 @@ class LocalStorageService {
   setDefaultRelayUrls(urls: string[]) {
     this.defaultRelayUrls = urls
     window.localStorage.setItem(StorageKey.DEFAULT_RELAY_URLS, JSON.stringify(urls))
+  }
+
+  getSearchRelayUrls() {
+    return this.searchRelayUrls
+  }
+
+  setSearchRelayUrls(urls: string[]) {
+    this.searchRelayUrls = urls
+    window.localStorage.setItem(StorageKey.SEARCH_RELAY_URLS, JSON.stringify(urls))
   }
 
   getMutedWords() {

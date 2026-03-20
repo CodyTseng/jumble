@@ -14,11 +14,14 @@ import { useNostr } from '@/providers/NostrProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
-import { ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
+import { CircleHelp, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Switch } from '@/components/ui/switch'
 import EmojiPickerDialog from '../EmojiPickerDialog'
 import Mentions from './Mentions'
 import PollEditor from './PollEditor'
@@ -67,6 +70,18 @@ export default function PostContent({
     relays: []
   })
   const [minPow, setMinPow] = useState(0)
+  const userDismissedProtected = useRef(false)
+  const handleProtectedSuggestionChange = useCallback((suggested: boolean) => {
+    if (suggested && !userDismissedProtected.current) {
+      setIsProtectedEvent(true)
+    }
+  }, [])
+  const handleProtectedToggle = useCallback((checked: boolean) => {
+    if (!checked) {
+      userDismissedProtected.current = true
+    }
+    setIsProtectedEvent(checked)
+  }, [])
   const isFirstRender = useRef(true)
   const canPost = useMemo(() => {
     return (
@@ -257,12 +272,39 @@ export default function PostContent({
           </div>
         ))}
       {!isPoll && (
-        <PostRelaySelector
-          setIsProtectedEvent={setIsProtectedEvent}
-          setAdditionalRelayUrls={setAdditionalRelayUrls}
-          parentEvent={parentEvent}
-          openFrom={openFrom}
-        />
+        <div className="flex items-center gap-3">
+          <div className="min-w-0">
+          <PostRelaySelector
+            onProtectedSuggestionChange={handleProtectedSuggestionChange}
+            setAdditionalRelayUrls={setAdditionalRelayUrls}
+            parentEvent={parentEvent}
+            openFrom={openFrom}
+          />
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Switch
+              id="protected-event"
+              checked={isProtectedEvent}
+              onCheckedChange={handleProtectedToggle}
+            />
+            <Label
+              htmlFor="protected-event"
+              className="cursor-pointer text-xs text-muted-foreground"
+            >
+              {t('Protected')}
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button type="button" className="flex shrink-0">
+                  <CircleHelp className="!size-3.5 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="text-sm">
+                {t('Protected event hint')}
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

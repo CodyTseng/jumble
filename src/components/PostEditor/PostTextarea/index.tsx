@@ -151,7 +151,7 @@ const PostTextarea = forwardRef<
             const emojiNode = editor.schema.nodes.emoji.create({
               name: customEmojiService.getEmojiId(emoji)
             })
-            editor.chain().insertContent(emojiNode).insertContent(' ').run()
+            editor.chain().insertContent(emojiNode).run()
           }
         }
       }

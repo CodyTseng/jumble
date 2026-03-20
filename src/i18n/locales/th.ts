@@ -163,7 +163,7 @@ export default {
     'Send only to r': 'ส่งเฉพาะไปยัง {{r}}',
     'Send only to these relays': 'ส่งเฉพาะไปยังรีเลย์เหล่านี้',
     Explore: 'สำรวจ',
-    'Search relays': 'ค้นหารีเลย์',
+    'Search relays': 'รีเลย์สำหรับค้นหา',
     relayInfoBadgeAuth: 'ยืนยันตัวตน',
     relayInfoBadgeSearch: 'ค้นหา',
     relayInfoBadgePayment: 'ชำระเงิน',
@@ -785,7 +785,11 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'คำขอ',
     'dm time date': '{{date}} {{time}}',
-    React: 'รีแอค'
-
+    React: 'รีแอค',
+    'Relays used for searching notes (NIP-50)': 'รีเลย์ที่ใช้สำหรับค้นหาโน้ต (NIP-50)',
+    'Protected event (NIP-70)': 'เหตุการณ์ที่ได้รับการป้องกัน (NIP-70)',
+    Protected: 'ป้องกัน',
+    'Protected event hint':
+      'เหตุการณ์ที่ได้รับการป้องกัน (NIP-70) สามารถเผยแพร่ได้โดยผู้เขียนเท่านั้น รีเลย์จะปฏิเสธเหตุการณ์เหล่านี้จากบุคคลที่สาม ป้องกันไม่ให้ผู้อื่นเผยแพร่เนื้อหาของคุณซ้ำ หมายเหตุ: รีเลย์บางแห่งไม่รองรับเหตุการณ์ที่ได้รับการป้องกัน'
   }
 }

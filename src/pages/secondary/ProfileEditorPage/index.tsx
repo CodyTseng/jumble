@@ -30,6 +30,8 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [nip05Error, setNip05Error] = useState<string>('')
   const [lightningAddress, setLightningAddress] = useState<string>('')
   const [lightningAddressError, setLightningAddressError] = useState<string>('')
+  const [silentPaymentAddress, setSilentPaymentAddress] = useState<string>('')
+  const [silentPaymentAddressError, setSilentPaymentAddressError] = useState<string>('')
   const [hasChanged, setHasChanged] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
@@ -48,6 +50,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       setWebsite(profile.website ?? '')
       setNip05(profile.nip05 ?? '')
       setLightningAddress(profile.lightningAddress || '')
+      setSilentPaymentAddress(profile.sp || '')
     } else {
       setBanner('')
       setAvatar('')
@@ -56,6 +59,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       setWebsite('')
       setNip05('')
       setLightningAddress('')
+      setSilentPaymentAddress('')
     }
   }, [profile])
 
@@ -91,6 +95,17 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
       }
     } else {
       delete newProfileContent.lud16
+    }
+
+    if (silentPaymentAddress) {
+      if (silentPaymentAddress.startsWith('sp1')) {
+        newProfileContent.sp = silentPaymentAddress
+      } else {
+        setSilentPaymentAddressError(t('Silent Payment address must start with sp1'))
+        return
+      }
+    } else {
+      delete newProfileContent.sp
     }
 
     setSaving(true)
@@ -226,6 +241,25 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           />
           {lightningAddressError && (
             <div className="pl-3 text-xs text-destructive">{lightningAddressError}</div>
+          )}
+        </Item>
+        <Item>
+          <Label htmlFor="profile-sp-address-input">
+            {t('Silent Payment Address (BIP 352)')}
+          </Label>
+          <Input
+            id="profile-sp-address-input"
+            value={silentPaymentAddress}
+            placeholder="sp1qq..."
+            onChange={(e) => {
+              setSilentPaymentAddressError('')
+              setSilentPaymentAddress(e.target.value)
+              setHasChanged(true)
+            }}
+            className={silentPaymentAddressError ? 'border-destructive' : ''}
+          />
+          {silentPaymentAddressError && (
+            <div className="pl-3 text-xs text-destructive">{silentPaymentAddressError}</div>
           )}
         </Item>
       </div>

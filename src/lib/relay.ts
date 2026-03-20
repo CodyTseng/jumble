@@ -5,6 +5,10 @@ export function getDefaultRelayUrls() {
   return storage.getDefaultRelayUrls()
 }
 
+export function getSearchRelayUrls() {
+  return storage.getSearchRelayUrls()
+}
+
 export function checkAlgoRelay(relayInfo: TRelayInfo | undefined) {
   return relayInfo?.software === 'https://github.com/bitvora/algo-relay' // hardcode for now
 }

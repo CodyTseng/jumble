@@ -168,7 +168,7 @@ export default {
     'Send only to r': 'Отправить только на {{r}}',
     'Send only to these relays': 'Отправить только на эти ретрансляторы',
     Explore: 'Обзор',
-    'Search relays': 'Поиск ретрансляторов',
+    'Search relays': 'Ретрансляторы для поиска',
     relayInfoBadgeAuth: 'Авторизация',
     relayInfoBadgeSearch: 'Поиск',
     relayInfoBadgePayment: 'Платежи',
@@ -687,7 +687,8 @@ export default {
     'Hide indirect': 'Скрыть косвенные',
     'Copy note content': 'Скопировать содержимое заметки',
     'Video loop': 'Зацикливание видео',
-    'Automatically replay videos when they end': 'Автоматически воспроизводить видео заново после окончания',
+    'Automatically replay videos when they end':
+      'Автоматически воспроизводить видео заново после окончания',
     Messages: 'Сообщения',
     Message: 'Сообщение',
     'Configure DM Relays': 'Настроить релеи для ЛС',
@@ -730,7 +731,8 @@ export default {
     'Encryption key not found': 'Ключ шифрования не найден',
     Conversation: 'Беседа',
     'Invalid user': 'Недопустимый пользователь',
-    'This user has not set up direct messages yet.': 'Этот пользователь ещё не настроил личные сообщения.',
+    'This user has not set up direct messages yet.':
+      'Этот пользователь ещё не настроил личные сообщения.',
     'Sign in to use Messages': 'Войдите, чтобы использовать Сообщения',
     'You need to be signed in to send and receive direct messages.':
       'Для отправки и получения личных сообщений необходимо войти в систему.',
@@ -777,7 +779,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Сообщения от людей, которым вы ещё не ответили, появятся здесь.',
     'Key sync request': 'Запрос синхронизации ключа',
-    'Another device is requesting your encryption key.': 'Другое устройство запрашивает ваш ключ шифрования.',
+    'Another device is requesting your encryption key.':
+      'Другое устройство запрашивает ваш ключ шифрования.',
     Dismiss: 'Закрыть',
     Retry: 'Повторить',
     'Retry ({{seconds}}s)': 'Повторить ({{seconds}}s)',
@@ -800,7 +803,11 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: 'Запросы',
     'dm time date': '{{date}} {{time}}',
-    React: 'Реакция'
-
+    React: 'Реакция',
+    'Relays used for searching notes (NIP-50)': 'Ретрансляторы для поиска заметок (NIP-50)',
+    'Protected event (NIP-70)': 'Защищённое событие (NIP-70)',
+    Protected: 'Защищённый',
+    'Protected event hint':
+      'Защищённые события (NIP-70) могут быть опубликованы только автором. Ретрансляторы отклонят эти события от третьих лиц, предотвращая повторную трансляцию вашего контента. Примечание: не все ретрансляторы поддерживают защищённые события.'
   }
 }

@@ -767,7 +767,11 @@ export default {
     'dm time weekday': '{{weekday}} {{time}}',
     Requests: '請求',
     'dm time date': '{{date}} {{time}}',
-    React: '回應'
-
+    React: '回應',
+    'Relays used for searching notes (NIP-50)': '用於搜尋筆記的伺服器 (NIP-50)',
+    'Protected event (NIP-70)': '受保護的事件 (NIP-70)',
+    Protected: '受保護',
+    'Protected event hint':
+      '受保護的事件（NIP-70）只能由作者發布。伺服器將拒絕來自第三方的這些事件，防止他人轉播你的內容。 注意：並非所有伺服器都支持受保護的事件。'
   }
 }

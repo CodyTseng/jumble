@@ -13,11 +13,12 @@ import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Link, MessageSquare, Zap } from 'lucide-react'
+import { Bitcoin, Check, Copy, Link, MessageSquare, Zap } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 import SearchInput from '../SearchInput'
+import SpQrCode from '../SpQrCode'
 import TextWithEmojis from '../TextWithEmojis'
 import TrustScoreBadge from '../TrustScoreBadge'
 import AvatarWithLightbox from './AvatarWithLightbox'
@@ -112,7 +113,7 @@ export default function Profile({ id }: { id?: string }) {
   }
   if (!profile) return <NotFound />
 
-  const { banner, username, about, pubkey, website, lightningAddress, emojis } = profile
+  const { banner, username, about, pubkey, website, lightningAddress, sp, emojis } = profile
   return (
     <>
       <div ref={topContainerRef}>
@@ -134,7 +135,11 @@ export default function Profile({ id }: { id?: string }) {
               <>
                 {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
                 <span
-                  title={!isDmSupportLoading && !canStartDm ? t('This user has not set up NIP-4e DMs') : undefined}
+                  title={
+                    !isDmSupportLoading && !canStartDm
+                      ? t('This user has not set up NIP-4e DMs')
+                      : undefined
+                  }
                   className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
                 >
                   <Button
@@ -172,6 +177,13 @@ export default function Profile({ id }: { id?: string }) {
               <div className="flex select-text items-center gap-1 text-sm text-yellow-400">
                 <Zap className="size-4 shrink-0" />
                 <div className="w-0 max-w-fit flex-1 truncate">{lightningAddress}</div>
+              </div>
+            )}
+            {sp && (
+              <div className="flex select-text items-center gap-1 text-sm text-orange-500">
+                <Bitcoin className="size-4 shrink-0" />
+                <SpCopy sp={sp} />
+                <SpQrCode sp={sp} />
               </div>
             )}
             <div className="mt-1 flex gap-1">
@@ -222,5 +234,23 @@ export default function Profile({ id }: { id?: string }) {
       </div>
       <ProfileFeed pubkey={pubkey} topSpace={topContainerHeight + 100} search={debouncedInput} />
     </>
+  )
+}
+
+function SpCopy({ sp }: { sp: string }) {
+  const [copied, setCopied] = useState(false)
+  const truncated = sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp
+
+  const copy = () => {
+    navigator.clipboard.writeText(sp)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="clickable flex w-fit items-center gap-1 font-mono text-xs" onClick={copy}>
+      <div>{truncated}</div>
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+    </div>
   )
 }

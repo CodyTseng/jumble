@@ -38,12 +38,12 @@ type TPostTargetItem =
 export default function PostRelaySelector({
   parentEvent,
   openFrom,
-  setIsProtectedEvent,
+  onProtectedSuggestionChange,
   setAdditionalRelayUrls
 }: {
   parentEvent?: NostrEvent
   openFrom?: string[]
-  setIsProtectedEvent: Dispatch<SetStateAction<boolean>>
+  onProtectedSuggestionChange: (suggested: boolean) => void
   setAdditionalRelayUrls: Dispatch<SetStateAction<string[]>>
 }) {
   const { t } = useTranslation()
@@ -108,7 +108,8 @@ export default function PostRelaySelector({
   }, [openFrom, parentEventSeenOnRelays])
 
   useEffect(() => {
-    const isProtectedEvent = postTargetItems.every((item) => item.type !== 'optimalRelays')
+    const shouldProtect =
+      postTargetItems.length > 0 && postTargetItems.every((item) => item.type !== 'optimalRelays')
     const relayUrls = postTargetItems.flatMap((item) => {
       if (item.type === 'relay') {
         return [item.url]
@@ -119,7 +120,7 @@ export default function PostRelaySelector({
       return []
     })
 
-    setIsProtectedEvent(isProtectedEvent)
+    onProtectedSuggestionChange(shouldProtect)
     setAdditionalRelayUrls(relayUrls)
   }, [postTargetItems])
 
@@ -208,10 +209,10 @@ export default function PostRelaySelector({
     return (
       <>
         <div className="flex items-center gap-2">
-          <Label>{t('Post to')}</Label>
+          <Label className="shrink-0">{t('Post to')}</Label>
           <Button
             variant="outline"
-            className="max-w-fit flex-1 justify-start px-2"
+            className="min-w-0 max-w-fit justify-start px-2"
             onClick={() => setIsDrawerOpen(true)}
           >
             <div className="truncate">{description}</div>
@@ -235,9 +236,9 @@ export default function PostRelaySelector({
   return (
     <DropdownMenu>
       <div className="flex items-center gap-2">
-        <Label>{t('Post to')}</Label>
+        <Label className="shrink-0">{t('Post to')}</Label>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="max-w-fit flex-1 justify-start px-2">
+          <Button variant="outline" className="min-w-0 max-w-fit justify-start px-2">
             <div className="truncate">{description}</div>
           </Button>
         </DropdownMenuTrigger>
