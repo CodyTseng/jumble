@@ -719,7 +719,8 @@ export default {
     'Encryption key not found': '암호화 키를 찾을 수 없습니다',
     Conversation: '대화',
     'Invalid user': '잘못된 사용자',
-    'This user has not set up direct messages yet.': '이 사용자는 아직 다이렉트 메시지를 설정하지 않았습니다.',
+    'This user has not set up direct messages yet.':
+      '이 사용자는 아직 다이렉트 메시지를 설정하지 않았습니다.',
     'Sign in to use Messages': '메시지를 사용하려면 로그인하세요',
     'You need to be signed in to send and receive direct messages.':
       '다이렉트 메시지를 보내고 받으려면 로그인이 필요합니다.',
@@ -766,7 +767,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       '아직 답장하지 않은 사람들의 메시지가 여기에 표시됩니다.',
     'Key sync request': '키 동기화 요청',
-    'Another device is requesting your encryption key.': '다른 기기에서 암호화 키를 요청하고 있습니다.',
+    'Another device is requesting your encryption key.':
+      '다른 기기에서 암호화 키를 요청하고 있습니다.',
     Dismiss: '닫기',
     Retry: '다시 시도',
     'Retry ({{seconds}}s)': '다시 시도 ({{seconds}}s)',
@@ -790,6 +792,10 @@ export default {
     Requests: '요청',
     'dm time date': '{{date}} {{time}}',
     React: '반응',
-    'Relays used for searching notes (NIP-50)': '노트 검색에 사용되는 릴레이 (NIP-50)'
+    'Relays used for searching notes (NIP-50)': '노트 검색에 사용되는 릴레이 (NIP-50)',
+    'Protected event (NIP-70)': '보호된 이벤트 (NIP-70)',
+    Protected: '보호됨',
+    'Protected event hint':
+      '보호된 이벤트(NIP-70)는 작성자만 게시할 수 있습니다. 릴레이는 제3자의 이벤트를 거부하여 다른 사람이 콘텐츠를 재배포하는 것을 방지합니다. 참고: 모든 릴레이가 보호된 이벤트를 지원하는 것은 아닙니다.'
   }
 }

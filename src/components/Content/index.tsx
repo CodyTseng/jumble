@@ -12,6 +12,7 @@ import {
 import { getImetaInfosFromEvent } from '@/lib/event'
 import { containsMarkdown } from '@/lib/markdown'
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
+import { EMOJI_REGEX } from '@/constants'
 import { cn } from '@/lib/utils'
 import mediaUpload from '@/services/media-upload.service'
 import { TImetaInfo } from '@/types'
@@ -102,6 +103,28 @@ export default function Content({
     return { nodes, allImages, emojiInfos, lastNormalUrl }
   }, [event, resolvedContent, isMarkdown])
 
+  const isEmojiOnly = useMemo(() => {
+    if (!nodes || nodes.length === 0) return false
+    const nonWhitespace = nodes.filter(
+      (node) => !(node.type === 'text' && /^\s*$/.test(node.data))
+    )
+    let emojiCount = 0
+    for (const node of nonWhitespace) {
+      if (node.type === 'emoji') {
+        emojiCount++
+      } else if (node.type === 'text') {
+        const matches = node.data.match(new RegExp(EMOJI_REGEX.source, 'gu'))
+        if (!matches || node.data.replace(new RegExp(EMOJI_REGEX.source, 'gu'), '').trim() !== '') {
+          return false
+        }
+        emojiCount += matches.length
+      } else {
+        return false
+      }
+    }
+    return emojiCount > 0 && emojiCount <= 3
+  }, [nodes])
+
   const handleHighlight = (text: string) => {
     setSelectedText(text)
     setShowHighlightEditor(true)
@@ -139,9 +162,12 @@ export default function Content({
   let imageIndex = 0
   return (
     <>
-      <div ref={contentRef} className={cn('whitespace-pre-wrap text-wrap break-words', className)}>
+      <div ref={contentRef} className={cn('whitespace-pre-wrap text-wrap break-words', isEmojiOnly && 'flex items-end gap-1', className)}>
         {nodes.map((node, index) => {
           if (node.type === 'text') {
+            if (isEmojiOnly) {
+              return <span key={index} className="text-7xl leading-none">{node.data}</span>
+            }
             return node.data
           }
           if (node.type === 'image' || node.type === 'images') {
@@ -187,7 +213,7 @@ export default function Content({
             const shortcode = node.data.split(':')[1]
             const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
             if (!emoji) return node.data
-            return <Emoji classNames={{ img: 'mb-1' }} emoji={emoji} key={index} />
+            return <Emoji classNames={{ img: isEmojiOnly ? 'size-20' : 'mb-1' }} emoji={emoji} key={index} />
           }
           if (node.type === 'youtube') {
             return (

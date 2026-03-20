@@ -725,7 +725,8 @@ export default {
     'Encryption key not found': '暗号化キーが見つかりません',
     Conversation: '会話',
     'Invalid user': '無効なユーザー',
-    'This user has not set up direct messages yet.': 'このユーザーはまだダイレクトメッセージを設定していません。',
+    'This user has not set up direct messages yet.':
+      'このユーザーはまだダイレクトメッセージを設定していません。',
     'Sign in to use Messages': 'メッセージを使用するにはログイン',
     'You need to be signed in to send and receive direct messages.':
       'ダイレクトメッセージの送受信にはログインが必要です。',
@@ -772,7 +773,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'まだ返信していない人からのメッセージがここに表示されます。',
     'Key sync request': 'キー同期リクエスト',
-    'Another device is requesting your encryption key.': '別のデバイスがあなたの暗号化キーをリクエストしています。',
+    'Another device is requesting your encryption key.':
+      '別のデバイスがあなたの暗号化キーをリクエストしています。',
     Dismiss: '閉じる',
     Retry: '再試行',
     'Retry ({{seconds}}s)': '再試行 ({{seconds}}s)',
@@ -796,6 +798,10 @@ export default {
     Requests: 'リクエスト',
     'dm time date': '{{date}} {{time}}',
     React: 'リアクション',
-    'Relays used for searching notes (NIP-50)': 'ノート検索に使用するリレー (NIP-50)'
+    'Relays used for searching notes (NIP-50)': 'ノート検索に使用するリレー (NIP-50)',
+    'Protected event (NIP-70)': '保護されたイベント (NIP-70)',
+    Protected: '保護',
+    'Protected event hint':
+      '保護されたイベント（NIP-70）は作成者のみが公開できます。リレーは第三者からのこれらのイベントを拒否し、他者によるコンテンツの再配信を防ぎます。 注意：すべてのリレーが保護されたイベントに対応しているわけではありません。'
   }
 }

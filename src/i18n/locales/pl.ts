@@ -178,7 +178,8 @@ export default {
     'Supported NIPs': 'Obsługiwane NIP-y',
     'Open in a': 'Otwórz w {{a}}',
     'Cannot handle event of kind k': 'Nie można obsłużyć zdarzenia typu {{k}}',
-    'Encrypted direct messages not supported': 'Szyfrowane wiadomości bezpośrednie nie są obsługiwane',
+    'Encrypted direct messages not supported':
+      'Szyfrowane wiadomości bezpośrednie nie są obsługiwane',
     'Sorry! The note cannot be found 😔 ': 'Przepraszam! Nie można znaleźć wpisu 😔',
     'This user has been muted': 'Ten użytkownik został przyblokowany',
     Wallet: 'Portfel',
@@ -731,7 +732,8 @@ export default {
     'Encryption key not found': 'Nie znaleziono klucza szyfrowania',
     Conversation: 'Rozmowa',
     'Invalid user': 'Nieprawidłowy użytkownik',
-    'This user has not set up direct messages yet.': 'Ten użytkownik nie skonfigurował jeszcze wiadomości prywatnych.',
+    'This user has not set up direct messages yet.':
+      'Ten użytkownik nie skonfigurował jeszcze wiadomości prywatnych.',
     'Sign in to use Messages': 'Zaloguj się, aby korzystać z Wiadomości',
     'You need to be signed in to send and receive direct messages.':
       'Musisz być zalogowany, aby wysyłać i odbierać wiadomości prywatne.',
@@ -778,7 +780,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Wiadomości od osób, którym jeszcze nie odpowiedziałeś, pojawią się tutaj.',
     'Key sync request': 'Żądanie synchronizacji klucza',
-    'Another device is requesting your encryption key.': 'Inne urządzenie żąda twojego klucza szyfrowania.',
+    'Another device is requesting your encryption key.':
+      'Inne urządzenie żąda twojego klucza szyfrowania.',
     Dismiss: 'Zamknij',
     Retry: 'Ponów',
     'Retry ({{seconds}}s)': 'Ponów ({{seconds}}s)',
@@ -802,6 +805,11 @@ export default {
     Requests: 'Prośby',
     'dm time date': '{{date}} {{time}}',
     React: 'Reaguj',
-    'Relays used for searching notes (NIP-50)': 'Przekaźniki używane do wyszukiwania notatek (NIP-50)'
+    'Relays used for searching notes (NIP-50)':
+      'Przekaźniki używane do wyszukiwania notatek (NIP-50)',
+    'Protected event (NIP-70)': 'Chronione zdarzenie (NIP-70)',
+    Protected: 'Chronione',
+    'Protected event hint':
+      'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Przekaźniki odrzucą te zdarzenia od osób trzecich, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie przekaźniki obsługują chronione zdarzenia.'
   }
 }

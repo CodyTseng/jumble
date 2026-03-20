@@ -773,6 +773,10 @@ export default {
     Requests: '请求',
     'dm time date': '{{date}} {{time}}',
     React: '回应',
-    'Relays used for searching notes (NIP-50)': '用于搜索笔记的服务器 (NIP-50)'
+    'Relays used for searching notes (NIP-50)': '用于搜索笔记的服务器 (NIP-50)',
+    'Protected event (NIP-70)': '受保护的事件 (NIP-70)',
+    Protected: '受保护',
+    'Protected event hint':
+      '受保护的事件（NIP-70）只能由作者发布。服务器将拒绝来自第三方的这些事件，防止他人转播你的内容。 注意：并非所有服务器都支持受保护的事件。'
   }
 }

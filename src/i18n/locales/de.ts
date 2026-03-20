@@ -182,7 +182,8 @@ export default {
     'Supported NIPs': 'Unterstützte NIPs',
     'Open in a': 'Öffnen in {{a}}',
     'Cannot handle event of kind k': 'Ereignis des Typs {{k}} kann nicht verarbeitet werden',
-    'Encrypted direct messages not supported': 'Verschlüsselte Direktnachrichten werden nicht unterstützt',
+    'Encrypted direct messages not supported':
+      'Verschlüsselte Direktnachrichten werden nicht unterstützt',
     'Sorry! The note cannot be found 😔': 'Entschuldigung! Die Notiz wurde nicht gefunden 😔',
     'This user has been muted': 'Dieser Benutzer wurde stummgeschaltet',
     Wallet: 'Wallet',
@@ -737,7 +738,8 @@ export default {
     'Encryption key not found': 'Verschlüsselungsschlüssel nicht gefunden',
     Conversation: 'Unterhaltung',
     'Invalid user': 'Ungültiger Benutzer',
-    'This user has not set up direct messages yet.': 'Dieser Benutzer hat noch keine Direktnachrichten eingerichtet.',
+    'This user has not set up direct messages yet.':
+      'Dieser Benutzer hat noch keine Direktnachrichten eingerichtet.',
     'Sign in to use Messages': 'Anmelden, um Nachrichten zu nutzen',
     'You need to be signed in to send and receive direct messages.':
       'Du musst angemeldet sein, um Direktnachrichten zu senden und zu empfangen.',
@@ -753,7 +755,8 @@ export default {
     'Publish Encryption Key': 'Verschlüsselungsschlüssel veröffentlichen',
     'Publishing...': 'Veröffentlichen...',
     'Encryption key published': 'Verschlüsselungsschlüssel veröffentlicht',
-    'Failed to publish encryption key': 'Verschlüsselungsschlüssel konnte nicht veröffentlicht werden',
+    'Failed to publish encryption key':
+      'Verschlüsselungsschlüssel konnte nicht veröffentlicht werden',
     'Chat History': 'Chatverlauf',
     'Export your chat history as a backup file, or import a previously exported file to restore messages.':
       'Exportiere deinen Chatverlauf als Sicherungsdatei oder importiere eine zuvor exportierte Datei, um Nachrichten wiederherzustellen.',
@@ -784,7 +787,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Nachrichten von Personen, denen du noch nicht geantwortet hast, werden hier angezeigt.',
     'Key sync request': 'Schlüssel-Synchronisierungsanfrage',
-    'Another device is requesting your encryption key.': 'Ein anderes Gerät fordert deinen Verschlüsselungsschlüssel an.',
+    'Another device is requesting your encryption key.':
+      'Ein anderes Gerät fordert deinen Verschlüsselungsschlüssel an.',
     Dismiss: 'Schließen',
     Retry: 'Erneut versuchen',
     'Retry ({{seconds}}s)': 'Erneut versuchen ({{seconds}}s)',
@@ -808,6 +812,10 @@ export default {
     Requests: 'Anfragen',
     'dm time date': '{{date}} {{time}}',
     React: 'Reagieren',
-    'Relays used for searching notes (NIP-50)': 'Relays für die Notizsuche (NIP-50)'
+    'Relays used for searching notes (NIP-50)': 'Relays für die Notizsuche (NIP-50)',
+    'Protected event (NIP-70)': 'Geschütztes Ereignis (NIP-70)',
+    Protected: 'Geschützt',
+    'Protected event hint':
+      'Geschützte Ereignisse (NIP-70) können nur vom Autor veröffentlicht werden. Relays lehnen diese Ereignisse von Dritten ab und verhindern so, dass andere Ihre Inhalte weiterverbreiten. Hinweis: Nicht alle Relays unterstützen geschützte Ereignisse.'
   }
 }

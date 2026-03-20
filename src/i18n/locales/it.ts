@@ -687,7 +687,8 @@ export default {
     'Hide indirect': 'Nascondi indirette',
     'Copy note content': 'Copia contenuto della nota',
     'Video loop': 'Ripetizione video',
-    'Automatically replay videos when they end': 'Riprodurre automaticamente i video quando terminano',
+    'Automatically replay videos when they end':
+      'Riprodurre automaticamente i video quando terminano',
     Messages: 'Messaggi',
     Message: 'Messaggio',
     'Configure DM Relays': 'Configura relay DM',
@@ -713,7 +714,7 @@ export default {
     'Publishing sync request...': 'Pubblicazione richiesta di sincronizzazione...',
     'Waiting for key from another device...': 'In attesa della chiave da un altro dispositivo...',
     'Open your other device and go to Messages to send the encryption key to this device.':
-      'Apri l\'altro dispositivo e vai su Messaggi per inviare la chiave di crittografia a questo dispositivo.',
+      "Apri l'altro dispositivo e vai su Messaggi per inviare la chiave di crittografia a questo dispositivo.",
     "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.":
       'Non hai accesso a un altro dispositivo? Puoi reimpostare la tua chiave di crittografia per generarne una nuova, ma non potrai più decrittare i messaggi inviati con la vecchia chiave.',
     'Generate New Key': 'Genera nuova chiave',
@@ -730,7 +731,8 @@ export default {
     'Encryption key not found': 'Chiave di crittografia non trovata',
     Conversation: 'Conversazione',
     'Invalid user': 'Utente non valido',
-    'This user has not set up direct messages yet.': 'Questo utente non ha ancora configurato i messaggi diretti.',
+    'This user has not set up direct messages yet.':
+      'Questo utente non ha ancora configurato i messaggi diretti.',
     'Sign in to use Messages': 'Accedi per usare i Messaggi',
     'You need to be signed in to send and receive direct messages.':
       'Devi accedere per inviare e ricevere messaggi diretti.',
@@ -738,7 +740,7 @@ export default {
     'Pending sync requests': 'Richieste di sincronizzazione in attesa',
     'Unknown device': 'Dispositivo sconosciuto',
     'Send Key': 'Invia chiave',
-    'Encryption key sent to other device': 'Chiave di crittografia inviata all\'altro dispositivo',
+    'Encryption key sent to other device': "Chiave di crittografia inviata all'altro dispositivo",
     'Failed to send encryption key': 'Impossibile inviare la chiave di crittografia',
     'Enable Direct Messages': 'Abilita messaggi diretti',
     'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.':
@@ -777,7 +779,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'I messaggi delle persone a cui non hai ancora risposto appariranno qui.',
     'Key sync request': 'Richiesta di sincronizzazione chiave',
-    'Another device is requesting your encryption key.': 'Un altro dispositivo sta richiedendo la tua chiave di crittografia.',
+    'Another device is requesting your encryption key.':
+      'Un altro dispositivo sta richiedendo la tua chiave di crittografia.',
     Dismiss: 'Chiudi',
     Retry: 'Riprova',
     'Retry ({{seconds}}s)': 'Riprova ({{seconds}}s)',
@@ -801,6 +804,10 @@ export default {
     Requests: 'Richieste',
     'dm time date': '{{date}} {{time}}',
     React: 'Reagisci',
-    'Relays used for searching notes (NIP-50)': 'Relay utilizzati per cercare le note (NIP-50)'
+    'Relays used for searching notes (NIP-50)': 'Relay utilizzati per cercare le note (NIP-50)',
+    'Protected event (NIP-70)': 'Evento protetto (NIP-70)',
+    Protected: 'Protetto',
+    'Protected event hint':
+      "Gli eventi protetti (NIP-70) possono essere pubblicati solo dall'autore. I relay rifiuteranno questi eventi da terze parti, impedendo ad altri di ridiffondere i tuoi contenuti. Nota: non tutti i relay supportano gli eventi protetti."
   }
 }

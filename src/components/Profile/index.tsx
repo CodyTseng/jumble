@@ -135,7 +135,11 @@ export default function Profile({ id }: { id?: string }) {
               <>
                 {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
                 <span
-                  title={!isDmSupportLoading && !canStartDm ? t('This user has not set up NIP-4e DMs') : undefined}
+                  title={
+                    !isDmSupportLoading && !canStartDm
+                      ? t('This user has not set up NIP-4e DMs')
+                      : undefined
+                  }
                   className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
                 >
                   <Button
@@ -244,10 +248,7 @@ function SpCopy({ sp }: { sp: string }) {
   }
 
   return (
-    <div
-      className="clickable flex w-fit items-center gap-1 font-mono text-xs"
-      onClick={copy}
-    >
+    <div className="clickable flex w-fit items-center gap-1 font-mono text-xs" onClick={copy}>
       <div>{truncated}</div>
       {copied ? <Check size={14} /> : <Copy size={14} />}
     </div>

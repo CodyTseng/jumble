@@ -725,7 +725,8 @@ export default {
     'Encryption key not found': 'کلید رمزنگاری یافت نشد',
     Conversation: 'مکالمه',
     'Invalid user': 'کاربر نامعتبر',
-    'This user has not set up direct messages yet.': 'این کاربر هنوز پیام مستقیم را تنظیم نکرده است.',
+    'This user has not set up direct messages yet.':
+      'این کاربر هنوز پیام مستقیم را تنظیم نکرده است.',
     'Sign in to use Messages': 'برای استفاده از پیام‌ها وارد شوید',
     'You need to be signed in to send and receive direct messages.':
       'برای ارسال و دریافت پیام‌های مستقیم باید وارد شوید.',
@@ -772,7 +773,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'پیام‌های افرادی که هنوز به آنها پاسخ نداده‌اید اینجا نمایش داده می‌شود.',
     'Key sync request': 'درخواست همگام‌سازی کلید',
-    'Another device is requesting your encryption key.': 'دستگاه دیگری کلید رمزنگاری شما را درخواست کرده است.',
+    'Another device is requesting your encryption key.':
+      'دستگاه دیگری کلید رمزنگاری شما را درخواست کرده است.',
     Dismiss: 'رد کردن',
     Retry: 'تلاش مجدد',
     'Retry ({{seconds}}s)': 'تلاش مجدد ({{seconds}}s)',
@@ -796,6 +798,11 @@ export default {
     Requests: 'درخواست‌ها',
     'dm time date': '{{date}} {{time}}',
     React: 'واکنش',
-    'Relays used for searching notes (NIP-50)': 'رله‌هایی که برای جستجوی یادداشت‌ها استفاده می‌شوند (NIP-50)'
+    'Relays used for searching notes (NIP-50)':
+      'رله‌هایی که برای جستجوی یادداشت‌ها استفاده می‌شوند (NIP-50)',
+    'Protected event (NIP-70)': 'رویداد محافظت‌شده (NIP-70)',
+    Protected: 'محافظت‌شده',
+    'Protected event hint':
+      'رویدادهای محافظت‌شده (NIP-70) فقط توسط نویسنده قابل انتشار هستند. رله‌ها این رویدادها را از اشخاص ثالث رد می‌کنند و از بازنشر محتوای شما توسط دیگران جلوگیری می‌کنند. توجه: همه رله‌ها از رویدادهای محافظت‌شده پشتیبانی نمی‌کنند.'
   }
 }

@@ -983,6 +983,14 @@ class IndexedDbService {
       {
         name: StoreNames.PIN_LIST_EVENTS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 days
+      },
+      {
+        name: StoreNames.USER_EMOJI_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 7 // 7 days
+      },
+      {
+        name: StoreNames.EMOJI_SET_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 7 // 7 days
       }
     ]
     const transaction = this.db!.transaction(

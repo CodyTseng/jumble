@@ -713,7 +713,8 @@ export default {
     'Encryption key not found': 'لم يتم العثور على مفتاح التشفير',
     Conversation: 'محادثة',
     'Invalid user': 'مستخدم غير صالح',
-    'This user has not set up direct messages yet.': 'لم يقم هذا المستخدم بإعداد الرسائل المباشرة بعد.',
+    'This user has not set up direct messages yet.':
+      'لم يقم هذا المستخدم بإعداد الرسائل المباشرة بعد.',
     'Sign in to use Messages': 'سجّل الدخول لاستخدام الرسائل',
     'You need to be signed in to send and receive direct messages.':
       'تحتاج إلى تسجيل الدخول لإرسال واستقبال الرسائل المباشرة.',
@@ -784,6 +785,10 @@ export default {
     Requests: 'طلبات',
     'dm time date': '{{date}} {{time}}',
     React: 'تفاعل',
-    'Relays used for searching notes (NIP-50)': 'الريلايات المستخدمة للبحث عن الملاحظات (NIP-50)'
+    'Relays used for searching notes (NIP-50)': 'الريلايات المستخدمة للبحث عن الملاحظات (NIP-50)',
+    'Protected event (NIP-70)': 'حدث محمي (NIP-70)',
+    Protected: 'محمي',
+    'Protected event hint':
+      'الأحداث المحمية (NIP-70) لا يمكن نشرها إلا من قبل المؤلف. سترفض الخوادم هذه الأحداث من أطراف ثالثة، مما يمنع الآخرين من إعادة بث محتواك. ملاحظة: لا تدعم جميع الخوادم الأحداث المحمية.'
   }
 }

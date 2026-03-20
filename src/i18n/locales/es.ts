@@ -687,7 +687,8 @@ export default {
     'Hide indirect': 'Ocultar indirectas',
     'Copy note content': 'Copiar contenido de la nota',
     'Video loop': 'Repetir video',
-    'Automatically replay videos when they end': 'Reproducir automáticamente los videos cuando terminen',
+    'Automatically replay videos when they end':
+      'Reproducir automáticamente los videos cuando terminen',
     Messages: 'Mensajes',
     Message: 'Mensaje',
     'Configure DM Relays': 'Configurar relays de MD',
@@ -730,7 +731,8 @@ export default {
     'Encryption key not found': 'Clave de cifrado no encontrada',
     Conversation: 'Conversación',
     'Invalid user': 'Usuario no válido',
-    'This user has not set up direct messages yet.': 'Este usuario aún no ha configurado los mensajes directos.',
+    'This user has not set up direct messages yet.':
+      'Este usuario aún no ha configurado los mensajes directos.',
     'Sign in to use Messages': 'Inicia sesión para usar Mensajes',
     'You need to be signed in to send and receive direct messages.':
       'Necesitas iniciar sesión para enviar y recibir mensajes directos.',
@@ -777,7 +779,8 @@ export default {
     "Messages from people you haven't replied to will appear here.":
       'Los mensajes de personas a las que aún no has respondido aparecerán aquí.',
     'Key sync request': 'Solicitud de sincronización de clave',
-    'Another device is requesting your encryption key.': 'Otro dispositivo está solicitando tu clave de cifrado.',
+    'Another device is requesting your encryption key.':
+      'Otro dispositivo está solicitando tu clave de cifrado.',
     Dismiss: 'Cerrar',
     Retry: 'Reintentar',
     'Retry ({{seconds}}s)': 'Reintentar ({{seconds}}s)',
@@ -801,6 +804,10 @@ export default {
     Requests: 'Solicitudes',
     'dm time date': '{{date}} {{time}}',
     React: 'Reaccionar',
-    'Relays used for searching notes (NIP-50)': 'Relés utilizados para buscar notas (NIP-50)'
+    'Relays used for searching notes (NIP-50)': 'Relés utilizados para buscar notas (NIP-50)',
+    'Protected event (NIP-70)': 'Evento protegido (NIP-70)',
+    Protected: 'Protegido',
+    'Protected event hint':
+      'Los eventos protegidos (NIP-70) solo pueden ser publicados por el autor. Los relés rechazarán estos eventos de terceros, evitando que otros redistribuyan tu contenido. Nota: no todos los relés admiten eventos protegidos.'
   }
 }

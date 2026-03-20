@@ -705,7 +705,7 @@ export default {
     'Saving...': 'Enregistrement...',
     'Please add at least one relay': 'Veuillez ajouter au moins un relais',
     'DM relays saved': 'Relais DM enregistrés',
-    'Failed to save DM relays': 'Échec de l\'enregistrement des relais DM',
+    'Failed to save DM relays': "Échec de l'enregistrement des relais DM",
     'Relay already added': 'Relais déjà ajouté',
     'Sync Encryption Key': 'Synchroniser la clé de chiffrement',
     'An encryption key was found for your account. Please open a client that already has your DM encryption key set up to approve the sync request.':
@@ -713,28 +713,29 @@ export default {
     'Checking encryption key...': 'Vérification de la clé de chiffrement...',
     'Encryption key synced!': 'Clé de chiffrement synchronisée !',
     'Encryption key synced successfully': 'Clé de chiffrement synchronisée avec succès',
-    'Failed to import encryption key': 'Échec de l\'importation de la clé de chiffrement',
+    'Failed to import encryption key': "Échec de l'importation de la clé de chiffrement",
     'Publishing sync request...': 'Publication de la demande de synchronisation...',
-    'Waiting for key from another device...': 'En attente de la clé d\'un autre appareil...',
+    'Waiting for key from another device...': "En attente de la clé d'un autre appareil...",
     'Open your other device and go to Messages to send the encryption key to this device.':
       'Ouvrez votre autre appareil et allez dans Messages pour envoyer la clé de chiffrement à cet appareil.',
     "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.":
-      'Pas d\'accès à un autre appareil ? Vous pouvez réinitialiser votre clé de chiffrement pour en générer une nouvelle, mais vous ne pourrez plus déchiffrer les messages envoyés avec l\'ancienne clé.',
+      "Pas d'accès à un autre appareil ? Vous pouvez réinitialiser votre clé de chiffrement pour en générer une nouvelle, mais vous ne pourrez plus déchiffrer les messages envoyés avec l'ancienne clé.",
     'Generate New Key': 'Générer une nouvelle clé',
     'New encryption key generated': 'Nouvelle clé de chiffrement générée',
     'Failed to generate encryption key': 'Échec de la génération de la clé de chiffrement',
     'Try Again': 'Réessayer',
     'No conversations yet': 'Pas encore de conversations',
     "Start a conversation by visiting someone's profile and clicking the message button.":
-      'Commencez une conversation en visitant le profil de quelqu\'un et en cliquant sur le bouton message.',
+      "Commencez une conversation en visitant le profil de quelqu'un et en cliquant sur le bouton message.",
     'No messages yet. Send one!': 'Pas encore de messages. Envoyez-en un !',
     'Type a message...': 'Saisissez un message...',
     'Press Ctrl+Enter or Cmd+Enter to send': 'Appuyez sur Ctrl+Entrée ou Cmd+Entrée pour envoyer',
-    'Failed to send message': 'Échec de l\'envoi du message',
+    'Failed to send message': "Échec de l'envoi du message",
     'Encryption key not found': 'Clé de chiffrement introuvable',
     Conversation: 'Conversation',
     'Invalid user': 'Utilisateur invalide',
-    'This user has not set up direct messages yet.': 'Cet utilisateur n\'a pas encore configuré les messages directs.',
+    'This user has not set up direct messages yet.':
+      "Cet utilisateur n'a pas encore configuré les messages directs.",
     'Sign in to use Messages': 'Connectez-vous pour utiliser les Messages',
     'You need to be signed in to send and receive direct messages.':
       'Vous devez être connecté pour envoyer et recevoir des messages directs.',
@@ -742,11 +743,11 @@ export default {
     'Pending sync requests': 'Demandes de synchronisation en attente',
     'Unknown device': 'Appareil inconnu',
     'Send Key': 'Envoyer la clé',
-    'Encryption key sent to other device': 'Clé de chiffrement envoyée à l\'autre appareil',
-    'Failed to send encryption key': 'Échec de l\'envoi de la clé de chiffrement',
+    'Encryption key sent to other device': "Clé de chiffrement envoyée à l'autre appareil",
+    'Failed to send encryption key': "Échec de l'envoi de la clé de chiffrement",
     'Enable Direct Messages': 'Activer les messages directs',
     'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.':
-      'Les messages directs sont chiffrés de bout en bout avec une paire de clés dédiée, séparée de votre clé d\'identité Nostr. Seule la partie publique est publiée pour que les autres puissent vous envoyer des messages chiffrés.',
+      "Les messages directs sont chiffrés de bout en bout avec une paire de clés dédiée, séparée de votre clé d'identité Nostr. Seule la partie publique est publiée pour que les autres puissent vous envoyer des messages chiffrés.",
     'Publish Encryption Key': 'Publier la clé de chiffrement',
     'Publishing...': 'Publication...',
     'Encryption key published': 'Clé de chiffrement publiée',
@@ -758,30 +759,31 @@ export default {
     Import: 'Importer',
     'No messages to export': 'Aucun message à exporter',
     'Exported {{count}} messages': '{{count}} messages exportés',
-    'Failed to export chat history': 'Échec de l\'exportation de l\'historique',
+    'Failed to export chat history': "Échec de l'exportation de l'historique",
     'No valid messages found in file': 'Aucun message valide trouvé dans le fichier',
     'Imported {{count}} messages': '{{count}} messages importés',
     'Imported {{count}} messages, {{errors}} lines skipped':
       '{{count}} messages importés, {{errors}} lignes ignorées',
-    'Failed to import chat history': 'Échec de l\'importation de l\'historique',
+    'Failed to import chat history': "Échec de l'importation de l'historique",
     'Delete conversation': 'Supprimer la conversation',
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
       'Êtes-vous sûr de vouloir supprimer cette conversation ? Tous les messages seront définitivement supprimés de cet appareil.',
-    'This user has not set up NIP-4e DMs': 'Cet utilisateur n\'a pas configuré les DM NIP-4e',
+    'This user has not set up NIP-4e DMs': "Cet utilisateur n'a pas configuré les DM NIP-4e",
     'Encryption key has been reset': 'La clé de chiffrement a été réinitialisée',
     'Failed to reset encryption key': 'Échec de la réinitialisation de la clé de chiffrement',
     'Encryption Key': 'Clé de chiffrement',
     'Your encryption key is a dedicated key pair used to encrypt and decrypt direct messages. It is separate from your Nostr identity key and stored locally on your device.':
-      'Votre clé de chiffrement est une paire de clés dédiée utilisée pour chiffrer et déchiffrer les messages directs. Elle est séparée de votre clé d\'identité Nostr et stockée localement sur votre appareil.',
+      "Votre clé de chiffrement est une paire de clés dédiée utilisée pour chiffrer et déchiffrer les messages directs. Elle est séparée de votre clé d'identité Nostr et stockée localement sur votre appareil.",
     'Resetting will generate a new key. You will no longer be able to read old messages. Please export and backup your chat history before proceeding.':
       'La réinitialisation générera une nouvelle clé. Vous ne pourrez plus lire les anciens messages. Veuillez exporter et sauvegarder votre historique de discussion avant de continuer.',
     'This action cannot be undone. After resetting, you will no longer be able to decrypt messages encrypted with the old key. It is strongly recommended to export and backup your chat history first.':
-      'Cette action est irréversible. Après la réinitialisation, vous ne pourrez plus déchiffrer les messages chiffrés avec l\'ancienne clé. Il est fortement recommandé d\'exporter et de sauvegarder votre historique de discussion au préalable.',
+      "Cette action est irréversible. Après la réinitialisation, vous ne pourrez plus déchiffrer les messages chiffrés avec l'ancienne clé. Il est fortement recommandé d'exporter et de sauvegarder votre historique de discussion au préalable.",
     'No message requests': 'Aucune demande de message',
     "Messages from people you haven't replied to will appear here.":
-      'Les messages des personnes auxquelles vous n\'avez pas encore répondu apparaîtront ici.',
+      "Les messages des personnes auxquelles vous n'avez pas encore répondu apparaîtront ici.",
     'Key sync request': 'Demande de synchronisation de clé',
-    'Another device is requesting your encryption key.': 'Un autre appareil demande votre clé de chiffrement.',
+    'Another device is requesting your encryption key.':
+      'Un autre appareil demande votre clé de chiffrement.',
     Dismiss: 'Fermer',
     Retry: 'Réessayer',
     'Retry ({{seconds}}s)': 'Réessayer ({{seconds}}s)',
@@ -805,6 +807,11 @@ export default {
     Requests: 'Demandes',
     'dm time date': '{{date}} {{time}}',
     React: 'Réagir',
-    'Relays used for searching notes (NIP-50)': 'Relais utilisés pour rechercher des notes (NIP-50)'
+    'Relays used for searching notes (NIP-50)':
+      'Relais utilisés pour rechercher des notes (NIP-50)',
+    'Protected event (NIP-70)': 'Événement protégé (NIP-70)',
+    Protected: 'Protégé',
+    'Protected event hint':
+      "Les événements protégés (NIP-70) ne peuvent être publiés que par l'auteur. Les relais rejetteront ces événements provenant de tiers, empêchant les autres de rediffuser votre contenu. Remarque : tous les relais ne prennent pas en charge les événements protégés."
   }
 }
