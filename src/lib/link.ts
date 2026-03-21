@@ -93,3 +93,8 @@ export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/user-aggregation/${feedId}/${npub}`
 }
+
+export const toDmConversation = (pubkey: string) => {
+  const npub = pubkey.startsWith('npub') ? pubkey : nip19.npubEncode(pubkey)
+  return `/dms/${npub}`
+}

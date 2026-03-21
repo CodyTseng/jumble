@@ -14,6 +14,7 @@ import RelaysButton from './ExploreButton'
 import FollowingButton from './FollowingButton'
 import HomeButton from './HomeButton'
 import LayoutSwitcher from './LayoutSwitcher'
+import MessagesButton from './MessagesButton'
 import NotificationsButton from './NotificationButton'
 import PostButton from './PostButton'
 import ProfileButton from './ProfileButton'
@@ -58,6 +59,7 @@ export default function PrimaryPageSidebar() {
         {!IS_COMMUNITY_MODE && <RelaysButton collapse={sidebarCollapse} />}
         {IS_COMMUNITY_MODE && <FollowingButton collapse={sidebarCollapse} />}
         <NotificationsButton collapse={sidebarCollapse} />
+        <MessagesButton collapse={sidebarCollapse} />
         <SearchButton collapse={sidebarCollapse} />
         <ProfileButton collapse={sidebarCollapse} />
         {pubkey && <BookmarkButton collapse={sidebarCollapse} />}

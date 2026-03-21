@@ -1,6 +1,6 @@
 import { ExtendedKind } from '@/constants'
 import { tagNameEquals } from '@/lib/tag'
-import { TRelayInfo } from '@/types'
+import { TDmConversation, TDmMessage, TRelayInfo } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
 
@@ -27,6 +27,10 @@ const StoreNames = {
   DECRYPTED_CONTENTS: 'decryptedContents',
   PINNED_USERS_EVENTS: 'pinnedUsersEvents',
   EVENTS: 'events',
+  DM_CONVERSATIONS: 'dmConversations',
+  DM_MESSAGES: 'dmMessages',
+  DM_RELAYS_EVENTS: 'dmRelaysEvents',
+  ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS: 'encryptionKeyAnnouncementEvents',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags', // deprecated
   RELAY_INFO_EVENTS: 'relayInfoEvents' // deprecated
 }
@@ -47,7 +51,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 11)
+        const request = window.indexedDB.open('jumble', 19)
 
         request.onerror = (event) => {
           reject(event)
@@ -58,8 +62,9 @@ class IndexedDbService {
           resolve()
         }
 
-        request.onupgradeneeded = () => {
+        request.onupgradeneeded = (event) => {
           const db = request.result
+          const oldVersion = (event as IDBVersionChangeEvent).oldVersion
           if (!db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
             db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
           }
@@ -111,6 +116,42 @@ class IndexedDbService {
             })
             feedEventsStore.createIndex('createdAtIndex', 'event.created_at')
           }
+          if (!db.objectStoreNames.contains(StoreNames.DM_CONVERSATIONS)) {
+            const dmConversationsStore = db.createObjectStore(StoreNames.DM_CONVERSATIONS, {
+              keyPath: 'key'
+            })
+            dmConversationsStore.createIndex('lastMessageAtIndex', 'lastMessageAt')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.DM_MESSAGES)) {
+            const dmMessagesStore = db.createObjectStore(StoreNames.DM_MESSAGES, {
+              keyPath: 'id'
+            })
+            dmMessagesStore.createIndex('conversationCreatedAtIndex', [
+              'conversationKey',
+              'createdAt'
+            ])
+          } else {
+            const transaction = (request.transaction as IDBTransaction)!
+            const dmMessagesStore = transaction.objectStore(StoreNames.DM_MESSAGES)
+            if (!dmMessagesStore.indexNames.contains('conversationCreatedAtIndex')) {
+              dmMessagesStore.createIndex('conversationCreatedAtIndex', [
+                'conversationKey',
+                'createdAt'
+              ])
+            }
+            if (dmMessagesStore.indexNames.contains('conversationKeyIndex')) {
+              dmMessagesStore.deleteIndex('conversationKeyIndex')
+            }
+            if (dmMessagesStore.indexNames.contains('createdAtIndex')) {
+              dmMessagesStore.deleteIndex('createdAtIndex')
+            }
+          }
+          if (!db.objectStoreNames.contains(StoreNames.DM_RELAYS_EVENTS)) {
+            db.createObjectStore(StoreNames.DM_RELAYS_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS)) {
+            db.createObjectStore(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS, { keyPath: 'key' })
+          }
 
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
             db.deleteObjectStore(StoreNames.RELAY_INFO_EVENTS)
@@ -118,6 +159,20 @@ class IndexedDbService {
           if (db.objectStoreNames.contains(StoreNames.MUTE_DECRYPTED_TAGS)) {
             db.deleteObjectStore(StoreNames.MUTE_DECRYPTED_TAGS)
           }
+
+          // v19: Clear DM data to re-sync with account-scoped conversation keys
+          if (oldVersion > 0 && oldVersion < 19) {
+            if (db.objectStoreNames.contains(StoreNames.DM_CONVERSATIONS)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.DM_CONVERSATIONS).clear()
+            }
+            if (db.objectStoreNames.contains(StoreNames.DM_MESSAGES)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.DM_MESSAGES).clear()
+            }
+            window.localStorage.removeItem('dmDeletedConversationsMap')
+          }
+
           this.db = db
         }
       })
@@ -544,6 +599,301 @@ class IndexedDbService {
     })
   }
 
+  async putDmConversation(conversation: TDmConversation): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_CONVERSATIONS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_CONVERSATIONS)
+
+      const putRequest = store.put(conversation)
+      putRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getDmConversation(key: string): Promise<TDmConversation | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_CONVERSATIONS, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_CONVERSATIONS)
+      const request = store.get(key)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve(request.result ?? null)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getAllDmConversations(accountPubkey: string): Promise<TDmConversation[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_CONVERSATIONS, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_CONVERSATIONS)
+      const index = store.index('lastMessageAtIndex')
+      const request = index.openCursor(null, 'prev')
+
+      const results: TDmConversation[] = []
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const conversation = cursor.value as TDmConversation
+          if (conversation.key.startsWith(accountPubkey + ':')) {
+            results.push(conversation)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve(results)
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async hasDmMessages(): Promise<boolean> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.openCursor()
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        transaction.commit()
+        resolve(!!cursor)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async putDmMessage(message: TDmMessage): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+
+      const putRequest = store.put(message)
+      putRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      putRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getDmMessages(
+    conversationKey: string,
+    options?: { limit?: number; before?: number }
+  ): Promise<TDmMessage[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const index = store.index('conversationCreatedAtIndex')
+
+      const limit = options?.limit ?? 50
+      const before = options?.before
+      const range =
+        before !== undefined
+          ? IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, before], false, true)
+          : IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range, 'prev')
+
+      const results: TDmMessage[] = []
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor && results.length < limit) {
+          results.push(cursor.value as TDmMessage)
+          cursor.continue()
+        } else {
+          transaction.commit()
+          results.reverse()
+          resolve(results)
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getLatestDmMessage(conversationKey: string): Promise<TDmMessage | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const index = store.index('conversationCreatedAtIndex')
+      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range, 'prev')
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        transaction.commit()
+        resolve(cursor ? (cursor.value as TDmMessage) : null)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getAllDmMessagesForAccount(accountPubkey: string): Promise<TDmMessage[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.openCursor()
+
+      const results: TDmMessage[] = []
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const message = cursor.value as TDmMessage
+          if (message.conversationKey.includes(accountPubkey)) {
+            results.push(message)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve(results)
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getDmMessageById(id: string): Promise<TDmMessage | null> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const request = store.get(id)
+
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve(request.result ? (request.result as TDmMessage) : null)
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteDmConversation(key: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_CONVERSATIONS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_CONVERSATIONS)
+
+      const deleteRequest = store.delete(key)
+      deleteRequest.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+
+      deleteRequest.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deleteDmMessagesByConversationKey(conversationKey: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readwrite')
+      const store = transaction.objectStore(StoreNames.DM_MESSAGES)
+      const index = store.index('conversationCreatedAtIndex')
+      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const request = index.openCursor(range)
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          cursor.delete()
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve()
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   private getReplaceableEventKeyFromEvent(event: Event): string {
     if (
       [kinds.Metadata, kinds.Contacts].includes(event.kind) ||
@@ -586,6 +936,10 @@ class IndexedDbService {
         return StoreNames.PIN_LIST_EVENTS
       case ExtendedKind.PINNED_USERS:
         return StoreNames.PINNED_USERS_EVENTS
+      case ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT:
+        return StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS
+      case ExtendedKind.DM_RELAYS:
+        return StoreNames.DM_RELAYS_EVENTS
       default:
         return undefined
     }
