@@ -777,6 +777,9 @@ export default {
     'Protected event (NIP-70)': '受保护的事件 (NIP-70)',
     Protected: '受保护',
     'Protected event hint':
-      '受保护的事件（NIP-70）只能由作者发布。服务器将拒绝来自第三方的这些事件，防止他人转播你的内容。 注意：并非所有服务器都支持受保护的事件。'
+      '受保护的事件（NIP-70）只能由作者发布。服务器将拒绝来自第三方的这些事件，防止他人转播你的内容。 注意：并非所有服务器都支持受保护的事件。',
+    'Allow insecure connections': '允许不安全的连接',
+    'Allow insecure connections description':
+      '允许加载 http:// 资源和连接 ws:// relay。可能会触发浏览器混合内容警告。'
   }
 }

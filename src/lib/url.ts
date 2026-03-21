@@ -7,6 +7,15 @@ export function isWebsocketUrl(url: string): boolean {
   }
 }
 
+export function isInsecureUrl(url: string): boolean {
+  try {
+    const protocol = new URL(url).protocol
+    return protocol === 'ws:' || protocol === 'http:'
+  } catch {
+    return false
+  }
+}
+
 export function isOnionUrl(url: string): boolean {
   try {
     const hostname = new URL(url).hostname

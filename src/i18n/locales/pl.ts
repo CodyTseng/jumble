@@ -810,6 +810,9 @@ export default {
     'Protected event (NIP-70)': 'Chronione zdarzenie (NIP-70)',
     Protected: 'Chronione',
     'Protected event hint':
-      'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Przekaźniki odrzucą te zdarzenia od osób trzecich, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie przekaźniki obsługują chronione zdarzenia.'
+      'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Przekaźniki odrzucą te zdarzenia od osób trzecich, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie przekaźniki obsługują chronione zdarzenia.',
+    'Allow insecure connections': 'Zezwól na niezabezpieczone połączenia',
+    'Allow insecure connections description':
+      'Zezwól na ładowanie zasobów http:// i łączenie z przekaźnikami ws://. Może wywołać ostrzeżenia przeglądarki o mieszanej zawartości.'
   }
 }

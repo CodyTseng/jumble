@@ -1,6 +1,8 @@
+import { isInsecureUrl } from '@/lib/url'
+import storage from '@/services/local-storage.service'
+import webService from '@/services/web.service'
 import { TWebMetadata } from '@/types'
 import { useEffect, useState } from 'react'
-import webService from '@/services/web.service'
 
 export function useFetchWebMetadata(url: string) {
   const [metadata, setMetadata] = useState<TWebMetadata>({})
@@ -10,6 +12,8 @@ export function useFetchWebMetadata(url: string) {
   }
 
   useEffect(() => {
+    if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) return
+
     webService.fetchWebMetadata(url).then((metadata) => setMetadata(metadata))
   }, [url])
 

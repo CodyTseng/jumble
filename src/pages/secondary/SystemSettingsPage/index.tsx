@@ -16,6 +16,9 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [filterOutOnionRelays, setFilterOutOnionRelays] = useState(
     storage.getFilterOutOnionRelays()
   )
+  const [allowInsecureConnection, setAllowInsecureConnection] = useState(
+    storage.getAllowInsecureConnection()
+  )
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('System')}>
@@ -42,6 +45,22 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             onCheckedChange={(checked) => {
               storage.setFilterOutOnionRelays(checked)
               setFilterOutOnionRelays(checked)
+            }}
+          />
+        </div>
+        <div className="flex min-h-9 items-center justify-between px-4">
+          <Label htmlFor="allow-insecure-connection" className="text-base font-normal">
+            <div>{t('Allow insecure connections')}</div>
+            <div className="text-muted-foreground">
+              {t('Allow insecure connections description')}
+            </div>
+          </Label>
+          <Switch
+            id="allow-insecure-connection"
+            checked={allowInsecureConnection}
+            onCheckedChange={(checked) => {
+              storage.setAllowInsecureConnection(checked)
+              setAllowInsecureConnection(checked)
             }}
           />
         </div>

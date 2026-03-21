@@ -799,6 +799,9 @@ export default {
     'Protected event (NIP-70)': 'Védett esemény (NIP-70)',
     Protected: 'Védett',
     'Protected event hint':
-      'A védett eseményeket (NIP-70) csak a szerző teheti közzé. A csomópontok elutasítják ezeket az eseményeket harmadik felektől, megakadályozva, hogy mások újraközvetítsék a tartalmadat. Megjegyzés: nem minden csomópont támogatja a védett eseményeket.'
+      'A védett eseményeket (NIP-70) csak a szerző teheti közzé. A csomópontok elutasítják ezeket az eseményeket harmadik felektől, megakadályozva, hogy mások újraközvetítsék a tartalmadat. Megjegyzés: nem minden csomópont támogatja a védett eseményeket.',
+    'Allow insecure connections': 'Nem biztonságos kapcsolatok engedélyezése',
+    'Allow insecure connections description':
+      'http:// erőforrások betöltésének és ws:// relékhez való csatlakozás engedélyezése. Böngésző vegyes tartalom figyelmeztetéseket válthat ki.'
   }
 }
