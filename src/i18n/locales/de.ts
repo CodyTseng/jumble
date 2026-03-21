@@ -816,6 +816,9 @@ export default {
     'Protected event (NIP-70)': 'Geschütztes Ereignis (NIP-70)',
     Protected: 'Geschützt',
     'Protected event hint':
-      'Geschützte Ereignisse (NIP-70) können nur vom Autor veröffentlicht werden. Relays lehnen diese Ereignisse von Dritten ab und verhindern so, dass andere Ihre Inhalte weiterverbreiten. Hinweis: Nicht alle Relays unterstützen geschützte Ereignisse.'
+      'Geschützte Ereignisse (NIP-70) können nur vom Autor veröffentlicht werden. Relays lehnen diese Ereignisse von Dritten ab und verhindern so, dass andere Ihre Inhalte weiterverbreiten. Hinweis: Nicht alle Relays unterstützen geschützte Ereignisse.',
+    'Allow insecure connections': 'Unsichere Verbindungen zulassen',
+    'Allow insecure connections description':
+      'Laden von http://-Ressourcen und Verbindung zu ws://-Relays erlauben. Kann Browser-Warnungen zu gemischten Inhalten auslösen.'
   }
 }

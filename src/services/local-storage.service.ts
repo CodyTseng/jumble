@@ -63,6 +63,7 @@ class LocalStorageService {
   private enableSingleColumnLayout: boolean = true
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
   private filterOutOnionRelays: boolean = !isTorBrowser()
+  private allowInsecureConnection: boolean = false
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
@@ -259,6 +260,9 @@ class LocalStorageService {
     if (filterOutOnionRelaysStr) {
       this.filterOutOnionRelays = filterOutOnionRelaysStr !== 'false'
     }
+
+    this.allowInsecureConnection =
+      window.localStorage.getItem(StorageKey.ALLOW_INSECURE_CONNECTION) === 'true'
 
     this.quickReaction = window.localStorage.getItem(StorageKey.QUICK_REACTION) === 'true'
     const quickReactionEmojiStr =
@@ -747,6 +751,15 @@ class LocalStorageService {
   setFilterOutOnionRelays(filterOut: boolean) {
     this.filterOutOnionRelays = filterOut
     window.localStorage.setItem(StorageKey.FILTER_OUT_ONION_RELAYS, filterOut.toString())
+  }
+
+  getAllowInsecureConnection() {
+    return this.allowInsecureConnection
+  }
+
+  setAllowInsecureConnection(allow: boolean) {
+    this.allowInsecureConnection = allow
+    window.localStorage.setItem(StorageKey.ALLOW_INSECURE_CONNECTION, allow.toString())
   }
 
   getQuickReaction() {

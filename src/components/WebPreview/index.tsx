@@ -1,7 +1,9 @@
 import { useFetchWebMetadata } from '@/hooks/useFetchWebMetadata'
+import { isInsecureUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import storage from '@/services/local-storage.service'
 import { useMemo } from 'react'
 import Image from '../Image'
 import ExternalLink from '../ExternalLink'
@@ -26,6 +28,10 @@ export default function WebPreview({
       return ''
     }
   }, [url])
+
+  if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) {
+    return null
+  }
 
   if (!autoLoadMedia && !mustLoad) {
     return null
