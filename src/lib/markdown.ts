@@ -34,10 +34,10 @@ export function containsMarkdown(content: string): boolean {
 
   let matchCount = 0
   for (const pattern of mediumPatterns) {
-    if (pattern.test(cleaned)) {
-      matchCount++
-      if (matchCount >= 2) return true
-    }
+    const globalPattern = new RegExp(pattern.source, pattern.flags.includes('m') ? 'gm' : 'g')
+    const occurrences = (cleaned.match(globalPattern) || []).length
+    matchCount += occurrences
+    if (matchCount >= 2) return true
   }
 
   return false
