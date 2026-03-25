@@ -163,7 +163,7 @@ export default {
     'Send only to r': 'Wyślij tylko do {{r}}',
     'Send only to these relays': 'Wyślij tylko do tych transmiterów',
     Explore: 'Transmitery',
-    'Search relays': 'Przekaźniki wyszukiwania',
+    'Search relays': 'Transmitery wyszukiwania',
     relayInfoBadgeAuth: '✔️',
     relayInfoBadgeSearch: 'Wyszukiwarka',
     relayInfoBadgePayment: 'Płatności',
@@ -672,22 +672,22 @@ export default {
     'Auto-load profile pictures': 'Automatyczne ładowanie zdjęć profilowych',
     'Disable live feed': 'Wyłącz kanał na żywo',
     'Enable live feed': 'Włącz kanał na żywo',
-    'Default relays': 'Domyślne przekaźniki',
+    'Default relays': 'Domyślne transmitery',
     'Reset to default': 'Przywróć domyślne',
     'Default relays description':
-      'Używane do odpytywania konfiguracji przekaźników innych użytkowników i jako rozwiązanie awaryjne, gdy użytkownicy nie mają skonfigurowanych przekaźników.',
+      'Używane do odpytywania konfiguracji transmiterów innych użytkowników i jako rozwiązanie awaryjne, gdy użytkownicy nie mają skonfigurowanych transmiterów.',
     'Default relays warning':
-      'Ostrzeżenie: Nie modyfikuj tych ustawień pochopnie, może to wpłynąć na podstawowe doświadczenie.',
-    'Invalid relay URL': 'Nieprawidłowy adres URL przekaźnika',
+      'Ostrzeżenie: Nie modyfikuj tych ustawień pochopnie, może to wpłynąć na komfort użytkowania.',
+    'Invalid relay URL': 'Nieprawidłowy adres URL transmitera',
     'Muted words': 'Wyciszone słowa',
     'Add muted word': 'Dodaj wyciszone słowo',
     'Zap Details': 'Szczegóły zapu',
     'Default trust score filter threshold ({{n}}%)':
       'Domyślny próg filtra wyniku zaufania ({{n}}%)',
-    'No notes found': 'Nie znaleziono notatek',
+    'No notes found': 'Nie znaleziono wpisów',
     'Try again later or check your connection': 'Spróbuj ponownie później lub sprawdź połączenie',
     'Hide indirect': 'Ukryj pośrednie',
-    'Copy note content': 'Kopiuj treść notatki',
+    'Copy note content': 'Kopiuj treść wpisu',
     'Video loop': 'Zapętlanie wideo',
     'Automatically replay videos when they end': 'Automatycznie powtarzaj filmy po zakończeniu',
     Messages: 'Wiadomości',
@@ -805,14 +805,12 @@ export default {
     Requests: 'Prośby',
     'dm time date': '{{date}} {{time}}',
     React: 'Reaguj',
-    'Relays used for searching notes (NIP-50)':
-      'Przekaźniki używane do wyszukiwania notatek (NIP-50)',
+    'Relays used for searching notes (NIP-50)': 'Transmitery używane do wyszukiwania wpisów (NIP-50)',
     'Protected event (NIP-70)': 'Chronione zdarzenie (NIP-70)',
     Protected: 'Chronione',
-    'Protected event hint':
-      'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Przekaźniki odrzucą te zdarzenia od osób trzecich, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie przekaźniki obsługują chronione zdarzenia.',
+    'Protected event hint': 'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Transmitery odrzucą publikację tych zdarzeń przez osoby trzecie, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie transmitery obsługują ochronę zdarzeń.',
     'Allow insecure connections': 'Zezwól na niezabezpieczone połączenia',
     'Allow insecure connections description':
-      'Zezwól na ładowanie zasobów http:// i łączenie z przekaźnikami ws://. Może wywołać ostrzeżenia przeglądarki o mieszanej zawartości.'
+      'Zezwól na ładowanie zasobów http:// i łączenie z transmiterami ws://. Może to wywołać ostrzeżenia przeglądarki o mieszanej zawartości.'
   }
 }
