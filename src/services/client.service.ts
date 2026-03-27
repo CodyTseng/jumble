@@ -5,7 +5,11 @@ import {
   getReplaceableCoordinateFromEvent,
   isReplaceableEvent
 } from '@/lib/event'
-import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
+import {
+  getFollowPackInfoFromEvent,
+  getProfileFromEvent,
+  getRelayListFromEvent
+} from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { filterOutBigRelays, getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { SmartPool } from '@/lib/smart-pool'
@@ -33,6 +37,19 @@ import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
 
 type TTimelineRef = [string, number]
+
+export type TMentionTarget =
+  | {
+      type: 'profile'
+      id: string
+    }
+  | {
+      type: 'list'
+      id: string
+      label: string
+      subtitle?: string
+      pubkeys: string[]
+    }
 
 class ClientService extends EventTarget {
   static instance: ClientService
@@ -67,6 +84,17 @@ class ClientService extends EventTarget {
   private userIndex = new FlexSearch.Index({
     tokenize: 'forward'
   })
+  private peopleListIndex = new FlexSearch.Index({
+    tokenize: 'forward'
+  })
+  private peopleListMetaMap = new Map<
+    string,
+    {
+      label: string
+      subtitle?: string
+      pubkeys: string[]
+    }
+  >()
 
   constructor() {
     super()
@@ -84,6 +112,9 @@ class ClientService extends EventTarget {
 
   async init() {
     await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
+    await indexedDb.iteratePeopleListEvents((peopleListEvent) =>
+      this.addPeopleListToIndex(peopleListEvent)
+    )
   }
 
   async determineTargetRelays(
@@ -876,6 +907,15 @@ class ClientService extends EventTarget {
         this.replaceableEventCacheMap.set(coordinate, event)
       }
     }
+
+    if (this.isMentionablePeopleListEvent(event)) {
+      this.addPeopleListToIndex(event).catch(() => {
+        // ignore mention index failures
+      })
+      indexedDb.putReplaceableEvent(event).catch(() => {
+        // ignore cache persistence failures
+      })
+    }
   }
 
   getReplaeableEventFromCache(coordinate: string): NEvent | undefined {
@@ -1050,6 +1090,38 @@ class ClientService extends EventTarget {
     return profiles.filter((profile) => !!profile) as TProfile[]
   }
 
+  async searchMentionTargetsFromLocal(
+    query: string,
+    limit: number = 20
+  ): Promise<TMentionTarget[]> {
+    const normalizedQuery = query.normalize('NFKD')
+    const [npubs, peopleLists] = await Promise.all([
+      this.searchNpubsFromLocal(normalizedQuery, limit),
+      this.peopleListIndex.searchAsync(normalizedQuery, { limit })
+    ])
+
+    const profileTargets: TMentionTarget[] = npubs.map((npub) => ({
+      type: 'profile',
+      id: npub
+    }))
+    const peopleListTargets = peopleLists.reduce<TMentionTarget[]>((acc, id) => {
+      const meta = this.peopleListMetaMap.get(id as string)
+      if (!meta || meta.pubkeys.length === 0) {
+        return acc
+      }
+      acc.push({
+        type: 'list' as const,
+        id: id as string,
+        label: meta.label,
+        subtitle: meta.subtitle,
+        pubkeys: meta.pubkeys
+      })
+      return acc
+    }, [])
+
+    return [...profileTargets, ...peopleListTargets].slice(0, limit)
+  }
+
   private async addUsernameToIndex(profileEvent: NEvent) {
     try {
       const profileObj = JSON.parse(profileEvent.content)
@@ -1069,6 +1141,40 @@ class ClientService extends EventTarget {
     } catch {
       return
     }
+  }
+
+  private isMentionablePeopleListEvent(event: NEvent) {
+    return [ExtendedKind.PEOPLE_LIST, ExtendedKind.FOLLOW_PACK].includes(event.kind)
+  }
+
+  private async addPeopleListToIndex(event: NEvent) {
+    if (!this.isMentionablePeopleListEvent(event)) {
+      return
+    }
+
+    const { title, description, pubkeys } = getFollowPackInfoFromEvent(event)
+    if (!title || pubkeys.length === 0) {
+      return
+    }
+
+    const identifier = event.tags.find(tagNameEquals('d'))?.[1] ?? ''
+    const id = nip19.naddrEncode({
+      pubkey: event.pubkey,
+      kind: event.kind,
+      identifier
+    })
+    const subtitle = description?.trim() || `${pubkeys.length} profiles`
+    const text = [title, description ?? '', event.tags.find(tagNameEquals('d'))?.[1] ?? '']
+      .join(' ')
+      .normalize('NFKD')
+      .trim()
+
+    this.peopleListMetaMap.set(id, { label: title, subtitle, pubkeys })
+    if (!text) {
+      return
+    }
+
+    await this.peopleListIndex.addAsync(id, text)
   }
 
   private async _fetchProfileEvent(id: string): Promise<NEvent | undefined> {
