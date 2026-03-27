@@ -306,7 +306,8 @@ const UserAggregationList = forwardRef<
         hideContentMentioningMutedUsers,
         isMentioningMutedUsers,
         meetsMinTrustScore,
-        trustScoreThreshold
+        trustScoreThreshold,
+        since
       ]
     )
 
