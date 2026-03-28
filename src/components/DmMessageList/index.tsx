@@ -18,7 +18,7 @@ import UserAvatar from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
-import { ExtendedKind } from '@/constants'
+import { EMOJI_REGEX, ExtendedKind } from '@/constants'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -955,8 +955,8 @@ function DmContent({
   isHighlighted?: boolean
   tags?: string[][]
 }) {
-  const { allImages, segments } = useMemo(() => {
-    if (!content) return { allImages: [], segments: [] }
+  const { allImages, segments, isEmojiOnly } = useMemo(() => {
+    if (!content) return { allImages: [], segments: [], isEmojiOnly: false }
 
     const nodes = parseContent(content, [
       EmbeddedEventParser,
@@ -982,7 +982,30 @@ function DmContent({
 
     const segments = segmentDmContent(nodes)
 
-    return { allImages, segments }
+    // Detect emoji-only content (1-3 emojis, no other content)
+    const nonWhitespace = nodes.filter(
+      (node) => !(node.type === 'text' && /^\s*$/.test(node.data))
+    )
+    let emojiCount = 0
+    let emojiOnly = true
+    for (const node of nonWhitespace) {
+      if (node.type === 'emoji') {
+        emojiCount++
+      } else if (node.type === 'text') {
+        const matches = node.data.match(new RegExp(EMOJI_REGEX.source, 'gu'))
+        if (!matches || node.data.replace(new RegExp(EMOJI_REGEX.source, 'gu'), '').trim() !== '') {
+          emojiOnly = false
+          break
+        }
+        emojiCount += matches.length
+      } else {
+        emojiOnly = false
+        break
+      }
+    }
+    const isEmojiOnly = emojiOnly && emojiCount > 0 && emojiCount <= 3
+
+    return { allImages, segments, isEmojiOnly }
   }, [content])
 
   const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(tags), [tags])
@@ -1002,6 +1025,23 @@ function DmContent({
     >
       {segments.map((seg, si) => {
         if (seg.kind === 'text') {
+          if (isEmojiOnly) {
+            return (
+              <div key={si} className="flex items-end gap-1">
+                {seg.nodes.map((node, ni) => {
+                  if (node.type === 'text')
+                    return <span key={ni} className="text-7xl leading-none">{node.data}</span>
+                  if (node.type === 'emoji') {
+                    const shortcode = node.data.split(':')[1]
+                    const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+                    if (!emoji) return node.data
+                    return <Emoji classNames={{ img: 'size-20' }} emoji={emoji} key={ni} />
+                  }
+                  return null
+                })}
+              </div>
+            )
+          }
           return (
             <div key={si} className={bubbleClass}>
               <div
