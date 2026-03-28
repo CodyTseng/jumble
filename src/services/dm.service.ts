@@ -842,8 +842,10 @@ class DmService {
       return null
     }
 
-    const recipientPubkey = rumor.tags.find((t) => t[0] === 'p')?.[1]
-    if (!recipientPubkey) return null
+    const pTags = rumor.tags.filter((t) => t[0] === 'p')
+    // Only support 1:1 chats, filter out group chats (multiple p tags)
+    if (pTags.length !== 1) return null
+    const recipientPubkey = pTags[0][1]
 
     const fromMe = this.isFromMe(senderPubkey, accountPubkey, encryptionPubkey)
     const effectiveSenderPubkey = fromMe ? accountPubkey : senderPubkey
