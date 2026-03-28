@@ -2,7 +2,7 @@ import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { Titlebar } from '@/components/Titlebar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useBottomBar, useSecondaryPage } from '@/PageManager'
+import { useSecondaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -38,7 +38,6 @@ const SecondaryPageLayout = forwardRef(
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const { enableSingleColumnLayout } = useUserPreferences()
     const { currentIndex } = useSecondaryPage()
-    const { hidden: bottomBarHidden } = useBottomBar()
 
     useImperativeHandle(
       ref,
@@ -71,15 +70,11 @@ const SecondaryPageLayout = forwardRef(
               style={
                 noScrollArea
                   ? {
-                      height: bottomBarHidden
-                        ? 'var(--vh)'
-                        : 'calc(var(--vh) - env(safe-area-inset-bottom) - 3rem)'
+                      height: 'calc(var(--vh) - var(--bottom-bar-offset, 0px))'
                     }
-                  : bottomBarHidden
-                    ? undefined
-                    : {
-                        paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-                      }
+                  : {
+                      paddingBottom: 'var(--bottom-bar-offset, 0px)'
+                    }
               }
             >
               <SecondaryPageTitlebar
