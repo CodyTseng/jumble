@@ -3,7 +3,7 @@ import DmMessageList from '@/components/DmMessageList'
 import { ExtendedKind } from '@/constants'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useBottomBar, useSecondaryPage } from '@/PageManager'
+import { useSecondaryPage } from '@/PageManager'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
 import { Loader2 } from 'lucide-react'
@@ -22,7 +22,6 @@ const DmConversationPage = forwardRef(
       senderPubkey: string
       tags?: string[][]
     } | null>(null)
-    const { setHidden } = useBottomBar()
     const { currentIndex } = useSecondaryPage()
     const active = currentIndex === index
 
@@ -46,9 +45,6 @@ const DmConversationPage = forwardRef(
       setReplyTo(null)
     }, [])
 
-    useEffect(() => {
-      setHidden(active)
-    }, [setHidden, active])
     const pubkey = useMemo(() => {
       if (pubkeyOrNpub?.startsWith('npub')) {
         try {

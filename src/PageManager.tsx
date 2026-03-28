@@ -8,7 +8,6 @@ import {
   createRef,
   ReactNode,
   RefObject,
-  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -43,19 +42,12 @@ type TStackItem = {
   url: string
   element: React.ReactElement | null
   ref: RefObject<TPageRef> | null
+  hideBottomBar: boolean
 }
 
 const PrimaryPageContext = createContext<TPrimaryPageContext | undefined>(undefined)
 
 const SecondaryPageContext = createContext<TSecondaryPageContext | undefined>(undefined)
-
-type TBottomBarContext = {
-  hidden: boolean
-  setHidden: (hidden: boolean) => void
-}
-
-const BottomBarContext = createContext<TBottomBarContext>({ hidden: false, setHidden: () => {} })
-const NO_BOTTOM_BAR: TBottomBarContext = { hidden: true, setHidden: () => {} }
 
 export function usePrimaryPage() {
   const context = useContext(PrimaryPageContext)
@@ -73,16 +65,7 @@ export function useSecondaryPage() {
   return context
 }
 
-export function useBottomBar() {
-  return useContext(BottomBarContext)
-}
-
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
-  const [bottomBarHidden, setBottomBarHidden] = useState(false)
-  const bottomBarContextValue = {
-    hidden: bottomBarHidden,
-    setHidden: useCallback((hidden: boolean) => setBottomBarHidden(hidden), [])
-  }
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -93,6 +76,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
+  const bottomBarHidden = secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
+  const bottomBarOffset = bottomBarHidden ? '0px' : 'calc(env(safe-area-inset-bottom) + 3rem)'
   const { isSmallScreen } = useScreenSize()
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout } = useUserPreferences()
@@ -205,21 +190,23 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         const topItem = newStack[newStack.length - 1] as TStackItem | undefined
         if (!topItem) {
           // Create a new stack item if it's not exist (e.g. when the user refreshes the page, the stack will be empty)
-          const { element, ref } = findAndCloneElement(state.url, state.index)
+          const { element, ref, hideBottomBar } = findAndCloneElement(state.url, state.index)
           if (element) {
             newStack.push({
               index: state.index,
               url: state.url,
               element,
-              ref
+              ref,
+              hideBottomBar: hideBottomBar ?? false
             })
           }
         } else if (!topItem.element) {
           // Load the element if it's not cached
-          const { element, ref } = findAndCloneElement(topItem.url, state.index)
+          const { element, ref, hideBottomBar } = findAndCloneElement(topItem.url, state.index)
           if (element) {
             topItem.element = element
             topItem.ref = ref
+            topItem.hideBottomBar = hideBottomBar ?? false
           }
         }
         if (newStack.length === 0) {
@@ -310,7 +297,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
-              <BottomBarContext.Provider value={bottomBarContextValue}>
+              <div style={{ '--bottom-bar-offset': bottomBarOffset } as React.CSSProperties}>
               {!!secondaryStack.length &&
                 secondaryStack.map((item, index) => (
                   <div
@@ -335,7 +322,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ))}
               {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
-              </BottomBarContext.Provider>
+              </div>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -363,7 +350,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
-              <BottomBarContext.Provider value={NO_BOTTOM_BAR}>
               <div className="flex w-full lg:justify-around">
                 <div className="sticky top-0 flex h-[var(--vh)] justify-end self-start lg:w-full">
                   <Sidebar />
@@ -398,7 +384,6 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <TooManyRelaysAlertDialog />
               <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
-              </BottomBarContext.Provider>
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -522,13 +507,13 @@ function isCurrentPage(stack: TStackItem[], url: string) {
 
 function findAndCloneElement(url: string, index: number) {
   const path = url.split('?')[0].split('#')[0]
-  for (const { matcher, element } of SECONDARY_ROUTES) {
+  for (const { matcher, element, hideBottomBar } of SECONDARY_ROUTES) {
     const match = matcher(path)
     if (!match) continue
 
     if (!element) return {}
     const ref = createRef<TPageRef>()
-    return { element: cloneElement(element, { ...match.params, index, ref } as any), ref }
+    return { element: cloneElement(element, { ...match.params, index, ref } as any), ref, hideBottomBar }
   }
   return {}
 }
@@ -542,10 +527,10 @@ function pushNewPageToStack(
   const currentItem = stack[stack.length - 1]
   const currentIndex = specificIndex ?? (currentItem ? currentItem.index + 1 : 0)
 
-  const { element, ref } = findAndCloneElement(url, currentIndex)
+  const { element, ref, hideBottomBar } = findAndCloneElement(url, currentIndex)
   if (!element) return { newStack: stack, newItem: null }
 
-  const newItem = { element, ref, url, index: currentIndex }
+  const newItem: TStackItem = { element, ref, url, index: currentIndex, hideBottomBar: hideBottomBar ?? false }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.element)
   // Clear the oldest cached element if there are too many cached elements
