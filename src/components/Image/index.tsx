@@ -1,14 +1,13 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { isInsecureUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import blossomService from '@/services/blossom.service'
-import storage from '@/services/local-storage.service'
 import { TImetaInfo } from '@/types'
 import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { thumbHashToDataURL } from 'thumbhash'
-import ExternalLink from '../ExternalLink'
 
 export default function Image({
   image: { url, blurHash, thumbHash, pubkey, dim },
@@ -29,21 +28,20 @@ export default function Image({
   hideIfError?: boolean
   errorPlaceholder?: React.ReactNode
 }) {
+  const { allowInsecureConnection } = useUserPreferences()
   const [isLoading, setIsLoading] = useState(true)
   const [displaySkeleton, setDisplaySkeleton] = useState(true)
   const [hasError, setHasError] = useState(false)
-  const [isBlocked, setIsBlocked] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>()
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setIsLoading(true)
     setHasError(false)
-    setIsBlocked(false)
     setDisplaySkeleton(true)
 
-    if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) {
-      setIsBlocked(true)
+    if (!allowInsecureConnection && isInsecureUrl(url)) {
+      setHasError(true)
       setIsLoading(false)
       return
     }
@@ -62,11 +60,7 @@ export default function Image({
     } else {
       setImageUrl(url)
     }
-  }, [url])
-
-  if (isBlocked) {
-    return <ExternalLink url={url} />
-  }
+  }, [url, allowInsecureConnection])
 
   if (hideIfError && hasError) return null
 
