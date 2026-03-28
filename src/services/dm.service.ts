@@ -18,6 +18,7 @@ class DmService {
   private isInitialized = false
   private isInitializing = false
   private relaySubscription: { close: () => void } | null = null
+  private syncSubscription: { close: () => void } | null = null
   private messageListeners = new Set<(message: TDmMessage) => void>()
   private reactionListeners = new Set<(reaction: TDmMessage) => void>()
   private dataChangedListeners = new Set<() => void>()
@@ -49,6 +50,7 @@ class DmService {
     this.currentEncryptionKeypair = encryptionKeypair
 
     try {
+      this.startSyncSubscription(accountPubkey, encryptionKeypair)
       let since = storage.getDmLastSyncedAt(accountPubkey)
       if (since && !(await indexedDb.hasDmMessages())) {
         storage.clearDmSyncState(accountPubkey)
@@ -74,6 +76,10 @@ class DmService {
       this.relaySubscription.close()
       this.relaySubscription = null
     }
+    if (this.syncSubscription) {
+      this.syncSubscription.close()
+      this.syncSubscription = null
+    }
     this.isInitialized = false
     this.isInitializing = false
 
@@ -84,6 +90,10 @@ class DmService {
     if (this.relaySubscription) {
       this.relaySubscription.close()
       this.relaySubscription = null
+    }
+    if (this.syncSubscription) {
+      this.syncSubscription.close()
+      this.syncSubscription = null
     }
     this.currentEncryptionKeypair = null
     this.isInitialized = false
@@ -662,11 +672,12 @@ class DmService {
     return message
   }
 
-  private async startRelaySubscription(
+  private async startSyncSubscription(
     accountPubkey: string,
     encryptionKeypair: TEncryptionKeypair
   ): Promise<void> {
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
+    if (myDmRelays.length === 0) return
 
     const myClientKeypair = encryptionKeyService.getClientKeypair(accountPubkey)
     const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300
@@ -674,11 +685,6 @@ class DmService {
     const sub = client.subscribe(
       myDmRelays,
       [
-        {
-          kinds: [ExtendedKind.GIFT_WRAP],
-          '#p': [accountPubkey],
-          limit: 0
-        },
         {
           kinds: [ExtendedKind.CLIENT_KEY_ANNOUNCEMENT],
           authors: [accountPubkey],
@@ -707,7 +713,30 @@ class DmService {
             this.emitEncryptionKeyChanged(newPubkey)
             return
           }
+        }
+      }
+    )
 
+    this.syncSubscription = { close: () => sub.close() }
+  }
+
+  private async startRelaySubscription(
+    accountPubkey: string,
+    encryptionKeypair: TEncryptionKeypair
+  ): Promise<void> {
+    const myDmRelays = await client.fetchDmRelays(accountPubkey)
+
+    const sub = client.subscribe(
+      myDmRelays,
+      [
+        {
+          kinds: [ExtendedKind.GIFT_WRAP],
+          '#p': [accountPubkey],
+          limit: 0
+        }
+      ],
+      {
+        onevent: async (event) => {
           // GIFT_WRAP handling
           const giftWrap = event
           const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
