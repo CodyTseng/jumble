@@ -21,6 +21,9 @@ type TUserPreferencesContext = {
 
   quickReactionEmoji: string | TEmoji
   updateQuickReactionEmoji: (emoji: string | TEmoji) => void
+
+  allowInsecureConnection: boolean
+  updateAllowInsecureConnection: (allow: boolean) => void
 }
 
 const UserPreferencesContext = createContext<TUserPreferencesContext | undefined>(undefined)
@@ -45,6 +48,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   )
   const [quickReaction, setQuickReaction] = useState(storage.getQuickReaction())
   const [quickReactionEmoji, setQuickReactionEmoji] = useState(storage.getQuickReactionEmoji())
+
+  const [allowInsecureConnection, setAllowInsecureConnection] = useState(
+    storage.getAllowInsecureConnection()
+  )
 
   useEffect(() => {
     if (!isSmallScreen && enableSingleColumnLayout) {
@@ -79,6 +86,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setQuickReactionEmoji(emoji)
   }
 
+  const updateAllowInsecureConnection = (allow: boolean) => {
+    setAllowInsecureConnection(allow)
+    storage.setAllowInsecureConnection(allow)
+  }
+
   return (
     <UserPreferencesContext.Provider
       value={{
@@ -93,7 +105,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         quickReaction,
         updateQuickReaction,
         quickReactionEmoji,
-        updateQuickReactionEmoji
+        updateQuickReactionEmoji,
+        allowInsecureConnection,
+        updateAllowInsecureConnection
       }}
     >
       {children}

@@ -2,14 +2,13 @@ import { isInsecureUrl } from '@/lib/url'
 import { cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import storage from '@/services/local-storage.service'
 import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
 export default function VideoPlayer({ src, className }: { src: string; className?: string }) {
   const { autoplay, videoLoop } = useContentPolicy()
-  const { muteMedia, updateMuteMedia } = useUserPreferences()
+  const { muteMedia, updateMuteMedia, allowInsecureConnection } = useUserPreferences()
   const [error, setError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -71,7 +70,7 @@ export default function VideoPlayer({ src, className }: { src: string; className
     }
   }, [muteMedia])
 
-  if (error || (!storage.getAllowInsecureConnection() && isInsecureUrl(src))) {
+  if (error || (!allowInsecureConnection && isInsecureUrl(src))) {
     return <ExternalLink url={src} />
   }
 

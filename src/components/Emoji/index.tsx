@@ -1,6 +1,6 @@
 import { isInsecureUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
-import storage from '@/services/local-storage.service'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TEmoji } from '@/types'
 import { Heart } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
@@ -15,6 +15,7 @@ export default function Emoji({
     img?: string
   }
 }) {
+  const { allowInsecureConnection } = useUserPreferences()
   const [hasError, setHasError] = useState(false)
 
   if (typeof emoji === 'string') {
@@ -25,7 +26,7 @@ export default function Emoji({
     )
   }
 
-  if (hasError || (!storage.getAllowInsecureConnection() && isInsecureUrl(emoji.url))) {
+  if (hasError || (!allowInsecureConnection && isInsecureUrl(emoji.url))) {
     return (
       <span className={cn('whitespace-nowrap', classNames?.text)}>{`:${emoji.shortcode}:`}</span>
     )
