@@ -20,9 +20,17 @@ import {
   DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
+import Emoji from '@/components/Emoji'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
 import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import {
+  EmbeddedEmojiParser,
+  EmbeddedEventParser,
+  EmbeddedMentionParser,
+  parseContent
+} from '@/lib/content-parser'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { toDmConversation } from '@/lib/link'
 import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -532,9 +540,10 @@ function ConversationItemContent({
           <span className="shrink-0 text-xs text-muted-foreground">{timeAgo}</span>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm text-muted-foreground">
-            {conversation.lastMessageContent}
-          </p>
+          <DmPreviewContent
+            content={conversation.lastMessageContent}
+            emojis={conversation.lastMessageEmojis}
+          />
           {conversation.unreadCount > 0 && (
             <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-primary px-1 text-xs font-medium text-primary-foreground">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
@@ -609,5 +618,50 @@ function DeleteConversationConfirmation({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+function DmPreviewContent({
+  content,
+  emojis
+}: {
+  content: string
+  emojis?: { shortcode: string; url: string }[]
+}) {
+  const { t } = useTranslation()
+  const nodes = useMemo(() => {
+    if (!content) return []
+    return parseContent(content, [EmbeddedMentionParser, EmbeddedEventParser, EmbeddedEmojiParser])
+  }, [content])
+
+  const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(
+    emojis?.map((e) => ['emoji', e.shortcode, e.url]) ?? []
+  ), [emojis])
+
+  return (
+    <p className="truncate text-sm text-muted-foreground">
+      {nodes.map((node, i) => {
+        if (node.type === 'text') return node.data
+        if (node.type === 'mention') {
+          return (
+            <SimpleUsername
+              key={i}
+              userId={node.data.split(':')[1]}
+              showAt
+              withoutSkeleton
+              className="inline"
+            />
+          )
+        }
+        if (node.type === 'event') return `[${t('Note')}]`
+        if (node.type === 'emoji') {
+          const shortcode = node.data.split(':')[1]
+          const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+          if (!emoji) return node.data
+          return <Emoji key={i} emoji={emoji} classNames={{ img: 'size-4' }} />
+        }
+        return null
+      })}
+    </p>
   )
 }

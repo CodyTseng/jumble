@@ -1,6 +1,6 @@
 import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { isValidPubkey } from '@/lib/pubkey'
-import { tagNameEquals } from '@/lib/tag'
+import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TEncryptionKeypair } from '@/types'
 import { Event, Filter, kinds } from 'nostr-tools'
 import client from './client.service'
@@ -951,15 +951,16 @@ class DmService {
     const displayContent = isFile
       ? this.getFilePreviewContent(message.decryptedRumor?.tags)
       : message.content
+    const isLatest = message.createdAt >= (existing?.lastMessageAt ?? 0)
 
     const conversation: TDmConversation = {
       key: conversationKey,
       pubkey: otherPubkey,
       lastMessageAt: Math.max(existing?.lastMessageAt ?? 0, message.createdAt),
-      lastMessageContent:
-        message.createdAt >= (existing?.lastMessageAt ?? 0)
-          ? displayContent
-          : (existing?.lastMessageContent ?? ''),
+      lastMessageContent: isLatest ? displayContent : (existing?.lastMessageContent ?? ''),
+      lastMessageEmojis: isLatest
+        ? getEmojiInfosFromEmojiTags(message.decryptedRumor?.tags)
+        : existing?.lastMessageEmojis,
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
       encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey
@@ -1032,6 +1033,9 @@ class DmService {
             ? this.getFilePreviewContent(latestMessage.decryptedRumor?.tags)
             : latestMessage.content
           : '',
+        lastMessageEmojis: latestMessage
+          ? getEmojiInfosFromEmojiTags(latestMessage.decryptedRumor?.tags)
+          : undefined,
         unreadCount,
         hasReplied
       }

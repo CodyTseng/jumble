@@ -233,6 +233,7 @@ export type TDmConversation = {
   pubkey: string
   lastMessageAt: number
   lastMessageContent: string
+  lastMessageEmojis?: TEmoji[]
   unreadCount: number
   hasReplied: boolean
   encryptionPubkey?: string
