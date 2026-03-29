@@ -18,9 +18,9 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       # Script for setting the version without the leading 'v'
-      - name: Set Versions
+      - name: Set Variables
         uses: actions/github-script@v7
-        id: set_version
+        id: set_variables
         with:
           script: |
             // Get the tag
@@ -33,8 +33,13 @@ jobs:
             const no_dash = (dash_index > -1) ?  no_v.substring(0, dash_index) : no_v
             // Set the tag, no-v and no-dash as output variables
             core.setOutput('tag', tag)
-            core.setOutput('no-v', no_v)
-            core.setOutput('no-dash', no_dash)
+            core.setOutput('tag-no-v', no_v)
+            core.setOutput('tag-no-dash', no_dash)
+            // convert everything to lowercase because ghcr repository name must be lowercase
+            const actor = context.actor.toLowerCase();
+            const repository = context.repo.toLowerCase();
+            core.setOutput('actor', actor);
+            core.setOutput('repository', repository);
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -49,6 +54,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.actor }}/jumble:latest, ghcr.io/${{ github.actor }}/jumble:${{steps.set_version.outputs.no-dash}}
+          tags: |
+            ghcr.io/${{ steps.set_variables.outputs.actor }}/${{ steps.set_variables.outputs.repository }}:latest
+            ghcr.io/${{ steps.set_variables.outputs.username }}/${{ steps.set_variables.outputs.repository }}:${{steps.set_variables.outputs.tag-no-dash}}
       - name: Release
         uses: softprops/action-gh-release@v1
