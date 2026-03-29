@@ -37,7 +37,7 @@ jobs:
             core.setOutput('tag-no-dash', no_dash)
             // convert everything to lowercase because ghcr repository name must be lowercase
             const actor = context.actor.toLowerCase();
-            const repository = context.repo.toLowerCase();
+            const repository = context.repo.repo.toLowerCase();
             core.setOutput('actor', actor);
             core.setOutput('repository', repository);
       - name: Set up Docker Buildx
