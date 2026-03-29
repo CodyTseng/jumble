@@ -56,6 +56,6 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ steps.set_variables.outputs.actor }}/${{ steps.set_variables.outputs.repository }}:latest
-            ghcr.io/${{ steps.set_variables.outputs.username }}/${{ steps.set_variables.outputs.repository }}:${{steps.set_variables.outputs.tag-no-dash}}
+            ghcr.io/${{ steps.set_variables.outputs.actor }}/${{ steps.set_variables.outputs.repository }}:${{steps.set_variables.outputs.tag-no-dash}}
       - name: Release
         uses: softprops/action-gh-release@v1
