@@ -25,7 +25,6 @@ jobs:
         id: set_variables
         with:
           script: |
-            const exec = require('@actions/exec');
             let tag = '';
 
             // Check if triggered by a tag push
