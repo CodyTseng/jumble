@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  push_avestruz_image:
+  push_image:
     runs-on: ubuntu-latest
     permissions:
       contents: write
