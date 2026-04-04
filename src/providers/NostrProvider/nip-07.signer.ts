@@ -1,5 +1,4 @@
 import { ISigner, TDraftEvent, TNip07 } from '@/types'
-import * as nip44 from 'nostr-tools/nip44'
 
 export class Nip07Signer implements ISigner {
   private signer: TNip07 | undefined
@@ -59,25 +58,21 @@ export class Nip07Signer implements ISigner {
     return await this.signer.nip04.decrypt(pubkey, cipherText)
   }
 
-  async nip44Encrypt(privkey: Uint8Array, pubkey: string, plainText: string) {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
-    return nip44.v2.encrypt(plainText, conversationKey)
-  }
-
-  async nip44Decrypt(privkey: Uint8Array, pubkey: string, cipherText: string) {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
-    return nip44.v2.decrypt(cipherText, conversationKey)
-  }
-
-  async nip44SignerEncrypt(pubkey: string, plainText: string) {
-    if (!this.signer?.nip44?.encrypt) {
+  async nip44Encrypt(pubkey: string, plainText: string) {
+    if (!this.signer) {
+      throw new Error('Should call init() first')
+    }
+    if (!this.signer.nip44?.encrypt) {
       throw new Error('The extension you are using does not support nip44 encryption')
     }
     return await this.signer.nip44.encrypt(pubkey, plainText)
   }
 
-  async nip44SignerDecrypt(pubkey: string, cipherText: string) {
-    if (!this.signer?.nip44?.decrypt) {
+  async nip44Decrypt(pubkey: string, cipherText: string) {
+    if (!this.signer) {
+      throw new Error('Should call init() first')
+    }
+    if (!this.signer.nip44?.decrypt) {
       throw new Error('The extension you are using does not support nip44 decryption')
     }
     return await this.signer.nip44.decrypt(pubkey, cipherText)

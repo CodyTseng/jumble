@@ -124,14 +124,14 @@ class EncryptionKeyService {
   ): Promise<Event | null> {
     const { relays } = await this.getRelays(accountPubkey)
     const encryptionKeypair = this.getEncryptionKeypair(accountPubkey)
-    if (!encryptionKeypair || !signer.nip44Encrypt) return null
+    if (!encryptionKeypair) return null
 
     // Get sender's client keypair for encryption
     const senderClientKeypair = this.getClientKeypair(accountPubkey)
 
     const encryptionPrivkeyHex = bytesToHex(encryptionKeypair.privkey)
     // Encrypt using sender's client privkey to recipient's client pubkey
-    const encrypted = await signer.nip44Encrypt(
+    const encrypted = this.encryptWithNip44(
       senderClientKeypair.privkey,
       recipientClientPubkey,
       encryptionPrivkeyHex
@@ -152,20 +152,15 @@ class EncryptionKeyService {
     return event
   }
 
-  async importKeyFromTransfer(
-    signer: ISigner,
-    accountPubkey: string,
-    transferEvent: Event
-  ): Promise<boolean> {
+  async importKeyFromTransfer(accountPubkey: string, transferEvent: Event): Promise<boolean> {
     const clientKeypair = this.getClientKeypair(accountPubkey)
-    if (!signer.nip44Decrypt) return false
 
     // Get sender's client pubkey from the P tag
     const senderClientPubkey = transferEvent.tags.find(tagNameEquals('P'))?.[1]
     if (!senderClientPubkey) return false
 
     try {
-      const decrypted = await signer.nip44Decrypt(
+      const decrypted = this.decryptWithNip44(
         clientKeypair.privkey,
         senderClientPubkey,
         transferEvent.content
@@ -208,7 +203,6 @@ class EncryptionKeyService {
   }
 
   async subscribeToKeyTransfer(
-    signer: ISigner,
     accountPubkey: string,
     onTransfer: (success: boolean) => void
   ): Promise<() => void> {
@@ -224,7 +218,7 @@ class EncryptionKeyService {
       },
       {
         onevent: async (event) => {
-          const success = await this.importKeyFromTransfer(signer, accountPubkey, event)
+          const success = await this.importKeyFromTransfer(accountPubkey, event)
           onTransfer(success)
           if (success) {
             sub.close()
