@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { DEFAULT_FAVICON_URL_TEMPLATE } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import storage from '@/services/local-storage.service'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -13,11 +14,9 @@ import { useTranslation } from 'react-i18next'
 const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { faviconUrlTemplate, setFaviconUrlTemplate } = useContentPolicy()
+  const { allowInsecureConnection, updateAllowInsecureConnection } = useUserPreferences()
   const [filterOutOnionRelays, setFilterOutOnionRelays] = useState(
     storage.getFilterOutOnionRelays()
-  )
-  const [allowInsecureConnection, setAllowInsecureConnection] = useState(
-    storage.getAllowInsecureConnection()
   )
 
   return (
@@ -58,10 +57,7 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <Switch
             id="allow-insecure-connection"
             checked={allowInsecureConnection}
-            onCheckedChange={(checked) => {
-              storage.setAllowInsecureConnection(checked)
-              setAllowInsecureConnection(checked)
-            }}
+            onCheckedChange={updateAllowInsecureConnection}
           />
         </div>
         <div className="space-y-2 px-4">

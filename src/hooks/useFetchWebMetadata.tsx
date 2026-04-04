@@ -1,10 +1,11 @@
 import { isInsecureUrl } from '@/lib/url'
-import storage from '@/services/local-storage.service'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import webService from '@/services/web.service'
 import { TWebMetadata } from '@/types'
 import { useEffect, useState } from 'react'
 
 export function useFetchWebMetadata(url: string) {
+  const { allowInsecureConnection } = useUserPreferences()
   const [metadata, setMetadata] = useState<TWebMetadata>({})
   const proxyServer = import.meta.env.VITE_PROXY_SERVER
   if (proxyServer) {
@@ -12,10 +13,10 @@ export function useFetchWebMetadata(url: string) {
   }
 
   useEffect(() => {
-    if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) return
+    if (!allowInsecureConnection && isInsecureUrl(url)) return
 
     webService.fetchWebMetadata(url).then((metadata) => setMetadata(metadata))
-  }, [url])
+  }, [url, allowInsecureConnection])
 
   return metadata
 }

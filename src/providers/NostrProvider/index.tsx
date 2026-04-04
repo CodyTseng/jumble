@@ -84,6 +84,8 @@ type TNostrContext = {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
+  nip44Encrypt: (pubkey: string, plainText: string) => Promise<string>
+  nip44Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   signer: ISigner | null
   hasEncryptionKey: () => boolean
   getEncryptionKeypair: () => TEncryptionKeypair | null
@@ -757,6 +759,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return signer?.nip04Decrypt(pubkey, cipherText) ?? ''
   }
 
+  const nip44Encrypt = async (pubkey: string, plainText: string) => {
+    return signer?.nip44Encrypt(pubkey, plainText) ?? ''
+  }
+
+  const nip44Decrypt = async (pubkey: string, cipherText: string) => {
+    return signer?.nip44Decrypt(pubkey, cipherText) ?? ''
+  }
+
   const hasEncryptionKey = () => {
     if (!account) return false
     return encryptionKeyService.hasEncryptionKey(account.pubkey)
@@ -901,6 +911,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         signHttpAuth,
         nip04Encrypt,
         nip04Decrypt,
+        nip44Encrypt,
+        nip44Decrypt,
         signer,
         hasEncryptionKey,
         getEncryptionKeypair,

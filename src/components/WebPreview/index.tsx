@@ -3,10 +3,10 @@ import { isInsecureUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import storage from '@/services/local-storage.service'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useMemo } from 'react'
-import Image from '../Image'
 import ExternalLink from '../ExternalLink'
+import Image from '../Image'
 
 export default function WebPreview({
   url,
@@ -18,6 +18,7 @@ export default function WebPreview({
   mustLoad?: boolean
 }) {
   const { autoLoadMedia } = useContentPolicy()
+  const { allowInsecureConnection } = useUserPreferences()
   const { isSmallScreen } = useScreenSize()
   const { title, description, image } = useFetchWebMetadata(url)
 
@@ -29,7 +30,7 @@ export default function WebPreview({
     }
   }, [url])
 
-  if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) {
+  if (!allowInsecureConnection && isInsecureUrl(url)) {
     return null
   }
 

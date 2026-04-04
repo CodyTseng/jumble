@@ -810,6 +810,8 @@ export default {
       'Eventos protegidos (NIP-70) só podem ser publicados pelo autor. Os relays rejeitarão esses eventos de terceiros, impedindo que outros retransmitam seu conteúdo. Nota: nem todos os relays suportam eventos protegidos.',
     'Allow insecure connections': 'Permitir conexões inseguras',
     'Allow insecure connections description':
-      'Permitir carregar recursos http:// e conectar a relays ws://. Pode acionar avisos de conteúdo misto do navegador.'
+      'Permitir carregar recursos http:// e conectar a relays ws://. Pode acionar avisos de conteúdo misto do navegador.',
+    'reacted to': 'reagiu a',
+    Reaction: 'Reação'
   }
 }

@@ -9,15 +9,18 @@ export default function ParentNotePreview({
   eventId,
   externalContent,
   className,
-  onClick
+  onClick,
+  label
 }: {
   eventId?: string
   externalContent?: string
   className?: string
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
+  label?: string
 }) {
   const { t } = useTranslation()
   const { event, isFetching } = useFetchEvent(eventId)
+  const displayLabel = label ?? t('reply to')
 
   if (externalContent) {
     return (
@@ -28,7 +31,7 @@ export default function ParentNotePreview({
         )}
         onClick={onClick}
       >
-        <div className="shrink-0">{t('reply to')}</div>
+        <div className="shrink-0">{displayLabel}</div>
         <div className="truncate">{externalContent}</div>
       </div>
     )
@@ -46,7 +49,7 @@ export default function ParentNotePreview({
           className
         )}
       >
-        <div className="shrink-0">{t('reply to')}</div>
+        <div className="shrink-0">{displayLabel}</div>
         <Skeleton className="h-4 w-4 rounded-full" />
         <div className="flex-1 py-1">
           <Skeleton className="h-3" />
@@ -64,7 +67,7 @@ export default function ParentNotePreview({
       )}
       onClick={event ? onClick : undefined}
     >
-      <div className="shrink-0">{t('reply to')}</div>
+      <div className="shrink-0">{displayLabel}</div>
       {event && <UserAvatar className="shrink-0" userId={event.pubkey} size="tiny" />}
       <ContentPreview className="truncate" event={event} />
     </div>

@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { isInsecureUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
-import storage from '@/services/local-storage.service'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { Minimize2, Pause, Play, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -24,6 +24,7 @@ export default function AudioPlayer({
   className
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
+  const { allowInsecureConnection } = useUserPreferences()
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -123,7 +124,7 @@ export default function AudioPlayer({
     }, 300)
   }
 
-  if (error || (!storage.getAllowInsecureConnection() && isInsecureUrl(src))) {
+  if (error || (!allowInsecureConnection && isInsecureUrl(src))) {
     return <ExternalLink url={src} />
   }
 
