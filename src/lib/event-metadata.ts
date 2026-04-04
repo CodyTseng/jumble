@@ -387,6 +387,25 @@ export function getEmojisFromEvent(event: Event): TEmoji[] {
   return info.emojis
 }
 
+export function getVideoMetadataFromEvent(event: Event) {
+  let title: string | undefined
+  const tags = new Set<string>()
+
+  event.tags.forEach(([tagName, tagValue]) => {
+    if (tagName === 'title') {
+      title = tagValue
+    } else if (tagName === 't' && tagValue && tags.size < 6) {
+      tags.add(tagValue.toLocaleLowerCase())
+    }
+  })
+
+  if (!title) {
+    title = event.tags.find(tagNameEquals('d'))?.[1]
+  }
+
+  return { title, tags: Array.from(tags) }
+}
+
 export function getStarsFromRelayReviewEvent(event: Event): number {
   const ratingTag = event.tags.find((t) => t[0] === 'rating')
   if (ratingTag) {
