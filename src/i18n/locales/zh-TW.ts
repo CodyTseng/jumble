@@ -775,6 +775,8 @@ export default {
       '受保護的事件（NIP-70）只能由作者發布。伺服器將拒絕來自第三方的這些事件，防止他人轉播你的內容。 注意：並非所有伺服器都支持受保護的事件。',
     'Allow insecure connections': '允許不安全的連線',
     'Allow insecure connections description':
-      '允許載入 http:// 資源和連線 ws:// relay。可能會觸發瀏覽器混合內容警告。'
+      '允許載入 http:// 資源和連線 ws:// relay。可能會觸發瀏覽器混合內容警告。',
+    'reacted to': '回應了',
+    Reaction: '回應'
   }
 }

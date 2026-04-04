@@ -802,6 +802,8 @@ export default {
       'A védett eseményeket (NIP-70) csak a szerző teheti közzé. A csomópontok elutasítják ezeket az eseményeket harmadik felektől, megakadályozva, hogy mások újraközvetítsék a tartalmadat. Megjegyzés: nem minden csomópont támogatja a védett eseményeket.',
     'Allow insecure connections': 'Nem biztonságos kapcsolatok engedélyezése',
     'Allow insecure connections description':
-      'http:// erőforrások betöltésének és ws:// relékhez való csatlakozás engedélyezése. Böngésző vegyes tartalom figyelmeztetéseket válthat ki.'
+      'http:// erőforrások betöltésének és ws:// relékhez való csatlakozás engedélyezése. Böngésző vegyes tartalom figyelmeztetéseket válthat ki.',
+    'reacted to': 'reagált erre',
+    Reaction: 'Reakció'
   }
 }
