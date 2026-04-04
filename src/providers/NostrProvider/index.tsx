@@ -84,8 +84,6 @@ type TNostrContext = {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
-  nip44Encrypt: (privkey: Uint8Array, pubkey: string, plainText: string) => Promise<string>
-  nip44Decrypt: (privkey: Uint8Array, pubkey: string, cipherText: string) => Promise<string>
   signer: ISigner | null
   hasEncryptionKey: () => boolean
   getEncryptionKeypair: () => TEncryptionKeypair | null
@@ -759,20 +757,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return signer?.nip04Decrypt(pubkey, cipherText) ?? ''
   }
 
-  const nip44Encrypt = async (privkey: Uint8Array, pubkey: string, plainText: string) => {
-    if (!signer?.nip44Encrypt) {
-      throw new Error('NIP-44 encryption not supported by this signer')
-    }
-    return signer.nip44Encrypt(privkey, pubkey, plainText)
-  }
-
-  const nip44Decrypt = async (privkey: Uint8Array, pubkey: string, cipherText: string) => {
-    if (!signer?.nip44Decrypt) {
-      throw new Error('NIP-44 decryption not supported by this signer')
-    }
-    return signer.nip44Decrypt(privkey, pubkey, cipherText)
-  }
-
   const hasEncryptionKey = () => {
     if (!account) return false
     return encryptionKeyService.hasEncryptionKey(account.pubkey)
@@ -917,8 +901,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         signHttpAuth,
         nip04Encrypt,
         nip04Decrypt,
-        nip44Encrypt,
-        nip44Decrypt,
         signer,
         hasEncryptionKey,
         getEncryptionKeypair,

@@ -52,10 +52,7 @@ export default function KeySyncRequestHandler() {
     try {
       const signer = {
         getPublicKey: async () => pubkey,
-        signEvent,
-        nip44Encrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-          return encryptionKeyService.encryptWithNip44(privkey, pk, text)
-        }
+        signEvent
       }
 
       await encryptionKeyService.exportKeyForTransfer(signer as any, pubkey, clientPubkey)

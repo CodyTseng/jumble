@@ -1,7 +1,6 @@
 import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { generateSecretKey } from 'nostr-tools'
-import * as nip44 from 'nostr-tools/nip44'
 import { BunkerSigner as NBunkerSigner, parseBunkerInput } from 'nostr-tools/nip46'
 
 export class BunkerSigner implements ISigner {
@@ -73,27 +72,4 @@ export class BunkerSigner implements ISigner {
     return bytesToHex(this.clientSecretKey)
   }
 
-  async nip44Encrypt(privkey: Uint8Array, pubkey: string, plainText: string) {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
-    return nip44.v2.encrypt(plainText, conversationKey)
-  }
-
-  async nip44Decrypt(privkey: Uint8Array, pubkey: string, cipherText: string) {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
-    return nip44.v2.decrypt(cipherText, conversationKey)
-  }
-
-  async nip44SignerEncrypt(pubkey: string, plainText: string) {
-    if (!this.signer) {
-      throw new Error('Not logged in')
-    }
-    return await this.signer.nip44Encrypt(pubkey, plainText)
-  }
-
-  async nip44SignerDecrypt(pubkey: string, cipherText: string) {
-    if (!this.signer) {
-      throw new Error('Not logged in')
-    }
-    return await this.signer.nip44Decrypt(pubkey, cipherText)
-  }
 }

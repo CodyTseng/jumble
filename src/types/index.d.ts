@@ -102,12 +102,6 @@ export interface ISigner {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
-  nip44Encrypt?: (privkey: Uint8Array, pubkey: string, plainText: string) => Promise<string>
-  nip44Decrypt?: (privkey: Uint8Array, pubkey: string, cipherText: string) => Promise<string>
-  /** NIP-44 encrypt using the signer's own key (for seal creation) */
-  nip44SignerEncrypt?: (pubkey: string, plainText: string) => Promise<string>
-  /** NIP-44 decrypt using the signer's own key (for seal decryption) */
-  nip44SignerDecrypt?: (pubkey: string, cipherText: string) => Promise<string>
 }
 
 export type TSignerType = 'nsec' | 'nip-07' | 'bunker' | 'browser-nsec' | 'ncryptsec' | 'npub'

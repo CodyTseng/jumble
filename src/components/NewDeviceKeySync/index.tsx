@@ -28,13 +28,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
       const signer = {
         getPublicKey: async () => pubkey,
-        signEvent,
-        nip44Encrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-          return encryptionKeyService.encryptWithNip44(privkey, pk, text)
-        },
-        nip44Decrypt: async (privkey: Uint8Array, pk: string, text: string) => {
-          return encryptionKeyService.decryptWithNip44(privkey, pk, text)
-        }
+        signEvent
       }
 
       await encryptionKeyService.publishClientKeyAnnouncement(
@@ -47,7 +41,6 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
       unsubscribeRef.current?.()
       unsubscribeRef.current = await encryptionKeyService.subscribeToKeyTransfer(
-        signer as any,
         pubkey,
         (success) => {
           if (success) {
