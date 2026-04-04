@@ -694,6 +694,8 @@ export default {
     'Protected event hint': 'Gli eventi protetti (NIP-70) possono essere pubblicati solo dall\'autore. I relay rifiuteranno questi eventi da terze parti, impedendo ad altri di ridiffondere i tuoi contenuti. Nota: non tutti i relay supportano gli eventi protetti.',
     'Allow insecure connections': 'Consenti connessioni non sicure',
     'Allow insecure connections description':
-      'Consenti il caricamento di risorse http:// e la connessione a relay ws://. Potrebbe attivare avvisi di contenuto misto del browser.'
+      'Consenti il caricamento di risorse http:// e la connessione a relay ws://. Potrebbe attivare avvisi di contenuto misto del browser.',
+    'reacted to': 'ha reagito a',
+    Reaction: 'Reazione'
   }
 }

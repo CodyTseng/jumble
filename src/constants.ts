@@ -125,7 +125,9 @@ export const SUPPORTED_KINDS = [
   ...ALLOWED_FILTER_KINDS,
   ExtendedKind.RELAY_REVIEW,
   kinds.Emojisets,
-  ExtendedKind.FOLLOW_PACK
+  ExtendedKind.FOLLOW_PACK,
+  kinds.Reaction,
+  ExtendedKind.EXTERNAL_CONTENT_REACTION
 ]
 
 export const URL_REGEX =

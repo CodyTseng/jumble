@@ -2,11 +2,13 @@ import { useSecondaryPage } from '@/PageManager'
 import { ExtendedKind, NSFW_DISPLAY_POLICY, SUPPORTED_KINDS } from '@/constants'
 import { getParentStuff, isNsfwEvent } from '@/lib/event'
 import { toExternalContent, toNote } from '@/lib/link'
+import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import AudioPlayer from '../AudioPlayer'
 import ClientTag from '../ClientTag'
 import Content from '../Content'
@@ -32,6 +34,7 @@ import MutedNote from './MutedNote'
 import NsfwNote from './NsfwNote'
 import PictureNote from './PictureNote'
 import Poll from './Poll'
+import Reaction from './Reaction'
 import RelayReview from './RelayReview'
 import UnknownNote from './UnknownNote'
 import VideoNote from './VideoNote'
@@ -51,10 +54,20 @@ export default function Note({
   hideParentNotePreview?: boolean
   showFull?: boolean
 }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const { parentEventId, parentExternalContent } = useMemo(() => {
     return getParentStuff(event)
+  }, [event])
+  const reactionTargetEventId = useMemo(() => {
+    if (event.kind !== kinds.Reaction && event.kind !== ExtendedKind.EXTERNAL_CONTENT_REACTION) {
+      return undefined
+    }
+    const aTag = event.tags.findLast(tagNameEquals('a'))
+    if (aTag) return generateBech32IdFromATag(aTag)
+    const eTag = event.tags.findLast(tagNameEquals('e'))
+    return eTag ? generateBech32IdFromETag(eTag) : undefined
   }, [event])
   const { nsfwDisplayPolicy } = useContentPolicy()
   const [showNsfw, setShowNsfw] = useState(false)
@@ -117,6 +130,8 @@ export default function Note({
     content = <EmojiPack className="mt-2" event={event} />
   } else if (event.kind === ExtendedKind.FOLLOW_PACK) {
     content = <FollowPack className="mt-2" event={event} />
+  } else if (event.kind === kinds.Reaction) {
+    content = <Reaction className="mt-2" event={event} />
   } else {
     content = <Content className="mt-2" event={event} enableHighlight />
   }
@@ -167,6 +182,17 @@ export default function Note({
             } else if (parentEventId) {
               push(toNote(parentEventId))
             }
+          }}
+        />
+      )}
+      {reactionTargetEventId && (
+        <ParentNotePreview
+          eventId={reactionTargetEventId}
+          label={t('reacted to')}
+          className="mt-2"
+          onClick={(e) => {
+            e.stopPropagation()
+            push(toNote(reactionTargetEventId))
           }}
         />
       )}
