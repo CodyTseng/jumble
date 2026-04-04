@@ -66,6 +66,20 @@ export class NostrConnectionSigner implements ISigner {
     return await this.signer.nip04Decrypt(pubkey, cipherText)
   }
 
+  async nip44Encrypt(pubkey: string, plainText: string) {
+    if (!this.signer) {
+      throw new Error('Not logged in')
+    }
+    return await this.signer.nip44Encrypt(pubkey, plainText)
+  }
+
+  async nip44Decrypt(pubkey: string, cipherText: string) {
+    if (!this.signer) {
+      throw new Error('Not logged in')
+    }
+    return await this.signer.nip44Decrypt(pubkey, cipherText)
+  }
+
   getClientSecretKey() {
     return bytesToHex(this.clientSecretKey)
   }
