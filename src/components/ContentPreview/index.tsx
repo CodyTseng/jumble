@@ -83,7 +83,12 @@ export default function ContentPreview({
     return <LongFormArticlePreview event={event} className={className} />
   }
 
-  if (event.kind === ExtendedKind.VIDEO || event.kind === ExtendedKind.SHORT_VIDEO) {
+  if (
+    event.kind === ExtendedKind.VIDEO ||
+    event.kind === ExtendedKind.SHORT_VIDEO ||
+    event.kind === ExtendedKind.ADDRESSABLE_NORMAL_VIDEO ||
+    event.kind === ExtendedKind.ADDRESSABLE_SHORT_VIDEO
+  ) {
     return <VideoNotePreview event={event} className={className} />
   }
 
