@@ -23,6 +23,10 @@ class DmService {
   private dataChangedListeners = new Set<() => void>()
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
+  private pendingPublishData = new Map<
+    string,
+    { giftWrap: Event; selfGiftWrap: Event; recipientDmRelays: string[] }
+  >()
   private syncRequestListeners = new Set<(event: Event) => void>()
   private encryptionKeyChangedListeners = new Set<(newPubkey: string) => void>()
   private activeConversationKey: string | null = null
@@ -119,6 +123,43 @@ class DmService {
 
   getSendingStatus(messageId: string): 'sending' | 'sent' | 'failed' | undefined {
     return this.sendingStatuses.get(messageId)
+  }
+
+  async resendMessage(messageId: string): Promise<void> {
+    const data = this.pendingPublishData.get(messageId)
+    if (!data) return
+
+    this.sendingStatuses.set(messageId, 'sending')
+    this.emitSendingStatusChanged()
+
+    try {
+      const accountPubkey = this.currentAccountPubkey
+      const myDmRelays = accountPubkey ? await client.fetchDmRelays(accountPubkey) : []
+      const [recipientResult, selfResult] = await Promise.allSettled([
+        client.publishEvent(data.recipientDmRelays, data.giftWrap),
+        myDmRelays.length > 0
+          ? client.publishEvent(myDmRelays, data.selfGiftWrap)
+          : Promise.resolve()
+      ])
+      if (selfResult.status === 'rejected') {
+        console.warn('[DM] selfGiftWrap publish failed:', selfResult.reason)
+      }
+      if (recipientResult.status === 'rejected') {
+        throw recipientResult.reason
+      }
+
+      this.sendingStatuses.set(messageId, 'sent')
+      this.pendingPublishData.delete(messageId)
+      this.emitSendingStatusChanged()
+
+      setTimeout(() => {
+        this.sendingStatuses.delete(messageId)
+        this.emitSendingStatusChanged()
+      }, 3000)
+    } catch {
+      this.sendingStatuses.set(messageId, 'failed')
+      this.emitSendingStatusChanged()
+    }
   }
 
   onSendingStatusChanged(listener: () => void): () => void {
@@ -476,6 +517,7 @@ class DmService {
     // Save and show immediately (optimistic UI)
     await this.saveMessage(accountPubkey, message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
+    this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
     this.emitNewMessage(message)
 
@@ -493,6 +535,7 @@ class DmService {
       }
 
       this.sendingStatuses.set(message.id, 'sent')
+      this.pendingPublishData.delete(message.id)
       this.emitSendingStatusChanged()
 
       setTimeout(() => {
@@ -586,6 +629,7 @@ class DmService {
 
     await this.saveMessage(accountPubkey, message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
+    this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
     this.emitNewMessage(message)
 
@@ -603,6 +647,7 @@ class DmService {
       }
 
       this.sendingStatuses.set(message.id, 'sent')
+      this.pendingPublishData.delete(message.id)
       this.emitSendingStatusChanged()
 
       setTimeout(() => {
