@@ -1398,16 +1398,20 @@ class ClientService extends EventTarget {
     pubkey: string,
     kind: number,
     d?: string,
-    updateCache = true
+    updateCache = true,
+    skipCache = false
   ) {
-    const storedEvent = await indexedDb.getReplaceableEvent(pubkey, kind, d)
-    if (storedEvent !== undefined) {
-      if (updateCache) {
-        this.replaceableEventDataLoader.load({ pubkey, kind, d }) // update cache in background
+    if (!skipCache) {
+      const storedEvent = await indexedDb.getReplaceableEvent(pubkey, kind, d)
+      if (storedEvent !== undefined) {
+        if (updateCache) {
+          this.replaceableEventDataLoader.load({ pubkey, kind, d }) // update cache in background
+        }
+        return storedEvent
       }
-      return storedEvent
     }
 
+    this.replaceableEventDataLoader.clear({ pubkey, kind, d })
     return await this.replaceableEventDataLoader.load({ pubkey, kind, d })
   }
 
@@ -1426,8 +1430,14 @@ class ClientService extends EventTarget {
 
   /** =========== Replaceable event =========== */
 
-  async fetchDmRelaysEvent(pubkey: string, updateCache = true) {
-    return await this.fetchReplaceableEvent(pubkey, ExtendedKind.DM_RELAYS, undefined, updateCache)
+  async fetchDmRelaysEvent(pubkey: string, updateCache = true, skipCache = false) {
+    return await this.fetchReplaceableEvent(
+      pubkey,
+      ExtendedKind.DM_RELAYS,
+      undefined,
+      updateCache,
+      skipCache
+    )
   }
 
   async fetchDmRelays(pubkey: string, updateCache = true) {
@@ -1444,12 +1454,17 @@ class ClientService extends EventTarget {
       : []
   }
 
-  async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true) {
+  async fetchEncryptionKeyAnnouncementEvent(
+    pubkey: string,
+    updateCache = true,
+    skipCache = false
+  ) {
     return await this.fetchReplaceableEvent(
       pubkey,
       ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT,
       undefined,
-      updateCache
+      updateCache,
+      skipCache
     )
   }
 

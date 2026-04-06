@@ -801,6 +801,9 @@ export default {
     'Allow insecure connections description':
       'http:// 리소스 로드 및 ws:// 릴레이 연결을 허용합니다. 브라우저 혼합 콘텐츠 경고가 발생할 수 있습니다.',
     'reacted to': '에 반응했습니다',
-    Reaction: '반응'
+    Reaction: '반응',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

@@ -804,6 +804,9 @@ export default {
     'Allow insecure connections description':
       'http:// erőforrások betöltésének és ws:// relékhez való csatlakozás engedélyezése. Böngésző vegyes tartalom figyelmeztetéseket válthat ki.',
     'reacted to': 'reagált erre',
-    Reaction: 'Reakció'
+    Reaction: 'Reakció',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

@@ -794,6 +794,9 @@ export default {
     'Allow insecure connections description':
       'السماح بتحميل موارد http:// والاتصال بمرحلات ws://. قد يؤدي إلى تحذيرات المحتوى المختلط في المتصفح.',
     'reacted to': 'تفاعل مع',
-    Reaction: 'تفاعل'
+    Reaction: 'تفاعل',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

@@ -795,6 +795,9 @@ export default {
     'Allow insecure connections description':
       'อนุญาตให้โหลดทรัพยากร http:// และเชื่อมต่อกับรีเลย์ ws:// อาจทำให้เบราว์เซอร์แสดงคำเตือนเนื้อหาแบบผสม',
     'reacted to': 'รีแอคชันไปที่',
-    Reaction: 'รีแอคชัน'
+    Reaction: 'รีแอคชัน',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

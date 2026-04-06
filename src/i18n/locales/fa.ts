@@ -808,6 +808,9 @@ export default {
     'Allow insecure connections description':
       'اجازه بارگذاری منابع http:// و اتصال به رله‌های ws://. ممکن است هشدارهای محتوای مختلط مرورگر را فعال کند.',
     'reacted to': 'واکنش نشان داد به',
-    Reaction: 'واکنش'
+    Reaction: 'واکنش',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

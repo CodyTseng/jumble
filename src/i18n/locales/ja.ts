@@ -807,6 +807,9 @@ export default {
     'Allow insecure connections description':
       'http:// リソースの読み込みと ws:// リレーへの接続を許可します。ブラウザの混合コンテンツ警告が表示される場合があります。',
     'reacted to': 'にリアクションしました',
-    Reaction: 'リアクション'
+    Reaction: 'リアクション',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }
