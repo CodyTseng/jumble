@@ -10,10 +10,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { createDmRelaysDraftEvent } from '@/lib/draft-event'
+import encryptionKeyService from '@/services/encryption-key.service'
 
 export default function DmRelayConfig({ onComplete }: { onComplete?: () => void }) {
   const { t } = useTranslation()
-  const { pubkey, publish } = useNostr()
+  const { pubkey, signer, publish } = useNostr()
   const [relays, setRelays] = useState<string[]>([])
   const [newRelay, setNewRelay] = useState('')
   const [newRelayError, setNewRelayError] = useState<string | null>(null)
@@ -45,11 +46,14 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
     async (newRelays: string[]) => {
       try {
         await publish(createDmRelaysDraftEvent(newRelays))
+        if (signer && pubkey) {
+          await encryptionKeyService.publishEncryptionKeyAnnouncement(signer, pubkey)
+        }
       } catch {
         toast.error(t('Failed to save DM relays'))
       }
     },
-    [publish, t]
+    [publish, signer, pubkey, t]
   )
 
   const handleAddRelay = () => {
@@ -105,7 +109,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
       </div>
     )
   }
@@ -113,7 +117,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
   return (
     <div className="space-y-4 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-2">{t('Configure DM Relays')}</h3>
+        <h3 className="mb-2 text-lg font-semibold">{t('Configure DM Relays')}</h3>
         <p className="text-sm text-muted-foreground">
           {t(
             'Select relays to use for direct messages. These relays will receive your encrypted messages.'
@@ -175,7 +179,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
                 className="text-xs"
                 onClick={() => handleAddDefault(relay)}
               >
-                <Plus className="h-3 w-3 mr-1" />
+                <Plus className="mr-1 h-3 w-3" />
                 {relay.replace('wss://', '').replace('/', '')}
               </Button>
             ))}

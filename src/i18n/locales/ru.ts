@@ -813,6 +813,9 @@ export default {
     'Allow insecure connections description':
       'Разрешить загрузку ресурсов http:// и подключение к реле ws://. Может вызвать предупреждения браузера о смешанном содержимом.',
     'reacted to': 'отреагировал на',
-    Reaction: 'Реакция'
+    Reaction: 'Реакция',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

@@ -795,7 +795,12 @@ function MessageBubble({
         </Drawer>
         {sendingStatus && (
           <div className="pb-1">
-            <SendingStatusIcon status={sendingStatus} />
+            <SendingStatusIcon
+              status={sendingStatus}
+              onRetry={
+                sendingStatus === 'failed' ? () => dmService.resendMessage(message.id) : undefined
+              }
+            />
           </div>
         )}
         <div className={cn('relative min-w-0 max-w-full', hasBlocks && !isFileMessage && 'flex-1')}>
@@ -1300,13 +1305,23 @@ function EncryptedFileMessage({
   )
 }
 
-function SendingStatusIcon({ status }: { status: 'sending' | 'sent' | 'failed' }) {
+function SendingStatusIcon({
+  status,
+  onRetry
+}: {
+  status: 'sending' | 'sent' | 'failed'
+  onRetry?: () => void
+}) {
   switch (status) {
     case 'sending':
       return <Clock className="h-3 w-3 text-muted-foreground" />
     case 'sent':
       return <Check className="h-3 w-3 text-muted-foreground" />
     case 'failed':
-      return <AlertCircle className="h-3 w-3 text-destructive" />
+      return (
+        <button onClick={onRetry} className="flex items-center">
+          <AlertCircle className="h-3 w-3 text-destructive" />
+        </button>
+      )
   }
 }

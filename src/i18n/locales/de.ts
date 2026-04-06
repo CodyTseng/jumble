@@ -821,6 +821,9 @@ export default {
     'Allow insecure connections description':
       'Laden von http://-Ressourcen und Verbindung zu ws://-Relays erlauben. Kann Browser-Warnungen zu gemischten Inhalten auslösen.',
     'reacted to': 'reagierte auf',
-    Reaction: 'Reaktion'
+    Reaction: 'Reaktion',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

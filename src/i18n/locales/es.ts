@@ -813,6 +813,9 @@ export default {
     'Allow insecure connections description':
       'Permitir cargar recursos http:// y conectar a relays ws://. Puede activar advertencias de contenido mixto del navegador.',
     'reacted to': 'reaccionó a',
-    Reaction: 'Reacción'
+    Reaction: 'Reacción',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

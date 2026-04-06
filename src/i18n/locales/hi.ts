@@ -809,6 +809,9 @@ export default {
     'Allow insecure connections description':
       'http:// संसाधन लोड करने और ws:// रिले से कनेक्ट करने की अनुमति दें। ब्राउज़र मिश्रित सामग्री चेतावनियाँ ट्रिगर हो सकती हैं।',
     'reacted to': 'पर प्रतिक्रिया दी',
-    Reaction: 'प्रतिक्रिया'
+    Reaction: 'प्रतिक्रिया',
+    'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      "This user's client does not support NIP-4e encrypted direct messages."
   }
 }

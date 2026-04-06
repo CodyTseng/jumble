@@ -855,7 +855,8 @@ export default function DmInput({
       <div className="flex items-end gap-2">
         <div>
           <button
-            onClick={() => {
+            onMouseDown={(e) => {
+              e.preventDefault()
               if (fileInputRef.current) {
                 fileInputRef.current.value = ''
                 fileInputRef.current.click()
@@ -873,8 +874,16 @@ export default function DmInput({
             multiple
           />
         </div>
-        <EmojiPickerDialog onEmojiClick={handlePickerEmoji}>
-          <button className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary">
+        <EmojiPickerDialog
+          onEmojiClick={handlePickerEmoji}
+          onOpenChange={(open) => {
+            if (open) editableRef.current?.blur()
+          }}
+        >
+          <button
+            onMouseDown={(e) => e.preventDefault()}
+            className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary"
+          >
             <Smile className="h-5 w-5" />
           </button>
         </EmojiPickerDialog>
@@ -896,7 +905,10 @@ export default function DmInput({
           )}
         />
         <button
-          onClick={handleSend}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            handleSend()
+          }}
           disabled={!canSend}
           className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
         >

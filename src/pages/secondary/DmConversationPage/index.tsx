@@ -6,7 +6,7 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useSecondaryPage } from '@/PageManager'
 import dmService from '@/services/dm.service'
 import { TDmMessage } from '@/types'
-import { Loader2 } from 'lucide-react'
+import { Loader2, RefreshCw } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +15,9 @@ const DmConversationPage = forwardRef(
   ({ pubkey: pubkeyOrNpub, index }: { pubkey?: string; index?: number }, ref) => {
     const { t } = useTranslation()
     const { profile } = useFetchProfile(pubkeyOrNpub)
-    const [canSendDm, setCanSendDm] = useState<boolean | null>(null)
+    const [dmSupportStatus, setDmSupportStatus] = useState<
+      'loading' | 'supported' | 'no_relays' | 'no_encryption_key'
+    >('loading')
     const [replyTo, setReplyTo] = useState<{
       id: string
       content: string
@@ -59,25 +61,39 @@ const DmConversationPage = forwardRef(
       return pubkeyOrNpub
     }, [pubkeyOrNpub])
 
-    useEffect(() => {
-      if (!pubkey) return
-
-      const checkDmSupport = async () => {
+    const checkDmSupport = useCallback(
+      async (skipCache = false) => {
+        if (!pubkey) return
+        setDmSupportStatus('loading')
         try {
-          const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey!)
-          setCanSendDm(hasDmRelays && hasEncryptionKey)
+          const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(
+            pubkey,
+            skipCache
+          )
+          if (!hasDmRelays) {
+            setDmSupportStatus('no_relays')
+          } else if (!hasEncryptionKey) {
+            setDmSupportStatus('no_encryption_key')
+          } else {
+            setDmSupportStatus('supported')
+          }
         } catch {
-          setCanSendDm(false)
+          setDmSupportStatus('no_relays')
         }
-      }
+      },
+      [pubkey]
+    )
 
+    useEffect(() => {
       checkDmSupport()
-    }, [pubkey])
+    }, [checkDmSupport])
 
     useEffect(() => {
       if (!pubkey || !active) return
 
-      const promise = dmService.subscribeRecipientEncryptionKey(pubkey)
+      const promise = dmService.subscribeRecipientEncryptionKey(pubkey, () => {
+        setDmSupportStatus('supported')
+      })
 
       return () => {
         promise.then((subscription) => {
@@ -99,7 +115,7 @@ const DmConversationPage = forwardRef(
     return (
       <SecondaryPageLayout index={index} title={profile?.username} ref={ref} noScrollArea>
         <DmMessageList otherPubkey={pubkey} onReply={handleReply} />
-        {canSendDm === null ? (
+        {dmSupportStatus === 'loading' ? (
           <div
             className="flex justify-center border-t"
             style={{
@@ -109,22 +125,30 @@ const DmConversationPage = forwardRef(
           >
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
-        ) : canSendDm === false ? (
+        ) : dmSupportStatus !== 'supported' ? (
           <div
-            className="border-t text-center"
+            className="flex items-center justify-center gap-2 border-t"
             style={{
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 14.5px)',
               paddingTop: '14.5px'
             }}
           >
             <p className="text-sm text-muted-foreground">
-              {t('This user has not set up direct messages yet.')}
+              {dmSupportStatus === 'no_relays'
+                ? t('This user has not set up DM relays yet.')
+                : t("This user's client does not support NIP-4e encrypted direct messages.")}
             </p>
+            <button
+              onClick={() => checkDmSupport(true)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
           </div>
         ) : (
           <DmInput
             recipientPubkey={pubkey}
-            disabled={!canSendDm}
+            disabled={dmSupportStatus !== 'supported'}
             replyTo={replyTo}
             onCancelReply={handleCancelReply}
             onSent={handleSent}

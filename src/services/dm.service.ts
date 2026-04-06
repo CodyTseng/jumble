@@ -24,6 +24,10 @@ class DmService {
   private dataChangedListeners = new Set<() => void>()
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
+  private pendingPublishData = new Map<
+    string,
+    { giftWrap: Event; selfGiftWrap: Event; recipientDmRelays: string[] }
+  >()
   private syncRequestListeners = new Set<(event: Event) => void>()
   private encryptionKeyChangedListeners = new Set<(newPubkey: string) => void>()
   private activeConversationKey: string | null = null
@@ -129,6 +133,43 @@ class DmService {
 
   getSendingStatus(messageId: string): 'sending' | 'sent' | 'failed' | undefined {
     return this.sendingStatuses.get(messageId)
+  }
+
+  async resendMessage(messageId: string): Promise<void> {
+    const data = this.pendingPublishData.get(messageId)
+    if (!data) return
+
+    this.sendingStatuses.set(messageId, 'sending')
+    this.emitSendingStatusChanged()
+
+    try {
+      const accountPubkey = this.currentAccountPubkey
+      const myDmRelays = accountPubkey ? await client.fetchDmRelays(accountPubkey) : []
+      const [recipientResult, selfResult] = await Promise.allSettled([
+        client.publishEvent(data.recipientDmRelays, data.giftWrap),
+        myDmRelays.length > 0
+          ? client.publishEvent(myDmRelays, data.selfGiftWrap)
+          : Promise.resolve()
+      ])
+      if (selfResult.status === 'rejected') {
+        console.warn('[DM] selfGiftWrap publish failed:', selfResult.reason)
+      }
+      if (recipientResult.status === 'rejected') {
+        throw recipientResult.reason
+      }
+
+      this.sendingStatuses.set(messageId, 'sent')
+      this.pendingPublishData.delete(messageId)
+      this.emitSendingStatusChanged()
+
+      setTimeout(() => {
+        this.sendingStatuses.delete(messageId)
+        this.emitSendingStatusChanged()
+      }, 3000)
+    } catch {
+      this.sendingStatuses.set(messageId, 'failed')
+      this.emitSendingStatusChanged()
+    }
   }
 
   onSendingStatusChanged(listener: () => void): () => void {
@@ -237,11 +278,12 @@ class DmService {
   }
 
   async checkDmSupport(
-    pubkey: string
+    pubkey: string,
+    skipCache = false
   ): Promise<{ hasDmRelays: boolean; hasEncryptionKey: boolean; encryptionPubkey: string | null }> {
     const [dmRelaysEvent, encryptionKeyEvent] = await Promise.all([
-      client.fetchDmRelaysEvent(pubkey),
-      client.fetchEncryptionKeyAnnouncementEvent(pubkey)
+      client.fetchDmRelaysEvent(pubkey, true, skipCache),
+      client.fetchEncryptionKeyAnnouncementEvent(pubkey, true, skipCache)
     ])
 
     let encryptionPubkey = encryptionKeyEvent
@@ -255,6 +297,17 @@ class DmService {
       if (conversation?.encryptionPubkey) {
         hasEncryptionKey = true
         encryptionPubkey = conversation.encryptionPubkey
+      } else if (conversation && this.currentEncryptionKeypair) {
+        // Try to extract encryption pubkey by fetching a gift wrap from relays
+        const extracted = await this.extractEncryptionPubkeyFromRelays(
+          this.currentAccountPubkey,
+          pubkey,
+          this.currentEncryptionKeypair
+        )
+        if (extracted) {
+          hasEncryptionKey = true
+          encryptionPubkey = extracted
+        }
       }
     }
 
@@ -371,6 +424,7 @@ class DmService {
     events: Event[]
   ) {
     const messages: TDmMessage[] = []
+    const encryptionPubkeyMap = new Map<string, string>()
     let unwrapFailCount = 0
     let parseFailCount = 0
 
@@ -392,6 +446,15 @@ class DmService {
         const saved = await this.saveMessage(accountPubkey, message)
         if (saved) {
           messages.push(message)
+
+          const fromMe = this.isFromMe(
+            unwrapped.senderPubkey,
+            accountPubkey,
+            encryptionKeypair.pubkey
+          )
+          if (!fromMe && unwrapped.senderEncryptionPubkey) {
+            encryptionPubkeyMap.set(unwrapped.senderPubkey, unwrapped.senderEncryptionPubkey)
+          }
         }
       } else {
         parseFailCount++
@@ -404,7 +467,7 @@ class DmService {
       `[DM sync] batch: ${events.length} events, ${messages.length} messages (${sentCount} sent, ${receivedCount} received), ${unwrapFailCount} unwrap failed, ${parseFailCount} parse failed`
     )
 
-    await this.rebuildConversationsFromMessages(accountPubkey, messages)
+    await this.rebuildConversationsFromMessages(accountPubkey, messages, encryptionPubkeyMap)
   }
 
   async sendMessage(
@@ -464,6 +527,7 @@ class DmService {
     // Save and show immediately (optimistic UI)
     await this.saveMessage(accountPubkey, message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
+    this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
     this.emitNewMessage(message)
 
@@ -481,6 +545,7 @@ class DmService {
       }
 
       this.sendingStatuses.set(message.id, 'sent')
+      this.pendingPublishData.delete(message.id)
       this.emitSendingStatusChanged()
 
       setTimeout(() => {
@@ -574,6 +639,7 @@ class DmService {
 
     await this.saveMessage(accountPubkey, message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
+    this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
     this.emitNewMessage(message)
 
@@ -591,6 +657,7 @@ class DmService {
       }
 
       this.sendingStatuses.set(message.id, 'sent')
+      this.pendingPublishData.delete(message.id)
       this.emitSendingStatusChanged()
 
       setTimeout(() => {
@@ -851,6 +918,46 @@ class DmService {
     return `${accountPubkey}:${otherPubkey}`
   }
 
+  private async extractEncryptionPubkeyFromRelays(
+    accountPubkey: string,
+    otherPubkey: string,
+    encryptionKeypair: TEncryptionKeypair
+  ): Promise<string | null> {
+    try {
+      const myDmRelays = await client.fetchDmRelays(accountPubkey)
+      if (myDmRelays.length === 0) return null
+
+      const giftWraps = await client.fetchEvents(myDmRelays, {
+        kinds: [ExtendedKind.GIFT_WRAP],
+        '#p': [accountPubkey],
+        limit: 20
+      })
+
+      for (const gw of giftWraps) {
+        const unwrapped = nip17GiftWrapService.unwrapGiftWrap(gw, encryptionKeypair.privkey)
+        if (!unwrapped) continue
+
+        const fromMe = this.isFromMe(
+          unwrapped.senderPubkey,
+          accountPubkey,
+          encryptionKeypair.pubkey
+        )
+        if (!fromMe && unwrapped.senderPubkey === otherPubkey) {
+          // Backfill conversation record
+          const conversation = await this.getConversation(accountPubkey, otherPubkey)
+          if (conversation) {
+            conversation.encryptionPubkey = unwrapped.senderEncryptionPubkey
+            await indexedDb.putDmConversation(conversation)
+          }
+          return unwrapped.senderEncryptionPubkey
+        }
+      }
+    } catch (e) {
+      console.error('[checkDmSupport] extractEncryptionPubkeyFromRelays failed:', e)
+    }
+    return null
+  }
+
   private isFromMe(senderPubkey: string, accountPubkey: string, encryptionPubkey: string): boolean {
     return senderPubkey === accountPubkey || senderPubkey === encryptionPubkey
   }
@@ -971,7 +1078,8 @@ class DmService {
 
   private async rebuildConversationsFromMessages(
     accountPubkey: string,
-    messages: TDmMessage[]
+    messages: TDmMessage[],
+    encryptionPubkeyMap?: Map<string, string>
   ): Promise<void> {
     // Group messages by conversation
     const conversationMap = new Map<string, { otherPubkey: string; messages: TDmMessage[] }>()
@@ -1037,7 +1145,9 @@ class DmService {
           ? getEmojiInfosFromEmojiTags(latestMessage.decryptedRumor?.tags)
           : undefined,
         unreadCount,
-        hasReplied
+        hasReplied,
+        encryptionPubkey:
+          encryptionPubkeyMap?.get(otherPubkey) ?? existingConversation?.encryptionPubkey
       }
 
       await indexedDb.putDmConversation(conversation)

@@ -87,7 +87,7 @@ class Nip17GiftWrapService {
 
     return finalizeEvent(
       {
-        kind: 13,
+        kind: kinds.Seal,
         content: encrypted,
         created_at: randomTimeUpTo2DaysInThePast(),
         tags: []
@@ -109,7 +109,7 @@ class Nip17GiftWrapService {
 
     return finalizeEvent(
       {
-        kind: 1059,
+        kind: kinds.GiftWrap,
         content,
         created_at: randomTimeUpTo2DaysInThePast(),
         tags

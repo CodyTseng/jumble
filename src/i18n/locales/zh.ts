@@ -782,6 +782,9 @@ export default {
     'Allow insecure connections description':
       '允许加载 http:// 资源和连接 ws:// relay。可能会触发浏览器混合内容警告。',
     'reacted to': '回应了',
-    Reaction: '回应'
+    Reaction: '回应',
+    'This user has not set up DM relays yet.': '该用户尚未设置 DM 中继。',
+    "This user's client does not support NIP-4e encrypted direct messages.":
+      '该用户的客户端不支持 NIP-4e 加密私信。'
   }
 }
