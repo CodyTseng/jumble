@@ -1,0 +1,188 @@
+import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
+import { Button } from '@/components/ui/button'
+import { useNostr } from '@/providers/NostrProvider'
+import encryptionKeyService from '@/services/encryption-key.service'
+import { getClientDescription } from '@/lib/utils'
+import { CheckCircle, Loader2, RefreshCw, Smartphone } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+
+type TSetupState = 'loading' | 'publishing' | 'waiting' | 'success' | 'error'
+
+const RETRY_COOLDOWN = 60
+
+export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => void }) {
+  const { t } = useTranslation()
+  const { pubkey, signEvent } = useNostr()
+  const [state, setState] = useState<TSetupState>('loading')
+  const [error, setError] = useState<string | null>(null)
+  const [countdown, setCountdown] = useState(RETRY_COOLDOWN)
+  const unsubscribeRef = useRef<(() => void) | null>(null)
+
+  const publishAndSubscribe = useCallback(async () => {
+    if (!pubkey) return
+
+    try {
+      setState('publishing')
+
+      const signer = {
+        getPublicKey: async () => pubkey,
+        signEvent
+      }
+
+      await encryptionKeyService.publishClientKeyAnnouncement(
+        signer as any,
+        pubkey,
+        getClientDescription()
+      )
+      setState('waiting')
+      setCountdown(RETRY_COOLDOWN)
+
+      unsubscribeRef.current?.()
+      unsubscribeRef.current = await encryptionKeyService.subscribeToKeyTransfer(
+        pubkey,
+        (success) => {
+          if (success) {
+            setState('success')
+            toast.success(t('Encryption key synced successfully'))
+            setTimeout(() => onComplete?.(), 1000)
+          } else {
+            setError(t('Failed to import encryption key'))
+            setState('error')
+          }
+        }
+      )
+    } catch (err) {
+      setError((err as Error).message)
+      setState('error')
+    }
+  }, [pubkey, signEvent, onComplete, t])
+
+  useEffect(() => {
+    if (!pubkey) return
+
+    if (encryptionKeyService.hasEncryptionKey(pubkey)) {
+      setState('success')
+      onComplete?.()
+      return
+    }
+
+    publishAndSubscribe()
+
+    return () => {
+      unsubscribeRef.current?.()
+    }
+  }, [pubkey])
+
+  useEffect(() => {
+    if (state !== 'waiting' || countdown <= 0) return
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [state, countdown <= 0])
+
+  const handleRetry = () => {
+    unsubscribeRef.current?.()
+    publishAndSubscribe()
+  }
+
+  const handleGenerateNew = async () => {
+    if (!pubkey) return
+
+    try {
+      const signer = {
+        getPublicKey: async () => pubkey,
+        signEvent
+      }
+
+      encryptionKeyService.generateEncryptionKey(pubkey)
+      await encryptionKeyService.publishEncryptionKeyAnnouncement(signer as any, pubkey)
+      toast.success(t('New encryption key generated'))
+      onComplete?.()
+    } catch {
+      toast.error(t('Failed to generate encryption key'))
+    }
+  }
+
+  if (state === 'loading') {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">{t('Checking encryption key...')}</p>
+      </div>
+    )
+  }
+
+  if (state === 'success') {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <CheckCircle className="h-12 w-12 text-green-500" />
+        <p className="text-sm font-medium">{t('Encryption key synced!')}</p>
+      </div>
+    )
+  }
+
+  if (state === 'error') {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <p className="text-sm text-destructive">{error}</p>
+        <Button onClick={() => window.location.reload()}>{t('Try Again')}</Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center p-6 space-y-6">
+      <Smartphone className="h-16 w-16 text-muted-foreground" />
+
+      <div className="text-center space-y-2">
+        <h3 className="text-lg font-semibold">{t('Sync Encryption Key')}</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          {t(
+            'An encryption key was found for your account. Please open a client that already has your DM encryption key set up to approve the sync request.'
+          )}
+        </p>
+      </div>
+
+      {state === 'publishing' && (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span className="text-sm">{t('Publishing sync request...')}</span>
+        </div>
+      )}
+
+      {state === 'waiting' && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">{t('Waiting for key from another device...')}</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={countdown > 0}
+            onClick={handleRetry}
+          >
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            {countdown > 0
+              ? t('Retry ({{seconds}}s)', { seconds: countdown })
+              : t('Retry')}
+          </Button>
+        </div>
+      )}
+
+      <div className="border-t pt-4 w-full space-y-3">
+        <p className="text-sm text-muted-foreground text-center">
+          {t(
+            "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key."
+          )}
+        </p>
+        <ResetEncryptionKeyButton onConfirm={handleGenerateNew} className="w-full" />
+      </div>
+    </div>
+  )
+}

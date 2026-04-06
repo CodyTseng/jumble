@@ -11,17 +11,24 @@ import EmojiPicker from '../EmojiPicker'
 
 export default function EmojiPickerDialog({
   children,
-  onEmojiClick
+  onEmojiClick,
+  onOpenChange
 }: {
   children: React.ReactNode
   onEmojiClick?: (emoji: string | TEmoji | undefined) => void
+  onOpenChange?: (open: boolean) => void
 }) {
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
 
+  const handleOpenChange = (value: boolean) => {
+    setOpen(value)
+    onOpenChange?.(value)
+  }
+
   if (isSmallScreen) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
         <DrawerContent>
           <EmojiPicker
@@ -37,7 +44,7 @@ export default function EmojiPickerDialog({
   }
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent side="top" className="w-fit p-0">
         <EmojiPicker

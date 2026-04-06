@@ -3,18 +3,17 @@ import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
 import NpubQrCode from '@/components/NpubQrCode'
 import ProfileAbout from '@/components/ProfileAbout'
-import ProfileOptions from '@/components/ProfileOptions'
 import ProfileZapButton from '@/components/ProfileZapButton'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useFetchFollowings, useFetchProfile } from '@/hooks'
-import { toMuteList, toProfileEditor } from '@/lib/link'
+import { useDmSupport, useFetchFollowings, useFetchProfile } from '@/hooks'
+import { toDmConversation, toMuteList, toProfileEditor } from '@/lib/link'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { Link, Zap, Bitcoin, Check, Copy } from 'lucide-react'
+import { Bitcoin, Check, Copy, Link, MessageSquare, Zap } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
@@ -39,6 +38,7 @@ export default function Profile({ id }: { id?: string }) {
   const [searchInput, setSearchInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(searchInput)
   const { followings } = useFetchFollowings(profile?.pubkey)
+  const { canStartDm, isLoading: isDmSupportLoading } = useDmSupport(profile?.pubkey)
   const isFollowingYou = useMemo(() => {
     return (
       !!accountPubkey && accountPubkey !== profile?.pubkey && followings.includes(accountPubkey)
@@ -123,7 +123,6 @@ export default function Profile({ id }: { id?: string }) {
         </div>
         <div className="px-4">
           <div className="flex h-8 items-center justify-end gap-2">
-            <ProfileOptions pubkey={pubkey} />
             {isSelf ? (
               <Button
                 className="w-20 min-w-20 rounded-full"
@@ -135,6 +134,25 @@ export default function Profile({ id }: { id?: string }) {
             ) : (
               <>
                 {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
+                <span
+                  title={
+                    !isDmSupportLoading && !canStartDm
+                      ? t('This user has not set up NIP-4e DMs')
+                      : undefined
+                  }
+                  className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
+                >
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="rounded-full"
+                    disabled={isDmSupportLoading || !canStartDm}
+                    onClick={() => push(toDmConversation(pubkey))}
+                    title={canStartDm ? t('Message') : undefined}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                </span>
                 <SpecialFollowButton pubkey={pubkey} />
                 <FollowButton pubkey={pubkey} />
               </>
@@ -230,10 +248,7 @@ function SpCopy({ sp }: { sp: string }) {
   }
 
   return (
-    <div
-      className="clickable flex w-fit items-center gap-1 font-mono text-xs"
-      onClick={copy}
-    >
+    <div className="clickable flex w-fit items-center gap-1 font-mono text-xs" onClick={copy}>
       <div>{truncated}</div>
       {copied ? <Check size={14} /> : <Copy size={14} />}
     </div>

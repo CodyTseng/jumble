@@ -148,6 +148,43 @@ export function detectLanguage(text?: string): string | null {
   }
 }
 
+export function getClientDescription(): string {
+  if (typeof window === 'undefined' || !window.navigator) return 'Jumble'
+
+  const ua = window.navigator.userAgent
+
+  // Detect OS
+  let os = ''
+  if (/Android/i.test(ua)) {
+    os = 'Android'
+  } else if (/iPad|iPhone|iPod/.test(ua)) {
+    os = 'iOS'
+  } else if (/Mac OS X/.test(ua)) {
+    os = 'macOS'
+  } else if (/Windows/.test(ua)) {
+    os = 'Windows'
+  } else if (/Linux/.test(ua)) {
+    os = 'Linux'
+  }
+
+  // Detect browser
+  let browser = ''
+  if (/Firefox\//.test(ua) && !/Seamonkey\//.test(ua)) {
+    browser = 'Firefox'
+  } else if (/Edg\//.test(ua)) {
+    browser = 'Edge'
+  } else if (/OPR\/|Opera\//.test(ua)) {
+    browser = 'Opera'
+  } else if (/Chrome\//.test(ua) && !/Chromium\//.test(ua)) {
+    browser = 'Chrome'
+  } else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) {
+    browser = 'Safari'
+  }
+
+  const details = [os, browser].filter(Boolean).join(', ')
+  return details ? `Jumble (${details})` : 'Jumble'
+}
+
 export function parseEmojiPickerUnified(unified: string): string | TEmoji | undefined {
   if (unified.startsWith(':')) {
     const secondColonIndex = unified.indexOf(':', 1)

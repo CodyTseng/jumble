@@ -630,6 +630,17 @@ export function createLeaveDraftEvent(): TDraftEvent {
   }
 }
 
+export function createDmRelaysDraftEvent(relays: string[]): TDraftEvent {
+  const tags = relays.map((url) => ['relay', url])
+
+  return {
+    kind: ExtendedKind.DM_RELAYS,
+    content: '',
+    created_at: dayjs().unix(),
+    tags
+  }
+}
+
 function generateImetaTags(imageUrls: string[]) {
   return imageUrls
     .map((imageUrl) => {
