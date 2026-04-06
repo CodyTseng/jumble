@@ -896,7 +896,10 @@ export default function DmInput({
           )}
         />
         <button
-          onClick={handleSend}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            handleSend()
+          }}
           disabled={!canSend}
           className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
         >
