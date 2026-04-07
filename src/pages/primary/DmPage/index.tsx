@@ -10,8 +10,8 @@ import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import { TPageRef } from '@/types'
+import { Download, Key, Loader2, MessageSquare, Settings, Upload } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { Key, Loader2, MessageSquare, Settings, Download, Upload } from 'lucide-react'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -45,22 +45,24 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     if (localKeypair) {
       setSetupState('ready')
       // Background check for key mismatch (e.g. key rotated on another device)
-      dmService.checkDmSupport(pubkey).then(({ encryptionPubkey }) => {
-        if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
-          console.log('[DM setup] key mismatch detected, entering sync flow')
-          encryptionKeyService.removeEncryptionKey(pubkey)
-          dmService.resetEncryption()
-          setSetupState('need_sync')
-        }
-      }).catch(() => {})
+      dmService
+        .checkDmSupport(pubkey)
+        .then(({ encryptionPubkey }) => {
+          if (encryptionPubkey && encryptionPubkey !== localKeypair.pubkey) {
+            console.log('[DM setup] key mismatch detected, entering sync flow')
+            encryptionKeyService.removeEncryptionKey(pubkey)
+            dmService.resetEncryption()
+            setSetupState('need_sync')
+          }
+        })
+        .catch(() => {})
       return
     }
 
     setSetupState('loading')
 
     try {
-      const { hasDmRelays, hasEncryptionKey } =
-        await dmService.checkDmSupport(pubkey)
+      const { hasDmRelays, hasEncryptionKey } = await dmService.checkDmSupport(pubkey)
       if (!hasDmRelays) {
         setSetupState('need_relays')
         return
@@ -137,6 +139,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     } catch (error) {
       console.error('Failed to publish encryption key:', error)
       toast.error(t('Failed to publish encryption key'))
+      throw error
     }
   }
 
@@ -196,9 +199,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
       {setupState === 'need_encryption_key' && (
         <NeedEncryptionKeyView onPublish={handlePublishEncryptionKey} />
       )}
-      {setupState === 'need_sync' && (
-        <NewDeviceKeySync onComplete={handleKeySyncComplete} />
-      )}
+      {setupState === 'need_sync' && <NewDeviceKeySync onComplete={handleKeySyncComplete} />}
       {setupState === 'ready' && (
         <>
           {showRelayConfig && (
@@ -229,7 +230,7 @@ function DmPageTitlebar({
   const { t } = useTranslation()
 
   return (
-    <div className="flex items-center justify-between h-full pl-3">
+    <div className="flex h-full items-center justify-between pl-3">
       <div className="flex items-center gap-2">
         <MessageSquare />
         <div className="text-lg font-semibold">{t('Messages')}</div>
@@ -253,7 +254,7 @@ function NeedLoginView() {
   const { startLogin } = useNostr()
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-4 text-center">
+    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
       <MessageSquare className="h-16 w-16 text-muted-foreground" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Sign in to use Messages')}</h3>
@@ -266,25 +267,29 @@ function NeedLoginView() {
   )
 }
 
-function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
+function NeedEncryptionKeyView({ onPublish }: { onPublish: () => Promise<void> }) {
   const { t } = useTranslation()
   const [isPublishing, setIsPublishing] = useState(false)
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     setIsPublishing(true)
     try {
       await onPublish()
     } finally {
       setIsPublishing(false)
     }
-  }
+  }, [onPublish])
+
+  useEffect(() => {
+    handlePublish()
+  }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-4 text-center">
+    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
       <Key className="h-16 w-16 text-muted-foreground" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Enable Direct Messages')}</h3>
-        <p className="text-sm text-muted-foreground max-w-md">
+        <p className="max-w-md text-sm text-muted-foreground">
           {t(
             'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.'
           )}
@@ -293,7 +298,7 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => void }) {
       <Button onClick={handlePublish} disabled={isPublishing}>
         {isPublishing ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             {t('Publishing...')}
           </>
         ) : (
@@ -359,7 +364,13 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
             errors.push(i + 1)
             continue
           }
-          if (!parsed.id || !parsed.pubkey || !parsed.created_at || !parsed.tags || parsed.content === undefined) {
+          if (
+            !parsed.id ||
+            !parsed.pubkey ||
+            !parsed.created_at ||
+            !parsed.tags ||
+            parsed.content === undefined
+          ) {
             errors.push(i + 1)
             continue
           }
@@ -408,9 +419,9 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
           {isExporting ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="mr-2 h-4 w-4" />
           )}
           {t('Export')}
         </Button>
@@ -421,9 +432,9 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
           disabled={isImporting}
         >
           {isImporting ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <Upload className="h-4 w-4 mr-2" />
+            <Upload className="mr-2 h-4 w-4" />
           )}
           {t('Import')}
         </Button>
@@ -459,4 +470,3 @@ function ResetEncryptionKeySection({ onReset }: { onReset: () => Promise<void> }
     </div>
   )
 }
-
