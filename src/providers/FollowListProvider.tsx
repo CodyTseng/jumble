@@ -48,6 +48,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     )
     try {
       const newFollowListEvent = await publish(newFollowListDraftEvent)
+      if (newFollowListEvent.pubkey !== accountPubkey) return
       await updateFollowListEvent(newFollowListEvent)
     } catch (error) {
       const errors = formatError(error)
@@ -69,6 +70,7 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
     )
     try {
       const newFollowListEvent = await publish(newFollowListDraftEvent)
+      if (newFollowListEvent.pubkey !== accountPubkey) return
       await updateFollowListEvent(newFollowListEvent)
     } catch (error) {
       const errors = formatError(error)
