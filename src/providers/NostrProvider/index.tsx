@@ -168,6 +168,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    const controller = new AbortController()
     const init = async () => {
       setRelayList(null)
       setProfile(null)
@@ -182,8 +183,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!account) {
         return
       }
-
-      const controller = new AbortController()
       const storedNsec = storage.getAccountNsec(account.pubkey)
       if (storedNsec) {
         setNsec(storedNsec)
@@ -220,6 +219,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS)
       ])
+      if (controller.signal.aborted) return
       if (storedRelayListEvent) {
         setRelayList(getRelayListFromEvent(storedRelayListEvent, storage.getFilterOutOnionRelays()))
       }
@@ -260,6 +260,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         client.updateRelayListCache(relayListEvent)
         await indexedDb.putReplaceableEvent(relayListEvent)
       }
+      if (controller.signal.aborted) return
       setRelayList(relayList)
 
       const events = await client.fetchEvents(relayList.write.concat(defaultRelays).slice(0, 4), [
@@ -283,6 +284,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
           '#d': [ApplicationDataKey.NOTIFICATIONS_SEEN_AT]
         }
       ])
+      if (controller.signal.aborted) return
       const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
       const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
       const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
@@ -368,13 +370,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       storage.setLastReadNotificationTime(account.pubkey, notificationsSeenAt)
 
       client.initUserIndexFromFollowings(account.pubkey, controller.signal)
-      return controller
     }
-    const promise = init()
+    init()
     return () => {
-      promise.then((controller) => {
-        controller?.abort()
-      })
+      controller.abort()
     }
   }, [account])
 
