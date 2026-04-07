@@ -3,8 +3,10 @@ import DmMessageList from '@/components/DmMessageList'
 import { ExtendedKind } from '@/constants'
 import { useFetchProfile } from '@/hooks'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
-import { useSecondaryPage } from '@/PageManager'
+import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { useNostr } from '@/providers/NostrProvider'
 import dmService from '@/services/dm.service'
+import encryptionKeyService from '@/services/encryption-key.service'
 import { TDmMessage } from '@/types'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
@@ -14,6 +16,8 @@ import { useTranslation } from 'react-i18next'
 const DmConversationPage = forwardRef(
   ({ pubkey: pubkeyOrNpub, index }: { pubkey?: string; index?: number }, ref) => {
     const { t } = useTranslation()
+    const { pubkey: accountPubkey } = useNostr()
+    const { navigate: navigatePrimary } = usePrimaryPage()
     const { profile } = useFetchProfile(pubkeyOrNpub)
     const [dmSupportStatus, setDmSupportStatus] = useState<
       'loading' | 'supported' | 'no_relays' | 'no_encryption_key'
@@ -26,6 +30,13 @@ const DmConversationPage = forwardRef(
     } | null>(null)
     const { currentIndex } = useSecondaryPage()
     const active = currentIndex === index
+
+    useEffect(() => {
+      if (!accountPubkey) return
+      if (!encryptionKeyService.hasEncryptionKey(accountPubkey)) {
+        navigatePrimary('dms')
+      }
+    }, [accountPubkey, navigatePrimary])
 
     const handleReply = useCallback((message: TDmMessage) => {
       const isFile = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
