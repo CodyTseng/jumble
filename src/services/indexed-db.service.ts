@@ -14,6 +14,7 @@ const StoreNames = {
   PROFILE_EVENTS: 'profileEvents',
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
+  PEOPLE_LIST_EVENTS: 'peopleListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
   BOOKMARK_LIST_EVENTS: 'bookmarkListEvents',
   BLOSSOM_SERVER_LIST_EVENTS: 'blossomServerListEvents',
@@ -47,7 +48,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 11)
+        const request = window.indexedDB.open('jumble', 12)
 
         request.onerror = (event) => {
           reject(event)
@@ -68,6 +69,9 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.FOLLOW_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.FOLLOW_LIST_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.PEOPLE_LIST_EVENTS)) {
+            db.createObjectStore(StoreNames.PEOPLE_LIST_EVENTS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.MUTE_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.MUTE_LIST_EVENTS, { keyPath: 'key' })
@@ -363,6 +367,37 @@ class IndexedDbService {
     })
   }
 
+  async iteratePeopleListEvents(callback: (event: Event) => Promise<void>): Promise<void> {
+    await this.initPromise
+    if (!this.db) {
+      return
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(StoreNames.PEOPLE_LIST_EVENTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.PEOPLE_LIST_EVENTS)
+      const request = store.openCursor()
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result
+        if (cursor) {
+          const value = (cursor.value as TValue<Event>).value
+          if (value) {
+            callback(value)
+          }
+          cursor.continue()
+        } else {
+          transaction.commit()
+          resolve()
+        }
+      }
+
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
   async putFollowingFavoriteRelays(pubkey: string, relays: [string, string[]][]): Promise<void> {
     await this.initPromise
     return new Promise((resolve, reject) => {
@@ -568,6 +603,9 @@ class IndexedDbService {
         return StoreNames.RELAY_LIST_EVENTS
       case kinds.Contacts:
         return StoreNames.FOLLOW_LIST_EVENTS
+      case ExtendedKind.PEOPLE_LIST:
+      case ExtendedKind.FOLLOW_PACK:
+        return StoreNames.PEOPLE_LIST_EVENTS
       case kinds.Mutelist:
         return StoreNames.MUTE_LIST_EVENTS
       case ExtendedKind.BLOSSOM_SERVER_LIST:
@@ -616,6 +654,10 @@ class IndexedDbService {
       },
       {
         name: StoreNames.FOLLOW_LIST_EVENTS,
+        expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
+      },
+      {
+        name: StoreNames.PEOPLE_LIST_EVENTS,
         expirationTimestamp: Date.now() - 1000 * 60 * 60 * 24 * 30 // 30 day
       },
       {
