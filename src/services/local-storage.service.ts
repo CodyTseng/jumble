@@ -221,14 +221,22 @@ class LocalStorageService {
     const profilePictureAutoLoadPolicy = window.localStorage.getItem(
       StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY
     )
-    if (
-      profilePictureAutoLoadPolicy &&
-      Object.values(PROFILE_PICTURE_AUTO_LOAD_POLICY).includes(
-        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
-      )
-    ) {
-      this.profilePictureAutoLoadPolicy =
-        profilePictureAutoLoadPolicy as TProfilePictureAutoLoadPolicy
+    if (profilePictureAutoLoadPolicy) {
+      // Migrate wifi-only to never
+      const policy =
+        profilePictureAutoLoadPolicy === 'wifi-only'
+          ? PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER
+          : profilePictureAutoLoadPolicy
+      if (
+        Object.values(PROFILE_PICTURE_AUTO_LOAD_POLICY).includes(
+          policy as TProfilePictureAutoLoadPolicy
+        )
+      ) {
+        this.profilePictureAutoLoadPolicy = policy as TProfilePictureAutoLoadPolicy
+        if (profilePictureAutoLoadPolicy === 'wifi-only') {
+          window.localStorage.setItem(StorageKey.PROFILE_PICTURE_AUTO_LOAD_POLICY, policy)
+        }
+      }
     }
 
     const shownCreateWalletGuideToastPubkeysStr = window.localStorage.getItem(

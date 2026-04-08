@@ -697,6 +697,9 @@ export default {
     'Allow insecure connections description':
       'Permitir carregar recursos http:// e ligar a relays ws://. Pode acionar avisos de conteúdo misto do navegador.',
     'reacted to': 'reagiu a',
-    Reaction: 'Reação'
+    Reaction: 'Reação',
+    'Show avatars': 'Mostrar avatares',
+    Show: 'Mostrar',
+    Hide: 'Ocultar'
   }
 }

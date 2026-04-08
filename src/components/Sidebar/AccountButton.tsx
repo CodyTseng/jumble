@@ -51,7 +51,7 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
           )}
         >
           <div className="flex w-0 flex-1 items-center gap-2">
-            <SimpleUserAvatar size="medium" userId={pubkey} />
+            <SimpleUserAvatar size="medium" userId={pubkey} ignorePolicy />
             {!collapse && (
               <SimpleUsername className="truncate text-lg font-semibold" userId={pubkey} />
             )}
@@ -76,7 +76,7 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
             }}
           >
             <div className="flex flex-1 items-center gap-2">
-              <SimpleUserAvatar userId={act.pubkey} />
+              <SimpleUserAvatar userId={act.pubkey} ignorePolicy />
               <div className="w-0 flex-1">
                 <SimpleUsername
                   userId={act.pubkey}

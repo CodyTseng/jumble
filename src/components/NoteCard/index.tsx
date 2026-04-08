@@ -1,3 +1,4 @@
+import { UserAvatarSkeleton } from '@/components/UserAvatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NSFW_DISPLAY_POLICY } from '@/constants'
 import { isMentioningMutedUsers, isNsfwEvent } from '@/lib/event'
@@ -56,7 +57,7 @@ export function NoteCardLoadingSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('px-4 py-3', className)}>
       <div className="flex items-center space-x-2">
-        <Skeleton className="h-10 w-10 rounded-full" />
+        <UserAvatarSkeleton className="h-10 w-10" />
         <div className={`w-0 flex-1`}>
           <div className="py-1">
             <Skeleton className="h-4 w-16" />

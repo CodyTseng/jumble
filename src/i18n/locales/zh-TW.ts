@@ -663,6 +663,9 @@ export default {
     'Allow insecure connections description':
       '允許載入 http:// 資源和連線 ws:// relay。可能會觸發瀏覽器混合內容警告。',
     'reacted to': '回應了',
-    Reaction: '回應'
+    Reaction: '回應',
+    'Show avatars': '顯示頭像',
+    Show: '顯示',
+    Hide: '隱藏'
   }
 }

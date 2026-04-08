@@ -42,6 +42,7 @@ export default function AccountButton() {
           profile ? (
             <SimpleUserAvatar
               userId={pubkey}
+              ignorePolicy
               className={cn('size-6', active ? 'ring-2 ring-primary' : '')}
             />
           ) : (

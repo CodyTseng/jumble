@@ -1,7 +1,7 @@
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
+import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
@@ -646,12 +646,12 @@ function UserAggregationItem({
 function UserAggregationItemSkeleton() {
   return (
     <div className="flex items-center gap-4 px-4 py-3">
-      <Skeleton className="size-10 rounded-full" />
+      <UserAvatarSkeleton className="size-10" />
       <div className="flex-1">
         <Skeleton className="my-1 h-4 w-36" />
         <Skeleton className="my-1 h-3 w-14" />
       </div>
-      <Skeleton className="size-10 rounded-full" />
+      <UserAvatarSkeleton className="size-10" />
     </div>
   )
 }

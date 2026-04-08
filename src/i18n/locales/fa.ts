@@ -691,6 +691,9 @@ export default {
     'Allow insecure connections description':
       'اجازه بارگذاری منابع http:// و اتصال به رله‌های ws://. ممکن است هشدارهای محتوای مختلط مرورگر را فعال کند.',
     'reacted to': 'واکنش نشان داد به',
-    Reaction: 'واکنش'
+    Reaction: 'واکنش',
+    'Show avatars': 'نمایش آواتارها',
+    Show: 'نمایش',
+    Hide: 'پنهان'
   }
 }

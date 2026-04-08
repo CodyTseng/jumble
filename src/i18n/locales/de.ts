@@ -703,6 +703,9 @@ export default {
     'Allow insecure connections description':
       'Laden von http://-Ressourcen und Verbindung zu ws://-Relays erlauben. Kann Browser-Warnungen zu gemischten Inhalten auslösen.',
     'reacted to': 'reagierte auf',
-    Reaction: 'Reaktion'
+    Reaction: 'Reaktion',
+    'Show avatars': 'Avatare anzeigen',
+    Show: 'Anzeigen',
+    Hide: 'Ausblenden'
   }
 }

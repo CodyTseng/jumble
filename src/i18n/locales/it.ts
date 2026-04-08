@@ -696,6 +696,9 @@ export default {
     'Allow insecure connections description':
       'Consenti il caricamento di risorse http:// e la connessione a relay ws://. Potrebbe attivare avvisi di contenuto misto del browser.',
     'reacted to': 'ha reagito a',
-    Reaction: 'Reazione'
+    Reaction: 'Reazione',
+    'Show avatars': 'Mostra avatar',
+    Show: 'Mostra',
+    Hide: 'Nascondi'
   }
 }

@@ -696,6 +696,9 @@ export default {
     'Allow insecure connections description':
       'Разрешить загрузку ресурсов http:// и подключение к реле ws://. Может вызвать предупреждения браузера о смешанном содержимом.',
     'reacted to': 'отреагировал на',
-    Reaction: 'Реакция'
+    Reaction: 'Реакция',
+    'Show avatars': 'Показывать аватары',
+    Show: 'Показать',
+    Hide: 'Скрыть'
   }
 }

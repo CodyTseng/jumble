@@ -686,6 +686,9 @@ export default {
     'Allow insecure connections description':
       'Allow loading http:// resources and connecting to ws:// relays. May trigger browser mixed content warnings.',
     'reacted to': 'reacted to',
-    Reaction: 'Reaction'
+    Reaction: 'Reaction',
+    'Show avatars': 'Show avatars',
+    Show: 'Show',
+    Hide: 'Hide'
   }
 }

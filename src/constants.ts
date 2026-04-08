@@ -186,7 +186,6 @@ export const MEDIA_AUTO_LOAD_POLICY = {
 
 export const PROFILE_PICTURE_AUTO_LOAD_POLICY = {
   ALWAYS: 'always',
-  WIFI_ONLY: 'wifi-only',
   NEVER: 'never'
 } as const
 

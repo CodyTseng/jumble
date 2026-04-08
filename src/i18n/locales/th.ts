@@ -681,6 +681,9 @@ export default {
     'Allow insecure connections description':
       'อนุญาตให้โหลดทรัพยากร http:// และเชื่อมต่อกับรีเลย์ ws:// อาจทำให้เบราว์เซอร์แสดงคำเตือนเนื้อหาแบบผสม',
     'reacted to': 'รีแอคชันไปที่',
-    Reaction: 'รีแอคชัน'
+    Reaction: 'รีแอคชัน',
+    'Show avatars': 'แสดงรูปโปรไฟล์',
+    Show: 'แสดง',
+    Hide: 'ซ่อน'
   }
 }

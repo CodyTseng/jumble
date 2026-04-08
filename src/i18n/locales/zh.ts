@@ -668,6 +668,9 @@ export default {
     'Allow insecure connections description':
       '允许加载 http:// 资源和连接 ws:// relay。可能会触发浏览器混合内容警告。',
     'reacted to': '回应了',
-    Reaction: '回应'
+    Reaction: '回应',
+    'Show avatars': '显示头像',
+    Show: '显示',
+    Hide: '隐藏'
   }
 }

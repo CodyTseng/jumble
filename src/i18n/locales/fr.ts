@@ -700,6 +700,9 @@ export default {
     'Allow insecure connections description':
       'Autoriser le chargement des ressources http:// et la connexion aux relais ws://. Peut déclencher des avertissements de contenu mixte du navigateur.',
     'reacted to': 'a réagi à',
-    Reaction: 'Réaction'
+    Reaction: 'Réaction',
+    'Show avatars': 'Afficher les avatars',
+    Show: 'Afficher',
+    Hide: 'Masquer'
   }
 }

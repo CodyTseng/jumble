@@ -39,7 +39,7 @@ export default function AccountList({
         >
           <div className="flex items-center justify-between p-2">
             <div className="relative flex flex-1 items-center gap-2">
-              <SimpleUserAvatar userId={act.pubkey} />
+              <SimpleUserAvatar userId={act.pubkey} ignorePolicy />
               <div className="w-0 flex-1">
                 <SimpleUsername userId={act.pubkey} className="truncate font-semibold" />
                 <div className="w-fit rounded-full bg-muted px-2 text-sm">

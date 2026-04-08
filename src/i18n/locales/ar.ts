@@ -679,6 +679,9 @@ export default {
     'Allow insecure connections description':
       'السماح بتحميل موارد http:// والاتصال بمرحلات ws://. قد يؤدي إلى تحذيرات المحتوى المختلط في المتصفح.',
     'reacted to': 'تفاعل مع',
-    Reaction: 'تفاعل'
+    Reaction: 'تفاعل',
+    'Show avatars': 'عرض الصور الرمزية',
+    Show: 'إظهار',
+    Hide: 'إخفاء'
   }
 }

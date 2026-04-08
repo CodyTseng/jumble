@@ -3,7 +3,7 @@ import ContentPreview from '@/components/ContentPreview'
 import Note from '@/components/Note'
 import NoteInteractions from '@/components/NoteInteractions'
 import StuffStats from '@/components/StuffStats'
-import UserAvatar from '@/components/UserAvatar'
+import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -43,7 +43,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
       <SecondaryPageLayout ref={ref} index={index} title={t('Note')}>
         <div className="px-4 pt-3">
           <div className="flex items-center space-x-2">
-            <Skeleton className="h-10 w-10 rounded-full" />
+            <UserAvatarSkeleton className="h-10 w-10" />
             <div className={`w-0 flex-1`}>
               <div className="py-1">
                 <Skeleton className="h-4 w-16" />
@@ -145,7 +145,7 @@ function ParentNote({
     return (
       <div>
         <div className="clickable flex items-center space-x-1 rounded-full border px-[0.4375rem] py-1 text-sm text-muted-foreground">
-          <Skeleton className="h-4 w-4 shrink rounded-full" />
+          <UserAvatarSkeleton className="h-4 w-4 shrink" />
           <div className="flex-1 py-1">
             <Skeleton className="h-3" />
           </div>

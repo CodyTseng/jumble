@@ -685,6 +685,9 @@ export default {
     'Allow insecure connections description':
       'http:// 리소스 로드 및 ws:// 릴레이 연결을 허용합니다. 브라우저 혼합 콘텐츠 경고가 발생할 수 있습니다.',
     'reacted to': '에 반응했습니다',
-    Reaction: '반응'
+    Reaction: '반응',
+    'Show avatars': '아바타 표시',
+    Show: '표시',
+    Hide: '숨기기'
   }
 }

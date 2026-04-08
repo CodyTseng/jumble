@@ -1,6 +1,6 @@
 import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
-import UserAvatar from '@/components/UserAvatar'
+import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { Skeleton } from '@/components/ui/skeleton'
 import { userIdToPubkey } from '@/lib/pubkey'
@@ -45,7 +45,7 @@ export default function UserItem({
 export function UserItemSkeleton({ hideFollowButton }: { hideFollowButton?: boolean }) {
   return (
     <div className="flex h-14 items-center gap-2">
-      <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+      <UserAvatarSkeleton className="h-10 w-10" />
       <div className="w-full">
         <div className="py-1">
           <Skeleton className="h-4 w-16" />

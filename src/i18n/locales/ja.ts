@@ -691,6 +691,9 @@ export default {
     'Allow insecure connections description':
       'http:// リソースの読み込みと ws:// リレーへの接続を許可します。ブラウザの混合コンテンツ警告が表示される場合があります。',
     'reacted to': 'にリアクションしました',
-    Reaction: 'リアクション'
+    Reaction: 'リアクション',
+    'Show avatars': 'アバターを表示',
+    Show: '表示',
+    Hide: '非表示'
   }
 }

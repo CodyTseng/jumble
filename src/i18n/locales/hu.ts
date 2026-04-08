@@ -685,6 +685,9 @@ export default {
     'Allow insecure connections description':
       'http:// erőforrások betöltésének és ws:// relékhez való csatlakozás engedélyezése. Böngésző vegyes tartalom figyelmeztetéseket válthat ki.',
     'reacted to': 'reagált erre',
-    Reaction: 'Reakció'
+    Reaction: 'Reakció',
+    'Show avatars': 'Avatarok megjelenítése',
+    Show: 'Megjelenítés',
+    Hide: 'Elrejtés'
   }
 }
