@@ -1,5 +1,10 @@
 import { ExtendedKind } from '@/constants'
-import { getEventKey, getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
+import {
+  getEventKey,
+  getNoteBech32Id,
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent
+} from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
@@ -10,7 +15,13 @@ import { Event, Filter, kinds } from 'nostr-tools'
 
 export type TStuffStats = {
   likeIdSet: Set<string>
-  likes: { id: string; pubkey: string; created_at: number; emoji: TEmoji | string }[]
+  likes: {
+    id: string
+    eventId: string
+    pubkey: string
+    created_at: number
+    emoji: TEmoji | string
+  }[]
   repostPubkeySet: Set<string>
   reposts: { id: string; pubkey: string; created_at: number }[]
   zapPrSet: Set<string>
@@ -269,7 +280,13 @@ class StuffStatsService {
     }
 
     likeIdSet.add(evt.id)
-    likes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
+    likes.push({
+      id: evt.id,
+      eventId: getNoteBech32Id(evt),
+      pubkey: evt.pubkey,
+      created_at: evt.created_at,
+      emoji
+    })
     this.stuffStatsMap.set(targetEventKey, { ...old, likeIdSet, likes })
     return targetEventKey
   }
@@ -298,7 +315,13 @@ class StuffStatsService {
     }
 
     likeIdSet.add(evt.id)
-    likes.push({ id: evt.id, pubkey: evt.pubkey, created_at: evt.created_at, emoji })
+    likes.push({
+      id: evt.id,
+      eventId: getNoteBech32Id(evt),
+      pubkey: evt.pubkey,
+      created_at: evt.created_at,
+      emoji
+    })
     this.stuffStatsMap.set(target, { ...old, likeIdSet, likes })
     return target
   }

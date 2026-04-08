@@ -81,6 +81,8 @@ type TNostrContext = {
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
+  nip44Encrypt: (pubkey: string, plainText: string) => Promise<string>
+  nip44Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   startLogin: () => void
   checkLogin: <T>(cb?: () => T) => Promise<T | void>
   updateRelayListEvent: (relayListEvent: Event) => Promise<void>
@@ -166,6 +168,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    const controller = new AbortController()
     const init = async () => {
       setRelayList(null)
       setProfile(null)
@@ -180,8 +183,6 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!account) {
         return
       }
-
-      const controller = new AbortController()
       const storedNsec = storage.getAccountNsec(account.pubkey)
       if (storedNsec) {
         setNsec(storedNsec)
@@ -218,6 +219,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS)
       ])
+      if (controller.signal.aborted) return
       if (storedRelayListEvent) {
         setRelayList(getRelayListFromEvent(storedRelayListEvent, storage.getFilterOutOnionRelays()))
       }
@@ -258,6 +260,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         client.updateRelayListCache(relayListEvent)
         await indexedDb.putReplaceableEvent(relayListEvent)
       }
+      if (controller.signal.aborted) return
       setRelayList(relayList)
 
       const events = await client.fetchEvents(relayList.write.concat(defaultRelays).slice(0, 4), [
@@ -281,6 +284,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
           '#d': [ApplicationDataKey.NOTIFICATIONS_SEEN_AT]
         }
       ])
+      if (controller.signal.aborted) return
       const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
       const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
       const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
@@ -366,13 +370,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       storage.setLastReadNotificationTime(account.pubkey, notificationsSeenAt)
 
       client.initUserIndexFromFollowings(account.pubkey, controller.signal)
-      return controller
     }
-    const promise = init()
+    init()
     return () => {
-      promise.then((controller) => {
-        controller?.abort()
-      })
+      controller.abort()
     }
   }, [account])
 
@@ -730,6 +731,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return signer?.nip04Decrypt(pubkey, cipherText) ?? ''
   }
 
+  const nip44Encrypt = async (pubkey: string, plainText: string) => {
+    return signer?.nip44Encrypt(pubkey, plainText) ?? ''
+  }
+
+  const nip44Decrypt = async (pubkey: string, cipherText: string) => {
+    return signer?.nip44Decrypt(pubkey, cipherText) ?? ''
+  }
+
   const checkLogin = async <T,>(cb?: () => T): Promise<T | void> => {
     if (signer) {
       return cb && cb()
@@ -857,6 +866,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         signHttpAuth,
         nip04Encrypt,
         nip04Decrypt,
+        nip44Encrypt,
+        nip44Decrypt,
         startLogin: () => setOpenLoginDialog(true),
         checkLogin,
         signEvent,
