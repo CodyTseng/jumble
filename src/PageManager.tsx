@@ -77,7 +77,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
   const { isSmallScreen } = useScreenSize()
   const { themeSetting } = useTheme()
-  const { enableSingleColumnLayout } = useUserPreferences()
+  const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
 
   useEffect(() => {
@@ -344,10 +344,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <CurrentRelaysProvider>
             <NotificationProvider>
               <div className="flex w-full lg:justify-around">
-                <div className="sticky top-0 flex h-[var(--vh)] justify-end self-start lg:w-full">
-                  <Sidebar />
-                </div>
-                <div className="w-0 flex-1 border-x bg-background lg:w-[640px] lg:flex-auto lg:shrink-0">
+                <div className={cn('lg:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
+                <div className="min-h-screen w-0 flex-1 border-x bg-background lg:w-[640px] lg:flex-auto lg:shrink-0">
                   {!!secondaryStack.length &&
                     secondaryStack.map((item, index) => (
                       <div
@@ -374,6 +372,16 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   ))}
                 </div>
                 <div className="hidden lg:block lg:w-full" />
+              </div>
+              <div
+                className={cn(
+                  'pointer-events-none fixed left-0 top-0 z-10 flex h-[var(--vh)] justify-end lg:w-[calc((100%_-_640px)_/_2)]',
+                  sidebarCollapse ? 'w-16' : 'w-52'
+                )}
+              >
+                <div className="pointer-events-auto">
+                  <Sidebar />
+                </div>
               </div>
               <TooManyRelaysAlertDialog />
               <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
