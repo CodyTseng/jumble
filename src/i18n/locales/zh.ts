@@ -785,6 +785,9 @@ export default {
     Reaction: '回应',
     'This user has not set up DM relays yet.': '该用户尚未设置 DM 中继。',
     "This user's client does not support NIP-4e encrypted direct messages.":
-      '该用户的客户端不支持 NIP-4e 加密私信。'
+      '该用户的客户端不支持 NIP-4e 加密私信。',
+    'Show avatars': '显示头像',
+    Show: '显示',
+    Hide: '隐藏'
   }
 }

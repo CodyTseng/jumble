@@ -1,3 +1,4 @@
+import { UserAvatarSkeleton } from '@/components/UserAvatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchEvent } from '@/hooks'
 import { cn } from '@/lib/utils'
@@ -33,7 +34,7 @@ function EmbeddedNoteSkeleton({ className }: { className?: string }) {
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center space-x-2">
-        <Skeleton className="h-9 w-9 rounded-full" />
+        <UserAvatarSkeleton className="h-9 w-9" />
         <div>
           <Skeleton className="my-1 h-3 w-16" />
           <Skeleton className="my-1 h-3 w-16" />

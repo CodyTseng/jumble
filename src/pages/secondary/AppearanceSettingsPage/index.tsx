@@ -1,10 +1,12 @@
 import { Label } from '@/components/ui/label'
-import { PRIMARY_COLORS, TPrimaryColor } from '@/constants'
+import { PRIMARY_COLORS, PROFILE_PICTURE_AUTO_LOAD_POLICY, TPrimaryColor } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useTheme } from '@/providers/ThemeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
+import { TProfilePictureAutoLoadPolicy } from '@/types'
 import { Columns2, LayoutList, List, Monitor, Moon, PanelLeft, Sun } from 'lucide-react'
 import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -30,6 +32,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { themeSetting, setThemeSetting, primaryColor, setPrimaryColor } = useTheme()
+  const { profilePictureAutoLoadPolicy, setProfilePictureAutoLoadPolicy } = useContentPolicy()
   const {
     enableSingleColumnLayout,
     updateEnableSingleColumnLayout,
@@ -85,6 +88,34 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
           </div>
         </div>
         <div className="flex flex-col gap-2 px-4">
+          <Label className="text-base">{t('Show avatars')}</Label>
+          <div className="grid w-full grid-cols-2 gap-4">
+            <AvatarPolicyCard
+              showAvatar
+              label={t('Show')}
+              isSelected={
+                profilePictureAutoLoadPolicy !== PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER
+              }
+              onClick={() =>
+                setProfilePictureAutoLoadPolicy(
+                  PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS as TProfilePictureAutoLoadPolicy
+                )
+              }
+            />
+            <AvatarPolicyCard
+              label={t('Hide')}
+              isSelected={
+                profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER
+              }
+              onClick={() =>
+                setProfilePictureAutoLoadPolicy(
+                  PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER as TProfilePictureAutoLoadPolicy
+                )
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 px-4">
           <Label className="text-base">{t('Primary color')}</Label>
           <div className="grid w-full grid-cols-4 gap-4">
             {Object.entries(PRIMARY_COLORS).map(([key, config]) => (
@@ -111,6 +142,47 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
 })
 AppearanceSettingsPage.displayName = 'AppearanceSettingsPage'
 export default AppearanceSettingsPage
+
+const NoteSkeletonLine = ({ className }: { className?: string }) => (
+  <div className={cn('h-1.5 rounded-full bg-muted-foreground/20', className)} />
+)
+
+const AvatarPolicyCard = ({
+  showAvatar,
+  label,
+  isSelected,
+  onClick
+}: {
+  showAvatar?: boolean
+  label?: string
+  isSelected: boolean
+  onClick: () => void
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'flex flex-col gap-2 rounded-lg border-2 px-3 py-4 transition-all',
+        isSelected ? 'border-primary' : 'border-border hover:border-muted-foreground/40'
+      )}
+    >
+      <div className="flex w-full items-center gap-1.5">
+        {showAvatar && (
+          <div className="size-5 shrink-0 rounded-full bg-muted-foreground/20" />
+        )}
+        <div className="flex flex-1 flex-col gap-1">
+          <NoteSkeletonLine className="w-8" />
+          <NoteSkeletonLine className="w-5" />
+        </div>
+      </div>
+      <div className="flex w-full flex-col gap-1">
+        <NoteSkeletonLine className="w-full" />
+        <NoteSkeletonLine className="w-2/3" />
+      </div>
+      {label && <span className="mt-1 self-center text-xs font-medium">{label}</span>}
+    </button>
+  )
+}
 
 const OptionButton = ({
   isSelected,

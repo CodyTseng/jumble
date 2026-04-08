@@ -3,12 +3,13 @@ import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import StuffStats from '@/components/StuffStats'
 import TrustScoreBadge from '@/components/TrustScoreBadge'
 import { Skeleton } from '@/components/ui/skeleton'
-import UserAvatar from '@/components/UserAvatar'
+import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { NOTIFICATION_LIST_STYLE } from '@/constants'
 import { toNote, toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -41,6 +42,7 @@ export default function Notification({
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const { isNotificationRead, markNotificationAsRead } = useNotification()
+  const { autoLoadProfilePicture } = useContentPolicy()
   const { notificationListStyle } = useUserPreferences()
   const unread = useMemo(
     () => isNew && !isNotificationRead(notificationId),
@@ -63,17 +65,25 @@ export default function Notification({
         onClick={handleClick}
       >
         <div className="flex w-0 flex-1 items-center gap-2">
-          <div className="relative">
-            <UserAvatar userId={sender} size="small" />
-            <TrustScoreBadge
-              pubkey={sender}
-              classNames={{
-                container:
-                  'absolute inset-0 w-full h-full rounded-full bg-background/60 backdrop-blur-sm flex flex-col justify-center items-center pointer-events-none'
-              }}
-            />
-          </div>
+          {autoLoadProfilePicture && (
+            <div className="relative">
+              <UserAvatar userId={sender} size="small" />
+              <TrustScoreBadge
+                pubkey={sender}
+                classNames={{
+                  container:
+                    'absolute inset-0 w-full h-full rounded-full bg-background/60 backdrop-blur-sm flex flex-col justify-center items-center pointer-events-none'
+                }}
+              />
+            </div>
+          )}
           {icon}
+          {!autoLoadProfilePicture && (
+            <Username
+              userId={sender}
+              className="max-w-[8rem] shrink-0 truncate text-sm font-semibold"
+            />
+          )}
           {middle}
           {targetEvent && (
             <ContentPreview
@@ -143,7 +153,7 @@ export function NotificationSkeleton() {
   if (notificationListStyle === NOTIFICATION_LIST_STYLE.COMPACT) {
     return (
       <div className="flex h-11 items-center gap-2 px-4 py-2">
-        <Skeleton className="h-7 w-7 rounded-full" />
+        <UserAvatarSkeleton className="h-7 w-7" />
         <Skeleton className="h-6 w-0 flex-1" />
       </div>
     )
@@ -153,7 +163,7 @@ export function NotificationSkeleton() {
     <div className="flex cursor-pointer items-start gap-2 px-4 py-2">
       <div className="mt-1.5 flex items-center gap-2">
         <Skeleton className="h-6 w-6" />
-        <Skeleton className="h-9 w-9 rounded-full" />
+        <UserAvatarSkeleton className="h-9 w-9" />
       </div>
       <div className="w-0 flex-1">
         <div className="py-1">

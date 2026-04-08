@@ -82,16 +82,10 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     return connectionType === 'wifi' || connectionType === 'ethernet'
   }, [mediaAutoLoadPolicy, connectionType])
 
-  const autoLoadProfilePicture = useMemo(() => {
-    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS) {
-      return true
-    }
-    if (profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER) {
-      return false
-    }
-    // WIFI_ONLY
-    return connectionType === 'wifi' || connectionType === 'ethernet'
-  }, [profilePictureAutoLoadPolicy, connectionType])
+  const autoLoadProfilePicture = useMemo(
+    () => profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS,
+    [profilePictureAutoLoadPolicy]
+  )
 
   const updateAutoplay = (autoplay: boolean) => {
     storage.setAutoplay(autoplay)

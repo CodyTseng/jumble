@@ -23,7 +23,7 @@ import ParentNotePreview from '../ParentNotePreview'
 import StuffStats from '../StuffStats'
 import TranslateButton from '../TranslateButton'
 import TrustScoreBadge from '../TrustScoreBadge'
-import UserAvatar from '../UserAvatar'
+import UserAvatar, { UserAvatarSkeleton } from '../UserAvatar'
 import Username from '../Username'
 
 export default function ReplyNote({
@@ -170,7 +170,7 @@ export default function ReplyNote({
 export function ReplyNoteSkeleton() {
   return (
     <div className="flex w-full items-start space-x-2 px-4 py-3">
-      <Skeleton className="mt-0.5 h-9 w-9 shrink-0 rounded-full" />
+      <UserAvatarSkeleton className="mt-0.5 h-9 w-9" />
       <div className="w-full">
         <div className="py-1">
           <Skeleton className="h-3 w-16" />

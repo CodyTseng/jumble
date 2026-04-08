@@ -804,6 +804,9 @@ export default {
     Reaction: '반응',
     'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
     "This user's client does not support NIP-4e encrypted direct messages.":
-      "This user's client does not support NIP-4e encrypted direct messages."
+      "This user's client does not support NIP-4e encrypted direct messages.",
+    'Show avatars': '아바타 표시',
+    Show: '표시',
+    Hide: '숨기기'
   }
 }

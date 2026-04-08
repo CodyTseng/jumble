@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import ContentPreview from '../ContentPreview'
 import RelayIcon from '../RelayIcon'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
-import { SimpleUserAvatar } from '../UserAvatar'
+import { SimpleUserAvatar, UserAvatarSkeleton } from '../UserAvatar'
 
 export default function RelaySimpleInfo({
   relayInfo,
@@ -63,7 +63,7 @@ export function RelaySimpleInfoSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('space-y-1', className)}>
       <div className="flex w-full items-center gap-2">
-        <Skeleton className="h-9 w-9 rounded-full" />
+        <UserAvatarSkeleton className="h-9 w-9" />
         <div className="w-0 flex-1 space-y-1">
           <Skeleton className="h-5 w-40" />
           <Skeleton className="h-4 w-20" />

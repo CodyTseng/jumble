@@ -816,6 +816,9 @@ export default {
     Reaction: 'Reakcja',
     'This user has not set up DM relays yet.': 'This user has not set up DM relays yet.',
     "This user's client does not support NIP-4e encrypted direct messages.":
-      "This user's client does not support NIP-4e encrypted direct messages."
+      "This user's client does not support NIP-4e encrypted direct messages.",
+    'Show avatars': 'Pokaż awatary',
+    Show: 'Pokaż',
+    Hide: 'Ukryj'
   }
 }

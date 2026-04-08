@@ -3,7 +3,7 @@ import { useFetchEvent } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import ContentPreview from '../ContentPreview'
-import UserAvatar from '../UserAvatar'
+import UserAvatar, { UserAvatarSkeleton } from '../UserAvatar'
 
 export default function ParentNotePreview({
   eventId,
@@ -50,7 +50,7 @@ export default function ParentNotePreview({
         )}
       >
         <div className="shrink-0">{displayLabel}</div>
-        <Skeleton className="h-4 w-4 rounded-full" />
+        <UserAvatarSkeleton className="h-4 w-4" />
         <div className="flex-1 py-1">
           <Skeleton className="h-3" />
         </div>
