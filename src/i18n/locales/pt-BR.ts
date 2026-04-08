@@ -818,6 +818,9 @@ export default {
       "This user's client does not support NIP-4e encrypted direct messages.",
     'Show avatars': 'Mostrar avatares',
     Show: 'Mostrar',
-    Hide: 'Ocultar'
+    Hide: 'Ocultar',
+    'Do not sync notification read status': 'Não sincronizar status de leitura de notificações',
+    'Only update read status locally without publishing to relays':
+      'Atualizar o status de leitura apenas localmente sem publicar nos relays'
   }
 }

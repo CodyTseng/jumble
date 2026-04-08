@@ -810,6 +810,9 @@ export default {
       "This user's client does not support NIP-4e encrypted direct messages.",
     'Show avatars': 'Avatarok megjelenítése',
     Show: 'Megjelenítés',
-    Hide: 'Elrejtés'
+    Hide: 'Elrejtés',
+    'Do not sync notification read status': 'Ne szinkronizálja az értesítések olvasási állapotát',
+    'Only update read status locally without publishing to relays':
+      'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre'
   }
 }

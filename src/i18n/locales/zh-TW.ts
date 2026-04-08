@@ -783,6 +783,9 @@ export default {
       '該使用者的客戶端不支援 NIP-4e 加密私訊。',
     'Show avatars': '顯示頭像',
     Show: '顯示',
-    Hide: '隱藏'
+    Hide: '隱藏',
+    'Do not sync notification read status': '不同步通知已讀狀態',
+    'Only update read status locally without publishing to relays':
+      '僅在本地更新已讀狀態，不發佈到中繼伺服器'
   }
 }

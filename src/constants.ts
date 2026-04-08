@@ -57,6 +57,7 @@ export const StorageKey = {
   DM_BACKWARD_CURSOR_MAP: 'dmBackwardCursorMap',
   PROCESSED_SYNC_REQUEST_IDS: 'processedSyncRequestIds',
   DM_DELETED_CONVERSATIONS_MAP: 'dmDeletedConversationsMap',
+  DISABLE_NOTIFICATION_SYNC: 'disableNotificationSync',
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
   HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions', // deprecated

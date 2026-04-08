@@ -819,6 +819,9 @@ export default {
       "This user's client does not support NIP-4e encrypted direct messages.",
     'Show avatars': 'Mostra avatar',
     Show: 'Mostra',
-    Hide: 'Nascondi'
+    Hide: 'Nascondi',
+    'Do not sync notification read status': 'Non sincronizzare lo stato di lettura delle notifiche',
+    'Only update read status locally without publishing to relays':
+      'Aggiorna lo stato di lettura solo localmente senza pubblicare sui relay'
   }
 }

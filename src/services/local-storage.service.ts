@@ -80,6 +80,7 @@ class LocalStorageService {
   private dmBackwardCursorMap: Record<string, number> = {}
   private processedSyncRequestIds: string[] = []
   private dmDeletedConversationsMap: Record<string, number> = {}
+  private disableNotificationSync: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -453,6 +454,9 @@ class LocalStorageService {
 
     this.hideIndirectNotifications =
       window.localStorage.getItem(StorageKey.HIDE_INDIRECT_NOTIFICATIONS) === 'true'
+
+    this.disableNotificationSync =
+      window.localStorage.getItem(StorageKey.DISABLE_NOTIFICATION_SYNC) === 'true'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.PINNED_PUBKEYS)
@@ -964,6 +968,15 @@ class LocalStorageService {
       StorageKey.DM_DELETED_CONVERSATIONS_MAP,
       JSON.stringify(this.dmDeletedConversationsMap)
     )
+  }
+
+  getDisableNotificationSync() {
+    return this.disableNotificationSync
+  }
+
+  setDisableNotificationSync(disable: boolean) {
+    this.disableNotificationSync = disable
+    window.localStorage.setItem(StorageKey.DISABLE_NOTIFICATION_SYNC, disable.toString())
   }
 }
 

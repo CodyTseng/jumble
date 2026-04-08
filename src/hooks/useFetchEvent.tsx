@@ -1,5 +1,6 @@
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import client from '@/services/client.service'
+import threadService from '@/services/thread.service'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
@@ -21,6 +22,7 @@ export function useFetchEvent(eventId?: string) {
       const event = await client.fetchEvent(eventId)
       if (event && !isEventDeleted(event)) {
         setEvent(event)
+        threadService.addRepliesToThread([event])
       }
     }
 

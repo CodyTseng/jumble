@@ -788,6 +788,9 @@ export default {
       '该用户的客户端不支持 NIP-4e 加密私信。',
     'Show avatars': '显示头像',
     Show: '显示',
-    Hide: '隐藏'
+    Hide: '隐藏',
+    'Do not sync notification read status': '不同步通知已读状态',
+    'Only update read status locally without publishing to relays':
+      '仅在本地更新已读状态，不发布到中继服务器'
   }
 }

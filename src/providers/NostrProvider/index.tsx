@@ -869,6 +869,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       lastPublishedSeenNotificationsAtEventAtMap.get(account.pubkey) ?? -1
     if (
       !skipPublish &&
+      !storage.getDisableNotificationSync() &&
       (lastPublishedSeenNotificationsAtEventAt < 0 ||
         now - lastPublishedSeenNotificationsAtEventAt > 10 * 60) // 10 minutes
     ) {
