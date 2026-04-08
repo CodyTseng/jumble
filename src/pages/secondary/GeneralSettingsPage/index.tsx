@@ -8,6 +8,7 @@ import { MEDIA_AUTO_LOAD_POLICY, NSFW_DISPLAY_POLICY } from '@/constants'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { isSupportCheckConnectionType } from '@/lib/utils'
+import localStorage from '@/services/local-storage.service'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
@@ -36,6 +37,9 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   } = useContentPolicy()
   const { quickReaction, updateQuickReaction, quickReactionEmoji, updateQuickReactionEmoji } =
     useUserPreferences()
+  const [disableNotificationSync, setDisableNotificationSync] = useState(
+    localStorage.getDisableNotificationSync()
+  )
 
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -109,6 +113,22 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             id="hide-content-mentioning-muted-users"
             checked={hideContentMentioningMutedUsers}
             onCheckedChange={setHideContentMentioningMutedUsers}
+          />
+        </SettingItem>
+        <SettingItem>
+          <Label htmlFor="disable-notification-sync" className="text-base font-normal">
+            <div>{t('Do not sync notification read status')}</div>
+            <div className="text-muted-foreground">
+              {t('Only update read status locally without publishing to relays')}
+            </div>
+          </Label>
+          <Switch
+            id="disable-notification-sync"
+            checked={disableNotificationSync}
+            onCheckedChange={(checked) => {
+              setDisableNotificationSync(checked)
+              localStorage.setDisableNotificationSync(checked)
+            }}
           />
         </SettingItem>
         <SettingItem>

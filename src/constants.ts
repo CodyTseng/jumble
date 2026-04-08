@@ -50,6 +50,7 @@ export const StorageKey = {
   MIN_TRUST_SCORE_MAP: 'minTrustScoreMap',
   SEARCH_RELAY_URLS: 'searchRelayUrls',
   HIDE_INDIRECT_NOTIFICATIONS: 'hideIndirectNotifications',
+  DISABLE_NOTIFICATION_SYNC: 'disableNotificationSync',
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
   HIDE_UNTRUSTED_INTERACTIONS: 'hideUntrustedInteractions', // deprecated

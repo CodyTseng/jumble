@@ -699,6 +699,9 @@ export default {
     Reaction: 'Реакция',
     'Show avatars': 'Показывать аватары',
     Show: 'Показать',
-    Hide: 'Скрыть'
+    Hide: 'Скрыть',
+    'Do not sync notification read status': 'Не синхронизировать статус прочтения уведомлений',
+    'Only update read status locally without publishing to relays':
+      'Обновлять статус прочтения только локально, не публикуя на реле'
   }
 }

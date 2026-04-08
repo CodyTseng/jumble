@@ -700,6 +700,9 @@ export default {
     Reaction: 'Reação',
     'Show avatars': 'Mostrar avatares',
     Show: 'Mostrar',
-    Hide: 'Ocultar'
+    Hide: 'Ocultar',
+    'Do not sync notification read status': 'Não sincronizar estado de leitura das notificações',
+    'Only update read status locally without publishing to relays':
+      'Atualizar o estado de leitura apenas localmente sem publicar nos relays'
   }
 }

@@ -694,6 +694,9 @@ export default {
     Reaction: 'واکنش',
     'Show avatars': 'نمایش آواتارها',
     Show: 'نمایش',
-    Hide: 'پنهان'
+    Hide: 'پنهان',
+    'Do not sync notification read status': 'عدم همگام‌سازی وضعیت خوانده شدن اعلان‌ها',
+    'Only update read status locally without publishing to relays':
+      'فقط وضعیت خوانده شدن را به صورت محلی به‌روزرسانی کنید بدون انتشار به رله‌ها'
   }
 }

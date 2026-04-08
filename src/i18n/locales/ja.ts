@@ -694,6 +694,9 @@ export default {
     Reaction: 'リアクション',
     'Show avatars': 'アバターを表示',
     Show: '表示',
-    Hide: '非表示'
+    Hide: '非表示',
+    'Do not sync notification read status': '通知の既読状態を同期しない',
+    'Only update read status locally without publishing to relays':
+      '既読状態をローカルのみで更新し、リレーに公開しない'
   }
 }

@@ -703,6 +703,9 @@ export default {
     Reaction: 'Réaction',
     'Show avatars': 'Afficher les avatars',
     Show: 'Afficher',
-    Hide: 'Masquer'
+    Hide: 'Masquer',
+    'Do not sync notification read status': 'Ne pas synchroniser le statut de lecture des notifications',
+    'Only update read status locally without publishing to relays':
+      'Mettre à jour le statut de lecture uniquement en local sans publier sur les relais'
   }
 }

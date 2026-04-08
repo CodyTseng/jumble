@@ -73,6 +73,7 @@ class LocalStorageService {
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
   private hideIndirectNotifications: boolean = false
+  private disableNotificationSync: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -354,6 +355,9 @@ class LocalStorageService {
 
     this.hideIndirectNotifications =
       window.localStorage.getItem(StorageKey.HIDE_INDIRECT_NOTIFICATIONS) === 'true'
+
+    this.disableNotificationSync =
+      window.localStorage.getItem(StorageKey.DISABLE_NOTIFICATION_SYNC) === 'true'
 
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.PINNED_PUBKEYS)
@@ -755,6 +759,15 @@ class LocalStorageService {
   setHideIndirectNotifications(onlyShow: boolean) {
     this.hideIndirectNotifications = onlyShow
     window.localStorage.setItem(StorageKey.HIDE_INDIRECT_NOTIFICATIONS, onlyShow.toString())
+  }
+
+  getDisableNotificationSync() {
+    return this.disableNotificationSync
+  }
+
+  setDisableNotificationSync(disable: boolean) {
+    this.disableNotificationSync = disable
+    window.localStorage.setItem(StorageKey.DISABLE_NOTIFICATION_SYNC, disable.toString())
   }
 }
 

@@ -684,6 +684,9 @@ export default {
     Reaction: 'รีแอคชัน',
     'Show avatars': 'แสดงรูปโปรไฟล์',
     Show: 'แสดง',
-    Hide: 'ซ่อน'
+    Hide: 'ซ่อน',
+    'Do not sync notification read status': 'ไม่ซิงค์สถานะการอ่านการแจ้งเตือน',
+    'Only update read status locally without publishing to relays':
+      'อัปเดตสถานะการอ่านในเครื่องเท่านั้น โดยไม่เผยแพร่ไปยังรีเลย์'
   }
 }
