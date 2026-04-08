@@ -3,6 +3,7 @@ import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } fro
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import client from '@/services/client.service'
+import threadService from '@/services/thread.service'
 import { Event, kinds, verifyEvent } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import MainNoteCard from './MainNoteCard'
@@ -59,6 +60,7 @@ export default function RepostNoteCard({
           })
         }
         setTargetEvent(eventFromContent)
+        threadService.addRepliesToThread([eventFromContent])
         return
       }
 
@@ -79,6 +81,7 @@ export default function RepostNoteCard({
       const targetEvent = await client.fetchEvent(targetEventId)
       if (targetEvent) {
         setTargetEvent(targetEvent)
+        threadService.addRepliesToThread([targetEvent])
       }
     }
     fetch()
