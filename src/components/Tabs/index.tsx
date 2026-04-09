@@ -37,7 +37,7 @@ export default function Tabs({
     if (activeIndex >= 0 && tabRefs.current[activeIndex]) {
       const activeTab = tabRefs.current[activeIndex]
       const { offsetWidth, offsetLeft } = activeTab
-      const padding = 16 // 8px padding on each side
+      const padding = 24 // 12px padding on each side
       setIndicatorStyle({
         width: offsetWidth - padding,
         left: offsetLeft + padding / 2
@@ -115,7 +115,7 @@ export default function Tabs({
             >
               {t(tab.label)}
               {tab.dot && (
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" />
               )}
             </div>
           ))}
