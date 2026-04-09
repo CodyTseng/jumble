@@ -36,7 +36,7 @@ export default function Tabs({
     if (activeIndex >= 0 && tabRefs.current[activeIndex]) {
       const activeTab = tabRefs.current[activeIndex]
       const { offsetWidth, offsetLeft } = activeTab
-      const padding = 16 // 8px padding on each side
+      const padding = 24 // 12px padding on each side
       setIndicatorStyle({
         width: offsetWidth - padding,
         left: offsetLeft + padding / 2
@@ -103,7 +103,7 @@ export default function Tabs({
               key={tab.value}
               ref={(el) => (tabRefs.current[index] = el)}
               className={cn(
-                `clickable my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-4 py-2 text-center font-semibold transition-all duration-200`,
+                `clickable my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-3 py-2 text-center font-semibold transition-all duration-200`,
                 value === tab.value
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground'

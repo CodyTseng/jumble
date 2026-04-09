@@ -1,6 +1,5 @@
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import Tabs from '@/components/Tabs'
+import { SPECIAL_FEED_ID } from '@/constants'
 import { Event } from 'nostr-tools'
 import { useState } from 'react'
 import QuoteList from '../QuoteList'
@@ -9,7 +8,16 @@ import ReplyNoteList from '../ReplyNoteList'
 import RepostList from '../RepostList'
 import TrustScoreFilter from '../TrustScoreFilter'
 import ZapList from '../ZapList'
-import { Tabs, TTabValue } from './Tabs'
+
+type TTabValue = 'replies' | 'quotes' | 'reactions' | 'reposts' | 'zaps'
+
+const TABS = [
+  { value: 'replies', label: 'Replies' },
+  { value: 'zaps', label: 'Zaps' },
+  { value: 'reposts', label: 'Reposts' },
+  { value: 'reactions', label: 'Reactions' },
+  { value: 'quotes', label: 'Quotes' }
+]
 
 export default function NoteInteractions({ event }: { event: Event }) {
   const [type, setType] = useState<TTabValue>('replies')
@@ -37,15 +45,14 @@ export default function NoteInteractions({ event }: { event: Event }) {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <ScrollArea className="w-0 flex-1">
-          <Tabs selectedTab={type} onTabChange={setType} />
-          <ScrollBar orientation="horizontal" className="pointer-events-none opacity-0" />
-        </ScrollArea>
-        <Separator orientation="vertical" className="h-6" />
-        <TrustScoreFilter filterId={SPECIAL_TRUST_SCORE_FILTER_ID.INTERACTIONS} />
-      </div>
-      <Separator />
+      <Tabs
+        tabs={TABS}
+        value={type}
+        onTabChange={(tab) => setType(tab as TTabValue)}
+        options={
+          <TrustScoreFilter filterId={SPECIAL_FEED_ID.INTERACTIONS} />
+        }
+      />
       {list}
     </>
   )
