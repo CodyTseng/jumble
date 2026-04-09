@@ -30,6 +30,7 @@ export const StorageKey = {
   DISMISSED_TOO_MANY_RELAYS_ALERT: 'dismissedTooManyRelaysAlert',
   SHOW_KINDS: 'showKinds',
   SHOW_KINDS_VERSION: 'showKindsVersion',
+  SHOW_KINDS_MAP: 'showKindsMap',
   HIDE_CONTENT_MENTIONING_MUTED_USERS: 'hideContentMentioningMutedUsers',
   NOTIFICATION_LIST_STYLE: 'notificationListStyle',
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
@@ -509,6 +510,12 @@ export const SPECIAL_TRUST_SCORE_FILTER_ID = {
   NAK: 'nak',
   TRENDING: 'trending',
   DM: 'dm'
+}
+
+export const SPECIAL_FEED_ID = {
+  ...SPECIAL_TRUST_SCORE_FILTER_ID,
+  FOLLOWING: 'following',
+  PINNED: 'pinned'
 }
 
 export const COMMUNITY_RELAY_SETS = import.meta.env.VITE_COMMUNITY_RELAY_SETS as TRelaySet[]

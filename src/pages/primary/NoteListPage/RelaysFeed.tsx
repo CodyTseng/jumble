@@ -8,7 +8,7 @@ export default function RelaysFeed() {
   const { relayUrls, feedInfo } = useFeed()
   const [isReady, setIsReady] = useState(false)
   const [areAlgoRelays, setAreAlgoRelays] = useState(false)
-  const trustScoreFilterId = useMemo(() => {
+  const feedId = useMemo(() => {
     if (feedInfo?.feedType === 'relay' && feedInfo.id) {
       return `relay-${feedInfo.id}`
     } else if (feedInfo?.feedType === 'relays' && feedInfo.id) {
@@ -32,7 +32,7 @@ export default function RelaysFeed() {
 
   return (
     <NormalFeed
-      trustScoreFilterId={trustScoreFilterId}
+      feedId={feedId}
       subRequests={[{ urls: relayUrls, filter: {} }]}
       areAlgoRelays={areAlgoRelays}
       isMainFeed

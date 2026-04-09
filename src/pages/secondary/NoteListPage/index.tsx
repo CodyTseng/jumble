@@ -107,18 +107,18 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       </div>
     )
   } else if (data) {
-    let trustScoreFilterId: string
+    let feedId: string
     if (data.type === 'hashtag') {
-      trustScoreFilterId = 'hashtag'
+      feedId = 'hashtag'
     } else if (data.type === 'domain') {
-      trustScoreFilterId = `domain-${data.domain}`
+      feedId = `domain-${data.domain}`
     } else {
-      trustScoreFilterId = 'search'
+      feedId = 'search'
     }
 
     content = (
       <NormalFeed
-        trustScoreFilterId={trustScoreFilterId}
+        feedId={feedId}
         subRequests={subRequests}
         disable24hMode={data.type !== 'domain'}
       />

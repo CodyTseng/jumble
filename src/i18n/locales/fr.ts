@@ -826,6 +826,6 @@ export default {
     Hide: 'Masquer',
     'Do not sync notification read status': 'Ne pas synchroniser le statut de lecture des notifications',
     'Only update read status locally without publishing to relays':
-      'Mettre à jour le statut de lecture uniquement en local sans publier sur les relais'
+      'Mettre à jour le statut de lecture uniquement en local sans publier sur les relais',
   }
 }

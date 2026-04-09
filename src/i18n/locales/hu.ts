@@ -813,6 +813,6 @@ export default {
     Hide: 'Elrejtés',
     'Do not sync notification read status': 'Ne szinkronizálja az értesítések olvasási állapotát',
     'Only update read status locally without publishing to relays':
-      'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre'
+      'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre',
   }
 }

@@ -11,7 +11,7 @@ import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
 import { TFeedSubRequest, TNoteListMode } from '@/types'
-import { NostrEvent } from 'nostr-tools'
+import { kinds, NostrEvent } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshButton } from '../RefreshButton'
 
@@ -25,8 +25,10 @@ export default function ProfileFeed({
   search?: string
 }) {
   const { pubkey: myPubkey, pinListEvent: myPinListEvent } = useNostr()
-  const { showKinds } = useKindFilter()
-  const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
+  const { getShowKinds } = useKindFilter()
+  const feedId = `profile-${pubkey}`
+  const feedShowKinds = useMemo(() => getShowKinds(feedId), [getShowKinds, feedId])
+  const [temporaryShowKinds, setTemporaryShowKinds] = useState(feedShowKinds)
   const [listMode, setListMode] = useState<TNoteListMode>(() => {
     const mode = storage.getNoteListMode()
     if (mode === '24h') {
@@ -39,7 +41,8 @@ export default function ProfileFeed({
   const tabs = useMemo(() => {
     const _tabs = [
       { value: 'posts', label: 'Notes' },
-      { value: 'postsAndReplies', label: 'Replies' }
+      { value: 'postsAndReplies', label: 'Replies' },
+      { value: 'articles', label: 'Articles' }
     ]
 
     if (myPubkey && myPubkey !== pubkey) {
@@ -50,6 +53,8 @@ export default function ProfileFeed({
   }, [myPubkey, pubkey])
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
+  const isArticlesMode = listMode === 'articles'
+  const effectiveShowKinds = isArticlesMode ? [kinds.LongFormArticle] : temporaryShowKinds
 
   useEffect(() => {
     const initPinnedEventIds = async () => {
@@ -165,17 +170,23 @@ export default function ProfileFeed({
         options={
           <>
             {!supportTouch && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}
-            <KindFilter showKinds={temporaryShowKinds} onShowKindsChange={handleShowKindsChange} />
+            {!isArticlesMode && (
+              <KindFilter
+                feedId={feedId}
+                showKinds={temporaryShowKinds}
+                onShowKindsChange={handleShowKindsChange}
+              />
+            )}
           </>
         }
       />
       <NoteList
         ref={noteListRef}
         subRequests={subRequests}
-        showKinds={temporaryShowKinds}
+        showKinds={effectiveShowKinds}
         hideReplies={listMode === 'posts'}
         filterMutedNotes={false}
-        pinnedEventIds={listMode === 'you' || !!search ? [] : pinnedEventIds}
+        pinnedEventIds={listMode === 'you' || isArticlesMode || !!search ? [] : pinnedEventIds}
         showNewNotesDirectly={myPubkey === pubkey}
       />
     </>

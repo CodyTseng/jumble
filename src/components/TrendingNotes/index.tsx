@@ -1,4 +1,4 @@
-import { SPECIAL_TRUST_SCORE_FILTER_ID, TRENDING_NOTES_RELAY_URLS } from '@/constants'
+import { SPECIAL_FEED_ID, TRENDING_NOTES_RELAY_URLS } from '@/constants'
 import { simplifyUrl } from '@/lib/url'
 import { useTranslation } from 'react-i18next'
 import NormalFeed from '../NormalFeed'
@@ -19,7 +19,7 @@ export default function TrendingNotes() {
         </div>
       </div>
       <NormalFeed
-        trustScoreFilterId={SPECIAL_TRUST_SCORE_FILTER_ID.TRENDING}
+        feedId={SPECIAL_FEED_ID.TRENDING}
         subRequests={[{ urls: TRENDING_NOTES_RELAY_URLS, filter: {} }]}
         showRelayCloseReason
       />

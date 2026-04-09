@@ -830,6 +830,6 @@ export default {
     Hide: 'Ausblenden',
     'Do not sync notification read status': 'Benachrichtigungs-Lesestatus nicht synchronisieren',
     'Only update read status locally without publishing to relays':
-      'Lesestatus nur lokal aktualisieren, ohne an Relays zu veröffentlichen'
+      'Lesestatus nur lokal aktualisieren, ohne an Relays zu veröffentlichen',
   }
 }
