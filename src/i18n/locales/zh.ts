@@ -674,6 +674,6 @@ export default {
     Hide: '隐藏',
     'Do not sync notification read status': '不同步通知已读状态',
     'Only update read status locally without publishing to relays':
-      '仅在本地更新已读状态，不发布到中继服务器'
+      '仅在本地更新已读状态，不发布到中继服务器',
   }
 }

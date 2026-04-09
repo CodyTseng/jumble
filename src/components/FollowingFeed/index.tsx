@@ -1,5 +1,6 @@
 import NormalFeed from '@/components/NormalFeed'
 import { Button } from '@/components/ui/button'
+import { SPECIAL_FEED_ID } from '@/constants'
 import { usePrimaryPage } from '@/PageManager'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -68,6 +69,7 @@ export default function FollowingFeed() {
 
   return (
     <NormalFeed
+      feedId={SPECIAL_FEED_ID.FOLLOWING}
       subRequests={subRequests}
       onRefresh={() => {
         initializedRef.current = false

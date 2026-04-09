@@ -697,6 +697,6 @@ export default {
     Hide: 'छिपाएँ',
     'Do not sync notification read status': 'सूचना पठन स्थिति सिंक न करें',
     'Only update read status locally without publishing to relays':
-      'केवल स्थानीय रूप से पठन स्थिति अपडेट करें, रिले पर प्रकाशित न करें'
+      'केवल स्थानीय रूप से पठन स्थिति अपडेट करें, रिले पर प्रकाशित न करें',
   }
 }

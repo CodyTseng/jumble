@@ -1,4 +1,5 @@
 import NormalFeed from '@/components/NormalFeed'
+import { SPECIAL_FEED_ID } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinnedUsers } from '@/providers/PinnedUsersProvider'
 import client from '@/services/client.service'
@@ -28,5 +29,7 @@ export default function PinnedFeed() {
     init()
   }, [pubkey, pinnedPubkeySet])
 
-  return <NormalFeed subRequests={subRequests} isMainFeed isPubkeyFeed />
+  return (
+    <NormalFeed feedId={SPECIAL_FEED_ID.PINNED} subRequests={subRequests} isMainFeed isPubkeyFeed />
+  )
 }

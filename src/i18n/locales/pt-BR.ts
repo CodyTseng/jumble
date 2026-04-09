@@ -700,6 +700,6 @@ export default {
     Hide: 'Ocultar',
     'Do not sync notification read status': 'Não sincronizar status de leitura de notificações',
     'Only update read status locally without publishing to relays':
-      'Atualizar o status de leitura apenas localmente sem publicar nos relays'
+      'Atualizar o status de leitura apenas localmente sem publicar nos relays',
   }
 }

@@ -52,6 +52,7 @@ class LocalStorageService {
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private dismissedTooManyRelaysAlert: boolean = false
   private showKinds: number[] = []
+  private showKindsMap: Record<string, number[]> = {}
   private hideContentMentioningMutedUsers: boolean = false
   private notificationListStyle: TNotificationStyle = NOTIFICATION_LIST_STYLE.DETAILED
   private mediaAutoLoadPolicy: TMediaAutoLoadPolicy = MEDIA_AUTO_LOAD_POLICY.ALWAYS
@@ -92,7 +93,7 @@ class LocalStorageService {
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
     this.noteListMode =
-      noteListModeStr && ['posts', 'postsAndReplies', '24h'].includes(noteListModeStr)
+      noteListModeStr && ['posts', 'postsAndReplies', '24h', 'articles'].includes(noteListModeStr)
         ? (noteListModeStr as TNoteListMode)
         : 'posts'
     const lastReadNotificationTimeMapStr =
@@ -201,6 +202,18 @@ class LocalStorageService {
     }
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(this.showKinds))
     window.localStorage.setItem(StorageKey.SHOW_KINDS_VERSION, '4')
+
+    const showKindsMapStr = window.localStorage.getItem(StorageKey.SHOW_KINDS_MAP)
+    if (showKindsMapStr) {
+      try {
+        const map = JSON.parse(showKindsMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.showKindsMap = map
+        }
+      } catch {
+        // ignore
+      }
+    }
 
     this.hideContentMentioningMutedUsers =
       window.localStorage.getItem(StorageKey.HIDE_CONTENT_MENTIONING_MUTED_USERS) === 'true'
@@ -568,6 +581,25 @@ class LocalStorageService {
   setShowKinds(kinds: number[]) {
     this.showKinds = kinds
     window.localStorage.setItem(StorageKey.SHOW_KINDS, JSON.stringify(kinds))
+  }
+
+  getShowKindsMap() {
+    return this.showKindsMap
+  }
+
+  getShowKindsForFeed(feedId: string): number[] {
+    return this.showKindsMap[feedId] ?? this.showKinds
+  }
+
+  setShowKindsForFeed(feedId: string, kinds: number[]) {
+    this.showKindsMap = { ...this.showKindsMap, [feedId]: kinds }
+    window.localStorage.setItem(StorageKey.SHOW_KINDS_MAP, JSON.stringify(this.showKindsMap))
+  }
+
+  clearShowKindsForFeed(feedId: string) {
+    const { [feedId]: _, ...rest } = this.showKindsMap
+    this.showKindsMap = rest
+    window.localStorage.setItem(StorageKey.SHOW_KINDS_MAP, JSON.stringify(this.showKindsMap))
   }
 
   getHideContentMentioningMutedUsers() {

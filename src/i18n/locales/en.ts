@@ -692,6 +692,6 @@ export default {
     Hide: 'Hide',
     'Do not sync notification read status': 'Do not sync notification read status',
     'Only update read status locally without publishing to relays':
-      'Only update read status locally without publishing to relays'
+      'Only update read status locally without publishing to relays',
   }
 }

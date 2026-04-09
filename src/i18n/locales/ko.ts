@@ -691,6 +691,6 @@ export default {
     Hide: '숨기기',
     'Do not sync notification read status': '알림 읽음 상태 동기화 안 함',
     'Only update read status locally without publishing to relays':
-      '읽음 상태를 릴레이에 게시하지 않고 로컬에서만 업데이트'
+      '읽음 상태를 릴레이에 게시하지 않고 로컬에서만 업데이트',
   }
 }

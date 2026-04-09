@@ -702,6 +702,6 @@ export default {
     Hide: 'Скрыть',
     'Do not sync notification read status': 'Не синхронизировать статус прочтения уведомлений',
     'Only update read status locally without publishing to relays':
-      'Обновлять статус прочтения только локально, не публикуя на реле'
+      'Обновлять статус прочтения только локально, не публикуя на реле',
   }
 }

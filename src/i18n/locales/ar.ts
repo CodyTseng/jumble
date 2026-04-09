@@ -685,6 +685,6 @@ export default {
     Hide: 'إخفاء',
     'Do not sync notification read status': 'عدم مزامنة حالة قراءة الإشعارات',
     'Only update read status locally without publishing to relays':
-      'تحديث حالة القراءة محليًا فقط دون النشر إلى المرحّلات'
+      'تحديث حالة القراءة محليًا فقط دون النشر إلى المرحّلات',
   }
 }
