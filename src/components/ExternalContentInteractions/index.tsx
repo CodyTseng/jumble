@@ -1,12 +1,18 @@
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import Tabs from '@/components/Tabs'
+import { SPECIAL_FEED_ID } from '@/constants'
 import { useState } from 'react'
 import QuoteList from '../QuoteList'
 import ReactionList from '../ReactionList'
 import ReplyNoteList from '../ReplyNoteList'
 import TrustScoreFilter from '../TrustScoreFilter'
-import { Tabs, TTabValue } from './Tabs'
+
+type TTabValue = 'replies' | 'reactions' | 'quotes'
+
+const TABS = [
+  { value: 'replies', label: 'Replies' },
+  { value: 'reactions', label: 'Reactions' },
+  { value: 'quotes', label: 'Quotes' }
+]
 
 export default function ExternalContentInteractions({
   externalContent
@@ -31,17 +37,14 @@ export default function ExternalContentInteractions({
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <ScrollArea className="w-0 flex-1">
-          <Tabs selectedTab={type} onTabChange={setType} />
-          <ScrollBar orientation="horizontal" className="pointer-events-none opacity-0" />
-        </ScrollArea>
-        <Separator orientation="vertical" className="h-6" />
-        <div className="flex size-10 items-center justify-center">
-          <TrustScoreFilter filterId={SPECIAL_TRUST_SCORE_FILTER_ID.INTERACTIONS} />
-        </div>
-      </div>
-      <Separator />
+      <Tabs
+        tabs={TABS}
+        value={type}
+        onTabChange={(tab) => setType(tab as TTabValue)}
+        options={
+          <TrustScoreFilter filterId={SPECIAL_FEED_ID.INTERACTIONS} />
+        }
+      />
       {list}
     </>
   )
