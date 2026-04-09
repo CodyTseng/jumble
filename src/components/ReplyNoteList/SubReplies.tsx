@@ -4,6 +4,7 @@ import { getEventKey, getKeyFromTag, getParentTag } from '@/lib/event'
 import { toNote } from '@/lib/link'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +13,7 @@ import ReplyNote from '../ReplyNote'
 export default function SubReplies({ parentKey }: { parentKey: string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
+  const { autoLoadProfilePicture } = useContentPolicy()
   const [isExpanded, setIsExpanded] = useState(false)
   const { replies } = useFilteredAllReplies(parentKey)
   const [highlightReplyKey, setHighlightReplyKey] = useState<string | undefined>(undefined)
@@ -47,10 +49,16 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
             e.stopPropagation()
             setIsExpanded(!isExpanded)
           }}
-          className="clickable relative flex w-full items-center gap-1.5 py-2 pl-14 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className={cn(
+            'clickable relative flex w-full items-center gap-1.5 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground',
+            autoLoadProfilePicture ? 'pl-14' : 'pl-5'
+          )}
         >
           <div
-            className={cn('absolute bottom-0 left-[34px] top-0 z-20 w-px text-border')}
+            className={cn(
+              'absolute bottom-0 top-0 z-20 w-px text-border',
+              autoLoadProfilePicture ? 'left-[34px]' : 'left-2'
+            )}
             style={{
               background: isExpanded
                 ? 'currentColor'
@@ -88,12 +96,24 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
                 key={currentReplyKey}
                 className="relative flex scroll-mt-12"
               >
-                <div className="absolute left-[34px] top-0 z-20 h-8 w-4 rounded-bl-lg border-b border-l" />
+                <div
+                  className={cn(
+                    'absolute top-0 z-20 rounded-bl-lg border-b border-l',
+                    autoLoadProfilePicture ? 'h-8' : 'h-6',
+                    autoLoadProfilePicture ? 'left-[34px] w-4' : 'left-2 w-7'
+                  )}
+                />
                 {index < replies.length - 1 && (
-                  <div className="absolute bottom-0 left-[34px] top-0 z-20 border-l" />
+                  <div
+                    className={cn(
+                      'absolute bottom-0 z-20 border-l',
+                      autoLoadProfilePicture ? 'left-[34px]' : 'left-2', 'top-0'
+                    )}
+                  />
                 )}
                 <ReplyNote
-                  className="w-0 flex-1 pl-10"
+                  className={cn('w-0 flex-1', autoLoadProfilePicture ? 'pl-10' : 'pl-7')}
+                  hideThreadGuide={!autoLoadProfilePicture}
                   event={reply}
                   parentEventId={_parentKey !== parentKey ? _parentEventId : undefined}
                   onClickParent={() => {
