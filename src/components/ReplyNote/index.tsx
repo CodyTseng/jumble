@@ -31,12 +31,14 @@ export default function ReplyNote({
   parentEventId,
   onClickParent = () => {},
   highlight = false,
+  hideThreadGuide = false,
   className = ''
 }: {
   event: Event
   parentEventId?: string
   onClickParent?: () => void
   highlight?: boolean
+  hideThreadGuide?: boolean
   className?: string
 }) {
   const { t } = useTranslation()
@@ -44,7 +46,7 @@ export default function ReplyNote({
   const { push } = useSecondaryPage()
   const { mutePubkeySet } = useMuteList()
   const { getMinTrustScore, meetsMinTrustScore } = useUserTrust()
-  const { hideContentMentioningMutedUsers } = useContentPolicy()
+  const { hideContentMentioningMutedUsers, autoLoadProfilePicture } = useContentPolicy()
   const eventKey = useMemo(() => getEventKey(event), [event])
   const replies = useThread(eventKey)
   const [showMuted, setShowMuted] = useState(false)
@@ -105,9 +107,20 @@ export default function ReplyNote({
       )}
       onClick={() => push(toNote(event))}
     >
-      {hasReplies && <div className="absolute bottom-0 left-[34px] top-14 z-20 border-l" />}
+      {hasReplies &&
+        !hideThreadGuide &&
+        (autoLoadProfilePicture ? (
+          <div className="absolute bottom-0 left-[34px] top-14 z-20 border-l" />
+        ) : (
+          <div className="absolute bottom-0 left-2 top-5 z-20 w-3 rounded-tl-lg border-l border-t" />
+        ))}
       <Collapsible>
-        <div className="flex items-start space-x-2 px-4 pt-3">
+        <div
+          className={cn(
+            'flex items-start space-x-2 pr-4 pt-3',
+            autoLoadProfilePicture || hideThreadGuide ? 'pl-4' : 'pl-7'
+          )}
+        >
           <UserAvatar userId={event.pubkey} size="medium" className="mt-0.5 shrink-0" />
           <div className="w-full overflow-hidden">
             <div className="flex items-start justify-between gap-2">
@@ -162,7 +175,16 @@ export default function ReplyNote({
           </div>
         </div>
       </Collapsible>
-      {show && <StuffStats className="ml-14 mr-4 mt-2 pl-1" stuff={event} displayTopZapsAndLikes />}
+      {show && (
+        <StuffStats
+          className={cn(
+            'mr-4 mt-2 pl-1',
+            autoLoadProfilePicture ? 'ml-14' : hideThreadGuide ? 'ml-4' : 'ml-7'
+          )}
+          stuff={event}
+          displayTopZapsAndLikes
+        />
+      )}
     </div>
   )
 }

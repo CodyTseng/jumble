@@ -3,14 +3,15 @@
  * Strips URLs and nostr: references first to avoid false positives.
  */
 export function containsMarkdown(content: string): boolean {
-  // Remove URLs and nostr: references to avoid false positives
+  // Replace URLs and nostr: references with placeholders to avoid false positives
+  // while preserving surrounding markdown structure like [text](url)
   const cleaned = content
-    .replace(/https?:\/\/[^\s)>\]]+/g, '')
-    .replace(/nostr:[a-z0-9]+/g, '')
+    .replace(/https?:\/\/[^\s)>\]]+/g, 'URL')
+    .replace(/nostr:[a-z0-9]+/g, 'NOSTR')
 
   // Strong signals — any single one triggers markdown
   const strongPatterns = [
-    /^```/m, // code fence
+    /```/, // code fence or inline triple backtick
     /\|[\s]*:?-+:?[\s]*\|/, // table separator |---|
     /!\[[^\]]*\]\(/ // image ![alt](
   ]
@@ -26,7 +27,6 @@ export function containsMarkdown(content: string): boolean {
     /__[^_\n]+__/, // bold __text__
     /\[[^\]]+\]\([^)]+\)/, // link [text](url)
     /^>\s+\S/m, // blockquote > text
-    /^[-*]\s+\S/m, // unordered list - item or * item
     /^\d+\.\s+\S/m, // ordered list 1. item
     /^---$/m, // horizontal rule
     /~~[^~\n]+~~/ // strikethrough ~~text~~
