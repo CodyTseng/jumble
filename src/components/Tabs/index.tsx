@@ -104,7 +104,7 @@ export default function Tabs({
               key={tab.value}
               ref={(el) => (tabRefs.current[index] = el)}
               className={cn(
-                `clickable relative my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-4 py-2 text-center font-semibold transition-all duration-200`,
+                `clickable relative my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-3 py-2 text-center font-semibold transition-all duration-200`,
                 value === tab.value
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
