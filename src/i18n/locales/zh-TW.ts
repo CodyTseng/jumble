@@ -787,5 +787,7 @@ export default {
     'Do not sync notification read status': '不同步通知已讀狀態',
     'Only update read status locally without publishing to relays':
       '僅在本地更新已讀狀態，不發佈到中繼伺服器',
+    'Trending': '熱門',
+    'Relay Reviews': '中繼評價',
   }
 }

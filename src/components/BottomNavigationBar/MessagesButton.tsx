@@ -1,7 +1,7 @@
 import { useDmUnread } from '@/hooks/useDmUnread'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { MessageSquare } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function MessagesButton() {
@@ -15,7 +15,7 @@ export default function MessagesButton() {
       onClick={() => checkLogin(() => navigate('dms'))}
     >
       <div className="relative">
-        <MessageSquare />
+        <MessageCircle />
         {hasUnread && (
           <div className="absolute -top-0.5 right-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
         )}

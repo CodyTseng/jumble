@@ -824,5 +824,7 @@ export default {
     'Do not sync notification read status': 'Não sincronizar estado de leitura das notificações',
     'Only update read status locally without publishing to relays':
       'Atualizar o estado de leitura apenas localmente sem publicar nos relays',
+    'Trending': 'Em alta',
+    'Relay Reviews': 'Avaliações de relays',
   }
 }

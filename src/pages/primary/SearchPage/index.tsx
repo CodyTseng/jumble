@@ -1,17 +1,47 @@
+import Explore from '@/components/Explore'
+import FollowingFavoriteRelayList from '@/components/FollowingFavoriteRelayList'
+import NoteList from '@/components/NoteList'
 import SearchBar, { TSearchBarRef } from '@/components/SearchBar'
 import SearchResult from '@/components/SearchResult'
+import Tabs from '@/components/Tabs'
+import TrendingNotes from '@/components/TrendingNotes'
+import { ExtendedKind } from '@/constants'
 import PrimaryPageLayout, { TPrimaryPageLayoutRef } from '@/layouts/PrimaryPageLayout'
+import { getReplaceableEventIdentifier } from '@/lib/event'
+import { getDefaultRelayUrls } from '@/lib/relay'
+import { isLocalNetworkUrl, isOnionUrl, isWebsocketUrl } from '@/lib/url'
 import { usePrimaryPage } from '@/PageManager'
+import storage from '@/services/local-storage.service'
 import { TPageRef, TSearchParams } from '@/types'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { NostrEvent } from 'nostr-tools'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+
+type TSearchTab = 'trending' | 'explore' | 'reviews' | 'following'
+
+const SEARCH_TABS = [
+  { value: 'trending', label: 'Trending' },
+  { value: 'explore', label: 'Explore Relays' },
+  { value: 'reviews', label: 'Relay Reviews' },
+  { value: 'following', label: "Following's Favorites" }
+]
 
 const SearchPage = forwardRef<TPageRef>((_, ref) => {
   const { current, display } = usePrimaryPage()
   const [input, setInput] = useState('')
   const [searchParams, setSearchParams] = useState<TSearchParams | null>(null)
+  const [tab, setTab] = useState<TSearchTab>('trending')
   const isActive = useMemo(() => current === 'search' && display, [current, display])
   const searchBarRef = useRef<TSearchBarRef>(null)
   const layoutRef = useRef<TPrimaryPageLayoutRef>(null)
+  const topRef = useRef<HTMLDivElement | null>(null)
 
   useImperativeHandle(
     ref,
@@ -35,6 +65,36 @@ const SearchPage = forwardRef<TPageRef>((_, ref) => {
     layoutRef.current?.scrollToTop('instant')
   }
 
+  const relayReviewFilterFn = useCallback((evt: NostrEvent) => {
+    const d = getReplaceableEventIdentifier(evt)
+    if (!d) return false
+    if (!isWebsocketUrl(d)) return false
+    if (isLocalNetworkUrl(d)) return false
+    if (storage.getFilterOutOnionRelays() && isOnionUrl(d)) return false
+    return true
+  }, [])
+
+  const tabContent = useMemo(() => {
+    switch (tab) {
+      case 'trending':
+        return <TrendingNotes />
+      case 'explore':
+        return <Explore />
+      case 'reviews':
+        return (
+          <NoteList
+            showKinds={[ExtendedKind.RELAY_REVIEW]}
+            subRequests={[{ urls: getDefaultRelayUrls(), filter: {} }]}
+            filterFn={relayReviewFilterFn}
+            filterMutedNotes
+            hideSpam
+          />
+        )
+      case 'following':
+        return <FollowingFavoriteRelayList />
+    }
+  }, [tab, relayReviewFilterFn])
+
   return (
     <PrimaryPageLayout
       ref={layoutRef}
@@ -44,7 +104,22 @@ const SearchPage = forwardRef<TPageRef>((_, ref) => {
       }
       displayScrollToTopButton
     >
-      <SearchResult searchParams={searchParams} />
+      {searchParams ? (
+        <SearchResult searchParams={searchParams} />
+      ) : (
+        <>
+          <Tabs
+            value={tab}
+            tabs={SEARCH_TABS}
+            onTabChange={(t) => {
+              setTab(t as TSearchTab)
+              topRef.current?.scrollIntoView({ behavior: 'instant' })
+            }}
+          />
+          <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
+          {tabContent}
+        </>
+      )}
     </PrimaryPageLayout>
   )
 })

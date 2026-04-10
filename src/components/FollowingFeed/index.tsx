@@ -6,7 +6,7 @@ import { useFollowList } from '@/providers/FollowListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
-import { Compass, Search, UserPlus } from 'lucide-react'
+import { Search, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -54,8 +54,8 @@ export default function FollowingFeed() {
           )}
         </p>
         <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-          <Button size="lg" onClick={() => navigate('explore')} className="w-full">
-            <Compass className="size-5" />
+          <Button size="lg" onClick={() => navigate('search')} className="w-full">
+            <Search className="size-5" />
             {t('Explore')}
           </Button>
           <Button size="lg" variant="outline" onClick={() => navigate('search')} className="w-full">

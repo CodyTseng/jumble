@@ -811,5 +811,7 @@ export default {
     'Do not sync notification read status': 'Do not sync notification read status',
     'Only update read status locally without publishing to relays':
       'Only update read status locally without publishing to relays',
+    'Trending': 'Trending',
+    'Relay Reviews': 'Relay Reviews',
   }
 }

@@ -804,5 +804,7 @@ export default {
     'Do not sync notification read status': 'عدم مزامنة حالة قراءة الإشعارات',
     'Only update read status locally without publishing to relays':
       'تحديث حالة القراءة محليًا فقط دون النشر إلى المرحّلات',
+    'Trending': 'الرائج',
+    'Relay Reviews': 'مراجعات الريلاي',
   }
 }

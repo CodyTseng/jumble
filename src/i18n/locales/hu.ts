@@ -814,5 +814,7 @@ export default {
     'Do not sync notification read status': 'Ne szinkronizálja az értesítések olvasási állapotát',
     'Only update read status locally without publishing to relays':
       'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre',
+    'Trending': 'Trendi',
+    'Relay Reviews': 'Relay vélemények',
   }
 }

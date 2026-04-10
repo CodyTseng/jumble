@@ -805,5 +805,7 @@ export default {
     'Do not sync notification read status': 'ไม่ซิงค์สถานะการอ่านการแจ้งเตือน',
     'Only update read status locally without publishing to relays':
       'อัปเดตสถานะการอ่านในเครื่องเท่านั้น โดยไม่เผยแพร่ไปยังรีเลย์',
+    'Trending': 'มาแรง',
+    'Relay Reviews': 'รีวิวรีเลย์',
   }
 }

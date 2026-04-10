@@ -1,16 +1,19 @@
-import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { usePrimaryPage } from '@/PageManager'
 import FollowingFeed from '@/components/FollowingFeed'
-import PostEditor from '@/components/PostEditor'
+import LoginDialog from '@/components/LoginDialog'
+import MeDrawer from '@/components/MeDrawer'
 import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { SimpleUserAvatar } from '@/components/UserAvatar'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toSearch } from '@/lib/link'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { Compass, Info, LogIn, PencilLine, Search, Sparkles } from 'lucide-react'
+import { LONG_PRESS_THRESHOLD } from '@/constants'
+import { Info, LogIn, Search, Sparkles, UserRound } from 'lucide-react'
 import {
   Dispatch,
   forwardRef,
@@ -32,6 +35,7 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
   const { pubkey } = useNostr()
   const { feedInfo, relayUrls, isReady, switchFeed } = useFeed()
   const [showRelayDetails, setShowRelayDetails] = useState(false)
+  const [meDrawerOpen, setMeDrawerOpen] = useState(false)
 
   useImperativeHandle(ref, () => layoutRef.current as TPageRef)
 
@@ -79,22 +83,26 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
   }
 
   return (
-    <PrimaryPageLayout
-      pageName="home"
-      ref={layoutRef}
-      titlebar={
-        <NoteListPageTitlebar
-          layoutRef={layoutRef}
-          showRelayDetails={showRelayDetails}
-          setShowRelayDetails={
-            feedInfo?.feedType === 'relay' && !!feedInfo.id ? setShowRelayDetails : undefined
-          }
-        />
-      }
-      displayScrollToTopButton
-    >
-      {content}
-    </PrimaryPageLayout>
+    <>
+      <PrimaryPageLayout
+        pageName="home"
+        ref={layoutRef}
+        titlebar={
+          <NoteListPageTitlebar
+            layoutRef={layoutRef}
+            showRelayDetails={showRelayDetails}
+            setShowRelayDetails={
+              feedInfo?.feedType === 'relay' && !!feedInfo.id ? setShowRelayDetails : undefined
+            }
+            setMeDrawerOpen={setMeDrawerOpen}
+          />
+        }
+        displayScrollToTopButton
+      >
+        {content}
+      </PrimaryPageLayout>
+      <MeDrawer open={meDrawerOpen} setOpen={setMeDrawerOpen} />
+    </>
   )
 })
 NoteListPage.displayName = 'NoteListPage'
@@ -103,13 +111,90 @@ export default NoteListPage
 function NoteListPageTitlebar({
   layoutRef,
   showRelayDetails,
-  setShowRelayDetails
+  setShowRelayDetails,
+  setMeDrawerOpen
 }: {
   layoutRef?: React.RefObject<TPageRef>
   showRelayDetails?: boolean
   setShowRelayDetails?: Dispatch<SetStateAction<boolean>>
+  setMeDrawerOpen?: Dispatch<SetStateAction<boolean>>
 }) {
   const { isSmallScreen } = useScreenSize()
+  const { pubkey, profile } = useNostr()
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressedRef = useRef(false)
+
+  const handlePointerDown = () => {
+    longPressedRef.current = false
+    pressTimerRef.current = setTimeout(() => {
+      longPressedRef.current = true
+      setLoginDialogOpen(true)
+      pressTimerRef.current = null
+    }, LONG_PRESS_THRESHOLD)
+  }
+
+  const handlePointerUp = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current)
+      pressTimerRef.current = null
+    }
+  }
+
+  const handleClick = () => {
+    if (!longPressedRef.current && !loginDialogOpen) {
+      setMeDrawerOpen?.(true)
+    }
+  }
+
+  if (isSmallScreen) {
+    return (
+      <>
+      <div className="grid h-full grid-cols-[48px_1fr_48px] items-center">
+        <div className="flex justify-center">
+          <button
+            className="flex size-8 items-center justify-center rounded-full"
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onClick={handleClick}
+          >
+            {pubkey ? (
+              profile ? (
+                <SimpleUserAvatar userId={pubkey} ignorePolicy className="size-7" />
+              ) : (
+                <Skeleton className="size-7 rounded-full" />
+              )
+            ) : (
+              <UserRound className="size-5 text-muted-foreground" />
+            )}
+          </button>
+        </div>
+        <div className="flex justify-center">
+          <FeedButton className="max-w-fit" compact />
+        </div>
+        <div className="flex justify-end">
+          {setShowRelayDetails && (
+            <Button
+              variant="ghost"
+              size="titlebar-icon"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowRelayDetails((show) => !show)
+                if (!showRelayDetails) {
+                  layoutRef?.current?.scrollToTop('smooth')
+                }
+              }}
+              className={showRelayDetails ? 'bg-muted/40' : ''}
+            >
+              <Info />
+            </Button>
+          )}
+        </div>
+      </div>
+      <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />
+      </>
+    )
+  }
 
   return (
     <div className="flex h-full items-center justify-between gap-1">
@@ -132,47 +217,8 @@ function NoteListPageTitlebar({
             <Info />
           </Button>
         )}
-        {isSmallScreen && (
-          <>
-            <SearchButton />
-            <PostButton />
-          </>
-        )}
       </div>
     </div>
-  )
-}
-
-function PostButton() {
-  const { checkLogin } = useNostr()
-  const [open, setOpen] = useState(false)
-
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="titlebar-icon"
-        onClick={(e) => {
-          e.stopPropagation()
-          checkLogin(() => {
-            setOpen(true)
-          })
-        }}
-      >
-        <PencilLine />
-      </Button>
-      <PostEditor open={open} setOpen={setOpen} />
-    </>
-  )
-}
-
-function SearchButton() {
-  const { push } = useSecondaryPage()
-
-  return (
-    <Button variant="ghost" size="titlebar-icon" onClick={() => push(toSearch())}>
-      <Search />
-    </Button>
   )
 }
 
@@ -197,8 +243,8 @@ function WelcomeGuide() {
       </div>
 
       <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-        <Button size="lg" className="w-full" onClick={() => navigate('explore')}>
-          <Compass className="size-5" />
+        <Button size="lg" className="w-full" onClick={() => navigate('search')}>
+          <Search className="size-5" />
           {t('Explore')}
         </Button>
 

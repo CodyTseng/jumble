@@ -831,5 +831,7 @@ export default {
     'Do not sync notification read status': 'Benachrichtigungs-Lesestatus nicht synchronisieren',
     'Only update read status locally without publishing to relays':
       'Lesestatus nur lokal aktualisieren, ohne an Relays zu veröffentlichen',
+    'Trending': 'Im Trend',
+    'Relay Reviews': 'Relay-Bewertungen',
   }
 }

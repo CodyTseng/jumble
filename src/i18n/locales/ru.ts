@@ -823,5 +823,7 @@ export default {
     'Do not sync notification read status': 'Не синхронизировать статус прочтения уведомлений',
     'Only update read status locally without publishing to relays':
       'Обновлять статус прочтения только локально, не публикуя на реле',
+    'Trending': 'В тренде',
+    'Relay Reviews': 'Отзывы о реле',
   }
 }

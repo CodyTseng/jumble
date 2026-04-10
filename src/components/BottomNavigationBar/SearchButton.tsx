@@ -1,16 +1,16 @@
 import { usePrimaryPage } from '@/PageManager'
-import { Compass } from 'lucide-react'
+import { Search } from 'lucide-react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
-export default function ExploreButton() {
+export default function SearchButton() {
   const { navigate, current, display } = usePrimaryPage()
 
   return (
     <BottomNavigationBarItem
-      active={current === 'explore' && display}
-      onClick={() => navigate('explore')}
+      active={current === 'search' && display}
+      onClick={() => navigate('search')}
     >
-      <Compass />
+      <Search />
     </BottomNavigationBarItem>
   )
 }
