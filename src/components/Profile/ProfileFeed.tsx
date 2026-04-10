@@ -17,11 +17,9 @@ import { RefreshButton } from '../RefreshButton'
 
 export default function ProfileFeed({
   pubkey,
-  topSpace = 0,
   search = ''
 }: {
   pubkey: string
-  topSpace?: number
   search?: string
 }) {
   const { pubkey: myPubkey, pinListEvent: myPinListEvent } = useNostr()
@@ -166,7 +164,6 @@ export default function ProfileFeed({
         onTabChange={(listMode) => {
           handleListModeChange(listMode as TNoteListMode)
         }}
-        threshold={Math.max(800, topSpace)}
         options={
           <>
             {!supportTouch && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}

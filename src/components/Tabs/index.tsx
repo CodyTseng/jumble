@@ -15,22 +15,22 @@ export default function Tabs({
   tabs,
   value,
   onTabChange,
-  threshold = 800,
   options = null,
   active = false
 }: {
   tabs: TabDefinition[]
   value: string
   onTabChange?: (tab: string) => void
-  threshold?: number
   options?: ReactNode
   active?: boolean
 }) {
   const { t } = useTranslation()
-  const { deepBrowsing, lastScrollTop } = useDeepBrowsing()
+  const { deepBrowsing } = useDeepBrowsing()
   const tabRefs = useRef<(HTMLDivElement | null)[]>([])
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 })
+  const [isSticky, setIsSticky] = useState(false)
 
   const updateIndicatorPosition = () => {
     const activeIndex = tabs.findIndex((tab) => tab.value === value)
@@ -87,16 +87,29 @@ export default function Tabs({
     }
   }, [tabs, value])
 
+  useEffect(() => {
+    if (!sentinelRef.current) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsSticky(!entry.isIntersecting)
+    })
+
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        'sticky top-12 z-30 flex w-full justify-between border-b bg-background px-1 transition-all duration-300',
-        deepBrowsing && lastScrollTop > threshold && !active
-          ? '-translate-y-[calc(100%+12rem)]'
-          : ''
-      )}
-    >
+    <>
+      <div ref={sentinelRef} className="h-0" />
+      <div
+        ref={containerRef}
+        className={cn(
+          'sticky top-12 z-30 flex w-full justify-between border-b bg-background px-1 transition-all duration-300',
+          deepBrowsing && isSticky && !active
+            ? '-translate-y-[calc(100%+12rem)]'
+            : ''
+        )}
+      >
       <ScrollArea className="w-0 flex-1">
         <div className="relative flex w-fit">
           {tabs.map((tab, index) => (
@@ -136,5 +149,6 @@ export default function Tabs({
         </div>
       )}
     </div>
+    </>
   )
 }
