@@ -15,7 +15,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { Link, Zap, Bitcoin, Check, Copy } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 import SearchInput from '../SearchInput'
@@ -44,14 +44,7 @@ export default function Profile({ id }: { id?: string }) {
       !!accountPubkey && accountPubkey !== profile?.pubkey && followings.includes(accountPubkey)
     )
   }, [followings, profile, accountPubkey])
-  const [topContainerHeight, setTopContainerHeight] = useState(0)
   const isSelf = accountPubkey === profile?.pubkey
-  const [topContainer, setTopContainer] = useState<HTMLDivElement | null>(null)
-  const topContainerRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      setTopContainer(node)
-    }
-  }, [])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -75,26 +68,6 @@ export default function Profile({ id }: { id?: string }) {
     forceUpdateCache()
   }, [profile?.pubkey])
 
-  useEffect(() => {
-    if (!topContainer) return
-
-    const checkHeight = () => {
-      setTopContainerHeight(topContainer.scrollHeight)
-    }
-
-    checkHeight()
-
-    const observer = new ResizeObserver(() => {
-      checkHeight()
-    })
-
-    observer.observe(topContainer)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [topContainer])
-
   if (!profile && isFetching) {
     return (
       <>
@@ -116,7 +89,7 @@ export default function Profile({ id }: { id?: string }) {
   const { banner, username, about, pubkey, website, lightningAddress, sp, emojis } = profile
   return (
     <>
-      <div ref={topContainerRef}>
+      <div>
         <div className="relative mb-2 bg-cover bg-center">
           <BannerWithLightbox banner={banner} pubkey={pubkey} />
           <AvatarWithLightbox userId={pubkey} />
@@ -214,7 +187,7 @@ export default function Profile({ id }: { id?: string }) {
           />
         </div>
       </div>
-      <ProfileFeed pubkey={pubkey} topSpace={topContainerHeight + 100} search={debouncedInput} />
+      <ProfileFeed pubkey={pubkey} search={debouncedInput} />
     </>
   )
 }
