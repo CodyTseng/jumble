@@ -835,7 +835,23 @@ class DmService {
   }
 
   async getConversations(accountPubkey: string): Promise<TDmConversation[]> {
-    return indexedDb.getAllDmConversations(accountPubkey)
+    const conversations = await indexedDb.getAllDmConversations(accountPubkey)
+
+    // Migrate old conversations missing lastMessageRumor
+    const needsMigration = conversations.filter((c) => !c.lastMessageRumor)
+    if (needsMigration.length > 0) {
+      await Promise.all(
+        needsMigration.map(async (conv) => {
+          const latestMessage = await indexedDb.getLatestDmMessage(conv.key)
+          if (latestMessage?.decryptedRumor) {
+            conv.lastMessageRumor = latestMessage.decryptedRumor
+            await indexedDb.putDmConversation(conv)
+          }
+        })
+      )
+    }
+
+    return conversations
   }
 
   async getConversation(
@@ -1025,19 +1041,13 @@ class DmService {
     const isUnread =
       !isActive && message.senderPubkey !== accountPubkey && message.createdAt > lastReadTime
 
-    const isFile = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
-    const displayContent = isFile
-      ? this.getFilePreviewContent(message.decryptedRumor?.tags)
-      : message.content
+    const isNewest = message.createdAt >= (existing?.lastMessageAt ?? 0)
 
     const conversation: TDmConversation = {
       key: conversationKey,
       pubkey: otherPubkey,
       lastMessageAt: Math.max(existing?.lastMessageAt ?? 0, message.createdAt),
-      lastMessageContent:
-        message.createdAt >= (existing?.lastMessageAt ?? 0)
-          ? displayContent
-          : (existing?.lastMessageContent ?? ''),
+      lastMessageRumor: isNewest ? message.decryptedRumor : existing?.lastMessageRumor,
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
       encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey
@@ -1106,11 +1116,7 @@ class DmService {
         key: conversationKey,
         pubkey: otherPubkey,
         lastMessageAt: latestMessage?.createdAt ?? 0,
-        lastMessageContent: latestMessage
-          ? latestMessage.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
-            ? this.getFilePreviewContent(latestMessage.decryptedRumor?.tags)
-            : latestMessage.content
-          : '',
+        lastMessageRumor: latestMessage?.decryptedRumor,
         unreadCount,
         hasReplied,
         encryptionPubkey:

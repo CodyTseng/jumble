@@ -1,4 +1,5 @@
 import { RefreshButton } from '@/components/RefreshButton'
+import TextWithEmojis from '@/components/TextWithEmojis'
 import Tabs from '@/components/Tabs'
 import TrustScoreFilter from '@/components/TrustScoreFilter'
 import {
@@ -22,7 +23,8 @@ import {
 } from '@/components/ui/drawer'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
-import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { toDmConversation } from '@/lib/link'
 import { isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -505,7 +507,27 @@ function ConversationItemContent({
   conversation: TDmConversation
   timeAgo: string
 }) {
+  const { t } = useTranslation()
   const supportTouch = useMemo(() => isTouchDevice(), [])
+
+  const { displayContent, emojis } = useMemo(() => {
+    const rumor = conversation.lastMessageRumor
+    if (!rumor) return { displayContent: '', emojis: undefined }
+
+    if (rumor.kind === ExtendedKind.RUMOR_FILE) {
+      const fileType = rumor.tags?.find((tag) => tag[0] === 'file-type')?.[1] ?? ''
+      let content = t('[File]')
+      if (fileType.startsWith('image/')) content = t('[Image]')
+      else if (fileType.startsWith('video/')) content = t('[Video]')
+      else if (fileType.startsWith('audio/')) content = t('[Audio]')
+      return { displayContent: content, emojis: undefined }
+    }
+
+    return {
+      displayContent: rumor.content,
+      emojis: getEmojiInfosFromEmojiTags(rumor.tags)
+    }
+  }, [conversation.lastMessageRumor, t])
 
   return (
     <>
@@ -532,9 +554,12 @@ function ConversationItemContent({
           <span className="shrink-0 text-xs text-muted-foreground">{timeAgo}</span>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm text-muted-foreground">
-            {conversation.lastMessageContent}
-          </p>
+          <TextWithEmojis
+            className="truncate text-sm text-muted-foreground"
+            text={displayContent}
+            emojis={emojis}
+            emojiClassName="h-4 w-4"
+          />
           {conversation.unreadCount > 0 && (
             <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-primary px-1 text-xs font-medium text-primary-foreground">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}

@@ -228,7 +228,7 @@ export type TDmConversation = {
   key: string
   pubkey: string
   lastMessageAt: number
-  lastMessageContent: string
+  lastMessageRumor?: Event
   unreadCount: number
   hasReplied: boolean
   encryptionPubkey?: string
