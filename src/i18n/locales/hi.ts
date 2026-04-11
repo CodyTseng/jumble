@@ -821,5 +821,7 @@ export default {
       'केवल स्थानीय रूप से पठन स्थिति अपडेट करें, रिले पर प्रकाशित न करें',
     'Trending': 'ट्रेंडिंग',
     'Relay Reviews': 'रिले समीक्षाएँ',
+    'New Message': 'नया संदेश',
+    'npub, hex key, or username': 'npub, hex कुंजी, या उपयोगकर्ता नाम',
   }
 }

@@ -789,5 +789,7 @@ export default {
       '僅在本地更新已讀狀態，不發佈到中繼伺服器',
     'Trending': '熱門',
     'Relay Reviews': '中繼評價',
+    'New Message': '新訊息',
+    'npub, hex key, or username': 'npub、hex key 或使用者名稱',
   }
 }

@@ -807,5 +807,7 @@ export default {
       'อัปเดตสถานะการอ่านในเครื่องเท่านั้น โดยไม่เผยแพร่ไปยังรีเลย์',
     'Trending': 'มาแรง',
     'Relay Reviews': 'รีวิวรีเลย์',
+    'New Message': 'ข้อความใหม่',
+    'npub, hex key, or username': 'npub, hex key หรือชื่อผู้ใช้',
   }
 }

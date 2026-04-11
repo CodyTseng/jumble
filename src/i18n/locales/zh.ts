@@ -794,5 +794,7 @@ export default {
       '仅在本地更新已读状态，不发布到中继服务器',
     'Trending': '热门',
     'Relay Reviews': '中继评价',
+    'New Message': '新消息',
+    'npub, hex key, or username': 'npub、hex key 或用户名',
   }
 }

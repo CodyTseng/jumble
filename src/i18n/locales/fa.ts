@@ -820,5 +820,7 @@ export default {
       'فقط وضعیت خوانده شدن را به صورت محلی به‌روزرسانی کنید بدون انتشار به رله‌ها',
     'Trending': 'داغ',
     'Relay Reviews': 'بررسی رله‌ها',
+    'New Message': 'پیام جدید',
+    'npub, hex key, or username': 'npub، کلید hex یا نام کاربری',
   }
 }

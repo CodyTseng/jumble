@@ -833,5 +833,7 @@ export default {
       'Lesestatus nur lokal aktualisieren, ohne an Relays zu veröffentlichen',
     'Trending': 'Im Trend',
     'Relay Reviews': 'Relay-Bewertungen',
+    'New Message': 'Neue Nachricht',
+    'npub, hex key, or username': 'npub, Hex-Schlüssel oder Benutzername',
   }
 }

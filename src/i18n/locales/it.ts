@@ -825,5 +825,7 @@ export default {
       'Aggiorna lo stato di lettura solo localmente senza pubblicare sui relay',
     'Trending': 'Di tendenza',
     'Relay Reviews': 'Recensioni relay',
+    'New Message': 'Nuovo messaggio',
+    'npub, hex key, or username': 'npub, chiave hex o nome utente',
   }
 }

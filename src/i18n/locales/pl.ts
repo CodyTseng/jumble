@@ -825,5 +825,7 @@ export default {
       'Aktualizuj status odczytu tylko lokalnie, bez publikowania na przekaźnikach',
     'Trending': 'Popularne',
     'Relay Reviews': 'Recenzje relay',
+    'New Message': 'Nowa wiadomość',
+    'npub, hex key, or username': 'npub, klucz hex lub nazwa użytkownika',
   }
 }

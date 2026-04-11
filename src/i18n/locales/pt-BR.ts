@@ -824,5 +824,7 @@ export default {
       'Atualizar o status de leitura apenas localmente sem publicar nos relays',
     'Trending': 'Em alta',
     'Relay Reviews': 'Avaliações de relays',
+    'New Message': 'Nova mensagem',
+    'npub, hex key, or username': 'npub, chave hex ou nome de usuário',
   }
 }

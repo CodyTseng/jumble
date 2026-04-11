@@ -806,5 +806,7 @@ export default {
       'تحديث حالة القراءة محليًا فقط دون النشر إلى المرحّلات',
     'Trending': 'الرائج',
     'Relay Reviews': 'مراجعات الريلاي',
+    'New Message': 'رسالة جديدة',
+    'npub, hex key, or username': 'npub أو مفتاح hex أو اسم المستخدم',
   }
 }

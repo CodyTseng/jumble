@@ -825,5 +825,7 @@ export default {
       'Обновлять статус прочтения только локально, не публикуя на реле',
     'Trending': 'В тренде',
     'Relay Reviews': 'Отзывы о реле',
+    'New Message': 'Новое сообщение',
+    'npub, hex key, or username': 'npub, hex-ключ или имя пользователя',
   }
 }

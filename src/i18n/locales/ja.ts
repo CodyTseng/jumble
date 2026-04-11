@@ -819,5 +819,7 @@ export default {
       '既読状態をローカルのみで更新し、リレーに公開しない',
     'Trending': 'トレンド',
     'Relay Reviews': 'リレーレビュー',
+    'New Message': '新しいメッセージ',
+    'npub, hex key, or username': 'npub、hexキー、またはユーザー名',
   }
 }

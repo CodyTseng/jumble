@@ -816,5 +816,7 @@ export default {
       'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre',
     'Trending': 'Trendi',
     'Relay Reviews': 'Relay vélemények',
+    'New Message': 'Új üzenet',
+    'npub, hex key, or username': 'npub, hex kulcs vagy felhasználónév',
   }
 }

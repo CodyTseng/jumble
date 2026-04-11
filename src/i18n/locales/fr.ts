@@ -829,5 +829,7 @@ export default {
       'Mettre à jour le statut de lecture uniquement en local sans publier sur les relais',
     'Trending': 'Tendance',
     'Relay Reviews': 'Avis sur les relais',
+    'New Message': 'Nouveau message',
+    'npub, hex key, or username': "npub, clé hex ou nom d'utilisateur",
   }
 }

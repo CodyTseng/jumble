@@ -813,5 +813,7 @@ export default {
       '읽음 상태를 릴레이에 게시하지 않고 로컬에서만 업데이트',
     'Trending': '인기',
     'Relay Reviews': '릴레이 리뷰',
+    'New Message': '새 메시지',
+    'npub, hex key, or username': 'npub, hex 키 또는 사용자 이름',
   }
 }

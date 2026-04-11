@@ -813,5 +813,7 @@ export default {
       'Only update read status locally without publishing to relays',
     'Trending': 'Trending',
     'Relay Reviews': 'Relay Reviews',
+    'New Message': 'New Message',
+    'npub, hex key, or username': 'npub, hex key, or username',
   }
 }

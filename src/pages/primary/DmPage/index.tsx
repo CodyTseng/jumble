@@ -2,17 +2,24 @@ import DmList from '@/components/DmList'
 import DmRelayConfig from '@/components/DmRelayConfig'
 import NewDeviceKeySync from '@/components/NewDeviceKeySync'
 import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
+import SearchInput from '@/components/SearchInput'
 import { Button } from '@/components/ui/button'
+import UserItem, { UserItemSkeleton } from '@/components/UserItem'
+import { useSearchProfiles } from '@/hooks'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { usePrimaryPage } from '@/PageManager'
+import { toDmConversation } from '@/lib/link'
+import { isValidPubkey, userIdToPubkey } from '@/lib/pubkey'
+import { cn } from '@/lib/utils'
+import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import { TPageRef } from '@/types'
-import { Download, Key, Loader2, MessageSquare, Settings, Upload } from 'lucide-react'
-import { Event, kinds } from 'nostr-tools'
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { Download, Key, Loader2, MessageCirclePlus, MessageSquare, Settings, Upload } from 'lucide-react'
+import { Event, kinds, nip19 } from 'nostr-tools'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -228,22 +235,154 @@ function DmPageTitlebar({
   onSettingsClick: () => void
 }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
+  const { isSmallScreen } = useScreenSize()
+  const [searching, setSearching] = useState(false)
+  const [input, setInput] = useState('')
+  const [debouncedInput, setDebouncedInput] = useState('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedInput(input)
+    }, 400)
+    return () => clearTimeout(handler)
+  }, [input])
+
+  const directPubkey = useMemo(() => {
+    const trimmed = input.trim()
+    if (!trimmed) return null
+
+    if (/^[0-9a-f]{64}$/.test(trimmed) && isValidPubkey(trimmed)) {
+      return trimmed
+    }
+
+    try {
+      const id = trimmed.startsWith('nostr:') ? trimmed.slice(6) : trimmed
+      const { type } = nip19.decode(id)
+      if (type === 'npub' || type === 'nprofile') {
+        return userIdToPubkey(id)
+      }
+    } catch {
+      // not a valid nip19 identifier
+    }
+
+    return null
+  }, [input])
+
+  const { profiles, isFetching } = useSearchProfiles(directPubkey ? '' : debouncedInput, 10)
+
+  const handleSelect = (pubkey: string) => {
+    push(toDmConversation(pubkey))
+    closeSearch()
+  }
+
+  const openSearch = () => {
+    searchInputRef.current?.focus()
+    setSearching(true)
+  }
+
+  const closeSearch = () => {
+    setSearching(false)
+    setInput('')
+    setDebouncedInput('')
+    searchInputRef.current?.blur()
+  }
+
+  const displayList = searching && !!input.trim()
+  const hasResults = directPubkey || profiles.length > 0 || isFetching
 
   return (
-    <div className="flex h-full items-center justify-between pl-3">
-      <div className="flex items-center gap-2">
-        <MessageSquare />
-        <div className="text-lg font-semibold">{t('Messages')}</div>
-      </div>
-      {showSettings && (
-        <Button
-          variant="ghost"
-          size="titlebar-icon"
-          onClick={onSettingsClick}
-          className={isSettingsActive ? 'bg-muted/40' : ''}
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
+    <div className="relative flex h-full w-full items-center gap-1">
+      {displayList && hasResults && (
+        <>
+          <div
+            className={cn(
+              'z-50 rounded-b-lg bg-surface-background shadow-lg',
+              isSmallScreen
+                ? 'fixed inset-x-0 top-12'
+                : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pb-1 pt-3.5'
+            )}
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <div className="h-fit max-h-80 overflow-y-auto">
+              {directPubkey && (
+                <div
+                  className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                  onClick={() => handleSelect(directPubkey)}
+                >
+                  <UserItem
+                    userId={directPubkey}
+                    className="pointer-events-none"
+                    hideFollowButton
+                    showFollowingBadge
+                  />
+                </div>
+              )}
+              {!directPubkey &&
+                profiles.map((profile) => (
+                  <div
+                    key={profile.pubkey}
+                    className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                    onClick={() => handleSelect(profile.pubkey)}
+                  >
+                    <UserItem
+                      userId={profile.npub}
+                      className="pointer-events-none"
+                      hideFollowButton
+                      showFollowingBadge
+                    />
+                  </div>
+                ))}
+              {!directPubkey && isFetching && (
+                <div className="px-2">
+                  <UserItemSkeleton hideFollowButton />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="fixed inset-0 h-full w-full" onClick={closeSearch} />
+        </>
+      )}
+      <SearchInput
+        ref={searchInputRef}
+        className={cn(
+          'h-full border-transparent bg-surface-background shadow-inner',
+          searching ? 'absolute inset-0' : 'absolute inset-0 pointer-events-none opacity-0',
+          displayList ? 'z-50' : ''
+        )}
+        placeholder={t('npub, hex key, or username')}
+        value={input}
+        onChange={(e) => setInput((e.target as HTMLInputElement).value)}
+        onFocus={() => setSearching(true)}
+        onBlur={() => {
+          if (!input.trim()) closeSearch()
+        }}
+      />
+      {!searching && (
+        <>
+          <div className="flex items-center gap-2 pl-3">
+            <MessageSquare />
+            <div className="text-lg font-semibold">{t('Messages')}</div>
+          </div>
+          <div className="ml-auto flex items-center">
+            {showSettings && (
+              <>
+                <Button variant="ghost" size="titlebar-icon" onClick={openSearch}>
+                  <MessageCirclePlus className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="titlebar-icon"
+                  onClick={onSettingsClick}
+                  className={isSettingsActive ? 'bg-muted/40' : ''}
+                >
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
