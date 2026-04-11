@@ -622,7 +622,7 @@ function MessageBubble({
 
   const bubbleClass = cn(
     'overflow-hidden break-words rounded-lg px-3 py-1.5',
-    'w-fit max-w-full',
+    'w-fit min-w-9 max-w-full',
     isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
   )
 
