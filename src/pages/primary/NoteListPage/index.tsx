@@ -143,7 +143,11 @@ function NoteListPageTitlebar({
 
   const handleClick = () => {
     if (!longPressedRef.current && !loginDialogOpen) {
-      setMeDrawerOpen?.(true)
+      if (pubkey) {
+        setMeDrawerOpen?.(true)
+      } else {
+        setLoginDialogOpen(true)
+      }
     }
   }
 
@@ -165,7 +169,7 @@ function NoteListPageTitlebar({
                 <Skeleton className="size-7 rounded-full" />
               )
             ) : (
-              <UserRound className="size-5 text-muted-foreground" />
+              <UserRound className="size-5" />
             )}
           </button>
         </div>
