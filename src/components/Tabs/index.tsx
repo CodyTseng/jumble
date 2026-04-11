@@ -90,7 +90,18 @@ export default function Tabs({
     if (!sentinelRef.current) return
 
     const observer = new IntersectionObserver(([entry]) => {
-      setIsSticky(!entry.isIntersecting)
+      if (entry.isIntersecting) {
+        setIsSticky(false)
+      } else {
+        // Distinguish "sentinel scrolled above" (tabs are CSS-sticky) from
+        // "sentinel still below viewport" (tabs not reached yet).
+        // When sticky, the container stays fixed while the sentinel scrolls away,
+        // creating a gap. When not sticky, they remain adjacent (gap ≈ 0).
+        const containerRect = containerRef.current?.getBoundingClientRect()
+        if (containerRect) {
+          setIsSticky(containerRect.top - entry.boundingClientRect.bottom > 10)
+        }
+      }
     })
 
     observer.observe(sentinelRef.current)
