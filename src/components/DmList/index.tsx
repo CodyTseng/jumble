@@ -271,7 +271,7 @@ function ConversationListContent({
   }
 
   return (
-    <div className="min-h-screen divide-y border-b">
+    <div className="min-h-screen divide-y">
       {filteredConversations.map((conv) => (
         <ConversationItem
           key={conv.key}
