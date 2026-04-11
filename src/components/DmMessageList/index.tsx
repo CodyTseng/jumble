@@ -435,7 +435,7 @@ export default function DmMessageList({
                     )}
                     <div
                       className={cn(
-                        'flex min-w-0 max-w-full flex-col gap-0.5 sm:max-w-[80%]',
+                        'flex min-w-0 flex-1 flex-col gap-0.5 sm:max-w-[80%]',
                         group.isOwn ? 'items-end' : 'items-start'
                       )}
                     >

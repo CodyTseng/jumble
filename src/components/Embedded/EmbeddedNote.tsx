@@ -30,7 +30,7 @@ export function EmbeddedNote({ noteId, className }: { noteId: string; className?
 function EmbeddedNoteSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn('rounded-xl border bg-card p-2 text-left sm:p-3', className)}
+      className={cn('w-full rounded-xl border bg-card p-2 text-left sm:p-3', className)}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center space-x-2">
