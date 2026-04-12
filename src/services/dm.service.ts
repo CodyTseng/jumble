@@ -837,14 +837,19 @@ class DmService {
   async getConversations(accountPubkey: string): Promise<TDmConversation[]> {
     const conversations = await indexedDb.getAllDmConversations(accountPubkey)
 
-    // Migrate old conversations missing lastMessageRumor
-    const needsMigration = conversations.filter((c) => !c.lastMessageRumor)
+    // Migrate old conversations missing lastMessageRumor or having reaction as lastMessageRumor
+    const needsMigration = conversations.filter(
+      (c) => !c.lastMessageRumor || c.lastMessageRumor.kind === kinds.Reaction
+    )
     if (needsMigration.length > 0) {
       await Promise.all(
         needsMigration.map(async (conv) => {
-          const latestMessage = await indexedDb.getLatestDmMessage(conv.key)
-          if (latestMessage?.decryptedRumor) {
-            conv.lastMessageRumor = latestMessage.decryptedRumor
+          const messages = await indexedDb.getDmMessages(conv.key, {})
+          const latestChatMessage = messages
+            .filter((m) => m.decryptedRumor?.kind !== kinds.Reaction)
+            .sort((a, b) => b.createdAt - a.createdAt)[0]
+          if (latestChatMessage?.decryptedRumor) {
+            conv.lastMessageRumor = latestChatMessage.decryptedRumor
             await indexedDb.putDmConversation(conv)
           }
         })
@@ -1041,13 +1046,15 @@ class DmService {
     const isUnread =
       !isActive && message.senderPubkey !== accountPubkey && message.createdAt > lastReadTime
 
+    const isReaction = message.decryptedRumor?.kind === kinds.Reaction
     const isNewest = message.createdAt >= (existing?.lastMessageAt ?? 0)
 
     const conversation: TDmConversation = {
       key: conversationKey,
       pubkey: otherPubkey,
       lastMessageAt: Math.max(existing?.lastMessageAt ?? 0, message.createdAt),
-      lastMessageRumor: isNewest ? message.decryptedRumor : existing?.lastMessageRumor,
+      lastMessageRumor:
+        isNewest && !isReaction ? message.decryptedRumor : existing?.lastMessageRumor,
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
       encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey
