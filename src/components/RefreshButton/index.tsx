@@ -3,14 +3,21 @@ import { cn } from '@/lib/utils'
 import { RefreshCcw } from 'lucide-react'
 import { useState } from 'react'
 
-export function RefreshButton({ onClick }: { onClick: () => void }) {
+export function RefreshButton({
+  onClick,
+  loading = false
+}: {
+  onClick: () => void
+  loading?: boolean
+}) {
   const [refreshing, setRefreshing] = useState(false)
+  const spinning = refreshing || loading
 
   return (
     <Button
       variant="ghost"
       size="titlebar-icon"
-      disabled={refreshing}
+      disabled={spinning}
       onClick={() => {
         setRefreshing(true)
         onClick()
@@ -18,7 +25,7 @@ export function RefreshButton({ onClick }: { onClick: () => void }) {
       }}
       className="text-muted-foreground focus:text-foreground [&_svg]:size-4"
     >
-      <RefreshCcw className={cn(refreshing ? 'animate-spin' : '')} />
+      <RefreshCcw className={cn(spinning ? 'animate-spin' : '')} />
     </Button>
   )
 }

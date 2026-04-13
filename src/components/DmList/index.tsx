@@ -60,6 +60,12 @@ export default function DmList() {
   const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.DM)
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const [isPullable, setIsPullable] = useState(true)
+  const [isReloading, setIsReloading] = useState(() => dmService.getIsLoading())
+
+  useEffect(() => {
+    const unsub = dmService.onLoadingChanged((loading) => setIsReloading(loading))
+    return unsub
+  }, [])
 
   const refresh = useCallback(async () => {
     await dmService.reinit()
@@ -189,7 +195,7 @@ export default function DmList() {
         options={
           !supportTouch || activeTab === 'requests' ? (
             <>
-              {!supportTouch && <RefreshButton onClick={refresh} />}
+              {!supportTouch && <RefreshButton onClick={refresh} loading={isReloading} />}
               {activeTab === 'requests' && (
                 <TrustScoreFilter
                   filterId={SPECIAL_TRUST_SCORE_FILTER_ID.DM}

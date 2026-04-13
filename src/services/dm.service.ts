@@ -21,6 +21,7 @@ class DmService {
   private messageListeners = new Set<(message: TDmMessage) => void>()
   private reactionListeners = new Set<(reaction: TDmMessage) => void>()
   private dataChangedListeners = new Set<() => void>()
+  private loadingListeners = new Set<(loading: boolean) => void>()
   private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
   private sendingStatusListeners = new Set<() => void>()
   private pendingPublishData = new Map<
@@ -49,6 +50,7 @@ class DmService {
     }
 
     this.isInitializing = true
+    this.emitLoadingChanged()
     this.currentAccountPubkey = accountPubkey
     this.currentEncryptionKeypair = encryptionKeypair
 
@@ -65,6 +67,7 @@ class DmService {
       this.isInitialized = true
     } finally {
       this.isInitializing = false
+      this.emitLoadingChanged()
     }
   }
 
@@ -99,6 +102,7 @@ class DmService {
     this.messageListeners.clear()
     this.reactionListeners.clear()
     this.dataChangedListeners.clear()
+    this.loadingListeners.clear()
     this.sendingStatuses.clear()
     this.sendingStatusListeners.clear()
     this.syncRequestListeners.clear()
@@ -118,6 +122,23 @@ class DmService {
     this.dataChangedListeners.add(listener)
     return () => {
       this.dataChangedListeners.delete(listener)
+    }
+  }
+
+  getIsLoading(): boolean {
+    return this.isInitializing
+  }
+
+  onLoadingChanged(listener: (loading: boolean) => void): () => void {
+    this.loadingListeners.add(listener)
+    return () => {
+      this.loadingListeners.delete(listener)
+    }
+  }
+
+  private emitLoadingChanged(): void {
+    for (const listener of this.loadingListeners) {
+      listener(this.isInitializing)
     }
   }
 
