@@ -18,6 +18,7 @@ Experience Jumble at [https://jumble.social](https://jumble.social)
 - [https://fevela.me/](https://fevela.me/) - by [@daniele](https://jumble.social/users/npub10000003zmk89narqpczy4ff6rnuht2wu05na7kpnh3mak7z2tqzsv8vwqk)
 - [https://x21.com/](https://x21.com/) - by [@Karnage](https://jumble.social/users/npub1r0rs5q2gk0e3dk3nlc7gnu378ec6cnlenqp8a3cjhyzu6f8k5sgs4sq9ac)
 - [https://jumble.imwald.eu/](https://jumble.imwald.eu/) Repo: [Silberengel/jumble](https://github.com/Silberengel/jumble) - by [@Silberengel](https://jumble.social/users/npub1l5sga6xg72phsz5422ykujprejwud075ggrr3z2hwyrfgr7eylqstegx9z)
+- [https://jumble.thecaptain.dev/](https://jumble.thecaptain.dev/) by [@Vibe Captain](https://jumble.social/users/npub1vlprg9j8u5l92az0zd6yd8ks7tl560v8ssepdkn07nwekdl9rs4saccfwp)
 
 ## Run Locally
 
