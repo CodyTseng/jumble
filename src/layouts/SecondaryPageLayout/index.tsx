@@ -1,10 +1,11 @@
 import ScrollToTopButton from '@/components/ScrollToTopButton'
-import { Titlebar } from '@/components/Titlebar'
+import { ThreeSectionTitlebar, Titlebar } from '@/components/Titlebar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSecondaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { PageActiveContext } from '@/providers/PageActiveProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronLeft } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
@@ -155,6 +156,8 @@ export function SecondaryPageTitlebar({
   hideBottomBorder?: boolean
   titlebar?: React.ReactNode
 }): JSX.Element {
+  const { isSmallScreen } = useScreenSize()
+
   if (titlebar) {
     return (
       <Titlebar className="p-1" hideBottomBorder={hideBottomBorder}>
@@ -162,6 +165,18 @@ export function SecondaryPageTitlebar({
       </Titlebar>
     )
   }
+
+  if (isSmallScreen) {
+    return (
+      <ThreeSectionTitlebar
+        left={hideBackButton ? null : <BackIconButton />}
+        center={title}
+        right={controls}
+        hideBottomBorder={hideBottomBorder}
+      />
+    )
+  }
+
   return (
     <Titlebar
       className="flex items-center justify-between gap-1 p-1 font-semibold"
@@ -173,7 +188,7 @@ export function SecondaryPageTitlebar({
         </div>
       ) : (
         <div className="flex w-0 flex-1 items-center">
-          <BackButton>{title}</BackButton>
+          <BackButtonWithTitle>{title}</BackButtonWithTitle>
         </div>
       )}
       <div className="flex-shrink-0">{controls}</div>
@@ -181,7 +196,18 @@ export function SecondaryPageTitlebar({
   )
 }
 
-function BackButton({ children }: { children?: React.ReactNode }) {
+function BackIconButton() {
+  const { t } = useTranslation()
+  const { pop } = useSecondaryPage()
+
+  return (
+    <Button variant="ghost" size="titlebar-icon" title={t('back')} onClick={() => pop()}>
+      <ChevronLeft />
+    </Button>
+  )
+}
+
+function BackButtonWithTitle({ children }: { children?: React.ReactNode }) {
   const { t } = useTranslation()
   const { pop } = useSecondaryPage()
 

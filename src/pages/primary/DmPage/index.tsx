@@ -1,5 +1,6 @@
 import DmList from '@/components/DmList'
 import DmRelayConfig from '@/components/DmRelayConfig'
+import MobileMeDrawerButton from '@/components/MobileMeDrawerButton'
 import NewDeviceKeySync from '@/components/NewDeviceKeySync'
 import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import SearchInput from '@/components/SearchInput'
@@ -195,6 +196,14 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
           onSettingsClick={() => setShowRelayConfig((prev) => !prev)}
         />
       }
+      mobileTitlebar={
+        <DmPageTitlebar
+          showSettings={setupState === 'ready'}
+          isSettingsActive={showRelayConfig}
+          onSettingsClick={() => setShowRelayConfig((prev) => !prev)}
+          mobile
+        />
+      }
     >
       {setupState === 'loading' && (
         <div className="flex items-center justify-center p-8">
@@ -228,11 +237,13 @@ export default DmPage
 function DmPageTitlebar({
   showSettings,
   isSettingsActive,
-  onSettingsClick
+  onSettingsClick,
+  mobile = false
 }: {
   showSettings: boolean
   isSettingsActive: boolean
   onSettingsClick: () => void
+  mobile?: boolean
 }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
@@ -291,6 +302,108 @@ function DmPageTitlebar({
 
   const displayList = searching && !!input.trim()
   const hasResults = directPubkey || profiles.length > 0 || isFetching
+
+  if (mobile) {
+    return (
+      <div className="relative h-full w-full">
+        {displayList && hasResults && (
+          <>
+            <div
+              className={cn(
+                'z-50 rounded-b-lg bg-surface-background shadow-lg',
+                isSmallScreen
+                  ? 'fixed inset-x-0 top-12'
+                  : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pb-1 pt-3.5'
+              )}
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              <div className="h-fit max-h-80 overflow-y-auto">
+                {directPubkey && (
+                  <div
+                    className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                    onClick={() => handleSelect(directPubkey)}
+                  >
+                    <UserItem
+                      userId={directPubkey}
+                      className="pointer-events-none"
+                      hideFollowButton
+                      showFollowingBadge
+                    />
+                  </div>
+                )}
+                {!directPubkey &&
+                  profiles.map((profile) => (
+                    <div
+                      key={profile.pubkey}
+                      className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                      onClick={() => handleSelect(profile.pubkey)}
+                    >
+                      <UserItem
+                        userId={profile.npub}
+                        className="pointer-events-none"
+                        hideFollowButton
+                        showFollowingBadge
+                      />
+                    </div>
+                  ))}
+                {!directPubkey && isFetching && (
+                  <div className="px-2">
+                    <UserItemSkeleton hideFollowButton />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="fixed inset-0 h-full w-full" onClick={closeSearch} />
+          </>
+        )}
+        <SearchInput
+          ref={searchInputRef}
+          className={cn(
+            'h-full border-transparent bg-surface-background shadow-inner',
+            searching ? 'absolute inset-0' : 'absolute inset-0 pointer-events-none opacity-0',
+            displayList ? 'z-50' : ''
+          )}
+          placeholder={t('npub, hex key, or username')}
+          value={input}
+          onChange={(e) => setInput((e.target as HTMLInputElement).value)}
+          onFocus={() => setSearching(true)}
+          onBlur={() => {
+            if (!input.trim()) closeSearch()
+          }}
+        />
+        {!searching && (
+          <div
+            className="grid h-full items-center"
+            style={{ gridTemplateColumns: '5rem minmax(0,1fr) 5rem' }}
+          >
+            <div className="flex items-center justify-start">
+              <MobileMeDrawerButton />
+            </div>
+            <div className="flex min-w-0 items-center justify-center px-1">
+              <div className="truncate text-lg font-semibold">{t('Messages')}</div>
+            </div>
+            <div className="flex items-center justify-end">
+              {showSettings && (
+                <>
+                  <Button variant="ghost" size="titlebar-icon" onClick={openSearch}>
+                    <MessageCirclePlus className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="titlebar-icon"
+                    onClick={onSettingsClick}
+                    className={isSettingsActive ? 'bg-muted/40' : ''}
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex h-full w-full items-center gap-1">

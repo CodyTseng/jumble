@@ -7,12 +7,14 @@ import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const ProfilePage = forwardRef<TPageRef>((_, ref) => {
+  const { t } = useTranslation()
   const { pubkey } = useNostr()
 
   return (
     <PrimaryPageLayout
       pageName="profile"
-      titlebar={<ProfilePageTitlebar />}
+      icon={<UserRound />}
+      title={t('Profile')}
       displayScrollToTopButton
       ref={ref}
     >
@@ -22,14 +24,3 @@ const ProfilePage = forwardRef<TPageRef>((_, ref) => {
 })
 ProfilePage.displayName = 'ProfilePage'
 export default ProfilePage
-
-function ProfilePageTitlebar() {
-  const { t } = useTranslation()
-
-  return (
-    <div className="flex h-full items-center gap-2 pl-3">
-      <UserRound />
-      <div className="text-lg font-semibold">{t('Profile')}</div>
-    </div>
-  )
-}

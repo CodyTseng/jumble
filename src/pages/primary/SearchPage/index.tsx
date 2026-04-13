@@ -1,5 +1,6 @@
 import Explore from '@/components/Explore'
 import FollowingFavoriteRelayList from '@/components/FollowingFavoriteRelayList'
+import MobileMeDrawerButton from '@/components/MobileMeDrawerButton'
 import NoteList from '@/components/NoteList'
 import SearchBar, { TSearchBarRef } from '@/components/SearchBar'
 import SearchResult from '@/components/SearchResult'
@@ -95,12 +96,20 @@ const SearchPage = forwardRef<TPageRef>((_, ref) => {
     }
   }, [tab, relayReviewFilterFn])
 
+  const searchBar = (
+    <SearchBar ref={searchBarRef} onSearch={onSearch} input={input} setInput={setInput} />
+  )
+
   return (
     <PrimaryPageLayout
       ref={layoutRef}
       pageName="search"
-      titlebar={
-        <SearchBar ref={searchBarRef} onSearch={onSearch} input={input} setInput={setInput} />
+      titlebar={searchBar}
+      mobileTitlebar={
+        <div className="flex h-full w-full items-center gap-1 pr-2">
+          <MobileMeDrawerButton />
+          <div className="h-full min-w-0 flex-1">{searchBar}</div>
+        </div>
       }
       displayScrollToTopButton
     >
