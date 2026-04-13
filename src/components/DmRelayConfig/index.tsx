@@ -12,7 +12,11 @@ import { toast } from 'sonner'
 import { createDmRelaysDraftEvent } from '@/lib/draft-event'
 import encryptionKeyService from '@/services/encryption-key.service'
 
-export default function DmRelayConfig({ onComplete }: { onComplete?: () => void }) {
+export default function DmRelayConfig({
+  onComplete
+}: {
+  onComplete?: () => void | Promise<void>
+}) {
   const { t } = useTranslation()
   const { pubkey, signer, publish } = useNostr()
   const [relays, setRelays] = useState<string[]>([])
@@ -98,7 +102,7 @@ export default function DmRelayConfig({ onComplete }: { onComplete?: () => void 
     try {
       await publish(createDmRelaysDraftEvent(relays))
       toast.success(t('DM relays saved'))
-      onComplete?.()
+      await onComplete?.()
     } catch {
       toast.error(t('Failed to save DM relays'))
     } finally {

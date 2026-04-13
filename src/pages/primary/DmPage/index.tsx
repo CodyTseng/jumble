@@ -107,26 +107,6 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     return unsub
   }, [pubkey])
 
-  const handleRelayConfigComplete = async () => {
-    if (!pubkey) return
-
-    const hasLocalKey = encryptionKeyService.hasEncryptionKey(pubkey)
-    if (hasLocalKey) {
-      setSetupState('ready')
-      setShowRelayConfig(false)
-      return
-    }
-
-    const existingAnnouncement = await encryptionKeyService.queryEncryptionKeyAnnouncement(pubkey)
-    if (existingAnnouncement) {
-      setSetupState('need_sync')
-    } else {
-      // Ask user if they want to publish encryption key
-      setSetupState('need_encryption_key')
-    }
-    setShowRelayConfig(false)
-  }
-
   const handlePublishEncryptionKey = async () => {
     if (!pubkey) return
 
@@ -211,7 +191,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
         </div>
       )}
       {setupState === 'need_login' && <NeedLoginView />}
-      {setupState === 'need_relays' && <DmRelayConfig onComplete={handleRelayConfigComplete} />}
+      {setupState === 'need_relays' && <DmRelayConfig onComplete={checkSetup} />}
       {setupState === 'need_encryption_key' && (
         <NeedEncryptionKeyView onPublish={handlePublishEncryptionKey} />
       )}
