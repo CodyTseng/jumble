@@ -51,7 +51,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 19)
+        const request = window.indexedDB.open('jumble', 20)
 
         request.onerror = (event) => {
           reject(event)
@@ -126,24 +126,27 @@ class IndexedDbService {
             const dmMessagesStore = db.createObjectStore(StoreNames.DM_MESSAGES, {
               keyPath: 'id'
             })
-            dmMessagesStore.createIndex('conversationCreatedAtIndex', [
-              'conversationKey',
+            dmMessagesStore.createIndex('participantsCreatedAtIndex', [
+              'participantsKey',
               'createdAt'
             ])
           } else {
             const transaction = (request.transaction as IDBTransaction)!
             const dmMessagesStore = transaction.objectStore(StoreNames.DM_MESSAGES)
-            if (!dmMessagesStore.indexNames.contains('conversationCreatedAtIndex')) {
-              dmMessagesStore.createIndex('conversationCreatedAtIndex', [
-                'conversationKey',
-                'createdAt'
-              ])
+            if (dmMessagesStore.indexNames.contains('conversationCreatedAtIndex')) {
+              dmMessagesStore.deleteIndex('conversationCreatedAtIndex')
             }
             if (dmMessagesStore.indexNames.contains('conversationKeyIndex')) {
               dmMessagesStore.deleteIndex('conversationKeyIndex')
             }
             if (dmMessagesStore.indexNames.contains('createdAtIndex')) {
               dmMessagesStore.deleteIndex('createdAtIndex')
+            }
+            if (!dmMessagesStore.indexNames.contains('participantsCreatedAtIndex')) {
+              dmMessagesStore.createIndex('participantsCreatedAtIndex', [
+                'participantsKey',
+                'createdAt'
+              ])
             }
           }
           if (!db.objectStoreNames.contains(StoreNames.DM_RELAYS_EVENTS)) {
@@ -170,6 +173,60 @@ class IndexedDbService {
               const tx = (request.transaction as IDBTransaction)!
               tx.objectStore(StoreNames.DM_MESSAGES).clear()
             }
+            window.localStorage.removeItem('dmDeletedConversationsMap')
+          }
+
+          // v20: Re-key dmMessages from per-account conversationKey to order-independent
+          // participantsKey (sorted pubkeys), and migrate the soft-delete state from
+          // localStorage.dmDeletedConversationsMap onto the dmConversations records.
+          if (oldVersion > 0 && oldVersion >= 19 && oldVersion < 20) {
+            const tx = (request.transaction as IDBTransaction)!
+
+            if (db.objectStoreNames.contains(StoreNames.DM_MESSAGES)) {
+              const store = tx.objectStore(StoreNames.DM_MESSAGES)
+              store.openCursor().onsuccess = (ev) => {
+                const cursor = (ev.target as IDBRequest).result as IDBCursorWithValue | null
+                if (!cursor) return
+                const record = cursor.value as TDmMessage & { conversationKey?: string }
+                if (!record.participantsKey && record.conversationKey) {
+                  const parts = record.conversationKey.split(':')
+                  if (parts.length === 2 && parts[0] && parts[1]) {
+                    record.participantsKey = [parts[0], parts[1]].sort().join(':')
+                    delete record.conversationKey
+                    cursor.update(record)
+                  }
+                }
+                cursor.continue()
+              }
+            }
+
+            let deletedMap: Record<string, number> = {}
+            try {
+              const raw = window.localStorage.getItem('dmDeletedConversationsMap')
+              if (raw) {
+                const parsed = JSON.parse(raw)
+                if (parsed && typeof parsed === 'object') deletedMap = parsed
+              }
+            } catch {
+              // ignore
+            }
+
+            if (db.objectStoreNames.contains(StoreNames.DM_CONVERSATIONS)) {
+              const store = tx.objectStore(StoreNames.DM_CONVERSATIONS)
+              store.openCursor().onsuccess = (ev) => {
+                const cursor = (ev.target as IDBRequest).result as IDBCursorWithValue | null
+                if (!cursor) return
+                const conv = cursor.value as TDmConversation
+                const delAt = deletedMap[conv.key]
+                if (typeof delAt === 'number') {
+                  conv.deletedAt = delAt
+                  conv.deleted = (conv.lastMessageAt ?? 0) <= delAt
+                  cursor.update(conv)
+                }
+                cursor.continue()
+              }
+            }
+
             window.localStorage.removeItem('dmDeletedConversationsMap')
           }
 
@@ -722,8 +779,8 @@ class IndexedDbService {
   }
 
   async getDmMessages(
-    conversationKey: string,
-    options?: { limit?: number; before?: number }
+    participantsKey: string,
+    options?: { limit?: number; before?: number; after?: number }
   ): Promise<TDmMessage[]> {
     await this.initPromise
     return new Promise((resolve, reject) => {
@@ -732,14 +789,21 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
       const store = transaction.objectStore(StoreNames.DM_MESSAGES)
-      const index = store.index('conversationCreatedAtIndex')
+      const index = store.index('participantsCreatedAtIndex')
 
       const limit = options?.limit ?? 50
       const before = options?.before
-      const range =
-        before !== undefined
-          ? IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, before], false, true)
-          : IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const after = options?.after
+      const lowerBound = after !== undefined ? after : -Infinity
+      const lowerOpen = after !== undefined
+      const upperBound = before !== undefined ? before : Infinity
+      const upperOpen = before !== undefined
+      const range = IDBKeyRange.bound(
+        [participantsKey, lowerBound],
+        [participantsKey, upperBound],
+        lowerOpen,
+        upperOpen
+      )
       const request = index.openCursor(range, 'prev')
 
       const results: TDmMessage[] = []
@@ -763,7 +827,7 @@ class IndexedDbService {
     })
   }
 
-  async getLatestDmMessage(conversationKey: string): Promise<TDmMessage | null> {
+  async getLatestDmMessage(participantsKey: string): Promise<TDmMessage | null> {
     await this.initPromise
     return new Promise((resolve, reject) => {
       if (!this.db) {
@@ -771,8 +835,8 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readonly')
       const store = transaction.objectStore(StoreNames.DM_MESSAGES)
-      const index = store.index('conversationCreatedAtIndex')
-      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const index = store.index('participantsCreatedAtIndex')
+      const range = IDBKeyRange.bound([participantsKey, -Infinity], [participantsKey, Infinity])
       const request = index.openCursor(range, 'prev')
 
       request.onsuccess = (event) => {
@@ -803,7 +867,7 @@ class IndexedDbService {
         const cursor = (event.target as IDBRequest).result
         if (cursor) {
           const message = cursor.value as TDmMessage
-          if (message.conversationKey.includes(accountPubkey)) {
+          if (message.participantsKey?.includes(accountPubkey)) {
             results.push(message)
           }
           cursor.continue()
@@ -864,7 +928,7 @@ class IndexedDbService {
     })
   }
 
-  async deleteDmMessagesByConversationKey(conversationKey: string): Promise<void> {
+  async deleteDmMessagesByParticipantsKey(participantsKey: string): Promise<void> {
     await this.initPromise
     return new Promise((resolve, reject) => {
       if (!this.db) {
@@ -872,8 +936,8 @@ class IndexedDbService {
       }
       const transaction = this.db.transaction(StoreNames.DM_MESSAGES, 'readwrite')
       const store = transaction.objectStore(StoreNames.DM_MESSAGES)
-      const index = store.index('conversationCreatedAtIndex')
-      const range = IDBKeyRange.bound([conversationKey, -Infinity], [conversationKey, Infinity])
+      const index = store.index('participantsCreatedAtIndex')
+      const range = IDBKeyRange.bound([participantsKey, -Infinity], [participantsKey, Infinity])
       const request = index.openCursor(range)
 
       request.onsuccess = (event) => {

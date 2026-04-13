@@ -232,10 +232,10 @@ export default function DmMessageList({
   useEffect(() => {
     if (!pubkey) return
 
-    const conversationKey = dmService.getConversationKey(pubkey, otherPubkey)
+    const participantsKey = dmService.getParticipantsKey(pubkey, otherPubkey)
 
     const unsubMessage = dmService.onNewMessage((message: TDmMessage) => {
-      if (message.conversationKey === conversationKey) {
+      if (message.participantsKey === participantsKey) {
         const atBottom = checkIsAtBottom()
         const isOwn = message.senderPubkey === pubkey
 
@@ -271,7 +271,7 @@ export default function DmMessageList({
     })
 
     const unsubReaction = dmService.onNewReaction((reaction: TDmMessage) => {
-      if (reaction.conversationKey === conversationKey) {
+      if (reaction.participantsKey === participantsKey) {
         const targetId = reaction.decryptedRumor?.tags?.find((t: string[]) => t[0] === 'e')?.[1]
         if (targetId) {
           setReactionsMap((prev) => {

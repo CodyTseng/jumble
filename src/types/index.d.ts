@@ -232,11 +232,13 @@ export type TDmConversation = {
   unreadCount: number
   hasReplied: boolean
   encryptionPubkey?: string
+  deleted?: boolean
+  deletedAt?: number
 }
 
 export type TDmMessage = {
   id: string
-  conversationKey: string
+  participantsKey: string
   senderPubkey: string
   content: string
   createdAt: number

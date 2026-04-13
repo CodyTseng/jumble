@@ -240,14 +240,14 @@ class DmService {
 
       const isFromMe = rumor.pubkey === accountPubkey
       const otherPubkey = isFromMe ? recipientPubkey : rumor.pubkey
-      const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
+      const participantsKey = this.getParticipantsKey(rumor.pubkey, recipientPubkey)
 
       const replyTag = rumor.tags.find((t) => t[0] === 'e')
       const replyToId = replyTag?.[1]
 
       const message: TDmMessage = {
         id: rumor.id,
-        conversationKey,
+        participantsKey,
         senderPubkey: rumor.pubkey,
         content: rumor.content,
         createdAt: rumor.created_at,
@@ -256,7 +256,7 @@ class DmService {
         ...(replyToId ? { replyTo: { id: replyToId, content: '', senderPubkey: '' } } : {})
       }
 
-      await this.saveMessage(accountPubkey, message)
+      await this.saveMessage(message)
       if (rumor.kind !== kinds.Reaction) {
         await this.updateConversation(accountPubkey, otherPubkey, message)
       }
@@ -433,18 +433,16 @@ class DmService {
       )
       if (message) {
         await this.resolveReplyTo(message)
-        const saved = await this.saveMessage(accountPubkey, message)
-        if (saved) {
-          messages.push(message)
+        await this.saveMessage(message)
+        messages.push(message)
 
-          const fromMe = this.isFromMe(
-            unwrapped.senderPubkey,
-            accountPubkey,
-            encryptionKeypair.pubkey
-          )
-          if (!fromMe && unwrapped.senderEncryptionPubkey) {
-            encryptionPubkeyMap.set(unwrapped.senderPubkey, unwrapped.senderEncryptionPubkey)
-          }
+        const fromMe = this.isFromMe(
+          unwrapped.senderPubkey,
+          accountPubkey,
+          encryptionKeypair.pubkey
+        )
+        if (!fromMe && unwrapped.senderEncryptionPubkey) {
+          encryptionPubkeyMap.set(unwrapped.senderPubkey, unwrapped.senderEncryptionPubkey)
         }
       } else {
         parseFailCount++
@@ -502,10 +500,10 @@ class DmService {
       accountPubkey
     )
 
-    const conversationKey = this.getConversationKey(accountPubkey, recipientPubkey)
+    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
     const message: TDmMessage = {
       id: rumor.id,
-      conversationKey,
+      participantsKey,
       senderPubkey: accountPubkey,
       content: rumor.content,
       createdAt: rumor.created_at,
@@ -515,7 +513,7 @@ class DmService {
     }
 
     // Save and show immediately (optimistic UI)
-    await this.saveMessage(accountPubkey, message)
+    await this.saveMessage(message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
     this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
@@ -616,10 +614,10 @@ class DmService {
       accountPubkey
     )
 
-    const conversationKey = this.getConversationKey(accountPubkey, recipientPubkey)
+    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
     const message: TDmMessage = {
       id: rumor.id,
-      conversationKey,
+      participantsKey,
       senderPubkey: accountPubkey,
       content: rumor.content,
       createdAt: rumor.created_at,
@@ -627,7 +625,7 @@ class DmService {
       decryptedRumor: rumor as unknown as Event
     }
 
-    await this.saveMessage(accountPubkey, message)
+    await this.saveMessage(message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
     this.pendingPublishData.set(message.id, { giftWrap, selfGiftWrap, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
@@ -706,10 +704,10 @@ class DmService {
       accountPubkey
     )
 
-    const conversationKey = this.getConversationKey(accountPubkey, recipientPubkey)
+    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
     const message: TDmMessage = {
       id: rumor.id,
-      conversationKey,
+      participantsKey,
       senderPubkey: accountPubkey,
       content: rumor.content,
       createdAt: rumor.created_at,
@@ -717,7 +715,7 @@ class DmService {
       decryptedRumor: rumor as unknown as Event
     }
 
-    await this.saveMessage(accountPubkey, message)
+    await this.saveMessage(message)
     this.emitNewReaction(message)
 
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
@@ -791,8 +789,7 @@ class DmService {
             if (!isReaction) {
               await this.resolveReplyTo(message)
             }
-            const saved = await this.saveMessage(accountPubkey, message)
-            if (!saved) return
+            await this.saveMessage(message)
 
             if (isReaction) {
               this.emitNewReaction(message)
@@ -827,15 +824,23 @@ class DmService {
 
   async deleteConversation(accountPubkey: string, otherPubkey: string): Promise<void> {
     const key = this.getConversationKey(accountPubkey, otherPubkey)
+    const existing = await indexedDb.getDmConversation(key)
+    if (!existing) return
     const deletedAt = Math.floor(Date.now() / 1000)
-    storage.setDmDeletedConversation(key, deletedAt)
-    await indexedDb.deleteDmConversation(key)
-    await indexedDb.deleteDmMessagesByConversationKey(key)
+    await indexedDb.putDmConversation({
+      ...existing,
+      deleted: true,
+      deletedAt,
+      unreadCount: 0,
+      hasReplied: false
+    })
     this.emitDataChanged()
   }
 
   async getConversations(accountPubkey: string): Promise<TDmConversation[]> {
-    const conversations = await indexedDb.getAllDmConversations(accountPubkey)
+    const conversations = (await indexedDb.getAllDmConversations(accountPubkey)).filter(
+      (c) => !c.deleted
+    )
 
     // Migrate old conversations missing lastMessageRumor or having reaction as lastMessageRumor
     const needsMigration = conversations.filter(
@@ -844,7 +849,10 @@ class DmService {
     if (needsMigration.length > 0) {
       await Promise.all(
         needsMigration.map(async (conv) => {
-          const messages = await indexedDb.getDmMessages(conv.key, {})
+          const participantsKey = this.getParticipantsKey(accountPubkey, conv.pubkey)
+          const messages = await indexedDb.getDmMessages(participantsKey, {
+            after: conv.deletedAt
+          })
           const latestChatMessage = messages
             .filter((m) => m.decryptedRumor?.kind !== kinds.Reaction)
             .sort((a, b) => b.createdAt - a.createdAt)[0]
@@ -872,8 +880,13 @@ class DmService {
     otherPubkey: string,
     options?: { limit?: number; before?: number }
   ): Promise<TDmMessage[]> {
+    const participantsKey = this.getParticipantsKey(accountPubkey, otherPubkey)
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
-    return indexedDb.getDmMessages(conversationKey, options)
+    const conversation = await indexedDb.getDmConversation(conversationKey)
+    return indexedDb.getDmMessages(participantsKey, {
+      ...options,
+      after: conversation?.deletedAt
+    })
   }
 
   async markConversationAsRead(accountPubkey: string, otherPubkey: string): Promise<void> {
@@ -908,6 +921,10 @@ class DmService {
 
   getConversationKey(accountPubkey: string, otherPubkey: string): string {
     return `${accountPubkey}:${otherPubkey}`
+  }
+
+  getParticipantsKey(pubkey1: string, pubkey2: string): string {
+    return [pubkey1, pubkey2].sort().join(':')
   }
 
   private async extractEncryptionPubkeyFromRelays(
@@ -977,8 +994,7 @@ class DmService {
 
     const fromMe = this.isFromMe(senderPubkey, accountPubkey, encryptionPubkey)
     const effectiveSenderPubkey = fromMe ? accountPubkey : senderPubkey
-    const otherPubkey = fromMe ? recipientPubkey : senderPubkey
-    const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
+    const participantsKey = this.getParticipantsKey(effectiveSenderPubkey, recipientPubkey)
 
     // Parse reply tag: ['e', kind-14-id, relay-url]
     const replyTag = rumor.tags.find((t) => t[0] === 'e')
@@ -986,7 +1002,7 @@ class DmService {
 
     return {
       id: rumor.id,
-      conversationKey,
+      participantsKey,
       senderPubkey: effectiveSenderPubkey,
       content: rumor.content,
       createdAt: rumor.created_at,
@@ -1023,13 +1039,8 @@ class DmService {
     return message
   }
 
-  private async saveMessage(_accountPubkey: string, message: TDmMessage): Promise<boolean> {
-    const deletedAt = storage.getDmDeletedConversation(message.conversationKey)
-    if (deletedAt !== null && message.createdAt <= deletedAt) {
-      return false
-    }
+  private async saveMessage(message: TDmMessage): Promise<void> {
     await indexedDb.putDmMessage(message)
-    return true
   }
 
   private async updateConversation(
@@ -1040,6 +1051,15 @@ class DmService {
   ): Promise<void> {
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
     const existing = await indexedDb.getDmConversation(conversationKey)
+
+    // Messages older than the soft-delete cutoff should not resurrect the conversation
+    // or update its last-message state for this account.
+    if (existing?.deletedAt !== undefined && message.createdAt <= existing.deletedAt) {
+      if (otherEncryptionPubkey && otherEncryptionPubkey !== existing.encryptionPubkey) {
+        await indexedDb.putDmConversation({ ...existing, encryptionPubkey: otherEncryptionPubkey })
+      }
+      return
+    }
 
     const lastReadTime = storage.getLastReadDmTime(accountPubkey, otherPubkey)
     const isActive = this.activeConversationKey === conversationKey
@@ -1057,7 +1077,9 @@ class DmService {
         isNewest && !isReaction ? message.decryptedRumor : existing?.lastMessageRumor,
       unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
-      encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey
+      encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey,
+      deleted: false,
+      deletedAt: existing?.deletedAt
     }
 
     await indexedDb.putDmConversation(conversation)
@@ -1089,13 +1111,17 @@ class DmService {
     // Build/update each conversation
     for (const [conversationKey, { otherPubkey, messages: convMessages }] of conversationMap) {
       const lastReadTime = storage.getLastReadDmTime(accountPubkey, otherPubkey)
+      const existingConversation = await indexedDb.getDmConversation(conversationKey)
+      const deletedAt = existingConversation?.deletedAt
+      const participantsKey = this.getParticipantsKey(accountPubkey, otherPubkey)
 
       // Get all stored messages for this conversation to calculate accurate unread count
-      const storedMessages = await indexedDb.getDmMessages(conversationKey, {})
+      const storedMessages = await indexedDb.getDmMessages(participantsKey, { after: deletedAt })
       const allMessages = [...storedMessages]
 
       // Add new messages that aren't already stored
       for (const msg of convMessages) {
+        if (deletedAt !== undefined && msg.createdAt <= deletedAt) continue
         if (!allMessages.some((m) => m.id === msg.id)) {
           allMessages.push(msg)
         }
@@ -1114,20 +1140,24 @@ class DmService {
       ).length
 
       // Check if the user has ever replied in this conversation
-      const existingConversation = await indexedDb.getDmConversation(conversationKey)
       const hasReplied =
         existingConversation?.hasReplied ||
         chatMessages.some((m) => m.senderPubkey === accountPubkey)
 
+      const hasVisibleMessages = chatMessages.length > 0
+      const deleted = hasVisibleMessages ? false : (existingConversation?.deleted ?? false)
+
       const conversation: TDmConversation = {
         key: conversationKey,
         pubkey: otherPubkey,
-        lastMessageAt: latestMessage?.createdAt ?? 0,
-        lastMessageRumor: latestMessage?.decryptedRumor,
+        lastMessageAt: latestMessage?.createdAt ?? existingConversation?.lastMessageAt ?? 0,
+        lastMessageRumor: latestMessage?.decryptedRumor ?? existingConversation?.lastMessageRumor,
         unreadCount,
         hasReplied,
         encryptionPubkey:
-          encryptionPubkeyMap?.get(otherPubkey) ?? existingConversation?.encryptionPubkey
+          encryptionPubkeyMap?.get(otherPubkey) ?? existingConversation?.encryptionPubkey,
+        deleted,
+        deletedAt
       }
 
       await indexedDb.putDmConversation(conversation)
