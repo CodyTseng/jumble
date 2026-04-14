@@ -796,5 +796,7 @@ export default {
     'Relay Reviews': '中继评价',
     'New Message': '新消息',
     'npub, hex key, or username': 'npub、hex key 或用户名',
+    'Encrypted DM unavailable': '无法发送加密私信',
+    'No DM relays': '未设置私信中继',
   }
 }

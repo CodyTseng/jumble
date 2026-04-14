@@ -815,5 +815,7 @@ export default {
     'Relay Reviews': 'Relay Reviews',
     'New Message': 'New Message',
     'npub, hex key, or username': 'npub, hex key, or username',
+    'Encrypted DM unavailable': 'Encrypted DM unavailable',
+    'No DM relays': 'No DM relays',
   }
 }
