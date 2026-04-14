@@ -23,7 +23,7 @@ export function RefreshButton({
         onClick()
         setTimeout(() => setRefreshing(false), 500)
       }}
-      className="text-muted-foreground focus:text-foreground [&_svg]:size-4"
+      className="text-muted-foreground focus:text-foreground"
     >
       <RefreshCcw className={cn(spinning ? 'animate-spin' : '')} />
     </Button>
