@@ -32,6 +32,7 @@ import {
 } from '@/lib/content-parser'
 import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
 import cryptoFileService from '@/services/crypto-file.service'
@@ -89,6 +90,7 @@ export default function DmMessageList({
 }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
+  const { autoLoadProfilePicture } = useContentPolicy()
   const active = usePageActive()
   const [messages, setMessages] = useState<TDmMessage[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -428,7 +430,7 @@ export default function DmMessageList({
                       lastMsgHasReactions && 'pb-7'
                     )}
                   >
-                    {!group.isOwn && (
+                    {!group.isOwn && autoLoadProfilePicture && (
                       <div className="w-9 shrink-0 self-end">
                         <UserAvatar userId={group.items[0].senderPubkey} size="medium" />
                       </div>
@@ -465,7 +467,7 @@ export default function DmMessageList({
                         />
                       ))}
                     </div>
-                    {group.isOwn && <div className="w-9 shrink-0" />}
+                    {group.isOwn && autoLoadProfilePicture && <div className="w-9 shrink-0" />}
                   </div>
                 </Fragment>
               )
