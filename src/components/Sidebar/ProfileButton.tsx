@@ -1,20 +1,21 @@
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { UserRound } from 'lucide-react'
+import { User } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function ProfileButton({ collapse }: { collapse: boolean }) {
   const { navigate, current, display } = usePrimaryPage()
   const { checkLogin } = useNostr()
+  const active = display && current === 'profile'
 
   return (
     <SidebarItem
       title="Profile"
       onClick={() => checkLogin(() => navigate('profile'))}
-      active={display && current === 'profile'}
+      active={active}
       collapse={collapse}
     >
-      <UserRound />
+      <User weight={active ? 'fill' : 'bold'} />
     </SidebarItem>
   )
 }

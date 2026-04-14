@@ -21,3 +21,41 @@ export function Titlebar({
     </div>
   )
 }
+
+export function ThreeSectionTitlebar({
+  left,
+  center,
+  right,
+  sideWidth = '3rem',
+  className,
+  hideBottomBorder
+}: {
+  left?: React.ReactNode
+  center?: React.ReactNode
+  right?: React.ReactNode
+  sideWidth?: string
+  className?: string
+  hideBottomBorder?: boolean
+}) {
+  const sideStyle = { flex: `0 0 ${sideWidth}` }
+
+  return (
+    <Titlebar className={cn('p-1', className)} hideBottomBorder={hideBottomBorder}>
+      <div className="flex h-full items-center">
+        <div className="flex items-center justify-start" style={sideStyle}>
+          {left}
+        </div>
+        <div className="flex min-w-0 flex-1 items-center justify-center px-1">
+          {typeof center === 'string' ? (
+            <div className="truncate text-lg font-semibold">{center}</div>
+          ) : (
+            center
+          )}
+        </div>
+        <div className="flex items-center justify-end" style={sideStyle}>
+          {right}
+        </div>
+      </div>
+    </Titlebar>
+  )
+}

@@ -1,5 +1,5 @@
 import BookmarkPage from '@/pages/primary/BookmarkPage'
-import ExplorePage from '@/pages/primary/ExplorePage'
+import DmPage from '@/pages/primary/DmPage'
 import FollowingPage from '@/pages/primary/FollowingPage'
 import MePage from '@/pages/primary/MePage'
 import NoteListPage from '@/pages/primary/NoteListPage'
@@ -13,9 +13,9 @@ import { createRef } from 'react'
 
 const PRIMARY_ROUTE_CONFIGS = [
   { key: 'home', component: NoteListPage },
-  { key: 'explore', component: ExplorePage },
   { key: 'following', component: FollowingPage },
   { key: 'notifications', component: NotificationListPage },
+  { key: 'dms', component: DmPage },
   { key: 'me', component: MePage },
   { key: 'profile', component: ProfilePage },
   { key: 'relay', component: RelayPage },

@@ -11,7 +11,8 @@ const RelayPage = forwardRef<TPageRef>(({ url }: { url?: string }, ref) => {
   return (
     <PrimaryPageLayout
       pageName="relay"
-      titlebar={<RelayPageTitlebar url={normalizedUrl} />}
+      icon={<Server />}
+      title={simplifyUrl(normalizedUrl ?? '')}
       displayScrollToTopButton
       ref={ref}
     >
@@ -21,12 +22,3 @@ const RelayPage = forwardRef<TPageRef>(({ url }: { url?: string }, ref) => {
 })
 RelayPage.displayName = 'RelayPage'
 export default RelayPage
-
-function RelayPageTitlebar({ url }: { url?: string }) {
-  return (
-    <div className="flex h-full items-center gap-2 px-3">
-      <Server />
-      <div className="truncate text-lg font-semibold">{simplifyUrl(url ?? '')}</div>
-    </div>
-  )
-}

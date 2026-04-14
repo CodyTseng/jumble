@@ -1,25 +1,14 @@
-import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { usePrimaryPage } from '@/PageManager'
 import FollowingFeed from '@/components/FollowingFeed'
-import PostEditor from '@/components/PostEditor'
 import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { toSearch } from '@/lib/link'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { Compass, Info, LogIn, PencilLine, Search, Sparkles } from 'lucide-react'
-import {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState
-} from 'react'
+import { Info, LogIn, Search, Sparkles } from 'lucide-react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import PinnedFeed from './PinnedFeed'
@@ -78,19 +67,36 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
     )
   }
 
+  const showInfoToggle = feedInfo?.feedType === 'relay' && !!feedInfo.id
+  const infoToggle = showInfoToggle ? (
+    <Button
+      variant="ghost"
+      size="titlebar-icon"
+      onClick={(e) => {
+        e.stopPropagation()
+        setShowRelayDetails((show) => !show)
+        if (!showRelayDetails) {
+          layoutRef?.current?.scrollToTop('smooth')
+        }
+      }}
+      className={showRelayDetails ? 'bg-muted/40' : ''}
+    >
+      <Info />
+    </Button>
+  ) : null
+
   return (
     <PrimaryPageLayout
       pageName="home"
       ref={layoutRef}
       titlebar={
-        <NoteListPageTitlebar
-          layoutRef={layoutRef}
-          showRelayDetails={showRelayDetails}
-          setShowRelayDetails={
-            feedInfo?.feedType === 'relay' && !!feedInfo.id ? setShowRelayDetails : undefined
-          }
-        />
+        <div className="flex h-full items-center justify-between gap-1">
+          <FeedButton className="w-0 max-w-fit flex-1" />
+          <div className="flex shrink-0 items-center gap-1">{infoToggle}</div>
+        </div>
       }
+      title={<FeedButton className="max-w-full" compact />}
+      controls={infoToggle}
       displayScrollToTopButton
     >
       {content}
@@ -99,82 +105,6 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
 })
 NoteListPage.displayName = 'NoteListPage'
 export default NoteListPage
-
-function NoteListPageTitlebar({
-  layoutRef,
-  showRelayDetails,
-  setShowRelayDetails
-}: {
-  layoutRef?: React.RefObject<TPageRef>
-  showRelayDetails?: boolean
-  setShowRelayDetails?: Dispatch<SetStateAction<boolean>>
-}) {
-  const { isSmallScreen } = useScreenSize()
-
-  return (
-    <div className="flex h-full items-center justify-between gap-1">
-      <FeedButton className="w-0 max-w-fit flex-1" />
-      <div className="flex shrink-0 items-center gap-1">
-        {setShowRelayDetails && (
-          <Button
-            variant="ghost"
-            size="titlebar-icon"
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowRelayDetails((show) => !show)
-
-              if (!showRelayDetails) {
-                layoutRef?.current?.scrollToTop('smooth')
-              }
-            }}
-            className={showRelayDetails ? 'bg-muted/40' : ''}
-          >
-            <Info />
-          </Button>
-        )}
-        {isSmallScreen && (
-          <>
-            <SearchButton />
-            <PostButton />
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function PostButton() {
-  const { checkLogin } = useNostr()
-  const [open, setOpen] = useState(false)
-
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="titlebar-icon"
-        onClick={(e) => {
-          e.stopPropagation()
-          checkLogin(() => {
-            setOpen(true)
-          })
-        }}
-      >
-        <PencilLine />
-      </Button>
-      <PostEditor open={open} setOpen={setOpen} />
-    </>
-  )
-}
-
-function SearchButton() {
-  const { push } = useSecondaryPage()
-
-  return (
-    <Button variant="ghost" size="titlebar-icon" onClick={() => push(toSearch())}>
-      <Search />
-    </Button>
-  )
-}
 
 function WelcomeGuide() {
   const { t } = useTranslation()
@@ -197,8 +127,8 @@ function WelcomeGuide() {
       </div>
 
       <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-        <Button size="lg" className="w-full" onClick={() => navigate('explore')}>
-          <Compass className="size-5" />
+        <Button size="lg" className="w-full" onClick={() => navigate('search')}>
+          <Search className="size-5" />
           {t('Explore')}
         </Button>
 

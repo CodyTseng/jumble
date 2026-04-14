@@ -1,23 +1,23 @@
+import LoginDialog from '@/components/LoginDialog'
+import MeDrawer from '@/components/MeDrawer'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { LONG_PRESS_THRESHOLD } from '@/constants'
-import { cn } from '@/lib/utils'
-import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { UserRound } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
-import LoginDialog from '../LoginDialog'
-import { SimpleUserAvatar } from '../UserAvatar'
-import BottomNavigationBarItem from './BottomNavigationBarItem'
+import { useRef, useState } from 'react'
 
-export default function AccountButton() {
-  const { navigate, current, display } = usePrimaryPage()
+export default function MobileMeDrawerButton() {
   const { pubkey, profile } = useNostr()
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
-  const active = useMemo(() => current === 'me' && display, [display, current])
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressedRef = useRef(false)
 
   const handlePointerDown = () => {
+    longPressedRef.current = false
     pressTimerRef.current = setTimeout(() => {
+      longPressedRef.current = true
       setLoginDialogOpen(true)
       pressTimerRef.current = null
     }, LONG_PRESS_THRESHOLD)
@@ -26,32 +26,39 @@ export default function AccountButton() {
   const handlePointerUp = () => {
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current)
-      navigate('me')
       pressTimerRef.current = null
+    }
+  }
+
+  const handleClick = () => {
+    if (!longPressedRef.current && !loginDialogOpen) {
+      if (pubkey) {
+        setDrawerOpen(true)
+      } else {
+        setLoginDialogOpen(true)
+      }
     }
   }
 
   return (
     <>
-      <BottomNavigationBarItem
+      <button
+        className="ml-1.5 flex size-10 items-center justify-center rounded-full"
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
-        active={active}
+        onClick={handleClick}
       >
         {pubkey ? (
           profile ? (
-            <SimpleUserAvatar
-              userId={pubkey}
-              ignorePolicy
-              className={cn('size-6', active ? 'ring-2 ring-primary' : '')}
-            />
+            <SimpleUserAvatar userId={pubkey} ignorePolicy className="size-7" />
           ) : (
-            <Skeleton className={cn('size-6 rounded-full', active ? 'ring-2 ring-primary' : '')} />
+            <Skeleton className="size-7 rounded-full" />
           )
         ) : (
-          <UserRound />
+          <UserRound className="size-5" />
         )}
-      </BottomNavigationBarItem>
+      </button>
+      <MeDrawer open={drawerOpen} setOpen={setDrawerOpen} />
       <LoginDialog open={loginDialogOpen} setOpen={setLoginDialogOpen} />
     </>
   )

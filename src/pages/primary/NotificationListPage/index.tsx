@@ -14,6 +14,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
+  const { t } = useTranslation()
   const { current } = usePrimaryPage()
   const [hideIndirect, setHideIndirect] = useState(localStorage.getHideIndirectNotifications())
   const firstRenderRef = useRef(true)
@@ -44,7 +45,10 @@ const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
       <PrimaryPageLayout
         ref={ref}
         pageName="notifications"
-        titlebar={<NotificationListPageTitlebar />}
+        icon={<Bell />}
+        title={t('Notifications')}
+        controls={<HideUnrelatedNotificationsToggle />}
+        sideWidth="7rem"
         displayScrollToTopButton
       >
         <NotificationList ref={notificationListRef} />
@@ -54,20 +58,6 @@ const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
 })
 NotificationListPage.displayName = 'NotificationListPage'
 export default NotificationListPage
-
-function NotificationListPageTitlebar() {
-  const { t } = useTranslation()
-
-  return (
-    <div className="flex h-full items-center justify-between gap-2 pl-3">
-      <div className="flex items-center gap-2">
-        <Bell />
-        <div className="text-lg font-semibold">{t('Notifications')}</div>
-      </div>
-      <HideUnrelatedNotificationsToggle />
-    </div>
-  )
-}
 
 function HideUnrelatedNotificationsToggle() {
   const { t } = useTranslation()
