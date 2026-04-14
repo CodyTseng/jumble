@@ -19,7 +19,7 @@ export default function BottomNavigationBarItem({
     <Button
       className={cn(
         'm-0 flex h-12 w-full items-center rounded-lg bg-transparent p-3 shadow-none [&_svg]:size-6',
-        active && 'text-primary hover:text-primary'
+        active ? 'text-foreground' : 'text-muted-foreground'
       )}
       variant="ghost"
       onClick={onClick}

@@ -1,7 +1,7 @@
 import PostEditor from '@/components/PostEditor'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { PencilLine } from 'lucide-react'
+import { PencilSimpleLine } from '@phosphor-icons/react'
 import { useState } from 'react'
 import SidebarItem from './SidebarItem'
 
@@ -24,7 +24,7 @@ export default function PostButton({ collapse }: { collapse: boolean }) {
         className={cn('gap-2 bg-primary', !collapse && 'justify-center')}
         collapse={collapse}
       >
-        <PencilLine />
+        <PencilSimpleLine weight="bold" />
       </SidebarItem>
       <PostEditor open={open} setOpen={setOpen} />
     </div>
