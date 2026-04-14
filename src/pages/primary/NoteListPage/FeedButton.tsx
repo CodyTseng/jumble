@@ -106,15 +106,17 @@ const FeedSwitcherTrigger = forwardRef<
     }
 
     const Inner = () => {
-      if (feedInfo?.feedType === 'following') return <UsersRound />
-      if (feedInfo?.feedType === 'pinned') return <Star />
-      if (feedInfo?.feedType === 'relays') return <FolderClosed />
-      return <Server />
+      if (feedInfo?.feedType === 'following')
+        return <UsersRound className={compact ? '!size-3.5' : ''} />
+      if (feedInfo?.feedType === 'pinned') return <Star className={compact ? '!size-3.5' : ''} />
+      if (feedInfo?.feedType === 'relays')
+        return <FolderClosed className={compact ? '!size-3.5' : ''} />
+      return <Server className={compact ? '!size-3.5' : ''} />
     }
 
     if (compact) {
       return (
-        <div className="flex items-center pl-1.5 [&_svg]:size-3.5">
+        <div className="flex items-center pl-1.5">
           <Inner />
         </div>
       )
@@ -123,31 +125,21 @@ const FeedSwitcherTrigger = forwardRef<
     return <Inner />
   }, [feedInfo, compact])
 
-  const clickable =
-    !IS_COMMUNITY_MODE || COMMUNITY_RELAY_SETS.length + COMMUNITY_RELAYS.length > 1
+  const clickable = !IS_COMMUNITY_MODE || COMMUNITY_RELAY_SETS.length + COMMUNITY_RELAYS.length > 1
 
   return (
     <div
       className={cn(
-        'flex items-center clickable',
-        compact
-          ? 'h-8 gap-1.5 rounded-full bg-muted pl-1 pr-1.5'
-          : 'h-full gap-2 rounded-xl px-3',
+        'clickable flex items-center',
+        compact ? 'h-8 gap-1.5 rounded-full bg-muted pl-1 pr-1.5' : 'h-full gap-2 rounded-xl px-3',
         !clickable && '!cursor-default',
         className
       )}
       ref={ref}
       {...props}
     >
-      {icon}
-      <div
-        className={cn(
-          'truncate font-semibold',
-          compact ? 'text-sm' : 'text-lg'
-        )}
-      >
-        {title}
-      </div>
+      <div className="shrink-0">{icon}</div>
+      <div className={cn('truncate font-semibold', compact ? 'text-sm' : 'text-lg')}>{title}</div>
       {clickable && <ChevronDown className={compact ? '!size-3' : ''} />}
     </div>
   )
