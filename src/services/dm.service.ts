@@ -1089,6 +1089,11 @@ class DmService {
 
     const isReaction = message.decryptedRumor?.kind === kinds.Reaction
     const isNewest = message.createdAt >= (existing?.lastMessageAt ?? 0)
+    const isNewestFromSelf =
+      isNewest && !isReaction && message.senderPubkey === accountPubkey
+    if (isNewestFromSelf && message.createdAt > lastReadTime) {
+      storage.setLastReadDmTime(accountPubkey, otherPubkey, message.createdAt)
+    }
 
     const conversation: TDmConversation = {
       key: conversationKey,
@@ -1096,7 +1101,7 @@ class DmService {
       lastMessageAt: Math.max(existing?.lastMessageAt ?? 0, message.createdAt),
       lastMessageRumor:
         isNewest && !isReaction ? message.decryptedRumor : existing?.lastMessageRumor,
-      unreadCount: (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
+      unreadCount: isNewestFromSelf ? 0 : (existing?.unreadCount ?? 0) + (isUnread ? 1 : 0),
       hasReplied: existing?.hasReplied || message.senderPubkey === accountPubkey,
       encryptionPubkey: otherEncryptionPubkey ?? existing?.encryptionPubkey,
       deleted: false,
@@ -1155,10 +1160,19 @@ class DmService {
       const sortedMessages = chatMessages.sort((a, b) => b.createdAt - a.createdAt)
       const latestMessage = sortedMessages[0]
 
+      // If the newest chat message is from self, treat the conversation as read.
+      const latestIsFromSelf =
+        !!latestMessage && latestMessage.senderPubkey === accountPubkey
+      if (latestIsFromSelf && latestMessage.createdAt > lastReadTime) {
+        storage.setLastReadDmTime(accountPubkey, otherPubkey, latestMessage.createdAt)
+      }
+
       // Count unread messages (from other user, after last read time, excluding reactions)
-      const unreadCount = chatMessages.filter(
-        (m) => m.senderPubkey !== accountPubkey && m.createdAt > lastReadTime
-      ).length
+      const unreadCount = latestIsFromSelf
+        ? 0
+        : chatMessages.filter(
+            (m) => m.senderPubkey !== accountPubkey && m.createdAt > lastReadTime
+          ).length
 
       // Check if the user has ever replied in this conversation
       const hasReplied =
