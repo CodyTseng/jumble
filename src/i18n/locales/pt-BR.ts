@@ -826,5 +826,14 @@ export default {
     'Relay Reviews': 'Avaliações de relays',
     'New Message': 'Nova mensagem',
     'npub, hex key, or username': 'npub, chave hex ou nome de usuário',
+    'Customize tabs': 'Personalizar abas',
+    'Reorder, hide or add tabs to the feed.':
+      'Reordene, oculte ou adicione abas ao feed.',
+    'Add tab': 'Adicionar aba',
+    'Edit tab': 'Editar aba',
+    'Tab name': 'Nome da aba',
+    'e.g. Highlights': 'ex. Marcações',
+    'Event kinds': 'Tipos de evento',
+    'Show tab': 'Mostrar aba'
   }
 }

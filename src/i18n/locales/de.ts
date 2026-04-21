@@ -835,5 +835,14 @@ export default {
     'Relay Reviews': 'Relay-Bewertungen',
     'New Message': 'Neue Nachricht',
     'npub, hex key, or username': 'npub, Hex-Schlüssel oder Benutzername',
+    'Customize tabs': 'Tabs anpassen',
+    'Reorder, hide or add tabs to the feed.':
+      'Tabs im Feed neu anordnen, ausblenden oder hinzufügen.',
+    'Add tab': 'Tab hinzufügen',
+    'Edit tab': 'Tab bearbeiten',
+    'Tab name': 'Tab-Name',
+    'e.g. Highlights': 'z. B. Highlights',
+    'Event kinds': 'Ereignisarten',
+    'Show tab': 'Tab anzeigen'
   }
 }

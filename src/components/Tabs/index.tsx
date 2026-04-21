@@ -2,7 +2,17 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { useDeepBrowsing } from '@/providers/DeepBrowsingProvider'
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { SlidersHorizontal } from 'lucide-react'
+import {
+  Children,
+  Fragment,
+  isValidElement,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 
 type TabDefinition = {
@@ -15,12 +25,14 @@ export default function Tabs({
   tabs,
   value,
   onTabChange,
+  onCustomize,
   options = null,
   active = false
 }: {
   tabs: TabDefinition[]
   value: string
   onTabChange?: (tab: string) => void
+  onCustomize?: () => void
   options?: ReactNode
   active?: boolean
 }) {
@@ -31,6 +43,19 @@ export default function Tabs({
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 })
   const [isSticky, setIsSticky] = useState(false)
+
+  const hasOptions = useMemo(() => {
+    const children = Children.toArray(options)
+    if (
+      children.length === 1 &&
+      isValidElement(children[0]) &&
+      children[0].type === Fragment
+    ) {
+      const inner = (children[0].props as { children?: ReactNode }).children
+      return Children.toArray(inner).length > 0
+    }
+    return children.length > 0
+  }, [options])
 
   const updateIndicatorPosition = () => {
     const activeIndex = tabs.findIndex((tab) => tab.value === value)
@@ -143,6 +168,16 @@ export default function Tabs({
               )}
             </div>
           ))}
+          {onCustomize && (
+            <div
+              className="clickable my-1 flex w-fit cursor-pointer items-center whitespace-nowrap rounded-xl px-3 py-2 text-muted-foreground transition-all duration-200 hover:text-foreground"
+              onClick={onCustomize}
+              title={t('Customize tabs')}
+              aria-label={t('Customize tabs')}
+            >
+              <SlidersHorizontal size={16} />
+            </div>
+          )}
           <div
             className="absolute bottom-0 h-1 rounded-full bg-gradient-to-r from-primary to-primary-hover transition-all duration-300"
             style={{
@@ -153,7 +188,7 @@ export default function Tabs({
         </div>
         <ScrollBar orientation="horizontal" className="pointer-events-none opacity-0" />
       </ScrollArea>
-      {options && (
+      {hasOptions && (
         <div className="flex items-center gap-1 py-1">
           <Separator orientation="vertical" className="h-8" />
           {options}

@@ -141,6 +141,17 @@ export type TPublishOptions = {
 
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'you' | '24h' | 'articles'
 
+export type TFeedTabBuiltin = 'posts' | 'postsAndReplies' | '24h' | 'articles'
+
+export type TFeedTabConfig = {
+  id: string
+  label: string
+  hidden?: boolean
+  kinds?: number[]
+  hideReplies?: boolean
+  builtin?: TFeedTabBuiltin
+}
+
 export type TNotificationType = 'all' | 'mentions' | 'reactions' | 'zaps'
 
 export type TPageRef = { scrollToTop: (behavior?: ScrollBehavior) => void }

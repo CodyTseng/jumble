@@ -818,5 +818,14 @@ export default {
     'Relay Reviews': 'Relay vélemények',
     'New Message': 'Új üzenet',
     'npub, hex key, or username': 'npub, hex kulcs vagy felhasználónév',
+    'Customize tabs': 'Fülek testreszabása',
+    'Reorder, hide or add tabs to the feed.':
+      'Rendezd át, rejtsd el vagy adj hozzá füleket a hírcsatornához.',
+    'Add tab': 'Fül hozzáadása',
+    'Edit tab': 'Fül szerkesztése',
+    'Tab name': 'Fül neve',
+    'e.g. Highlights': 'pl. Kiemelések',
+    'Event kinds': 'Eseménytípusok',
+    'Show tab': 'Fül megjelenítése'
   }
 }

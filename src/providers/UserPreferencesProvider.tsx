@@ -1,5 +1,5 @@
 import storage from '@/services/local-storage.service'
-import { TEmoji, TNotificationStyle } from '@/types'
+import { TEmoji, TFeedTabConfig, TNotificationStyle } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useScreenSize } from './ScreenSizeProvider'
 
@@ -24,6 +24,9 @@ type TUserPreferencesContext = {
 
   allowInsecureConnection: boolean
   updateAllowInsecureConnection: (allow: boolean) => void
+
+  feedTabs: TFeedTabConfig[]
+  updateFeedTabs: (tabs: TFeedTabConfig[]) => void
 }
 
 const UserPreferencesContext = createContext<TUserPreferencesContext | undefined>(undefined)
@@ -52,6 +55,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const [allowInsecureConnection, setAllowInsecureConnection] = useState(
     storage.getAllowInsecureConnection()
   )
+  const [feedTabs, setFeedTabs] = useState<TFeedTabConfig[]>(storage.getFeedTabs())
 
   useEffect(() => {
     if (!isSmallScreen && enableSingleColumnLayout) {
@@ -91,6 +95,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setAllowInsecureConnection(allow)
   }
 
+  const updateFeedTabs = (tabs: TFeedTabConfig[]) => {
+    setFeedTabs(tabs)
+    storage.setFeedTabs(tabs)
+  }
+
   return (
     <UserPreferencesContext.Provider
       value={{
@@ -107,7 +116,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         quickReactionEmoji,
         updateQuickReactionEmoji,
         allowInsecureConnection,
-        updateAllowInsecureConnection
+        updateAllowInsecureConnection,
+        feedTabs,
+        updateFeedTabs
       }}
     >
       {children}

@@ -823,5 +823,14 @@ export default {
     'Relay Reviews': 'रिले समीक्षाएँ',
     'New Message': 'नया संदेश',
     'npub, hex key, or username': 'npub, hex कुंजी, या उपयोगकर्ता नाम',
+    'Customize tabs': 'टैब अनुकूलित करें',
+    'Reorder, hide or add tabs to the feed.':
+      'फ़ीड के टैब को पुनर्क्रमित करें, छिपाएँ या जोड़ें।',
+    'Add tab': 'टैब जोड़ें',
+    'Edit tab': 'टैब संपादित करें',
+    'Tab name': 'टैब का नाम',
+    'e.g. Highlights': 'उदा. हाइलाइट्स',
+    'Event kinds': 'इवेंट प्रकार',
+    'Show tab': 'टैब दिखाएँ'
   }
 }

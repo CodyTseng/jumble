@@ -817,5 +817,13 @@ export default {
     'npub, hex key, or username': 'npub, hex key, or username',
     'Encrypted DM unavailable': 'Encrypted DM unavailable',
     'No DM relays': 'No DM relays',
+    'Customize tabs': 'Customize tabs',
+    'Reorder, hide or add tabs to the feed.': 'Reorder, hide or add tabs to the feed.',
+    'Add tab': 'Add tab',
+    'Edit tab': 'Edit tab',
+    'Tab name': 'Tab name',
+    'e.g. Highlights': 'e.g. Highlights',
+    'Event kinds': 'Event kinds',
+    'Show tab': 'Show tab'
   }
 }

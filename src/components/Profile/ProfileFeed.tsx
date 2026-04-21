@@ -1,3 +1,4 @@
+import FeedTabsCustomizeDialog from '@/components/FeedTabsCustomizeDialog'
 import KindFilter from '@/components/KindFilter'
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
@@ -7,13 +8,16 @@ import { generateBech32IdFromETag } from '@/lib/tag'
 import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
-import { TFeedSubRequest, TNoteListMode } from '@/types'
-import { kinds, NostrEvent } from 'nostr-tools'
+import { TFeedSubRequest, TFeedTabConfig } from '@/types'
+import { NostrEvent } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshButton } from '../RefreshButton'
+
+const YOU_TAB: TFeedTabConfig = { id: 'you', label: 'YouTabName' }
 
 export default function ProfileFeed({
   pubkey,
@@ -24,35 +28,41 @@ export default function ProfileFeed({
 }) {
   const { pubkey: myPubkey, pinListEvent: myPinListEvent } = useNostr()
   const { getShowKinds } = useKindFilter()
+  const { feedTabs } = useUserPreferences()
   const feedId = `profile-${pubkey}`
   const feedShowKinds = useMemo(() => getShowKinds(feedId), [getShowKinds, feedId])
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(feedShowKinds)
-  const [listMode, setListMode] = useState<TNoteListMode>(() => {
-    const mode = storage.getNoteListMode()
-    if (mode === '24h') {
-      return 'posts'
+
+  const visibleTabs = useMemo(() => {
+    const base = feedTabs.filter((tab) => !tab.hidden && tab.builtin !== '24h')
+    if (myPubkey && myPubkey !== pubkey) {
+      return [...base, YOU_TAB]
     }
-    return mode
-  })
+    return base
+  }, [feedTabs, myPubkey, pubkey])
+
+  const [selectedTabId, setSelectedTabId] = useState<string>(
+    () => storage.getNoteListMode() || 'posts'
+  )
+  const selectedTab: TFeedTabConfig | undefined =
+    visibleTabs.find((tab) => tab.id === selectedTabId) ?? visibleTabs[0]
+
+  useEffect(() => {
+    if (selectedTab && selectedTab.id !== selectedTabId) {
+      setSelectedTabId(selectedTab.id)
+    }
+  }, [selectedTab, selectedTabId])
+
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
   const [pinnedEventIds, setPinnedEventIds] = useState<string[]>([])
-  const tabs = useMemo(() => {
-    const _tabs = [
-      { value: 'posts', label: 'Notes' },
-      { value: 'postsAndReplies', label: 'Replies' },
-      { value: 'articles', label: 'Articles' }
-    ]
-
-    if (myPubkey && myPubkey !== pubkey) {
-      _tabs.push({ value: 'you', label: 'YouTabName' })
-    }
-
-    return _tabs
-  }, [myPubkey, pubkey])
+  const [customizeOpen, setCustomizeOpen] = useState(false)
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
-  const isArticlesMode = listMode === 'articles'
-  const effectiveShowKinds = isArticlesMode ? [kinds.LongFormArticle] : temporaryShowKinds
+
+  const isYouMode = selectedTab?.id === 'you'
+  const tabHasFixedKinds = !!selectedTab?.kinds
+  const effectiveShowKinds = selectedTab?.kinds ?? temporaryShowKinds
+  const hideReplies = selectedTab?.hideReplies ?? false
 
   useEffect(() => {
     const initPinnedEventIds = async () => {
@@ -88,7 +98,7 @@ export default function ProfileFeed({
 
   useEffect(() => {
     const init = async () => {
-      if (listMode === 'you') {
+      if (isYouMode) {
         if (!myPubkey) {
           setSubRequests([])
           return
@@ -144,10 +154,10 @@ export default function ProfileFeed({
       }
     }
     init()
-  }, [pubkey, listMode, search])
+  }, [pubkey, isYouMode, search])
 
-  const handleListModeChange = (mode: TNoteListMode) => {
-    setListMode(mode)
+  const handleListModeChange = (mode: string) => {
+    setSelectedTabId(mode)
     noteListRef.current?.scrollToTop('smooth')
   }
 
@@ -159,15 +169,14 @@ export default function ProfileFeed({
   return (
     <>
       <Tabs
-        value={listMode}
-        tabs={tabs}
-        onTabChange={(listMode) => {
-          handleListModeChange(listMode as TNoteListMode)
-        }}
+        value={selectedTab?.id ?? ''}
+        tabs={visibleTabs.map((tab) => ({ value: tab.id, label: tab.label }))}
+        onTabChange={handleListModeChange}
+        onCustomize={() => setCustomizeOpen(true)}
         options={
           <>
             {!supportTouch && <RefreshButton onClick={() => noteListRef.current?.refresh()} />}
-            {!isArticlesMode && (
+            {!tabHasFixedKinds && (
               <KindFilter
                 feedId={feedId}
                 showKinds={temporaryShowKinds}
@@ -181,11 +190,12 @@ export default function ProfileFeed({
         ref={noteListRef}
         subRequests={subRequests}
         showKinds={effectiveShowKinds}
-        hideReplies={listMode === 'posts'}
+        hideReplies={hideReplies}
         filterMutedNotes={false}
-        pinnedEventIds={listMode === 'you' || isArticlesMode || !!search ? [] : pinnedEventIds}
+        pinnedEventIds={isYouMode || tabHasFixedKinds || !!search ? [] : pinnedEventIds}
         showNewNotesDirectly={myPubkey === pubkey}
       />
+      <FeedTabsCustomizeDialog open={customizeOpen} onOpenChange={setCustomizeOpen} />
     </>
   )
 }

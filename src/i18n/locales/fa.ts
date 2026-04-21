@@ -822,5 +822,14 @@ export default {
     'Relay Reviews': 'بررسی رله‌ها',
     'New Message': 'پیام جدید',
     'npub, hex key, or username': 'npub، کلید hex یا نام کاربری',
+    'Customize tabs': 'سفارشی‌سازی زبانه‌ها',
+    'Reorder, hide or add tabs to the feed.':
+      'ترتیب زبانه‌های فید را تغییر دهید، پنهان کنید یا اضافه کنید.',
+    'Add tab': 'افزودن زبانه',
+    'Edit tab': 'ویرایش زبانه',
+    'Tab name': 'نام زبانه',
+    'e.g. Highlights': 'مثلاً برجسته‌ها',
+    'Event kinds': 'انواع رویداد',
+    'Show tab': 'نمایش زبانه'
   }
 }

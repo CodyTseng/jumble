@@ -808,5 +808,14 @@ export default {
     'Relay Reviews': 'مراجعات الريلاي',
     'New Message': 'رسالة جديدة',
     'npub, hex key, or username': 'npub أو مفتاح hex أو اسم المستخدم',
+    'Customize tabs': 'تخصيص علامات التبويب',
+    'Reorder, hide or add tabs to the feed.':
+      'أعد ترتيب علامات التبويب في الموجز أو إخفائها أو إضافتها.',
+    'Add tab': 'إضافة علامة تبويب',
+    'Edit tab': 'تعديل علامة التبويب',
+    'Tab name': 'اسم علامة التبويب',
+    'e.g. Highlights': 'مثال: التمييز',
+    'Event kinds': 'أنواع الأحداث',
+    'Show tab': 'إظهار علامة التبويب'
   }
 }

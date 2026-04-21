@@ -827,5 +827,14 @@ export default {
     'Relay Reviews': 'Отзывы о реле',
     'New Message': 'Новое сообщение',
     'npub, hex key, or username': 'npub, hex-ключ или имя пользователя',
+    'Customize tabs': 'Настроить вкладки',
+    'Reorder, hide or add tabs to the feed.':
+      'Измените порядок, скройте или добавьте вкладки ленты.',
+    'Add tab': 'Добавить вкладку',
+    'Edit tab': 'Редактировать вкладку',
+    'Tab name': 'Название вкладки',
+    'e.g. Highlights': 'например, Выделения',
+    'Event kinds': 'Типы событий',
+    'Show tab': 'Показать вкладку'
   }
 }

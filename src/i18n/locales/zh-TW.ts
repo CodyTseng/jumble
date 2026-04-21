@@ -791,5 +791,13 @@ export default {
     'Relay Reviews': '中繼評價',
     'New Message': '新訊息',
     'npub, hex key, or username': 'npub、hex key 或使用者名稱',
+    'Customize tabs': '自訂頁籤',
+    'Reorder, hide or add tabs to the feed.': '調整順序、隱藏或新增動態的頁籤。',
+    'Add tab': '新增頁籤',
+    'Edit tab': '編輯頁籤',
+    'Tab name': '頁籤名稱',
+    'e.g. Highlights': '例如：精選',
+    'Event kinds': '事件類型',
+    'Show tab': '顯示頁籤'
   }
 }

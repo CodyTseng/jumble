@@ -2,6 +2,7 @@ import {
   ALLOWED_FILTER_KINDS,
   BIG_RELAY_URLS,
   DEFAULT_FAVICON_URL_TEMPLATE,
+  DEFAULT_FEED_TABS,
   DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
@@ -20,9 +21,9 @@ import {
   TAccountPointer,
   TEmoji,
   TFeedInfo,
+  TFeedTabConfig,
   TMediaAutoLoadPolicy,
   TMediaUploadServiceConfig,
-  TNoteListMode,
   TNotificationStyle,
   TNsfwDisplayPolicy,
   TProfilePictureAutoLoadPolicy,
@@ -39,7 +40,8 @@ class LocalStorageService {
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
-  private noteListMode: TNoteListMode = 'posts'
+  private noteListMode: string = 'posts'
+  private feedTabs: TFeedTabConfig[] = DEFAULT_FEED_TABS
   private lastReadNotificationTimeMap: Record<string, number> = {}
   private defaultZapSats: number = 21
   private defaultZapComment: string = 'Zap!'
@@ -98,10 +100,29 @@ class LocalStorageService {
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
     const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
-    this.noteListMode =
-      noteListModeStr && ['posts', 'postsAndReplies', '24h', 'articles'].includes(noteListModeStr)
-        ? (noteListModeStr as TNoteListMode)
-        : 'posts'
+    this.noteListMode = noteListModeStr && noteListModeStr.length > 0 ? noteListModeStr : 'posts'
+
+    const feedTabsStr = window.localStorage.getItem(StorageKey.FEED_TABS)
+    if (feedTabsStr) {
+      try {
+        const parsed = JSON.parse(feedTabsStr)
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter(
+            (tab): tab is TFeedTabConfig =>
+              tab != null &&
+              typeof tab === 'object' &&
+              typeof tab.id === 'string' &&
+              tab.id.length > 0 &&
+              typeof tab.label === 'string'
+          )
+          if (valid.length > 0) {
+            this.feedTabs = valid
+          }
+        }
+      } catch {
+        // ignore, fall back to defaults
+      }
+    }
     const lastReadNotificationTimeMapStr =
       window.localStorage.getItem(StorageKey.LAST_READ_NOTIFICATION_TIME_MAP) ?? '{}'
     this.lastReadNotificationTimeMap = JSON.parse(lastReadNotificationTimeMapStr)
@@ -490,9 +511,18 @@ class LocalStorageService {
     return this.noteListMode
   }
 
-  setNoteListMode(mode: TNoteListMode) {
+  setNoteListMode(mode: string) {
     window.localStorage.setItem(StorageKey.NOTE_LIST_MODE, mode)
     this.noteListMode = mode
+  }
+
+  getFeedTabs() {
+    return this.feedTabs
+  }
+
+  setFeedTabs(tabs: TFeedTabConfig[]) {
+    this.feedTabs = tabs
+    window.localStorage.setItem(StorageKey.FEED_TABS, JSON.stringify(tabs))
   }
 
   getAccounts() {

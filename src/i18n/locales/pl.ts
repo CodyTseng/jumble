@@ -827,5 +827,14 @@ export default {
     'Relay Reviews': 'Recenzje transmiterów',
     'New Message': 'Nowa wiadomość',
     'npub, hex key, or username': 'npub, klucz hex lub nazwa użytkownika',
+    'Customize tabs': 'Dostosuj karty',
+    'Reorder, hide or add tabs to the feed.':
+      'Zmień kolejność, ukryj lub dodaj karty w aktualnościach.',
+    'Add tab': 'Dodaj kartę',
+    'Edit tab': 'Edytuj kartę',
+    'Tab name': 'Nazwa karty',
+    'e.g. Highlights': 'np. Wyróżnienia',
+    'Event kinds': 'Rodzaje zdarzeń',
+    'Show tab': 'Pokaż kartę'
   }
 }

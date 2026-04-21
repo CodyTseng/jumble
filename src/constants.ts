@@ -1,5 +1,5 @@
 import { kinds } from 'nostr-tools'
-import { TRelaySet } from './types'
+import { TFeedTabConfig, TRelaySet } from './types'
 
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
@@ -31,6 +31,7 @@ export const StorageKey = {
   SHOW_KINDS: 'showKinds',
   SHOW_KINDS_VERSION: 'showKindsVersion',
   SHOW_KINDS_MAP: 'showKindsMap',
+  FEED_TABS: 'feedTabs',
   HIDE_CONTENT_MENTIONING_MUTED_USERS: 'hideContentMentioningMutedUsers',
   NOTIFICATION_LIST_STYLE: 'notificationListStyle',
   MEDIA_AUTO_LOAD_POLICY: 'mediaAutoLoadPolicy',
@@ -144,6 +145,18 @@ export const SUPPORTED_KINDS = [
   ExtendedKind.FOLLOW_PACK,
   kinds.Reaction,
   ExtendedKind.EXTERNAL_CONTENT_REACTION
+]
+
+export const DEFAULT_FEED_TABS: TFeedTabConfig[] = [
+  { id: 'posts', builtin: 'posts', label: 'Notes', hideReplies: true },
+  { id: 'postsAndReplies', builtin: 'postsAndReplies', label: 'Replies' },
+  { id: '24h', builtin: '24h', label: '24h Pulse' },
+  {
+    id: 'articles',
+    builtin: 'articles',
+    label: 'Articles',
+    kinds: [kinds.LongFormArticle]
+  }
 ]
 
 export const URL_REGEX =

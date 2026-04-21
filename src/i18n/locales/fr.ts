@@ -831,5 +831,14 @@ export default {
     'Relay Reviews': 'Avis sur les relais',
     'New Message': 'Nouveau message',
     'npub, hex key, or username': "npub, clé hex ou nom d'utilisateur",
+    'Customize tabs': 'Personnaliser les onglets',
+    'Reorder, hide or add tabs to the feed.':
+      'Réorganisez, masquez ou ajoutez des onglets au flux.',
+    'Add tab': 'Ajouter un onglet',
+    'Edit tab': "Modifier l'onglet",
+    'Tab name': "Nom de l'onglet",
+    'e.g. Highlights': 'ex. Surlignages',
+    'Event kinds': "Types d'événements",
+    'Show tab': "Afficher l'onglet"
   }
 }

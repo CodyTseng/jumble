@@ -815,5 +815,13 @@ export default {
     'Relay Reviews': '릴레이 리뷰',
     'New Message': '새 메시지',
     'npub, hex key, or username': 'npub, hex 키 또는 사용자 이름',
+    'Customize tabs': '탭 맞춤설정',
+    'Reorder, hide or add tabs to the feed.': '피드의 탭을 재정렬, 숨기기 또는 추가합니다.',
+    'Add tab': '탭 추가',
+    'Edit tab': '탭 편집',
+    'Tab name': '탭 이름',
+    'e.g. Highlights': '예: 하이라이트',
+    'Event kinds': '이벤트 종류',
+    'Show tab': '탭 표시'
   }
 }

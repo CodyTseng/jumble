@@ -828,5 +828,14 @@ export default {
     'Relay Reviews': 'Avaliações de relays',
     'New Message': 'Nova mensagem',
     'npub, hex key, or username': 'npub, chave hex ou nome de utilizador',
+    'Customize tabs': 'Personalizar separadores',
+    'Reorder, hide or add tabs to the feed.':
+      'Reorganize, oculte ou adicione separadores ao feed.',
+    'Add tab': 'Adicionar separador',
+    'Edit tab': 'Editar separador',
+    'Tab name': 'Nome do separador',
+    'e.g. Highlights': 'ex. Destaques',
+    'Event kinds': 'Tipos de evento',
+    'Show tab': 'Mostrar separador'
   }
 }

@@ -809,5 +809,14 @@ export default {
     'Relay Reviews': 'รีวิวรีเลย์',
     'New Message': 'ข้อความใหม่',
     'npub, hex key, or username': 'npub, hex key หรือชื่อผู้ใช้',
+    'Customize tabs': 'ปรับแต่งแท็บ',
+    'Reorder, hide or add tabs to the feed.':
+      'จัดลำดับ ซ่อน หรือเพิ่มแท็บในฟีด',
+    'Add tab': 'เพิ่มแท็บ',
+    'Edit tab': 'แก้ไขแท็บ',
+    'Tab name': 'ชื่อแท็บ',
+    'e.g. Highlights': 'เช่น ไฮไลต์',
+    'Event kinds': 'ประเภทอีเวนต์',
+    'Show tab': 'แสดงแท็บ'
   }
 }

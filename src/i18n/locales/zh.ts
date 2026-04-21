@@ -798,5 +798,13 @@ export default {
     'npub, hex key, or username': 'npub、hex key 或用户名',
     'Encrypted DM unavailable': '无法发送加密私信',
     'No DM relays': '未设置私信中继',
+    'Customize tabs': '自定义标签',
+    'Reorder, hide or add tabs to the feed.': '调整顺序、隐藏或新增信息流标签。',
+    'Add tab': '新增标签',
+    'Edit tab': '编辑标签',
+    'Tab name': '标签名称',
+    'e.g. Highlights': '例如：高亮',
+    'Event kinds': '事件类型',
+    'Show tab': '显示标签'
   }
 }
