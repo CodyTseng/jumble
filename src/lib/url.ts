@@ -1,5 +1,3 @@
-import storage from '@/services/local-storage.service'
-
 export function isWebsocketUrl(url: string): boolean {
   try {
     const protocol = new URL(url).protocol
@@ -10,8 +8,8 @@ export function isWebsocketUrl(url: string): boolean {
 }
 
 export function isInsecureUrl(url: string): boolean {
-  // If onion services are enabled, consider them secure
-  if (!storage.getFilterOutOnionRelays() && isOnionUrl(url)) {
+  // Consider .onion URLs as secure
+  if (isOnionUrl(url)) {
     return false
   }
 
