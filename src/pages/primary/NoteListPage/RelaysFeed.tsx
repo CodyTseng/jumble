@@ -35,7 +35,6 @@ export default function RelaysFeed() {
       feedId={feedId}
       subRequests={[{ urls: relayUrls, filter: {} }]}
       areAlgoRelays={areAlgoRelays}
-      isMainFeed
       showRelayCloseReason
     />
   )

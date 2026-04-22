@@ -46,9 +46,9 @@ export default function FollowingFeed() {
   if (hasFollowings === false && subRequests.length > 0) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-        <UserPlus size={64} className="mb-4 text-muted-foreground" strokeWidth={1.5} />
+        <UserPlus size={64} className="text-muted-foreground mb-4" strokeWidth={1.5} />
         <h2 className="mb-2 text-2xl font-semibold">{t('Welcome to Jumble!')}</h2>
-        <p className="mb-6 max-w-md text-muted-foreground">
+        <p className="text-muted-foreground mb-6 max-w-md">
           {t(
             'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!'
           )}
@@ -75,7 +75,6 @@ export default function FollowingFeed() {
         initializedRef.current = false
         setRefreshCount((count) => count + 1)
       }}
-      isMainFeed
       isPubkeyFeed
     />
   )

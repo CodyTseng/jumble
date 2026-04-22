@@ -8,7 +8,6 @@ import { isTouchDevice } from '@/lib/utils'
 import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
-import storage from '@/services/local-storage.service'
 import { TFeedSubRequest, TFeedTabConfig } from '@/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
@@ -18,7 +17,6 @@ export default function NormalFeed({
   feedId,
   subRequests,
   areAlgoRelays = false,
-  isMainFeed = false,
   showRelayCloseReason = false,
   disable24hMode = false,
   onRefresh,
@@ -27,7 +25,6 @@ export default function NormalFeed({
   feedId: string
   subRequests: TFeedSubRequest[]
   areAlgoRelays?: boolean
-  isMainFeed?: boolean
   showRelayCloseReason?: boolean
   disable24hMode?: boolean
   onRefresh?: () => void
@@ -40,18 +37,14 @@ export default function NormalFeed({
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(feedShowKinds)
 
   const visibleTabs = useMemo(
-    () =>
-      feedTabs.filter(
-        (tab) => !tab.hidden && !(tab.builtin === '24h' && disable24hMode)
-      ),
+    () => feedTabs.filter((tab) => !tab.hidden && !(tab.builtin === '24h' && disable24hMode)),
     [feedTabs, disable24hMode]
   )
 
-  const [selectedTabId, setSelectedTabId] = useState<string>(
-    () => storage.getNoteListMode() || 'posts'
-  )
-  const selectedTab: TFeedTabConfig | undefined =
-    visibleTabs.find((tab) => tab.id === selectedTabId) ?? visibleTabs[0]
+  const [selectedTabId, setSelectedTabId] = useState<string | undefined>()
+  const selectedTab: TFeedTabConfig = selectedTabId
+    ? (visibleTabs.find((tab) => tab.id === selectedTabId) ?? visibleTabs[0])
+    : visibleTabs[0]
 
   useEffect(() => {
     if (selectedTab && selectedTab.id !== selectedTabId) {
@@ -85,9 +78,6 @@ export default function NormalFeed({
 
   const handleListModeChange = (mode: string) => {
     setSelectedTabId(mode)
-    if (isMainFeed) {
-      storage.setNoteListMode(mode)
-    }
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -138,7 +128,7 @@ export default function NormalFeed({
         }
         active={trustFilterOpen}
       />
-      <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
+      <div ref={topRef} className="scroll-mt-24.25" />
       {selectedTab ? (
         is24hMode ? (
           <UserAggregationList

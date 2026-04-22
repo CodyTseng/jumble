@@ -29,7 +29,5 @@ export default function PinnedFeed() {
     init()
   }, [pubkey, pinnedPubkeySet])
 
-  return (
-    <NormalFeed feedId={SPECIAL_FEED_ID.PINNED} subRequests={subRequests} isMainFeed isPubkeyFeed />
-  )
+  return <NormalFeed feedId={SPECIAL_FEED_ID.PINNED} subRequests={subRequests} isPubkeyFeed />
 }

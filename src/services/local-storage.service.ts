@@ -40,7 +40,6 @@ class LocalStorageService {
   private themeSetting: TThemeSetting = 'system'
   private accounts: TAccount[] = []
   private currentAccount: TAccount | null = null
-  private noteListMode: string = 'posts'
   private feedTabs: TFeedTabConfig[] = DEFAULT_FEED_TABS
   private lastReadNotificationTimeMap: Record<string, number> = {}
   private defaultZapSats: number = 21
@@ -99,8 +98,6 @@ class LocalStorageService {
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
-    const noteListModeStr = window.localStorage.getItem(StorageKey.NOTE_LIST_MODE)
-    this.noteListMode = noteListModeStr && noteListModeStr.length > 0 ? noteListModeStr : 'posts'
 
     const feedTabsStr = window.localStorage.getItem(StorageKey.FEED_TABS)
     if (feedTabsStr) {
@@ -399,9 +396,7 @@ class LocalStorageService {
       }
     }
 
-    const dmBackwardCursorMapStr = window.localStorage.getItem(
-      StorageKey.DM_BACKWARD_CURSOR_MAP
-    )
+    const dmBackwardCursorMapStr = window.localStorage.getItem(StorageKey.DM_BACKWARD_CURSOR_MAP)
     if (dmBackwardCursorMapStr) {
       try {
         const map = JSON.parse(dmBackwardCursorMapStr)
@@ -507,14 +502,14 @@ class LocalStorageService {
     this.themeSetting = themeSetting
   }
 
-  getNoteListMode() {
-    return this.noteListMode
-  }
+  // getNoteListMode() {
+  //   return this.noteListMode
+  // }
 
-  setNoteListMode(mode: string) {
-    window.localStorage.setItem(StorageKey.NOTE_LIST_MODE, mode)
-    this.noteListMode = mode
-  }
+  // setNoteListMode(mode: string) {
+  //   window.localStorage.setItem(StorageKey.NOTE_LIST_MODE, mode)
+  //   this.noteListMode = mode
+  // }
 
   getFeedTabs() {
     return this.feedTabs

@@ -156,7 +156,7 @@ export default function FeedTabsCustomizeDialog({
       autoFocusLabel={!isSmallScreen}
     />
   ) : (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -184,7 +184,7 @@ export default function FeedTabsCustomizeDialog({
         <Plus size={16} />
         {t('Add tab')}
       </Button>
-      <div className="flex justify-end pt-1">
+      <div className="flex justify-end pt-2">
         <Button variant="outline" onClick={handleReset} className="w-full sm:w-auto">
           <RotateCcw size={16} />
           {t('Reset to default')}
@@ -276,12 +276,12 @@ function TabRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-1 rounded-lg border px-1 py-1.5',
+        'flex items-center gap-2 rounded-lg border py-1.5 pl-1 pr-3',
         tab.hidden && 'opacity-60'
       )}
     >
       <div
-        className="cursor-grab touch-none rounded p-2 hover:bg-muted active:cursor-grabbing"
+        className="cursor-grab touch-none rounded-md p-2 hover:bg-muted active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
@@ -295,13 +295,13 @@ function TabRow({
       />
       {!isBuiltin && (
         <>
-          <Button variant="ghost" size="icon" onClick={onEdit}>
+          <Button variant="ghost" size="icon" className="size-8" onClick={onEdit}>
             <Pencil size={16} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="text-destructive hover:text-destructive"
+            className="size-8 text-destructive hover:text-destructive"
             onClick={onDelete}
           >
             <Trash2 size={16} />

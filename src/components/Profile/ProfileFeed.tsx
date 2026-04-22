@@ -10,7 +10,6 @@ import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
-import storage from '@/services/local-storage.service'
 import relayInfoService from '@/services/relay-info.service'
 import { TFeedSubRequest, TFeedTabConfig } from '@/types'
 import { NostrEvent } from 'nostr-tools'
@@ -19,13 +18,7 @@ import { RefreshButton } from '../RefreshButton'
 
 const YOU_TAB: TFeedTabConfig = { id: 'you', label: 'YouTabName' }
 
-export default function ProfileFeed({
-  pubkey,
-  search = ''
-}: {
-  pubkey: string
-  search?: string
-}) {
+export default function ProfileFeed({ pubkey, search = '' }: { pubkey: string; search?: string }) {
   const { pubkey: myPubkey, pinListEvent: myPinListEvent } = useNostr()
   const { getShowKinds } = useKindFilter()
   const { feedTabs } = useUserPreferences()
@@ -41,11 +34,10 @@ export default function ProfileFeed({
     return base
   }, [feedTabs, myPubkey, pubkey])
 
-  const [selectedTabId, setSelectedTabId] = useState<string>(
-    () => storage.getNoteListMode() || 'posts'
-  )
-  const selectedTab: TFeedTabConfig | undefined =
-    visibleTabs.find((tab) => tab.id === selectedTabId) ?? visibleTabs[0]
+  const [selectedTabId, setSelectedTabId] = useState<string | undefined>()
+  const selectedTab: TFeedTabConfig = selectedTabId
+    ? (visibleTabs.find((tab) => tab.id === selectedTabId) ?? visibleTabs[0])
+    : visibleTabs[0]
 
   useEffect(() => {
     if (selectedTab && selectedTab.id !== selectedTabId) {
