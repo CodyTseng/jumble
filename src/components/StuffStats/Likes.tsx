@@ -148,7 +148,7 @@ export default function Likes({ stuff }: { stuff: Event | string }) {
             {(isLongPressing === key || isCompleted === key) && (
               <div className="absolute inset-0 overflow-hidden rounded-full">
                 <div
-                  className="h-full bg-gradient-to-r from-primary/40 via-primary/60 to-primary/80"
+                  className="h-full bg-linear-to-r from-primary/40 via-primary/60 to-primary/80"
                   style={{
                     width: isCompleted === key ? '100%' : '0%',
                     animation:

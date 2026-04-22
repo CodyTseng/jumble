@@ -56,7 +56,7 @@ export default function NoteCard({
 export function NoteCardLoadingSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('px-4 py-3', className)}>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <UserAvatarSkeleton className="h-10 w-10" />
         <div className={`w-0 flex-1`}>
           <div className="py-1">

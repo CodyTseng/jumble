@@ -61,7 +61,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               >
                 Copy Error Message
               </Button>
-              <pre className="whitespace-pre-wrap text-wrap break-words rounded bg-destructive/10 p-2 text-destructive">
+              <pre className="whitespace-pre-wrap text-wrap wrap-break-word rounded bg-destructive/10 p-2 text-destructive">
                 Error: {this.state.error.message}
               </pre>
             </>

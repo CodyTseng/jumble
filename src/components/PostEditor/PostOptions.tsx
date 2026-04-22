@@ -44,7 +44,7 @@ export default function PostOptions({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <Label htmlFor="add-client-tag">{t('Add client tag')}</Label>
           <Switch
             id="add-client-tag"
@@ -58,7 +58,7 @@ export default function PostOptions({
         </div>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <Label htmlFor="add-nsfw-tag">{t('NSFW')}</Label>
         <Switch
           id="add-nsfw-tag"

@@ -29,7 +29,7 @@ export default function RelayReviewCard({
       onClick={() => push(toNote(event))}
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-1 items-center space-x-2">
+        <div className="flex flex-1 items-center gap-2">
           <SimpleUserAvatar userId={event.pubkey} size="medium" />
           <div className="w-0 flex-1">
             <div className="flex items-center gap-2">

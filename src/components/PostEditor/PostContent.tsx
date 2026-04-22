@@ -215,7 +215,7 @@ export default function PostContent({
           <div className="pointer-events-none p-2 sm:p-3">
             {highlightedText ? (
               <div className="flex gap-4">
-                <div className="my-1 w-1 flex-shrink-0 rounded-md bg-primary/60" />
+                <div className="my-1 w-1 shrink-0 rounded-md bg-primary/60" />
                 <div className="whitespace-pre-line italic">{highlightedText}</div>
               </div>
             ) : (
@@ -296,7 +296,7 @@ export default function PostContent({
             <Popover>
               <PopoverTrigger asChild>
                 <button type="button" className="flex shrink-0">
-                  <CircleHelp className="!size-3.5 text-muted-foreground" />
+                  <CircleHelp className="size-3.5! text-muted-foreground" />
                 </button>
               </PopoverTrigger>
               <PopoverContent className="text-sm">

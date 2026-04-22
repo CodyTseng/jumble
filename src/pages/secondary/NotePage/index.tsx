@@ -42,7 +42,7 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
     return (
       <SecondaryPageLayout ref={ref} index={index} title={t('Note')}>
         <div className="px-4 pt-3">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <UserAvatarSkeleton className="h-10 w-10" />
             <div className={`w-0 flex-1`}>
               <div className="py-1">
@@ -118,7 +118,7 @@ function ExternalRoot({ value }: { value: string }) {
   return (
     <div>
       <Card
-        className="clickable flex items-center space-x-1 px-1.5 py-1 text-sm text-muted-foreground hover:text-foreground"
+        className="clickable flex items-center gap-1 px-1.5 py-1 text-sm text-muted-foreground hover:text-foreground"
         onClick={() => push(toExternalContent(value))}
       >
         <div className="truncate">{value}</div>
@@ -144,7 +144,7 @@ function ParentNote({
   if (isFetching) {
     return (
       <div>
-        <div className="clickable flex items-center space-x-1 rounded-full border px-[0.4375rem] py-1 text-sm text-muted-foreground">
+        <div className="clickable flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm text-muted-foreground">
           <UserAvatarSkeleton className="h-4 w-4 shrink" />
           <div className="flex-1 py-1">
             <Skeleton className="h-3" />
@@ -159,7 +159,7 @@ function ParentNote({
     <div>
       <div
         className={cn(
-          'clickable flex items-center space-x-1 rounded-full border px-[0.4375rem] py-1 text-sm text-muted-foreground',
+          'clickable flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm text-muted-foreground',
           event && 'hover:text-foreground'
         )}
         onClick={() => {

@@ -133,8 +133,8 @@ export default function TrustScoreFilter({
               className={cn(
                 'flex-1 rounded px-2 py-1.5 text-center text-xs transition-all duration-200',
                 temporaryScore === level.value
-                  ? 'bg-primary font-medium text-primary-foreground shadow-sm'
-                  : 'bg-secondary hover:scale-[1.02] hover:bg-secondary/80 hover:shadow-sm'
+                  ? 'bg-primary font-medium text-primary-foreground shadow-xs'
+                  : 'bg-secondary hover:scale-[1.02] hover:bg-secondary/80 hover:shadow-xs'
               )}
             >
               {t(level.label)}

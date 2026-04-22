@@ -50,7 +50,7 @@ export function EmbeddedLNInvoice({ invoice, className }: { invoice: string; cla
         <div className="text-sm font-semibold">{t('Lightning Invoice')}</div>
       </div>
       {description && (
-        <div className="break-words text-sm text-muted-foreground">{description}</div>
+        <div className="wrap-break-word text-sm text-muted-foreground">{description}</div>
       )}
       <div className="text-lg font-bold">
         {formatAmount(amount)} {t('sats')}

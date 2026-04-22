@@ -61,7 +61,7 @@ export default function TrustScoreBadge({
         title={t('Low trust ranking ({{percentile}}%)', { percentile })}
         className={classNames?.container}
       >
-        <ShieldAlert className={cn('!size-4 text-red-500', className)} />
+        <ShieldAlert className={cn('size-4! text-red-500', className)} />
       </div>
     )
   }

@@ -486,7 +486,7 @@ function NeedLoginView() {
   const { startLogin } = useNostr()
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
+    <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
       <MessageSquare className="h-16 w-16 text-muted-foreground" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Sign in to use Messages')}</h3>
@@ -517,7 +517,7 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => Promise<void> }
   }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center">
+    <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
       <Key className="h-16 w-16 text-muted-foreground" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Enable Direct Messages')}</h3>

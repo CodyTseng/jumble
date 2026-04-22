@@ -191,7 +191,7 @@ export function SecondaryPageTitlebar({
           <BackButtonWithTitle>{title}</BackButtonWithTitle>
         </div>
       )}
-      <div className="flex-shrink-0">{controls}</div>
+      <div className="shrink-0">{controls}</div>
     </Titlebar>
   )
 }

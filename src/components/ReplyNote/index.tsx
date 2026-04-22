@@ -117,7 +117,7 @@ export default function ReplyNote({
       <Collapsible>
         <div
           className={cn(
-            'flex items-start space-x-2 pr-4 pt-3',
+            'flex items-start gap-2 pr-4 pt-3',
             autoLoadProfilePicture || hideThreadGuide ? 'pl-4' : 'pl-7'
           )}
         >
@@ -131,7 +131,7 @@ export default function ReplyNote({
                     className="truncate text-sm font-semibold text-muted-foreground hover:text-foreground"
                     skeletonClassName="h-3"
                   />
-                  <TrustScoreBadge pubkey={event.pubkey} className="!size-3.5" />
+                  <TrustScoreBadge pubkey={event.pubkey} className="size-3.5!" />
                   <ClientTag event={event} />
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -191,7 +191,7 @@ export default function ReplyNote({
 
 export function ReplyNoteSkeleton() {
   return (
-    <div className="flex w-full items-start space-x-2 px-4 py-3">
+    <div className="flex w-full items-start gap-2 px-4 py-3">
       <UserAvatarSkeleton className="mt-0.5 h-9 w-9" />
       <div className="w-full">
         <div className="py-1">

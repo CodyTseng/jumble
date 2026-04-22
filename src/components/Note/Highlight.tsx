@@ -21,10 +21,10 @@ export default function Highlight({ event, className }: { event: Event; classNam
   )
 
   return (
-    <div className={cn('space-y-4 whitespace-pre-wrap text-wrap break-words', className)}>
+    <div className={cn('space-y-4 whitespace-pre-wrap text-wrap wrap-break-word', className)}>
       {comment && <Content event={createFakeEvent({ content: comment, tags: event.tags })} />}
       <div className="flex gap-4">
-        <div className="my-1 w-1 flex-shrink-0 rounded-md bg-primary/60" />
+        <div className="my-1 w-1 shrink-0 rounded-md bg-primary/60" />
         <div
           className="whitespace-pre-line italic"
           style={{

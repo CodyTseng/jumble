@@ -36,7 +36,7 @@ export default function RelaySimpleInfo({
         {relayInfo && !IS_COMMUNITY_MODE && <SaveRelayDropdownMenu urls={[relayInfo.url]} />}
       </div>
       {!!relayInfo?.description && (
-        <div className="line-clamp-3 overflow-hidden whitespace-pre-wrap [overflow-wrap:anywhere]">
+        <div className="line-clamp-3 overflow-hidden whitespace-pre-wrap wrap-anywhere">
           <ContentPreview event={createFakeEvent({ content: relayInfo.description })} />
         </div>
       )}

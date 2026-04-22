@@ -55,7 +55,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             </div>
           )}
           {relayInfo.description && (
-            <div className="mt-2 select-text whitespace-pre-wrap text-wrap break-words">
+            <div className="mt-2 select-text whitespace-pre-wrap text-wrap wrap-break-word">
               <Content event={createFakeEvent({ content: relayInfo.description })} />
             </div>
           )}

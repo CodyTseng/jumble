@@ -37,13 +37,13 @@ export default function LongFormArticle({
         nostr: ({ rawText, bech32Id }) => <NostrNode rawText={rawText} bech32Id={bech32Id} />,
         a: ({ href, children, ...props }) => {
           if (!href) {
-            return <span {...props} className="break-words" />
+            return <span {...props} className="wrap-break-word" />
           }
           if (href.startsWith('note1') || href.startsWith('nevent1') || href.startsWith('naddr1')) {
             return (
               <SecondaryPageLink
                 to={toNote(href)}
-                className="break-words text-foreground underline"
+                className="wrap-break-word text-foreground underline"
               >
                 {children}
               </SecondaryPageLink>
@@ -53,7 +53,7 @@ export default function LongFormArticle({
             return (
               <SecondaryPageLink
                 to={toProfile(href)}
-                className="break-words text-foreground underline"
+                className="wrap-break-word text-foreground underline"
               >
                 {children}
               </SecondaryPageLink>
@@ -65,15 +65,15 @@ export default function LongFormArticle({
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-baseline gap-1 break-words"
+              className="inline-flex items-baseline gap-1 wrap-break-word"
             >
               {children} <ExternalLink className="size-3" />
             </a>
           )
         },
-        p: (props) => <p {...props} className="break-words" />,
-        div: (props) => <div {...props} className="break-words" />,
-        code: (props) => <code {...props} className="whitespace-pre-wrap break-words" />,
+        p: (props) => <p {...props} className="wrap-break-word" />,
+        div: (props) => <div {...props} className="wrap-break-word" />,
+        code: (props) => <code {...props} className="whitespace-pre-wrap wrap-break-word" />,
         img: (props) => (
           <ImageWithLightbox
             image={{ url: props.src || '', pubkey: event.pubkey }}
@@ -91,18 +91,18 @@ export default function LongFormArticle({
     <>
       <div
         ref={contentRef}
-        className={`overflow-wrap-anywhere prose prose-zinc max-w-none break-words dark:prose-invert ${className || ''}`}
+        className={`overflow-wrap-anywhere prose prose-zinc max-w-none wrap-break-word dark:prose-invert ${className || ''}`}
       >
-        <h1 className="break-words">{metadata.title}</h1>
+        <h1 className="wrap-break-word">{metadata.title}</h1>
         {metadata.summary && (
           <blockquote>
-            <p className="whitespace-pre-line break-words">{metadata.summary}</p>
+            <p className="whitespace-pre-line wrap-break-word">{metadata.summary}</p>
           </blockquote>
         )}
         {metadata.image && (
           <ImageWithLightbox
             image={{ url: metadata.image, pubkey: event.pubkey }}
-            className="my-0 aspect-[3/1] w-full object-cover"
+            className="my-0 aspect-3/1 w-full object-cover"
           />
         )}
         <Markdown

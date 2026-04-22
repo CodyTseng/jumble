@@ -186,7 +186,7 @@ export default function NostrConnectLogin({
 
   return (
     <div className="relative flex flex-col gap-4">
-      <div ref={qrContainerRef} className="mb-3 flex w-full flex-col items-center space-y-3">
+      <div ref={qrContainerRef} className="mb-3 flex w-full flex-col items-center gap-3">
         <a href={loginDetails.connectionString} aria-label="Open with Nostr signer app">
           <QrCode size={qrCodeSize} value={loginDetails.connectionString} />
         </a>
@@ -204,21 +204,21 @@ export default function NostrConnectLogin({
           role="button"
           tabIndex={0}
         >
-          <div className="min-w-0 flex-grow select-none truncate">
+          <div className="min-w-0 grow select-none truncate">
             {loginDetails.connectionString}
           </div>
-          <div className="flex-shrink-0">{copied ? <Check size={14} /> : <Copy size={14} />}</div>
+          <div className="shrink-0">{copied ? <Check size={14} /> : <Copy size={14} />}</div>
         </div>
       </div>
 
       <div className="my-4 flex w-full items-center">
-        <div className="flex-grow border-t border-border/40"></div>
+        <div className="grow border-t border-border/40"></div>
         <span className="px-3 text-xs text-muted-foreground">OR</span>
-        <div className="flex-grow border-t border-border/40"></div>
+        <div className="grow border-t border-border/40"></div>
       </div>
 
       <div className="w-full space-y-1">
-        <div className="flex items-start space-x-2">
+        <div className="flex items-start gap-2">
           <div className="relative flex-1">
             <Input
               placeholder="bunker://..."

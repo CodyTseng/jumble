@@ -91,7 +91,7 @@ export default function MarkdownContent({
         ),
         code: ({ children, className }) => {
           if (className) {
-            return <code className="whitespace-pre-wrap break-words">{children}</code>
+            return <code className="whitespace-pre-wrap wrap-break-word">{children}</code>
           }
           return <code className="rounded bg-muted px-1 py-0.5 text-sm">{children}</code>
         },

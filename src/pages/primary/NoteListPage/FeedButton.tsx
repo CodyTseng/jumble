@@ -107,11 +107,11 @@ const FeedSwitcherTrigger = forwardRef<
 
     const Inner = () => {
       if (feedInfo?.feedType === 'following')
-        return <UsersRound className={compact ? '!size-3.5' : ''} />
-      if (feedInfo?.feedType === 'pinned') return <Star className={compact ? '!size-3.5' : ''} />
+        return <UsersRound className={compact ? 'size-3.5!' : ''} />
+      if (feedInfo?.feedType === 'pinned') return <Star className={compact ? 'size-3.5!' : ''} />
       if (feedInfo?.feedType === 'relays')
-        return <FolderClosed className={compact ? '!size-3.5' : ''} />
-      return <Server className={compact ? '!size-3.5' : ''} />
+        return <FolderClosed className={compact ? 'size-3.5!' : ''} />
+      return <Server className={compact ? 'size-3.5!' : ''} />
     }
 
     if (compact) {
@@ -132,7 +132,7 @@ const FeedSwitcherTrigger = forwardRef<
       className={cn(
         'clickable flex items-center',
         compact ? 'h-8 gap-1.5 rounded-full bg-muted pl-1 pr-1.5' : 'h-full gap-2 rounded-xl px-3',
-        !clickable && '!cursor-default',
+        !clickable && 'cursor-default!',
         className
       )}
       ref={ref}
@@ -140,7 +140,7 @@ const FeedSwitcherTrigger = forwardRef<
     >
       <div className="shrink-0">{icon}</div>
       <div className={cn('truncate font-semibold', compact ? 'text-sm' : 'text-lg')}>{title}</div>
-      {clickable && <ChevronDown className={compact ? '!size-3' : ''} />}
+      {clickable && <ChevronDown className={compact ? 'size-3!' : ''} />}
     </div>
   )
 })

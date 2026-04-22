@@ -25,7 +25,7 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
 
   return (
     <div
-      className="flex items-center gap-1 truncate [&_svg]:!size-3.5 [&_svg]:shrink-0"
+      className="flex items-center gap-1 truncate [&_svg]:size-3.5! [&_svg]:shrink-0"
       onClick={(e) => e.stopPropagation()}
     >
       {nip05Name !== '_' ? (

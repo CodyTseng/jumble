@@ -179,7 +179,7 @@ function FeedSwitcherItem({
         'group relative w-full rounded-lg border px-3 py-2.5 transition-all duration-200',
         disabled && 'pointer-events-none opacity-50',
         isActive
-          ? 'border-primary bg-primary/5 shadow-sm'
+          ? 'border-primary bg-primary/5 shadow-xs'
           : 'clickable border-border hover:border-primary/50 hover:bg-accent/50'
       )}
       onClick={() => {

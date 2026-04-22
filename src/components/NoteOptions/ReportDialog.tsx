@@ -109,7 +109,7 @@ function ReportContent({ event, closeDialog }: { event: NostrEvent; closeDialog:
     <div className="w-full space-y-4">
       <RadioGroup value={reason} onValueChange={setReason} className="space-y-2">
         {['nudity', 'malware', 'profanity', 'illegal', 'spam', 'other'].map((item) => (
-          <div key={item} className="flex items-center space-x-2">
+          <div key={item} className="flex items-center gap-2">
             <RadioGroupItem value={item} id={item} />
             <Label htmlFor={item} className="text-base">
               {t(item)}

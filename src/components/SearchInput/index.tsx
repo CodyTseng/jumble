@@ -24,7 +24,7 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
       <div
         tabIndex={0}
         className={cn(
-          'flex h-9 w-full items-center rounded-xl border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-all duration-200 hover:border-ring/50 md:text-sm [&:has(:focus-visible)]:outline-none [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring',
+          'flex h-9 w-full items-center rounded-xl border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-all duration-200 hover:border-ring/50 md:text-sm [&:has(:focus-visible)]:outline-hidden [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring',
           className
         )}
       >
@@ -35,7 +35,7 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
           ref={setRefs}
           value={value}
           onChange={onChange}
-          className="mx-2 size-full border-none bg-transparent placeholder:text-muted-foreground focus:outline-none"
+          className="mx-2 size-full border-none bg-transparent placeholder:text-muted-foreground focus:outline-hidden"
         />
         {displayClear && (
           <button
@@ -44,7 +44,7 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onChange?.({ target: { value: '' } } as any)}
           >
-            <X className="!size-3 shrink-0 text-background" strokeWidth={4} />
+            <X className="size-3! shrink-0 text-background" strokeWidth={4} />
           </button>
         )}
       </div>

@@ -18,7 +18,7 @@ export default function ProfileCard({ userId }: { userId: string }) {
   return (
     <div className="not-prose flex w-full flex-col gap-2">
       {autoLoadProfilePicture && (
-        <div className="flex w-full items-start justify-between space-x-2">
+        <div className="flex w-full items-start justify-between gap-2">
           <SimpleUserAvatar userId={pubkey} className="h-12 w-12" />
           <FollowButton pubkey={pubkey} />
         </div>
@@ -41,7 +41,7 @@ export default function ProfileCard({ userId }: { userId: string }) {
         <ProfileAbout
           about={about}
           emojis={emojis}
-          className="line-clamp-6 w-full overflow-hidden text-ellipsis text-wrap break-words text-sm"
+          className="line-clamp-6 w-full overflow-hidden text-ellipsis text-wrap wrap-break-word text-sm"
         />
       )}
     </div>

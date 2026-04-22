@@ -73,7 +73,7 @@ export default function Profile({ id }: { id?: string }) {
       <>
         <div>
           <div className="relative mb-2 bg-cover bg-center">
-            <Skeleton className="aspect-[3/1] w-full rounded-none" />
+            <Skeleton className="aspect-3/1 w-full rounded-none" />
             <Skeleton className="absolute bottom-0 left-3 h-24 w-24 translate-y-1/2 rounded-full border-4 border-background" />
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function Profile({ id }: { id?: string }) {
               <ProfileAbout
                 about={about}
                 emojis={emojis}
-                className="mt-2 select-text whitespace-pre-wrap text-wrap break-words"
+                className="mt-2 select-text whitespace-pre-wrap text-wrap wrap-break-word"
               />
             </Collapsible>
             {website && (

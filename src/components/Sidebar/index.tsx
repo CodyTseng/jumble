@@ -36,7 +36,7 @@ export default function PrimaryPageSidebar() {
         sidebarCollapse ? 'w-16 px-2' : 'w-52 px-4'
       )}
     >
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         {sidebarCollapse ? (
           <button
             className="mb-4 w-full cursor-pointer px-3 py-1 transition-opacity hover:opacity-80"
@@ -64,7 +64,7 @@ export default function PrimaryPageSidebar() {
         <SettingsButton collapse={sidebarCollapse} />
         <PostButton collapse={sidebarCollapse} />
       </div>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <LayoutSwitcher collapse={sidebarCollapse} />
         <AccountButton collapse={sidebarCollapse} />
       </div>

@@ -23,10 +23,10 @@ export default function BannerWithLightbox({
   return (
     <ImageWithLightbox
       image={{ url: bannerUrl, pubkey }}
-      className="aspect-[3/1] w-full rounded-none"
+      className="aspect-3/1 w-full rounded-none"
       classNames={{
         skeleton: 'rounded-none',
-        wrapper: 'rounded-none border-none aspect-[3/1]'
+        wrapper: 'rounded-none border-none aspect-3/1'
       }}
       errorPlaceholder={defaultBanner}
       ignoreAutoLoadPolicy

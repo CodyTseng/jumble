@@ -623,7 +623,7 @@ function MessageBubble({
   )
 
   const bubbleClass = cn(
-    'overflow-hidden break-words rounded-lg px-3 py-1.5',
+    'overflow-hidden wrap-break-word rounded-lg px-3 py-1.5',
     'w-fit min-w-9 max-w-full',
     isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
   )
@@ -820,7 +820,7 @@ function MessageBubble({
           {hasReactions && (
             <div
               className={cn(
-                'absolute top-full z-[1] mt-0.5 flex flex-wrap gap-1',
+                'absolute top-full z-1 mt-0.5 flex flex-wrap gap-1',
                 isOwn ? 'left-0' : 'right-0'
               )}
             >
@@ -828,7 +828,7 @@ function MessageBubble({
                 <div
                   key={r.emoji}
                   className={cn(
-                    'relative flex h-6 cursor-pointer select-none items-center gap-1 overflow-hidden rounded-full border px-1.5 text-sm shadow-sm transition-all duration-200',
+                    'relative flex h-6 cursor-pointer select-none items-center gap-1 overflow-hidden rounded-full border px-1.5 text-sm shadow-xs transition-all duration-200',
                     r.hasOwn
                       ? 'border-primary/50 bg-primary/10 hover:border-primary hover:bg-primary/20'
                       : 'border-border bg-background hover:border-primary/30 hover:bg-primary/5',
@@ -849,7 +849,7 @@ function MessageBubble({
                   {(chipLongPressing === r.emoji || chipCompleted === r.emoji) && (
                     <div className="absolute inset-0 overflow-hidden rounded-full">
                       <div
-                        className="h-full bg-gradient-to-r from-primary/40 via-primary/60 to-primary/80"
+                        className="h-full bg-linear-to-r from-primary/40 via-primary/60 to-primary/80"
                         style={{
                           width: chipCompleted === r.emoji ? '100%' : '0%',
                           animation:
@@ -1053,7 +1053,7 @@ function DmContent({
             <div key={si} className={bubbleClass}>
               <div
                 className={cn(
-                  'whitespace-pre-wrap text-wrap break-words text-base',
+                  'whitespace-pre-wrap text-wrap wrap-break-word text-base',
                   isOwn &&
                     '[&>div]:text-foreground [&_.text-primary]:text-primary-foreground [&_.text-primary]:underline [&_.text-primary]:decoration-primary-foreground/50',
                   '[&_.bg-card:hover]:bg-accent'

@@ -382,7 +382,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <div
                 className={cn(
-                  'pointer-events-none fixed left-0 top-0 z-10 flex h-[var(--vh)] justify-end lg:w-[calc((100%_-_640px)_/_2)]',
+                  'pointer-events-none fixed left-0 top-0 z-10 flex h-(--vh) justify-end lg:w-[calc((100%-640px)/2)]',
                   sidebarCollapse ? 'w-16' : 'w-52'
                 )}
               >
@@ -418,7 +418,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <NotificationProvider>
             <div className="flex flex-col items-center bg-surface-background">
               <div
-                className="flex h-[var(--vh)] w-full bg-surface-background"
+                className="flex h-(--vh) w-full bg-surface-background"
                 style={{
                   maxWidth: '1920px'
                 }}

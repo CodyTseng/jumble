@@ -22,7 +22,7 @@ export default function RelaySetCard({
       className={cn(
         'group relative w-full rounded-lg border px-3 py-2.5 transition-all duration-200',
         select
-          ? 'border-primary bg-primary/5 shadow-sm'
+          ? 'border-primary bg-primary/5 shadow-xs'
           : 'clickable border-border hover:border-primary/50 hover:bg-accent/50'
       )}
       onClick={() => onSelectChange(!select)}
