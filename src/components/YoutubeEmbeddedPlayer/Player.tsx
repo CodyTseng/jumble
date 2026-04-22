@@ -181,7 +181,7 @@ const Player = memo(({ videoId, isShort, className }: PlayerProps) => {
       ref={wrapperRef}
       className={cn(
         'overflow-hidden rounded-xl border',
-        isShort ? 'aspect-[9/16] max-h-[80vh] sm:max-h-[60vh]' : 'aspect-video max-h-[60vh]',
+        isShort ? 'aspect-9/16 max-h-[80vh] sm:max-h-[60vh]' : 'aspect-video max-h-[60vh]',
         className
       )}
     >

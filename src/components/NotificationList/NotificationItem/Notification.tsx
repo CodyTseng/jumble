@@ -72,7 +72,7 @@ export default function Notification({
                 pubkey={sender}
                 classNames={{
                   container:
-                    'absolute inset-0 w-full h-full rounded-full bg-background/60 backdrop-blur-sm flex flex-col justify-center items-center pointer-events-none'
+                    'absolute inset-0 w-full h-full rounded-full bg-background/60 backdrop-blur-xs flex flex-col justify-center items-center pointer-events-none'
                 }}
               />
             </div>
@@ -81,7 +81,7 @@ export default function Notification({
           {!autoLoadProfilePicture && (
             <Username
               userId={sender}
-              className="max-w-[8rem] shrink-0 truncate text-sm font-semibold"
+              className="max-w-32 shrink-0 truncate text-sm font-semibold"
             />
           )}
           {middle}

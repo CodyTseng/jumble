@@ -52,7 +52,7 @@ export default function ZapList({ event }: { event: Event }) {
             <div className="text-sm font-semibold text-yellow-400">{formatAmount(zap.amount)}</div>
           </div>
 
-          <div className="flex items-start space-x-2">
+          <div className="flex items-start gap-2">
             <UserAvatar userId={zap.pubkey} size="medium" className="mt-0.5 shrink-0" />
             <div className="flex-1">
               <Username

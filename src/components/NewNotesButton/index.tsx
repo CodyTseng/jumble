@@ -51,7 +51,7 @@ export default function NewNotesButton({
             className="group pointer-events-auto h-fit rounded-full py-2 pl-2 pr-3 hover:bg-primary-hover"
           >
             {pubkeys.length > 0 && (
-              <div className="flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background *:data-[slot=avatar]:grayscale">
+              <div className="flex -space-x-2 data-[slot=avatar]:*:ring-2 data-[slot=avatar]:*:ring-background data-[slot=avatar]:*:grayscale">
                 {pubkeys.map((pubkey) => (
                   <SimpleUserAvatar key={pubkey} userId={pubkey} size="small" />
                 ))}

@@ -615,7 +615,7 @@ function UserAggregationItem({
         variant="ghost"
         size="icon"
         onClick={onTogglePin}
-        className={`flex-shrink-0 ${
+        className={`shrink-0 ${
           pinned
             ? 'text-primary hover:text-primary/80'
             : 'text-muted-foreground hover:text-foreground'
@@ -631,7 +631,7 @@ function UserAggregationItem({
 
       <button
         className={cn(
-          'flex size-10 flex-shrink-0 flex-col items-center justify-center rounded-full border border-primary/80 bg-primary/10 font-bold tabular-nums text-primary transition-colors hover:border-primary hover:bg-primary/20',
+          'flex size-10 shrink-0 flex-col items-center justify-center rounded-full border border-primary/80 bg-primary/10 font-bold tabular-nums text-primary transition-colors hover:border-primary hover:bg-primary/20',
           !hasNewEvents &&
             'border-muted-foreground/80 bg-muted-foreground/10 text-muted-foreground/80 hover:border-muted-foreground hover:bg-muted-foreground/20 hover:text-muted-foreground'
         )}

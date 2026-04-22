@@ -253,7 +253,7 @@ function ConversationListContent({
 
   if (filteredConversations.length === 0) {
     return (
-      <div className="flex min-h-screen flex-col items-center space-y-4 p-8 pt-[25vh] text-center">
+      <div className="flex min-h-screen flex-col items-center gap-4 p-8 pt-[25vh] text-center">
         <MessageSquare className="h-16 w-16 text-muted-foreground" />
         <div className="space-y-2">
           {activeTab === 'messages' ? (
@@ -567,7 +567,7 @@ function ConversationItemContent({
             emojiClassName="h-4 w-4"
           />
           {conversation.unreadCount > 0 && (
-            <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-primary px-1 text-xs font-medium text-primary-foreground">
+            <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1 text-xs font-medium text-primary-foreground">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
             </span>
           )}

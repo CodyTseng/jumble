@@ -83,7 +83,7 @@ export default function PollEditor({
         </Button>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <Label htmlFor="multiple-choice">{t('Allow multiple choices')}</Label>
         <Switch
           id="multiple-choice"

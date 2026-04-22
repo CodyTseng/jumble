@@ -762,7 +762,7 @@ export default function DmInput({
             <button
               key={profile.npub}
               className={cn(
-                'flex w-full cursor-pointer items-center gap-2 rounded-md p-2 text-start outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+                'flex w-full cursor-pointer items-center gap-2 rounded-md p-2 text-start outline-hidden transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
                 mentionIndex === index && 'bg-accent text-accent-foreground'
               )}
               onMouseDown={(e) => {
@@ -793,7 +793,7 @@ export default function DmInput({
             <button
               key={`${emoji.shortcode}:${emoji.url}`}
               className={cn(
-                'flex w-full cursor-pointer items-center gap-2 rounded-md p-1 text-start outline-none transition-colors',
+                'flex w-full cursor-pointer items-center gap-2 rounded-md p-1 text-start outline-hidden transition-colors',
                 emojiIndex === index && 'bg-accent text-accent-foreground'
               )}
               onMouseDown={(e) => {
@@ -899,7 +899,7 @@ export default function DmInput({
           onBlur={() => setIsFocused(false)}
           data-placeholder={t('Type a message...')}
           className={cn(
-            'max-h-40 min-h-[36px] flex-1 select-text overflow-y-auto break-words bg-transparent py-2 text-base focus:outline-none',
+            'max-h-40 min-h-[36px] flex-1 select-text overflow-y-auto wrap-break-word bg-transparent py-2 text-base focus:outline-hidden',
             disabled && 'cursor-not-allowed opacity-50',
             'empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]'
           )}

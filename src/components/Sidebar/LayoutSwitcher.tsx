@@ -14,9 +14,9 @@ export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
         onClick={() => updateEnableSingleColumnLayout(!enableSingleColumnLayout)}
       >
         {enableSingleColumnLayout ? (
-          <PanelLeft className="!size-5" />
+          <PanelLeft className="size-5!" />
         ) : (
-          <Columns2 className="!size-5" />
+          <Columns2 className="size-5!" />
         )}
       </Button>
     )
@@ -41,7 +41,7 @@ export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
         </div>
         <div
           className={cn(
-            'absolute inset-0 left-0 top-0 h-full w-1/2 rounded-md shadow-sm transition-transform',
+            'absolute inset-0 left-0 top-0 h-full w-1/2 rounded-md shadow-xs transition-transform',
             !enableSingleColumnLayout
               ? 'translate-x-0 bg-surface-background'
               : 'translate-x-full bg-background'

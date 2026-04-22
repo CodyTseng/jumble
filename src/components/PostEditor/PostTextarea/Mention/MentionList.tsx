@@ -78,7 +78,7 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
       {props.items.map((item, index) => (
         <button
           className={cn(
-            'm-1 cursor-pointer items-center rounded-md p-2 text-start outline-none transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+            'm-1 cursor-pointer items-center rounded-md p-2 text-start outline-hidden transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
             selectedIndex === index && 'bg-accent text-accent-foreground'
           )}
           key={item}

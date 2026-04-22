@@ -179,7 +179,7 @@ export default function Tabs({
             </div>
           )}
           <div
-            className="absolute bottom-0 h-1 rounded-full bg-gradient-to-r from-primary to-primary-hover transition-all duration-300"
+            className="absolute bottom-0 h-1 rounded-full bg-linear-to-r from-primary to-primary-hover transition-all duration-300"
             style={{
               width: `${indicatorStyle.width}px`,
               left: `${indicatorStyle.left}px`

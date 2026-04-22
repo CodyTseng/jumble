@@ -28,7 +28,7 @@ export default function FollowPack({ event, className }: { event: Event; classNa
             image={{ url: image, pubkey: event.pubkey }}
             className="h-20 w-24 object-cover"
             classNames={{
-              wrapper: 'w-24 h-20 flex-shrink-0',
+              wrapper: 'w-24 h-20 shrink-0',
               errorPlaceholder: 'w-24 h-20'
             }}
             hideIfError

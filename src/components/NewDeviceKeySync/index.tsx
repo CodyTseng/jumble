@@ -110,7 +110,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
   if (state === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+      <div className="flex flex-col items-center justify-center p-8 gap-4">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         <p className="text-sm text-muted-foreground">{t('Checking encryption key...')}</p>
       </div>
@@ -119,7 +119,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
   if (state === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+      <div className="flex flex-col items-center justify-center p-8 gap-4">
         <CheckCircle className="h-12 w-12 text-green-500" />
         <p className="text-sm font-medium">{t('Encryption key synced!')}</p>
       </div>
@@ -128,7 +128,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
   if (state === 'error') {
     return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+      <div className="flex flex-col items-center justify-center p-8 gap-4">
         <p className="text-sm text-destructive">{error}</p>
         <Button onClick={() => window.location.reload()}>{t('Try Again')}</Button>
       </div>
@@ -136,7 +136,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
   }
 
   return (
-    <div className="flex flex-col items-center p-6 space-y-6">
+    <div className="flex flex-col items-center p-6 gap-6">
       <Smartphone className="h-16 w-16 text-muted-foreground" />
 
       <div className="text-center space-y-2">

@@ -115,7 +115,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
   if (connected) {
     return (
       <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Vault')}>
-        <div className="flex flex-col items-center space-y-6 px-4 pt-3">
+        <div className="flex flex-col items-center gap-6 px-4 pt-3">
           <CheckCircle2 className="size-40 fill-green-400 text-background" />
           <div className="text-2xl font-semibold">{t('Rizful Vault connected!')}</div>
           <div className="text-center text-sm text-muted-foreground">

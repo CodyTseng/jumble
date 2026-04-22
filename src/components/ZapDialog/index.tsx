@@ -224,7 +224,7 @@ function ZapDialogContent({
                 e.target.setSelectionRange(val.length, val.length)
               })
             }}
-            className="w-full bg-transparent p-0 text-center text-6xl font-bold focus-visible:outline-none"
+            className="w-full bg-transparent p-0 text-center text-6xl font-bold focus-visible:outline-hidden"
           />
         </div>
         <Label htmlFor="sats">{t('Sats')}</Label>

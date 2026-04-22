@@ -66,7 +66,7 @@ export default function LiveEvent({ event, className }: { event: Event; classNam
         {metadata.image && autoLoadMedia && (
           <Image
             image={{ url: metadata.image, pubkey: event.pubkey }}
-            className="aspect-[4/3] h-44 bg-foreground xl:aspect-video"
+            className="aspect-4/3 h-44 bg-foreground xl:aspect-video"
             hideIfError
           />
         )}

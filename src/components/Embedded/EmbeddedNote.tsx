@@ -33,7 +33,7 @@ function EmbeddedNoteSkeleton({ className }: { className?: string }) {
       className={cn('w-full rounded-xl border bg-card p-2 text-left sm:p-3', className)}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <UserAvatarSkeleton className="h-9 w-9" />
         <div>
           <Skeleton className="my-1 h-3 w-16" />
