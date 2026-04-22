@@ -2,8 +2,8 @@ import { EMBEDDED_MENTION_REGEX, ExtendedKind } from '@/constants'
 import client from '@/services/client.service'
 import { TImetaInfo } from '@/types'
 import { LRUCache } from 'lru-cache'
-import { Event, kinds, nip19, UnsignedEvent } from 'nostr-tools'
-import { fastEventHash, getPow } from 'nostr-tools/nip13'
+import { Event, getEventHash, kinds, nip19, UnsignedEvent } from 'nostr-tools'
+import { getPow } from 'nostr-tools/nip13'
 import {
   generateBech32IdFromATag,
   generateBech32IdFromETag,
@@ -383,7 +383,7 @@ export async function minePow(
         }
 
         tag[1] = (++count).toString()
-        event.id = fastEventHash(event)
+        event.id = getEventHash(event)
 
         if (getPow(event.id) >= difficulty) {
           resolve(event)
