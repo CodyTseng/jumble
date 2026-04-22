@@ -1,7 +1,7 @@
 import Settings from '@/components/Settings'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { TPageRef } from '@/types'
-import { SettingsIcon } from 'lucide-react'
+import { GearSixIcon } from '@phosphor-icons/react'
 import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -11,7 +11,7 @@ const SettingsPage = forwardRef<TPageRef>((_, ref) => {
     <PrimaryPageLayout
       pageName="settings"
       ref={ref}
-      icon={<SettingsIcon />}
+      icon={<GearSixIcon />}
       title={t('Settings')}
       displayScrollToTopButton
     >

@@ -1,7 +1,7 @@
 import { useDmUnread } from '@/hooks/useDmUnread'
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { ChatCircle } from '@phosphor-icons/react'
+import { ChatCircleIcon } from '@phosphor-icons/react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function MessagesButton() {
@@ -13,9 +13,9 @@ export default function MessagesButton() {
   return (
     <BottomNavigationBarItem active={active} onClick={() => checkLogin(() => navigate('dms'))}>
       <div className="relative">
-        <ChatCircle weight={active ? 'fill' : 'bold'} />
+        <ChatCircleIcon weight={active ? 'fill' : 'bold'} />
         {hasUnread && (
-          <div className="absolute -top-0.5 right-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
+          <div className="bg-primary ring-background absolute -top-0.5 right-0.5 h-2 w-2 rounded-full ring-2" />
         )}
       </div>
     </BottomNavigationBarItem>

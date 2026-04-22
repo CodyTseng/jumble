@@ -1,5 +1,5 @@
 import { usePrimaryPage } from '@/PageManager'
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function SearchButton() {
@@ -8,7 +8,7 @@ export default function SearchButton() {
 
   return (
     <BottomNavigationBarItem active={active} onClick={() => navigate('search')}>
-      <MagnifyingGlass weight={active ? 'fill' : 'bold'} />
+      <MagnifyingGlassIcon weight={active ? 'fill' : 'bold'} />
     </BottomNavigationBarItem>
   )
 }

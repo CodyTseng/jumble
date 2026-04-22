@@ -9,7 +9,7 @@ import {
 } from '@/providers/NotificationUserPreferenceProvider'
 import localStorage from '@/services/local-storage.service'
 import { TPageRef } from '@/types'
-import { Bell } from 'lucide-react'
+import { BellIcon } from '@phosphor-icons/react'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -45,7 +45,7 @@ const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
       <PrimaryPageLayout
         ref={ref}
         pageName="notifications"
-        icon={<Bell />}
+        icon={<BellIcon />}
         title={t('Notifications')}
         controls={<HideUnrelatedNotificationsToggle />}
         sideWidth="7rem"

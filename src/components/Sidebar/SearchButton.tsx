@@ -1,5 +1,5 @@
 import { usePrimaryPage } from '@/PageManager'
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function SearchButton({ collapse }: { collapse: boolean }) {
@@ -13,7 +13,7 @@ export default function SearchButton({ collapse }: { collapse: boolean }) {
       active={active}
       collapse={collapse}
     >
-      <MagnifyingGlass weight={active ? 'fill' : 'bold'} />
+      <MagnifyingGlassIcon weight={active ? 'fill' : 'bold'} />
     </SidebarItem>
   )
 }

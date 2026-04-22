@@ -1,6 +1,6 @@
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { User } from '@phosphor-icons/react'
+import { UserIcon } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function ProfileButton({ collapse }: { collapse: boolean }) {
@@ -15,7 +15,7 @@ export default function ProfileButton({ collapse }: { collapse: boolean }) {
       active={active}
       collapse={collapse}
     >
-      <User weight={active ? 'fill' : 'bold'} />
+      <UserIcon weight={active ? 'fill' : 'bold'} />
     </SidebarItem>
   )
 }

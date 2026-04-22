@@ -1,6 +1,6 @@
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { BookmarkSimple } from '@phosphor-icons/react'
+import { BookmarkSimpleIcon } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function BookmarkButton({ collapse }: { collapse: boolean }) {
@@ -15,7 +15,7 @@ export default function BookmarkButton({ collapse }: { collapse: boolean }) {
       active={active}
       collapse={collapse}
     >
-      <BookmarkSimple weight={active ? 'fill' : 'bold'} />
+      <BookmarkSimpleIcon weight={active ? 'fill' : 'bold'} />
     </SidebarItem>
   )
 }

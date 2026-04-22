@@ -1,7 +1,7 @@
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
-import { Bell } from '@phosphor-icons/react'
+import { BellIcon } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function NotificationsButton({ collapse }: { collapse: boolean }) {
@@ -18,9 +18,9 @@ export default function NotificationsButton({ collapse }: { collapse: boolean })
       collapse={collapse}
     >
       <div className="relative">
-        <Bell weight={active ? 'fill' : 'bold'} />
+        <BellIcon weight={active ? 'fill' : 'bold'} />
         {hasNewNotification && (
-          <div className="absolute -top-1 right-0 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
+          <div className="bg-primary ring-background absolute -top-1 right-0 h-2 w-2 rounded-full ring-2" />
         )}
       </div>
     </SidebarItem>

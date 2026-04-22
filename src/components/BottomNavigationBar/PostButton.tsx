@@ -1,6 +1,6 @@
 import PostEditor from '@/components/PostEditor'
 import { useNostr } from '@/providers/NostrProvider'
-import { PlusCircle } from '@phosphor-icons/react'
+import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
@@ -17,7 +17,7 @@ export default function PostButton() {
           })
         }}
       >
-        <PlusCircle weight="bold" className="size-7!" />
+        <PlusCircleIcon weight="bold" className="size-7!" />
       </BottomNavigationBarItem>
       <PostEditor open={open} setOpen={setOpen} />
     </>

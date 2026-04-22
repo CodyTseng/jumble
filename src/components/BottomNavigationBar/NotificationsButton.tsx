@@ -1,7 +1,7 @@
 import { usePrimaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotification } from '@/providers/NotificationProvider'
-import { Bell } from '@phosphor-icons/react'
+import { BellIcon } from '@phosphor-icons/react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function NotificationsButton() {
@@ -16,9 +16,9 @@ export default function NotificationsButton() {
       onClick={() => checkLogin(() => navigate('notifications'))}
     >
       <div className="relative">
-        <Bell weight={active ? 'fill' : 'bold'} />
+        <BellIcon weight={active ? 'fill' : 'bold'} />
         {hasNewNotification && (
-          <div className="absolute -top-0.5 right-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
+          <div className="bg-primary ring-background absolute -top-0.5 right-0.5 h-2 w-2 rounded-full ring-2" />
         )}
       </div>
     </BottomNavigationBarItem>

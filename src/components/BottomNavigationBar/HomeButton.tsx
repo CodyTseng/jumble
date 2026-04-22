@@ -1,5 +1,5 @@
 import { usePrimaryPage } from '@/PageManager'
-import { House } from '@phosphor-icons/react'
+import { HouseIcon } from '@phosphor-icons/react'
 import BottomNavigationBarItem from './BottomNavigationBarItem'
 
 export default function HomeButton() {
@@ -8,7 +8,7 @@ export default function HomeButton() {
 
   return (
     <BottomNavigationBarItem active={active} onClick={() => navigate('home')}>
-      <House weight={active ? 'fill' : 'bold'} />
+      <HouseIcon weight={active ? 'fill' : 'bold'} />
     </BottomNavigationBarItem>
   )
 }

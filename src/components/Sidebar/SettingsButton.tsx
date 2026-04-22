@@ -1,7 +1,7 @@
 import { toSettings } from '@/lib/link'
 import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { GearSix } from '@phosphor-icons/react'
+import { GearSixIcon } from '@phosphor-icons/react'
 import SidebarItem from './SidebarItem'
 
 export default function SettingsButton({ collapse }: { collapse: boolean }) {
@@ -17,7 +17,7 @@ export default function SettingsButton({ collapse }: { collapse: boolean }) {
       collapse={collapse}
       active={active}
     >
-      <GearSix weight={active ? 'fill' : 'bold'} />
+      <GearSixIcon weight={active ? 'fill' : 'bold'} />
     </SidebarItem>
   )
 }

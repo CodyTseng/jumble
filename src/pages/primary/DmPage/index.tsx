@@ -18,7 +18,8 @@ import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import { TPageRef } from '@/types'
-import { Download, Key, Loader2, MessageCirclePlus, MessageSquare, Settings, Upload } from 'lucide-react'
+import { ChatCircleIcon, UserCirclePlusIcon } from '@phosphor-icons/react'
+import { Download, Key, Loader2, Settings, Upload } from 'lucide-react'
 import { Event, kinds, nip19 } from 'nostr-tools'
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -187,7 +188,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
     >
       {setupState === 'loading' && (
         <div className="flex items-center justify-center p-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       )}
       {setupState === 'need_login' && <NeedLoginView />}
@@ -290,17 +291,17 @@ function DmPageTitlebar({
           <>
             <div
               className={cn(
-                'z-50 rounded-b-lg bg-surface-background shadow-lg',
+                'bg-surface-background z-50 rounded-b-lg shadow-lg',
                 isSmallScreen
                   ? 'fixed inset-x-0 top-12'
-                  : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pb-1 pt-3.5'
+                  : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pt-3.5 pb-1'
               )}
               onMouseDown={(e) => e.preventDefault()}
             >
               <div className="h-fit max-h-80 overflow-y-auto">
                 {directPubkey && (
                   <div
-                    className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                    className="hover:bg-accent cursor-pointer rounded-md px-2"
                     onClick={() => handleSelect(directPubkey)}
                   >
                     <UserItem
@@ -315,7 +316,7 @@ function DmPageTitlebar({
                   profiles.map((profile) => (
                     <div
                       key={profile.pubkey}
-                      className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                      className="hover:bg-accent cursor-pointer rounded-md px-2"
                       onClick={() => handleSelect(profile.pubkey)}
                     >
                       <UserItem
@@ -339,8 +340,8 @@ function DmPageTitlebar({
         <SearchInput
           ref={searchInputRef}
           className={cn(
-            'h-full border-transparent bg-surface-background shadow-inner',
-            searching ? 'absolute inset-0' : 'absolute inset-0 pointer-events-none opacity-0',
+            'bg-surface-background h-full border-transparent shadow-inner',
+            searching ? 'absolute inset-0' : 'pointer-events-none absolute inset-0 opacity-0',
             displayList ? 'z-50' : ''
           )}
           placeholder={t('npub, hex key, or username')}
@@ -366,7 +367,7 @@ function DmPageTitlebar({
               {showSettings && (
                 <>
                   <Button variant="ghost" size="titlebar-icon" onClick={openSearch}>
-                    <MessageCirclePlus className="h-5 w-5" />
+                    <UserCirclePlusIcon className="h-5 w-5" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -391,17 +392,17 @@ function DmPageTitlebar({
         <>
           <div
             className={cn(
-              'z-50 rounded-b-lg bg-surface-background shadow-lg',
+              'bg-surface-background z-50 rounded-b-lg shadow-lg',
               isSmallScreen
                 ? 'fixed inset-x-0 top-12'
-                : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pb-1 pt-3.5'
+                : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pt-3.5 pb-1'
             )}
             onMouseDown={(e) => e.preventDefault()}
           >
             <div className="h-fit max-h-80 overflow-y-auto">
               {directPubkey && (
                 <div
-                  className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                  className="hover:bg-accent cursor-pointer rounded-md px-2"
                   onClick={() => handleSelect(directPubkey)}
                 >
                   <UserItem
@@ -416,7 +417,7 @@ function DmPageTitlebar({
                 profiles.map((profile) => (
                   <div
                     key={profile.pubkey}
-                    className="cursor-pointer rounded-md px-2 hover:bg-accent"
+                    className="hover:bg-accent cursor-pointer rounded-md px-2"
                     onClick={() => handleSelect(profile.pubkey)}
                   >
                     <UserItem
@@ -440,8 +441,8 @@ function DmPageTitlebar({
       <SearchInput
         ref={searchInputRef}
         className={cn(
-          'h-full border-transparent bg-surface-background shadow-inner',
-          searching ? 'absolute inset-0' : 'absolute inset-0 pointer-events-none opacity-0',
+          'bg-surface-background h-full border-transparent shadow-inner',
+          searching ? 'absolute inset-0' : 'pointer-events-none absolute inset-0 opacity-0',
           displayList ? 'z-50' : ''
         )}
         placeholder={t('npub, hex key, or username')}
@@ -455,14 +456,14 @@ function DmPageTitlebar({
       {!searching && (
         <>
           <div className="flex items-center gap-2 pl-3">
-            <MessageSquare />
+            <ChatCircleIcon />
             <div className="text-lg font-semibold">{t('Messages')}</div>
           </div>
           <div className="ml-auto flex items-center">
             {showSettings && (
               <>
                 <Button variant="ghost" size="titlebar-icon" onClick={openSearch}>
-                  <MessageCirclePlus className="h-5 w-5" />
+                  <UserCirclePlusIcon className="h-5 w-5" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -487,10 +488,10 @@ function NeedLoginView() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
-      <MessageSquare className="h-16 w-16 text-muted-foreground" />
+      <ChatCircleIcon className="text-muted-foreground h-16 w-16" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Sign in to use Messages')}</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {t('You need to be signed in to send and receive direct messages.')}
         </p>
       </div>
@@ -518,10 +519,10 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => Promise<void> }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
-      <Key className="h-16 w-16 text-muted-foreground" />
+      <Key className="text-muted-foreground h-16 w-16" />
       <div className="space-y-2">
         <h3 className="font-medium">{t('Enable Direct Messages')}</h3>
-        <p className="max-w-md text-sm text-muted-foreground">
+        <p className="text-muted-foreground max-w-md text-sm">
           {t(
             'Direct messages are end-to-end encrypted with a dedicated key pair, separate from your Nostr identity key. Only the public portion is published so others can send you encrypted messages.'
           )}
@@ -643,7 +644,7 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
   return (
     <div className="space-y-2 border-t px-4 py-4">
       <div className="text-sm font-medium">{t('Chat History')}</div>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {t(
           'Export your chat history as a backup file, or import a previously exported file to restore messages.'
         )}
@@ -688,12 +689,12 @@ function ResetEncryptionKeySection({ onReset }: { onReset: () => Promise<void> }
   return (
     <div className="space-y-2 border-t px-4 py-4">
       <div className="text-sm font-medium">{t('Encryption Key')}</div>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {t(
           'Your encryption key is a dedicated key pair used to encrypt and decrypt direct messages. It is separate from your Nostr identity key and stored locally on your device.'
         )}
       </p>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {t(
           'Resetting will generate a new key. You will no longer be able to read old messages. Please export and backup your chat history before proceeding.'
         )}
