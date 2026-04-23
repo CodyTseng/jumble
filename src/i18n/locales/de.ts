@@ -831,7 +831,7 @@ export default {
     'Do not sync notification read status': 'Benachrichtigungs-Lesestatus nicht synchronisieren',
     'Only update read status locally without publishing to relays':
       'Lesestatus nur lokal aktualisieren, ohne an Relays zu veröffentlichen',
-    'Trending': 'Im Trend',
+    Trending: 'Im Trend',
     'Relay Reviews': 'Relay-Bewertungen',
     'New Message': 'Neue Nachricht',
     'npub, hex key, or username': 'npub, Hex-Schlüssel oder Benutzername',
@@ -843,6 +843,8 @@ export default {
     'Tab name': 'Tab-Name',
     'e.g. Highlights': 'z. B. Highlights',
     'Event kinds': 'Ereignisarten',
-    'Show tab': 'Tab anzeigen'
+    'Show tab': 'Tab anzeigen',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

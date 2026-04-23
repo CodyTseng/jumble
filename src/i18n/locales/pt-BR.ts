@@ -822,18 +822,19 @@ export default {
     'Do not sync notification read status': 'Não sincronizar status de leitura de notificações',
     'Only update read status locally without publishing to relays':
       'Atualizar o status de leitura apenas localmente sem publicar nos relays',
-    'Trending': 'Em alta',
+    Trending: 'Em alta',
     'Relay Reviews': 'Avaliações de relays',
     'New Message': 'Nova mensagem',
     'npub, hex key, or username': 'npub, chave hex ou nome de usuário',
     'Customize tabs': 'Personalizar abas',
-    'Reorder, hide or add tabs to the feed.':
-      'Reordene, oculte ou adicione abas ao feed.',
+    'Reorder, hide or add tabs to the feed.': 'Reordene, oculte ou adicione abas ao feed.',
     'Add tab': 'Adicionar aba',
     'Edit tab': 'Editar aba',
     'Tab name': 'Nome da aba',
     'e.g. Highlights': 'ex. Marcações',
     'Event kinds': 'Tipos de evento',
-    'Show tab': 'Mostrar aba'
+    'Show tab': 'Mostrar aba',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

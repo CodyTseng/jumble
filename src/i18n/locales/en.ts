@@ -811,7 +811,7 @@ export default {
     'Do not sync notification read status': 'Do not sync notification read status',
     'Only update read status locally without publishing to relays':
       'Only update read status locally without publishing to relays',
-    'Trending': 'Trending',
+    Trending: 'Trending',
     'Relay Reviews': 'Relay Reviews',
     'New Message': 'New Message',
     'npub, hex key, or username': 'npub, hex key, or username',
@@ -824,6 +824,8 @@ export default {
     'Tab name': 'Tab name',
     'e.g. Highlights': 'e.g. Highlights',
     'Event kinds': 'Event kinds',
-    'Show tab': 'Show tab'
+    'Show tab': 'Show tab',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

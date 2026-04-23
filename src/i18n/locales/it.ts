@@ -823,18 +823,19 @@ export default {
     'Do not sync notification read status': 'Non sincronizzare lo stato di lettura delle notifiche',
     'Only update read status locally without publishing to relays':
       'Aggiorna lo stato di lettura solo localmente senza pubblicare sui relay',
-    'Trending': 'Di tendenza',
+    Trending: 'Di tendenza',
     'Relay Reviews': 'Recensioni relay',
     'New Message': 'Nuovo messaggio',
     'npub, hex key, or username': 'npub, chiave hex o nome utente',
     'Customize tabs': 'Personalizza schede',
-    'Reorder, hide or add tabs to the feed.':
-      'Riordina, nascondi o aggiungi schede al feed.',
+    'Reorder, hide or add tabs to the feed.': 'Riordina, nascondi o aggiungi schede al feed.',
     'Add tab': 'Aggiungi scheda',
     'Edit tab': 'Modifica scheda',
     'Tab name': 'Nome della scheda',
     'e.g. Highlights': 'es. Evidenziazioni',
     'Event kinds': 'Tipi di evento',
-    'Show tab': 'Mostra scheda'
+    'Show tab': 'Mostra scheda',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

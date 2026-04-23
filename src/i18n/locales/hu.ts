@@ -814,7 +814,7 @@ export default {
     'Do not sync notification read status': 'Ne szinkronizálja az értesítések olvasási állapotát',
     'Only update read status locally without publishing to relays':
       'Csak helyben frissítse az olvasási állapotot, ne tegye közzé a relékre',
-    'Trending': 'Trendi',
+    Trending: 'Trendi',
     'Relay Reviews': 'Relay vélemények',
     'New Message': 'Új üzenet',
     'npub, hex key, or username': 'npub, hex kulcs vagy felhasználónév',
@@ -826,6 +826,8 @@ export default {
     'Tab name': 'Fül neve',
     'e.g. Highlights': 'pl. Kiemelések',
     'Event kinds': 'Eseménytípusok',
-    'Show tab': 'Fül megjelenítése'
+    'Show tab': 'Fül megjelenítése',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

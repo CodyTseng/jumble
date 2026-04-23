@@ -804,7 +804,7 @@ export default {
     'Do not sync notification read status': 'عدم مزامنة حالة قراءة الإشعارات',
     'Only update read status locally without publishing to relays':
       'تحديث حالة القراءة محليًا فقط دون النشر إلى المرحّلات',
-    'Trending': 'الرائج',
+    Trending: 'الرائج',
     'Relay Reviews': 'مراجعات الريلاي',
     'New Message': 'رسالة جديدة',
     'npub, hex key, or username': 'npub أو مفتاح hex أو اسم المستخدم',
@@ -816,6 +816,8 @@ export default {
     'Tab name': 'اسم علامة التبويب',
     'e.g. Highlights': 'مثال: التمييز',
     'Event kinds': 'أنواع الأحداث',
-    'Show tab': 'إظهار علامة التبويب'
+    'Show tab': 'إظهار علامة التبويب',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

@@ -817,17 +817,20 @@ export default {
     'Do not sync notification read status': '通知の既読状態を同期しない',
     'Only update read status locally without publishing to relays':
       '既読状態をローカルのみで更新し、リレーに公開しない',
-    'Trending': 'トレンド',
+    Trending: 'トレンド',
     'Relay Reviews': 'リレーレビュー',
     'New Message': '新しいメッセージ',
     'npub, hex key, or username': 'npub、hexキー、またはユーザー名',
     'Customize tabs': 'タブをカスタマイズ',
-    'Reorder, hide or add tabs to the feed.': 'フィードのタブを並べ替え、非表示、または追加します。',
+    'Reorder, hide or add tabs to the feed.':
+      'フィードのタブを並べ替え、非表示、または追加します。',
     'Add tab': 'タブを追加',
     'Edit tab': 'タブを編集',
     'Tab name': 'タブ名',
     'e.g. Highlights': '例：ハイライト',
     'Event kinds': 'イベントの種類',
-    'Show tab': 'タブを表示'
+    'Show tab': 'タブを表示',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

@@ -818,7 +818,7 @@ export default {
     'Do not sync notification read status': 'عدم همگام‌سازی وضعیت خوانده شدن اعلان‌ها',
     'Only update read status locally without publishing to relays':
       'فقط وضعیت خوانده شدن را به صورت محلی به‌روزرسانی کنید بدون انتشار به رله‌ها',
-    'Trending': 'داغ',
+    Trending: 'داغ',
     'Relay Reviews': 'بررسی رله‌ها',
     'New Message': 'پیام جدید',
     'npub, hex key, or username': 'npub، کلید hex یا نام کاربری',
@@ -830,6 +830,8 @@ export default {
     'Tab name': 'نام زبانه',
     'e.g. Highlights': 'مثلاً برجسته‌ها',
     'Event kinds': 'انواع رویداد',
-    'Show tab': 'نمایش زبانه'
+    'Show tab': 'نمایش زبانه',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

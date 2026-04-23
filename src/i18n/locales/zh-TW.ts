@@ -787,7 +787,7 @@ export default {
     'Do not sync notification read status': '不同步通知已讀狀態',
     'Only update read status locally without publishing to relays':
       '僅在本地更新已讀狀態，不發佈到中繼伺服器',
-    'Trending': '熱門',
+    Trending: '熱門',
     'Relay Reviews': '中繼評價',
     'New Message': '新訊息',
     'npub, hex key, or username': 'npub、hex key 或使用者名稱',
@@ -798,6 +798,8 @@ export default {
     'Tab name': '頁籤名稱',
     'e.g. Highlights': '例如：精選',
     'Event kinds': '事件類型',
-    'Show tab': '顯示頁籤'
+    'Show tab': '顯示頁籤',
+    'Show {{count}} media_one': '顯示媒體內容',
+    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容'
   }
 }

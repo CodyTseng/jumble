@@ -819,18 +819,19 @@ export default {
     'Do not sync notification read status': 'सूचना पठन स्थिति सिंक न करें',
     'Only update read status locally without publishing to relays':
       'केवल स्थानीय रूप से पठन स्थिति अपडेट करें, रिले पर प्रकाशित न करें',
-    'Trending': 'ट्रेंडिंग',
+    Trending: 'ट्रेंडिंग',
     'Relay Reviews': 'रिले समीक्षाएँ',
     'New Message': 'नया संदेश',
     'npub, hex key, or username': 'npub, hex कुंजी, या उपयोगकर्ता नाम',
     'Customize tabs': 'टैब अनुकूलित करें',
-    'Reorder, hide or add tabs to the feed.':
-      'फ़ीड के टैब को पुनर्क्रमित करें, छिपाएँ या जोड़ें।',
+    'Reorder, hide or add tabs to the feed.': 'फ़ीड के टैब को पुनर्क्रमित करें, छिपाएँ या जोड़ें।',
     'Add tab': 'टैब जोड़ें',
     'Edit tab': 'टैब संपादित करें',
     'Tab name': 'टैब का नाम',
     'e.g. Highlights': 'उदा. हाइलाइट्स',
     'Event kinds': 'इवेंट प्रकार',
-    'Show tab': 'टैब दिखाएँ'
+    'Show tab': 'टैब दिखाएँ',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

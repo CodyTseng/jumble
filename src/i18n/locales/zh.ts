@@ -792,7 +792,7 @@ export default {
     'Do not sync notification read status': '不同步通知已读状态',
     'Only update read status locally without publishing to relays':
       '仅在本地更新已读状态，不发布到中继服务器',
-    'Trending': '热门',
+    Trending: '热门',
     'Relay Reviews': '中继评价',
     'New Message': '新消息',
     'npub, hex key, or username': 'npub、hex key 或用户名',
@@ -805,6 +805,8 @@ export default {
     'Tab name': '标签名称',
     'e.g. Highlights': '例如：高亮',
     'Event kinds': '事件类型',
-    'Show tab': '显示标签'
+    'Show tab': '显示标签',
+    'Show {{count}} media_one': '显示媒体内容',
+    'Show {{count}} media_other': '显示 {{count}} 项媒体内容'
   }
 }

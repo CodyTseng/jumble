@@ -823,7 +823,7 @@ export default {
     'Do not sync notification read status': 'Не синхронизировать статус прочтения уведомлений',
     'Only update read status locally without publishing to relays':
       'Обновлять статус прочтения только локально, не публикуя на реле',
-    'Trending': 'В тренде',
+    Trending: 'В тренде',
     'Relay Reviews': 'Отзывы о реле',
     'New Message': 'Новое сообщение',
     'npub, hex key, or username': 'npub, hex-ключ или имя пользователя',
@@ -835,6 +835,8 @@ export default {
     'Tab name': 'Название вкладки',
     'e.g. Highlights': 'например, Выделения',
     'Event kinds': 'Типы событий',
-    'Show tab': 'Показать вкладку'
+    'Show tab': 'Показать вкладку',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

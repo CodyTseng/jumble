@@ -805,25 +805,28 @@ export default {
     Requests: 'Prośby',
     'dm time date': '{{date}} {{time}}',
     React: 'Reaguj',
-    'Relays used for searching notes (NIP-50)': 'Transmitery używane do wyszukiwania wpisów (NIP-50)',
+    'Relays used for searching notes (NIP-50)':
+      'Transmitery używane do wyszukiwania wpisów (NIP-50)',
     'Protected event (NIP-70)': 'Chronione zdarzenie (NIP-70)',
     Protected: 'Chronione',
-    'Protected event hint': 'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Transmitery odrzucą publikację tych zdarzeń przez osoby trzecie, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie transmitery obsługują ochronę zdarzeń.',
+    'Protected event hint':
+      'Chronione zdarzenia (NIP-70) mogą być publikowane tylko przez autora. Transmitery odrzucą publikację tych zdarzeń przez osoby trzecie, uniemożliwiając innym retransmisję Twoich treści. Uwaga: nie wszystkie transmitery obsługują ochronę zdarzeń.',
     'Allow insecure connections': 'Zezwól na niezabezpieczone połączenia',
     'Allow insecure connections description':
       'Zezwól na ładowanie zasobów http:// i łączenie z transmiterami ws://. Może to wywołać ostrzeżenia przeglądarki o mieszanej zawartości.',
     'reacted to': 'zareagował na',
     Reaction: 'Reakcja',
-    'This user has not set up DM relays yet.': 'Ten użytkownik nie ustawił jeszcze transmiterów WP.',
+    'This user has not set up DM relays yet.':
+      'Ten użytkownik nie ustawił jeszcze transmiterów WP.',
     "This user's client does not support NIP-4e encrypted direct messages.":
-      "Aplikacja tego użytkownika nie obsługuje wiadomości prywatnych szyfrowanych zgodnie ze standardem NIP-4e.",
+      'Aplikacja tego użytkownika nie obsługuje wiadomości prywatnych szyfrowanych zgodnie ze standardem NIP-4e.',
     'Show avatars': 'Pokaż awatary',
     Show: 'Pokaż',
     Hide: 'Ukryj',
     'Do not sync notification read status': 'Nie synchronizuj statusu odczytu powiadomień',
     'Only update read status locally without publishing to relays':
       'Aktualizuj status odczytu lokalnie, bez publikowania na transmiterach',
-    'Trending': 'Popularne',
+    Trending: 'Popularne',
     'Relay Reviews': 'Recenzje transmiterów',
     'New Message': 'Nowa wiadomość',
     'npub, hex key, or username': 'npub, klucz hex lub nazwa użytkownika',
@@ -835,6 +838,8 @@ export default {
     'Tab name': 'Nazwa karty',
     'e.g. Highlights': 'np. Wyróżnienia',
     'Event kinds': 'Rodzaje zdarzeń',
-    'Show tab': 'Pokaż kartę'
+    'Show tab': 'Pokaż kartę',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

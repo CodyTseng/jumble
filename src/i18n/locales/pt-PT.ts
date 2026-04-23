@@ -824,18 +824,19 @@ export default {
     'Do not sync notification read status': 'Não sincronizar estado de leitura das notificações',
     'Only update read status locally without publishing to relays':
       'Atualizar o estado de leitura apenas localmente sem publicar nos relays',
-    'Trending': 'Em alta',
+    Trending: 'Em alta',
     'Relay Reviews': 'Avaliações de relays',
     'New Message': 'Nova mensagem',
     'npub, hex key, or username': 'npub, chave hex ou nome de utilizador',
     'Customize tabs': 'Personalizar separadores',
-    'Reorder, hide or add tabs to the feed.':
-      'Reorganize, oculte ou adicione separadores ao feed.',
+    'Reorder, hide or add tabs to the feed.': 'Reorganize, oculte ou adicione separadores ao feed.',
     'Add tab': 'Adicionar separador',
     'Edit tab': 'Editar separador',
     'Tab name': 'Nome do separador',
     'e.g. Highlights': 'ex. Destaques',
     'Event kinds': 'Tipos de evento',
-    'Show tab': 'Mostrar separador'
+    'Show tab': 'Mostrar separador',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

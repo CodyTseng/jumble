@@ -823,18 +823,19 @@ export default {
     'Do not sync notification read status': 'No sincronizar el estado de lectura de notificaciones',
     'Only update read status locally without publishing to relays':
       'Solo actualizar el estado de lectura localmente sin publicar en los relays',
-    'Trending': 'Tendencias',
+    Trending: 'Tendencias',
     'Relay Reviews': 'Reseñas de relays',
     'New Message': 'Nuevo mensaje',
     'npub, hex key, or username': 'npub, clave hex o nombre de usuario',
     'Customize tabs': 'Personalizar pestañas',
-    'Reorder, hide or add tabs to the feed.':
-      'Reordena, oculta o añade pestañas al feed.',
+    'Reorder, hide or add tabs to the feed.': 'Reordena, oculta o añade pestañas al feed.',
     'Add tab': 'Añadir pestaña',
     'Edit tab': 'Editar pestaña',
     'Tab name': 'Nombre de la pestaña',
     'e.g. Highlights': 'p. ej. Destacados',
     'Event kinds': 'Tipos de evento',
-    'Show tab': 'Mostrar pestaña'
+    'Show tab': 'Mostrar pestaña',
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }

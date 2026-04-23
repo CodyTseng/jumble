@@ -824,10 +824,11 @@ export default {
     'Show avatars': 'Afficher les avatars',
     Show: 'Afficher',
     Hide: 'Masquer',
-    'Do not sync notification read status': 'Ne pas synchroniser le statut de lecture des notifications',
+    'Do not sync notification read status':
+      'Ne pas synchroniser le statut de lecture des notifications',
     'Only update read status locally without publishing to relays':
       'Mettre à jour le statut de lecture uniquement en local sans publier sur les relais',
-    'Trending': 'Tendance',
+    Trending: 'Tendance',
     'Relay Reviews': 'Avis sur les relais',
     'New Message': 'Nouveau message',
     'npub, hex key, or username': "npub, clé hex ou nom d'utilisateur",
@@ -839,6 +840,8 @@ export default {
     'Tab name': "Nom de l'onglet",
     'e.g. Highlights': 'ex. Surlignages',
     'Event kinds': "Types d'événements",
-    'Show tab': "Afficher l'onglet"
+    'Show tab': "Afficher l'onglet",
+    'Show {{count}} media_one': 'Show media',
+    'Show {{count}} media_other': 'Show {{count}} media'
   }
 }
