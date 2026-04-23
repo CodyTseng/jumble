@@ -100,8 +100,8 @@ export default function MarkdownContent({
             {children}
           </blockquote>
         ),
-        ul: ({ children }) => <ul className="list-disc pl-5">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal pl-5">{children}</ol>,
+        ul: ({ children }) => <ul className="list-disc pl-8">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-8">{children}</ol>,
         li: ({ children }) => <li>{children}</li>,
         table: ({ children }) => (
           <div className="overflow-x-auto">
