@@ -1,6 +1,7 @@
 import SearchInput from '@/components/SearchInput'
 import { useSearchProfiles } from '@/hooks'
 import { toExternalContent, toNote } from '@/lib/link'
+import { isNamecoinIdentifier, resolveNamecoin } from '@/lib/namecoin'
 import { formatFeedRequest, parseNakReqCommand } from '@/lib/nak-parser'
 import { randomString } from '@/lib/random'
 import { normalizeUrl } from '@/lib/url'
@@ -9,7 +10,7 @@ import { useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import modalManager from '@/services/modal-manager.service'
 import { TSearchParams } from '@/types'
-import { Hash, MessageSquare, Notebook, Search, Server, Terminal } from 'lucide-react'
+import { Hash, MessageSquare, Notebook, Search, Server, ShieldCheck, Terminal } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import {
   forwardRef,
@@ -43,10 +44,30 @@ const SearchBar = forwardRef<
     const id = search.startsWith('nostr:') ? search.slice(6) : search
     return /^(npub1|nprofile1|note1|nevent1|naddr1)/.test(id)
   }, [debouncedInput])
+  const isNmcSearch = useMemo(() => isNamecoinIdentifier(debouncedInput.trim()), [debouncedInput])
+  const [nmcResolvedPubkey, setNmcResolvedPubkey] = useState<string | null>(null)
+  const [isResolvingNmc, setIsResolvingNmc] = useState(false)
   const { profiles, isFetching: isFetchingProfiles } = useSearchProfiles(
-    isIdSearch ? '' : debouncedInput,
+    isIdSearch || isNmcSearch ? '' : debouncedInput,
     5
   )
+
+  // Resolve Namecoin identifiers
+  useEffect(() => {
+    if (!isNmcSearch) {
+      setNmcResolvedPubkey(null)
+      setIsResolvingNmc(false)
+      return
+    }
+    setIsResolvingNmc(true)
+    resolveNamecoin(debouncedInput.trim()).then((result) => {
+      setNmcResolvedPubkey(result?.pubkey ?? null)
+      setIsResolvingNmc(false)
+    }).catch(() => {
+      setNmcResolvedPubkey(null)
+      setIsResolvingNmc(false)
+    })
+  }, [debouncedInput, isNmcSearch])
   const [searching, setSearching] = useState(false)
   const [displayList, setDisplayList] = useState(false)
   const [selectableOptions, setSelectableOptions] = useState<TSearchParams[]>([])
@@ -154,6 +175,22 @@ const SearchBar = forwardRef<
       // ignore
     }
 
+    // Namecoin identifier resolved to a pubkey
+    if (isNmcSearch && nmcResolvedPubkey) {
+      const npub = nip19.npubEncode(nmcResolvedPubkey)
+      setSelectableOptions([{ type: 'profile', search: npub, input: search }])
+      return
+    }
+    if (isNmcSearch && isResolvingNmc) {
+      setSelectableOptions([])
+      return
+    }
+    if (isNmcSearch && !nmcResolvedPubkey) {
+      // Namecoin name not found, show as text search
+      setSelectableOptions([{ type: 'notes', search }])
+      return
+    }
+
     const hashtag = search.match(/[\p{L}\p{N}\p{M}]+/u)?.[0].toLowerCase() ?? ''
 
     setSelectableOptions([
@@ -168,7 +205,7 @@ const SearchBar = forwardRef<
       })),
       ...(profiles.length >= 5 ? [{ type: 'profiles', search }] : [])
     ] as TSearchParams[])
-  }, [input, debouncedInput, profiles])
+  }, [input, debouncedInput, profiles, isNmcSearch, nmcResolvedPubkey, isResolvingNmc])
 
   const list = useMemo(() => {
     if (selectableOptions.length <= 0) {
@@ -261,6 +298,17 @@ const SearchBar = forwardRef<
           }
           return null
         })}
+        {isResolvingNmc && (
+          <Item>
+            <div className="flex size-10 items-center justify-center">
+              <ShieldCheck className="flex-shrink-0 animate-pulse text-teal-500" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="truncate font-semibold">{debouncedInput.trim()}</div>
+              <div className="text-sm text-muted-foreground">{t('Resolving Namecoin name...')}</div>
+            </div>
+          </Item>
+        )}
         {isFetchingProfiles && profiles.length < 5 && (
           <div className="px-2">
             <UserItemSkeleton hideFollowButton />
@@ -268,7 +316,7 @@ const SearchBar = forwardRef<
         )}
       </>
     )
-  }, [selectableOptions, selectedIndex, isFetchingProfiles, profiles])
+  }, [selectableOptions, selectedIndex, isFetchingProfiles, profiles, isResolvingNmc, debouncedInput])
 
   useEffect(() => {
     setDisplayList(searching && !!input)
