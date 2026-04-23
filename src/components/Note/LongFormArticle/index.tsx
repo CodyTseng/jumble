@@ -65,9 +65,10 @@ export default function LongFormArticle({
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-baseline gap-1 wrap-break-word"
+              className="wrap-break-word"
             >
-              {children} <ExternalLink className="size-3" />
+              {children}
+              <ExternalLink className="ml-1 inline size-3 align-baseline" />
             </a>
           )
         },
