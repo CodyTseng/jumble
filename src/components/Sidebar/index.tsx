@@ -39,11 +39,11 @@ export default function PrimaryPageSidebar() {
       <div className="flex flex-col gap-2">
         {sidebarCollapse ? (
           <button
-            className="mb-4 w-full cursor-pointer px-3 py-1 transition-opacity hover:opacity-80"
+            className="mb-4 flex h-12 w-full cursor-pointer items-center justify-center transition-opacity hover:opacity-80"
             onClick={() => navigate('home')}
             aria-label="Go to home"
           >
-            <Icon />
+            <Icon className="size-6" />
           </button>
         ) : (
           <button

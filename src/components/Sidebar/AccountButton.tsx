@@ -50,7 +50,12 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
             collapse ? 'h-12 w-12' : 'h-auto w-full'
           )}
         >
-          <div className="flex w-0 flex-1 items-center gap-2">
+          <div
+            className={cn(
+              'flex w-0 flex-1 items-center gap-2',
+              collapse && 'justify-center'
+            )}
+          >
             <SimpleUserAvatar size="medium" userId={pubkey} ignorePolicy />
             {!collapse && (
               <SimpleUsername className="truncate text-lg font-semibold" userId={pubkey} />
