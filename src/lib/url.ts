@@ -197,6 +197,10 @@ export const truncateUrl = (url: string, maxLength: number = 40) => {
       domain = domain.slice(4)
     }
 
+    if (domain.length > maxLength - 3) {
+      return domain.slice(0, maxLength - 3) + '...'
+    }
+
     if (!path || path === '/') {
       return domain
     }
