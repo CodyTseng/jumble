@@ -18,6 +18,7 @@ import pt_BR from './locales/pt-BR'
 import pt_PT from './locales/pt-PT'
 import ru from './locales/ru'
 import th from './locales/th'
+import tr from './locales/tr'
 import zh from './locales/zh'
 import zh_TW from './locales/zh-TW'
 
@@ -38,6 +39,7 @@ const languages = {
   'pt-PT': { resource: pt_PT, name: 'Português (Portugal)' },
   ru: { resource: ru, name: 'Русский' },
   th: { resource: th, name: 'ไทย' },
+  tr: { resource: tr, name: 'Türkçe' },
   zh: { resource: zh, name: '简体中文' },
   'zh-TW': { resource: zh_TW, name: '繁體中文' }
 } as const
@@ -83,6 +85,7 @@ i18n.services.formatter?.add('date', (timestamp, lng) => {
     case 'pl':
     case 'de':
     case 'ru':
+    case 'tr':
       return dayjs(timestamp).format('DD.MM.YYYY')
     case 'fa':
     case 'hu':
@@ -112,6 +115,7 @@ i18n.services.formatter?.add('date_short', (timestamp, lng) => {
     case 'pl':
     case 'de':
     case 'ru':
+    case 'tr':
       return dayjs(timestamp).format('DD.MM')
     case 'fa':
     case 'hu':

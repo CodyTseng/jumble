@@ -133,6 +133,7 @@ export function detectLanguage(text?: string): string | null {
       pol: 'pl', // Polish
       por: 'pt', // Portuguese
       rus: 'ru', // Russian
+      tur: 'tr', // Turkish
       cmn: 'zh', // Chinese (Mandarin)
       zho: 'zh' // Chinese (alternative code)
     }
