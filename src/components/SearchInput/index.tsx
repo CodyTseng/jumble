@@ -24,7 +24,7 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
       <div
         tabIndex={0}
         className={cn(
-          'flex h-9 w-full items-center rounded-xl border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-all duration-200 hover:border-ring/50 md:text-sm [&:has(:focus-visible)]:outline-hidden [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring',
+          'border-input hover:border-ring/50 [&:has(:focus-visible)]:ring-ring flex h-9 w-full items-center rounded-xl border bg-transparent px-2.25 py-1 text-base shadow-xs transition-all duration-200 md:text-sm [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:outline-hidden',
           className
         )}
       >
@@ -35,16 +35,16 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
           ref={setRefs}
           value={value}
           onChange={onChange}
-          className="mx-2 size-full border-none bg-transparent placeholder:text-muted-foreground focus:outline-hidden"
+          className="placeholder:text-muted-foreground mx-2 size-full border-none bg-transparent focus:outline-hidden"
         />
         {displayClear && (
           <button
             type="button"
-            className="flex size-5 shrink-0 flex-col items-center justify-center rounded-full bg-foreground/40 transition-opacity hover:bg-foreground"
+            className="bg-foreground/40 hover:bg-foreground flex size-5 shrink-0 flex-col items-center justify-center rounded-full transition-opacity"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onChange?.({ target: { value: '' } } as any)}
           >
-            <X className="size-3! shrink-0 text-background" strokeWidth={4} />
+            <X className="text-background size-3! shrink-0" strokeWidth={4} />
           </button>
         )}
       </div>
