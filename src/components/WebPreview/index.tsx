@@ -84,7 +84,7 @@ export default function WebPreview({
           image={{ url: image }}
           className="aspect-4/3 h-44 bg-foreground xl:aspect-video"
           classNames={{
-            wrapper: 'rounded-none border-r'
+            wrapper: 'rounded-none border-e'
           }}
           hideIfError
         />

@@ -156,7 +156,11 @@ export default function Content({
   if (isMarkdown) {
     return (
       <>
-        <div ref={contentRef} className={cn('text-wrap wrap-break-word', className)}>
+        <div
+          ref={contentRef}
+          dir="auto"
+          className={cn('text-wrap wrap-break-word', className)}
+        >
           <MarkdownContent content={resolvedContent} event={event} />
         </div>
         {enableHighlight && (
@@ -185,6 +189,7 @@ export default function Content({
     <>
       <div
         ref={contentRef}
+        dir="auto"
         className={cn(
           'text-wrap wrap-break-word whitespace-pre-wrap',
           isEmojiOnly && 'flex items-end gap-1',

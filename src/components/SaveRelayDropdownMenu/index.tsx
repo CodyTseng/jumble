@@ -50,7 +50,7 @@ export default function SaveRelayDropdownMenu({
     </Button>
   ) : (
     <button
-      className="pr-0 pt-0.5 enabled:hover:text-primary [&_svg]:size-5"
+      className="pe-0 pt-0.5 enabled:hover:text-primary [&_svg]:size-5"
       onClick={(e) => {
         e.stopPropagation()
         setIsDrawerOpen(true)

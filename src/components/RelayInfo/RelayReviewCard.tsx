@@ -47,7 +47,7 @@ export default function RelayReviewCard({
           </div>
         </div>
         <div className="flex items-center">
-          <TranslateButton event={event} className="pr-0" />
+          <TranslateButton event={event} className="pe-0" />
         </div>
       </div>
       <Stars stars={stars} className="mt-2 gap-0.5 [&_svg]:size-3" />

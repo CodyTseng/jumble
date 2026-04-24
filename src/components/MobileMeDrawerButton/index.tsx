@@ -43,7 +43,7 @@ export default function MobileMeDrawerButton() {
   return (
     <>
       <button
-        className="ml-1.5 flex size-10 items-center justify-center rounded-full"
+        className="ms-1.5 flex size-10 items-center justify-center rounded-full"
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onClick={handleClick}

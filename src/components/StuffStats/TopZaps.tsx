@@ -26,7 +26,7 @@ export default function TopZaps({ stuff }: { stuff: Event | string }) {
         {topZaps.map((zap, index) => (
           <div key={zap.pr}>
             <div
-              className="flex max-w-72 cursor-pointer items-center gap-1 rounded-full border border-yellow-400 bg-muted/80 py-1 pl-1 pr-2 text-sm text-yellow-400 hover:bg-yellow-400/20"
+              className="flex max-w-72 cursor-pointer items-center gap-1 rounded-full border border-yellow-400 bg-muted/80 py-1 ps-1 pe-2 text-sm text-yellow-400 hover:bg-yellow-400/20"
               onClick={(e) => {
                 e.stopPropagation()
                 setZapIndex(index)

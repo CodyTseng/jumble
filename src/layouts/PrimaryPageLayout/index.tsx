@@ -151,7 +151,7 @@ const PrimaryPageLayout = forwardRef(
       <PrimaryPageTitlebar hideBottomBorder={hideTitlebarBottomBorder}>
         {titlebar ?? (
           <div className="flex h-full items-center justify-between gap-1">
-            <div className="flex min-w-0 items-center gap-2 pl-3">
+            <div className="flex min-w-0 items-center gap-2 ps-3">
               {icon}
               <div className="truncate text-lg font-semibold">{title}</div>
             </div>

@@ -135,7 +135,7 @@ export default function BlossomServerListSetting() {
         <div
           key={url}
           className={cn(
-            'flex items-center justify-between gap-2 rounded-lg border py-1 pl-3 pr-1',
+            'flex items-center justify-between gap-2 rounded-lg border py-1 ps-3 pe-1',
             idx === 0 && 'border-primary'
           )}
         >

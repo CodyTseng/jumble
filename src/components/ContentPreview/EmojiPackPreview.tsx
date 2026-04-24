@@ -16,7 +16,7 @@ export default function EmojiPackPreview({
 
   return (
     <div className={cn('pointer-events-none', className)}>
-      [{t('Emoji Pack')}] <span className="pr-0.5 italic">{title}</span>
+      [{t('Emoji Pack')}] <span className="pe-0.5 italic">{title}</span>
       {emojis.length > 0 && <span>({emojis.length})</span>}
     </div>
   )

@@ -62,7 +62,7 @@ const SearchPage = forwardRef(({ index }: { index?: number }, ref) => {
       titlebar={
         <div className="flex h-full items-center gap-1">
           <Button variant="ghost" size="titlebar-icon" onClick={() => pop()}>
-            <ChevronLeft />
+            <ChevronLeft className="rtl:-scale-x-100" />
           </Button>
           <SearchBar ref={searchBarRef} input={input} setInput={setInput} onSearch={onSearch} />
         </div>

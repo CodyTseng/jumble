@@ -73,7 +73,7 @@ const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number 
             <button
               onClick={() => setTab('users')}
               className={cn(
-                'rounded-l-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                'rounded-s-lg px-3 py-1.5 text-sm font-medium transition-colors',
                 tab === 'users'
                   ? 'bg-background text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
@@ -84,7 +84,7 @@ const FollowPackPage = forwardRef(({ id, index }: { id?: string; index?: number 
             <button
               onClick={() => setTab('feed')}
               className={cn(
-                'rounded-r-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                'rounded-e-lg px-3 py-1.5 text-sm font-medium transition-colors',
                 tab === 'feed'
                   ? 'bg-background text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'

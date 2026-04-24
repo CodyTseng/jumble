@@ -52,7 +52,7 @@ export default function ScrollToTopButton({
   return (
     <div
       className={cn(
-        'pointer-events-none sticky z-30 flex w-full justify-end pr-3 transition-all duration-700',
+        'pointer-events-none sticky z-30 flex w-full justify-end pe-3 transition-all duration-700',
         visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
         className
       )}

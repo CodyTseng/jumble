@@ -36,8 +36,9 @@ export default function Tabs({
   options?: ReactNode
   active?: boolean
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { deepBrowsing } = useDeepBrowsing()
+  const dir = i18n.dir()
   const tabRefs = useRef<(HTMLDivElement | null)[]>([])
   const containerRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
@@ -78,7 +79,7 @@ export default function Tabs({
     return () => {
       cancelAnimationFrame(animationId)
     }
-  }, [tabs, value])
+  }, [tabs, value, dir])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -146,7 +147,7 @@ export default function Tabs({
             : ''
         )}
       >
-      <ScrollArea className="w-0 flex-1">
+      <ScrollArea className="w-0 flex-1" dir={dir}>
         <div className="relative flex w-fit">
           {tabs.map((tab, index) => (
             <div

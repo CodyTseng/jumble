@@ -352,7 +352,7 @@ function ContextMenuConversationItem({
   return (
     <>
       <button
-        className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-accent/50"
+        className="flex w-full items-center gap-3 p-3 text-start transition-colors hover:bg-accent/50"
         onClick={onClick}
         onContextMenu={handleContextMenu}
       >
@@ -484,7 +484,7 @@ function SwipeableConversationItem({
           }}
         >
           <Trash2 className="h-5 w-5" />
-          <span className="ml-1 text-xs">{t('Delete')}</span>
+          <span className="ms-1 text-xs">{t('Delete')}</span>
         </button>
       </div>
       <div
@@ -496,7 +496,7 @@ function SwipeableConversationItem({
         onTouchEnd={handleTouchEnd}
       >
         <button
-          className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-accent/50"
+          className="flex w-full items-center gap-3 p-3 text-start transition-colors hover:bg-accent/50"
           onClick={handleClick}
         >
           <ConversationItemContent conversation={conversation} timeAgo={timeAgo} />

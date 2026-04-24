@@ -75,7 +75,7 @@ export function useMenuActions({
     const items = []
     if (pubkey && event.pubkey === pubkey) {
       items.push({
-        label: <div className="text-left"> {t('Optimal relays')}</div>,
+        label: <div className="text-start"> {t('Optimal relays')}</div>,
         onClick: async () => {
           closeDrawer()
           const promise = async () => {
@@ -106,7 +106,7 @@ export function useMenuActions({
         ...relaySets
           .filter((set) => set.relayUrls.length)
           .map((set, index) => ({
-            label: <div className="truncate text-left">{set.name}</div>,
+            label: <div className="truncate text-start">{set.name}</div>,
             onClick: async () => {
               closeDrawer()
               const promise = client.publishEvent(set.relayUrls, event)
@@ -134,7 +134,7 @@ export function useMenuActions({
           label: (
             <div className="flex w-full items-center gap-2">
               <RelayIcon url={relay} />
-              <div className="flex-1 truncate text-left">{simplifyUrl(relay)}</div>
+              <div className="flex-1 truncate text-start">{simplifyUrl(relay)}</div>
             </div>
           ),
           onClick: async () => {

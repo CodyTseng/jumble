@@ -38,7 +38,7 @@ export default function ResetEncryptionKeyButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="outline" className={cn(className)} disabled={isLoading}>
-          <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+          <RotateCcw className="h-3.5 w-3.5 me-1.5" />
           {isLoading ? t('Resetting...') : t('Reset Encryption Key')}
         </Button>
       </AlertDialogTrigger>

@@ -37,7 +37,7 @@ export default function TextWithEmojis({
   }, [emojis])
 
   return (
-    <span className={className}>
+    <span dir="auto" className={className}>
       {nodes.map((node, index) => {
         if (node.type === 'text') {
           return node.data

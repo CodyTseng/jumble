@@ -55,7 +55,7 @@ export function MobileMenu({
                   className="mb-2 w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
                   variant="ghost"
                 >
-                  <ArrowLeft />
+                  <ArrowLeft className="rtl:-scale-x-100" />
                   {subMenuTitle}
                 </Button>
                 <div className="mb-2 border-t border-border" />

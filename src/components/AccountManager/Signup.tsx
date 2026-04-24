@@ -129,7 +129,7 @@ export default function Signup({
           </Button>
         </div>
 
-        <div className="ml-2 flex items-center gap-2">
+        <div className="ms-2 flex items-center gap-2">
           <Checkbox
             id="acknowledge-checkbox"
             checked={checkedSaveKey}

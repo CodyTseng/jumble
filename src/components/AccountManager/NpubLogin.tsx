@@ -42,7 +42,7 @@ export default function NpubLogin({
           onChange={handleInputChange}
           className={errMsg ? 'border-destructive' : ''}
         />
-        {errMsg && <div className="pl-3 text-xs text-destructive">{errMsg}</div>}
+        {errMsg && <div className="ps-3 text-xs text-destructive">{errMsg}</div>}
       </div>
       <Button onClick={handleLogin} disabled={pending}>
         <Loader className={pending ? 'animate-spin' : 'hidden'} />

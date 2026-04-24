@@ -16,7 +16,7 @@ export default function LongFormArticlePreview({
 
   return (
     <div className={cn('pointer-events-none', className)}>
-      [{t('Article')}] <span className="pr-0.5 italic">{metadata.title}</span>
+      [{t('Article')}] <span className="pe-0.5 italic">{metadata.title}</span>
     </div>
   )
 }

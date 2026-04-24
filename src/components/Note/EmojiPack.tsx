@@ -55,7 +55,7 @@ export default function EmojiPack({ event, className }: { event: Event; classNam
             className="shrink-0"
           >
             {updating ? (
-              <Loader className="mr-1 animate-spin" />
+              <Loader className="me-1 animate-spin" />
             ) : isCollected ? (
               <CheckIcon />
             ) : (

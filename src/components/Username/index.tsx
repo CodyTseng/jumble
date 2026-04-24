@@ -33,7 +33,7 @@ export default function Username({
   if (!profile) return null
 
   const trigger = (
-    <div className={className}>
+    <div dir="auto" className={className}>
       <SecondaryPageLink
         to={toProfile(userId)}
         className="truncate hover:underline"
@@ -85,7 +85,7 @@ export function SimpleUsername({
   const { username, emojis } = profile
 
   return (
-    <div className={className}>
+    <div dir="auto" className={className}>
       {showAt && '@'}
       <TextWithEmojis text={username} emojis={emojis} emojiClassName="mb-1" />
     </div>

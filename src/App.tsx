@@ -22,10 +22,18 @@ import { TranslationServiceProvider } from '@/providers/TranslationServiceProvid
 import { UserPreferencesProvider } from '@/providers/UserPreferencesProvider'
 import { UserTrustProvider } from '@/providers/UserTrustProvider'
 import { ZapProvider } from '@/providers/ZapProvider'
+import { DirectionProvider } from '@radix-ui/react-direction'
+import { useTranslation } from 'react-i18next'
 import { PageManager } from './PageManager'
+
+function RadixDirectionProvider({ children }: { children: React.ReactNode }) {
+  const { i18n } = useTranslation()
+  return <DirectionProvider dir={i18n.dir()}>{children}</DirectionProvider>
+}
 
 export default function App(): JSX.Element {
   return (
+    <RadixDirectionProvider>
     <ScreenSizeProvider>
       <UserPreferencesProvider>
         <ThemeProvider>
@@ -67,5 +75,6 @@ export default function App(): JSX.Element {
         </ThemeProvider>
       </UserPreferencesProvider>
     </ScreenSizeProvider>
+    </RadixDirectionProvider>
   )
 }

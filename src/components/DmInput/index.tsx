@@ -813,7 +813,7 @@ export default function DmInput({
       )}
       {replyTo && (
         <div className="mb-2 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
-          <div className="min-w-0 flex-1 border-l-2 border-primary pl-2">
+          <div className="min-w-0 flex-1 border-s-2 border-primary ps-2">
             <SimpleUsername
               userId={replyTo.senderPubkey}
               className="text-xs font-medium text-primary"

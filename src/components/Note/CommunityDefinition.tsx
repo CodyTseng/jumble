@@ -16,11 +16,15 @@ export default function CommunityDefinition({
   const metadata = useMemo(() => getCommunityDefinitionFromEvent(event), [event])
 
   const communityNameComponent = (
-    <div className="line-clamp-1 text-xl font-semibold">{metadata.name}</div>
+    <div dir="auto" className="line-clamp-1 text-xl font-semibold">
+      {metadata.name}
+    </div>
   )
 
   const communityDescriptionComponent = metadata.description && (
-    <div className="line-clamp-2 text-sm text-muted-foreground">{metadata.description}</div>
+    <div dir="auto" className="line-clamp-2 text-sm text-muted-foreground">
+      {metadata.description}
+    </div>
   )
 
   return (

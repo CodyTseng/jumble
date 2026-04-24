@@ -30,7 +30,7 @@ export function EmbeddedNote({ noteId, className }: { noteId: string; className?
 function EmbeddedNoteSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn('w-full rounded-xl border bg-card p-2 text-left sm:p-3', className)}
+      className={cn('w-full rounded-xl border bg-card p-2 text-start sm:p-3', className)}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ function EmbeddedNoteNotFound({ noteId, className }: { noteId: string; className
   const { t } = useTranslation()
 
   return (
-    <div className={cn('rounded-xl border bg-card p-2 text-left sm:p-3', className)}>
+    <div className={cn('rounded-xl border bg-card p-2 text-start sm:p-3', className)}>
       <div className="flex flex-col items-center gap-2 font-medium text-muted-foreground">
         <div>{t('Sorry! The note cannot be found 😔')}</div>
         <ClientSelect className="mt-2 w-full" originalNoteId={noteId} />

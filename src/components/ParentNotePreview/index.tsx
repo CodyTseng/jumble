@@ -32,7 +32,9 @@ export default function ParentNotePreview({
         onClick={onClick}
       >
         <div className="shrink-0">{displayLabel}</div>
-        <div className="truncate">{externalContent}</div>
+        <div dir="auto" className="truncate">
+          {externalContent}
+        </div>
       </div>
     )
   }

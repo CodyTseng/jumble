@@ -55,6 +55,21 @@ for (const [key, value] of Object.entries(languages)) {
   supportedLanguages.push(lang)
 }
 
+const RTL_LANGUAGES: readonly TLanguage[] = ['ar', 'fa']
+
+export function isRTL(lang: string | undefined | null): boolean {
+  if (!lang) return false
+  const base = lang.split('-')[0]
+  return (RTL_LANGUAGES as readonly string[]).includes(base)
+}
+
+function applyDocumentDirection(lang: string | undefined) {
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
+  root.dir = isRTL(lang) ? 'rtl' : 'ltr'
+  if (lang) root.lang = lang
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -75,6 +90,9 @@ i18n
       }
     }
   })
+  .then(() => applyDocumentDirection(i18n.resolvedLanguage ?? i18n.language))
+
+i18n.on('languageChanged', (lang) => applyDocumentDirection(lang))
 
 i18n.services.formatter?.add('date', (timestamp, lng) => {
   switch (lng) {

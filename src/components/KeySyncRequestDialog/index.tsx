@@ -91,7 +91,7 @@ export default function KeySyncRequestHandler() {
     <Button onClick={handleSendKey} disabled={isSending} className={isSmallScreen ? 'w-full' : ''}>
       {isSending ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          <Loader2 className="h-4 w-4 animate-spin me-2" />
           {t('Sending...')}
         </>
       ) : (

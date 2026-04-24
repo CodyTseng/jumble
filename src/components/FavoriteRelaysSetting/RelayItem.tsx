@@ -21,7 +21,7 @@ export default function RelayItem({ relay }: { relay: string }) {
 
   return (
     <div
-      className="clickable group relative flex select-none items-center justify-between gap-2 rounded-lg border p-2 pr-2.5"
+      className="clickable group relative flex select-none items-center justify-between gap-2 rounded-lg border p-2 pe-2.5"
       ref={setNodeRef}
       style={style}
       onClick={() => push(toRelay(relay))}

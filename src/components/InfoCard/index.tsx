@@ -30,7 +30,7 @@ export default function InfoCard({
         {icon ?? ICON_MAP[variant]}
         <div className="font-medium">{title}</div>
       </div>
-      {content && <div className="pl-6">{content}</div>}
+      {content && <div className="ps-6">{content}</div>}
     </div>
   )
 }

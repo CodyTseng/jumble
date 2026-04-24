@@ -80,7 +80,7 @@ export default function RelayUrls({ relaySetId }: { relaySetId: string }) {
 
 function RelayUrl({ url, onRemove }: { url: string; onRemove: () => void }) {
   return (
-    <div className="flex items-center justify-between pl-1 pr-3">
+    <div className="flex items-center justify-between ps-1 pe-3">
       <div className="flex w-0 flex-1 items-center gap-3">
         <RelayIcon url={url} className="h-4 w-4" />
         <div className="truncate text-sm text-muted-foreground">{url}</div>

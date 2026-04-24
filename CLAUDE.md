@@ -155,7 +155,7 @@ At the trial stage, you can skip translation first. After the feature is complet
 
 - Translation files located in `src/i18n/locales/`
 - Using `react-i18next` for internationalization
-- Supported languages: ar, de, en, es, fa, fr, hi, hu, it, ja, ko, pl, pt-BR, pt-PT, ru, th, zh, zh-TW
+- Supported languages: ar, de, en, es, fa, fr, hi, hu, it, ja, ko, pl, pt-BR, pt-PT, ru, th, tr, zh, zh-TW
 
 #### Adding New Language
 
@@ -163,6 +163,49 @@ At the trial stage, you can skip translation first. After the feature is complet
 2. According to `src/i18n/locales/en.ts`, add translation key-value pairs
 3. Update `src/i18n/index.ts` to include the new language resource
 4. Update `detectLanguage` function in `src/lib/utils.ts` to support detecting the new language
+5. If the new language is RTL (right-to-left, e.g. Arabic, Persian, Hebrew, Urdu), add its base code to the `RTL_LANGUAGES` array in `src/i18n/index.ts`
+
+### RTL (Right-to-Left) Layout Support
+
+Jumble supports RTL languages (currently Arabic `ar` and Persian `fa`). **All new UI must work in both LTR and RTL layouts.** The app sets `<html dir="rtl">` automatically when an RTL language is active (see `applyDocumentDirection` in `src/i18n/index.ts`), and wraps the tree in a Radix `DirectionProvider` in `src/App.tsx` so Radix primitives (ScrollArea, DropdownMenu, Dialog, Popover, Tooltip, Select, etc.) follow suit.
+
+#### Conventions
+
+**Always prefer logical Tailwind classes over physical ones.** Tailwind v4 supports these natively; they flip automatically when `dir="rtl"` is set.
+
+| Use (logical) | Not (physical) |
+| --- | --- |
+| `ms-*`, `me-*` | `ml-*`, `mr-*` |
+| `ps-*`, `pe-*` | `pl-*`, `pr-*` |
+| `start-*`, `end-*` | `left-*`, `right-*` |
+| `text-start`, `text-end` | `text-left`, `text-right` |
+| `border-s`, `border-e` | `border-l`, `border-r` |
+| `rounded-s-*`, `rounded-e-*` | `rounded-l-*`, `rounded-r-*` |
+| `rounded-ss-*`, `rounded-se-*`, `rounded-es-*`, `rounded-ee-*` | `rounded-tl-*`, `rounded-tr-*`, `rounded-bl-*`, `rounded-br-*` |
+
+**Exceptions — keep physical classes when anchoring to the screen edge, not to content flow.** Modal close buttons (top-right by global convention), notification badges on icon corners, dialog centering via `left-[50%]`, and carousel prev/next buttons anchored to physical positions should stay physical.
+
+#### What does NOT flip automatically
+
+- **CSS transforms** (`translate-x-*`, `rotate-*`): these are not direction-aware. Use the `rtl:` variant to compensate, e.g. `translate-x-full rtl:-translate-x-full`.
+- **Direction-sensitive icons** from `lucide-react` (`ChevronRight`, `ChevronLeft`, `ArrowLeft`, `ArrowRight`, `ChevronsLeft`, `ChevronsRight`, etc.) when used as navigation/drill-in/back indicators: add `className="rtl:-scale-x-100"` to flip horizontally. Skip the flip when the icon represents a physical spatial concept (e.g. carousel arrows tied to absolute `left-4`/`right-4` buttons).
+- **JS-driven directions** — props like Vaul's `direction="left"`, Embla's scroll direction, or any manually-positioned element using `offsetLeft`/`scrollLeft`. Read `i18n.dir()` via `useTranslation` and branch accordingly. Example: `<Drawer direction={i18n.dir() === 'rtl' ? 'right' : 'left'}>`.
+
+#### User-generated content (notes, bios, usernames, DM text)
+
+**Add `dir="auto"` to the outermost container of any user-written text.** This lets the browser's Unicode Bidirectional Algorithm pick the direction per content — an Arabic note renders RTL, an English note stays LTR, even inside an RTL app chrome. Mixed text within a single node is handled by UBA automatically.
+
+Current containers that already have `dir="auto"`: `Content`, `MarkdownContent` (inherited), `Username` (both variants), `TextWithEmojis`, `ProfileAbout`, `DmMessageList` bubble text, `ContentPreview/Content`, `ParentNotePreview`, `GroupMetadata`, `CommunityDefinition`. Follow the same pattern for any new component that renders freeform user text.
+
+**Do NOT** put `dir="auto"` on translated UI strings (t() output, button labels, timestamps, relay URLs, event IDs) — those follow chrome direction.
+
+#### When adding a new component, verify
+
+1. No new `ml-*/mr-*/pl-*/pr-*/left-*/right-*/text-left/right/border-l/r/rounded-l/r*` unless physically anchored.
+2. Any chevron/arrow used for navigation flow carries `rtl:-scale-x-100`.
+3. User-generated text containers carry `dir="auto"`.
+4. Any JS that reads `offsetLeft` or sets `translate-x-*` has been thought through for RTL.
+5. Smoke-test by switching the app to Arabic (Settings → Languages → العربية) and verifying the feature visually mirrors correctly.
 
 ## Nostr Protocol Integration
 

@@ -48,7 +48,7 @@ export default function Collapsible({
 
   return (
     <div
-      className={cn('relative overflow-hidden text-left', className)}
+      className={cn('relative overflow-hidden text-start', className)}
       ref={containerRef}
       {...props}
       style={{

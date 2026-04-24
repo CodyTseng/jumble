@@ -224,7 +224,7 @@ export default function NostrConnectLogin({
               placeholder="bunker://..."
               value={bunkerInput}
               onChange={handleInputChange}
-              className={errMsg ? 'border-destructive pr-10' : 'pr-10'}
+              className={errMsg ? 'border-destructive pe-10' : 'pe-10'}
             />
             <Button
               size="sm"
@@ -237,12 +237,12 @@ export default function NostrConnectLogin({
             </Button>
           </div>
           <Button onClick={() => handleLogin()} disabled={pending}>
-            <Loader className={pending ? 'mr-2 animate-spin' : 'hidden'} />
+            <Loader className={pending ? 'me-2 animate-spin' : 'hidden'} />
             {t('Login')}
           </Button>
         </div>
 
-        {errMsg && <div className="pl-3 pt-1 text-xs text-destructive">{errMsg}</div>}
+        {errMsg && <div className="ps-3 pt-1 text-xs text-destructive">{errMsg}</div>}
       </div>
       <Button variant="secondary" onClick={back} className="w-full">
         {t('Back')}

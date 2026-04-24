@@ -110,15 +110,15 @@ export default function ReplyNote({
       {hasReplies &&
         !hideThreadGuide &&
         (autoLoadProfilePicture ? (
-          <div className="absolute bottom-0 left-[34px] top-14 z-20 border-l" />
+          <div className="absolute bottom-0 start-[34px] top-14 z-20 border-s" />
         ) : (
-          <div className="absolute bottom-0 left-2 top-5 z-20 w-3 rounded-tl-lg border-l border-t" />
+          <div className="absolute bottom-0 start-2 top-5 z-20 w-3 rounded-ss-lg border-s border-t" />
         ))}
       <Collapsible>
         <div
           className={cn(
-            'flex items-start gap-2 pr-4 pt-3',
-            autoLoadProfilePicture || hideThreadGuide ? 'pl-4' : 'pl-7'
+            'flex items-start gap-2 pe-4 pt-3',
+            autoLoadProfilePicture || hideThreadGuide ? 'ps-4' : 'ps-7'
           )}
         >
           <UserAvatar userId={event.pubkey} size="medium" className="mt-0.5 shrink-0" />
@@ -178,8 +178,8 @@ export default function ReplyNote({
       {show && (
         <StuffStats
           className={cn(
-            'mr-4 mt-2 pl-1',
-            autoLoadProfilePicture ? 'ml-14' : hideThreadGuide ? 'ml-4' : 'ml-7'
+            'me-4 mt-2 ps-1',
+            autoLoadProfilePicture ? 'ms-14' : hideThreadGuide ? 'ms-4' : 'ms-7'
           )}
           stuff={event}
           displayTopZapsAndLikes

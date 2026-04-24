@@ -50,7 +50,7 @@ export default function AddNewRelay() {
         />
         <Button onClick={saveRelay}>{t('Add')}</Button>
       </div>
-      {errorMsg && <div className="pl-8 text-sm text-destructive">{errorMsg}</div>}
+      {errorMsg && <div className="ps-8 text-sm text-destructive">{errorMsg}</div>}
     </div>
   )
 }

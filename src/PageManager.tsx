@@ -382,7 +382,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <div
                 className={cn(
-                  'pointer-events-none fixed left-0 top-0 z-10 flex h-(--vh) justify-end lg:w-[calc((100%-640px)/2)]',
+                  'pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end lg:w-[calc((100%-640px)/2)]',
                   sidebarCollapse ? 'w-16' : 'w-52'
                 )}
               >
@@ -391,7 +391,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 </div>
               </div>
               <TooManyRelaysAlertDialog />
-              <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
+              <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -427,13 +427,13 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 <div
                   className={cn(
                     'grid w-full grid-cols-2',
-                    themeSetting === 'pure-black' ? '' : 'gap-2 py-2 pr-2'
+                    themeSetting === 'pure-black' ? '' : 'gap-2 py-2 pe-2'
                   )}
                 >
                   <div
                     className={cn(
                       'overflow-hidden bg-background',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-2xl shadow-lg'
+                      themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl shadow-lg'
                     )}
                   >
                     {primaryPages.map(({ name, element, props }) => (
@@ -451,7 +451,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     className={cn(
                       'overflow-hidden bg-background',
-                      themeSetting === 'pure-black' ? 'border-l' : 'rounded-2xl',
+                      themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl',
                       themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
                       secondaryStack.length === 0 ? 'bg-surface' : ''
                     )}
@@ -470,7 +470,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
-            <BackgroundAudio className="fixed bottom-20 right-0 z-50 w-80 overflow-hidden rounded-l-full rounded-r-none border shadow-lg" />
+            <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>

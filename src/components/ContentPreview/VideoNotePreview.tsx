@@ -24,7 +24,7 @@ export default function VideoNotePreview({
   return (
     <div className={cn('pointer-events-none', className)}>
       [{t('Media')}]{' '}
-      <span className="pr-0.5 italic">{metadata?.title || event.content}</span>
+      <span className="pe-0.5 italic">{metadata?.title || event.content}</span>
     </div>
   )
 }

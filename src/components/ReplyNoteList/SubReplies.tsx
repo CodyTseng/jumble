@@ -51,13 +51,13 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
           }}
           className={cn(
             'clickable relative flex w-full items-center gap-1.5 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground',
-            autoLoadProfilePicture ? 'pl-14' : 'pl-5'
+            autoLoadProfilePicture ? 'ps-14' : 'ps-5'
           )}
         >
           <div
             className={cn(
               'absolute bottom-0 top-0 z-20 w-px text-border',
-              autoLoadProfilePicture ? 'left-[34px]' : 'left-2'
+              autoLoadProfilePicture ? 'start-[34px]' : 'start-2'
             )}
             style={{
               background: isExpanded
@@ -98,21 +98,21 @@ export default function SubReplies({ parentKey }: { parentKey: string }) {
               >
                 <div
                   className={cn(
-                    'absolute top-0 z-20 rounded-bl-lg border-b border-l',
+                    'absolute top-0 z-20 rounded-es-lg border-b border-s',
                     autoLoadProfilePicture ? 'h-8' : 'h-6',
-                    autoLoadProfilePicture ? 'left-[34px] w-4' : 'left-2 w-7'
+                    autoLoadProfilePicture ? 'start-[34px] w-4' : 'start-2 w-7'
                   )}
                 />
                 {index < replies.length - 1 && (
                   <div
                     className={cn(
-                      'absolute bottom-0 z-20 border-l',
-                      autoLoadProfilePicture ? 'left-[34px]' : 'left-2', 'top-0'
+                      'absolute bottom-0 z-20 border-s',
+                      autoLoadProfilePicture ? 'start-[34px]' : 'start-2', 'top-0'
                     )}
                   />
                 )}
                 <ReplyNote
-                  className={cn('w-0 flex-1', autoLoadProfilePicture ? 'pl-10' : 'pl-7')}
+                  className={cn('w-0 flex-1', autoLoadProfilePicture ? 'ps-10' : 'ps-7')}
                   hideThreadGuide={!autoLoadProfilePicture}
                   event={reply}
                   parentEventId={_parentKey !== parentKey ? _parentEventId : undefined}

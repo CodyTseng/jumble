@@ -18,11 +18,15 @@ export default function GroupMetadata({
   const metadata = useMemo(() => getGroupMetadataFromEvent(event), [event])
 
   const groupNameComponent = (
-    <div className="line-clamp-1 text-xl font-semibold">{metadata.name}</div>
+    <div dir="auto" className="line-clamp-1 text-xl font-semibold">
+      {metadata.name}
+    </div>
   )
 
   const groupAboutComponent = metadata.about && (
-    <div className="line-clamp-2 text-sm text-muted-foreground">{metadata.about}</div>
+    <div dir="auto" className="line-clamp-2 text-sm text-muted-foreground">
+      {metadata.about}
+    </div>
   )
 
   return (

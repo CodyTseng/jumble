@@ -68,7 +68,7 @@ export default function LongFormArticle({
               className="wrap-break-word"
             >
               {children}
-              <ExternalLink className="ml-1 inline size-3 align-baseline" />
+              <ExternalLink className="ms-1 inline size-3 align-baseline" />
             </a>
           )
         },

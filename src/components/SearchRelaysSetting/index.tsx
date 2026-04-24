@@ -71,7 +71,7 @@ export default function SearchRelaysSetting() {
       </div>
       <div className="mt-1">
         {relayUrls.map((url, index) => (
-          <div key={index} className="flex items-center justify-between py-1 pl-1 pr-3">
+          <div key={index} className="flex items-center justify-between py-1 ps-1 pe-3">
             <div className="flex w-0 flex-1 items-center gap-3">
               <RelayIcon url={url} className="h-4 w-4" />
               <div className="truncate text-sm text-muted-foreground">{url}</div>

@@ -97,7 +97,7 @@ export default function KindFilter({
     >
       <ListFilter size={16} />
       {isDifferentFromDefault && (
-        <div className="absolute left-7 top-2 size-2 rounded-full bg-primary ring-2 ring-background" />
+        <div className="absolute start-7 top-2 size-2 rounded-full bg-primary ring-2 ring-background" />
       )}
     </Button>
   )

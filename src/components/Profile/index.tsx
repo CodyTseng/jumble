@@ -74,7 +74,7 @@ export default function Profile({ id }: { id?: string }) {
         <div>
           <div className="relative mb-2 bg-cover bg-center">
             <Skeleton className="aspect-3/1 w-full rounded-none" />
-            <Skeleton className="absolute bottom-0 left-3 h-24 w-24 translate-y-1/2 rounded-full border-4 border-background" />
+            <Skeleton className="absolute bottom-0 start-3 h-24 w-24 translate-y-1/2 rounded-full border-4 border-background" />
           </div>
         </div>
         <div className="px-4">

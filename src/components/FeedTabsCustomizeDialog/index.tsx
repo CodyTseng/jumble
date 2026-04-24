@@ -208,10 +208,10 @@ export default function FeedTabsCustomizeDialog({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="-ml-2 size-7"
+                  className="-ms-2 size-7"
                   onClick={() => setEditor(null)}
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} className="rtl:-scale-x-100" />
                 </Button>
               )}
               {title}
@@ -233,7 +233,7 @@ export default function FeedTabsCustomizeDialog({
               <Button
                 variant="ghost"
                 size="icon"
-                className="-ml-2 size-7"
+                className="-ms-2 size-7"
                 onClick={() => setEditor(null)}
               >
                 <ArrowLeft size={16} />
@@ -276,7 +276,7 @@ function TabRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-2 rounded-lg border py-1.5 pl-1 pr-3',
+        'flex items-center gap-2 rounded-lg border py-1.5 ps-1 pe-3',
         tab.hidden && 'opacity-60'
       )}
     >

@@ -16,7 +16,7 @@ export default function CommunityDefinitionPreview({
 
   return (
     <div className={cn('pointer-events-none', className)}>
-      [{t('Community')}] <span className="pr-0.5 italic">{metadata.name}</span>
+      [{t('Community')}] <span className="pe-0.5 italic">{metadata.name}</span>
     </div>
   )
 }

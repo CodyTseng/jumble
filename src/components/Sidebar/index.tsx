@@ -70,17 +70,21 @@ export default function PrimaryPageSidebar() {
       </div>
       <button
         className={cn(
-          'absolute flex h-6 w-5 flex-col items-center justify-center rounded-l-md p-0 text-muted-foreground transition-colors hover:bg-background hover:text-foreground hover:shadow-md [&_svg]:size-4',
+          'absolute flex h-6 w-5 flex-col items-center justify-center rounded-s-md p-0 text-muted-foreground transition-colors hover:bg-background hover:text-foreground hover:shadow-md [&_svg]:size-4',
           themeSetting === 'pure-black' || enableSingleColumnLayout
-            ? 'right-0 top-3'
-            : '-right-0.5 top-5'
+            ? 'end-0 top-3'
+            : '-end-0.5 top-5'
         )}
         onClick={(e) => {
           e.stopPropagation()
           updateSidebarCollapse(!sidebarCollapse)
         }}
       >
-        {sidebarCollapse ? <ChevronsRight /> : <ChevronsLeft />}
+        {sidebarCollapse ? (
+          <ChevronsRight className="rtl:-scale-x-100" />
+        ) : (
+          <ChevronsLeft className="rtl:-scale-x-100" />
+        )}
       </button>
     </div>
   )

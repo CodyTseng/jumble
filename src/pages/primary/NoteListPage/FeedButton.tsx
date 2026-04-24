@@ -116,7 +116,7 @@ const FeedSwitcherTrigger = forwardRef<
 
     if (compact) {
       return (
-        <div className="flex items-center pl-1.5">
+        <div className="flex items-center ps-1.5">
           <Inner />
         </div>
       )
@@ -131,7 +131,7 @@ const FeedSwitcherTrigger = forwardRef<
     <div
       className={cn(
         'clickable flex items-center',
-        compact ? 'h-8 gap-1.5 rounded-full bg-muted pl-1 pr-1.5' : 'h-full gap-2 rounded-xl px-3',
+        compact ? 'h-8 gap-1.5 rounded-full bg-muted ps-1 pe-1.5' : 'h-full gap-2 rounded-xl px-3',
         !clickable && 'cursor-default!',
         className
       )}

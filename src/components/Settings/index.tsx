@@ -45,21 +45,21 @@ export default function Settings() {
           <Settings2 />
           <div>{t('General')}</div>
         </div>
-        <ChevronRight />
+        <ChevronRight className="rtl:-scale-x-100" />
       </SettingItem>
       <SettingItem className="clickable" onClick={() => push(toAppearanceSettings())}>
         <div className="flex items-center gap-4">
           <Palette />
           <div>{t('Appearance')}</div>
         </div>
-        <ChevronRight />
+        <ChevronRight className="rtl:-scale-x-100" />
       </SettingItem>
       <SettingItem className="clickable" onClick={() => push(toRelaySettings())}>
         <div className="flex items-center gap-4">
           <Server />
           <div>{t('Relays')}</div>
         </div>
-        <ChevronRight />
+        <ChevronRight className="rtl:-scale-x-100" />
       </SettingItem>
       {!!pubkey && (
         <SettingItem className="clickable" onClick={() => push(toTranslation())}>
@@ -67,7 +67,7 @@ export default function Settings() {
             <Languages />
             <div>{t('Translation')}</div>
           </div>
-          <ChevronRight />
+          <ChevronRight className="rtl:-scale-x-100" />
         </SettingItem>
       )}
       {!!pubkey && (
@@ -76,7 +76,7 @@ export default function Settings() {
             <Wallet />
             <div>{t('Wallet')}</div>
           </div>
-          <ChevronRight />
+          <ChevronRight className="rtl:-scale-x-100" />
         </SettingItem>
       )}
       {!!pubkey && (
@@ -85,7 +85,7 @@ export default function Settings() {
             <PencilLine />
             <div>{t('Post settings')}</div>
           </div>
-          <ChevronRight />
+          <ChevronRight className="rtl:-scale-x-100" />
         </SettingItem>
       )}
       {!!pubkey && (
@@ -94,7 +94,7 @@ export default function Settings() {
             <Smile />
             <div>{t('Emoji Packs')}</div>
           </div>
-          <ChevronRight />
+          <ChevronRight className="rtl:-scale-x-100" />
         </SettingItem>
       )}
       {!!nsec && (
@@ -134,7 +134,7 @@ export default function Settings() {
           <Cog />
           <div>{t('System')}</div>
         </div>
-        <ChevronRight />
+        <ChevronRight className="rtl:-scale-x-100" />
       </SettingItem>
       <AboutInfoDialog>
         <SettingItem className="clickable">
@@ -146,7 +146,7 @@ export default function Settings() {
             <div className="text-muted-foreground">
               v{import.meta.env.APP_VERSION} ({import.meta.env.GIT_COMMIT})
             </div>
-            <ChevronRight />
+            <ChevronRight className="rtl:-scale-x-100" />
           </div>
         </SettingItem>
       </AboutInfoDialog>

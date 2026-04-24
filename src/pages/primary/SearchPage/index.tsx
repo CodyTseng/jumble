@@ -106,7 +106,7 @@ const SearchPage = forwardRef<TPageRef>((_, ref) => {
       pageName="search"
       titlebar={searchBar}
       mobileTitlebar={
-        <div className="flex h-full w-full items-center gap-1 pr-2">
+        <div className="flex h-full w-full items-center gap-1 pe-2">
           <MobileMeDrawerButton />
           <div className="h-full min-w-0 flex-1">{searchBar}</div>
         </div>

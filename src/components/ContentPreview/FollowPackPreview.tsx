@@ -16,7 +16,7 @@ export default function FollowPackPreview({
 
   return (
     <div className={cn('truncate', className)}>
-      [{t('Follow Pack')}] <span className="pr-0.5 italic">{title}</span>
+      [{t('Follow Pack')}] <span className="pe-0.5 italic">{title}</span>
     </div>
   )
 }

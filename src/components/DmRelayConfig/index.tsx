@@ -136,7 +136,7 @@ export default function DmRelayConfig({
         ) : (
           <div>
             {relays.map((relay) => (
-              <div key={relay} className="flex items-center justify-between py-1 pl-1 pr-3">
+              <div key={relay} className="flex items-center justify-between py-1 ps-1 pe-3">
                 <div className="flex w-0 flex-1 items-center gap-3">
                   <RelayIcon url={relay} className="h-4 w-4" />
                   <div className="truncate text-sm text-muted-foreground">{relay}</div>
@@ -183,7 +183,7 @@ export default function DmRelayConfig({
                 className="text-xs"
                 onClick={() => handleAddDefault(relay)}
               >
-                <Plus className="mr-1 h-3 w-3" />
+                <Plus className="me-1 h-3 w-3" />
                 {relay.replace('wss://', '').replace('/', '')}
               </Button>
             ))}

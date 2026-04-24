@@ -676,13 +676,13 @@ function MessageBubble({
       {message.replyTo && (
         <button
           onClick={() => onScrollToMessage?.(message.replyTo!.id)}
-          className="mb-0.5 flex min-w-0 max-w-full items-center overflow-hidden rounded py-0.5 pl-1.5 pr-2 text-[11px] text-muted-foreground hover:bg-muted"
+          className="mb-0.5 flex min-w-0 max-w-full items-center overflow-hidden rounded py-0.5 ps-1.5 pe-2 text-[11px] text-muted-foreground hover:bg-muted"
         >
-          <span className="mr-1.5 self-stretch border-l-2 border-muted-foreground/50" />
+          <span className="me-1.5 self-stretch border-s-2 border-muted-foreground/50" />
           {message.replyTo.senderPubkey ? (
             <SimpleUsername
               userId={message.replyTo.senderPubkey}
-              className="mr-1 shrink-0 font-medium"
+              className="me-1 shrink-0 font-medium"
               withoutSkeleton
             />
           ) : null}
@@ -1052,6 +1052,7 @@ function DmContent({
           return (
             <div key={si} className={bubbleClass}>
               <div
+                dir="auto"
                 className={cn(
                   'whitespace-pre-wrap text-wrap wrap-break-word text-base',
                   isOwn &&
@@ -1204,7 +1205,7 @@ function EncryptedFileMessage({
           onClick={handleFileDownload}
           disabled={loading}
           className={cn(
-            'flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2 text-left transition-opacity hover:opacity-80',
+            'flex w-48 items-center gap-2 overflow-hidden rounded-lg p-2 text-start transition-opacity hover:opacity-80',
             isOwn ? 'bg-primary text-primary-foreground' : 'bg-secondary'
           )}
         >

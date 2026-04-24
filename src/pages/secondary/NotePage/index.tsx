@@ -123,7 +123,7 @@ function ExternalRoot({ value }: { value: string }) {
       >
         <div className="truncate">{value}</div>
       </Card>
-      <div className="ml-5 h-2 w-px bg-border" />
+      <div className="ms-5 h-2 w-px bg-border" />
     </div>
   )
 }
@@ -150,7 +150,7 @@ function ParentNote({
             <Skeleton className="h-3" />
           </div>
         </div>
-        <div className="ml-5 h-3 w-px bg-border" />
+        <div className="ms-5 h-3 w-px bg-border" />
       </div>
     )
   }
@@ -170,9 +170,9 @@ function ParentNote({
         <ContentPreview className="truncate" event={event} />
       </div>
       {isConsecutive ? (
-        <div className="ml-5 h-3 w-px bg-border" />
+        <div className="ms-5 h-3 w-px bg-border" />
       ) : (
-        <Ellipsis className="ml-3.5 size-3 text-muted-foreground/60" />
+        <Ellipsis className="ms-3.5 size-3 text-muted-foreground/60" />
       )}
     </div>
   )

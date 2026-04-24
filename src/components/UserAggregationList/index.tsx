@@ -465,7 +465,7 @@ const UserAggregationList = forwardRef<
       <div>
         <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
         {showLoadingBar && <LoadingBar />}
-        <div className="flex h-12 items-center justify-between gap-2 border-b pl-4 pr-1">
+        <div className="flex h-12 items-center justify-between gap-2 border-b ps-4 pe-1">
           <div className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
             <span className="font-medium text-foreground">
               {lastXDays === 1

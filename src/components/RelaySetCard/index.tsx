@@ -77,7 +77,7 @@ function RelayUrls({ urls }: { urls: string[] }) {
   return (
     <div className="mt-2.5 space-y-1.5 border-t pt-2.5">
       {urls.map((url) => (
-        <div key={url} className="flex items-center gap-2.5 pl-1">
+        <div key={url} className="flex items-center gap-2.5 ps-1">
           <RelayIcon url={url} className="size-4 shrink-0" classNames={{ fallback: 'size-3' }} />
           <div className="truncate text-xs text-muted-foreground">{url}</div>
         </div>

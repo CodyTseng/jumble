@@ -185,7 +185,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
               >
                 {/* Content */}
                 <div className="z-10 flex w-0 flex-1 items-center gap-2">
-                  <div className={cn('line-clamp-2 text-left', isMax ? 'font-semibold' : '')}>
+                  <div className={cn('line-clamp-2 text-start', isMax ? 'font-semibold' : '')}>
                     {option.label}
                   </div>
                   {votedOptionIds.includes(option.id) && (
@@ -206,7 +206,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
                 {/* Progress Bar Background */}
                 <div
                   className={cn(
-                    'absolute inset-0 rounded-r-sm transition-all duration-700 ease-out',
+                    'absolute inset-0 rounded-e-sm transition-all duration-700 ease-out',
                     isMax ? 'bg-primary/60' : 'bg-muted/90'
                   )}
                   style={{ width: `${percentage}%` }}

@@ -56,7 +56,7 @@ export default function ReviewEditor({
           {Array.from({ length: 5 }).map((_, index) => (
             <div
               key={index}
-              className="cursor-pointer pr-2"
+              className="cursor-pointer pe-2"
               onMouseEnter={() => setHoverStars(index + 1)}
               onMouseLeave={() => setHoverStars(0)}
             >

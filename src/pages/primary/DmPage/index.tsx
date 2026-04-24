@@ -455,11 +455,11 @@ function DmPageTitlebar({
       />
       {!searching && (
         <>
-          <div className="flex items-center gap-2 pl-3">
+          <div className="flex items-center gap-2 ps-3">
             <ChatCircleIcon />
             <div className="text-lg font-semibold">{t('Messages')}</div>
           </div>
-          <div className="ml-auto flex items-center">
+          <div className="ms-auto flex items-center">
             {showSettings && (
               <>
                 <Button variant="ghost" size="titlebar-icon" onClick={openSearch}>
@@ -531,7 +531,7 @@ function NeedEncryptionKeyView({ onPublish }: { onPublish: () => Promise<void> }
       <Button onClick={handlePublish} disabled={isPublishing}>
         {isPublishing ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="me-2 h-4 w-4 animate-spin" />
             {t('Publishing...')}
           </>
         ) : (
@@ -652,9 +652,9 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
           {isExporting ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="me-2 h-4 w-4 animate-spin" />
           ) : (
-            <Upload className="mr-2 h-4 w-4" />
+            <Upload className="me-2 h-4 w-4" />
           )}
           {t('Export')}
         </Button>
@@ -665,9 +665,9 @@ function ChatHistorySection({ accountPubkey }: { accountPubkey: string }) {
           disabled={isImporting}
         >
           {isImporting ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="me-2 h-4 w-4 animate-spin" />
           ) : (
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
           )}
           {t('Import')}
         </Button>

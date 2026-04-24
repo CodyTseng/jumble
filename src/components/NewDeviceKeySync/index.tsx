@@ -167,7 +167,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
             disabled={countdown > 0}
             onClick={handleRetry}
           >
-            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            <RefreshCw className="h-3.5 w-3.5 me-1.5" />
             {countdown > 0
               ? t('Retry ({{seconds}}s)', { seconds: countdown })
               : t('Retry')}

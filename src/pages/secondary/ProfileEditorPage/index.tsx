@@ -138,7 +138,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   const controls = (
-    <div className="pr-3">
+    <div className="pe-3">
       <Button className="w-16 rounded-full" onClick={save} disabled={saving || !hasChanged}>
         {saving ? <Loader className="animate-spin" /> : t('Save')}
       </Button>
@@ -223,7 +223,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             }}
             className={nip05Error ? 'border-destructive' : ''}
           />
-          {nip05Error && <div className="pl-3 text-xs text-destructive">{nip05Error}</div>}
+          {nip05Error && <div className="ps-3 text-xs text-destructive">{nip05Error}</div>}
         </Item>
         <Item>
           <Label htmlFor="profile-lightning-address-input">
@@ -240,7 +240,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             className={lightningAddressError ? 'border-destructive' : ''}
           />
           {lightningAddressError && (
-            <div className="pl-3 text-xs text-destructive">{lightningAddressError}</div>
+            <div className="ps-3 text-xs text-destructive">{lightningAddressError}</div>
           )}
         </Item>
         <Item>
@@ -259,7 +259,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             className={silentPaymentAddressError ? 'border-destructive' : ''}
           />
           {silentPaymentAddressError && (
-            <div className="pl-3 text-xs text-destructive">{silentPaymentAddressError}</div>
+            <div className="ps-3 text-xs text-destructive">{silentPaymentAddressError}</div>
           )}
         </Item>
       </div>

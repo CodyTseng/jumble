@@ -110,12 +110,12 @@ export default function MarkdownContent({
           return <code className="rounded bg-muted px-1 py-0.5 text-sm">{children}</code>
         },
         blockquote: ({ children }) => (
-          <blockquote className="border-l-2 border-muted-foreground/30 pl-3 text-muted-foreground">
+          <blockquote className="border-s-2 border-muted-foreground/30 ps-3 text-muted-foreground">
             {children}
           </blockquote>
         ),
-        ul: ({ children }) => <ul className="list-disc pl-8">{children}</ul>,
-        ol: ({ children }) => <ol className="list-decimal pl-8">{children}</ol>,
+        ul: ({ children }) => <ul className="list-disc ps-8">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal ps-8">{children}</ol>,
         li: ({ children }) => <li>{children}</li>,
         table: ({ children }) => (
           <div className="overflow-x-auto">
@@ -123,7 +123,7 @@ export default function MarkdownContent({
           </div>
         ),
         th: ({ children }) => (
-          <th className="whitespace-nowrap border border-border bg-muted px-3 py-1.5 text-left font-semibold">
+          <th className="whitespace-nowrap border border-border bg-muted px-3 py-1.5 text-start font-semibold">
             {children}
           </th>
         ),

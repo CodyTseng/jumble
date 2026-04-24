@@ -41,10 +41,10 @@ export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
         </div>
         <div
           className={cn(
-            'absolute inset-0 left-0 top-0 h-full w-1/2 rounded-md shadow-xs transition-transform',
+            'absolute inset-0 start-0 top-0 h-full w-1/2 rounded-md shadow-xs transition-transform',
             !enableSingleColumnLayout
               ? 'translate-x-0 bg-surface-background'
-              : 'translate-x-full bg-background'
+              : 'translate-x-full rtl:-translate-x-full bg-background'
           )}
         />
       </div>
