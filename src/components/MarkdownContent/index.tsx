@@ -25,6 +25,19 @@ import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
 import { remarkInlineContent } from './remarkInlineContent'
 
+// A nostr: URL that references a note (note1/nevent1/naddr1) renders as a
+// block-level card. When such a URL sits on a line right after a list item,
+// markdown treats it as the item's lazy continuation and the card inherits
+// the list's padding. Pad these lines with blank lines so they become
+// standalone paragraphs outside the list. npub1/nprofile1 mentions render
+// inline, so we deliberately leave those untouched to preserve soft breaks.
+const STANDALONE_NOSTR_NOTE_LINE_REGEX =
+  /^[ \t]*nostr:(?:note1|nevent1|naddr1)[a-z0-9]+[ \t]*$/gim
+
+function ensureNostrEmbedsAreStandalone(content: string): string {
+  return content.replace(STANDALONE_NOSTR_NOTE_LINE_REGEX, '\n$&\n')
+}
+
 export default function MarkdownContent({
   content,
   event
@@ -33,6 +46,7 @@ export default function MarkdownContent({
   event?: Event
 }) {
   const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(event?.tags), [event?.tags])
+  const processedContent = useMemo(() => ensureNostrEmbedsAreStandalone(content), [content])
 
   const components = useMemo(
     () =>
@@ -133,7 +147,7 @@ export default function MarkdownContent({
         }}
         components={components}
       >
-        {content}
+        {processedContent}
       </Markdown>
     </div>
   )
