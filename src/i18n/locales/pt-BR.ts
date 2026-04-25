@@ -834,7 +834,7 @@ export default {
     'e.g. Highlights': 'ex. Marcações',
     'Event kinds': 'Tipos de evento',
     'Show tab': 'Mostrar aba',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'Mostrar mídia',
+    'Show {{count}} media_other': 'Mostrar {{count}} mídias'
   }
 }
