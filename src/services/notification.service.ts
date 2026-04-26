@@ -27,7 +27,6 @@ class NotificationService {
 
   private currentPubkey: string | null = null
   private events: NostrEvent[] = []
-  private storedEvents: NostrEvent[] = []
   private timelineKey: string | undefined
   private until: number | undefined
   private subscriptionCloser: (() => void) | null = null
@@ -106,7 +105,6 @@ class NotificationService {
     }
     this.currentPubkey = null
     this.events = []
-    this.storedEvents = []
     this.timelineKey = undefined
     this.until = undefined
     this.initialLoading = false
@@ -121,7 +119,6 @@ class NotificationService {
       this.subscriptionCloser = null
     }
     this.events = []
-    this.storedEvents = []
     this.timelineKey = undefined
     this.until = undefined
     await this._start(pubkey)
@@ -162,10 +159,13 @@ class NotificationService {
     }
 
     try {
-      this.storedEvents = (await client.getEventsFromIndexed(filter)).filter(
+      const stored = (await client.getEventsFromIndexed(filter)).filter(
         (evt) => evt.pubkey !== pubkey
       )
-      this.recomputeEvents()
+      if (this.currentPubkey === pubkey && stored.length > 0) {
+        this.events = stored
+        this.emitDataChanged()
+      }
     } catch {
       // ignore
     }
@@ -186,18 +186,15 @@ class NotificationService {
         onEvents: (events, eosed) => {
           if (this.currentPubkey !== pubkey) return
           const filteredEvents = events.filter((evt) => evt.pubkey !== pubkey)
-          if (filteredEvents.length > 0) {
-            this.events = filteredEvents
-            this.recomputeEvents()
-            threadService.addRepliesToThread(filteredEvents)
-            stuffStatsService.updateStuffStatsByEvents(filteredEvents)
-          }
           if (eosed) {
-            this.initialLoading = false
+            this.events = this.mergeWithStored(filteredEvents)
             this.until =
               filteredEvents.length > 0
                 ? filteredEvents[filteredEvents.length - 1].created_at - 1
                 : undefined
+            this.initialLoading = false
+            threadService.addRepliesToThread(filteredEvents)
+            stuffStatsService.updateStuffStatsByEvents(filteredEvents)
             this.emitLoadingChanged()
             this.emitDataChanged()
           }
@@ -231,34 +228,24 @@ class NotificationService {
     } else {
       this.events = [...this.events.slice(0, idx), event, ...this.events.slice(idx)]
     }
-    this.recomputeEvents()
     this.emitNewEvent(event)
   }
 
-  private recomputeEvents(): void {
-    if (this.storedEvents.length === 0) {
-      this.emitDataChanged()
-      return
-    }
-    const idSet = new Set(this.events.map((e) => e.id))
-    const oldestLive = this.events.length
-      ? this.events[this.events.length - 1].created_at
-      : Number.POSITIVE_INFINITY
-    const filteredStored = this.storedEvents.filter((evt) => {
+  private mergeWithStored(liveEvents: NostrEvent[]): NostrEvent[] {
+    const cachedFromInitialRead = this.events
+    if (cachedFromInitialRead.length === 0) return liveEvents
+    if (liveEvents.length === 0) return cachedFromInitialRead
+
+    const idSet = new Set(liveEvents.map((e) => e.id))
+    const oldestLive = liveEvents[liveEvents.length - 1].created_at
+    const supplemental = cachedFromInitialRead.filter((evt) => {
       if (idSet.has(evt.id)) return false
       idSet.add(evt.id)
       return true
     })
-
-    if (this.events.length === 0) {
-      this.events = mergeTimelines([this.events, filteredStored])
-    } else if (
-      filteredStored.length > 0 &&
-      filteredStored[0].created_at >= oldestLive - 1
-    ) {
-      this.events = mergeTimelines([this.events, filteredStored])
-    }
-    this.emitDataChanged()
+    if (supplemental.length === 0) return liveEvents
+    if (supplemental[0].created_at < oldestLive - 1) return liveEvents
+    return mergeTimelines([liveEvents, supplemental])
   }
 
   private emitDataChanged(): void {

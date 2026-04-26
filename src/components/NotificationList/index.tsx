@@ -9,15 +9,7 @@ import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import notificationService from '@/services/notification.service'
 import { TNotificationType } from '@/types'
 import { NostrEvent, kinds } from 'nostr-tools'
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
 import { LoadingBar } from '../LoadingBar'
@@ -30,7 +22,7 @@ import { NotificationSkeleton } from './NotificationItem/Notification'
 const SHOW_COUNT = 30
 const LOAD_MORE_LIMIT = 100
 
-const NotificationList = forwardRef((_, ref) => {
+export default function NotificationList() {
   const { t } = useTranslation()
   const { current } = usePrimaryPage()
   const { pubkey } = useNostr()
@@ -66,17 +58,6 @@ const NotificationList = forwardRef((_, ref) => {
         return null
     }
   }, [notificationType])
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      refresh: () => {
-        if (initialLoading) return
-        notificationService.restart()
-      }
-    }),
-    [initialLoading]
-  )
 
   // Reset last-read marker whenever this page becomes current.
   useEffect(() => {
@@ -211,6 +192,4 @@ const NotificationList = forwardRef((_, ref) => {
       )}
     </div>
   )
-})
-NotificationList.displayName = 'NotificationList'
-export default NotificationList
+}

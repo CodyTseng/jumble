@@ -2,7 +2,6 @@ import NotificationList from '@/components/NotificationList'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { cn } from '@/lib/utils'
-import { usePrimaryPage } from '@/PageManager'
 import {
   NotificationUserPreferenceContext,
   useNotificationUserPreference
@@ -10,22 +9,12 @@ import {
 import localStorage from '@/services/local-storage.service'
 import { TPageRef } from '@/types'
 import { BellIcon } from '@phosphor-icons/react'
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
   const { t } = useTranslation()
-  const { current } = usePrimaryPage()
   const [hideIndirect, setHideIndirect] = useState(localStorage.getHideIndirectNotifications())
-  const firstRenderRef = useRef(true)
-  const notificationListRef = useRef<{ refresh: () => void }>(null)
-
-  useEffect(() => {
-    if (current === 'notifications' && !firstRenderRef.current) {
-      notificationListRef.current?.refresh()
-    }
-    firstRenderRef.current = false
-  }, [current])
 
   const updateHideIndirect = useCallback(
     (enable: boolean) => {
@@ -51,7 +40,7 @@ const NotificationListPage = forwardRef<TPageRef>((_, ref) => {
         sideWidth="7rem"
         displayScrollToTopButton
       >
-        <NotificationList ref={notificationListRef} />
+        <NotificationList />
       </PrimaryPageLayout>
     </NotificationUserPreferenceContext.Provider>
   )
