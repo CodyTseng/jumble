@@ -51,6 +51,29 @@ docker compose up --build -d
 
 After finishing, access: http://localhost:8089
 
+## Run as Desktop App (Electron)
+
+Jumble can also run as a native desktop app via Electron. The desktop build runs all relay WebSockets in the main process (bypassing Chrome's per-origin connection cap) and stores secrets in the OS keychain via Electron's `safeStorage`.
+
+```bash
+# Clone and install (same as above)
+git clone https://github.com/CodyTseng/jumble.git
+cd jumble
+npm install
+
+# Start in dev mode (vite dev server + auto-launch Electron)
+npm run electron:dev
+
+# Build a distributable for the current platform
+# Output goes to release/<version>/
+npm run electron:build
+
+# Preview a production build without packaging
+npm run electron:preview
+```
+
+The web build (`npm run dev`, `npm run build`) is unaffected and never loads any Electron-only code.
+
 ## Community mode (Optional)
 
 If you want to run Jumble in community mode (with pre-configured relay sets and relays), you can set the following environment variables in a `.env` file at the root of the project:
