@@ -285,6 +285,100 @@ Properties:
 
 - [DM (Direct Messages)](docs/dm-feature.md) - End-to-end encrypted messaging based on NIP-17
 
+## Electron Mode
+
+Jumble ships as both a web app and an Electron desktop app from a single codebase. The Electron build is opt-in via the `ELECTRON=true` environment flag at build/dev time. The web build is the default and remains unchanged.
+
+### Why Electron
+
+The desktop build solves two problems the web build can't:
+
+1. **Chrome's per-origin WebSocket connection cap**. With many subscribed relays the browser stalls or drops connections. In Electron all relay WebSockets run in the **main process** (Node, no cap).
+2. **OS-level secret storage**. Private keys, encryption privkeys, and bunker client keys are written to a `safeStorage`-encrypted file in `userData/`, instead of plaintext `localStorage`.
+
+### Build & Run
+
+```bash
+npm run electron:dev      # vite dev + auto-launch electron
+npm run electron:build    # vite build + electron-builder → release/<version>/
+npm run electron:preview  # vite build + electron .  (no packaging)
+```
+
+Web scripts (`npm run dev`, `npm run build`) are untouched and never load any electron-only code.
+
+### Project Layout
+
+```
+electron/
+├── main/
+│   ├── index.ts          # main-process entry (BrowserWindow, app lifecycle)
+│   ├── relay-manager.ts  # owns SmartPool, pumps relay events to renderer
+│   ├── secrets-store.ts  # safeStorage-backed encrypted secrets file
+│   ├── proxy-fetch.ts    # generic HTTP proxy (CORS-bypass for renderer)
+│   └── ipc.ts            # ipcMain.handle registrations
+├── preload/index.ts      # contextBridge → window.electron
+├── shared/ipc-types.ts   # IPC channel names + payload types (used by main + renderer)
+└── tsconfig.json         # main-process TS config (Node target)
+```
+
+Renderer counterparts:
+
+- `src/lib/platform.ts` — `isElectron()`, `getElectronBridge()` helpers.
+- `src/lib/electron-pool.ts` — `ElectronPool` proxy that mimics `SmartPool`'s surface but ferries calls over IPC.
+- `src/services/local-storage.service.ts` — `hydrate()` async method called from `main.tsx` before React mount.
+- `src/services/web.service.ts` — branches to `bridge.proxy.fetch` in Electron mode.
+
+### Architectural Rules
+
+**Single source code**, mode-branched at the seams:
+
+- `src/lib/smart-pool.ts` is shared by web and main process. It accepts an `isAllowInsecure` getter via constructor options — do not import `local-storage.service` from it.
+- Any singleton that the renderer touches (e.g. `ClientService`) chooses its backing implementation in its constructor based on `isElectron() && getElectronBridge()`.
+- Signing (`ISigner`, NIP-07, nsec, bunker) **stays in the renderer** in Electron mode too. Browser extension support requires `window.nostr`, which only exists in the renderer.
+- Keep all renderer-facing storage APIs **synchronous**. The one async hook is `storage.hydrate()`, awaited once in `main.tsx` before mounting React. Do not introduce `async` getters.
+
+### IPC Contract (`electron/shared/ipc-types.ts`)
+
+The bridge exposed at `window.electron` has three namespaces:
+
+- `relay.*` — `ensure / publish / subscribe / closeSub / auth / close / setAllowInsecure`, plus event-stream listeners (`onSubEvent`, `onSubEose`, `onSubClose`, `onAuthRequest`) and `sendAuthResponse`. The renderer streams events back through `ipcRenderer.on`; the main process triggers AUTH signing via a request/response over IPC so the signer stays in the renderer.
+- `secrets.*` — `isAvailable / load / save`. Writes are atomic (tmp + rename) and serialized via a Promise chain.
+- `proxy.fetch(url, options)` — **generic CORS-bypass HTTP proxy**. Any future renderer code that needs to bypass CORS should call this rather than add a new channel. Returns `{ ok, status, statusText, url, headers, body }`. Default 15s timeout, 5 MB body cap, custom UA. Renderer parses the body itself (no domain logic in main).
+
+When adding a new IPC channel:
+1. Add the channel name to `IPC_CHANNELS` in `electron/shared/ipc-types.ts`.
+2. Add types to the same file.
+3. Register the handler in `electron/main/ipc.ts`.
+4. Expose it in `electron/preload/index.ts` via `contextBridge`.
+5. Consume it in renderer via `getElectronBridge()`.
+
+### Secrets Storage Model
+
+- Five secret categories: `nsec`, `ncryptsec`, `bunkerClientSecretKey`, `encryptionKeyPrivkey`, `clientKeyPrivkey`.
+- Internally always stored in per-pubkey maps on `LocalStorageService`.
+- Web mode: maps serialize back inline into the `accounts` JSON / dedicated localStorage keys (current behavior preserved).
+- Electron mode: maps persist via `bridge.secrets.save(...)` to `userData/secrets.enc` (encrypted by OS keychain). The `accounts` JSON in localStorage carries no secrets.
+- `getAccounts()`, `findAccount()`, `getCurrentAccount()` always re-attach secrets from the maps so callers like `account.bunkerClientSecretKey` keep working transparently.
+- If `safeStorage.isEncryptionAvailable()` is false (rare Linux without keyring), secrets are kept in memory only and a warning is logged. They will not silently degrade to plaintext at rest.
+
+### What Lives Where
+
+| Concern | Web mode | Electron mode |
+| --- | --- | --- |
+| Relay WebSockets | renderer (`SmartPool`) | main (`SmartPool` + `RelayManager`) |
+| Signing (`ISigner`) | renderer | renderer (unchanged) |
+| Secret storage | localStorage | `safeStorage` file in `userData/` |
+| Cross-origin HTTP fetch | direct or `VITE_PROXY_SERVER` | `bridge.proxy.fetch` |
+| IndexedDB caches | renderer | renderer (unchanged) |
+| PWA / service worker | enabled | disabled (vite-plugin-pwa skipped) |
+
+### When Modifying Electron Behavior
+
+- Don't add Node-only imports to anything under `src/`. Code in `src/` runs in the renderer (sandboxed Chromium); only `electron/main/**` runs in Node.
+- Don't add `import` paths in `electron/main/**` that touch `@/services/local-storage.service` or any other browser-API-dependent module. The shared module pattern (`src/lib/smart-pool.ts`) is fine because it has been deliberately stripped of browser deps.
+- When extending the proxy: keep the channel generic. Don't add domain-specific channels for one-off CORS needs — extend `proxy.fetch` options if needed.
+- Renderer code must remain functional in pure web mode. Always guard Electron paths with `isElectron() && getElectronBridge()`.
+
 ## Common Modification Scenarios
 
 ### Adding a New Component

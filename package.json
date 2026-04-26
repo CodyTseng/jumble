@@ -11,6 +11,7 @@
     "url": "git+https://github.com/CodyTseng/jumble"
   },
   "homepage": "https://github.com/CodyTseng/jumble",
+  "main": "dist-electron/main/index.js",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -21,7 +22,10 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:schemas": "vitest run schemata-validation"
+    "test:schemas": "vitest run schemata-validation",
+    "electron:dev": "cross-env ELECTRON=true vite",
+    "electron:build": "cross-env ELECTRON=true tsc -b && cross-env ELECTRON=true vite build && electron-builder",
+    "electron:preview": "cross-env ELECTRON=true vite build && electron ."
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -94,6 +98,7 @@
     "tw-animate-css": "^1.4.0",
     "uri-templates": "^0.2.0",
     "vaul": "^1.1.2",
+    "ws": "^8.18.0",
     "yet-another-react-lightbox": "^3.31.0",
     "zod": "^4.3.6"
   },
@@ -113,9 +118,13 @@
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "@types/uri-templates": "^0.1.34",
+    "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^5.2.0",
     "ajv": "^8.18.0",
     "ajv-errors": "^3.0.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.16",
@@ -127,6 +136,7 @@
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.59.0",
     "vite": "^7.3.2",
+    "vite-plugin-electron": "^0.29.0",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.4"
   }

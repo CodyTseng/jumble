@@ -1,0 +1,36 @@
+appId: live.ezze.jumble
+productName: Jumble
+copyright: Copyright © ${author}
+directories:
+  output: release/${version}
+  buildResources: build
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+asar: true
+mac:
+  category: public.app-category.social-networking
+  target:
+    - target: dmg
+      arch:
+        - universal
+  icon: public/pwa-512x512.png
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: public/pwa-512x512.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Network
+  icon: public/pwa-512x512.png

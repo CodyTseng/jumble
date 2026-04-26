@@ -1,4 +1,3 @@
-import storage from '@/services/local-storage.service'
 import { SimplePool } from 'nostr-tools'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import { isInsecureUrl } from './url'
@@ -8,18 +7,25 @@ const CLEANUP_THRESHOLD = 15 // number of relays to trigger cleanup
 const CLEANUP_INTERVAL = 30 * 1000 // 30 seconds
 const IDLE_TIMEOUT = 10 * 1000 // 10 seconds
 
+export type SmartPoolOptions = {
+  isAllowInsecure?: () => boolean
+}
+
 export class SmartPool extends SimplePool {
   private relayIdleTracker = new Map<string, number>()
+  private isAllowInsecure: () => boolean
 
-  constructor() {
+  constructor(options: SmartPoolOptions = {}) {
     super({ enablePing: true, enableReconnect: true })
+
+    this.isAllowInsecure = options.isAllowInsecure ?? (() => false)
 
     // Periodically clean up idle relays
     setInterval(() => this.cleanIdleRelays(), CLEANUP_INTERVAL)
   }
 
   ensureRelay(url: string): Promise<AbstractRelay> {
-    if (!storage.getAllowInsecureConnection() && isInsecureUrl(url)) {
+    if (!this.isAllowInsecure() && isInsecureUrl(url)) {
       return Promise.reject(new Error(`Insecure relay connection blocked: ${url}`))
     }
     // If relay is new and we have many relays, trigger cleanup

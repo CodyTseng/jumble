@@ -7,6 +7,8 @@ import {
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
+import { ElectronPool } from '@/lib/electron-pool'
+import { getElectronBridge, isElectron } from '@/lib/platform'
 import { filterOutBigRelays, getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { SmartPool } from '@/lib/smart-pool'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
@@ -70,7 +72,18 @@ class ClientService extends EventTarget {
 
   constructor() {
     super()
-    this.pool = new SmartPool()
+    const bridge = getElectronBridge()
+    if (isElectron() && bridge) {
+      const electronPool = new ElectronPool(bridge, () =>
+        this.signer ? (evt) => this.signer!.signEvent(evt) : undefined
+      )
+      electronPool.setAllowInsecure(storage.getAllowInsecureConnection())
+      this.pool = electronPool as unknown as SmartPool
+    } else {
+      this.pool = new SmartPool({
+        isAllowInsecure: () => storage.getAllowInsecureConnection()
+      })
+    }
     this.pool.trackRelays = true
   }
 
