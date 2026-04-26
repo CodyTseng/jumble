@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, nativeTheme, shell } from 'electron'
 import { useWebSocketImplementation as setWebSocketImpl } from 'nostr-tools/relay'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -38,7 +38,8 @@ function createWindow() {
     minWidth: 480,
     minHeight: 480,
     title: 'Jumble',
-    backgroundColor: '#ffffff',
+    show: false,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#171717' : '#ffffff',
     webPreferences: {
       preload: path.join(MAIN_DIST, 'preload', 'index.mjs'),
       contextIsolation: true,
@@ -47,9 +48,12 @@ function createWindow() {
     }
   })
 
-  if (savedState.isMaximized) {
-    win.maximize()
-  }
+  win.once('ready-to-show', () => {
+    if (savedState.isMaximized) {
+      win?.maximize()
+    }
+    win?.show()
+  })
 
   attachWindowStatePersistence(win)
   manager.attachWindow(win)
