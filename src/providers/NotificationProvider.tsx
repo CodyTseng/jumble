@@ -1,17 +1,11 @@
 import { useDmUnread } from '@/hooks/useDmUnread'
-import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
-import { compareEvents } from '@/lib/event'
-import { notificationFilter } from '@/lib/notification'
-import { getDefaultRelayUrls } from '@/lib/relay'
+import { useNotificationFilter } from '@/hooks/useNotificationFilter'
 import { usePrimaryPage } from '@/PageManager'
-import client from '@/services/client.service'
+import notificationService from '@/services/notification.service'
 import storage from '@/services/local-storage.service'
-import { kinds, NostrEvent } from 'nostr-tools'
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { useContentPolicy } from './ContentPolicyProvider'
-import { useMuteList } from './MuteListProvider'
+import { NostrEvent } from 'nostr-tools'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useNostr } from './NostrProvider'
-import { useUserTrust } from './UserTrustProvider'
 
 type TNotificationContext = {
   hasNewNotification: boolean
@@ -34,122 +28,61 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { current } = usePrimaryPage()
   const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
-  const { mutePubkeySet } = useMuteList()
-  const { getMinTrustScore, meetsMinTrustScore } = useUserTrust()
-  const { hideContentMentioningMutedUsers } = useContentPolicy()
-  const [newNotifications, setNewNotifications] = useState<NostrEvent[]>([])
+  const filterFn = useNotificationFilter()
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
   const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
   const { unreadCount: dmUnreadCount } = useDmUnread()
 
   useEffect(() => {
-    if (active || notificationsSeenAt < 0) {
+    if (!pubkey) {
+      notificationService.stop()
+      setReadNotificationIdSet(new Set())
+      return
+    }
+    notificationService.start(pubkey)
+    setReadNotificationIdSet(new Set())
+    return () => {
+      // keep the subscription alive for the session; only stop on logout (handled above)
+    }
+  }, [pubkey])
+
+  useEffect(() => {
+    updateNotificationsSeenAt(!active)
+  }, [active])
+
+  useEffect(() => {
+    if (active || notificationsSeenAt < 0 || !pubkey) {
       setFilteredNewNotifications([])
       return
     }
-    const filterNotifications = async () => {
+
+    let cancelled = false
+    const recompute = async () => {
+      const events = notificationService.getEvents()
       const filtered: NostrEvent[] = []
-      const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.NOTIFICATIONS)
       await Promise.allSettled(
-        newNotifications.map(async (notification) => {
+        events.map(async (notification) => {
           if (notification.created_at <= notificationsSeenAt || filtered.length >= 10) {
             return
           }
-          if (
-            !(await notificationFilter(notification, {
-              pubkey,
-              mutePubkeySet,
-              hideContentMentioningMutedUsers,
-              meetsMinTrustScore: async (pubkey: string) => {
-                if (trustScoreThreshold === 0) return true
-                return meetsMinTrustScore(pubkey, trustScoreThreshold)
-              }
-            }))
-          ) {
+          if (!(await filterFn(notification))) {
             return
           }
           filtered.push(notification)
         })
       )
-      setFilteredNewNotifications(filtered)
-    }
-    filterNotifications()
-  }, [
-    newNotifications,
-    notificationsSeenAt,
-    mutePubkeySet,
-    hideContentMentioningMutedUsers,
-    meetsMinTrustScore
-  ])
-
-  useEffect(() => {
-    setNewNotifications([])
-    updateNotificationsSeenAt(!active)
-  }, [active])
-
-  useEffect(() => {
-    if (!pubkey) return
-
-    setNewNotifications([])
-    setReadNotificationIdSet(new Set())
-
-    const subscribe = async () => {
-      let eosed = false
-      const relayList = await client.fetchRelayList(pubkey)
-      const relays = relayList.read.length > 0 ? relayList.read.slice(0, 5) : getDefaultRelayUrls()
-      return client.subscribe(
-        relays,
-        [
-          {
-            kinds: [
-              kinds.ShortTextNote,
-              kinds.Repost,
-              kinds.GenericRepost,
-              kinds.Reaction,
-              kinds.Zap,
-              kinds.Highlights,
-              ExtendedKind.COMMENT,
-              ExtendedKind.POLL_RESPONSE,
-              ExtendedKind.VOICE_COMMENT,
-              ExtendedKind.POLL
-            ],
-            '#p': [pubkey],
-            limit: 20
-          }
-        ],
-        {
-          oneose: (e) => {
-            if (e) {
-              eosed = e
-              setNewNotifications((prev) => {
-                return [...prev.sort((a, b) => compareEvents(b, a))]
-              })
-            }
-          },
-          onevent: (evt) => {
-            if (evt.pubkey !== pubkey) {
-              setNewNotifications((prev) => {
-                if (!eosed) {
-                  return [evt, ...prev]
-                }
-                if (prev.length && compareEvents(prev[0], evt) >= 0) {
-                  return prev
-                }
-
-                client.emitNewEvent(evt, relays)
-                return [evt, ...prev]
-              })
-            }
-          }
-        }
-      )
+      if (!cancelled) {
+        setFilteredNewNotifications(filtered)
+      }
     }
 
-    const promise = subscribe()
+    recompute()
+    const unsub = notificationService.onDataChanged(recompute)
     return () => {
-      promise.then((closer) => closer.close())
+      cancelled = true
+      unsub()
     }
-  }, [pubkey])
+  }, [active, notificationsSeenAt, pubkey, filterFn])
 
   useEffect(() => {
     const totalBadgeCount = filteredNewNotifications.length + dmUnreadCount
@@ -192,7 +125,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [filteredNewNotifications, dmUnreadCount])
 
-  const getNotificationsSeenAt = () => {
+  const getNotificationsSeenAt = useCallback(() => {
     if (notificationsSeenAt >= 0) {
       return notificationsSeenAt
     }
@@ -200,15 +133,18 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       return storage.getLastReadNotificationTime(pubkey)
     }
     return 0
-  }
+  }, [notificationsSeenAt, pubkey])
 
-  const isNotificationRead = (notificationId: string): boolean => {
-    return readNotificationIdSet.has(notificationId)
-  }
+  const isNotificationRead = useCallback(
+    (notificationId: string): boolean => {
+      return readNotificationIdSet.has(notificationId)
+    },
+    [readNotificationIdSet]
+  )
 
-  const markNotificationAsRead = (notificationId: string): void => {
+  const markNotificationAsRead = useCallback((notificationId: string): void => {
     setReadNotificationIdSet((prev) => new Set([...prev, notificationId]))
-  }
+  }, [])
 
   return (
     <NotificationContext.Provider
