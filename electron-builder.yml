@@ -11,6 +11,7 @@ files:
 asar: true
 mac:
   category: public.app-category.social-networking
+  identity: null
   target:
     - target: dmg
       arch:
