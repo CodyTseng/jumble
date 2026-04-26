@@ -835,7 +835,17 @@ export default {
     'e.g. Highlights': 'es. Evidenziazioni',
     'Event kinds': 'Tipi di evento',
     'Show tab': 'Mostra scheda',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'Mostra media',
+    'Show {{count}} media_other': 'Mostra {{count}} media',
+    'Check for updates': 'Cerca aggiornamenti',
+    'Checking…': 'Controllo in corso…',
+    "You're up to date": 'Sei aggiornato',
+    'New version v{{version}} found': 'Nuova versione v{{version}} trovata',
+    'Update failed': 'Aggiornamento non riuscito',
+    'Update ready: v{{version}}': 'Aggiornamento pronto: v{{version}}',
+    'Restart Jumble to install the latest version.':
+      'Riavvia Jumble per installare l’ultima versione.',
+    'Restart now': 'Riavvia ora',
+    'Downloading update v{{version}}…': 'Download dell’aggiornamento v{{version}} in corso…'
   }
 }

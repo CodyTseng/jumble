@@ -826,6 +826,16 @@ export default {
     'Event kinds': 'Event kinds',
     'Show tab': 'Show tab',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Check for updates': 'Check for updates',
+    'Checking…': 'Checking…',
+    "You're up to date": "You're up to date",
+    'New version v{{version}} found': 'New version v{{version}} found',
+    'Update failed': 'Update failed',
+    'Update ready: v{{version}}': 'Update ready: v{{version}}',
+    'Restart Jumble to install the latest version.':
+      'Restart Jumble to install the latest version.',
+    'Restart now': 'Restart now',
+    'Downloading update v{{version}}…': 'Downloading update v{{version}}…'
   }
 }

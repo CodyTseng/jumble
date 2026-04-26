@@ -9,7 +9,8 @@ import {
   TSecretsBundle,
   TSubClosePayload,
   TSubEosePayload,
-  TSubEventPayload
+  TSubEventPayload,
+  TUpdateState
 } from '../shared/ipc-types.js'
 
 const bridge: TElectronBridge = {
@@ -55,6 +56,17 @@ const bridge: TElectronBridge = {
   proxy: {
     fetch: (url: string, options?: TProxyFetchOptions) =>
       ipcRenderer.invoke(IPC_CHANNELS.proxyFetch, url, options)
+  },
+  update: {
+    check: () => ipcRenderer.invoke(IPC_CHANNELS.updateCheck),
+    download: () => ipcRenderer.invoke(IPC_CHANNELS.updateDownload),
+    install: () => ipcRenderer.invoke(IPC_CHANNELS.updateInstall),
+    getState: () => ipcRenderer.invoke(IPC_CHANNELS.updateGetState),
+    onState: (cb) => {
+      const listener = (_e: unknown, payload: TUpdateState) => cb(payload)
+      ipcRenderer.on(IPC_CHANNELS.updateState, listener)
+      return () => ipcRenderer.off(IPC_CHANNELS.updateState, listener)
+    }
   }
 }
 

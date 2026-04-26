@@ -9,8 +9,13 @@ import {
 import { proxyFetch } from './proxy-fetch.js'
 import type { RelayManager } from './relay-manager.js'
 import type { SecretsStore } from './secrets-store.js'
+import type { Updater } from './updater.js'
 
-export function registerIpcHandlers(manager: RelayManager, secrets: SecretsStore) {
+export function registerIpcHandlers(
+  manager: RelayManager,
+  secrets: SecretsStore,
+  updater: Updater
+) {
   ipcMain.handle(IPC_CHANNELS.ensure, (_e, url: string) => manager.ensure(url))
 
   ipcMain.handle(
@@ -45,6 +50,11 @@ export function registerIpcHandlers(manager: RelayManager, secrets: SecretsStore
   ipcMain.handle(IPC_CHANNELS.proxyFetch, (_e, url: string, options?: TProxyFetchOptions) =>
     proxyFetch(url, options)
   )
+
+  ipcMain.handle(IPC_CHANNELS.updateCheck, () => updater.check())
+  ipcMain.handle(IPC_CHANNELS.updateDownload, () => updater.download())
+  ipcMain.handle(IPC_CHANNELS.updateInstall, () => updater.install())
+  ipcMain.handle(IPC_CHANNELS.updateGetState, () => updater.getState())
 }
 
 export function unregisterIpcHandlers() {

@@ -823,7 +823,17 @@ export default {
     'e.g. Highlights': '예: 하이라이트',
     'Event kinds': '이벤트 종류',
     'Show tab': '탭 표시',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': '미디어 표시',
+    'Show {{count}} media_other': '{{count}}개의 미디어 표시',
+    'Check for updates': '업데이트 확인',
+    'Checking…': '확인 중…',
+    "You're up to date": '최신 버전입니다',
+    'New version v{{version}} found': '새 버전 v{{version}}을(를) 찾았습니다',
+    'Update failed': '업데이트 실패',
+    'Update ready: v{{version}}': '업데이트 준비 완료: v{{version}}',
+    'Restart Jumble to install the latest version.':
+      '최신 버전을 설치하려면 Jumble을 다시 시작하세요.',
+    'Restart now': '지금 다시 시작',
+    'Downloading update v{{version}}…': '업데이트 v{{version}} 다운로드 중…'
   }
 }

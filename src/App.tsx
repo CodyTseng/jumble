@@ -19,6 +19,7 @@ import { PinnedUsersProvider } from '@/providers/PinnedUsersProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { TranslationServiceProvider } from '@/providers/TranslationServiceProvider'
+import { UpdaterProvider } from '@/providers/UpdaterProvider'
 import { UserPreferencesProvider } from '@/providers/UserPreferencesProvider'
 import { UserTrustProvider } from '@/providers/UserTrustProvider'
 import { ZapProvider } from '@/providers/ZapProvider'
@@ -35,6 +36,7 @@ export default function App(): JSX.Element {
   return (
     <RadixDirectionProvider>
     <ScreenSizeProvider>
+      <UpdaterProvider>
       <UserPreferencesProvider>
         <ThemeProvider>
           <ContentPolicyProvider>
@@ -74,6 +76,7 @@ export default function App(): JSX.Element {
           </ContentPolicyProvider>
         </ThemeProvider>
       </UserPreferencesProvider>
+      </UpdaterProvider>
     </ScreenSizeProvider>
     </RadixDirectionProvider>
   )

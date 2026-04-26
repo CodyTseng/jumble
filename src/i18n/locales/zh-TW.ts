@@ -800,6 +800,15 @@ export default {
     'Event kinds': '事件類型',
     'Show tab': '顯示頁籤',
     'Show {{count}} media_one': '顯示媒體內容',
-    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容'
+    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容',
+    'Check for updates': '檢查更新',
+    'Checking…': '檢查中…',
+    "You're up to date": '已是最新版本',
+    'New version v{{version}} found': '發現新版本 v{{version}}',
+    'Update failed': '更新失敗',
+    'Update ready: v{{version}}': '新版本 v{{version}} 已就緒',
+    'Restart Jumble to install the latest version.': '重啟 Jumble 即可安裝最新版本。',
+    'Restart now': '立即重啟',
+    'Downloading update v{{version}}…': '正在下載新版本 v{{version}}…'
   }
 }

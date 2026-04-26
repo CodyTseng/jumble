@@ -1,5 +1,6 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
+import UpdateSection from '@/components/UpdateSection'
 import {
   toAppearanceSettings,
   toEmojiPackSettings,
@@ -150,6 +151,7 @@ export default function Settings() {
           </div>
         </SettingItem>
       </AboutInfoDialog>
+      <UpdateSection />
       <div className="p-4">
         <Donation />
       </div>

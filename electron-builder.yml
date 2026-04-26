@@ -4,6 +4,11 @@ copyright: Copyright © ${author}
 directories:
   output: release/${version}
   buildResources: build
+publish:
+  provider: github
+  owner: CodyTseng
+  repo: jumble
+  releaseType: release
 files:
   - dist/**/*
   - dist-electron/**/*
