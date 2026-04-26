@@ -833,14 +833,7 @@ export default {
     'Show tab': 'टैब दिखाएँ',
     'Show {{count}} media_one': 'मीडिया दिखाएँ',
     'Show {{count}} media_other': '{{count}} मीडिया दिखाएँ',
-    'Check for updates': 'अपडेट जांचें',
-    'Checking…': 'जांच हो रही है…',
-    "You're up to date": 'आप अद्यतित हैं',
-    'New version v{{version}} found': 'नया संस्करण v{{version}} मिला',
-    'Update failed': 'अपडेट विफल',
     'Update ready: v{{version}}': 'अपडेट तैयार: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'नवीनतम संस्करण इंस्टॉल करने के लिए Jumble को पुनरारंभ करें।',
     'Restart now': 'अभी पुनरारंभ करें',
     'Downloading update v{{version}}…': 'अपडेट v{{version}} डाउनलोड हो रहा है…'
   }

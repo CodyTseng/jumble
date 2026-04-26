@@ -819,13 +819,7 @@ export default {
     'Show tab': 'แสดงแท็บ',
     'Show {{count}} media_one': 'แสดงสื่อ',
     'Show {{count}} media_other': 'แสดงสื่อ {{count}} รายการ',
-    'Check for updates': 'ตรวจสอบการอัปเดต',
-    'Checking…': 'กำลังตรวจสอบ…',
-    "You're up to date": 'คุณใช้เวอร์ชันล่าสุดแล้ว',
-    'New version v{{version}} found': 'พบเวอร์ชันใหม่ v{{version}}',
-    'Update failed': 'การอัปเดตล้มเหลว',
     'Update ready: v{{version}}': 'พร้อมอัปเดต: v{{version}}',
-    'Restart Jumble to install the latest version.': 'รีสตาร์ท Jumble เพื่อติดตั้งเวอร์ชันล่าสุด',
     'Restart now': 'รีสตาร์ตเดี๋ยวนี้',
     'Downloading update v{{version}}…': 'กำลังดาวน์โหลดอัปเดต v{{version}}…'
   }

@@ -837,14 +837,7 @@ export default {
     'Show tab': 'Mostrar pestaña',
     'Show {{count}} media_one': 'Mostrar contenido multimedia',
     'Show {{count}} media_other': 'Mostrar {{count}} contenidos multimedia',
-    'Check for updates': 'Buscar actualizaciones',
-    'Checking…': 'Comprobando…',
-    "You're up to date": 'Estás al día',
-    'New version v{{version}} found': 'Se encontró la nueva versión v{{version}}',
-    'Update failed': 'Error al actualizar',
     'Update ready: v{{version}}': 'Actualización lista: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'Reinicia Jumble para instalar la última versión.',
     'Restart now': 'Reiniciar ahora',
     'Downloading update v{{version}}…': 'Descargando actualización v{{version}}…'
   }

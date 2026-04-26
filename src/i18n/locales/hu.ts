@@ -829,14 +829,7 @@ export default {
     'Show tab': 'Fül megjelenítése',
     'Show {{count}} media_one': 'Média megjelenítése',
     'Show {{count}} media_other': '{{count}} média megjelenítése',
-    'Check for updates': 'Frissítések keresése',
-    'Checking…': 'Keresés…',
-    "You're up to date": 'A legújabb verziót használod',
-    'New version v{{version}} found': 'Új verzió található: v{{version}}',
-    'Update failed': 'A frissítés sikertelen',
     'Update ready: v{{version}}': 'A frissítés készen áll: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'Indítsd újra a Jumble-t a legújabb verzió telepítéséhez.',
     'Restart now': 'Újraindítás most',
     'Downloading update v{{version}}…': 'Frissítés letöltése: v{{version}}…'
   }

@@ -819,13 +819,7 @@ export default {
     'Show tab': 'إظهار علامة التبويب',
     'Show {{count}} media_one': 'عرض الوسائط',
     'Show {{count}} media_other': 'عرض {{count}} وسائط',
-    'Check for updates': 'التحقق من التحديثات',
-    'Checking…': 'جارٍ التحقق…',
-    "You're up to date": 'لديك أحدث إصدار',
-    'New version v{{version}} found': 'تم العثور على إصدار جديد v{{version}}',
-    'Update failed': 'فشل التحديث',
     'Update ready: v{{version}}': 'التحديث جاهز: v{{version}}',
-    'Restart Jumble to install the latest version.': 'أعد تشغيل Jumble لتثبيت أحدث إصدار.',
     'Restart now': 'إعادة التشغيل الآن',
     'Downloading update v{{version}}…': 'جارٍ تنزيل التحديث v{{version}}…'
   }

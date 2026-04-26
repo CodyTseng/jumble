@@ -832,14 +832,7 @@ export default {
     'Show tab': 'タブを表示',
     'Show {{count}} media_one': 'メディアを表示',
     'Show {{count}} media_other': '{{count}} 個のメディアを表示',
-    'Check for updates': 'アップデートを確認',
-    'Checking…': '確認中…',
-    "You're up to date": '最新のバージョンです',
-    'New version v{{version}} found': '新しいバージョン v{{version}} が見つかりました',
-    'Update failed': 'アップデートに失敗しました',
     'Update ready: v{{version}}': 'アップデートの準備ができました: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      '最新バージョンをインストールするには Jumble を再起動してください。',
     'Restart now': '今すぐ再起動',
     'Downloading update v{{version}}…': 'アップデート v{{version}} をダウンロード中…'
   }

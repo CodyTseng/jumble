@@ -838,14 +838,7 @@ export default {
     'Show tab': 'Показать вкладку',
     'Show {{count}} media_one': 'Показать медиа',
     'Show {{count}} media_other': 'Показать {{count}} медиа',
-    'Check for updates': 'Проверить обновления',
-    'Checking…': 'Проверка…',
-    "You're up to date": 'У вас установлена последняя версия',
-    'New version v{{version}} found': 'Найдена новая версия v{{version}}',
-    'Update failed': 'Не удалось обновить',
     'Update ready: v{{version}}': 'Обновление готово: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'Перезапустите Jumble, чтобы установить последнюю версию.',
     'Restart now': 'Перезапустить сейчас',
     'Downloading update v{{version}}…': 'Загрузка обновления v{{version}}…'
   }

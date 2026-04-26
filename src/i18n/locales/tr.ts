@@ -842,14 +842,7 @@ export default {
     'Show tab': 'Sekmeyi göster',
     'Show {{count}} media_one': 'Medya göster',
     'Show {{count}} media_other': '{{count}} medya göster',
-    'Check for updates': 'Güncellemeleri denetle',
-    'Checking…': 'Denetleniyor…',
-    "You're up to date": 'Güncelsin',
-    'New version v{{version}} found': 'Yeni sürüm v{{version}} bulundu',
-    'Update failed': 'Güncelleme başarısız',
     'Update ready: v{{version}}': 'Güncelleme hazır: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'En son sürümü yüklemek için Jumble’ı yeniden başlatın.',
     'Restart now': 'Şimdi yeniden başlat',
     'Downloading update v{{version}}…': 'v{{version}} güncellemesi indiriliyor…'
   }

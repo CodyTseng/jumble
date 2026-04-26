@@ -843,14 +843,7 @@ export default {
     'Show tab': "Afficher l'onglet",
     'Show {{count}} media_one': 'Afficher le média',
     'Show {{count}} media_other': 'Afficher {{count}} médias',
-    'Check for updates': 'Vérifier les mises à jour',
-    'Checking…': 'Vérification…',
-    "You're up to date": 'Vous êtes à jour',
-    'New version v{{version}} found': 'Nouvelle version v{{version}} trouvée',
-    'Update failed': 'Échec de la mise à jour',
     'Update ready: v{{version}}': 'Mise à jour prête : v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'Redémarrez Jumble pour installer la dernière version.',
     'Restart now': 'Redémarrer maintenant',
     'Downloading update v{{version}}…': 'Téléchargement de la mise à jour v{{version}}…'
   }

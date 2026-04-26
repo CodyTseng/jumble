@@ -833,14 +833,7 @@ export default {
     'Show tab': 'نمایش زبانه',
     'Show {{count}} media_one': 'نمایش رسانه',
     'Show {{count}} media_other': 'نمایش {{count}} رسانه',
-    'Check for updates': 'بررسی به‌روزرسانی‌ها',
-    'Checking…': 'در حال بررسی…',
-    "You're up to date": 'نسخهٔ شما به‌روز است',
-    'New version v{{version}} found': 'نسخهٔ جدید v{{version}} پیدا شد',
-    'Update failed': 'به‌روزرسانی ناموفق بود',
     'Update ready: v{{version}}': 'به‌روزرسانی آماده است: v{{version}}',
-    'Restart Jumble to install the latest version.':
-      'برای نصب آخرین نسخه، Jumble را راه‌اندازی مجدد کنید.',
     'Restart now': 'هم‌اکنون راه‌اندازی مجدد',
     'Downloading update v{{version}}…': 'در حال دانلود به‌روزرسانی v{{version}}…'
   }
