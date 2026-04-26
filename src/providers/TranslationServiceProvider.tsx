@@ -117,6 +117,36 @@ export function TranslationServiceProvider({ children }: { children: React.React
     }
   }
 
+  const translateLongFormArticleEvent = async (event: Event): Promise<Event> => {
+    const target = i18n.language
+    const title = event.tags.find((tag) => tag[0] === 'title')?.[1]
+    const summary = event.tags.find((tag) => tag[0] === 'summary')?.[1]
+
+    const texts = {
+      title,
+      summary,
+      content: event.content
+    }
+    const joinedText = joinTexts(texts)
+    if (!joinedText) return event
+
+    const translatedText = await translate(joinedText, target)
+    const translatedTexts = splitTranslatedText(translatedText)
+    return {
+      ...event,
+      content: translatedTexts.content ?? event.content,
+      tags: event.tags.map((tag) => {
+        if (tag[0] === 'title' && translatedTexts.title) {
+          return ['title', translatedTexts.title]
+        }
+        if (tag[0] === 'summary' && translatedTexts.summary) {
+          return ['summary', translatedTexts.summary]
+        }
+        return tag
+      })
+    }
+  }
+
   const translatePollEvent = async (event: Event): Promise<Event> => {
     const target = i18n.language
     const pollMetadata = getPollMetadataFromEvent(event)
@@ -162,6 +192,8 @@ export function TranslationServiceProvider({ children }: { children: React.React
     let translatedEvent: Event | undefined
     if (event.kind === kinds.Highlights) {
       translatedEvent = await translateHighlightEvent(event)
+    } else if (event.kind === kinds.LongFormArticle) {
+      translatedEvent = await translateLongFormArticleEvent(event)
     } else if (event.kind === ExtendedKind.POLL) {
       translatedEvent = await translatePollEvent(event)
     } else {

@@ -1,3 +1,4 @@
+import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { toNoteList } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
@@ -17,7 +18,9 @@ export default function LongFormArticlePreview({
   const { isSmallScreen } = useScreenSize()
   const { push } = useSecondaryPage()
   const { autoLoadMedia } = useContentPolicy()
-  const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(event), [event])
+  const translatedEvent = useTranslatedEvent(event.id)
+  const displayEvent = translatedEvent ?? event
+  const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(displayEvent), [displayEvent])
 
   const titleComponent = <div className="line-clamp-2 text-xl font-semibold">{metadata.title}</div>
 
@@ -26,7 +29,7 @@ export default function LongFormArticlePreview({
       {metadata.tags.map((tag) => (
         <div
           key={tag}
-          className="flex max-w-32 cursor-pointer items-center rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground flex max-w-32 cursor-pointer items-center rounded-full px-2.5 py-0.5 text-xs"
           onClick={(e) => {
             e.stopPropagation()
             push(toNoteList({ hashtag: tag, kinds: [kinds.LongFormArticle] }))
@@ -39,7 +42,9 @@ export default function LongFormArticlePreview({
   )
 
   const summaryComponent = metadata.summary && (
-    <div className="line-clamp-4 whitespace-pre-line text-sm text-muted-foreground">{metadata.summary}</div>
+    <div className="text-muted-foreground line-clamp-4 text-sm whitespace-pre-line">
+      {metadata.summary}
+    </div>
   )
 
   if (isSmallScreen) {
@@ -67,7 +72,7 @@ export default function LongFormArticlePreview({
         {metadata.image && autoLoadMedia && (
           <Image
             image={{ url: metadata.image, pubkey: event.pubkey }}
-            className="aspect-4/3 h-44 bg-foreground object-cover xl:aspect-video"
+            className="bg-foreground aspect-4/3 h-44 object-cover xl:aspect-video"
             hideIfError
           />
         )}

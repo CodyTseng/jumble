@@ -12,9 +12,11 @@ import { toast } from 'sonner'
 
 export default function TranslateButton({
   event,
+  showFull = false,
   className
 }: {
   event: Event
+  showFull?: boolean
   className?: string
 }) {
   const { i18n } = useTranslation()
@@ -22,18 +24,19 @@ export default function TranslateButton({
   const { translateEvent, showOriginalEvent } = useTranslationService()
   const [translating, setTranslating] = useState(false)
   const translatedEvent = useTranslatedEvent(event.id)
-  const supported = useMemo(
-    () =>
-      [
-        kinds.ShortTextNote,
-        kinds.Highlights,
-        ExtendedKind.COMMENT,
-        ExtendedKind.PICTURE,
-        ExtendedKind.POLL,
-        ExtendedKind.RELAY_REVIEW
-      ].includes(event.kind),
-    [event]
-  )
+  const supported = useMemo(() => {
+    if (event.kind === kinds.LongFormArticle) {
+      return showFull
+    }
+    return [
+      kinds.ShortTextNote,
+      kinds.Highlights,
+      ExtendedKind.COMMENT,
+      ExtendedKind.PICTURE,
+      ExtendedKind.POLL,
+      ExtendedKind.RELAY_REVIEW
+    ].includes(event.kind)
+  }, [event, showFull])
 
   const needTranslation = useMemo(() => {
     const detected = detectLanguage(event.content)
@@ -71,7 +74,7 @@ export default function TranslateButton({
   return (
     <button
       className={cn(
-        'flex h-full items-center px-2 py-1 text-muted-foreground transition-colors hover:text-pink-400 disabled:text-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0',
+        'text-muted-foreground disabled:text-muted-foreground flex h-full items-center px-2 py-1 transition-colors hover:text-pink-400 [&_svg]:size-4 [&_svg]:shrink-0',
         className
       )}
       disabled={translating}

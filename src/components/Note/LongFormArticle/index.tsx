@@ -2,6 +2,7 @@ import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import ImageWithLightbox from '@/components/ImageWithLightbox'
 import HighlightButton from '@/components/HighlightButton'
 import PostEditor from '@/components/PostEditor'
+import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { toNote, toNoteList, toProfile } from '@/lib/link'
 import { ExternalLink } from 'lucide-react'
@@ -21,7 +22,12 @@ export default function LongFormArticle({
   className?: string
 }) {
   const { push } = useSecondaryPage()
-  const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(event), [event])
+  const translatedEvent = useTranslatedEvent(event.id)
+  const displayEvent = translatedEvent ?? event
+  const metadata = useMemo(
+    () => getLongFormArticleMetadataFromEvent(displayEvent),
+    [displayEvent]
+  )
   const contentRef = useRef<HTMLDivElement>(null)
   const [showHighlightEditor, setShowHighlightEditor] = useState(false)
   const [selectedText, setSelectedText] = useState('')
@@ -116,7 +122,7 @@ export default function LongFormArticle({
           }}
           components={components}
         >
-          {event.content}
+          {displayEvent.content}
         </Markdown>
         {metadata.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 pb-2">
