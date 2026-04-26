@@ -68,10 +68,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
         let plainText: string
         if (storedPlainText) {
-          console.log('[MuteList] Using cached decrypted content for event', muteListEvent.id)
           plainText = storedPlainText
         } else {
-          console.log('[MuteList] Decrypting content with', wasNip04 ? 'NIP-04' : 'NIP-44', 'for event', muteListEvent.id)
           plainText = wasNip04
             ? await nip04Decrypt(muteListEvent.pubkey, muteListEvent.content)
             : await nip44Decrypt(muteListEvent.pubkey, muteListEvent.content)
@@ -79,7 +77,6 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         }
 
         const privateTags = z.array(z.array(z.string())).parse(JSON.parse(plainText))
-        console.log('[MuteList] Decrypted privateTags count:', privateTags.length, 'wasNip04:', wasNip04)
         return { privateTags, wasNip04 }
       } catch (error) {
         console.error('Failed to decrypt mute list content', error)
@@ -92,12 +89,10 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   const migrateToNip44 = useCallback(
     async (muteListEvent: Event, privateTags: string[][]) => {
       if (!accountPubkey) return
-      console.log('[MuteList] Migrating from NIP-04 to NIP-44, privateTags count:', privateTags.length)
       try {
         const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
         const newMuteListDraftEvent = createMuteListDraftEvent(muteListEvent.tags, cipherText)
         const event = await publish(newMuteListDraftEvent)
-        console.log('[MuteList] Migration successful, new event id:', event.id)
         await updateMuteListEvent(event, privateTags)
       } catch (error) {
         console.error('[MuteList] Failed to migrate to NIP-44', error)
