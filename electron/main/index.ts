@@ -6,6 +6,7 @@ import WebSocket from 'ws'
 import { registerIpcHandlers, unregisterIpcHandlers } from './ipc.js'
 import { RelayManager } from './relay-manager.js'
 import { SecretsStore } from './secrets-store.js'
+import { attachWindowStatePersistence, loadWindowState } from './window-state.js'
 
 // Inject Node's ws so nostr-tools uses it instead of global WebSocket
 setWebSocketImpl(WebSocket)
@@ -28,9 +29,12 @@ const manager = new RelayManager()
 const secrets = new SecretsStore()
 
 function createWindow() {
+  const savedState = loadWindowState()
   win = new BrowserWindow({
-    width: 1280,
-    height: 820,
+    x: savedState.x,
+    y: savedState.y,
+    width: savedState.width,
+    height: savedState.height,
     minWidth: 480,
     minHeight: 480,
     title: 'Jumble',
@@ -43,6 +47,11 @@ function createWindow() {
     }
   })
 
+  if (savedState.isMaximized) {
+    win.maximize()
+  }
+
+  attachWindowStatePersistence(win)
   manager.attachWindow(win)
 
   win.webContents.setWindowOpenHandler(({ url }) => {
