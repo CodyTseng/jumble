@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { ElectronPool } from '@/lib/electron-pool'
 import {
   compareEvents,
   getReplaceableCoordinate,
@@ -6,9 +7,8 @@ import {
   isReplaceableEvent
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
+import { isElectron } from '@/lib/platform'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
-import { ElectronPool } from '@/lib/electron-pool'
-import { getElectronBridge, isElectron } from '@/lib/platform'
 import { filterOutBigRelays, getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { SmartPool } from '@/lib/smart-pool'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
@@ -16,6 +16,7 @@ import { mergeTimelines } from '@/lib/timeline'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
 import { ISigner, TProfile, TPublishOptions, TRelayList, TSubRequestFilter } from '@/types'
+import { IRelay, IRelayPool } from '@/types/relay-pool'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
 import dayjs from 'dayjs'
@@ -30,7 +31,6 @@ import {
   nip19,
   VerifiedEvent
 } from 'nostr-tools'
-import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
 
@@ -42,7 +42,7 @@ class ClientService extends EventTarget {
   signer?: ISigner
   pubkey?: string
   currentRelays: string[] = []
-  private pool: SmartPool
+  private pool: IRelayPool
   private externalSeenOn = new Map<string, Set<string>>()
 
   private timelines: Record<
@@ -72,18 +72,14 @@ class ClientService extends EventTarget {
 
   constructor() {
     super()
-    const bridge = getElectronBridge()
-    if (isElectron() && bridge) {
-      const electronPool = new ElectronPool(bridge, () =>
+    if (isElectron()) {
+      this.pool = new ElectronPool(() =>
         this.signer ? (evt) => this.signer!.signEvent(evt) : undefined
       )
-      electronPool.setAllowInsecure(storage.getAllowInsecureConnection())
-      this.pool = electronPool as unknown as SmartPool
     } else {
-      this.pool = new SmartPool({
-        isAllowInsecure: () => storage.getAllowInsecureConnection()
-      })
+      this.pool = new SmartPool()
     }
+    this.pool.setAllowInsecure(storage.getAllowInsecureConnection())
     this.pool.trackRelays = true
   }
 
@@ -97,6 +93,10 @@ class ClientService extends EventTarget {
 
   async init() {
     await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
+  }
+
+  setAllowInsecure(allow: boolean) {
+    this.pool.setAllowInsecure(allow)
   }
 
   async determineTargetRelays(
@@ -767,7 +767,7 @@ class ClientService extends EventTarget {
   /** =========== Event =========== */
 
   getSeenEventRelays(eventId: string) {
-    return Array.from(this.pool.seenOn.get(eventId)?.values() || [])
+    return this.pool.getSeenRelays(eventId)
   }
 
   getSeenEventRelayUrls(eventId: string) {
@@ -787,13 +787,8 @@ class ClientService extends EventTarget {
     return this.getSeenEventRelayUrls(eventId).find((url) => !isLocalNetworkUrl(url)) ?? ''
   }
 
-  trackEventSeenOn(eventId: string, relay: AbstractRelay) {
-    let set = this.pool.seenOn.get(eventId)
-    if (!set) {
-      set = new Set()
-      this.pool.seenOn.set(eventId, set)
-    }
-    set.add(relay)
+  trackEventSeenOn(eventId: string, relay: IRelay) {
+    this.pool.trackEventSeen(eventId, relay)
   }
 
   trackEventExternalSeenOn(eventId: string, relayUrls: string[]) {
@@ -1467,11 +1462,7 @@ class ClientService extends EventTarget {
       : []
   }
 
-  async fetchEncryptionKeyAnnouncementEvent(
-    pubkey: string,
-    updateCache = true,
-    skipCache = false
-  ) {
+  async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true, skipCache = false) {
     return await this.fetchReplaceableEvent(
       pubkey,
       ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT,

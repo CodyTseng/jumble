@@ -1,25 +1,23 @@
-import type { EventTemplate, Filter, Event as NEvent, VerifiedEvent } from 'nostr-tools'
+import type { Filter, Event as NEvent } from 'nostr-tools'
 import type { TElectronBridge } from '../../electron/shared/ipc-types'
+import type {
+  IRelay,
+  IRelayPool,
+  TSignAuthEvent,
+  TSubCloser,
+  TSubHandlers
+} from '@/types/relay-pool'
+import { getElectronBridge } from './platform'
 
-type SubHandlers = {
-  receivedEvent?: (relay: ElectronRelay, id: string) => void
-  alreadyHaveEvent?: (id: string) => boolean
-  onevent?: (evt: NEvent) => void
-  oneose?: () => void
-  onclose?: (reason: string) => void
-  eoseTimeout?: number
-}
-
-export class ElectronRelay {
+export class ElectronRelay implements IRelay {
   publishTimeout = 10_000
 
   constructor(
     readonly url: string,
     private readonly bridge: TElectronBridge,
-    private readonly listeners: Map<string, SubHandlers>
+    private readonly listeners: Map<string, TSubHandlers>
   ) {}
 
-  // Satisfies AbstractRelay-like shape used by ClientService
   get connected(): boolean {
     return true
   }
@@ -28,16 +26,14 @@ export class ElectronRelay {
     return this.bridge.relay.publish(this.url, event, this.publishTimeout)
   }
 
-  async auth(
-    _signFn: (authEvt: EventTemplate) => Promise<VerifiedEvent>
-  ): Promise<void> {
+  async auth(_signFn: TSignAuthEvent): Promise<void> {
     // In Electron mode, signing is triggered by the main process via an
     // auth-request IPC message handled at the pool level; the signer
     // callback argument is ignored here.
     await this.bridge.relay.auth(this.url)
   }
 
-  subscribe(filters: Filter[], handlers: SubHandlers): { close: () => void } {
+  subscribe(filters: Filter[], handlers: TSubHandlers): TSubCloser {
     const subId = crypto.randomUUID()
     this.listeners.set(subId, handlers)
     // Fire and forget — errors surface via onclose
@@ -57,19 +53,21 @@ export class ElectronRelay {
   }
 }
 
-export type TSignAuthEvent = (authEvt: EventTemplate) => Promise<VerifiedEvent>
-
-export class ElectronPool {
-  // API surface used by ClientService: trackRelays, seenOn, ensureRelay, close
+export class ElectronPool implements IRelayPool {
   trackRelays = true
-  seenOn = new Map<string, Set<ElectronRelay>>()
 
+  private seenOn = new Map<string, Set<IRelay>>()
   private relays = new Map<string, ElectronRelay>()
-  private listeners = new Map<string, SubHandlers>()
+  private listeners = new Map<string, TSubHandlers>()
   private bridge: TElectronBridge
   private getSigner: () => TSignAuthEvent | undefined
 
-  constructor(bridge: TElectronBridge, getSigner: () => TSignAuthEvent | undefined) {
+  constructor(getSigner: () => TSignAuthEvent | undefined) {
+    const bridge = getElectronBridge()
+    if (!bridge) {
+      throw new Error('Electron bridge is not available')
+    }
+
     this.bridge = bridge
     this.getSigner = getSigner
 
@@ -79,13 +77,6 @@ export class ElectronPool {
       const relay = this.getOrCreateRelay(relayUrl)
       handlers.receivedEvent?.(relay, event.id)
       if (handlers.alreadyHaveEvent?.(event.id)) return
-      // Track seenOn so ClientService.getSeenEventRelays keeps working
-      let set = this.seenOn.get(event.id)
-      if (!set) {
-        set = new Set()
-        this.seenOn.set(event.id, set)
-      }
-      set.add(relay)
       handlers.onevent?.(event)
     })
 
@@ -117,7 +108,7 @@ export class ElectronPool {
     })
   }
 
-  async ensureRelay(url: string): Promise<ElectronRelay> {
+  async ensureRelay(url: string): Promise<IRelay> {
     const result = await this.bridge.relay.ensure(url)
     if (!result.ok) {
       throw new Error(result.error || `failed to ensure relay ${url}`)
@@ -125,7 +116,7 @@ export class ElectronPool {
     return this.getOrCreateRelay(url)
   }
 
-  close(urls?: string[]) {
+  close(urls: string[]) {
     this.bridge.relay.close(urls).catch(() => {
       // ignore
     })
@@ -135,6 +126,19 @@ export class ElectronPool {
     this.bridge.relay.setAllowInsecure(allow).catch(() => {
       // ignore
     })
+  }
+
+  getSeenRelays(eventId: string): IRelay[] {
+    return Array.from(this.seenOn.get(eventId)?.values() ?? [])
+  }
+
+  trackEventSeen(eventId: string, relay: IRelay) {
+    let set = this.seenOn.get(eventId)
+    if (!set) {
+      set = new Set()
+      this.seenOn.set(eventId, set)
+    }
+    set.add(relay)
   }
 
   private getOrCreateRelay(url: string): ElectronRelay {

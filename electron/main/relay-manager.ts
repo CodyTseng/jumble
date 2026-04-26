@@ -21,8 +21,7 @@ type SubCloser = { close: () => void }
 const DEFAULT_PUBLISH_TIMEOUT = 10_000
 
 export class RelayManager {
-  private allowInsecure = false
-  private pool = new SmartPool({ isAllowInsecure: () => this.allowInsecure })
+  private pool = new SmartPool()
   private subs = new Map<string, SubCloser>()
   private pendingAuthRequests = new Map<
     string,
@@ -35,7 +34,7 @@ export class RelayManager {
   }
 
   setAllowInsecure(allow: boolean) {
-    this.allowInsecure = allow
+    this.pool.setAllowInsecure(allow)
   }
 
   async ensure(url: string): Promise<{ ok: boolean; error?: string }> {
