@@ -24,7 +24,7 @@
     "test": "vitest run",
     "test:schemas": "vitest run schemata-validation",
     "electron:dev": "cross-env ELECTRON=true vite",
-    "electron:build": "cross-env ELECTRON=true tsc -b && cross-env ELECTRON=true vite build && electron-builder",
+    "electron:build": "cross-env ELECTRON=true tsc -b && cross-env ELECTRON=true vite build && electron-builder --config electron-builder.config.cjs",
     "electron:preview": "cross-env ELECTRON=true vite build && electron ."
   },
   "dependencies": {
