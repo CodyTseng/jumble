@@ -836,7 +836,10 @@ export default {
     'e.g. Highlights': 'например, Выделения',
     'Event kinds': 'Типы событий',
     'Show tab': 'Показать вкладку',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'Показать медиа',
+    'Show {{count}} media_other': 'Показать {{count}} медиа',
+    'Update ready: v{{version}}': 'Обновление готово: v{{version}}',
+    'Restart now': 'Перезапустить сейчас',
+    'Downloading update v{{version}}…': 'Загрузка обновления v{{version}}…'
   }
 }

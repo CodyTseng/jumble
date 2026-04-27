@@ -841,6 +841,9 @@ export default {
     'Event kinds': 'Olay türleri',
     'Show tab': 'Sekmeyi göster',
     'Show {{count}} media_one': 'Medya göster',
-    'Show {{count}} media_other': '{{count}} medya göster'
+    'Show {{count}} media_other': '{{count}} medya göster',
+    'Update ready: v{{version}}': 'Güncelleme hazır: v{{version}}',
+    'Restart now': 'Şimdi yeniden başlat',
+    'Downloading update v{{version}}…': 'v{{version}} güncellemesi indiriliyor…'
   }
 }

@@ -835,6 +835,9 @@ export default {
     'Event kinds': 'Tipos de evento',
     'Show tab': 'Mostrar aba',
     'Show {{count}} media_one': 'Mostrar mídia',
-    'Show {{count}} media_other': 'Mostrar {{count}} mídias'
+    'Show {{count}} media_other': 'Mostrar {{count}} mídias',
+    'Update ready: v{{version}}': 'Atualização pronta: v{{version}}',
+    'Restart now': 'Reiniciar agora',
+    'Downloading update v{{version}}…': 'Baixando atualização v{{version}}…'
   }
 }

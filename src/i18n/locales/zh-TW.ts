@@ -800,6 +800,9 @@ export default {
     'Event kinds': '事件類型',
     'Show tab': '顯示頁籤',
     'Show {{count}} media_one': '顯示媒體內容',
-    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容'
+    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容',
+    'Update ready: v{{version}}': '新版本 v{{version}} 已就緒',
+    'Restart now': '立即重啟',
+    'Downloading update v{{version}}…': '正在下載新版本 v{{version}}…'
   }
 }

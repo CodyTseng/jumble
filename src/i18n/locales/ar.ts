@@ -817,7 +817,10 @@ export default {
     'e.g. Highlights': 'مثال: التمييز',
     'Event kinds': 'أنواع الأحداث',
     'Show tab': 'إظهار علامة التبويب',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'عرض الوسائط',
+    'Show {{count}} media_other': 'عرض {{count}} وسائط',
+    'Update ready: v{{version}}': 'التحديث جاهز: v{{version}}',
+    'Restart now': 'إعادة التشغيل الآن',
+    'Downloading update v{{version}}…': 'جارٍ تنزيل التحديث v{{version}}…'
   }
 }

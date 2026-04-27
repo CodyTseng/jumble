@@ -19,6 +19,7 @@ import PostButton from './PostButton'
 import ProfileButton from './ProfileButton'
 import SearchButton from './SearchButton'
 import SettingsButton from './SettingsButton'
+import UpdateButton from './UpdateButton'
 
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
@@ -65,6 +66,7 @@ export default function PrimaryPageSidebar() {
         <PostButton collapse={sidebarCollapse} />
       </div>
       <div className="flex flex-col gap-4">
+        <UpdateButton collapse={sidebarCollapse} />
         <LayoutSwitcher collapse={sidebarCollapse} />
         <AccountButton collapse={sidebarCollapse} />
       </div>

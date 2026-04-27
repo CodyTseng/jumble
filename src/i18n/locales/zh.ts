@@ -807,6 +807,9 @@ export default {
     'Event kinds': '事件类型',
     'Show tab': '显示标签',
     'Show {{count}} media_one': '显示媒体内容',
-    'Show {{count}} media_other': '显示 {{count}} 项媒体内容'
+    'Show {{count}} media_other': '显示 {{count}} 项媒体内容',
+    'Update ready: v{{version}}': '新版本 v{{version}} 已就绪',
+    'Restart now': '立即重启',
+    'Downloading update v{{version}}…': '正在下载新版本 v{{version}}…'
   }
 }

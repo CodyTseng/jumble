@@ -835,7 +835,10 @@ export default {
     'e.g. Highlights': 'p. ej. Destacados',
     'Event kinds': 'Tipos de evento',
     'Show tab': 'Mostrar pestaña',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'Mostrar contenido multimedia',
+    'Show {{count}} media_other': 'Mostrar {{count}} contenidos multimedia',
+    'Update ready: v{{version}}': 'Actualización lista: v{{version}}',
+    'Restart now': 'Reiniciar ahora',
+    'Downloading update v{{version}}…': 'Descargando actualización v{{version}}…'
   }
 }

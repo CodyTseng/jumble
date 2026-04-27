@@ -844,7 +844,10 @@ export default {
     'e.g. Highlights': 'z. B. Highlights',
     'Event kinds': 'Ereignisarten',
     'Show tab': 'Tab anzeigen',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'Medium anzeigen',
+    'Show {{count}} media_other': '{{count}} Medien anzeigen',
+    'Update ready: v{{version}}': 'Update bereit: v{{version}}',
+    'Restart now': 'Jetzt neu starten',
+    'Downloading update v{{version}}…': 'Update v{{version}} wird heruntergeladen…'
   }
 }

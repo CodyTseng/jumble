@@ -830,7 +830,10 @@ export default {
     'e.g. Highlights': '例：ハイライト',
     'Event kinds': 'イベントの種類',
     'Show tab': 'タブを表示',
-    'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_one': 'メディアを表示',
+    'Show {{count}} media_other': '{{count}} 個のメディアを表示',
+    'Update ready: v{{version}}': 'アップデートの準備ができました: v{{version}}',
+    'Restart now': '今すぐ再起動',
+    'Downloading update v{{version}}…': 'アップデート v{{version}} をダウンロード中…'
   }
 }
