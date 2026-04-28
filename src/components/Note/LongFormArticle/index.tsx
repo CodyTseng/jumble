@@ -1,4 +1,5 @@
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
+import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import ImageWithLightbox from '@/components/ImageWithLightbox'
 import HighlightButton from '@/components/HighlightButton'
 import PostEditor from '@/components/PostEditor'
@@ -8,6 +9,7 @@ import { toNote, toNoteList, toProfile } from '@/lib/link'
 import { ExternalLink } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import NostrNode from './NostrNode'
@@ -21,6 +23,7 @@ export default function LongFormArticle({
   event: Event
   className?: string
 }) {
+  const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const translatedEvent = useTranslatedEvent(event.id)
   const displayEvent = translatedEvent ?? event
@@ -101,6 +104,9 @@ export default function LongFormArticle({
         className={`overflow-wrap-anywhere prose prose-zinc max-w-none wrap-break-word dark:prose-invert ${className || ''}`}
       >
         <h1 className="wrap-break-word">{metadata.title}</h1>
+        <div className="-mt-4 mb-6 text-sm text-muted-foreground">
+          {t('Last edited')}: <FormattedTimestamp timestamp={event.created_at} />
+        </div>
         {metadata.summary && (
           <blockquote>
             <p className="whitespace-pre-line wrap-break-word">{metadata.summary}</p>

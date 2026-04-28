@@ -824,6 +824,7 @@ export default {
     'Event kinds': '이벤트 종류',
     'Show tab': '탭 표시',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': '마지막 편집'
   }
 }

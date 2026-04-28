@@ -826,6 +826,7 @@ export default {
     'Event kinds': 'Event kinds',
     'Show tab': 'Show tab',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'Last edited'
   }
 }

@@ -818,6 +818,7 @@ export default {
     'Event kinds': 'ประเภทอีเวนต์',
     'Show tab': 'แสดงแท็บ',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'แก้ไขล่าสุด'
   }
 }

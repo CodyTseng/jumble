@@ -841,6 +841,7 @@ export default {
     'Event kinds': 'Olay türleri',
     'Show tab': 'Sekmeyi göster',
     'Show {{count}} media_one': 'Medya göster',
-    'Show {{count}} media_other': '{{count}} medya göster'
+    'Show {{count}} media_other': '{{count}} medya göster',
+    'Last edited': 'Son düzenleme'
   }
 }

@@ -832,6 +832,7 @@ export default {
     'Event kinds': 'انواع رویداد',
     'Show tab': 'نمایش زبانه',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'آخرین ویرایش'
   }
 }

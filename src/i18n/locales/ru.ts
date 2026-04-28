@@ -837,6 +837,7 @@ export default {
     'Event kinds': 'Типы событий',
     'Show tab': 'Показать вкладку',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'Последнее редактирование'
   }
 }

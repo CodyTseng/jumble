@@ -831,6 +831,7 @@ export default {
     'Event kinds': 'イベントの種類',
     'Show tab': 'タブを表示',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': '最終編集'
   }
 }

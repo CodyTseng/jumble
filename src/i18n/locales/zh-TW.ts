@@ -800,6 +800,7 @@ export default {
     'Event kinds': '事件類型',
     'Show tab': '顯示頁籤',
     'Show {{count}} media_one': '顯示媒體內容',
-    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容'
+    'Show {{count}} media_other': '顯示 {{count}} 項媒體內容',
+    'Last edited': '最後編輯'
   }
 }

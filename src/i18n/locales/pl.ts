@@ -840,6 +840,7 @@ export default {
     'Event kinds': 'Rodzaje zdarzeń',
     'Show tab': 'Pokaż kartę',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'Ostatnia edycja'
   }
 }

@@ -845,6 +845,7 @@ export default {
     'Event kinds': 'Ereignisarten',
     'Show tab': 'Tab anzeigen',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'Zuletzt bearbeitet'
   }
 }

@@ -832,6 +832,7 @@ export default {
     'Event kinds': 'इवेंट प्रकार',
     'Show tab': 'टैब दिखाएँ',
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'अंतिम बार संपादित'
   }
 }

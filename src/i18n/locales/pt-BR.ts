@@ -835,6 +835,7 @@ export default {
     'Event kinds': 'Tipos de evento',
     'Show tab': 'Mostrar aba',
     'Show {{count}} media_one': 'Mostrar mídia',
-    'Show {{count}} media_other': 'Mostrar {{count}} mídias'
+    'Show {{count}} media_other': 'Mostrar {{count}} mídias',
+    'Last edited': 'Última edição'
   }
 }

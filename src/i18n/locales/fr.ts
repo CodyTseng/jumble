@@ -842,6 +842,7 @@ export default {
     'Event kinds': "Types d'événements",
     'Show tab': "Afficher l'onglet",
     'Show {{count}} media_one': 'Show media',
-    'Show {{count}} media_other': 'Show {{count}} media'
+    'Show {{count}} media_other': 'Show {{count}} media',
+    'Last edited': 'Dernière modification'
   }
 }
