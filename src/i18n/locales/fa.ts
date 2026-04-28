@@ -833,6 +833,7 @@ export default {
     'Show tab': 'نمایش زبانه',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'آخرین ویرایش'
+    'Last edited': 'آخرین ویرایش',
+    '{{count}} min read': '{{count}} دقیقه مطالعه'
   }
 }

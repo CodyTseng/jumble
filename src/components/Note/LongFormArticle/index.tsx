@@ -6,6 +6,7 @@ import PostEditor from '@/components/PostEditor'
 import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { toNote, toNoteList, toProfile } from '@/lib/link'
+import { estimateReadingMinutes } from '@/lib/markdown'
 import { ExternalLink } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
@@ -30,6 +31,10 @@ export default function LongFormArticle({
   const metadata = useMemo(
     () => getLongFormArticleMetadataFromEvent(displayEvent),
     [displayEvent]
+  )
+  const readingMinutes = useMemo(
+    () => estimateReadingMinutes(displayEvent.content),
+    [displayEvent.content]
   )
   const contentRef = useRef<HTMLDivElement>(null)
   const [showHighlightEditor, setShowHighlightEditor] = useState(false)
@@ -105,6 +110,8 @@ export default function LongFormArticle({
       >
         <h1 className="wrap-break-word">{metadata.title}</h1>
         <div className="-mt-4 mb-6 text-sm text-muted-foreground">
+          {t('{{count}} min read', { count: readingMinutes })}
+          <span className="mx-1.5">·</span>
           {t('Last edited')}: <FormattedTimestamp timestamp={event.created_at} />
         </div>
         {metadata.summary && (

@@ -843,6 +843,7 @@ export default {
     'Show tab': "Afficher l'onglet",
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Dernière modification'
+    'Last edited': 'Dernière modification',
+    '{{count}} min read': '{{count}} min de lecture'
   }
 }

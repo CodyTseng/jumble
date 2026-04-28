@@ -837,6 +837,7 @@ export default {
     'Show tab': 'Mostra scheda',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Ultima modifica'
+    'Last edited': 'Ultima modifica',
+    '{{count}} min read': '{{count}} min di lettura'
   }
 }

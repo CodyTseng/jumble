@@ -832,6 +832,7 @@ export default {
     'Show tab': 'タブを表示',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': '最終編集'
+    'Last edited': '最終編集',
+    '{{count}} min read': '読了目安 {{count}} 分'
   }
 }

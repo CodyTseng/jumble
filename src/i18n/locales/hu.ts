@@ -829,6 +829,7 @@ export default {
     'Show tab': 'Fül megjelenítése',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Utoljára szerkesztve'
+    'Last edited': 'Utoljára szerkesztve',
+    '{{count}} min read': '{{count}} perc olvasás'
   }
 }

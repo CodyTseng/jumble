@@ -827,6 +827,7 @@ export default {
     'Show tab': 'Show tab',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Last edited'
+    'Last edited': 'Last edited',
+    '{{count}} min read': '{{count}} min read'
   }
 }

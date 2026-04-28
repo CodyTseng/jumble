@@ -825,6 +825,7 @@ export default {
     'Show tab': '탭 표시',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': '마지막 편집'
+    'Last edited': '마지막 편집',
+    '{{count}} min read': '읽는 데 {{count}}분'
   }
 }

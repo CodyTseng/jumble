@@ -842,6 +842,7 @@ export default {
     'Show tab': 'Sekmeyi göster',
     'Show {{count}} media_one': 'Medya göster',
     'Show {{count}} media_other': '{{count}} medya göster',
-    'Last edited': 'Son düzenleme'
+    'Last edited': 'Son düzenleme',
+    '{{count}} min read': '{{count}} dk. okuma'
   }
 }

@@ -841,6 +841,7 @@ export default {
     'Show tab': 'Pokaż kartę',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Ostatnia edycja'
+    'Last edited': 'Ostatnia edycja',
+    '{{count}} min read': '{{count}} min czytania'
   }
 }

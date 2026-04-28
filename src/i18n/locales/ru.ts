@@ -838,6 +838,7 @@ export default {
     'Show tab': 'Показать вкладку',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'Последнее редактирование'
+    'Last edited': 'Последнее редактирование',
+    '{{count}} min read': '{{count}} мин чтения'
   }
 }

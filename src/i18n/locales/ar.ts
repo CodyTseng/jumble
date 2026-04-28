@@ -819,6 +819,7 @@ export default {
     'Show tab': 'إظهار علامة التبويب',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'آخر تعديل'
+    'Last edited': 'آخر تعديل',
+    '{{count}} min read': '{{count}} دقيقة قراءة'
   }
 }

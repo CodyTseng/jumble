@@ -833,6 +833,7 @@ export default {
     'Show tab': 'टैब दिखाएँ',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
-    'Last edited': 'अंतिम बार संपादित'
+    'Last edited': 'अंतिम बार संपादित',
+    '{{count}} min read': '{{count}} मिनट पठन'
   }
 }
