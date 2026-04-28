@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/drawer'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
+import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { toDmConversation } from '@/lib/link'
@@ -34,15 +35,11 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import PullToRefresh from 'react-simple-pull-to-refresh'
-
-dayjs.extend(relativeTime)
 
 type TDmTab = 'messages' | 'requests'
 
@@ -305,13 +302,11 @@ function ConversationItem({
   onSwipeStateChange?: (pullable: boolean) => void
 }) {
   const { isSmallScreen } = useScreenSize()
-  const timeAgo = dayjs.unix(conversation.lastMessageAt).fromNow()
 
   if (isSmallScreen) {
     return (
       <SwipeableConversationItem
         conversation={conversation}
-        timeAgo={timeAgo}
         onClick={onClick}
         onDelete={onDelete}
         onSwipeStateChange={onSwipeStateChange}
@@ -322,7 +317,6 @@ function ConversationItem({
   return (
     <ContextMenuConversationItem
       conversation={conversation}
-      timeAgo={timeAgo}
       onClick={onClick}
       onDelete={onDelete}
     />
@@ -331,12 +325,10 @@ function ConversationItem({
 
 function ContextMenuConversationItem({
   conversation,
-  timeAgo,
   onClick,
   onDelete
 }: {
   conversation: TDmConversation
-  timeAgo: string
   onClick: () => void
   onDelete: () => void
 }) {
@@ -356,7 +348,7 @@ function ContextMenuConversationItem({
         onClick={onClick}
         onContextMenu={handleContextMenu}
       >
-        <ConversationItemContent conversation={conversation} timeAgo={timeAgo} />
+        <ConversationItemContent conversation={conversation} />
       </button>
       {contextMenu &&
         createPortal(
@@ -393,13 +385,11 @@ function ContextMenuConversationItem({
 
 function SwipeableConversationItem({
   conversation,
-  timeAgo,
   onClick,
   onDelete,
   onSwipeStateChange
 }: {
   conversation: TDmConversation
-  timeAgo: string
   onClick: () => void
   onDelete: () => void
   onSwipeStateChange?: (pullable: boolean) => void
@@ -499,7 +489,7 @@ function SwipeableConversationItem({
           className="flex w-full items-center gap-3 p-3 text-start transition-colors hover:bg-accent/50"
           onClick={handleClick}
         >
-          <ConversationItemContent conversation={conversation} timeAgo={timeAgo} />
+          <ConversationItemContent conversation={conversation} />
         </button>
       </div>
     </div>
@@ -507,11 +497,9 @@ function SwipeableConversationItem({
 }
 
 function ConversationItemContent({
-  conversation,
-  timeAgo
+  conversation
 }: {
   conversation: TDmConversation
-  timeAgo: string
 }) {
   const { t } = useTranslation()
   const supportTouch = useMemo(() => isTouchDevice(), [])
@@ -557,7 +545,10 @@ function ConversationItemContent({
               skeletonClassName="h-4"
             />
           )}
-          <span className="shrink-0 text-xs text-muted-foreground">{timeAgo}</span>
+          <FormattedTimestamp
+            timestamp={conversation.lastMessageAt}
+            className="shrink-0 text-xs text-muted-foreground"
+          />
         </div>
         <div className="flex items-center justify-between gap-2">
           <TextWithEmojis
