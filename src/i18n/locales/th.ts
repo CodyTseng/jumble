@@ -820,6 +820,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'แก้ไขล่าสุด',
-    '{{count}} min read': 'อ่าน {{count}} นาที'
+    '{{count}} min read': 'อ่าน {{count}} นาที',
+    'Avatar URL': 'URL รูปโปรไฟล์',
+    'Banner URL': 'URL แบนเนอร์'
   }
 }

@@ -834,6 +834,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'अंतिम बार संपादित',
-    '{{count}} min read': '{{count}} मिनट पठन'
+    '{{count}} min read': '{{count}} मिनट पठन',
+    'Avatar URL': 'अवतार URL',
+    'Banner URL': 'बैनर URL'
   }
 }

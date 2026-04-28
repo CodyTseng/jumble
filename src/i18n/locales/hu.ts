@@ -830,6 +830,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'Utoljára szerkesztve',
-    '{{count}} min read': '{{count}} perc olvasás'
+    '{{count}} min read': '{{count}} perc olvasás',
+    'Avatar URL': 'Avatar URL',
+    'Banner URL': 'Borítókép URL'
   }
 }

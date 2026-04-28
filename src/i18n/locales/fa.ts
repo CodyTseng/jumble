@@ -834,6 +834,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'آخرین ویرایش',
-    '{{count}} min read': '{{count}} دقیقه مطالعه'
+    '{{count}} min read': '{{count}} دقیقه مطالعه',
+    'Avatar URL': 'نشانی تصویر نمایه',
+    'Banner URL': 'نشانی تصویر سربرگ'
   }
 }

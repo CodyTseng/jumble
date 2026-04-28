@@ -833,6 +833,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': '最終編集',
-    '{{count}} min read': '読了目安 {{count}} 分'
+    '{{count}} min read': '読了目安 {{count}} 分',
+    'Avatar URL': 'アイコンの URL',
+    'Banner URL': 'バナーの URL'
   }
 }

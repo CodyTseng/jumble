@@ -820,6 +820,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'آخر تعديل',
-    '{{count}} min read': '{{count}} دقيقة قراءة'
+    '{{count}} min read': '{{count}} دقيقة قراءة',
+    'Avatar URL': 'رابط الصورة الرمزية',
+    'Banner URL': 'رابط صورة الغلاف'
   }
 }

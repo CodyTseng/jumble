@@ -844,6 +844,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'Dernière modification',
-    '{{count}} min read': '{{count}} min de lecture'
+    '{{count}} min read': '{{count}} min de lecture',
+    'Avatar URL': 'URL de l’avatar',
+    'Banner URL': 'URL de la bannière'
   }
 }

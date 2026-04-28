@@ -828,6 +828,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'Last edited',
-    '{{count}} min read': '{{count}} min read'
+    '{{count}} min read': '{{count}} min read',
+    'Avatar URL': 'Avatar URL',
+    'Banner URL': 'Banner URL'
   }
 }

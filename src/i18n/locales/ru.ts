@@ -839,6 +839,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': 'Последнее редактирование',
-    '{{count}} min read': '{{count}} мин чтения'
+    '{{count}} min read': '{{count}} мин чтения',
+    'Avatar URL': 'URL аватара',
+    'Banner URL': 'URL баннера'
   }
 }

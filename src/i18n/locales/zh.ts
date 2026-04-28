@@ -809,6 +809,8 @@ export default {
     'Show {{count}} media_one': '显示媒体内容',
     'Show {{count}} media_other': '显示 {{count}} 项媒体内容',
     'Last edited': '最后编辑',
-    '{{count}} min read': '约 {{count}} 分钟读完'
+    '{{count}} min read': '约 {{count}} 分钟读完',
+    'Avatar URL': '头像链接',
+    'Banner URL': '横幅链接'
   }
 }

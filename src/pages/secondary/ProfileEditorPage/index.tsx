@@ -154,8 +154,8 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           onUploadEnd={() => setUploadingBanner(false)}
           className="relative w-full cursor-pointer"
         >
-          <ProfileBanner banner={banner} pubkey={account.pubkey} className="aspect-3/1 w-full" />
-          <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center bg-muted/30">
+          <ProfileBanner banner={banner} pubkey={account.pubkey} />
+          <div className="bg-muted/30 absolute top-0 flex h-full w-full flex-col items-center justify-center">
             {uploadingBanner ? <Loader size={36} className="animate-spin" /> : <Upload size={36} />}
           </div>
         </Uploader>
@@ -163,7 +163,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
           onUploadSuccess={onAvatarUploadSuccess}
           onUploadStart={() => setUploadingAvatar(true)}
           onUploadEnd={() => setUploadingAvatar(false)}
-          className="absolute bottom-0 left-4 h-24 w-24 translate-y-1/2 cursor-pointer rounded-full border-4 border-background"
+          className="border-background absolute bottom-0 left-4 h-24 w-24 translate-y-1/2 cursor-pointer rounded-full border-4"
         >
           <Avatar className="h-full w-full">
             <AvatarImage src={avatar} className="object-cover object-center" />
@@ -171,12 +171,36 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
               <img src={defaultImage} />
             </AvatarFallback>
           </Avatar>
-          <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center rounded-full bg-muted/30">
+          <div className="bg-muted/30 absolute top-0 flex h-full w-full flex-col items-center justify-center rounded-full">
             {uploadingAvatar ? <Loader className="animate-spin" /> : <Upload />}
           </div>
         </Uploader>
       </div>
       <div className="flex flex-col gap-4 px-4 pt-14">
+        <Item>
+          <Label htmlFor="profile-avatar-url-input">{t('Avatar URL')}</Label>
+          <Input
+            id="profile-avatar-url-input"
+            value={avatar}
+            placeholder="https://..."
+            onChange={(e) => {
+              setAvatar(e.target.value)
+              setHasChanged(true)
+            }}
+          />
+        </Item>
+        <Item>
+          <Label htmlFor="profile-banner-url-input">{t('Banner URL')}</Label>
+          <Input
+            id="profile-banner-url-input"
+            value={banner}
+            placeholder="https://..."
+            onChange={(e) => {
+              setBanner(e.target.value)
+              setHasChanged(true)
+            }}
+          />
+        </Item>
         <Item>
           <Label htmlFor="profile-username-input">{t('Display Name')}</Label>
           <Input
@@ -223,7 +247,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             }}
             className={nip05Error ? 'border-destructive' : ''}
           />
-          {nip05Error && <div className="ps-3 text-xs text-destructive">{nip05Error}</div>}
+          {nip05Error && <div className="text-destructive ps-3 text-xs">{nip05Error}</div>}
         </Item>
         <Item>
           <Label htmlFor="profile-lightning-address-input">
@@ -240,13 +264,11 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             className={lightningAddressError ? 'border-destructive' : ''}
           />
           {lightningAddressError && (
-            <div className="ps-3 text-xs text-destructive">{lightningAddressError}</div>
+            <div className="text-destructive ps-3 text-xs">{lightningAddressError}</div>
           )}
         </Item>
         <Item>
-          <Label htmlFor="profile-sp-address-input">
-            {t('Silent Payment Address (BIP 352)')}
-          </Label>
+          <Label htmlFor="profile-sp-address-input">{t('Silent Payment Address (BIP 352)')}</Label>
           <Input
             id="profile-sp-address-input"
             value={silentPaymentAddress}
@@ -259,7 +281,7 @@ const ProfileEditorPage = forwardRef(({ index }: { index?: number }, ref) => {
             className={silentPaymentAddressError ? 'border-destructive' : ''}
           />
           {silentPaymentAddressError && (
-            <div className="ps-3 text-xs text-destructive">{silentPaymentAddressError}</div>
+            <div className="text-destructive ps-3 text-xs">{silentPaymentAddressError}</div>
           )}
         </Item>
       </div>

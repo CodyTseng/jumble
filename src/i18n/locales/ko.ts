@@ -826,6 +826,8 @@ export default {
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
     'Last edited': '마지막 편집',
-    '{{count}} min read': '읽는 데 {{count}}분'
+    '{{count}} min read': '읽는 데 {{count}}분',
+    'Avatar URL': '아바타 URL',
+    'Banner URL': '배너 URL'
   }
 }

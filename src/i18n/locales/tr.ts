@@ -843,6 +843,8 @@ export default {
     'Show {{count}} media_one': 'Medya göster',
     'Show {{count}} media_other': '{{count}} medya göster',
     'Last edited': 'Son düzenleme',
-    '{{count}} min read': '{{count}} dk. okuma'
+    '{{count}} min read': '{{count}} dk. okuma',
+    'Avatar URL': 'Avatar URL’si',
+    'Banner URL': 'Banner URL’si'
   }
 }
