@@ -16,6 +16,7 @@ class UserAggregationService {
   private aggregationStore: Map<string, Map<string, Event[]>> = new Map()
   private listenersMap: Map<string, Set<() => void>> = new Map()
   private lastViewedMap: Map<string, number> = new Map()
+  private backfillingFeeds: Set<string> = new Set()
 
   constructor() {
     if (UserAggregationService.instance) {
@@ -155,6 +156,23 @@ class UserAggregationService {
     const lastViewed = this.lastViewedMap.get(key)
 
     return lastViewed ?? 0
+  }
+
+  setBackfilling(feedId: string, backfilling: boolean) {
+    if (backfilling) {
+      this.backfillingFeeds.add(feedId)
+    } else {
+      this.backfillingFeeds.delete(feedId)
+    }
+    this.notify(`backfill:${feedId}`)
+  }
+
+  isBackfilling(feedId: string): boolean {
+    return this.backfillingFeeds.has(feedId)
+  }
+
+  subscribeBackfillChange(feedId: string, listener: () => void) {
+    return this.subscribe(`backfill:${feedId}`, listener)
   }
 }
 

@@ -1,3 +1,4 @@
+import DeepPulseList, { TDeepPulseListRef } from '@/components/DeepPulseList'
 import FeedTabsCustomizeDialog from '@/components/FeedTabsCustomizeDialog'
 import NoteList, { TNoteListRef } from '@/components/NoteList'
 import Tabs from '@/components/Tabs'
@@ -36,8 +37,16 @@ export default function NormalFeed({
   const feedShowKinds = useMemo(() => getShowKinds(feedId), [getShowKinds, feedId])
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(feedShowKinds)
 
+  // `disable24hMode` is used by hashtag/search secondary feeds where there
+  // are no stable authors, so per-author aggregation (24h Pulse + deep Pulse)
+  // doesn't make sense. We treat both aggregation builtins the same here.
   const visibleTabs = useMemo(
-    () => feedTabs.filter((tab) => !tab.hidden && !(tab.builtin === '24h' && disable24hMode)),
+    () =>
+      feedTabs.filter(
+        (tab) =>
+          !tab.hidden &&
+          !(disable24hMode && (tab.builtin === '24h' || tab.builtin === 'pulse'))
+      ),
     [feedTabs, disable24hMode]
   )
 
@@ -55,6 +64,7 @@ export default function NormalFeed({
   const supportTouch = useMemo(() => isTouchDevice(), [])
   const noteListRef = useRef<TNoteListRef>(null)
   const userAggregationListRef = useRef<TUserAggregationListRef>(null)
+  const deepPulseListRef = useRef<TDeepPulseListRef>(null)
   const topRef = useRef<HTMLDivElement>(null)
   const subRequestsHaveKinds = useMemo(() => {
     return subRequests.some((req) => !!req.filter.kinds?.length)
@@ -69,6 +79,7 @@ export default function NormalFeed({
 
   const tabHasFixedKinds = !!selectedTab?.kinds
   const is24hMode = selectedTab?.builtin === '24h'
+  const isPulseMode = selectedTab?.builtin === 'pulse'
   const effectiveShowKinds = selectedTab?.kinds ?? temporaryShowKinds
   const hideReplies = selectedTab?.hideReplies ?? false
 
@@ -108,6 +119,8 @@ export default function NormalFeed({
                   }
                   if (is24hMode) {
                     userAggregationListRef.current?.refresh()
+                  } else if (isPulseMode) {
+                    deepPulseListRef.current?.refresh()
                   } else {
                     noteListRef.current?.refresh()
                   }
@@ -133,6 +146,16 @@ export default function NormalFeed({
         is24hMode ? (
           <UserAggregationList
             ref={userAggregationListRef}
+            showKinds={effectiveShowKinds}
+            subRequests={subRequests}
+            areAlgoRelays={areAlgoRelays}
+            showRelayCloseReason={showRelayCloseReason}
+            isPubkeyFeed={isPubkeyFeed}
+            trustScoreThreshold={trustScoreThreshold}
+          />
+        ) : isPulseMode ? (
+          <DeepPulseList
+            ref={deepPulseListRef}
             showKinds={effectiveShowKinds}
             subRequests={subRequests}
             areAlgoRelays={areAlgoRelays}

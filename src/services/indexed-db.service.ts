@@ -27,6 +27,17 @@ const StoreNames = {
   DECRYPTED_CONTENTS: 'decryptedContents',
   PINNED_USERS_EVENTS: 'pinnedUsersEvents',
   EVENTS: 'events',
+  // Per-author cache used by the Pulse view. Unlike EVENTS (which is
+  // time-pruned every 5 days), PULSE_EVENTS is capped per author so inactive
+  // follows' old posts stay cached indefinitely. Keyed by event id, indexed
+  // by pubkey and by created_at.
+  PULSE_EVENTS: 'pulseEvents',
+  // Per-author metadata for the Pulse view: when we last successfully
+  // checked for new posts, and whether that check succeeded. Lets the next
+  // check send `since: lastCheckedAt` instead of an unbounded query, so we
+  // only fill the gap rather than re-fetching the whole timeline. Keyed by
+  // pubkey.
+  PULSE_AUTHOR_META: 'pulseAuthorMeta',
   DM_CONVERSATIONS: 'dmConversations',
   DM_MESSAGES: 'dmMessages',
   DM_RELAYS_EVENTS: 'dmRelaysEvents',
@@ -51,7 +62,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 20)
+        const request = window.indexedDB.open('jumble', 22)
 
         request.onerror = (event) => {
           reject(event)
@@ -115,6 +126,21 @@ class IndexedDbService {
               keyPath: 'event.id'
             })
             feedEventsStore.createIndex('createdAtIndex', 'event.created_at')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.PULSE_EVENTS)) {
+            const pulseStore = db.createObjectStore(StoreNames.PULSE_EVENTS, {
+              keyPath: 'event.id'
+            })
+            pulseStore.createIndex('pubkeyIndex', 'event.pubkey')
+            pulseStore.createIndex(
+              'pubkeyCreatedAtIndex',
+              ['event.pubkey', 'event.created_at']
+            )
+          }
+          if (!db.objectStoreNames.contains(StoreNames.PULSE_AUTHOR_META)) {
+            db.createObjectStore(StoreNames.PULSE_AUTHOR_META, {
+              keyPath: 'pubkey'
+            })
           }
           if (!db.objectStoreNames.contains(StoreNames.DM_CONVERSATIONS)) {
             const dmConversationsStore = db.createObjectStore(StoreNames.DM_CONVERSATIONS, {
@@ -620,6 +646,172 @@ class IndexedDbService {
       request.onerror = (event) => {
         transaction.commit()
         reject(event)
+      }
+    })
+  }
+
+  // ----- Pulse per-author cache ---------------------------------------
+
+  // Store events for the Pulse view. We cap to `perAuthorCap` most-recent
+  // events per author so the store stays bounded even after years of use.
+  // Each call:
+  //   1) writes the new events,
+  //   2) for every affected pubkey, drops any record beyond the cap.
+  // Cap trimming happens inside the same transaction so the store never
+  // holds more than cap*authors records.
+  async putPulseEvents(
+    items: { event: Event; relays: string[] }[],
+    perAuthorCap: number
+  ): Promise<void> {
+    await this.initPromise
+    if (!this.db) return
+    if (items.length === 0) return
+
+    const db = this.db
+    const affectedPubkeys = new Set(items.map((i) => i.event.pubkey))
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.PULSE_EVENTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.PULSE_EVENTS)
+      const index = store.index('pubkeyCreatedAtIndex')
+
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = (ev) => reject(ev)
+      transaction.onabort = (ev) => reject(ev)
+
+      // 1) Upsert all new items.
+      for (const item of items) {
+        store.put(item)
+      }
+
+      // 2) For each affected pubkey, keep only the top N by created_at.
+      //    We walk the index in reverse (newest first) and delete anything
+      //    past the cap.
+      for (const pubkey of affectedPubkeys) {
+        const range = IDBKeyRange.bound(
+          [pubkey, -Infinity],
+          [pubkey, Infinity]
+        )
+        const req = index.openCursor(range, 'prev')
+        let kept = 0
+        req.onsuccess = (ev) => {
+          const cursor = (ev.target as IDBRequest).result as
+            | IDBCursorWithValue
+            | null
+          if (!cursor) return
+          if (kept < perAuthorCap) {
+            kept++
+            cursor.continue()
+          } else {
+            cursor.delete()
+            cursor.continue()
+          }
+        }
+      }
+    })
+  }
+
+  // Return up to `perAuthorCap` most-recent cached events for each of the
+  // given pubkeys. Used to hydrate the Pulse view instantly on open.
+  async getPulseEventsForAuthors(
+    pubkeys: string[],
+    perAuthorCap: number
+  ): Promise<Event[]> {
+    await this.initPromise
+    if (!this.db) return []
+    if (pubkeys.length === 0) return []
+
+    const db = this.db
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.PULSE_EVENTS, 'readonly')
+      const store = transaction.objectStore(StoreNames.PULSE_EVENTS)
+      const index = store.index('pubkeyCreatedAtIndex')
+      const out: Event[] = []
+
+      let pending = pubkeys.length
+      const done = () => {
+        pending--
+        if (pending === 0) {
+          resolve(out)
+        }
+      }
+
+      for (const pubkey of pubkeys) {
+        const range = IDBKeyRange.bound(
+          [pubkey, -Infinity],
+          [pubkey, Infinity]
+        )
+        const req = index.openCursor(range, 'prev')
+        let collected = 0
+        req.onsuccess = (ev) => {
+          const cursor = (ev.target as IDBRequest).result as
+            | IDBCursorWithValue
+            | null
+          if (!cursor || collected >= perAuthorCap) {
+            done()
+            return
+          }
+          const item = cursor.value as { event: Event; relays: string[] }
+          out.push(item.event)
+          collected++
+          cursor.continue()
+        }
+        req.onerror = (ev) => reject(ev)
+      }
+    })
+  }
+
+  // Bulk set last-checked timestamps for Pulse authors. Only call this
+  // AFTER a successful fetch for that author — timeout / network errors
+  // must leave the previous timestamp untouched so the next attempt
+  // still fills the whole missed window.
+  async putPulseAuthorMeta(
+    items: { pubkey: string; lastCheckedAt: number; lastCheckOk: boolean }[]
+  ): Promise<void> {
+    await this.initPromise
+    if (!this.db) return
+    if (items.length === 0) return
+
+    const db = this.db
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.PULSE_AUTHOR_META, 'readwrite')
+      const store = transaction.objectStore(StoreNames.PULSE_AUTHOR_META)
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = (ev) => reject(ev)
+      transaction.onabort = (ev) => reject(ev)
+      for (const item of items) {
+        store.put(item)
+      }
+    })
+  }
+
+  async getPulseAuthorMeta(
+    pubkeys: string[]
+  ): Promise<Map<string, { lastCheckedAt: number; lastCheckOk: boolean }>> {
+    await this.initPromise
+    const out = new Map<string, { lastCheckedAt: number; lastCheckOk: boolean }>()
+    if (!this.db) return out
+    if (pubkeys.length === 0) return out
+
+    const db = this.db
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.PULSE_AUTHOR_META, 'readonly')
+      const store = transaction.objectStore(StoreNames.PULSE_AUTHOR_META)
+      let pending = pubkeys.length
+      const done = () => {
+        pending--
+        if (pending === 0) resolve(out)
+      }
+      for (const pubkey of pubkeys) {
+        const req = store.get(pubkey)
+        req.onsuccess = () => {
+          const v = req.result as
+            | { pubkey: string; lastCheckedAt: number; lastCheckOk: boolean }
+            | undefined
+          if (v) out.set(pubkey, { lastCheckedAt: v.lastCheckedAt, lastCheckOk: v.lastCheckOk })
+          done()
+        }
+        req.onerror = (ev) => reject(ev)
       }
     })
   }
