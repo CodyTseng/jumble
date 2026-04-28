@@ -1,4 +1,6 @@
+import { isTouchDevice } from '@/lib/utils'
 import dayjs from 'dayjs'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function FormattedTimestamp({
@@ -10,8 +12,10 @@ export function FormattedTimestamp({
   short?: boolean
   className?: string
 }) {
+  const supportTouch = useMemo(() => isTouchDevice(), [])
+  const title = supportTouch ? undefined : new Date(timestamp * 1000).toLocaleString()
   return (
-    <span className={className}>
+    <span className={className} title={title}>
       <FormattedTimestampContent timestamp={timestamp} short={short} />
     </span>
   )
