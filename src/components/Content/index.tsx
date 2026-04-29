@@ -62,7 +62,7 @@ export default function Content({
     () => (resolvedContent ? containsMarkdown(resolvedContent) : false),
     [resolvedContent]
   )
-  const { nodes, allImages, lastNormalUrl, emojiInfos, hiddenMediaCount } = useMemo(() => {
+  const { nodes, allImages, lastNormalUrl, emojiInfos, hiddenMediaCount, imetaInfos } = useMemo(() => {
     if (!resolvedContent || isMarkdown) return {}
     const _content = resolvedContent
 
@@ -121,7 +121,7 @@ export default function Content({
       }
     }
 
-    return { nodes, allImages, emojiInfos, lastNormalUrl, hiddenMediaCount }
+    return { nodes, allImages, emojiInfos, lastNormalUrl, hiddenMediaCount, imetaInfos }
   }, [event, resolvedContent, isMarkdown])
 
   const isEmojiOnly = useMemo(() => {
@@ -225,12 +225,14 @@ export default function Content({
           }
           if (node.type === 'media') {
             if (mediaHidden) return null
+            const mediaInfo = imetaInfos?.find((info) => info.url === node.data)
             return (
               <MediaPlayer
                 className="mt-2"
                 key={index}
                 src={node.data}
                 mustLoad={effectiveMustLoad}
+                dim={mediaInfo?.dim}
               />
             )
           }

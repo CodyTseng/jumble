@@ -6,7 +6,15 @@ import mediaManager from '@/services/media-manager.service'
 import { useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
-export default function VideoPlayer({ src, className }: { src: string; className?: string }) {
+export default function VideoPlayer({
+  src,
+  className,
+  dim
+}: {
+  src: string
+  className?: string
+  dim?: { width: number; height: number }
+}) {
   const { autoplay, videoLoop } = useContentPolicy()
   const { muteMedia, updateMuteMedia, allowInsecureConnection } = useUserPreferences()
   const [error, setError] = useState(false)
@@ -82,6 +90,11 @@ export default function VideoPlayer({ src, className }: { src: string; className
         playsInline
         loop={videoLoop}
         className={cn('max-h-[80vh] rounded-xl border sm:max-h-[60vh]', className)}
+        style={
+          dim?.width && dim?.height
+            ? { aspectRatio: `${dim.width} / ${dim.height}`, width: '100%' }
+            : undefined
+        }
         src={src}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {

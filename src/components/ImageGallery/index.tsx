@@ -122,8 +122,7 @@ export default function ImageGallery({
         {displayImages.map((image, i) => (
           <Image
             key={i}
-            className="aspect-square w-full"
-            classNames={{ wrapper: 'cursor-zoom-in border' }}
+            classNames={{ wrapper: 'aspect-square w-full cursor-zoom-in border' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />
@@ -136,8 +135,7 @@ export default function ImageGallery({
         {displayImages.map((image, i) => (
           <Image
             key={i}
-            className="aspect-square w-full"
-            classNames={{ wrapper: 'cursor-zoom-in border' }}
+            classNames={{ wrapper: 'aspect-square w-full cursor-zoom-in border' }}
             image={image}
             onClick={(e) => handlePhotoClick(e, i)}
           />

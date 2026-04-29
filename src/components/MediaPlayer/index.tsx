@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -8,11 +9,13 @@ import ExternalLink from '../ExternalLink'
 export default function MediaPlayer({
   src,
   className,
-  mustLoad = false
+  mustLoad = false,
+  dim
 }: {
   src: string
   className?: string
   mustLoad?: boolean
+  dim?: { width: number; height: number }
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -84,11 +87,19 @@ export default function MediaPlayer({
   }
 
   if (!mediaType) {
+    if (dim?.width && dim?.height) {
+      return (
+        <div
+          className={cn('rounded-xl border bg-muted', className)}
+          style={{ aspectRatio: `${dim.width} / ${dim.height}`, width: '100%' }}
+        />
+      )
+    }
     return null
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={className} />
+    return <VideoPlayer src={src} className={className} dim={dim} />
   }
 
   return <AudioPlayer src={src} className={className} />
