@@ -27,7 +27,11 @@ export default function ProfileFeed({ pubkey, search = '' }: { pubkey: string; s
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(feedShowKinds)
 
   const visibleTabs = useMemo(() => {
-    const base = feedTabs.filter((tab) => !tab.hidden && tab.builtin !== '24h')
+    // Per-author aggregation tabs (24h Pulse, deep Pulse) don't make sense
+    // on a single profile page — we're already scoped to one author.
+    const base = feedTabs.filter(
+      (tab) => !tab.hidden && tab.builtin !== '24h' && tab.builtin !== 'pulse'
+    )
     if (myPubkey && myPubkey !== pubkey) {
       return [...base, YOU_TAB]
     }

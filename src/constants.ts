@@ -155,6 +155,10 @@ export const DEFAULT_FEED_TABS: TFeedTabConfig[] = [
   { id: 'posts', builtin: 'posts', label: 'Notes', hideReplies: true },
   { id: 'postsAndReplies', builtin: 'postsAndReplies', label: 'Replies' },
   { id: '24h', builtin: '24h', label: '24h Pulse' },
+  // Deep per-author Pulse with backfill beyond 24h. Slower to load than
+  // the default `24h` Pulse, so it ships hidden by default; users can
+  // enable it from Customize tabs.
+  { id: 'pulse', builtin: 'pulse', label: 'Pulse', hidden: true },
   {
     id: 'articles',
     builtin: 'articles',

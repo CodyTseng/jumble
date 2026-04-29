@@ -113,7 +113,25 @@ class LocalStorageService {
               typeof tab.label === 'string'
           )
           if (valid.length > 0) {
-            this.feedTabs = valid
+            // Backfill any default builtin tabs the user has never seen
+            // before (e.g. ones added in a later version). They're appended
+            // at the end with their default `hidden` value preserved, so
+            // they show up in Customize tabs and the user can enable them
+            // without losing their existing layout.
+            const knownIds = new Set(valid.map((tab) => tab.id))
+            const knownBuiltins = new Set(
+              valid.map((tab) => tab.builtin).filter((b): b is NonNullable<typeof b> => !!b)
+            )
+            const missingDefaults = DEFAULT_FEED_TABS.filter(
+              (tab) => !knownIds.has(tab.id) && !(tab.builtin && knownBuiltins.has(tab.builtin))
+            ).map((tab) => ({ ...tab }))
+            this.feedTabs = [...valid, ...missingDefaults]
+            if (missingDefaults.length > 0) {
+              window.localStorage.setItem(
+                StorageKey.FEED_TABS,
+                JSON.stringify(this.feedTabs)
+              )
+            }
           }
         }
       } catch {
