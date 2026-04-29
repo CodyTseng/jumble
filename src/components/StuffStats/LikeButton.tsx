@@ -1,6 +1,7 @@
 import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
-import { LONG_PRESS_THRESHOLD, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import { LONG_PRESS_THRESHOLD } from '@/constants'
+import { useFilteredLikeCount } from '@/hooks/useFilteredLikeCount'
 import { useStuff } from '@/hooks/useStuff'
 import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import {
@@ -11,7 +12,6 @@ import { getDefaultRelayUrls } from '@/lib/relay'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { TEmoji } from '@/types'
@@ -30,13 +30,12 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
-  const { getMinTrustScore, meetsMinTrustScore } = useUserTrust()
   const { quickReaction, quickReactionEmoji } = useUserPreferences()
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const [likeCount, setLikeCount] = useState(0)
+  const likeCount = useFilteredLikeCount(stuffKey)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const isLongPressRef = useRef(false)
   const noteStats = useStuffStatsById(stuffKey)
@@ -45,29 +44,6 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
     const myLike = stats.likes?.find((like) => like.pubkey === pubkey)
     return myLike?.emoji
   }, [noteStats, pubkey])
-
-  useEffect(() => {
-    const filterLikes = async () => {
-      const stats = noteStats || {}
-      const likes = stats.likes || []
-      let count = 0
-
-      const trustScoreThreshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.INTERACTIONS)
-      if (!trustScoreThreshold) {
-        setLikeCount(likes.length)
-        return
-      }
-      await Promise.all(
-        likes.map(async (like) => {
-          if (await meetsMinTrustScore(like.pubkey, trustScoreThreshold)) {
-            count++
-          }
-        })
-      )
-      setLikeCount(count)
-    }
-    filterLikes()
-  }, [noteStats, meetsMinTrustScore, getMinTrustScore])
 
   useEffect(() => {
     setTimeout(() => setIsPickerOpen(false), 100)

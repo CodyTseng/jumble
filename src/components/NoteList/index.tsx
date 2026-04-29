@@ -58,6 +58,7 @@ const NoteList = forwardRef<
     filterFn?: (event: Event) => boolean
     showNewNotesDirectly?: boolean
     isPubkeyFeed?: boolean
+    onFilteredCountChange?: (count: number) => void
   }
 >(
   (
@@ -73,7 +74,8 @@ const NoteList = forwardRef<
       pinnedEventIds,
       filterFn,
       showNewNotesDirectly = false,
-      isPubkeyFeed = false
+      isPubkeyFeed = false,
+      onFilteredCountChange
     },
     ref
   ) => {
@@ -269,6 +271,10 @@ const NoteList = forwardRef<
       meetsMinTrustScore,
       trustScoreThreshold
     ])
+
+    useEffect(() => {
+      onFilteredCountChange?.(filteredNotes.length)
+    }, [filteredNotes.length, onFilteredCountChange])
 
     useEffect(() => {
       const processNewEvents = async () => {
