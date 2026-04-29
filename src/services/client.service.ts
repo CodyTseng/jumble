@@ -693,9 +693,6 @@ class ClientService extends EventTarget {
           // if new refs are more than limit, means old refs are too old, replace them
           timeline.refs = newRefs
           onEvents([...events], true)
-          if (needSaveToDb) {
-            indexedDb.deleteEvents({ ...filter, until: events[events.length - 1].created_at })
-          }
         } else {
           // merge new refs with old refs
           timeline.refs = newRefs.concat(timeline.refs)
@@ -885,6 +882,12 @@ class ClientService extends EventTarget {
         if (cache) {
           return cache
         }
+
+        const cacheFromIndexedDb = await indexedDb.getEventById(eventId)
+        if (cacheFromIndexedDb) {
+          this.trackEventExternalSeenOn(eventId, cacheFromIndexedDb.relays)
+          return cacheFromIndexedDb.event
+        }
       }
     }
     return this.eventDataLoader.load(id)
@@ -960,6 +963,10 @@ class ClientService extends EventTarget {
 
     if (event && event.id !== id) {
       this.addEventToCache(event)
+    }
+
+    if (event && !isReplaceableEvent(event.kind)) {
+      indexedDb.putEvents([{ event, relays: this.getEventHints(event.id) }])
     }
 
     return event
@@ -1454,11 +1461,7 @@ class ClientService extends EventTarget {
       : []
   }
 
-  async fetchEncryptionKeyAnnouncementEvent(
-    pubkey: string,
-    updateCache = true,
-    skipCache = false
-  ) {
+  async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true, skipCache = false) {
     return await this.fetchReplaceableEvent(
       pubkey,
       ExtendedKind.ENCRYPTION_KEY_ANNOUNCEMENT,
