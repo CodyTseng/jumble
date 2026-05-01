@@ -829,6 +829,10 @@ export default {
     'Show {{count}} media_other': 'Show {{count}} media',
     'Update ready: v{{version}}': 'Update ready: v{{version}}',
     'Restart now': 'Restart now',
-    'Downloading update v{{version}}…': 'Downloading update v{{version}}…'
+    'Downloading update v{{version}}…': 'Downloading update v{{version}}…',
+    'Last edited': 'Last edited',
+    '{{count}} min read': '{{count}} min read',
+    'Avatar URL': 'Avatar URL',
+    'Banner URL': 'Banner URL'
   }
 }

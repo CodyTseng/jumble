@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { isReplaceableEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TRelayInfo } from '@/types'
 import dayjs from 'dayjs'
@@ -574,6 +575,9 @@ class IndexedDbService {
 
       let completed = 0
       items.forEach((item) => {
+        if (isReplaceableEvent(item.event.kind)) {
+          return
+        }
         const putRequest = store.put(item)
         putRequest.onsuccess = () => {
           completed++
@@ -624,29 +628,19 @@ class IndexedDbService {
     })
   }
 
-  async deleteEvents(filter: Filter & { until: number }): Promise<void> {
+  async getEventById(id: string): Promise<{ event: Event; relays: string[] } | undefined> {
     await this.initPromise
     return new Promise((resolve, reject) => {
       if (!this.db) {
         return reject('database not initialized')
       }
-      const transaction = this.db.transaction(StoreNames.EVENTS, 'readwrite')
+      const transaction = this.db.transaction(StoreNames.EVENTS, 'readonly')
       const store = transaction.objectStore(StoreNames.EVENTS)
-      const index = store.index('createdAtIndex')
-      const request = index.openCursor(IDBKeyRange.upperBound(filter.until, true))
+      const request = store.get(id)
 
-      request.onsuccess = (event) => {
-        const cursor = (event.target as IDBRequest).result
-        if (cursor) {
-          const item = cursor.value as { event: Event; relays: string[] }
-          if (matchFilter(filter, item.event)) {
-            cursor.delete()
-          }
-          cursor.continue()
-        } else {
-          transaction.commit()
-          resolve()
-        }
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve(request.result?.value as { event: Event; relays: string[] })
       }
 
       request.onerror = (event) => {

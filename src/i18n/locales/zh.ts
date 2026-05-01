@@ -810,6 +810,10 @@ export default {
     'Show {{count}} media_other': '显示 {{count}} 项媒体内容',
     'Update ready: v{{version}}': '新版本 v{{version}} 已就绪',
     'Restart now': '立即重启',
-    'Downloading update v{{version}}…': '正在下载新版本 v{{version}}…'
+    'Downloading update v{{version}}…': '正在下载新版本 v{{version}}…',
+    'Last edited': '最后编辑',
+    '{{count}} min read': '约 {{count}} 分钟读完',
+    'Avatar URL': '头像链接',
+    'Banner URL': '横幅链接'
   }
 }

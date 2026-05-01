@@ -844,6 +844,10 @@ export default {
     'Show {{count}} media_other': '{{count}} medya göster',
     'Update ready: v{{version}}': 'Güncelleme hazır: v{{version}}',
     'Restart now': 'Şimdi yeniden başlat',
-    'Downloading update v{{version}}…': 'v{{version}} güncellemesi indiriliyor…'
+    'Downloading update v{{version}}…': 'v{{version}} güncellemesi indiriliyor…',
+    'Last edited': 'Son düzenleme',
+    '{{count}} min read': '{{count}} dk. okuma',
+    'Avatar URL': 'Avatar URL’si',
+    'Banner URL': 'Banner URL’si'
   }
 }

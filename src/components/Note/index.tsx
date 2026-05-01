@@ -77,6 +77,14 @@ export default function Note({
     () => (nsfwDisplayPolicy === NSFW_DISPLAY_POLICY.SHOW ? false : isNsfwEvent(event)),
     [event, nsfwDisplayPolicy]
   )
+  const displayTimestamp = useMemo(() => {
+    if (event.kind === kinds.LongFormArticle) {
+      const publishedAt = event.tags.find(tagNameEquals('published_at'))?.[1]
+      const parsed = publishedAt ? parseInt(publishedAt, 10) : NaN
+      if (Number.isFinite(parsed)) return parsed
+    }
+    return event.created_at
+  }, [event])
 
   let content: React.ReactNode
   if (
@@ -156,7 +164,7 @@ export default function Note({
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Nip05 pubkey={event.pubkey} append="·" />
               <FormattedTimestamp
-                timestamp={event.created_at}
+                timestamp={displayTimestamp}
                 className="shrink-0"
                 short={isSmallScreen}
               />

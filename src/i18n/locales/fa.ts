@@ -835,6 +835,10 @@ export default {
     'Show {{count}} media_other': 'نمایش {{count}} رسانه',
     'Update ready: v{{version}}': 'به‌روزرسانی آماده است: v{{version}}',
     'Restart now': 'هم‌اکنون راه‌اندازی مجدد',
-    'Downloading update v{{version}}…': 'در حال دانلود به‌روزرسانی v{{version}}…'
+    'Downloading update v{{version}}…': 'در حال دانلود به‌روزرسانی v{{version}}…',
+    'Last edited': 'آخرین ویرایش',
+    '{{count}} min read': '{{count}} دقیقه مطالعه',
+    'Avatar URL': 'نشانی تصویر نمایه',
+    'Banner URL': 'نشانی تصویر سربرگ'
   }
 }

@@ -803,6 +803,10 @@ export default {
     'Show {{count}} media_other': '顯示 {{count}} 項媒體內容',
     'Update ready: v{{version}}': '新版本 v{{version}} 已就緒',
     'Restart now': '立即重啟',
-    'Downloading update v{{version}}…': '正在下載新版本 v{{version}}…'
+    'Downloading update v{{version}}…': '正在下載新版本 v{{version}}…',
+    'Last edited': '最後編輯',
+    '{{count}} min read': '約 {{count}} 分鐘讀完',
+    'Avatar URL': '頭像連結',
+    'Banner URL': '橫幅連結'
   }
 }

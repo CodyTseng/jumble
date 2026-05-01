@@ -831,6 +831,10 @@ export default {
     'Show {{count}} media_other': '{{count}} média megjelenítése',
     'Update ready: v{{version}}': 'A frissítés készen áll: v{{version}}',
     'Restart now': 'Újraindítás most',
-    'Downloading update v{{version}}…': 'Frissítés letöltése: v{{version}}…'
+    'Downloading update v{{version}}…': 'Frissítés letöltése: v{{version}}…',
+    'Last edited': 'Utoljára szerkesztve',
+    '{{count}} min read': '{{count}} perc olvasás',
+    'Avatar URL': 'Avatar URL',
+    'Banner URL': 'Borítókép URL'
   }
 }

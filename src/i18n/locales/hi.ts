@@ -835,6 +835,10 @@ export default {
     'Show {{count}} media_other': '{{count}} मीडिया दिखाएँ',
     'Update ready: v{{version}}': 'अपडेट तैयार: v{{version}}',
     'Restart now': 'अभी पुनरारंभ करें',
-    'Downloading update v{{version}}…': 'अपडेट v{{version}} डाउनलोड हो रहा है…'
+    'Downloading update v{{version}}…': 'अपडेट v{{version}} डाउनलोड हो रहा है…',
+    'Last edited': 'अंतिम बार संपादित',
+    '{{count}} min read': '{{count}} मिनट पठन',
+    'Avatar URL': 'अवतार URL',
+    'Banner URL': 'बैनर URL'
   }
 }

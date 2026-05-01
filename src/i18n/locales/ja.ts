@@ -834,6 +834,10 @@ export default {
     'Show {{count}} media_other': '{{count}} 個のメディアを表示',
     'Update ready: v{{version}}': 'アップデートの準備ができました: v{{version}}',
     'Restart now': '今すぐ再起動',
-    'Downloading update v{{version}}…': 'アップデート v{{version}} をダウンロード中…'
+    'Downloading update v{{version}}…': 'アップデート v{{version}} をダウンロード中…',
+    'Last edited': '最終編集',
+    '{{count}} min read': '読了目安 {{count}} 分',
+    'Avatar URL': 'アイコンの URL',
+    'Banner URL': 'バナーの URL'
   }
 }

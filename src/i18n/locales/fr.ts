@@ -845,6 +845,10 @@ export default {
     'Show {{count}} media_other': 'Afficher {{count}} médias',
     'Update ready: v{{version}}': 'Mise à jour prête : v{{version}}',
     'Restart now': 'Redémarrer maintenant',
-    'Downloading update v{{version}}…': 'Téléchargement de la mise à jour v{{version}}…'
+    'Downloading update v{{version}}…': 'Téléchargement de la mise à jour v{{version}}…',
+    'Last edited': 'Dernière modification',
+    '{{count}} min read': '{{count}} min de lecture',
+    'Avatar URL': 'URL de l’avatar',
+    'Banner URL': 'URL de la bannière'
   }
 }

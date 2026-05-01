@@ -821,6 +821,10 @@ export default {
     'Show {{count}} media_other': 'عرض {{count}} وسائط',
     'Update ready: v{{version}}': 'التحديث جاهز: v{{version}}',
     'Restart now': 'إعادة التشغيل الآن',
-    'Downloading update v{{version}}…': 'جارٍ تنزيل التحديث v{{version}}…'
+    'Downloading update v{{version}}…': 'جارٍ تنزيل التحديث v{{version}}…',
+    'Last edited': 'آخر تعديل',
+    '{{count}} min read': '{{count}} دقيقة قراءة',
+    'Avatar URL': 'رابط الصورة الرمزية',
+    'Banner URL': 'رابط صورة الغلاف'
   }
 }

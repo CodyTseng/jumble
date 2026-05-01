@@ -42,3 +42,29 @@ export function containsMarkdown(content: string): boolean {
 
   return false
 }
+
+/**
+ * Rough reading-time estimate for markdown content.
+ * Counts CJK characters (~300/min) and latin word tokens (~220/min) separately
+ * so the result holds up for mixed-language articles. Always returns at least 1.
+ */
+export function estimateReadingMinutes(content: string): number {
+  const stripped = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/nostr:[a-z0-9]+/gi, ' ')
+
+  const cjkMatches = stripped.match(/[぀-ヿ㐀-䶿一-鿿가-힯]/g)
+  const cjkCount = cjkMatches ? cjkMatches.length : 0
+
+  const latinMatches = stripped
+    .replace(/[぀-ヿ㐀-䶿一-鿿가-힯]/g, ' ')
+    .match(/[\p{L}\p{N}]+/gu)
+  const latinCount = latinMatches ? latinMatches.length : 0
+
+  const minutes = cjkCount / 300 + latinCount / 220
+  return Math.max(1, Math.round(minutes))
+}

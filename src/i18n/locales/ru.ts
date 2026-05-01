@@ -840,6 +840,10 @@ export default {
     'Show {{count}} media_other': 'Показать {{count}} медиа',
     'Update ready: v{{version}}': 'Обновление готово: v{{version}}',
     'Restart now': 'Перезапустить сейчас',
-    'Downloading update v{{version}}…': 'Загрузка обновления v{{version}}…'
+    'Downloading update v{{version}}…': 'Загрузка обновления v{{version}}…',
+    'Last edited': 'Последнее редактирование',
+    '{{count}} min read': '{{count}} мин чтения',
+    'Avatar URL': 'URL аватара',
+    'Banner URL': 'URL баннера'
   }
 }

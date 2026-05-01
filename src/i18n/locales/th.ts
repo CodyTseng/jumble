@@ -821,6 +821,10 @@ export default {
     'Show {{count}} media_other': 'แสดงสื่อ {{count}} รายการ',
     'Update ready: v{{version}}': 'พร้อมอัปเดต: v{{version}}',
     'Restart now': 'รีสตาร์ตเดี๋ยวนี้',
-    'Downloading update v{{version}}…': 'กำลังดาวน์โหลดอัปเดต v{{version}}…'
+    'Downloading update v{{version}}…': 'กำลังดาวน์โหลดอัปเดต v{{version}}…',
+    'Last edited': 'แก้ไขล่าสุด',
+    '{{count}} min read': 'อ่าน {{count}} นาที',
+    'Avatar URL': 'URL รูปโปรไฟล์',
+    'Banner URL': 'URL แบนเนอร์'
   }
 }
