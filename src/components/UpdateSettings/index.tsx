@@ -2,15 +2,20 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { isElectron } from '@/lib/platform'
+import { cn } from '@/lib/utils'
 import { useUpdater } from '@/providers/UpdaterProvider'
 import { Loader2, RotateCw } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 export default function UpdateSettings() {
   const { t } = useTranslation()
   const { state, setAutoUpdate } = useUpdater()
 
   if (!isElectron()) return null
+
+  const hasNewVersion = state.status === 'available' || state.status === 'downloaded'
 
   return (
     <div className="space-y-4">
@@ -31,7 +36,14 @@ export default function UpdateSettings() {
       <div className="space-y-2 px-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="text-base">{t('Check for updates')}</div>
+            <div className="flex items-center gap-2 text-base">
+              {t('Check for updates')}
+              {hasNewVersion && (
+                <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs font-medium leading-none text-primary-foreground">
+                  {t('NEW')}
+                </span>
+              )}
+            </div>
             <UpdateStatusLine />
           </div>
           <UpdateActionButton />
@@ -89,6 +101,33 @@ function UpdateStatusLine() {
 function UpdateActionButton() {
   const { t } = useTranslation()
   const { state, check, download, install } = useUpdater()
+  const [localChecking, setLocalChecking] = useState(false)
+  const prevStatusRef = useRef(state.status)
+
+  useEffect(() => {
+    const prev = prevStatusRef.current
+    prevStatusRef.current = state.status
+    if (prev !== 'checking') return
+    if (state.status === 'not-available') {
+      toast.success(t('You are on the latest version ({{version}})', { version: `v${state.currentVersion}` }))
+    } else if (state.status === 'available') {
+      toast.info(t('Update available: v{{version}}', { version: state.newVersion ?? '' }))
+    } else if (state.status === 'error') {
+      toast.error(state.error ?? t('Failed to check for updates'))
+    }
+  }, [state.status, state.currentVersion, state.newVersion, state.error, t])
+
+  const handleCheck = async () => {
+    setLocalChecking(true)
+    try {
+      await check()
+    } finally {
+      setLocalChecking(false)
+    }
+    if (!state.supported) {
+      toast.info(t('Updates are not available in development mode'))
+    }
+  }
 
   if (state.status === 'downloaded') {
     return (
@@ -114,10 +153,10 @@ function UpdateActionButton() {
     )
   }
 
-  const isChecking = state.status === 'checking'
+  const isChecking = localChecking || state.status === 'checking'
   return (
-    <Button size="sm" variant="secondary" onClick={check} disabled={isChecking}>
-      {isChecking ? <Loader2 className="animate-spin" /> : <RotateCw />}
+    <Button size="sm" variant="secondary" onClick={handleCheck} disabled={isChecking}>
+      <RotateCw className={cn(isChecking && 'animate-spin')} />
       {t('Check')}
     </Button>
   )

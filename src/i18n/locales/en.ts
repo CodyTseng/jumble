@@ -843,6 +843,9 @@ export default {
     'You are on the latest version ({{version}})': 'You are on the latest version ({{version}})',
     'Failed to check for updates': 'Failed to check for updates',
     'Check': 'Check',
-    'Download': 'Download'
+    'Download': 'Download',
+    'NEW': 'NEW',
+    'Updates are not available in development mode':
+      'Updates are not available in development mode'
   }
 }
