@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { isElectron } from '@/lib/platform'
 import { useUpdater } from '@/providers/UpdaterProvider'
 import { Loader2, RotateCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +10,7 @@ export default function UpdateSettings() {
   const { t } = useTranslation()
   const { state, setAutoUpdate } = useUpdater()
 
-  if (!state.supported) return null
+  if (!isElectron()) return null
 
   return (
     <div className="space-y-4">
