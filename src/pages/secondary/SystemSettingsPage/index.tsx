@@ -22,7 +22,7 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('System')}>
-      <div className="mt-3 space-y-4">
+      <div className="mt-3 space-y-4 pb-4">
         <div className="space-y-2 px-4">
           <Label htmlFor="favicon-url" className="text-base font-normal">
             {t('Favicon URL')}
