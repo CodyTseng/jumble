@@ -10,15 +10,9 @@ const CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000 // 4 hours
 const FIRST_CHECK_DELAY_MS = 5_000
 const SETTINGS_FILE = 'updater-settings.json'
 
-const MOCK_CHECK_DELAY_MS = 1500
-const MOCK_DOWNLOAD_TICK_MS = 200
-const MOCK_BYTES_PER_SECOND = 2 * 1024 * 1024
-
 type TUpdaterSettings = {
   autoUpdateEnabled: boolean
 }
-
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 export class Updater {
   private window: BrowserWindow | null = null
@@ -26,21 +20,17 @@ export class Updater {
   private timer: NodeJS.Timeout | null = null
   private firstCheckTimer: NodeJS.Timeout | null = null
   private autoUpdateEnabled: boolean
-  // dev / unpackaged builds simulate the update flow so the UI can be exercised
-  // end-to-end without a real release server.
-  private readonly mock: boolean
 
   constructor(private readonly enabled: boolean) {
     this.autoUpdateEnabled = this.loadSettings().autoUpdateEnabled
-    this.mock = !enabled
     this.state = {
       status: 'idle',
       currentVersion: app.getVersion(),
-      supported: enabled || this.mock,
+      supported: enabled,
       autoUpdateEnabled: this.autoUpdateEnabled
     }
 
-    if (this.mock || !enabled) return
+    if (!enabled) return
 
     autoUpdater.autoDownload = this.autoUpdateEnabled
     autoUpdater.autoInstallOnAppQuit = true
@@ -85,7 +75,6 @@ export class Updater {
   }
 
   start() {
-    if (this.mock) return
     if (!this.enabled) return
     if (!this.autoUpdateEnabled) return
     this.scheduleBackgroundChecks()
@@ -103,10 +92,6 @@ export class Updater {
   }
 
   async check(): Promise<TUpdateState> {
-    if (this.mock) {
-      await this.mockCheck()
-      return this.state
-    }
     if (!this.enabled) return this.state
     try {
       await autoUpdater.checkForUpdates()
@@ -120,10 +105,6 @@ export class Updater {
   }
 
   async download(): Promise<void> {
-    if (this.mock) {
-      await this.mockDownload()
-      return
-    }
     if (!this.enabled) return
     try {
       await autoUpdater.downloadUpdate()
@@ -136,11 +117,6 @@ export class Updater {
   }
 
   async install(): Promise<void> {
-    if (this.mock) {
-      console.log('[updater] mock install — would quit and install', this.state.newVersion)
-      this.update({ status: 'idle', newVersion: undefined, progressPercent: undefined })
-      return
-    }
     if (!this.enabled) return
     autoUpdater.quitAndInstall()
   }
@@ -161,37 +137,6 @@ export class Updater {
 
     this.update({ autoUpdateEnabled: enabled })
     return this.state
-  }
-
-  private async mockCheck() {
-    this.update({ status: 'checking', error: undefined })
-    await sleep(MOCK_CHECK_DELAY_MS)
-    this.update({
-      status: 'available',
-      newVersion: bumpVersion(this.state.currentVersion),
-      releaseNotes: 'Mock release notes for dev testing.'
-    })
-    if (this.autoUpdateEnabled) {
-      await this.mockDownload()
-    }
-  }
-
-  private async mockDownload() {
-    this.update({
-      status: 'downloading',
-      progressPercent: 0,
-      bytesPerSecond: MOCK_BYTES_PER_SECOND
-    })
-    for (let p = 10; p <= 100; p += 10) {
-      await sleep(MOCK_DOWNLOAD_TICK_MS)
-      this.update({
-        status: 'downloading',
-        progressPercent: p,
-        bytesPerSecond: MOCK_BYTES_PER_SECOND
-      })
-    }
-    this.update({ status: 'downloaded', progressPercent: 100 })
-    this.notifyDownloaded(this.state.newVersion ?? 'mock')
   }
 
   private scheduleBackgroundChecks() {
@@ -246,10 +191,4 @@ export class Updater {
       console.error('[updater] failed to persist settings:', err)
     }
   }
-}
-
-function bumpVersion(v: string): string {
-  const m = v.match(/^(\d+)\.(\d+)\.(\d+)(.*)$/)
-  if (m) return `${m[1]}.${m[2]}.${parseInt(m[3], 10) + 1}${m[4] ?? ''}`
-  return `${v}.dev`
 }
