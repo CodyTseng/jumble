@@ -66,7 +66,9 @@ const bridge: TElectronBridge = {
       const listener = (_e: unknown, payload: TUpdateState) => cb(payload)
       ipcRenderer.on(IPC_CHANNELS.updateState, listener)
       return () => ipcRenderer.off(IPC_CHANNELS.updateState, listener)
-    }
+    },
+    setAutoUpdate: (enabled: boolean) =>
+      ipcRenderer.invoke(IPC_CHANNELS.updateSetAuto, enabled)
   }
 }
 

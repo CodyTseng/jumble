@@ -7,7 +7,8 @@ const APP_VERSION = (import.meta.env.APP_VERSION as string | undefined) ?? ''
 const DEFAULT_STATE: TUpdateState = {
   status: 'idle',
   currentVersion: APP_VERSION,
-  supported: false
+  supported: false,
+  autoUpdateEnabled: true
 }
 
 type TUpdaterContext = {
@@ -15,6 +16,7 @@ type TUpdaterContext = {
   check: () => Promise<void>
   download: () => Promise<void>
   install: () => Promise<void>
+  setAutoUpdate: (enabled: boolean) => Promise<void>
 }
 
 const UpdaterContext = createContext<TUpdaterContext | undefined>(undefined)
@@ -59,8 +61,15 @@ export function UpdaterProvider({ children }: { children: React.ReactNode }) {
     await bridge.update.install()
   }, [])
 
+  const setAutoUpdate = useCallback(async (enabled: boolean) => {
+    const bridge = getElectronBridge()
+    if (!bridge) return
+    const s = await bridge.update.setAutoUpdate(enabled)
+    setState(s)
+  }, [])
+
   return (
-    <UpdaterContext.Provider value={{ state, check, download, install }}>
+    <UpdaterContext.Provider value={{ state, check, download, install, setAutoUpdate }}>
       {children}
     </UpdaterContext.Provider>
   )

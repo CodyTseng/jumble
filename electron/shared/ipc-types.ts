@@ -21,7 +21,8 @@ export const IPC_CHANNELS = {
   updateDownload: 'update:download',
   updateInstall: 'update:install',
   updateGetState: 'update:get-state',
-  updateState: 'update:state'
+  updateState: 'update:state',
+  updateSetAuto: 'update:set-auto'
 } as const
 
 export type TSecretsBundle = {
@@ -129,6 +130,8 @@ export type TUpdateState = {
   error?: string
   /** Whether the platform supports auto-update at all (false on web/dev) */
   supported: boolean
+  /** User preference: when false, the app does not auto-check or auto-download */
+  autoUpdateEnabled: boolean
 }
 
 export type TUpdateBridge = {
@@ -142,6 +145,8 @@ export type TUpdateBridge = {
   getState: () => Promise<TUpdateState>
   /** Subscribe to state changes pushed by the main process. */
   onState: (cb: (state: TUpdateState) => void) => () => void
+  /** Toggle the periodic background check + autoDownload behavior. */
+  setAutoUpdate: (enabled: boolean) => Promise<TUpdateState>
 }
 
 export type TElectronBridge = {

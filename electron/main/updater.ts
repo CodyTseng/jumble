@@ -1,27 +1,38 @@
 import { app, BrowserWindow, Notification } from 'electron'
 import electronUpdater, { UpdateInfo } from 'electron-updater'
+import fs from 'node:fs'
+import path from 'node:path'
 import { IPC_CHANNELS, TUpdateState } from '../shared/ipc-types.js'
 
 const { autoUpdater } = electronUpdater
 
 const CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000 // 4 hours
 const FIRST_CHECK_DELAY_MS = 5_000
+const SETTINGS_FILE = 'updater-settings.json'
+
+type TUpdaterSettings = {
+  autoUpdateEnabled: boolean
+}
 
 export class Updater {
   private window: BrowserWindow | null = null
   private state: TUpdateState
   private timer: NodeJS.Timeout | null = null
+  private firstCheckTimer: NodeJS.Timeout | null = null
+  private autoUpdateEnabled: boolean
 
   constructor(private readonly enabled: boolean) {
+    this.autoUpdateEnabled = this.loadSettings().autoUpdateEnabled
     this.state = {
       status: 'idle',
       currentVersion: app.getVersion(),
-      supported: enabled
+      supported: enabled,
+      autoUpdateEnabled: this.autoUpdateEnabled
     }
 
     if (!enabled) return
 
-    autoUpdater.autoDownload = true
+    autoUpdater.autoDownload = this.autoUpdateEnabled
     autoUpdater.autoInstallOnAppQuit = true
     autoUpdater.allowPrerelease = false
 
@@ -65,11 +76,13 @@ export class Updater {
 
   start() {
     if (!this.enabled) return
-    setTimeout(() => this.check().catch(() => undefined), FIRST_CHECK_DELAY_MS)
-    this.timer = setInterval(() => this.check().catch(() => undefined), CHECK_INTERVAL_MS)
+    if (!this.autoUpdateEnabled) return
+    this.scheduleBackgroundChecks()
   }
 
   stop() {
+    if (this.firstCheckTimer) clearTimeout(this.firstCheckTimer)
+    this.firstCheckTimer = null
     if (this.timer) clearInterval(this.timer)
     this.timer = null
   }
@@ -108,6 +121,33 @@ export class Updater {
     autoUpdater.quitAndInstall()
   }
 
+  setAutoUpdate(enabled: boolean): TUpdateState {
+    if (this.autoUpdateEnabled === enabled) return this.state
+    this.autoUpdateEnabled = enabled
+    this.saveSettings({ autoUpdateEnabled: enabled })
+
+    if (this.enabled) {
+      autoUpdater.autoDownload = enabled
+      if (enabled) {
+        this.scheduleBackgroundChecks()
+      } else {
+        this.stop()
+      }
+    }
+
+    this.update({ autoUpdateEnabled: enabled })
+    return this.state
+  }
+
+  private scheduleBackgroundChecks() {
+    this.stop()
+    this.firstCheckTimer = setTimeout(
+      () => this.check().catch(() => undefined),
+      FIRST_CHECK_DELAY_MS
+    )
+    this.timer = setInterval(() => this.check().catch(() => undefined), CHECK_INTERVAL_MS)
+  }
+
   private update(patch: Partial<TUpdateState>) {
     this.state = { ...this.state, ...patch }
     if (this.window && !this.window.isDestroyed()) {
@@ -124,6 +164,31 @@ export class Updater {
       }).show()
     } catch {
       // ignore
+    }
+  }
+
+  private settingsPath(): string {
+    return path.join(app.getPath('userData'), SETTINGS_FILE)
+  }
+
+  private loadSettings(): TUpdaterSettings {
+    try {
+      const raw = fs.readFileSync(this.settingsPath(), 'utf8')
+      const parsed = JSON.parse(raw) as Partial<TUpdaterSettings>
+      if (typeof parsed?.autoUpdateEnabled === 'boolean') {
+        return { autoUpdateEnabled: parsed.autoUpdateEnabled }
+      }
+    } catch {
+      // missing or unreadable — fall through to default
+    }
+    return { autoUpdateEnabled: true }
+  }
+
+  private saveSettings(settings: TUpdaterSettings) {
+    try {
+      fs.writeFileSync(this.settingsPath(), JSON.stringify(settings), 'utf8')
+    } catch (err) {
+      console.error('[updater] failed to persist settings:', err)
     }
   }
 }

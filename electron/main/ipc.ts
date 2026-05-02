@@ -55,6 +55,9 @@ export function registerIpcHandlers(
   ipcMain.handle(IPC_CHANNELS.updateDownload, () => updater.download())
   ipcMain.handle(IPC_CHANNELS.updateInstall, () => updater.install())
   ipcMain.handle(IPC_CHANNELS.updateGetState, () => updater.getState())
+  ipcMain.handle(IPC_CHANNELS.updateSetAuto, (_e, enabled: boolean) =>
+    updater.setAutoUpdate(enabled)
+  )
 }
 
 export function unregisterIpcHandlers() {

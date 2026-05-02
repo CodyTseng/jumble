@@ -3,6 +3,7 @@ import SearchRelaysSetting from '@/components/SearchRelaysSetting'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import UpdateSettings from '@/components/UpdateSettings'
 import { DEFAULT_FAVICON_URL_TEMPLATE } from '@/constants'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -66,6 +67,7 @@ const SystemSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         <div className="space-y-2 px-4">
           <SearchRelaysSetting />
         </div>
+        <UpdateSettings />
       </div>
     </SecondaryPageLayout>
   )

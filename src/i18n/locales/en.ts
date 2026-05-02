@@ -833,6 +833,16 @@ export default {
     'Last edited': 'Last edited',
     '{{count}} min read': '{{count}} min read',
     'Avatar URL': 'Avatar URL',
-    'Banner URL': 'Banner URL'
+    'Banner URL': 'Banner URL',
+    'Automatic updates': 'Automatic updates',
+    'Check for and download updates in the background':
+      'Check for and download updates in the background',
+    'Check for updates': 'Check for updates',
+    'Checking for updates…': 'Checking for updates…',
+    'Update available: v{{version}}': 'Update available: v{{version}}',
+    'You are on the latest version ({{version}})': 'You are on the latest version ({{version}})',
+    'Failed to check for updates': 'Failed to check for updates',
+    'Check': 'Check',
+    'Download': 'Download'
   }
 }
