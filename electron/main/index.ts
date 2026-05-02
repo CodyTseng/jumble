@@ -1,3 +1,5 @@
+import 'websocket-polyfill'
+
 import { app, BrowserWindow, nativeTheme, shell } from 'electron'
 import { useWebSocketImplementation as setWebSocketImpl } from 'nostr-tools/relay'
 import { fileURLToPath } from 'node:url'
