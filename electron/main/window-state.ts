@@ -6,7 +6,7 @@ const STATE_FILE = 'window-state.json'
 const SAVE_DEBOUNCE_MS = 500
 
 const DEFAULTS = {
-  width: 1280,
+  width: 1024,
   height: 820
 }
 

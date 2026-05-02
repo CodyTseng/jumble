@@ -54,7 +54,11 @@ export default defineConfig(({ mode }) => {
             build: {
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: ['electron']
+                external: ['electron'],
+                output: {
+                  format: 'cjs',
+                  entryFileNames: '[name].cjs'
+                }
               }
             }
           }

@@ -45,7 +45,7 @@ function createWindow() {
     show: false,
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#171717' : '#ffffff',
     webPreferences: {
-      preload: path.join(MAIN_DIST, 'preload', 'index.mjs'),
+      preload: path.join(MAIN_DIST, 'preload', 'index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false
