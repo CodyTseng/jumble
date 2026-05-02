@@ -827,9 +827,25 @@ export default {
     'Show tab': 'Show tab',
     'Show {{count}} media_one': 'Show media',
     'Show {{count}} media_other': 'Show {{count}} media',
+    'Update ready: v{{version}}': 'Update ready: v{{version}}',
+    'Restart now': 'Restart now',
+    'Downloading update v{{version}}…': 'Downloading update v{{version}}…',
     'Last edited': 'Last edited',
     '{{count}} min read': '{{count}} min read',
     'Avatar URL': 'Avatar URL',
-    'Banner URL': 'Banner URL'
+    'Banner URL': 'Banner URL',
+    'Automatic updates': 'Automatic updates',
+    'Check for and download updates in the background':
+      'Check for and download updates in the background',
+    'Check for updates': 'Check for updates',
+    'Checking for updates…': 'Checking for updates…',
+    'Update available: v{{version}}': 'Update available: v{{version}}',
+    'You are on the latest version ({{version}})': 'You are on the latest version ({{version}})',
+    'Failed to check for updates': 'Failed to check for updates',
+    'Check': 'Check',
+    'Download': 'Download',
+    'NEW': 'NEW',
+    'Updates are not available in development mode':
+      'Updates are not available in development mode'
   }
 }

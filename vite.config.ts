@@ -1,7 +1,8 @@
 import react from '@vitejs/plugin-react'
 import { execSync } from 'child_process'
 import path from 'path'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type PluginOption } from 'vite'
+import electron from 'vite-plugin-electron/simple'
 import { VitePWA } from 'vite-plugin-pwa'
 import packageJson from './package.json'
 import { normalizeUrl } from './src/lib/url'
@@ -24,29 +25,48 @@ const getAppVersion = () => {
   }
 }
 
+const IS_ELECTRON = process.env.ELECTRON === 'true'
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  return {
-    define: {
-      'import.meta.env.GIT_COMMIT': getGitHash(),
-      'import.meta.env.APP_VERSION': getAppVersion(),
-      'import.meta.env.VITE_COMMUNITY_RELAY_SETS': JSON.parse(
-        JSON.stringify(env.VITE_COMMUNITY_RELAY_SETS ?? '[]')
-      ),
-      'import.meta.env.VITE_COMMUNITY_RELAYS': (env.VITE_COMMUNITY_RELAYS ?? '')
-        .split(',')
-        .map((url) => normalizeUrl(url))
-        .filter(Boolean)
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './src')
-      }
-    },
-    plugins: [
-      react(),
+  const plugins: PluginOption[] = [react()]
+
+  if (IS_ELECTRON) {
+    plugins.push(
+      electron({
+        main: {
+          entry: 'electron/main/index.ts',
+          vite: {
+            build: {
+              outDir: 'dist-electron/main',
+              rollupOptions: {
+                // Keep native/electron-only deps external; bundle nostr-tools etc.
+                external: ['electron', 'ws']
+              }
+            }
+          }
+        },
+        preload: {
+          input: 'electron/preload/index.ts',
+          vite: {
+            build: {
+              outDir: 'dist-electron/preload',
+              rollupOptions: {
+                external: ['electron'],
+                output: {
+                  format: 'cjs',
+                  entryFileNames: '[name].cjs'
+                }
+              }
+            }
+          }
+        }
+      })
+    )
+  } else {
+    plugins.push(
       VitePWA({
         registerType: 'autoUpdate',
         workbox: {
@@ -100,6 +120,27 @@ export default defineConfig(({ mode }) => {
           description: packageJson.description
         }
       })
-    ]
+    )
+  }
+
+  return {
+    base: IS_ELECTRON ? './' : '/',
+    define: {
+      'import.meta.env.GIT_COMMIT': getGitHash(),
+      'import.meta.env.APP_VERSION': getAppVersion(),
+      'import.meta.env.VITE_COMMUNITY_RELAY_SETS': JSON.parse(
+        JSON.stringify(env.VITE_COMMUNITY_RELAY_SETS ?? '[]')
+      ),
+      'import.meta.env.VITE_COMMUNITY_RELAYS': (env.VITE_COMMUNITY_RELAYS ?? '')
+        .split(',')
+        .map((url) => normalizeUrl(url))
+        .filter(Boolean)
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src')
+      }
+    },
+    plugins
   }
 })

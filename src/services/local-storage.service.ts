@@ -14,6 +14,7 @@ import {
   TPrimaryColor
 } from '@/constants'
 import { isSameAccount } from '@/lib/account'
+import { getElectronBridge, isElectron } from '@/lib/platform'
 import { randomString } from '@/lib/random'
 import { isTorBrowser } from '@/lib/utils'
 import {
@@ -77,6 +78,15 @@ class LocalStorageService {
   private hideIndirectNotifications: boolean = false
   private encryptionKeyPrivkeyMap: Record<string, string> = {}
   private clientKeyPrivkeyMap: Record<string, string> = {}
+  // Per-pubkey maps for fields that historically lived inline on TAccount.
+  // Always the source of truth at runtime regardless of mode.
+  private nsecByPubkey: Record<string, string> = {}
+  private ncryptsecByPubkey: Record<string, string> = {}
+  private bunkerClientSecretByPubkey: Record<string, string> = {}
+  // True when secrets persist via main-process safeStorage (Electron) instead of localStorage.
+  private secretsViaIpc = false
+  private secretsHydrated = false
+  private secretsWriteChain: Promise<void> = Promise.resolve()
   private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
   private dmLastSyncedAtMap: Record<string, number> = {}
   private dmBackwardCursorMap: Record<string, number> = {}
@@ -98,6 +108,12 @@ class LocalStorageService {
     this.accounts = accountsStr ? JSON.parse(accountsStr) : []
     const currentAccountStr = window.localStorage.getItem(StorageKey.CURRENT_ACCOUNT)
     this.currentAccount = currentAccountStr ? JSON.parse(currentAccountStr) : null
+
+    // Peel any inline secrets out of accounts into per-pubkey maps so the
+    // accessor surface is uniform. In Web mode these maps are still backed
+    // by inline storage (re-attached on persistence). In Electron mode
+    // hydrate() will discard these and reload from safeStorage.
+    this.peelInlineSecrets()
 
     const feedTabsStr = window.localStorage.getItem(StorageKey.FEED_TABS)
     if (feedTabsStr) {
@@ -520,57 +536,244 @@ class LocalStorageService {
     window.localStorage.setItem(StorageKey.FEED_TABS, JSON.stringify(tabs))
   }
 
+  /**
+   * Hydrate sensitive fields from secure storage. Must be awaited once at
+   * boot, before any code reads/writes secrets. In Web mode this is a no-op;
+   * in Electron mode it loads the encrypted secrets bundle from the main
+   * process via safeStorage.
+   */
+  async hydrate(): Promise<void> {
+    if (this.secretsHydrated) return
+    this.secretsHydrated = true
+
+    const bridge = getElectronBridge()
+    if (!isElectron() || !bridge) return
+
+    let available = false
+    try {
+      available = await bridge.secrets.isAvailable()
+    } catch {
+      available = false
+    }
+
+    // Discard anything peeled out of localStorage; main-process file is the
+    // sole source of truth in Electron mode.
+    this.nsecByPubkey = {}
+    this.ncryptsecByPubkey = {}
+    this.bunkerClientSecretByPubkey = {}
+    this.encryptionKeyPrivkeyMap = {}
+    this.clientKeyPrivkeyMap = {}
+
+    if (available) {
+      this.secretsViaIpc = true
+      try {
+        const bundle = await bridge.secrets.load()
+        Object.assign(this.nsecByPubkey, bundle.nsec ?? {})
+        Object.assign(this.ncryptsecByPubkey, bundle.ncryptsec ?? {})
+        Object.assign(this.bunkerClientSecretByPubkey, bundle.bunkerClientSecretKey ?? {})
+        Object.assign(this.encryptionKeyPrivkeyMap, bundle.encryptionKeyPrivkey ?? {})
+        Object.assign(this.clientKeyPrivkeyMap, bundle.clientKeyPrivkey ?? {})
+      } catch (err) {
+        console.error('[storage] failed to load encrypted secrets:', err)
+      }
+    } else {
+      console.warn(
+        '[storage] safeStorage not available — secrets stay in-memory and will be lost on quit'
+      )
+    }
+
+    // Defensive cleanup: scrub any plaintext that lingered in localStorage.
+    window.localStorage.removeItem(StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP)
+    window.localStorage.removeItem(StorageKey.CLIENT_KEY_PRIVKEY_MAP)
+    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.serializeAccounts()))
+    if (this.currentAccount) {
+      window.localStorage.setItem(
+        StorageKey.CURRENT_ACCOUNT,
+        JSON.stringify(this.serializeAccount(this.currentAccount))
+      )
+    }
+  }
+
+  /**
+   * Pulls inline nsec/ncryptsec/bunkerClientSecretKey out of the accounts
+   * array (and currentAccount) and into per-pubkey maps. Idempotent.
+   */
+  private peelInlineSecrets() {
+    for (const act of this.accounts) {
+      if (act.nsec) this.nsecByPubkey[act.pubkey] = act.nsec
+      if (act.ncryptsec) this.ncryptsecByPubkey[act.pubkey] = act.ncryptsec
+      if (act.bunkerClientSecretKey) {
+        this.bunkerClientSecretByPubkey[act.pubkey] = act.bunkerClientSecretKey
+      }
+    }
+    if (this.currentAccount) {
+      const act = this.currentAccount
+      if (act.nsec) this.nsecByPubkey[act.pubkey] = act.nsec
+      if (act.ncryptsec) this.ncryptsecByPubkey[act.pubkey] = act.ncryptsec
+      if (act.bunkerClientSecretKey) {
+        this.bunkerClientSecretByPubkey[act.pubkey] = act.bunkerClientSecretKey
+      }
+    }
+  }
+
+  /**
+   * Returns a copy of the account with the per-pubkey secret fields re-attached.
+   * Consumers receive accounts with secrets visible (back-compat); internal
+   * state stores secrets in maps only.
+   */
+  private hydrateAccount(account: TAccount): TAccount {
+    return {
+      ...account,
+      nsec: this.nsecByPubkey[account.pubkey] ?? account.nsec,
+      ncryptsec: this.ncryptsecByPubkey[account.pubkey] ?? account.ncryptsec,
+      bunkerClientSecretKey:
+        this.bunkerClientSecretByPubkey[account.pubkey] ?? account.bunkerClientSecretKey
+    }
+  }
+
+  /** Shape an account for persistence: web inlines secrets, electron strips. */
+  private serializeAccount(account: TAccount): TAccount {
+    if (this.secretsViaIpc) {
+      const stripped: TAccount = { ...account }
+      delete stripped.nsec
+      delete stripped.ncryptsec
+      delete stripped.bunkerClientSecretKey
+      return stripped
+    }
+    return this.hydrateAccount(account)
+  }
+
+  private serializeAccounts(): TAccount[] {
+    return this.accounts.map((a) => this.serializeAccount(a))
+  }
+
+  private persistAccountsToLocalStorage() {
+    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.serializeAccounts()))
+  }
+
+  private persistCurrentAccountToLocalStorage() {
+    if (this.currentAccount) {
+      window.localStorage.setItem(
+        StorageKey.CURRENT_ACCOUNT,
+        JSON.stringify(this.serializeAccount(this.currentAccount))
+      )
+    } else {
+      window.localStorage.removeItem(StorageKey.CURRENT_ACCOUNT)
+    }
+  }
+
+  private persistEncryptionKeyMap() {
+    if (this.secretsViaIpc) {
+      this.queueSecretsSave()
+    } else {
+      window.localStorage.setItem(
+        StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP,
+        JSON.stringify(this.encryptionKeyPrivkeyMap)
+      )
+    }
+  }
+
+  private persistClientKeyMap() {
+    if (this.secretsViaIpc) {
+      this.queueSecretsSave()
+    } else {
+      window.localStorage.setItem(
+        StorageKey.CLIENT_KEY_PRIVKEY_MAP,
+        JSON.stringify(this.clientKeyPrivkeyMap)
+      )
+    }
+  }
+
+  private queueSecretsSave() {
+    const bridge = getElectronBridge()
+    if (!bridge) return
+    const snapshot = {
+      nsec: { ...this.nsecByPubkey },
+      ncryptsec: { ...this.ncryptsecByPubkey },
+      bunkerClientSecretKey: { ...this.bunkerClientSecretByPubkey },
+      encryptionKeyPrivkey: { ...this.encryptionKeyPrivkeyMap },
+      clientKeyPrivkey: { ...this.clientKeyPrivkeyMap }
+    }
+    this.secretsWriteChain = this.secretsWriteChain
+      .catch(() => {
+        // swallow so chain stays alive
+      })
+      .then(() =>
+        bridge.secrets.save(snapshot).catch((err) => {
+          console.error('[storage] failed to persist encrypted secrets:', err)
+        })
+      )
+  }
+
   getAccounts() {
-    return this.accounts
+    return this.accounts.map((a) => this.hydrateAccount(a))
   }
 
   findAccount(account: TAccountPointer) {
-    return this.accounts.find((act) => isSameAccount(act, account))
+    const found = this.accounts.find((act) => isSameAccount(act, account))
+    return found ? this.hydrateAccount(found) : undefined
   }
 
   getCurrentAccount() {
-    return this.currentAccount
+    return this.currentAccount ? this.hydrateAccount(this.currentAccount) : null
   }
 
   getAccountNsec(pubkey: string) {
-    const account = this.accounts.find((act) => act.pubkey === pubkey && act.signerType === 'nsec')
-    return account?.nsec
+    return this.nsecByPubkey[pubkey]
   }
 
   getAccountNcryptsec(pubkey: string) {
-    const account = this.accounts.find(
-      (act) => act.pubkey === pubkey && act.signerType === 'ncryptsec'
-    )
-    return account?.ncryptsec
+    return this.ncryptsecByPubkey[pubkey]
+  }
+
+  getBunkerClientSecretKey(pubkey: string) {
+    return this.bunkerClientSecretByPubkey[pubkey]
   }
 
   addAccount(account: TAccount) {
+    if (account.nsec) this.nsecByPubkey[account.pubkey] = account.nsec
+    if (account.ncryptsec) this.ncryptsecByPubkey[account.pubkey] = account.ncryptsec
+    if (account.bunkerClientSecretKey) {
+      this.bunkerClientSecretByPubkey[account.pubkey] = account.bunkerClientSecretKey
+    }
+
+    // Internal accounts array stores stripped copies; we re-attach on read.
+    const stripped: TAccount = { ...account }
+    delete stripped.nsec
+    delete stripped.ncryptsec
+    delete stripped.bunkerClientSecretKey
+
     const index = this.accounts.findIndex((act) => isSameAccount(act, account))
     if (index !== -1) {
-      this.accounts[index] = account
+      this.accounts[index] = stripped
     } else {
-      this.accounts.push(account)
+      this.accounts.push(stripped)
     }
-    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
-    return this.accounts
+    this.persistAccountsToLocalStorage()
+    if (this.secretsViaIpc) this.queueSecretsSave()
+    return this.getAccounts()
   }
 
   removeAccount(account: TAccount) {
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
-    window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.accounts))
-    return this.accounts
+    delete this.nsecByPubkey[account.pubkey]
+    delete this.ncryptsecByPubkey[account.pubkey]
+    delete this.bunkerClientSecretByPubkey[account.pubkey]
+    this.persistAccountsToLocalStorage()
+    if (this.secretsViaIpc) this.queueSecretsSave()
+    return this.getAccounts()
   }
 
   switchAccount(account: TAccount | null) {
     if (isSameAccount(this.currentAccount, account)) {
       return
     }
-    const act = this.accounts.find((act) => isSameAccount(act, account))
+    const act = this.accounts.find((a) => isSameAccount(a, account))
     if (!act) {
       return
     }
     this.currentAccount = act
-    window.localStorage.setItem(StorageKey.CURRENT_ACCOUNT, JSON.stringify(act))
+    this.persistCurrentAccountToLocalStorage()
   }
 
   getDefaultZapSats() {
@@ -908,18 +1111,12 @@ class LocalStorageService {
 
   setEncryptionKeyPrivkey(accountPubkey: string, privkey: string) {
     this.encryptionKeyPrivkeyMap[accountPubkey] = privkey
-    window.localStorage.setItem(
-      StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP,
-      JSON.stringify(this.encryptionKeyPrivkeyMap)
-    )
+    this.persistEncryptionKeyMap()
   }
 
   removeEncryptionKeyPrivkey(accountPubkey: string) {
     delete this.encryptionKeyPrivkeyMap[accountPubkey]
-    window.localStorage.setItem(
-      StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP,
-      JSON.stringify(this.encryptionKeyPrivkeyMap)
-    )
+    this.persistEncryptionKeyMap()
   }
 
   getClientKeyPrivkey(accountPubkey: string): string | null {
@@ -928,10 +1125,7 @@ class LocalStorageService {
 
   setClientKeyPrivkey(accountPubkey: string, privkey: string) {
     this.clientKeyPrivkeyMap[accountPubkey] = privkey
-    window.localStorage.setItem(
-      StorageKey.CLIENT_KEY_PRIVKEY_MAP,
-      JSON.stringify(this.clientKeyPrivkeyMap)
-    )
+    this.persistClientKeyMap()
   }
 
   getLastReadDmTime(accountPubkey: string, conversationPubkey: string): number {

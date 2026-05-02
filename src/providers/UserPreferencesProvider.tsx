@@ -1,3 +1,4 @@
+import client from '@/services/client.service'
 import storage from '@/services/local-storage.service'
 import { TEmoji, TFeedTabConfig, TNotificationStyle } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -93,6 +94,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const updateAllowInsecureConnection = (allow: boolean) => {
     setAllowInsecureConnection(allow)
     storage.setAllowInsecureConnection(allow)
+    client.setAllowInsecure(allow)
   }
 
   const updateFeedTabs = (tabs: TFeedTabConfig[]) => {
