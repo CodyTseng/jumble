@@ -1,6 +1,6 @@
 import 'websocket-polyfill'
 
-import { app, BrowserWindow, nativeTheme, shell } from 'electron'
+import { app, BrowserWindow, nativeTheme, session, shell } from 'electron'
 import { useWebSocketImplementation as setWebSocketImpl } from 'nostr-tools/relay'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -84,6 +84,17 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Bypass renderer-side CORS by injecting a permissive ACAO header on every
+  // cross-origin response. Affects fetch/XHR as well as <video>/<img>/<audio>
+  // since they share Chromium's network stack.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const headers = { ...(details.responseHeaders ?? {}) }
+    delete headers['access-control-allow-origin']
+    delete headers['Access-Control-Allow-Origin']
+    headers['Access-Control-Allow-Origin'] = ['*']
+    callback({ responseHeaders: headers })
+  })
+
   registerIpcHandlers(manager, secrets, updater)
   createWindow()
   updater.start()
