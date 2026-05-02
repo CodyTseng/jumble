@@ -124,9 +124,6 @@ function UpdateActionButton() {
     } finally {
       setLocalChecking(false)
     }
-    if (!state.supported) {
-      toast.info(t('Updates are not available in development mode'))
-    }
   }
 
   if (state.status === 'downloaded') {

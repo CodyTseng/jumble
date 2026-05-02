@@ -844,8 +844,6 @@ export default {
     'Failed to check for updates': 'Failed to check for updates',
     'Check': 'Check',
     'Download': 'Download',
-    'NEW': 'NEW',
-    'Updates are not available in development mode':
-      'Updates are not available in development mode'
+    'NEW': 'NEW'
   }
 }
