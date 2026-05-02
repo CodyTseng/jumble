@@ -4,7 +4,10 @@
   "description": "A user-friendly Nostr client for exploring relay feeds",
   "private": true,
   "type": "module",
-  "author": "codytseng",
+  "author": {
+    "name": "codytseng",
+    "email": "codytseng98@gmail.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
