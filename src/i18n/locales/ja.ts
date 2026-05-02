@@ -838,6 +838,9 @@ export default {
     'Last edited': '最終編集',
     '{{count}} min read': '読了目安 {{count}} 分',
     'Avatar URL': 'アイコンの URL',
-    'Banner URL': 'バナーの URL'
+    'Banner URL': 'バナーの URL',
+    'Try the desktop app': 'デスクトップアプリを試す',
+    'No browser relay connection limit, for a better following feed experience.':
+      'ブラウザのリレイ接続数制限なし、フォロー中フィードの体験が向上します。'
   }
 }

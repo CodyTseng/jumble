@@ -846,6 +846,9 @@ export default {
     'Download': 'Download',
     'NEW': 'NEW',
     'Updates are not available in development mode':
-      'Updates are not available in development mode'
+      'Updates are not available in development mode',
+    'Try the desktop app': 'Try the desktop app',
+    'No browser relay connection limit, for a better following feed experience.':
+      'No browser relay connection limit, for a better following feed experience.'
   }
 }

@@ -807,6 +807,9 @@ export default {
     'Last edited': '最後編輯',
     '{{count}} min read': '約 {{count}} 分鐘讀完',
     'Avatar URL': '頭像連結',
-    'Banner URL': '橫幅連結'
+    'Banner URL': '橫幅連結',
+    'Try the desktop app': '試試桌面版',
+    'No browser relay connection limit, for a better following feed experience.':
+      '不受瀏覽器中繼連接數限制，追蹤 feed 體驗更好。'
   }
 }

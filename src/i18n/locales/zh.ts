@@ -814,6 +814,9 @@ export default {
     'Last edited': '最后编辑',
     '{{count}} min read': '约 {{count}} 分钟读完',
     'Avatar URL': '头像链接',
-    'Banner URL': '横幅链接'
+    'Banner URL': '横幅链接',
+    'Try the desktop app': '试试桌面版',
+    'No browser relay connection limit, for a better following feed experience.':
+      '不受浏览器中继连接数限制，关注 feed 体验更好。'
   }
 }

@@ -58,6 +58,7 @@ export const StorageKey = {
   DM_BACKWARD_CURSOR_MAP: 'dmBackwardCursorMap',
   PROCESSED_SYNC_REQUEST_IDS: 'processedSyncRequestIds',
   DISABLE_NOTIFICATION_SYNC: 'disableNotificationSync',
+  DISMISSED_DESKTOP_APP_TIP: 'dismissedDesktopAppTip',
   NOTE_LIST_MODE: 'noteListMode', // deprecated
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated

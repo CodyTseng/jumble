@@ -843,6 +843,9 @@ export default {
     'Last edited': 'Última edición',
     '{{count}} min read': '{{count}} min de lectura',
     'Avatar URL': 'URL del avatar',
-    'Banner URL': 'URL del banner'
+    'Banner URL': 'URL del banner',
+    'Try the desktop app': 'Prueba la app de escritorio',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Sin límite de conexiones a relés del navegador, para una mejor experiencia en el feed de Siguiendo.'
   }
 }

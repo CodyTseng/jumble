@@ -847,6 +847,9 @@ export default {
     'Last edited': 'Ostatnia edycja',
     '{{count}} min read': '{{count}} min czytania',
     'Avatar URL': 'URL awatara',
-    'Banner URL': 'URL banera'
+    'Banner URL': 'URL banera',
+    'Try the desktop app': 'Wypróbuj aplikację na komputer',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Brak limitu połączeń transmiterów w przeglądarce, dla lepszego odczytu obserwowanych.'
   }
 }

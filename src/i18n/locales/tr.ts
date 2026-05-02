@@ -848,6 +848,9 @@ export default {
     'Last edited': 'Son düzenleme',
     '{{count}} min read': '{{count}} dk. okuma',
     'Avatar URL': 'Avatar URL’si',
-    'Banner URL': 'Banner URL’si'
+    'Banner URL': 'Banner URL’si',
+    'Try the desktop app': 'Masaüstü uygulamasını deneyin',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Tarayıcı relay bağlantı limiti yok, daha iyi takip akışı deneyimi için.'
   }
 }

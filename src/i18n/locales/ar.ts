@@ -825,6 +825,9 @@ export default {
     'Last edited': 'آخر تعديل',
     '{{count}} min read': '{{count}} دقيقة قراءة',
     'Avatar URL': 'رابط الصورة الرمزية',
-    'Banner URL': 'رابط صورة الغلاف'
+    'Banner URL': 'رابط صورة الغلاف',
+    'Try the desktop app': 'جرّب تطبيق سطح المكتب',
+    'No browser relay connection limit, for a better following feed experience.':
+      'لا يوجد حد لاتصالات الريلاي في المتصفح، لتجربة أفضل في موجز المتابَعين.'
   }
 }

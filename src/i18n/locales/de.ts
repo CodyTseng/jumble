@@ -852,6 +852,9 @@ export default {
     'Last edited': 'Zuletzt bearbeitet',
     '{{count}} min read': '{{count}} Min. Lesedauer',
     'Avatar URL': 'Avatar-URL',
-    'Banner URL': 'Banner-URL'
+    'Banner URL': 'Banner-URL',
+    'Try the desktop app': 'Desktop-App ausprobieren',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Keine Browser-Begrenzung für Relay-Verbindungen, für ein besseres Folgende-Feed-Erlebnis.'
   }
 }

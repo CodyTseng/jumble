@@ -53,6 +53,7 @@ class LocalStorageService {
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
   private mediaUploadServiceConfigMap: Record<string, TMediaUploadServiceConfig> = {}
   private dismissedTooManyRelaysAlert: boolean = false
+  private dismissedDesktopAppTip: boolean = false
   private showKinds: number[] = []
   private showKindsMap: Record<string, number[]> = {}
   private hideContentMentioningMutedUsers: boolean = false
@@ -215,6 +216,9 @@ class LocalStorageService {
 
     this.dismissedTooManyRelaysAlert =
       window.localStorage.getItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT) === 'true'
+
+    this.dismissedDesktopAppTip =
+      window.localStorage.getItem(StorageKey.DISMISSED_DESKTOP_APP_TIP) === 'true'
 
     const showKindsStr = window.localStorage.getItem(StorageKey.SHOW_KINDS)
     if (!showKindsStr) {
@@ -884,6 +888,15 @@ class LocalStorageService {
   setDismissedTooManyRelaysAlert(dismissed: boolean) {
     this.dismissedTooManyRelaysAlert = dismissed
     window.localStorage.setItem(StorageKey.DISMISSED_TOO_MANY_RELAYS_ALERT, dismissed.toString())
+  }
+
+  getDismissedDesktopAppTip() {
+    return this.dismissedDesktopAppTip
+  }
+
+  setDismissedDesktopAppTip(dismissed: boolean) {
+    this.dismissedDesktopAppTip = dismissed
+    window.localStorage.setItem(StorageKey.DISMISSED_DESKTOP_APP_TIP, dismissed.toString())
   }
 
   getShowKinds() {

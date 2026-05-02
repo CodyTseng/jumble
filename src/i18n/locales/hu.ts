@@ -835,6 +835,9 @@ export default {
     'Last edited': 'Utoljára szerkesztve',
     '{{count}} min read': '{{count}} perc olvasás',
     'Avatar URL': 'Avatar URL',
-    'Banner URL': 'Borítókép URL'
+    'Banner URL': 'Borítókép URL',
+    'Try the desktop app': 'Próbáld ki az asztali alkalmazást',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Nincs böngészős csomópont-kapcsolati korlát, jobb követések feed élményért.'
   }
 }

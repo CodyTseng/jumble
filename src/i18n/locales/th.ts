@@ -825,6 +825,9 @@ export default {
     'Last edited': 'แก้ไขล่าสุด',
     '{{count}} min read': 'อ่าน {{count}} นาที',
     'Avatar URL': 'URL รูปโปรไฟล์',
-    'Banner URL': 'URL แบนเนอร์'
+    'Banner URL': 'URL แบนเนอร์',
+    'Try the desktop app': 'ลองใช้แอปเดสก์ท็อป',
+    'No browser relay connection limit, for a better following feed experience.':
+      'ไม่จำกัดการเชื่อมต่อรีเลย์ในเบราว์เซอร์ เพื่อประสบการณ์ฟีดติดตามที่ดีขึ้น'
   }
 }

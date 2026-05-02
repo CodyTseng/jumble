@@ -10,6 +10,7 @@ import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import AccountButton from './AccountButton'
 import BookmarkButton from './BookmarkButton'
+import DesktopAppTip from './DesktopAppTip'
 import FollowingButton from './FollowingButton'
 import HomeButton from './HomeButton'
 import LayoutSwitcher from './LayoutSwitcher'
@@ -67,6 +68,7 @@ export default function PrimaryPageSidebar() {
       </div>
       <div className="flex flex-col gap-4">
         <UpdateButton collapse={sidebarCollapse} />
+        <DesktopAppTip collapse={sidebarCollapse} />
         <LayoutSwitcher collapse={sidebarCollapse} />
         <AccountButton collapse={sidebarCollapse} />
       </div>

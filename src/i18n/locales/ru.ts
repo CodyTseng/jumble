@@ -844,6 +844,9 @@ export default {
     'Last edited': 'Последнее редактирование',
     '{{count}} min read': '{{count}} мин чтения',
     'Avatar URL': 'URL аватара',
-    'Banner URL': 'URL баннера'
+    'Banner URL': 'URL баннера',
+    'Try the desktop app': 'Попробуйте десктопное приложение',
+    'No browser relay connection limit, for a better following feed experience.':
+      'Без ограничения подключений к ретрансляторам в браузере, для лучшего опыта в ленте подписок.'
   }
 }

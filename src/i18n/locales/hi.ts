@@ -839,6 +839,9 @@ export default {
     'Last edited': 'अंतिम बार संपादित',
     '{{count}} min read': '{{count}} मिनट पठन',
     'Avatar URL': 'अवतार URL',
-    'Banner URL': 'बैनर URL'
+    'Banner URL': 'बैनर URL',
+    'Try the desktop app': 'डेस्कटॉप ऐप आज़माएँ',
+    'No browser relay connection limit, for a better following feed experience.':
+      'ब्राउज़र की रिले कनेक्शन सीमा नहीं, बेहतर फ़ॉलोइंग फ़ीड अनुभव के लिए।'
   }
 }
