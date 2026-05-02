@@ -16,7 +16,6 @@ export const IPC_CHANNELS = {
   secretsLoad: 'secrets:load',
   secretsSave: 'secrets:save',
   secretsAvailable: 'secrets:available',
-  proxyFetch: 'proxy:fetch',
   updateCheck: 'update:check',
   updateDownload: 'update:download',
   updateInstall: 'update:install',
@@ -37,32 +36,6 @@ export type TSecretsBridge = {
   isAvailable: () => Promise<boolean>
   load: () => Promise<TSecretsBundle>
   save: (bundle: TSecretsBundle) => Promise<void>
-}
-
-export type TProxyFetchOptions = {
-  method?: string
-  headers?: Record<string, string>
-  body?: string
-  timeout?: number
-  maxBodySize?: number
-  redirect?: 'follow' | 'manual' | 'error'
-}
-
-export type TProxyFetchResponse = {
-  ok: boolean
-  status: number
-  statusText: string
-  url: string
-  headers: Record<string, string>
-  body: string
-}
-
-/**
- * Generic main-process fetch proxy. Anything in the renderer that hits a
- * remote origin and would otherwise be blocked by CORS should call this.
- */
-export type TProxyBridge = {
-  fetch: (url: string, options?: TProxyFetchOptions) => Promise<TProxyFetchResponse>
 }
 
 export type TSubEventPayload = {
@@ -152,6 +125,5 @@ export type TUpdateBridge = {
 export type TElectronBridge = {
   relay: TElectronRelayBridge
   secrets: TSecretsBridge
-  proxy: TProxyBridge
   update: TUpdateBridge
 }

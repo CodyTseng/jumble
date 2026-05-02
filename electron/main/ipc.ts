@@ -1,12 +1,6 @@
 import { ipcMain } from 'electron'
 import type { Event as NEvent, Filter } from 'nostr-tools'
-import {
-  IPC_CHANNELS,
-  TAuthResponsePayload,
-  TProxyFetchOptions,
-  TSecretsBundle
-} from '../shared/ipc-types.js'
-import { proxyFetch } from './proxy-fetch.js'
+import { IPC_CHANNELS, TAuthResponsePayload, TSecretsBundle } from '../shared/ipc-types.js'
 import type { RelayManager } from './relay-manager.js'
 import type { SecretsStore } from './secrets-store.js'
 import type { Updater } from './updater.js'
@@ -46,10 +40,6 @@ export function registerIpcHandlers(
   ipcMain.handle(IPC_CHANNELS.secretsAvailable, () => secrets.isAvailable())
   ipcMain.handle(IPC_CHANNELS.secretsLoad, () => secrets.load())
   ipcMain.handle(IPC_CHANNELS.secretsSave, (_e, bundle: TSecretsBundle) => secrets.save(bundle))
-
-  ipcMain.handle(IPC_CHANNELS.proxyFetch, (_e, url: string, options?: TProxyFetchOptions) =>
-    proxyFetch(url, options)
-  )
 
   ipcMain.handle(IPC_CHANNELS.updateCheck, () => updater.check())
   ipcMain.handle(IPC_CHANNELS.updateDownload, () => updater.download())

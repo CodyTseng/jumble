@@ -1,4 +1,3 @@
-import { getElectronBridge, isElectron } from '@/lib/platform'
 import { TWebMetadata } from '@/types'
 import DataLoader from 'dataloader'
 
@@ -25,7 +24,11 @@ class WebService {
 
   private async fetchOne(url: string): Promise<TWebMetadata> {
     try {
-      const html = await this.fetchHtml(url)
+      const res = await fetch(url, { headers: { accept: 'text/html,application/xhtml+xml' } })
+      if (!res.ok) return {}
+      const ct = res.headers.get('content-type') ?? ''
+      if (!ct.includes('text/html') && !ct.includes('application/xhtml')) return {}
+      const html = await res.text()
       if (!html) return {}
 
       const parser = new DOMParser()
@@ -44,21 +47,6 @@ class WebService {
     } catch {
       return {}
     }
-  }
-
-  private async fetchHtml(url: string): Promise<string> {
-    const bridge = getElectronBridge()
-    if (isElectron() && bridge) {
-      const res = await bridge.proxy.fetch(url, {
-        headers: { accept: 'text/html,application/xhtml+xml' }
-      })
-      if (!res.ok) return ''
-      const ct = res.headers['content-type'] ?? ''
-      if (!ct.includes('text/html') && !ct.includes('application/xhtml')) return ''
-      return res.body
-    }
-    const res = await fetch(url)
-    return await res.text()
   }
 }
 

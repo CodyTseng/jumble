@@ -5,7 +5,6 @@ import {
   TAuthRequestPayload,
   TAuthResponsePayload,
   TElectronBridge,
-  TProxyFetchOptions,
   TSecretsBundle,
   TSubClosePayload,
   TSubEosePayload,
@@ -52,10 +51,6 @@ const bridge: TElectronBridge = {
     isAvailable: () => ipcRenderer.invoke(IPC_CHANNELS.secretsAvailable),
     load: () => ipcRenderer.invoke(IPC_CHANNELS.secretsLoad),
     save: (bundle: TSecretsBundle) => ipcRenderer.invoke(IPC_CHANNELS.secretsSave, bundle)
-  },
-  proxy: {
-    fetch: (url: string, options?: TProxyFetchOptions) =>
-      ipcRenderer.invoke(IPC_CHANNELS.proxyFetch, url, options)
   },
   update: {
     check: () => ipcRenderer.invoke(IPC_CHANNELS.updateCheck),
