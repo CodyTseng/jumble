@@ -17,6 +17,10 @@ class PostEditorService extends EventTarget {
       this.dispatchEvent(new CustomEvent('closeSuggestionPopup'))
     }
   }
+
+  minimizeEditor(editorId: string) {
+    this.dispatchEvent(new CustomEvent('minimizeEditor', { detail: { editorId } }))
+  }
 }
 
 const instance = new PostEditorService()

@@ -13,7 +13,16 @@ import { useNostr } from '@/providers/NostrProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
-import { CircleHelp, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
+import {
+  CircleHelp,
+  ImageUp,
+  ListTodo,
+  LoaderCircle,
+  Minimize2,
+  Settings,
+  Smile,
+  X
+} from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -34,12 +43,14 @@ export default function PostContent({
   defaultContent = '',
   parentStuff,
   close,
+  onMinimize,
   openFrom,
   highlightedText
 }: {
   defaultContent?: string
   parentStuff?: Event | string
   close: () => void
+  onMinimize?: () => void
   openFrom?: string[]
   highlightedText?: string
 }) {
@@ -207,14 +218,19 @@ export default function PostContent({
     setUploadProgresses((prev) => prev.filter((item) => item.file !== file))
   }
 
+  const handleMinimize = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onMinimize?.()
+  }
+
   return (
     <div className="space-y-2">
       {parentEvent && (
-        <ScrollArea className="flex max-h-48 flex-col overflow-y-auto rounded-lg border bg-muted/40">
+        <ScrollArea className="bg-muted/40 flex max-h-48 flex-col overflow-y-auto rounded-lg border">
           <div className="pointer-events-none p-2 sm:p-3">
             {highlightedText ? (
               <div className="flex gap-4">
-                <div className="my-1 w-1 shrink-0 rounded-md bg-primary/60" />
+                <div className="bg-primary/60 my-1 w-1 shrink-0 rounded-md" />
                 <div className="whitespace-pre-line italic">{highlightedText}</div>
               </div>
             ) : (
@@ -247,12 +263,12 @@ export default function PostContent({
         uploadProgresses.map(({ file, progress, cancel }, index) => (
           <div key={`${file.name}-${index}`} className="mt-2 flex items-end gap-2">
             <div className="min-w-0 flex-1">
-              <div className="mb-1 truncate text-xs text-muted-foreground">
+              <div className="text-muted-foreground mb-1 truncate text-xs">
                 {file.name ?? t('Uploading...')}
               </div>
-              <div className="h-0.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="bg-muted h-0.5 w-full overflow-hidden rounded-full">
                 <div
-                  className="h-full bg-primary transition-[width] duration-200 ease-out"
+                  className="bg-primary h-full transition-[width] duration-200 ease-out"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -273,12 +289,12 @@ export default function PostContent({
       {!isPoll && (
         <div className="flex items-center gap-3">
           <div className="min-w-0">
-          <PostRelaySelector
-            onProtectedSuggestionChange={handleProtectedSuggestionChange}
-            setAdditionalRelayUrls={setAdditionalRelayUrls}
-            parentEvent={parentEvent}
-            openFrom={openFrom}
-          />
+            <PostRelaySelector
+              onProtectedSuggestionChange={handleProtectedSuggestionChange}
+              setAdditionalRelayUrls={setAdditionalRelayUrls}
+              parentEvent={parentEvent}
+              openFrom={openFrom}
+            />
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
             <Switch
@@ -288,19 +304,17 @@ export default function PostContent({
             />
             <Label
               htmlFor="protected-event"
-              className="cursor-pointer text-xs text-muted-foreground"
+              className="text-muted-foreground cursor-pointer text-xs"
             >
               {t('Protected')}
             </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <button type="button" className="flex shrink-0">
-                  <CircleHelp className="size-3.5! text-muted-foreground" />
+                  <CircleHelp className="text-muted-foreground size-3.5!" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="text-sm">
-                {t('Protected event hint')}
-              </PopoverContent>
+              <PopoverContent className="text-sm">{t('Protected event hint')}</PopoverContent>
             </Popover>
           </div>
         </div>
@@ -358,6 +372,16 @@ export default function PostContent({
             setMentions={setMentions}
           />
           <div className="flex items-center gap-2 max-sm:hidden">
+            {onMinimize && (
+              <Button
+                variant="secondary"
+                size="icon"
+                title={t('Minimize')}
+                onClick={handleMinimize}
+              >
+                <Minimize2 />
+              </Button>
+            )}
             <Button
               variant="secondary"
               onClick={(e) => {
@@ -385,6 +409,11 @@ export default function PostContent({
         setMinPow={setMinPow}
       />
       <div className="flex items-center justify-around gap-2 sm:hidden">
+        {onMinimize && (
+          <Button variant="secondary" size="icon" title={t('Minimize')} onClick={handleMinimize}>
+            <Minimize2 />
+          </Button>
+        )}
         <Button
           className="w-full"
           variant="secondary"
