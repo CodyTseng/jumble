@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button'
+import { ExtendedKind } from '@/constants'
+import { getPeopleListPubkeys, isPeopleListEvent } from '@/lib/people-list'
 import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
 import {
   DropdownMenu,
@@ -195,7 +197,7 @@ async function extractMentions(content: string, parentEvent?: Event) {
   const pubkeys: string[] = []
   const relatedPubkeys: string[] = []
   const matches = content.match(
-    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
+    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+|naddr1[a-z0-9]+)/g
   )
 
   const addToSet = (arr: string[], pubkey: string) => {
@@ -214,6 +216,13 @@ async function extractMentions(content: string, parentEvent?: Event) {
       } else if (['nevent', 'note'].includes(type)) {
         const event = await client.fetchEvent(id)
         if (event) {
+          addToSet(pubkeys, event.pubkey)
+        }
+      } else if (type === 'naddr') {
+        const event = await client.fetchEvent(id)
+        if (isPeopleListEvent(event)) {
+          getPeopleListPubkeys(event).forEach((pubkey) => addToSet(pubkeys, pubkey))
+        } else if (event && data.kind !== ExtendedKind.PEOPLE_LIST) {
           addToSet(pubkeys, event.pubkey)
         }
       }

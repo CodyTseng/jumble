@@ -7,6 +7,7 @@ import {
   isReplaceableEvent
 } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
+import { getPeopleListInfo, getPeopleListTitle, isPeopleListEvent } from '@/lib/people-list'
 import { isElectron } from '@/lib/platform'
 import { formatPubkey, isValidPubkey, pubkeyToNpub, userIdToPubkey } from '@/lib/pubkey'
 import { filterOutBigRelays, getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
@@ -15,7 +16,14 @@ import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/
 import { mergeTimelines } from '@/lib/timeline'
 import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
-import { ISigner, TProfile, TPublishOptions, TRelayList, TSubRequestFilter } from '@/types'
+import {
+  ISigner,
+  TPeopleList,
+  TProfile,
+  TPublishOptions,
+  TRelayList,
+  TSubRequestFilter
+} from '@/types'
 import { IRelay, IRelayPool } from '@/types/relay-pool'
 import { sha256 } from '@noble/hashes/sha2'
 import DataLoader from 'dataloader'
@@ -1089,6 +1097,49 @@ class ClientService extends EventTarget {
     const npubs = await this.searchNpubsFromLocal(query, limit)
     const profiles = await Promise.all(npubs.map((npub) => this.fetchProfile(npub)))
     return profiles.filter((profile) => !!profile) as TProfile[]
+  }
+
+  async searchPeopleLists(query: string, limit: number = 20): Promise<TPeopleList[]> {
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return []
+
+    const searchableRelays = getSearchRelayUrls()
+    const discoveryRelays = Array.from(new Set([...this.currentRelays, ...getDefaultRelayUrls()]))
+    const results = await Promise.allSettled([
+      this.fetchEvents(searchableRelays, {
+        kinds: [ExtendedKind.PEOPLE_LIST],
+        search: normalizedQuery,
+        limit
+      }),
+      this.fetchEvents(discoveryRelays, {
+        kinds: [ExtendedKind.PEOPLE_LIST],
+        limit: 100
+      })
+    ])
+
+    const events = results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
+    const seen = new Set<string>()
+
+    return events
+      .filter(isPeopleListEvent)
+      .filter((event) => {
+        const coordinate = getReplaceableCoordinateFromEvent(event)
+        if (seen.has(coordinate)) return false
+        seen.add(coordinate)
+
+        const title = getPeopleListTitle(event).toLowerCase()
+        const identifier = event.tags.find(tagNameEquals('d'))?.[1]?.toLowerCase() ?? ''
+        return title.includes(normalizedQuery) || identifier.includes(normalizedQuery)
+      })
+      .sort((a, b) => b.created_at - a.created_at)
+      .map((event) => getPeopleListInfo(event, this.getEventHints(event.id)))
+      .filter(Boolean)
+      .slice(0, limit) as TPeopleList[]
+  }
+
+  async fetchPeopleList(id: string): Promise<TPeopleList | null> {
+    const event = await this.fetchEvent(id)
+    return getPeopleListInfo(event ?? null, event ? this.getEventHints(event.id) : [])
   }
 
   private async addUsernameToIndex(profileEvent: NEvent) {

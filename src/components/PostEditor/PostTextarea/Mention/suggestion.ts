@@ -4,11 +4,32 @@ import type { Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
-import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
+import MentionList, {
+  MentionListHandle,
+  MentionListProps,
+  TMentionSuggestionItem
+} from './MentionList'
 
 const suggestion = {
   items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+    const [profiles, peopleLists] = await Promise.all([
+      client.searchNpubsFromLocal(query, 20),
+      client.searchPeopleLists(query, 10)
+    ])
+
+    return [
+      ...profiles.map((id) => ({ type: 'profile', id }) as TMentionSuggestionItem),
+      ...peopleLists.map(
+        (list) =>
+          ({
+            type: 'people-list',
+            id: list.naddr,
+            title: list.title,
+            author: list.author,
+            count: list.pubkeys.length
+          }) as TMentionSuggestionItem
+      )
+    ]
   },
 
   render: () => {

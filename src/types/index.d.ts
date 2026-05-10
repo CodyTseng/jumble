@@ -74,6 +74,14 @@ export type TRelaySet = {
   relayUrls: string[]
 }
 
+export type TPeopleList = {
+  naddr: string
+  title: string
+  author: string
+  pubkeys: string[]
+  event: Event
+}
+
 export type TConfig = {
   relayGroups: TRelaySet[]
   theme: TThemeSetting
