@@ -147,7 +147,15 @@ const NoteList = forwardRef<
 
         return false
       },
-      [mutePubkeySet, isEventDeleted, filterFn, mutedWords, pinnedEventHexIdSet]
+      [
+        mutePubkeySet,
+        isEventDeleted,
+        filterFn,
+        mutedWords,
+        pinnedEventHexIdSet,
+        filterMutedNotes,
+        hideContentMentioningMutedUsers
+      ]
     )
 
     useEffect(() => {
@@ -201,7 +209,7 @@ const NoteList = forwardRef<
               ) {
                 return
               }
-              if (shouldHideEvent(evt)) return
+              if (shouldHideEvent(eventFromContent)) return
 
               targetEventKey = getEventKey(eventFromContent)
             }
