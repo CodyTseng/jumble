@@ -1,4 +1,14 @@
 import Sidebar from '@/components/Sidebar'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { CurrentRelaysProvider } from '@/providers/CurrentRelaysProvider'
 import { TPageRef } from '@/types'
@@ -13,6 +23,7 @@ import {
   useRef,
   useState
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
@@ -66,6 +77,7 @@ export function useSecondaryPage() {
 }
 
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
+  const { t } = useTranslation()
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -82,6 +94,13 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
+  const exitConfirmedRef = useRef(false)
+  const secondaryStackRef = useRef<TStackItem[]>([])
+  const [exitConfirmationOpen, setExitConfirmationOpen] = useState(false)
+
+  useEffect(() => {
+    secondaryStackRef.current = secondaryStack
+  }, [secondaryStack])
 
   useEffect(() => {
     if (isSmallScreen) return
@@ -162,6 +181,20 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       }
 
       let state = e.state as { index: number; url: string } | null
+      const isRootUrl = window.location.pathname + window.location.search + window.location.hash === '/'
+      if (
+        isSmallScreen &&
+        !exitConfirmedRef.current &&
+        !state &&
+        isRootUrl &&
+        secondaryStackRef.current.length === 0
+      ) {
+        setExitConfirmationOpen(true)
+        ignorePopStateRef.current = true
+        window.history.forward()
+        return
+      }
+
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
         const currentIndex = currentItem?.index
@@ -277,6 +310,42 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     popSecondaryPage(-secondaryStack.length)
   }
 
+  const exitConfirmationDialog = (
+    <AlertDialog
+      open={exitConfirmationOpen}
+      onOpenChange={(open) => {
+        setExitConfirmationOpen(open)
+        if (open) {
+          exitConfirmedRef.current = false
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('Close Jumble?')}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('Pressing back again will close Jumble. Do you want to leave the app?')}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => (exitConfirmedRef.current = false)}>
+            {t('Stay')}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={() => {
+              exitConfirmedRef.current = true
+              setExitConfirmationOpen(false)
+              setTimeout(() => window.history.back(), 0)
+            }}
+          >
+            {t('Close Jumble')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+
   if (isSmallScreen) {
     return (
       <PrimaryPageContext.Provider
@@ -322,6 +391,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ))}
               {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
+              {exitConfirmationDialog}
               </div>
             </NotificationProvider>
           </CurrentRelaysProvider>
@@ -391,6 +461,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 </div>
               </div>
               <TooManyRelaysAlertDialog />
+              {exitConfirmationDialog}
               <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
             </NotificationProvider>
           </CurrentRelaysProvider>
@@ -470,6 +541,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
+            {exitConfirmationDialog}
             <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
           </NotificationProvider>
         </CurrentRelaysProvider>
