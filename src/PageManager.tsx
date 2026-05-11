@@ -13,6 +13,7 @@ import {
   useRef,
   useState
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
@@ -66,6 +67,7 @@ export function useSecondaryPage() {
 }
 
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
+  const { t } = useTranslation()
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -76,12 +78,15 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
-  const bottomBarHidden = secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
+  const bottomBarHidden =
+    secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
   const bottomBarOffset = bottomBarHidden ? '0px' : 'calc(env(safe-area-inset-bottom) + 3rem)'
   const { isSmallScreen } = useScreenSize()
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
+  const secondaryStackRef = useRef(secondaryStack)
+  secondaryStackRef.current = secondaryStack
 
   useEffect(() => {
     if (isSmallScreen) return
@@ -162,6 +167,15 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       }
 
       let state = e.state as { index: number; url: string } | null
+      if (!state && window.location.pathname === '/' && secondaryStackRef.current.length === 0) {
+        if (confirm(t('Are you sure you want to close Jumble?'))) {
+          window.history.back()
+        } else {
+          window.history.pushState(null, '', window.location.href)
+        }
+        return
+      }
+
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
         const currentIndex = currentItem?.index
@@ -298,30 +312,32 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <CurrentRelaysProvider>
             <NotificationProvider>
               <div style={{ '--bottom-bar-offset': bottomBarOffset } as React.CSSProperties}>
-              {!!secondaryStack.length &&
-                secondaryStack.map((item, index) => (
+                {!!secondaryStack.length &&
+                  secondaryStack.map((item, index) => (
+                    <div
+                      key={item.index}
+                      style={{
+                        display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                      }}
+                    >
+                      {item.element}
+                    </div>
+                  ))}
+                {primaryPages.map(({ name, element, props }) => (
                   <div
-                    key={item.index}
+                    key={name}
                     style={{
-                      display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                      display:
+                        secondaryStack.length === 0 && currentPrimaryPage === name
+                          ? 'block'
+                          : 'none'
                     }}
                   >
-                    {item.element}
+                    {props ? cloneElement(element as React.ReactElement, props) : element}
                   </div>
                 ))}
-              {primaryPages.map(({ name, element, props }) => (
-                <div
-                  key={name}
-                  style={{
-                    display:
-                      secondaryStack.length === 0 && currentPrimaryPage === name ? 'block' : 'none'
-                  }}
-                >
-                  {props ? cloneElement(element as React.ReactElement, props) : element}
-                </div>
-              ))}
-              {!bottomBarHidden && <BottomNavigationBar />}
-              <TooManyRelaysAlertDialog />
+                {!bottomBarHidden && <BottomNavigationBar />}
+                <TooManyRelaysAlertDialog />
               </div>
             </NotificationProvider>
           </CurrentRelaysProvider>
@@ -352,7 +368,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
             <NotificationProvider>
               <div className="flex w-full lg:justify-around">
                 <div className={cn('lg:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
-                <div className="min-h-screen w-0 flex-1 border-x bg-background lg:w-[640px] lg:flex-auto lg:shrink-0">
+                <div className="bg-background min-h-screen w-0 flex-1 border-x lg:w-[640px] lg:flex-auto lg:shrink-0">
                   {!!secondaryStack.length &&
                     secondaryStack.map((item, index) => (
                       <div
@@ -391,7 +407,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 </div>
               </div>
               <TooManyRelaysAlertDialog />
-              <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+              <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -416,9 +432,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       >
         <CurrentRelaysProvider>
           <NotificationProvider>
-            <div className="flex flex-col items-center bg-surface-background">
+            <div className="bg-surface-background flex flex-col items-center">
               <div
-                className="flex h-(--vh) w-full bg-surface-background"
+                className="bg-surface-background flex h-(--vh) w-full"
                 style={{
                   maxWidth: '1920px'
                 }}
@@ -432,7 +448,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 >
                   <div
                     className={cn(
-                      'overflow-hidden bg-background',
+                      'bg-background overflow-hidden',
                       themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl shadow-lg'
                     )}
                   >
@@ -450,7 +466,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   </div>
                   <div
                     className={cn(
-                      'overflow-hidden bg-background',
+                      'bg-background overflow-hidden',
                       themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl',
                       themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
                       secondaryStack.length === 0 ? 'bg-surface' : ''
@@ -470,7 +486,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
-            <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+            <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>
@@ -521,7 +537,11 @@ function findAndCloneElement(url: string, index: number) {
 
     if (!element) return {}
     const ref = createRef<TPageRef>()
-    return { element: cloneElement(element, { ...match.params, index, ref } as any), ref, hideBottomBar }
+    return {
+      element: cloneElement(element, { ...match.params, index, ref } as any),
+      ref,
+      hideBottomBar
+    }
   }
   return {}
 }
@@ -538,7 +558,13 @@ function pushNewPageToStack(
   const { element, ref, hideBottomBar } = findAndCloneElement(url, currentIndex)
   if (!element) return { newStack: stack, newItem: null }
 
-  const newItem: TStackItem = { element, ref, url, index: currentIndex, hideBottomBar: hideBottomBar ?? false }
+  const newItem: TStackItem = {
+    element,
+    ref,
+    url,
+    index: currentIndex,
+    hideBottomBar: hideBottomBar ?? false
+  }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.element)
   // Clear the oldest cached element if there are too many cached elements
