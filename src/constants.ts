@@ -47,6 +47,7 @@ export const StorageKey = {
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
   DEFAULT_RELAY_URLS: 'defaultRelayUrls',
   MUTED_WORDS: 'mutedWords',
+  MUTED_NIP05_DOMAINS: 'mutedNip05Domains',
   MIN_TRUST_SCORE: 'minTrustScore',
   MIN_TRUST_SCORE_MAP: 'minTrustScoreMap',
   SEARCH_RELAY_URLS: 'searchRelayUrls',

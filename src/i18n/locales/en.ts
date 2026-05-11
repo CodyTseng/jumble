@@ -668,6 +668,10 @@ export default {
     'Invalid relay URL': 'Invalid relay URL',
     'Muted words': 'Muted words',
     'Add muted word': 'Add muted word',
+    'Muted NIP-05 domains': 'Muted NIP-05 domains',
+    'Hide notes from these NIP-05 domains unless you follow the author':
+      'Hide notes from these NIP-05 domains unless you follow the author',
+    'Add NIP-05 domain': 'Add NIP-05 domain',
     'Zap Details': 'Zap Details',
     'Default trust score filter threshold ({{n}}%)':
       'Default trust score filter threshold ({{n}}%)',

@@ -21,6 +21,7 @@ import { RotateCcw } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultTrustScoreFilter from './DefaultTrustScoreFilter'
+import MutedNip05Domains from './MutedNip05Domains'
 import MutedWords from './MutedWords'
 
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
@@ -151,6 +152,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           />
           <DefaultTrustScoreFilter />
           <MutedWords />
+          <MutedNip05Domains />
         </SettingsGroup>
 
         <SettingsGroup title={t('Reactions')}>

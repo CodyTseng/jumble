@@ -4,9 +4,11 @@ import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
+import { getPubkeysMutedByNip05Domain } from '@/lib/muted-nip05'
 import { mergeTimelines } from '@/lib/timeline'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
+import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -36,6 +38,20 @@ import PinnedNoteCard from '../PinnedNoteCard'
 const LIMIT = 200
 const ALGO_LIMIT = 500
 const SHOW_COUNT = 10
+
+const getEmbeddedRepostEvents = (events: Event[]) => {
+  return events
+    .map((evt) => {
+      if (evt.kind !== kinds.Repost && evt.kind !== kinds.GenericRepost) return null
+      if (!evt.content) return null
+      try {
+        return JSON.parse(evt.content) as Event
+      } catch {
+        return null
+      }
+    })
+    .filter((event): event is Event => !!event)
+}
 
 export type TNoteListRef = {
   scrollToTop: (behavior?: ScrollBehavior) => void
@@ -83,7 +99,8 @@ const NoteList = forwardRef<
     const { startLogin } = useNostr()
     const { isSpammer, meetsMinTrustScore } = useUserTrust()
     const { mutePubkeySet } = useMuteList()
-    const { hideContentMentioningMutedUsers, mutedWords } = useContentPolicy()
+    const { followingSet } = useFollowList()
+    const { hideContentMentioningMutedUsers, mutedWords, mutedNip05Domains } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
     const [storedEvents, setStoredEvents] = useState<Event[]>([])
     const [events, setEvents] = useState<Event[]>([])
@@ -121,11 +138,31 @@ const NoteList = forwardRef<
       return set
     }, [pinnedEventIds?.join(',')])
 
+    const mutedNip05DomainSet = useMemo(
+      () => new Set(mutedNip05Domains),
+      [mutedNip05Domains]
+    )
+
+    const getMutedNip05PubkeySet = useCallback(
+      async (events: Event[]) => {
+        if (!filterMutedNotes || mutedNip05DomainSet.size === 0) return new Set<string>()
+
+        return getPubkeysMutedByNip05Domain(
+          events.map((event) => event.pubkey),
+          mutedNip05DomainSet,
+          followingSet,
+          (pubkey) => client.fetchProfile(pubkey)
+        )
+      },
+      [filterMutedNotes, mutedNip05DomainSet, followingSet]
+    )
+
     const shouldHideEvent = useCallback(
-      (evt: Event) => {
+      (evt: Event, mutedNip05PubkeySet = new Set<string>()) => {
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
+        if (filterMutedNotes && mutedNip05PubkeySet.has(evt.pubkey)) return true
         if (
           filterMutedNotes &&
           hideContentMentioningMutedUsers &&
@@ -147,7 +184,15 @@ const NoteList = forwardRef<
 
         return false
       },
-      [mutePubkeySet, isEventDeleted, filterFn, mutedWords, pinnedEventHexIdSet]
+      [
+        mutePubkeySet,
+        isEventDeleted,
+        filterMutedNotes,
+        hideContentMentioningMutedUsers,
+        filterFn,
+        mutedWords,
+        pinnedEventHexIdSet
+      ]
     )
 
     useEffect(() => {
@@ -167,12 +212,16 @@ const NoteList = forwardRef<
         ) {
           mergedEvents = mergeTimelines([storedEvents, events])
         }
+        const mutedNip05PubkeySet = await getMutedNip05PubkeySet([
+          ...mergedEvents,
+          ...getEmbeddedRepostEvents(mergedEvents)
+        ])
         mergedEvents.forEach((evt) => {
           const key = getEventKey(evt)
           if (keySet.has(key)) return
           keySet.add(key)
 
-          if (shouldHideEvent(evt)) return
+          if (shouldHideEvent(evt, mutedNip05PubkeySet)) return
           if (hideReplies && isReplyNoteEvent(evt)) return
           if (evt.kind !== kinds.Repost && evt.kind !== kinds.GenericRepost) {
             filteredEvents.push(evt)
@@ -201,7 +250,7 @@ const NoteList = forwardRef<
               ) {
                 return
               }
-              if (shouldHideEvent(evt)) return
+              if (shouldHideEvent(eventFromContent, mutedNip05PubkeySet)) return
 
               targetEventKey = getEventKey(eventFromContent)
             }
@@ -264,6 +313,7 @@ const NoteList = forwardRef<
       events,
       storedEvents,
       shouldHideEvent,
+      getMutedNip05PubkeySet,
       hideReplies,
       hideSpam,
       meetsMinTrustScore,
@@ -278,9 +328,10 @@ const NoteList = forwardRef<
       const processNewEvents = async () => {
         const keySet = new Set<string>()
         const filteredEvents: Event[] = []
+        const mutedNip05PubkeySet = await getMutedNip05PubkeySet(newEvents)
 
         newEvents.forEach((event) => {
-          if (shouldHideEvent(event)) return
+          if (shouldHideEvent(event, mutedNip05PubkeySet)) return
           if (hideReplies && isReplyNoteEvent(event)) return
 
           const key = getEventKey(event)
@@ -316,7 +367,15 @@ const NoteList = forwardRef<
         setFilteredNewEvents(_filteredNotes)
       }
       processNewEvents()
-    }, [newEvents, shouldHideEvent, isSpammer, hideSpam, meetsMinTrustScore, trustScoreThreshold])
+    }, [
+      newEvents,
+      shouldHideEvent,
+      getMutedNip05PubkeySet,
+      isSpammer,
+      hideSpam,
+      meetsMinTrustScore,
+      trustScoreThreshold
+    ])
 
     const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {

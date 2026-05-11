@@ -29,6 +29,9 @@ type TContentPolicyContext = {
 
   mutedWords: string[]
   setMutedWords: (words: string[]) => void
+
+  mutedNip05Domains: string[]
+  setMutedNip05Domains: (domains: string[]) => void
 }
 
 const ContentPolicyContext = createContext<TContentPolicyContext | undefined>(undefined)
@@ -54,6 +57,7 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
   )
   const [faviconUrlTemplate, setFaviconUrlTemplate] = useState(storage.getFaviconUrlTemplate())
   const [mutedWords, setMutedWords] = useState(storage.getMutedWords())
+  const [mutedNip05Domains, setMutedNip05Domains] = useState(storage.getMutedNip05Domains())
   const [connectionType, setConnectionType] = useState((navigator as any).connection?.type)
 
   useEffect(() => {
@@ -127,6 +131,11 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setMutedWords(words)
   }
 
+  const updateMutedNip05Domains = (domains: string[]) => {
+    storage.setMutedNip05Domains(domains)
+    setMutedNip05Domains(storage.getMutedNip05Domains())
+  }
+
   return (
     <ContentPolicyContext.Provider
       value={{
@@ -147,7 +156,9 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
         faviconUrlTemplate,
         setFaviconUrlTemplate: updateFaviconUrlTemplate,
         mutedWords,
-        setMutedWords: updateMutedWords
+        setMutedWords: updateMutedWords,
+        mutedNip05Domains,
+        setMutedNip05Domains: updateMutedNip05Domains
       }}
     >
       {children}

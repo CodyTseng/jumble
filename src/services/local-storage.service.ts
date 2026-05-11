@@ -14,6 +14,7 @@ import {
   TPrimaryColor
 } from '@/constants'
 import { isSameAccount } from '@/lib/account'
+import { normalizeMutedNip05Domains } from '@/lib/muted-nip05'
 import { getElectronBridge, isElectron } from '@/lib/platform'
 import { randomString } from '@/lib/random'
 import { isTorBrowser } from '@/lib/utils'
@@ -74,6 +75,7 @@ class LocalStorageService {
   private defaultRelayUrls: string[] = BIG_RELAY_URLS
   private searchRelayUrls: string[] = SEARCHABLE_RELAY_URLS
   private mutedWords: string[] = []
+  private mutedNip05Domains: string[] = []
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
   private hideIndirectNotifications: boolean = false
@@ -480,6 +482,18 @@ class LocalStorageService {
         const words = JSON.parse(mutedWordsStr)
         if (Array.isArray(words) && words.every((word) => typeof word === 'string')) {
           this.mutedWords = words
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const mutedNip05DomainsStr = window.localStorage.getItem(StorageKey.MUTED_NIP05_DOMAINS)
+    if (mutedNip05DomainsStr) {
+      try {
+        const domains = JSON.parse(mutedNip05DomainsStr)
+        if (Array.isArray(domains) && domains.every((domain) => typeof domain === 'string')) {
+          this.mutedNip05Domains = normalizeMutedNip05Domains(domains)
         }
       } catch {
         // Invalid JSON, use default
@@ -1111,6 +1125,18 @@ class LocalStorageService {
   setMutedWords(words: string[]) {
     this.mutedWords = words
     window.localStorage.setItem(StorageKey.MUTED_WORDS, JSON.stringify(this.mutedWords))
+  }
+
+  getMutedNip05Domains() {
+    return this.mutedNip05Domains
+  }
+
+  setMutedNip05Domains(domains: string[]) {
+    this.mutedNip05Domains = normalizeMutedNip05Domains(domains)
+    window.localStorage.setItem(
+      StorageKey.MUTED_NIP05_DOMAINS,
+      JSON.stringify(this.mutedNip05Domains)
+    )
   }
 
   getHideIndirectNotifications() {

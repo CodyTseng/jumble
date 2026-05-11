@@ -5,11 +5,13 @@ import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/U
 import Username, { SimpleUsername } from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
+import { getPubkeysMutedByNip05Domain } from '@/lib/muted-nip05'
 import { mergeTimelines } from '@/lib/timeline'
 import { cn, isTouchDevice } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
+import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -75,9 +77,10 @@ const UserAggregationList = forwardRef<
     const { pubkey: currentPubkey, startLogin } = useNostr()
     const { push } = useSecondaryPage()
     const { mutePubkeySet } = useMuteList()
+    const { followingSet } = useFollowList()
     const { pinnedPubkeySet } = usePinnedUsers()
     const { meetsMinTrustScore } = useUserTrust()
-    const { hideContentMentioningMutedUsers } = useContentPolicy()
+    const { hideContentMentioningMutedUsers, mutedNip05Domains } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
     const [since, setSince] = useState(() => dayjs().subtract(1, 'day').unix())
     const [storedEvents, setStoredEvents] = useState<Event[]>([])
@@ -104,6 +107,11 @@ const UserAggregationList = forwardRef<
       : events.length
         ? events[0].created_at + 1
         : undefined
+
+    const mutedNip05DomainSet = useMemo(
+      () => new Set(mutedNip05Domains),
+      [mutedNip05Domains]
+    )
 
     const scrollToTop = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {
@@ -270,12 +278,23 @@ const UserAggregationList = forwardRef<
 
     const filterEvents = useCallback(
       async (events: Event[]) => {
+        const mutedNip05PubkeySet =
+          filterMutedNotes && mutedNip05DomainSet.size > 0
+            ? await getPubkeysMutedByNip05Domain(
+                events.map((event) => event.pubkey),
+                mutedNip05DomainSet,
+                followingSet,
+                (pubkey) => client.fetchProfile(pubkey)
+              )
+            : new Set<string>()
+
         const results = await Promise.allSettled(
           events.map(async (evt) => {
             if (evt.pubkey === currentPubkey) return null
             if (evt.created_at < since) return null
             if (isEventDeleted(evt)) return null
             if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return null
+            if (filterMutedNotes && mutedNip05PubkeySet.has(evt.pubkey)) return null
             if (
               filterMutedNotes &&
               hideContentMentioningMutedUsers &&
@@ -299,6 +318,8 @@ const UserAggregationList = forwardRef<
       },
       [
         mutePubkeySet,
+        mutedNip05DomainSet,
+        followingSet,
         isEventDeleted,
         currentPubkey,
         filterMutedNotes,
