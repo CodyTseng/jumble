@@ -18,13 +18,11 @@ import { Label } from '@/components/ui/label'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useZap } from '@/providers/ZapProvider'
-import lightning from '@/services/lightning.service'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
 
@@ -136,7 +134,7 @@ function ZapDialogContent({
 }) {
   const { t, i18n } = useTranslation()
   const { pubkey } = useNostr()
-  const { defaultZapSats, defaultZapComment } = useZap()
+  const { defaultZapSats, defaultZapComment, zap } = useZap()
   const [sats, setSats] = useState(defaultAmount ?? defaultZapSats)
   const [comment, setComment] = useState(defaultComment ?? defaultZapComment)
   const isSelfZap = useMemo(() => pubkey === recipient, [pubkey, recipient])
@@ -181,7 +179,7 @@ function ZapDialogContent({
         throw new Error('You need to be logged in to zap')
       }
       setZapping(true)
-      const zapResult = await lightning.zap(pubkey, event ?? recipient, sats, comment, () =>
+      const zapResult = await zap(pubkey, event ?? recipient, sats, comment, () =>
         setOpen(false)
       )
       // user canceled
@@ -191,8 +189,8 @@ function ZapDialogContent({
       if (event) {
         stuffStatsService.addZap(pubkey, event.id, zapResult.invoice, sats, comment)
       }
-    } catch (error) {
-      toast.error(`${t('Zap failed')}: ${(error as Error).message}`)
+    } catch (_error) {
+      // The global zap status toast reports the error and stays visible after navigation.
     } finally {
       setZapping(false)
     }

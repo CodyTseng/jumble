@@ -1,8 +1,12 @@
 import lightningService from '@/services/lightning.service'
+import { formatError } from '@/lib/error'
+import { trackZapStatus, TZapStatusResult } from '@/lib/zap-status-toast'
 import storage from '@/services/local-storage.service'
 import { onConnected, onDisconnected } from '@getalby/bitcoin-connect-react'
 import { GetInfoResponse, WebLNProvider } from '@webbtc/webln-types'
+import { NostrEvent } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type TZapContext = {
   isWalletConnected: boolean
@@ -14,6 +18,13 @@ type TZapContext = {
   updateDefaultComment: (comment: string) => void
   quickZap: boolean
   updateQuickZap: (quickZap: boolean) => void
+  zap: (
+    sender: string,
+    recipientOrEvent: string | NostrEvent,
+    sats: number,
+    comment: string,
+    closeOuterModel?: () => void
+  ) => Promise<TZapStatusResult>
 }
 
 const ZapContext = createContext<TZapContext | undefined>(undefined)
@@ -27,6 +38,7 @@ export const useZap = () => {
 }
 
 export function ZapProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation()
   const [defaultZapSats, setDefaultZapSats] = useState<number>(storage.getDefaultZapSats())
   const [defaultZapComment, setDefaultZapComment] = useState<string>(storage.getDefaultZapComment())
   const [quickZap, setQuickZap] = useState<boolean>(storage.getQuickZap())
@@ -69,6 +81,24 @@ export function ZapProvider({ children }: { children: React.ReactNode }) {
     setQuickZap(quickZap)
   }
 
+  const zap = (
+    sender: string,
+    recipientOrEvent: string | NostrEvent,
+    sats: number,
+    comment: string,
+    closeOuterModel?: () => void
+  ) => {
+    return trackZapStatus(
+      lightningService.zap(sender, recipientOrEvent, sats, comment, closeOuterModel),
+      {
+        loading: t('Zapping...'),
+        success: t('Zap sent!'),
+        canceled: t('Zap canceled'),
+        error: (error) => `${t('Zap failed')}: ${formatError(error).join('; ')}`
+      }
+    )
+  }
+
   return (
     <ZapContext.Provider
       value={{
@@ -80,7 +110,8 @@ export function ZapProvider({ children }: { children: React.ReactNode }) {
         defaultZapComment,
         updateDefaultComment,
         quickZap,
-        updateQuickZap
+        updateQuickZap,
+        zap
       }}
     >
       {children}

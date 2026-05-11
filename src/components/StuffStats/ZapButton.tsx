@@ -6,13 +6,11 @@ import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useZap } from '@/providers/ZapProvider'
 import client from '@/services/client.service'
-import lightning from '@/services/lightning.service'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader, Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { MouseEvent, TouchEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import ZapDialog from '../ZapDialog'
 
 export default function ZapButton({ stuff }: { stuff: Event | string }) {
@@ -20,7 +18,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
   const { checkLogin, pubkey } = useNostr()
   const { event, stuffKey } = useStuff(stuff)
   const noteStats = useStuffStatsById(stuffKey)
-  const { defaultZapSats, defaultZapComment, quickZap } = useZap()
+  const { defaultZapSats, defaultZapComment, quickZap, zap } = useZap()
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
@@ -55,7 +53,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
       if (zapping || !event) return
 
       setZapping(true)
-      const zapResult = await lightning.zap(pubkey, event, defaultZapSats, defaultZapComment)
+      const zapResult = await zap(pubkey, event, defaultZapSats, defaultZapComment)
       // user canceled
       if (!zapResult) {
         return
@@ -67,8 +65,8 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
         defaultZapSats,
         defaultZapComment
       )
-    } catch (error) {
-      toast.error(`${t('Zap failed')}: ${(error as Error).message}`)
+    } catch (_error) {
+      // The global zap status toast reports the error and stays visible after navigation.
     } finally {
       setZapping(false)
     }

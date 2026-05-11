@@ -899,6 +899,10 @@ export default {
     'Connect wallet': 'Connect wallet',
     'Connect wallet via NWC': 'Connect wallet via NWC',
     'Use any NWC-compatible Lightning wallet': 'Use any NWC-compatible Lightning wallet',
-    'Quickly create a custodial Lightning vault': 'Quickly create a custodial Lightning vault'
+    'Quickly create a custodial Lightning vault': 'Quickly create a custodial Lightning vault',
+    'Zapping...': 'Zapping...',
+    'Zap sent!': 'Zap sent!',
+    'Zap canceled': 'Zap canceled',
+    'Zap failed': 'Zap failed'
   }
 }
