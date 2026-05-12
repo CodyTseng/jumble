@@ -895,6 +895,12 @@ export default {
     'Donation failed': 'Пожертвование не удалось',
     'Thank you for supporting Jumble! 💛': 'Спасибо за поддержку Jumble! 💛',
     'Your donation will appear in Recent Supporters':
-      'Ваше пожертвование появится в списке последних сторонников'
+      'Ваше пожертвование появится в списке последних сторонников',
+    'Download Jumble Desktop': 'Скачать Jumble Desktop',
+    'Pick a build for your operating system.': 'Выберите сборку для вашей операционной системы.',
+    'View all releases on GitHub': 'Все релизы на GitHub',
+    'No auto-updates — manual re-download required':
+      'Без автообновлений — требуется ручная повторная загрузка',
+    Download: 'Скачать'
   }
 }

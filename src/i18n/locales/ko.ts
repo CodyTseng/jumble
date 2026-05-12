@@ -880,6 +880,12 @@ export default {
     'Donate n sats': '{{n}} sats 후원',
     'Donation failed': '후원 실패',
     'Thank you for supporting Jumble! 💛': 'Jumble을 후원해 주셔서 감사합니다! 💛',
-    'Your donation will appear in Recent Supporters': '당신의 후원이 최근 후원자 목록에 표시됩니다'
+    'Your donation will appear in Recent Supporters': '당신의 후원이 최근 후원자 목록에 표시됩니다',
+    'Download Jumble Desktop': 'Jumble 데스크톱 다운로드',
+    'Pick a build for your operating system.': '운영체제에 맞는 빌드를 선택하세요.',
+    'View all releases on GitHub': 'GitHub에서 모든 릴리스 보기',
+    'No auto-updates — manual re-download required':
+      '자동 업데이트 미지원 — 수동으로 다시 다운로드해야 함',
+    Download: '다운로드'
   }
 }

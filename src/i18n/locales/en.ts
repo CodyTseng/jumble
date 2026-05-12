@@ -908,6 +908,10 @@ export default {
     'Donation failed': 'Donation failed',
     'Thank you for supporting Jumble! 💛': 'Thank you for supporting Jumble! 💛',
     'Your donation will appear in Recent Supporters':
-      'Your donation will appear in Recent Supporters'
+      'Your donation will appear in Recent Supporters',
+    'Download Jumble Desktop': 'Download Jumble Desktop',
+    'Pick a build for your operating system.': 'Pick a build for your operating system.',
+    'View all releases on GitHub': 'View all releases on GitHub',
+    'No auto-updates — manual re-download required': 'No auto-updates — manual re-download required'
   }
 }

@@ -861,6 +861,11 @@ export default {
     'Donate n sats': '捐赠 {{n}} sats',
     'Donation failed': '捐赠失败',
     'Thank you for supporting Jumble! 💛': '感谢你支持 Jumble！💛',
-    'Your donation will appear in Recent Supporters': '你的捐赠将显示在近期支持者中'
+    'Your donation will appear in Recent Supporters': '你的捐赠将显示在近期支持者中',
+    'Download Jumble Desktop': '下载 Jumble 桌面版',
+    'Pick a build for your operating system.': '选择适合你操作系统的版本。',
+    'View all releases on GitHub': '在 GitHub 上查看所有版本',
+    'No auto-updates — manual re-download required': '不支持自动更新 — 需要手动重新下载',
+    Download: '下载'
   }
 }

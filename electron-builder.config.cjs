@@ -37,19 +37,22 @@ module.exports = {
       { target: 'dmg', arch: ['arm64'] },
       { target: 'zip', arch: ['arm64'] }
     ],
+    artifactName: 'Jumble-mac-${arch}.${ext}',
     icon: 'public/pwa-512x512.png'
   },
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
+    artifactName: 'Jumble-windows-${arch}.${ext}',
     icon: 'public/pwa-512x512.png'
   },
   nsis: {
-    oneClick: false,
-    allowToChangeInstallationDirectory: true
+    oneClick: true,
+    perMachine: false
   },
   linux: {
     target: ['AppImage', 'deb'],
     category: 'Network',
+    artifactName: 'Jumble-linux-${arch}.${ext}',
     icon: 'public/pwa-512x512.png'
   }
 }

@@ -54,9 +54,9 @@ export default {
     'switch to system theme': 'sistem temasına geç',
     Note: 'Not',
     note: 'not',
-    "username's following": "{{username}} kullanıcısının takip ettikleri",
-    "username's used relays": "{{username}} kullanıcısının kullandığı relayler",
-    "username's muted": "{{username}} kullanıcısının susturdukları",
+    "username's following": '{{username}} kullanıcısının takip ettikleri',
+    "username's used relays": '{{username}} kullanıcısının kullandığı relayler',
+    "username's muted": '{{username}} kullanıcısının susturdukları',
     Login: 'Giriş yap',
     'Follows you': 'Sizi takip ediyor',
     'Relay Settings': 'Relay Ayarları',
@@ -68,7 +68,7 @@ export default {
     'Copy share link': 'Paylaşım bağlantısını kopyala',
     Delete: 'Sil',
     'Relay already exists': 'Relay zaten mevcut',
-    'invalid relay URL': 'geçersiz relay URL\'si',
+    'invalid relay URL': "geçersiz relay URL'si",
     'Add a new relay': 'Yeni bir relay ekle',
     back: 'geri',
     'Lost in the void': 'Boşlukta kayboldu',
@@ -145,7 +145,7 @@ export default {
     'Enter the password to decrypt your ncryptsec':
       'ncryptsec şifresini çözmek için parolayı girin',
     Back: 'Geri',
-    'optional: encrypt nsec': 'isteğe bağlı: nsec\'i şifrele',
+    'optional: encrypt nsec': "isteğe bağlı: nsec'i şifrele",
     password: 'parola',
     'Sign up': 'Kayıt ol',
     'Save to': 'Şuraya kaydet',
@@ -177,7 +177,7 @@ export default {
     randomRelaysRefresh: 'Yenile',
     'Explore more': 'Daha fazla keşfet',
     'Payment page': 'Ödeme sayfası',
-    'Supported NIPs': 'Desteklenen NIP\'ler',
+    'Supported NIPs': "Desteklenen NIP'ler",
     'Open in a': '{{a}} içinde aç',
     'Cannot handle event of kind k': '{{k}} türündeki olay işlenemiyor',
     'Encrypted direct messages not supported': 'Şifreli doğrudan mesajlar desteklenmiyor',
@@ -197,10 +197,10 @@ export default {
       'Etkinleştirilirse, tek tıklama ile zap gönderebilirsiniz. Özel miktarlar için tıklayıp basılı tutun',
     All: 'Tümü',
     Reactions: 'Tepkiler',
-    Zaps: 'Zap\'ler',
-    'Enjoying Jumble?': 'Jumble\'dan memnun musunuz?',
+    Zaps: "Zap'ler",
+    'Enjoying Jumble?': "Jumble'dan memnun musunuz?",
     'Your donation helps me maintain Jumble and make it better! 😊':
-      'Bağışınız, Jumble\'ı sürdürmeme ve daha iyi hale getirmeme yardımcı olur! 😊',
+      "Bağışınız, Jumble'ı sürdürmeme ve daha iyi hale getirmeme yardımcı olur! 😊",
     'Earlier notifications': 'Daha önceki bildirimler',
     'Temporarily display this note': 'Bu notu geçici olarak göster',
     buttonFollowing: 'Takip ediliyor',
@@ -232,7 +232,8 @@ export default {
     General: 'Genel',
     Autoplay: 'Otomatik oynatma',
     'Enable video autoplay on this device': 'Bu cihazda video otomatik oynatmayı etkinleştir',
-    'Paste or drop media files to upload': 'Yüklemek için medya dosyalarını yapıştırın veya sürükleyin',
+    'Paste or drop media files to upload':
+      'Yüklemek için medya dosyalarını yapıştırın veya sürükleyin',
     Preview: 'Önizleme',
     'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?':
       '[{{eventAuthorName}}] tarafından imzalanmış bir olayı yayınlamak üzeresiniz. Şu anda [{{currentUsername}}] olarak giriş yaptınız. Emin misiniz?',
@@ -254,7 +255,7 @@ export default {
     Balance: 'Bakiye',
     characters: 'karakter',
     jumbleTranslateApiKeyDescription:
-      'Bu API anahtarını LibreTranslate\'i destekleyen başka her yerde kullanabilirsiniz. Hizmet URL\'si {{serviceUrl}}',
+      "Bu API anahtarını LibreTranslate'i destekleyen başka her yerde kullanabilirsiniz. Hizmet URL'si {{serviceUrl}}",
     'Top up': 'Yükleme yap',
     'Will receive: {n} characters': 'Alınacak: {{n}} karakter',
     'Top up {n} sats': '{{n}} sats yükle',
@@ -295,11 +296,11 @@ export default {
     Article: 'Makale',
     Unfavorite: 'Favorilerden çıkar',
     'Recommended relays': 'Önerilen relayler',
-    'Blossom server URLs': 'Blossom sunucu URL\'leri',
+    'Blossom server URLs': "Blossom sunucu URL'leri",
     'You need to add at least one blossom server in order to upload media files.':
       'Medya dosyaları yüklemek için en az bir Blossom sunucusu eklemeniz gerekir.',
     'Recommended blossom servers': 'Önerilen Blossom sunucuları',
-    'Enter Blossom server URL': 'Blossom sunucu URL\'si girin',
+    'Enter Blossom server URL': "Blossom sunucu URL'si girin",
     Preferred: 'Tercih edilen',
     'Multiple choice (select one or more)': 'Çoktan seçmeli (bir veya daha fazla seçin)',
     Vote: 'Oy ver',
@@ -316,7 +317,7 @@ export default {
     'Allow multiple choices': 'Çoklu seçime izin ver',
     'End Date (optional)': 'Bitiş Tarihi (isteğe bağlı)',
     'Clear end date': 'Bitiş tarihini temizle',
-    'Relay URLs (optional, comma-separated)': 'Relay URL\'leri (isteğe bağlı, virgülle ayrılmış)',
+    'Relay URLs (optional, comma-separated)': "Relay URL'leri (isteğe bağlı, virgülle ayrılmış)",
     'Remove poll': 'Anketi kaldır',
     'Refresh results': 'Sonuçları yenile',
     Poll: 'Anket',
@@ -378,8 +379,7 @@ export default {
     'Deletion request sent to {{count}} relays': 'Silme isteği {{count}} relaye gönderildi',
     'Suitable Relays': 'Uygun Relayler',
     'People, keywords, or relays': 'Kişiler, anahtar kelimeler veya relayler',
-    'Hide content mentioning muted users':
-      'Susturulan kullanıcılardan bahseden içeriği gizle',
+    'Hide content mentioning muted users': 'Susturulan kullanıcılardan bahseden içeriği gizle',
     'This note mentions a user you muted': 'Bu not, susturduğunuz bir kullanıcıdan bahsediyor',
     Filter: 'Filtrele',
     'mentioned you in a note': 'bir notta sizden bahsetti',
@@ -419,8 +419,7 @@ export default {
     'Click to load X post': 'X gönderisini yüklemek için tıklayın',
     '{{count}} reviews': '{{count}} inceleme',
     'Write a review': 'Bir inceleme yaz',
-    'No reviews yet. Be the first to write one!':
-      'Henüz inceleme yok. İlk yazan siz olun!',
+    'No reviews yet. Be the first to write one!': 'Henüz inceleme yok. İlk yazan siz olun!',
     'View more reviews': 'Daha fazla inceleme gör',
     'Failed to review': 'İnceleme başarısız',
     'Write a review and pick a star rating': 'Bir inceleme yazın ve bir yıldız puanı seçin',
@@ -442,15 +441,15 @@ export default {
     'Rizful Vault': 'Rizful Vault',
     'Rizful Vault connected!': 'Rizful Vault bağlandı!',
     'You can now use your Rizful Vault to zap your favorite notes and creators.':
-      'Artık favori notlarınıza ve içerik üreticilerinize zap göndermek için Rizful Vault\'unuzu kullanabilirsiniz.',
+      "Artık favori notlarınıza ve içerik üreticilerinize zap göndermek için Rizful Vault'unuzu kullanabilirsiniz.",
     'Your Lightning Address': 'Lightning Adresiniz',
-    'New to Rizful?': 'Rizful\'da yeni misiniz?',
-    'Sign up for Rizful': 'Rizful\'a kayıt olun',
+    'New to Rizful?': "Rizful'da yeni misiniz?",
+    'Sign up for Rizful': "Rizful'a kayıt olun",
     'If you already have a Rizful account, you can skip this step.':
       'Zaten bir Rizful hesabınız varsa, bu adımı atlayabilirsiniz.',
     'Get your one-time code': 'Tek kullanımlık kodunuzu alın',
     'Get code': 'Kodu al',
-    'Connect to your Rizful Vault': 'Rizful Vault\'unuza bağlanın',
+    'Connect to your Rizful Vault': "Rizful Vault'unuza bağlanın",
     'Paste your one-time code here': 'Tek kullanımlık kodunuzu buraya yapıştırın',
     Connect: 'Bağlan',
     'Set up your wallet to send and receive sats!':
@@ -496,9 +495,9 @@ export default {
     Remote: 'Uzak',
     'Encrypted Key': 'Şifrelenmiş Anahtar',
     'Private Key': 'Özel Anahtar',
-    'Welcome to Jumble': 'Jumble\'a hoş geldiniz',
+    'Welcome to Jumble': "Jumble'a hoş geldiniz",
     'Jumble is a client focused on browsing relays. Get started by exploring interesting relays or login to view your following feed.':
-      'Jumble, relay\'lere göz atmaya odaklanan bir istemcidir. İlginç relay\'leri keşfederek başlayın veya takip akışınızı görüntülemek için giriş yapın.',
+      "Jumble, relay'lere göz atmaya odaklanan bir istemcidir. İlginç relay'leri keşfederek başlayın veya takip akışınızı görüntülemek için giriş yapın.",
     'Explore Relays': 'Relayleri Keşfet',
     'Choose a feed': 'Bir akış seçin',
     'and {{x}} others': 've {{x}} diğer',
@@ -546,7 +545,7 @@ export default {
     'Failed to get invite code from relay': 'Relayden davet kodu alınamadı',
     'Failed to get invite code': 'Davet kodu alınamadı',
     'Invite code copied to clipboard': 'Davet kodu panoya kopyalandı',
-    'Favicon URL': 'Favicon URL\'si',
+    'Favicon URL': "Favicon URL'si",
     'Filter out onion relays': 'Onion relayleri filtrele',
     'View Nostr comments': 'Nostr yorumlarını görüntüle',
     'Search for notes': 'Not ara',
@@ -601,7 +600,7 @@ export default {
     'Publish Highlight': 'Öne Çıkanı Yayınla',
     'Show replies': 'Yanıtları göster',
     'Hide replies': 'Yanıtları gizle',
-    'Welcome to Jumble!': 'Jumble\'a hoş geldiniz!',
+    'Welcome to Jumble!': "Jumble'a hoş geldiniz!",
     'Your feed is empty because you are not following anyone yet. Start by exploring interesting content and following users you like!':
       'Henüz kimseyi takip etmediğiniz için akışınız boş. İlginç içerikleri keşfederek ve beğendiğiniz kullanıcıları takip ederek başlayın!',
     'Search Users': 'Kullanıcı Ara',
@@ -611,7 +610,7 @@ export default {
     'Your private key IS your account. Keep it safe!':
       'Özel anahtarınız hesabınızdır. Güvende tutun!',
     'In Nostr, your private key IS your account. If you lose your private key, you lose your account forever.':
-      'Nostr\'da özel anahtarınız hesabınızdır. Özel anahtarınızı kaybederseniz, hesabınızı sonsuza dek kaybedersiniz.',
+      "Nostr'da özel anahtarınız hesabınızdır. Özel anahtarınızı kaybederseniz, hesabınızı sonsuza dek kaybedersiniz.",
     'Your Private Key': 'Özel Anahtarınız',
     'Generate new key': 'Yeni anahtar oluştur',
     'Download Backup File': 'Yedekleme Dosyasını İndir',
@@ -662,7 +661,7 @@ export default {
     'trust-filter.quick-presets': 'Hızlı ön ayarlar',
     'trust-filter.show-all-content': 'Tüm içeriği göster',
     'trust-filter.only-show-wot':
-      'Yalnızca Web of Trust\'ınızı gösterin (takip ettikleriniz + onların takip ettikleri)',
+      "Yalnızca Web of Trust'ınızı gösterin (takip ettikleriniz + onların takip ettikleri)",
     'trust-filter.hide-bottom-percent':
       'Güven sıralamasına göre en alttaki {{score}}% kullanıcıyı filtrele',
     'trust-filter.trust-score-description':
@@ -676,12 +675,11 @@ export default {
       'Diğer kullanıcıların relay yapılandırmalarını sorgulamak ve kullanıcıların yapılandırılmış relayi olmadığında yedek olarak kullanılır.',
     'Default relays warning':
       'Uyarı: Temel deneyiminizi etkileyebileceğinden lütfen bu ayarları rastgele değiştirmeyin.',
-    'Invalid relay URL': 'Geçersiz relay URL\'si',
+    'Invalid relay URL': "Geçersiz relay URL'si",
     'Muted words': 'Susturulmuş kelimeler',
     'Add muted word': 'Susturulmuş kelime ekle',
     'Zap Details': 'Zap Ayrıntıları',
-    'Default trust score filter threshold ({{n}}%)':
-      'Varsayılan güven puanı filtre eşiği ({{n}}%)',
+    'Default trust score filter threshold ({{n}}%)': 'Varsayılan güven puanı filtre eşiği ({{n}}%)',
     'No notes found': 'Not bulunamadı',
     'Try again later or check your connection':
       'Daha sonra tekrar deneyin veya bağlantınızı kontrol edin',
@@ -715,7 +713,7 @@ export default {
     'Publishing sync request...': 'Senkronizasyon isteği yayınlanıyor...',
     'Waiting for key from another device...': 'Başka bir cihazdan anahtar bekleniyor...',
     'Open your other device and go to Messages to send the encryption key to this device.':
-      'Şifreleme anahtarını bu cihaza göndermek için diğer cihazınızı açın ve Mesajlar\'a gidin.',
+      "Şifreleme anahtarını bu cihaza göndermek için diğer cihazınızı açın ve Mesajlar'a gidin.",
     "Don't have access to another device? You can reset your encryption key to generate a new one, but you will no longer be able to decrypt messages sent with the old key.":
       'Başka bir cihaza erişiminiz yok mu? Yeni bir tane oluşturmak için şifreleme anahtarınızı sıfırlayabilirsiniz, ancak eski anahtarla gönderilen mesajların şifresini artık çözemeyeceksiniz.',
     'Generate New Key': 'Yeni Anahtar Oluştur',
@@ -727,7 +725,7 @@ export default {
       'Birinin profilini ziyaret edip mesaj düğmesine tıklayarak bir sohbet başlatın.',
     'No messages yet. Send one!': 'Henüz mesaj yok. Bir tane gönderin!',
     'Type a message...': 'Bir mesaj yazın...',
-    'Press Ctrl+Enter or Cmd+Enter to send': 'Göndermek için Ctrl+Enter veya Cmd+Enter\'a basın',
+    'Press Ctrl+Enter or Cmd+Enter to send': "Göndermek için Ctrl+Enter veya Cmd+Enter'a basın",
     'Failed to send message': 'Mesaj gönderilemedi',
     'Encryption key not found': 'Şifreleme anahtarı bulunamadı',
     Conversation: 'Sohbet',
@@ -766,7 +764,7 @@ export default {
     'Delete conversation': 'Sohbeti sil',
     'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.':
       'Bu sohbeti silmek istediğinizden emin misiniz? Tüm mesajlar bu cihazdan kalıcı olarak kaldırılacaktır.',
-    'This user has not set up NIP-4e DMs': 'Bu kullanıcı NIP-4e DM\'leri ayarlamamış',
+    'This user has not set up NIP-4e DMs': "Bu kullanıcı NIP-4e DM'leri ayarlamamış",
     'Encryption key has been reset': 'Şifreleme anahtarı sıfırlandı',
     'Failed to reset encryption key': 'Şifreleme anahtarı sıfırlanamadı',
     'Encryption Key': 'Şifreleme Anahtarı',
@@ -805,8 +803,7 @@ export default {
     Requests: 'İstekler',
     'dm time date': '{{date}} {{time}}',
     React: 'Tepki ver',
-    'Relays used for searching notes (NIP-50)':
-      'Not aramak için kullanılan relayler (NIP-50)',
+    'Relays used for searching notes (NIP-50)': 'Not aramak için kullanılan relayler (NIP-50)',
     'Protected event (NIP-70)': 'Korumalı olay (NIP-70)',
     Protected: 'Korumalı',
     'Protected event hint':
@@ -889,18 +886,21 @@ export default {
     'Connect wallet via NWC': 'NWC ile cüzdan bağla',
     'Use any NWC-compatible Lightning wallet':
       'NWC uyumlu herhangi bir Lightning cüzdanını kullanın',
-    'Quickly create a custodial Lightning vault':
-      'Hızlıca emanet bir Lightning cüzdanı oluşturun',
+    'Quickly create a custodial Lightning vault': 'Hızlıca emanet bir Lightning cüzdanı oluşturun',
     'Recent Searches': 'Son Aramalar',
     'Clear all': 'Tümünü temizle',
     'Donate to': 'Bağış yap',
     'Leave a message (optional)': 'Mesaj bırak (isteğe bağlı)',
-    'Say hi or share what you love about Jumble':
-      "Merhaba de veya Jumble'da neyi sevdiğini paylaş",
+    'Say hi or share what you love about Jumble': "Merhaba de veya Jumble'da neyi sevdiğini paylaş",
     'Donate n sats': '{{n}} sats bağışla',
     'Donation failed': 'Bağış başarısız',
     'Thank you for supporting Jumble! 💛': "Jumble'ı desteklediğin için teşekkürler! 💛",
-    'Your donation will appear in Recent Supporters':
-      'Bağışın Son Destekçiler bölümünde görünecek'
+    'Your donation will appear in Recent Supporters': 'Bağışın Son Destekçiler bölümünde görünecek',
+    'Download Jumble Desktop': "Jumble Masaüstü'nü İndir",
+    'Pick a build for your operating system.': 'İşletim sisteminize uygun bir sürüm seçin.',
+    'View all releases on GitHub': "Tüm sürümleri GitHub'da görüntüle",
+    'No auto-updates — manual re-download required':
+      'Otomatik güncelleme yok — manuel olarak yeniden indirmeniz gerekir',
+    Download: 'İndir'
   }
 }

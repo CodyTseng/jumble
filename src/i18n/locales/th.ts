@@ -873,6 +873,12 @@ export default {
     'Donate n sats': 'บริจาค {{n}} sats',
     'Donation failed': 'การบริจาคล้มเหลว',
     'Thank you for supporting Jumble! 💛': 'ขอบคุณที่สนับสนุน Jumble! 💛',
-    'Your donation will appear in Recent Supporters': 'การบริจาคของคุณจะปรากฏในผู้สนับสนุนล่าสุด'
+    'Your donation will appear in Recent Supporters': 'การบริจาคของคุณจะปรากฏในผู้สนับสนุนล่าสุด',
+    'Download Jumble Desktop': 'ดาวน์โหลด Jumble เดสก์ท็อป',
+    'Pick a build for your operating system.': 'เลือกเวอร์ชันที่เหมาะกับระบบปฏิบัติการของคุณ',
+    'View all releases on GitHub': 'ดูรุ่นทั้งหมดบน GitHub',
+    'No auto-updates — manual re-download required':
+      'ไม่รองรับอัปเดตอัตโนมัติ — ต้องดาวน์โหลดใหม่ด้วยตนเอง',
+    Download: 'ดาวน์โหลด'
   }
 }

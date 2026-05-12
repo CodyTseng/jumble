@@ -873,6 +873,12 @@ export default {
     'Donate n sats': 'تبرع بـ {{n}} ساتوشي',
     'Donation failed': 'فشل التبرع',
     'Thank you for supporting Jumble! 💛': 'شكرًا لدعمك Jumble! 💛',
-    'Your donation will appear in Recent Supporters': 'سيظهر تبرعك في الداعمين الأخيرين'
+    'Your donation will appear in Recent Supporters': 'سيظهر تبرعك في الداعمين الأخيرين',
+    'Download Jumble Desktop': 'تنزيل تطبيق Jumble لسطح المكتب',
+    'Pick a build for your operating system.': 'اختر إصدارًا متوافقًا مع نظام التشغيل الخاص بك.',
+    'View all releases on GitHub': 'عرض جميع الإصدارات على GitHub',
+    'No auto-updates — manual re-download required':
+      'لا توجد تحديثات تلقائية — يتطلب التنزيل مجددًا يدويًا',
+    Download: 'تنزيل'
   }
 }

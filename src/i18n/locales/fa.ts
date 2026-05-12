@@ -889,6 +889,12 @@ export default {
     'Donate n sats': 'اهدا {{n}} ساتوشی',
     'Donation failed': 'اهدا ناموفق بود',
     'Thank you for supporting Jumble! 💛': 'ممنون از حمایتت از Jumble! 💛',
-    'Your donation will appear in Recent Supporters': 'اهدای شما در حامیان اخیر نمایش داده می‌شود'
+    'Your donation will appear in Recent Supporters': 'اهدای شما در حامیان اخیر نمایش داده می‌شود',
+    'Download Jumble Desktop': 'دانلود نسخه دسکتاپ Jumble',
+    'Pick a build for your operating system.': 'نسخه‌ای مناسب سیستم‌عامل خود را انتخاب کنید.',
+    'View all releases on GitHub': 'مشاهده همه نسخه‌ها در GitHub',
+    'No auto-updates — manual re-download required':
+      'بدون به‌روزرسانی خودکار — نیاز به دانلود مجدد دستی',
+    Download: 'دانلود'
   }
 }

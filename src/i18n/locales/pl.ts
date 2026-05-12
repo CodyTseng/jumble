@@ -898,6 +898,12 @@ export default {
     'Donation failed': 'Wsparcie nieudane',
     'Thank you for supporting Jumble! 💛': 'Dziękujemy za wsparcie Jumble! 💛',
     'Your donation will appear in Recent Supporters':
-      'Twoja darowizna pojawi się wśród Ostatnich wspierających'
+      'Twoja darowizna pojawi się wśród Ostatnich wspierających',
+    'Download Jumble Desktop': 'Pobierz Jumble Desktop',
+    'Pick a build for your operating system.': 'Wybierz wersję dla swojego systemu operacyjnego.',
+    'View all releases on GitHub': 'Zobacz wszystkie wydania na GitHubie',
+    'No auto-updates — manual re-download required':
+      'Brak automatycznych aktualizacji — wymagane ponowne ręczne pobranie',
+    Download: 'Pobierz'
   }
 }

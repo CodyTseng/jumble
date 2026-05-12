@@ -888,6 +888,13 @@ export default {
     'Donation failed': 'Adományozás sikertelen',
     'Thank you for supporting Jumble! 💛': 'Köszönjük, hogy támogatod a Jumble-t! 💛',
     'Your donation will appear in Recent Supporters':
-      'Adományod megjelenik a legutóbbi támogatók között'
+      'Adományod megjelenik a legutóbbi támogatók között',
+    'Download Jumble Desktop': 'Jumble asztali alkalmazás letöltése',
+    'Pick a build for your operating system.':
+      'Válassz az operációs rendszerednek megfelelő verziót.',
+    'View all releases on GitHub': 'Az összes kiadás megtekintése a GitHubon',
+    'No auto-updates — manual re-download required':
+      'Nincs automatikus frissítés — kézi újraletöltés szükséges',
+    Download: 'Letöltés'
   }
 }

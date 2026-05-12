@@ -889,6 +889,12 @@ export default {
     'Donate n sats': '{{n}} सैट्स दान करें',
     'Donation failed': 'दान विफल',
     'Thank you for supporting Jumble! 💛': 'Jumble का समर्थन करने के लिए धन्यवाद! 💛',
-    'Your donation will appear in Recent Supporters': 'आपका दान हाल के समर्थकों में दिखाई देगा'
+    'Your donation will appear in Recent Supporters': 'आपका दान हाल के समर्थकों में दिखाई देगा',
+    'Download Jumble Desktop': 'Jumble डेस्कटॉप डाउनलोड करें',
+    'Pick a build for your operating system.': 'अपने ऑपरेटिंग सिस्टम के लिए एक बिल्ड चुनें।',
+    'View all releases on GitHub': 'GitHub पर सभी रिलीज़ देखें',
+    'No auto-updates — manual re-download required':
+      'कोई स्वचालित अपडेट नहीं — मैन्युअल रूप से दोबारा डाउनलोड करना होगा',
+    Download: 'डाउनलोड करें'
   }
 }

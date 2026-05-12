@@ -895,6 +895,12 @@ export default {
     'Donation failed': 'Doação falhou',
     'Thank you for supporting Jumble! 💛': 'Obrigado por apoiar o Jumble! 💛',
     'Your donation will appear in Recent Supporters':
-      'A sua doação aparecerá nos Apoiantes Recentes'
+      'A sua doação aparecerá nos Apoiantes Recentes',
+    'Download Jumble Desktop': 'Transferir Jumble Desktop',
+    'Pick a build for your operating system.': 'Escolha uma versão para o seu sistema operativo.',
+    'View all releases on GitHub': 'Ver todas as versões no GitHub',
+    'No auto-updates — manual re-download required':
+      'Sem atualizações automáticas — é necessário transferir novamente manualmente',
+    Download: 'Transferir'
   }
 }

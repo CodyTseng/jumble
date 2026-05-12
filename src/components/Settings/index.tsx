@@ -1,5 +1,6 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
+import DownloadDialog from '@/components/DownloadDialog'
 import {
   SettingsGroup,
   SettingsPageContainer,
@@ -16,13 +17,16 @@ import {
   toTranslation,
   toWallet
 } from '@/lib/link'
+import { isElectron } from '@/lib/platform'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import {
   Cog,
   Info,
   KeyRound,
   Languages,
+  MonitorDown,
   Palette,
   PencilLine,
   Server,
@@ -30,13 +34,17 @@ import {
   Smile,
   Wallet
 } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function Settings() {
   const { t } = useTranslation()
   const { pubkey, nsec, ncryptsec } = useNostr()
   const { push } = useSecondaryPage()
+  const { isSmallScreen } = useScreenSize()
   const hasPrivateKey = !!nsec || !!ncryptsec
+  const showDownloadEntry = !isElectron() && !isSmallScreen
+  const [downloadOpen, setDownloadOpen] = useState(false)
 
   return (
     <SettingsPageContainer>
@@ -115,6 +123,17 @@ export default function Settings() {
         />
       </SettingsGroup>
 
+      {showDownloadEntry && (
+        <SettingsGroup>
+          <SettingsRow
+            icon={<MonitorDown />}
+            title={t('Download Jumble Desktop')}
+            chevron
+            onClick={() => setDownloadOpen(true)}
+          />
+        </SettingsGroup>
+      )}
+
       <SettingsGroup>
         <AboutInfoDialog>
           <SettingsRow
@@ -130,6 +149,10 @@ export default function Settings() {
       <div className="pt-6">
         <Donation />
       </div>
+
+      {showDownloadEntry && (
+        <DownloadDialog open={downloadOpen} onOpenChange={setDownloadOpen} />
+      )}
     </SettingsPageContainer>
   )
 }

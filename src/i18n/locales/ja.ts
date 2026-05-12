@@ -888,6 +888,13 @@ export default {
     'Donate n sats': '{{n}} sats を寄付',
     'Donation failed': '寄付に失敗しました',
     'Thank you for supporting Jumble! 💛': 'Jumble をサポートしていただきありがとうございます！💛',
-    'Your donation will appear in Recent Supporters': 'あなたの寄付は最近のサポーターに表示されます'
+    'Your donation will appear in Recent Supporters':
+      'あなたの寄付は最近のサポーターに表示されます',
+    'Download Jumble Desktop': 'Jumble デスクトップ版をダウンロード',
+    'Pick a build for your operating system.': 'お使いの OS 向けのビルドを選んでください。',
+    'View all releases on GitHub': 'GitHub ですべてのリリースを表示',
+    'No auto-updates — manual re-download required':
+      '自動アップデート非対応 — 手動で再ダウンロードが必要',
+    Download: 'ダウンロード'
   }
 }
