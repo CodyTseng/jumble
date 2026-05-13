@@ -7,11 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { toExternalContent } from '@/lib/link'
+import { toExternalContent, toSearch } from '@/lib/link'
 import { truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { ExternalLink as ExternalLinkIcon, MessageSquare } from 'lucide-react'
+import { ExternalLink as ExternalLinkIcon, MessageSquare, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -46,6 +46,17 @@ export default function ExternalLink({
       return
     }
     push(toExternalContent(url))
+  }
+
+  const handleSearchNotes = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const searchUrl = toSearch({ type: 'notes', search: url, input: url })
+    if (isSmallScreen) {
+      setIsDrawerOpen(false)
+      setTimeout(() => push(searchUrl), 100) // wait for drawer to close
+      return
+    }
+    push(searchUrl)
   }
 
   if (justOpenLink) {
@@ -106,6 +117,14 @@ export default function ExternalLink({
                 <MessageSquare />
                 {t('View Nostr discussions')}
               </Button>
+              <Button
+                onClick={handleSearchNotes}
+                className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
+                variant="ghost"
+              >
+                <Search />
+                {t('Search for notes')}
+              </Button>
             </div>
           </DrawerContent>
         </Drawer>
@@ -128,6 +147,10 @@ export default function ExternalLink({
         <DropdownMenuItem onClick={handleViewDiscussions}>
           <MessageSquare />
           {t('View Nostr discussions')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSearchNotes}>
+          <Search />
+          {t('Search for notes')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
