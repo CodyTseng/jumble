@@ -6,6 +6,7 @@ import { usePrimaryPage } from '@/PageManager'
 import { DeepBrowsingProvider } from '@/providers/DeepBrowsingProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { PageActiveContext } from '@/providers/PageActiveProvider'
+import { ScrollAreaProvider } from '@/providers/ScrollAreaProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TPrimaryPageName } from '@/routes/primary'
@@ -165,16 +166,18 @@ const PrimaryPageLayout = forwardRef(
       return (
         <PageActiveContext.Provider value={current === pageName && display}>
           <DeepBrowsingProvider active={current === pageName && display}>
-            <div
-              ref={smallScreenScrollAreaRef}
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-              }}
-            >
-              {resolvedTitlebar}
-              {children}
-            </div>
-            {displayScrollToTopButton && <ScrollToTopButton />}
+            <ScrollAreaProvider>
+              <div
+                ref={smallScreenScrollAreaRef}
+                style={{
+                  paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
+                }}
+              >
+                {resolvedTitlebar}
+                {children}
+              </div>
+              {displayScrollToTopButton && <ScrollToTopButton />}
+            </ScrollAreaProvider>
           </DeepBrowsingProvider>
         </PageActiveContext.Provider>
       )
@@ -186,16 +189,18 @@ const PrimaryPageLayout = forwardRef(
           active={current === pageName && display}
           scrollAreaRef={scrollAreaRef}
         >
-          <ScrollArea
-            className="h-full overflow-auto"
-            scrollBarClassName="z-30 pt-12"
-            ref={scrollAreaRef}
-          >
-            {resolvedTitlebar}
-            {children}
-            <div className="h-4" />
-          </ScrollArea>
-          {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
+          <ScrollAreaProvider scrollAreaRef={scrollAreaRef}>
+            <ScrollArea
+              className="h-full overflow-auto"
+              scrollBarClassName="z-30 pt-12"
+              ref={scrollAreaRef}
+            >
+              {resolvedTitlebar}
+              {children}
+              <div className="h-4" />
+            </ScrollArea>
+            {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
+          </ScrollAreaProvider>
         </DeepBrowsingProvider>
       </PageActiveContext.Provider>
     )
