@@ -1,7 +1,6 @@
 import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
 import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
@@ -10,6 +9,7 @@ import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
+import { useScrollArea } from '@/providers/ScrollAreaProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import threadService from '@/services/thread.service'
@@ -22,20 +22,69 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState
 } from 'react'
 import { useTranslation } from 'react-i18next'
-import PullToRefresh from '../PullToRefresh'
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import { toast } from 'sonner'
 import { LoadingBar } from '../LoadingBar'
 import NoteCard, { NoteCardLoadingSkeleton } from '../NoteCard'
 import PinnedNoteCard from '../PinnedNoteCard'
+import PullToRefresh from '../PullToRefresh'
 
 const LIMIT = 200
 const ALGO_LIMIT = 500
-const SHOW_COUNT = 10
+
+type TListItem =
+  | { kind: 'pinned'; id: string }
+  | { kind: 'note'; key: string; event: Event; reposters: string[] }
+
+type TVirtuosoContext = {
+  initialLoading: boolean
+  loadingMore: boolean
+  filtering: boolean
+  hasEvents: boolean
+  hasMore: boolean
+  onReload: () => void
+  filterMutedNotes: boolean
+}
+
+const VirtuosoHeader = ({ context }: { context?: TVirtuosoContext }) => {
+  if (!context) return null
+  return context.initialLoading && (context.hasMore || context.loadingMore) ? <LoadingBar /> : null
+}
+
+const VirtuosoFooter = ({ context }: { context?: TVirtuosoContext }) => {
+  const { t } = useTranslation()
+  if (!context) return null
+  if (context.loadingMore || context.filtering || context.initialLoading) {
+    return <NoteCardLoadingSkeleton />
+  }
+  if (context.hasEvents) {
+    return (
+      <div className="text-muted-foreground mt-2 text-center text-sm">{t('no more notes')}</div>
+    )
+  }
+  return (
+    <div className="mt-8 flex w-full flex-col items-center justify-center gap-4">
+      <div className="text-muted-foreground text-center">
+        <div className="text-lg font-medium">{t('No notes found')}</div>
+        <div className="mt-1 text-sm">{t('Try again later or check your connection')}</div>
+      </div>
+      <Button size="lg" onClick={context.onReload}>
+        {t('Reload')}
+      </Button>
+    </div>
+  )
+}
+
+const VIRTUOSO_COMPONENTS = {
+  Header: VirtuosoHeader,
+  Footer: VirtuosoFooter
+}
 
 export type TNoteListRef = {
   scrollToTop: (behavior?: ScrollBehavior) => void
@@ -78,7 +127,6 @@ const NoteList = forwardRef<
     },
     ref
   ) => {
-    const { t } = useTranslation()
     const active = usePageActive()
     const { startLogin } = useNostr()
     const { isSpammer, meetsMinTrustScore } = useUserTrust()
@@ -97,6 +145,7 @@ const NoteList = forwardRef<
     const [filteredNewEvents, setFilteredNewEvents] = useState<Event[]>([])
     const [refreshCount, setRefreshCount] = useState(0)
     const topRef = useRef<HTMLDivElement | null>(null)
+    const virtuosoRef = useRef<VirtuosoHandle | null>(null)
     const sinceRef = useRef<number | undefined>(undefined)
     sinceRef.current = newEvents.length
       ? newEvents[0].created_at + 1
@@ -464,11 +513,83 @@ const NoteList = forwardRef<
       return true
     }, [timelineKey, events, areAlgoRelays])
 
-    const { visibleItems, shouldShowLoadingIndicator, bottomRef } = useInfiniteScroll({
-      items: filteredNotes,
-      showCount: SHOW_COUNT,
-      onLoadMore: handleLoadMore,
-      initialLoading
+    const [hasMore, setHasMore] = useState(true)
+    const [loadingMore, setLoadingMore] = useState(false)
+
+    useEffect(() => {
+      // Reset pagination state whenever the underlying timeline is reset.
+      setHasMore(true)
+      setLoadingMore(false)
+    }, [JSON.stringify(subRequests), refreshCount])
+
+    const handleEndReached = useCallback(async () => {
+      if (loadingMore || !hasMore || areAlgoRelays || !timelineKey) return
+      setLoadingMore(true)
+      try {
+        const more = await handleLoadMore()
+        setHasMore(more)
+      } finally {
+        setLoadingMore(false)
+      }
+    }, [loadingMore, hasMore, areAlgoRelays, timelineKey, handleLoadMore])
+
+    const listItems = useMemo<TListItem[]>(() => {
+      const pinned: TListItem[] =
+        pinnedEventIds?.map((id) => ({ kind: 'pinned', id }) as const) ?? []
+      const notes: TListItem[] = filteredNotes.map(
+        ({ key, event, reposters }) => ({ kind: 'note', key, event, reposters }) as const
+      )
+      return [...pinned, ...notes]
+    }, [pinnedEventIds, filteredNotes])
+
+    const computeItemKey = useCallback(
+      (_index: number, item: TListItem) =>
+        item.kind === 'pinned' ? `pinned-${item.id}` : item.key,
+      []
+    )
+
+    const itemContent = useCallback(
+      (_index: number, item: TListItem) => {
+        if (item.kind === 'pinned') {
+          return <PinnedNoteCard eventId={item.id} className="w-full" />
+        }
+        return (
+          <NoteCard
+            className="w-full"
+            event={item.event}
+            filterMutedNotes={filterMutedNotes}
+            reposters={item.reposters}
+          />
+        )
+      },
+      [filterMutedNotes]
+    )
+
+    const onReload = useCallback(() => setRefreshCount((count) => count + 1), [])
+
+    const virtuosoContext = useMemo<TVirtuosoContext>(
+      () => ({
+        initialLoading,
+        loadingMore,
+        filtering,
+        hasEvents: events.length > 0,
+        hasMore,
+        onReload,
+        filterMutedNotes
+      }),
+      [initialLoading, loadingMore, filtering, events.length, hasMore, onReload, filterMutedNotes]
+    )
+
+    const { scrollAreaRef } = useScrollArea()
+    const useWindowScroll = !scrollAreaRef
+    const [customScrollParent, setCustomScrollParent] = useState<HTMLDivElement | null>(
+      () => scrollAreaRef?.current ?? null
+    )
+    useLayoutEffect(() => {
+      if (!scrollAreaRef) return
+      if (scrollAreaRef.current && scrollAreaRef.current !== customScrollParent) {
+        setCustomScrollParent(scrollAreaRef.current)
+      }
     })
 
     const showNewEvents = () => {
@@ -479,38 +600,6 @@ const NoteList = forwardRef<
       }, 0)
     }
 
-    const list = (
-      <div className="min-h-screen">
-        {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
-        {pinnedEventIds?.map((id) => <PinnedNoteCard key={id} eventId={id} className="w-full" />)}
-        {visibleItems.map(({ key, event, reposters }) => (
-          <NoteCard
-            key={key}
-            className="w-full"
-            event={event}
-            filterMutedNotes={filterMutedNotes}
-            reposters={reposters}
-          />
-        ))}
-        <div ref={bottomRef} />
-        {shouldShowLoadingIndicator || filtering || initialLoading ? (
-          <NoteCardLoadingSkeleton />
-        ) : events.length ? (
-          <div className="text-muted-foreground mt-2 text-center text-sm">{t('no more notes')}</div>
-        ) : (
-          <div className="mt-8 flex w-full flex-col items-center justify-center gap-4">
-            <div className="text-muted-foreground text-center">
-              <div className="text-lg font-medium">{t('No notes found')}</div>
-              <div className="mt-1 text-sm">{t('Try again later or check your connection')}</div>
-            </div>
-            <Button size="lg" onClick={() => setRefreshCount((count) => count + 1)}>
-              {t('Reload')}
-            </Button>
-          </div>
-        )}
-      </div>
-    )
-
     return (
       <div>
         <div ref={topRef} className="scroll-mt-24.25" />
@@ -520,7 +609,21 @@ const NoteList = forwardRef<
             await new Promise((resolve) => setTimeout(resolve, 1000))
           }}
         >
-          {list}
+          <Virtuoso
+            ref={virtuosoRef}
+            data={listItems}
+            itemContent={itemContent}
+            computeItemKey={computeItemKey}
+            components={VIRTUOSO_COMPONENTS}
+            context={virtuosoContext}
+            endReached={handleEndReached}
+            overscan={1000}
+            increaseViewportBy={1000}
+            skipAnimationFrameInResizeObserver
+            {...(useWindowScroll
+              ? { useWindowScroll: true }
+              : { customScrollParent: customScrollParent ?? undefined })}
+          />
         </PullToRefresh>
         <div className="h-20" />
         {filteredNewEvents.length > 0 && (
