@@ -888,6 +888,46 @@ export default {
       '자동 업데이트 미지원 — 수동으로 다시 다운로드해야 함',
     Download: '다운로드',
     'Followed by your follows': '내가 팔로우한 사람들이 팔로우하는 사람',
-    Shuffle: '셔플'
+    Shuffle: '셔플',
+    'Login with Google': 'Google로 로그인',
+    'Continue with Google': 'Google로 계속하기',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Google로 로그인하면 Nostr 키가 자동으로 생성됩니다.',
+    'How it works': '작동 방식',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      '개인 키는 별도의 운영자가 보관하는 샤드로 분할되므로 한 곳에 저장되지 않습니다. Jumble은 안전한 원격 서명자를 통해 서명합니다. 언제든지 계정 설정에서 키를 내보낼 수 있습니다.',
+    'Waiting for Google sign-in...': 'Google 로그인 대기 중...',
+    'Checking your account...': '계정 확인 중...',
+    'Setting up your secure account...': '보안 계정 설정 중...',
+    'Logging in...': '로그인 중...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      '팝업이 차단되었습니다. 이 사이트의 팝업을 허용한 후 다시 시도해 주세요.',
+    'Export private key': '개인 키 내보내기',
+    'Recover your private key by collecting shards from the operators.':
+      '운영자로부터 샤드를 수집하여 개인 키를 복구하세요.',
+    'Keep your private key safe': '개인 키를 안전하게 보관하세요',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      '이 작업은 브라우저에서 전체 개인 키를 재조합합니다. 신뢰할 수 있는 기기에서만 계속하세요.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      '이 키를 가진 누구든 계정을 완전히 제어할 수 있습니다. 안전한 곳에 보관하고 절대 공유하지 마세요.',
+    'Recovered {{count}} of {{total}} shards': '{{total}}개 샤드 중 {{count}}개 복구됨',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      '샤드를 하나씩 복구하세요. 각 단계마다 운영자에 로그인하는 창이 열립니다.',
+    'Recover next shard': '다음 샤드 복구',
+    'Start recovery': '복구 시작',
+    'Something went wrong': '오류가 발생했습니다',
+    'Central server': '중앙 서버',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      '연결을 끊으면 이 계정과 중앙 서버의 연결이 해제됩니다. 개인 키로 계정을 계속 사용할 수 있습니다.',
+    'Disconnect from central server': '중앙 서버에서 연결 해제',
+    'Disconnected from central server': '중앙 서버에서 연결 해제됨',
+    'What happens next': '다음에 일어나는 일',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      '이 계정은 더 이상 중앙 서버와 연결되어 있지 않습니다. 계속 사용하려면 개인 키 (nsec)로 다시 로그인하세요.',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      '연결 해제는 이 계정과 중앙 서버 간의 연결만 제거합니다. 계정은 여전히 존재하며 개인 키 (nsec)로 로그인하여 계속 사용할 수 있습니다. 계속하기 전에 "개인 키 내보내기" 옵션을 사용하여 nsec를 내보내고 안전하게 저장하세요.',
+    Done: '완료',
+    Recover: '복구',
+    'Recovering...': '복구 중...'
   }
 }

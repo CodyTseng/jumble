@@ -897,6 +897,46 @@ export default {
       'بدون به‌روزرسانی خودکار — نیاز به دانلود مجدد دستی',
     Download: 'دانلود',
     'Followed by your follows': 'دنبال‌شده توسط افرادی که دنبال می‌کنید',
-    Shuffle: 'بُر زدن'
+    Shuffle: 'بُر زدن',
+    'Login with Google': 'ورود با Google',
+    'Continue with Google': 'ادامه با Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'با Google وارد شوید و یک کلید Nostr به طور خودکار برای شما ایجاد می‌شود.',
+    'How it works': 'نحوه کار',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'کلید خصوصی شما به قطعاتی تقسیم می‌شود که هر کدام نزد اپراتورهای جداگانه نگهداری می‌شوند، پس هرگز در یک جا ذخیره نمی‌شود. Jumble از طریق یک امضاکننده از راه دور امن امضا می‌کند. می‌توانید کلیدتان را هر زمان از تنظیمات حساب صادر کنید.',
+    'Waiting for Google sign-in...': 'در انتظار ورود با Google...',
+    'Checking your account...': 'در حال بررسی حساب شما...',
+    'Setting up your secure account...': 'در حال راه‌اندازی حساب امن شما...',
+    'Logging in...': 'در حال ورود...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'پنجره بازشو مسدود شد. لطفا پنجره‌های بازشو را برای این سایت مجاز کنید و دوباره تلاش کنید.',
+    'Export private key': 'صادر کردن کلید خصوصی',
+    'Recover your private key by collecting shards from the operators.':
+      'کلید خصوصی خود را با جمع‌آوری قطعات از اپراتورها بازیابی کنید.',
+    'Keep your private key safe': 'کلید خصوصی خود را ایمن نگه دارید',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'این کار کلید خصوصی کامل شما را در این مرورگر بازسازی می‌کند. فقط روی دستگاهی که به آن اعتماد دارید ادامه دهید.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'هر کسی که این کلید را داشته باشد کنترل کامل حساب شما را دارد. آن را در جایی امن نگه دارید و هرگز به اشتراک نگذارید.',
+    'Recovered {{count}} of {{total}} shards': '{{count}} از {{total}} قطعه بازیابی شد',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'هر بار یک قطعه را بازیابی کنید. هر مرحله پنجره‌ای برای ورود با اپراتور باز می‌کند.',
+    'Recover next shard': 'بازیابی قطعه بعدی',
+    'Start recovery': 'شروع بازیابی',
+    'Something went wrong': 'مشکلی پیش آمد',
+    'Central server': 'سرور مرکزی',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'قطع اتصال، این حساب را از سرور مرکزی جدا می‌کند. همچنان می‌توانید با کلید خصوصی خود از حساب استفاده کنید.',
+    'Disconnect from central server': 'قطع اتصال از سرور مرکزی',
+    'Disconnected from central server': 'اتصال از سرور مرکزی قطع شد',
+    'What happens next': 'مرحله بعد چیست',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'این حساب دیگر به سرور مرکزی متصل نیست. برای ادامه استفاده، دوباره با کلید خصوصی خود (nsec) وارد شوید.',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'قطع اتصال فقط پیوند بین این حساب و سرور مرکزی را حذف می‌کند. حساب شما همچنان وجود دارد و می‌توانید با ورود با کلید خصوصی (nsec) از آن استفاده کنید. پیش از ادامه، nsec خود را با استفاده از گزینه «صادر کردن کلید خصوصی» صادر کرده و به‌طور ایمن ذخیره کنید.',
+    Done: 'انجام شد',
+    Recover: 'بازیابی',
+    'Recovering...': 'در حال بازیابی...'
   }
 }

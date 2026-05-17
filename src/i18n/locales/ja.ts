@@ -897,6 +897,46 @@ export default {
       '自動アップデート非対応 — 手動で再ダウンロードが必要',
     Download: 'ダウンロード',
     'Followed by your follows': 'フォロー中のユーザーがフォローしている人',
-    Shuffle: 'シャッフル'
+    Shuffle: 'シャッフル',
+    'Login with Google': 'Googleでログイン',
+    'Continue with Google': 'Googleで続ける',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Googleでサインインすると、Nostrキーが自動的に作成されます。',
+    'How it works': '仕組み',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'あなたの秘密鍵は複数のオペレーターが保持するシャードに分割されるため、一箇所に保存されることはありません。Jumbleはセキュアなリモート署名者を通じて署名します。アカウント設定からいつでも鍵をエクスポートできます。',
+    'Waiting for Google sign-in...': 'Googleサインインを待っています...',
+    'Checking your account...': 'アカウントを確認しています...',
+    'Setting up your secure account...': 'セキュアなアカウントを設定しています...',
+    'Logging in...': 'ログインしています...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'ポップアップがブロックされました。このサイトのポップアップを許可してから再試行してください。',
+    'Export private key': '秘密鍵をエクスポート',
+    'Recover your private key by collecting shards from the operators.':
+      'オペレーターからシャードを収集して秘密鍵を復元してください。',
+    'Keep your private key safe': '秘密鍵を安全に保管してください',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'これはこのブラウザーで完全な秘密鍵を再構成します。信頼できるデバイスでのみ続行してください。',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'この鍵を持つ人は誰でもあなたのアカウントを完全に制御できます。安全な場所に保管し、絶対に共有しないでください。',
+    'Recovered {{count}} of {{total}} shards': '{{total}} 個中 {{count}} 個のシャードを復元しました',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'シャードを一つずつ復元します。各ステップでオペレーターにサインインするウィンドウが開きます。',
+    'Recover next shard': '次のシャードを復元',
+    'Start recovery': '復元を開始',
+    'Something went wrong': 'エラーが発生しました',
+    'Central server': '中央サーバー',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      '切断すると、このアカウントと中央サーバーの連携が解除されます。秘密鍵を使ってアカウントを引き続き利用できます。',
+    'Disconnect from central server': '中央サーバーから切断',
+    'Disconnected from central server': '中央サーバーから切断されました',
+    'What happens next': '次に起こること',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'このアカウントは中央サーバーとの連携が解除されました。引き続き使用するには、秘密鍵 (nsec) で再度ログインしてください。',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      '切断はこのアカウントと中央サーバーの連携を解除するだけです。アカウントは引き続き存在し、秘密鍵 (nsec) でログインすることで使い続けられます。続行する前に、「秘密鍵をエクスポート」オプションを使って nsec をエクスポートし、安全に保存してください。',
+    Done: '完了',
+    Recover: '復元',
+    'Recovering...': '復元中...'
   }
 }

@@ -915,6 +915,46 @@ export default {
     'No auto-updates — manual re-download required':
       'No auto-updates — manual re-download required',
     'Followed by your follows': 'Followed by your follows',
-    Shuffle: 'Shuffle'
+    Shuffle: 'Shuffle',
+    'Login with Google': 'Login with Google',
+    'Continue with Google': 'Continue with Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Sign in with Google and a Nostr key will be created for you automatically.',
+    'How it works': 'How it works',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.',
+    'Waiting for Google sign-in...': 'Waiting for Google sign-in...',
+    'Checking your account...': 'Checking your account...',
+    'Setting up your secure account...': 'Setting up your secure account...',
+    'Logging in...': 'Logging in...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'Popup was blocked. Please allow popups for this site and try again.',
+    'Export private key': 'Export private key',
+    'Recover your private key by collecting shards from the operators.':
+      'Recover your private key by collecting shards from the operators.',
+    'Keep your private key safe': 'Keep your private key safe',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'This reassembles your full private key in this browser. Only continue on a device you trust.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Anyone with this key has full control of your account. Store it somewhere secure and never share it.',
+    'Recovered {{count}} of {{total}} shards': 'Recovered {{count}} of {{total}} shards',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Recover one shard at a time. Each step opens a window to sign in with the operator.',
+    'Recover next shard': 'Recover next shard',
+    'Start recovery': 'Start recovery',
+    'Something went wrong': 'Something went wrong',
+    'Central server': 'Central server',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Disconnecting unlinks this account from the central server. You can still use the account with your private key.',
+    'Disconnect from central server': 'Disconnect from central server',
+    'Disconnected from central server': 'Disconnected from central server',
+    'What happens next': 'What happens next',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.',
+    Done: 'Done',
+    Recover: 'Recover',
+    'Recovering...': 'Recovering...'
   }
 }

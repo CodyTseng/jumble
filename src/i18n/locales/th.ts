@@ -881,6 +881,46 @@ export default {
       'ไม่รองรับอัปเดตอัตโนมัติ — ต้องดาวน์โหลดใหม่ด้วยตนเอง',
     Download: 'ดาวน์โหลด',
     'Followed by your follows': 'ติดตามโดยคนที่คุณติดตาม',
-    Shuffle: 'สุ่ม'
+    Shuffle: 'สุ่ม',
+    'Login with Google': 'เข้าสู่ระบบด้วย Google',
+    'Continue with Google': 'ดำเนินการต่อด้วย Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'ลงชื่อเข้าใช้ด้วย Google แล้วระบบจะสร้างคีย์ Nostr ให้คุณโดยอัตโนมัติ',
+    'How it works': 'วิธีการทำงาน',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'คีย์ส่วนตัวของคุณถูกแบ่งเป็นส่วนย่อยที่เก็บโดยผู้ดำเนินการแยกกัน จึงไม่เคยถูกเก็บในที่เดียว Jumble เซ็นชื่อผ่านผู้เซ็นระยะไกลที่ปลอดภัย คุณสามารถส่งออกคีย์ได้ทุกเมื่อจากการตั้งค่าบัญชี',
+    'Waiting for Google sign-in...': 'กำลังรอการเข้าสู่ระบบด้วย Google...',
+    'Checking your account...': 'กำลังตรวจสอบบัญชีของคุณ...',
+    'Setting up your secure account...': 'กำลังตั้งค่าบัญชีที่ปลอดภัยของคุณ...',
+    'Logging in...': 'กำลังเข้าสู่ระบบ...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'หน้าต่างป๊อปอัปถูกบล็อก กรุณาอนุญาตป๊อปอัปสำหรับเว็บไซต์นี้แล้วลองอีกครั้ง',
+    'Export private key': 'ส่งออกคีย์ส่วนตัว',
+    'Recover your private key by collecting shards from the operators.':
+      'กู้คืนคีย์ส่วนตัวของคุณโดยรวบรวมส่วนย่อยจากผู้ดำเนินการ',
+    'Keep your private key safe': 'เก็บคีย์ส่วนตัวของคุณให้ปลอดภัย',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'ระบบจะรวบรวมคีย์ส่วนตัวทั้งหมดของคุณในเบราว์เซอร์นี้ ดำเนินการต่อเฉพาะบนอุปกรณ์ที่คุณไว้วางใจ',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'ผู้ที่มีคีย์นี้สามารถควบคุมบัญชีของคุณได้อย่างเต็มที่ เก็บไว้ในที่ปลอดภัยและอย่าแชร์กับใคร',
+    'Recovered {{count}} of {{total}} shards': 'กู้คืนแล้ว {{count}} จาก {{total}} ส่วน',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'กู้คืนทีละส่วน แต่ละขั้นตอนจะเปิดหน้าต่างเพื่อเข้าสู่ระบบกับผู้ดำเนินการ',
+    'Recover next shard': 'กู้คืนส่วนถัดไป',
+    'Start recovery': 'เริ่มการกู้คืน',
+    'Something went wrong': 'เกิดข้อผิดพลาดบางอย่าง',
+    'Central server': 'เซิร์ฟเวอร์กลาง',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'การยกเลิกการเชื่อมต่อจะยกเลิกการเชื่อมโยงบัญชีนี้กับเซิร์ฟเวอร์กลาง คุณยังสามารถใช้บัญชีด้วยคีย์ส่วนตัวได้',
+    'Disconnect from central server': 'ยกเลิกการเชื่อมต่อจากเซิร์ฟเวอร์กลาง',
+    'Disconnected from central server': 'ยกเลิกการเชื่อมต่อจากเซิร์ฟเวอร์กลางแล้ว',
+    'What happens next': 'ขั้นตอนถัดไป',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'บัญชีนี้ไม่ได้เชื่อมโยงกับเซิร์ฟเวอร์กลางอีกต่อไป หากต้องการใช้ต่อ ให้เข้าสู่ระบบอีกครั้งด้วยคีย์ส่วนตัว (nsec)',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'การยกเลิกการเชื่อมต่อจะลบเฉพาะการเชื่อมโยงระหว่างบัญชีนี้กับเซิร์ฟเวอร์กลาง บัญชียังคงมีอยู่และคุณสามารถใช้ต่อได้โดยเข้าสู่ระบบด้วยคีย์ส่วนตัว (nsec) ก่อนดำเนินการต่อ โปรดส่งออกและบันทึก nsec อย่างปลอดภัยผ่านตัวเลือก "ส่งออกคีย์ส่วนตัว"',
+    Done: 'เสร็จสิ้น',
+    Recover: 'กู้คืน',
+    'Recovering...': 'กำลังกู้คืน...'
   }
 }

@@ -897,6 +897,46 @@ export default {
       'कोई स्वचालित अपडेट नहीं — मैन्युअल रूप से दोबारा डाउनलोड करना होगा',
     Download: 'डाउनलोड करें',
     'Followed by your follows': 'जिन्हें आप फ़ॉलो करते हैं वे इन्हें फ़ॉलो करते हैं',
-    Shuffle: 'फेरबदल'
+    Shuffle: 'फेरबदल',
+    'Login with Google': 'Google से लॉगिन करें',
+    'Continue with Google': 'Google से जारी रखें',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Google से साइन इन करें और आपके लिए स्वचालित रूप से एक Nostr कुंजी बनाई जाएगी।',
+    'How it works': 'यह कैसे काम करता है',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'आपकी निजी कुंजी अलग-अलग ऑपरेटरों के पास रखे गए टुकड़ों में विभाजित है, इसलिए इसे कभी भी एक जगह संग्रहीत नहीं किया जाता। Jumble एक सुरक्षित रिमोट साइनर के माध्यम से हस्ताक्षर करता है। आप खाता सेटिंग से कभी भी अपनी कुंजी निर्यात कर सकते हैं।',
+    'Waiting for Google sign-in...': 'Google साइन-इन की प्रतीक्षा...',
+    'Checking your account...': 'आपका खाता जांचा जा रहा है...',
+    'Setting up your secure account...': 'आपका सुरक्षित खाता सेट किया जा रहा है...',
+    'Logging in...': 'लॉगिन हो रहा है...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'पॉपअप ब्लॉक हो गया। कृपया इस साइट के लिए पॉपअप की अनुमति दें और पुनः प्रयास करें।',
+    'Export private key': 'निजी कुंजी निर्यात करें',
+    'Recover your private key by collecting shards from the operators.':
+      'ऑपरेटरों से टुकड़े एकत्र करके अपनी निजी कुंजी पुनः प्राप्त करें।',
+    'Keep your private key safe': 'अपनी निजी कुंजी को सुरक्षित रखें',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'यह इस ब्राउज़र में आपकी पूर्ण निजी कुंजी को पुनः जोड़ता है। केवल उसी डिवाइस पर जारी रखें जिस पर आपको भरोसा है।',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'इस कुंजी वाले किसी भी व्यक्ति का आपके खाते पर पूर्ण नियंत्रण होता है। इसे किसी सुरक्षित स्थान पर रखें और कभी भी साझा न करें।',
+    'Recovered {{count}} of {{total}} shards': '{{total}} में से {{count}} टुकड़े प्राप्त किए',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'एक बार में एक टुकड़ा प्राप्त करें। प्रत्येक चरण ऑपरेटर से साइन इन करने के लिए एक विंडो खोलता है।',
+    'Recover next shard': 'अगला टुकड़ा प्राप्त करें',
+    'Start recovery': 'पुनर्प्राप्ति शुरू करें',
+    'Something went wrong': 'कुछ गलत हो गया',
+    'Central server': 'केंद्रीय सर्वर',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'डिस्कनेक्ट करने से यह खाता केंद्रीय सर्वर से अलग हो जाता है। आप अभी भी अपनी निजी कुंजी से खाते का उपयोग कर सकते हैं।',
+    'Disconnect from central server': 'केंद्रीय सर्वर से डिस्कनेक्ट करें',
+    'Disconnected from central server': 'केंद्रीय सर्वर से डिस्कनेक्ट हो गया',
+    'What happens next': 'आगे क्या होता है',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'यह खाता अब केंद्रीय सर्वर से जुड़ा नहीं है। इसका उपयोग जारी रखने के लिए, अपनी निजी कुंजी (nsec) से फिर से लॉगिन करें।',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "निजी कुंजी निर्यात करें" option.':
+      'डिस्कनेक्ट करने से केवल इस खाते और केंद्रीय सर्वर के बीच का लिंक हटता है। आपका खाता अभी भी मौजूद है और आप अपनी निजी कुंजी (nsec) से लॉगिन करके इसका उपयोग जारी रख सकते हैं। जारी रखने से पहले, "निजी कुंजी निर्यात करें" विकल्प का उपयोग करके अपना nsec निर्यात करें और सुरक्षित रूप से सहेजें।',
+    Done: 'हो गया',
+    Recover: 'पुनर्प्राप्त करें',
+    'Recovering...': 'पुनर्प्राप्त हो रहा है...'
   }
 }

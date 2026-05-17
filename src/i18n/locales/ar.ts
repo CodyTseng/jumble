@@ -881,6 +881,46 @@ export default {
       'لا توجد تحديثات تلقائية — يتطلب التنزيل مجددًا يدويًا',
     Download: 'تنزيل',
     'Followed by your follows': 'يتابعه من تتابعهم',
-    Shuffle: 'تبديل'
+    Shuffle: 'تبديل',
+    'Login with Google': 'تسجيل الدخول باستخدام Google',
+    'Continue with Google': 'المتابعة باستخدام Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'سجّل الدخول باستخدام Google وسيتم إنشاء مفتاح Nostr لك تلقائيًا.',
+    'How it works': 'كيف يعمل',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'يتم تقسيم مفتاحك الخاص إلى أجزاء يحتفظ بها مشغّلون منفصلون، لذا لا يُخزَّن في مكان واحد أبدًا. يوقّع Jumble عبر موقّع بعيد آمن. يمكنك تصدير مفتاحك في أي وقت من إعدادات الحساب.',
+    'Waiting for Google sign-in...': 'في انتظار تسجيل الدخول عبر Google...',
+    'Checking your account...': 'جارٍ التحقق من حسابك...',
+    'Setting up your secure account...': 'جارٍ إعداد حسابك الآمن...',
+    'Logging in...': 'جارٍ تسجيل الدخول...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'تم حجب النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع والمحاولة مرة أخرى.',
+    'Export private key': 'تصدير المفتاح الخاص',
+    'Recover your private key by collecting shards from the operators.':
+      'استعد مفتاحك الخاص عن طريق جمع الأجزاء من المشغّلين.',
+    'Keep your private key safe': 'حافظ على أمان مفتاحك الخاص',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'سيُعاد تجميع مفتاحك الخاص الكامل في هذا المتصفح. تابع فقط على جهاز تثق به.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'أي شخص يمتلك هذا المفتاح يتحكم تمامًا في حسابك. احفظه في مكان آمن ولا تشاركه أبدًا.',
+    'Recovered {{count}} of {{total}} shards': 'تمت استعادة {{count}} من {{total}} أجزاء',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'استعد جزءًا واحدًا في كل مرة. تفتح كل خطوة نافذة لتسجيل الدخول مع المشغّل.',
+    'Recover next shard': 'استعادة الجزء التالي',
+    'Start recovery': 'بدء الاستعادة',
+    'Something went wrong': 'حدث خطأ ما',
+    'Central server': 'الخادم المركزي',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'سيؤدي قطع الاتصال إلى إلغاء ربط هذا الحساب بالخادم المركزي. لا يزال بإمكانك استخدام الحساب بمفتاحك الخاص.',
+    'Disconnect from central server': 'قطع الاتصال بالخادم المركزي',
+    'Disconnected from central server': 'تم قطع الاتصال بالخادم المركزي',
+    'What happens next': 'ما الذي سيحدث بعد ذلك',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'لم يعد هذا الحساب مرتبطًا بالخادم المركزي. لمواصلة استخدامه، سجّل الدخول مرة أخرى بمفتاحك الخاص (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'قطع الاتصال يزيل فقط الرابط بين هذا الحساب والخادم المركزي. لا يزال حسابك موجودًا، ويمكنك مواصلة استخدامه بتسجيل الدخول بمفتاحك الخاص (nsec). قبل المتابعة، صدّر وأحفظ nsec بأمان باستخدام خيار «تصدير المفتاح الخاص».',
+    Done: 'تم',
+    Recover: 'استرداد',
+    'Recovering...': 'جارٍ الاسترداد...'
   }
 }

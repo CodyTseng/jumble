@@ -903,6 +903,46 @@ export default {
       'Без автообновлений — требуется ручная повторная загрузка',
     Download: 'Скачать',
     'Followed by your follows': 'На кого подписаны ваши подписки',
-    Shuffle: 'Перемешать'
+    Shuffle: 'Перемешать',
+    'Login with Google': 'Войти через Google',
+    'Continue with Google': 'Продолжить через Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Войдите через Google, и ключ Nostr будет создан для вас автоматически.',
+    'How it works': 'Как это работает',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Ваш приватный ключ разделён на фрагменты, хранящиеся у разных операторов, поэтому он никогда не хранится в одном месте. Jumble подписывает через защищённый удалённый подписант. Вы можете экспортировать ключ в любое время в настройках аккаунта.',
+    'Waiting for Google sign-in...': 'Ожидание входа через Google...',
+    'Checking your account...': 'Проверка аккаунта...',
+    'Setting up your secure account...': 'Настройка защищённого аккаунта...',
+    'Logging in...': 'Вход...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'Всплывающее окно заблокировано. Разрешите всплывающие окна для этого сайта и попробуйте снова.',
+    'Export private key': 'Экспортировать приватный ключ',
+    'Recover your private key by collecting shards from the operators.':
+      'Восстановите приватный ключ, собрав фрагменты у операторов.',
+    'Keep your private key safe': 'Храните приватный ключ в безопасности',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Здесь восстанавливается ваш полный приватный ключ в браузере. Продолжайте только на доверенном устройстве.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Любой, у кого есть этот ключ, имеет полный контроль над вашим аккаунтом. Храните его в надёжном месте и никому не передавайте.',
+    'Recovered {{count}} of {{total}} shards': 'Восстановлено {{count}} из {{total}} фрагментов',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Восстанавливайте по одному фрагменту за раз. Каждый шаг открывает окно для входа через оператора.',
+    'Recover next shard': 'Восстановить следующий фрагмент',
+    'Start recovery': 'Начать восстановление',
+    'Something went wrong': 'Что-то пошло не так',
+    'Central server': 'Центральный сервер',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Отключение удаляет связь этого аккаунта с центральным сервером. Вы по-прежнему можете использовать аккаунт с приватным ключом.',
+    'Disconnect from central server': 'Отключиться от центрального сервера',
+    'Disconnected from central server': 'Отключено от центрального сервера',
+    'What happens next': 'Что будет дальше',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Этот аккаунт больше не связан с центральным сервером. Чтобы продолжить пользоваться им, войдите снова с приватным ключом (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Отключение только удаляет связь между аккаунтом и центральным сервером. Аккаунт продолжает существовать, и вы можете использовать его, войдя с приватным ключом (nsec). Перед продолжением экспортируйте и сохраните nsec через опцию «Экспортировать приватный ключ».',
+    Done: 'Готово',
+    Recover: 'Восстановить',
+    'Recovering...': 'Восстановление...'
   }
 }

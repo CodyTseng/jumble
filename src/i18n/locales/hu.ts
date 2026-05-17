@@ -897,6 +897,46 @@ export default {
       'Nincs automatikus frissítés — kézi újraletöltés szükséges',
     Download: 'Letöltés',
     'Followed by your follows': 'Akiket a követéseid követnek',
-    Shuffle: 'Keverés'
+    Shuffle: 'Keverés',
+    'Login with Google': 'Bejelentkezés Google-lel',
+    'Continue with Google': 'Folytatás Google-lel',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Jelentkezz be Google-lel, és automatikusan létrejön egy Nostr kulcsod.',
+    'How it works': 'Hogyan működik',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'A privát kulcsod külön operátoroknál tárolt töredékekre van osztva, így soha nem tárolják egy helyen. A Jumble egy biztonságos távoli aláírón keresztül ír alá. A kulcsodat bármikor exportálhatod a fiókbeállításokból.',
+    'Waiting for Google sign-in...': 'Várakozás a Google bejelentkezésre...',
+    'Checking your account...': 'Fiók ellenőrzése...',
+    'Setting up your secure account...': 'Biztonságos fiók beállítása...',
+    'Logging in...': 'Bejelentkezés...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'A felugró ablak le volt tiltva. Kérjük, engedélyezd a felugró ablakokat ezen az oldalon, és próbáld újra.',
+    'Export private key': 'Privát kulcs exportálása',
+    'Recover your private key by collecting shards from the operators.':
+      'Állítsd helyre a privát kulcsodat az operátoroktól gyűjtött töredékek segítségével.',
+    'Keep your private key safe': 'Tartsd biztonságban a privát kulcsodat',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Ez összerakja a teljes privát kulcsodat ebben a böngészőben. Csak megbízható eszközön folytasd.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Aki rendelkezik ezzel a kulccsal, teljes kontrollt kap a fiókod felett. Tárold biztonságos helyen, és soha ne oszd meg.',
+    'Recovered {{count}} of {{total}} shards': '{{count}}/{{total}} töredék visszaállítva',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Egyszerre egy töredéket állíts helyre. Minden lépés megnyit egy ablakot az operátorral való bejelentkezéshez.',
+    'Recover next shard': 'Következő töredék visszaállítása',
+    'Start recovery': 'Visszaállítás indítása',
+    'Something went wrong': 'Valami hiba történt',
+    'Central server': 'Központi szerver',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'A leválasztás megszünteti a fiók és a központi szerver közötti kapcsolatot. A fiókot továbbra is használhatod a privát kulcsoddal.',
+    'Disconnect from central server': 'Leválasztás a központi szerverről',
+    'Disconnected from central server': 'Leválasztva a központi szerverről',
+    'What happens next': 'Mi történik ezután',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Ez a fiók már nincs kapcsolva a központi szerverhez. A használat folytatásához jelentkezz be újra a privát kulcsoddal (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Privát kulcs exportálása" option.':
+      'A leválasztás csak a fiókod és a központi szerver közötti kapcsolatot szünteti meg. A fiókod továbbra is létezik, és folytathatod a használatát a privát kulcsoddal (nsec) való bejelentkezéssel. A folytatás előtt exportáld és mentsd biztonságos helyre az nsec-edet a "Privát kulcs exportálása" lehetőséggel.',
+    Done: 'Kész',
+    Recover: 'Visszaállítás',
+    'Recovering...': 'Visszaállítás folyamatban...'
   }
 }

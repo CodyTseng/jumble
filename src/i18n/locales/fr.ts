@@ -911,6 +911,46 @@ export default {
       'Pas de mise à jour automatique — nouveau téléchargement manuel requis',
     Download: 'Télécharger',
     'Followed by your follows': 'Suivis par vos abonnements',
-    Shuffle: 'Mélanger'
+    Shuffle: 'Mélanger',
+    'Login with Google': 'Se connecter avec Google',
+    'Continue with Google': 'Continuer avec Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Connectez-vous avec Google et une clé Nostr sera créée automatiquement pour vous.',
+    'How it works': 'Comment ça fonctionne',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Votre clé privée est divisée en fragments détenus par des opérateurs distincts, elle n\'est donc jamais stockée en un seul endroit. Jumble signe via un signataire distant sécurisé. Vous pouvez exporter votre clé à tout moment depuis les paramètres du compte.',
+    'Waiting for Google sign-in...': 'En attente de la connexion Google...',
+    'Checking your account...': 'Vérification de votre compte...',
+    'Setting up your secure account...': 'Configuration de votre compte sécurisé...',
+    'Logging in...': 'Connexion en cours...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'La fenêtre contextuelle a été bloquée. Veuillez autoriser les fenêtres contextuelles pour ce site et réessayer.',
+    'Export private key': 'Exporter la clé privée',
+    'Recover your private key by collecting shards from the operators.':
+      'Récupérez votre clé privée en collectant les fragments auprès des opérateurs.',
+    'Keep your private key safe': 'Gardez votre clé privée en sécurité',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Ceci reconstitue votre clé privée complète dans ce navigateur. Continuez uniquement sur un appareil de confiance.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Toute personne possédant cette clé a le contrôle total de votre compte. Conservez-la dans un endroit sécurisé et ne la partagez jamais.',
+    'Recovered {{count}} of {{total}} shards': '{{count}} fragment(s) sur {{total}} récupéré(s)',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Récupérez un fragment à la fois. Chaque étape ouvre une fenêtre pour vous connecter avec l\'opérateur.',
+    'Recover next shard': 'Récupérer le fragment suivant',
+    'Start recovery': 'Démarrer la récupération',
+    'Something went wrong': 'Quelque chose a mal tourné',
+    'Central server': 'Serveur central',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'La déconnexion dissocie ce compte du serveur central. Vous pouvez toujours utiliser le compte avec votre clé privée.',
+    'Disconnect from central server': 'Se déconnecter du serveur central',
+    'Disconnected from central server': 'Déconnecté du serveur central',
+    'What happens next': 'Ce qui se passe ensuite',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Ce compte n\'est plus lié au serveur central. Pour continuer à l\'utiliser, connectez-vous à nouveau avec votre clé privée (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Exporter la clé privée" option.':
+      'La déconnexion supprime uniquement le lien entre ce compte et le serveur central. Votre compte existe toujours et vous pouvez continuer à l\'utiliser en vous connectant avec votre clé privée (nsec). Avant de continuer, exportez et sauvegardez votre nsec en toute sécurité via l\'option "Exporter la clé privée".',
+    Done: 'Terminé',
+    Recover: 'Récupérer',
+    'Recovering...': 'Récupération...'
   }
 }

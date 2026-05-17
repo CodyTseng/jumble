@@ -900,6 +900,46 @@ export default {
       'Sem atualizações automáticas — é necessário baixar novamente manualmente',
     Download: 'Baixar',
     'Followed by your follows': 'Seguidos por quem você segue',
-    Shuffle: 'Embaralhar'
+    Shuffle: 'Embaralhar',
+    'Login with Google': 'Entrar com Google',
+    'Continue with Google': 'Continuar com Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Entre com o Google e uma chave Nostr será criada para você automaticamente.',
+    'How it works': 'Como funciona',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Sua chave privada é dividida em fragmentos mantidos por operadores separados, portanto nunca é armazenada em um único lugar. O Jumble assina por meio de um assinador remoto seguro. Você pode exportar sua chave a qualquer momento nas configurações da conta.',
+    'Waiting for Google sign-in...': 'Aguardando login com Google...',
+    'Checking your account...': 'Verificando sua conta...',
+    'Setting up your secure account...': 'Configurando sua conta segura...',
+    'Logging in...': 'Entrando...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'O popup foi bloqueado. Permita popups para este site e tente novamente.',
+    'Export private key': 'Exportar chave privada',
+    'Recover your private key by collecting shards from the operators.':
+      'Recupere sua chave privada coletando fragmentos dos operadores.',
+    'Keep your private key safe': 'Mantenha sua chave privada em segurança',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Isso remonta sua chave privada completa neste navegador. Continue somente em um dispositivo em que você confia.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Qualquer pessoa com esta chave tem controle total da sua conta. Guarde-a em um lugar seguro e nunca a compartilhe.',
+    'Recovered {{count}} of {{total}} shards': '{{count}} de {{total}} fragmentos recuperados',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Recupere um fragmento por vez. Cada etapa abre uma janela para entrar com o operador.',
+    'Recover next shard': 'Recuperar próximo fragmento',
+    'Start recovery': 'Iniciar recuperação',
+    'Something went wrong': 'Algo deu errado',
+    'Central server': 'Servidor central',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Desconectar desvincula esta conta do servidor central. Você ainda pode usar a conta com sua chave privada.',
+    'Disconnect from central server': 'Desconectar do servidor central',
+    'Disconnected from central server': 'Desconectado do servidor central',
+    'What happens next': 'O que acontece a seguir',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Esta conta não está mais vinculada ao servidor central. Para continuar usando-a, entre novamente com sua chave privada (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Desconectar remove apenas o vínculo entre esta conta e o servidor central. Sua conta ainda existe e você pode continuar usá-la entrando com sua chave privada (nsec). Antes de continuar, exporte e salve com segurança seu nsec usando a opção "Exportar chave privada".',
+    Done: 'Concluído',
+    Recover: 'Recuperar',
+    'Recovering...': 'Recuperando...'
   }
 }

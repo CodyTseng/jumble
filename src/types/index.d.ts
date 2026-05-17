@@ -116,6 +116,9 @@ export type TAccount = {
   bunker?: string
   bunkerClientSecretKey?: string
   npub?: string
+  // Central server URL when the account was created via "Login with Google"
+  // (pomegranate). Its presence marks the account as a pomegranate account.
+  pomegranateCentral?: string
 }
 
 export type TAccountPointer = Pick<TAccount, 'pubkey' | 'signerType'>

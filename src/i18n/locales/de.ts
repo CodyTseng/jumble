@@ -911,6 +911,46 @@ export default {
       'Keine automatischen Updates — manueller erneuter Download nötig',
     Download: 'Herunterladen',
     'Followed by your follows': 'Von Personen gefolgt, denen du folgst',
-    Shuffle: 'Mischen'
+    Shuffle: 'Mischen',
+    'Login with Google': 'Mit Google anmelden',
+    'Continue with Google': 'Mit Google fortfahren',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Melde dich mit Google an und ein Nostr-Schlüssel wird automatisch für dich erstellt.',
+    'How it works': 'So funktioniert es',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Dein privater Schlüssel wird in Fragmente aufgeteilt, die von separaten Betreibern gehalten werden, sodass er nie an einem Ort gespeichert ist. Jumble signiert über einen sicheren Remote-Signer. Du kannst deinen Schlüssel jederzeit aus den Kontoeinstellungen exportieren.',
+    'Waiting for Google sign-in...': 'Warte auf Google-Anmeldung...',
+    'Checking your account...': 'Konto wird überprüft...',
+    'Setting up your secure account...': 'Sicheres Konto wird eingerichtet...',
+    'Logging in...': 'Anmeldung läuft...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'Popup wurde blockiert. Bitte erlaube Popups für diese Seite und versuche es erneut.',
+    'Export private key': 'Privaten Schlüssel exportieren',
+    'Recover your private key by collecting shards from the operators.':
+      'Stelle deinen privaten Schlüssel wieder her, indem du Fragmente von den Betreibern sammelst.',
+    'Keep your private key safe': 'Bewahre deinen privaten Schlüssel sicher auf',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Dadurch wird dein vollständiger privater Schlüssel in diesem Browser zusammengesetzt. Fahre nur auf einem Gerät fort, dem du vertraust.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Jeder mit diesem Schlüssel hat die volle Kontrolle über dein Konto. Bewahre ihn sicher auf und teile ihn niemals.',
+    'Recovered {{count}} of {{total}} shards': '{{count}} von {{total}} Fragmenten wiederhergestellt',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Stelle ein Fragment nach dem anderen wieder her. Jeder Schritt öffnet ein Fenster zum Anmelden beim Betreiber.',
+    'Recover next shard': 'Nächstes Fragment wiederherstellen',
+    'Start recovery': 'Wiederherstellung starten',
+    'Something went wrong': 'Etwas ist schiefgelaufen',
+    'Central server': 'Zentralserver',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Das Trennen der Verbindung hebt die Verknüpfung dieses Kontos mit dem Zentralserver auf. Du kannst das Konto weiterhin mit deinem privaten Schlüssel verwenden.',
+    'Disconnect from central server': 'Vom Zentralserver trennen',
+    'Disconnected from central server': 'Vom Zentralserver getrennt',
+    'What happens next': 'Was als Nächstes passiert',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Dieses Konto ist nicht mehr mit dem Zentralserver verknüpft. Um es weiterhin zu nutzen, melde dich erneut mit deinem privaten Schlüssel (nsec) an.',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Das Trennen entfernt nur die Verknüpfung zwischen diesem Konto und dem Zentralserver. Dein Konto existiert weiterhin und du kannst es durch Anmeldung mit deinem privaten Schlüssel (nsec) weiter nutzen. Exportiere und sichere deinen nsec vor dem Fortfahren über die Option "Privaten Schlüssel exportieren".',
+    Done: 'Fertig',
+    Recover: 'Wiederherstellen',
+    'Recovering...': 'Wird wiederhergestellt...'
   }
 }

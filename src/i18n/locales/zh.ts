@@ -868,6 +868,46 @@ export default {
     'No auto-updates — manual re-download required': '不支持自动更新 — 需要手动重新下载',
     Download: '下载',
     'Followed by your follows': '你关注的人也关注',
-    Shuffle: '换一批'
+    Shuffle: '换一批',
+    'Login with Google': '使用 Google 登录',
+    'Continue with Google': '使用 Google 继续',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      '使用 Google 登录，系统会自动为你创建 Nostr 密钥。',
+    'How it works': '工作原理',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      '你的私钥会被拆分成多个分片，由不同的运营方分别保管，不会集中存放在任何一处。Jumble 通过安全的远程签名器进行签名。你可以随时在账号设置中导出私钥。',
+    'Waiting for Google sign-in...': '等待 Google 登录…',
+    'Checking your account...': '正在检查你的账号…',
+    'Setting up your secure account...': '正在创建你的安全账号…',
+    'Logging in...': '正在登录…',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      '弹窗被拦截，请允许本站弹窗后重试。',
+    'Export private key': '导出私钥',
+    'Recover your private key by collecting shards from the operators.':
+      '从各运营方收集密钥分片，以导出你的私钥。',
+    'Keep your private key safe': '请妥善保管你的私钥',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      '此操作会在浏览器中重组出你的完整私钥。请仅在你信任的设备上继续。',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      '任何人持有此密钥都能完全控制你的账号。请将其存放在安全的地方，切勿分享给他人。',
+    'Recovered {{count}} of {{total}} shards': '已获取 {{count}} / {{total}} 个分片',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      '每次获取一个分片。每一步都会打开一个窗口，让你登录对应的运营方。',
+    'Recover next shard': '恢复下一个分片',
+    'Start recovery': '开始获取',
+    'Something went wrong': '出错了',
+    'Central server': '中央服务器',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      '从中央服务器注销账号只会解除关联，你仍可凭私钥继续使用该账号。',
+    'Disconnect from central server': '从中央服务器注销账号',
+    'Disconnected from central server': '已从中央服务器注销账号',
+    'What happens next': '接下来会怎样',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      '此账号已不再与中央服务器关联。若要继续使用，请用你的私钥（nsec）重新登录。',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      '注销只会解除此账号与中央服务器的关联。你的账号依然存在，仍可用私钥（nsec）登录使用。继续之前，请先用上方的「导出私钥」功能导出并妥善保管好你的 nsec。',
+    Done: '完成',
+    Recover: '获取分片',
+    'Recovering...': '获取中…'
   }
 }

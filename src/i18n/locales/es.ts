@@ -902,6 +902,46 @@ export default {
       'Sin actualizaciones automáticas — requiere descargar de nuevo manualmente',
     Download: 'Descargar',
     'Followed by your follows': 'Seguidos por las personas a las que sigues',
-    Shuffle: 'Mezclar'
+    Shuffle: 'Mezclar',
+    'Login with Google': 'Iniciar sesión con Google',
+    'Continue with Google': 'Continuar con Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Inicia sesión con Google y se creará automáticamente una clave Nostr para ti.',
+    'How it works': 'Cómo funciona',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Tu clave privada se divide en fragmentos custodiados por operadores separados, por lo que nunca se almacena en un solo lugar. Jumble firma a través de un firmante remoto seguro. Puedes exportar tu clave en cualquier momento desde la configuración de la cuenta.',
+    'Waiting for Google sign-in...': 'Esperando inicio de sesión con Google...',
+    'Checking your account...': 'Verificando tu cuenta...',
+    'Setting up your secure account...': 'Configurando tu cuenta segura...',
+    'Logging in...': 'Iniciando sesión...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'La ventana emergente fue bloqueada. Permite las ventanas emergentes para este sitio e inténtalo de nuevo.',
+    'Export private key': 'Exportar clave privada',
+    'Recover your private key by collecting shards from the operators.':
+      'Recupera tu clave privada recopilando fragmentos de los operadores.',
+    'Keep your private key safe': 'Mantén tu clave privada segura',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Esto reconstruye tu clave privada completa en este navegador. Continúa solo en un dispositivo de confianza.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Cualquier persona con esta clave tiene control total de tu cuenta. Guárdala en un lugar seguro y nunca la compartas.',
+    'Recovered {{count}} of {{total}} shards': 'Recuperados {{count}} de {{total}} fragmentos',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Recupera un fragmento a la vez. Cada paso abre una ventana para iniciar sesión con el operador.',
+    'Recover next shard': 'Recuperar el siguiente fragmento',
+    'Start recovery': 'Iniciar recuperación',
+    'Something went wrong': 'Algo salió mal',
+    'Central server': 'Servidor central',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Desconectarte desvincula esta cuenta del servidor central. Puedes seguir usando la cuenta con tu clave privada.',
+    'Disconnect from central server': 'Desconectar del servidor central',
+    'Disconnected from central server': 'Desconectado del servidor central',
+    'What happens next': 'Qué ocurre a continuación',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Esta cuenta ya no está vinculada al servidor central. Para seguir usándola, inicia sesión de nuevo con tu clave privada (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Desconectarte solo elimina el vínculo entre esta cuenta y el servidor central. Tu cuenta sigue existiendo y puedes seguir usándola iniciando sesión con tu clave privada (nsec). Antes de continuar, exporta y guarda de forma segura tu nsec usando la opción "Exportar clave privada".',
+    Done: 'Listo',
+    Recover: 'Recuperar',
+    'Recovering...': 'Recuperando...'
   }
 }

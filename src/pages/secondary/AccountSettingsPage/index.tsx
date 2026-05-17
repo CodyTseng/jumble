@@ -1,19 +1,24 @@
-import {
-  SettingsGroup,
-  SettingsPageContainer,
-  SettingsRow
-} from '@/components/ui/settings'
+import PomegranateDisconnectDialog from '@/components/PomegranateDisconnectDialog'
+import PomegranateExportDialog from '@/components/PomegranateExportDialog'
+import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { isPomegranateAccount } from '@/lib/pomegranate'
 import { useNostr } from '@/providers/NostrProvider'
-import { Check, Copy, KeyRound } from 'lucide-react'
+import storage from '@/services/local-storage.service'
+import { Check, Copy, KeyRound, Unplug } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { nsec, ncryptsec } = useNostr()
+  const { nsec, ncryptsec, account } = useNostr()
   const [copiedNsec, setCopiedNsec] = useState(false)
   const [copiedNcryptsec, setCopiedNcryptsec] = useState(false)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false)
+
+  const fullAccount = account ? storage.findAccount(account) : undefined
+  const pomegranate = fullAccount ? isPomegranateAccount(fullAccount) : false
 
   const copy = async (value: string, setCopied: (v: boolean) => void) => {
     await navigator.clipboard.writeText(value)
@@ -50,6 +55,50 @@ const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
               />
             )}
           </SettingsGroup>
+        )}
+
+        {pomegranate && account && fullAccount?.pomegranateCentral && (
+          <>
+            <SettingsGroup
+              title={t('Private key')}
+              description={t(
+                'Your private key controls your account. Keep it safe and never share it.'
+              )}
+            >
+              <SettingsRow
+                icon={<KeyRound />}
+                title={`${t('Export private key')} (nsec)`}
+                chevron
+                onClick={() => setExportDialogOpen(true)}
+              />
+            </SettingsGroup>
+            <SettingsGroup
+              title={t('Central server')}
+              description={t(
+                'Disconnecting unlinks this account from the central server. You can still use the account with your private key.'
+              )}
+            >
+              <SettingsRow
+                icon={<Unplug />}
+                title={t('Disconnect from central server')}
+                destructive
+                chevron
+                onClick={() => setDisconnectDialogOpen(true)}
+              />
+            </SettingsGroup>
+            <PomegranateExportDialog
+              open={exportDialogOpen}
+              onOpenChange={setExportDialogOpen}
+              central={fullAccount.pomegranateCentral}
+              pubkey={fullAccount.pubkey}
+            />
+            <PomegranateDisconnectDialog
+              open={disconnectDialogOpen}
+              onOpenChange={setDisconnectDialogOpen}
+              central={fullAccount.pomegranateCentral}
+              account={account}
+            />
+          </>
         )}
       </SettingsPageContainer>
     </SecondaryPageLayout>

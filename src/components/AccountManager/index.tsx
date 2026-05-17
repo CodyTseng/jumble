@@ -1,16 +1,21 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { POMEGRANATE_ENABLED } from '@/constants'
+import { isElectron } from '@/lib/platform'
 import { isDevEnv } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AccountList from '../AccountList'
+import GoogleLogin from './GoogleLogin'
 import NostrConnectLogin from './NostrConnectionLogin'
 import NpubLogin from './NpubLogin'
 import PrivateKeyLogin from './PrivateKeyLogin'
 import Signup from './Signup'
 
-type TAccountManagerPage = 'nsec' | 'bunker' | 'npub' | 'signup' | null
+type TAccountManagerPage = 'nsec' | 'bunker' | 'npub' | 'signup' | 'google' | null
+
+const SHOW_GOOGLE_LOGIN = POMEGRANATE_ENABLED && !isElectron()
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
@@ -25,6 +30,8 @@ export default function AccountManager({ close }: { close?: () => void }) {
         <NpubLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : page === 'signup' ? (
         <Signup back={() => setPage(null)} onSignupSuccess={() => close?.()} />
+      ) : page === 'google' ? (
+        <GoogleLogin back={() => setPage(null)} onLoginSuccess={() => close?.()} />
       ) : (
         <AccountManagerNav setPage={setPage} close={close} />
       )}
@@ -52,6 +59,11 @@ function AccountManagerNav({
           {!!window.nostr && (
             <Button onClick={() => nip07Login().then(() => close?.())} className="w-full">
               {t('Login with Browser Extension')}
+            </Button>
+          )}
+          {SHOW_GOOGLE_LOGIN && (
+            <Button variant="secondary" onClick={() => setPage('google')} className="w-full">
+              {t('Login with Google')}
             </Button>
           )}
           <Button variant="secondary" onClick={() => setPage('bunker')} className="w-full">
