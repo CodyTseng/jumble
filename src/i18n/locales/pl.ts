@@ -217,8 +217,8 @@ export default {
     "Following's Favorites": 'Ulubione transmitery obserwowanych',
     'no more relays': 'brak kolejnych transmiterów',
     'Favorited by': 'Ulubione od',
-    'Post settings': 'Ustawienia publikacji',
-    'Media upload service': 'Usługa przesyłania mediów',
+    'Post settings': 'Opcje multimediów',
+    'Media upload service': 'Dystrybucja multimediów',
     'Choose a relay': 'Wybierz transmiter',
     'no relays found': 'Nie znaleziono transmiterów',
     video: 'wideo',
@@ -776,7 +776,7 @@ export default {
       'Reset wygeneruje nowy klucz. Wiadomości zaszyfrowane starym kluczem nie będą już mogły zostać odszyfrowane, ale historia czatu już zapisana na tym urządzeniu nie zostanie utracona. Dla bezpieczeństwa wyeksportuj i wykonaj kopię zapasową historii czatu przed kontynuowaniem.',
     'This action cannot be undone. After resetting, messages encrypted with the old key can no longer be decrypted, but the chat history already saved on this device will not be lost.':
       'Tej akcji nie można cofnąć. Po resecie wiadomości zaszyfrowane starym kluczem nie będą już mogły zostać odszyfrowane, ale historia czatu już zapisana na tym urządzeniu nie zostanie utracona.',
-    'No message requests': 'Brak zapytań o wiadomości',
+    'No message requests': 'Brak nowych wiadomości',
     "Messages from people you haven't replied to will appear here.":
       'Wiadomości od osób, którym jeszcze nie odpowiedziałeś, pojawią się tutaj.',
     'Key sync request': 'Żądanie synchronizacji klucza',
@@ -802,7 +802,7 @@ export default {
     weekday_6: 'Sobota',
     'dm time yesterday': '{{yesterday}} {{time}}',
     'dm time weekday': '{{weekday}} {{time}}',
-    Requests: 'Prośby',
+    Requests: 'Otrzymane',
     'dm time date': '{{date}} {{time}}',
     React: 'Reaguj',
     'Relays used for searching notes (NIP-50)':
@@ -870,7 +870,7 @@ export default {
     'Your private key controls your account. Keep it safe and never share it.':
       'Twój klucz prywatny kontroluje Twoje konto. Przechowuj go bezpiecznie i nigdy nikomu nie udostępniaj.',
     'Template URL used to fetch website favicons':
-      'Szablon URL używany do pobierania favikon stron',
+      'Szablon URL używany do pobierania faviconów stron',
     'Display language': 'Język wyświetlania',
     'Translation service': 'Usługa tłumaczeń',
     'API key': 'Klucz API',
@@ -883,7 +883,7 @@ export default {
     'Top up failed': 'Nie udało się doładować',
     'An error occurred while topping up': 'Wystąpił błąd podczas doładowania',
     'Connected wallet': 'Połączony portfel',
-    'Zap defaults': 'Domyślne ustawienia zap',
+    'Zap defaults': 'Domyślne ustawienia zapów',
     'Connect wallet': 'Połącz portfel',
     'Connect wallet via NWC': 'Połącz portfel przez NWC',
     'Use any NWC-compatible Lightning wallet': 'Użyj dowolnego portfela Lightning zgodnego z NWC',
@@ -893,24 +893,24 @@ export default {
     'Donate to': 'Wesprzyj',
     'Leave a message (optional)': 'Zostaw wiadomość (opcjonalnie)',
     'Say hi or share what you love about Jumble':
-      'Przywitaj się lub podziel się, co lubisz w Jumble',
-    'Donate n sats': 'Przekaż {{n}} satów',
+      'Przywitaj się lub opowiedz, co lubisz w Jumble',
+    'Donate n sats': 'Przekaż {{n}} satoszy',
     'Donation failed': 'Wsparcie nieudane',
     'Thank you for supporting Jumble! 💛': 'Dziękujemy za wsparcie Jumble! 💛',
     'Your donation will appear in Recent Supporters':
-      'Twoja darowizna pojawi się wśród Ostatnich wspierających',
+      'Twoja darowizna pojawi się wśród ostatnich wspierających',
     'Download Jumble Desktop': 'Pobierz Jumble Desktop',
     'Pick a build for your operating system.': 'Wybierz wersję dla swojego systemu operacyjnego.',
-    'View all releases on GitHub': 'Zobacz wszystkie wydania na GitHubie',
+    'View all releases on GitHub': 'Zobacz wszystkie wersje na GitHubie',
     'No auto-updates — manual re-download required':
       'Brak automatycznych aktualizacji — wymagane ponowne ręczne pobranie',
     Download: 'Pobierz',
-    'Followed by your follows': 'Obserwowani przez Twoje obserwacje',
-    Shuffle: 'Tasuj',
-    'Pairing code': 'Kod parowania',
+    'Followed by your follows': 'Obserwowani przez Twoich obserwowanych',
+    Shuffle: 'Wymieszaj',
+    'Pairing code': 'Kod sparowania',
     'Make sure this code matches the one shown on your other device.':
       'Upewnij się, że ten kod jest zgodny z kodem wyświetlanym na drugim urządzeniu.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Aby uniknąć wysłania klucza szyfrującego do nieznanego urządzenia, sprawdź, czy ten kod jest zgodny z kodem wyświetlanym na drugim urządzeniu.'
+      'Aby uniknąć wysłania klucza szyfrującego do nieznanego urządzenia, sprawdź, czy ten kod zgadza się z kodem wyświetlanym na drugim urządzeniu.'
   }
 }
