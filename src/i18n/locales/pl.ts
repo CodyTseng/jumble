@@ -905,6 +905,46 @@ export default {
     'No auto-updates — manual re-download required':
       'Brak automatycznych aktualizacji — wymagane ponowne ręczne pobranie',
     Download: 'Pobierz',
+    'Login with Google': 'Zaloguj się przez Google',
+    'Continue with Google': 'Kontynuuj przez Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Zaloguj się przez Google, a klucz Nostr zostanie utworzony automatycznie.',
+    'How it works': 'Jak to działa',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Twój klucz prywatny jest podzielony na fragmenty przechowywane przez oddzielnych operatorów, więc nigdy nie jest przechowywany w jednym miejscu. Jumble podpisuje przez bezpiecznego zdalnego podpisującego. Możesz wyeksportować klucz w dowolnym momencie z ustawień konta.',
+    'Waiting for Google sign-in...': 'Oczekiwanie na logowanie Google...',
+    'Checking your account...': 'Sprawdzanie konta...',
+    'Setting up your secure account...': 'Konfigurowanie bezpiecznego konta...',
+    'Logging in...': 'Logowanie...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'Wyskakujące okno zostało zablokowane. Zezwól na wyskakujące okna dla tej strony i spróbuj ponownie.',
+    'Export private key': 'Eksportuj klucz prywatny',
+    'Recover your private key by collecting shards from the operators.':
+      'Odzyskaj swój klucz prywatny, zbierając fragmenty od operatorów.',
+    'Keep your private key safe': 'Zachowaj swój klucz prywatny w bezpiecznym miejscu',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'To odtworzy Twój pełny klucz prywatny w tej przeglądarce. Kontynuuj tylko na urządzeniu, któremu ufasz.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Każdy, kto posiada ten klucz, ma pełną kontrolę nad Twoim kontem. Przechowuj go w bezpiecznym miejscu i nigdy go nie udostępniaj.',
+    'Recovered {{count}} of {{total}} shards': 'Odzyskano {{count}} z {{total}} fragmentów',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Odzyskuj fragmenty jeden po drugim. Każdy krok otwiera okno do zalogowania się u operatora.',
+    'Recover next shard': 'Odzyskaj następny fragment',
+    'Start recovery': 'Rozpocznij odzyskiwanie',
+    'Something went wrong': 'Coś poszło nie tak',
+    'Central server': 'Centralny serwer',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Rozłączenie odwiązuje to konto od centralnego serwera. Możesz nadal używać konta za pomocą swojego klucza prywatnego.',
+    'Disconnect from central server': 'Rozłącz od centralnego serwera',
+    'Disconnected from central server': 'Rozłączono od centralnego serwera',
+    'What happens next': 'Co dalej',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'To konto nie jest już powiązane z centralnym serwerem. Aby nadal z niego korzystać, zaloguj się ponownie swoim kluczem prywatnym (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Rozłączenie usuwa tylko powiązanie między tym kontem a centralnym serwerem. Twoje konto nadal istnieje i możesz z niego korzystać, logując się kluczem prywatnym (nsec). Przed kontynuowaniem wyeksportuj i bezpiecznie zapisz swój nsec, używając opcji "Eksportuj klucz prywatny".',
+    Done: 'Gotowe',
+    Recover: 'Odzyskaj',
+    'Recovering...': 'Odzyskiwanie...',
     'Followed by your follows': 'Obserwowani przez Twoich obserwowanych',
     Shuffle: 'Wymieszaj',
     'Pairing code': 'Kod sparowania',

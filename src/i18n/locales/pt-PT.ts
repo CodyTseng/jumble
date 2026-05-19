@@ -904,6 +904,46 @@ export default {
     Download: 'Transferir',
     'Followed by your follows': 'Seguidos por quem segue',
     Shuffle: 'Baralhar',
+    'Login with Google': 'Entrar com Google',
+    'Continue with Google': 'Continuar com Google',
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      'Inicie sessão com Google e uma chave Nostr será criada automaticamente para si.',
+    'How it works': 'Como funciona',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'A sua chave privada é dividida em fragmentos mantidos por operadores distintos, pelo que nunca é guardada num único lugar. O Jumble assina através de um signatário remoto seguro. Pode exportar a sua chave a qualquer momento nas definições da conta.',
+    'Waiting for Google sign-in...': 'À espera do início de sessão com Google...',
+    'Checking your account...': 'A verificar a sua conta...',
+    'Setting up your secure account...': 'A configurar a sua conta segura...',
+    'Logging in...': 'A iniciar sessão...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'A janela emergente foi bloqueada. Por favor permita janelas emergentes para este site e tente novamente.',
+    'Export private key': 'Exportar chave privada',
+    'Recover your private key by collecting shards from the operators.':
+      'Recupere a sua chave privada recolhendo os fragmentos junto dos operadores.',
+    'Keep your private key safe': 'Guarde a sua chave privada em segurança',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Isto reconstrói a sua chave privada completa neste navegador. Continue apenas num dispositivo em que confie.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Qualquer pessoa com esta chave tem controlo total da sua conta. Guarde-a num lugar seguro e nunca a partilhe.',
+    'Recovered {{count}} of {{total}} shards': 'Recuperados {{count}} de {{total}} fragmentos',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Recupere um fragmento de cada vez. Cada passo abre uma janela para iniciar sessão com o operador.',
+    'Recover next shard': 'Recuperar próximo fragmento',
+    'Start recovery': 'Iniciar recuperação',
+    'Something went wrong': 'Algo correu mal',
+    'Central server': 'Servidor central',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Desligar remove a associação desta conta ao servidor central. Ainda pode utilizar a conta com a sua chave privada.',
+    'Disconnect from central server': 'Desligar do servidor central',
+    'Disconnected from central server': 'Desligado do servidor central',
+    'What happens next': 'O que acontece a seguir',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Esta conta já não está associada ao servidor central. Para continuar a utilizá-la, inicie sessão novamente com a sua chave privada (nsec).',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Desligar apenas remove a ligação entre esta conta e o servidor central. A sua conta continua a existir e pode continuar a utilizá-la iniciando sessão com a sua chave privada (nsec). Antes de continuar, exporte e guarde em segurança o seu nsec através da opção "Exportar chave privada".',
+    Done: 'Concluído',
+    Recover: 'Recuperar',
+    'Recovering...': 'A recuperar...',
     'Pairing code': 'Código de emparelhamento',
     'Make sure this code matches the one shown on your other device.':
       'Certifique-se de que este código corresponde ao apresentado no seu outro dispositivo.',

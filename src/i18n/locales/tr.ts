@@ -904,6 +904,46 @@ export default {
     Download: 'İndir',
     'Followed by your follows': 'Takip ettiklerinin takip ettiği kişiler',
     Shuffle: 'Karıştır',
+    'Login with Google': "Google ile giriş yap",
+    'Continue with Google': "Google ile devam et",
+    'Sign in with Google and a Nostr key will be created for you automatically.':
+      "Google ile giriş yap, senin için otomatik olarak bir Nostr anahtarı oluşturulsun.",
+    'How it works': 'Nasıl çalışır',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
+      'Özel anahtarın, ayrı operatörler tarafından tutulan parçalara bölünür, bu sayede hiçbir zaman tek bir yerde saklanmaz. Jumble, güvenli bir uzak imzalayıcı aracılığıyla imzalar. Anahtarını istediğin zaman hesap ayarlarından dışa aktarabilirsin.',
+    'Waiting for Google sign-in...': 'Google girişi bekleniyor...',
+    'Checking your account...': 'Hesabın kontrol ediliyor...',
+    'Setting up your secure account...': 'Güvenli hesabın ayarlanıyor...',
+    'Logging in...': 'Giriş yapılıyor...',
+    'Popup was blocked. Please allow popups for this site and try again.':
+      'Açılır pencere engellendi. Bu site için açılır pencerelere izin ver ve tekrar dene.',
+    'Export private key': 'Özel anahtarı dışa aktar',
+    'Recover your private key by collecting shards from the operators.':
+      'Operatörlerden parçaları toplayarak özel anahtarını kurtar.',
+    'Keep your private key safe': 'Özel anahtarını güvende tut',
+    'This reassembles your full private key in this browser. Only continue on a device you trust.':
+      'Bu işlem, tam özel anahtarını bu tarayıcıda yeniden birleştirir. Yalnızca güvendiğin bir cihazda devam et.',
+    'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
+      'Bu anahtara sahip olan herkes hesabın üzerinde tam denetime sahip olur. Güvenli bir yerde sakla ve asla paylaşma.',
+    'Recovered {{count}} of {{total}} shards': '{{total}} parçadan {{count}} tanesi kurtarıldı',
+    'Recover one shard at a time. Each step opens a window to sign in with the operator.':
+      'Bir seferde bir parça kurtar. Her adım, operatörle giriş yapmak için bir pencere açar.',
+    'Recover next shard': 'Sonraki parçayı kurtar',
+    'Start recovery': 'Kurtarmayı başlat',
+    'Something went wrong': 'Bir şeyler ters gitti',
+    'Central server': 'Merkezi sunucu',
+    'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
+      'Bağlantıyı kesmek bu hesabın merkezi sunucuyla ilişkisini kaldırır. Hesabı özel anahtarınla kullanmaya devam edebilirsin.',
+    'Disconnect from central server': 'Merkezi sunucudan bağlantıyı kes',
+    'Disconnected from central server': 'Merkezi sunucudan bağlantı kesildi',
+    'What happens next': 'Bundan sonra ne olur',
+    'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
+      'Bu hesap artık merkezi sunucuya bağlı değil. Kullanmaya devam etmek için özel anahtarınla (nsec) tekrar giriş yap.',
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
+      'Bağlantıyı kesmek yalnızca bu hesap ile merkezi sunucu arasındaki bağlantıyı kaldırır. Hesabın varlığını sürdürür ve özel anahtarınla (nsec) giriş yaparak kullanmaya devam edebilirsin. Devam etmeden önce, "Özel anahtarı dışa aktar" seçeneğini kullanarak nsec\'ini dışa aktar ve güvenli bir şekilde kaydet.',
+    Done: 'Tamam',
+    Recover: 'Kurtar',
+    'Recovering...': 'Kurtarılıyor...',
     'Pairing code': 'Eşleştirme kodu',
     'Make sure this code matches the one shown on your other device.':
       'Bu kodun diğer cihazınızda gösterilen kodla eşleştiğinden emin olun.',

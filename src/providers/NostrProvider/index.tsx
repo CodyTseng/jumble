@@ -71,7 +71,7 @@ type TNostrContext = {
   nsecLogin: (nsec: string, password?: string, needSetup?: boolean) => Promise<string>
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
-  bunkerLogin: (bunker: string) => Promise<string>
+  bunkerLogin: (bunker: string, pomegranateCentral?: string) => Promise<string>
   nostrConnectionLogin: (clientSecretKey: Uint8Array, connectionString: string) => Promise<string>
   npubLogin(npub: string): Promise<string>
   removeAccount: (account: TAccountPointer) => void
@@ -568,7 +568,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const bunkerLogin = async (bunker: string) => {
+  // `pomegranateCentral` is set for accounts created via "Login with Google";
+  // persisting it marks the account as a pomegranate account.
+  const bunkerLogin = async (bunker: string, pomegranateCentral?: string) => {
     const bunkerSigner = new BunkerSigner()
     const pubkey = await bunkerSigner.login(bunker)
     if (!pubkey) {
@@ -580,7 +582,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       pubkey,
       signerType: 'bunker',
       bunker: bunkerUrl.toString(),
-      bunkerClientSecretKey: bunkerSigner.getClientSecretKey()
+      bunkerClientSecretKey: bunkerSigner.getClientSecretKey(),
+      ...(pomegranateCentral ? { pomegranateCentral } : {})
     })
   }
 
