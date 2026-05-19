@@ -1,9 +1,9 @@
+import Content from '@/components/ContentPreview/Content'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import { LoadingBar } from '@/components/LoadingBar'
 import PullToRefresh from '@/components/PullToRefresh'
 import { RefreshButton } from '@/components/RefreshButton'
 import Tabs from '@/components/Tabs'
-import TextWithEmojis from '@/components/TextWithEmojis'
 import TrustScoreFilter from '@/components/TrustScoreFilter'
 import {
   AlertDialog,
@@ -489,9 +489,9 @@ function ConversationItemContent({ conversation }: { conversation: TDmConversati
   const { t } = useTranslation()
   const supportTouch = useMemo(() => isTouchDevice(), [])
 
-  const { displayContent, emojis } = useMemo(() => {
+  const { displayContent, emojis, isFile } = useMemo(() => {
     const rumor = conversation.lastMessageRumor
-    if (!rumor) return { displayContent: '', emojis: undefined }
+    if (!rumor) return { displayContent: '', emojis: undefined, isFile: false }
 
     if (rumor.kind === ExtendedKind.RUMOR_FILE) {
       const fileType = rumor.tags?.find((tag) => tag[0] === 'file-type')?.[1] ?? ''
@@ -499,12 +499,13 @@ function ConversationItemContent({ conversation }: { conversation: TDmConversati
       if (fileType.startsWith('image/')) content = t('[Image]')
       else if (fileType.startsWith('video/')) content = t('[Video]')
       else if (fileType.startsWith('audio/')) content = t('[Audio]')
-      return { displayContent: content, emojis: undefined }
+      return { displayContent: content, emojis: undefined, isFile: true }
     }
 
     return {
       displayContent: rumor.content,
-      emojis: getEmojiInfosFromEmojiTags(rumor.tags)
+      emojis: getEmojiInfosFromEmojiTags(rumor.tags),
+      isFile: false
     }
   }, [conversation.lastMessageRumor, t])
 
@@ -536,12 +537,15 @@ function ConversationItemContent({ conversation }: { conversation: TDmConversati
           />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <TextWithEmojis
-            className="text-muted-foreground truncate text-sm"
-            text={displayContent}
-            emojis={emojis}
-            emojiClassName="h-4 w-4"
-          />
+          {isFile ? (
+            <span className="text-muted-foreground truncate text-sm">{displayContent}</span>
+          ) : (
+            <Content
+              className="text-muted-foreground truncate text-sm"
+              content={displayContent}
+              emojiInfos={emojis}
+            />
+          )}
           {conversation.unreadCount > 0 && (
             <span className="bg-primary text-primary-foreground flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-xs font-medium">
               {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}

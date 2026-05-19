@@ -13,6 +13,11 @@ export function isInsecureUrl(url: string): boolean {
     return false
   }
 
+  // Consider local network URLs as secure
+  if (isLocalNetworkUrl(url)) {
+    return false
+  }
+
   try {
     const protocol = new URL(url).protocol
     return protocol === 'ws:' || protocol === 'http:'
@@ -105,8 +110,8 @@ export function isLocalNetworkUrl(urlString: string): boolean {
     const url = new URL(urlString)
     const hostname = url.hostname
 
-    // Check if it's localhost
-    if (hostname === 'localhost' || hostname === '::1') {
+    // Check if it's localhost or an mDNS .local hostname (e.g. umbrel.local)
+    if (hostname === 'localhost' || hostname === '::1' || hostname.endsWith('.local')) {
       return true
     }
 

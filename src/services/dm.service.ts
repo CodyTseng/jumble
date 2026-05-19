@@ -503,7 +503,7 @@ class DmService {
     const replyRelayHint = recipientDmRelays[0] ?? ''
     const replyTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : []
     const extraTags = [...replyTags, ...(additionalTags ?? [])]
-    const { giftWrap, seal, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
+    const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       content,
       accountPubkey,
       keypair.privkey,
@@ -511,9 +511,6 @@ class DmService {
       recipientEncryptionPubkey,
       extraTags
     )
-    console.debug('[DM] rumor:', rumor)
-    console.debug('[DM] seal:', seal)
-    console.debug('[DM] giftWrap:', giftWrap)
 
     const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
       rumor,
@@ -616,7 +613,7 @@ class DmService {
       fileTags.push(['thumbhash', thumbHash])
     }
 
-    const { giftWrap, seal, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
+    const { giftWrap, rumor } = nip17GiftWrapService.createGiftWrappedMessage(
       fileUrl,
       accountPubkey,
       keypair.privkey,
@@ -625,9 +622,6 @@ class DmService {
       fileTags,
       ExtendedKind.RUMOR_FILE
     )
-    console.debug('[DM] file rumor:', rumor)
-    console.debug('[DM] file seal:', seal)
-    console.debug('[DM] file giftWrap:', giftWrap)
 
     const selfGiftWrap = nip17GiftWrapService.createGiftWrapForSelf(
       rumor,
