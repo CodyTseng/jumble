@@ -905,8 +905,6 @@ export default {
     'No auto-updates — manual re-download required':
       'Brak automatycznych aktualizacji — wymagane ponowne ręczne pobranie',
     Download: 'Pobierz',
-    'Followed by your follows': 'Obserwowani przez Twoje obserwacje',
-    Shuffle: 'Tasuj',
     'Login with Google': 'Zaloguj się przez Google',
     'Continue with Google': 'Kontynuuj przez Google',
     'Sign in with Google and a Nostr key will be created for you automatically.':
