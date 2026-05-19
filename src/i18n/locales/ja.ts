@@ -937,6 +937,11 @@ export default {
       '切断はこのアカウントと中央サーバーの連携を解除するだけです。アカウントは引き続き存在し、秘密鍵 (nsec) でログインすることで使い続けられます。続行する前に、「秘密鍵をエクスポート」オプションを使って nsec をエクスポートし、安全に保存してください。',
     Done: '完了',
     Recover: '復元',
-    'Recovering...': '復元中...'
+    'Recovering...': '復元中...',
+    'Pairing code': 'ペアリングコード',
+    'Make sure this code matches the one shown on your other device.':
+      'このコードがもう一方のデバイスに表示されているコードと一致していることを確認してください。',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      '暗号鍵を不明なデバイスに送信しないよう、このコードがもう一方のデバイスに表示されているコードと一致しているか確認してください。'
   }
 }

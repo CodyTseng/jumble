@@ -19,7 +19,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
-import { Loader2, Smartphone } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -77,13 +77,26 @@ export default function KeySyncRequestHandler() {
   const open = !!pendingEvent
   const onOpenChange = (v: boolean) => !v && handleClose()
 
-  const clientTag = pendingEvent?.tags.find((t) => t[0] === 'client')
-  const clientName = clientTag?.[1] || t('Unknown device')
+  const clientPubkey = pendingEvent
+    ? encryptionKeyService.getClientPubkeyFromEvent(pendingEvent)
+    : null
+  const verificationCode = clientPubkey
+    ? encryptionKeyService.getVerificationCode(clientPubkey)
+    : ''
 
   const deviceInfo = (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-      <Smartphone className="h-5 w-5 shrink-0 text-muted-foreground" />
-      <span className="font-medium truncate">{clientName}</span>
+    <div className="flex flex-col gap-3">
+      <div className="bg-muted flex flex-col items-center gap-2 rounded-lg p-4">
+        <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          {t('Pairing code')}
+        </span>
+        <div className="font-mono text-2xl font-semibold tracking-[0.2em]">{verificationCode}</div>
+      </div>
+      <p className="text-muted-foreground text-center text-sm">
+        {t(
+          'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.'
+        )}
+      </p>
     </div>
   )
 
@@ -91,7 +104,7 @@ export default function KeySyncRequestHandler() {
     <Button onClick={handleSendKey} disabled={isSending} className={isSmallScreen ? 'w-full' : ''}>
       {isSending ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin me-2" />
+          <Loader2 className="me-2 h-4 w-4 animate-spin" />
           {t('Sending...')}
         </>
       ) : (

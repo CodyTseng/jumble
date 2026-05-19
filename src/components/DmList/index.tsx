@@ -1,4 +1,5 @@
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
+import { LoadingBar } from '@/components/LoadingBar'
 import PullToRefresh from '@/components/PullToRefresh'
 import { RefreshButton } from '@/components/RefreshButton'
 import Tabs from '@/components/Tabs'
@@ -172,14 +173,6 @@ export default function DmList() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2" />
-      </div>
-    )
-  }
-
   return (
     <div>
       <Tabs
@@ -204,15 +197,20 @@ export default function DmList() {
         }
         active={trustFilterOpen}
       />
-      <PullToRefresh isPullable={isPullable} onRefresh={refresh}>
-        <ConversationListContent
-          filteredConversations={filteredConversations}
-          activeTab={activeTab}
-          onConversationClick={handleConversationClick}
-          onDelete={(conv) => setDeleteTarget(conv)}
-          onSwipeStateChange={setIsPullable}
-        />
-      </PullToRefresh>
+      {(isLoading || isReloading) && <LoadingBar />}
+      {isLoading ? (
+        <div className="min-h-screen" />
+      ) : (
+        <PullToRefresh isPullable={isPullable} onRefresh={refresh}>
+          <ConversationListContent
+            filteredConversations={filteredConversations}
+            activeTab={activeTab}
+            onConversationClick={handleConversationClick}
+            onDelete={(conv) => setDeleteTarget(conv)}
+            onSwipeStateChange={setIsPullable}
+          />
+        </PullToRefresh>
+      )}
       <DeleteConversationConfirmation
         open={!!deleteTarget}
         setOpen={(open) => {

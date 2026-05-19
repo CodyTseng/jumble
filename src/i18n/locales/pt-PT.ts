@@ -943,6 +943,11 @@ export default {
       'Desligar apenas remove a ligação entre esta conta e o servidor central. A sua conta continua a existir e pode continuar a utilizá-la iniciando sessão com a sua chave privada (nsec). Antes de continuar, exporte e guarde em segurança o seu nsec através da opção "Exportar chave privada".',
     Done: 'Concluído',
     Recover: 'Recuperar',
-    'Recovering...': 'A recuperar...'
+    'Recovering...': 'A recuperar...',
+    'Pairing code': 'Código de emparelhamento',
+    'Make sure this code matches the one shown on your other device.':
+      'Certifique-se de que este código corresponde ao apresentado no seu outro dispositivo.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'Para evitar enviar a sua chave de encriptação para um dispositivo desconhecido, verifique se este código corresponde ao apresentado no outro dispositivo.'
   }
 }

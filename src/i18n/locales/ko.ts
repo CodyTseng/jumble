@@ -928,6 +928,11 @@ export default {
       '연결 해제는 이 계정과 중앙 서버 간의 연결만 제거합니다. 계정은 여전히 존재하며 개인 키 (nsec)로 로그인하여 계속 사용할 수 있습니다. 계속하기 전에 "개인 키 내보내기" 옵션을 사용하여 nsec를 내보내고 안전하게 저장하세요.',
     Done: '완료',
     Recover: '복구',
-    'Recovering...': '복구 중...'
+    'Recovering...': '복구 중...',
+    'Pairing code': '페어링 코드',
+    'Make sure this code matches the one shown on your other device.':
+      '이 코드가 다른 기기에 표시된 코드와 일치하는지 확인하세요.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      '암호화 키를 알 수 없는 기기로 보내지 않도록, 이 코드가 다른 기기에 표시된 코드와 일치하는지 확인하세요.'
   }
 }

@@ -941,6 +941,11 @@ export default {
       'La disconnessione rimuove solo il collegamento tra questo account e il server centrale. Il tuo account esiste ancora e puoi continuare a usarlo accedendo con la tua chiave privata (nsec). Prima di continuare, esporta e salva in modo sicuro il tuo nsec usando l\'opzione "Esporta chiave privata".',
     Done: 'Fatto',
     Recover: 'Recupera',
-    'Recovering...': 'Recupero in corso...'
+    'Recovering...': 'Recupero in corso...',
+    'Pairing code': 'Codice di abbinamento',
+    'Make sure this code matches the one shown on your other device.':
+      "Assicurati che questo codice corrisponda a quello mostrato sull'altro dispositivo.",
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      "Per evitare di inviare la tua chiave di crittografia a un dispositivo sconosciuto, verifica che questo codice corrisponda a quello mostrato sull'altro dispositivo."
   }
 }

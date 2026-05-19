@@ -942,6 +942,11 @@ export default {
       'Desconectarte solo elimina el vínculo entre esta cuenta y el servidor central. Tu cuenta sigue existiendo y puedes seguir usándola iniciando sesión con tu clave privada (nsec). Antes de continuar, exporta y guarda de forma segura tu nsec usando la opción "Exportar clave privada".',
     Done: 'Listo',
     Recover: 'Recuperar',
-    'Recovering...': 'Recuperando...'
+    'Recovering...': 'Recuperando...',
+    'Pairing code': 'Código de emparejamiento',
+    'Make sure this code matches the one shown on your other device.':
+      'Asegúrate de que este código coincida con el que se muestra en tu otro dispositivo.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'Para evitar enviar tu clave de cifrado a un dispositivo desconocido, comprueba que este código coincida con el que se muestra en el otro dispositivo.'
   }
 }

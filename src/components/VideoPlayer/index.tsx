@@ -97,7 +97,7 @@ export default function VideoPlayer({
     <div
       ref={containerRef}
       className={cn(
-        'block w-full overflow-hidden rounded-xl border sm:h-[40vh] sm:w-auto sm:max-w-full',
+        'block w-full overflow-hidden rounded-xl border bg-black sm:h-[40vh] sm:w-auto sm:max-w-full',
         className
       )}
       style={{ aspectRatio }}

@@ -943,6 +943,11 @@ export default {
       'Bağlantıyı kesmek yalnızca bu hesap ile merkezi sunucu arasındaki bağlantıyı kaldırır. Hesabın varlığını sürdürür ve özel anahtarınla (nsec) giriş yaparak kullanmaya devam edebilirsin. Devam etmeden önce, "Özel anahtarı dışa aktar" seçeneğini kullanarak nsec\'ini dışa aktar ve güvenli bir şekilde kaydet.',
     Done: 'Tamam',
     Recover: 'Kurtar',
-    'Recovering...': 'Kurtarılıyor...'
+    'Recovering...': 'Kurtarılıyor...',
+    'Pairing code': 'Eşleştirme kodu',
+    'Make sure this code matches the one shown on your other device.':
+      'Bu kodun diğer cihazınızda gösterilen kodla eşleştiğinden emin olun.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'Şifreleme anahtarınızı bilinmeyen bir cihaza göndermemek için, bu kodun diğer cihazda gösterilen kodla eşleştiğini kontrol edin.'
   }
 }

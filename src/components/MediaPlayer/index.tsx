@@ -75,7 +75,7 @@ export default function MediaPlayer({
   if (!mustLoad && !display) {
     return (
       <div
-        className="w-fit cursor-pointer truncate text-primary hover:underline"
+        className="text-primary w-fit cursor-pointer truncate hover:underline"
         onClick={(e) => {
           e.stopPropagation()
           setDisplay(true)
@@ -90,7 +90,7 @@ export default function MediaPlayer({
     return (
       <div
         className={cn(
-          'w-full rounded-xl border bg-muted sm:h-[60vh] sm:w-auto sm:max-w-full',
+          'bg-muted block w-full overflow-hidden rounded-xl border sm:h-[40vh] sm:w-auto sm:max-w-full',
           className
         )}
         style={{

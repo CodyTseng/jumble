@@ -3,6 +3,7 @@ import { useStuff } from '@/hooks/useStuff'
 import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { createFakeEvent } from '@/lib/event'
 import { formatAmount } from '@/lib/lightning'
+import { cn } from '@/lib/utils'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
@@ -10,7 +11,15 @@ import ContentPreview from '../ContentPreview'
 import { SimpleUserAvatar } from '../UserAvatar'
 import ZapDetailDialog from '../ZapDetailDialog'
 
-export default function TopZaps({ stuff }: { stuff: Event | string }) {
+export default function TopZaps({
+  stuff,
+  scrollAreaClassName,
+  contentClassName
+}: {
+  stuff: Event | string
+  scrollAreaClassName?: string
+  contentClassName?: string
+}) {
   const { event, stuffKey } = useStuff(stuff)
   const noteStats = useStuffStatsById(stuffKey)
   const [zapIndex, setZapIndex] = useState(-1)
@@ -21,12 +30,12 @@ export default function TopZaps({ stuff }: { stuff: Event | string }) {
   if (!topZaps.length || !event) return null
 
   return (
-    <ScrollArea className="mb-1 pb-2">
-      <div className="flex gap-1">
+    <ScrollArea className={cn('mb-1 pb-2', scrollAreaClassName)}>
+      <div className={cn('flex gap-1', contentClassName)}>
         {topZaps.map((zap, index) => (
           <div key={zap.pr}>
             <div
-              className="flex max-w-72 cursor-pointer items-center gap-1 rounded-full border border-yellow-400 bg-muted/80 py-1 ps-1 pe-2 text-sm text-yellow-400 hover:bg-yellow-400/20"
+              className="bg-muted/80 flex max-w-72 cursor-pointer items-center gap-1 rounded-full border border-yellow-400 py-1 ps-1 pe-2 text-sm text-yellow-400 hover:bg-yellow-400/20"
               onClick={(e) => {
                 e.stopPropagation()
                 setZapIndex(index)

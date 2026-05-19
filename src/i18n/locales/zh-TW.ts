@@ -901,6 +901,11 @@ export default {
       '註銷只會解除此帳號與中央伺服器的關聯。你的帳號依然存在，仍可用私鑰（nsec）登入使用。繼續之前，請先用上方的「匯出私鑰」功能匯出並妥善保管好你的 nsec。',
     Done: '完成',
     Recover: '取得分片',
-    'Recovering...': '取得中…'
+    'Recovering...': '取得中…',
+    'Pairing code': '配對碼',
+    'Make sure this code matches the one shown on your other device.':
+      '請確認此配對碼與你另一台裝置上顯示的一致。',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      '為避免將加密金鑰發送給未知裝置，請檢查配對碼是否與另一台裝置上顯示的一致。'
   }
 }

@@ -955,6 +955,11 @@ export default {
       'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.',
     Done: 'Done',
     Recover: 'Recover',
-    'Recovering...': 'Recovering...'
+    'Recovering...': 'Recovering...',
+    'Pairing code': 'Pairing code',
+    'Make sure this code matches the one shown on your other device.':
+      'Make sure this code matches the one shown on your other device.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.'
   }
 }

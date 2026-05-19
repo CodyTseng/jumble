@@ -937,6 +937,11 @@ export default {
       'A leválasztás csak a fiókod és a központi szerver közötti kapcsolatot szünteti meg. A fiókod továbbra is létezik, és folytathatod a használatát a privát kulcsoddal (nsec) való bejelentkezéssel. A folytatás előtt exportáld és mentsd biztonságos helyre az nsec-edet a "Privát kulcs exportálása" lehetőséggel.',
     Done: 'Kész',
     Recover: 'Visszaállítás',
-    'Recovering...': 'Visszaállítás folyamatban...'
+    'Recovering...': 'Visszaállítás folyamatban...',
+    'Pairing code': 'Párosítási kód',
+    'Make sure this code matches the one shown on your other device.':
+      'Győződj meg róla, hogy ez a kód megegyezik a másik eszközödön megjelenővel.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'Hogy elkerüld a titkosítási kulcsod ismeretlen eszközre küldését, ellenőrizd, hogy ez a kód megegyezik-e a másik eszközön megjelenővel.'
   }
 }

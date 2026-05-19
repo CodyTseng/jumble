@@ -9,6 +9,7 @@ import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { getEmojiInfosFromEmojiTags, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import { TEmoji } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds } from 'nostr-tools'
@@ -238,7 +239,9 @@ class StuffStatsService {
       } else if (evt.kind === kinds.Repost || evt.kind === kinds.GenericRepost) {
         targetKey = this.addRepostByEvent(evt)
       } else if (evt.kind === kinds.Zap) {
-        targetKey = this.addZapByEvent(evt)
+        // Zap receipts need an async issuer check before counting; the
+        // method validates the receipt and notifies subscribers itself.
+        this.addZapByEvent(evt)
       }
       if (targetKey) {
         targetKeySet.add(targetKey)
@@ -348,21 +351,16 @@ class StuffStatsService {
     return targetEventKey
   }
 
-  private addZapByEvent(evt: Event) {
+  private async addZapByEvent(evt: Event) {
     const info = getZapInfoFromEvent(evt)
     if (!info) return
     const { originalEventId, senderPubkey, invoice, amount, comment } = info
     if (!originalEventId || !senderPubkey || amount <= 0) return
 
-    return this.addZap(
-      senderPubkey,
-      originalEventId,
-      invoice,
-      amount,
-      comment,
-      evt.created_at,
-      false
-    )
+    const valid = await lightning.validateZapReceipt(evt)
+    if (!valid) return
+
+    this.addZap(senderPubkey, originalEventId, invoice, amount, comment, evt.created_at)
   }
 }
 

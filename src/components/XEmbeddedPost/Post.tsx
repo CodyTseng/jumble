@@ -63,6 +63,9 @@ const Post = memo(({ tweetId, url, className, embedded = true }: PostProps) => {
         .then((element: HTMLElement | undefined) => {
           if (unmountedRef.current) return
           if (element) {
+            // Twitter's widget adds a 10px vertical margin; drop it so the
+            // tweet sits flush with the rounded container and overlay.
+            element.style.margin = '0'
             setTimeout(() => {
               if (!unmountedRef.current) {
                 setLoaded(true)
@@ -101,7 +104,7 @@ const Post = memo(({ tweetId, url, className, embedded = true }: PostProps) => {
 
   return (
     <div
-      className={cn('group relative', className)}
+      className={cn('group relative rounded-lg', className)}
       style={{
         maxWidth: '550px',
         minHeight: '225px'
@@ -110,14 +113,14 @@ const Post = memo(({ tweetId, url, className, embedded = true }: PostProps) => {
       <div ref={containerRef} className="cursor-pointer" onClick={handleViewComments} />
       {!loaded && <Skeleton className="absolute inset-0 h-full w-full rounded-lg" />}
       {loaded && embedded && !supportTouch && (
-        /* Hover overlay mask */
+        /* Hover overlay */
         <div
-          className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-lg bg-muted/40 opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100"
+          className="bg-background/40 absolute inset-0 flex cursor-pointer items-center justify-center rounded-lg border opacity-0 backdrop-blur-sm transition-opacity duration-200 ease-out group-hover:opacity-100"
           onClick={handleViewComments}
         >
-          <div className="flex flex-col items-center gap-3">
-            <MessageCircle className="size-12" strokeWidth={1.5} />
-            <span className="text-lg font-medium">{t('View Nostr comments')}</span>
+          <div className="bg-background text-foreground ring-border flex scale-95 items-center gap-2 rounded-full px-4 py-2 shadow-lg ring-1 transition-transform duration-200 ease-out group-hover:scale-100">
+            <MessageCircle className="size-4" strokeWidth={2} />
+            <span className="text-sm font-medium">{t('View Nostr comments')}</span>
           </div>
         </div>
       )}

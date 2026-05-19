@@ -908,6 +908,11 @@ export default {
       '注销只会解除此账号与中央服务器的关联。你的账号依然存在，仍可用私钥（nsec）登录使用。继续之前，请先用上方的「导出私钥」功能导出并妥善保管好你的 nsec。',
     Done: '完成',
     Recover: '获取分片',
-    'Recovering...': '获取中…'
+    'Recovering...': '获取中…',
+    'Pairing code': '配对码',
+    'Make sure this code matches the one shown on your other device.':
+      '请确认此配对码与你另一台设备上显示的一致。',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      '为避免将加密密钥发送给未知设备，请检查配对码是否与另一台设备上显示的一致。'
   }
 }

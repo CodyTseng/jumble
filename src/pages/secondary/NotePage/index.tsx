@@ -102,7 +102,13 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
           originalNoteId={id}
           showFull
         />
-        <StuffStats className="mt-3" stuff={event} fetchIfNotExisting displayTopZapsAndLikes />
+        <StuffStats
+          className="mt-3"
+          classNames={{ topList: '-mx-4', topListContent: 'px-4' }}
+          stuff={event}
+          fetchIfNotExisting
+          displayTopZapsAndLikes
+        />
       </div>
       <Separator className="mt-4" />
       <NoteInteractions key={`note-interactions-${event.id}`} event={event} />
@@ -118,12 +124,12 @@ function ExternalRoot({ value }: { value: string }) {
   return (
     <div>
       <Card
-        className="clickable flex items-center gap-1 px-1.5 py-1 text-sm text-muted-foreground hover:text-foreground"
+        className="clickable text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-1 text-sm"
         onClick={() => push(toExternalContent(value))}
       >
         <div className="truncate">{value}</div>
       </Card>
-      <div className="ms-5 h-2 w-px bg-border" />
+      <div className="bg-border ms-5 h-2 w-px" />
     </div>
   )
 }
@@ -144,13 +150,13 @@ function ParentNote({
   if (isFetching) {
     return (
       <div>
-        <div className="clickable flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm text-muted-foreground">
+        <div className="clickable text-muted-foreground flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm">
           <UserAvatarSkeleton className="h-4 w-4 shrink" />
           <div className="flex-1 py-1">
             <Skeleton className="h-3" />
           </div>
         </div>
-        <div className="ms-5 h-3 w-px bg-border" />
+        <div className="bg-border ms-5 h-3 w-px" />
       </div>
     )
   }
@@ -159,7 +165,7 @@ function ParentNote({
     <div>
       <div
         className={cn(
-          'clickable flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm text-muted-foreground',
+          'clickable text-muted-foreground flex items-center gap-1 rounded-full border px-1.75 py-1 text-sm',
           event && 'hover:text-foreground'
         )}
         onClick={() => {
@@ -170,9 +176,9 @@ function ParentNote({
         <ContentPreview className="truncate" event={event} />
       </div>
       {isConsecutive ? (
-        <div className="ms-5 h-3 w-px bg-border" />
+        <div className="bg-border ms-5 h-3 w-px" />
       ) : (
-        <Ellipsis className="ms-3.5 size-3 text-muted-foreground/60" />
+        <Ellipsis className="text-muted-foreground/60 ms-3.5 size-3" />
       )}
     </div>
   )

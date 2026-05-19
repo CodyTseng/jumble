@@ -937,6 +937,11 @@ export default {
       'قطع اتصال فقط پیوند بین این حساب و سرور مرکزی را حذف می‌کند. حساب شما همچنان وجود دارد و می‌توانید با ورود با کلید خصوصی (nsec) از آن استفاده کنید. پیش از ادامه، nsec خود را با استفاده از گزینه «صادر کردن کلید خصوصی» صادر کرده و به‌طور ایمن ذخیره کنید.',
     Done: 'انجام شد',
     Recover: 'بازیابی',
-    'Recovering...': 'در حال بازیابی...'
+    'Recovering...': 'در حال بازیابی...',
+    'Pairing code': 'کد جفت‌سازی',
+    'Make sure this code matches the one shown on your other device.':
+      'مطمئن شوید این کد با کدی که روی دستگاه دیگرتان نمایش داده می‌شود مطابقت دارد.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'برای جلوگیری از ارسال کلید رمزنگاری به دستگاه ناشناس، بررسی کنید که این کد با کد نمایش‌داده‌شده روی دستگاه دیگر مطابقت دارد.'
   }
 }

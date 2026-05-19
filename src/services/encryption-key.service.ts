@@ -1,6 +1,5 @@
 import { ExtendedKind } from '@/constants'
 import { tagNameEquals } from '@/lib/tag'
-import { getClientDescription } from '@/lib/utils'
 import { ISigner, TEncryptionKeypair } from '@/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import dayjs from 'dayjs'
@@ -94,19 +93,20 @@ class EncryptionKeyService {
 
   async publishClientKeyAnnouncement(
     signer: ISigner,
-    accountPubkey: string,
-    clientName: string = getClientDescription()
+    accountPubkey: string
   ): Promise<Event | null> {
     const { relays } = await this.getRelays(accountPubkey)
 
     const clientKeypair = this.getClientKeypair(accountPubkey)
 
+    // Intentionally no 'client' tag here: it would leak the OS/browser of the
+    // requesting device. The verification code (see getVerificationCode) is
+    // used instead to let the user confirm the request.
     const draftEvent = {
       kind: ExtendedKind.CLIENT_KEY_ANNOUNCEMENT,
       content: '',
       created_at: dayjs().unix(),
       tags: [
-        ['client', clientName],
         ['pubkey', clientKeypair.pubkey], // coop uses 'pubkey' tag
         ['P', clientKeypair.pubkey] // NIP defines 'P' tag
       ]
@@ -200,6 +200,18 @@ class EncryptionKeyService {
     // NIP defines 'P' tag, coop uses 'pubkey' tag
     const tag = event.tags.find(tagNameEquals('P')) ?? event.tags.find(tagNameEquals('pubkey'))
     return tag?.[1] ?? null
+  }
+
+  /**
+   * Derive a human-comparable verification code from a client pubkey.
+   * The client pubkey is uniformly random, so its leading hex digits are
+   * already uniformly random and no hashing is needed. Both devices derive
+   * the same code from the same client pubkey; the user compares them to
+   * confirm the sync request belongs to the device they are holding.
+   */
+  getVerificationCode(clientPubkey: string): string {
+    const code = clientPubkey.slice(0, 8).toUpperCase()
+    return `${code.slice(0, 4)} ${code.slice(4)}`
   }
 
   async subscribeToKeyTransfer(

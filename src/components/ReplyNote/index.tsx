@@ -110,9 +110,9 @@ export default function ReplyNote({
       {hasReplies &&
         !hideThreadGuide &&
         (autoLoadProfilePicture ? (
-          <div className="absolute bottom-0 start-[34px] top-14 z-20 border-s" />
+          <div className="absolute inset-s-8.5 top-14 bottom-0 z-20 border-s" />
         ) : (
-          <div className="absolute bottom-0 start-2 top-5 z-20 w-3 rounded-ss-lg border-s border-t" />
+          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s border-t" />
         ))}
       <Collapsible>
         <div
@@ -128,13 +128,13 @@ export default function ReplyNote({
                 <div className="flex items-center gap-1">
                   <Username
                     userId={event.pubkey}
-                    className="truncate text-sm font-semibold text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground truncate text-sm font-semibold"
                     skeletonClassName="h-3"
                   />
                   <TrustScoreBadge pubkey={event.pubkey} className="size-3.5!" />
                   <ClientTag event={event} />
                 </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <div className="text-muted-foreground flex items-center gap-1 text-sm">
                   <Nip05 pubkey={event.pubkey} append="·" />
                   <FormattedTimestamp
                     timestamp={event.created_at}
@@ -163,7 +163,7 @@ export default function ReplyNote({
             ) : (
               <Button
                 variant="outline"
-                className="mt-2 font-medium text-muted-foreground"
+                className="text-muted-foreground mt-2 font-medium"
                 onClick={(e) => {
                   e.stopPropagation()
                   setShowMuted(true)
@@ -181,6 +181,16 @@ export default function ReplyNote({
             'me-4 mt-2 ps-1',
             autoLoadProfilePicture ? 'ms-14' : hideThreadGuide ? 'ms-4' : 'ms-7'
           )}
+          classNames={{
+            topList: cn(
+              '-me-4',
+              autoLoadProfilePicture ? '-ms-14' : hideThreadGuide ? '-ms-4' : '-ms-7'
+            ),
+            topListContent: cn(
+              'pe-4',
+              autoLoadProfilePicture ? 'ps-14' : hideThreadGuide ? 'ps-4' : 'ps-7'
+            )
+          }}
           stuff={event}
           displayTopZapsAndLikes
         />

@@ -25,6 +25,8 @@ export default function StuffStats({
   className?: string
   classNames?: {
     buttonBar?: string
+    topList?: string
+    topListContent?: string
   }
   fetchIfNotExisting?: boolean
   displayTopZapsAndLikes?: boolean
@@ -45,8 +47,16 @@ export default function StuffStats({
       <div className={cn('select-none', className)}>
         {displayTopZapsAndLikes && (
           <>
-            <TopZaps stuff={stuff} />
-            <Likes stuff={stuff} />
+            <TopZaps
+              stuff={stuff}
+              scrollAreaClassName={classNames?.topList}
+              contentClassName={classNames?.topListContent}
+            />
+            <Likes
+              stuff={stuff}
+              scrollAreaClassName={classNames?.topList}
+              contentClassName={classNames?.topListContent}
+            />
           </>
         )}
         <div
@@ -72,8 +82,16 @@ export default function StuffStats({
     <div className={cn('select-none', className)}>
       {displayTopZapsAndLikes && (
         <>
-          <TopZaps stuff={stuff} />
-          <Likes stuff={stuff} />
+          <TopZaps
+            stuff={stuff}
+            scrollAreaClassName={classNames?.topList}
+            contentClassName={classNames?.topListContent}
+          />
+          <Likes
+            stuff={stuff}
+            scrollAreaClassName={classNames?.topList}
+            contentClassName={classNames?.topListContent}
+          />
         </>
       )}
       <div className="flex h-5 justify-between [&_svg]:size-4">

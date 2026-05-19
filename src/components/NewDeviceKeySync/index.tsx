@@ -2,9 +2,8 @@ import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import { Button } from '@/components/ui/button'
 import { useNostr } from '@/providers/NostrProvider'
 import encryptionKeyService from '@/services/encryption-key.service'
-import { getClientDescription } from '@/lib/utils'
 import { CheckCircle, Loader2, RefreshCw, Smartphone } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -20,6 +19,16 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
   const [countdown, setCountdown] = useState(RETRY_COOLDOWN)
   const unsubscribeRef = useRef<(() => void) | null>(null)
 
+  const verificationCode = useMemo(
+    () =>
+      pubkey
+        ? encryptionKeyService.getVerificationCode(
+            encryptionKeyService.getClientKeypair(pubkey).pubkey
+          )
+        : '',
+    [pubkey]
+  )
+
   const publishAndSubscribe = useCallback(async () => {
     if (!pubkey) return
 
@@ -31,11 +40,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
         signEvent
       }
 
-      await encryptionKeyService.publishClientKeyAnnouncement(
-        signer as any,
-        pubkey,
-        getClientDescription()
-      )
+      await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey)
       setState('waiting')
       setCountdown(RETRY_COOLDOWN)
 
@@ -110,16 +115,16 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
   if (state === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center p-8 gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">{t('Checking encryption key...')}</p>
+      <div className="flex flex-col items-center justify-center gap-4 p-8">
+        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+        <p className="text-muted-foreground text-sm">{t('Checking encryption key...')}</p>
       </div>
     )
   }
 
   if (state === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center p-8 gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 p-8">
         <CheckCircle className="h-12 w-12 text-green-500" />
         <p className="text-sm font-medium">{t('Encryption key synced!')}</p>
       </div>
@@ -140,6 +145,20 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
           </p>
         </div>
 
+        {(state === 'publishing' || state === 'waiting') && verificationCode && (
+          <div className="bg-muted flex w-full flex-col items-center gap-2 rounded-lg p-4">
+            <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              {t('Pairing code')}
+            </span>
+            <div className="font-mono text-2xl font-semibold tracking-[0.2em]">
+              {verificationCode}
+            </div>
+            <p className="text-muted-foreground text-center text-xs">
+              {t('Make sure this code matches the one shown on your other device.')}
+            </p>
+          </div>
+        )}
+
         {state === 'publishing' && (
           <div className="text-muted-foreground flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -154,7 +173,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
               <span className="text-sm">{t('Waiting for key from another device...')}</span>
             </div>
             <Button variant="outline" size="sm" disabled={countdown > 0} onClick={handleRetry}>
-              <RefreshCw className="h-3.5 w-3.5 me-1.5" />
+              <RefreshCw className="me-1.5 h-3.5 w-3.5" />
               {countdown > 0 ? t('Retry ({{seconds}}s)', { seconds: countdown }) : t('Retry')}
             </Button>
           </div>
@@ -164,7 +183,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
           <div className="flex flex-col items-center gap-3">
             <p className="text-destructive text-center text-sm">{error}</p>
             <Button variant="outline" size="sm" onClick={handleRetry}>
-              <RefreshCw className="h-3.5 w-3.5 me-1.5" />
+              <RefreshCw className="me-1.5 h-3.5 w-3.5" />
               {t('Retry')}
             </Button>
           </div>

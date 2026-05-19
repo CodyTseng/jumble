@@ -951,6 +951,11 @@ export default {
       'La déconnexion supprime uniquement le lien entre ce compte et le serveur central. Votre compte existe toujours et vous pouvez continuer à l\'utiliser en vous connectant avec votre clé privée (nsec). Avant de continuer, exportez et sauvegardez votre nsec en toute sécurité via l\'option "Exporter la clé privée".',
     Done: 'Terminé',
     Recover: 'Récupérer',
-    'Recovering...': 'Récupération...'
+    'Recovering...': 'Récupération...',
+    'Pairing code': "Code d'appairage",
+    'Make sure this code matches the one shown on your other device.':
+      'Assurez-vous que ce code correspond à celui affiché sur votre autre appareil.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      "Pour éviter d'envoyer votre clé de chiffrement à un appareil inconnu, vérifiez que ce code correspond à celui affiché sur l'autre appareil."
   }
 }

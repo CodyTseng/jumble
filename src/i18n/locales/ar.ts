@@ -921,6 +921,11 @@ export default {
       'قطع الاتصال يزيل فقط الرابط بين هذا الحساب والخادم المركزي. لا يزال حسابك موجودًا، ويمكنك مواصلة استخدامه بتسجيل الدخول بمفتاحك الخاص (nsec). قبل المتابعة، صدّر وأحفظ nsec بأمان باستخدام خيار «تصدير المفتاح الخاص».',
     Done: 'تم',
     Recover: 'استرداد',
-    'Recovering...': 'جارٍ الاسترداد...'
+    'Recovering...': 'جارٍ الاسترداد...',
+    'Pairing code': 'رمز الإقران',
+    'Make sure this code matches the one shown on your other device.':
+      'تأكد من تطابق هذا الرمز مع الرمز المعروض على جهازك الآخر.',
+    'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
+      'لتجنب إرسال مفتاح التشفير الخاص بك إلى جهاز غير معروف، تحقق من تطابق هذا الرمز مع الرمز المعروض على الجهاز الآخر.'
   }
 }

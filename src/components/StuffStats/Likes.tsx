@@ -18,7 +18,15 @@ import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import Emoji from '../Emoji'
 
-export default function Likes({ stuff }: { stuff: Event | string }) {
+export default function Likes({
+  stuff,
+  scrollAreaClassName,
+  contentClassName
+}: {
+  stuff: Event | string
+  scrollAreaClassName?: string
+  contentClassName?: string
+}) {
   const { pubkey, checkLogin, publish } = useNostr()
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const noteStats = useStuffStatsById(stuffKey)
@@ -124,16 +132,16 @@ export default function Likes({ stuff }: { stuff: Event | string }) {
   }
 
   return (
-    <ScrollArea className="mb-1 pb-2">
-      <div className="flex gap-1">
+    <ScrollArea className={cn('mb-1 pb-2', scrollAreaClassName)}>
+      <div className={cn('flex gap-1', contentClassName)}>
         {likes.map(({ key, emoji, pubkeys }) => (
           <div
             key={key}
             className={cn(
-              'relative flex h-7 w-fit shrink-0 select-none items-center gap-2 overflow-hidden rounded-full border px-2 transition-all duration-200',
+              'relative flex h-7 w-fit shrink-0 items-center gap-2 overflow-hidden rounded-full border px-2 transition-all duration-200 select-none',
               pubkey && pubkeys.has(pubkey)
-                ? 'cursor-not-allowed border-primary bg-primary/20 text-foreground'
-                : 'cursor-pointer bg-muted/80 text-muted-foreground hover:border-primary hover:bg-primary/40 hover:text-foreground',
+                ? 'border-primary bg-primary/20 text-foreground cursor-not-allowed'
+                : 'bg-muted/80 text-muted-foreground hover:border-primary hover:bg-primary/40 hover:text-foreground cursor-pointer',
               (isLongPressing === key || isCompleted === key) && 'border-primary bg-primary/20'
             )}
             onClick={(e) => e.stopPropagation()}
@@ -148,7 +156,7 @@ export default function Likes({ stuff }: { stuff: Event | string }) {
             {(isLongPressing === key || isCompleted === key) && (
               <div className="absolute inset-0 overflow-hidden rounded-full">
                 <div
-                  className="h-full bg-linear-to-r from-primary/40 via-primary/60 to-primary/80"
+                  className="from-primary/40 via-primary/60 to-primary/80 h-full bg-linear-to-r"
                   style={{
                     width: isCompleted === key ? '100%' : '0%',
                     animation:

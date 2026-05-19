@@ -129,7 +129,6 @@
     "ajv": "^8.18.0",
     "ajv-errors": "^3.0.0",
     "cross-env": "^7.0.3",
-    "electron": "^41.5.0",
     "electron-builder": "^26.8.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -145,5 +144,8 @@
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.4"
+  },
+  "optionalDependencies": {
+    "electron": "^41.5.0"
   }
 }

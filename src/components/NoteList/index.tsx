@@ -481,7 +481,6 @@ const NoteList = forwardRef<
 
     const list = (
       <div className="min-h-screen">
-        {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
         {pinnedEventIds?.map((id) => <PinnedNoteCard key={id} eventId={id} className="w-full" />)}
         {visibleItems.map(({ key, event, reposters }) => (
           <NoteCard
@@ -514,6 +513,7 @@ const NoteList = forwardRef<
     return (
       <div>
         <div ref={topRef} className="scroll-mt-24.25" />
+        {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
         <PullToRefresh
           onRefresh={async () => {
             refresh()

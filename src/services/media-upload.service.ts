@@ -1,3 +1,4 @@
+import { stripImageMetadata } from '@/lib/strip-image-metadata'
 import { simplifyUrl } from '@/lib/url'
 import { TDraftEvent, TMediaUploadServiceConfig } from '@/types'
 import { BlossomClient } from 'blossom-client-sdk'
@@ -31,11 +32,14 @@ class MediaUploadService {
   }
 
   async upload(file: File, options?: UploadOptions) {
+    // Strip sensitive metadata (EXIF/GPS, ...) from the file before upload.
+    const safeFile = await stripImageMetadata(file)
+
     let result: { url: string; tags: string[][] }
     if (this.serviceConfig.type === 'nip96') {
-      result = await this.uploadByNip96(this.serviceConfig.service, file, options)
+      result = await this.uploadByNip96(this.serviceConfig.service, safeFile, options)
     } else {
-      result = await this.uploadByBlossom(file, options)
+      result = await this.uploadByBlossom(safeFile, options)
     }
 
     if (result.tags.length > 0) {

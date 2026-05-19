@@ -146,7 +146,6 @@ export default function NotificationList() {
 
   const list = (
     <div>
-      {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
       {groupedNotifications.map((group) => (
         <Fragment key={group.key}>
           <NotificationGroupHeader label={group.label} />
@@ -193,6 +192,7 @@ export default function NotificationList() {
         }
       />
       <div ref={topRef} className="scroll-mt-24.25" />
+      {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
       <PullToRefresh
         onRefresh={async () => {
           refresh()
