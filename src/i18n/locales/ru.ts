@@ -948,6 +948,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Убедитесь, что этот код совпадает с кодом, показанным на вашем другом устройстве.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Чтобы не отправить ключ шифрования на неизвестное устройство, проверьте, что этот код совпадает с кодом, показанным на другом устройстве.'
+      'Чтобы не отправить ключ шифрования на неизвестное устройство, проверьте, что этот код совпадает с кодом, показанным на другом устройстве.',
+    'Edit DM relays': 'Изменить релеи для ЛС',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Если ключ так и не приходит или сброс не удаётся, ваши релеи для ЛС могут быть недоступны. Попробуйте изменить их.'
   }
 }

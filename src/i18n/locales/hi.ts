@@ -942,6 +942,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'सुनिश्चित करें कि यह कोड आपके दूसरे डिवाइस पर दिखाए गए कोड से मेल खाता है।',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'अपनी एन्क्रिप्शन कुंजी किसी अज्ञात डिवाइस को भेजने से बचने के लिए, जांचें कि यह कोड दूसरे डिवाइस पर दिखाए गए कोड से मेल खाता है।'
+      'अपनी एन्क्रिप्शन कुंजी किसी अज्ञात डिवाइस को भेजने से बचने के लिए, जांचें कि यह कोड दूसरे डिवाइस पर दिखाए गए कोड से मेल खाता है।',
+    'Edit DM relays': 'DM रिले संपादित करें',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'यदि कुंजी कभी नहीं आती, या रीसेट विफल हो जाता है, तो आपके DM रिले अनुपलब्ध हो सकते हैं। उन्हें संपादित करने का प्रयास करें।'
   }
 }

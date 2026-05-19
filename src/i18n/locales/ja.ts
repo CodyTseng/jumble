@@ -942,6 +942,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'このコードがもう一方のデバイスに表示されているコードと一致していることを確認してください。',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      '暗号鍵を不明なデバイスに送信しないよう、このコードがもう一方のデバイスに表示されているコードと一致しているか確認してください。'
+      '暗号鍵を不明なデバイスに送信しないよう、このコードがもう一方のデバイスに表示されているコードと一致しているか確認してください。',
+    'Edit DM relays': 'DMリレーを編集',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      '鍵が届かない場合やリセットに失敗した場合、DMリレーに接続できない可能性があります。リレーを編集してみてください。'
   }
 }

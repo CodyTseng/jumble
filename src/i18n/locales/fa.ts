@@ -942,6 +942,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'مطمئن شوید این کد با کدی که روی دستگاه دیگرتان نمایش داده می‌شود مطابقت دارد.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'برای جلوگیری از ارسال کلید رمزنگاری به دستگاه ناشناس، بررسی کنید که این کد با کد نمایش‌داده‌شده روی دستگاه دیگر مطابقت دارد.'
+      'برای جلوگیری از ارسال کلید رمزنگاری به دستگاه ناشناس، بررسی کنید که این کد با کد نمایش‌داده‌شده روی دستگاه دیگر مطابقت دارد.',
+    'Edit DM relays': 'ویرایش رله‌های پیام خصوصی',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'اگر کلید هرگز نرسد یا بازنشانی ناموفق باشد، ممکن است رله‌های پیام خصوصی شما در دسترس نباشند. سعی کنید آن‌ها را ویرایش کنید.'
   }
 }

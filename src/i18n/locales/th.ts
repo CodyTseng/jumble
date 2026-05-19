@@ -926,6 +926,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'ตรวจสอบให้แน่ใจว่ารหัสนี้ตรงกับรหัสที่แสดงบนอุปกรณ์อีกเครื่องของคุณ',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'เพื่อหลีกเลี่ยงการส่งกุญแจเข้ารหัสของคุณไปยังอุปกรณ์ที่ไม่รู้จัก โปรดตรวจสอบว่ารหัสนี้ตรงกับรหัสที่แสดงบนอุปกรณ์อีกเครื่อง'
+      'เพื่อหลีกเลี่ยงการส่งกุญแจเข้ารหัสของคุณไปยังอุปกรณ์ที่ไม่รู้จัก โปรดตรวจสอบว่ารหัสนี้ตรงกับรหัสที่แสดงบนอุปกรณ์อีกเครื่อง',
+    'Edit DM relays': 'แก้ไขรีเลย์ DM',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'หากคีย์ไม่มาถึง หรือการรีเซ็ตล้มเหลว รีเลย์ DM ของคุณอาจเข้าถึงไม่ได้ ลองแก้ไขรีเลย์เหล่านั้น'
   }
 }

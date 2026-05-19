@@ -942,6 +942,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Győződj meg róla, hogy ez a kód megegyezik a másik eszközödön megjelenővel.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Hogy elkerüld a titkosítási kulcsod ismeretlen eszközre küldését, ellenőrizd, hogy ez a kód megegyezik-e a másik eszközön megjelenővel.'
+      'Hogy elkerüld a titkosítási kulcsod ismeretlen eszközre küldését, ellenőrizd, hogy ez a kód megegyezik-e a másik eszközön megjelenővel.',
+    'Edit DM relays': 'DM relék szerkesztése',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Ha a kulcs soha nem érkezik meg, vagy a visszaállítás sikertelen, a DM reléid elérhetetlenek lehetnek. Próbáld meg szerkeszteni őket.'
   }
 }

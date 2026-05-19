@@ -960,6 +960,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Make sure this code matches the one shown on your other device.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.'
+      'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.',
+    'Edit DM relays': 'Edit DM relays',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.'
   }
 }

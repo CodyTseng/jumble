@@ -948,6 +948,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Bu kodun diğer cihazınızda gösterilen kodla eşleştiğinden emin olun.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Şifreleme anahtarınızı bilinmeyen bir cihaza göndermemek için, bu kodun diğer cihazda gösterilen kodla eşleştiğini kontrol edin.'
+      'Şifreleme anahtarınızı bilinmeyen bir cihaza göndermemek için, bu kodun diğer cihazda gösterilen kodla eşleştiğini kontrol edin.',
+    'Edit DM relays': 'DM relaylerini düzenle',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Anahtar hiç gelmezse veya sıfırlama başarısız olursa, DM relayleriniz erişilemez olabilir. Bunları düzenlemeyi deneyin.'
   }
 }

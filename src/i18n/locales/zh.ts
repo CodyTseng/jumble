@@ -913,6 +913,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       '请确认此配对码与你另一台设备上显示的一致。',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      '为避免将加密密钥发送给未知设备，请检查配对码是否与另一台设备上显示的一致。'
+      '为避免将加密密钥发送给未知设备，请检查配对码是否与另一台设备上显示的一致。',
+    'Edit DM relays': '编辑私信中继',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      '若密钥始终未送达，或重置失败，可能是你的私信中继无法访问。请尝试编辑它们。'
   }
 }

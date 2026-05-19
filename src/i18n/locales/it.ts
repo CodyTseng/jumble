@@ -946,6 +946,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       "Assicurati che questo codice corrisponda a quello mostrato sull'altro dispositivo.",
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      "Per evitare di inviare la tua chiave di crittografia a un dispositivo sconosciuto, verifica che questo codice corrisponda a quello mostrato sull'altro dispositivo."
+      "Per evitare di inviare la tua chiave di crittografia a un dispositivo sconosciuto, verifica che questo codice corrisponda a quello mostrato sull'altro dispositivo.",
+    'Edit DM relays': 'Modifica relay DM',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Se la chiave non arriva mai, o il ripristino non riesce, i tuoi relay DM potrebbero non essere raggiungibili. Prova a modificarli.'
   }
 }

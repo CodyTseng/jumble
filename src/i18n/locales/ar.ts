@@ -926,6 +926,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'تأكد من تطابق هذا الرمز مع الرمز المعروض على جهازك الآخر.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'لتجنب إرسال مفتاح التشفير الخاص بك إلى جهاز غير معروف، تحقق من تطابق هذا الرمز مع الرمز المعروض على الجهاز الآخر.'
+      'لتجنب إرسال مفتاح التشفير الخاص بك إلى جهاز غير معروف، تحقق من تطابق هذا الرمز مع الرمز المعروض على الجهاز الآخر.',
+    'Edit DM relays': 'تعديل مرحّلات الرسائل الخاصة',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'إذا لم يصل المفتاح أبدًا، أو فشلت إعادة التعيين، فقد تكون مرحّلات رسائلك الخاصة غير قابلة للوصول. حاول تعديلها.'
   }
 }

@@ -956,6 +956,9 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Stelle sicher, dass dieser Code mit dem auf deinem anderen Gerät angezeigten übereinstimmt.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Um zu vermeiden, dass dein Verschlüsselungsschlüssel an ein unbekanntes Gerät gesendet wird, überprüfe, ob dieser Code mit dem auf dem anderen Gerät angezeigten übereinstimmt.'
+      'Um zu vermeiden, dass dein Verschlüsselungsschlüssel an ein unbekanntes Gerät gesendet wird, überprüfe, ob dieser Code mit dem auf dem anderen Gerät angezeigten übereinstimmt.',
+    'Edit DM relays': 'DM-Relays bearbeiten',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Wenn der Schlüssel nie ankommt oder das Zurücksetzen fehlschlägt, sind deine DM-Relays möglicherweise nicht erreichbar. Versuche, sie zu bearbeiten.'
   }
 }
