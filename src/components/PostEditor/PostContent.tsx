@@ -11,6 +11,7 @@ import {
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useNostr } from '@/providers/NostrProvider'
 import postEditorCache from '@/services/post-editor-cache.service'
+import klipyService from '@/services/klipy.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
 import { CircleHelp, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
@@ -22,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import EmojiPickerDialog from '../EmojiPickerDialog'
+import GifPickerDialog from '../GifPickerDialog'
 import Mentions from './Mentions'
 import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
@@ -330,6 +332,23 @@ export default function PostContent({
               <Smile />
             </Button>
           </EmojiPickerDialog>
+          {klipyService.isEnabled() && (
+            <GifPickerDialog
+              onGifClick={(gif) => {
+                if (!gif) return
+                textareaRef.current?.appendText(gif.url, true)
+              }}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                title={t('GIF')}
+                className="text-xs font-bold tracking-tight"
+              >
+                GIF
+              </Button>
+            </GifPickerDialog>
+          )}
           {!parentStuff && (
             <Button
               variant="ghost"

@@ -1,7 +1,7 @@
 import { ExtendedKind } from '@/constants'
 import { isReplaceableEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
-import { TDmConversation, TDmMessage, TRelayInfo } from '@/types'
+import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
 
@@ -32,6 +32,8 @@ const StoreNames = {
   DM_MESSAGES: 'dmMessages',
   DM_RELAYS_EVENTS: 'dmRelaysEvents',
   ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS: 'encryptionKeyAnnouncementEvents',
+  FAVORITE_GIFS: 'favoriteGifs',
+  RECENT_GIFS: 'recentGifs',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags', // deprecated
   RELAY_INFO_EVENTS: 'relayInfoEvents' // deprecated
 }
@@ -52,7 +54,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 20)
+        const request = window.indexedDB.open('jumble', 21)
 
         request.onerror = (event) => {
           reject(event)
@@ -155,6 +157,18 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS)) {
             db.createObjectStore(StoreNames.ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.FAVORITE_GIFS)) {
+            const favoriteGifsStore = db.createObjectStore(StoreNames.FAVORITE_GIFS, {
+              keyPath: 'id'
+            })
+            favoriteGifsStore.createIndex('addedAtIndex', 'addedAt')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.RECENT_GIFS)) {
+            const recentGifsStore = db.createObjectStore(StoreNames.RECENT_GIFS, {
+              keyPath: 'id'
+            })
+            recentGifsStore.createIndex('addedAtIndex', 'addedAt')
           }
 
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
@@ -920,6 +934,137 @@ class IndexedDbService {
         reject(event)
       }
     })
+  }
+
+  async putFavoriteGif(record: TGifRecord): Promise<void> {
+    return this.putGif(StoreNames.FAVORITE_GIFS, record)
+  }
+
+  async deleteFavoriteGif(id: string): Promise<void> {
+    return this.deleteGif(StoreNames.FAVORITE_GIFS, id)
+  }
+
+  async getAllFavoriteGifs(): Promise<TGifRecord[]> {
+    return this.getAllGifs(StoreNames.FAVORITE_GIFS)
+  }
+
+  async putRecentGif(record: TGifRecord, max: number): Promise<void> {
+    await this.putGif(StoreNames.RECENT_GIFS, record)
+    return this.trimRecentGifs(max)
+  }
+
+  async getAllRecentGifs(): Promise<TGifRecord[]> {
+    return this.getAllGifs(StoreNames.RECENT_GIFS)
+  }
+
+  private putGif(storeName: string, record: TGifRecord): Promise<void> {
+    return this.initPromise!.then(
+      () =>
+        new Promise((resolve, reject) => {
+          if (!this.db) return reject('database not initialized')
+          const transaction = this.db.transaction(storeName, 'readwrite')
+          const store = transaction.objectStore(storeName)
+          const putRequest = store.put(record)
+          putRequest.onsuccess = () => {
+            transaction.commit()
+            resolve()
+          }
+          putRequest.onerror = (event) => {
+            transaction.commit()
+            reject(event)
+          }
+        })
+    )
+  }
+
+  private deleteGif(storeName: string, id: string): Promise<void> {
+    return this.initPromise!.then(
+      () =>
+        new Promise((resolve, reject) => {
+          if (!this.db) return reject('database not initialized')
+          const transaction = this.db.transaction(storeName, 'readwrite')
+          const store = transaction.objectStore(storeName)
+          const deleteRequest = store.delete(id)
+          deleteRequest.onsuccess = () => {
+            transaction.commit()
+            resolve()
+          }
+          deleteRequest.onerror = (event) => {
+            transaction.commit()
+            reject(event)
+          }
+        })
+    )
+  }
+
+  private getAllGifs(storeName: string): Promise<TGifRecord[]> {
+    return this.initPromise!.then(
+      () =>
+        new Promise((resolve, reject) => {
+          if (!this.db) return reject('database not initialized')
+          const transaction = this.db.transaction(storeName, 'readonly')
+          const store = transaction.objectStore(storeName)
+          const index = store.index('addedAtIndex')
+          const request = index.openCursor(null, 'prev')
+          const results: TGifRecord[] = []
+          request.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest).result
+            if (cursor) {
+              results.push(cursor.value as TGifRecord)
+              cursor.continue()
+            } else {
+              transaction.commit()
+              resolve(results)
+            }
+          }
+          request.onerror = (event) => {
+            transaction.commit()
+            reject(event)
+          }
+        })
+    )
+  }
+
+  private trimRecentGifs(max: number): Promise<void> {
+    return this.initPromise!.then(
+      () =>
+        new Promise((resolve, reject) => {
+          if (!this.db) return reject('database not initialized')
+          const transaction = this.db.transaction(StoreNames.RECENT_GIFS, 'readwrite')
+          const store = transaction.objectStore(StoreNames.RECENT_GIFS)
+          const index = store.index('addedAtIndex')
+          // Cursor walks oldest → newest; delete entries until only `max` remain.
+          const countRequest = store.count()
+          countRequest.onsuccess = () => {
+            const overflow = countRequest.result - max
+            if (overflow <= 0) {
+              transaction.commit()
+              return resolve()
+            }
+            let removed = 0
+            const cursorRequest = index.openCursor(null, 'next')
+            cursorRequest.onsuccess = (event) => {
+              const cursor = (event.target as IDBRequest).result
+              if (cursor && removed < overflow) {
+                cursor.delete()
+                removed++
+                cursor.continue()
+              } else {
+                transaction.commit()
+                resolve()
+              }
+            }
+            cursorRequest.onerror = (event) => {
+              transaction.commit()
+              reject(event)
+            }
+          }
+          countRequest.onerror = (event) => {
+            transaction.commit()
+            reject(event)
+          }
+        })
+    )
   }
 
   async deleteDmMessagesByParticipantsKey(participantsKey: string): Promise<void> {
