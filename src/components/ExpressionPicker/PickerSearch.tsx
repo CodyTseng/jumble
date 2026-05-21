@@ -3,13 +3,15 @@ import { Search, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function GifPickerSearch({
+export default function PickerSearch({
   value,
   onChange,
+  placeholder,
   autoFocus
 }: {
   value: string
   onChange: (value: string) => void
+  placeholder: string
   autoFocus?: boolean
 }) {
   const { t } = useTranslation()
@@ -26,7 +28,7 @@ export default function GifPickerSearch({
         ref={inputRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={t('Search GIFs')}
+        placeholder={placeholder}
         className="h-10 ps-8 pe-8"
       />
       {value && (

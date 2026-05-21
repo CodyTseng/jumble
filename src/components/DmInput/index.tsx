@@ -1,7 +1,7 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
 import Emoji from '@/components/Emoji'
-import EmojiPickerDialog from '@/components/EmojiPickerDialog'
 import FollowingBadge from '@/components/FollowingBadge'
+import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import Nip05 from '@/components/Nip05'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
@@ -14,6 +14,7 @@ import cryptoFileService from '@/services/crypto-file.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import recentEmojiService from '@/services/recent-emoji.service'
 import dmService from '@/services/dm.service'
+import { TGif } from '@/services/klipy.service'
 import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from '@/services/media-upload.service'
 import { TEmoji, TProfile } from '@/types'
 import { nip19 } from 'nostr-tools'
@@ -693,6 +694,39 @@ export default function DmInput({
     }
   }
 
+  const handlePickerGif = useCallback(
+    (gif: TGif | undefined) => {
+      if (!gif) return
+      const div = editableRef.current
+      if (!div) return
+      div.focus()
+
+      const sel = window.getSelection()
+      if (!sel || !sel.rangeCount || !div.contains(sel.anchorNode)) {
+        const range = document.createRange()
+        range.selectNodeContents(div)
+        range.collapse(false)
+        sel?.removeAllRanges()
+        sel?.addRange(range)
+      }
+
+      const range = sel!.getRangeAt(0)
+      range.deleteContents()
+
+      const currentText = serializeContent()
+      const prefix = currentText.length > 0 && !/\s$/.test(currentText) ? '\n' : ''
+      const textNode = document.createTextNode(`${prefix}${gif.url} `)
+      range.insertNode(textNode)
+      range.setStartAfter(textNode)
+      range.collapse(true)
+      sel!.removeAllRanges()
+      sel!.addRange(range)
+
+      setContent(serializeContent())
+    },
+    [serializeContent]
+  )
+
   const handlePickerEmoji = useCallback(
     (emoji: string | TEmoji | undefined) => {
       if (!emoji) return
@@ -872,8 +906,10 @@ export default function DmInput({
             multiple
           />
         </div>
-        <EmojiPickerDialog
+        <ExpressionPickerDialog
+          enableGif
           onEmojiClick={handlePickerEmoji}
+          onGifClick={handlePickerGif}
           onOpenChange={(open) => {
             if (open) editableRef.current?.blur()
           }}
@@ -884,7 +920,7 @@ export default function DmInput({
           >
             <Smile className="h-5 w-5" />
           </button>
-        </EmojiPickerDialog>
+        </ExpressionPickerDialog>
         <div
           ref={editableRef}
           contentEditable={!disabled}

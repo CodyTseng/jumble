@@ -6,17 +6,13 @@ import { ArrowLeft } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import GifGrid from './GifGrid'
-import GifPickerSearch from './GifPickerSearch'
-import GifPickerTabs, { TGifTabId } from './GifPickerTabs'
+import GifTabs, { TGifTabId } from './GifTabs'
+import PickerSearch from './PickerSearch'
 
 const PAGE_LIMIT = 24
 const SEARCH_DEBOUNCE_MS = 300
 
-export default function GifPicker({
-  onGifClick
-}: {
-  onGifClick: (gif: TGif) => void
-}) {
+export default function GifContent({ onGifClick }: { onGifClick: (gif: TGif) => void }) {
   const { t, i18n } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const enabled = klipyService.isEnabled()
@@ -25,10 +21,6 @@ export default function GifPicker({
 
   const [query, setQuery] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  // Smart default: land on recents if any exist, else trending. On the very
-  // first picker open after a page load, IndexedDB has not been hydrated yet
-  // so the initializer sees an empty list — the effect below promotes the
-  // tab to 'recent' once hydration completes, unless the user has interacted.
   const [activeTabId, setActiveTabId] = useState<TGifTabId>(() =>
     gifService.getRecents().length > 0 ? 'recent' : 'trending'
   )
@@ -54,9 +46,6 @@ export default function GifPicker({
 
   const favoriteIds = useMemo(() => new Set(favorites.map((g) => g.id)), [favorites])
 
-  // Whenever the active fetch context changes, reset and load the first page.
-  // The fetch context is: search mode + (query OR trending tab). Local tabs
-  // (favorites/recent) don't hit the network.
   const fetchContextKey = useMemo(() => {
     if (searchMode) return `search:${query.trim()}`
     if (activeTabId === 'trending') return 'trending'
@@ -163,7 +152,7 @@ export default function GifPicker({
 
   if (!enabled) {
     return (
-      <div className="flex h-[400px] w-full sm:h-[50vh] flex-col items-center justify-center bg-background p-6 text-center text-sm text-muted-foreground sm:w-[480px]">
+      <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-muted-foreground">
         {t('GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.')}
       </div>
     )
@@ -181,7 +170,7 @@ export default function GifPicker({
         : t('No GIFs found')
 
   return (
-    <div className="flex h-[400px] w-full sm:h-[50vh] flex-col bg-background sm:w-[480px]">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       {searchMode ? (
         <div className="flex items-center gap-1 border-b px-1.5 py-1">
           <button
@@ -192,10 +181,15 @@ export default function GifPicker({
           >
             <ArrowLeft className="size-5 rtl:-scale-x-100" />
           </button>
-          <GifPickerSearch value={query} onChange={setQuery} autoFocus />
+          <PickerSearch
+            value={query}
+            onChange={setQuery}
+            placeholder={t('Search GIFs')}
+            autoFocus
+          />
         </div>
       ) : (
-        <GifPickerTabs
+        <GifTabs
           activeTabId={activeTabId}
           onChange={handleTabChange}
           onSearchClick={() => setSearchMode(true)}
@@ -220,9 +214,9 @@ export default function GifPicker({
           onPick={handlePick}
         />
       )}
-      <div className="border-t px-2 py-1 text-center text-[10px] text-muted-foreground">
+      <span className="pointer-events-none absolute bottom-1.5 end-1.5 rounded-md border bg-background/95 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-muted-foreground shadow-sm backdrop-blur-sm">
         {t('Powered by KLIPY')}
-      </div>
+      </span>
     </div>
   )
 }

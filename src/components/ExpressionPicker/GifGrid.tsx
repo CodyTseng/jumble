@@ -41,9 +41,6 @@ export default function GifGrid({
     return () => observer.disconnect()
   }, [onLoadMore])
 
-  // Manually distribute items into columns. Each item lands in the currently
-  // shortest column, so appending new pages never reshuffles prior items —
-  // their column placement only depends on items already in front of them.
   const columns = useMemo(() => {
     const cols: TGif[][] = Array.from({ length: columnCount }, () => [])
     const heights = new Array<number>(columnCount).fill(0)

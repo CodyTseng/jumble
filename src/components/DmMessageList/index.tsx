@@ -7,7 +7,7 @@ import {
   EmbeddedWebsocketUrl
 } from '@/components/Embedded'
 import Emoji from '@/components/Emoji'
-import EmojiPicker from '@/components/EmojiPicker'
+import ExpressionPicker from '@/components/ExpressionPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
@@ -689,7 +689,7 @@ function MessageBubble({
               <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
               <PopoverContent side="top" className="w-fit overflow-hidden border-0 p-0 shadow-lg">
                 {isPickerOpen ? (
-                  <EmojiPicker
+                  <ExpressionPicker
                     onEmojiClick={(emoji) => {
                       handleEmojiSelect(emoji)
                     }}
@@ -754,7 +754,7 @@ function MessageBubble({
                 </button>
               </div>
             ) : (
-              <EmojiPicker
+              <ExpressionPicker
                 onEmojiClick={(emoji) => {
                   if (!emoji) return
                   handleEmojiSelect(emoji)

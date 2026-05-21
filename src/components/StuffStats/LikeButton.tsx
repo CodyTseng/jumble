@@ -20,7 +20,7 @@ import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Emoji from '../Emoji'
-import EmojiPicker from '../EmojiPicker'
+import ExpressionPicker from '../ExpressionPicker'
 import SuggestedEmojis from '../SuggestedEmojis'
 import { formatCount } from './utils'
 import { formatError } from '@/lib/error'
@@ -147,7 +147,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
         <Drawer open={isEmojiReactionsOpen} onOpenChange={setIsEmojiReactionsOpen}>
           <DrawerOverlay onClick={() => setIsEmojiReactionsOpen(false)} />
           <DrawerContent hideOverlay>
-            <EmojiPicker
+            <ExpressionPicker
               onEmojiClick={(emoji) => {
                 setIsEmojiReactionsOpen(false)
                 if (!emoji) return
@@ -166,7 +166,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
       <PopoverAnchor asChild>{trigger}</PopoverAnchor>
       <PopoverContent side="top" className="w-fit overflow-hidden border-0 p-0 shadow-lg">
         {isPickerOpen ? (
-          <EmojiPicker
+          <ExpressionPicker
             onEmojiClick={(emoji) => {
               setIsEmojiReactionsOpen(false)
               like(emoji)

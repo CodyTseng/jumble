@@ -937,6 +937,7 @@ export default {
     'Remove from favorites': 'Remove from favorites',
     'Powered by KLIPY': 'Powered by KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
-      'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.'
+      'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.',
+    Emoji: 'Emoji'
   }
 }

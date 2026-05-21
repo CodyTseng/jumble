@@ -7,7 +7,7 @@ export type TGifTabId = 'trending' | 'favorites' | 'recent'
 const tabClass =
   'flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
 
-export default function GifPickerTabs({
+export default function GifTabs({
   activeTabId,
   onChange,
   onSearchClick

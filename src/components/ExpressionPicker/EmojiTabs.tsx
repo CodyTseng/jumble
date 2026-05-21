@@ -5,20 +5,20 @@ import { TEmoji, TEmojiPack } from '@/types'
 import { Search, Smile, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export type TPickerTabId = 'system' | 'standalone' | string
+export type TEmojiTabId = 'system' | 'standalone' | string
 
 const tabClass =
   'flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
 
-export default function EmojiPickerTabs({
+export default function EmojiTabs({
   activeTabId,
   onChange,
   onSearchClick,
   showStandalone,
   packs
 }: {
-  activeTabId: TPickerTabId
-  onChange: (id: TPickerTabId) => void
+  activeTabId: TEmojiTabId
+  onChange: (id: TEmojiTabId) => void
   onSearchClick: () => void
   showStandalone: boolean
   packs: TEmojiPack[]
