@@ -207,7 +207,8 @@ interface HistoryEntry {
 
 interface RpcResponse {
   jsonrpc?: string
-  id: number
+  id?: number
+  method?: string
   result?: unknown
   error?: { code: number; message: string }
 }
@@ -216,7 +217,7 @@ interface RpcResponse {
  * Batch multiple JSON-RPC calls over a single WebSocket connection.
  * Sends requests sequentially but keeps the socket open until all are done.
  */
-function wsRpcBatch(
+export function wsRpcBatch(
   url: string,
   calls: Array<{ method: string; params: unknown[] }>,
   timeoutMs = 20000
@@ -248,22 +249,35 @@ function wsRpcBatch(
       if (settled) return
       try {
         const data = typeof ev.data === 'string' ? ev.data : String(ev.data)
-        const msg: RpcResponse = JSON.parse(data.trim())
-        if (msg.error) {
-          settled = true
-          clearTimeout(timer)
-          ws.close()
-          reject(new Error(msg.error.message || `RPC error ${msg.error.code}`))
-          return
-        }
-        results.push(msg.result)
-        callIndex++
-        if (callIndex >= calls.length) {
-          settled = true
-          clearTimeout(timer)
-          ws.close()
-          resolve(results)
-        } else {
+        // ElectrumX may pack multiple JSON-RPC messages into a single frame,
+        // separated by newlines.
+        for (const line of data.split('\n')) {
+          const trimmed = line.trim()
+          if (!trimmed || settled) continue
+          const msg: RpcResponse = JSON.parse(trimmed)
+          // ElectrumX is bidirectional JSON-RPC: the server initiates its own
+          // RPC calls at us (server.banner, blockchain.headers.subscribe,
+          // blockchain.relayfee, blockchain.estimatefee, …) which arrive
+          // interleaved with — and often before — responses to our outstanding
+          // requests. Only consume frames whose id matches the call we're
+          // waiting on; ignore everything else.
+          if (msg.id !== callIndex + 1) continue
+          if (msg.error) {
+            settled = true
+            clearTimeout(timer)
+            ws.close()
+            reject(new Error(msg.error.message || `RPC error ${msg.error.code}`))
+            return
+          }
+          results.push(msg.result)
+          callIndex++
+          if (callIndex >= calls.length) {
+            settled = true
+            clearTimeout(timer)
+            ws.close()
+            resolve(results)
+            return
+          }
           sendNext()
         }
       } catch (err) {
