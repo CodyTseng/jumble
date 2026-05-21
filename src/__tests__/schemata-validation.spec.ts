@@ -42,6 +42,7 @@ vi.mock('@/services/media-upload.service', () => ({
 
 // ── Imports ─────────────────────────────────────────────────────────────
 import { createRequire } from 'node:module'
+import path from 'node:path'
 import Ajv from 'ajv'
 import ajvErrors from 'ajv-errors'
 import { kinds, type Event } from 'nostr-tools'
@@ -73,9 +74,8 @@ import { ExtendedKind } from '@/constants'
 
 // ── Schema loading ──────────────────────────────────────────────────────
 const require_ = createRequire(import.meta.url)
-const schemataBase = require_
-  .resolve('@nostrability/schemata')
-  .replace(/\/dist\/.*/, '/dist/nips')
+const schemataPackageRoot = path.dirname(require_.resolve('@nostrability/schemata/package.json'))
+const schemataBase = path.join(schemataPackageRoot, 'dist', 'nips')
 
 function loadSchema(path: string): object {
   return require_(`${schemataBase}/${path}`)

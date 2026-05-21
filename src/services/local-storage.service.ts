@@ -77,6 +77,7 @@ class LocalStorageService {
   private mutedWords: string[] = []
   private minTrustScore: number = 0
   private minTrustScoreMap: Record<string, number> = {}
+  private hideFollowedAuthorsFeedMap: Record<string, boolean> = {}
   private hideIndirectNotifications: boolean = false
   private encryptionKeyPrivkeyMap: Record<string, string> = {}
   private clientKeyPrivkeyMap: Record<string, string> = {}
@@ -361,6 +362,20 @@ class LocalStorageService {
         const map = JSON.parse(minTrustScoreMapStr)
         if (typeof map === 'object' && map !== null) {
           this.minTrustScoreMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const hideFollowedAuthorsFeedMapStr = window.localStorage.getItem(
+      StorageKey.HIDE_FOLLOWED_AUTHORS_FEED_MAP
+    )
+    if (hideFollowedAuthorsFeedMapStr) {
+      try {
+        const map = JSON.parse(hideFollowedAuthorsFeedMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.hideFollowedAuthorsFeedMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -942,6 +957,24 @@ class LocalStorageService {
     const { [feedId]: _, ...rest } = this.showKindsMap
     this.showKindsMap = rest
     window.localStorage.setItem(StorageKey.SHOW_KINDS_MAP, JSON.stringify(this.showKindsMap))
+  }
+
+  getHideFollowedAuthorsForFeed(feedId: string): boolean {
+    return this.hideFollowedAuthorsFeedMap[feedId] ?? false
+  }
+
+  setHideFollowedAuthorsForFeed(feedId: string, hide: boolean) {
+    const nextMap = { ...this.hideFollowedAuthorsFeedMap }
+    if (hide) {
+      nextMap[feedId] = true
+    } else {
+      delete nextMap[feedId]
+    }
+    this.hideFollowedAuthorsFeedMap = nextMap
+    window.localStorage.setItem(
+      StorageKey.HIDE_FOLLOWED_AUTHORS_FEED_MAP,
+      JSON.stringify(nextMap)
+    )
   }
 
   getHideContentMentioningMutedUsers() {

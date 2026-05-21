@@ -49,6 +49,7 @@ export const StorageKey = {
   MUTED_WORDS: 'mutedWords',
   MIN_TRUST_SCORE: 'minTrustScore',
   MIN_TRUST_SCORE_MAP: 'minTrustScoreMap',
+  HIDE_FOLLOWED_AUTHORS_FEED_MAP: 'hideFollowedAuthorsFeedMap',
   SEARCH_RELAY_URLS: 'searchRelayUrls',
   SEARCH_HISTORY: 'searchHistory',
   HIDE_INDIRECT_NOTIFICATIONS: 'hideIndirectNotifications',

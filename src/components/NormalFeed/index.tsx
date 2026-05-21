@@ -9,7 +9,7 @@ import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { TFeedSubRequest, TFeedTabConfig } from '@/types'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
 
@@ -20,7 +20,9 @@ export default function NormalFeed({
   showRelayCloseReason = false,
   disable24hMode = false,
   onRefresh,
-  isPubkeyFeed = false
+  isPubkeyFeed = false,
+  hiddenAuthorPubkeys,
+  extraOptions
 }: {
   feedId: string
   subRequests: TFeedSubRequest[]
@@ -29,6 +31,8 @@ export default function NormalFeed({
   disable24hMode?: boolean
   onRefresh?: () => void
   isPubkeyFeed?: boolean
+  hiddenAuthorPubkeys?: ReadonlySet<string>
+  extraOptions?: ReactNode
 }) {
   const { getShowKinds } = useKindFilter()
   const { getMinTrustScore } = useUserTrust()
@@ -117,6 +121,7 @@ export default function NormalFeed({
             {showTrustScoreFilter && (
               <TrustScoreFilter filterId={feedId} onOpenChange={handleTrustFilterOpenChange} />
             )}
+            {extraOptions}
             {!subRequestsHaveKinds && !tabHasFixedKinds && (
               <KindFilter
                 feedId={feedId}
@@ -139,6 +144,7 @@ export default function NormalFeed({
             showRelayCloseReason={showRelayCloseReason}
             isPubkeyFeed={isPubkeyFeed}
             trustScoreThreshold={trustScoreThreshold}
+            hiddenAuthorPubkeys={hiddenAuthorPubkeys}
           />
         ) : (
           <NoteList
@@ -150,6 +156,7 @@ export default function NormalFeed({
             showRelayCloseReason={showRelayCloseReason}
             isPubkeyFeed={isPubkeyFeed}
             trustScoreThreshold={trustScoreThreshold}
+            hiddenAuthorPubkeys={hiddenAuthorPubkeys}
           />
         )
       ) : null}

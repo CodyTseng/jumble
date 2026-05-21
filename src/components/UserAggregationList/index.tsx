@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
 import { isMentioningMutedUsers } from '@/lib/event'
+import { isFollowedAuthor } from '@/lib/feed-filter'
 import { toNote, toUserAggregationDetail } from '@/lib/link'
 import { mergeTimelines } from '@/lib/timeline'
 import { cn, isTouchDevice } from '@/lib/utils'
@@ -56,6 +57,7 @@ const UserAggregationList = forwardRef<
     showRelayCloseReason?: boolean
     isPubkeyFeed?: boolean
     trustScoreThreshold?: number
+    hiddenAuthorPubkeys?: ReadonlySet<string>
   }
 >(
   (
@@ -66,7 +68,8 @@ const UserAggregationList = forwardRef<
       areAlgoRelays = false,
       showRelayCloseReason = false,
       isPubkeyFeed = false,
-      trustScoreThreshold
+      trustScoreThreshold,
+      hiddenAuthorPubkeys
     },
     ref
   ) => {
@@ -275,6 +278,7 @@ const UserAggregationList = forwardRef<
             if (evt.pubkey === currentPubkey) return null
             if (evt.created_at < since) return null
             if (isEventDeleted(evt)) return null
+            if (isFollowedAuthor(evt, hiddenAuthorPubkeys)) return null
             if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return null
             if (
               filterMutedNotes &&
@@ -300,6 +304,7 @@ const UserAggregationList = forwardRef<
       [
         mutePubkeySet,
         isEventDeleted,
+        hiddenAuthorPubkeys,
         currentPubkey,
         filterMutedNotes,
         hideContentMentioningMutedUsers,

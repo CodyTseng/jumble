@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
+import { isFollowedAuthor } from '@/lib/feed-filter'
 import { tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -54,6 +55,7 @@ const NoteList = forwardRef<
     areAlgoRelays?: boolean
     showRelayCloseReason?: boolean
     pinnedEventIds?: string[]
+    hiddenAuthorPubkeys?: ReadonlySet<string>
     filterFn?: (event: Event) => boolean
     showNewNotesDirectly?: boolean
     isPubkeyFeed?: boolean
@@ -71,6 +73,7 @@ const NoteList = forwardRef<
       areAlgoRelays = false,
       showRelayCloseReason = false,
       pinnedEventIds,
+      hiddenAuthorPubkeys,
       filterFn,
       showNewNotesDirectly = false,
       isPubkeyFeed = false,
@@ -125,6 +128,7 @@ const NoteList = forwardRef<
       (evt: Event) => {
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
+        if (isFollowedAuthor(evt, hiddenAuthorPubkeys)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
         if (
           filterMutedNotes &&
@@ -147,7 +151,7 @@ const NoteList = forwardRef<
 
         return false
       },
-      [mutePubkeySet, isEventDeleted, filterFn, mutedWords, pinnedEventHexIdSet]
+      [mutePubkeySet, isEventDeleted, hiddenAuthorPubkeys, filterFn, mutedWords, pinnedEventHexIdSet]
     )
 
     useEffect(() => {
