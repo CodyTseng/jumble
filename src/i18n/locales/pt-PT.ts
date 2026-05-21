@@ -911,6 +911,21 @@ export default {
       'Para evitar enviar a sua chave de encriptação para um dispositivo desconhecido, verifique se este código corresponde ao apresentado no outro dispositivo.',
     'Edit DM relays': 'Editar relays de MD',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'Se a chave nunca chegar, ou a reposição falhar, os seus relays de MD podem estar inacessíveis. Tente editá-los.'
+      'Se a chave nunca chegar, ou a reposição falhar, os seus relays de MD podem estar inacessíveis. Tente editá-los.',
+    GIF: 'GIF',
+    'Search GIFs': 'Pesquisar GIFs',
+    Favorites: 'Favoritos',
+    Recent: 'Recentes',
+    'No GIFs found': 'Nenhum GIF encontrado',
+    'Type to search GIFs': 'Escreva para pesquisar GIFs',
+    'No favorite GIFs yet': 'Ainda sem GIFs favoritos',
+    'No recent GIFs yet': 'Ainda sem GIFs recentes',
+    'Failed to load GIFs': 'Falha ao carregar GIFs',
+    'Add to favorites': 'Adicionar aos favoritos',
+    'Remove from favorites': 'Remover dos favoritos',
+    'Powered by KLIPY': 'Distribuído por KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'O seletor de GIF não está configurado. Defina VITE_KLIPY_API_KEY para o ativar.',
+    Emoji: 'Emoji'
   }
 }

@@ -911,6 +911,21 @@ export default {
       'Чтобы не отправить ключ шифрования на неизвестное устройство, проверьте, что этот код совпадает с кодом, показанным на другом устройстве.',
     'Edit DM relays': 'Изменить релеи для ЛС',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'Если ключ так и не приходит или сброс не удаётся, ваши релеи для ЛС могут быть недоступны. Попробуйте изменить их.'
+      'Если ключ так и не приходит или сброс не удаётся, ваши релеи для ЛС могут быть недоступны. Попробуйте изменить их.',
+    GIF: 'GIF',
+    'Search GIFs': 'Поиск GIF',
+    Favorites: 'Избранное',
+    Recent: 'Недавние',
+    'No GIFs found': 'GIF не найдены',
+    'Type to search GIFs': 'Введите для поиска GIF',
+    'No favorite GIFs yet': 'Пока нет избранных GIF',
+    'No recent GIFs yet': 'Пока нет недавних GIF',
+    'Failed to load GIFs': 'Не удалось загрузить GIF',
+    'Add to favorites': 'Добавить в избранное',
+    'Remove from favorites': 'Удалить из избранного',
+    'Powered by KLIPY': 'При поддержке KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'Выбор GIF не настроен. Установите VITE_KLIPY_API_KEY для активации.',
+    Emoji: 'Эмодзи'
   }
 }

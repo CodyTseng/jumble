@@ -889,6 +889,21 @@ export default {
       'เพื่อหลีกเลี่ยงการส่งกุญแจเข้ารหัสของคุณไปยังอุปกรณ์ที่ไม่รู้จัก โปรดตรวจสอบว่ารหัสนี้ตรงกับรหัสที่แสดงบนอุปกรณ์อีกเครื่อง',
     'Edit DM relays': 'แก้ไขรีเลย์ DM',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'หากคีย์ไม่มาถึง หรือการรีเซ็ตล้มเหลว รีเลย์ DM ของคุณอาจเข้าถึงไม่ได้ ลองแก้ไขรีเลย์เหล่านั้น'
+      'หากคีย์ไม่มาถึง หรือการรีเซ็ตล้มเหลว รีเลย์ DM ของคุณอาจเข้าถึงไม่ได้ ลองแก้ไขรีเลย์เหล่านั้น',
+    GIF: 'GIF',
+    'Search GIFs': 'ค้นหา GIF',
+    Favorites: 'รายการโปรด',
+    Recent: 'ล่าสุด',
+    'No GIFs found': 'ไม่พบ GIF',
+    'Type to search GIFs': 'พิมพ์เพื่อค้นหา GIF',
+    'No favorite GIFs yet': 'ยังไม่มี GIF โปรด',
+    'No recent GIFs yet': 'ยังไม่มี GIF ล่าสุด',
+    'Failed to load GIFs': 'โหลด GIF ไม่สำเร็จ',
+    'Add to favorites': 'เพิ่มในรายการโปรด',
+    'Remove from favorites': 'ลบจากรายการโปรด',
+    'Powered by KLIPY': 'ขับเคลื่อนโดย KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'ยังไม่ได้กำหนดค่าตัวเลือก GIF กำหนด VITE_KLIPY_API_KEY เพื่อเปิดใช้งาน',
+    Emoji: 'อิโมจิ'
   }
 }

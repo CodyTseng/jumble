@@ -905,6 +905,21 @@ export default {
       '暗号鍵を不明なデバイスに送信しないよう、このコードがもう一方のデバイスに表示されているコードと一致しているか確認してください。',
     'Edit DM relays': 'DMリレーを編集',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      '鍵が届かない場合やリセットに失敗した場合、DMリレーに接続できない可能性があります。リレーを編集してみてください。'
+      '鍵が届かない場合やリセットに失敗した場合、DMリレーに接続できない可能性があります。リレーを編集してみてください。',
+    GIF: 'GIF',
+    'Search GIFs': 'GIFを検索',
+    Favorites: 'お気に入り',
+    Recent: '最近',
+    'No GIFs found': 'GIFが見つかりません',
+    'Type to search GIFs': 'GIFを検索するには入力してください',
+    'No favorite GIFs yet': 'まだお気に入りのGIFはありません',
+    'No recent GIFs yet': '最近使用したGIFはありません',
+    'Failed to load GIFs': 'GIFの読み込みに失敗しました',
+    'Add to favorites': 'お気に入りに追加',
+    'Remove from favorites': 'お気に入りから削除',
+    'Powered by KLIPY': 'Powered by KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIFピッカーが設定されていません。有効にするにはVITE_KLIPY_API_KEYを設定してください。',
+    Emoji: '絵文字'
   }
 }

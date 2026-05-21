@@ -913,6 +913,21 @@ export default {
       'Aby uniknąć wysłania klucza szyfrującego do nieznanego urządzenia, sprawdź, czy ten kod zgadza się z kodem wyświetlanym na drugim urządzeniu.',
     'Edit DM relays': 'Edytuj transmitery WP',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'Jeśli klucz nigdy nie dotrze lub resetowanie się nie powiedzie, Twoje transmitery WP mogą być nieosiągalne. Spróbuj je edytować.'
+      'Jeśli klucz nigdy nie dotrze lub resetowanie się nie powiedzie, Twoje transmitery WP mogą być nieosiągalne. Spróbuj je edytować.',
+    GIF: 'GIF',
+    'Search GIFs': 'Szukaj GIF-ów',
+    Favorites: 'Ulubione',
+    Recent: 'Ostatnie',
+    'No GIFs found': 'Nie znaleziono GIF-ów',
+    'Type to search GIFs': 'Wpisz, aby wyszukać GIF-y',
+    'No favorite GIFs yet': 'Brak ulubionych GIF-ów',
+    'No recent GIFs yet': 'Brak ostatnich GIF-ów',
+    'Failed to load GIFs': 'Nie udało się załadować GIF-ów',
+    'Add to favorites': 'Dodaj do ulubionych',
+    'Remove from favorites': 'Usuń z ulubionych',
+    'Powered by KLIPY': 'Wspierane przez KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'Selektor GIF nie jest skonfigurowany. Ustaw VITE_KLIPY_API_KEY, aby go włączyć.',
+    Emoji: 'Emoji'
   }
 }

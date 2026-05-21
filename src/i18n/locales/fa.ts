@@ -905,6 +905,21 @@ export default {
       'برای جلوگیری از ارسال کلید رمزنگاری به دستگاه ناشناس، بررسی کنید که این کد با کد نمایش‌داده‌شده روی دستگاه دیگر مطابقت دارد.',
     'Edit DM relays': 'ویرایش رله‌های پیام خصوصی',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'اگر کلید هرگز نرسد یا بازنشانی ناموفق باشد، ممکن است رله‌های پیام خصوصی شما در دسترس نباشند. سعی کنید آن‌ها را ویرایش کنید.'
+      'اگر کلید هرگز نرسد یا بازنشانی ناموفق باشد، ممکن است رله‌های پیام خصوصی شما در دسترس نباشند. سعی کنید آن‌ها را ویرایش کنید.',
+    GIF: 'GIF',
+    'Search GIFs': 'جستجوی GIF',
+    Favorites: 'علاقه‌مندی‌ها',
+    Recent: 'اخیر',
+    'No GIFs found': 'GIF یافت نشد',
+    'Type to search GIFs': 'برای جستجوی GIF تایپ کنید',
+    'No favorite GIFs yet': 'هنوز GIF مورد علاقه‌ای ندارید',
+    'No recent GIFs yet': 'هنوز GIF اخیری وجود ندارد',
+    'Failed to load GIFs': 'بارگذاری GIF با شکست مواجه شد',
+    'Add to favorites': 'افزودن به علاقه‌مندی‌ها',
+    'Remove from favorites': 'حذف از علاقه‌مندی‌ها',
+    'Powered by KLIPY': 'قدرت‌گرفته از KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'انتخابگر GIF پیکربندی نشده است. برای فعال‌سازی VITE_KLIPY_API_KEY را تنظیم کنید.',
+    Emoji: 'ایموجی'
   }
 }

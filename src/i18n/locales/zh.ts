@@ -876,6 +876,21 @@ export default {
       '为避免将加密密钥发送给未知设备，请检查配对码是否与另一台设备上显示的一致。',
     'Edit DM relays': '编辑私信中继',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      '若密钥始终未送达，或重置失败，可能是你的私信中继无法访问。请尝试编辑它们。'
+      '若密钥始终未送达，或重置失败，可能是你的私信中继无法访问。请尝试编辑它们。',
+    GIF: 'GIF',
+    'Search GIFs': '搜索 GIF',
+    Favorites: '收藏',
+    Recent: '最近',
+    'No GIFs found': '未找到 GIF',
+    'Type to search GIFs': '输入以搜索 GIF',
+    'No favorite GIFs yet': '还没有收藏的 GIF',
+    'No recent GIFs yet': '还没有最近使用的 GIF',
+    'Failed to load GIFs': '加载 GIF 失败',
+    'Add to favorites': '添加到收藏',
+    'Remove from favorites': '取消收藏',
+    'Powered by KLIPY': '由 KLIPY 提供支持',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF 选择器未配置。设置 VITE_KLIPY_API_KEY 以启用。',
+    Emoji: '表情'
   }
 }

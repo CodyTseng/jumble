@@ -18,13 +18,7 @@ export default function ExpressionPicker({
   const [mode, setMode] = useState<TExpressionPickerMode>('emoji')
 
   return (
-    <div
-      className={
-        showGifMode
-          ? 'flex h-[400px] w-full flex-col bg-background sm:h-[50vh] sm:w-[420px]'
-          : 'flex h-[400px] w-full flex-col bg-background sm:w-[350px]'
-      }
-    >
+    <div className="flex h-[400px] w-full flex-col bg-background sm:h-[50vh] sm:w-[420px]">
       {showGifMode && mode === 'gif' ? (
         <GifContent onGifClick={onGifClick} />
       ) : (

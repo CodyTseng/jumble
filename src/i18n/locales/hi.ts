@@ -905,6 +905,21 @@ export default {
       'अपनी एन्क्रिप्शन कुंजी किसी अज्ञात डिवाइस को भेजने से बचने के लिए, जांचें कि यह कोड दूसरे डिवाइस पर दिखाए गए कोड से मेल खाता है।',
     'Edit DM relays': 'DM रिले संपादित करें',
     'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
-      'यदि कुंजी कभी नहीं आती, या रीसेट विफल हो जाता है, तो आपके DM रिले अनुपलब्ध हो सकते हैं। उन्हें संपादित करने का प्रयास करें।'
+      'यदि कुंजी कभी नहीं आती, या रीसेट विफल हो जाता है, तो आपके DM रिले अनुपलब्ध हो सकते हैं। उन्हें संपादित करने का प्रयास करें।',
+    GIF: 'GIF',
+    'Search GIFs': 'GIFs खोजें',
+    Favorites: 'पसंदीदा',
+    Recent: 'हाल का',
+    'No GIFs found': 'कोई GIF नहीं मिला',
+    'Type to search GIFs': 'GIFs खोजने के लिए टाइप करें',
+    'No favorite GIFs yet': 'अभी तक कोई पसंदीदा GIF नहीं',
+    'No recent GIFs yet': 'अभी तक कोई हाल का GIF नहीं',
+    'Failed to load GIFs': 'GIFs लोड करने में विफल',
+    'Add to favorites': 'पसंदीदा में जोड़ें',
+    'Remove from favorites': 'पसंदीदा से हटाएं',
+    'Powered by KLIPY': 'KLIPY द्वारा संचालित',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF पिकर कॉन्फ़िगर नहीं है। सक्षम करने के लिए VITE_KLIPY_API_KEY सेट करें।',
+    Emoji: 'इमोजी'
   }
 }

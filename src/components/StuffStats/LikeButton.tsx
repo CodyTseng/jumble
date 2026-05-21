@@ -164,7 +164,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   return (
     <Popover open={isEmojiReactionsOpen} onOpenChange={(open) => setIsEmojiReactionsOpen(open)}>
       <PopoverAnchor asChild>{trigger}</PopoverAnchor>
-      <PopoverContent side="top" className="w-fit overflow-hidden border-0 p-0 shadow-lg">
+      <PopoverContent side="top" className="w-fit overflow-hidden p-0 shadow-lg">
         {isPickerOpen ? (
           <ExpressionPicker
             onEmojiClick={(emoji) => {
