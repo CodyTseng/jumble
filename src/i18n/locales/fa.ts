@@ -960,6 +960,7 @@ export default {
     'Powered by KLIPY': 'قدرت‌گرفته از KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'انتخابگر GIF پیکربندی نشده است. برای فعال‌سازی VITE_KLIPY_API_KEY را تنظیم کنید.',
-    Emoji: 'ایموجی'
+    Emoji: 'ایموجی',
+    Ad: 'تبلیغ'
   }
 }

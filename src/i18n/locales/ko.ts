@@ -951,6 +951,7 @@ export default {
     'Powered by KLIPY': 'KLIPY 제공',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF 선택기가 구성되지 않았습니다. 활성화하려면 VITE_KLIPY_API_KEY를 설정하세요.',
-    Emoji: '이모지'
+    Emoji: '이모지',
+    Ad: '광고'
   }
 }

@@ -58,7 +58,7 @@ export default function GifGrid({
 
   if (items.length === 0 && !loading) {
     return (
-      <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
         {emptyMessage ?? t('No GIFs found')}
       </div>
     )
@@ -81,7 +81,7 @@ export default function GifGrid({
         ))}
       </div>
       {loading && (
-        <div className="flex items-center justify-center py-2 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-center py-2 text-xs">
           {t('Loading...')}
         </div>
       )}
@@ -106,7 +106,7 @@ function GifCell({
     <button
       type="button"
       onClick={() => onPick(gif)}
-      className="group relative block w-full overflow-hidden rounded-md bg-muted/40 transition-opacity hover:opacity-80"
+      className="group bg-muted/40 relative block w-full overflow-hidden rounded-md transition-opacity hover:opacity-80"
       style={{ aspectRatio: aspect }}
       title={gif.description || undefined}
     >
@@ -116,6 +116,11 @@ function GifCell({
         loading="lazy"
         className="h-full w-full object-cover"
       />
+      {gif.isAd && (
+        <span className="pointer-events-none absolute start-1 top-1 rounded bg-black/60 px-1 py-0.5 text-[10px] leading-none font-semibold tracking-wide text-white uppercase">
+          {t('Ad')}
+        </span>
+      )}
       <span
         role="button"
         tabIndex={-1}
@@ -127,13 +132,11 @@ function GifCell({
           gifService.toggleFavorite(gif)
         }}
         className={cn(
-          'absolute end-1 top-1 flex size-7 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/60 group-hover:opacity-100',
+          'absolute end-1 top-1 flex size-7 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60',
           isFavorite && 'opacity-100'
         )}
       >
-        <Heart
-          className={cn('size-4', isFavorite && 'fill-red-500 text-red-500')}
-        />
+        <Heart className={cn('size-4', isFavorite && 'fill-red-500 text-red-500')} />
       </span>
     </button>
   )

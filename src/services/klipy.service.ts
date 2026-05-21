@@ -12,6 +12,8 @@ export type TGif = {
   url: string
   width: number
   height: number
+  /** True when KLIPY tags the item as a sponsored ("ad") slot. Surfaced as a badge in the picker. */
+  isAd?: boolean
 }
 
 export type TGifFetchResult = {
@@ -43,6 +45,8 @@ type KlipyGifItem = {
   id: number | string
   slug?: string
   title?: string
+  /** KLIPY uses `"ad"` for sponsored items, `"gif"` (or omitted) for organic results. */
+  type?: string
   /** Real responses use `file` (singular). Docs sometimes show `files` (plural) — accept both. */
   file?: KlipyMediaSizes
   files?: KlipyMediaSizes
@@ -141,7 +145,8 @@ class KlipyService {
       description: raw.title ?? '',
       url: main.url,
       width: main.width ?? 0,
-      height: main.height ?? 0
+      height: main.height ?? 0,
+      isAd: raw.type === 'ad'
     }
   }
 

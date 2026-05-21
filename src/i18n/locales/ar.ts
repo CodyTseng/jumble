@@ -944,6 +944,7 @@ export default {
     'Powered by KLIPY': 'مدعوم بواسطة KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'لم يتم تكوين منتقي GIF. قم بتعيين VITE_KLIPY_API_KEY للتفعيل.',
-    Emoji: 'إيموجي'
+    Emoji: 'إيموجي',
+    Ad: 'إعلان'
   }
 }

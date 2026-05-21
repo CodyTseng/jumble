@@ -966,6 +966,7 @@ export default {
     'Powered by KLIPY': 'При поддержке KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'Выбор GIF не настроен. Установите VITE_KLIPY_API_KEY для активации.',
-    Emoji: 'Эмодзи'
+    Emoji: 'Эмодзи',
+    Ad: 'Реклама'
   }
 }

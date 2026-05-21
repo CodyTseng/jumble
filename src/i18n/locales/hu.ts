@@ -960,6 +960,7 @@ export default {
     'Powered by KLIPY': 'KLIPY működteti',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'A GIF-választó nincs konfigurálva. Állítsd be a VITE_KLIPY_API_KEY változót az engedélyezéshez.',
-    Emoji: 'Emoji'
+    Emoji: 'Emoji',
+    Ad: 'Hirdetés'
   }
 }

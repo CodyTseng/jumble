@@ -965,6 +965,7 @@ export default {
     'Powered by KLIPY': 'Con tecnología de KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'El selector de GIF no está configurado. Establece VITE_KLIPY_API_KEY para habilitarlo.',
-    Emoji: 'Emoji'
+    Emoji: 'Emoji',
+    Ad: 'Anuncio'
   }
 }

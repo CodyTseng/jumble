@@ -924,6 +924,7 @@ export default {
     'Powered by KLIPY': '由 KLIPY 提供',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF 選擇器未配置。設定 VITE_KLIPY_API_KEY 以啟用。',
-    Emoji: '表情'
+    Emoji: '表情',
+    Ad: '廣告'
   }
 }

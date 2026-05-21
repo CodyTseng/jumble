@@ -960,6 +960,7 @@ export default {
     'Powered by KLIPY': 'KLIPY द्वारा संचालित',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF पिकर कॉन्फ़िगर नहीं है। सक्षम करने के लिए VITE_KLIPY_API_KEY सेट करें।',
-    Emoji: 'इमोजी'
+    Emoji: 'इमोजी',
+    Ad: 'विज्ञापन'
   }
 }

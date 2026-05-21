@@ -944,6 +944,7 @@ export default {
     'Powered by KLIPY': 'ขับเคลื่อนโดย KLIPY',
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'ยังไม่ได้กำหนดค่าตัวเลือก GIF กำหนด VITE_KLIPY_API_KEY เพื่อเปิดใช้งาน',
-    Emoji: 'อิโมจิ'
+    Emoji: 'อิโมจิ',
+    Ad: 'โฆษณา'
   }
 }
