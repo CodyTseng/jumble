@@ -10,6 +10,7 @@ import {
 } from '@/lib/draft-event'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useNostr } from '@/providers/NostrProvider'
+import mediaUpload from '@/services/media-upload.service'
 import postEditorCache from '@/services/post-editor-cache.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
@@ -328,6 +329,13 @@ export default function PostContent({
             }}
             onGifClick={(gif) => {
               if (!gif) return
+              if (gif.width > 0 && gif.height > 0) {
+                mediaUpload.registerImetaTag(gif.url, [
+                  'imeta',
+                  `url ${gif.url}`,
+                  `dim ${gif.width}x${gif.height}`
+                ])
+              }
               textareaRef.current?.appendText(gif.url, true)
             }}
           >

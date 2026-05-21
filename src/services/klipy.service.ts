@@ -5,13 +5,11 @@ const DEFAULT_LIMIT = 24
 
 export type TGif = {
   id: string
-  /** KLIPY slug — also used to register share with /klipy/register-share */
+  /** KLIPY slug, also used to register share with /klipy/register-share */
   slug: string
   description: string
-  /** Full-size GIF URL inserted into the post. */
+  /** Medium-tier GIF URL, used both for picker thumbnails and as the URL inserted into messages. */
   url: string
-  /** Small GIF URL for picker thumbnails. */
-  previewUrl: string
   width: number
   height: number
 }
@@ -132,17 +130,18 @@ class KlipyService {
 
   private normalize(raw: KlipyGifItem): TGif | null {
     const sizes = raw.file ?? raw.files
-    const full = sizes?.hd?.gif ?? sizes?.md?.gif ?? sizes?.sm?.gif
-    const preview = sizes?.sm?.gif ?? sizes?.xs?.gif ?? sizes?.md?.gif ?? full
-    if (!full?.url || !preview?.url) return null
+    // Use xs as the single tier for both picker thumbnails and the URL we send.
+    // xs (~96-150px) keeps the picker grid lightning fast and is the same URL
+    // the chat bubble renders, so the browser cache always hits.
+    const main = sizes?.xs?.gif ?? sizes?.sm?.gif ?? sizes?.md?.gif ?? sizes?.hd?.gif
+    if (!main?.url) return null
     return {
       id: String(raw.id),
       slug: raw.slug ?? String(raw.id),
       description: raw.title ?? '',
-      url: full.url,
-      previewUrl: preview.url,
-      width: full.width ?? 0,
-      height: full.height ?? 0
+      url: main.url,
+      width: main.width ?? 0,
+      height: main.height ?? 0
     }
   }
 

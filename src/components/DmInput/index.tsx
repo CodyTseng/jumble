@@ -698,7 +698,18 @@ export default function DmInput({
     async (gif: TGif | undefined) => {
       if (!gif || !pubkey || disabled) return
       try {
-        await dmService.sendMessage(pubkey, recipientPubkey, gif.url, replyTo ?? undefined)
+        const imetaParts = [`url ${gif.url}`]
+        if (gif.width > 0 && gif.height > 0) {
+          imetaParts.push(`dim ${gif.width}x${gif.height}`)
+        }
+        const imetaTag = ['imeta', ...imetaParts]
+        await dmService.sendMessage(
+          pubkey,
+          recipientPubkey,
+          gif.url,
+          replyTo ?? undefined,
+          [imetaTag]
+        )
         onSent?.()
       } catch (error) {
         console.error('Failed to send GIF:', error)

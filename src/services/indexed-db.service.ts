@@ -54,7 +54,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 21)
+        const request = window.indexedDB.open('jumble', 22)
 
         request.onerror = (event) => {
           reject(event)
@@ -243,6 +243,21 @@ class IndexedDbService {
             }
 
             window.localStorage.removeItem('dmDeletedConversationsMap')
+          }
+
+          // v22: TGifRecord schema changed (dropped previewUrl, url tier
+          // switched from hd to xs). Old records carry stale URLs that no
+          // longer cache-hit against the picker, so wipe favorites and
+          // recents to force a fresh pick.
+          if (oldVersion >= 21 && oldVersion < 22) {
+            if (db.objectStoreNames.contains(StoreNames.FAVORITE_GIFS)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.FAVORITE_GIFS).clear()
+            }
+            if (db.objectStoreNames.contains(StoreNames.RECENT_GIFS)) {
+              const tx = (request.transaction as IDBTransaction)!
+              tx.objectStore(StoreNames.RECENT_GIFS).clear()
+            }
           }
 
           this.db = db

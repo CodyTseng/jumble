@@ -111,7 +111,7 @@ function GifCell({
       title={gif.description || undefined}
     >
       <img
-        src={gif.previewUrl}
+        src={gif.url}
         alt={gif.description}
         loading="lazy"
         className="h-full w-full object-cover"

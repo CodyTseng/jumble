@@ -85,7 +85,6 @@ class GifService {
     return {
       id: gif.id,
       url: gif.url,
-      previewUrl: gif.previewUrl,
       width: gif.width,
       height: gif.height,
       description: gif.description,

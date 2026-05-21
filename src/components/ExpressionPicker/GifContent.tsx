@@ -144,7 +144,6 @@ export default function GifContent({ onGifClick }: { onGifClick: (gif: TGif) => 
       slug: r.id,
       description: r.description,
       url: r.url,
-      previewUrl: r.previewUrl,
       width: r.width,
       height: r.height
     }))
