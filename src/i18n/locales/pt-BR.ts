@@ -945,6 +945,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Certifique-se de que este código corresponde ao exibido no seu outro dispositivo.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Para evitar enviar sua chave de criptografia para um dispositivo desconhecido, verifique se este código corresponde ao exibido no outro dispositivo.'
+      'Para evitar enviar sua chave de criptografia para um dispositivo desconhecido, verifique se este código corresponde ao exibido no outro dispositivo.',
+    'Edit DM relays': 'Editar relays de mensagens diretas',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Se a chave nunca chegar, ou a redefinição falhar, seus relays de mensagens diretas podem estar inacessíveis. Tente editá-los.',
+    GIF: 'GIF',
+    'Search GIFs': 'Buscar GIFs',
+    Favorites: 'Favoritos',
+    Recent: 'Recentes',
+    'No GIFs found': 'Nenhum GIF encontrado',
+    'Type to search GIFs': 'Digite para buscar GIFs',
+    'No favorite GIFs yet': 'Nenhum GIF favorito ainda',
+    'No recent GIFs yet': 'Nenhum GIF recente ainda',
+    'Failed to load GIFs': 'Falha ao carregar GIFs',
+    'Add to favorites': 'Adicionar aos favoritos',
+    'Remove from favorites': 'Remover dos favoritos',
+    'Powered by KLIPY': 'Distribuído por KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'O seletor de GIF não está configurado. Defina VITE_KLIPY_API_KEY para habilitá-lo.',
+    Emoji: 'Emoji'
   }
 }

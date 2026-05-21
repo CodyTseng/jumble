@@ -33,7 +33,6 @@ export default function Image({
   const [displaySkeleton, setDisplaySkeleton] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>()
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     setIsLoading(true)
@@ -46,19 +45,26 @@ export default function Image({
       return
     }
 
-    if (pubkey) {
-      blossomService.getValidUrl(url, pubkey).then((validUrl) => {
-        setImageUrl(validUrl)
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = null
-        }
-      })
-      timeoutRef.current = setTimeout(() => {
-        setImageUrl(url)
-      }, 5000)
-    } else {
+    if (!pubkey) {
       setImageUrl(url)
+      return
+    }
+
+    let cancelled = false
+    const timer = setTimeout(() => {
+      if (cancelled) return
+      setImageUrl(url)
+    }, 5000)
+
+    blossomService.getValidUrl(url, pubkey).then((validUrl) => {
+      if (cancelled) return
+      setImageUrl(validUrl)
+      clearTimeout(timer)
+    })
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
     }
   }, [url, allowInsecureConnection])
 
@@ -151,7 +157,7 @@ export default function Image({
         ) : (
           <div
             className={cn(
-              'flex h-full w-full flex-col items-center justify-center bg-muted object-cover',
+              'bg-muted flex h-full w-full flex-col items-center justify-center object-cover',
               className,
               classNames.errorPlaceholder
             )}

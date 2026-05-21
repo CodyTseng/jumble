@@ -7,6 +7,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
+import localBlossomCache from './services/local-blossom-cache.service'
 import storage from './services/local-storage.service'
 
 const setVh = () => {
@@ -18,17 +19,19 @@ setVh()
 
 const root = createRoot(document.getElementById('root')!)
 
-storage
-  .hydrate()
-  .catch((err) => {
+Promise.allSettled([
+  storage.hydrate().catch((err) => {
     console.error('[main] storage hydrate failed:', err)
+  }),
+  localBlossomCache.init().catch((err) => {
+    console.error('[main] local blossom cache probe failed:', err)
   })
-  .finally(() => {
-    root.render(
-      <StrictMode>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </StrictMode>
-    )
-  })
+]).finally(() => {
+  root.render(
+    <StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </StrictMode>
+  )
+})

@@ -47,7 +47,7 @@ export default function SkinTonePicker({
     <div
       ref={containerRef}
       className={cn(
-        'flex h-9 items-center justify-end overflow-hidden transition-[gap] duration-200',
+        'flex items-center justify-end overflow-hidden rounded-md border bg-background/95 p-0.5 shadow-sm backdrop-blur-sm transition-[gap] duration-200',
         expanded ? 'gap-0.5' : 'gap-0'
       )}
     >
@@ -62,7 +62,7 @@ export default function SkinTonePicker({
             tabIndex={visible ? 0 : -1}
             aria-hidden={!visible}
             className={cn(
-              'flex h-9 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md text-2xl leading-none transition-all duration-200 hover:bg-muted',
+              'flex h-9 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md text-xl leading-none transition-all duration-200 hover:bg-muted',
               visible ? 'w-9 translate-x-0 opacity-100' : 'pointer-events-none w-0 translate-x-2 opacity-0',
               expanded && isSelected && 'bg-muted'
             )}

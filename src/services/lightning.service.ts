@@ -296,7 +296,6 @@ class LightningService {
       const res = await fetch(lnurl)
       const body = await res.json()
 
-      console.log('Zap endpoint:', body)
       if (body.allowsNostr !== false && body.callback) {
         return {
           callback: body.callback,

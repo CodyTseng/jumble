@@ -1,5 +1,5 @@
 import Emoji from '@/components/Emoji'
-import EmojiPickerDialog from '@/components/EmojiPickerDialog'
+import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import {
@@ -182,7 +182,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                   >
                     <RotateCcw />
                   </Button>
-                  <EmojiPickerDialog
+                  <ExpressionPickerDialog
                     onEmojiClick={(emoji) => {
                       if (!emoji) return
                       updateQuickReactionEmoji(emoji)
@@ -191,7 +191,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
                     <Button variant="ghost" size="icon" className="border">
                       <Emoji emoji={quickReactionEmoji} />
                     </Button>
-                  </EmojiPickerDialog>
+                  </ExpressionPickerDialog>
                 </div>
               }
             />

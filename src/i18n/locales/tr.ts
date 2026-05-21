@@ -948,6 +948,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Bu kodun diğer cihazınızda gösterilen kodla eşleştiğinden emin olun.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Şifreleme anahtarınızı bilinmeyen bir cihaza göndermemek için, bu kodun diğer cihazda gösterilen kodla eşleştiğini kontrol edin.'
+      'Şifreleme anahtarınızı bilinmeyen bir cihaza göndermemek için, bu kodun diğer cihazda gösterilen kodla eşleştiğini kontrol edin.',
+    'Edit DM relays': 'DM relaylerini düzenle',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Anahtar hiç gelmezse veya sıfırlama başarısız olursa, DM relayleriniz erişilemez olabilir. Bunları düzenlemeyi deneyin.',
+    GIF: 'GIF',
+    'Search GIFs': 'GIF ara',
+    Favorites: 'Favoriler',
+    Recent: 'Son',
+    'No GIFs found': 'GIF bulunamadı',
+    'Type to search GIFs': 'GIF aramak için yazın',
+    'No favorite GIFs yet': 'Henüz favori GIF yok',
+    'No recent GIFs yet': 'Henüz son GIF yok',
+    'Failed to load GIFs': "GIF'ler yüklenemedi",
+    'Add to favorites': 'Favorilere ekle',
+    'Remove from favorites': 'Favorilerden kaldır',
+    'Powered by KLIPY': 'KLIPY destekli',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF seçici yapılandırılmamış. Etkinleştirmek için VITE_KLIPY_API_KEY ayarlayın.',
+    Emoji: 'Emoji'
   }
 }

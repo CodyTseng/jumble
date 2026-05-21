@@ -942,6 +942,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Győződj meg róla, hogy ez a kód megegyezik a másik eszközödön megjelenővel.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'Hogy elkerüld a titkosítási kulcsod ismeretlen eszközre küldését, ellenőrizd, hogy ez a kód megegyezik-e a másik eszközön megjelenővel.'
+      'Hogy elkerüld a titkosítási kulcsod ismeretlen eszközre küldését, ellenőrizd, hogy ez a kód megegyezik-e a másik eszközön megjelenővel.',
+    'Edit DM relays': 'DM relék szerkesztése',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'Ha a kulcs soha nem érkezik meg, vagy a visszaállítás sikertelen, a DM reléid elérhetetlenek lehetnek. Próbáld meg szerkeszteni őket.',
+    GIF: 'GIF',
+    'Search GIFs': 'GIF-ek keresése',
+    Favorites: 'Kedvencek',
+    Recent: 'Legutóbbi',
+    'No GIFs found': 'Nem található GIF',
+    'Type to search GIFs': 'Írj a GIF-ek kereséséhez',
+    'No favorite GIFs yet': 'Még nincs kedvenc GIF',
+    'No recent GIFs yet': 'Még nincs legutóbbi GIF',
+    'Failed to load GIFs': 'A GIF-ek betöltése sikertelen',
+    'Add to favorites': 'Hozzáadás a kedvencekhez',
+    'Remove from favorites': 'Eltávolítás a kedvencek közül',
+    'Powered by KLIPY': 'KLIPY működteti',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'A GIF-választó nincs konfigurálva. Állítsd be a VITE_KLIPY_API_KEY változót az engedélyezéshez.',
+    Emoji: 'Emoji'
   }
 }

@@ -1,7 +1,7 @@
 import ContentPreviewContent from '@/components/ContentPreview/Content'
 import Emoji from '@/components/Emoji'
-import EmojiPickerDialog from '@/components/EmojiPickerDialog'
 import FollowingBadge from '@/components/FollowingBadge'
+import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import Nip05 from '@/components/Nip05'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
@@ -14,6 +14,7 @@ import cryptoFileService from '@/services/crypto-file.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import recentEmojiService from '@/services/recent-emoji.service'
 import dmService from '@/services/dm.service'
+import { TGif } from '@/services/klipy.service'
 import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from '@/services/media-upload.service'
 import { TEmoji, TProfile } from '@/types'
 import { nip19 } from 'nostr-tools'
@@ -693,6 +694,31 @@ export default function DmInput({
     }
   }
 
+  const handlePickerGif = useCallback(
+    async (gif: TGif | undefined) => {
+      if (!gif || !pubkey || disabled) return
+      try {
+        const imetaParts = [`url ${gif.url}`]
+        if (gif.width > 0 && gif.height > 0) {
+          imetaParts.push(`dim ${gif.width}x${gif.height}`)
+        }
+        const imetaTag = ['imeta', ...imetaParts]
+        await dmService.sendMessage(
+          pubkey,
+          recipientPubkey,
+          gif.url,
+          replyTo ?? undefined,
+          [imetaTag]
+        )
+        onSent?.()
+      } catch (error) {
+        console.error('Failed to send GIF:', error)
+        toast.error(t('Failed to send message'))
+      }
+    },
+    [pubkey, recipientPubkey, replyTo, onSent, disabled, t]
+  )
+
   const handlePickerEmoji = useCallback(
     (emoji: string | TEmoji | undefined) => {
       if (!emoji) return
@@ -872,8 +898,10 @@ export default function DmInput({
             multiple
           />
         </div>
-        <EmojiPickerDialog
+        <ExpressionPickerDialog
+          enableGif
           onEmojiClick={handlePickerEmoji}
+          onGifClick={handlePickerGif}
           onOpenChange={(open) => {
             if (open) editableRef.current?.blur()
           }}
@@ -884,7 +912,7 @@ export default function DmInput({
           >
             <Smile className="h-5 w-5" />
           </button>
-        </EmojiPickerDialog>
+        </ExpressionPickerDialog>
         <div
           ref={editableRef}
           contentEditable={!disabled}

@@ -206,6 +206,16 @@ class MediaUploadService {
   getImetaTagByUrl(url: string) {
     return this.imetaTagMap.get(url)
   }
+
+  /**
+   * Register an imeta tag for a URL that wasn't uploaded through this service
+   * (e.g. third-party GIFs from the KLIPY picker). The tag is consumed later
+   * by draft-event's generateImetaTags() when the user publishes.
+   */
+  registerImetaTag(url: string, tag: string[]) {
+    if (!url || tag.length === 0 || tag[0] !== 'imeta') return
+    this.imetaTagMap.set(url, tag)
+  }
 }
 
 const instance = new MediaUploadService()

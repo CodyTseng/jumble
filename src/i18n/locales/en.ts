@@ -960,6 +960,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Make sure this code matches the one shown on your other device.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.'
+      'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.',
+    'Edit DM relays': 'Edit DM relays',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.',
+    GIF: 'GIF',
+    'Search GIFs': 'Search GIFs',
+    Favorites: 'Favorites',
+    Recent: 'Recent',
+    'No GIFs found': 'No GIFs found',
+    'Type to search GIFs': 'Type to search GIFs',
+    'No favorite GIFs yet': 'No favorite GIFs yet',
+    'No recent GIFs yet': 'No recent GIFs yet',
+    'Failed to load GIFs': 'Failed to load GIFs',
+    'Add to favorites': 'Add to favorites',
+    'Remove from favorites': 'Remove from favorites',
+    'Powered by KLIPY': 'Powered by KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.',
+    Emoji: 'Emoji'
   }
 }

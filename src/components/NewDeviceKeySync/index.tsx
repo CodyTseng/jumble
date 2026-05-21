@@ -1,8 +1,11 @@
+import DmRelayConfig from '@/components/DmRelayConfig'
 import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import { Button } from '@/components/ui/button'
+import { formatError } from '@/lib/error'
 import { useNostr } from '@/providers/NostrProvider'
+import client from '@/services/client.service'
 import encryptionKeyService from '@/services/encryption-key.service'
-import { CheckCircle, Loader2, RefreshCw, Smartphone } from 'lucide-react'
+import { CheckCircle, Loader2, RefreshCw, Server, Smartphone } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -17,6 +20,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
   const [state, setState] = useState<TSetupState>('loading')
   const [error, setError] = useState<string | null>(null)
   const [countdown, setCountdown] = useState(RETRY_COOLDOWN)
+  const [showRelayConfig, setShowRelayConfig] = useState(false)
   const unsubscribeRef = useRef<(() => void) | null>(null)
 
   const verificationCode = useMemo(
@@ -95,6 +99,21 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
     publishAndSubscribe()
   }
 
+  const handleRelaysUpdated = async () => {
+    setShowRelayConfig(false)
+    // DmRelayConfig updates the replaceable event cache asynchronously after
+    // publishing. Force a fresh fetch so the retry below subscribes on the
+    // newly configured relays rather than the stale cached set.
+    if (pubkey) {
+      try {
+        await client.fetchDmRelaysEvent(pubkey, true, true)
+      } catch {
+        // ignore; retry falls back to whatever the cache holds
+      }
+    }
+    handleRetry()
+  }
+
   const handleGenerateNew = async () => {
     if (!pubkey) return
 
@@ -108,8 +127,16 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
       await encryptionKeyService.publishEncryptionKeyAnnouncement(signer as any, pubkey)
       toast.success(t('New encryption key generated'))
       onComplete?.()
-    } catch {
-      toast.error(t('Failed to generate encryption key'))
+    } catch (error) {
+      console.error('Failed to generate new encryption key', error)
+      const messages = formatError(error).filter(Boolean)
+      if (messages.length === 0) {
+        toast.error(t('Failed to generate encryption key'))
+      } else {
+        messages.forEach((message) => {
+          toast.error(`${t('Failed to generate encryption key')}: ${message}`)
+        })
+      }
     }
   }
 
@@ -132,8 +159,8 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
   }
 
   return (
-    <div className="flex justify-center p-6">
-      <div className="flex w-full max-w-sm flex-col items-center gap-6">
+    <div className="flex justify-center px-4 py-6">
+      <div className="flex w-full max-w-2xl flex-col items-center gap-6">
         <Smartphone className="text-muted-foreground h-16 w-16" />
 
         <div className="space-y-2 text-center">
@@ -190,12 +217,30 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
         )}
 
         <div className="w-full space-y-3 border-t pt-6">
-          <p className="text-muted-foreground text-center text-sm">
+          <p className="text-muted-foreground text-sm">
             {t(
               "Don't have access to another device? You can reset your encryption key to generate a new one. Messages encrypted with the old key can no longer be decrypted, but the chat history already saved on this device will not be lost."
             )}
           </p>
           <ResetEncryptionKeyButton onConfirm={handleGenerateNew} className="w-full" />
+        </div>
+
+        <div className="w-full space-y-3 border-t pt-6">
+          <p className="text-muted-foreground text-sm">
+            {t(
+              'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.'
+            )}
+          </p>
+          {showRelayConfig ? (
+            <div className="rounded-lg border">
+              <DmRelayConfig onComplete={handleRelaysUpdated} />
+            </div>
+          ) : (
+            <Button variant="outline" className="w-full" onClick={() => setShowRelayConfig(true)}>
+              <Server className="me-1.5 h-3.5 w-3.5" />
+              {t('Edit DM relays')}
+            </Button>
+          )}
         </div>
       </div>
     </div>

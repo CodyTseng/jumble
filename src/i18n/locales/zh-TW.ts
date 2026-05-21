@@ -906,6 +906,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       '請確認此配對碼與你另一台裝置上顯示的一致。',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      '為避免將加密金鑰發送給未知裝置，請檢查配對碼是否與另一台裝置上顯示的一致。'
+      '為避免將加密金鑰發送給未知裝置，請檢查配對碼是否與另一台裝置上顯示的一致。',
+    'Edit DM relays': '編輯私訊中繼',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      '若密鑰始終未送達，或重設失敗，可能是你的私訊中繼無法存取。請嘗試編輯它們。',
+    GIF: 'GIF',
+    'Search GIFs': '搜尋 GIF',
+    Favorites: '最愛',
+    Recent: '最近',
+    'No GIFs found': '找不到 GIF',
+    'Type to search GIFs': '輸入以搜尋 GIF',
+    'No favorite GIFs yet': '還沒有最愛的 GIF',
+    'No recent GIFs yet': '還沒有最近使用的 GIF',
+    'Failed to load GIFs': '載入 GIF 失敗',
+    'Add to favorites': '加入最愛',
+    'Remove from favorites': '從最愛移除',
+    'Powered by KLIPY': '由 KLIPY 提供',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF 選擇器未配置。設定 VITE_KLIPY_API_KEY 以啟用。',
+    Emoji: '表情'
   }
 }

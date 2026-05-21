@@ -10,6 +10,7 @@ import {
 } from '@/lib/draft-event'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useNostr } from '@/providers/NostrProvider'
+import mediaUpload from '@/services/media-upload.service'
 import postEditorCache from '@/services/post-editor-cache.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
@@ -21,7 +22,7 @@ import { toast } from 'sonner'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
-import EmojiPickerDialog from '../EmojiPickerDialog'
+import ExpressionPickerDialog from '../ExpressionPickerDialog'
 import Mentions from './Mentions'
 import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
@@ -320,16 +321,28 @@ export default function PostContent({
               <ImageUp />
             </Button>
           </Uploader>
-          <EmojiPickerDialog
+          <ExpressionPickerDialog
+            enableGif
             onEmojiClick={(emoji) => {
               if (!emoji) return
               textareaRef.current?.insertEmoji(emoji)
+            }}
+            onGifClick={(gif) => {
+              if (!gif) return
+              if (gif.width > 0 && gif.height > 0) {
+                mediaUpload.registerImetaTag(gif.url, [
+                  'imeta',
+                  `url ${gif.url}`,
+                  `dim ${gif.width}x${gif.height}`
+                ])
+              }
+              textareaRef.current?.appendText(gif.url, true)
             }}
           >
             <Button variant="ghost" size="icon">
               <Smile />
             </Button>
-          </EmojiPickerDialog>
+          </ExpressionPickerDialog>
           {!parentStuff && (
             <Button
               variant="ghost"

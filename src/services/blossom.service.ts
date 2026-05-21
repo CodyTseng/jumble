@@ -1,4 +1,5 @@
 import client from '@/services/client.service'
+import localBlossomCache from '@/services/local-blossom-cache.service'
 import { getHashFromURL } from 'blossom-client-sdk'
 
 class BlossomService {
@@ -34,6 +35,18 @@ class BlossomService {
     const tried = new Set<string>()
     this.cacheMap.set(url, { pubkey, resolve: resolveFunc!, promise, tried })
 
+    const localUrl = localBlossomCache.rewriteUrl(url, pubkey)
+    if (localUrl) {
+      tried.add(localBlossomCache.hostname)
+      return localUrl
+    }
+
+    try {
+      const u = new URL(url)
+      tried.add(u.hostname)
+    } catch {
+      // ignore
+    }
     return url
   }
 
@@ -56,6 +69,12 @@ class BlossomService {
     } catch (error) {
       console.error('Invalid image URL:', error)
     }
+
+    if (oldImageUrl && !tried.has(oldImageUrl.hostname)) {
+      tried.add(oldImageUrl.hostname)
+      return originalUrl
+    }
+
     if (!pubkey || !hash || !oldImageUrl) {
       resolve(originalUrl)
       return null

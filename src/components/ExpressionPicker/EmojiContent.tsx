@@ -6,12 +6,12 @@ import { ArrowLeft } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import EmojiGrid, { TEmojiGridSection } from './EmojiGrid'
-import EmojiPickerSearch from './EmojiPickerSearch'
-import EmojiPickerTabs, { TPickerTabId } from './EmojiPickerTabs'
+import EmojiTabs, { TEmojiTabId } from './EmojiTabs'
+import PickerSearch from './PickerSearch'
 import SkinTonePicker from './SkinTonePicker'
 import { useEmojiCollections } from './useEmojiCollections'
 
-export default function EmojiPicker({
+export default function EmojiContent({
   onEmojiClick
 }: {
   onEmojiClick: (emoji: string | TEmoji) => void
@@ -21,13 +21,12 @@ export default function EmojiPicker({
 
   const [query, setQuery] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  const [activeTabId, setActiveTabId] = useState<TPickerTabId>('system')
+  const [activeTabId, setActiveTabId] = useState<TEmojiTabId>('system')
   const [skinTone, setSkinTone] = useState<TSkinTone>(() => recentEmojiService.getSkinTone())
   const [pickVersion, setPickVersion] = useState(0)
   const [nativeResults, setNativeResults] = useState<TNativeEmoji[]>([])
   const [customResults, setCustomResults] = useState<TEmoji[]>([])
 
-  // Reset to system if active tab becomes invalid
   useEffect(() => {
     if (activeTabId === 'system') return
     if (activeTabId === 'standalone') {
@@ -39,7 +38,6 @@ export default function EmojiPicker({
     }
   }, [activeTabId, standalone, packs])
 
-  // Run search when query changes
   useEffect(() => {
     const trimmed = query.trim()
     if (!trimmed) {
@@ -158,8 +156,7 @@ export default function EmojiPicker({
     t
   ])
 
-  const isSearching = searchMode
-  const showSkinTone = !isSearching && activeTabId === 'system'
+  const showSkinTone = !searchMode && activeTabId === 'system'
 
   const exitSearch = useCallback(() => {
     setSearchMode(false)
@@ -167,7 +164,7 @@ export default function EmojiPicker({
   }, [])
 
   return (
-    <div className="flex h-[400px] w-full flex-col bg-background sm:w-[350px]">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       {searchMode ? (
         <div className="flex items-center gap-1 border-b px-1.5 py-1">
           <button
@@ -178,10 +175,15 @@ export default function EmojiPicker({
           >
             <ArrowLeft className="size-5 rtl:-scale-x-100" />
           </button>
-          <EmojiPickerSearch value={query} onChange={setQuery} autoFocus />
+          <PickerSearch
+            value={query}
+            onChange={setQuery}
+            placeholder={t('Search emojis')}
+            autoFocus
+          />
         </div>
       ) : (
-        <EmojiPickerTabs
+        <EmojiTabs
           activeTabId={activeTabId}
           onChange={setActiveTabId}
           onSearchClick={() => setSearchMode(true)}
@@ -197,7 +199,7 @@ export default function EmojiPicker({
         <EmojiGrid sections={sections} skinTone={skinTone} onPick={handlePick} />
       )}
       {showSkinTone && (
-        <div className="flex items-center justify-end border-t px-2 py-1">
+        <div className="absolute bottom-1.5 end-1.5 z-10">
           <SkinTonePicker value={skinTone} onChange={handleSkinToneChange} />
         </div>
       )}

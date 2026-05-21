@@ -956,6 +956,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       'Assurez-vous que ce code correspond à celui affiché sur votre autre appareil.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      "Pour éviter d'envoyer votre clé de chiffrement à un appareil inconnu, vérifiez que ce code correspond à celui affiché sur l'autre appareil."
+      "Pour éviter d'envoyer votre clé de chiffrement à un appareil inconnu, vérifiez que ce code correspond à celui affiché sur l'autre appareil.",
+    'Edit DM relays': 'Modifier les relais DM',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      "Si la clé n'arrive jamais ou si la réinitialisation échoue, vos relais DM sont peut-être injoignables. Essayez de les modifier.",
+    GIF: 'GIF',
+    'Search GIFs': 'Rechercher des GIFs',
+    Favorites: 'Favoris',
+    Recent: 'Récents',
+    'No GIFs found': 'Aucun GIF trouvé',
+    'Type to search GIFs': 'Tapez pour rechercher des GIFs',
+    'No favorite GIFs yet': 'Aucun GIF favori pour le moment',
+    'No recent GIFs yet': 'Aucun GIF récent pour le moment',
+    'Failed to load GIFs': 'Échec du chargement des GIFs',
+    'Add to favorites': 'Ajouter aux favoris',
+    'Remove from favorites': 'Retirer des favoris',
+    'Powered by KLIPY': 'Propulsé par KLIPY',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      "Le sélecteur de GIF n'est pas configuré. Définissez VITE_KLIPY_API_KEY pour l'activer.",
+    Emoji: 'Émoji'
   }
 }

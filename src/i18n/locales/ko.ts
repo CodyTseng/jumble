@@ -933,6 +933,24 @@ export default {
     'Make sure this code matches the one shown on your other device.':
       '이 코드가 다른 기기에 표시된 코드와 일치하는지 확인하세요.',
     'To avoid sending your encryption key to an unknown device, check that this code matches the one shown on the other device.':
-      '암호화 키를 알 수 없는 기기로 보내지 않도록, 이 코드가 다른 기기에 표시된 코드와 일치하는지 확인하세요.'
+      '암호화 키를 알 수 없는 기기로 보내지 않도록, 이 코드가 다른 기기에 표시된 코드와 일치하는지 확인하세요.',
+    'Edit DM relays': 'DM 릴레이 편집',
+    'If the key never arrives, or resetting fails, your DM relays may be unreachable. Try editing them.':
+      '키가 도착하지 않거나 재설정에 실패하면 DM 릴레이에 연결할 수 없을 수 있습니다. 릴레이를 편집해 보세요.',
+    GIF: 'GIF',
+    'Search GIFs': 'GIF 검색',
+    Favorites: '즐겨찾기',
+    Recent: '최근',
+    'No GIFs found': 'GIF를 찾을 수 없습니다',
+    'Type to search GIFs': 'GIF를 검색하려면 입력하세요',
+    'No favorite GIFs yet': '즐겨찾는 GIF가 아직 없습니다',
+    'No recent GIFs yet': '최근 GIF가 아직 없습니다',
+    'Failed to load GIFs': 'GIF 로드 실패',
+    'Add to favorites': '즐겨찾기에 추가',
+    'Remove from favorites': '즐겨찾기에서 제거',
+    'Powered by KLIPY': 'KLIPY 제공',
+    'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
+      'GIF 선택기가 구성되지 않았습니다. 활성화하려면 VITE_KLIPY_API_KEY를 설정하세요.',
+    Emoji: '이모지'
   }
 }

@@ -279,3 +279,12 @@ export type TEncryptionKeypair = {
   privkey: Uint8Array
   pubkey: string
 }
+
+export type TGifRecord = {
+  id: string
+  url: string
+  width: number
+  height: number
+  description: string
+  addedAt: number
+}

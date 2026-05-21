@@ -7,7 +7,7 @@ import {
   EmbeddedWebsocketUrl
 } from '@/components/Embedded'
 import Emoji from '@/components/Emoji'
-import EmojiPicker from '@/components/EmojiPicker'
+import ExpressionPicker from '@/components/ExpressionPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
@@ -29,7 +29,8 @@ import {
   TEmbeddedNode,
   parseContent
 } from '@/lib/content-parser'
-import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
+import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
+import { isImage } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -429,7 +430,7 @@ export default function DmMessageList({
                   >
                     <div
                       className={cn(
-                        'flex max-w-[80%] min-w-0 flex-1 flex-col gap-0.5',
+                        'flex max-w-[80%] min-w-0 flex-1 flex-col gap-0.5 sm:max-w-[90%]',
                         group.isOwn ? 'items-end' : 'items-start'
                       )}
                     >
@@ -514,6 +515,17 @@ function MessageBubble({
   const hasBlocks =
     isFileMessage ||
     /https?:\/\/|nostr:n(?:ote|event|addr)1|note1|nevent1|lnbc/i.test(message.content)
+  // When the message is just image URL(s) (e.g. a GIF picked from the picker),
+  // the row shouldn't be stretched to full width — otherwise the action buttons
+  // float far away from the small image. Cards like EmbeddedNote/YouTube still
+  // need the full-width hint, so we only opt out for pure-image messages.
+  const isImageOnlyMessage = useMemo(() => {
+    if (isFileMessage) return false
+    const trimmed = message.content.trim()
+    if (!trimmed) return false
+    const tokens = trimmed.split(/\s+/)
+    return tokens.every((tok) => /^https?:\/\//i.test(tok) && isImage(tok))
+  }, [isFileMessage, message.content])
   const [copied, setCopied] = useState(false)
   const [isEmojiOpen, setIsEmojiOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
@@ -667,7 +679,10 @@ function MessageBubble({
       <div
         className={cn(
           'flex max-w-full min-w-0 items-end gap-1',
-          hasBlocks && !isOwn && 'w-full',
+          // Stretch to full row so embedded cards (EmbeddedNote / YouTube /
+          // X-post) get a width reference and don't collapse to min-content.
+          // Both directions need it — keeps own/peer layouts mirrored.
+          hasBlocks && !isImageOnlyMessage && 'w-full',
           isFileMessage && 'justify-end',
           isOwn ? 'flex-row' : 'flex-row-reverse'
         )}
@@ -687,9 +702,9 @@ function MessageBubble({
           {onReact && (
             <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
               <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
-              <PopoverContent side="top" className="w-fit overflow-hidden border-0 p-0 shadow-lg">
+              <PopoverContent side="top" className="w-fit overflow-hidden p-0 shadow-lg">
                 {isPickerOpen ? (
-                  <EmojiPicker
+                  <ExpressionPicker
                     onEmojiClick={(emoji) => {
                       handleEmojiSelect(emoji)
                     }}
@@ -754,7 +769,7 @@ function MessageBubble({
                 </button>
               </div>
             ) : (
-              <EmojiPicker
+              <ExpressionPicker
                 onEmojiClick={(emoji) => {
                   if (!emoji) return
                   handleEmojiSelect(emoji)
@@ -768,7 +783,7 @@ function MessageBubble({
           className={cn(
             'relative flex max-w-full min-w-0 flex-col',
             isOwn ? 'items-end' : 'items-start',
-            hasBlocks && !isFileMessage && 'flex-1'
+            hasBlocks && !isFileMessage && !isImageOnlyMessage && 'flex-1'
           )}
         >
           {message.replyTo && (
@@ -976,12 +991,23 @@ function DmContent({
       EmbeddedEmojiParser
     ])
 
+    // Index imeta tags by URL so we can attach dim/blurhash/thumbHash to image
+    // nodes. Without this the Image placeholder collapses to a tiny rounded
+    // border while the GIF loads.
+    const imetaByUrl = new Map<string, TImetaInfo>()
+    for (const tag of tags ?? []) {
+      const imeta = getImetaInfoFromImetaTag(tag)
+      if (imeta) imetaByUrl.set(imeta.url, imeta)
+    }
+
     const allImages = nodes
       .map((node) => {
-        if (node.type === 'image') return { url: node.data } as TImetaInfo
+        if (node.type === 'image') {
+          return imetaByUrl.get(node.data) ?? ({ url: node.data } as TImetaInfo)
+        }
         if (node.type === 'images') {
           const urls = Array.isArray(node.data) ? node.data : [node.data]
-          return urls.map((url) => ({ url }) as TImetaInfo)
+          return urls.map((url) => imetaByUrl.get(url) ?? ({ url } as TImetaInfo))
         }
         return null
       })
@@ -1012,7 +1038,7 @@ function DmContent({
     const isEmojiOnly = emojiOnly && emojiCount > 0 && emojiCount <= 3
 
     return { allImages, segments, isEmojiOnly }
-  }, [content])
+  }, [content, tags])
 
   const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(tags), [tags])
 
@@ -1024,7 +1050,12 @@ function DmContent({
     <div
       className={cn(
         'flex max-w-full min-w-0 flex-col gap-0.5 rounded-lg transition-all duration-500',
-        segments.some((s) => s.kind === 'block') && 'flex-1',
+        // Stretch horizontally so embedded cards (EmbeddedNote / YouTube /
+        // X-post) anchor to a stable width even while their content is still
+        // loading — otherwise the skeleton collapses to min-content and the
+        // card visibly snaps wider once data arrives. flex-1 doesn't help here
+        // because the parent is flex-col, where flex grows the cross axis.
+        segments.some((s) => s.kind === 'block') && 'w-full',
         isOwn ? 'items-end' : 'items-start',
         isHighlighted && 'ring-primary ring-offset-background ring-2 ring-offset-2'
       )}
