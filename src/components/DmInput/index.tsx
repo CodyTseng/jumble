@@ -695,36 +695,17 @@ export default function DmInput({
   }
 
   const handlePickerGif = useCallback(
-    (gif: TGif | undefined) => {
-      if (!gif) return
-      const div = editableRef.current
-      if (!div) return
-      div.focus()
-
-      const sel = window.getSelection()
-      if (!sel || !sel.rangeCount || !div.contains(sel.anchorNode)) {
-        const range = document.createRange()
-        range.selectNodeContents(div)
-        range.collapse(false)
-        sel?.removeAllRanges()
-        sel?.addRange(range)
+    async (gif: TGif | undefined) => {
+      if (!gif || !pubkey || disabled) return
+      try {
+        await dmService.sendMessage(pubkey, recipientPubkey, gif.url, replyTo ?? undefined)
+        onSent?.()
+      } catch (error) {
+        console.error('Failed to send GIF:', error)
+        toast.error(t('Failed to send message'))
       }
-
-      const range = sel!.getRangeAt(0)
-      range.deleteContents()
-
-      const currentText = serializeContent()
-      const prefix = currentText.length > 0 && !/\s$/.test(currentText) ? '\n' : ''
-      const textNode = document.createTextNode(`${prefix}${gif.url} `)
-      range.insertNode(textNode)
-      range.setStartAfter(textNode)
-      range.collapse(true)
-      sel!.removeAllRanges()
-      sel!.addRange(range)
-
-      setContent(serializeContent())
     },
-    [serializeContent]
+    [pubkey, recipientPubkey, replyTo, onSent, disabled, t]
   )
 
   const handlePickerEmoji = useCallback(
