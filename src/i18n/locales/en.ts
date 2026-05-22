@@ -949,6 +949,9 @@ export default {
     'dm verification reason impersonated':
       'This message may not actually be from the displayed sender. It could be an impersonation attempt.',
     'dm verification dialog footer':
-      "You can still read this message, but the sender's identity cannot be confirmed."
+      "You can still read this message, but the sender's identity cannot be confirmed.",
+    'Show more context': 'Show more context',
+    'Show full context': 'Show full context',
+    'Gathering context...': 'Gathering context...'
   }
 }
