@@ -9,6 +9,8 @@ import StuffStats from '../StuffStats'
 import PinnedButton from './PinnedButton'
 import RepostDescription from './RepostDescription'
 
+const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"]'
+
 export default function MainNoteCard({
   event,
   className,
@@ -30,7 +32,15 @@ export default function MainNoteCard({
     <div
       className={className}
       onClick={(e) => {
-        e.stopPropagation()
+        // We can't stopPropagation() on inner interactive elements: React's
+        // stopPropagation() also calls nativeEvent.stopPropagation(), which
+        // breaks Radix Dialog's touch-mode outside-click detection (it
+        // listens for native `click` bubbling to `document`). So filter
+        // here instead — skip portal-rendered descendants (overlays/menus)
+        // and skip interactive controls inside the card.
+        const target = e.target
+        if (!(target instanceof Node) || !e.currentTarget.contains(target)) return
+        if (target instanceof Element && target.closest(INTERACTIVE_SELECTOR)) return
         push(toNote(originalNoteId ?? event))
       }}
     >

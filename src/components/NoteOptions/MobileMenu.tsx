@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { MenuAction, SubMenuAction } from './useMenuActions'
 
 interface MobileMenuProps {
@@ -26,13 +27,19 @@ export function MobileMenu({
   closeDrawer,
   goBackToMainMenu
 }: MobileMenuProps) {
+  const { t } = useTranslation()
   return (
     <>
       {trigger}
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerOverlay onClick={closeDrawer} />
-        <DrawerContent hideOverlay className="max-h-[80vh]">
-          <div className="overflow-y-auto overscroll-contain py-2" style={{ touchAction: 'pan-y' }}>
+      <Drawer
+        open={isDrawerOpen}
+        // Route close events through closeDrawer so the parent also resets
+        // showSubMenu — otherwise reopening the drawer would land on the
+        // previously-open submenu instead of the root menu.
+        onOpenChange={(open) => (open ? setIsDrawerOpen(true) : closeDrawer())}
+      >
+        <DrawerContent title={subMenuTitle || t('Options')} className="max-h-[80dvh]">
+          <div className="overflow-y-auto overscroll-contain py-2">
             {!showSubMenu ? (
               menuActions.map((action, index) => {
                 const Icon = action.icon

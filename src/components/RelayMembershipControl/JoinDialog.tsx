@@ -12,8 +12,6 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
@@ -88,21 +86,21 @@ export default function JoinDialog({
     return (
       <Drawer open={showJoinDialog} onOpenChange={setShowJoinDialog}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Request to Join Relay')}</DrawerTitle>
             <DrawerDescription>
               {t('Enter the invite code you received from a relay member.')}
             </DrawerDescription>
-          </DrawerHeader>
+          </div>
           <div className="p-4">{content}</div>
-          <DrawerFooter>
+          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
             <Button onClick={handleJoinSubmit} disabled={isLoading || !inviteCode.trim()}>
               {isLoading ? t('Sending...') : t('Send Request')}
             </Button>
             <DrawerClose asChild>
               <Button variant="outline">{t('Cancel')}</Button>
             </DrawerClose>
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
     )

@@ -952,6 +952,15 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF 선택기가 구성되지 않았습니다. 활성화하려면 VITE_KLIPY_API_KEY를 설정하세요.',
     Emoji: '이모지',
-    Ad: '광고'
+    Ad: '광고',
+    'Sender could not be verified': '발신자를 확인할 수 없습니다',
+    'dm verification dialog body':
+      '이 메시지의 서명 키가 발신자가 현재 게시한 암호화 키와 일치하지 않습니다. 가능한 이유:',
+    'dm verification reason rotated': '발신자가 이 메시지를 보낸 후 암호화 키를 변경했습니다.',
+    'dm verification reason not found': '발신자의 암호화 키를 찾을 수 없습니다.',
+    'dm verification reason impersonated':
+      '이 메시지는 실제로 표시된 발신자가 보낸 것이 아닐 수 있으며, 사칭 시도일 수 있습니다.',
+    'dm verification dialog footer':
+      '이 메시지는 계속 읽을 수 있지만 발신자의 신원은 확인할 수 없습니다.'
   }
 }

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ExtendedKind } from '@/constants'
@@ -179,9 +179,7 @@ export default function KindFilter({
       <>
         {trigger}
         <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild></DrawerTrigger>
-          <DrawerContent className="px-4">
-            <DrawerHeader />
+          <DrawerContent title={t('Filter')} className="px-4">
             {content}
           </DrawerContent>
         </Drawer>

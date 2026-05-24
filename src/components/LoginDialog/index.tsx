@@ -16,7 +16,7 @@ export default function LoginDialog({
   if (isSmallScreen) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="max-h-[90vh]">
+        <DrawerContent className="max-h-[90dvh]">
           <div className="flex flex-col gap-4 overflow-auto p-4">
             <AccountManager close={() => setOpen(false)} />
           </div>

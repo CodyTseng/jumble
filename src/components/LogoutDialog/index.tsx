@@ -13,8 +13,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { useNostr } from '@/providers/NostrProvider'
@@ -36,11 +34,11 @@ export default function LogoutDialog({
     return (
       <Drawer defaultOpen={false} open={open} onOpenChange={setOpen}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Logout')}</DrawerTitle>
             <DrawerDescription>{t('Are you sure you want to logout?')}</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
+          </div>
+          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
             <Button variant="outline" onClick={() => setOpen(false)} className="w-full">
               {t('Cancel')}
             </Button>
@@ -56,7 +54,7 @@ export default function LogoutDialog({
             >
               {t('Logout')}
             </Button>
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
     )

@@ -967,6 +967,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF seçici yapılandırılmamış. Etkinleştirmek için VITE_KLIPY_API_KEY ayarlayın.',
     Emoji: 'Emoji',
-    Ad: 'Reklam'
+    Ad: 'Reklam',
+    'Sender could not be verified': 'Gönderici doğrulanamadı',
+    'dm verification dialog body':
+      'Bu iletinin imzalama anahtarı, göndericinin şu anda yayımladığı şifreleme anahtarıyla eşleşmiyor. Olası nedenler:',
+    'dm verification reason rotated':
+      'Gönderici bu iletiyi gönderdikten sonra şifreleme anahtarını değiştirdi.',
+    'dm verification reason not found': 'Göndericinin şifreleme anahtarı bulunamadı.',
+    'dm verification reason impersonated':
+      'Bu ileti gerçekten görüntülenen göndericiden olmayabilir. Bir kimliğe bürünme girişimi olabilir.',
+    'dm verification dialog footer':
+      'Bu iletiyi okumaya devam edebilirsiniz, ancak göndericinin kimliği doğrulanamıyor.'
   }
 }

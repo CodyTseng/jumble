@@ -336,12 +336,69 @@ class DmService {
       const recipient = event.tags.find(tagNameEquals('n'))?.[1]
       if (recipient && isValidPubkey(recipient)) return recipient
     }
-    // Fallback: use encryption pubkey learned from received messages
+    // Fallback: encryption pubkey learned from previously *verified* received messages.
+    // updateConversation() / rebuildConversationsFromMessages() refuse to write this
+    // field unless the source message passed verification, so the cache cannot be
+    // poisoned by impersonation attempts.
     if (this.currentAccountPubkey) {
       const conversation = await this.getConversation(this.currentAccountPubkey, pubkey)
       if (conversation?.encryptionPubkey) return conversation.encryptionPubkey
     }
     return null
+  }
+
+  /**
+   * Canonical (authoritative) source for a pubkey's current DM encryption key.
+   * Used only by the verification pipeline — never falls back to
+   * `conversation.encryptionPubkey`, because that fallback is what an impersonator
+   * would otherwise be able to poison.
+   *
+   * `skipCache=true` forces a relay re-fetch even if a Kind 10044 is already
+   * cached — necessary when verifying messages encrypted with a freshly rotated
+   * key that the cache hasn't observed yet.
+   */
+  async getCanonicalEncryptionPubkey(pubkey: string, skipCache = false): Promise<string | null> {
+    const event = await client.fetchEncryptionKeyAnnouncementEvent(pubkey, true, skipCache)
+    if (!event) return null
+    const n = encryptionKeyService.getEncryptionPubkeyFromEvent(event)
+    return n && isValidPubkey(n) ? n : null
+  }
+
+  /**
+   * One-shot verification at ingestion time. Result is persisted on the message and
+   * never re-evaluated (per design — see docs/dm-feature.md / plan).
+   *
+   * - For own messages: seal.pubkey must match the current encryption pubkey we
+   *   are using right now. (A message we just sent ourselves is verified by
+   *   construction; a self-copy received from another device verifies the same way.)
+   * - For peer messages: seal.pubkey must match rumor.pubkey's published Kind 10044
+   *   encryption pubkey. If the cached Kind 10044 disagrees, force-refetch once —
+   *   the sender may have rotated their key after our last cache update. Persistent
+   *   mismatches degrade to `false` (the message is still readable; the UI just
+   *   flags it).
+   *
+   * Per-batch dedupe of relay fetches is handled inside `client.fetchReplaceableEvent`
+   * by its DataLoader, so no extra caching layer is needed here.
+   */
+  async determineVerification(
+    unwrapped: TUnwrappedMessage,
+    accountPubkey: string,
+    myEncryptionPubkey: string
+  ): Promise<boolean> {
+    const { rumor, senderEncryptionPubkey } = unwrapped
+    if (rumor.pubkey === accountPubkey) {
+      return senderEncryptionPubkey === myEncryptionPubkey
+    }
+
+    // First attempt: trust the cached Kind 10044 if there is one.
+    let canonical = await this.getCanonicalEncryptionPubkey(rumor.pubkey)
+    if (canonical && senderEncryptionPubkey === canonical) return true
+
+    // Cache disagrees. Could be a key rotation we haven't observed yet — force a
+    // relay re-fetch before deciding. (An impersonator's seal.pubkey still won't
+    // match the legitimate refreshed value, so this is safe.)
+    canonical = await this.getCanonicalEncryptionPubkey(rumor.pubkey, true)
+    return !!canonical && senderEncryptionPubkey === canonical
   }
 
   async subscribeRecipientEncryptionKey(
@@ -447,11 +504,18 @@ class DmService {
         continue
       }
 
+      const verified = await this.determineVerification(
+        unwrapped,
+        accountPubkey,
+        encryptionKeypair.pubkey
+      )
+
       const message = this.createMessageFromUnwrapped(
         accountPubkey,
         encryptionKeypair.pubkey,
         unwrapped,
-        giftWrap
+        giftWrap,
+        verified
       )
       if (message) {
         await this.resolveReplyTo(message)
@@ -463,7 +527,9 @@ class DmService {
           accountPubkey,
           encryptionKeypair.pubkey
         )
-        if (!fromMe && unwrapped.senderEncryptionPubkey) {
+        // Only verified messages contribute to the conversation.encryptionPubkey cache;
+        // otherwise an impersonator could poison the cache and reroute future sends.
+        if (!fromMe && unwrapped.senderEncryptionPubkey && verified) {
           encryptionPubkeyMap.set(unwrapped.senderPubkey, unwrapped.senderEncryptionPubkey)
         }
       } else {
@@ -797,11 +863,18 @@ class DmService {
           const unwrapped = nip17GiftWrapService.unwrapGiftWrap(giftWrap, encryptionKeypair.privkey)
           if (!unwrapped) return
 
+          const verified = await this.determineVerification(
+            unwrapped,
+            accountPubkey,
+            encryptionKeypair.pubkey
+          )
+
           const message = this.createMessageFromUnwrapped(
             accountPubkey,
             encryptionKeypair.pubkey,
             unwrapped,
-            giftWrap
+            giftWrap,
+            verified
           )
           if (message) {
             const isReaction = unwrapped.rumor.kind === kinds.Reaction
@@ -821,7 +894,10 @@ class DmService {
               const otherPubkey = fromMe
                 ? unwrapped.rumor.tags.find((t) => t[0] === 'p')?.[1]
                 : unwrapped.senderPubkey
-              const otherEncryptionPubkey = fromMe ? undefined : unwrapped.senderEncryptionPubkey
+              // Only propagate seal.pubkey into the conversation cache when the message
+              // verified. An impersonator can otherwise reroute future sends.
+              const otherEncryptionPubkey =
+                fromMe || !verified ? undefined : unwrapped.senderEncryptionPubkey
               if (otherPubkey) {
                 await this.updateConversation(
                   accountPubkey,
@@ -994,7 +1070,8 @@ class DmService {
     accountPubkey: string,
     encryptionPubkey: string,
     unwrapped: TUnwrappedMessage,
-    giftWrap: Event
+    giftWrap: Event,
+    verified: boolean
   ): TDmMessage | null {
     const { rumor, senderPubkey } = unwrapped
 
@@ -1027,6 +1104,7 @@ class DmService {
       createdAt: rumor.created_at,
       originalEvent: giftWrap,
       decryptedRumor: rumor as unknown as Event,
+      verified,
       ...(replyToId ? { replyTo: { id: replyToId, content: '', senderPubkey: '' } } : {})
     }
   }
@@ -1059,6 +1137,17 @@ class DmService {
   }
 
   private async saveMessage(message: TDmMessage): Promise<void> {
+    // `verified` is monotonic by design:
+    //   - `true` may never be downgraded (a transient relay miss for Kind 10044
+    //     during a refresh shouldn't undo a previously-confirmed identity).
+    //   - `undefined` (legacy / imported messages that predate the check) is left
+    //     alone — those records were never meant to participate in the check.
+    //   - `false` may be upgraded to `true` on a later pass when the sender's
+    //     Kind 10044 finally becomes reachable, but cannot regress.
+    const existing = await indexedDb.getDmMessageById(message.id)
+    if (existing && existing.verified !== false) {
+      message.verified = existing.verified
+    }
     await indexedDb.putDmMessage(message)
   }
 

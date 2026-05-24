@@ -11,8 +11,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { useNostr } from '@/providers/NostrProvider'
@@ -128,17 +126,17 @@ export default function KeySyncRequestHandler() {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Key sync request')}</DrawerTitle>
             <DrawerDescription>
               {t('Another device is requesting your encryption key.')}
             </DrawerDescription>
-          </DrawerHeader>
+          </div>
           <div className="px-4">{deviceInfo}</div>
-          <DrawerFooter>
+          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
             {sendKeyButton}
             {dismissButton}
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
     )

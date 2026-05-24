@@ -273,6 +273,11 @@ export type TDmMessage = {
     senderPubkey: string
     tags?: string[][]
   }
+  // Sender-identity verification result captured at ingestion time.
+  // true      — seal.pubkey matched rumor.pubkey's current Kind 10044 'n' tag
+  // false     — mismatch, or Kind 10044 could not be retrieved
+  // undefined — message was ingested before this check existed, or imported from a JSONL dump
+  verified?: boolean
 }
 
 export type TEncryptionKeypair = {

@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { formatAmount } from '@/lib/lightning'
 import { Zap } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
@@ -47,10 +47,10 @@ export default function ZapDetailDialog({ open, setOpen, zap }: ZapDetailDialogP
   if (isSmallScreen) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="px-4 pb-4">
-          <DrawerHeader>
+        <DrawerContent className="px-4">
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Zap Details')}</DrawerTitle>
-          </DrawerHeader>
+          </div>
           {content}
         </DrawerContent>
       </Drawer>

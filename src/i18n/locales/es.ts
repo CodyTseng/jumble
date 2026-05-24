@@ -966,6 +966,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'El selector de GIF no está configurado. Establece VITE_KLIPY_API_KEY para habilitarlo.',
     Emoji: 'Emoji',
-    Ad: 'Anuncio'
+    Ad: 'Anuncio',
+    'Sender could not be verified': 'No se pudo verificar al remitente',
+    'dm verification dialog body':
+      'La clave de firma de este mensaje no coincide con la clave de cifrado que el remitente tiene publicada actualmente. Posibles razones:',
+    'dm verification reason rotated':
+      'El remitente cambió su clave de cifrado después de enviar este mensaje.',
+    'dm verification reason not found': 'No se encontró la clave de cifrado del remitente.',
+    'dm verification reason impersonated':
+      'Este mensaje podría no ser realmente del remitente mostrado. Podría tratarse de un intento de suplantación.',
+    'dm verification dialog footer':
+      'Aún puedes leer este mensaje, pero no se puede confirmar la identidad del remitente.'
   }
 }

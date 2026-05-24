@@ -945,6 +945,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'لم يتم تكوين منتقي GIF. قم بتعيين VITE_KLIPY_API_KEY للتفعيل.',
     Emoji: 'إيموجي',
-    Ad: 'إعلان'
+    Ad: 'إعلان',
+    'Sender could not be verified': 'تعذّر التحقق من هوية المُرسِل',
+    'dm verification dialog body':
+      'لا يتطابق مفتاح توقيع هذه الرسالة مع مفتاح التشفير المنشور حاليًا للمُرسِل. الأسباب المحتملة:',
+    'dm verification reason rotated':
+      'قام المُرسِل بتغيير مفتاح التشفير الخاص به بعد إرسال هذه الرسالة.',
+    'dm verification reason not found': 'تعذّر العثور على مفتاح التشفير الخاص بالمُرسِل.',
+    'dm verification reason impersonated':
+      'قد لا تكون هذه الرسالة فعلًا من المُرسِل المعروض. قد يكون الأمر محاولة انتحال هوية.',
+    'dm verification dialog footer':
+      'لا يزال بإمكانك قراءة هذه الرسالة، لكن لا يمكن تأكيد هوية المُرسِل.'
   }
 }

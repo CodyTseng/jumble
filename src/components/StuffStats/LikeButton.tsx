@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import { LONG_PRESS_THRESHOLD } from '@/constants'
 import { useFilteredLikeCount } from '@/hooks/useFilteredLikeCount'
@@ -145,8 +145,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
       <>
         {trigger}
         <Drawer open={isEmojiReactionsOpen} onOpenChange={setIsEmojiReactionsOpen}>
-          <DrawerOverlay onClick={() => setIsEmojiReactionsOpen(false)} />
-          <DrawerContent hideOverlay>
+          <DrawerContent title={t('React')}>
             <ExpressionPicker
               onEmojiClick={(emoji) => {
                 setIsEmojiReactionsOpen(false)

@@ -20,8 +20,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
@@ -573,15 +571,15 @@ function DeleteConversationConfirmation({
     return (
       <Drawer defaultOpen={false} open={open} onOpenChange={setOpen}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Delete conversation')}</DrawerTitle>
             <DrawerDescription>
               {t(
                 'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.'
               )}
             </DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
+          </div>
+          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
             <Button variant="outline" onClick={() => setOpen(false)} className="w-full">
               {t('Cancel')}
             </Button>
@@ -595,7 +593,7 @@ function DeleteConversationConfirmation({
             >
               {t('Delete')}
             </Button>
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
     )

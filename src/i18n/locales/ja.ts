@@ -961,6 +961,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIFピッカーが設定されていません。有効にするにはVITE_KLIPY_API_KEYを設定してください。',
     Emoji: '絵文字',
-    Ad: '広告'
+    Ad: '広告',
+    'Sender could not be verified': '送信者を確認できませんでした',
+    'dm verification dialog body':
+      'このメッセージの署名キーが、送信者が現在公開している暗号化キーと一致しません。考えられる理由：',
+    'dm verification reason rotated':
+      '送信者はこのメッセージを送信したあとに暗号化キーを変更しました。',
+    'dm verification reason not found': '送信者の暗号化キーが見つかりませんでした。',
+    'dm verification reason impersonated':
+      'このメッセージは実際には表示されている送信者からではない可能性があり、なりすましの可能性があります。',
+    'dm verification dialog footer':
+      'このメッセージは引き続き読めますが、送信者の身元は確認できません。'
   }
 }

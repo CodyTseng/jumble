@@ -10,7 +10,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
@@ -106,12 +105,12 @@ export default function InviteCodeDialog({
     return (
       <Drawer open={showInviteCodeDialog} onOpenChange={setShowInviteCodeDialog}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{t('Get Invite Code')}</DrawerTitle>
             <DrawerDescription>
               {t('Share this invite code with others to invite them to join this relay.')}
             </DrawerDescription>
-          </DrawerHeader>
+          </div>
           <div className="p-4">{content}</div>
         </DrawerContent>
       </Drawer>

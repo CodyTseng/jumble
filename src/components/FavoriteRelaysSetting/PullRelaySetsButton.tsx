@@ -7,14 +7,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { buildATag } from '@/lib/draft-event'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { getDefaultRelayUrls } from '@/lib/relay'
@@ -52,12 +45,11 @@ export default function PullRelaySetsButton() {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent className="max-h-[90vh]">
+        <DrawerContent className="max-h-[90dvh]">
           <div className="flex flex-col gap-4 overflow-auto p-4">
-            <DrawerHeader>
-              <DrawerTitle>{t('Select the relay sets you want to pull')}</DrawerTitle>
-              <DrawerDescription className="hidden" />
-            </DrawerHeader>
+            <DrawerTitle className="text-base font-semibold">
+              {t('Select the relay sets you want to pull')}
+            </DrawerTitle>
             <RemoteRelaySets close={() => setOpen(false)} />
           </div>
         </DrawerContent>

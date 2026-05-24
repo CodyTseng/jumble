@@ -1,18 +1,6 @@
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerTitle
-} from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useNostr } from '@/providers/NostrProvider'
@@ -22,7 +10,7 @@ import lightning from '@/services/lightning.service'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import UserAvatar from '../UserAvatar'
@@ -45,45 +33,18 @@ export default function ZapDialog({
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
-  const drawerContentRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (drawerContentRef.current) {
-        drawerContentRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`)
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      handleResize() // Initial call in case the keyboard is already open
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-      }
-    }
-  }, [])
 
   if (isSmallScreen) {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerOverlay onClick={() => setOpen(false)} />
-        <DrawerContent
-          hideOverlay
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          ref={drawerContentRef}
-          className="mb-4 flex flex-col gap-4 px-4"
-        >
-          <DrawerHeader>
+        <DrawerContent className="flex flex-col gap-4 px-4">
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle className="flex items-center gap-2">
               <div className="shrink-0">{t('Zap to')}</div>
               <UserAvatar size="small" userId={pubkey} />
               <Username userId={pubkey} className="h-5 w-0 flex-1 truncate text-start" />
             </DrawerTitle>
-            <DialogDescription></DialogDescription>
-          </DrawerHeader>
+          </div>
           <ZapDialogContent
             open={open}
             setOpen={setOpen}

@@ -945,6 +945,14 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'ยังไม่ได้กำหนดค่าตัวเลือก GIF กำหนด VITE_KLIPY_API_KEY เพื่อเปิดใช้งาน',
     Emoji: 'อิโมจิ',
-    Ad: 'โฆษณา'
+    Ad: 'โฆษณา',
+    'Sender could not be verified': 'ไม่สามารถยืนยันผู้ส่งได้',
+    'dm verification dialog body':
+      'คีย์ลงนามของข้อความนี้ไม่ตรงกับคีย์การเข้ารหัสที่ผู้ส่งเผยแพร่อยู่ในปัจจุบัน เหตุผลที่เป็นไปได้:',
+    'dm verification reason rotated': 'ผู้ส่งเปลี่ยนคีย์การเข้ารหัสหลังจากส่งข้อความนี้',
+    'dm verification reason not found': 'ไม่พบคีย์การเข้ารหัสของผู้ส่ง',
+    'dm verification reason impersonated':
+      'ข้อความนี้อาจไม่ได้มาจากผู้ส่งที่แสดงไว้จริง อาจเป็นความพยายามแอบอ้างตัวตน',
+    'dm verification dialog footer': 'คุณยังคงอ่านข้อความนี้ได้ แต่ไม่สามารถยืนยันตัวตนของผู้ส่งได้'
   }
 }

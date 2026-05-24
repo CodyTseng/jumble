@@ -1,6 +1,6 @@
 import { Button, ButtonProps } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
 import { getReplaceableEventIdentifier, getNoteBech32Id } from '@/lib/event'
@@ -174,13 +174,7 @@ export default function ClientSelect({
       <div onClick={(e) => e.stopPropagation()}>
         <Drawer open={open} onOpenChange={setOpen}>
           <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-          <DrawerOverlay
-            onClick={(e) => {
-              e.stopPropagation()
-              setOpen(false)
-            }}
-          />
-          <DrawerContent hideOverlay>{content}</DrawerContent>
+          <DrawerContent title={t('Open in another client')}>{content}</DrawerContent>
         </Drawer>
       </div>
     )

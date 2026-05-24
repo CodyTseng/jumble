@@ -11,8 +11,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { toRelaySettings } from '@/lib/link'
@@ -66,11 +64,11 @@ export default function TooManyRelaysAlertDialog() {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent>
-          <DrawerHeader>
+          <div className="grid gap-1.5 p-4 text-center sm:text-start">
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
+          </div>
+          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
             <Button onClick={handleFixNow}>{t('Optimize Now')}</Button>
             <Button variant="outline" onClick={handleMaybeLater}>
               {t('Maybe Later')}
@@ -82,7 +80,7 @@ export default function TooManyRelaysAlertDialog() {
             >
               {t("Don't remind me again")}
             </Button>
-          </DrawerFooter>
+          </div>
         </DrawerContent>
       </Drawer>
     )

@@ -6,13 +6,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { createReportDraftEvent } from '@/lib/draft-event'
@@ -34,6 +28,7 @@ export default function ReportDialog({
   isOpen: boolean
   closeDialog: () => void
 }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
 
   if (isSmallScreen) {
@@ -46,11 +41,7 @@ export default function ReportDialog({
           }
         }}
       >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="hidden" />
-            <DrawerDescription className="hidden" />
-          </DrawerHeader>
+        <DrawerContent title={t('Report')}>
           <div className="p-4">
             <ReportContent event={event} closeDialog={closeDialog} />
           </div>

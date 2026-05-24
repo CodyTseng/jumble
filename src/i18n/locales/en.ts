@@ -979,6 +979,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.',
     Emoji: 'Emoji',
-    Ad: 'Ad'
+    Ad: 'Ad',
+    'Sender could not be verified': 'Sender could not be verified',
+    'dm verification dialog body':
+      'The signing key of this message does not match the encryption key currently published by the sender. Possible reasons:',
+    'dm verification reason rotated':
+      'The sender rotated their encryption key after sending this message.',
+    'dm verification reason not found': "The sender's encryption key could not be found.",
+    'dm verification reason impersonated':
+      'This message may not actually be from the displayed sender. It could be an impersonation attempt.',
+    'dm verification dialog footer':
+      "You can still read this message, but the sender's identity cannot be confirmed."
   }
 }

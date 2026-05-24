@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
@@ -158,11 +158,10 @@ export default function TrustScoreFilter({
       <>
         {trigger}
         <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild></DrawerTrigger>
-          <DrawerContent className="px-4 pb-4">
-            <DrawerHeader className="text-base font-semibold">
-              {t('trust-filter.title')}
-            </DrawerHeader>
+          <DrawerContent className="px-4">
+            <div className="grid gap-1.5 p-4 text-center sm:text-start">
+              <DrawerTitle className="text-base">{t('trust-filter.title')}</DrawerTitle>
+            </div>
             <div className="space-y-4 pb-4">{content}</div>
           </DrawerContent>
         </Drawer>

@@ -925,6 +925,12 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF 選擇器未配置。設定 VITE_KLIPY_API_KEY 以啟用。',
     Emoji: '表情',
-    Ad: '廣告'
+    Ad: '廣告',
+    'Sender could not be verified': '發送者身份無法核驗',
+    'dm verification dialog body': '此訊息的簽名金鑰與發送者目前公佈的加密金鑰不一致。可能原因：',
+    'dm verification reason rotated': '發送者在發送此訊息後重置了加密金鑰。',
+    'dm verification reason not found': '未能找到該發送者的加密金鑰。',
+    'dm verification reason impersonated': '此訊息或非來自顯示的發送者，存在被冒充的可能。',
+    'dm verification dialog footer': '此訊息仍可閱讀，但發送者身份無法確認。'
   }
 }

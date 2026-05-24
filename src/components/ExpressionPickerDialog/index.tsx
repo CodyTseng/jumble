@@ -9,6 +9,7 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TGif } from '@/services/klipy.service'
 import { TEmoji } from '@/types'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function ExpressionPickerDialog({
   children,
@@ -23,13 +24,13 @@ export default function ExpressionPickerDialog({
   enableGif?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
 
   const handleOpenChange = (value: boolean) => {
-    if (value && document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur()
-    }
+    // Note: Drawer itself blurs the active element when opening, so we don't
+    // need to do it here for the mobile path.
     setOpen(value)
     onOpenChange?.(value)
   }
@@ -50,7 +51,7 @@ export default function ExpressionPickerDialog({
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerTrigger asChild>{children}</DrawerTrigger>
-        <DrawerContent onClick={(e) => e.stopPropagation()}>
+        <DrawerContent title={t('Expression picker')} onClick={(e) => e.stopPropagation()}>
           <ExpressionPicker
             onEmojiClick={handleEmojiPick}
             onGifClick={handleGifPick}

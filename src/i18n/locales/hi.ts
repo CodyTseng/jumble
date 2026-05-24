@@ -961,6 +961,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'GIF पिकर कॉन्फ़िगर नहीं है। सक्षम करने के लिए VITE_KLIPY_API_KEY सेट करें।',
     Emoji: 'इमोजी',
-    Ad: 'विज्ञापन'
+    Ad: 'विज्ञापन',
+    'Sender could not be verified': 'भेजने वाले की पुष्टि नहीं हो सकी',
+    'dm verification dialog body':
+      'इस संदेश की हस्ताक्षर कुंजी भेजने वाले द्वारा वर्तमान में प्रकाशित एन्क्रिप्शन कुंजी से मेल नहीं खाती। संभावित कारण:',
+    'dm verification reason rotated':
+      'भेजने वाले ने यह संदेश भेजने के बाद अपनी एन्क्रिप्शन कुंजी बदल दी।',
+    'dm verification reason not found': 'भेजने वाले की एन्क्रिप्शन कुंजी नहीं मिल सकी।',
+    'dm verification reason impersonated':
+      'यह संदेश शायद वास्तव में दिखाए गए भेजने वाले से नहीं है। यह नकल का प्रयास हो सकता है।',
+    'dm verification dialog footer':
+      'आप अभी भी यह संदेश पढ़ सकते हैं, लेकिन भेजने वाले की पहचान की पुष्टि नहीं की जा सकती।'
   }
 }

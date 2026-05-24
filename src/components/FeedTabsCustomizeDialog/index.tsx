@@ -12,8 +12,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerHeader,
-  DrawerOverlay,
   DrawerTitle
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
@@ -44,7 +42,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft, GripVertical, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type TEditorState = { mode: 'add' } | { mode: 'edit'; id: string } | null
@@ -60,32 +58,12 @@ export default function FeedTabsCustomizeDialog({
   const { isSmallScreen } = useScreenSize()
   const { feedTabs, updateFeedTabs } = useUserPreferences()
   const [editor, setEditor] = useState<TEditorState>(null)
-  const drawerContentRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!open) {
       setEditor(null)
     }
   }, [open])
-
-  // Keep the drawer above the mobile virtual keyboard.
-  useEffect(() => {
-    if (!isSmallScreen || !open) return
-    const vv = window.visualViewport
-    if (!vv) return
-    const handleResize = () => {
-      if (!drawerContentRef.current) return
-      const keyboardHeight = Math.max(window.innerHeight - vv.height - vv.offsetTop, 0)
-      drawerContentRef.current.style.bottom = `${keyboardHeight}px`
-    }
-    vv.addEventListener('resize', handleResize)
-    vv.addEventListener('scroll', handleResize)
-    handleResize()
-    return () => {
-      vv.removeEventListener('resize', handleResize)
-      vv.removeEventListener('scroll', handleResize)
-    }
-  }, [isSmallScreen, open])
 
   const editingTab = useMemo(() => {
     if (!editor) return null
@@ -196,13 +174,8 @@ export default function FeedTabsCustomizeDialog({
   if (isSmallScreen) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerOverlay onClick={() => onOpenChange(false)} />
-        <DrawerContent
-          hideOverlay
-          ref={drawerContentRef}
-          className="max-h-[90vh] overflow-y-auto px-4 pb-4"
-        >
-          <DrawerHeader className="px-0">
+        <DrawerContent className="max-h-[90dvh] overflow-y-auto px-4">
+          <div className="grid gap-1.5 py-4 text-center sm:text-start">
             <DrawerTitle className="flex items-center gap-2">
               {showBack && (
                 <Button
@@ -217,7 +190,7 @@ export default function FeedTabsCustomizeDialog({
               {title}
             </DrawerTitle>
             {description && <DrawerDescription>{description}</DrawerDescription>}
-          </DrawerHeader>
+          </div>
           {body}
         </DrawerContent>
       </Drawer>

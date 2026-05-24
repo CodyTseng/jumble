@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,8 +52,7 @@ export default function ProfileOptions({
       <>
         {trigger}
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent hideOverlay>
+          <DrawerContent title={t('Profile options')}>
             <div className="py-2">
               <Button
                 onClick={() => {

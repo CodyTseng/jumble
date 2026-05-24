@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -110,14 +110,8 @@ export default function Mentions({
           {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
         </Button>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerOverlay onClick={() => setIsDrawerOpen(false)} />
-          <DrawerContent className="max-h-[80vh]" hideOverlay>
-            <div
-              className="overflow-y-auto overscroll-contain py-2"
-              style={{ touchAction: 'pan-y' }}
-            >
-              {items}
-            </div>
+          <DrawerContent title={t('Mentions')} className="max-h-[80dvh]">
+            <div className="overflow-y-auto overscroll-contain py-2">{items}</div>
           </DrawerContent>
         </Drawer>
       </>

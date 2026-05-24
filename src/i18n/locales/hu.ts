@@ -961,6 +961,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'A GIF-választó nincs konfigurálva. Állítsd be a VITE_KLIPY_API_KEY változót az engedélyezéshez.',
     Emoji: 'Emoji',
-    Ad: 'Hirdetés'
+    Ad: 'Hirdetés',
+    'Sender could not be verified': 'A küldő nem volt hitelesíthető',
+    'dm verification dialog body':
+      'Az üzenet aláíró kulcsa nem egyezik a küldő által jelenleg közzétett titkosítási kulccsal. Lehetséges okok:',
+    'dm verification reason rotated':
+      'A küldő az üzenet elküldése után lecserélte a titkosítási kulcsát.',
+    'dm verification reason not found': 'A küldő titkosítási kulcsa nem található.',
+    'dm verification reason impersonated':
+      'Lehet, hogy ez az üzenet valójában nem a feltüntetett küldőtől származik. Akár személyazonosság-lopási kísérlet is lehet.',
+    'dm verification dialog footer':
+      'Az üzenet továbbra is olvasható, de a küldő személyazonossága nem erősíthető meg.'
   }
 }

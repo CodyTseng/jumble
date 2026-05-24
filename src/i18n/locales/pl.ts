@@ -969,6 +969,16 @@ export default {
     'GIF picker is not configured. Set VITE_KLIPY_API_KEY to enable.':
       'Selektor GIF nie jest skonfigurowany. Ustaw VITE_KLIPY_API_KEY, aby go włączyć.',
     Emoji: 'Emoji',
-    Ad: 'Reklama'
+    Ad: 'Reklama',
+    'Sender could not be verified': 'Nie udało się zweryfikować nadawcy',
+    'dm verification dialog body':
+      'Klucz podpisu tej wiadomości nie zgadza się z aktualnie opublikowanym kluczem szyfrowania nadawcy. Możliwe przyczyny:',
+    'dm verification reason rotated':
+      'Nadawca zmienił swój klucz szyfrowania po wysłaniu tej wiadomości.',
+    'dm verification reason not found': 'Nie znaleziono klucza szyfrowania nadawcy.',
+    'dm verification reason impersonated':
+      'Ta wiadomość może faktycznie nie pochodzić od wyświetlanego nadawcy. Może to być próba podszycia się.',
+    'dm verification dialog footer':
+      'Możesz nadal odczytać tę wiadomość, ale tożsamości nadawcy nie można potwierdzić.'
   }
 }
