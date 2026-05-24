@@ -904,10 +904,10 @@ export default {
     Download: 'İndir',
     'Followed by your follows': 'Takip ettiklerinin takip ettiği kişiler',
     Shuffle: 'Karıştır',
-    'Login with Google': "Google ile giriş yap",
-    'Continue with Google': "Google ile devam et",
+    'Login with Google': 'Google ile giriş yap',
+    'Continue with Google': 'Google ile devam et',
     'Sign in with Google and a Nostr key will be created for you automatically.':
-      "Google ile giriş yap, senin için otomatik olarak bir Nostr anahtarı oluşturulsun.",
+      'Google ile giriş yap, senin için otomatik olarak bir Nostr anahtarı oluşturulsun.',
     'How it works': 'Nasıl çalışır',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
       'Özel anahtarın, ayrı operatörler tarafından tutulan parçalara bölünür, bu sayede hiçbir zaman tek bir yerde saklanmaz. Jumble, güvenli bir uzak imzalayıcı aracılığıyla imzalar. Anahtarını istediğin zaman hesap ayarlarından dışa aktarabilirsin.',
@@ -977,6 +977,16 @@ export default {
     'dm verification reason impersonated':
       'Bu ileti gerçekten görüntülenen göndericiden olmayabilir. Bir kimliğe bürünme girişimi olabilir.',
     'dm verification dialog footer':
-      'Bu iletiyi okumaya devam edebilirsiniz, ancak göndericinin kimliği doğrulanamıyor.'
+      'Bu iletiyi okumaya devam edebilirsiniz, ancak göndericinin kimliği doğrulanamıyor.',
+    'Remote signer': 'Uzak imzalayıcı',
+    'Public Key': 'Açık Anahtar',
+    'Account actions': 'Hesap işlemleri',
+    'Remove account': 'Hesabı kaldır',
+    Current: 'Geçerli',
+    or: 'veya',
+    'Connect a remote signer': 'Uzak imzalayıcı bağla',
+    'Scan with your signer app': 'İmzalayıcı uygulamanızla tarayın',
+    'Open with Nostr signer app': 'Nostr imzalayıcı uygulamayla aç',
+    'Scan QR code': 'QR kodu tara'
   }
 }

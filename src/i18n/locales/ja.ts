@@ -919,7 +919,8 @@ export default {
       'これはこのブラウザーで完全な秘密鍵を再構成します。信頼できるデバイスでのみ続行してください。',
     'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
       'この鍵を持つ人は誰でもあなたのアカウントを完全に制御できます。安全な場所に保管し、絶対に共有しないでください。',
-    'Recovered {{count}} of {{total}} shards': '{{total}} 個中 {{count}} 個のシャードを復元しました',
+    'Recovered {{count}} of {{total}} shards':
+      '{{total}} 個中 {{count}} 個のシャードを復元しました',
     'Recover one shard at a time. Each step opens a window to sign in with the operator.':
       'シャードを一つずつ復元します。各ステップでオペレーターにサインインするウィンドウが開きます。',
     'Recover next shard': '次のシャードを復元',
@@ -971,6 +972,16 @@ export default {
     'dm verification reason impersonated':
       'このメッセージは実際には表示されている送信者からではない可能性があり、なりすましの可能性があります。',
     'dm verification dialog footer':
-      'このメッセージは引き続き読めますが、送信者の身元は確認できません。'
+      'このメッセージは引き続き読めますが、送信者の身元は確認できません。',
+    'Remote signer': 'リモート署名者',
+    'Public Key': '公開鍵',
+    'Account actions': 'アカウント操作',
+    'Remove account': 'アカウントを削除',
+    Current: '現在',
+    or: 'または',
+    'Connect a remote signer': 'リモート署名者に接続',
+    'Scan with your signer app': '署名アプリでスキャン',
+    'Open with Nostr signer app': 'Nostr 署名アプリで開く',
+    'Scan QR code': 'QR コードをスキャン'
   }
 }

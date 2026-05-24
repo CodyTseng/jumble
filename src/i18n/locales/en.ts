@@ -989,6 +989,16 @@ export default {
     'dm verification reason impersonated':
       'This message may not actually be from the displayed sender. It could be an impersonation attempt.',
     'dm verification dialog footer':
-      "You can still read this message, but the sender's identity cannot be confirmed."
+      "You can still read this message, but the sender's identity cannot be confirmed.",
+    'Remote signer': 'Remote signer',
+    'Public Key': 'Public Key',
+    'Account actions': 'Account actions',
+    'Remove account': 'Remove account',
+    Current: 'Current',
+    or: 'or',
+    'Connect a remote signer': 'Connect a remote signer',
+    'Scan with your signer app': 'Scan with your signer app',
+    'Open with Nostr signer app': 'Open with Nostr signer app',
+    'Scan QR code': 'Scan QR code'
   }
 }

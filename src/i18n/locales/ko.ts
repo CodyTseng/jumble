@@ -961,6 +961,16 @@ export default {
     'dm verification reason impersonated':
       '이 메시지는 실제로 표시된 발신자가 보낸 것이 아닐 수 있으며, 사칭 시도일 수 있습니다.',
     'dm verification dialog footer':
-      '이 메시지는 계속 읽을 수 있지만 발신자의 신원은 확인할 수 없습니다.'
+      '이 메시지는 계속 읽을 수 있지만 발신자의 신원은 확인할 수 없습니다.',
+    'Remote signer': '원격 서명자',
+    'Public Key': '공개 키',
+    'Account actions': '계정 작업',
+    'Remove account': '계정 제거',
+    Current: '현재',
+    or: '또는',
+    'Connect a remote signer': '원격 서명자 연결',
+    'Scan with your signer app': '서명 앱으로 스캔',
+    'Open with Nostr signer app': 'Nostr 서명 앱으로 열기',
+    'Scan QR code': 'QR 코드 스캔'
   }
 }

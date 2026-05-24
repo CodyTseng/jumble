@@ -955,6 +955,16 @@ export default {
     'dm verification reason impersonated':
       'قد لا تكون هذه الرسالة فعلًا من المُرسِل المعروض. قد يكون الأمر محاولة انتحال هوية.',
     'dm verification dialog footer':
-      'لا يزال بإمكانك قراءة هذه الرسالة، لكن لا يمكن تأكيد هوية المُرسِل.'
+      'لا يزال بإمكانك قراءة هذه الرسالة، لكن لا يمكن تأكيد هوية المُرسِل.',
+    'Remote signer': 'موقّع عن بُعد',
+    'Public Key': 'المفتاح العام',
+    'Account actions': 'إجراءات الحساب',
+    'Remove account': 'إزالة الحساب',
+    Current: 'الحالي',
+    or: 'أو',
+    'Connect a remote signer': 'الاتصال بموقّع عن بُعد',
+    'Scan with your signer app': 'امسح برمز التطبيق الموقّع',
+    'Open with Nostr signer app': 'افتح باستخدام تطبيق توقيع Nostr',
+    'Scan QR code': 'مسح رمز QR'
   }
 }

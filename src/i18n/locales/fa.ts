@@ -971,6 +971,16 @@ export default {
     'dm verification reason impersonated':
       'این پیام ممکن است در واقع از فرستنده‌ی نمایش‌داده‌شده نباشد. می‌تواند یک تلاش برای جعل هویت باشد.',
     'dm verification dialog footer':
-      'هنوز می‌توانید این پیام را بخوانید، اما هویت فرستنده قابل تأیید نیست.'
+      'هنوز می‌توانید این پیام را بخوانید، اما هویت فرستنده قابل تأیید نیست.',
+    'Remote signer': 'امضاکننده‌ی راه‌دور',
+    'Public Key': 'کلید عمومی',
+    'Account actions': 'عملیات حساب',
+    'Remove account': 'حذف حساب',
+    Current: 'فعلی',
+    or: 'یا',
+    'Connect a remote signer': 'اتصال به امضاکننده‌ی راه‌دور',
+    'Scan with your signer app': 'با اپلیکیشن امضاکننده اسکن کنید',
+    'Open with Nostr signer app': 'با اپلیکیشن امضاکننده‌ی Nostr باز کنید',
+    'Scan QR code': 'اسکن کد QR'
   }
 }

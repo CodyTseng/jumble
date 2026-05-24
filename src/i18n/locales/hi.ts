@@ -971,6 +971,16 @@ export default {
     'dm verification reason impersonated':
       'यह संदेश शायद वास्तव में दिखाए गए भेजने वाले से नहीं है। यह नकल का प्रयास हो सकता है।',
     'dm verification dialog footer':
-      'आप अभी भी यह संदेश पढ़ सकते हैं, लेकिन भेजने वाले की पहचान की पुष्टि नहीं की जा सकती।'
+      'आप अभी भी यह संदेश पढ़ सकते हैं, लेकिन भेजने वाले की पहचान की पुष्टि नहीं की जा सकती।',
+    'Remote signer': 'रिमोट साइनर',
+    'Public Key': 'सार्वजनिक कुंजी',
+    'Account actions': 'खाता क्रियाएँ',
+    'Remove account': 'खाता हटाएँ',
+    Current: 'वर्तमान',
+    or: 'या',
+    'Connect a remote signer': 'रिमोट साइनर कनेक्ट करें',
+    'Scan with your signer app': 'अपने साइनर ऐप से स्कैन करें',
+    'Open with Nostr signer app': 'Nostr साइनर ऐप से खोलें',
+    'Scan QR code': 'QR कोड स्कैन करें'
   }
 }

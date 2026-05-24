@@ -908,7 +908,7 @@ export default {
       'Accedi con Google e una chiave Nostr verrà creata automaticamente per te.',
     'How it works': 'Come funziona',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'La tua chiave privata è divisa in frammenti detenuti da operatori separati, quindi non viene mai archiviata in un unico posto. Jumble firma tramite un firmatario remoto sicuro. Puoi esportare la tua chiave in qualsiasi momento dalle impostazioni dell\'account.',
+      "La tua chiave privata è divisa in frammenti detenuti da operatori separati, quindi non viene mai archiviata in un unico posto. Jumble firma tramite un firmatario remoto sicuro. Puoi esportare la tua chiave in qualsiasi momento dalle impostazioni dell'account.",
     'Waiting for Google sign-in...': 'In attesa del login Google...',
     'Checking your account...': 'Verifica del tuo account...',
     'Setting up your secure account...': 'Configurazione del tuo account sicuro...',
@@ -925,13 +925,13 @@ export default {
       'Chiunque abbia questa chiave ha il pieno controllo del tuo account. Conservala in un posto sicuro e non condividerla mai.',
     'Recovered {{count}} of {{total}} shards': '{{count}} di {{total}} frammenti recuperati',
     'Recover one shard at a time. Each step opens a window to sign in with the operator.':
-      'Recupera un frammento alla volta. Ogni passaggio apre una finestra per accedere con l\'operatore.',
+      "Recupera un frammento alla volta. Ogni passaggio apre una finestra per accedere con l'operatore.",
     'Recover next shard': 'Recupera il frammento successivo',
     'Start recovery': 'Avvia il recupero',
     'Something went wrong': 'Qualcosa è andato storto',
     'Central server': 'Server centrale',
     'Disconnecting unlinks this account from the central server. You can still use the account with your private key.':
-      'La disconnessione scollega questo account dal server centrale. Puoi ancora usare l\'account con la tua chiave privata.',
+      "La disconnessione scollega questo account dal server centrale. Puoi ancora usare l'account con la tua chiave privata.",
     'Disconnect from central server': 'Disconnetti dal server centrale',
     'Disconnected from central server': 'Disconnesso dal server centrale',
     'What happens next': 'Cosa succede dopo',
@@ -976,6 +976,16 @@ export default {
     'dm verification reason impersonated':
       'Questo messaggio potrebbe non provenire effettivamente dal mittente mostrato. Potrebbe trattarsi di un tentativo di impersonificazione.',
     'dm verification dialog footer':
-      "Puoi comunque leggere questo messaggio, ma l'identità del mittente non può essere confermata."
+      "Puoi comunque leggere questo messaggio, ma l'identità del mittente non può essere confermata.",
+    'Remote signer': 'Signer remoto',
+    'Public Key': 'Chiave pubblica',
+    'Account actions': 'Azioni account',
+    'Remove account': 'Rimuovi account',
+    Current: 'Corrente',
+    or: 'o',
+    'Connect a remote signer': 'Connetti un signer remoto',
+    'Scan with your signer app': 'Scansiona con la tua app di firma',
+    'Open with Nostr signer app': 'Apri con app di firma Nostr',
+    'Scan QR code': 'Scansiona codice QR'
   }
 }

@@ -938,6 +938,16 @@ export default {
     'dm verification reason rotated': '发送者在发送此消息后重置了加密密钥。',
     'dm verification reason not found': '未能找到该发送者的加密密钥。',
     'dm verification reason impersonated': '此消息或非来自显示的发送者，存在被冒充的可能。',
-    'dm verification dialog footer': '此消息仍可阅读，但发送者身份无法确认。'
+    'dm verification dialog footer': '此消息仍可阅读，但发送者身份无法确认。',
+    'Remote signer': '远程签名器',
+    'Public Key': '公钥',
+    'Account actions': '账户操作',
+    'Remove account': '移除账户',
+    Current: '当前',
+    or: '或',
+    'Connect a remote signer': '连接远程签名器',
+    'Scan with your signer app': '用你的签名应用扫码',
+    'Open with Nostr signer app': '用 Nostr 签名应用打开',
+    'Scan QR code': '扫描二维码'
   }
 }

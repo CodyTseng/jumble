@@ -975,6 +975,16 @@ export default {
     'dm verification reason impersonated':
       'Esta mensagem pode não ser de fato do remetente exibido. Pode ser uma tentativa de personificação.',
     'dm verification dialog footer':
-      'Você ainda pode ler esta mensagem, mas a identidade do remetente não pode ser confirmada.'
+      'Você ainda pode ler esta mensagem, mas a identidade do remetente não pode ser confirmada.',
+    'Remote signer': 'Assinador remoto',
+    'Public Key': 'Chave pública',
+    'Account actions': 'Ações da conta',
+    'Remove account': 'Remover conta',
+    Current: 'Atual',
+    or: 'ou',
+    'Connect a remote signer': 'Conectar um assinador remoto',
+    'Scan with your signer app': 'Escaneie com seu app de assinatura',
+    'Open with Nostr signer app': 'Abrir com app de assinatura Nostr',
+    'Scan QR code': 'Escanear código QR'
   }
 }

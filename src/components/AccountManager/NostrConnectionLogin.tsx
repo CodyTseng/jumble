@@ -185,67 +185,85 @@ export default function NostrConnectLogin({
   }, [])
 
   return (
-    <div className="relative flex flex-col gap-4">
-      <div ref={qrContainerRef} className="mb-3 flex w-full flex-col items-center gap-3">
-        <a href={loginDetails.connectionString} aria-label="Open with Nostr signer app">
+    <div className="relative flex flex-col gap-5">
+      {/* Header */}
+      <h3 className="text-center text-lg font-semibold">{t('Connect a remote signer')}</h3>
+
+      {/* QR + connection string */}
+      <div ref={qrContainerRef} className="flex w-full flex-col items-center gap-3">
+        <div className="text-xs text-muted-foreground">{t('Scan with your signer app')}</div>
+        <a
+          href={loginDetails.connectionString}
+          aria-label={t('Open with Nostr signer app')}
+          className="rounded-2xl outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
           <QrCode size={qrCodeSize} value={loginDetails.connectionString} />
         </a>
+        <button
+          type="button"
+          onClick={copyConnectionString}
+          className="flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/80"
+          style={{
+            maxWidth: qrCodeSize > 0 ? `${Math.max(150, Math.min(qrCodeSize, 320))}px` : '100%'
+          }}
+        >
+          <span className="min-w-0 flex-1 truncate text-start">
+            {loginDetails.connectionString}
+          </span>
+          {copied ? (
+            <Check className="size-3.5 shrink-0" />
+          ) : (
+            <Copy className="size-3.5 shrink-0" />
+          )}
+        </button>
         {nostrConnectionErrMsg && (
-          <div className="text-destructive pt-1 text-center text-xs">{nostrConnectionErrMsg}</div>
+          <div className="text-center text-xs text-destructive">{nostrConnectionErrMsg}</div>
         )}
       </div>
-      <div className="mb-3 flex w-full justify-center">
-        <div
-          className="bg-muted text-muted-foreground hover:bg-muted/80 flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-sm transition-all"
-          style={{
-            width: qrCodeSize > 0 ? `${Math.max(150, Math.min(qrCodeSize, 320))}px` : 'auto'
-          }}
-          onClick={copyConnectionString}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="min-w-0 grow truncate select-none">{loginDetails.connectionString}</div>
-          <div className="shrink-0">{copied ? <Check size={14} /> : <Copy size={14} />}</div>
-        </div>
+
+      {/* OR divider — matches AccountManager style */}
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs uppercase tracking-wide text-muted-foreground/70">{t('or')}</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="my-4 flex w-full items-center">
-        <div className="border-border/40 grow border-t"></div>
-        <span className="text-muted-foreground px-3 text-xs">OR</span>
-        <div className="border-border/40 grow border-t"></div>
-      </div>
-
-      <div className="w-full space-y-1">
-        <div className="flex items-start gap-2">
-          <div className="relative flex-1">
-            <Input
-              placeholder="bunker://..."
-              value={bunkerInput}
-              onChange={handleInputChange}
-              className={errMsg ? 'border-destructive pe-10' : 'pe-10'}
-            />
-            <Button
-              size="sm"
-              variant="ghost"
-              className="absolute! inset-e-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
-              onClick={startQrScan}
-              disabled={pending}
-            >
-              <ScanQrCode />
-            </Button>
-          </div>
-          <Button onClick={() => handleLogin()} disabled={pending}>
-            <Loader className={pending ? 'me-2 animate-spin' : 'hidden'} />
-            {t('Login')}
+      {/* Bunker URI input — placeholder self-explains, no Label needed */}
+      <div className="space-y-1">
+        <div className="relative">
+          <Input
+            id="bunker-input"
+            placeholder="bunker://..."
+            value={bunkerInput}
+            onChange={handleInputChange}
+            className={cn('pe-10', errMsg && 'border-destructive')}
+          />
+          <Button
+            size="sm"
+            variant="ghost"
+            className="absolute! inset-e-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+            onClick={startQrScan}
+            disabled={pending}
+            aria-label={t('Scan QR code')}
+          >
+            <ScanQrCode />
           </Button>
         </div>
-
-        {errMsg && <div className="text-destructive ps-3 pt-1 text-xs">{errMsg}</div>}
+        {errMsg && <div className="text-xs text-destructive">{errMsg}</div>}
       </div>
-      <Button variant="secondary" onClick={back} className="w-full">
-        {t('Back')}
-      </Button>
 
+      {/* Actions */}
+      <div className="flex gap-2">
+        <Button className="w-fit px-8" variant="secondary" type="button" onClick={back}>
+          {t('Back')}
+        </Button>
+        <Button className="flex-1" onClick={() => handleLogin()} disabled={pending}>
+          <Loader className={pending ? 'me-2 animate-spin' : 'hidden'} />
+          {t('Login')}
+        </Button>
+      </div>
+
+      {/* QR scanner overlay */}
       <div className={cn('flex h-full w-full justify-center', isScanning ? '' : 'hidden')}>
         <video
           ref={videoRef}
@@ -260,7 +278,7 @@ export default function NostrConnectLogin({
           className="absolute top-2 right-2"
           onClick={stopQrScan}
         >
-          Cancel
+          {t('Cancel')}
         </Button>
       </div>
     </div>

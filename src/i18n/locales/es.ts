@@ -976,6 +976,16 @@ export default {
     'dm verification reason impersonated':
       'Este mensaje podría no ser realmente del remitente mostrado. Podría tratarse de un intento de suplantación.',
     'dm verification dialog footer':
-      'Aún puedes leer este mensaje, pero no se puede confirmar la identidad del remitente.'
+      'Aún puedes leer este mensaje, pero no se puede confirmar la identidad del remitente.',
+    'Remote signer': 'Firmante remoto',
+    'Public Key': 'Clave pública',
+    'Account actions': 'Acciones de la cuenta',
+    'Remove account': 'Eliminar cuenta',
+    Current: 'Actual',
+    or: 'o',
+    'Connect a remote signer': 'Conectar un firmante remoto',
+    'Scan with your signer app': 'Escanea con tu app de firma',
+    'Open with Nostr signer app': 'Abrir con app de firma Nostr',
+    'Scan QR code': 'Escanear código QR'
   }
 }

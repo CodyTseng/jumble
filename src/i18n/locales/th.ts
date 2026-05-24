@@ -953,6 +953,17 @@ export default {
     'dm verification reason not found': 'ไม่พบคีย์การเข้ารหัสของผู้ส่ง',
     'dm verification reason impersonated':
       'ข้อความนี้อาจไม่ได้มาจากผู้ส่งที่แสดงไว้จริง อาจเป็นความพยายามแอบอ้างตัวตน',
-    'dm verification dialog footer': 'คุณยังคงอ่านข้อความนี้ได้ แต่ไม่สามารถยืนยันตัวตนของผู้ส่งได้'
+    'dm verification dialog footer':
+      'คุณยังคงอ่านข้อความนี้ได้ แต่ไม่สามารถยืนยันตัวตนของผู้ส่งได้',
+    'Remote signer': 'ผู้ลงนามระยะไกล',
+    'Public Key': 'กุญแจสาธารณะ',
+    'Account actions': 'การจัดการบัญชี',
+    'Remove account': 'ลบบัญชี',
+    Current: 'ปัจจุบัน',
+    or: 'หรือ',
+    'Connect a remote signer': 'เชื่อมต่อผู้ลงนามระยะไกล',
+    'Scan with your signer app': 'สแกนด้วยแอปลงนามของคุณ',
+    'Open with Nostr signer app': 'เปิดด้วยแอปลงนาม Nostr',
+    'Scan QR code': 'สแกนรหัส QR'
   }
 }

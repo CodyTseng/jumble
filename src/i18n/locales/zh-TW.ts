@@ -931,6 +931,16 @@ export default {
     'dm verification reason rotated': '發送者在發送此訊息後重置了加密金鑰。',
     'dm verification reason not found': '未能找到該發送者的加密金鑰。',
     'dm verification reason impersonated': '此訊息或非來自顯示的發送者，存在被冒充的可能。',
-    'dm verification dialog footer': '此訊息仍可閱讀，但發送者身份無法確認。'
+    'dm verification dialog footer': '此訊息仍可閱讀，但發送者身份無法確認。',
+    'Remote signer': '遠端簽名器',
+    'Public Key': '公鑰',
+    'Account actions': '帳戶操作',
+    'Remove account': '移除帳戶',
+    Current: '目前',
+    or: '或',
+    'Connect a remote signer': '連接遠端簽名器',
+    'Scan with your signer app': '用你的簽名應用程式掃碼',
+    'Open with Nostr signer app': '用 Nostr 簽名應用程式開啟',
+    'Scan QR code': '掃描二維碼'
   }
 }

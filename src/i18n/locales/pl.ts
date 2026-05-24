@@ -979,6 +979,16 @@ export default {
     'dm verification reason impersonated':
       'Ta wiadomość może faktycznie nie pochodzić od wyświetlanego nadawcy. Może to być próba podszycia się.',
     'dm verification dialog footer':
-      'Możesz nadal odczytać tę wiadomość, ale tożsamości nadawcy nie można potwierdzić.'
+      'Możesz nadal odczytać tę wiadomość, ale tożsamości nadawcy nie można potwierdzić.',
+    'Remote signer': 'Zdalny podpisujący',
+    'Public Key': 'Klucz publiczny',
+    'Account actions': 'Akcje konta',
+    'Remove account': 'Usuń konto',
+    Current: 'Bieżące',
+    or: 'lub',
+    'Connect a remote signer': 'Połącz zdalnego podpisującego',
+    'Scan with your signer app': 'Zeskanuj aplikacją do podpisywania',
+    'Open with Nostr signer app': 'Otwórz w aplikacji podpisującej Nostr',
+    'Scan QR code': 'Skanuj kod QR'
   }
 }

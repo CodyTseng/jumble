@@ -933,7 +933,8 @@ export default {
       'Dadurch wird dein vollständiger privater Schlüssel in diesem Browser zusammengesetzt. Fahre nur auf einem Gerät fort, dem du vertraust.',
     'Anyone with this key has full control of your account. Store it somewhere secure and never share it.':
       'Jeder mit diesem Schlüssel hat die volle Kontrolle über dein Konto. Bewahre ihn sicher auf und teile ihn niemals.',
-    'Recovered {{count}} of {{total}} shards': '{{count}} von {{total}} Fragmenten wiederhergestellt',
+    'Recovered {{count}} of {{total}} shards':
+      '{{count}} von {{total}} Fragmenten wiederhergestellt',
     'Recover one shard at a time. Each step opens a window to sign in with the operator.':
       'Stelle ein Fragment nach dem anderen wieder her. Jeder Schritt öffnet ein Fenster zum Anmelden beim Betreiber.',
     'Recover next shard': 'Nächstes Fragment wiederherstellen',
@@ -986,6 +987,16 @@ export default {
     'dm verification reason impersonated':
       'Diese Nachricht stammt möglicherweise nicht vom angezeigten Absender. Es könnte sich um einen Identitätsbetrug handeln.',
     'dm verification dialog footer':
-      'Du kannst diese Nachricht weiterhin lesen, aber die Identität des Absenders kann nicht bestätigt werden.'
+      'Du kannst diese Nachricht weiterhin lesen, aber die Identität des Absenders kann nicht bestätigt werden.',
+    'Remote signer': 'Remote-Signer',
+    'Public Key': 'Öffentlicher Schlüssel',
+    'Account actions': 'Kontoaktionen',
+    'Remove account': 'Konto entfernen',
+    Current: 'Aktuell',
+    or: 'oder',
+    'Connect a remote signer': 'Mit Remote-Signer verbinden',
+    'Scan with your signer app': 'Mit deiner Signer-App scannen',
+    'Open with Nostr signer app': 'Mit Nostr-Signer-App öffnen',
+    'Scan QR code': 'QR-Code scannen'
   }
 }

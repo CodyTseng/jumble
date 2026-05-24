@@ -978,6 +978,16 @@ export default {
     'dm verification reason impersonated':
       'Esta mensagem pode não ser efetivamente do remetente apresentado. Pode tratar-se de uma tentativa de personificação.',
     'dm verification dialog footer':
-      'Pode continuar a ler esta mensagem, mas a identidade do remetente não pode ser confirmada.'
+      'Pode continuar a ler esta mensagem, mas a identidade do remetente não pode ser confirmada.',
+    'Remote signer': 'Signatário remoto',
+    'Public Key': 'Chave pública',
+    'Account actions': 'Ações da conta',
+    'Remove account': 'Remover conta',
+    Current: 'Atual',
+    or: 'ou',
+    'Connect a remote signer': 'Ligar um signatário remoto',
+    'Scan with your signer app': 'Digitalize com a sua app de assinatura',
+    'Open with Nostr signer app': 'Abrir com app de assinatura Nostr',
+    'Scan QR code': 'Digitalizar código QR'
   }
 }

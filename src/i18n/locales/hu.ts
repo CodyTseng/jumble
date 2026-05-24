@@ -971,6 +971,16 @@ export default {
     'dm verification reason impersonated':
       'Lehet, hogy ez az üzenet valójában nem a feltüntetett küldőtől származik. Akár személyazonosság-lopási kísérlet is lehet.',
     'dm verification dialog footer':
-      'Az üzenet továbbra is olvasható, de a küldő személyazonossága nem erősíthető meg.'
+      'Az üzenet továbbra is olvasható, de a küldő személyazonossága nem erősíthető meg.',
+    'Remote signer': 'Távoli aláíró',
+    'Public Key': 'Nyilvános kulcs',
+    'Account actions': 'Fiókműveletek',
+    'Remove account': 'Fiók eltávolítása',
+    Current: 'Jelenlegi',
+    or: 'vagy',
+    'Connect a remote signer': 'Távoli aláíró csatlakoztatása',
+    'Scan with your signer app': 'Olvasd be az aláíró alkalmazásoddal',
+    'Open with Nostr signer app': 'Megnyitás Nostr aláíró alkalmazással',
+    'Scan QR code': 'QR-kód beolvasása'
   }
 }

@@ -11,7 +11,7 @@ import { toWallet } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
-import { LogIn, LogOut, Plus, Wallet } from 'lucide-react'
+import { Check, LogIn, LogOut, Plus, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LoginDialog from '../LoginDialog'
@@ -70,35 +70,40 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>{t('Switch account')}</DropdownMenuLabel>
-        {accounts.map((act) => (
-          <DropdownMenuItem
-            className={act.pubkey === pubkey ? 'cursor-default focus:bg-background' : ''}
-            key={`${act.pubkey}:${act.signerType}`}
-            onClick={() => {
-              if (act.pubkey !== pubkey) {
-                switchAccount(act)
-              }
-            }}
-          >
-            <div className="flex flex-1 items-center gap-2">
+        {accounts.map((act, idx) => {
+          const isCurrent = act.pubkey === pubkey
+          return (
+            <DropdownMenuItem
+              key={`${act.pubkey}:${act.signerType}`}
+              className={cn(
+                'gap-2',
+                idx < accounts.length - 1 && 'mb-1',
+                isCurrent &&
+                  'cursor-default bg-primary/10 ring-1 ring-inset ring-primary/40 focus:bg-primary/10'
+              )}
+              onClick={() => {
+                if (!isCurrent) {
+                  switchAccount(act)
+                }
+              }}
+            >
               <SimpleUserAvatar userId={act.pubkey} ignorePolicy />
-              <div className="w-0 flex-1">
-                <SimpleUsername
-                  userId={act.pubkey}
-                  className="truncate font-medium"
-                  skeletonClassName="h-3"
-                />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <SimpleUsername
+                    userId={act.pubkey}
+                    className="truncate font-medium"
+                    skeletonClassName="h-3"
+                  />
+                  {isCurrent && (
+                    <Check className="size-3.5 shrink-0 text-primary" aria-label={t('Current')} />
+                  )}
+                </div>
                 <SignerTypeBadge signerType={act.signerType} />
               </div>
-            </div>
-            <div
-              className={cn(
-                'size-3.5 rounded-full border border-muted-foreground',
-                act.pubkey === pubkey && 'size-4 border-4 border-primary'
-              )}
-            />
-          </DropdownMenuItem>
-        ))}
+            </DropdownMenuItem>
+          )
+        })}
         <DropdownMenuItem
           onClick={() => setLoginDialogOpen(true)}
           className="m-2 border border-dashed focus:border-muted-foreground focus:bg-background"
