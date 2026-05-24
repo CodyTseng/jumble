@@ -29,7 +29,7 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       onClick={(e) => e.stopPropagation()}
     >
       {nip05Name !== '_' ? (
-        <span className="truncate text-sm text-muted-foreground">@{nip05Name}</span>
+        <span className="text-muted-foreground truncate text-sm">@{nip05Name}</span>
       ) : null}
       {nip05IsVerified ? (
         isNamecoin ? (
@@ -38,11 +38,11 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
           <Favicon
             domain={nip05Domain}
             className="h-3.5 w-3.5 shrink-0 rounded-full"
-            fallback={<BadgeCheck className="shrink-0 text-primary" />}
+            fallback={<BadgeCheck className="text-primary shrink-0" />}
           />
         )
       ) : (
-        <BadgeAlert className="shrink-0 text-muted-foreground" />
+        <BadgeAlert className="text-muted-foreground shrink-0" />
       )}
       <SecondaryPageLink
         to={toNoteList({ domain: nip05Domain })}
@@ -50,7 +50,7 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       >
         {nip05Domain}
       </SecondaryPageLink>
-      {append && <span className="truncate text-sm text-muted-foreground">{append}</span>}
+      {append && <span className="text-muted-foreground truncate text-sm">{append}</span>}
     </div>
   )
 }

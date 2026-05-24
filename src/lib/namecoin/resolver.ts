@@ -186,12 +186,21 @@ function isValidHexPubkey(s: string): boolean {
 // ── Main resolution function ────────────────────────────────────────
 
 /**
- * Resolve a Namecoin identifier to a Nostr pubkey.
- * Uses an in-memory LRU cache and direct WebSocket connection to ElectrumX.
+ * In-flight dedup: while a lookup for `cacheKey` is pending, concurrent
+ * callers share the same promise instead of issuing parallel ElectrumX
+ * round-trips. Complements the LRU cache (which only helps AFTER the
+ * first lookup completes) and keeps the shared WebSocket lightly loaded
+ * when a feed render references the same `.bit` identifier in several
+ * places at once.
  */
-export async function resolveNamecoin(
-  address: string
-): Promise<NamecoinNostrResult | null> {
+const inFlight = new Map<string, Promise<NamecoinNostrResult | null>>()
+
+/**
+ * Resolve a Namecoin identifier to a Nostr pubkey.
+ * Uses an in-memory LRU cache, in-flight request dedup, and a shared
+ * multiplexed WebSocket to ElectrumX.
+ */
+export async function resolveNamecoin(address: string): Promise<NamecoinNostrResult | null> {
   const parsed = parseNamecoinIdentifier(address)
   if (!parsed) return null
 
@@ -202,12 +211,22 @@ export async function resolveNamecoin(
   const cached = cache.get(cacheKey)
   if (cached !== undefined) return cached === SENTINEL_NOT_FOUND ? null : cached
 
-  try {
-    const result = await resolveNamecoinViaWs(parsed)
-    cache.set(cacheKey, result ?? SENTINEL_NOT_FOUND)
-    return result
-  } catch (err) {
-    console.warn('[Namecoin] Resolution failed for', address, err)
-    return null
-  }
+  const pending = inFlight.get(cacheKey)
+  if (pending) return pending
+
+  const promise = (async () => {
+    try {
+      const result = await resolveNamecoinViaWs(parsed)
+      cache.set(cacheKey, result ?? SENTINEL_NOT_FOUND)
+      return result
+    } catch (err) {
+      console.warn('[Namecoin] Resolution failed for', address, err)
+      return null
+    } finally {
+      inFlight.delete(cacheKey)
+    }
+  })()
+
+  inFlight.set(cacheKey, promise)
+  return promise
 }
