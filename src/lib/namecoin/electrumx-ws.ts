@@ -7,6 +7,14 @@
  * Protocol: JSON-RPC 1.0 over WebSocket text frames (newline-delimited).
  * ElectrumX 1.16.0+ with websockets support required on the server side.
  *
+ * Connection model: one persistent, multiplexed WebSocket per ElectrumX
+ * server URL. Concurrent name lookups share the same socket and dispatch
+ * responses by JSON-RPC `id`. Sockets close themselves after a short idle
+ * window with no in-flight calls. This collapses N concurrent `.bit`
+ * lookups into 1 socket rather than N short-lived sockets — important
+ * because browsers cap renderer-wide WebSocket counts (Chromium ≈ 256;
+ * Safari is markedly lower and slow to open many in parallel).
+ *
  * Resolution strategy:
  * 1. Build a canonical name index script for the identifier
  * 2. Compute the Electrum-style scripthash (reversed SHA-256)
@@ -121,10 +129,7 @@ async function electrumScripthash(script: Uint8Array): Promise<string> {
 // ── Transaction parsing ─────────────────────────────────────────────
 
 /** Read a push-data encoded byte sequence from script at pos */
-function readPushData(
-  script: Uint8Array,
-  pos: number
-): { data: Uint8Array; next: number } | null {
+function readPushData(script: Uint8Array, pos: number): { data: Uint8Array; next: number } | null {
   if (pos >= script.length) return null
   const opcode = script[pos]
 
@@ -198,7 +203,7 @@ function parseNameFromVerboseTx(
   return null
 }
 
-// ── WebSocket JSON-RPC client ───────────────────────────────────────
+// ── Multiplexed WebSocket JSON-RPC client ───────────────────────────
 
 interface HistoryEntry {
   tx_hash: string
@@ -213,97 +218,336 @@ interface RpcResponse {
   error?: { code: number; message: string }
 }
 
+interface PendingCall {
+  resolve: (result: unknown) => void
+  reject: (err: Error) => void
+  timer: ReturnType<typeof setTimeout>
+}
+
+/** ms a socket may sit with no in-flight calls before being closed. */
+const IDLE_CLOSE_MS = 15_000
+/** ms to wait for the WebSocket to open before failing. */
+const OPEN_TIMEOUT_MS = 10_000
+/** default per-call timeout. */
+const DEFAULT_CALL_TIMEOUT_MS = 20_000
+
+type ConnState = 'connecting' | 'open' | 'closed'
+
 /**
- * Batch multiple JSON-RPC calls over a single WebSocket connection.
- * Sends requests sequentially but keeps the socket open until all are done.
+ * Persistent, multiplexed ElectrumX client over a single WebSocket.
+ *
+ * Concurrent callers share one socket; each call gets a unique JSON-RPC id
+ * and is dispatched independently when the matching response arrives.
+ * Server-initiated frames (banner, headers subscriptions, relayfee pushes)
+ * carry no matching id and are silently discarded.
+ *
+ * After all in-flight calls settle, the socket stays open for IDLE_CLOSE_MS
+ * to absorb follow-up bursts (a feed render typically resolves several
+ * `.bit` identifiers within a second of each other), then closes itself.
+ */
+export class ElectrumxClient {
+  private ws: WebSocket | null = null
+  private state: ConnState = 'closed'
+  private openWaiters: Array<{ resolve: () => void; reject: (err: Error) => void }> = []
+  private pending = new Map<number, PendingCall>()
+  private nextId = 1
+  private idleTimer: ReturnType<typeof setTimeout> | null = null
+  private openTimer: ReturnType<typeof setTimeout> | null = null
+
+  constructor(readonly url: string) {}
+
+  /**
+   * Issue a single JSON-RPC call over the shared socket. Opens the socket
+   * lazily on first use and reuses it for subsequent concurrent calls.
+   */
+  call(
+    method: string,
+    params: unknown[],
+    timeoutMs: number = DEFAULT_CALL_TIMEOUT_MS
+  ): Promise<unknown> {
+    return new Promise<unknown>((resolve, reject) => {
+      const start = () => {
+        if (this.state !== 'open' || !this.ws) {
+          reject(new Error(`ElectrumX socket not open: ${this.url}`))
+          return
+        }
+        const id = this.nextId++
+        const timer = setTimeout(() => {
+          const entry = this.pending.get(id)
+          if (!entry) return
+          this.pending.delete(id)
+          entry.reject(new Error(`ElectrumX RPC '${method}' timeout after ${timeoutMs}ms`))
+          this.scheduleIdleClose()
+        }, timeoutMs)
+        this.pending.set(id, { resolve, reject, timer })
+        this.cancelIdleClose()
+        try {
+          this.ws.send(JSON.stringify({ jsonrpc: '2.0', method, params, id }) + '\n')
+        } catch (err) {
+          const entry = this.pending.get(id)
+          if (entry) {
+            clearTimeout(entry.timer)
+            this.pending.delete(id)
+          }
+          reject(err instanceof Error ? err : new Error(String(err)))
+          this.scheduleIdleClose()
+        }
+      }
+
+      this.ensureOpen()
+        .then(start)
+        .catch((err) => reject(err instanceof Error ? err : new Error(String(err))))
+    })
+  }
+
+  /**
+   * Convenience: issue multiple calls in parallel over the shared socket and
+   * resolve to results in the same order. (Each call is independent; this
+   * does NOT serialise them.)
+   */
+  callAll(
+    calls: Array<{ method: string; params: unknown[] }>,
+    timeoutMs?: number
+  ): Promise<unknown[]> {
+    return Promise.all(calls.map(({ method, params }) => this.call(method, params, timeoutMs)))
+  }
+
+  /** Force-close the socket and fail any in-flight calls. */
+  close(reason = 'closed by caller') {
+    const err = new Error(`ElectrumX socket closed: ${reason}`)
+    this.failAllPending(err)
+    this.cancelIdleClose()
+    this.cancelOpenTimer()
+    const ws = this.ws
+    this.ws = null
+    this.state = 'closed'
+    if (ws) {
+      try {
+        ws.close()
+      } catch {
+        // ignore
+      }
+    }
+    // Reject any open waiters so callers don't hang.
+    const waiters = this.openWaiters
+    this.openWaiters = []
+    for (const w of waiters) w.reject(err)
+  }
+
+  /** True when the socket is connected and ready to send. */
+  get isOpen(): boolean {
+    return this.state === 'open'
+  }
+
+  /** Total in-flight RPC calls awaiting a response. */
+  get inFlight(): number {
+    return this.pending.size
+  }
+
+  // ── Internal ──────────────────────────────────────────────────────
+
+  private ensureOpen(): Promise<void> {
+    if (this.state === 'open') return Promise.resolve()
+    if (this.state === 'connecting') {
+      return new Promise<void>((resolve, reject) => {
+        this.openWaiters.push({ resolve, reject })
+      })
+    }
+
+    // state === 'closed' — initiate.
+    this.state = 'connecting'
+    return new Promise<void>((resolve, reject) => {
+      this.openWaiters.push({ resolve, reject })
+      let ws: WebSocket
+      try {
+        ws = new WebSocket(this.url)
+      } catch (err) {
+        this.state = 'closed'
+        const e = err instanceof Error ? err : new Error(String(err))
+        const waiters = this.openWaiters
+        this.openWaiters = []
+        for (const w of waiters) w.reject(e)
+        return
+      }
+      this.ws = ws
+      this.openTimer = setTimeout(() => {
+        if (this.state === 'connecting') {
+          this.bailOnOpenFailure(new Error(`ElectrumX connect timeout: ${this.url}`))
+        }
+      }, OPEN_TIMEOUT_MS)
+
+      ws.addEventListener('open', () => {
+        this.cancelOpenTimer()
+        this.state = 'open'
+        const waiters = this.openWaiters
+        this.openWaiters = []
+        for (const w of waiters) w.resolve()
+        this.scheduleIdleClose()
+      })
+
+      ws.addEventListener('message', (ev) => this.onMessage(ev))
+
+      ws.addEventListener('error', () => {
+        if (this.state === 'connecting') {
+          this.bailOnOpenFailure(new Error(`ElectrumX connect failed: ${this.url}`))
+        } else {
+          // Error after open — let close handler tear everything down.
+        }
+      })
+
+      ws.addEventListener('close', (ev) => {
+        const wasConnecting = this.state === 'connecting'
+        const reason = `ElectrumX socket closed (code=${ev.code})`
+        this.cancelOpenTimer()
+        this.cancelIdleClose()
+        this.ws = null
+        this.state = 'closed'
+        const err = new Error(reason)
+        this.failAllPending(err)
+        if (wasConnecting) {
+          const waiters = this.openWaiters
+          this.openWaiters = []
+          for (const w of waiters) w.reject(err)
+        }
+      })
+    })
+  }
+
+  private bailOnOpenFailure(err: Error) {
+    this.cancelOpenTimer()
+    const ws = this.ws
+    this.ws = null
+    this.state = 'closed'
+    const waiters = this.openWaiters
+    this.openWaiters = []
+    for (const w of waiters) w.reject(err)
+    if (ws) {
+      try {
+        ws.close()
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  private onMessage(ev: MessageEvent) {
+    if (this.state !== 'open') return
+    const data = typeof ev.data === 'string' ? ev.data : String(ev.data)
+    // ElectrumX may pack multiple JSON-RPC messages into a single frame,
+    // separated by newlines.
+    for (const line of data.split('\n')) {
+      const trimmed = line.trim()
+      if (!trimmed) continue
+      let msg: RpcResponse
+      try {
+        msg = JSON.parse(trimmed)
+      } catch {
+        // Malformed frame — ignore.
+        continue
+      }
+      // ElectrumX is bidirectional JSON-RPC: the server initiates its own
+      // RPC calls at us (server.banner, blockchain.headers.subscribe,
+      // blockchain.relayfee, blockchain.estimatefee, …) which arrive
+      // interleaved with — and often before — responses to our outstanding
+      // requests. Only consume frames whose id matches a pending call;
+      // discard everything else.
+      if (typeof msg.id !== 'number') continue
+      const entry = this.pending.get(msg.id)
+      if (!entry) continue
+      this.pending.delete(msg.id)
+      clearTimeout(entry.timer)
+      if (msg.error) {
+        entry.reject(new Error(msg.error.message || `RPC error ${msg.error.code}`))
+      } else {
+        entry.resolve(msg.result)
+      }
+    }
+    if (this.pending.size === 0) this.scheduleIdleClose()
+  }
+
+  private failAllPending(err: Error) {
+    const entries = Array.from(this.pending.values())
+    this.pending.clear()
+    for (const e of entries) {
+      clearTimeout(e.timer)
+      e.reject(err)
+    }
+  }
+
+  private scheduleIdleClose() {
+    this.cancelIdleClose()
+    if (this.pending.size > 0) return
+    this.idleTimer = setTimeout(() => {
+      this.idleTimer = null
+      if (this.pending.size === 0 && this.state === 'open' && this.ws) {
+        try {
+          this.ws.close()
+        } catch {
+          // ignore — close handler still runs.
+        }
+      }
+    }, IDLE_CLOSE_MS)
+  }
+
+  private cancelIdleClose() {
+    if (this.idleTimer !== null) {
+      clearTimeout(this.idleTimer)
+      this.idleTimer = null
+    }
+  }
+
+  private cancelOpenTimer() {
+    if (this.openTimer !== null) {
+      clearTimeout(this.openTimer)
+      this.openTimer = null
+    }
+  }
+}
+
+/**
+ * Module-level pool: one ElectrumxClient per server URL. Concurrent name
+ * lookups against the same server share the same socket; lookups against
+ * different servers each get their own. Sockets self-close on idle.
+ */
+const clientPool = new Map<string, ElectrumxClient>()
+
+/**
+ * Get or create the shared client for a given server URL.
+ *
+ * The same ElectrumxClient instance is returned for the lifetime of the
+ * pool. The client transparently re-opens its socket on the next `call()`
+ * after an idle-close or a server-initiated disconnect, so callers never
+ * have to think about connection state.
+ */
+export function getElectrumxClient(url: string): ElectrumxClient {
+  let client = clientPool.get(url)
+  if (!client) {
+    client = new ElectrumxClient(url)
+    clientPool.set(url, client)
+  }
+  return client
+}
+
+/** Close all pooled clients. Test/teardown utility. */
+export function closeAllElectrumxClients(reason = 'pool reset') {
+  for (const client of clientPool.values()) {
+    client.close(reason)
+  }
+  clientPool.clear()
+}
+
+/**
+ * Backward-compatible batch call. Opens a one-shot connection if no pooled
+ * client exists yet, but otherwise multiplexes through the shared one.
+ * Kept for callers that already pass a list of method/params pairs.
  */
 export function wsRpcBatch(
   url: string,
   calls: Array<{ method: string; params: unknown[] }>,
-  timeoutMs = 20000
+  timeoutMs = DEFAULT_CALL_TIMEOUT_MS
 ): Promise<unknown[]> {
-  return new Promise((resolve, reject) => {
-    let settled = false
-    const results: unknown[] = []
-    let callIndex = 0
-    const ws = new WebSocket(url)
-    const timer = setTimeout(() => {
-      if (!settled) {
-        settled = true
-        ws.close()
-        reject(new Error(`WebSocket batch timeout after ${timeoutMs}ms`))
-      }
-    }, timeoutMs)
-
-    ws.addEventListener('open', () => {
-      sendNext()
-    })
-
-    function sendNext() {
-      if (callIndex >= calls.length) return
-      const { method, params } = calls[callIndex]
-      ws.send(JSON.stringify({ jsonrpc: '2.0', method, params, id: callIndex + 1 }) + '\n')
-    }
-
-    ws.addEventListener('message', (ev) => {
-      if (settled) return
-      try {
-        const data = typeof ev.data === 'string' ? ev.data : String(ev.data)
-        // ElectrumX may pack multiple JSON-RPC messages into a single frame,
-        // separated by newlines.
-        for (const line of data.split('\n')) {
-          const trimmed = line.trim()
-          if (!trimmed || settled) continue
-          const msg: RpcResponse = JSON.parse(trimmed)
-          // ElectrumX is bidirectional JSON-RPC: the server initiates its own
-          // RPC calls at us (server.banner, blockchain.headers.subscribe,
-          // blockchain.relayfee, blockchain.estimatefee, …) which arrive
-          // interleaved with — and often before — responses to our outstanding
-          // requests. Only consume frames whose id matches the call we're
-          // waiting on; ignore everything else.
-          if (msg.id !== callIndex + 1) continue
-          if (msg.error) {
-            settled = true
-            clearTimeout(timer)
-            ws.close()
-            reject(new Error(msg.error.message || `RPC error ${msg.error.code}`))
-            return
-          }
-          results.push(msg.result)
-          callIndex++
-          if (callIndex >= calls.length) {
-            settled = true
-            clearTimeout(timer)
-            ws.close()
-            resolve(results)
-            return
-          }
-          sendNext()
-        }
-      } catch (err) {
-        settled = true
-        clearTimeout(timer)
-        ws.close()
-        reject(err)
-      }
-    })
-
-    ws.addEventListener('error', () => {
-      if (!settled) {
-        settled = true
-        clearTimeout(timer)
-        reject(new Error(`WebSocket connection failed: ${url}`))
-      }
-    })
-
-    ws.addEventListener('close', (ev) => {
-      if (!settled) {
-        settled = true
-        clearTimeout(timer)
-        reject(new Error(`WebSocket closed unexpectedly: code=${ev.code}`))
-      }
-    })
-  })
+  const client = getElectrumxClient(url)
+  return client.callAll(calls, timeoutMs)
 }
 
 // ── Public API ──────────────────────────────────────────────────────
@@ -311,8 +555,9 @@ export function wsRpcBatch(
 /**
  * Resolve a Namecoin name via WebSocket to an ElectrumX server.
  *
- * Connects directly from the browser — no proxy needed.
- * Uses a single WebSocket connection for all RPCs in the lookup sequence.
+ * Reuses a shared, multiplexed WebSocket per server. Concurrent `.bit`
+ * lookups against the same server share one socket; the socket idles for
+ * IDLE_CLOSE_MS after the last in-flight call before closing.
  *
  * @param fullName  The Namecoin name, e.g. "d/example" or "id/alice"
  * @param serverUrl WebSocket URL of the ElectrumX server
@@ -323,31 +568,29 @@ export async function nameShowWs(
   serverUrl?: string
 ): Promise<NameShowResult | null> {
   const url = serverUrl || DEFAULT_ELECTRUMX_SERVERS[0].url
+  const client = getElectrumxClient(url)
 
   // 1. Compute scripthash
   const nameBytes = new TextEncoder().encode(fullName)
   const script = buildNameIndexScript(nameBytes)
   const scripthash = await electrumScripthash(script)
 
-  // 2. Negotiate version + get history in one connection
-  const batch1Results = (await wsRpcBatch(url, [
+  // 2. Negotiate version + get history in parallel on the shared socket
+  const [, history] = (await client.callAll([
     { method: 'server.version', params: ['jumble/0.1', '1.4'] },
     { method: 'blockchain.scripthash.get_history', params: [scripthash] }
   ])) as [unknown, HistoryEntry[]]
 
-  const history = batch1Results[1]
   if (!history || !history.length) return null
 
   // 3. Get latest transaction + current block height
   const latest = history.reduce((a, b) => (a.height > b.height ? a : b))
 
-  const batch2Results = (await wsRpcBatch(url, [
+  const [txResult, headersResult] = (await client.callAll([
     { method: 'blockchain.transaction.get', params: [latest.tx_hash, true] },
     { method: 'blockchain.headers.subscribe', params: [] }
   ])) as [VerboseTxResult, { height?: number; block_height?: number }]
 
-  const txResult = batch2Results[0]
-  const headersResult = batch2Results[1]
   const currentHeight = headersResult?.height || headersResult?.block_height || 0
 
   // 4. Check expiry
