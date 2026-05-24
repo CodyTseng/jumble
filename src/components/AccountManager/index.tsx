@@ -52,7 +52,13 @@ function AccountManagerNav({
   const { nip07Login, accounts } = useNostr()
   const hasExtension = !!window.nostr
 
-  const otherMethods: { key: string; label: string; icon: JSX.Element; onClick: () => void; show: boolean }[] = [
+  const otherMethods: {
+    key: string
+    label: string
+    icon: JSX.Element
+    onClick: () => void
+    show: boolean
+  }[] = [
     {
       key: 'bunker',
       label: t('Remote signer'),
@@ -96,7 +102,7 @@ function AccountManagerNav({
           <button
             type="button"
             onClick={() => nip07Login().then(() => close?.())}
-            className="mt-3 flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-primary-hover"
+            className="bg-primary text-primary-foreground hover:bg-primary-hover mt-3 flex w-full items-center gap-3 rounded-xl px-4 py-3 transition-colors"
           >
             <Puzzle className="size-5 shrink-0" />
             <span className="flex-1 text-start text-sm font-semibold">
@@ -108,36 +114,25 @@ function AccountManagerNav({
 
         {hasExtension && otherCount > 0 && (
           <div className="my-3 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs uppercase tracking-wide text-muted-foreground/70">
+            <div className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground/70 text-xs tracking-wide uppercase">
               {t('or')}
             </span>
-            <div className="h-px flex-1 bg-border" />
+            <div className="bg-border h-px flex-1" />
           </div>
         )}
 
-        <div
-          className={cn(
-            'grid gap-2',
-            !hasExtension && 'mt-3',
-            otherCount >= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'
-          )}
-        >
+        <div className={cn('flex justify-around gap-2', !hasExtension && 'mt-3')}>
           {visibleOtherMethods.map((m) => (
-            <LoginMethodTile
-              key={m.key}
-              label={m.label}
-              icon={m.icon}
-              onClick={m.onClick}
-            />
+            <LoginMethodTile key={m.key} label={m.label} icon={m.icon} onClick={m.onClick} />
           ))}
         </div>
-        <div className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
+        <div className="text-muted-foreground mt-3 flex items-center justify-center gap-1.5 text-sm">
           <span>{t("Don't have an account yet?")}</span>
           <button
             type="button"
             onClick={() => setPage('signup')}
-            className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+            className="text-primary inline-flex items-center gap-1 font-semibold hover:underline"
           >
             {t('Create New Account')}
             <ChevronRight className="size-3.5 rtl:-scale-x-100" />
@@ -151,7 +146,7 @@ function AccountManagerNav({
           <div>
             <SectionTitle>
               {t('Logged in Accounts')}
-              <span className="ms-1.5 text-xs font-normal text-muted-foreground/70">
+              <span className="text-muted-foreground/70 ms-1.5 text-xs font-normal">
                 {accounts.length}
               </span>
             </SectionTitle>
@@ -167,7 +162,7 @@ function SectionTitle({ children, className }: { children: React.ReactNode; clas
   return (
     <div
       className={cn(
-        'text-xs font-semibold uppercase tracking-wide text-muted-foreground/80',
+        'text-muted-foreground/80 text-xs font-semibold tracking-wide uppercase',
         className
       )}
     >
@@ -189,10 +184,10 @@ function LoginMethodTile({
     <button
       type="button"
       onClick={onClick}
-      className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card px-2 py-4 transition-colors hover:border-primary/60 hover:bg-accent/40 [&_svg]:size-5 [&_svg]:text-muted-foreground [&_svg]:transition-colors group-hover:[&_svg]:text-foreground"
+      className="group border-border bg-card hover:border-primary/60 hover:bg-accent/40 [&_svg]:text-muted-foreground group-hover:[&_svg]:text-foreground flex w-full flex-col items-center justify-center gap-2 rounded-xl border px-2 py-4 transition-colors [&_svg]:size-5 [&_svg]:transition-colors"
     >
       {icon}
-      <span className="text-xs font-medium leading-tight">{label}</span>
+      <span className="text-xs leading-tight font-medium">{label}</span>
     </button>
   )
 }
