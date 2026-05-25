@@ -545,6 +545,7 @@ export const IS_COMMUNITY_MODE = COMMUNITY_RELAY_SETS.length > 0 || COMMUNITY_RE
 export const POMEGRANATE_ENABLED = true
 export const POMEGRANATE_CENTRAL_URL = 'https://auth.njump.me/'
 export const POMEGRANATE_OPERATOR_URLS = [
+  'https://po.jumble.social/',
   'https://po.njump.me/',
   'https://po.f7z.io/',
   'https://po.nostrver.se/'
