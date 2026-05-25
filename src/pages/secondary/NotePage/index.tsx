@@ -189,7 +189,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
                     noConnector
                   />
                 )}
-                <div className="bg-border ms-5 h-1 w-px" />
+                <div className="bg-border ms-4.75 h-1.5 w-0.5" />
               </div>
             )}
         {canExpand && <ExpandThreadButton expanded={expanded} onToggle={handleToggleExpand} />}
@@ -259,7 +259,7 @@ function ParentNote({
             <Skeleton className="h-3" />
           </div>
         </div>
-        {!noConnector && <div className="bg-border ms-5 h-3 w-px" />}
+        {!noConnector && <div className="bg-border ms-4.75 h-3 w-0.5" />}
       </div>
     )
   }
@@ -280,7 +280,7 @@ function ParentNote({
       </div>
       {!noConnector &&
         (isConsecutive ? (
-          <div className="bg-border ms-5 h-3 w-px" />
+          <div className="bg-border ms-4.75 h-3 w-0.5" />
         ) : (
           <Ellipsis className="text-muted-foreground/60 ms-3.5 size-3" />
         ))}
@@ -311,12 +311,8 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
         push(toNote(event))
       }}
     >
-      <div
-        className={cn(
-          'bg-border absolute inset-s-9 bottom-0 z-0 w-px',
-          isFirst ? 'top-15' : 'top-0'
-        )}
-      />
+      {!isFirst && <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />}
+      <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
       <div className="flex items-start gap-2">
         <UserAvatar userId={event.pubkey} size="normal" className="shrink-0" />
         <div className="w-0 flex-1">
@@ -364,7 +360,7 @@ function ExpandThreadButton({ expanded, onToggle }: { expanded: boolean; onToggl
       onClick={onToggle}
       className="clickable text-muted-foreground hover:text-foreground hover:bg-accent/30 relative flex w-full items-center gap-2 py-1.5 ps-11 pe-4 text-sm transition-colors"
     >
-      <div className="bg-border absolute inset-s-9 top-0 bottom-0 z-0 w-px" />
+      <div className="bg-border absolute inset-s-8.75 top-0 bottom-0 z-0 w-0.5" />
       {expanded ? <FoldVertical className="size-4" /> : <UnfoldVertical className="size-4" />}
       {expanded ? t('Hide thread context') : t('Show thread context')}
     </button>
