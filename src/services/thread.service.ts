@@ -38,7 +38,9 @@ class ThreadService {
   private threadMap = new Map<string, NostrEvent[]>()
   private processedReplyKeys = new Set<string>()
   private parentKeyMap = new Map<string, string>()
+  private eventByKey = new Map<string, NostrEvent>()
   private descendantCache = new Map<string, Map<string, NostrEvent[]>>()
+  private ancestorChainCache = new Map<string, NostrEvent[]>()
 
   private threadListeners = new Map<string, Set<() => void>>()
   private allDescendantThreadsListeners = new Map<string, Set<() => void>>()
@@ -205,6 +207,7 @@ class ThreadService {
       const key = getEventKey(reply)
       if (this.processedReplyKeys.has(key)) return
       this.processedReplyKeys.add(key)
+      this.eventByKey.set(key, reply)
 
       if (!isReplyNoteEvent(reply)) return
 
@@ -228,10 +231,38 @@ class ThreadService {
     }
 
     this.descendantCache.clear()
+    this.ancestorChainCache.clear()
     for (const key of newReplyEventMap.keys()) {
       this.notifyThreadUpdate(key)
       this.notifyAllDescendantThreadsUpdate(key)
     }
+  }
+
+  getEventByKey(key: string): NostrEvent | undefined {
+    return this.eventByKey.get(key)
+  }
+
+  getAncestorChain(currentKey: string, rootKey: string): NostrEvent[] {
+    if (!currentKey || !rootKey || currentKey === rootKey) return this.EMPTY_ARRAY
+
+    const cacheKey = `${currentKey}${rootKey}`
+    const cached = this.ancestorChainCache.get(cacheKey)
+    if (cached) return cached
+
+    const chain: NostrEvent[] = []
+    const visited = new Set<string>([currentKey])
+    let key: string | undefined = this.parentKeyMap.get(currentKey)
+    while (key && key !== rootKey && !visited.has(key)) {
+      const event = this.eventByKey.get(key)
+      if (!event) break
+      chain.unshift(event)
+      visited.add(key)
+      key = this.parentKeyMap.get(key)
+    }
+
+    const result = chain.length === 0 ? this.EMPTY_ARRAY : chain
+    this.ancestorChainCache.set(cacheKey, result)
+    return result
   }
 
   getThread(stuffKey: string): NostrEvent[] {

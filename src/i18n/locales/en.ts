@@ -1005,6 +1005,8 @@ export default {
     'End date': 'End date',
     'Advanced options': 'Advanced options',
     'Polls may not display on clients that don’t support them.':
-      'Polls may not display on clients that don’t support them.'
+      'Polls may not display on clients that don’t support them.',
+    'Show thread context': 'Show thread context',
+    'Hide thread context': 'Hide thread context'
   }
 }

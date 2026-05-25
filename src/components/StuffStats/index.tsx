@@ -5,7 +5,6 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { Event } from 'nostr-tools'
 import { useEffect, useState } from 'react'
-import BookmarkButton from '../BookmarkButton'
 import LikeButton from './LikeButton'
 import Likes from './Likes'
 import ReplyButton from './ReplyButton'
@@ -70,7 +69,6 @@ export default function StuffStats({
           <RepostButton stuff={stuff} />
           <LikeButton stuff={stuff} />
           <ZapButton stuff={stuff} />
-          <BookmarkButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>
       </div>
@@ -101,7 +99,6 @@ export default function StuffStats({
           <ZapButton stuff={stuff} />
         </div>
         <div className="flex items-center">
-          <BookmarkButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>
       </div>

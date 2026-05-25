@@ -1,8 +1,14 @@
 import { formatError } from '@/lib/error'
-import { getNoteBech32Id, isProtectedEvent } from '@/lib/event'
+import {
+  getNoteBech32Id,
+  getReplaceableCoordinateFromEvent,
+  isProtectedEvent,
+  isReplaceableEvent
+} from '@/lib/event'
 import { toJumbleNote } from '@/lib/link'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { simplifyUrl } from '@/lib/url'
+import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -12,6 +18,8 @@ import client from '@/services/client.service'
 import {
   Bell,
   BellOff,
+  Bookmark,
+  BookmarkX,
   Code,
   Copy,
   Link,
@@ -61,7 +69,7 @@ export function useMenuActions({
   isSmallScreen
 }: UseMenuActionsProps) {
   const { t } = useTranslation()
-  const { pubkey, attemptDelete } = useNostr()
+  const { pubkey, attemptDelete, bookmarkListEvent, checkLogin } = useNostr()
   const { relayUrls: currentBrowsingRelayUrls } = useCurrentRelays()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const relayUrls = useMemo(() => {
@@ -69,7 +77,15 @@ export function useMenuActions({
   }, [currentBrowsingRelayUrls, favoriteRelays])
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
   const { pinnedEventHexIdSet, pin, unpin } = usePinList()
+  const { addBookmark, removeBookmark } = useBookmarks()
   const isMuted = useMemo(() => mutePubkeySet.has(event.pubkey), [mutePubkeySet, event])
+  const isBookmarked = useMemo(() => {
+    const isReplaceable = isReplaceableEvent(event.kind)
+    const eventKey = isReplaceable ? getReplaceableCoordinateFromEvent(event) : event.id
+    return !!bookmarkListEvent?.tags.some((tag) =>
+      isReplaceable ? tag[0] === 'a' && tag[1] === eventKey : tag[0] === 'e' && tag[1] === eventKey
+    )
+  }, [bookmarkListEvent, event])
 
   const broadcastSubMenu: SubMenuAction[] = useMemo(() => {
     const items = []
@@ -206,6 +222,24 @@ export function useMenuActions({
       }
     ]
 
+    if (pubkey) {
+      actions.push({
+        icon: isBookmarked ? BookmarkX : Bookmark,
+        label: isBookmarked ? t('Remove bookmark') : t('Bookmark'),
+        onClick: () => {
+          closeDrawer()
+          checkLogin(async () => {
+            if (isBookmarked) {
+              await removeBookmark(event)
+            } else {
+              await addBookmark(event)
+            }
+          })
+        },
+        separator: true
+      })
+    }
+
     const isProtected = isProtectedEvent(event)
     if (!isProtected || event.pubkey === pubkey) {
       actions.push({
@@ -300,6 +334,7 @@ export function useMenuActions({
     event,
     pubkey,
     isMuted,
+    isBookmarked,
     isSmallScreen,
     broadcastSubMenu,
     pinnedEventHexIdSet,
@@ -308,7 +343,10 @@ export function useMenuActions({
     setIsRawEventDialogOpen,
     mutePubkeyPrivately,
     mutePubkeyPublicly,
-    unmutePubkey
+    unmutePubkey,
+    checkLogin,
+    addBookmark,
+    removeBookmark
   ])
 
   return menuActions
