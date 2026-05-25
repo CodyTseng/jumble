@@ -1085,6 +1085,70 @@ class ClientService extends EventTarget {
     return result.map((pubkey) => pubkeyToNpub(pubkey as string)).filter(Boolean) as string[]
   }
 
+  async fetchNostrListFromNaddr(id: string) {
+    const normalized = id.replace(/^nostr:/, '')
+    const { type, data } = nip19.decode(normalized)
+    if (type !== 'naddr' || data.kind !== ExtendedKind.NOSTR_LIST) {
+      return null
+    }
+
+    const event = await this.fetchEvent(normalized)
+    if (!event) {
+      return null
+    }
+
+    const npubs = getPubkeysFromPTags(event.tags)
+      .map((pubkey) => pubkeyToNpub(pubkey))
+      .filter(Boolean) as string[]
+    const title =
+      event.tags.find(([name, value]) => ['title', 'name'].includes(name) && value)?.[1] ??
+      data.identifier
+
+    return {
+      id: normalized,
+      title,
+      npubs
+    }
+  }
+
+  async searchNostrLists(query: string, limit: number = 5) {
+    if (query.trim().length < 2) {
+      return []
+    }
+
+    const events = await this.fetchEvents(getSearchRelayUrls(), {
+      kinds: [ExtendedKind.NOSTR_LIST],
+      search: query,
+      limit
+    }).catch(() => [])
+
+    const lists = events.map((event) => {
+        const npubs = getPubkeysFromPTags(event.tags)
+          .map((pubkey) => pubkeyToNpub(pubkey))
+          .filter(Boolean) as string[]
+        if (npubs.length === 0) {
+          return null
+        }
+
+        const title =
+          event.tags.find(([name, value]) => ['title', 'name', 'd'].includes(name) && value)?.[1] ??
+          'Nostr list'
+
+        return {
+          id: nip19.naddrEncode({
+            pubkey: event.pubkey,
+            kind: event.kind,
+            identifier: event.tags.find(tagNameEquals('d'))?.[1] ?? '',
+            relays: this.getEventHints(event.id)
+          }),
+          title,
+          npubs
+        }
+      })
+
+    return lists.filter((list): list is NonNullable<typeof list> => list !== null)
+  }
+
   async searchProfilesFromLocal(query: string, limit: number = 100) {
     const npubs = await this.searchNpubsFromLocal(query, limit)
     const profiles = await Promise.all(npubs.map((npub) => this.fetchProfile(npub)))

@@ -1,6 +1,6 @@
 import FollowingBadge from '@/components/FollowingBadge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { formatNpub, userIdToPubkey } from '@/lib/pubkey'
+import { userIdToPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -10,9 +10,21 @@ import Nip05 from '../../../Nip05'
 import { SimpleUserAvatar } from '../../../UserAvatar'
 import { SimpleUsername } from '../../../Username'
 
+export type MentionListItem =
+  | {
+      type: 'profile'
+      id: string
+    }
+  | {
+      type: 'list'
+      id: string
+      label: string
+      npubs: string[]
+    }
+
 export interface MentionListProps {
-  items: string[]
-  command: (payload: { id: string; label?: string }) => void
+  items: MentionListItem[]
+  command: (payload: MentionListItem) => void
 }
 
 export interface MentionListHandle {
@@ -25,11 +37,14 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
   const { isUserTrusted } = useUserTrust()
 
   const items = useMemo(() => {
-    const tier = (npub: string) => {
+    const tier = (item: MentionListItem) => {
+      if (item.type === 'list') return 0
+
+      const npub = item.id
       const pubkey = userIdToPubkey(npub)
-      if (followingSet.has(pubkey)) return 0
-      if (isUserTrusted(pubkey)) return 1
-      return 2
+      if (followingSet.has(pubkey)) return 1
+      if (isUserTrusted(pubkey)) return 2
+      return 3
     }
     return props.items
       .map((item, idx) => ({ item, idx, tier: tier(item) }))
@@ -41,7 +56,7 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
     const item = items[index]
 
     if (item) {
-      props.command({ id: item, label: formatNpub(item) })
+      props.command(item.type === 'profile' ? { ...item, id: item.id } : item)
     }
   }
 
@@ -98,18 +113,36 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
             'm-1 cursor-pointer items-center rounded-md p-2 text-start outline-hidden transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
             selectedIndex === index && 'bg-accent text-accent-foreground'
           )}
-          key={item}
+          key={item.id}
           onClick={() => selectItem(index)}
           onMouseEnter={() => setSelectedIndex(index)}
         >
           <div className="pointer-events-none flex w-80 items-center gap-2 truncate">
-            <SimpleUserAvatar userId={item} />
+            {item.type === 'list' ? (
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted font-semibold">
+                #
+              </div>
+            ) : (
+              <SimpleUserAvatar userId={item.id} />
+            )}
             <div className="w-0 flex-1">
               <div className="flex items-center gap-2">
-                <SimpleUsername userId={item} className="truncate font-semibold" />
-                <FollowingBadge userId={item} />
+                {item.type === 'list' ? (
+                  <span className="truncate font-semibold">{item.label}</span>
+                ) : (
+                  <>
+                    <SimpleUsername userId={item.id} className="truncate font-semibold" />
+                    <FollowingBadge userId={item.id} />
+                  </>
+                )}
               </div>
-              <Nip05 pubkey={userIdToPubkey(item)} />
+              {item.type === 'list' ? (
+                <div className="truncate text-sm text-muted-foreground">
+                  {item.npubs.length} profiles
+                </div>
+              ) : (
+                <Nip05 pubkey={userIdToPubkey(item.id)} />
+              )}
             </div>
           </div>
         </button>

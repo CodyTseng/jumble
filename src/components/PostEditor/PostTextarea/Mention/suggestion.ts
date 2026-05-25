@@ -2,13 +2,84 @@ import client from '@/services/client.service'
 import postEditor from '@/services/post-editor.service'
 import type { Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
+import { Range } from '@tiptap/core'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 import tippy, { GetReferenceClientRect, Instance, Props } from 'tippy.js'
-import MentionList, { MentionListHandle, MentionListProps } from './MentionList'
+import MentionList, { MentionListHandle, MentionListItem, MentionListProps } from './MentionList'
+
+const naddrRegex = /^(?:nostr:)?naddr1[0-9a-z]+$/i
 
 const suggestion = {
   items: async ({ query }: { query: string }) => {
-    return await client.searchNpubsFromLocal(query, 20)
+    const profileItems = (await client.searchNpubsFromLocal(query, 20)).map(
+      (npub): MentionListItem => ({
+        type: 'profile',
+        id: npub
+      })
+    )
+
+    if (!naddrRegex.test(query)) {
+      const lists = await client.searchNostrLists(query, 5)
+      return [
+        ...lists.map(
+          (list): MentionListItem => ({
+            type: 'list',
+            id: list.id,
+            label: list.title,
+            npubs: list.npubs
+          })
+        ),
+        ...profileItems
+      ]
+    }
+
+    const list = await client.fetchNostrListFromNaddr(query).catch(() => null)
+    if (!list || list.npubs.length === 0) {
+      return profileItems
+    }
+
+    return [
+      {
+        type: 'list',
+        id: list.id,
+        label: list.title,
+        npubs: list.npubs
+      } satisfies MentionListItem,
+      ...profileItems
+    ]
+  },
+
+  command: ({
+    editor,
+    range,
+    props
+  }: {
+    editor: Editor
+    range: Range
+    props: unknown
+  }) => {
+    const item = props as MentionListItem
+    const npubs = item.type === 'list' ? item.npubs : [item.id]
+    editor
+      .chain()
+      .focus()
+      .insertContentAt(
+        range,
+        npubs.flatMap((npub) => [
+          {
+            type: 'mention',
+            attrs: {
+              id: npub,
+              label: npub
+            }
+          },
+          {
+            type: 'text',
+            text: ' '
+          }
+        ])
+      )
+      .run()
   },
 
   render: () => {
