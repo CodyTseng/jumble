@@ -994,6 +994,8 @@ export default {
     'End date': 'Data de fim',
     'Advanced options': 'Opções avançadas',
     'Polls may not display on clients that don’t support them.':
-      'As sondagens podem não ser apresentadas em clientes que não as suportem.'
+      'As sondagens podem não ser apresentadas em clientes que não as suportem.',
+    'Show thread context': 'Mostrar contexto da conversa',
+    'Hide thread context': 'Ocultar contexto da conversa'
   }
 }

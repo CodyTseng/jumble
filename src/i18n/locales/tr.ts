@@ -993,6 +993,8 @@ export default {
     'End date': 'Bitiş tarihi',
     'Advanced options': 'Gelişmiş seçenekler',
     'Polls may not display on clients that don’t support them.':
-      'Anketler, onları desteklemeyen istemcilerde görüntülenmeyebilir.'
+      'Anketler, onları desteklemeyen istemcilerde görüntülenmeyebilir.',
+    'Show thread context': 'Konu bağlamını göster',
+    'Hide thread context': 'Konu bağlamını gizle'
   }
 }

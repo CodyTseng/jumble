@@ -995,6 +995,8 @@ export default {
     'End date': 'Data zakończenia',
     'Advanced options': 'Opcje zaawansowane',
     'Polls may not display on clients that don’t support them.':
-      'Ankiety mogą nie być wyświetlane w klientach, które ich nie obsługują.'
+      'Ankiety mogą nie być wyświetlane w klientach, które ich nie obsługują.',
+    'Show thread context': 'Pokaż kontekst wątku',
+    'Hide thread context': 'Ukryj kontekst wątku'
   }
 }

@@ -1001,6 +1001,8 @@ export default {
     'End date': 'Date de fin',
     'Advanced options': 'Options avancées',
     'Polls may not display on clients that don’t support them.':
-      'Les sondages peuvent ne pas s’afficher sur les clients qui ne les prennent pas en charge.'
+      'Les sondages peuvent ne pas s’afficher sur les clients qui ne les prennent pas en charge.',
+    'Show thread context': 'Afficher le contexte du fil',
+    'Hide thread context': 'Masquer le contexte du fil'
   }
 }

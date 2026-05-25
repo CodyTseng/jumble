@@ -987,6 +987,8 @@ export default {
     'End date': 'समाप्ति तिथि',
     'Advanced options': 'उन्नत विकल्प',
     'Polls may not display on clients that don’t support them.':
-      'पोल उन क्लाइंट पर प्रदर्शित नहीं हो सकते जो इनका समर्थन नहीं करते।'
+      'पोल उन क्लाइंट पर प्रदर्शित नहीं हो सकते जो इनका समर्थन नहीं करते।',
+    'Show thread context': 'थ्रेड संदर्भ दिखाएं',
+    'Hide thread context': 'थ्रेड संदर्भ छिपाएं'
   }
 }

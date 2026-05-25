@@ -988,6 +988,8 @@ export default {
     'End date': '終了日',
     'Advanced options': '詳細オプション',
     'Polls may not display on clients that don’t support them.':
-      '投票機能に対応していないクライアントでは表示されない場合があります。'
+      '投票機能に対応していないクライアントでは表示されない場合があります。',
+    'Show thread context': 'スレッドの文脈を表示',
+    'Hide thread context': 'スレッドの文脈を非表示'
   }
 }

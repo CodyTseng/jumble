@@ -993,6 +993,8 @@ export default {
     'End date': 'Дата окончания',
     'Advanced options': 'Дополнительные параметры',
     'Polls may not display on clients that don’t support them.':
-      'Опросы могут не отображаться в клиентах, которые их не поддерживают.'
+      'Опросы могут не отображаться в клиентах, которые их не поддерживают.',
+    'Show thread context': 'Показать контекст треда',
+    'Hide thread context': 'Скрыть контекст треда'
   }
 }

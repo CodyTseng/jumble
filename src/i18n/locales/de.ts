@@ -1003,6 +1003,8 @@ export default {
     'End date': 'Enddatum',
     'Advanced options': 'Erweiterte Optionen',
     'Polls may not display on clients that don’t support them.':
-      'Umfragen werden möglicherweise nicht auf Clients angezeigt, die sie nicht unterstützen.'
+      'Umfragen werden möglicherweise nicht auf Clients angezeigt, die sie nicht unterstützen.',
+    'Show thread context': 'Thread-Kontext anzeigen',
+    'Hide thread context': 'Thread-Kontext ausblenden'
   }
 }

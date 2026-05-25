@@ -987,6 +987,8 @@ export default {
     'End date': 'Befejezés dátuma',
     'Advanced options': 'Speciális beállítások',
     'Polls may not display on clients that don’t support them.':
-      'A szavazások előfordulhat, hogy nem jelennek meg azokon a klienseken, amelyek nem támogatják őket.'
+      'A szavazások előfordulhat, hogy nem jelennek meg azokon a klienseken, amelyek nem támogatják őket.',
+    'Show thread context': 'Beszélgetés kontextusának megjelenítése',
+    'Hide thread context': 'Beszélgetés kontextusának elrejtése'
   }
 }

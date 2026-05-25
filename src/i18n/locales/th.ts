@@ -970,6 +970,8 @@ export default {
     'End date': 'วันที่สิ้นสุด',
     'Advanced options': 'ตัวเลือกขั้นสูง',
     'Polls may not display on clients that don’t support them.':
-      'โพลอาจไม่แสดงบนไคลเอนต์ที่ไม่รองรับ'
+      'โพลอาจไม่แสดงบนไคลเอนต์ที่ไม่รองรับ',
+    'Show thread context': 'แสดงบริบทของเธรด',
+    'Hide thread context': 'ซ่อนบริบทของเธรด'
   }
 }

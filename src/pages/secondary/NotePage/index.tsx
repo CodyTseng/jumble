@@ -41,6 +41,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState
@@ -94,12 +95,16 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
   )
 
   const handleToggleExpand = useCallback(() => {
-    setExpanded((prev) => {
-      const next = !prev
-      if (!next) layoutRef.current?.scrollToTop('instant')
-      return next
-    })
+    setExpanded((prev) => !prev)
   }, [])
+
+  const prevExpandedRef = useRef(expanded)
+  useLayoutEffect(() => {
+    if (prevExpandedRef.current && !expanded) {
+      layoutRef.current?.scrollToTop('instant')
+    }
+    prevExpandedRef.current = expanded
+  }, [expanded])
 
   useEffect(() => {
     if (!expanded || !event) return

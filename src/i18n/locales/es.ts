@@ -992,6 +992,8 @@ export default {
     'End date': 'Fecha de finalización',
     'Advanced options': 'Opciones avanzadas',
     'Polls may not display on clients that don’t support them.':
-      'Es posible que las encuestas no se muestren en clientes que no las admiten.'
+      'Es posible que las encuestas no se muestren en clientes que no las admiten.',
+    'Show thread context': 'Mostrar contexto del hilo',
+    'Hide thread context': 'Ocultar contexto del hilo'
   }
 }

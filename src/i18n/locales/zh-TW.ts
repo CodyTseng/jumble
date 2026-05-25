@@ -947,6 +947,8 @@ export default {
     'End date': '結束日期',
     'Advanced options': '進階選項',
     'Polls may not display on clients that don’t support them.':
-      '不支援投票的客戶端可能無法顯示此投票。'
+      '不支援投票的客戶端可能無法顯示此投票。',
+    'Show thread context': '展開對話上下文',
+    'Hide thread context': '收起對話上下文'
   }
 }
