@@ -38,13 +38,13 @@ class ThreadService {
   private threadMap = new Map<string, NostrEvent[]>()
   private processedReplyKeys = new Set<string>()
   private parentKeyMap = new Map<string, string>()
-  private eventByKey = new Map<string, NostrEvent>()
   private descendantCache = new Map<string, Map<string, NostrEvent[]>>()
-  private ancestorChainCache = new Map<string, NostrEvent[]>()
+  private ancestorChainCache = new Map<string, string[]>()
 
   private threadListeners = new Map<string, Set<() => void>>()
   private allDescendantThreadsListeners = new Map<string, Set<() => void>>()
   private readonly EMPTY_ARRAY: NostrEvent[] = []
+  private readonly EMPTY_STRING_ARRAY: string[] = []
   private readonly EMPTY_MAP: Map<string, NostrEvent[]> = new Map()
 
   constructor() {
@@ -207,7 +207,7 @@ class ThreadService {
       const key = getEventKey(reply)
       if (this.processedReplyKeys.has(key)) return
       this.processedReplyKeys.add(key)
-      this.eventByKey.set(key, reply)
+      client.addEventToCache(reply)
 
       if (!isReplyNoteEvent(reply)) return
 
@@ -238,29 +238,23 @@ class ThreadService {
     }
   }
 
-  getEventByKey(key: string): NostrEvent | undefined {
-    return this.eventByKey.get(key)
-  }
+  getAncestorChain(currentKey: string, rootKey: string): string[] {
+    if (!currentKey || !rootKey || currentKey === rootKey) return this.EMPTY_STRING_ARRAY
 
-  getAncestorChain(currentKey: string, rootKey: string): NostrEvent[] {
-    if (!currentKey || !rootKey || currentKey === rootKey) return this.EMPTY_ARRAY
-
-    const cacheKey = `${currentKey}${rootKey}`
+    const cacheKey = `${currentKey}:${rootKey}`
     const cached = this.ancestorChainCache.get(cacheKey)
     if (cached) return cached
 
-    const chain: NostrEvent[] = []
+    const chain: string[] = []
     const visited = new Set<string>([currentKey])
     let key: string | undefined = this.parentKeyMap.get(currentKey)
     while (key && key !== rootKey && !visited.has(key)) {
-      const event = this.eventByKey.get(key)
-      if (!event) break
-      chain.unshift(event)
+      chain.unshift(key)
       visited.add(key)
       key = this.parentKeyMap.get(key)
     }
 
-    const result = chain.length === 0 ? this.EMPTY_ARRAY : chain
+    const result = chain.length === 0 ? this.EMPTY_STRING_ARRAY : chain
     this.ancestorChainCache.set(cacheKey, result)
     return result
   }

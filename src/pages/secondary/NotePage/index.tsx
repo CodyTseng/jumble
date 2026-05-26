@@ -69,21 +69,14 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
   const ancestorChain = useAncestorChain(currentKey, rootKey)
   const canExpand = !!parentEventId
   const fullChain = useMemo(() => {
-    const items: Event[] = []
-    const seen = new Set<string>()
-    if (rootEvent && rootEventId && rootEventId !== parentEventId) {
-      items.push(rootEvent)
-      seen.add(rootEvent.id)
+    const chain = [...ancestorChain]
+    if (rootEvent && chain[0] !== rootEvent.id) {
+      chain.unshift(rootEvent.id)
     }
-    for (const evt of ancestorChain) {
-      if (seen.has(evt.id)) continue
-      items.push(evt)
-      seen.add(evt.id)
+    if (parentEvent && chain[chain.length - 1] !== parentEvent.id) {
+      chain.push(parentEvent.id)
     }
-    if (parentEvent && !seen.has(parentEvent.id)) {
-      items.push(parentEvent)
-    }
-    return items
+    return chain
   }, [rootEvent, rootEventId, parentEvent, parentEventId, ancestorChain])
   const layoutRef = useRef<TPageRef>(null)
 
@@ -163,12 +156,8 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
           </div>
         )}
         {expanded
-          ? fullChain.map((ancestor, idx) => (
-              <ChainItem
-                key={`chain-${ancestor.id}`}
-                event={ancestor}
-                isFirst={idx === 0 && !rootITag}
-              />
+          ? fullChain.map((id, idx) => (
+              <ChainItem key={`chain-${id}`} eventId={id} isFirst={idx === 0 && !rootITag} />
             ))
           : canExpand && (
               <div className={cn('px-4', !rootITag && 'pt-3')}>
@@ -311,10 +300,18 @@ function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
   return getEventKey(rootEvent) === getKeyFromTag(tag.tag)
 }
 
-function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
+function ChainItem({ eventId, isFirst }: { eventId: string; isFirst: boolean }) {
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const { autoLoadProfilePicture } = useContentPolicy()
+  const { event, isFetching } = useFetchEvent(eventId)
+
+  if (isFetching) {
+    return <ChainItemSkeleton isFirst={isFirst} />
+  }
+  if (!event) {
+    return null
+  }
 
   return (
     <ClickableCard
@@ -365,6 +362,36 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
         </div>
       </div>
     </ClickableCard>
+  )
+}
+
+function ChainItemSkeleton({ isFirst }: { isFirst: boolean }) {
+  const { autoLoadProfilePicture } = useContentPolicy()
+
+  return (
+    <div className={cn('relative px-4 py-3', !autoLoadProfilePicture && 'border-b')}>
+      {autoLoadProfilePicture && !isFirst && (
+        <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />
+      )}
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
+      )}
+      <div className="flex items-start gap-2">
+        <UserAvatarSkeleton className="h-10 w-10" />
+        <div className="w-0 flex-1">
+          <div className="py-1">
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="py-0.5">
+            <Skeleton className="h-3 w-16" />
+          </div>
+          <div className="space-y-2 pt-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
