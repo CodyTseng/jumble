@@ -31,6 +31,7 @@ import {
 import { toExternalContent, toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import threadService from '@/services/thread.service'
 import { TPageRef } from '@/types'
@@ -53,6 +54,7 @@ const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"
 
 const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, index }, ref) => {
   const { t } = useTranslation()
+  const { autoLoadProfilePicture } = useContentPolicy()
   const { event, isFetching } = useFetchEvent(id)
   const parentEventId = useMemo(() => getParentBech32Id(event), [event])
   const rootEventId = useMemo(() => getRootBech32Id(event), [event])
@@ -189,7 +191,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
                     noConnector
                   />
                 )}
-                <div className="bg-border ms-4.75 h-1.5 w-0.5" />
+                {autoLoadProfilePicture && <div className="bg-border ms-4.75 h-1.5 w-0.5" />}
               </div>
             )}
         {canExpand && <ExpandThreadButton expanded={expanded} onToggle={handleToggleExpand} />}
@@ -221,6 +223,7 @@ export default NotePage
 
 function ExternalRoot({ value }: { value: string }) {
   const { push } = useSecondaryPage()
+  const { autoLoadProfilePicture } = useContentPolicy()
 
   return (
     <div>
@@ -230,7 +233,11 @@ function ExternalRoot({ value }: { value: string }) {
       >
         <div className="truncate">{value}</div>
       </Card>
-      <div className="bg-border ms-5 h-2 w-px" />
+      {autoLoadProfilePicture ? (
+        <div className="bg-border ms-5 h-2 w-px" />
+      ) : (
+        <div className="h-2" />
+      )}
     </div>
   )
 }
@@ -249,6 +256,9 @@ function ParentNote({
   noConnector?: boolean
 }) {
   const { push } = useSecondaryPage()
+  const { autoLoadProfilePicture } = useContentPolicy()
+  const showLine = !noConnector && autoLoadProfilePicture
+  const showSpacer = !noConnector && !autoLoadProfilePicture
 
   if (isFetching) {
     return (
@@ -259,7 +269,11 @@ function ParentNote({
             <Skeleton className="h-3" />
           </div>
         </div>
-        {!noConnector && <div className="bg-border ms-4.75 h-3 w-0.5" />}
+        {showLine ? (
+          <div className="bg-border ms-4.75 h-3 w-0.5" />
+        ) : showSpacer ? (
+          <div className="h-1.5" />
+        ) : null}
       </div>
     )
   }
@@ -278,12 +292,13 @@ function ParentNote({
         {event && <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />}
         <ContentPreview className="truncate" event={event} />
       </div>
-      {!noConnector &&
-        (isConsecutive ? (
-          <div className="bg-border ms-4.75 h-3 w-0.5" />
-        ) : (
-          <Ellipsis className="text-muted-foreground/60 ms-3.5 size-3" />
-        ))}
+      {!isConsecutive ? (
+        <Ellipsis className="text-muted-foreground/60 ms-3.5 size-3" />
+      ) : showLine ? (
+        <div className="bg-border ms-4.75 h-3 w-0.5" />
+      ) : showSpacer ? (
+        <div className="h-1.5" />
+      ) : null}
     </div>
   )
 }
@@ -300,10 +315,14 @@ function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
 function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
+  const { autoLoadProfilePicture } = useContentPolicy()
 
   return (
     <div
-      className="clickable hover:bg-accent/30 relative px-4 py-3 transition-colors duration-200"
+      className={cn(
+        'clickable hover:bg-accent/30 relative px-4 py-3 transition-colors duration-200',
+        !autoLoadProfilePicture && 'border-b'
+      )}
       onClick={(e) => {
         const target = e.target
         if (!(target instanceof Node) || !e.currentTarget.contains(target)) return
@@ -311,8 +330,12 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
         push(toNote(event))
       }}
     >
-      {!isFirst && <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />}
-      <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
+      {autoLoadProfilePicture && !isFirst && (
+        <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />
+      )}
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
+      )}
       <div className="flex items-start gap-2">
         <UserAvatar userId={event.pubkey} size="normal" className="shrink-0" />
         <div className="w-0 flex-1">
@@ -353,14 +376,20 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
 
 function ExpandThreadButton({ expanded, onToggle }: { expanded: boolean; onToggle: () => void }) {
   const { t } = useTranslation()
+  const { autoLoadProfilePicture } = useContentPolicy()
 
   return (
     <button
       type="button"
       onClick={onToggle}
-      className="clickable text-muted-foreground hover:text-foreground hover:bg-accent/30 relative flex w-full items-center gap-2 py-1.5 ps-11 pe-4 text-sm transition-colors"
+      className={cn(
+        'clickable text-muted-foreground hover:text-foreground hover:bg-accent/30 relative flex w-full items-center gap-2 py-1.5 pe-4 text-sm transition-colors',
+        autoLoadProfilePicture ? 'ps-16' : 'border-b ps-4'
+      )}
     >
-      <div className="bg-border absolute inset-s-8.75 top-0 bottom-0 z-0 w-0.5" />
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-0 bottom-0 z-0 w-0.5" />
+      )}
       {expanded ? <FoldVertical className="size-4" /> : <UnfoldVertical className="size-4" />}
       {expanded ? t('Hide thread context') : t('Show thread context')}
     </button>

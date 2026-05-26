@@ -112,7 +112,7 @@ export default function ReplyNote({
         (autoLoadProfilePicture ? (
           <div className="bg-border absolute inset-s-8.25 top-14 bottom-0 z-20 w-0.5" />
         ) : (
-          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s border-t" />
+          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s-2 border-t-2" />
         ))}
       <Collapsible>
         <div
