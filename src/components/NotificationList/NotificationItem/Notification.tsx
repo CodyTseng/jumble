@@ -1,3 +1,4 @@
+import ClickableCard from '@/components/ClickableCard'
 import ContentPreview from '@/components/ContentPreview'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import StuffStats from '@/components/StuffStats'
@@ -60,7 +61,7 @@ export default function Notification({
 
   if (notificationListStyle === NOTIFICATION_LIST_STYLE.COMPACT) {
     return (
-      <div
+      <ClickableCard
         className="flex cursor-pointer items-center justify-between px-4 py-2"
         onClick={handleClick}
       >
@@ -98,12 +99,12 @@ export default function Notification({
         <div className="shrink-0 text-muted-foreground">
           <FormattedTimestamp timestamp={sentAt} short />
         </div>
-      </div>
+      </ClickableCard>
     )
   }
 
   return (
-    <div
+    <ClickableCard
       className="clickable flex cursor-pointer items-start gap-2 border-b px-4 py-2"
       onClick={handleClick}
     >
@@ -143,7 +144,7 @@ export default function Notification({
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-sm text-muted-foreground" />
         {showStats && targetEvent && <StuffStats stuff={targetEvent} className="mt-1" />}
       </div>
-    </div>
+    </ClickableCard>
   )
 }
 

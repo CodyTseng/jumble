@@ -281,6 +281,24 @@ Properties:
 - `threshold`: `number` - Height threshold for hiding the tab bar on scroll down. Default is `800`. It should larger than the height of the area above the tab bar. Normally you don't need to change this value.
 - `options`: `React.ReactNode` - Additional options to display on the right side of the tab bar.
 
+### src/components/ClickableCard
+
+A behavioral wrapper for any container whose `onClick` should navigate the user (e.g. note cards, reply cards, notification cards). It renders a `<div>` and forwards `HTMLAttributes<HTMLDivElement>`.
+
+**Always use `ClickableCard` instead of a plain `<div onClick={...}>` when the container is meant to navigate on click.** It marks itself with `data-clickable-card` and filters the click before calling the provided `onClick`, so the handler only fires when the click is for *this* card. Specifically it skips:
+
+1. Portal-rendered descendants (overlays, menus rendered outside the DOM subtree).
+2. Interactive controls inside the card — `button`, `a`, `input`, `textarea`, `select`, `[role="button"]` (matched via `closest()`).
+3. Clicks that originate inside a *nested* `ClickableCard` (e.g. an embedded note inside a note card, or a `StuffStats` action button — actions are real `<button>`s and are already covered by rule 2).
+
+**Why not just call `e.stopPropagation()` on inner controls?** React's `stopPropagation()` also calls `nativeEvent.stopPropagation()`, which prevents the click from bubbling to `document`. Radix Dialog/Drawer's touch-mode outside-click detection relies on that native bubble to close itself when the user taps outside. Stopping propagation breaks that detection. The filter-on-the-parent approach in `ClickableCard` sidesteps the issue entirely — clicks still bubble to `document`, we just ignore the ones that don't belong to us.
+
+**Rules for new components:**
+
+- Any new card / row / list-item whose `onClick` navigates → wrap with `<ClickableCard>` instead of a plain `<div onClick={...}>`. Do not duplicate the filter logic by hand.
+- Inside such a card, custom clickable elements that are *not* a `button`/`a`/`input`/`textarea`/`select` must declare `role="button"` so the filter recognizes them. Do **not** rely on `e.stopPropagation()` to block the parent — it breaks Radix Dialog/Drawer touch-mode (see "Why not stopPropagation" above). If you need to handle the inner click *and* prevent the parent's navigation, the role/element-type alone is enough.
+- When introducing a brand-new kind of "clickable container" pattern (rare), keep the `data-clickable-card` contract consistent — i.e. extend `ClickableCard` or follow the same marker. Do not invent a parallel mechanism.
+
 ## Feature Documentation
 
 - [DM (Direct Messages)](docs/dm-feature.md) - End-to-end encrypted messaging based on NIP-17

@@ -13,6 +13,7 @@ import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ClickableCard from '../ClickableCard'
 import ClientTag from '../ClientTag'
 import Collapsible from '../Collapsible'
 import Content from '../Content'
@@ -99,7 +100,7 @@ export default function ReplyNote({
   ])
 
   return (
-    <div
+    <ClickableCard
       className={cn(
         'clickable relative pb-3 transition-colors duration-500',
         highlight ? 'bg-primary/40' : '',
@@ -195,7 +196,7 @@ export default function ReplyNote({
           displayTopZapsAndLikes
         />
       )}
-    </div>
+    </ClickableCard>
   )
 }
 
