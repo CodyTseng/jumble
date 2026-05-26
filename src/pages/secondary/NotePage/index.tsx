@@ -1,4 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
+import ClickableCard from '@/components/ClickableCard'
 import ClientTag from '@/components/ClientTag'
 import Content from '@/components/Content'
 import ContentPreview from '@/components/ContentPreview'
@@ -49,8 +50,6 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from './NotFound'
-
-const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"]'
 
 const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, index }, ref) => {
   const { t } = useTranslation()
@@ -318,17 +317,12 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
   const { autoLoadProfilePicture } = useContentPolicy()
 
   return (
-    <div
+    <ClickableCard
       className={cn(
         'clickable hover:bg-accent/30 relative px-4 py-3 transition-colors duration-200',
         !autoLoadProfilePicture && 'border-b'
       )}
-      onClick={(e) => {
-        const target = e.target
-        if (!(target instanceof Node) || !e.currentTarget.contains(target)) return
-        if (target instanceof Element && target.closest(INTERACTIVE_SELECTOR)) return
-        push(toNote(event))
-      }}
+      onClick={() => push(toNote(event))}
     >
       {autoLoadProfilePicture && !isFirst && (
         <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />
@@ -370,7 +364,7 @@ function ChainItem({ event, isFirst }: { event: Event; isFirst: boolean }) {
           <StuffStats className="mt-2" stuff={event} />
         </div>
       </div>
-    </div>
+    </ClickableCard>
   )
 }
 
