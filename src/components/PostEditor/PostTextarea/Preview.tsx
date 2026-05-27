@@ -1,4 +1,3 @@
-import { Card } from '@/components/ui/card'
 import { transformCustomEmojisInContent } from '@/lib/draft-event'
 import { createFakeEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
@@ -11,12 +10,12 @@ export default function Preview({ content, className }: { content: string; class
     [content]
   )
   return (
-    <Card className={cn('p-3', className)}>
+    <div className={cn('px-5 py-2 text-base sm:px-6', className)}>
       <Content
         event={createFakeEvent({ content: processedContent, tags: emojiTags })}
         className="pointer-events-none h-full"
         mustLoadMedia
       />
-    </Card>
+    </div>
   )
 }

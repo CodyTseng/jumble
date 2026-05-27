@@ -956,6 +956,7 @@ export default {
     'Polls may not display on clients that don’t support them.':
       '不支持投票的客户端可能无法显示此投票。',
     'Show thread context': '展开对话上下文',
-    'Hide thread context': '收起对话上下文'
+    'Hide thread context': '收起对话上下文',
+    Enable: '启用'
   }
 }

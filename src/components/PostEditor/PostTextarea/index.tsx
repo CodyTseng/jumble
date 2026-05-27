@@ -41,6 +41,7 @@ const PostTextarea = forwardRef<
     onUploadProgress?: (file: File, progress: number) => void
     onUploadEnd?: (file: File) => void
     placeholder?: string
+    topRightActions?: React.ReactNode
   }
 >(
   (
@@ -54,7 +55,8 @@ const PostTextarea = forwardRef<
       onUploadStart,
       onUploadProgress,
       onUploadEnd,
-      placeholder
+      placeholder,
+      topRightActions
     },
     ref
   ) => {
@@ -88,10 +90,7 @@ const PostTextarea = forwardRef<
       ],
       editorProps: {
         attributes: {
-          class: cn(
-            'border rounded-lg p-3 focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring',
-            className
-          )
+          class: cn('px-5 py-2 text-base focus-visible:outline-hidden sm:px-6', className)
         },
         handleKeyDown: (_view, event) => {
           // Handle Ctrl+Enter or Cmd+Enter for submit
@@ -162,21 +161,30 @@ const PostTextarea = forwardRef<
     }
 
     return (
-      <Tabs
-        defaultValue="edit"
-        value={tabValue}
-        onValueChange={(v) => setTabValue(v)}
-        className="space-y-2"
-      >
-        <TabsList>
-          <TabsTrigger value="edit">{t('Edit')}</TabsTrigger>
-          <TabsTrigger value="preview">{t('Preview')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="edit">
+      <Tabs defaultValue="edit" value={tabValue} onValueChange={(v) => setTabValue(v)}>
+        <div className="flex items-center gap-2 px-5 pt-3 sm:px-6">
+          <TabsList className="h-auto gap-1 bg-transparent p-0">
+            <TabsTrigger
+              value="edit"
+              className="h-8 rounded-md bg-transparent px-2.5 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              {t('Edit')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="preview"
+              className="h-8 rounded-md bg-transparent px-2.5 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            >
+              {t('Preview')}
+            </TabsTrigger>
+          </TabsList>
+          {topRightActions && <div className="ms-auto sm:hidden">{topRightActions}</div>}
+        </div>
+        <TabsContent value="edit" className="mt-0">
           <EditorContent className="tiptap" editor={editor} />
         </TabsContent>
         <TabsContent
           value="preview"
+          className="mt-0"
           onClick={() => {
             setTabValue('edit')
             editor.commands.focus()

@@ -7,7 +7,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { isProtectedEvent } from '@/lib/event'
 import { simplifyUrl } from '@/lib/url'
@@ -15,7 +14,7 @@ import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
-import { Check } from 'lucide-react'
+import { Check, ChevronDown, Radio } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -205,19 +204,23 @@ export default function PostRelaySelector({
     )
   }, [postTargetItems, relaySets, selectableRelays])
 
+  const triggerClass =
+    'h-9 min-w-0 max-w-full gap-1.5 px-2.5 text-sm font-normal text-muted-foreground hover:text-foreground'
+
   if (isSmallScreen) {
     return (
       <>
-        <div className="flex items-center gap-2">
-          <Label className="shrink-0">{t('Post to')}</Label>
-          <Button
-            variant="outline"
-            className="min-w-0 max-w-fit justify-start px-2"
-            onClick={() => setIsDrawerOpen(true)}
-          >
-            <div className="truncate">{description}</div>
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          title={t('Post to')}
+          className={triggerClass}
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <Radio className="size-4 shrink-0" />
+          <span className="truncate">{description}</span>
+          <ChevronDown className="size-3.5 shrink-0 opacity-60" />
+        </Button>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerContent title={t('Post to')} className="max-h-[80dvh]">
             <div className="overflow-y-auto overscroll-contain py-2">{content}</div>
@@ -229,14 +232,13 @@ export default function PostRelaySelector({
 
   return (
     <DropdownMenu>
-      <div className="flex items-center gap-2">
-        <Label className="shrink-0">{t('Post to')}</Label>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="min-w-0 max-w-fit justify-start px-2">
-            <div className="truncate">{description}</div>
-          </Button>
-        </DropdownMenuTrigger>
-      </div>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" title={t('Post to')} className={triggerClass}>
+          <Radio className="size-4 shrink-0" />
+          <span className="truncate">{description}</span>
+          <ChevronDown className="size-3.5 shrink-0 opacity-60" />
+        </Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-[50vh] max-w-96" showScrollButtons>
         {content}
       </DropdownMenuContent>

@@ -1,6 +1,5 @@
-import Note from '@/components/Note'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   createCommentDraftEvent,
   createHighlightDraftEvent,
@@ -14,16 +13,23 @@ import mediaUpload from '@/services/media-upload.service'
 import postEditorCache from '@/services/post-editor-cache.service'
 import threadService from '@/services/thread.service'
 import { TPollCreateData } from '@/types'
-import { CircleHelp, ImageUp, ListTodo, LoaderCircle, Settings, Smile, X } from 'lucide-react'
+import {
+  CircleHelp,
+  ImageUp,
+  ListTodo,
+  LoaderCircle,
+  Lock,
+  Settings,
+  Smile,
+  X
+} from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Switch } from '@/components/ui/switch'
 import ExpressionPickerDialog from '../ExpressionPickerDialog'
 import Mentions from './Mentions'
+import ParentEventPreview from './ParentEventPreview'
 import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
 import PostRelaySelector from './PostRelaySelector'
@@ -209,21 +215,46 @@ export default function PostContent({
   }
 
   return (
-    <div className="space-y-2">
-      {parentEvent && (
-        <ScrollArea className="flex max-h-48 flex-col overflow-y-auto rounded-lg border bg-muted/40">
-          <div className="pointer-events-none p-2 sm:p-3">
-            {highlightedText ? (
-              <div className="flex gap-4">
-                <div className="my-1 w-1 shrink-0 rounded-md bg-primary/60" />
-                <div className="whitespace-pre-line italic">{highlightedText}</div>
+    <div className="pb-2">
+
+      {uploadProgresses.length > 0 && (
+        <div className="space-y-2 px-5 pb-3 sm:px-6">
+          {uploadProgresses.map(({ file, progress, cancel }, index) => (
+            <div key={`${file.name}-${index}`} className="flex items-end gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 truncate text-xs text-muted-foreground">
+                  {file.name ?? t('Uploading...')}
+                </div>
+                <div className="h-0.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full bg-primary transition-[width] duration-200 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
               </div>
-            ) : (
-              <Note size="small" event={parentEvent} hideParentNotePreview />
-            )}
-          </div>
-        </ScrollArea>
+              <button
+                type="button"
+                onClick={() => {
+                  cancel?.()
+                  handleUploadEnd(file)
+                }}
+                className="text-muted-foreground hover:text-foreground"
+                title={t('Cancel')}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
       )}
+
+      {parentEvent && (
+        <>
+          <ParentEventPreview parentEvent={parentEvent} highlightedText={highlightedText} />
+          <div className="h-px bg-border" />
+        </>
+      )}
+
       <PostTextarea
         ref={textareaRef}
         text={text}
@@ -235,79 +266,77 @@ export default function PostContent({
         onUploadStart={handleUploadStart}
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
-        placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
+        placeholder={
+          highlightedText ? t('Write your thoughts about this highlight...') : undefined
+        }
+        topRightActions={
+          <Button
+            type="submit"
+            size="sm"
+            disabled={!canPost}
+            onClick={post}
+            className="px-4 text-sm font-semibold shadow-sm"
+          >
+            {posting && <LoaderCircle className="animate-spin" />}
+            {parentStuff ? (highlightedText ? t('Publish Highlight') : t('Reply')) : t('Post')}
+          </Button>
+        }
       />
+
       {isPoll && (
-        <PollEditor
-          pollCreateData={pollCreateData}
-          setPollCreateData={setPollCreateData}
-          setIsPoll={setIsPoll}
-        />
-      )}
-      {uploadProgresses.length > 0 &&
-        uploadProgresses.map(({ file, progress, cancel }, index) => (
-          <div key={`${file.name}-${index}`} className="mt-2 flex items-end gap-2">
-            <div className="min-w-0 flex-1">
-              <div className="mb-1 truncate text-xs text-muted-foreground">
-                {file.name ?? t('Uploading...')}
-              </div>
-              <div className="h-0.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full bg-primary transition-[width] duration-200 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                cancel?.()
-                handleUploadEnd(file)
-              }}
-              className="text-muted-foreground hover:text-foreground"
-              title={t('Cancel')}
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
-      {!isPoll && (
-        <div className="flex items-center gap-3">
-          <div className="min-w-0">
-          <PostRelaySelector
-            onProtectedSuggestionChange={handleProtectedSuggestionChange}
-            setAdditionalRelayUrls={setAdditionalRelayUrls}
-            parentEvent={parentEvent}
-            openFrom={openFrom}
+        <div className="px-5 pb-3 sm:px-6">
+          <PollEditor
+            pollCreateData={pollCreateData}
+            setPollCreateData={setPollCreateData}
+            setIsPoll={setIsPoll}
           />
-          </div>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <Switch
-              id="protected-event"
-              checked={isProtectedEvent}
-              onCheckedChange={handleProtectedToggle}
-            />
-            <Label
-              htmlFor="protected-event"
-              className="cursor-pointer text-xs text-muted-foreground"
+        </div>
+      )}
+
+      {!isPoll && (
+        <div className="flex items-center gap-2 px-3 py-2 sm:px-4">
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={
+                isProtectedEvent
+                  ? 'h-9 gap-1.5 bg-emerald-500/15 px-2.5 text-sm font-normal text-emerald-600 hover:bg-emerald-500/20 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-400'
+                  : 'h-9 gap-1.5 px-2.5 text-sm font-normal text-muted-foreground hover:text-foreground'
+              }
+              onClick={() => handleProtectedToggle(!isProtectedEvent)}
             >
-              {t('Protected')}
-            </Label>
+              <Lock className="size-4 shrink-0" />
+              <span>{t('Protected')}</span>
+            </Button>
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" className="flex shrink-0">
-                  <CircleHelp className="size-3.5! text-muted-foreground" />
-                </button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 text-muted-foreground hover:text-foreground"
+                  title={t('Protected event hint')}
+                >
+                  <CircleHelp className="size-4!" />
+                </Button>
               </PopoverTrigger>
-              <PopoverContent className="text-sm">
-                {t('Protected event hint')}
-              </PopoverContent>
+              <PopoverContent className="text-sm">{t('Protected event hint')}</PopoverContent>
             </Popover>
+          </div>
+          <div className="flex min-w-0 flex-1 justify-end">
+            <PostRelaySelector
+              onProtectedSuggestionChange={handleProtectedSuggestionChange}
+              setAdditionalRelayUrls={setAdditionalRelayUrls}
+              parentEvent={parentEvent}
+              openFrom={openFrom}
+            />
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+
+      <div className="h-px bg-border" />
+      <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-4">
+        <div className="flex items-center gap-0.5">
           <Uploader
             onUploadSuccess={({ url }) => {
               textareaRef.current?.appendText(url, true)
@@ -317,7 +346,7 @@ export default function PostContent({
             onProgress={handleUploadProgress}
             accept="image/*,video/*,audio/*"
           >
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" title={t('Upload')}>
               <ImageUp />
             </Button>
           </Uploader>
@@ -339,7 +368,7 @@ export default function PostContent({
               textareaRef.current?.appendText(gif.url, true)
             }}
           >
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" title={t('Emoji')}>
               <Smile />
             </Button>
           </ExpressionPickerDialog>
@@ -348,7 +377,7 @@ export default function PostContent({
               variant="ghost"
               size="icon"
               title={t('Create Poll')}
-              className={isPoll ? 'bg-accent' : ''}
+              className={isPoll ? 'bg-muted text-foreground' : ''}
               onClick={handlePollToggle}
             >
               <ListTodo />
@@ -357,7 +386,8 @@ export default function PostContent({
           <Button
             variant="ghost"
             size="icon"
-            className={showMoreOptions ? 'bg-accent' : ''}
+            title={t('Post settings')}
+            className={showMoreOptions ? 'bg-muted text-foreground' : ''}
             onClick={() => setShowMoreOptions((pre) => !pre)}
           >
             <Settings />
@@ -370,9 +400,10 @@ export default function PostContent({
             mentions={mentions}
             setMentions={setMentions}
           />
-          <div className="flex items-center gap-2 max-sm:hidden">
+          <div className="hidden items-center gap-2 sm:flex">
             <Button
-              variant="secondary"
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation()
                 close()
@@ -380,39 +411,36 @@ export default function PostContent({
             >
               {t('Cancel')}
             </Button>
-            <Button type="submit" disabled={!canPost} onClick={post}>
+            <Button
+              type="submit"
+              disabled={!canPost}
+              onClick={post}
+              className="px-5 font-semibold shadow-sm"
+            >
               {posting && <LoaderCircle className="animate-spin" />}
               {parentStuff ? (highlightedText ? t('Publish Highlight') : t('Reply')) : t('Post')}
             </Button>
           </div>
         </div>
       </div>
-      <PostOptions
-        posting={posting}
-        show={showMoreOptions}
-        addClientTag={addClientTag}
-        setAddClientTag={setAddClientTag}
-        isNsfw={isNsfw}
-        setIsNsfw={setIsNsfw}
-        minPow={minPow}
-        setMinPow={setMinPow}
-      />
-      <div className="flex items-center justify-around gap-2 sm:hidden">
-        <Button
-          className="w-full"
-          variant="secondary"
-          onClick={(e) => {
-            e.stopPropagation()
-            close()
-          }}
-        >
-          {t('Cancel')}
-        </Button>
-        <Button className="w-full" type="submit" disabled={!canPost} onClick={post}>
-          {posting && <LoaderCircle className="animate-spin" />}
-          {parentStuff ? t('Reply') : t('Post')}
-        </Button>
-      </div>
+
+      {showMoreOptions && (
+        <>
+          <div className="h-px bg-border" />
+          <div className="px-5 py-3 sm:px-6">
+            <PostOptions
+              posting={posting}
+              show={showMoreOptions}
+              addClientTag={addClientTag}
+              setAddClientTag={setAddClientTag}
+              isNsfw={isNsfw}
+              setIsNsfw={setIsNsfw}
+              minPow={minPow}
+              setMinPow={setMinPow}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }

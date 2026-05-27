@@ -5,14 +5,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle
-} from '@/components/ui/sheet'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import postEditor from '@/services/post-editor.service'
 import { Event } from 'nostr-tools'
@@ -53,11 +47,10 @@ export default function PostEditor({
 
   if (isSmallScreen) {
     return (
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          className="h-full w-full border-none p-0"
-          side="bottom"
-          hideClose
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerContent
+          className="h-dvh max-h-dvh overflow-hidden"
+          title={highlightedText ? t('Create Highlight') : t('New Note')}
           onEscapeKeyDown={(e) => {
             if (postEditor.isSuggestionPopupOpen) {
               e.preventDefault()
@@ -65,26 +58,16 @@ export default function PostEditor({
             }
           }}
         >
-          <ScrollArea className="h-full max-h-screen px-4">
-            <div className="space-y-4 px-2 py-6">
-              <SheetHeader>
-                <SheetTitle className="text-start">
-                  {highlightedText ? t('Create Highlight') : <Title parentStuff={parentStuff} />}
-                </SheetTitle>
-                <SheetDescription className="hidden" />
-              </SheetHeader>
-              {content}
-            </div>
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+          <ScrollArea className="min-h-0 flex-1">{content}</ScrollArea>
+        </DrawerContent>
+      </Drawer>
     )
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-w-2xl p-0"
+        className="max-w-2xl p-0 sm:rounded-2xl"
         withoutClose
         onEscapeKeyDown={(e) => {
           if (postEditor.isSuggestionPopupOpen) {
@@ -93,16 +76,14 @@ export default function PostEditor({
           }
         }}
       >
-        <ScrollArea className="h-full max-h-screen px-4">
-          <div className="space-y-4 px-2 py-6">
-            <DialogHeader>
-              <DialogTitle>
-                {highlightedText ? t('Create Highlight') : <Title parentStuff={parentStuff} />}
-              </DialogTitle>
-              <DialogDescription className="hidden" />
-            </DialogHeader>
-            {content}
-          </div>
+        <ScrollArea className="h-full max-h-[85vh]">
+          <DialogHeader className="px-6 pt-6 pb-0">
+            <DialogTitle>
+              {highlightedText ? t('Create Highlight') : <Title parentStuff={parentStuff} />}
+            </DialogTitle>
+            <DialogDescription className="hidden" />
+          </DialogHeader>
+          {content}
         </ScrollArea>
       </DialogContent>
     </Dialog>
