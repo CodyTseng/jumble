@@ -996,6 +996,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'As sondagens podem não ser apresentadas em clientes que não as suportem.',
     'Show thread context': 'Mostrar contexto da conversa',
-    'Hide thread context': 'Ocultar contexto da conversa'
+    'Hide thread context': 'Ocultar contexto da conversa',
+    Enable: 'Ativar',
+    Upload: 'Carregar'
   }
 }

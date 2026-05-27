@@ -1005,6 +1005,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'Umfragen werden möglicherweise nicht auf Clients angezeigt, die sie nicht unterstützen.',
     'Show thread context': 'Thread-Kontext anzeigen',
-    'Hide thread context': 'Thread-Kontext ausblenden'
+    'Hide thread context': 'Thread-Kontext ausblenden',
+    Enable: 'Aktivieren',
+    Upload: 'Hochladen'
   }
 }

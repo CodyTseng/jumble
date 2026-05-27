@@ -957,6 +957,7 @@ export default {
       '不支持投票的客户端可能无法显示此投票。',
     'Show thread context': '展开对话上下文',
     'Hide thread context': '收起对话上下文',
-    Enable: '启用'
+    Enable: '启用',
+    Upload: '上传'
   }
 }

@@ -995,6 +995,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'Опросы могут не отображаться в клиентах, которые их не поддерживают.',
     'Show thread context': 'Показать контекст треда',
-    'Hide thread context': 'Скрыть контекст треда'
+    'Hide thread context': 'Скрыть контекст треда',
+    Enable: 'Включить',
+    Upload: 'Загрузить'
   }
 }

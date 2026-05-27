@@ -989,6 +989,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'A szavazások előfordulhat, hogy nem jelennek meg azokon a klienseken, amelyek nem támogatják őket.',
     'Show thread context': 'Beszélgetés kontextusának megjelenítése',
-    'Hide thread context': 'Beszélgetés kontextusának elrejtése'
+    'Hide thread context': 'Beszélgetés kontextusának elrejtése',
+    Enable: 'Engedélyezés',
+    Upload: 'Feltöltés'
   }
 }

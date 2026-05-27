@@ -979,6 +979,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       '투표를 지원하지 않는 클라이언트에서는 표시되지 않을 수 있습니다.',
     'Show thread context': '스레드 맥락 보기',
-    'Hide thread context': '스레드 맥락 숨기기'
+    'Hide thread context': '스레드 맥락 숨기기',
+    Enable: '사용',
+    Upload: '업로드'
   }
 }

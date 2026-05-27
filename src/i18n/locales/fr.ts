@@ -1003,6 +1003,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'Les sondages peuvent ne pas s’afficher sur les clients qui ne les prennent pas en charge.',
     'Show thread context': 'Afficher le contexte du fil',
-    'Hide thread context': 'Masquer le contexte du fil'
+    'Hide thread context': 'Masquer le contexte du fil',
+    Enable: 'Activer',
+    Upload: 'Téléverser'
   }
 }

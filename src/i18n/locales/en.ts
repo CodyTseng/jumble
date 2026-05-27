@@ -1008,6 +1008,7 @@ export default {
       'Polls may not display on clients that don’t support them.',
     'Show thread context': 'Show thread context',
     'Hide thread context': 'Hide thread context',
-    Enable: 'Enable'
+    Enable: 'Enable',
+    Upload: 'Upload'
   }
 }

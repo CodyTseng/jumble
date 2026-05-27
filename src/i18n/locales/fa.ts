@@ -989,6 +989,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'نظرسنجی‌ها ممکن است در کلاینت‌هایی که از آن‌ها پشتیبانی نمی‌کنند نمایش داده نشوند.',
     'Show thread context': 'نمایش بافت گفت‌وگو',
-    'Hide thread context': 'پنهان کردن بافت گفت‌وگو'
+    'Hide thread context': 'پنهان کردن بافت گفت‌وگو',
+    Enable: 'فعال‌سازی',
+    Upload: 'بارگذاری'
   }
 }

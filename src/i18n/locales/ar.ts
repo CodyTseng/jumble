@@ -973,6 +973,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'قد لا تظهر الاستطلاعات على العملاء الذين لا يدعمونها.',
     'Show thread context': 'إظهار سياق المحادثة',
-    'Hide thread context': 'إخفاء سياق المحادثة'
+    'Hide thread context': 'إخفاء سياق المحادثة',
+    Enable: 'تفعيل',
+    Upload: 'رفع'
   }
 }

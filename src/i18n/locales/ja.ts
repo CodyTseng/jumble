@@ -990,6 +990,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       '投票機能に対応していないクライアントでは表示されない場合があります。',
     'Show thread context': 'スレッドの文脈を表示',
-    'Hide thread context': 'スレッドの文脈を非表示'
+    'Hide thread context': 'スレッドの文脈を非表示',
+    Enable: '有効化',
+    Upload: 'アップロード'
   }
 }

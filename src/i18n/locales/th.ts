@@ -972,6 +972,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'โพลอาจไม่แสดงบนไคลเอนต์ที่ไม่รองรับ',
     'Show thread context': 'แสดงบริบทของเธรด',
-    'Hide thread context': 'ซ่อนบริบทของเธรด'
+    'Hide thread context': 'ซ่อนบริบทของเธรด',
+    Enable: 'เปิดใช้งาน',
+    Upload: 'อัปโหลด'
   }
 }

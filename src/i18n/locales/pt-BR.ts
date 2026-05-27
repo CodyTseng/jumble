@@ -993,6 +993,8 @@ export default {
     'Polls may not display on clients that don’t support them.':
       'As enquetes podem não ser exibidas em clientes que não as suportam.',
     'Show thread context': 'Mostrar contexto da conversa',
-    'Hide thread context': 'Ocultar contexto da conversa'
+    'Hide thread context': 'Ocultar contexto da conversa',
+    Enable: 'Ativar',
+    Upload: 'Enviar'
   }
 }
