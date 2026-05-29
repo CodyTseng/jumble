@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useFetchProfile } from '@/hooks'
 import { sanitizeContactComment, sanitizeContactName } from '@/lib/contact-note'
+import { cn } from '@/lib/utils'
 import { useContactNotes } from '@/providers/ContactNotesProvider'
 import { Check, Loader, Lock, TriangleAlert } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -9,7 +10,16 @@ import { useTranslation } from 'react-i18next'
 
 const AUTOSAVE_DELAY = 5000
 
-export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
+// Lightweight, always-editable name + note for a single contact. Persists 5s
+// after the last keystroke and on unmount. Works for any pubkey — followed or
+// not. Renders nothing for logged-out / npub sessions (can't encrypt).
+export default function ContactNoteEditor({
+  pubkey,
+  className
+}: {
+  pubkey: string
+  className?: string
+}) {
   const { t } = useTranslation()
   const { names, comments, canEdit, setName, setComment } = useContactNotes()
   const { profile } = useFetchProfile(pubkey)
@@ -62,7 +72,6 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
     timerRef.current = setTimeout(() => flushRef.current(), AUTOSAVE_DELAY)
   }
 
-  // Flush on unmount (navigating away).
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -76,7 +85,7 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
   const mismatch = !!name && !!currentName && name !== currentName
 
   return (
-    <div className="mt-2 space-y-2 rounded-md border border-border/60 bg-muted/30 p-3">
+    <div className={cn('space-y-2 rounded-md border border-border/60 bg-muted/30 p-3', className)}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Lock className="size-3" />
@@ -90,16 +99,21 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
           <Check className="size-3.5 text-muted-foreground/50" />
         )}
       </div>
-      <Input
-        value={name}
-        onChange={(e) => {
-          setNameDraft(e.target.value)
-          setDirty(true)
-          schedule()
-        }}
-        placeholder={currentName || t('Saved name (for rename detection)')}
-        className="h-8"
-      />
+
+      <label className="block space-y-1">
+        <span className="text-xs text-muted-foreground">{t('Saved name')}</span>
+        <Input
+          value={name}
+          onChange={(e) => {
+            setNameDraft(e.target.value)
+            setDirty(true)
+            schedule()
+          }}
+          placeholder={currentName || t('Saved name (for rename detection)')}
+          className="h-8"
+        />
+      </label>
+
       {mismatch && (
         <button
           type="button"
@@ -115,16 +129,20 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
           <span className="truncate">{t('Now broadcasting: {{n}}', { n: currentName })}</span>
         </button>
       )}
-      <Textarea
-        value={comment}
-        onChange={(e) => {
-          setCommentDraft(e.target.value)
-          setDirty(true)
-          schedule()
-        }}
-        placeholder={t('Private note, e.g. "met at Alice’s party"')}
-        rows={2}
-      />
+
+      <label className="block space-y-1">
+        <span className="text-xs text-muted-foreground">{t('Note')}</span>
+        <Textarea
+          value={comment}
+          onChange={(e) => {
+            setCommentDraft(e.target.value)
+            setDirty(true)
+            schedule()
+          }}
+          placeholder={t('Private note, e.g. "met at Alice’s party"')}
+          rows={2}
+        />
+      </label>
     </div>
   )
 }

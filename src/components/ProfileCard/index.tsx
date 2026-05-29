@@ -2,7 +2,7 @@ import { useFetchProfile } from '@/hooks'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMemo } from 'react'
-import ContactNoteSummary from '../ContactNoteSummary'
+import ContactNoteEditor from '../ContactNoteEditor'
 import FollowButton from '../FollowButton'
 import Nip05 from '../Nip05'
 import ProfileAbout from '../ProfileAbout'
@@ -45,7 +45,7 @@ export default function ProfileCard({ userId }: { userId: string }) {
           className="line-clamp-6 w-full overflow-hidden text-ellipsis text-wrap wrap-break-word text-sm"
         />
       )}
-      <ContactNoteSummary pubkey={pubkey} currentName={username} />
+      <ContactNoteEditor pubkey={pubkey} />
     </div>
   )
 }

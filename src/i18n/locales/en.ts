@@ -1017,7 +1017,6 @@ export default {
     'You saved': 'You saved',
     'Now broadcasting': 'Now broadcasting',
     'Now broadcasting: {{n}}': 'Now broadcasting: {{n}}',
-    'You saved: {{n}}': 'You saved: {{n}}',
     'Update saved name': 'Update saved name',
     'Show saved names': 'Show saved names',
     'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.':
