@@ -4,7 +4,7 @@ import { useFetchProfile } from '@/hooks'
 import { sanitizeContactComment, sanitizeContactName } from '@/lib/contact-note'
 import { cn } from '@/lib/utils'
 import { useContactNotes } from '@/providers/ContactNotesProvider'
-import { Check, Loader, Lock, TriangleAlert } from 'lucide-react'
+import { Loader, Lock } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -82,21 +82,19 @@ export default function ContactNoteEditor({
   if (!canEdit) return null
 
   const currentName = profile?.username ?? ''
-  const mismatch = !!name && !!currentName && name !== currentName
 
   return (
     <div className={cn('space-y-2 rounded-md border border-border/60 bg-muted/30 p-3', className)}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="flex h-4 items-center justify-between gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5">
           <Lock className="size-3" />
           {t('Private note')}
         </div>
-        {saving ? (
-          <Loader className="size-3.5 animate-spin text-muted-foreground" />
-        ) : dirty ? (
-          <span className="size-2 rounded-full bg-amber-500" title={t('Unsaved')} />
-        ) : (
-          <Check className="size-3.5 text-muted-foreground/50" />
+        {saving && (
+          <span className="flex items-center gap-1">
+            <Loader className="size-3 animate-spin" />
+            {t('Saving edits')}
+          </span>
         )}
       </div>
 
@@ -113,22 +111,6 @@ export default function ContactNoteEditor({
           className="h-8"
         />
       </label>
-
-      {mismatch && (
-        <button
-          type="button"
-          onClick={() => {
-            setNameDraft(currentName)
-            setDirty(true)
-            schedule()
-          }}
-          className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400"
-          title={t('Update saved name')}
-        >
-          <TriangleAlert className="size-3.5 shrink-0" />
-          <span className="truncate">{t('Now broadcasting: {{n}}', { n: currentName })}</span>
-        </button>
-      )}
 
       <label className="block space-y-1">
         <span className="text-xs text-muted-foreground">{t('Note')}</span>

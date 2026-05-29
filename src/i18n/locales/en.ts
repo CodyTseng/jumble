@@ -1037,6 +1037,7 @@ export default {
     'No notes yet. Add one from any profile, or snapshot your follows above.':
       'No notes yet. Add one from any profile, or snapshot your follows above.',
     'Saving…': 'Saving…',
+    'Saving edits': 'Saving edits',
     Unsaved: 'Unsaved',
     Saved: 'Saved',
     'All changes saved': 'All changes saved'
