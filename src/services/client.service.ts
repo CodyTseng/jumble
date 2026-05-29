@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { CONTACT_NOTES_D_TAG } from '@/lib/contact-note'
 import { ElectronPool } from '@/lib/electron-pool'
 import {
   compareEvents,
@@ -1501,6 +1502,16 @@ class ClientService extends EventTarget {
 
   async fetchMuteListEvent(pubkey: string) {
     return await this.fetchReplaceableEvent(pubkey, kinds.Mutelist)
+  }
+
+  async fetchContactNotesEvent(pubkey: string, skipCache = false) {
+    return await this.fetchReplaceableEvent(
+      pubkey,
+      kinds.Followsets,
+      CONTACT_NOTES_D_TAG,
+      true,
+      skipCache
+    )
   }
 
   async fetchBookmarkListEvent(pubkey: string) {

@@ -4,6 +4,7 @@ import './index.css'
 import KeySyncRequestHandler from '@/components/KeySyncRequestDialog'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
+import { ContactNotesProvider } from '@/providers/ContactNotesProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
 import { DeletedEventProvider } from '@/providers/DeletedEventProvider'
 import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
@@ -46,6 +47,7 @@ export default function App(): JSX.Element {
                   <TranslationServiceProvider>
                     <FavoriteRelaysProvider>
                       <FollowListProvider>
+                        <ContactNotesProvider>
                         <MuteListProvider>
                           <UserTrustProvider>
                             <BookmarksProvider>
@@ -67,6 +69,7 @@ export default function App(): JSX.Element {
                             </BookmarksProvider>
                           </UserTrustProvider>
                         </MuteListProvider>
+                        </ContactNotesProvider>
                       </FollowListProvider>
                     </FavoriteRelaysProvider>
                   </TranslationServiceProvider>
