@@ -4,7 +4,7 @@ import { tagNameEquals } from './tag'
 // The `d` identifier for our private contact-notes follow set (NIP-51 kind
 // 30000). All entries live in the NIP-44-encrypted content, so to other
 // clients this is an opaque/empty named set — nothing leaks.
-export const CONTACT_NOTES_D_TAG = 'jumble-contact-notes'
+export const CONTACT_NOTES_D_TAG = 'contact-notes'
 
 const MAX_NAME_LENGTH = 80
 const MAX_COMMENT_LENGTH = 2000
