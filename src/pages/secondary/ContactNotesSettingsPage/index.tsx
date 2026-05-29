@@ -15,7 +15,12 @@ import ContactNoteRow from './ContactNoteRow'
 const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
   const { names, comments, canEdit, loading, bulkSnapshotNames } = useContactNotes()
-  const { preferSavedContactNames, updatePreferSavedContactNames } = useUserPreferences()
+  const {
+    preferSavedContactNames,
+    updatePreferSavedContactNames,
+    autoSnapshotContactNames,
+    updateAutoSnapshotContactNames
+  } = useUserPreferences()
   const { followingSet } = useFollowList()
   const [snapshotting, setSnapshotting] = useState(false)
 
@@ -71,6 +76,40 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
           <>
             <SettingsGroup>
               <SettingsRow
+                htmlFor="auto-snapshot-names"
+                title={t('Auto-record follow names')}
+                description={t(
+                  'Save each follow’s current name in the background, so you’re warned if someone later changes their name to impersonate another contact.'
+                )}
+                control={
+                  <Switch
+                    id="auto-snapshot-names"
+                    checked={autoSnapshotContactNames}
+                    onCheckedChange={updateAutoSnapshotContactNames}
+                  />
+                }
+              />
+              {missingCount > 0 && (
+                <SettingsRow
+                  title={t('Record names now')}
+                  description={t('n follows not yet recorded', { n: missingCount })}
+                  control={
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleSnapshot}
+                      disabled={snapshotting}
+                    >
+                      {snapshotting ? (
+                        <Loader className="animate-spin" />
+                      ) : (
+                        t('Record n', { n: missingCount })
+                      )}
+                    </Button>
+                  }
+                />
+              )}
+              <SettingsRow
                 htmlFor="prefer-saved-names"
                 title={t('Show saved names')}
                 description={t(
@@ -82,26 +121,6 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
                     checked={preferSavedContactNames}
                     onCheckedChange={updatePreferSavedContactNames}
                   />
-                }
-              />
-              <SettingsRow
-                title={t('Snapshot follow names')}
-                description={t(
-                  'Save the current display name of everyone you follow, so you’re alerted if they later change it.'
-                )}
-                control={
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleSnapshot}
-                    disabled={snapshotting || missingCount === 0}
-                  >
-                    {snapshotting ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      t('Snapshot n', { n: missingCount })
-                    )}
-                  </Button>
                 }
               />
             </SettingsGroup>

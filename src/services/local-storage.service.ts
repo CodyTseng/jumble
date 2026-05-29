@@ -71,6 +71,7 @@ class LocalStorageService {
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
   private preferSavedContactNames: boolean = false
+  private autoSnapshotContactNames: boolean = true
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
   private defaultRelayUrls: string[] = BIG_RELAY_URLS
   private searchRelayUrls: string[] = SEARCHABLE_RELAY_URLS
@@ -328,6 +329,8 @@ class LocalStorageService {
     this.quickReaction = window.localStorage.getItem(StorageKey.QUICK_REACTION) === 'true'
     this.preferSavedContactNames =
       window.localStorage.getItem(StorageKey.PREFER_SAVED_CONTACT_NAMES) === 'true'
+    this.autoSnapshotContactNames =
+      window.localStorage.getItem(StorageKey.AUTO_SNAPSHOT_CONTACT_NAMES) !== 'false'
     const quickReactionEmojiStr =
       window.localStorage.getItem(StorageKey.QUICK_REACTION_EMOJI) ?? '+'
     if (quickReactionEmojiStr.startsWith('{')) {
@@ -1068,6 +1071,15 @@ class LocalStorageService {
   setPreferSavedContactNames(value: boolean) {
     this.preferSavedContactNames = value
     window.localStorage.setItem(StorageKey.PREFER_SAVED_CONTACT_NAMES, value.toString())
+  }
+
+  getAutoSnapshotContactNames() {
+    return this.autoSnapshotContactNames
+  }
+
+  setAutoSnapshotContactNames(value: boolean) {
+    this.autoSnapshotContactNames = value
+    window.localStorage.setItem(StorageKey.AUTO_SNAPSHOT_CONTACT_NAMES, value.toString())
   }
 
   getQuickReactionEmoji() {

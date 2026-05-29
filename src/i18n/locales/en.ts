@@ -1021,10 +1021,12 @@ export default {
     'Show saved names': 'Show saved names',
     'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.':
       'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.',
-    'Snapshot follow names': 'Snapshot follow names',
-    'Save the current display name of everyone you follow, so you’re alerted if they later change it.':
-      'Save the current display name of everyone you follow, so you’re alerted if they later change it.',
-    'Snapshot n': 'Snapshot {{n}}',
+    'Auto-record follow names': 'Auto-record follow names',
+    'Save each follow’s current name in the background, so you’re warned if someone later changes their name to impersonate another contact.':
+      'Save each follow’s current name in the background, so you’re warned if someone later changes their name to impersonate another contact.',
+    'Record names now': 'Record names now',
+    'n follows not yet recorded': '{{n}} follows not yet recorded',
+    'Record n': 'Record {{n}}',
     'Saved n names': 'Saved {{n}} names',
     'Nothing new to snapshot': 'Nothing new to snapshot',
     'Saved names and notes live in NIP-51 lists encrypted to you. Only you can read them.':

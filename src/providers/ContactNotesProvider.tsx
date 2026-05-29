@@ -21,7 +21,9 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { useFollowList } from './FollowListProvider'
 import { useNostr } from './NostrProvider'
+import { useUserPreferences } from './UserPreferencesProvider'
 
 type TContactNotesContext = {
   /** pubkey -> saved display-name snapshot (drives rename detection) */
@@ -52,6 +54,8 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
   const { t } = useTranslation()
   const { pubkey: accountPubkey, account, publish, nip44Encrypt, nip44Decrypt, nip04Decrypt } =
     useNostr()
+  const { followingSet } = useFollowList()
+  const { autoSnapshotContactNames } = useUserPreferences()
   const [names, setNames] = useState<Map<string, string>>(new Map())
   const [comments, setComments] = useState<Map<string, string>>(new Map())
   const [loading, setLoading] = useState(false)
@@ -176,16 +180,14 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     async (pubkeys: string[], resolve: (pubkey: string) => Promise<string | undefined>) => {
       const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
       if (!accountPubkey || !canEdit) return 0
-      const existing = await client.fetchPrivateContactListEvent(accountPubkey, CONTACT_NAMES_D_TAG, true)
-      const map = await decrypt(existing, sanitizeContactName)
-      const missing = pubkeys.filter((pk) => !map.get(pk))
-      if (!missing.length) return 0
 
-      let added = 0
+      // 1. Resolve names first (slow: profile fetches). We hold no event yet, so
+      //    this long phase can't clobber a concurrent manual edit.
+      const resolved = new Map<string, string>()
       const CHUNK = 50
-      for (let i = 0; i < missing.length; i += CHUNK) {
+      for (let i = 0; i < pubkeys.length; i += CHUNK) {
         const out = await Promise.all(
-          missing.slice(i, i + CHUNK).map(async (pk) => {
+          pubkeys.slice(i, i + CHUNK).map(async (pk) => {
             try {
               return [pk, sanitizeContactName(await resolve(pk))] as const
             } catch {
@@ -194,10 +196,21 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
           })
         )
         for (const [pk, name] of out) {
-          if (!name) continue
-          map.set(pk, name)
-          added++
+          if (name) resolved.set(pk, name)
         }
+      }
+      if (resolved.size === 0) return 0
+
+      // 2. Fetch the freshest list right before publishing, and fill ONLY gaps —
+      //    never overwrite an existing recorded name (preserves manual edits and
+      //    earlier snapshots; a re-follow can't clobber).
+      const existing = await client.fetchPrivateContactListEvent(accountPubkey, CONTACT_NAMES_D_TAG, true)
+      const map = await decrypt(existing, sanitizeContactName)
+      let added = 0
+      for (const [pk, name] of resolved) {
+        if (map.get(pk)) continue
+        map.set(pk, name)
+        added++
       }
       if (!added) return 0
 
@@ -209,6 +222,26 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     },
     []
   )
+
+  // Impersonation protection: keep a name snapshot for everyone the user
+  // follows, captured *now*, so a later rename (e.g. a hijacked key renamed to
+  // impersonate someone else) shows up as a mismatch. Runs in the background,
+  // fills only gaps, never overwrites. Converges: once a follow has a name (or
+  // has no kind-0 to snapshot), it stops re-attempting until the follow list
+  // or names map changes.
+  const autoRunningRef = useRef(false)
+  useEffect(() => {
+    if (!canEdit || loading || !autoSnapshotContactNames || autoRunningRef.current) return
+    const missing = Array.from(followingSet).filter((pk) => !names.get(pk))
+    if (missing.length === 0) return
+    autoRunningRef.current = true
+    bulkSnapshotNames(missing, async (pubkey) => {
+      const profile = await client.fetchProfile(pubkey)
+      return profile?.original_username
+    }).finally(() => {
+      autoRunningRef.current = false
+    })
+  }, [followingSet, names, canEdit, loading, autoSnapshotContactNames, bulkSnapshotNames])
 
   const value = useMemo(
     () => ({ names, comments, canEdit, loading, setName, setComment, bulkSnapshotNames }),

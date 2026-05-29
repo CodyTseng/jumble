@@ -31,6 +31,9 @@ type TUserPreferencesContext = {
 
   preferSavedContactNames: boolean
   updatePreferSavedContactNames: (value: boolean) => void
+
+  autoSnapshotContactNames: boolean
+  updateAutoSnapshotContactNames: (value: boolean) => void
 }
 
 const UserPreferencesContext = createContext<TUserPreferencesContext | undefined>(undefined)
@@ -62,6 +65,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const [feedTabs, setFeedTabs] = useState<TFeedTabConfig[]>(storage.getFeedTabs())
   const [preferSavedContactNames, setPreferSavedContactNames] = useState(
     storage.getPreferSavedContactNames()
+  )
+  const [autoSnapshotContactNames, setAutoSnapshotContactNames] = useState(
+    storage.getAutoSnapshotContactNames()
   )
 
   useEffect(() => {
@@ -113,6 +119,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setPreferSavedContactNames(value)
   }
 
+  const updateAutoSnapshotContactNames = (value: boolean) => {
+    setAutoSnapshotContactNames(value)
+    storage.setAutoSnapshotContactNames(value)
+  }
+
   return (
     <UserPreferencesContext.Provider
       value={{
@@ -133,7 +144,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         feedTabs,
         updateFeedTabs,
         preferSavedContactNames,
-        updatePreferSavedContactNames
+        updatePreferSavedContactNames,
+        autoSnapshotContactNames,
+        updateAutoSnapshotContactNames
       }}
     >
       {children}

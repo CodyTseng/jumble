@@ -61,6 +61,7 @@ export const StorageKey = {
   DISABLE_NOTIFICATION_SYNC: 'disableNotificationSync',
   DISMISSED_DESKTOP_APP_TIP: 'dismissedDesktopAppTip',
   PREFER_SAVED_CONTACT_NAMES: 'preferSavedContactNames',
+  AUTO_SNAPSHOT_CONTACT_NAMES: 'autoSnapshotContactNames',
   NOTE_LIST_MODE: 'noteListMode', // deprecated
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated
