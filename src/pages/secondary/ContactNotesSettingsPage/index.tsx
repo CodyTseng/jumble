@@ -2,19 +2,25 @@ import { Button } from '@/components/ui/button'
 import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import { Switch } from '@/components/ui/switch'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { sanitizeContactComment, sanitizeContactName } from '@/lib/contact-note'
 import { useContactNotes } from '@/providers/ContactNotesProvider'
 import { useFollowList } from '@/providers/FollowListProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
-import { Loader, Lock } from 'lucide-react'
-import { forwardRef, useMemo, useState } from 'react'
+import { Check, Loader, Lock } from 'lucide-react'
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import ContactNoteRow from './ContactNoteRow'
+import ContactNoteRow, { TRowState } from './ContactNoteRow'
+
+const AUTOSAVE_DELAY = 5000
+
+type TDraft = { name: string; comment: string }
 
 const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { names, comments, canEdit, loading, bulkSnapshotNames } = useContactNotes()
+  const { names, comments, canEdit, loading, setNamesBatch, setCommentsBatch, bulkSnapshotNames } =
+    useContactNotes()
   const {
     preferSavedContactNames,
     updatePreferSavedContactNames,
@@ -29,11 +35,83 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
     () => followings.filter((pk) => !names.get(pk)).length,
     [followings, names]
   )
-  // Union of everyone with a saved name and/or a comment.
-  const pubkeys = useMemo(
-    () => Array.from(new Set([...names.keys(), ...comments.keys()])),
-    [names, comments]
-  )
+
+  // --- inline editing with debounced autosave ---------------------------------
+  const [drafts, setDrafts] = useState<Map<string, TDraft>>(new Map())
+  const [dirty, setDirty] = useState<Set<string>>(new Set())
+  const [saving, setSaving] = useState<Set<string>>(new Set())
+  const draftsRef = useRef(drafts)
+  draftsRef.current = drafts
+  const dirtyRef = useRef(dirty)
+  dirtyRef.current = dirty
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Reconcile provider state into drafts: refresh non-dirty rows, add new
+  // pubkeys, drop rows the provider no longer has (and aren't mid-edit).
+  useEffect(() => {
+    setDrafts((prev) => {
+      const next = new Map(prev)
+      const all = new Set<string>([...names.keys(), ...comments.keys()])
+      for (const pk of all) {
+        if (dirtyRef.current.has(pk)) continue
+        next.set(pk, { name: names.get(pk) ?? '', comment: comments.get(pk) ?? '' })
+      }
+      for (const pk of Array.from(next.keys())) {
+        if (!all.has(pk) && !dirtyRef.current.has(pk)) next.delete(pk)
+      }
+      return next
+    })
+  }, [names, comments])
+
+  // flushRef always points at the latest closure so the debounce timer and the
+  // unmount cleanup save the freshest state.
+  const flushRef = useRef<() => Promise<void>>(async () => {})
+  flushRef.current = async () => {
+    const dirtyPks = Array.from(dirtyRef.current)
+    if (dirtyPks.length === 0) return
+
+    const nameChanges: [string, string][] = []
+    const commentChanges: [string, string][] = []
+    for (const pk of dirtyPks) {
+      const d = draftsRef.current.get(pk) ?? { name: '', comment: '' }
+      if (sanitizeContactName(d.name) !== (names.get(pk) ?? '')) nameChanges.push([pk, d.name])
+      if (sanitizeContactComment(d.comment) !== (comments.get(pk) ?? ''))
+        commentChanges.push([pk, d.comment])
+    }
+
+    setDirty(new Set())
+    if (!nameChanges.length && !commentChanges.length) return
+    setSaving(new Set(dirtyPks))
+    try {
+      if (nameChanges.length) await setNamesBatch(nameChanges)
+      if (commentChanges.length) await setCommentsBatch(commentChanges)
+    } finally {
+      setSaving(new Set())
+    }
+  }
+
+  const scheduleFlush = () => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => flushRef.current(), AUTOSAVE_DELAY)
+  }
+
+  // Flush on unmount (navigating away).
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      flushRef.current()
+    }
+  }, [])
+
+  const editDraft = (pk: string, patch: Partial<TDraft>) => {
+    setDrafts((prev) => {
+      const next = new Map(prev)
+      next.set(pk, { name: '', comment: '', ...prev.get(pk), ...patch })
+      return next
+    })
+    setDirty((prev) => new Set(prev).add(pk))
+    scheduleFlush()
+  }
 
   const handleSnapshot = async () => {
     setSnapshotting(true)
@@ -51,6 +129,12 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
       setSnapshotting(false)
     }
   }
+
+  const pubkeys = useMemo(() => Array.from(drafts.keys()), [drafts])
+  const rowState = (pk: string): TRowState =>
+    saving.has(pk) ? 'saving' : dirty.has(pk) ? 'dirty' : 'saved'
+  const globalState: 'saving' | 'dirty' | 'saved' =
+    saving.size > 0 ? 'saving' : dirty.size > 0 ? 'dirty' : 'saved'
 
   return (
     <SecondaryPageLayout ref={ref} index={index} title={t('Private contact notes')}>
@@ -125,7 +209,14 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
               />
             </SettingsGroup>
 
-            <SettingsGroup title={t('n notes', { n: pubkeys.length })}>
+            <SettingsGroup
+              title={
+                <div className="flex items-center justify-between gap-2">
+                  <span>{t('n notes', { n: pubkeys.length })}</span>
+                  <SaveStatus state={globalState} />
+                </div>
+              }
+            >
               {loading && pubkeys.length === 0 ? (
                 <div className="flex justify-center p-6">
                   <Loader className="size-5 animate-spin text-muted-foreground" />
@@ -136,9 +227,22 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
                 </div>
               ) : (
                 <div className="divide-y divide-border/60">
-                  {pubkeys.map((pubkey) => (
-                    <ContactNoteRow key={pubkey} pubkey={pubkey} />
-                  ))}
+                  {pubkeys.map((pk) => {
+                    const d = drafts.get(pk) ?? { name: '', comment: '' }
+                    return (
+                      <ContactNoteRow
+                        key={pk}
+                        pubkey={pk}
+                        name={d.name}
+                        comment={d.comment}
+                        state={rowState(pk)}
+                        onNameChange={(v) => editDraft(pk, { name: v })}
+                        onCommentChange={(v) => editDraft(pk, { comment: v })}
+                        onAdoptCurrent={(currentName) => editDraft(pk, { name: currentName })}
+                        onDelete={() => editDraft(pk, { name: '', comment: '' })}
+                      />
+                    )
+                  })}
                 </div>
               )}
             </SettingsGroup>
@@ -149,4 +253,31 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
   )
 })
 ContactNotesSettingsPage.displayName = 'ContactNotesSettingsPage'
+
+function SaveStatus({ state }: { state: 'saving' | 'dirty' | 'saved' }) {
+  const { t } = useTranslation()
+  if (state === 'saving') {
+    return (
+      <span className="flex items-center gap-1 text-xs normal-case text-muted-foreground">
+        <Loader className="size-3 animate-spin" />
+        {t('Saving…')}
+      </span>
+    )
+  }
+  if (state === 'dirty') {
+    return (
+      <span className="flex items-center gap-1 text-xs normal-case text-amber-500">
+        <span className="size-2 rounded-full bg-amber-500" />
+        {t('Unsaved')}
+      </span>
+    )
+  }
+  return (
+    <span className="flex items-center gap-1 text-xs normal-case text-muted-foreground">
+      <Check className="size-3" />
+      {t('All changes saved')}
+    </span>
+  )
+}
+
 export default ContactNotesSettingsPage

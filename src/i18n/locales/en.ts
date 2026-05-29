@@ -1035,6 +1035,10 @@ export default {
       'Log in with a key that can encrypt (not a public-key-only login) to use this.',
     'n notes': '{{n}} notes',
     'No notes yet. Add one from any profile, or snapshot your follows above.':
-      'No notes yet. Add one from any profile, or snapshot your follows above.'
+      'No notes yet. Add one from any profile, or snapshot your follows above.',
+    'Saving…': 'Saving…',
+    Unsaved: 'Unsaved',
+    Saved: 'Saved',
+    'All changes saved': 'All changes saved'
   }
 }

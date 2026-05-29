@@ -34,6 +34,10 @@ type TContactNotesContext = {
   loading: boolean
   setName: (pubkey: string, name: string) => Promise<void>
   setComment: (pubkey: string, comment: string) => Promise<void>
+  /** Apply many name changes in one publish. Empty value deletes the entry. */
+  setNamesBatch: (entries: [string, string][]) => Promise<void>
+  /** Apply many comment changes in one publish. Empty value deletes the entry. */
+  setCommentsBatch: (entries: [string, string][]) => Promise<void>
   bulkSnapshotNames: (
     pubkeys: string[],
     resolve: (pubkey: string) => Promise<string | undefined>
@@ -176,6 +180,44 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     [commitList]
   )
 
+  const setNamesBatch = useCallback(
+    async (entries: [string, string][]) => {
+      if (!entries.length) return
+      await commitList(
+        CONTACT_NAMES_D_TAG,
+        sanitizeContactName,
+        (map) => {
+          for (const [pk, v] of entries) {
+            const c = sanitizeContactName(v)
+            if (c) map.set(pk, c)
+            else map.delete(pk)
+          }
+        },
+        setNames
+      )
+    },
+    [commitList]
+  )
+
+  const setCommentsBatch = useCallback(
+    async (entries: [string, string][]) => {
+      if (!entries.length) return
+      await commitList(
+        CONTACT_NOTES_D_TAG,
+        sanitizeContactComment,
+        (map) => {
+          for (const [pk, v] of entries) {
+            const c = sanitizeContactComment(v)
+            if (c) map.set(pk, c)
+            else map.delete(pk)
+          }
+        },
+        setComments
+      )
+    },
+    [commitList]
+  )
+
   const bulkSnapshotNames = useCallback(
     async (pubkeys: string[], resolve: (pubkey: string) => Promise<string | undefined>) => {
       const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
@@ -244,8 +286,28 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
   }, [followingSet, names, canEdit, loading, autoSnapshotContactNames, bulkSnapshotNames])
 
   const value = useMemo(
-    () => ({ names, comments, canEdit, loading, setName, setComment, bulkSnapshotNames }),
-    [names, comments, canEdit, loading, setName, setComment, bulkSnapshotNames]
+    () => ({
+      names,
+      comments,
+      canEdit,
+      loading,
+      setName,
+      setComment,
+      setNamesBatch,
+      setCommentsBatch,
+      bulkSnapshotNames
+    }),
+    [
+      names,
+      comments,
+      canEdit,
+      loading,
+      setName,
+      setComment,
+      setNamesBatch,
+      setCommentsBatch,
+      bulkSnapshotNames
+    ]
   )
 
   return <ContactNotesContext.Provider value={value}>{children}</ContactNotesContext.Provider>
