@@ -1503,8 +1503,14 @@ class ClientService extends EventTarget {
     return await this.fetchReplaceableEvent(pubkey, kinds.Mutelist)
   }
 
-  async fetchPrivateFollowSetEvent(pubkey: string, dTag: string, skipCache = false) {
-    return await this.fetchReplaceableEvent(pubkey, kinds.Followsets, dTag, true, skipCache)
+  async fetchPrivateContactListEvent(pubkey: string, dTag: string, skipCache = false) {
+    return await this.fetchReplaceableEvent(
+      pubkey,
+      ExtendedKind.PRIVATE_CONTACT_LIST,
+      dTag,
+      true,
+      skipCache
+    )
   }
 
   async fetchBookmarkListEvent(pubkey: string) {

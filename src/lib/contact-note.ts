@@ -1,10 +1,11 @@
 import { isValidPubkey } from './pubkey'
 import { tagNameEquals } from './tag'
 
-// Two private NIP-51 follow sets (kind 30000), one per concern. Both keep all
-// entries in NIP-44 self-encrypted content, so to other clients they're opaque
-// empty named sets. Each entry is a standard ["p", pubkey, relay, value] tag —
-// the value sits in the NIP-02 petname slot, no non-standard elements.
+// Two private contact-metadata lists on a fresh addressable kind
+// (constants.ts ExtendedKind.PRIVATE_CONTACT_LIST), distinguished by d-tag.
+// All entries live in NIP-44 self-encrypted content; each entry is
+// ["p", pubkey, value] (no relay-hint slot). Specs: docs/nip-contact-names.md
+// and docs/nip-contact-notes.md.
 export const CONTACT_NAMES_D_TAG = 'contact-names'
 export const CONTACT_NOTES_D_TAG = 'contact-notes'
 
@@ -22,7 +23,7 @@ export const sanitizeContactName = (raw: string | undefined | null) => clamp(raw
 export const sanitizeContactComment = (raw: string | undefined | null) =>
   clamp(raw, MAX_COMMENT_LENGTH)
 
-// Parse a private tag array (["p", pubkey, relay, value]) into pubkey -> value,
+// Parse a private tag array (["p", pubkey, value]) into pubkey -> value,
 // dropping empties. Used for both the names and notes lists.
 export function parsePValueMap(
   tags: string[][],
@@ -33,18 +34,18 @@ export function parsePValueMap(
     if (!tagNameEquals('p')(tag)) continue
     const pubkey = tag[1]
     if (!pubkey || !isValidPubkey(pubkey)) continue
-    const value = sanitize(tag[3])
+    const value = sanitize(tag[2])
     if (value) map.set(pubkey, value)
   }
   return map
 }
 
-// pubkey -> value back into ["p", pubkey, "", value] tags (relay hint left empty).
+// pubkey -> value back into ["p", pubkey, value] tags.
 export function serializePValueMap(map: Map<string, string>): string[][] {
   const tags: string[][] = []
   for (const [pubkey, value] of map) {
     if (!value) continue
-    tags.push(['p', pubkey, '', value])
+    tags.push(['p', pubkey, value])
   }
   return tags
 }

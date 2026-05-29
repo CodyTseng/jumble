@@ -122,6 +122,10 @@ export const ExtendedKind = {
   DM_RELAYS: 10050,
   BLOSSOM_SERVER_LIST: 10063,
   FOLLOW_PACK: 39089,
+  // Private contact metadata (see docs/nip-contact-names.md, nip-contact-notes.md).
+  // Fresh addressable kind in the unregistered 33xxx range; distinguished by
+  // d-tag ("contact-names" / "contact-notes"), content NIP-44 self-encrypted.
+  PRIVATE_CONTACT_LIST: 33333,
   RELAY_REVIEW: 31987,
   GROUP_METADATA: 39000,
   ADDRESSABLE_NORMAL_VIDEO: 34235,

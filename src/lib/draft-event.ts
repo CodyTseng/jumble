@@ -402,9 +402,9 @@ export function createMuteListDraftEvent(tags: string[][], content?: string): TD
   }
 }
 
-export function createPrivateFollowSetDraftEvent(dTag: string, content: string): TDraftEvent {
+export function createPrivateContactListDraftEvent(dTag: string, content: string): TDraftEvent {
   return {
-    kind: kinds.Followsets,
+    kind: ExtendedKind.PRIVATE_CONTACT_LIST,
     content,
     created_at: dayjs().unix(),
     tags: [['d', dTag]]

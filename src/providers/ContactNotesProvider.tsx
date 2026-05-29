@@ -6,7 +6,7 @@ import {
   sanitizeContactName,
   serializePValueMap
 } from '@/lib/contact-note'
-import { createPrivateFollowSetDraftEvent } from '@/lib/draft-event'
+import { createPrivateContactListDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import client from '@/services/client.service'
 import { Event } from 'nostr-tools'
@@ -93,10 +93,10 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     setLoading(true)
     Promise.all([
       client
-        .fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NAMES_D_TAG)
+        .fetchPrivateContactListEvent(accountPubkey, CONTACT_NAMES_D_TAG)
         .then((e) => decrypt(e, sanitizeContactName)),
       client
-        .fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NOTES_D_TAG)
+        .fetchPrivateContactListEvent(accountPubkey, CONTACT_NOTES_D_TAG)
         .then((e) => decrypt(e, sanitizeContactComment))
     ])
       .then(([n, c]) => {
@@ -126,13 +126,13 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
       if (!accountPubkey || !canEdit || savingRef.current) return
       savingRef.current = true
       try {
-        const existing = await client.fetchPrivateFollowSetEvent(accountPubkey, dTag, true)
+        const existing = await client.fetchPrivateContactListEvent(accountPubkey, dTag, true)
         const map = await decrypt(existing, sanitize)
         mutate(map)
         const tags = serializePValueMap(map)
         const cipherText =
           tags.length > 0 ? await nip44Encrypt(accountPubkey, JSON.stringify(tags)) : ''
-        const event = await publish(createPrivateFollowSetDraftEvent(dTag, cipherText))
+        const event = await publish(createPrivateContactListDraftEvent(dTag, cipherText))
         if (event.pubkey === accountPubkey) apply(map)
       } catch (error) {
         formatError(error).forEach((err) =>
@@ -176,7 +176,7 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     async (pubkeys: string[], resolve: (pubkey: string) => Promise<string | undefined>) => {
       const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
       if (!accountPubkey || !canEdit) return 0
-      const existing = await client.fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NAMES_D_TAG, true)
+      const existing = await client.fetchPrivateContactListEvent(accountPubkey, CONTACT_NAMES_D_TAG, true)
       const map = await decrypt(existing, sanitizeContactName)
       const missing = pubkeys.filter((pk) => !map.get(pk))
       if (!missing.length) return 0
@@ -203,7 +203,7 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
 
       const tags = serializePValueMap(map)
       const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(tags))
-      const event = await publish(createPrivateFollowSetDraftEvent(CONTACT_NAMES_D_TAG, cipherText))
+      const event = await publish(createPrivateContactListDraftEvent(CONTACT_NAMES_D_TAG, cipherText))
       if (event.pubkey === accountPubkey) setNames(map)
       return added
     },
