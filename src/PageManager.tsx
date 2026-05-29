@@ -82,6 +82,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
+  const secondaryStackRef = useRef<TStackItem[]>([])
+
+  useEffect(() => {
+    secondaryStackRef.current = secondaryStack
+  }, [secondaryStack])
 
   useEffect(() => {
     if (isSmallScreen) return
@@ -158,6 +163,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       if (closeModal) {
         ignorePopStateRef.current = true
         window.history.forward()
+        return
+      }
+
+      if (
+        !e.state &&
+        window.location.pathname + window.location.search + window.location.hash === '/' &&
+        secondaryStackRef.current.length === 0
+      ) {
+        const shouldClose = window.confirm('Close Jumble?')
+        if (!shouldClose) {
+          ignorePopStateRef.current = true
+          window.history.forward()
+        }
         return
       }
 
