@@ -1010,22 +1010,25 @@ export default {
     Keep: 'Keep',
     'Saved name updated': 'Saved name updated',
     'Failed to save contact note': 'Failed to save contact note',
-    'This contact changed their name': 'This contact changed their name',
-    'Name changed': 'Name changed',
-    'The name you saved no longer matches what they broadcast.':
-      'The name you saved no longer matches what they broadcast.',
-    'Your saved name': 'Your saved name',
+    'Name differs from the one you saved': 'Name differs from the one you saved',
+    'Name doesn’t match': 'Name doesn’t match',
+    'This contact is broadcasting a name different from the one you saved.':
+      'This contact is broadcasting a name different from the one you saved.',
+    'You saved': 'You saved',
     'Now broadcasting': 'Now broadcasting',
     'Now broadcasting: {{n}}': 'Now broadcasting: {{n}}',
     'Update saved name': 'Update saved name',
+    'Show saved names': 'Show saved names',
+    'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.':
+      'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.',
     'Snapshot follow names': 'Snapshot follow names',
     'Save the current display name of everyone you follow, so you’re alerted if they later change it.':
       'Save the current display name of everyone you follow, so you’re alerted if they later change it.',
     'Snapshot n': 'Snapshot {{n}}',
     'Saved n names': 'Saved {{n}} names',
     'Nothing new to snapshot': 'Nothing new to snapshot',
-    'Saved names and notes are stored in a NIP-51 list encrypted to you. Only you can read them.':
-      'Saved names and notes are stored in a NIP-51 list encrypted to you. Only you can read them.',
+    'Saved names and notes live in NIP-51 lists encrypted to you. Only you can read them.':
+      'Saved names and notes live in NIP-51 lists encrypted to you. Only you can read them.',
     'Log in with a key that can encrypt (not a public-key-only login) to use this.':
       'Log in with a key that can encrypt (not a public-key-only login) to use this.',
     'n notes': '{{n}} notes',

@@ -5,25 +5,39 @@ import { toProfile } from '@/lib/link'
 import { cn, isTouchDevice } from '@/lib/utils'
 import { SecondaryPageLink } from '@/PageManager'
 import { useContactNotes } from '@/providers/ContactNotesProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TProfile } from '@/types'
 import { useMemo } from 'react'
 import ProfileCard from '../ProfileCard'
 import TextWithEmojis from '../TextWithEmojis'
 import RebrandIndicator from './RebrandIndicator'
 
-// FollowListContext-style subscription lives in these children so a logged-out
-// or npub-only session (canEdit === false) renders the plain path and never
-// subscribes — keeps feeds full of Usernames from churning.
-function SavedNameLabel({ profile, prefix }: { profile: TProfile; prefix: React.ReactNode }) {
-  const { notes } = useContactNotes()
-  const saved = notes.get(profile.pubkey)?.name
+// Subscribes to the (memoized) contact-notes context. Kept in a child so the
+// plain path (logged out / npub) never subscribes — avoids feed-wide churn.
+// Default: show the CURRENT broadcast name + a hint mark when a saved name
+// differs. Opt-in (preferSavedContactNames): show the saved name instead.
+function DecoratedLabel({ profile, prefix }: { profile: TProfile; prefix: React.ReactNode }) {
+  const { names } = useContactNotes()
+  const { preferSavedContactNames } = useUserPreferences()
+  const saved = names.get(profile.pubkey)
+  const mismatch = !!saved && saved !== profile.username
+
   return (
     <>
       {prefix}
-      {saved ? (
+      {preferSavedContactNames && saved ? (
         saved
       ) : (
         <TextWithEmojis text={profile.username} emojis={profile.emojis} emojiClassName="mb-1" />
+      )}
+      {mismatch && (
+        <RebrandIndicator
+          pubkey={profile.pubkey}
+          savedName={saved}
+          currentName={profile.username}
+          showingSaved={preferSavedContactNames}
+          className="ms-1 align-middle"
+        />
       )}
     </>
   )
@@ -35,20 +49,6 @@ function PlainLabel({ profile, prefix }: { profile: TProfile; prefix: React.Reac
       {prefix}
       <TextWithEmojis text={profile.username} emojis={profile.emojis} emojiClassName="mb-1" />
     </>
-  )
-}
-
-function RebrandSlot({ profile }: { profile: TProfile }) {
-  const { notes } = useContactNotes()
-  const saved = notes.get(profile.pubkey)?.name
-  if (!saved || saved === profile.username) return null
-  return (
-    <RebrandIndicator
-      pubkey={profile.pubkey}
-      storedName={saved}
-      currentName={profile.username}
-      className="ms-1 align-middle"
-    />
   )
 }
 
@@ -87,12 +87,11 @@ export default function Username({
         onClick={(e) => e.stopPropagation()}
       >
         {canEdit ? (
-          <SavedNameLabel profile={profile} prefix={prefix} />
+          <DecoratedLabel profile={profile} prefix={prefix} />
         ) : (
           <PlainLabel profile={profile} prefix={prefix} />
         )}
       </SecondaryPageLink>
-      {canEdit && <RebrandSlot profile={profile} />}
     </div>
   )
 
@@ -139,7 +138,7 @@ export function SimpleUsername({
   return (
     <div dir="auto" className={className}>
       {canEdit ? (
-        <SavedNameLabel profile={profile} prefix={prefix} />
+        <DecoratedLabel profile={profile} prefix={prefix} />
       ) : (
         <PlainLabel profile={profile} prefix={prefix} />
       )}

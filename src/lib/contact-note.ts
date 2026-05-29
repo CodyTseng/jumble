@@ -1,22 +1,15 @@
 import { isValidPubkey } from './pubkey'
 import { tagNameEquals } from './tag'
 
-// The `d` identifier for our private contact-notes follow set (NIP-51 kind
-// 30000). All entries live in the NIP-44-encrypted content, so to other
-// clients this is an opaque/empty named set — nothing leaks.
+// Two private NIP-51 follow sets (kind 30000), one per concern. Both keep all
+// entries in NIP-44 self-encrypted content, so to other clients they're opaque
+// empty named sets. Each entry is a standard ["p", pubkey, relay, value] tag —
+// the value sits in the NIP-02 petname slot, no non-standard elements.
+export const CONTACT_NAMES_D_TAG = 'contact-names'
 export const CONTACT_NOTES_D_TAG = 'contact-notes'
 
 const MAX_NAME_LENGTH = 80
 const MAX_COMMENT_LENGTH = 2000
-
-export type TContactNote = {
-  pubkey: string
-  // Snapshot of the contact's display name when the note was created/updated.
-  // Drives rebrand detection: compare against the current kind-0 name.
-  name: string
-  // Freeform private annotation ("met at Alice's party", "shitcoin scammer").
-  comment: string
-}
 
 function clamp(raw: string | undefined | null, max: number): string {
   if (!raw) return ''
@@ -29,31 +22,29 @@ export const sanitizeContactName = (raw: string | undefined | null) => clamp(raw
 export const sanitizeContactComment = (raw: string | undefined | null) =>
   clamp(raw, MAX_COMMENT_LENGTH)
 
-// Private entry wire shape (inside the encrypted content tag array):
-//   ["p", pubkey, "", name, comment]
-// The 4th element is the standard NIP-02 petname slot (reused as the name
-// snapshot); the 5th is our private comment extension. Both optional.
-export function parseContactNotesFromPrivateTags(tags: string[][]): Map<string, TContactNote> {
-  const map = new Map<string, TContactNote>()
+// Parse a private tag array (["p", pubkey, relay, value]) into pubkey -> value,
+// dropping empties. Used for both the names and notes lists.
+export function parsePValueMap(
+  tags: string[][],
+  sanitize: (v: string | undefined | null) => string
+): Map<string, string> {
+  const map = new Map<string, string>()
   for (const tag of tags) {
     if (!tagNameEquals('p')(tag)) continue
     const pubkey = tag[1]
     if (!pubkey || !isValidPubkey(pubkey)) continue
-    const name = sanitizeContactName(tag[3])
-    const comment = sanitizeContactComment(tag[4])
-    if (!name && !comment) continue
-    map.set(pubkey, { pubkey, name, comment })
+    const value = sanitize(tag[3])
+    if (value) map.set(pubkey, value)
   }
   return map
 }
 
-export function serializeContactNotesToPrivateTags(map: Map<string, TContactNote>): string[][] {
+// pubkey -> value back into ["p", pubkey, "", value] tags (relay hint left empty).
+export function serializePValueMap(map: Map<string, string>): string[][] {
   const tags: string[][] = []
-  for (const note of map.values()) {
-    const name = sanitizeContactName(note.name)
-    const comment = sanitizeContactComment(note.comment)
-    if (!name && !comment) continue
-    tags.push(['p', note.pubkey, '', name, comment])
+  for (const [pubkey, value] of map) {
+    if (!value) continue
+    tags.push(['p', pubkey, '', value])
   }
   return tags
 }

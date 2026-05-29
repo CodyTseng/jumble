@@ -8,26 +8,29 @@ import { useTranslation } from 'react-i18next'
 
 export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation()
-  const { notes, canEdit, setNote } = useContactNotes()
+  const { names, comments, canEdit, setName, setComment } = useContactNotes()
 
-  const note = notes.get(pubkey)
+  const savedName = names.get(pubkey) ?? ''
+  const savedComment = comments.get(pubkey) ?? ''
   const [editing, setEditing] = useState(false)
-  const [name, setName] = useState(note?.name ?? '')
-  const [comment, setComment] = useState(note?.comment ?? '')
+  const [name, setNameDraft] = useState(savedName)
+  const [comment, setCommentDraft] = useState(savedComment)
   const [saving, setSaving] = useState(false)
 
   if (!canEdit) return null
 
   const open = () => {
-    setName(note?.name ?? '')
-    setComment(note?.comment ?? '')
+    setNameDraft(savedName)
+    setCommentDraft(savedComment)
     setEditing(true)
   }
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      await setNote(pubkey, { name, comment })
+      // Two separate encrypted lists — only publish the one(s) that changed.
+      if (name !== savedName) await setName(pubkey, name)
+      if (comment !== savedComment) await setComment(pubkey, comment)
       setEditing(false)
     } finally {
       setSaving(false)
@@ -43,13 +46,13 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
         </div>
         <Input
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setNameDraft(e.target.value)}
           placeholder={t('Saved name (for rename detection)')}
           className="h-8"
         />
         <Textarea
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e) => setCommentDraft(e.target.value)}
           placeholder={t('Private note, e.g. "met at Alice’s party"')}
           rows={3}
         />
@@ -65,7 +68,7 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
     )
   }
 
-  if (!note) {
+  if (!savedName && !savedComment) {
     return (
       <button
         type="button"
@@ -94,16 +97,14 @@ export default function ContactNoteCard({ pubkey }: { pubkey: string }) {
           <Pencil className="size-3.5" />
         </button>
       </div>
-      {note.name && (
+      {savedName && (
         <div className="text-sm">
           <span className="text-muted-foreground">{t('Saved name')}: </span>
-          <span className="font-medium">{note.name}</span>
+          <span className="font-medium">{savedName}</span>
         </div>
       )}
-      {note.comment && (
-        <div className="text-sm whitespace-pre-wrap wrap-break-word select-text">
-          {note.comment}
-        </div>
+      {savedComment && (
+        <div className="text-sm whitespace-pre-wrap wrap-break-word select-text">{savedComment}</div>
       )}
     </div>
   )

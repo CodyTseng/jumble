@@ -28,6 +28,9 @@ type TUserPreferencesContext = {
 
   feedTabs: TFeedTabConfig[]
   updateFeedTabs: (tabs: TFeedTabConfig[]) => void
+
+  preferSavedContactNames: boolean
+  updatePreferSavedContactNames: (value: boolean) => void
 }
 
 const UserPreferencesContext = createContext<TUserPreferencesContext | undefined>(undefined)
@@ -57,6 +60,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.getAllowInsecureConnection()
   )
   const [feedTabs, setFeedTabs] = useState<TFeedTabConfig[]>(storage.getFeedTabs())
+  const [preferSavedContactNames, setPreferSavedContactNames] = useState(
+    storage.getPreferSavedContactNames()
+  )
 
   useEffect(() => {
     if (!isSmallScreen && enableSingleColumnLayout) {
@@ -102,6 +108,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setFeedTabs(tabs)
   }
 
+  const updatePreferSavedContactNames = (value: boolean) => {
+    setPreferSavedContactNames(value)
+    storage.setPreferSavedContactNames(value)
+  }
+
   return (
     <UserPreferencesContext.Provider
       value={{
@@ -120,7 +131,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         allowInsecureConnection,
         updateAllowInsecureConnection,
         feedTabs,
-        updateFeedTabs
+        updateFeedTabs,
+        preferSavedContactNames,
+        updatePreferSavedContactNames
       }}
     >
       {children}

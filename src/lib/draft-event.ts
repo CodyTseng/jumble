@@ -20,7 +20,6 @@ import {
   isProtectedEvent,
   isReplaceableEvent
 } from './event'
-import { CONTACT_NOTES_D_TAG } from './contact-note'
 import { determineExternalContentKind } from './external-content'
 import { randomString } from './random'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
@@ -403,12 +402,12 @@ export function createMuteListDraftEvent(tags: string[][], content?: string): TD
   }
 }
 
-export function createContactNotesDraftEvent(tags: string[][], content: string): TDraftEvent {
+export function createPrivateFollowSetDraftEvent(dTag: string, content: string): TDraftEvent {
   return {
     kind: kinds.Followsets,
     content,
     created_at: dayjs().unix(),
-    tags: [['d', CONTACT_NOTES_D_TAG], ...tags]
+    tags: [['d', dTag]]
   }
 }
 

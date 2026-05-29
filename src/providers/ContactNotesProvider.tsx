@@ -1,11 +1,12 @@
 import {
-  parseContactNotesFromPrivateTags,
+  CONTACT_NAMES_D_TAG,
+  CONTACT_NOTES_D_TAG,
+  parsePValueMap,
   sanitizeContactComment,
   sanitizeContactName,
-  serializeContactNotesToPrivateTags,
-  TContactNote
+  serializePValueMap
 } from '@/lib/contact-note'
-import { createContactNotesDraftEvent } from '@/lib/draft-event'
+import { createPrivateFollowSetDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import client from '@/services/client.service'
 import { Event } from 'nostr-tools'
@@ -23,11 +24,14 @@ import { toast } from 'sonner'
 import { useNostr } from './NostrProvider'
 
 type TContactNotesContext = {
-  notes: Map<string, TContactNote>
+  /** pubkey -> saved display-name snapshot (drives rename detection) */
+  names: Map<string, string>
+  /** pubkey -> freeform private comment */
+  comments: Map<string, string>
   canEdit: boolean
   loading: boolean
-  setNote: (pubkey: string, patch: { name?: string; comment?: string }) => Promise<void>
-  removeNote: (pubkey: string) => Promise<void>
+  setName: (pubkey: string, name: string) => Promise<void>
+  setComment: (pubkey: string, comment: string) => Promise<void>
   bulkSnapshotNames: (
     pubkeys: string[],
     resolve: (pubkey: string) => Promise<string | undefined>
@@ -48,33 +52,33 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
   const { t } = useTranslation()
   const { pubkey: accountPubkey, account, publish, nip44Encrypt, nip44Decrypt, nip04Decrypt } =
     useNostr()
-  const [notes, setNotes] = useState<Map<string, TContactNote>>(new Map())
+  const [names, setNames] = useState<Map<string, string>>(new Map())
+  const [comments, setComments] = useState<Map<string, string>>(new Map())
   const [loading, setLoading] = useState(false)
 
   const canEdit = !!accountPubkey && account?.signerType !== 'npub'
 
-  // useNostr() hands back fresh function identities on every render, and
-  // NostrProvider re-renders frequently. Funnel the volatile bits through a ref
-  // so the context value (and thus every Username consumer) doesn't churn.
+  // useNostr() returns fresh function identities every render and NostrProvider
+  // re-renders often. Funnel the volatile bits through a ref so the context
+  // value only changes on real edits (no feed-wide re-render storm).
   const deps = useRef({ accountPubkey, canEdit, publish, nip44Encrypt, nip44Decrypt, nip04Decrypt })
   deps.current = { accountPubkey, canEdit, publish, nip44Encrypt, nip44Decrypt, nip04Decrypt }
   const savingRef = useRef(false)
 
-  const decryptNotes = async (
-    event: Event | null | undefined
-  ): Promise<Map<string, TContactNote>> => {
+  const decrypt = async (
+    event: Event | null | undefined,
+    sanitize: (v: string | undefined | null) => string
+  ): Promise<Map<string, string>> => {
     const { accountPubkey, nip44Decrypt, nip04Decrypt } = deps.current
     if (!event?.content || !accountPubkey) return new Map()
     try {
-      const wasNip04 = event.content.includes('?iv=')
-      const plainText = wasNip04
+      const plainText = event.content.includes('?iv=')
         ? await nip04Decrypt(accountPubkey, event.content)
         : await nip44Decrypt(accountPubkey, event.content)
       const tags = JSON.parse(plainText)
       if (!Array.isArray(tags)) return new Map()
-      return parseContactNotesFromPrivateTags(tags as string[][])
+      return parsePValueMap(tags as string[][], sanitize)
     } catch {
-      // npub-only signer or corrupt content — treat as empty.
       return new Map()
     }
   }
@@ -82,15 +86,23 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     let cancelled = false
     if (!accountPubkey || !canEdit) {
-      setNotes(new Map())
+      setNames(new Map())
+      setComments(new Map())
       return
     }
     setLoading(true)
-    client
-      .fetchContactNotesEvent(accountPubkey)
-      .then((event) => decryptNotes(event))
-      .then((map) => {
-        if (!cancelled) setNotes(map)
+    Promise.all([
+      client
+        .fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NAMES_D_TAG)
+        .then((e) => decrypt(e, sanitizeContactName)),
+      client
+        .fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NOTES_D_TAG)
+        .then((e) => decrypt(e, sanitizeContactComment))
+    ])
+      .then(([n, c]) => {
+        if (cancelled) return
+        setNames(n)
+        setComments(c)
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -100,63 +112,73 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
     }
   }, [accountPubkey, canEdit])
 
-  // Re-fetch latest, apply mutate, encrypt, publish. Builds on freshest relay
-  // state so concurrent edits elsewhere aren't clobbered.
-  const commit = useCallback(async (mutate: (map: Map<string, TContactNote>) => void) => {
-    const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
-    if (!accountPubkey || !canEdit || savingRef.current) return
-    savingRef.current = true
-    try {
-      const existing = await client.fetchContactNotesEvent(accountPubkey, true)
-      const map = await decryptNotes(existing)
-      mutate(map)
-      const privateTags = serializeContactNotesToPrivateTags(map)
-      const cipherText =
-        privateTags.length > 0 ? await nip44Encrypt(accountPubkey, JSON.stringify(privateTags)) : ''
-      const event = await publish(createContactNotesDraftEvent([], cipherText))
-      if (event.pubkey === accountPubkey) setNotes(map)
-    } catch (error) {
-      formatError(error).forEach((err) =>
-        toast.error(t('Failed to save contact note') + ': ' + err, { duration: 10_000 })
-      )
-      throw error
-    } finally {
-      savingRef.current = false
-    }
-  }, [])
-
-  const setNote = useCallback(
-    async (pubkey: string, patch: { name?: string; comment?: string }) => {
-      await commit((map) => {
-        const prev = map.get(pubkey)
-        const name = patch.name !== undefined ? sanitizeContactName(patch.name) : (prev?.name ?? '')
-        const comment =
-          patch.comment !== undefined
-            ? sanitizeContactComment(patch.comment)
-            : (prev?.comment ?? '')
-        if (!name && !comment) map.delete(pubkey)
-        else map.set(pubkey, { pubkey, name, comment })
-      })
+  // Re-fetch the latest list for `dTag`, apply mutate, encrypt, publish. Builds
+  // on freshest relay state so concurrent edits aren't clobbered. Never prunes
+  // entries the caller didn't touch.
+  const commitList = useCallback(
+    async (
+      dTag: string,
+      sanitize: (v: string | undefined | null) => string,
+      mutate: (map: Map<string, string>) => void,
+      apply: (map: Map<string, string>) => void
+    ) => {
+      const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
+      if (!accountPubkey || !canEdit || savingRef.current) return
+      savingRef.current = true
+      try {
+        const existing = await client.fetchPrivateFollowSetEvent(accountPubkey, dTag, true)
+        const map = await decrypt(existing, sanitize)
+        mutate(map)
+        const tags = serializePValueMap(map)
+        const cipherText =
+          tags.length > 0 ? await nip44Encrypt(accountPubkey, JSON.stringify(tags)) : ''
+        const event = await publish(createPrivateFollowSetDraftEvent(dTag, cipherText))
+        if (event.pubkey === accountPubkey) apply(map)
+      } catch (error) {
+        formatError(error).forEach((err) =>
+          toast.error(t('Failed to save contact note') + ': ' + err, { duration: 10_000 })
+        )
+        throw error
+      } finally {
+        savingRef.current = false
+      }
     },
-    [commit]
+    []
   )
 
-  const removeNote = useCallback(
-    async (pubkey: string) => {
-      await commit((map) => {
-        map.delete(pubkey)
-      })
+  const setName = useCallback(
+    async (pubkey: string, name: string) => {
+      const clean = sanitizeContactName(name)
+      await commitList(
+        CONTACT_NAMES_D_TAG,
+        sanitizeContactName,
+        (map) => (clean ? map.set(pubkey, clean) : map.delete(pubkey)),
+        setNames
+      )
     },
-    [commit]
+    [commitList]
+  )
+
+  const setComment = useCallback(
+    async (pubkey: string, comment: string) => {
+      const clean = sanitizeContactComment(comment)
+      await commitList(
+        CONTACT_NOTES_D_TAG,
+        sanitizeContactComment,
+        (map) => (clean ? map.set(pubkey, clean) : map.delete(pubkey)),
+        setComments
+      )
+    },
+    [commitList]
   )
 
   const bulkSnapshotNames = useCallback(
     async (pubkeys: string[], resolve: (pubkey: string) => Promise<string | undefined>) => {
       const { accountPubkey, canEdit, nip44Encrypt, publish } = deps.current
       if (!accountPubkey || !canEdit) return 0
-      const existing = await client.fetchContactNotesEvent(accountPubkey, true)
-      const map = await decryptNotes(existing)
-      const missing = pubkeys.filter((pk) => !map.get(pk)?.name)
+      const existing = await client.fetchPrivateFollowSetEvent(accountPubkey, CONTACT_NAMES_D_TAG, true)
+      const map = await decrypt(existing, sanitizeContactName)
+      const missing = pubkeys.filter((pk) => !map.get(pk))
       if (!missing.length) return 0
 
       let added = 0
@@ -173,25 +195,24 @@ export function ContactNotesProvider({ children }: { children: React.ReactNode }
         )
         for (const [pk, name] of out) {
           if (!name) continue
-          const prev = map.get(pk)
-          map.set(pk, { pubkey: pk, name, comment: prev?.comment ?? '' })
+          map.set(pk, name)
           added++
         }
       }
       if (!added) return 0
 
-      const privateTags = serializeContactNotesToPrivateTags(map)
-      const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
-      const event = await publish(createContactNotesDraftEvent([], cipherText))
-      if (event.pubkey === accountPubkey) setNotes(map)
+      const tags = serializePValueMap(map)
+      const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(tags))
+      const event = await publish(createPrivateFollowSetDraftEvent(CONTACT_NAMES_D_TAG, cipherText))
+      if (event.pubkey === accountPubkey) setNames(map)
       return added
     },
     []
   )
 
   const value = useMemo(
-    () => ({ notes, canEdit, loading, setNote, removeNote, bulkSnapshotNames }),
-    [notes, canEdit, loading, setNote, removeNote, bulkSnapshotNames]
+    () => ({ names, comments, canEdit, loading, setName, setComment, bulkSnapshotNames }),
+    [names, comments, canEdit, loading, setName, setComment, bulkSnapshotNames]
   )
 
   return <ContactNotesContext.Provider value={value}>{children}</ContactNotesContext.Provider>

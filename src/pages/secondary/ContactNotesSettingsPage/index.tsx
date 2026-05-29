@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
+import { Switch } from '@/components/ui/switch'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { useContactNotes } from '@/providers/ContactNotesProvider'
 import { useFollowList } from '@/providers/FollowListProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
 import { Loader, Lock } from 'lucide-react'
 import { forwardRef, useMemo, useState } from 'react'
@@ -12,16 +14,21 @@ import ContactNoteRow from './ContactNoteRow'
 
 const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
-  const { notes, canEdit, loading, bulkSnapshotNames } = useContactNotes()
+  const { names, comments, canEdit, loading, bulkSnapshotNames } = useContactNotes()
+  const { preferSavedContactNames, updatePreferSavedContactNames } = useUserPreferences()
   const { followingSet } = useFollowList()
   const [snapshotting, setSnapshotting] = useState(false)
 
   const followings = useMemo(() => Array.from(followingSet), [followingSet])
   const missingCount = useMemo(
-    () => followings.filter((pk) => !notes.get(pk)?.name).length,
-    [followings, notes]
+    () => followings.filter((pk) => !names.get(pk)).length,
+    [followings, names]
   )
-  const noteList = useMemo(() => Array.from(notes.values()), [notes])
+  // Union of everyone with a saved name and/or a comment.
+  const pubkeys = useMemo(
+    () => Array.from(new Set([...names.keys(), ...comments.keys()])),
+    [names, comments]
+  )
 
   const handleSnapshot = async () => {
     setSnapshotting(true)
@@ -48,7 +55,7 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
             <Lock className="mt-0.5 size-4 shrink-0" />
             <span>
               {t(
-                'Saved names and notes are stored in a NIP-51 list encrypted to you. Only you can read them.'
+                'Saved names and notes live in NIP-51 lists encrypted to you. Only you can read them.'
               )}
             </span>
           </div>
@@ -63,6 +70,20 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
         ) : (
           <>
             <SettingsGroup>
+              <SettingsRow
+                htmlFor="prefer-saved-names"
+                title={t('Show saved names')}
+                description={t(
+                  'Display the name you saved instead of the current one. Off by default — a warning mark shows when they differ.'
+                )}
+                control={
+                  <Switch
+                    id="prefer-saved-names"
+                    checked={preferSavedContactNames}
+                    onCheckedChange={updatePreferSavedContactNames}
+                  />
+                }
+              />
               <SettingsRow
                 title={t('Snapshot follow names')}
                 description={t(
@@ -85,19 +106,19 @@ const ContactNotesSettingsPage = forwardRef(({ index }: { index?: number }, ref)
               />
             </SettingsGroup>
 
-            <SettingsGroup title={t('n notes', { n: noteList.length })}>
-              {loading && noteList.length === 0 ? (
+            <SettingsGroup title={t('n notes', { n: pubkeys.length })}>
+              {loading && pubkeys.length === 0 ? (
                 <div className="flex justify-center p-6">
                   <Loader className="size-5 animate-spin text-muted-foreground" />
                 </div>
-              ) : noteList.length === 0 ? (
+              ) : pubkeys.length === 0 ? (
                 <div className="p-6 text-center text-sm text-muted-foreground">
                   {t('No notes yet. Add one from any profile, or snapshot your follows above.')}
                 </div>
               ) : (
                 <div className="divide-y divide-border/60">
-                  {noteList.map((note) => (
-                    <ContactNoteRow key={note.pubkey} note={note} />
+                  {pubkeys.map((pubkey) => (
+                    <ContactNoteRow key={pubkey} pubkey={pubkey} />
                   ))}
                 </div>
               )}
