@@ -140,6 +140,14 @@ export type TPublishOptions = {
   specifiedRelayUrls?: string[]
   additionalRelayUrls?: string[]
   minPow?: number
+  /**
+   * Mark this publish as authored by an ephemeral identity (anonymous mode).
+   * When set, the relay resolver falls back to the hardcoded BIG_RELAY_URLS
+   * set instead of the user's customized default relays — which may contain
+   * paid relays with the user's npub baked into the URL or write relays
+   * correlated with their account.
+   */
+  isAnonymous?: boolean
 }
 
 export type TPostTargetItem =

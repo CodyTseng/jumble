@@ -1,4 +1,4 @@
-import { ExtendedKind } from '@/constants'
+import { BIG_RELAY_URLS, ExtendedKind } from '@/constants'
 import { ElectronPool } from '@/lib/electron-pool'
 import {
   compareEvents,
@@ -101,7 +101,7 @@ class ClientService extends EventTarget {
 
   async determineTargetRelays(
     event: NEvent,
-    { specifiedRelayUrls, additionalRelayUrls }: TPublishOptions = {}
+    { specifiedRelayUrls, additionalRelayUrls, isAnonymous }: TPublishOptions = {}
   ) {
     if (event.kind === kinds.Report) {
       const targetEventId = event.tags.find(tagNameEquals('e'))?.[1]
@@ -110,7 +110,11 @@ class ClientService extends EventTarget {
       }
     }
 
-    const defaultRelays = getDefaultRelayUrls()
+    // Anonymous publishes must not be steered to the user's customized default
+    // relays (which may include paid relays with their npub in the URL, or
+    // write relays correlated to their account). Anchor on the generic public
+    // set instead — same names every major Nostr client ships with.
+    const defaultRelays = isAnonymous ? BIG_RELAY_URLS : getDefaultRelayUrls()
     const relaySet = new Set<string>()
     if (specifiedRelayUrls?.length) {
       specifiedRelayUrls.forEach((url) => relaySet.add(url))
@@ -139,8 +143,13 @@ class ClientService extends EventTarget {
         }
       }
 
-      const relayList = await this.fetchRelayList(event.pubkey)
-      relayList.write.forEach((url) => relaySet.add(url))
+      // For anonymous publishes the author is an ephemeral key with no
+      // published relay list — and fetching one would only waste a round trip
+      // and could leak intent. Skip.
+      if (!isAnonymous) {
+        const relayList = await this.fetchRelayList(event.pubkey)
+        relayList.write.forEach((url) => relaySet.add(url))
+      }
 
       if (
         [

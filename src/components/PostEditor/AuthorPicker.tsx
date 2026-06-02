@@ -9,7 +9,8 @@ import {
 import { formatPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { Check, ChevronDown, VenetianMask } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Check, ChevronDown, CircleHelp, VenetianMask } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
@@ -73,7 +74,35 @@ export default function AuthorPicker({
         <DropdownMenuItem onSelect={() => onChange('anonymous')} className="gap-2">
           <AnonymousAvatar />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-medium">{t('Anonymous')}</div>
+            <div className="flex items-center gap-1">
+              <span className="truncate text-sm font-medium">{t('Anonymous')}</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t('What does Anonymous mean?')}
+                    className="text-muted-foreground hover:text-foreground"
+                    // Don't let opening the explainer also select the item.
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <CircleHelp className="size-3.5" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  side="right"
+                  className="max-w-xs text-xs leading-relaxed"
+                >
+                  {t(
+                    "Anonymous hides your signing key — every post gets a fresh, unstored key. It does NOT hide your IP or your relay connections. To minimise leaks, anonymous posts go to a generic public relay set (and, for replies, to relays where the thread already lives) rather than your customized default relays. The Jumble client tag is suppressed."
+                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="truncate text-xs text-muted-foreground">
               {t('Post with a one-off ephemeral key')}
             </div>

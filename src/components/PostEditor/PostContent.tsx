@@ -356,20 +356,34 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
           isPoll,
           pollCreateData,
           pubkey: authorPubkey,
-          addClientTag,
+          // Suppress the NIP-89 client tag on anonymous posts even if the
+          // user has the global toggle on. The tag wouldn't out the signer
+          // directly, but every metadata bit narrows the set of plausible
+          // authors. Anonymous should ship with the minimal fingerprint.
+          addClientTag: isAnonymous ? false : addClientTag,
           isProtectedEvent,
           isNsfw
         })
 
         const _additionalRelayUrls = [...additionalRelayUrls]
-        if (initialParentStuff && typeof initialParentStuff === 'string') {
+        if (initialParentStuff && typeof initialParentStuff === 'string' && !isAnonymous) {
+          // For external-content comments we normally fan out to the user's
+          // default relays. Skip for anonymous — those defaults can leak the
+          // user's customized relay set (paid/account-bound).
           _additionalRelayUrls.push(...getDefaultRelayUrls())
+        }
+        if (isAnonymous && parentEvent) {
+          // "Publish to relays the thread lives on": anonymous replies should
+          // land where the parent event is already visible, not on the
+          // logged-in user's write relays.
+          _additionalRelayUrls.push(...client.getSeenEventRelayUrls(parentEvent.id))
         }
 
         const publishOptions = {
           specifiedRelayUrls: isProtectedEvent ? additionalRelayUrls : undefined,
           additionalRelayUrls: isPoll ? pollCreateData.relays : _additionalRelayUrls,
-          minPow
+          minPow,
+          isAnonymous
         }
 
         const toSign = minPow > 0

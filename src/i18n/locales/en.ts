@@ -1022,6 +1022,9 @@ export default {
     Empty: 'Empty',
     'Posting as': 'Posting as',
     Anonymous: 'Anonymous',
-    'Post with a one-off ephemeral key': 'Post with a one-off ephemeral key'
+    'Post with a one-off ephemeral key': 'Post with a one-off ephemeral key',
+    'What does Anonymous mean?': 'What does Anonymous mean?',
+    "Anonymous hides your signing key — every post gets a fresh, unstored key. It does NOT hide your IP or your relay connections. To minimise leaks, anonymous posts go to a generic public relay set (and, for replies, to relays where the thread already lives) rather than your customized default relays. The Jumble client tag is suppressed.":
+      "Anonymous hides your signing key — every post gets a fresh, unstored key. It does NOT hide your IP or your relay connections. To minimise leaks, anonymous posts go to a generic public relay set (and, for replies, to relays where the thread already lives) rather than your customized default relays. The Jumble client tag is suppressed."
   }
 }
