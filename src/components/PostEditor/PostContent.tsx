@@ -81,9 +81,24 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   ref
 ) {
   const { t } = useTranslation()
-  const { pubkey, checkLogin, account, signer } = useNostr()
+  const { pubkey, checkLogin, account, buildSignerForAccount } = useNostr()
 
-  const [authorChoice, setAuthorChoice] = useState<TAuthorChoice>('self')
+  const [authorChoice, setAuthorChoice] = useState<TAuthorChoice>(() =>
+    account ? { kind: 'account', account } : { kind: 'anonymous' }
+  )
+  const authorChoiceTouchedRef = useRef(false)
+  const handleAuthorChoiceChange = useCallback((choice: TAuthorChoice) => {
+    authorChoiceTouchedRef.current = true
+    setAuthorChoice(choice)
+  }, [])
+  // If the editor mounted before login (so we defaulted to anonymous), latch
+  // on to the account once it appears — but only if the user hasn't already
+  // picked something explicitly. Picking another account or Anonymous is a
+  // per-post override and must never be reverted automatically.
+  useEffect(() => {
+    if (authorChoiceTouchedRef.current) return
+    if (account) setAuthorChoice({ kind: 'account', account })
+  }, [account])
   // Ephemeral signer, lazily built on first use and reused across re-renders so
   // typing doesn't churn a new identity each keystroke. Never persisted.
   const anonymousSignerRef = useRef<TAnonymousSigner | null>(null)
@@ -162,22 +177,22 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
 
   const hasContent = !!text.trim() || (isPoll && pollCreateData.options.some((o) => o.trim()))
 
-  // Anonymous always has a signer (we generate one on the fly), so a logged-out
-  // user can still ship an anonymous post. Otherwise we need a logged-in
-  // account capable of signing.
-  const isAnonymous = authorChoice === 'anonymous'
+  const isAnonymous = authorChoice.kind === 'anonymous'
+  // The picked author must be capable of signing. Anonymous always can (we
+  // generate the key on the spot); a stored account can iff its signerType
+  // isn't 'npub' (read-only). Independent of session state — a logged-out
+  // user can still ship an anonymous post.
+  const authorCanSign = isAnonymous || authorChoice.account.signerType !== 'npub'
   const canPost = useMemo(() => {
     return (
-      (isAnonymous || (!!pubkey && account?.signerType !== 'npub')) &&
+      authorCanSign &&
       (!!text || !!highlightedText) &&
       !uploadProgresses.length &&
       (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2) &&
       (!isProtectedEvent || additionalRelayUrls.length > 0)
     )
   }, [
-    isAnonymous,
-    pubkey,
-    account,
+    authorCanSign,
     text,
     highlightedText,
     uploadProgresses,
@@ -332,22 +347,31 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   // editor produces an author-free TDraftEvent (no pubkey/id/sig); the signer
   // fills those in. So per-post author overrides are just a matter of swapping
   // which ISigner runs at sign time — nothing else in the post flow changes.
-  const resolveAuthorSigner = (): { signer: ISigner; pubkey: string } | null => {
-    if (authorChoice === 'anonymous') return getAnonymousSigner()
-    if (!signer || !pubkey) return null
-    return { signer, pubkey }
+  const resolveAuthorSigner = async (): Promise<{ signer: ISigner; pubkey: string }> => {
+    if (authorChoice.kind === 'anonymous') {
+      return getAnonymousSigner()
+    }
+    const oneOff = await buildSignerForAccount(authorChoice.account)
+    return { signer: oneOff, pubkey: authorChoice.account.pubkey }
   }
+
+  // The draft queue is per-account: enqueueing under a different pubkey would
+  // surface a foreign signed event in the active user's drafts box and let
+  // them "retry" something they didn't author. So only the active account's
+  // posts go through it; anonymous and other-account posts publish directly.
+  const isCurrentAccountAuthor =
+    authorChoice.kind === 'account' &&
+    !!account &&
+    authorChoice.account.pubkey === account.pubkey
 
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
     const runPost = async () => {
       if (!canPost || postingRef.current) return
-      const resolved = resolveAuthorSigner()
-      if (!resolved) return
-      const { signer: authorSigner, pubkey: authorPubkey } = resolved
-
       postingRef.current = true
       try {
+        const { signer: authorSigner, pubkey: authorPubkey } = await resolveAuthorSigner()
+
         const draftEvent = await createDraftEvent({
           parentStuff: initialParentStuff,
           highlightedText,
@@ -394,13 +418,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         deleteDraftEventCache(draftEvent)
         const targetRelays = await client.determineTargetRelays(signed, publishOptions)
 
-        if (authorChoice === 'anonymous') {
-          // Per-post override: bypass the per-account draft queue. Its records
-          // are keyed to the logged-in pubkey and an ephemeral failure would
-          // otherwise surface in the user's drafts box with a foreign signed
-          // event they can't retry meaningfully.
-          await client.publishEvent(targetRelays, signed)
-        } else {
+        if (isCurrentAccountAuthor) {
           await postDraftService.enqueue({
             id: draftIdRef.current,
             pubkey: authorPubkey,
@@ -412,6 +430,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
               typeof initialParentStuff === 'string' ? initialParentStuff : undefined,
             highlightedText
           })
+        } else {
+          await client.publishEvent(targetRelays, signed)
         }
         close()
       } catch (error) {
@@ -424,7 +444,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
       }
     }
 
-    if (authorChoice === 'anonymous') {
+    if (authorChoice.kind === 'anonymous') {
       // Anonymous doesn't need a logged-in user — skip the login gate.
       runPost()
     } else {
@@ -482,7 +502,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
         placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
-        topLeftActions={<AuthorPicker value={authorChoice} onChange={setAuthorChoice} />}
+        topLeftActions={<AuthorPicker value={authorChoice} onChange={handleAuthorChoiceChange} />}
         topRightActions={
           <div className="flex items-center gap-1">
             <DraftsButton onClick={() => onOpenDrafts?.()} />
@@ -657,10 +677,14 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
             parentEvent={parentEvent}
             mentions={mentions}
             setMentions={setMentions}
-            // Anonymous posts are signed with an ephemeral key, so the
-            // logged-in user is a *legitimate* mention target — don't let
-            // Mentions filter them out.
-            authorPubkey={authorChoice === 'anonymous' ? undefined : pubkey ?? undefined}
+            // Filter the *effective* author out of suggested mentions, not
+            // the logged-in user. Anonymous → undefined so the logged-in user
+            // (a legitimate mention target) is not stripped; posting as
+            // another account → that account's pubkey so it doesn't suggest
+            // self-mention.
+            authorPubkey={
+              authorChoice.kind === 'anonymous' ? undefined : authorChoice.account.pubkey
+            }
           />
           <div className="hidden items-center gap-2 sm:flex">
             <Button

@@ -82,6 +82,15 @@ type TNostrContext = {
   attemptDelete: (targetEvent: Event) => Promise<void>
   signHttpAuth: (url: string, method: string) => Promise<string>
   signEvent: (draftEvent: TDraftEvent) => Promise<VerifiedEvent>
+  /**
+   * Build a signer for the given account without changing the active session.
+   * Returns the live signer when the account is already current; otherwise
+   * constructs a one-off signer from stored secrets. Used for per-post author
+   * overrides — picking another account in the editor should not switch the
+   * user out of their current session. Throws for npub (read-only) or when
+   * the account's secrets are not available locally.
+   */
+  buildSignerForAccount: (account: TAccountPointer) => Promise<ISigner>
   nip04Encrypt: (pubkey: string, plainText: string) => Promise<string>
   nip04Decrypt: (pubkey: string, cipherText: string) => Promise<string>
   nip44Encrypt: (pubkey: string, plainText: string) => Promise<string>
@@ -682,6 +691,61 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return event as VerifiedEvent
   }
 
+  const buildSignerForAccount = async (act: TAccountPointer): Promise<ISigner> => {
+    if (
+      account &&
+      signer &&
+      account.pubkey === act.pubkey &&
+      account.signerType === act.signerType
+    ) {
+      return signer
+    }
+    const full = storage.findAccount(act)
+    if (!full) {
+      throw new Error(t('Account not found'))
+    }
+    switch (full.signerType) {
+      case 'nsec':
+      case 'browser-nsec': {
+        if (!full.nsec) throw new Error(t('No private key stored for this account'))
+        const s = new NsecSigner()
+        s.login(full.nsec)
+        return s
+      }
+      case 'ncryptsec': {
+        if (!full.ncryptsec) throw new Error(t('No encrypted key stored for this account'))
+        const password = await requestPassword()
+        const privkey = nip49.decrypt(full.ncryptsec, password)
+        const s = new NsecSigner()
+        s.login(privkey)
+        return s
+      }
+      case 'bunker': {
+        if (!full.bunker || !full.bunkerClientSecretKey) {
+          throw new Error(t('Bunker connection details missing'))
+        }
+        const s = new BunkerSigner(full.bunkerClientSecretKey)
+        await s.login(full.bunker, false)
+        return s
+      }
+      case 'nip-07': {
+        const s = new Nip07Signer()
+        await s.init()
+        const extPubkey = await s.getPublicKey()
+        if (extPubkey !== act.pubkey) {
+          throw new Error(
+            t('Your browser extension is signed in as a different account')
+          )
+        }
+        return s
+      }
+      case 'npub':
+        throw new Error(t('Read-only account cannot sign events'))
+      default:
+        throw new Error(t('Unsupported signer type'))
+    }
+  }
+
   const publishSignedEvent = async (event: Event, options: TPublishOptions = {}) => {
     const relays = await client.determineTargetRelays(event, options)
     await client.publishEvent(relays, event)
@@ -926,6 +990,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         startLogin: () => setOpenLoginDialog(true),
         checkLogin,
         signEvent,
+        buildSignerForAccount,
         updateRelayListEvent,
         updateProfileEvent,
         updateFollowListEvent,

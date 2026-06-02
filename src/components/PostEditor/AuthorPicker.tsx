@@ -6,16 +6,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { isSameAccount } from '@/lib/account'
 import { formatPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
-import { useNostr } from '@/providers/NostrProvider'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useNostr } from '@/providers/NostrProvider'
+import { TAccountPointer } from '@/types'
 import { Check, ChevronDown, CircleHelp, VenetianMask } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
 
-export type TAuthorChoice = 'self' | 'anonymous'
+export type TAuthorChoice =
+  | { kind: 'account'; account: TAccountPointer }
+  | { kind: 'anonymous' }
 
 export default function AuthorPicker({
   value,
@@ -25,7 +29,13 @@ export default function AuthorPicker({
   onChange: (choice: TAuthorChoice) => void
 }) {
   const { t } = useTranslation()
-  const { account } = useNostr()
+  const { accounts } = useNostr()
+
+  // npub accounts are read-only and can't sign — hide them entirely from the
+  // picker so a user can't pick a dead-end choice. Author overrides are purely
+  // local to this draft; selecting a different account never touches the
+  // active session.
+  const signableAccounts = accounts.filter((a) => a.signerType !== 'npub')
 
   return (
     <DropdownMenu>
@@ -37,10 +47,10 @@ export default function AuthorPicker({
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {value === 'anonymous' || !account ? (
+          {value.kind === 'anonymous' ? (
             <AnonymousAvatar />
           ) : (
-            <SimpleUserAvatar userId={account.pubkey} size="small" ignorePolicy />
+            <SimpleUserAvatar userId={value.account.pubkey} size="small" ignorePolicy />
           )}
           <ChevronDown className="size-3.5 text-muted-foreground" />
         </button>
@@ -53,25 +63,35 @@ export default function AuthorPicker({
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
           {t('Posting as')}
         </DropdownMenuLabel>
-        {account && (
-          <DropdownMenuItem onSelect={() => onChange('self')} className="gap-2">
-            <SimpleUserAvatar userId={account.pubkey} size="small" ignorePolicy />
-            <div className="min-w-0 flex-1">
-              <SimpleUsername
-                userId={account.pubkey}
-                className="block truncate text-sm font-medium"
-              />
-              <div className="truncate text-xs text-muted-foreground">
-                {formatPubkey(account.pubkey)}
+        {signableAccounts.map((act) => {
+          const isPicked = value.kind === 'account' && isSameAccount(value.account, act)
+          return (
+            <DropdownMenuItem
+              key={`${act.pubkey}-${act.signerType}`}
+              onSelect={() => onChange({ kind: 'account', account: act })}
+              className="gap-2"
+            >
+              <SimpleUserAvatar userId={act.pubkey} size="small" ignorePolicy />
+              <div className="min-w-0 flex-1">
+                <SimpleUsername
+                  userId={act.pubkey}
+                  className="block truncate text-sm font-medium"
+                />
+                <div className="truncate text-xs text-muted-foreground">
+                  {formatPubkey(act.pubkey)}
+                </div>
               </div>
-            </div>
-            {value === 'self' && (
-              <Check className="size-4 shrink-0 text-primary" aria-label={t('Selected')} />
-            )}
-          </DropdownMenuItem>
-        )}
-        {account && <DropdownMenuSeparator />}
-        <DropdownMenuItem onSelect={() => onChange('anonymous')} className="gap-2">
+              {isPicked && (
+                <Check className="size-4 shrink-0 text-primary" aria-label={t('Selected')} />
+              )}
+            </DropdownMenuItem>
+          )
+        })}
+        {signableAccounts.length > 0 && <DropdownMenuSeparator />}
+        <DropdownMenuItem
+          onSelect={() => onChange({ kind: 'anonymous' })}
+          className="gap-2"
+        >
           <AnonymousAvatar />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1">
@@ -107,7 +127,7 @@ export default function AuthorPicker({
               {t('Post with a one-off ephemeral key')}
             </div>
           </div>
-          {value === 'anonymous' && (
+          {value.kind === 'anonymous' && (
             <Check className="size-4 shrink-0 text-primary" aria-label={t('Selected')} />
           )}
         </DropdownMenuItem>
