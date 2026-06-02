@@ -1019,6 +1019,9 @@ export default {
     'Keep editing': 'Keep editing',
     'Open drafts': 'Open drafts',
     'No drafts yet': 'No drafts yet',
-    Empty: 'Empty'
+    Empty: 'Empty',
+    'Posting as': 'Posting as',
+    Anonymous: 'Anonymous',
+    'Post with a one-off ephemeral key': 'Post with a one-off ephemeral key'
   }
 }

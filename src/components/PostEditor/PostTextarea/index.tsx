@@ -47,6 +47,7 @@ const PostTextarea = forwardRef<
     onUploadProgress?: (file: File, progress: number) => void
     onUploadEnd?: (file: File) => void
     placeholder?: string
+    topLeftActions?: React.ReactNode
     topRightActions?: React.ReactNode
   }
 >(
@@ -61,6 +62,7 @@ const PostTextarea = forwardRef<
       onUploadProgress,
       onUploadEnd,
       placeholder,
+      topLeftActions,
       topRightActions
     },
     ref
@@ -218,7 +220,8 @@ const PostTextarea = forwardRef<
             ref={headerRef}
             className={cn('flex gap-2', stackActions ? 'flex-col-reverse gap-1' : 'items-center')}
           >
-            <div ref={tabsRef} className={stackActions ? 'self-start' : ''}>
+            <div ref={tabsRef} className={cn('flex items-center gap-2', stackActions ? 'self-start' : '')}>
+              {topLeftActions}
               <TabsList className="h-auto gap-1 bg-transparent p-0">
                 <TabsTrigger
                   value="edit"

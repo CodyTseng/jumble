@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { createAnonymousSigner, TAnonymousSigner } from '@/lib/anonymous-signer'
 import { formatError } from '@/lib/error'
 import DraftsButton from './DraftsButton'
 import {
@@ -21,11 +22,12 @@ import { useNostr } from '@/providers/NostrProvider'
 import mediaUpload from '@/services/media-upload.service'
 import client from '@/services/client.service'
 import postDraftService from '@/services/post-draft.service'
-import { TPollCreateData, TPostTargetItem } from '@/types'
+import { ISigner, TPollCreateData, TPostTargetItem } from '@/types'
 import { TPostDraftUnsigned } from '@/types/post-draft'
+import AuthorPicker, { TAuthorChoice } from './AuthorPicker'
 import { Content } from '@tiptap/react'
 import { CircleHelp, ImageUp, ListTodo, Lock, Settings, Smile, X } from 'lucide-react'
-import { Event, kinds, VerifiedEvent } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import {
   forwardRef,
   useCallback,
@@ -79,7 +81,18 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   ref
 ) {
   const { t } = useTranslation()
-  const { pubkey, signEvent, checkLogin, account } = useNostr()
+  const { pubkey, checkLogin, account, signer } = useNostr()
+
+  const [authorChoice, setAuthorChoice] = useState<TAuthorChoice>('self')
+  // Ephemeral signer, lazily built on first use and reused across re-renders so
+  // typing doesn't churn a new identity each keystroke. Never persisted.
+  const anonymousSignerRef = useRef<TAnonymousSigner | null>(null)
+  const getAnonymousSigner = () => {
+    if (!anonymousSignerRef.current) {
+      anonymousSignerRef.current = createAnonymousSigner()
+    }
+    return anonymousSignerRef.current
+  }
 
   const initialParentStuff = useMemo<Event | string | undefined>(() => {
     if (initialDraft?.parentEvent) return initialDraft.parentEvent
@@ -149,16 +162,22 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
 
   const hasContent = !!text.trim() || (isPoll && pollCreateData.options.some((o) => o.trim()))
 
+  // Anonymous always has a signer (we generate one on the fly), so a logged-out
+  // user can still ship an anonymous post. Otherwise we need a logged-in
+  // account capable of signing.
+  const isAnonymous = authorChoice === 'anonymous'
   const canPost = useMemo(() => {
     return (
-      !!pubkey &&
+      (isAnonymous || (!!pubkey && account?.signerType !== 'npub')) &&
       (!!text || !!highlightedText) &&
       !uploadProgresses.length &&
       (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2) &&
       (!isProtectedEvent || additionalRelayUrls.length > 0)
     )
   }, [
+    isAnonymous,
     pubkey,
+    account,
     text,
     highlightedText,
     uploadProgresses,
@@ -309,11 +328,24 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
 
   const postingRef = useRef(false)
 
+  // Single source of truth for the signer this draft is authored with. The
+  // editor produces an author-free TDraftEvent (no pubkey/id/sig); the signer
+  // fills those in. So per-post author overrides are just a matter of swapping
+  // which ISigner runs at sign time — nothing else in the post flow changes.
+  const resolveAuthorSigner = (): { signer: ISigner; pubkey: string } | null => {
+    if (authorChoice === 'anonymous') return getAnonymousSigner()
+    if (!signer || !pubkey) return null
+    return { signer, pubkey }
+  }
+
   const post = async (e?: React.MouseEvent) => {
     e?.stopPropagation()
-    checkLogin(async () => {
-      if (!canPost || !pubkey || !account || account.signerType === 'npub') return
-      if (postingRef.current) return
+    const runPost = async () => {
+      if (!canPost || postingRef.current) return
+      const resolved = resolveAuthorSigner()
+      if (!resolved) return
+      const { signer: authorSigner, pubkey: authorPubkey } = resolved
+
       postingRef.current = true
       try {
         const draftEvent = await createDraftEvent({
@@ -323,7 +355,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
           mentions,
           isPoll,
           pollCreateData,
-          pubkey,
+          pubkey: authorPubkey,
           addClientTag,
           isProtectedEvent,
           isNsfw
@@ -340,32 +372,33 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
           minPow
         }
 
-        let signed: VerifiedEvent
-        if (minPow > 0) {
-          const mined = await minePow({ ...draftEvent, pubkey }, minPow)
-          signed = await signEvent(mined)
-        } else {
-          signed = await signEvent(draftEvent)
-        }
+        const toSign = minPow > 0
+          ? await minePow({ ...draftEvent, pubkey: authorPubkey }, minPow)
+          : draftEvent
+        const signed = await authorSigner.signEvent(toSign)
 
         deleteDraftEventCache(draftEvent)
-
-        // Resolve the concrete relay set now (needs the user's relay context) and
-        // persist it with the draft, so a background/interrupted resend can target
-        // the exact same relays without re-resolving.
         const targetRelays = await client.determineTargetRelays(signed, publishOptions)
 
-        await postDraftService.enqueue({
-          id: draftIdRef.current,
-          pubkey,
-          createdAt: draftCreatedAtRef.current,
-          signedEvent: signed,
-          targetRelays,
-          parentEvent,
-          parentEventCoordinate:
-            typeof initialParentStuff === 'string' ? initialParentStuff : undefined,
-          highlightedText
-        })
+        if (authorChoice === 'anonymous') {
+          // Per-post override: bypass the per-account draft queue. Its records
+          // are keyed to the logged-in pubkey and an ephemeral failure would
+          // otherwise surface in the user's drafts box with a foreign signed
+          // event they can't retry meaningfully.
+          await client.publishEvent(targetRelays, signed)
+        } else {
+          await postDraftService.enqueue({
+            id: draftIdRef.current,
+            pubkey: authorPubkey,
+            createdAt: draftCreatedAtRef.current,
+            signedEvent: signed,
+            targetRelays,
+            parentEvent,
+            parentEventCoordinate:
+              typeof initialParentStuff === 'string' ? initialParentStuff : undefined,
+            highlightedText
+          })
+        }
         close()
       } catch (error) {
         const errors = formatError(error)
@@ -375,7 +408,14 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
       } finally {
         postingRef.current = false
       }
-    })
+    }
+
+    if (authorChoice === 'anonymous') {
+      // Anonymous doesn't need a logged-in user — skip the login gate.
+      runPost()
+    } else {
+      checkLogin(runPost)
+    }
   }
 
   const handlePollToggle = () => {
@@ -428,6 +468,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         onUploadProgress={handleUploadProgress}
         onUploadEnd={handleUploadEnd}
         placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
+        topLeftActions={<AuthorPicker value={authorChoice} onChange={setAuthorChoice} />}
         topRightActions={
           <div className="flex items-center gap-1">
             <DraftsButton onClick={() => onOpenDrafts?.()} />
