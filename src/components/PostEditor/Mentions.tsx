@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
-import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
 import { Check } from 'lucide-react'
@@ -22,17 +21,22 @@ export default function Mentions({
   content,
   mentions,
   setMentions,
-  parentEvent
+  parentEvent,
+  authorPubkey
 }: {
   content: string
   mentions: string[]
   setMentions: (mentions: string[]) => void
   parentEvent?: Event
+  // The pubkey this draft will be signed with. The picker filters this out of
+  // suggested mentions ("can't mention yourself"). Passing `undefined` — e.g.
+  // for an anonymous draft, where the author is an ephemeral key and the
+  // logged-in user is a legitimate mention target — disables that filter.
+  authorPubkey?: string
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const { pubkey } = useNostr()
   const { mutePubkeySet } = useMuteList()
   const [potentialMentions, setPotentialMentions] = useState<string[]>([])
   const [parentEventPubkey, setParentEventPubkey] = useState<string | undefined>()
@@ -40,9 +44,12 @@ export default function Mentions({
 
   useEffect(() => {
     extractMentions(content, parentEvent).then(({ pubkeys, relatedPubkeys, parentEventPubkey }) => {
-      const _parentEventPubkey = parentEventPubkey !== pubkey ? parentEventPubkey : undefined
+      const _parentEventPubkey =
+        parentEventPubkey !== authorPubkey ? parentEventPubkey : undefined
       setParentEventPubkey(_parentEventPubkey)
-      const potentialMentions = [...pubkeys, ...relatedPubkeys].filter((p) => p !== pubkey)
+      const potentialMentions = [...pubkeys, ...relatedPubkeys].filter(
+        (p) => p !== authorPubkey
+      )
       if (_parentEventPubkey) {
         potentialMentions.push(_parentEventPubkey)
       }
@@ -59,7 +66,7 @@ export default function Mentions({
         )
       })
     })
-  }, [content, parentEvent, pubkey, mutePubkeySet])
+  }, [content, parentEvent, authorPubkey, mutePubkeySet])
 
   useEffect(() => {
     const newMentions = potentialMentions.filter((pubkey) => !removedPubkeys.includes(pubkey))

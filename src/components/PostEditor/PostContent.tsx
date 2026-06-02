@@ -643,6 +643,10 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
             parentEvent={parentEvent}
             mentions={mentions}
             setMentions={setMentions}
+            // Anonymous posts are signed with an ephemeral key, so the
+            // logged-in user is a *legitimate* mention target — don't let
+            // Mentions filter them out.
+            authorPubkey={authorChoice === 'anonymous' ? undefined : pubkey ?? undefined}
           />
           <div className="hidden items-center gap-2 sm:flex">
             <Button
