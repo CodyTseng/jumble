@@ -15,6 +15,7 @@ import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
 import { MuteListProvider } from '@/providers/MuteListProvider'
 import { NostrProvider } from '@/providers/NostrProvider'
+import { PageActiveProvider } from '@/providers/PageActiveProvider'
 import { PinListProvider } from '@/providers/PinListProvider'
 import { PinnedUsersProvider } from '@/providers/PinnedUsersProvider'
 import { ScreenSizeProvider } from '@/providers/ScreenSizeProvider'
@@ -57,9 +58,11 @@ export default function App(): JSX.Element {
                                     <FeedProvider>
                                       <MediaUploadServiceProvider>
                                         <KindFilterProvider>
-                                          <PageManager />
-                                          <KeySyncRequestHandler />
-                                          <Toaster />
+                                          <PageActiveProvider>
+                                            <PageManager />
+                                            <KeySyncRequestHandler />
+                                            <Toaster />
+                                          </PageActiveProvider>
                                         </KindFilterProvider>
                                       </MediaUploadServiceProvider>
                                     </FeedProvider>
