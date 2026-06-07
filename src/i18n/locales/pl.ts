@@ -1032,38 +1032,38 @@ export default {
     'Invalid image URL': 'Nieprawidłowy URL obrazu',
     'Post as': 'Opublikuj jako',
     'Failed to get the signer for the selected account':
-      'Nie udało się uzyskać podpisującego dla wybranego konta',
+      'Nie udało się znaleźć urządzenia logujące dla wybranego konta',
     'Blossom cache server': 'Serwer pamięci podręcznej Blossom',
     'Blossom cache server description':
       'Ładuj multimedia przez serwer pamięci podręcznej Blossom. Włącz go dopiero po sprawdzeniu, że serwer jest osiągalny.',
     'Server URL': 'Adres URL serwera',
     'Cannot reach the Blossom cache server':
       'Nie można połączyć się z serwerem pamięci podręcznej Blossom',
-    'Link Google account': 'Powiąż konto Google',
+    'Link Google account': 'Podłącz konto Google',
     'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
-      'Powiąż konto Google, aby móc logować się do tego konta przez Google. Twój klucz prywatny nigdy nie jest udostępniany Google.',
+      'Podłącz konto Google, aby móc logować się do tego konta przez Google. Twój klucz prywatny nigdy nie jest udostępniany Google.',
     'Link a Google account so you can sign in to this account with Google.':
-      'Powiąż konto Google, aby móc logować się do tego konta przez Google.',
-    'Linking your account...': 'Wiązanie Twojego konta...',
+      'Podłącz konto Google, aby móc logować się do tego konta przez Google.',
+    'Linking your account...': 'Podłączanie Twojego konta...',
     'Switching to remote signer...': 'Przełączanie na zdalne logowanie...',
-    'Google account already linked': 'Konto Google jest już powiązane',
+    'Google account already linked': 'Konto Google jest już połączone',
     'This Google account is already linked to another account':
-      'To konto Google jest już powiązane z innym kontem',
+      'To konto Google jest już połączone z innym kontem',
     'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
-      'Jest obecnie powiązane z {{email}}. Aby powiązać je z tym kontem, poprzednie powiązanie zostanie usunięte. Poprzednie konto nadal istnieje i pozostaje używalne za pomocą swojego klucza prywatnego.',
-    'Unlink the previous account and link this one': 'Odwiąż poprzednie konto i powiąż to',
-    'Switch to remote signer login?': 'Przełączyć na logowanie przez zdalne logowanie?',
+      'Jest obecnie połączone z {{email}}. Aby połączyć je z tym kontem, poprzednie połączenie zostanie usunięte. Poprzednie konto nadal istnieje i można z niego korzystać z pomocą swojego klucza prywatnego.',
+    'Unlink the previous account and link this one': 'Odłącz poprzednie konto i połącz to',
+    'Switch to remote signer login?': 'Przełączyć na zdalne logowanie?',
     'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
-      'Twoje konto jest teraz powiązane. Możesz przełączyć się na podpisywanie przez zdalne logowanie lub nadal podpisywać lokalnie swoim kluczem prywatnym.',
+      'Twoje konto jest teraz połączone. Możesz przełączyć się na zdalne logowanie lub nadal logować się lokalnie swoim kluczem prywatnym.',
     'Switch to remote signer': 'Przełącz na zdalne logowanie',
-    'Keep signing locally': 'Nadal podpisuj lokalnie',
-    'Google account linked': 'Konto Google powiązane',
+    'Keep signing locally': 'Nadal loguj się lokalnie',
+    'Google account linked': 'Konto Google podłączone',
     'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
-      'To konto podpisuje teraz przez bezpieczne zdalne logowanie i możesz logować się przez Google w dowolnym momencie. Twój klucz prywatny nigdy nie jest udostępniany Google.',
+      'To konto korzysta teraz z bezpiecznego zdalnego logowania i możesz zalogować się za pomocą konta Google w dowolnym momencie. Twój klucz prywatny nie jest nigdy udostępniany firmie Google.',
     'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
-      'Możesz teraz logować się do tego konta przez Google. Nadal podpisujesz lokalnie swoim kluczem prywatnym, który nigdy nie jest udostępniany Google.',
+      'Możesz teraz logować się do tego konta przez Google. Nadal logujesz się lokalnie swoim kluczem prywatnym, którego nigdy nie jest udostępniany Google.',
     'Could not reach the remote signer. Please try again later or check your network connection.':
-      'Nie można połączyć się ze zdalnym logowaniem. Spróbuj ponownie później lub sprawdź połączenie sieciowe.',
+      'Nie można połączyć się z urządzeniem zdalnego logowania. Spróbuj ponownie później lub sprawdź połączenie sieciowe.',
     'Retrying ({{current}}/{{max}})': 'Ponawianie ({{current}}/{{max}})',
     'Automatic updates': 'Automatyczne aktualizacje',
     'Check for and download updates in the background': 'Sprawdzaj i pobieraj aktualizacje w tle',
@@ -1090,7 +1090,7 @@ export default {
     'My emojis': 'Moje emoji',
     'No emojis found': 'Nie znaleziono emoji',
     'Encrypted DM unavailable': 'Szyfrowane wiadomości niedostępne',
-    'No DM relays': 'Brak przekaźników wiadomości',
+    'No DM relays': 'Brak transmiterów WP',
     'n users_one': '{{count}} użytkownik',
     'n users_few': '{{count}} użytkowników',
     'n users_many': '{{count}} użytkowników',
