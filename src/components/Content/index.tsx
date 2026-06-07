@@ -3,6 +3,7 @@ import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
   EmbeddedHashtagParser,
+  EmbeddedLegacyMentionParser,
   EmbeddedLNInvoiceParser,
   EmbeddedMentionParser,
   EmbeddedUrlParser,
@@ -69,6 +70,7 @@ export default function Content({
     const nodes = parseContent(_content, [
       EmbeddedEventParser,
       EmbeddedMentionParser,
+      EmbeddedLegacyMentionParser,
       EmbeddedUrlParser,
       EmbeddedLNInvoiceParser,
       EmbeddedWebsocketUrlParser,
@@ -252,6 +254,9 @@ export default function Content({
           }
           if (node.type === 'mention') {
             return <EmbeddedMention key={index} userId={node.data.split(':')[1]} />
+          }
+          if (node.type === 'legacy-mention') {
+            return <EmbeddedMention key={index} userId={node.data} />
           }
           if (node.type === 'hashtag') {
             return <EmbeddedHashtag hashtag={node.data} key={index} />
