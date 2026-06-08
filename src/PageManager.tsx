@@ -3,6 +3,16 @@ import { cn } from '@/lib/utils'
 import { CurrentRelaysProvider } from '@/providers/CurrentRelaysProvider'
 import { TPageRef } from '@/types'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
+import {
   cloneElement,
   createContext,
   createRef,
@@ -13,6 +23,7 @@ import {
   useRef,
   useState
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import DraftBox from './components/DraftBox'
@@ -68,6 +79,7 @@ export function useSecondaryPage() {
 }
 
 export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
+  const { t } = useTranslation()
   const [currentPrimaryPage, setCurrentPrimaryPage] = useState<TPrimaryPageName>('home')
   const [primaryPages, setPrimaryPages] = useState<
     { name: TPrimaryPageName; element: ReactNode; props?: any }[]
@@ -84,6 +96,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
+  const allowAppExitRef = useRef(false)
+  const [exitConfirmationOpen, setExitConfirmationOpen] = useState(false)
 
   useEffect(() => {
     if (isSmallScreen) return
@@ -156,6 +170,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         return
       }
 
+      if (allowAppExitRef.current) {
+        allowAppExitRef.current = false
+        return
+      }
+
       const closeModal = modalManager.pop()
       if (closeModal) {
         ignorePopStateRef.current = true
@@ -179,6 +198,18 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
         // Go forward
         if (currentIndex === undefined || state.index > currentIndex) {
+          if (
+            isSmallScreen &&
+            pre.length === 0 &&
+            !e.state &&
+            window.location.pathname + window.location.search + window.location.hash === '/'
+          ) {
+            ignorePopStateRef.current = true
+            window.history.forward()
+            setExitConfirmationOpen(true)
+            return pre
+          }
+
           const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
           return newStack
         }
@@ -279,6 +310,32 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     popSecondaryPage(-secondaryStack.length)
   }
 
+  const exitConfirmationDialog = (
+    <AlertDialog open={exitConfirmationOpen} onOpenChange={setExitConfirmationOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('Close Jumble?')}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('Are you sure you want to close Jumble?')}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={() => {
+              allowAppExitRef.current = true
+              setExitConfirmationOpen(false)
+              window.history.back()
+            }}
+          >
+            {t('Close')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+
   if (isSmallScreen) {
     return (
       <PrimaryPageContext.Provider
@@ -324,6 +381,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ))}
               {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
+              {exitConfirmationDialog}
               <DraftBox />
               <DraftEditorHost />
               </div>
@@ -395,6 +453,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 </div>
               </div>
               <TooManyRelaysAlertDialog />
+              {exitConfirmationDialog}
               <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
               <DraftBox />
               <DraftEditorHost />
@@ -476,6 +535,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
+            {exitConfirmationDialog}
             <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
             <DraftBox />
             <DraftEditorHost />
