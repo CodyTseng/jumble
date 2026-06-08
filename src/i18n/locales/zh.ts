@@ -96,6 +96,8 @@ export default {
     'Add client tag': '添加客户端标签',
     'Show others this was sent via Jumble': '告诉别人这是通过 Jumble 发送的',
     'Are you sure you want to logout?': '确定要退出登录吗？',
+    'Close Jumble?': '关闭 Jumble？',
+    'Are you sure you want to close Jumble?': '确定要关闭 Jumble 吗？',
     'relay sets': '服务器组',
     edit: '编辑',
     Languages: '语言',
@@ -1040,10 +1042,6 @@ export default {
     Flags: '旗帜',
     'My emojis': '我的表情',
     'No emojis found': '未找到表情',
-    'n users_other': '{{count}} 位用户',
-    'Add this emoji': '添加此表情',
-    'Added to my emojis': '已添加到我的表情',
-    'Add whole set': '添加整套',
-    'Emoji set': '表情套装'
+    'n users_other': '{{count}} 位用户'
   }
 }
