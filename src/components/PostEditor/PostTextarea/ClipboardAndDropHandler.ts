@@ -129,9 +129,28 @@ async function uploadFiles(
 
     const placeholder = `[Uploading "${name}"...]`
     const uploadingNode = view.state.schema.text(placeholder)
-    const hardBreakNode = view.state.schema.nodes.hardBreak.create()
-    let tr = view.state.tr.replaceSelectionWith(uploadingNode)
-    tr = tr.insert(tr.selection.from, hardBreakNode)
+
+    // Separate the media from any preceding content so the inserted URL is not
+    // glued onto the previous token (e.g. a mention or pasted nostr entity),
+    // which would produce malformed content like `nostr:npub1...https://...`.
+    // Skip when already at a boundary: block start, an existing hard break
+    // (e.g. consecutive uploads), or text ending in whitespace.
+    const { $from } = view.state.selection
+    const before = $from.nodeBefore
+    const needsLeadingBreak =
+      $from.parentOffset > 0 &&
+      before != null &&
+      before.type.name !== 'hardBreak' &&
+      !(before.isText && /\s$/.test(before.text ?? ''))
+
+    let tr = view.state.tr
+    if (needsLeadingBreak) {
+      tr = tr.replaceSelectionWith(view.state.schema.nodes.hardBreak.create())
+      tr = tr.insert(tr.selection.from, uploadingNode)
+    } else {
+      tr = tr.replaceSelectionWith(uploadingNode)
+    }
+    tr = tr.insert(tr.selection.from, view.state.schema.nodes.hardBreak.create())
     view.dispatch(tr)
 
     const abortController = abortControllers.get(file)
