@@ -29,7 +29,13 @@ export default function VideoNote({ event, className }: { event: Event; classNam
         </div>
       )}
       {videoInfos.map((video) => (
-        <MediaPlayer src={video.url} key={video.url} className="mt-2" dim={video.dim} />
+        <MediaPlayer
+          src={video.url}
+          pubkey={video.pubkey}
+          key={video.url}
+          className="mt-2"
+          dim={video.dim}
+        />
       ))}
     </div>
   )

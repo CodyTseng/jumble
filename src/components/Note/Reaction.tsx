@@ -3,13 +3,7 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 
-export default function Reaction({
-  event,
-  className
-}: {
-  event: Event
-  className?: string
-}) {
+export default function Reaction({ event, className }: { event: Event; className?: string }) {
   const emoji = useMemo(() => {
     const content = event.content
     if (!content || content === '+') return '+'
@@ -27,7 +21,11 @@ export default function Reaction({
 
   return (
     <div className={className}>
-      <Emoji emoji={emoji} classNames={{ text: 'text-7xl leading-none', img: 'size-20' }} />
+      <Emoji
+        emoji={emoji}
+        clickable
+        classNames={{ text: 'text-7xl leading-none', img: 'size-20' }}
+      />
     </div>
   )
 }

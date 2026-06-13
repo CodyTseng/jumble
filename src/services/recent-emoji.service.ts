@@ -21,12 +21,36 @@ class RecentEmojiService {
   private entries: StoredEntry[] = []
   private skinTone: TSkinTone = 0
   private hydrated = false
+  private listeners = new Set<() => void>()
 
   constructor() {
     if (!RecentEmojiService.instance) {
       RecentEmojiService.instance = this
     }
     return RecentEmojiService.instance
+  }
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener)
+    return () => {
+      this.listeners.delete(listener)
+    }
+  }
+
+  private notify(): void {
+    this.listeners.forEach((fn) => fn())
+  }
+
+  markBroken(url: string): void {
+    if (!url) return
+    this.hydrate()
+    const before = this.entries.length
+    this.entries = this.entries.filter(
+      (e) => typeof e.entry === 'string' || e.entry.url !== url
+    )
+    if (this.entries.length === before) return
+    this.persist()
+    this.notify()
   }
 
   private hydrate() {

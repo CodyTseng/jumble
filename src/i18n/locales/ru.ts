@@ -156,7 +156,6 @@ export default {
     Mute: 'Заглушить',
     Muted: 'Заглушено',
     Unmute: 'Отменить заглушку',
-    'Mute user': 'Заглушить пользователя',
     'Unmute user': 'Снять заглушку с пользователя',
     'Append n relays': 'Добавить {{n}} ретрансляторов',
     Append: 'Добавить',
@@ -906,11 +905,11 @@ export default {
     Shuffle: 'Перемешать',
     'Login with Google': 'Войти через Google',
     'Continue with Google': 'Продолжить через Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Войдите через Google, и ключ Nostr будет создан для вас автоматически.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Войдите через Google, чтобы получить доступ к своему аккаунту. Если у вас его ещё нет, аккаунт Nostr будет создан для вас автоматически.',
     'How it works': 'Как это работает',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'Ваш приватный ключ разделён на фрагменты, хранящиеся у разных операторов, поэтому он никогда не хранится в одном месте. Jumble подписывает через защищённый удалённый подписант. Вы можете экспортировать ключ в любое время в настройках аккаунта.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'Ваш приватный ключ разделён на фрагменты, хранящиеся у разных независимых операторов, поэтому он никогда не хранится в одном месте. Google используется только для подтверждения вашей личности перед операторами, но никогда для хранения вашего ключа.',
     'Waiting for Google sign-in...': 'Ожидание входа через Google...',
     'Checking your account...': 'Проверка аккаунта...',
     'Setting up your secure account...': 'Настройка защищённого аккаунта...',
@@ -988,8 +987,124 @@ export default {
     'Scan with your signer app': 'Сканируйте приложением для подписи',
     'Open with Nostr signer app': 'Открыть в приложении для подписи Nostr',
     'Scan QR code': 'Сканировать QR-код',
-    'Add operator URL': 'Добавить URL оператора',
+    Options: 'Варианты',
+    Remove: 'Удалить',
+    'End date': 'Дата окончания',
     'Advanced options': 'Дополнительные параметры',
+    'Polls may not display on clients that don’t support them.':
+      'Опросы могут не отображаться в клиентах, которые их не поддерживают.',
+    'Show thread context': 'Показать контекст треда',
+    'Hide thread context': 'Скрыть контекст треда',
+    Enable: 'Включить',
+    Upload: 'Загрузить',
+    Drafts: 'Черновики',
+    Failed: 'Не удалось',
+    'Save as draft?': 'Сохранить как черновик?',
+    'Your changes will be saved to the drafts box.': 'Ваши изменения будут сохранены в черновиках.',
+    Discard: 'Не сохранять',
+    'Keep editing': 'Продолжить редактирование',
+    'Open drafts': 'Открыть черновики',
+    'No drafts yet': 'Пока нет черновиков',
+    Empty: 'Пусто',
+    'Add emoji': 'Добавить эмодзи',
+    'Edit emoji': 'Изменить эмодзи',
+    Title: 'Название',
+    'Image URL': 'URL изображения',
+    shortcode: 'короткий код',
+    Emojis: 'Эмодзи',
+    'Create emoji set': 'Создать набор эмодзи',
+    'Edit emoji set': 'Изменить набор эмодзи',
+    'My emoji set': 'Мой набор эмодзи',
+    'Emoji set not found': 'Набор эмодзи не найден',
+    'You can only edit your own emoji sets': 'Вы можете изменять только свои наборы эмодзи',
+    'No custom emojis yet': 'Пока нет своих эмодзи',
+    'Title is required': 'Укажите название',
+    'At least one emoji is required': 'Требуется хотя бы одно эмодзи',
+    'Duplicate shortcode: {{shortcode}}': 'Повторяющийся короткий код: {{shortcode}}',
+    'Shortcode is required': 'Укажите короткий код',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'Короткий код может содержать только буквы, цифры, дефисы и подчёркивания',
+    'Image URL is required': 'Укажите URL изображения',
+    'Invalid image URL': 'Недействительный URL изображения',
+    'Post as': 'Опубликовать от имени',
+    'Failed to get the signer for the selected account':
+      'Не удалось получить подписанта для выбранной учётной записи',
+    'Blossom cache server': 'Сервер кэша Blossom',
+    'Blossom cache server description':
+      'Загружать медиа через сервер кэша Blossom. Включайте его только после проверки доступности сервера.',
+    'Server URL': 'URL сервера',
+    'Cannot reach the Blossom cache server': 'Не удаётся подключиться к серверу кэша Blossom',
+    'Link Google account': 'Привязать аккаунт Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Привяжите аккаунт Google, чтобы входить в этот аккаунт через Google. Ваш приватный ключ никогда не передаётся Google.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Привяжите аккаунт Google, чтобы входить в этот аккаунт через Google.',
+    'Linking your account...': 'Привязка вашего аккаунта...',
+    'Switching to remote signer...': 'Переключение на удалённый подписант...',
+    'Google account already linked': 'Аккаунт Google уже привязан',
+    'This Google account is already linked to another account':
+      'Этот аккаунт Google уже привязан к другому аккаунту',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'Сейчас он привязан к {{email}}. Чтобы привязать его к этому аккаунту, предыдущая привязка будет удалена. Предыдущий аккаунт продолжает существовать, и им можно пользоваться с его приватным ключом.',
+    'Unlink the previous account and link this one': 'Отвязать предыдущий аккаунт и привязать этот',
+    'Switch to remote signer login?': 'Переключиться на вход через удалённый подписант?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'Ваш аккаунт теперь привязан. Вы можете переключиться на подписание через удалённый подписант или продолжить подписывать локально с приватным ключом.',
+    'Switch to remote signer': 'Переключиться на удалённый подписант',
+    'Keep signing locally': 'Продолжить подписывать локально',
+    'Google account linked': 'Аккаунт Google привязан',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'Этот аккаунт теперь подписывает через защищённый удалённый подписант, и вы можете входить через Google в любое время. Ваш приватный ключ никогда не передаётся Google.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'Теперь вы можете входить в этот аккаунт через Google. Вы по-прежнему подписываете локально с приватным ключом, который никогда не передаётся Google.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Не удалось связаться с удалённым подписантом. Пожалуйста, попробуйте позже или проверьте подключение к сети.',
+    'Retrying ({{current}}/{{max}})': 'Повторная попытка ({{current}}/{{max}})',
+    'Automatic updates': 'Автоматические обновления',
+    'Check for and download updates in the background':
+      'Проверять и загружать обновления в фоновом режиме',
+    'Check for updates': 'Проверить обновления',
+    'Checking for updates…': 'Проверка обновлений…',
+    'Update available: v{{version}}': 'Доступно обновление: v{{version}}',
+    'You are on the latest version ({{version}})':
+      'У вас установлена последняя версия ({{version}})',
+    'Failed to check for updates': 'Не удалось проверить обновления',
+    Check: 'Проверить',
+    NEW: 'НОВОЕ',
+    'Updates are not available in development mode': 'Обновления недоступны в режиме разработки',
+    'Search emojis': 'Поиск эмодзи',
+    'Recently used': 'Недавно использованные',
+    'Smileys & Emotion': 'Смайлики и эмоции',
+    'People & Body': 'Люди и тело',
+    'Animals & Nature': 'Животные и природа',
+    'Food & Drink': 'Еда и напитки',
+    'Travel & Places': 'Путешествия и места',
+    Activities: 'Занятия',
+    Objects: 'Объекты',
+    Symbols: 'Символы',
+    Flags: 'Флаги',
+    'My emojis': 'Мои эмодзи',
+    'No emojis found': 'Эмодзи не найдены',
+    'Encrypted DM unavailable': 'Зашифрованные ЛС недоступны',
+    'No DM relays': 'Нет релеев для ЛС',
+    'n users_one': '{{count}} пользователь',
+    'n users_few': '{{count}} пользователя',
+    'n users_many': '{{count}} пользователей',
+    'n users_other': '{{count}} пользователя',
+    'Add this emoji': 'Добавить этот эмодзи',
+    'Added to my emojis': 'Добавлено в мои эмодзи',
+    'Add whole set': 'Добавить весь набор',
+    'Emoji set': 'Набор эмодзи',
+    'Waiting for signer approval...': 'Ожидание подтверждения от подписывающего...',
+    'Signer did not respond in time': 'Подписывающий не ответил вовремя',
+    'Media servers': 'Медиасерверы',
+    'Blossom servers': 'Серверы Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'Медиафайлы загружаются на предпочитаемый сервер и зеркалируются на остальные.',
+    'Add Blossom server': 'Добавить сервер Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'Чтобы загружать медиафайлы, нужно добавить хотя бы один медиасервер.',
+    'Add operator URL': 'Добавить URL оператора',
     'All set': 'Всё готово',
     'Connect Google account': 'Подключить аккаунт Google',
     'Connected to Google': 'Подключено к Google',
@@ -1001,17 +1116,13 @@ export default {
       'Привяжите этот аккаунт к Google, чтобы входить и восстанавливать его через Google на других устройствах.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'Привяжите этот аккаунт к Google, чтобы входить и восстанавливать его через Google.',
-    'Linking your account...': 'Привязка аккаунта...',
     'New account': 'Новый аккаунт',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'Для этого входа через Google ещё нет аккаунта. Для вас создан новый ключ Nostr.',
     Operators: 'Операторы',
-    Remove: 'Удалить',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Войдите через Google, чтобы авторизоваться, или чтобы автоматически создать новый ключ Nostr, если у вас его ещё нет.',
     'Signing threshold': 'Порог подписи',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'Координатор, который проверяет ваш вход через Google и передаёт запросы на подпись операторам.',
     'This account is linked to Google.': 'Этот аккаунт привязан к Google.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'Этот ключ принадлежит вам. Хотя вы можете восстановить его через Google, сохраните резервную копию сейчас, чтобы никогда не потерять доступ к аккаунту.',
@@ -1021,9 +1132,10 @@ export default {
       'Ваш аккаунт теперь привязан к Google. Вы можете входить или восстанавливать ключ через Google на других устройствах.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'Ваш приватный ключ разделён на фрагменты, хранящиеся у разных операторов, поэтому он никогда не хранится в одном месте. Вы продолжаете подписывать своим приватным ключом на этом устройстве.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Координатор, который проверяет ваш вход через Google и передаёт запросы на подпись операторам.',
     'of {{total}} operators are enough to sign': 'из {{total}} операторов достаточно для подписи',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Независимые серверы, каждый из которых хранит фрагмент вашего приватного ключа, поэтому ни один оператор не может подписать в одиночку.',
-    'This service is provided by {{host}}': 'Этот сервис предоставлен {{host}}'
+      'Независимые серверы, каждый из которых хранит фрагмент вашего приватного ключа, поэтому ни один оператор не может подписать в одиночку.'
   }
 }

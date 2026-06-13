@@ -26,6 +26,7 @@ export interface IRelayPool {
   ensureRelay(url: string): Promise<IRelay>
   close(urls: string[]): void
   setAllowInsecure(allow: boolean): void
+  setTrustedInsecureRelayUrls(urls: string[]): void
   getSeenRelays(eventId: string): IRelay[]
   trackEventSeen(eventId: string, relay: IRelay): void
 }

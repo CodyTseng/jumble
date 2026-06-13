@@ -80,6 +80,10 @@ export default function DmRelayConfig({
 
   const handleRemoveRelay = (url: string) => {
     const newRelays = relays.filter((r) => r !== url)
+    if (autoSave && newRelays.length === 0) {
+      toast.error(t('Please add at least one relay'))
+      return
+    }
     setRelays(newRelays)
     if (autoSave) publishRelays(newRelays)
   }

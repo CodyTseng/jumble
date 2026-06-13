@@ -1,3 +1,4 @@
+import { getConversationKey } from '@/lib/crypto'
 import { ISigner, TDraftEvent } from '@/types'
 import { finalizeEvent, getPublicKey as nGetPublicKey, nip04, nip19 } from 'nostr-tools'
 import { v2 as nip44 } from 'nostr-tools/nip44'
@@ -30,6 +31,10 @@ export class NsecSigner implements ISigner {
     return this.pubkey
   }
 
+  getPrivkey() {
+    return this.privkey
+  }
+
   async signEvent(draftEvent: TDraftEvent) {
     if (!this.privkey) {
       throw new Error('Not logged in')
@@ -56,7 +61,7 @@ export class NsecSigner implements ISigner {
     if (!this.privkey) {
       throw new Error('Not logged in')
     }
-    const conversationKey = nip44.utils.getConversationKey(this.privkey, pubkey)
+    const conversationKey = getConversationKey(this.privkey, pubkey)
     return nip44.encrypt(plainText, conversationKey)
   }
 
@@ -64,7 +69,7 @@ export class NsecSigner implements ISigner {
     if (!this.privkey) {
       throw new Error('Not logged in')
     }
-    const conversationKey = nip44.utils.getConversationKey(this.privkey, pubkey)
+    const conversationKey = getConversationKey(this.privkey, pubkey)
     return nip44.decrypt(cipherText, conversationKey)
   }
 }

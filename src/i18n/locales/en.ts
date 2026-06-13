@@ -918,11 +918,11 @@ export default {
     Shuffle: 'Shuffle',
     'Login with Google': 'Login with Google',
     'Continue with Google': 'Continue with Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Sign in with Google and a Nostr key will be created for you automatically.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.",
     'How it works': 'How it works',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.',
     'Waiting for Google sign-in...': 'Waiting for Google sign-in...',
     'Checking your account...': 'Checking your account...',
     'Setting up your secure account...': 'Setting up your secure account...',
@@ -1000,8 +1000,95 @@ export default {
     'Scan with your signer app': 'Scan with your signer app',
     'Open with Nostr signer app': 'Open with Nostr signer app',
     'Scan QR code': 'Scan QR code',
-    'Add operator URL': 'Add operator URL',
+    Options: 'Options',
+    Remove: 'Remove',
+    'End date': 'End date',
     'Advanced options': 'Advanced options',
+    'Polls may not display on clients that don’t support them.':
+      'Polls may not display on clients that don’t support them.',
+    'Show thread context': 'Show thread context',
+    'Hide thread context': 'Hide thread context',
+    Enable: 'Enable',
+    Upload: 'Upload',
+    Drafts: 'Drafts',
+    Failed: 'Failed',
+    'Save as draft?': 'Save as draft?',
+    'Your changes will be saved to the drafts box.':
+      'Your changes will be saved to the drafts box.',
+    Discard: 'Discard',
+    'Keep editing': 'Keep editing',
+    'Open drafts': 'Open drafts',
+    'No drafts yet': 'No drafts yet',
+    Empty: 'Empty',
+    'Add emoji': 'Add emoji',
+    'Edit emoji': 'Edit emoji',
+    Title: 'Title',
+    'Image URL': 'Image URL',
+    shortcode: 'shortcode',
+    Emojis: 'Emojis',
+    'Create emoji set': 'Create emoji set',
+    'Edit emoji set': 'Edit emoji set',
+    'My emoji set': 'My emoji set',
+    'Emoji set not found': 'Emoji set not found',
+    'You can only edit your own emoji sets': 'You can only edit your own emoji sets',
+    'No custom emojis yet': 'No custom emojis yet',
+    'Title is required': 'Title is required',
+    'At least one emoji is required': 'At least one emoji is required',
+    'Duplicate shortcode: {{shortcode}}': 'Duplicate shortcode: {{shortcode}}',
+    'Shortcode is required': 'Shortcode is required',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'Shortcode can only contain letters, numbers, hyphens and underscores',
+    'Image URL is required': 'Image URL is required',
+    'Invalid image URL': 'Invalid image URL',
+    'Post as': 'Post as',
+    'Failed to get the signer for the selected account':
+      'Failed to get the signer for the selected account',
+    'Blossom cache server': 'Blossom cache server',
+    'Blossom cache server description':
+      'Load media through a Blossom cache server. Enable it only after the server has been verified to be reachable.',
+    'Server URL': 'Server URL',
+    'Cannot reach the Blossom cache server': 'Cannot reach the Blossom cache server',
+    'Link Google account': 'Link Google account',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Link a Google account so you can sign in to this account with Google.',
+    'Linking your account...': 'Linking your account...',
+    'Switching to remote signer...': 'Switching to remote signer...',
+    'Google account already linked': 'Google account already linked',
+    'This Google account is already linked to another account':
+      'This Google account is already linked to another account',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.',
+    'Unlink the previous account and link this one':
+      'Unlink the previous account and link this one',
+    'Switch to remote signer login?': 'Switch to remote signer login?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.',
+    'Switch to remote signer': 'Switch to remote signer',
+    'Keep signing locally': 'Keep signing locally',
+    'Google account linked': 'Google account linked',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.',
+    'Retrying ({{current}}/{{max}})': 'Retrying ({{current}}/{{max}})',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Could not reach the remote signer. Please try again later or check your network connection.',
+    'Add this emoji': 'Add this emoji',
+    'Added to my emojis': 'Added to my emojis',
+    'Add whole set': 'Add whole set',
+    'Emoji set': 'Emoji set',
+    'Waiting for signer approval...': 'Waiting for signer approval...',
+    'Signer did not respond in time': 'Signer did not respond in time',
+    'Media servers': 'Media servers',
+    'Blossom servers': 'Blossom servers',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'Media is uploaded to the preferred server and mirrored to the others.',
+    'Add Blossom server': 'Add Blossom server',
+    'You need to add at least one media server in order to upload media files.':
+      'You need to add at least one media server in order to upload media files.',
+    'Add operator URL': 'Add operator URL',
     'All set': 'All set',
     'Connect Google account': 'Connect Google account',
     'Connected to Google': 'Connected to Google',
@@ -1013,17 +1100,13 @@ export default {
       'Link this account to Google so you can sign in and recover it with Google on other devices.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'Link this account to Google so you can sign in and recover it with Google.',
-    'Linking your account...': 'Linking your account...',
     'New account': 'New account',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'No account exists for this Google login yet. A new Nostr key has been created for you.',
     Operators: 'Operators',
-    Remove: 'Remove',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.',
     'Signing threshold': 'Signing threshold',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'The coordinator that verifies your Google sign-in and relays signing requests to the operators.',
     'This account is linked to Google.': 'This account is linked to Google.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.',
@@ -1033,9 +1116,10 @@ export default {
       'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'The coordinator that verifies your Google sign-in and relays signing requests to the operators.',
     'of {{total}} operators are enough to sign': 'of {{total}} operators are enough to sign',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.',
-    'This service is provided by {{host}}': 'This service is provided by {{host}}'
+      'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.'
   }
 }

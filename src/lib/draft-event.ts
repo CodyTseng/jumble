@@ -1,4 +1,10 @@
-import { ApplicationDataKey, EMBEDDED_EVENT_REGEX, ExtendedKind, POLL_TYPE } from '@/constants'
+import {
+  ApplicationDataKey,
+  EMBEDDED_EVENT_REGEX,
+  EMOJI_SHORT_CODE_REGEX,
+  ExtendedKind,
+  POLL_TYPE
+} from '@/constants'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import mediaUpload from '@/services/media-upload.service'
@@ -470,6 +476,19 @@ export function createUserEmojiListDraftEvent(tags: string[][], content = ''): T
   }
 }
 
+export function createEmojiSetDraftEvent(
+  emojis: TEmoji[],
+  title: string,
+  d: string = randomString(16)
+): TDraftEvent {
+  return {
+    kind: kinds.Emojisets,
+    content: '',
+    tags: [buildDTag(d), buildTitleTag(title), ...emojis.map((emoji) => buildEmojiTag(emoji))],
+    created_at: dayjs().unix()
+  }
+}
+
 export function createBlossomServerListDraftEvent(servers: string[]): TDraftEvent {
   return {
     kind: ExtendedKind.BLOSSOM_SERVER_LIST,
@@ -785,7 +804,7 @@ function extractImagesFromContent(content: string) {
 export function transformCustomEmojisInContent(content: string) {
   const emojiTags: string[][] = []
   let processedContent = content
-  const matches = content.match(/:[a-zA-Z0-9]+:/g)
+  const matches = content.match(EMOJI_SHORT_CODE_REGEX)
 
   const emojiIdSet = new Set<string>()
   matches?.forEach((m) => {
@@ -882,8 +901,8 @@ function buildTTag(hashtag: string) {
   return ['t', hashtag]
 }
 
-function buildEmojiTag(emoji: TEmoji) {
-  return ['emoji', emoji.shortcode, emoji.url]
+export function buildEmojiTag(emoji: TEmoji) {
+  return trimTagEnd(['emoji', emoji.shortcode, emoji.url, emoji.setAddress ?? ''])
 }
 
 function buildTitleTag(title: string) {

@@ -114,7 +114,6 @@ export default {
     'Picture note requires images': '사진 노트에는 이미지가 필요합니다',
     Relays: '릴레이',
     Image: '이미지',
-    Normal: '일반',
     'R & W': '읽기/쓰기',
     Read: '읽기 전용',
     Write: '쓰기 전용',
@@ -125,7 +124,6 @@ export default {
     Pull: '가져오기',
     'Select all': '전체 선택',
     'Relay Sets': '릴레이 세트',
-    Mailbox: '메일박스',
     'Read & Write Relays': '읽기/쓰기 릴레이',
     'read relays description':
       '읽기 릴레이는 회원님과 관련된 이벤트를 찾는 데 사용됩니다. 다른 사용자는 회원님이 보길 원하는 이벤트를 회원님의 읽기 릴레이에 게시합니다.',
@@ -145,7 +143,6 @@ export default {
     'Copy private key': '개인 키 복사',
     'Enter the password to decrypt your ncryptsec': 'ncryptsec를 복호화할 비밀번호 입력',
     Back: '뒤로',
-    'password (optional): encrypt nsec': '비밀번호(선택): nsec 암호화',
     'optional: encrypt nsec': '선택: nsec 암호화',
     password: '비밀번호',
     'Sign up': '회원가입',
@@ -891,11 +888,11 @@ export default {
     Shuffle: '셔플',
     'Login with Google': 'Google로 로그인',
     'Continue with Google': 'Google로 계속하기',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Google로 로그인하면 Nostr 키가 자동으로 생성됩니다.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Google로 로그인하여 계정에 접속하세요. 아직 계정이 없다면 Nostr 계정이 자동으로 생성됩니다.',
     'How it works': '작동 방식',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      '개인 키는 별도의 운영자가 보관하는 샤드로 분할되므로 한 곳에 저장되지 않습니다. Jumble은 안전한 원격 서명자를 통해 서명합니다. 언제든지 계정 설정에서 키를 내보낼 수 있습니다.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      '개인 키는 별도의 독립적인 운영자가 보관하는 샤드로 분할되므로 한 곳에 저장되지 않습니다. Google은 운영자에게 신원을 증명하는 데만 사용되며 키를 저장하는 데는 절대 사용되지 않습니다.',
     'Waiting for Google sign-in...': 'Google 로그인 대기 중...',
     'Checking your account...': '계정 확인 중...',
     'Setting up your secure account...': '보안 계정 설정 중...',
@@ -972,8 +969,121 @@ export default {
     'Scan with your signer app': '서명 앱으로 스캔',
     'Open with Nostr signer app': 'Nostr 서명 앱으로 열기',
     'Scan QR code': 'QR 코드 스캔',
-    'Add operator URL': '운영자 URL 추가',
+    Options: '옵션',
+    Remove: '제거',
+    'End date': '종료 날짜',
     'Advanced options': '고급 옵션',
+    'Polls may not display on clients that don’t support them.':
+      '투표를 지원하지 않는 클라이언트에서는 표시되지 않을 수 있습니다.',
+    'Show thread context': '스레드 맥락 보기',
+    'Hide thread context': '스레드 맥락 숨기기',
+    Enable: '사용',
+    Upload: '업로드',
+    Drafts: '임시저장',
+    Failed: '실패',
+    'Save as draft?': '임시저장하시겠어요?',
+    'Your changes will be saved to the drafts box.': '변경 사항이 임시저장함에 저장됩니다.',
+    Discard: '버리기',
+    'Keep editing': '계속 편집',
+    'Open drafts': '임시저장 열기',
+    'No drafts yet': '임시저장된 항목이 없습니다',
+    Empty: '비어 있음',
+    'Add emoji': '이모지 추가',
+    'Edit emoji': '이모지 편집',
+    Title: '제목',
+    'Image URL': '이미지 URL',
+    shortcode: '단축 코드',
+    Emojis: '이모지',
+    'Create emoji set': '이모지 세트 만들기',
+    'Edit emoji set': '이모지 세트 편집',
+    'My emoji set': '내 이모지 세트',
+    'Emoji set not found': '이모지 세트를 찾을 수 없습니다',
+    'You can only edit your own emoji sets': '자신의 이모지 세트만 편집할 수 있습니다',
+    'No custom emojis yet': '아직 사용자 지정 이모지가 없습니다',
+    'Title is required': '제목은 필수입니다',
+    'At least one emoji is required': '이모지가 하나 이상 필요합니다',
+    'Duplicate shortcode: {{shortcode}}': '중복된 단축 코드: {{shortcode}}',
+    'Shortcode is required': '단축 코드는 필수입니다',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      '단축 코드에는 영문자, 숫자, 하이픈, 밑줄만 사용할 수 있습니다',
+    'Image URL is required': '이미지 URL은 필수입니다',
+    'Invalid image URL': '잘못된 이미지 URL입니다',
+    'Post as': '게시 계정',
+    'Failed to get the signer for the selected account':
+      '선택한 계정의 서명자를 가져오지 못했습니다',
+    'Blossom cache server': 'Blossom 캐시 서버',
+    'Blossom cache server description':
+      'Blossom 캐시 서버를 통해 미디어를 불러옵니다. 서버에 연결할 수 있는지 확인한 후에만 활성화하세요.',
+    'Server URL': '서버 URL',
+    'Cannot reach the Blossom cache server': 'Blossom 캐시 서버에 연결할 수 없습니다',
+    'Link Google account': 'Google 계정 연결',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Google로 이 계정에 로그인할 수 있도록 Google 계정을 연결하세요. 개인 키는 Google과 절대 공유되지 않습니다.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Google로 이 계정에 로그인할 수 있도록 Google 계정을 연결하세요.',
+    'Linking your account...': '계정 연결 중...',
+    'Switching to remote signer...': '원격 서명자로 전환 중...',
+    'Google account already linked': 'Google 계정이 이미 연결됨',
+    'This Google account is already linked to another account':
+      '이 Google 계정은 이미 다른 계정에 연결되어 있습니다',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      '현재 {{email}}에 연결되어 있습니다. 대신 이 계정에 연결하려면 이전 연결이 제거됩니다. 이전 계정은 여전히 존재하며 개인 키로 계속 사용할 수 있습니다.',
+    'Unlink the previous account and link this one': '이전 계정 연결을 해제하고 이 계정을 연결',
+    'Switch to remote signer login?': '원격 서명자 로그인으로 전환하시겠습니까?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      '계정이 연결되었습니다. 원격 서명자를 통한 서명으로 전환하거나 개인 키로 로컬 서명을 계속할 수 있습니다.',
+    'Switch to remote signer': '원격 서명자로 전환',
+    'Keep signing locally': '로컬 서명 유지',
+    'Google account linked': 'Google 계정 연결됨',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      '이제 이 계정은 안전한 원격 서명자를 통해 서명하며 언제든지 Google로 로그인할 수 있습니다. 개인 키는 Google과 절대 공유되지 않습니다.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      '이제 Google로 이 계정에 로그인할 수 있습니다. 여전히 개인 키로 로컬 서명을 하고 있으며, 개인 키는 Google과 절대 공유되지 않습니다.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      '원격 서명자에 연결할 수 없습니다. 나중에 다시 시도하거나 네트워크 연결을 확인해 주세요.',
+    'Retrying ({{current}}/{{max}})': '다시 시도 중 ({{current}}/{{max}})',
+    'Automatic updates': '자동 업데이트',
+    'Check for and download updates in the background':
+      '백그라운드에서 업데이트를 확인하고 다운로드',
+    'Check for updates': '업데이트 확인',
+    'Checking for updates…': '업데이트 확인 중…',
+    'Update available: v{{version}}': '업데이트 가능: v{{version}}',
+    'You are on the latest version ({{version}})': '최신 버전을 사용 중입니다 ({{version}})',
+    'Failed to check for updates': '업데이트 확인 실패',
+    Check: '확인',
+    NEW: '신규',
+    'Updates are not available in development mode':
+      '개발 모드에서는 업데이트를 사용할 수 없습니다',
+    'Search emojis': '이모지 검색',
+    'Recently used': '최근 사용',
+    'Smileys & Emotion': '스마일리 및 감정',
+    'People & Body': '사람 및 신체',
+    'Animals & Nature': '동물 및 자연',
+    'Food & Drink': '음식 및 음료',
+    'Travel & Places': '여행 및 장소',
+    Activities: '활동',
+    Objects: '사물',
+    Symbols: '기호',
+    Flags: '깃발',
+    'My emojis': '내 이모지',
+    'No emojis found': '이모지를 찾을 수 없습니다',
+    'Encrypted DM unavailable': '암호화된 DM을 사용할 수 없습니다',
+    'No DM relays': 'DM 릴레이 없음',
+    'n users_other': '{{count}}명의 사용자',
+    'Add this emoji': '이 이모지 추가',
+    'Added to my emojis': '내 이모지에 추가됨',
+    'Add whole set': '세트 전체 추가',
+    'Emoji set': '이모지 세트',
+    'Waiting for signer approval...': '서명자 승인을 기다리는 중…',
+    'Signer did not respond in time': '서명자가 제때 응답하지 않았습니다',
+    'Media servers': '미디어 서버',
+    'Blossom servers': 'Blossom 서버',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      '미디어는 기본 서버에 업로드되고 다른 서버에 미러링됩니다.',
+    'Add Blossom server': 'Blossom 서버 추가',
+    'You need to add at least one media server in order to upload media files.':
+      '미디어 파일을 업로드하려면 미디어 서버를 하나 이상 추가해야 합니다.',
+    'Add operator URL': '운영자 URL 추가',
     'All set': '완료',
     'Connect Google account': 'Google 계정 연결',
     'Connected to Google': 'Google에 연결됨',
@@ -985,17 +1095,13 @@ export default {
       '이 계정을 Google에 연결하면 다른 기기에서도 Google로 로그인하고 복구할 수 있습니다.',
     'Link this account to Google so you can sign in and recover it with Google.':
       '이 계정을 Google에 연결하면 Google로 로그인하고 복구할 수 있습니다.',
-    'Linking your account...': '계정을 연결하는 중...',
     'New account': '새 계정',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       '이 Google 로그인에 연결된 계정이 아직 없습니다. 새 Nostr 키를 생성했습니다.',
     Operators: '운영자',
-    Remove: '제거',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Google로 로그인하거나, Nostr 키가 아직 없다면 자동으로 새 키를 생성하세요.',
     'Signing threshold': '서명 임계값',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'Google 로그인을 확인하고 서명 요청을 운영자에게 중계하는 코디네이터입니다.',
     'This account is linked to Google.': '이 계정은 Google에 연결되어 있습니다.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       '이 키는 사용자 본인의 것입니다. Google로 복구할 수 있지만, 계정 접근 권한을 잃지 않도록 지금 백업을 저장하세요.',
@@ -1005,10 +1111,11 @@ export default {
       '이제 계정이 Google에 연결되었습니다. 다른 기기에서도 Google로 로그인하거나 키를 복구할 수 있습니다.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       '개인 키는 여러 운영자가 나누어 보관하는 샤드로 분할되므로 한곳에 저장되지 않습니다. 이 기기에서는 계속 개인 키로 서명합니다.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Google 로그인을 확인하고 서명 요청을 운영자에게 중계하는 코디네이터입니다.',
     'of {{total}} operators are enough to sign':
       '명의 운영자만 있으면 서명할 수 있습니다 (총 {{total}}명 중)',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      '각자 당신의 개인 키 샤드를 보관하는 독립적인 서버입니다. 따라서 단일 운영자만으로는 서명할 수 없습니다.',
-    'This service is provided by {{host}}': '이 서비스는 {{host}}에서 제공합니다'
+      '각자 당신의 개인 키 샤드를 보관하는 독립적인 서버입니다. 따라서 단일 운영자만으로는 서명할 수 없습니다.'
   }
 }

@@ -70,7 +70,6 @@ export default function StuffStats({
           <RepostButton stuff={stuff} />
           <LikeButton stuff={stuff} />
           <ZapButton stuff={stuff} />
-          <BookmarkButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>
       </div>

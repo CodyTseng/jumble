@@ -2,6 +2,7 @@ import { ExtendedKind } from '@/constants'
 import { isReplaceableEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
+import { TPostDraft } from '@/types/post-draft'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
 
@@ -34,6 +35,7 @@ const StoreNames = {
   ENCRYPTION_KEY_ANNOUNCEMENT_EVENTS: 'encryptionKeyAnnouncementEvents',
   FAVORITE_GIFS: 'favoriteGifs',
   RECENT_GIFS: 'recentGifs',
+  POST_DRAFTS: 'postDrafts',
   MUTE_DECRYPTED_TAGS: 'muteDecryptedTags', // deprecated
   RELAY_INFO_EVENTS: 'relayInfoEvents' // deprecated
 }
@@ -54,7 +56,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 22)
+        const request = window.indexedDB.open('jumble', 23)
 
         request.onerror = (event) => {
           reject(event)
@@ -169,6 +171,12 @@ class IndexedDbService {
               keyPath: 'id'
             })
             recentGifsStore.createIndex('addedAtIndex', 'addedAt')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.POST_DRAFTS)) {
+            const postDraftsStore = db.createObjectStore(StoreNames.POST_DRAFTS, {
+              keyPath: 'id'
+            })
+            postDraftsStore.createIndex('pubkeyUpdatedAtIndex', ['pubkey', 'updatedAt'])
           }
 
           if (db.objectStoreNames.contains(StoreNames.RELAY_INFO_EVENTS)) {
@@ -1080,6 +1088,66 @@ class IndexedDbService {
           }
         })
     )
+  }
+
+  async putPostDraft(draft: TPostDraft): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.POST_DRAFTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.POST_DRAFTS)
+      const request = store.put(draft)
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async deletePostDraft(id: string): Promise<void> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.POST_DRAFTS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.POST_DRAFTS)
+      const request = store.delete(id)
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve()
+      }
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
+  }
+
+  async getAllPostDrafts(): Promise<TPostDraft[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        return reject('database not initialized')
+      }
+      const transaction = this.db.transaction(StoreNames.POST_DRAFTS, 'readonly')
+      const store = transaction.objectStore(StoreNames.POST_DRAFTS)
+      const request = store.getAll()
+      request.onsuccess = () => {
+        transaction.commit()
+        resolve((request.result ?? []) as TPostDraft[])
+      }
+      request.onerror = (event) => {
+        transaction.commit()
+        reject(event)
+      }
+    })
   }
 
   async deleteDmMessagesByParticipantsKey(participantsKey: string): Promise<void> {

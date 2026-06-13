@@ -31,20 +31,13 @@ import { remarkInlineContent } from './remarkInlineContent'
 // the list's padding. Pad these lines with blank lines so they become
 // standalone paragraphs outside the list. npub1/nprofile1 mentions render
 // inline, so we deliberately leave those untouched to preserve soft breaks.
-const STANDALONE_NOSTR_NOTE_LINE_REGEX =
-  /^[ \t]*nostr:(?:note1|nevent1|naddr1)[a-z0-9]+[ \t]*$/gim
+const STANDALONE_NOSTR_NOTE_LINE_REGEX = /^[ \t]*nostr:(?:note1|nevent1|naddr1)[a-z0-9]+[ \t]*$/gim
 
 function ensureNostrEmbedsAreStandalone(content: string): string {
   return content.replace(STANDALONE_NOSTR_NOTE_LINE_REGEX, '\n$&\n')
 }
 
-export default function MarkdownContent({
-  content,
-  event
-}: {
-  content: string
-  event?: Event
-}) {
+export default function MarkdownContent({ content, event }: { content: string; event?: Event }) {
   const emojiInfos = useMemo(() => getEmojiInfosFromEmojiTags(event?.tags), [event?.tags])
   const processedContent = useMemo(() => ensureNostrEmbedsAreStandalone(content), [content])
 
@@ -57,7 +50,7 @@ export default function MarkdownContent({
           const shortcode = value.slice(1, -1)
           const emojiInfo = emojiInfos.find((e) => e.shortcode === shortcode)
           if (!emojiInfo) return value
-          return <Emoji classNames={{ img: 'mb-1' }} emoji={emojiInfo} />
+          return <Emoji classNames={{ img: 'mb-1' }} emoji={emojiInfo} clickable />
         },
         invoice: ({ value }) => <EmbeddedLNInvoice invoice={value} className="mt-2" />,
         a: ({ href, children }) => {
@@ -82,9 +75,7 @@ export default function MarkdownContent({
           if (X_URL_REGEX.test(href)) {
             return <XEmbeddedPost url={href} className="mt-2" />
           }
-          return (
-            <ExternalLink url={href} justOpenLink />
-          )
+          return <ExternalLink url={href} justOpenLink />
         },
         h1: ({ children }) => <p className="font-bold">{children}</p>,
         h2: ({ children }) => <p className="font-bold">{children}</p>,
@@ -101,16 +92,16 @@ export default function MarkdownContent({
           />
         ),
         pre: ({ children }) => (
-          <pre className="overflow-x-auto rounded-md bg-muted p-3 text-sm">{children}</pre>
+          <pre className="bg-muted overflow-x-auto rounded-md p-3 text-sm">{children}</pre>
         ),
         code: ({ children, className }) => {
           if (className) {
-            return <code className="whitespace-pre-wrap wrap-break-word">{children}</code>
+            return <code className="wrap-break-word whitespace-pre-wrap">{children}</code>
           }
-          return <code className="rounded bg-muted px-1 py-0.5 text-sm">{children}</code>
+          return <code className="bg-muted rounded px-1 py-0.5 text-sm">{children}</code>
         },
         blockquote: ({ children }) => (
-          <blockquote className="border-s-2 border-muted-foreground/30 ps-3 text-muted-foreground">
+          <blockquote className="border-muted-foreground/30 text-muted-foreground border-s-2 ps-3">
             {children}
           </blockquote>
         ),
@@ -127,12 +118,12 @@ export default function MarkdownContent({
           </div>
         ),
         th: ({ children }) => (
-          <th className="whitespace-nowrap border border-border bg-muted px-3 py-1.5 text-start font-semibold">
+          <th className="border-border bg-muted border px-3 py-1.5 text-start font-semibold whitespace-nowrap">
             {children}
           </th>
         ),
         td: ({ children }) => (
-          <td className="whitespace-nowrap border border-border px-3 py-1.5">{children}</td>
+          <td className="border-border border px-3 py-1.5 whitespace-nowrap">{children}</td>
         ),
         hr: () => <hr className="border-border" />
       }) as Components,

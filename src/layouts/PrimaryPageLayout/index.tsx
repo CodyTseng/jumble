@@ -9,7 +9,7 @@ import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TPrimaryPageName } from '@/routes/primary'
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 
 /**
  * Titlebar rendering rules (driven by `useScreenSize().isSmallScreen`, decoupled from the
@@ -85,7 +85,6 @@ const PrimaryPageLayout = forwardRef(
   ) => {
     const { pubkey } = useNostr()
     const scrollAreaRef = useRef<HTMLDivElement>(null)
-    const smallScreenScrollAreaRef = useRef<HTMLDivElement>(null)
     const smallScreenLastScrollTopRef = useRef(0)
     const { enableSingleColumnLayout } = useUserPreferences()
     const { isSmallScreen } = useScreenSize()
@@ -106,28 +105,30 @@ const PrimaryPageLayout = forwardRef(
       []
     )
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!enableSingleColumnLayout) return
+      // In single-column layout (always on small screens) every primary page shares the
+      // window scroll. Only the active page should restore and track its own scroll
+      // position; relying on the deterministic active-page check (instead of a DOM
+      // visibility probe) avoids one page's scroll leaking into another during a switch.
+      if (current !== pageName || !display) return
 
-      const isVisible = () => {
-        return smallScreenScrollAreaRef.current?.checkVisibility
-          ? smallScreenScrollAreaRef.current?.checkVisibility()
-          : false
-      }
+      const target = smallScreenLastScrollTopRef.current
+      // Safari re-adjusts the shared window scroll (scroll anchoring) right after the
+      // outgoing page is hidden, overriding a single synchronous scrollTo. Re-apply on
+      // the next frame to win that race. Use the positional form so it's always instant.
+      window.scrollTo(0, target)
+      const raf = requestAnimationFrame(() => window.scrollTo(0, target))
 
-      if (isVisible()) {
-        window.scrollTo({ top: smallScreenLastScrollTopRef.current, behavior: 'instant' })
-      }
       const handleScroll = () => {
-        if (isVisible()) {
-          smallScreenLastScrollTopRef.current = window.scrollY
-        }
+        smallScreenLastScrollTopRef.current = window.scrollY
       }
       window.addEventListener('scroll', handleScroll)
       return () => {
+        cancelAnimationFrame(raf)
         window.removeEventListener('scroll', handleScroll)
       }
-    }, [current, enableSingleColumnLayout, display])
+    }, [current, enableSingleColumnLayout, display, pageName])
 
     useEffect(() => {
       smallScreenLastScrollTopRef.current = 0
@@ -166,7 +167,6 @@ const PrimaryPageLayout = forwardRef(
         <PageActiveContext.Provider value={current === pageName && display}>
           <DeepBrowsingProvider active={current === pageName && display}>
             <div
-              ref={smallScreenScrollAreaRef}
               style={{
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
               }}

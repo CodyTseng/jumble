@@ -15,6 +15,8 @@ import {
 } from 'react'
 import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
+import DraftBox from './components/DraftBox'
+import DraftEditorHost from './components/DraftBox/DraftEditorHost'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
 import { normalizeUrl } from './lib/url'
 import { NotificationProvider } from './providers/NotificationProvider'
@@ -322,6 +324,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               ))}
               {!bottomBarHidden && <BottomNavigationBar />}
               <TooManyRelaysAlertDialog />
+              <DraftBox />
+              <DraftEditorHost />
               </div>
             </NotificationProvider>
           </CurrentRelaysProvider>
@@ -350,9 +354,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
-              <div className="flex w-full lg:justify-around">
-                <div className={cn('lg:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
-                <div className="min-h-screen w-0 flex-1 border-x bg-background lg:w-[640px] lg:flex-auto lg:shrink-0">
+              <div className="flex w-full wide:justify-around">
+                <div className={cn('wide:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
+                <div className="min-h-screen w-0 flex-1 border-x bg-background wide:w-[640px] wide:flex-auto wide:shrink-0">
                   {!!secondaryStack.length &&
                     secondaryStack.map((item, index) => (
                       <div
@@ -378,11 +382,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                     </div>
                   ))}
                 </div>
-                <div className="hidden lg:block lg:w-full" />
+                <div className="hidden wide:block wide:w-full" />
               </div>
               <div
                 className={cn(
-                  'pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end lg:w-[calc((100%-640px)/2)]',
+                  'pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end wide:w-[calc((100%-640px)/2)]',
                   sidebarCollapse ? 'w-16' : 'w-52'
                 )}
               >
@@ -392,6 +396,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
               <TooManyRelaysAlertDialog />
               <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+              <DraftBox />
+              <DraftEditorHost />
             </NotificationProvider>
           </CurrentRelaysProvider>
         </SecondaryPageContext.Provider>
@@ -471,6 +477,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
             </div>
             <TooManyRelaysAlertDialog />
             <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+            <DraftBox />
+            <DraftEditorHost />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>

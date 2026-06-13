@@ -15,16 +15,19 @@ const PostSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const isBlossom = serviceConfig.type === 'blossom'
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title={t('Post settings')}>
+    <SecondaryPageLayout ref={ref} index={index} title={t('Media servers')}>
       <SettingsPageContainer>
         <SettingsGroup title={t('Media upload')}>
           <MediaUploadServiceSetting />
         </SettingsGroup>
         {isBlossom && (
-          <SettingsGroup>
-            <div className="px-4 py-3">
-              <BlossomServerListSetting />
-            </div>
+          <SettingsGroup
+            title={t('Blossom servers')}
+            description={t(
+              'Media is uploaded to the preferred server and mirrored to the others.'
+            )}
+          >
+            <BlossomServerListSetting />
           </SettingsGroup>
         )}
       </SettingsPageContainer>

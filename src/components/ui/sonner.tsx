@@ -11,7 +11,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={themeSetting === 'pure-black' ? 'dark' : themeSetting}
       className="toaster group"
       richColors
-      mobileOffset={64}
+      mobileOffset={{
+        top: 20,
+        right: 20,
+        left: 20,
+        // Raise bottom toasts above the bottom navigation bar (h-12 = 3rem)
+        // plus the device safe-area inset, so they never cover it on mobile.
+        bottom: 'calc(env(safe-area-inset-bottom) + 3.5rem)'
+      }}
       toastOptions={{
         classNames: {
           toast:

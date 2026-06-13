@@ -73,6 +73,12 @@ export const toGeneralSettings = () => '/settings/general'
 export const toAppearanceSettings = () => '/settings/appearance'
 export const toTranslation = () => '/settings/translation'
 export const toEmojiPackSettings = () => '/settings/emoji-packs'
+export const toEmojiSetEditor = (eventOrId?: Event | string) => {
+  if (!eventOrId) return '/emoji-set-editor'
+  if (typeof eventOrId === 'string') return `/emoji-set-editor/${eventOrId}`
+  return `/emoji-set-editor/${getNoteBech32Id(eventOrId)}`
+}
+export const toStandaloneEmojiEditor = () => '/standalone-emoji-editor'
 export const toSystemSettings = () => '/settings/system'
 export const toAccountSettings = () => '/settings/account'
 export const toProfileEditor = () => '/profile-editor'

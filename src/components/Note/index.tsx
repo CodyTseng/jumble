@@ -45,7 +45,8 @@ export default function Note({
   size = 'normal',
   className,
   hideParentNotePreview = false,
-  showFull = false
+  showFull = false,
+  hideHeader = false
 }: {
   event: Event
   originalNoteId?: string
@@ -53,6 +54,7 @@ export default function Note({
   className?: string
   hideParentNotePreview?: boolean
   showFull?: boolean
+  hideHeader?: boolean
 }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
@@ -122,7 +124,7 @@ export default function Note({
       </>
     )
   } else if (event.kind === ExtendedKind.VOICE || event.kind === ExtendedKind.VOICE_COMMENT) {
-    content = <AudioPlayer className="mt-2" src={event.content} />
+    content = <AudioPlayer className="mt-2" src={event.content} pubkey={event.pubkey} />
   } else if (event.kind === ExtendedKind.PICTURE) {
     content = <PictureNote className="mt-2" event={event} />
   } else if (
@@ -146,42 +148,44 @@ export default function Note({
 
   return (
     <div className={className}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-1 items-center gap-2">
-          <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
-          <div className="w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <Username
-                userId={event.pubkey}
-                className={`flex truncate font-semibold ${size === 'small' ? 'text-sm' : ''}`}
-                skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
-              />
-              <FollowingBadge pubkey={event.pubkey} />
-              <TrustScoreBadge pubkey={event.pubkey} />
-              <ProtectedBadge event={event} />
-              <ClientTag event={event} />
-            </div>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Nip05 pubkey={event.pubkey} append="·" />
-              <FormattedTimestamp
-                timestamp={displayTimestamp}
-                className="shrink-0"
-                short={isSmallScreen}
-              />
+      {!hideHeader && (
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-1 items-center gap-2">
+            <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
+            <div className="w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <Username
+                  userId={event.pubkey}
+                  className={`flex truncate font-semibold ${size === 'small' ? 'text-sm' : ''}`}
+                  skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
+                />
+                <FollowingBadge pubkey={event.pubkey} />
+                <TrustScoreBadge pubkey={event.pubkey} />
+                <ProtectedBadge event={event} />
+                <ClientTag event={event} />
+              </div>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Nip05 pubkey={event.pubkey} append="·" />
+                <FormattedTimestamp
+                  timestamp={displayTimestamp}
+                  className="shrink-0"
+                  short={isSmallScreen}
+                />
+              </div>
             </div>
           </div>
+          <div className="flex items-center">
+            <TranslateButton
+              event={event}
+              showFull={showFull}
+              className={size === 'normal' ? '' : 'pe-0'}
+            />
+            {size === 'normal' && (
+              <NoteOptions event={event} className="shrink-0 py-1 [&_svg]:size-5" />
+            )}
+          </div>
         </div>
-        <div className="flex items-center">
-          <TranslateButton
-            event={event}
-            showFull={showFull}
-            className={size === 'normal' ? '' : 'pe-0'}
-          />
-          {size === 'normal' && (
-            <NoteOptions event={event} className="shrink-0 py-1 [&_svg]:size-5" />
-          )}
-        </div>
-      </div>
+      )}
       {!hideParentNotePreview && (
         <ParentNotePreview
           eventId={parentEventId}

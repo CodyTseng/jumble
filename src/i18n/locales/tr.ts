@@ -906,11 +906,11 @@ export default {
     Shuffle: 'Karıştır',
     'Login with Google': 'Google ile giriş yap',
     'Continue with Google': 'Google ile devam et',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Google ile giriş yap, senin için otomatik olarak bir Nostr anahtarı oluşturulsun.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Hesabına erişmek için Google ile giriş yap. Henüz bir hesabın yoksa, senin için otomatik olarak bir Nostr hesabı oluşturulur.',
     'How it works': 'Nasıl çalışır',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'Özel anahtarın, ayrı operatörler tarafından tutulan parçalara bölünür, bu sayede hiçbir zaman tek bir yerde saklanmaz. Jumble, güvenli bir uzak imzalayıcı aracılığıyla imzalar. Anahtarını istediğin zaman hesap ayarlarından dışa aktarabilirsin.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'Özel anahtarın, ayrı ve bağımsız operatörler tarafından tutulan parçalara bölünür, bu sayede hiçbir zaman tek bir yerde saklanmaz. Google yalnızca kimliğini operatörlere kanıtlamak için kullanılır, anahtarını saklamak için asla kullanılmaz.',
     'Waiting for Google sign-in...': 'Google girişi bekleniyor...',
     'Checking your account...': 'Hesabın kontrol ediliyor...',
     'Setting up your secure account...': 'Güvenli hesabın ayarlanıyor...',
@@ -988,8 +988,119 @@ export default {
     'Scan with your signer app': 'İmzalayıcı uygulamanızla tarayın',
     'Open with Nostr signer app': 'Nostr imzalayıcı uygulamayla aç',
     'Scan QR code': 'QR kodu tara',
-    'Add operator URL': "Operatör URL'si ekle",
+    Options: 'Seçenekler',
+    Remove: 'Kaldır',
+    'End date': 'Bitiş tarihi',
     'Advanced options': 'Gelişmiş seçenekler',
+    'Polls may not display on clients that don’t support them.':
+      'Anketler, onları desteklemeyen istemcilerde görüntülenmeyebilir.',
+    'Show thread context': 'Konu bağlamını göster',
+    'Hide thread context': 'Konu bağlamını gizle',
+    Enable: 'Etkinleştir',
+    Upload: 'Yükle',
+    Drafts: 'Taslaklar',
+    Failed: 'Başarısız',
+    'Save as draft?': 'Taslak olarak kaydedilsin mi?',
+    'Your changes will be saved to the drafts box.':
+      'Değişiklikleriniz taslak kutusuna kaydedilecek.',
+    Discard: 'Vazgeç',
+    'Keep editing': 'Düzenlemeye devam et',
+    'Open drafts': 'Taslakları aç',
+    'No drafts yet': 'Henüz taslak yok',
+    Empty: 'Boş',
+    'Add emoji': 'Emoji ekle',
+    'Edit emoji': 'Emoji düzenle',
+    Title: 'Başlık',
+    'Image URL': 'Görsel URL',
+    shortcode: 'kısa kod',
+    Emojis: 'Emojiler',
+    'Create emoji set': 'Emoji seti oluştur',
+    'Edit emoji set': 'Emoji setini düzenle',
+    'My emoji set': 'Emoji setim',
+    'Emoji set not found': 'Emoji seti bulunamadı',
+    'You can only edit your own emoji sets': 'Yalnızca kendi emoji setlerinizi düzenleyebilirsiniz',
+    'No custom emojis yet': 'Henüz özel emoji yok',
+    'Title is required': 'Başlık gereklidir',
+    'At least one emoji is required': 'En az bir emoji gereklidir',
+    'Duplicate shortcode: {{shortcode}}': 'Yinelenen kısa kod: {{shortcode}}',
+    'Shortcode is required': 'Kısa kod gereklidir',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'Kısa kod yalnızca harf, rakam, tire ve alt çizgi içerebilir',
+    'Image URL is required': 'Görsel URL gereklidir',
+    'Invalid image URL': 'Geçersiz görsel URL',
+    'Post as': 'Şu hesapla gönder',
+    'Failed to get the signer for the selected account': 'Seçili hesap için imzalayıcı alınamadı',
+    'Blossom cache server': 'Blossom önbellek sunucusu',
+    'Blossom cache server description':
+      'Medyayı bir Blossom önbellek sunucusu üzerinden yükle. Yalnızca sunucuya erişilebildiği doğrulandıktan sonra etkinleştir.',
+    'Server URL': 'Sunucu adresi',
+    'Cannot reach the Blossom cache server': 'Blossom önbellek sunucusuna ulaşılamıyor',
+    'Link Google account': 'Google hesabı bağla',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Bu hesaba Google ile giriş yapabilmen için bir Google hesabı bağla. Özel anahtarın asla Google ile paylaşılmaz.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Bu hesaba Google ile giriş yapabilmen için bir Google hesabı bağla.',
+    'Linking your account...': 'Hesabın bağlanıyor...',
+    'Switching to remote signer...': 'Uzak imzalayıcıya geçiliyor...',
+    'Google account already linked': 'Google hesabı zaten bağlı',
+    'This Google account is already linked to another account':
+      'Bu Google hesabı zaten başka bir hesaba bağlı',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'Şu anda {{email}} hesabına bağlı. Bunun yerine bu hesaba bağlamak için önceki bağlantı kaldırılır. Önceki hesap varlığını sürdürür ve özel anahtarıyla kullanılabilir kalır.',
+    'Unlink the previous account and link this one':
+      'Önceki hesabın bağlantısını kaldır ve bunu bağla',
+    'Switch to remote signer login?': 'Uzak imzalayıcı girişine geçilsin mi?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'Hesabın artık bağlı. Uzak imzalayıcı aracılığıyla imzalamaya geçebilir ya da özel anahtarınla yerel olarak imzalamaya devam edebilirsin.',
+    'Switch to remote signer': 'Uzak imzalayıcıya geç',
+    'Keep signing locally': 'Yerel olarak imzalamaya devam et',
+    'Google account linked': 'Google hesabı bağlandı',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'Bu hesap artık güvenli bir uzak imzalayıcı aracılığıyla imzalıyor ve istediğin zaman Google ile giriş yapabilirsin. Özel anahtarın asla Google ile paylaşılmaz.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'Bu hesaba artık Google ile giriş yapabilirsin. Hâlâ asla Google ile paylaşılmayan özel anahtarınla yerel olarak imzalıyorsun.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Uzak imzalayıcıya ulaşılamadı. Lütfen daha sonra tekrar dene veya ağ bağlantını kontrol et.',
+    'Retrying ({{current}}/{{max}})': 'Yeniden deneniyor ({{current}}/{{max}})',
+    'Automatic updates': 'Otomatik güncellemeler',
+    'Check for and download updates in the background':
+      'Güncellemeleri arka planda denetle ve indir',
+    'Check for updates': 'Güncellemeleri denetle',
+    'Checking for updates…': 'Güncellemeler denetleniyor…',
+    'Update available: v{{version}}': 'Güncelleme mevcut: v{{version}}',
+    'You are on the latest version ({{version}})': 'En son sürümü kullanıyorsun ({{version}})',
+    'Failed to check for updates': 'Güncellemeler denetlenemedi',
+    Check: 'Denetle',
+    NEW: 'YENİ',
+    'Updates are not available in development mode':
+      'Geliştirme modunda güncellemeler kullanılamaz',
+    'Search emojis': 'Emoji ara',
+    'Recently used': 'Son kullanılanlar',
+    'Smileys & Emotion': 'Yüz ifadeleri ve duygular',
+    'People & Body': 'İnsanlar ve vücut',
+    'Animals & Nature': 'Hayvanlar ve doğa',
+    'Food & Drink': 'Yiyecek ve içecek',
+    'Travel & Places': 'Seyahat ve mekanlar',
+    Activities: 'Etkinlikler',
+    Objects: 'Nesneler',
+    Symbols: 'Semboller',
+    Flags: 'Bayraklar',
+    'My emojis': 'Emojilerim',
+    'No emojis found': 'Emoji bulunamadı',
+    'Add this emoji': 'Bu emojiyi ekle',
+    'Added to my emojis': 'Emojilerime eklendi',
+    'Add whole set': 'Tüm seti ekle',
+    'Emoji set': 'Emoji seti',
+    'Waiting for signer approval...': 'İmzalayanın onayı bekleniyor...',
+    'Signer did not respond in time': 'İmzalayan zamanında yanıt vermedi',
+    'Media servers': 'Medya sunucuları',
+    'Blossom servers': 'Blossom sunucuları',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'Medya, tercih edilen sunucuya yüklenir ve diğerlerine yansıtılır.',
+    'Add Blossom server': 'Blossom sunucusu ekle',
+    'You need to add at least one media server in order to upload media files.':
+      'Medya dosyalarını yüklemek için en az bir medya sunucusu eklemelisiniz.',
+    'Add operator URL': "Operatör URL'si ekle",
     'All set': 'Her şey hazır',
     'Connect Google account': 'Google hesabını bağla',
     'Connected to Google': "Google'a bağlandı",
@@ -1001,17 +1112,13 @@ export default {
       "Diğer cihazlarda Google ile oturum açıp hesabı kurtarabilmen için bu hesabı Google'a bağla.",
     'Link this account to Google so you can sign in and recover it with Google.':
       "Google ile oturum açıp hesabı kurtarabilmen için bu hesabı Google'a bağla.",
-    'Linking your account...': 'Hesabın bağlanıyor...',
     'New account': 'Yeni hesap',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'Bu Google girişi için henüz bir hesap yok. Senin için yeni bir Nostr anahtarı oluşturuldu.',
     Operators: 'Operatörler',
-    Remove: 'Kaldır',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Oturum açmak için Google ile giriş yap; henüz bir Nostr anahtarın yoksa otomatik olarak yeni bir tane oluşturulur.',
     'Signing threshold': 'İmzalama eşiği',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'Google girişini doğrulayan ve imzalama isteklerini operatörlere ileten koordinatör.',
     'This account is linked to Google.': "Bu hesap Google'a bağlı.",
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'Bu anahtar sana ait ve sende kalmalı. Google ile kurtarabilsen de, hesabına erişimini asla kaybetmemek için şimdi bir yedek kaydet.',
@@ -1021,10 +1128,11 @@ export default {
       "Hesabın artık Google'a bağlı. Diğer cihazlarda Google ile oturum açabilir veya anahtarını kurtarabilirsin.",
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'Özel anahtarın, ayrı operatörlerde tutulan parçalara bölünür; böylece hiçbir zaman tek bir yerde saklanmaz. Bu cihazda imzalamaya kendi özel anahtarınla devam edersin.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Google girişini doğrulayan ve imzalama isteklerini operatörlere ileten koordinatör.',
     'of {{total}} operators are enough to sign':
       'operatör imzalamaya yeter ({{total}} operatörden)',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Her biri özel anahtarının bir parçasını tutan bağımsız sunuculardır; böylece tek bir operatör tek başına imzalayamaz.',
-    'This service is provided by {{host}}': 'Bu hizmet {{host}} tarafından sağlanıyor'
+      'Her biri özel anahtarının bir parçasını tutan bağımsız sunuculardır; böylece tek bir operatör tek başına imzalayamaz.'
   }
 }

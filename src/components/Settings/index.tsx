@@ -25,12 +25,12 @@ import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import storage from '@/services/local-storage.service'
 import {
   Cog,
+  ImageUp,
   Info,
   KeyRound,
   Languages,
   MonitorDown,
   Palette,
-  PencilLine,
   Server,
   Settings2,
   Smile,
@@ -75,14 +75,6 @@ export default function Settings() {
         )}
         {!!pubkey && (
           <SettingsRow
-            icon={<PencilLine />}
-            title={t('Post settings')}
-            chevron
-            onClick={() => push(toPostSettings())}
-          />
-        )}
-        {!!pubkey && (
-          <SettingsRow
             icon={<Smile />}
             title={t('Emoji Packs')}
             chevron
@@ -119,6 +111,14 @@ export default function Settings() {
           chevron
           onClick={() => push(toRelaySettings())}
         />
+        {!!pubkey && (
+          <SettingsRow
+            icon={<ImageUp />}
+            title={t('Media servers')}
+            chevron
+            onClick={() => push(toPostSettings())}
+          />
+        )}
         <SettingsRow
           icon={<Cog />}
           title={t('System')}

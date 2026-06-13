@@ -281,6 +281,25 @@ Properties:
 - `threshold`: `number` - Height threshold for hiding the tab bar on scroll down. Default is `800`. It should larger than the height of the area above the tab bar. Normally you don't need to change this value.
 - `options`: `React.ReactNode` - Additional options to display on the right side of the tab bar.
 
+### src/components/ClickableCard
+
+A behavioral wrapper for a container whose `onClick` navigates the user (e.g. note cards, reply cards, notification cards). It renders a `<div>` and forwards `HTMLAttributes<HTMLDivElement>`.
+
+It marks itself with `data-clickable-card` and filters the click before calling the provided `onClick`, so the handler only fires when the click is for *this* card. Specifically it skips:
+
+1. Portal-rendered descendants (overlays, menus rendered outside the DOM subtree).
+2. Interactive controls inside the card — `button`, `a`, `input`, `textarea`, `select`, `[role="button"]` (matched via `closest()`).
+3. Clicks that originate inside a *nested* `ClickableCard` (e.g. an embedded note inside a note card).
+
+**Why not just call `e.stopPropagation()` on inner controls?** React's `stopPropagation()` also calls `nativeEvent.stopPropagation()`, which prevents the click from bubbling to `document`. Radix Dialog/Drawer's touch-mode outside-click detection relies on that native bubble to close itself when the user taps outside. Stopping propagation breaks that detection. The filter-on-the-parent approach in `ClickableCard` sidesteps the issue entirely — clicks still bubble to `document`, we just ignore the ones that don't belong to us.
+
+**When to use it:**
+
+- Use `<ClickableCard>` when the clickable container holds anything that could bubble an unwanted click — interactive controls (`<button>`, `<a>`, `StuffStats`, `NoteOptions`, etc.) or other clickable cards (e.g. embedded notes). For these cases, do **not** hand-roll the filter logic, and do **not** rely on `e.stopPropagation()` on inner controls (it breaks Radix Dialog/Drawer touch-mode — see above).
+- A plain `<div onClick={...}>` (or `<Card onClick={...}>`) is fine when the container only holds purely-display content (text, avatars, icons) with no clickable descendants. If you later add an interactive child or nested card, swap it for `<ClickableCard>` at that time.
+- Inside a `ClickableCard`, a custom clickable element that is *not* a `button`/`a`/`input`/`textarea`/`select` must declare `role="button"` so the filter recognizes it.
+- When introducing a brand-new kind of "clickable container" pattern (rare), keep the `data-clickable-card` contract consistent — i.e. extend `ClickableCard` or follow the same marker. Do not invent a parallel mechanism.
+
 ## Feature Documentation
 
 - [DM (Direct Messages)](docs/dm-feature.md) - End-to-end encrypted messaging based on NIP-17
@@ -341,7 +360,7 @@ Renderer counterparts:
 
 The bridge exposed at `window.electron` has three namespaces:
 
-- `relay.*` — `ensure / publish / subscribe / closeSub / auth / close / setAllowInsecure`, plus event-stream listeners (`onSubEvent`, `onSubEose`, `onSubClose`, `onAuthRequest`) and `sendAuthResponse`. The renderer streams events back through `ipcRenderer.on`; the main process triggers AUTH signing via a request/response over IPC so the signer stays in the renderer.
+- `relay.*` — `ensure / publish / subscribe / closeSub / auth / close / setAllowInsecure / setTrustedInsecureRelayUrls`, plus event-stream listeners (`onSubEvent`, `onSubEose`, `onSubClose`, `onAuthRequest`) and `sendAuthResponse`. The renderer streams events back through `ipcRenderer.on`; the main process triggers AUTH signing via a request/response over IPC so the signer stays in the renderer.
 - `secrets.*` — `isAvailable / load / save`. Writes are atomic (tmp + rename) and serialized via a Promise chain.
 - `proxy.fetch(url, options)` — **generic CORS-bypass HTTP proxy**. Any future renderer code that needs to bypass CORS should call this rather than add a new channel. Returns `{ ok, status, statusText, url, headers, body }`. Default 15s timeout, 5 MB body cap, custom UA. Renderer parses the body itself (no domain logic in main).
 

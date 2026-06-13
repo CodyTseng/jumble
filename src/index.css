@@ -6,6 +6,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --breakpoint-wide: 1200px;
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -107,6 +109,15 @@
   body,
   html {
     overscroll-behavior-y: none;
+    /*
+      Disable scroll anchoring on the window scroll. In single-column layout all primary
+      pages share the window scroll and switch via display:block/none. When the outgoing
+      page is hidden, Safari's scroll anchoring otherwise re-pins the shared scroll to the
+      previous offset, leaking one page's scroll position into the next (e.g. Home → DM
+      not landing at the top). Window-scroll pages here never rely on anchoring (feeds
+      insert at the top, infinite scroll appends below the viewport).
+    */
+    overflow-anchor: none;
   }
 
   button:not([disabled]),

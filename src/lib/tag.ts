@@ -102,7 +102,10 @@ export function getEmojiInfosFromEmojiTags(tags: string[][] = []) {
   return tags
     .map((tag) => {
       if (tag.length < 3 || tag[0] !== 'emoji') return null
-      return { shortcode: tag[1], url: tag[2] }
+      const emoji: TEmoji = { shortcode: tag[1], url: tag[2] }
+      // 4th position (optional) points to the kind 30030 emoji set this emoji belongs to
+      if (tag[3]) emoji.setAddress = tag[3]
+      return emoji
     })
     .filter(Boolean) as TEmoji[]
 }

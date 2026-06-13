@@ -9,10 +9,43 @@ import {
 } from '@/constants'
 import { clsx, type ClassValue } from 'clsx'
 import { franc } from 'franc-min'
+import type { MouseEvent } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+// crypto.randomUUID is unavailable on older iOS Safari and in non-secure
+// contexts. Fall back to getRandomValues, then Math.random, since we only need
+// a locally-unique id (not a spec-compliant UUID).
+export function randomId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = crypto.getRandomValues(new Uint8Array(16))
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  }
+  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`
+}
+
+const INTERACTIVE_SELECTOR = 'button, a, input, textarea, select, [role="button"]'
+
+// For containers whose onClick navigates the user (a "clickable card"), return
+// true if the click should be ignored — either because it came from a portal-
+// rendered descendant, an interactive control, or a nested clickable card
+// (marked with `data-clickable-card`). We can't stopPropagation() on inner
+// controls because React's stopPropagation also stops the native event, which
+// breaks Radix Dialog's touch-mode outside-click detection (it listens for
+// native `click` bubbling to `document`).
+export function isClickInsideNestedCardOrControl(e: MouseEvent<HTMLElement>): boolean {
+  const target = e.target
+  if (!(target instanceof Node) || !e.currentTarget.contains(target)) return true
+  if (!(target instanceof Element)) return false
+  if (target.closest(INTERACTIVE_SELECTOR)) return true
+  const nearestClickableCard = target.closest('[data-clickable-card]')
+  return !!nearestClickableCard && nearestClickableCard !== e.currentTarget
 }
 
 export function isSafari() {

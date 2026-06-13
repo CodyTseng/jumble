@@ -1,4 +1,6 @@
-import { ExtendedKind } from '@/constants'
+import { ENCRYPTION_KEY_RETENTION_MS, ExtendedKind, MAX_RETIRED_ENCRYPTION_KEYS } from '@/constants'
+import { getConversationKey } from '@/lib/crypto'
+import { getDefaultRelayUrls } from '@/lib/relay'
 import { tagNameEquals } from '@/lib/tag'
 import { ISigner, TEncryptionKeypair } from '@/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
@@ -26,15 +28,52 @@ class EncryptionKeyService {
 
   getEncryptionKeypair(accountPubkey: string): TEncryptionKeypair | null {
     const privkeyHex = storage.getEncryptionKeyPrivkey(accountPubkey)
-    if (!privkeyHex) return null
-
-    const privkey = hexToBytes(privkeyHex)
-    const pubkey = getPublicKey(privkey)
-    return { privkey, pubkey }
+    return privkeyHex ? this.hexToKeypair(privkeyHex) : null
   }
 
+  private hexToKeypair(privkeyHex: string): TEncryptionKeypair {
+    const privkey = hexToBytes(privkeyHex)
+    return { privkey, pubkey: getPublicKey(privkey) }
+  }
+
+  /**
+   * Retires the current encryption key instead of dropping it outright: the old
+   * private key is moved into a kept-around list (bounded by age and count) so
+   * messages still encrypted to it — by contacts who haven't learned the new key
+   * yet — can keep being decrypted during the grace period. Then it clears the
+   * current key so a fresh one can take its place.
+   */
   removeEncryptionKey(accountPubkey: string): void {
+    const privkeyHex = storage.getEncryptionKeyPrivkey(accountPubkey)
+    if (privkeyHex) {
+      storage.addRetiredEncryptionKeyPrivkey(accountPubkey, privkeyHex, dayjs().valueOf())
+    }
     storage.removeEncryptionKeyPrivkey(accountPubkey)
+    this.pruneRetiredKeys(accountPubkey)
+  }
+
+  /**
+   * Returns the still-valid retired encryption keypairs, pruning (in place) any
+   * that have exceeded the retention age or the count cap. Used as decryption
+   * fallbacks when the current key fails to unwrap a gift wrap.
+   */
+  getValidRetiredKeypairs(accountPubkey: string): TEncryptionKeypair[] {
+    return this.pruneRetiredKeys(accountPubkey).map((k) => this.hexToKeypair(k.privkey))
+  }
+
+  // Storage keeps retired keys newest-first (see addRetiredEncryptionKeyPrivkey),
+  // so dropping expired entries and capping the count needs no re-sort. Only
+  // persists when something was actually pruned.
+  private pruneRetiredKeys(accountPubkey: string): { privkey: string; retiredAt: number }[] {
+    const now = dayjs().valueOf()
+    const stored = storage.getRetiredEncryptionKeyPrivkeys(accountPubkey)
+    const kept = stored
+      .filter((k) => now - k.retiredAt < ENCRYPTION_KEY_RETENTION_MS)
+      .slice(0, MAX_RETIRED_ENCRYPTION_KEYS)
+    if (kept.length !== stored.length) {
+      storage.setRetiredEncryptionKeyPrivkeys(accountPubkey, kept)
+    }
+    return kept
   }
 
   generateEncryptionKey(accountPubkey: string): TEncryptionKeypair {
@@ -51,9 +90,7 @@ class EncryptionKeyService {
       privkeyHex = bytesToHex(privkey)
       storage.setClientKeyPrivkey(accountPubkey, privkeyHex)
     }
-    const privkey = hexToBytes(privkeyHex)
-    const pubkey = getPublicKey(privkey)
-    return { privkey, pubkey }
+    return this.hexToKeypair(privkeyHex)
   }
 
   async queryEncryptionKeyAnnouncement(pubkey: string): Promise<Event | null> {
@@ -252,12 +289,12 @@ class EncryptionKeyService {
   }
 
   encryptWithNip44(privkey: Uint8Array, pubkey: string, plainText: string): string {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
+    const conversationKey = getConversationKey(privkey, pubkey)
     return nip44.v2.encrypt(plainText, conversationKey)
   }
 
   decryptWithNip44(privkey: Uint8Array, pubkey: string, cipherText: string): string {
-    const conversationKey = nip44.v2.utils.getConversationKey(privkey, pubkey)
+    const conversationKey = getConversationKey(privkey, pubkey)
     return nip44.v2.decrypt(cipherText, conversationKey)
   }
 
@@ -267,7 +304,10 @@ class EncryptionKeyService {
       client.fetchRelayList(accountPubkey)
     ])
     const writeRelays = relayList.write.slice(0, 5)
-    const relays = Array.from(new Set([...dmRelays, ...writeRelays]))
+    // These are non-private setup events (key announcements, sync requests, key
+    // transfers). Always include the big default relays so a flaky or
+    // misconfigured DM/write relay set can't strand the sync handshake.
+    const relays = Array.from(new Set([...dmRelays, ...writeRelays, ...getDefaultRelayUrls()]))
 
     return {
       dmRelays,

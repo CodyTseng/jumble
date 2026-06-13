@@ -13,6 +13,7 @@ import { useUserTrust } from '@/providers/UserTrustProvider'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ClickableCard from '../ClickableCard'
 import ClientTag from '../ClientTag'
 import Collapsible from '../Collapsible'
 import Content from '../Content'
@@ -99,7 +100,7 @@ export default function ReplyNote({
   ])
 
   return (
-    <div
+    <ClickableCard
       className={cn(
         'clickable relative pb-3 transition-colors duration-500',
         highlight ? 'bg-primary/40' : '',
@@ -110,9 +111,9 @@ export default function ReplyNote({
       {hasReplies &&
         !hideThreadGuide &&
         (autoLoadProfilePicture ? (
-          <div className="absolute inset-s-8.5 top-14 bottom-0 z-20 border-s" />
+          <div className="bg-border absolute inset-s-8.25 top-14 bottom-0 z-20 w-0.5" />
         ) : (
-          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s border-t" />
+          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s-2 border-t-2" />
         ))}
       <Collapsible>
         <div
@@ -195,7 +196,7 @@ export default function ReplyNote({
           displayTopZapsAndLikes
         />
       )}
-    </div>
+    </ClickableCard>
   )
 }
 

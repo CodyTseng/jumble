@@ -8,11 +8,17 @@ export default function BackgroundAudio({ className }: { className?: string }) {
 
   useEffect(() => {
     const handlePlayAudioBackground = (event: Event) => {
-      const { src, time } = (event as CustomEvent).detail
+      const { src, time, pubkey } = (event as CustomEvent).detail
       if (backgroundAudioSrc === src) return
 
       setBackgroundAudio(
-        <FloatingAudioPlayer key={src + time} src={src} time={time} className={className} />
+        <FloatingAudioPlayer
+          key={src + time}
+          src={src}
+          pubkey={pubkey}
+          time={time}
+          className={className}
+        />
       )
       setBackgroundAudioSrc(src)
     }
@@ -35,12 +41,23 @@ export default function BackgroundAudio({ className }: { className?: string }) {
 
 function FloatingAudioPlayer({
   src,
+  pubkey,
   time,
   className
 }: {
   src: string
+  pubkey?: string
   time?: number
   className?: string
 }) {
-  return <AudioPlayer src={src} className={className} startTime={time} autoPlay isMinimized />
+  return (
+    <AudioPlayer
+      src={src}
+      pubkey={pubkey}
+      className={className}
+      startTime={time}
+      autoPlay
+      isMinimized
+    />
+  )
 }

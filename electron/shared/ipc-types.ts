@@ -13,6 +13,7 @@ export const IPC_CHANNELS = {
   authRequest: 'relay:auth-request',
   authResponse: 'relay:auth-response',
   setAllowInsecure: 'relay:set-allow-insecure',
+  setTrustedInsecureUrls: 'relay:set-trusted-insecure-urls',
   secretsLoad: 'secrets:load',
   secretsSave: 'secrets:save',
   secretsAvailable: 'secrets:available',
@@ -31,6 +32,7 @@ export type TSecretsBundle = {
   ncryptsec?: Record<string, string>
   bunkerClientSecretKey?: Record<string, string>
   encryptionKeyPrivkey?: Record<string, string>
+  retiredEncryptionKeyPrivkey?: Record<string, { privkey: string; retiredAt: number }[]>
   clientKeyPrivkey?: Record<string, string>
 }
 
@@ -75,6 +77,7 @@ export type TElectronRelayBridge = {
   auth: (url: string) => Promise<void>
   close: (urls?: string[]) => Promise<void>
   setAllowInsecure: (allow: boolean) => Promise<void>
+  setTrustedInsecureRelayUrls: (urls: string[]) => Promise<void>
   onSubEvent: (cb: (payload: TSubEventPayload) => void) => () => void
   onSubEose: (cb: (payload: TSubEosePayload) => void) => () => void
   onSubClose: (cb: (payload: TSubClosePayload) => void) => () => void

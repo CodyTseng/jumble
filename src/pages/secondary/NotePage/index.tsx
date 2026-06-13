@@ -1,14 +1,27 @@
 import { useSecondaryPage } from '@/PageManager'
+import ClickableCard from '@/components/ClickableCard'
+import ClientTag from '@/components/ClientTag'
+import Content from '@/components/Content'
 import ContentPreview from '@/components/ContentPreview'
+import FollowingBadge from '@/components/FollowingBadge'
+import { FormattedTimestamp } from '@/components/FormattedTimestamp'
+import Nip05 from '@/components/Nip05'
 import Note from '@/components/Note'
 import NoteInteractions from '@/components/NoteInteractions'
+import NoteOptions from '@/components/NoteOptions'
+import RepostDescription from '@/components/NoteCard/RepostDescription'
+import ProtectedBadge from '@/components/ProtectedBadge'
 import StuffStats from '@/components/StuffStats'
+import TranslateButton from '@/components/TranslateButton'
+import TrustScoreBadge from '@/components/TrustScoreBadge'
 import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
+import Username from '@/components/Username'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExtendedKind } from '@/constants'
-import { useFetchEvent } from '@/hooks'
+import { isRepostEvent, useFetchEvent, useRepostTarget } from '@/hooks'
+import { useAncestorChain } from '@/hooks/useThread'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import {
   getEventKey,
@@ -20,15 +33,38 @@ import {
 import { toExternalContent, toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
-import { Ellipsis } from 'lucide-react'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import threadService from '@/services/thread.service'
+import { TPageRef } from '@/types'
+import { Ellipsis, FoldVertical, UnfoldVertical } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { forwardRef, useMemo } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from './NotFound'
 
-const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref) => {
+const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, index }, ref) => {
   const { t } = useTranslation()
-  const { event, isFetching } = useFetchEvent(id)
+  const { autoLoadProfilePicture } = useContentPolicy()
+  const { event: fetchedEvent, isFetching } = useFetchEvent(id)
+  const isRepost = isRepostEvent(fetchedEvent)
+  const { targetEvent: repostTarget, isResolving: isResolvingRepostTarget } = useRepostTarget(
+    isRepost ? fetchedEvent : undefined
+  )
+  const event = isRepost ? (repostTarget ?? undefined) : fetchedEvent
+  const reposters = useMemo(
+    () => (isRepost && fetchedEvent ? [fetchedEvent.pubkey] : undefined),
+    [isRepost, fetchedEvent]
+  )
   const parentEventId = useMemo(() => getParentBech32Id(event), [event])
   const rootEventId = useMemo(() => getRootBech32Id(event), [event])
   const rootITag = useMemo(
@@ -37,10 +73,58 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
   )
   const { isFetching: isFetchingRootEvent, event: rootEvent } = useFetchEvent(rootEventId)
   const { isFetching: isFetchingParentEvent, event: parentEvent } = useFetchEvent(parentEventId)
+  const [expanded, setExpanded] = useState(false)
+  const currentKey = useMemo(() => (event ? getEventKey(event) : ''), [event])
+  const rootKey = useMemo(() => (rootEvent ? getEventKey(rootEvent) : ''), [rootEvent])
+  const ancestorChain = useAncestorChain(currentKey, rootKey)
+  const canExpand = !!parentEventId
+  const fullChain = useMemo(() => {
+    const chain = [...ancestorChain]
+    if (rootEvent && chain[0] !== rootEvent.id) {
+      chain.unshift(rootEvent.id)
+    }
+    if (parentEvent && chain[chain.length - 1] !== parentEvent.id) {
+      chain.push(parentEvent.id)
+    }
+    return chain
+  }, [rootEvent, rootEventId, parentEvent, parentEventId, ancestorChain])
+  const layoutRef = useRef<TPageRef>(null)
 
-  if (!event && isFetching) {
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToTop: (behavior) => layoutRef.current?.scrollToTop(behavior)
+    }),
+    []
+  )
+
+  const handleToggleExpand = useCallback(() => {
+    setExpanded((prev) => !prev)
+  }, [])
+
+  const prevExpandedRef = useRef(expanded)
+  useLayoutEffect(() => {
+    if (prevExpandedRef.current && !expanded) {
+      layoutRef.current?.scrollToTop('instant')
+    }
+    prevExpandedRef.current = expanded
+  }, [expanded])
+
+  useEffect(() => {
+    if (!expanded || !event) return
+    threadService.subscribe(event)
+    return () => {
+      threadService.unsubscribe(event)
+    }
+  }, [expanded, event])
+
+  useEffect(() => {
+    if (!canExpand) setExpanded(false)
+  }, [canExpand])
+
+  if (!event && (isFetching || isResolvingRepostTarget)) {
     return (
-      <SecondaryPageLayout ref={ref} index={index} title={t('Note')}>
+      <SecondaryPageLayout ref={layoutRef} index={index} title={t('Note')}>
         <div className="px-4 pt-3">
           <div className="flex items-center gap-2">
             <UserAvatarSkeleton className="h-10 w-10" />
@@ -67,48 +151,66 @@ const NotePage = forwardRef(({ id, index }: { id?: string; index?: number }, ref
   }
   if (!event) {
     return (
-      <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
+      <SecondaryPageLayout ref={layoutRef} index={index} title={t('Note')} displayScrollToTopButton>
         <NotFound bech32Id={id} />
       </SecondaryPageLayout>
     )
   }
 
   return (
-    <SecondaryPageLayout ref={ref} index={index} title={t('Note')} displayScrollToTopButton>
-      <div className="px-4 pt-3">
-        {rootITag && <ExternalRoot value={rootITag[1]} />}
-        {rootEventId && rootEventId !== parentEventId && (
-          <ParentNote
-            key={`root-note-${event.id}`}
-            isFetching={isFetchingRootEvent}
-            event={rootEvent}
-            eventBech32Id={rootEventId}
-            isConsecutive={isConsecutive(rootEvent, parentEvent)}
-          />
+    <SecondaryPageLayout ref={layoutRef} index={index} title={t('Note')} displayScrollToTopButton>
+      <div>
+        {rootITag && (
+          <div className="px-4 pt-3">
+            <ExternalRoot value={rootITag[1]} />
+          </div>
         )}
-        {parentEventId && (
-          <ParentNote
-            key={`parent-note-${event.id}`}
-            isFetching={isFetchingParentEvent}
-            event={parentEvent}
-            eventBech32Id={parentEventId}
+        {expanded
+          ? fullChain.map((id, idx) => (
+              <ChainItem key={`chain-${id}`} eventId={id} isFirst={idx === 0 && !rootITag} />
+            ))
+          : canExpand && (
+              <div className={cn('px-4', !rootITag && 'pt-3')}>
+                {rootEventId && rootEventId !== parentEventId && (
+                  <ParentNote
+                    key={`root-note-${event.id}`}
+                    isFetching={isFetchingRootEvent}
+                    event={rootEvent}
+                    eventBech32Id={rootEventId}
+                    isConsecutive={isConsecutive(rootEvent, parentEvent)}
+                  />
+                )}
+                {parentEventId && (
+                  <ParentNote
+                    key={`parent-note-${event.id}`}
+                    isFetching={isFetchingParentEvent}
+                    event={parentEvent}
+                    eventBech32Id={parentEventId}
+                    noConnector
+                  />
+                )}
+                {autoLoadProfilePicture && <div className="bg-border ms-4.75 h-1.5 w-0.5" />}
+              </div>
+            )}
+        {canExpand && <ExpandThreadButton expanded={expanded} onToggle={handleToggleExpand} />}
+        <div className={cn('relative px-4 pt-3', canExpand && 'pt-1')}>
+          {reposters && <RepostDescription reposters={reposters} />}
+          <Note
+            key={`note-${event.id}`}
+            event={event}
+            className="select-text"
+            hideParentNotePreview
+            originalNoteId={isRepost ? undefined : id}
+            showFull
           />
-        )}
-        <Note
-          key={`note-${event.id}`}
-          event={event}
-          className="select-text"
-          hideParentNotePreview
-          originalNoteId={id}
-          showFull
-        />
-        <StuffStats
-          className="mt-3"
-          classNames={{ topList: '-mx-4', topListContent: 'px-4' }}
-          stuff={event}
-          fetchIfNotExisting
-          displayTopZapsAndLikes
-        />
+          <StuffStats
+            className="mt-3"
+            classNames={{ topList: '-mx-4', topListContent: 'px-4' }}
+            stuff={event}
+            fetchIfNotExisting
+            displayTopZapsAndLikes
+          />
+        </div>
       </div>
       <Separator className="mt-4" />
       <NoteInteractions key={`note-interactions-${event.id}`} event={event} />
@@ -120,6 +222,7 @@ export default NotePage
 
 function ExternalRoot({ value }: { value: string }) {
   const { push } = useSecondaryPage()
+  const { autoLoadProfilePicture } = useContentPolicy()
 
   return (
     <div>
@@ -129,7 +232,11 @@ function ExternalRoot({ value }: { value: string }) {
       >
         <div className="truncate">{value}</div>
       </Card>
-      <div className="bg-border ms-5 h-2 w-px" />
+      {autoLoadProfilePicture ? (
+        <div className="bg-border ms-5 h-2 w-px" />
+      ) : (
+        <div className="h-2" />
+      )}
     </div>
   )
 }
@@ -138,14 +245,19 @@ function ParentNote({
   event,
   eventBech32Id,
   isFetching,
-  isConsecutive = true
+  isConsecutive = true,
+  noConnector = false
 }: {
   event?: Event
   eventBech32Id: string
   isFetching: boolean
   isConsecutive?: boolean
+  noConnector?: boolean
 }) {
   const { push } = useSecondaryPage()
+  const { autoLoadProfilePicture } = useContentPolicy()
+  const showLine = !noConnector && autoLoadProfilePicture
+  const showSpacer = !noConnector && !autoLoadProfilePicture
 
   if (isFetching) {
     return (
@@ -156,7 +268,11 @@ function ParentNote({
             <Skeleton className="h-3" />
           </div>
         </div>
-        <div className="bg-border ms-5 h-3 w-px" />
+        {showLine ? (
+          <div className="bg-border ms-4.75 h-3 w-0.5" />
+        ) : showSpacer ? (
+          <div className="h-1.5" />
+        ) : null}
       </div>
     )
   }
@@ -175,11 +291,13 @@ function ParentNote({
         {event && <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />}
         <ContentPreview className="truncate" event={event} />
       </div>
-      {isConsecutive ? (
-        <div className="bg-border ms-5 h-3 w-px" />
-      ) : (
+      {!isConsecutive ? (
         <Ellipsis className="text-muted-foreground/60 ms-3.5 size-3" />
-      )}
+      ) : showLine ? (
+        <div className="bg-border ms-4.75 h-3 w-0.5" />
+      ) : showSpacer ? (
+        <div className="h-1.5" />
+      ) : null}
     </div>
   )
 }
@@ -191,4 +309,121 @@ function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
   if (!tag) return false
 
   return getEventKey(rootEvent) === getKeyFromTag(tag.tag)
+}
+
+function ChainItem({ eventId, isFirst }: { eventId: string; isFirst: boolean }) {
+  const { push } = useSecondaryPage()
+  const { isSmallScreen } = useScreenSize()
+  const { autoLoadProfilePicture } = useContentPolicy()
+  const { event, isFetching } = useFetchEvent(eventId)
+
+  if (isFetching) {
+    return <ChainItemSkeleton isFirst={isFirst} />
+  }
+  if (!event) {
+    return null
+  }
+
+  return (
+    <ClickableCard
+      className={cn(
+        'clickable hover:bg-accent/30 relative px-4 py-3 transition-colors duration-200',
+        !autoLoadProfilePicture && 'border-b'
+      )}
+      onClick={() => push(toNote(event))}
+    >
+      {autoLoadProfilePicture && !isFirst && (
+        <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />
+      )}
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
+      )}
+      <div className="flex items-start gap-2">
+        <UserAvatar userId={event.pubkey} size="normal" className="shrink-0" />
+        <div className="w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <Username
+                  userId={event.pubkey}
+                  className="flex truncate font-semibold"
+                  skeletonClassName="h-4"
+                />
+                <FollowingBadge pubkey={event.pubkey} />
+                <TrustScoreBadge pubkey={event.pubkey} />
+                <ProtectedBadge event={event} />
+                <ClientTag event={event} />
+              </div>
+              <div className="text-muted-foreground flex items-center gap-1 text-sm">
+                <Nip05 pubkey={event.pubkey} append="·" />
+                <FormattedTimestamp
+                  timestamp={event.created_at}
+                  className="shrink-0"
+                  short={isSmallScreen}
+                />
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center">
+              <TranslateButton event={event} className="py-0" />
+              <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
+            </div>
+          </div>
+          <Content className="mt-2" event={event} />
+          <StuffStats className="mt-2" stuff={event} />
+        </div>
+      </div>
+    </ClickableCard>
+  )
+}
+
+function ChainItemSkeleton({ isFirst }: { isFirst: boolean }) {
+  const { autoLoadProfilePicture } = useContentPolicy()
+
+  return (
+    <div className={cn('relative px-4 py-3', !autoLoadProfilePicture && 'border-b')}>
+      {autoLoadProfilePicture && !isFirst && (
+        <div className="bg-border absolute inset-s-8.75 top-0 z-0 h-2 w-0.5" />
+      )}
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
+      )}
+      <div className="flex items-start gap-2">
+        <UserAvatarSkeleton className="h-10 w-10" />
+        <div className="w-0 flex-1">
+          <div className="py-1">
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <div className="py-0.5">
+            <Skeleton className="h-3 w-16" />
+          </div>
+          <div className="space-y-2 pt-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ExpandThreadButton({ expanded, onToggle }: { expanded: boolean; onToggle: () => void }) {
+  const { t } = useTranslation()
+  const { autoLoadProfilePicture } = useContentPolicy()
+
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={cn(
+        'clickable text-muted-foreground hover:text-foreground hover:bg-accent/30 relative flex w-full items-center gap-2 py-1.5 pe-4 text-sm transition-colors',
+        autoLoadProfilePicture ? 'ps-16' : 'border-b ps-4'
+      )}
+    >
+      {autoLoadProfilePicture && (
+        <div className="bg-border absolute inset-s-8.75 top-0 bottom-0 z-0 w-0.5" />
+      )}
+      {expanded ? <FoldVertical className="size-4" /> : <UnfoldVertical className="size-4" />}
+      {expanded ? t('Hide thread context') : t('Show thread context')}
+    </button>
+  )
 }

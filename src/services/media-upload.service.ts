@@ -1,3 +1,5 @@
+import { RECOMMENDED_BLOSSOM_SERVERS } from '@/constants'
+import { createBlossomServerListDraftEvent } from '@/lib/draft-event'
 import { stripImageMetadata } from '@/lib/strip-image-metadata'
 import { simplifyUrl } from '@/lib/url'
 import { TDraftEvent, TMediaUploadServiceConfig } from '@/types'
@@ -19,6 +21,7 @@ class MediaUploadService {
   private serviceConfig: TMediaUploadServiceConfig = storage.getMediaUploadServiceConfig()
   private nip96ServiceUploadUrlMap = new Map<string, string | undefined>()
   private imetaTagMap = new Map<string, string[]>()
+  private creatingBlossomServerList = false
 
   constructor() {
     if (!MediaUploadService.instance) {
@@ -88,9 +91,13 @@ class MediaUploadService {
     }
     startPseudoProgress()
 
-    const servers = await client.fetchBlossomServerList(pubkey)
+    let servers = await client.fetchBlossomServerList(pubkey)
     if (servers.length === 0) {
-      throw new Error('No Blossom services available')
+      // The user has no Blossom server list yet. Use the default servers for this
+      // upload right away, and asynchronously create a server list for the user in
+      // the background so it's persisted for next time.
+      servers = RECOMMENDED_BLOSSOM_SERVERS
+      this.ensureBlossomServerList(pubkey)
     }
     const [mainServer, ...mirrorServers] = servers
 
@@ -215,6 +222,33 @@ class MediaUploadService {
   registerImetaTag(url: string, tag: string[]) {
     if (!url || tag.length === 0 || tag[0] !== 'imeta') return
     this.imetaTagMap.set(url, tag)
+  }
+
+  /**
+   * Create a Blossom server list (kind 10063) for a user who doesn't have one yet,
+   * using the default recommended servers. Runs in the background (fire-and-forget)
+   * and never throws to the caller.
+   */
+  private async ensureBlossomServerList(pubkey: string) {
+    if (this.creatingBlossomServerList) return
+    this.creatingBlossomServerList = true
+    try {
+      // Re-check in case it was created in the meantime.
+      const existing = await client.fetchBlossomServerList(pubkey)
+      if (existing.length > 0) return
+      if (!client.signer) return
+
+      const event = await client.signer.signEvent(
+        createBlossomServerListDraftEvent(RECOMMENDED_BLOSSOM_SERVERS)
+      )
+      const relays = await client.determineTargetRelays(event)
+      await client.publishEvent(relays, event)
+      await client.updateBlossomServerListEventCache(event)
+    } catch (err) {
+      console.error('Failed to create default Blossom server list', err)
+    } finally {
+      this.creatingBlossomServerList = false
+    }
   }
 }
 

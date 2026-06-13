@@ -900,11 +900,11 @@ export default {
     Shuffle: 'Keverés',
     'Login with Google': 'Bejelentkezés Google-lel',
     'Continue with Google': 'Folytatás Google-lel',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Jelentkezz be Google-lel, és automatikusan létrejön egy Nostr kulcsod.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Jelentkezz be Google-lel a fiókod eléréséhez. Ha még nincs fiókod, automatikusan létrejön egy Nostr fiók a számodra.',
     'How it works': 'Hogyan működik',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'A privát kulcsod külön operátoroknál tárolt töredékekre van osztva, így soha nem tárolják egy helyen. A Jumble egy biztonságos távoli aláírón keresztül ír alá. A kulcsodat bármikor exportálhatod a fiókbeállításokból.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'A privát kulcsod külön, független operátoroknál tárolt töredékekre van osztva, így soha nem tárolják egy helyen. A Google-t csak arra használjuk, hogy igazolja a személyazonosságodat az operátorok felé, a kulcsod tárolására soha.',
     'Waiting for Google sign-in...': 'Várakozás a Google bejelentkezésre...',
     'Checking your account...': 'Fiók ellenőrzése...',
     'Setting up your secure account...': 'Biztonságos fiók beállítása...',
@@ -933,7 +933,7 @@ export default {
     'What happens next': 'Mi történik ezután',
     'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
       'Ez a fiók már nincs kapcsolva a központi szerverhez. A használat folytatásához jelentkezz be újra a privát kulcsoddal (nsec).',
-    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Privát kulcs exportálása" option.':
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
       'A leválasztás csak a fiókod és a központi szerver közötti kapcsolatot szünteti meg. A fiókod továbbra is létezik, és folytathatod a használatát a privát kulcsoddal (nsec) való bejelentkezéssel. A folytatás előtt exportáld és mentsd biztonságos helyre az nsec-edet a "Privát kulcs exportálása" lehetőséggel.',
     Done: 'Kész',
     Recover: 'Visszaállítás',
@@ -982,8 +982,126 @@ export default {
     'Scan with your signer app': 'Olvasd be az aláíró alkalmazásoddal',
     'Open with Nostr signer app': 'Megnyitás Nostr aláíró alkalmazással',
     'Scan QR code': 'QR-kód beolvasása',
-    'Add operator URL': 'Operátor URL hozzáadása',
+    Options: 'Lehetőségek',
+    Remove: 'Eltávolítás',
+    'End date': 'Befejezés dátuma',
     'Advanced options': 'Speciális beállítások',
+    'Polls may not display on clients that don’t support them.':
+      'A szavazások előfordulhat, hogy nem jelennek meg azokon a klienseken, amelyek nem támogatják őket.',
+    'Show thread context': 'Beszélgetés kontextusának megjelenítése',
+    'Hide thread context': 'Beszélgetés kontextusának elrejtése',
+    Enable: 'Engedélyezés',
+    Upload: 'Feltöltés',
+    Drafts: 'Piszkozatok',
+    Failed: 'Sikertelen',
+    'Save as draft?': 'Mentés piszkozatként?',
+    'Your changes will be saved to the drafts box.':
+      'A módosításaid a piszkozatok közé lesznek mentve.',
+    Discard: 'Elvetés',
+    'Keep editing': 'Szerkesztés folytatása',
+    'Open drafts': 'Piszkozatok megnyitása',
+    'No drafts yet': 'Még nincsenek piszkozatok',
+    Empty: 'Üres',
+    'Add emoji': 'Emoji hozzáadása',
+    'Edit emoji': 'Emoji szerkesztése',
+    Title: 'Cím',
+    'Image URL': 'Kép URL',
+    shortcode: 'rövid kód',
+    Emojis: 'Emojik',
+    'Create emoji set': 'Emoji-készlet létrehozása',
+    'Edit emoji set': 'Emoji-készlet szerkesztése',
+    'My emoji set': 'Saját emoji-készlet',
+    'Emoji set not found': 'Az emoji-készlet nem található',
+    'You can only edit your own emoji sets': 'Csak a saját emoji-készleteidet szerkesztheted',
+    'No custom emojis yet': 'Még nincsenek egyéni emojik',
+    'Title is required': 'A cím megadása kötelező',
+    'At least one emoji is required': 'Legalább egy emoji szükséges',
+    'Duplicate shortcode: {{shortcode}}': 'Ismétlődő rövid kód: {{shortcode}}',
+    'Shortcode is required': 'A rövid kód megadása kötelező',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'A rövid kód csak betűket, számokat, kötőjeleket és aláhúzásokat tartalmazhat',
+    'Image URL is required': 'A kép URL megadása kötelező',
+    'Invalid image URL': 'Érvénytelen kép-URL',
+    'Post as': 'Közzététel mint',
+    'Failed to get the signer for the selected account':
+      'Nem sikerült lekérni a kiválasztott fiók aláíróját',
+    'Blossom cache server': 'Blossom gyorsítótár-kiszolgáló',
+    'Blossom cache server description':
+      'Média betöltése Blossom gyorsítótár-kiszolgálón keresztül. Csak akkor engedélyezd, ha a kiszolgáló elérhetősége ellenőrizve lett.',
+    'Server URL': 'Kiszolgáló URL-címe',
+    'Cannot reach the Blossom cache server': 'A Blossom gyorsítótár-kiszolgáló nem érhető el',
+    'Link Google account': 'Google-fiók összekapcsolása',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Kapcsolj össze egy Google-fiókot, hogy ezzel be tudj jelentkezni ebbe a fiókba. A privát kulcsodat soha nem osztjuk meg a Google-lel.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Kapcsolj össze egy Google-fiókot, hogy ezzel be tudj jelentkezni ebbe a fiókba.',
+    'Linking your account...': 'Fiók összekapcsolása...',
+    'Switching to remote signer...': 'Átváltás távoli aláíróra...',
+    'Google account already linked': 'A Google-fiók már össze van kapcsolva',
+    'This Google account is already linked to another account':
+      'Ez a Google-fiók már egy másik fiókhoz van kapcsolva',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'Jelenleg ehhez van kapcsolva: {{email}}. Ha ehelyett ehhez a fiókhoz szeretnéd kapcsolni, a korábbi kapcsolat megszűnik. A korábbi fiók továbbra is létezik, és használható marad a privát kulcsával.',
+    'Unlink the previous account and link this one':
+      'A korábbi fiók leválasztása és ennek összekapcsolása',
+    'Switch to remote signer login?': 'Átváltasz a távoli aláíróval való bejelentkezésre?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'A fiókod mostantól össze van kapcsolva. Átválthatsz a távoli aláírón keresztüli aláírásra, vagy folytathatod a helyi aláírást a privát kulcsoddal.',
+    'Switch to remote signer': 'Átváltás távoli aláíróra',
+    'Keep signing locally': 'Helyi aláírás megtartása',
+    'Google account linked': 'Google-fiók összekapcsolva',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'Ez a fiók mostantól egy biztonságos távoli aláírón keresztül ír alá, és bármikor bejelentkezhetsz Google-lel. A privát kulcsodat soha nem osztjuk meg a Google-lel.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'Mostantól bejelentkezhetsz ebbe a fiókba Google-lel. Továbbra is helyben írsz alá a privát kulcsoddal, amelyet soha nem osztunk meg a Google-lel.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Nem sikerült elérni a távoli aláírót. Kérlek, próbáld újra később, vagy ellenőrizd a hálózati kapcsolatodat.',
+    'Retrying ({{current}}/{{max}})': 'Újrapróbálkozás ({{current}}/{{max}})',
+    selfZapWarning:
+      'A Jumble nem felelős azért, ami akkor történik, ha saját magadat zappolod. A saját felelősségedre folytasd. 😉⚡',
+    'Automatic updates': 'Automatikus frissítések',
+    'Check for and download updates in the background':
+      'Frissítések keresése és letöltése a háttérben',
+    'Check for updates': 'Frissítések keresése',
+    'Checking for updates…': 'Frissítések keresése…',
+    'Update available: v{{version}}': 'Elérhető frissítés: v{{version}}',
+    'You are on the latest version ({{version}})': 'A legújabb verziót használod ({{version}})',
+    'Failed to check for updates': 'Nem sikerült ellenőrizni a frissítéseket',
+    Check: 'Ellenőrzés',
+    NEW: 'ÚJ',
+    'Updates are not available in development mode':
+      'A frissítések nem érhetők el fejlesztői módban',
+    'Search emojis': 'Emojik keresése',
+    'Recently used': 'Nemrég használt',
+    'Smileys & Emotion': 'Mosolyok és érzelmek',
+    'People & Body': 'Emberek és test',
+    'Animals & Nature': 'Állatok és természet',
+    'Food & Drink': 'Étel és ital',
+    'Travel & Places': 'Utazás és helyek',
+    Activities: 'Tevékenységek',
+    Objects: 'Tárgyak',
+    Symbols: 'Szimbólumok',
+    Flags: 'Zászlók',
+    'My emojis': 'Saját emojik',
+    'No emojis found': 'Nem található emoji',
+    'Encrypted DM unavailable': 'A titkosított DM nem érhető el',
+    'No DM relays': 'Nincsenek DM relék',
+    'n users_one': '{{count}} felhasználó',
+    'n users_other': '{{count}} felhasználó',
+    'Add this emoji': 'Emoji hozzáadása',
+    'Added to my emojis': 'Hozzáadva az emojikhoz',
+    'Add whole set': 'Teljes készlet hozzáadása',
+    'Emoji set': 'Emoji-készlet',
+    'Waiting for signer approval...': 'Várakozás az aláíró jóváhagyására...',
+    'Signer did not respond in time': 'Az aláíró nem válaszolt időben',
+    'Media servers': 'Médiakiszolgálók',
+    'Blossom servers': 'Blossom szerverek',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'A médiafájlok az előnyben részesített kiszolgálóra töltődnek fel, és a többire tükröződnek.',
+    'Add Blossom server': 'Blossom szerver hozzáadása',
+    'You need to add at least one media server in order to upload media files.':
+      'Legalább egy médiakiszolgálót hozzá kell adnod a médiafájlok feltöltéséhez.',
+    'Add operator URL': 'Operátor URL hozzáadása',
     'All set': 'Minden kész',
     'Connect Google account': 'Google-fiók csatlakoztatása',
     'Connected to Google': 'Csatlakoztatva a Google-höz',
@@ -995,17 +1113,13 @@ export default {
       'Kösd össze ezt a fiókot a Google-lel, hogy bejelentkezhess és visszaállíthasd a Google-lel más eszközökön is.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'Kösd össze ezt a fiókot a Google-lel, hogy bejelentkezhess és visszaállíthasd a Google-lel.',
-    'Linking your account...': 'Fiók összekötése...',
     'New account': 'Új fiók',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'Ehhez a Google-bejelentkezéshez még nem létezik fiók. Létrehoztunk neked egy új Nostr kulcsot.',
     Operators: 'Operátorok',
-    Remove: 'Eltávolítás',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Jelentkezz be Google-lel a belépéshez, vagy hogy automatikusan létrehozz egy új Nostr kulcsot, ha még nincs ilyened.',
     'Signing threshold': 'Aláírási küszöb',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'A koordinátor, amely ellenőrzi a Google-bejelentkezésedet és továbbítja az aláírási kéréseket az operátoroknak.',
     'This account is linked to Google.': 'Ez a fiók a Google-höz van kötve.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'Ez a kulcs a tiéd. Bár vissza tudod állítani a Google-lel, mentsd el most egy biztonsági másolatot, hogy soha ne veszítsd el a hozzáférést a fiókodhoz.',
@@ -1015,9 +1129,10 @@ export default {
       'A fiókod mostantól a Google-höz van kötve. Bejelentkezhetsz vagy visszaállíthatod a kulcsodat a Google-lel más eszközökön.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'A privát kulcsod külön operátoroknál tárolt töredékekre van osztva, így soha nem tárolják egy helyen. Ezen az eszközön továbbra is a saját privát kulcsoddal írsz alá.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'A koordinátor, amely ellenőrzi a Google-bejelentkezésedet és továbbítja az aláírási kéréseket az operátoroknak.',
     'of {{total}} operators are enough to sign': '/ {{total}} operátor elég az aláíráshoz',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Független szerverek, amelyek mindegyike a privát kulcsod egy töredékét tárolja, így egyetlen operátor sem tud egyedül aláírni.',
-    'This service is provided by {{host}}': 'Ezt a szolgáltatást a(z) {{host}} biztosítja'
+      'Független szerverek, amelyek mindegyike a privát kulcsod egy töredékét tárolja, így egyetlen operátor sem tud egyedül aláírni.'
   }
 }

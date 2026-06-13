@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo } from 'react'
+import { isElectron } from '@/lib/platform'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 type TScreenSizeContext = {
   isSmallScreen: boolean
@@ -16,8 +17,18 @@ export const useScreenSize = () => {
 }
 
 export function ScreenSizeProvider({ children }: { children: React.ReactNode }) {
-  const isSmallScreen = useMemo(() => window.innerWidth <= 768, [])
-  const isLargeScreen = useMemo(() => window.innerWidth >= 1280, [])
+  const [isSmallScreen, setIsSmallScreen] = useState(() => window.innerWidth <= 768)
+  const [isLargeScreen, setIsLargeScreen] = useState(() => window.innerWidth >= 1280)
+
+  useEffect(() => {
+    if (!isElectron()) return
+    const onResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768)
+      setIsLargeScreen(window.innerWidth >= 1280)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   return (
     <ScreenSizeContext.Provider

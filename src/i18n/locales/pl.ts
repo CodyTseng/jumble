@@ -180,7 +180,7 @@ export default {
     'Cannot handle event of kind k': 'Nie można obsłużyć zdarzenia typu {{k}}',
     'Encrypted direct messages not supported':
       'Szyfrowane wiadomości bezpośrednie nie są obsługiwane',
-    'Sorry! The note cannot be found 😔 ': 'Przepraszam! Nie można znaleźć wpisu 😔',
+    'Sorry! The note cannot be found 😔': 'Przepraszam! Nie można znaleźć wpisu 😔',
     'This user has been muted': 'Ten użytkownik został przyblokowany',
     Wallet: 'Portfel',
     Sats: 'Satoszy',
@@ -906,11 +906,11 @@ export default {
     Download: 'Pobierz',
     'Login with Google': 'Zaloguj się przez Google',
     'Continue with Google': 'Kontynuuj przez Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Zaloguj się przez Google, a klucz Nostr zostanie utworzony automatycznie.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Zaloguj się przez Google, aby uzyskać dostęp do swojego konta. Jeśli jeszcze go nie masz, konto Nostr zostanie utworzone automatycznie.',
     'How it works': 'Jak to działa',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'Twój klucz prywatny jest podzielony na fragmenty przechowywane przez oddzielnych operatorów, więc nigdy nie jest przechowywany w jednym miejscu. Jumble podpisuje przez bezpiecznego zdalnego podpisującego. Możesz wyeksportować klucz w dowolnym momencie z ustawień konta.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'Twój klucz prywatny jest podzielony na fragmenty przechowywane przez oddzielnych, niezależnych operatorów, więc nigdy nie jest przechowywany w jednym miejscu. Google służy wyłącznie do potwierdzenia Twojej tożsamości wobec operatorów, nigdy do przechowywania klucza.',
     'Waiting for Google sign-in...': 'Oczekiwanie na logowanie Google...',
     'Checking your account...': 'Sprawdzanie konta...',
     'Setting up your secure account...': 'Konfigurowanie bezpiecznego konta...',
@@ -980,18 +980,135 @@ export default {
       'Ta wiadomość może faktycznie nie pochodzić od wyświetlanego nadawcy. Może to być próba podszycia się.',
     'dm verification dialog footer':
       'Możesz nadal odczytać tę wiadomość, ale tożsamości nadawcy nie można potwierdzić.',
-    'Remote signer': 'Zdalny podpisujący',
+    'Remote signer': 'Zdalne logowanie',
     'Public Key': 'Klucz publiczny',
     'Account actions': 'Akcje konta',
     'Remove account': 'Usuń konto',
     Current: 'Bieżące',
     or: 'lub',
-    'Connect a remote signer': 'Połącz zdalnego podpisującego',
-    'Scan with your signer app': 'Zeskanuj aplikacją do podpisywania',
-    'Open with Nostr signer app': 'Otwórz w aplikacji podpisującej Nostr',
-    'Scan QR code': 'Skanuj kod QR',
-    'Add operator URL': 'Dodaj URL operatora',
+    'Connect a remote signer': 'Podłącz urządzenie logujące',
+    'Scan with your signer app': 'Zeskanuj aplikacją do logowania',
+    'Open with Nostr signer app': 'Otwórz w aplikacji logującej Nostr',
+    'Scan QR code': 'Zeskanuj QR kod',
+    Options: 'Opcje',
+    Remove: 'Usuń',
+    'End date': 'Data zakończenia',
     'Advanced options': 'Opcje zaawansowane',
+    'Polls may not display on clients that don’t support them.':
+      'Ankiety mogą nie być wyświetlane w klientach, które ich nie obsługują.',
+    'Show thread context': 'Pokaż kontekst wątku',
+    'Hide thread context': 'Ukryj kontekst wątku',
+    Enable: 'Włącz',
+    Upload: 'Prześlij',
+    Drafts: 'Wersje robocze',
+    Failed: 'Niepowodzenie',
+    'Save as draft?': 'Zapisać jako wersję roboczą?',
+    'Your changes will be saved to the drafts box.':
+      'Twoje zmiany zostaną zapisane w wersjach roboczych.',
+    Discard: 'Odrzuć',
+    'Keep editing': 'Kontynuuj edycję',
+    'Open drafts': 'Otwórz wersje robocze',
+    'No drafts yet': 'Brak wersji roboczych',
+    Empty: 'Pusty',
+    'Add emoji': 'Dodaj emoji',
+    'Edit emoji': 'Edytuj emoji',
+    Title: 'Tytuł',
+    'Image URL': 'URL obrazu',
+    shortcode: 'krótki kod',
+    Emojis: 'Emoji',
+    'Create emoji set': 'Utwórz zestaw emoji',
+    'Edit emoji set': 'Edytuj zestaw emoji',
+    'My emoji set': 'Mój zestaw emoji',
+    'Emoji set not found': 'Nie znaleziono zestawu emoji',
+    'You can only edit your own emoji sets': 'Możesz edytować tylko własne zestawy emoji',
+    'No custom emojis yet': 'Brak własnych emoji',
+    'Title is required': 'Tytuł jest wymagany',
+    'At least one emoji is required': 'Wymagane jest co najmniej jedno emoji',
+    'Duplicate shortcode: {{shortcode}}': 'Zduplikowany krótki kod: {{shortcode}}',
+    'Shortcode is required': 'Krótki kod jest wymagany',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'Krótki kod może zawierać tylko litery, cyfry, myślniki i podkreślenia',
+    'Image URL is required': 'URL obrazu jest wymagany',
+    'Invalid image URL': 'Nieprawidłowy URL obrazu',
+    'Post as': 'Opublikuj jako',
+    'Failed to get the signer for the selected account':
+      'Nie udało się znaleźć urządzenia logujące dla wybranego konta',
+    'Blossom cache server': 'Serwer pamięci podręcznej Blossom',
+    'Blossom cache server description':
+      'Ładuj multimedia przez serwer pamięci podręcznej Blossom. Włącz go dopiero po sprawdzeniu, że serwer jest osiągalny.',
+    'Server URL': 'Adres URL serwera',
+    'Cannot reach the Blossom cache server':
+      'Nie można połączyć się z serwerem pamięci podręcznej Blossom',
+    'Link Google account': 'Podłącz konto Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Podłącz konto Google, aby móc logować się do tego konta przez Google. Twój klucz prywatny nigdy nie jest udostępniany Google.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Podłącz konto Google, aby móc logować się do tego konta przez Google.',
+    'Linking your account...': 'Podłączanie Twojego konta...',
+    'Switching to remote signer...': 'Przełączanie na zdalne logowanie...',
+    'Google account already linked': 'Konto Google jest już połączone',
+    'This Google account is already linked to another account':
+      'To konto Google jest już połączone z innym kontem',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'Jest obecnie połączone z {{email}}. Aby połączyć je z tym kontem, poprzednie połączenie zostanie usunięte. Poprzednie konto nadal istnieje i można z niego korzystać z pomocą swojego klucza prywatnego.',
+    'Unlink the previous account and link this one': 'Odłącz poprzednie konto i połącz to',
+    'Switch to remote signer login?': 'Przełączyć na zdalne logowanie?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'Twoje konto jest teraz połączone. Możesz przełączyć się na zdalne logowanie lub nadal logować się lokalnie swoim kluczem prywatnym.',
+    'Switch to remote signer': 'Przełącz na zdalne logowanie',
+    'Keep signing locally': 'Nadal loguj się lokalnie',
+    'Google account linked': 'Konto Google podłączone',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'To konto korzysta teraz z bezpiecznego zdalnego logowania i możesz zalogować się za pomocą konta Google w dowolnym momencie. Twój klucz prywatny nie jest nigdy udostępniany firmie Google.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'Możesz teraz logować się do tego konta przez Google. Nadal logujesz się lokalnie swoim kluczem prywatnym, którego nigdy nie jest udostępniany Google.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Nie można połączyć się z urządzeniem zdalnego logowania. Spróbuj ponownie później lub sprawdź połączenie sieciowe.',
+    'Retrying ({{current}}/{{max}})': 'Ponawianie ({{current}}/{{max}})',
+    'Automatic updates': 'Automatyczne aktualizacje',
+    'Check for and download updates in the background': 'Sprawdzaj i pobieraj aktualizacje w tle',
+    'Check for updates': 'Sprawdź aktualizacje',
+    'Checking for updates…': 'Sprawdzanie aktualizacji…',
+    'Update available: v{{version}}': 'Dostępna aktualizacja: v{{version}}',
+    'You are on the latest version ({{version}})': 'Masz najnowszą wersję ({{version}})',
+    'Failed to check for updates': 'Nie udało się sprawdzić aktualizacji',
+    Check: 'Sprawdź',
+    NEW: 'NOWE',
+    'Updates are not available in development mode':
+      'Aktualizacje nie są dostępne w trybie deweloperskim',
+    'Search emojis': 'Szukaj emoji',
+    'Recently used': 'Ostatnio używane',
+    'Smileys & Emotion': 'Buźki i emocje',
+    'People & Body': 'Ludzie i ciało',
+    'Animals & Nature': 'Zwierzęta i natura',
+    'Food & Drink': 'Jedzenie i napoje',
+    'Travel & Places': 'Podróże i miejsca',
+    Activities: 'Aktywności',
+    Objects: 'Obiekty',
+    Symbols: 'Symbole',
+    Flags: 'Flagi',
+    'My emojis': 'Moje emoji',
+    'No emojis found': 'Nie znaleziono emoji',
+    'Encrypted DM unavailable': 'Szyfrowane wiadomości niedostępne',
+    'No DM relays': 'Brak transmiterów WP',
+    'n users_one': '{{count}} użytkownik',
+    'n users_few': '{{count}} użytkowników',
+    'n users_many': '{{count}} użytkowników',
+    'n users_other': '{{count}} użytkownika',
+    'Add this emoji': 'Dodaj to emoji',
+    'Added to my emojis': 'Dodano do moich emoji',
+    'Add whole set': 'Dodaj cały zestaw',
+    'Emoji set': 'Zestaw emoji',
+    'Waiting for signer approval...': 'Oczekiwanie na zatwierdzenie przez podpisującego...',
+    'Signer did not respond in time': 'Podpisujący nie odpowiedział na czas',
+    'Media servers': 'Serwery multimediów',
+    'Blossom servers': 'Serwery Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'Multimedia są przesyłane na preferowany serwer i kopiowane na pozostałe.',
+    'Add Blossom server': 'Dodaj serwer Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'Aby przesyłać pliki multimedialne, musisz dodać co najmniej jeden serwer multimediów.',
+    'Add operator URL': 'Dodaj URL operatora',
     'All set': 'Gotowe',
     'Connect Google account': 'Połącz konto Google',
     'Connected to Google': 'Połączono z Google',
@@ -1003,17 +1120,13 @@ export default {
       'Powiąż to konto z Google, aby logować się i odzyskiwać je przez Google na innych urządzeniach.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'Powiąż to konto z Google, aby logować się i odzyskiwać je przez Google.',
-    'Linking your account...': 'Wiązanie konta...',
     'New account': 'Nowe konto',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'Dla tego logowania Google nie istnieje jeszcze żadne konto. Utworzono dla Ciebie nowy klucz Nostr.',
     Operators: 'Operatorzy',
-    Remove: 'Usuń',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Zaloguj się przez Google, aby się uwierzytelnić, lub aby automatycznie utworzyć nowy klucz Nostr, jeśli jeszcze go nie masz.',
     'Signing threshold': 'Próg podpisu',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'Koordynator, który weryfikuje Twoje logowanie Google i przekazuje żądania podpisu do operatorów.',
     'This account is linked to Google.': 'To konto jest powiązane z Google.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'Ten klucz należy do Ciebie. Choć możesz go odzyskać przez Google, zapisz teraz kopię zapasową, aby nigdy nie stracić dostępu do konta.',
@@ -1023,9 +1136,10 @@ export default {
       'Twoje konto jest teraz powiązane z Google. Możesz logować się lub odzyskiwać klucz przez Google na innych urządzeniach.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'Twój klucz prywatny jest podzielony na fragmenty przechowywane przez oddzielnych operatorów, więc nigdy nie jest przechowywany w jednym miejscu. Nadal podpisujesz swoim kluczem prywatnym na tym urządzeniu.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Koordynator, który weryfikuje Twoje logowanie Google i przekazuje żądania podpisu do operatorów.',
     'of {{total}} operators are enough to sign': 'z {{total}} operatorów wystarczy do podpisania',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Niezależne serwery, z których każdy przechowuje fragment Twojego klucza prywatnego, więc żaden pojedynczy operator nie może podpisać samodzielnie.',
-    'This service is provided by {{host}}': 'Tę usługę zapewnia {{host}}'
+      'Niezależne serwery, z których każdy przechowuje fragment Twojego klucza prywatnego, więc żaden pojedynczy operator nie może podpisać samodzielnie.'
   }
 }

@@ -73,8 +73,8 @@ class MediaManagerService extends EventTarget {
     })
   }
 
-  playAudioBackground(src: string, time: number = 0) {
-    this.dispatchEvent(new CustomEvent('playAudioBackground', { detail: { src, time } }))
+  playAudioBackground(src: string, time: number = 0, pubkey?: string) {
+    this.dispatchEvent(new CustomEvent('playAudioBackground', { detail: { src, time, pubkey } }))
     store.set(hasBackgroundAudioAtom, true)
   }
 

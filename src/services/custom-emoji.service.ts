@@ -58,13 +58,15 @@ class CustomEmojiService {
         if (!event || event instanceof Error) return
         const { title, emojis: packEmojis } = getEmojiPackInfoFromEvent(event)
         if (packEmojis.length === 0) return
+        const setAddress = getReplaceableCoordinateFromEvent(event)
+        const emojisWithSet = packEmojis.map((emoji) => ({ ...emoji, setAddress }))
         packs.push({
-          id: getReplaceableCoordinateFromEvent(event),
+          id: setAddress,
           title,
           author: event.pubkey,
-          emojis: packEmojis
+          emojis: emojisWithSet
         })
-        await this.addEmojisToIndex(packEmojis)
+        await this.addEmojisToIndex(emojisWithSet)
       })
     )
     // Preserve a-tag order from the user's kind 10030 event
@@ -103,6 +105,12 @@ class CustomEmojiService {
   getEmojiById(id?: string): TEmoji | undefined {
     if (!id) return undefined
     return this.emojiMap.get(id)
+  }
+
+  registerExternalEmoji(emoji: TEmoji) {
+    const id = this.getEmojiId(emoji)
+    if (this.emojiMap.has(id)) return
+    this.emojiMap.set(id, emoji)
   }
 
   getEmojiId(emoji: TEmoji): string {

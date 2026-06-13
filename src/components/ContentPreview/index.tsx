@@ -17,6 +17,7 @@ import NormalContentPreview from './NormalContentPreview'
 import PictureNotePreview from './PictureNotePreview'
 import PollPreview from './PollPreview'
 import ReactionPreview from './ReactionPreview'
+import RepostPreview from './RepostPreview'
 import VideoNotePreview from './VideoNotePreview'
 
 export default function ContentPreview({
@@ -118,6 +119,10 @@ export default function ContentPreview({
 
   if (event.kind === kinds.Reaction || event.kind === ExtendedKind.EXTERNAL_CONTENT_REACTION) {
     return <ReactionPreview event={event} className={className} />
+  }
+
+  if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
+    return <RepostPreview event={event} className={className} />
   }
 
   return (

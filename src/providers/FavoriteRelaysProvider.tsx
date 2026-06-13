@@ -143,6 +143,20 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
     )
   }, [relaySetEvents])
 
+  // Tell the client which relays the user explicitly owns/configured. Their
+  // insecure (ws://) subset becomes the pool's trusted-insecure allowlist, so
+  // the user can still browse their own local relays while insecure relays from
+  // other people's data stay blocked.
+  useEffect(() => {
+    client.setOwnRelayUrls([
+      ...getDefaultRelayUrls(),
+      ...(relayList?.read ?? []),
+      ...(relayList?.write ?? []),
+      ...favoriteRelays,
+      ...relaySets.flatMap((set) => set.relayUrls)
+    ])
+  }, [relayList, favoriteRelays, relaySets])
+
   const addFavoriteRelays = async (relayUrls: string[]) => {
     const normalizedUrls = relayUrls
       .map((relayUrl) => normalizeUrl(relayUrl))

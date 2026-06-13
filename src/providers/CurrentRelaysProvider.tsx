@@ -22,7 +22,7 @@ export function CurrentRelaysProvider({ children }: { children: React.ReactNode 
   const relayUrls = useMemo(() => Object.keys(relayRefCount), [relayRefCount])
 
   useEffect(() => {
-    client.currentRelays = relayUrls
+    client.setCurrentRelays(relayUrls)
   }, [relayUrls])
 
   const addRelayUrls = useCallback((urls: string[]) => {

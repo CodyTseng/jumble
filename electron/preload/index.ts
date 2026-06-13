@@ -24,6 +24,8 @@ const bridge: TElectronBridge = {
     auth: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.auth, url),
     close: (urls?: string[]) => ipcRenderer.invoke(IPC_CHANNELS.close, urls),
     setAllowInsecure: (allow: boolean) => ipcRenderer.invoke(IPC_CHANNELS.setAllowInsecure, allow),
+    setTrustedInsecureRelayUrls: (urls: string[]) =>
+      ipcRenderer.invoke(IPC_CHANNELS.setTrustedInsecureUrls, urls),
     onSubEvent: (cb) => {
       const listener = (_e: unknown, payload: TSubEventPayload) => cb(payload)
       ipcRenderer.on(IPC_CHANNELS.subEvent, listener)

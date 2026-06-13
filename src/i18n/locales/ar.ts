@@ -884,11 +884,11 @@ export default {
     Shuffle: 'تبديل',
     'Login with Google': 'تسجيل الدخول باستخدام Google',
     'Continue with Google': 'المتابعة باستخدام Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'سجّل الدخول باستخدام Google وسيتم إنشاء مفتاح Nostr لك تلقائيًا.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'سجّل الدخول باستخدام Google للوصول إلى حسابك. وإذا لم يكن لديك حساب بعد، فسيتم إنشاء حساب Nostr لك تلقائيًا.',
     'How it works': 'كيف يعمل',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'يتم تقسيم مفتاحك الخاص إلى أجزاء يحتفظ بها مشغّلون منفصلون، لذا لا يُخزَّن في مكان واحد أبدًا. يوقّع Jumble عبر موقّع بعيد آمن. يمكنك تصدير مفتاحك في أي وقت من إعدادات الحساب.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'يتم تقسيم مفتاحك الخاص إلى أجزاء يحتفظ بها مشغّلون منفصلون ومستقلون، لذا لا يُخزَّن في مكان واحد أبدًا. يُستخدم Google فقط لإثبات هويتك لدى المشغّلين، وليس لتخزين مفتاحك أبدًا.',
     'Waiting for Google sign-in...': 'في انتظار تسجيل الدخول عبر Google...',
     'Checking your account...': 'جارٍ التحقق من حسابك...',
     'Setting up your secure account...': 'جارٍ إعداد حسابك الآمن...',
@@ -966,8 +966,124 @@ export default {
     'Scan with your signer app': 'امسح برمز التطبيق الموقّع',
     'Open with Nostr signer app': 'افتح باستخدام تطبيق توقيع Nostr',
     'Scan QR code': 'مسح رمز QR',
-    'Add operator URL': 'إضافة رابط مشغّل',
+    Options: 'الخيارات',
+    Remove: 'إزالة',
+    'End date': 'تاريخ الانتهاء',
     'Advanced options': 'خيارات متقدمة',
+    'Polls may not display on clients that don’t support them.':
+      'قد لا تظهر الاستطلاعات على العملاء الذين لا يدعمونها.',
+    'Show thread context': 'إظهار سياق المحادثة',
+    'Hide thread context': 'إخفاء سياق المحادثة',
+    Enable: 'تفعيل',
+    Upload: 'رفع',
+    Drafts: 'المسودات',
+    Failed: 'فشل',
+    'Save as draft?': 'حفظ كمسودة؟',
+    'Your changes will be saved to the drafts box.': 'سيتم حفظ تغييراتك في صندوق المسودات.',
+    Discard: 'تجاهل',
+    'Keep editing': 'متابعة التحرير',
+    'Open drafts': 'فتح المسودات',
+    'No drafts yet': 'لا توجد مسودات بعد',
+    Empty: 'فارغ',
+    'Add emoji': 'إضافة رمز تعبيري',
+    'Edit emoji': 'تعديل الرمز التعبيري',
+    Title: 'العنوان',
+    'Image URL': 'رابط الصورة',
+    shortcode: 'الرمز القصير',
+    Emojis: 'الرموز التعبيرية',
+    'Create emoji set': 'إنشاء مجموعة رموز تعبيرية',
+    'Edit emoji set': 'تعديل مجموعة الرموز التعبيرية',
+    'My emoji set': 'مجموعتي من الرموز التعبيرية',
+    'Emoji set not found': 'لم يتم العثور على مجموعة الرموز التعبيرية',
+    'You can only edit your own emoji sets': 'يمكنك تعديل مجموعات الرموز التعبيرية الخاصة بك فقط',
+    'No custom emojis yet': 'لا توجد رموز تعبيرية مخصصة بعد',
+    'Title is required': 'العنوان مطلوب',
+    'At least one emoji is required': 'مطلوب رمز تعبيري واحد على الأقل',
+    'Duplicate shortcode: {{shortcode}}': 'رمز قصير مكرر: {{shortcode}}',
+    'Shortcode is required': 'الرمز القصير مطلوب',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'يمكن أن يحتوي الرمز القصير على أحرف وأرقام وشرطات وشرطات سفلية فقط',
+    'Image URL is required': 'رابط الصورة مطلوب',
+    'Invalid image URL': 'رابط الصورة غير صالح',
+    'Post as': 'النشر باسم',
+    'Failed to get the signer for the selected account':
+      'تعذّر الحصول على أداة التوقيع للحساب المحدد',
+    'Blossom cache server': 'خادم التخزين المؤقت Blossom',
+    'Blossom cache server description':
+      'تحميل الوسائط عبر خادم تخزين مؤقت Blossom. لا تُفعّله إلا بعد التحقق من إمكانية الوصول إلى الخادم.',
+    'Server URL': 'عنوان الخادم',
+    'Cannot reach the Blossom cache server': 'تعذّر الوصول إلى خادم التخزين المؤقت Blossom',
+    'Link Google account': 'ربط حساب Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'اربط حساب Google حتى تتمكن من تسجيل الدخول إلى هذا الحساب باستخدام Google. لا تتم مشاركة مفتاحك الخاص مع Google أبدًا.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'اربط حساب Google حتى تتمكن من تسجيل الدخول إلى هذا الحساب باستخدام Google.',
+    'Linking your account...': 'جارٍ ربط حسابك...',
+    'Switching to remote signer...': 'جارٍ التبديل إلى الموقّع البعيد...',
+    'Google account already linked': 'حساب Google مرتبط بالفعل',
+    'This Google account is already linked to another account':
+      'حساب Google هذا مرتبط بالفعل بحساب آخر',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'إنه مرتبط حاليًا بـ {{email}}. لربطه بهذا الحساب بدلاً من ذلك، ستتم إزالة الرابط السابق. لا يزال الحساب السابق موجودًا ويمكن استخدامه بمفتاحه الخاص.',
+    'Unlink the previous account and link this one': 'إلغاء ربط الحساب السابق وربط هذا الحساب',
+    'Switch to remote signer login?': 'التبديل إلى تسجيل الدخول عبر الموقّع البعيد؟',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'تم ربط حسابك الآن. يمكنك التبديل إلى التوقيع عبر الموقّع البعيد، أو الاستمرار في التوقيع محليًا بمفتاحك الخاص.',
+    'Switch to remote signer': 'التبديل إلى الموقّع البعيد',
+    'Keep signing locally': 'الاستمرار في التوقيع محليًا',
+    'Google account linked': 'تم ربط حساب Google',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'يوقّع هذا الحساب الآن عبر موقّع بعيد آمن، ويمكنك تسجيل الدخول باستخدام Google في أي وقت. لا تتم مشاركة مفتاحك الخاص مع Google أبدًا.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'يمكنك الآن تسجيل الدخول إلى هذا الحساب باستخدام Google. لا تزال توقّع محليًا بمفتاحك الخاص، الذي لا تتم مشاركته مع Google أبدًا.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'تعذّر الوصول إلى الموقّع البعيد. يُرجى المحاولة لاحقًا أو التحقق من اتصالك بالشبكة.',
+    'Retrying ({{current}}/{{max}})': 'إعادة المحاولة ({{current}}/{{max}})',
+    'Automatic updates': 'التحديثات التلقائية',
+    'Check for and download updates in the background': 'البحث عن التحديثات وتنزيلها في الخلفية',
+    'Check for updates': 'التحقق من وجود تحديثات',
+    'Checking for updates…': 'جارٍ التحقق من وجود تحديثات…',
+    'Update available: v{{version}}': 'يتوفر تحديث: v{{version}}',
+    'You are on the latest version ({{version}})': 'أنت تستخدم أحدث إصدار ({{version}})',
+    'Failed to check for updates': 'فشل التحقق من وجود تحديثات',
+    Check: 'تحقق',
+    NEW: 'جديد',
+    'Updates are not available in development mode': 'التحديثات غير متاحة في وضع التطوير',
+    'Search emojis': 'البحث عن الرموز التعبيرية',
+    'Recently used': 'المستخدمة مؤخرًا',
+    'Smileys & Emotion': 'الوجوه والمشاعر',
+    'People & Body': 'الأشخاص والجسم',
+    'Animals & Nature': 'الحيوانات والطبيعة',
+    'Food & Drink': 'الطعام والشراب',
+    'Travel & Places': 'السفر والأماكن',
+    Activities: 'الأنشطة',
+    Objects: 'الأشياء',
+    Symbols: 'الرموز',
+    Flags: 'الأعلام',
+    'My emojis': 'رموزي التعبيرية',
+    'No emojis found': 'لم يتم العثور على رموز تعبيرية',
+    'Encrypted DM unavailable': 'الرسائل المباشرة المشفّرة غير متاحة',
+    'No DM relays': 'لا توجد مرحّلات للرسائل الخاصة',
+    'n users_zero': 'لا مستخدمين',
+    'n users_one': 'مستخدم واحد',
+    'n users_two': 'مستخدمان',
+    'n users_few': '{{count}} مستخدمين',
+    'n users_many': '{{count}} مستخدمًا',
+    'n users_other': '{{count}} مستخدم',
+    'Add this emoji': 'إضافة هذا الإيموجي',
+    'Added to my emojis': 'تمت الإضافة إلى الإيموجي الخاص بي',
+    'Add whole set': 'إضافة المجموعة كاملة',
+    'Emoji set': 'مجموعة إيموجي',
+    'Waiting for signer approval...': 'بانتظار موافقة الموقّع...',
+    'Signer did not respond in time': 'لم يستجب الموقّع في الوقت المناسب',
+    'Media servers': 'خوادم الوسائط',
+    'Blossom servers': 'خوادم Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'تُرفع الوسائط إلى الخادم المفضّل وتُنسخ إلى الخوادم الأخرى.',
+    'Add Blossom server': 'إضافة خادم Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'تحتاج إلى إضافة خادم وسائط واحد على الأقل لرفع ملفات الوسائط.',
+    'Add operator URL': 'إضافة رابط مشغّل',
     'All set': 'اكتمل كل شيء',
     'Connect Google account': 'ربط حساب Google',
     'Connected to Google': 'متصل بـ Google',
@@ -979,17 +1095,13 @@ export default {
       'اربط هذا الحساب بـ Google لتتمكن من تسجيل الدخول واستعادته عبر Google على الأجهزة الأخرى.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'اربط هذا الحساب بـ Google لتتمكن من تسجيل الدخول واستعادته عبر Google.',
-    'Linking your account...': 'جارٍ ربط حسابك...',
     'New account': 'حساب جديد',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'لا يوجد حساب لتسجيل دخول Google هذا بعد. تم إنشاء مفتاح Nostr جديد لك.',
     Operators: 'المشغّلون',
-    Remove: 'إزالة',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'سجّل الدخول عبر Google لتسجيل الدخول، أو لإنشاء مفتاح Nostr جديد تلقائيًا إن لم يكن لديك واحد بعد.',
     'Signing threshold': 'حد التوقيع',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'المنسّق الذي يتحقق من تسجيل دخولك عبر Google ويمرّر طلبات التوقيع إلى المشغّلين.',
     'This account is linked to Google.': 'هذا الحساب مرتبط بـ Google.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'هذا المفتاح ملكك تحتفظ به. ورغم أنه يمكنك استعادته عبر Google، احفظ نسخة احتياطية الآن حتى لا تفقد الوصول إلى حسابك أبدًا.',
@@ -999,9 +1111,10 @@ export default {
       'أصبح حسابك الآن مرتبطًا بـ Google. يمكنك تسجيل الدخول أو استعادة مفتاحك عبر Google على الأجهزة الأخرى.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'يُقسَّم مفتاحك الخاص إلى شظايا يحتفظ بها مشغّلون منفصلون، لذا لا يُخزَّن أبدًا في مكان واحد. وتبقى أنت من يوقّع بمفتاحك الخاص على هذا الجهاز.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'المنسّق الذي يتحقق من تسجيل دخولك عبر Google ويمرّر طلبات التوقيع إلى المشغّلين.',
     'of {{total}} operators are enough to sign': 'من أصل {{total}} مشغّلين يكفون للتوقيع',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'خوادم مستقلة يحتفظ كل منها بشظية من مفتاحك الخاص، بحيث لا يمكن لأي مشغّل التوقيع بمفرده.',
-    'This service is provided by {{host}}': 'هذه الخدمة مقدّمة من {{host}}'
+      'خوادم مستقلة يحتفظ كل منها بشظية من مفتاحك الخاص، بحيث لا يمكن لأي مشغّل التوقيع بمفرده.'
   }
 }

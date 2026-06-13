@@ -134,10 +134,9 @@ class KlipyService {
 
   private normalize(raw: KlipyGifItem): TGif | null {
     const sizes = raw.file ?? raw.files
-    // Use xs as the single tier for both picker thumbnails and the URL we send.
-    // xs (~96-150px) keeps the picker grid lightning fast and is the same URL
-    // the chat bubble renders, so the browser cache always hits.
-    const main = sizes?.xs?.gif ?? sizes?.sm?.gif ?? sizes?.md?.gif ?? sizes?.hd?.gif
+    // Single tier shared by picker thumbnails and the URL inserted into messages,
+    // so the chat bubble always hits the same cached asset.
+    const main = sizes?.sm?.gif ?? sizes?.xs?.gif ?? sizes?.md?.gif ?? sizes?.hd?.gif
     if (!main?.url) return null
     return {
       id: String(raw.id),

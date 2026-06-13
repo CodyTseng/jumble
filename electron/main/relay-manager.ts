@@ -37,6 +37,10 @@ export class RelayManager {
     this.pool.setAllowInsecure(allow)
   }
 
+  setTrustedInsecureRelayUrls(urls: string[]) {
+    this.pool.setTrustedInsecureRelayUrls(urls)
+  }
+
   async ensure(url: string): Promise<{ ok: boolean; error?: string }> {
     try {
       await this.pool.ensureRelay(url)

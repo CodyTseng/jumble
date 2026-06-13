@@ -35,11 +35,11 @@ const SEARCH_TABS = [
 ]
 
 const SearchPage = forwardRef<TPageRef>((_, ref) => {
-  const { current, display } = usePrimaryPage()
+  const { current } = usePrimaryPage()
   const [input, setInput] = useState('')
   const [searchParams, setSearchParams] = useState<TSearchParams | null>(null)
   const [tab, setTab] = useState<TSearchTab>('trending')
-  const isActive = useMemo(() => current === 'search' && display, [current, display])
+  const isActive = useMemo(() => current === 'search', [current])
   const searchBarRef = useRef<TSearchBarRef>(null)
   const layoutRef = useRef<TPrimaryPageLayoutRef>(null)
   const topRef = useRef<HTMLDivElement | null>(null)
@@ -125,7 +125,7 @@ const SearchPage = forwardRef<TPageRef>((_, ref) => {
               topRef.current?.scrollIntoView({ behavior: 'instant' })
             }}
           />
-          <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
+          <div ref={topRef} className="scroll-mt-24.25" />
           {tabContent}
         </>
       )}

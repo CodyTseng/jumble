@@ -86,7 +86,7 @@ export default {
     Replies: 'Respostas',
     Notifications: 'Notificações',
     'no more notifications': 'não há mais notificações',
-    'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x. If you must use a private key, please set a password for encryption at minimum.Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x.':
+    'Using private key login is insecure. It is recommended to use a browser extension for login, such as alby, nostr-keyx or nos2x. If you must use a private key, please set a password for encryption at minimum.':
       'O uso de login com chave privada é inseguro. Recomenda-se usar uma extensão de navegador para login, como alby, nostr-keyx ou nos2x. Se você precisar usar uma chave privada, defina uma senha para criptografia pelo menos.',
     'Login with Browser Extension': 'Entrar com Extensão do Navegador',
     'Login with Bunker': 'Entrar com Bunker',
@@ -906,11 +906,11 @@ export default {
     Shuffle: 'Baralhar',
     'Login with Google': 'Entrar com Google',
     'Continue with Google': 'Continuar com Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Inicie sessão com Google e uma chave Nostr será criada automaticamente para si.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Inicie sessão com Google para aceder à sua conta. Se ainda não tiver uma, é criada automaticamente uma conta Nostr para si.',
     'How it works': 'Como funciona',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'A sua chave privada é dividida em fragmentos mantidos por operadores distintos, pelo que nunca é guardada num único lugar. O Jumble assina através de um signatário remoto seguro. Pode exportar a sua chave a qualquer momento nas definições da conta.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'A sua chave privada é dividida em fragmentos mantidos por operadores distintos e independentes, pelo que nunca é guardada num único lugar. O Google é usado apenas para comprovar a sua identidade junto dos operadores, nunca para guardar a sua chave.',
     'Waiting for Google sign-in...': 'À espera do início de sessão com Google...',
     'Checking your account...': 'A verificar a sua conta...',
     'Setting up your secure account...': 'A configurar a sua conta segura...',
@@ -989,8 +989,125 @@ export default {
     'Scan with your signer app': 'Digitalize com a sua app de assinatura',
     'Open with Nostr signer app': 'Abrir com app de assinatura Nostr',
     'Scan QR code': 'Digitalizar código QR',
-    'Add operator URL': 'Adicionar URL de operador',
+    Options: 'Opções',
+    Remove: 'Remover',
+    'End date': 'Data de fim',
     'Advanced options': 'Opções avançadas',
+    'Polls may not display on clients that don’t support them.':
+      'As sondagens podem não ser apresentadas em clientes que não as suportem.',
+    'Show thread context': 'Mostrar contexto da conversa',
+    'Hide thread context': 'Ocultar contexto da conversa',
+    Enable: 'Ativar',
+    Upload: 'Carregar',
+    Drafts: 'Rascunhos',
+    Failed: 'Falhou',
+    'Save as draft?': 'Guardar como rascunho?',
+    'Your changes will be saved to the drafts box.':
+      'As tuas alterações serão guardadas na caixa de rascunhos.',
+    Discard: 'Descartar',
+    'Keep editing': 'Continuar a editar',
+    'Open drafts': 'Abrir rascunhos',
+    'No drafts yet': 'Ainda não há rascunhos',
+    Empty: 'Vazio',
+    'Add emoji': 'Adicionar emoji',
+    'Edit emoji': 'Editar emoji',
+    Title: 'Título',
+    'Image URL': 'URL da imagem',
+    shortcode: 'código curto',
+    Emojis: 'Emojis',
+    'Create emoji set': 'Criar conjunto de emojis',
+    'Edit emoji set': 'Editar conjunto de emojis',
+    'My emoji set': 'O meu conjunto de emojis',
+    'Emoji set not found': 'Conjunto de emojis não encontrado',
+    'You can only edit your own emoji sets': 'Só pode editar os seus próprios conjuntos de emojis',
+    'No custom emojis yet': 'Ainda não há emojis personalizados',
+    'Title is required': 'O título é obrigatório',
+    'At least one emoji is required': 'É necessário pelo menos um emoji',
+    'Duplicate shortcode: {{shortcode}}': 'Código curto duplicado: {{shortcode}}',
+    'Shortcode is required': 'O código curto é obrigatório',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'O código curto só pode conter letras, números, hífens e sublinhados',
+    'Image URL is required': 'A URL da imagem é obrigatória',
+    'Invalid image URL': 'URL de imagem inválida',
+    'Post as': 'Publicar como',
+    'Failed to get the signer for the selected account':
+      'Falha ao obter o assinante da conta selecionada',
+    'Blossom cache server': 'Servidor de cache Blossom',
+    'Blossom cache server description':
+      'Carregar multimédia através de um servidor de cache Blossom. Ative-o apenas depois de verificar que o servidor está acessível.',
+    'Server URL': 'URL do servidor',
+    'Cannot reach the Blossom cache server':
+      'Não foi possível alcançar o servidor de cache Blossom',
+    'Link Google account': 'Associar conta Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Associe uma conta Google para poder iniciar sessão nesta conta com o Google. A sua chave privada nunca é partilhada com o Google.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Associe uma conta Google para poder iniciar sessão nesta conta com o Google.',
+    'Linking your account...': 'A associar a sua conta...',
+    'Switching to remote signer...': 'A mudar para o signatário remoto...',
+    'Google account already linked': 'Conta Google já associada',
+    'This Google account is already linked to another account':
+      'Esta conta Google já está associada a outra conta',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'Está atualmente associada a {{email}}. Para a associar antes a esta conta, a associação anterior será removida. A conta anterior continua a existir e pode ser utilizada com a sua chave privada.',
+    'Unlink the previous account and link this one': 'Desassociar a conta anterior e associar esta',
+    'Switch to remote signer login?': 'Mudar para o início de sessão com signatário remoto?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'A sua conta está agora associada. Pode mudar para assinar através do signatário remoto, ou continuar a assinar localmente com a sua chave privada.',
+    'Switch to remote signer': 'Mudar para o signatário remoto',
+    'Keep signing locally': 'Continuar a assinar localmente',
+    'Google account linked': 'Conta Google associada',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'Esta conta assina agora através de um signatário remoto seguro e pode iniciar sessão com o Google a qualquer momento. A sua chave privada nunca é partilhada com o Google.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'Pode agora iniciar sessão nesta conta com o Google. Continua a assinar localmente com a sua chave privada, que nunca é partilhada com o Google.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'Não foi possível contactar o signatário remoto. Tente novamente mais tarde ou verifique a sua ligação de rede.',
+    'Retrying ({{current}}/{{max}})': 'A tentar novamente ({{current}}/{{max}})',
+    'Automatic updates': 'Atualizações automáticas',
+    'Check for and download updates in the background':
+      'Procurar e transferir atualizações em segundo plano',
+    'Check for updates': 'Procurar atualizações',
+    'Checking for updates…': 'A procurar atualizações…',
+    'Update available: v{{version}}': 'Atualização disponível: v{{version}}',
+    'You are on the latest version ({{version}})':
+      'Está a utilizar a versão mais recente ({{version}})',
+    'Failed to check for updates': 'Falha ao procurar atualizações',
+    Check: 'Procurar',
+    NEW: 'NOVO',
+    'Updates are not available in development mode':
+      'As atualizações não estão disponíveis no modo de desenvolvimento',
+    'Search emojis': 'Procurar emojis',
+    'Recently used': 'Utilizados recentemente',
+    'Smileys & Emotion': 'Sorrisos e emoções',
+    'People & Body': 'Pessoas e corpo',
+    'Animals & Nature': 'Animais e natureza',
+    'Food & Drink': 'Comida e bebida',
+    'Travel & Places': 'Viagens e lugares',
+    Activities: 'Atividades',
+    Objects: 'Objetos',
+    Symbols: 'Símbolos',
+    Flags: 'Bandeiras',
+    'My emojis': 'Os meus emojis',
+    'No emojis found': 'Nenhum emoji encontrado',
+    'Encrypted DM unavailable': 'Mensagem privada encriptada indisponível',
+    'No DM relays': 'Sem relays de mensagens privadas',
+    'n users_one': '{{count}} utilizador',
+    'n users_other': '{{count}} utilizadores',
+    'Add this emoji': 'Adicionar este emoji',
+    'Added to my emojis': 'Adicionado aos meus emojis',
+    'Add whole set': 'Adicionar todo o conjunto',
+    'Emoji set': 'Conjunto de emojis',
+    'Waiting for signer approval...': 'A aguardar a aprovação do assinante...',
+    'Signer did not respond in time': 'O assinante não respondeu a tempo',
+    'Media servers': 'Servidores de média',
+    'Blossom servers': 'Servidores Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'Os ficheiros multimédia são enviados para o servidor preferido e espelhados nos restantes.',
+    'Add Blossom server': 'Adicionar servidor Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'É necessário adicionar pelo menos um servidor multimédia para enviar ficheiros.',
+    'Add operator URL': 'Adicionar URL de operador',
     'All set': 'Tudo pronto',
     'Connect Google account': 'Ligar conta Google',
     'Connected to Google': 'Ligado ao Google',
@@ -1002,17 +1119,13 @@ export default {
       'Associe esta conta ao Google para poder iniciar sessão e recuperá-la com o Google noutros dispositivos.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'Associe esta conta ao Google para poder iniciar sessão e recuperá-la com o Google.',
-    'Linking your account...': 'A associar a sua conta...',
     'New account': 'Nova conta',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'Ainda não existe nenhuma conta para este início de sessão com o Google. Foi criada uma nova chave Nostr para si.',
     Operators: 'Operadores',
-    Remove: 'Remover',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Inicie sessão com o Google para entrar, ou para criar automaticamente uma nova chave Nostr caso ainda não tenha uma.',
     'Signing threshold': 'Limiar de assinatura',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'O coordenador que verifica o seu início de sessão com o Google e encaminha os pedidos de assinatura para os operadores.',
     'This account is linked to Google.': 'Esta conta está associada ao Google.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'Esta chave é sua para guardar. Embora possa recuperá-la com o Google, guarde já uma cópia de segurança para nunca perder o acesso à sua conta.',
@@ -1022,9 +1135,10 @@ export default {
       'A sua conta está agora associada ao Google. Pode iniciar sessão ou recuperar a sua chave com o Google noutros dispositivos.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'A sua chave privada é dividida em fragmentos guardados por operadores independentes, pelo que nunca fica armazenada num único local. Continua a assinar com a sua chave privada neste dispositivo.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'O coordenador que verifica o seu início de sessão com o Google e encaminha os pedidos de assinatura para os operadores.',
     'of {{total}} operators are enough to sign': 'de {{total}} operadores bastam para assinar',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'Servidores independentes que guardam cada um um fragmento da sua chave privada, de modo que nenhum operador sozinho pode assinar.',
-    'This service is provided by {{host}}': 'Este serviço é fornecido por {{host}}'
+      'Servidores independentes que guardam cada um um fragmento da sua chave privada, de modo que nenhum operador sozinho pode assinar.'
   }
 }

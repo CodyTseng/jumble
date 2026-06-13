@@ -1,3 +1,4 @@
+import { withSignerApproval } from '@/lib/signer-approval'
 import { ISigner, TDraftEvent, TNip07 } from '@/types'
 
 export class Nip07Signer implements ISigner {
@@ -35,7 +36,7 @@ export class Nip07Signer implements ISigner {
     if (!this.signer) {
       throw new Error('Should call init() first')
     }
-    return await this.signer.signEvent(draftEvent)
+    return await withSignerApproval(this.signer.signEvent(draftEvent))
   }
 
   async nip04Encrypt(pubkey: string, plainText: string) {

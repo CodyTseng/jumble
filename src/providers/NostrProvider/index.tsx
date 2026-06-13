@@ -17,6 +17,7 @@ import {
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import { getDefaultRelayUrls } from '@/lib/relay'
+import { isSameAccount } from '@/lib/account'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import dmService from '@/services/dm.service'
@@ -68,6 +69,18 @@ type TNostrContext = {
   nsec: string | null
   ncryptsec: string | null
   switchAccount: (account: TAccountPointer | null) => Promise<void>
+  /**
+   * Build a signer for the given account WITHOUT changing the active account.
+   * Used to publish "as" another account temporarily. Returns null if the
+   * account can't sign (e.g. npub read-only) or its identity can't be verified.
+   */
+  getSignerForAccount: (account: TAccountPointer) => Promise<ISigner | null>
+  /**
+   * The active account's private key when it signs locally (nsec/ncryptsec),
+   * already decrypted in memory; null for remote/read-only signers. Used by the
+   * "Bind Google account" flow to register the existing key's shards.
+   */
+  getActivePrivkey: () => Uint8Array | null
   nsecLogin: (nsec: string, password?: string, needSetup?: boolean) => Promise<string>
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
@@ -502,6 +515,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const getActivePrivkey = () => {
+    return signer instanceof NsecSigner ? signer.getPrivkey() : null
+  }
+
   const switchAccount = async (act: TAccountPointer | null) => {
     if (!act) {
       storage.switchAccount(null)
@@ -660,6 +677,64 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return null
   }
 
+  // Construct a signer instance for an account without touching global state or
+  // storage (no migrations, no account removal). npub accounts are read-only and
+  // return null.
+  const buildSignerForAccount = async (account: TAccount): Promise<ISigner | null> => {
+    if (account.signerType === 'nsec' || account.signerType === 'browser-nsec') {
+      if (account.nsec) {
+        const nsecSigner = new NsecSigner()
+        nsecSigner.login(account.nsec)
+        return nsecSigner
+      }
+    } else if (account.signerType === 'ncryptsec') {
+      if (account.ncryptsec) {
+        const password = await requestPassword()
+        const privkey = nip49.decrypt(account.ncryptsec, password)
+        const nsecSigner = new NsecSigner()
+        nsecSigner.login(privkey)
+        return nsecSigner
+      }
+    } else if (account.signerType === 'nip-07') {
+      const nip07Signer = new Nip07Signer()
+      await nip07Signer.init()
+      return nip07Signer
+    } else if (account.signerType === 'bunker') {
+      if (account.bunker && account.bunkerClientSecretKey) {
+        const bunkerSigner = new BunkerSigner(account.bunkerClientSecretKey)
+        await bunkerSigner.login(account.bunker, false)
+        return bunkerSigner
+      }
+    }
+    return null
+  }
+
+  const getSignerForAccount = async (act: TAccountPointer): Promise<ISigner | null> => {
+    // Reuse the active signer when it already matches the requested account.
+    if (signer && isSameAccount(account, act)) {
+      return signer
+    }
+    const storedAccount = storage.findAccount(act)
+    if (!storedAccount) {
+      return null
+    }
+    try {
+      const newSigner = await buildSignerForAccount(storedAccount)
+      if (!newSigner) {
+        return null
+      }
+      // Guard against the signer resolving to a different identity (e.g. a NIP-07
+      // extension currently set to another account) — never sign with the wrong key.
+      const signerPubkey = await newSigner.getPublicKey()
+      if (signerPubkey !== act.pubkey) {
+        return null
+      }
+      return newSigner
+    } catch {
+      return null
+    }
+  }
+
   const setupNewUser = async (signer: ISigner) => {
     const defaultRelays = getDefaultRelayUrls()
     await Promise.allSettled([
@@ -680,6 +755,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       throw new Error('sign event failed')
     }
     return event as VerifiedEvent
+  }
+
+  const publishSignedEvent = async (event: Event, options: TPublishOptions = {}) => {
+    const relays = await client.determineTargetRelays(event, options)
+    await client.publishEvent(relays, event)
+    return event
   }
 
   const publish = async (
@@ -712,10 +793,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const relays = await client.determineTargetRelays(event, options)
-
-    await client.publishEvent(relays, event)
-    return event
+    return publishSignedEvent(event, options)
   }
 
   const attemptDelete = async (targetEvent: Event) => {
@@ -902,6 +980,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         nsec,
         ncryptsec,
         switchAccount,
+        getSignerForAccount,
+        getActivePrivkey,
         nsecLogin,
         ncryptsecLogin,
         nip07Login,

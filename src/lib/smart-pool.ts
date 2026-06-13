@@ -1,7 +1,7 @@
 import { SimplePool } from 'nostr-tools'
 import { AbstractRelay } from 'nostr-tools/abstract-relay'
 import { IRelay, IRelayPool } from '../types/relay-pool'
-import { isInsecureUrl } from './url'
+import { isInsecureUrl, normalizeUrl } from './url'
 
 const DEFAULT_CONNECTION_TIMEOUT = 10 * 1000 // 10 seconds
 const CLEANUP_THRESHOLD = 15 // number of relays to trigger cleanup
@@ -15,6 +15,11 @@ export type SmartPoolOptions = {
 export class SmartPool extends SimplePool implements IRelayPool {
   private relayIdleTracker = new Map<string, number>()
   private allowInsecure: boolean
+  // Insecure (ws://) relays the user explicitly opted into — their own
+  // read/write relays, relay sets, defaults, or a relay they are actively
+  // browsing. Insecure relays coming from other people's data are NOT here, so
+  // they get rejected below. Stored as normalized URLs.
+  private trustedInsecureRelays = new Set<string>()
 
   constructor(options: SmartPoolOptions = {}) {
     super({ enablePing: true, enableReconnect: true })
@@ -27,6 +32,10 @@ export class SmartPool extends SimplePool implements IRelayPool {
 
   setAllowInsecure(allow: boolean) {
     this.allowInsecure = allow
+  }
+
+  setTrustedInsecureRelayUrls(urls: string[]) {
+    this.trustedInsecureRelays = new Set(urls.map((url) => normalizeUrl(url)))
   }
 
   getSeenRelays(eventId: string): IRelay[] {
@@ -43,7 +52,11 @@ export class SmartPool extends SimplePool implements IRelayPool {
   }
 
   ensureRelay(url: string): Promise<AbstractRelay> {
-    if (!this.allowInsecure && isInsecureUrl(url)) {
+    if (
+      !this.allowInsecure &&
+      isInsecureUrl(url) &&
+      !this.trustedInsecureRelays.has(normalizeUrl(url))
+    ) {
       return Promise.reject(new Error(`Insecure relay connection blocked: ${url}`))
     }
     // If relay is new and we have many relays, trigger cleanup

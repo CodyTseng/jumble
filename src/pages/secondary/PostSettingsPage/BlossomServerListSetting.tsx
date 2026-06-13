@@ -1,16 +1,15 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
+import { SettingsRow } from '@/components/ui/settings'
 import { RECOMMENDED_BLOSSOM_SERVERS } from '@/constants'
 import { createBlossomServerListDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getServersFromServerTags } from '@/lib/tag'
-import { normalizeHttpUrl } from '@/lib/url'
-import { cn } from '@/lib/utils'
+import { normalizeHttpUrl, simplifyUrl } from '@/lib/url'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
-import { AlertCircle, ArrowUpToLine, Loader, X } from 'lucide-react'
+import { AlertCircle, ArrowUpToLine, Loader, Plus, Server, X } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,38 +19,51 @@ export default function BlossomServerListSetting() {
   const { t } = useTranslation()
   const { pubkey, publish } = useNostr()
   const [blossomServerListEvent, setBlossomServerListEvent] = useState<Event | null>(null)
-  const serverUrls = useMemo(() => {
-    return getServersFromServerTags(blossomServerListEvent ? blossomServerListEvent.tags : [])
-  }, [blossomServerListEvent])
+  const [loading, setLoading] = useState(true)
   const [url, setUrl] = useState('')
   const [removingIndex, setRemovingIndex] = useState(-1)
   const [movingIndex, setMovingIndex] = useState(-1)
   const [adding, setAdding] = useState(false)
 
+  const serverUrls = useMemo(() => {
+    return getServersFromServerTags(blossomServerListEvent ? blossomServerListEvent.tags : [])
+  }, [blossomServerListEvent])
+  const recommendedServers = useMemo(
+    () => RECOMMENDED_BLOSSOM_SERVERS.filter((url) => !serverUrls.includes(normalizeHttpUrl(url))),
+    [serverUrls]
+  )
+  const busy = adding || removingIndex >= 0 || movingIndex >= 0
+
   useEffect(() => {
     const init = async () => {
       if (!pubkey) {
         setBlossomServerListEvent(null)
+        setLoading(false)
         return
       }
+      setLoading(true)
       const event = await client.fetchBlossomServerListEvent(pubkey)
       setBlossomServerListEvent(event)
+      setLoading(false)
     }
     init()
   }, [pubkey])
 
-  const addBlossomUrl = async (url: string) => {
-    if (!url || adding || removingIndex >= 0 || movingIndex >= 0) return
+  const updateServerList = async (newUrls: string[]) => {
+    const draftEvent = createBlossomServerListDraftEvent(newUrls)
+    const newEvent = await publish(draftEvent)
+    await client.updateBlossomServerListEventCache(newEvent)
+    setBlossomServerListEvent(newEvent)
+  }
+
+  const addBlossomUrl = async (target: string) => {
+    if (!target || busy || serverUrls.includes(normalizeHttpUrl(target))) return
     setAdding(true)
     try {
-      const draftEvent = createBlossomServerListDraftEvent([...serverUrls, url])
-      const newEvent = await publish(draftEvent)
-      await client.updateBlossomServerListEventCache(newEvent)
-      setBlossomServerListEvent(newEvent)
+      await updateServerList([...serverUrls, target])
       setUrl('')
     } catch (error) {
-      const errors = formatError(error)
-      errors.forEach((err) => {
+      formatError(error).forEach((err) => {
         toast.error(`${t('Failed to add Blossom URL')}: ${err}`, { duration: 10_000 })
       })
     } finally {
@@ -59,26 +71,19 @@ export default function BlossomServerListSetting() {
     }
   }
 
-  const handleUrlInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      const normalizedUrl = normalizeHttpUrl(url.trim())
-      if (!normalizedUrl) return
-      addBlossomUrl(normalizedUrl)
-    }
+  const handleAddFromInput = () => {
+    const normalizedUrl = normalizeHttpUrl(url.trim())
+    if (!normalizedUrl) return
+    addBlossomUrl(normalizedUrl)
   }
 
   const removeBlossomUrl = async (idx: number) => {
-    if (removingIndex >= 0 || adding || movingIndex >= 0) return
+    if (busy) return
     setRemovingIndex(idx)
     try {
-      const draftEvent = createBlossomServerListDraftEvent(serverUrls.filter((_, i) => i !== idx))
-      const newEvent = await publish(draftEvent)
-      await client.updateBlossomServerListEventCache(newEvent)
-      setBlossomServerListEvent(newEvent)
+      await updateServerList(serverUrls.filter((_, i) => i !== idx))
     } catch (error) {
-      const errors = formatError(error)
-      errors.forEach((err) => {
+      formatError(error).forEach((err) => {
         toast.error(`${t('Failed to remove Blossom URL')}: ${err}`, { duration: 10_000 })
       })
     } finally {
@@ -87,17 +92,12 @@ export default function BlossomServerListSetting() {
   }
 
   const moveToTop = async (idx: number) => {
-    if (removingIndex >= 0 || adding || movingIndex >= 0 || idx === 0) return
+    if (busy || idx === 0) return
     setMovingIndex(idx)
     try {
-      const newUrls = [serverUrls[idx], ...serverUrls.filter((_, i) => i !== idx)]
-      const draftEvent = createBlossomServerListDraftEvent(newUrls)
-      const newEvent = await publish(draftEvent)
-      await client.updateBlossomServerListEventCache(newEvent)
-      setBlossomServerListEvent(newEvent)
+      await updateServerList([serverUrls[idx], ...serverUrls.filter((_, i) => i !== idx)])
     } catch (error) {
-      const errors = formatError(error)
-      errors.forEach((err) => {
+      formatError(error).forEach((err) => {
         toast.error(`${t('Failed to move Blossom URL to top')}: ${err}`, { duration: 10_000 })
       })
     } finally {
@@ -105,95 +105,105 @@ export default function BlossomServerListSetting() {
     }
   }
 
+  if (loading) {
+    return (
+      <SettingsRow title={<Loader className="size-4 animate-spin text-muted-foreground" />} />
+    )
+  }
+
   return (
-    <div className="space-y-2">
-      <div className="text-sm font-medium">{t('Blossom server URLs')}</div>
-      {serverUrls.length === 0 && (
-        <div className="flex flex-col gap-1 rounded-lg border bg-muted p-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 font-medium">
-            <AlertCircle className="size-4" />
-            {t('You need to add at least one media server in order to upload media files.')}
-          </div>
-          <Separator className="my-2 bg-muted-foreground" />
-          <div className="font-medium">{t('Recommended blossom servers')}:</div>
-          <div className="flex flex-col">
-            {RECOMMENDED_BLOSSOM_SERVERS.map((recommendedUrl) => (
+    <>
+      {serverUrls.map((serverUrl, idx) => (
+        <SettingsRow
+          key={serverUrl}
+          icon={<Server />}
+          title={<span className="block truncate">{simplifyUrl(serverUrl)}</span>}
+          control={
+            <>
+              {idx === 0 ? (
+                <Badge variant="secondary">{t('Preferred')}</Badge>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => moveToTop(idx)}
+                  title={t('Move to top')}
+                  disabled={busy}
+                  className="text-muted-foreground"
+                >
+                  {movingIndex === idx ? <Loader className="animate-spin" /> : <ArrowUpToLine />}
+                </Button>
+              )}
               <Button
-                variant="link"
-                key={recommendedUrl}
-                onClick={() => addBlossomUrl(recommendedUrl)}
-                disabled={removingIndex >= 0 || adding || movingIndex >= 0}
-                className="h-fit w-fit p-0 text-muted-foreground hover:text-foreground"
-              >
-                {recommendedUrl}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
-      {serverUrls.map((url, idx) => (
-        <div
-          key={url}
-          className={cn(
-            'flex items-center justify-between gap-2 rounded-lg border py-1 ps-3 pe-1',
-            idx === 0 && 'border-primary'
-          )}
-        >
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="truncate hover:underline"
-          >
-            {url}
-          </a>
-          <div className="flex items-center gap-2">
-            {idx > 0 ? (
-              <Button
-                variant="ghost"
+                variant="ghost-destructive"
                 size="icon"
-                onClick={() => moveToTop(idx)}
-                title={t('Move to top')}
-                disabled={removingIndex >= 0 || adding || movingIndex >= 0}
-                className="text-muted-foreground"
+                onClick={() => removeBlossomUrl(idx)}
+                title={t('Remove')}
+                disabled={busy}
               >
-                {movingIndex === idx ? <Loader className="animate-spin" /> : <ArrowUpToLine />}
+                {removingIndex === idx ? <Loader className="animate-spin" /> : <X />}
               </Button>
-            ) : (
-              <Badge>{t('Preferred')}</Badge>
-            )}
+            </>
+          }
+        />
+      ))}
+
+      <SettingsRow layout="stacked" title={t('Add Blossom server')}>
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder={t('Enter Blossom server URL')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddFromInput()
+                }
+              }}
+              className="flex-1"
+            />
             <Button
-              variant="ghost-destructive"
+              variant="ghost"
               size="icon"
-              onClick={() => removeBlossomUrl(idx)}
-              title={t('Remove')}
-              disabled={removingIndex >= 0 || adding || movingIndex >= 0}
+              onClick={handleAddFromInput}
+              disabled={busy || !url.trim()}
+              title={t('Add')}
             >
-              {removingIndex === idx ? <Loader className="animate-spin" /> : <X />}
+              {adding ? <Loader className="animate-spin" /> : <Plus />}
             </Button>
           </div>
+
+          {serverUrls.length === 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AlertCircle className="size-4 shrink-0" />
+              {t('You need to add at least one media server in order to upload media files.')}
+            </div>
+          )}
+
+          {recommendedServers.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-xs font-medium text-muted-foreground">
+                {t('Recommended blossom servers')}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {recommendedServers.map((recommendedUrl) => (
+                  <button
+                    key={recommendedUrl}
+                    type="button"
+                    onClick={() => addBlossomUrl(recommendedUrl)}
+                    disabled={busy}
+                    className="clickable flex items-center gap-1 rounded-full border px-2.5 py-1 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  >
+                    <Plus className="size-3.5" />
+                    {simplifyUrl(recommendedUrl)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      ))}
-      <div className="flex items-center gap-2">
-        <Input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder={t('Enter Blossom server URL')}
-          onKeyDown={handleUrlInputKeyDown}
-        />
-        <Button
-          type="button"
-          onClick={() => {
-            const normalizedUrl = normalizeHttpUrl(url.trim())
-            if (!normalizedUrl) return
-            addBlossomUrl(normalizedUrl)
-          }}
-          title={t('Add')}
-        >
-          {adding && <Loader className="animate-spin" />}
-          {t('Add')}
-        </Button>
-      </div>
-    </div>
+      </SettingsRow>
+    </>
   )
 }

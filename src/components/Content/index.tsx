@@ -62,67 +62,68 @@ export default function Content({
     () => (resolvedContent ? containsMarkdown(resolvedContent) : false),
     [resolvedContent]
   )
-  const { nodes, allImages, lastNormalUrl, emojiInfos, hiddenMediaCount, imetaInfos } = useMemo(() => {
-    if (!resolvedContent || isMarkdown) return {}
-    const _content = resolvedContent
+  const { nodes, allImages, lastNormalUrl, emojiInfos, hiddenMediaCount, imetaInfos } =
+    useMemo(() => {
+      if (!resolvedContent || isMarkdown) return {}
+      const _content = resolvedContent
 
-    const nodes = parseContent(_content, [
-      EmbeddedEventParser,
-      EmbeddedMentionParser,
-      EmbeddedUrlParser,
-      EmbeddedLNInvoiceParser,
-      EmbeddedWebsocketUrlParser,
-      EmbeddedHashtagParser,
-      EmbeddedEmojiParser
-    ])
+      const nodes = parseContent(_content, [
+        EmbeddedEventParser,
+        EmbeddedMentionParser,
+        EmbeddedUrlParser,
+        EmbeddedLNInvoiceParser,
+        EmbeddedWebsocketUrlParser,
+        EmbeddedHashtagParser,
+        EmbeddedEmojiParser
+      ])
 
-    const imetaInfos = event ? getImetaInfosFromEvent(event) : []
-    const allImages = nodes
-      .map((node) => {
-        if (node.type === 'image') {
-          const imageInfo = imetaInfos.find((image) => image.url === node.data)
-          if (imageInfo) {
-            return imageInfo
+      const imetaInfos = event ? getImetaInfosFromEvent(event) : []
+      const allImages = nodes
+        .map((node) => {
+          if (node.type === 'image') {
+            const imageInfo = imetaInfos.find((image) => image.url === node.data)
+            if (imageInfo) {
+              return imageInfo
+            }
+            const tag = mediaUpload.getImetaTagByUrl(node.data)
+            return tag
+              ? getImetaInfoFromImetaTag(tag, event?.pubkey)
+              : { url: node.data, pubkey: event?.pubkey }
           }
-          const tag = mediaUpload.getImetaTagByUrl(node.data)
-          return tag
-            ? getImetaInfoFromImetaTag(tag, event?.pubkey)
-            : { url: node.data, pubkey: event?.pubkey }
+          if (node.type === 'images') {
+            const urls = Array.isArray(node.data) ? node.data : [node.data]
+            return urls.map((url) => {
+              const imageInfo = imetaInfos.find((image) => image.url === url)
+              return imageInfo ?? { url, pubkey: event?.pubkey }
+            })
+          }
+          return null
+        })
+        .filter(Boolean)
+        .flat() as TImetaInfo[]
+
+      const emojiInfos = getEmojiInfosFromEmojiTags(event?.tags)
+
+      const lastNormalUrlNode = nodes.findLast((node) => node.type === 'url')
+      const lastNormalUrl =
+        typeof lastNormalUrlNode?.data === 'string' ? lastNormalUrlNode.data : undefined
+
+      let hiddenMediaCount = 0
+      for (const node of nodes) {
+        if (
+          node.type === 'image' ||
+          node.type === 'media' ||
+          node.type === 'youtube' ||
+          node.type === 'x-post'
+        ) {
+          hiddenMediaCount += 1
+        } else if (node.type === 'images') {
+          hiddenMediaCount += Array.isArray(node.data) ? node.data.length : 1
         }
-        if (node.type === 'images') {
-          const urls = Array.isArray(node.data) ? node.data : [node.data]
-          return urls.map((url) => {
-            const imageInfo = imetaInfos.find((image) => image.url === url)
-            return imageInfo ?? { url, pubkey: event?.pubkey }
-          })
-        }
-        return null
-      })
-      .filter(Boolean)
-      .flat() as TImetaInfo[]
-
-    const emojiInfos = getEmojiInfosFromEmojiTags(event?.tags)
-
-    const lastNormalUrlNode = nodes.findLast((node) => node.type === 'url')
-    const lastNormalUrl =
-      typeof lastNormalUrlNode?.data === 'string' ? lastNormalUrlNode.data : undefined
-
-    let hiddenMediaCount = 0
-    for (const node of nodes) {
-      if (
-        node.type === 'image' ||
-        node.type === 'media' ||
-        node.type === 'youtube' ||
-        node.type === 'x-post'
-      ) {
-        hiddenMediaCount += 1
-      } else if (node.type === 'images') {
-        hiddenMediaCount += Array.isArray(node.data) ? node.data.length : 1
       }
-    }
 
-    return { nodes, allImages, emojiInfos, lastNormalUrl, hiddenMediaCount, imetaInfos }
-  }, [event, resolvedContent, isMarkdown])
+      return { nodes, allImages, emojiInfos, lastNormalUrl, hiddenMediaCount, imetaInfos }
+    }, [event, resolvedContent, isMarkdown])
 
   const isEmojiOnly = useMemo(() => {
     if (!nodes || nodes.length === 0) return false
@@ -156,11 +157,7 @@ export default function Content({
   if (isMarkdown) {
     return (
       <>
-        <div
-          ref={contentRef}
-          dir="auto"
-          className={cn('text-wrap wrap-break-word', className)}
-        >
+        <div ref={contentRef} dir="auto" className={cn('text-wrap wrap-break-word', className)}>
           <MarkdownContent content={resolvedContent} event={event} />
         </div>
         {enableHighlight && (
@@ -231,6 +228,7 @@ export default function Content({
                 className="mt-2"
                 key={index}
                 src={node.data}
+                pubkey={mediaInfo?.pubkey ?? event?.pubkey}
                 mustLoad={effectiveMustLoad}
                 dim={mediaInfo?.dim}
               />
@@ -263,6 +261,7 @@ export default function Content({
               <Emoji
                 classNames={{ img: isEmojiOnly ? 'size-20' : 'mb-1' }}
                 emoji={emoji}
+                clickable
                 key={index}
               />
             )

@@ -9,6 +9,7 @@ import { TEmoji } from '@/types'
 import { Event } from 'nostr-tools'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ClickableCard from '../ClickableCard'
 import Emoji from '../Emoji'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
@@ -80,7 +81,7 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
   return (
     <div className="min-h-[80vh]">
       {filteredLikes.slice(0, showCount).map((like) => (
-        <div
+        <ClickableCard
           key={like.id}
           className="clickable flex items-center gap-3 border-b px-4 py-3 transition-colors"
           onClick={() => push(toNote(like.eventId))}
@@ -88,6 +89,7 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
           <div className="flex w-6 flex-col items-center">
             <Emoji
               emoji={like.emoji}
+              clickable
               classNames={{
                 text: 'text-xl'
               }}
@@ -111,7 +113,7 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
               />
             </div>
           </div>
-        </div>
+        </ClickableCard>
       ))}
 
       <div ref={bottomRef} />

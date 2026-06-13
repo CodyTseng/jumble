@@ -1,4 +1,4 @@
-import { isInsecureUrl } from '@/lib/url'
+import { useBlossomUrl } from '@/hooks/useBlossomUrl'
 import { cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -8,16 +8,18 @@ import ExternalLink from '../ExternalLink'
 
 export default function VideoPlayer({
   src,
+  pubkey,
   className,
   dim
 }: {
   src: string
+  pubkey?: string
   className?: string
   dim?: { width: number; height: number }
 }) {
   const { autoplay, videoLoop } = useContentPolicy()
-  const { muteMedia, updateMuteMedia, allowInsecureConnection } = useUserPreferences()
-  const [error, setError] = useState(false)
+  const { muteMedia, updateMuteMedia } = useUserPreferences()
+  const { url: videoUrl, error, handleError, markSuccess } = useBlossomUrl(src, pubkey)
   const [intrinsicDim, setIntrinsicDim] = useState<{ width: number; height: number } | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -83,7 +85,7 @@ export default function VideoPlayer({
     }
   }, [muteMedia])
 
-  if (error || (!allowInsecureConnection && isInsecureUrl(src))) {
+  if (error) {
     return <ExternalLink url={src} />
   }
 
@@ -108,7 +110,7 @@ export default function VideoPlayer({
         playsInline
         loop={videoLoop}
         className="block h-full w-full object-contain"
-        src={src}
+        src={videoUrl}
         onClick={(e) => e.stopPropagation()}
         onPlay={(event) => {
           mediaManager.play(event.currentTarget)
@@ -118,9 +120,10 @@ export default function VideoPlayer({
           if (v.videoWidth > 0 && v.videoHeight > 0) {
             setIntrinsicDim({ width: v.videoWidth, height: v.videoHeight })
           }
+          markSuccess()
         }}
         muted={muteMedia}
-        onError={() => setError(true)}
+        onError={handleError}
       />
     </div>
   )

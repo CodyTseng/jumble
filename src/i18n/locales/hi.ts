@@ -900,11 +900,11 @@ export default {
     Shuffle: 'फेरबदल',
     'Login with Google': 'Google से लॉगिन करें',
     'Continue with Google': 'Google से जारी रखें',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Google से साइन इन करें और आपके लिए स्वचालित रूप से एक Nostr कुंजी बनाई जाएगी।',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'अपने खाते तक पहुँचने के लिए Google से साइन इन करें। यदि आपके पास अभी तक कोई खाता नहीं है, तो आपके लिए स्वचालित रूप से एक Nostr खाता बना दिया जाता है।',
     'How it works': 'यह कैसे काम करता है',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'आपकी निजी कुंजी अलग-अलग ऑपरेटरों के पास रखे गए टुकड़ों में विभाजित है, इसलिए इसे कभी भी एक जगह संग्रहीत नहीं किया जाता। Jumble एक सुरक्षित रिमोट साइनर के माध्यम से हस्ताक्षर करता है। आप खाता सेटिंग से कभी भी अपनी कुंजी निर्यात कर सकते हैं।',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'आपकी निजी कुंजी अलग-अलग, स्वतंत्र ऑपरेटरों के पास रखे गए टुकड़ों में विभाजित है, इसलिए इसे कभी भी एक जगह संग्रहीत नहीं किया जाता। Google का उपयोग केवल ऑपरेटरों के सामने आपकी पहचान साबित करने के लिए किया जाता है, आपकी कुंजी संग्रहीत करने के लिए कभी नहीं।',
     'Waiting for Google sign-in...': 'Google साइन-इन की प्रतीक्षा...',
     'Checking your account...': 'आपका खाता जांचा जा रहा है...',
     'Setting up your secure account...': 'आपका सुरक्षित खाता सेट किया जा रहा है...',
@@ -933,7 +933,7 @@ export default {
     'What happens next': 'आगे क्या होता है',
     'This account is no longer linked to the central server. To keep using it, log in again with your private key (nsec).':
       'यह खाता अब केंद्रीय सर्वर से जुड़ा नहीं है। इसका उपयोग जारी रखने के लिए, अपनी निजी कुंजी (nsec) से फिर से लॉगिन करें।',
-    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "निजी कुंजी निर्यात करें" option.':
+    'Disconnecting only removes the link between this account and the central server. Your account still exists, and you can keep using it by logging in with your private key (nsec). Before continuing, export and safely save your nsec using the "Export private key" option.':
       'डिस्कनेक्ट करने से केवल इस खाते और केंद्रीय सर्वर के बीच का लिंक हटता है। आपका खाता अभी भी मौजूद है और आप अपनी निजी कुंजी (nsec) से लॉगिन करके इसका उपयोग जारी रख सकते हैं। जारी रखने से पहले, "निजी कुंजी निर्यात करें" विकल्प का उपयोग करके अपना nsec निर्यात करें और सुरक्षित रूप से सहेजें।',
     Done: 'हो गया',
     Recover: 'पुनर्प्राप्त करें',
@@ -982,8 +982,121 @@ export default {
     'Scan with your signer app': 'अपने साइनर ऐप से स्कैन करें',
     'Open with Nostr signer app': 'Nostr साइनर ऐप से खोलें',
     'Scan QR code': 'QR कोड स्कैन करें',
-    'Add operator URL': 'ऑपरेटर URL जोड़ें',
+    Options: 'विकल्प',
+    Remove: 'हटाएं',
+    'End date': 'समाप्ति तिथि',
     'Advanced options': 'उन्नत विकल्प',
+    'Polls may not display on clients that don’t support them.':
+      'पोल उन क्लाइंट पर प्रदर्शित नहीं हो सकते जो इनका समर्थन नहीं करते।',
+    'Show thread context': 'थ्रेड संदर्भ दिखाएं',
+    'Hide thread context': 'थ्रेड संदर्भ छिपाएं',
+    Enable: 'सक्षम करें',
+    Upload: 'अपलोड',
+    Drafts: 'ड्राफ़्ट',
+    Failed: 'विफल',
+    'Save as draft?': 'ड्राफ़्ट के रूप में सहेजें?',
+    'Your changes will be saved to the drafts box.': 'आपके बदलाव ड्राफ़्ट बॉक्स में सहेजे जाएंगे।',
+    Discard: 'खारिज करें',
+    'Keep editing': 'संपादन जारी रखें',
+    'Open drafts': 'ड्राफ़्ट खोलें',
+    'No drafts yet': 'अभी कोई ड्राफ़्ट नहीं',
+    Empty: 'खाली',
+    'Add emoji': 'इमोजी जोड़ें',
+    'Edit emoji': 'इमोजी संपादित करें',
+    Title: 'शीर्षक',
+    'Image URL': 'छवि URL',
+    shortcode: 'शॉर्टकोड',
+    Emojis: 'इमोजी',
+    'Create emoji set': 'इमोजी सेट बनाएँ',
+    'Edit emoji set': 'इमोजी सेट संपादित करें',
+    'My emoji set': 'मेरा इमोजी सेट',
+    'Emoji set not found': 'इमोजी सेट नहीं मिला',
+    'You can only edit your own emoji sets': 'आप केवल अपने स्वयं के इमोजी सेट संपादित कर सकते हैं',
+    'No custom emojis yet': 'अभी तक कोई कस्टम इमोजी नहीं',
+    'Title is required': 'शीर्षक आवश्यक है',
+    'At least one emoji is required': 'कम से कम एक इमोजी आवश्यक है',
+    'Duplicate shortcode: {{shortcode}}': 'डुप्लिकेट शॉर्टकोड: {{shortcode}}',
+    'Shortcode is required': 'शॉर्टकोड आवश्यक है',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'शॉर्टकोड में केवल अक्षर, संख्याएँ, हाइफ़न और अंडरस्कोर हो सकते हैं',
+    'Image URL is required': 'छवि URL आवश्यक है',
+    'Invalid image URL': 'अमान्य छवि URL',
+    'Post as': 'इस रूप में पोस्ट करें',
+    'Failed to get the signer for the selected account':
+      'चयनित खाते के लिए हस्ताक्षरकर्ता प्राप्त करने में विफल',
+    'Blossom cache server': 'Blossom कैश सर्वर',
+    'Blossom cache server description':
+      'Blossom कैश सर्वर के माध्यम से मीडिया लोड करें। सर्वर तक पहुँच की पुष्टि होने के बाद ही इसे सक्षम करें।',
+    'Server URL': 'सर्वर URL',
+    'Cannot reach the Blossom cache server': 'Blossom कैश सर्वर तक नहीं पहुँचा जा सका',
+    'Link Google account': 'Google खाता लिंक करें',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'एक Google खाता लिंक करें ताकि आप Google से इस खाते में साइन इन कर सकें। आपकी निजी कुंजी कभी भी Google के साथ साझा नहीं की जाती।',
+    'Link a Google account so you can sign in to this account with Google.':
+      'एक Google खाता लिंक करें ताकि आप Google से इस खाते में साइन इन कर सकें।',
+    'Linking your account...': 'आपका खाता लिंक हो रहा है...',
+    'Switching to remote signer...': 'रिमोट साइनर पर स्विच हो रहा है...',
+    'Google account already linked': 'Google खाता पहले से लिंक है',
+    'This Google account is already linked to another account':
+      'यह Google खाता पहले से किसी अन्य खाते से लिंक है',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'यह वर्तमान में {{email}} से लिंक है। इसके बजाय इसे इस खाते से लिंक करने पर, पिछला लिंक हटा दिया जाएगा। पिछला खाता अभी भी मौजूद है और अपनी निजी कुंजी के साथ उपयोग योग्य रहता है।',
+    'Unlink the previous account and link this one': 'पिछला खाता अनलिंक करें और इसे लिंक करें',
+    'Switch to remote signer login?': 'रिमोट साइनर लॉगिन पर स्विच करें?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'आपका खाता अब लिंक हो गया है। आप रिमोट साइनर के माध्यम से हस्ताक्षर करने पर स्विच कर सकते हैं, या अपनी निजी कुंजी से स्थानीय रूप से हस्ताक्षर करना जारी रख सकते हैं।',
+    'Switch to remote signer': 'रिमोट साइनर पर स्विच करें',
+    'Keep signing locally': 'स्थानीय रूप से हस्ताक्षर करना जारी रखें',
+    'Google account linked': 'Google खाता लिंक हो गया',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'यह खाता अब एक सुरक्षित रिमोट साइनर के माध्यम से हस्ताक्षर करता है, और आप कभी भी Google से साइन इन कर सकते हैं। आपकी निजी कुंजी कभी भी Google के साथ साझा नहीं की जाती।',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'अब आप Google से इस खाते में साइन इन कर सकते हैं। आप अभी भी अपनी निजी कुंजी से स्थानीय रूप से हस्ताक्षर कर रहे हैं, जो कभी भी Google के साथ साझा नहीं की जाती।',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'रिमोट साइनर तक नहीं पहुँचा जा सका। कृपया बाद में फिर से प्रयास करें या अपना नेटवर्क कनेक्शन जाँचें।',
+    'Retrying ({{current}}/{{max}})': 'पुनः प्रयास ({{current}}/{{max}})',
+    'Automatic updates': 'स्वचालित अपडेट',
+    'Check for and download updates in the background':
+      'पृष्ठभूमि में अपडेट जाँचें और डाउनलोड करें',
+    'Check for updates': 'अपडेट जाँचें',
+    'Checking for updates…': 'अपडेट जाँच रहे हैं…',
+    'Update available: v{{version}}': 'अपडेट उपलब्ध: v{{version}}',
+    'You are on the latest version ({{version}})': 'आप नवीनतम संस्करण पर हैं ({{version}})',
+    'Failed to check for updates': 'अपडेट जाँचने में विफल',
+    Check: 'जाँचें',
+    NEW: 'नया',
+    'Updates are not available in development mode': 'डेवलपमेंट मोड में अपडेट उपलब्ध नहीं हैं',
+    'Search emojis': 'इमोजी खोजें',
+    'Recently used': 'हाल में उपयोग किए गए',
+    'Smileys & Emotion': 'स्माइली और भावनाएँ',
+    'People & Body': 'लोग और शरीर',
+    'Animals & Nature': 'जानवर और प्रकृति',
+    'Food & Drink': 'खाना और पेय',
+    'Travel & Places': 'यात्रा और स्थान',
+    Activities: 'गतिविधियाँ',
+    Objects: 'वस्तुएँ',
+    Symbols: 'प्रतीक',
+    Flags: 'झंडे',
+    'My emojis': 'मेरी इमोजी',
+    'No emojis found': 'कोई इमोजी नहीं मिली',
+    'Encrypted DM unavailable': 'एन्क्रिप्टेड DM अनुपलब्ध',
+    'No DM relays': 'कोई DM रिले नहीं',
+    'n users_one': '{{count}} उपयोगकर्ता',
+    'n users_other': '{{count}} उपयोगकर्ता',
+    'Add this emoji': 'यह इमोजी जोड़ें',
+    'Added to my emojis': 'मेरे इमोजी में जोड़ा गया',
+    'Add whole set': 'पूरा सेट जोड़ें',
+    'Emoji set': 'इमोजी सेट',
+    'Waiting for signer approval...': 'हस्ताक्षरकर्ता की स्वीकृति की प्रतीक्षा है...',
+    'Signer did not respond in time': 'हस्ताक्षरकर्ता ने समय पर प्रतिक्रिया नहीं दी',
+    'Media servers': 'मीडिया सर्वर',
+    'Blossom servers': 'Blossom सर्वर',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'मीडिया पसंदीदा सर्वर पर अपलोड होता है और बाकी सर्वरों पर मिरर किया जाता है।',
+    'Add Blossom server': 'Blossom सर्वर जोड़ें',
+    'You need to add at least one media server in order to upload media files.':
+      'मीडिया फ़ाइलें अपलोड करने के लिए आपको कम से कम एक मीडिया सर्वर जोड़ना होगा।',
+    'Add operator URL': 'ऑपरेटर URL जोड़ें',
     'All set': 'सब तैयार है',
     'Connect Google account': 'Google खाता कनेक्ट करें',
     'Connected to Google': 'Google से कनेक्ट है',
@@ -995,17 +1108,13 @@ export default {
       'इस खाते को Google से लिंक करें ताकि आप दूसरे डिवाइस पर Google से साइन इन कर सकें और इसे पुनर्प्राप्त कर सकें।',
     'Link this account to Google so you can sign in and recover it with Google.':
       'इस खाते को Google से लिंक करें ताकि आप Google से साइन इन कर सकें और इसे पुनर्प्राप्त कर सकें।',
-    'Linking your account...': 'आपका खाता लिंक किया जा रहा है...',
     'New account': 'नया खाता',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'इस Google लॉगिन के लिए अभी तक कोई खाता मौजूद नहीं है। आपके लिए एक नई Nostr कुंजी बनाई गई है।',
     Operators: 'ऑपरेटर',
-    Remove: 'हटाएं',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'लॉग इन करने के लिए Google से साइन इन करें, या यदि आपके पास अभी तक कोई Nostr कुंजी नहीं है तो स्वचालित रूप से एक नई कुंजी बनाएं।',
     'Signing threshold': 'हस्ताक्षर सीमा',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'वह समन्वयक जो आपके Google साइन-इन को सत्यापित करता है और हस्ताक्षर अनुरोधों को ऑपरेटरों तक भेजता है।',
     'This account is linked to Google.': 'यह खाता Google से लिंक है।',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'यह कुंजी आपकी अपनी है। हालांकि आप इसे Google से पुनर्प्राप्त कर सकते हैं, अभी एक बैकअप सहेजें ताकि आप अपने खाते तक पहुंच कभी न खोएं।',
@@ -1015,10 +1124,11 @@ export default {
       'अब आपका खाता Google से लिंक हो गया है। आप दूसरे डिवाइस पर Google से साइन इन कर सकते हैं या अपनी कुंजी पुनर्प्राप्त कर सकते हैं।',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'आपकी निजी कुंजी अलग-अलग ऑपरेटरों के पास रखे गए शार्ड में विभाजित होती है, इसलिए यह कभी एक ही जगह संग्रहीत नहीं होती। आप इस डिवाइस पर अपनी निजी कुंजी से हस्ताक्षर करते रहते हैं।',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'वह समन्वयक जो आपके Google साइन-इन को सत्यापित करता है और हस्ताक्षर अनुरोधों को ऑपरेटरों तक भेजता है।',
     'of {{total}} operators are enough to sign':
       'ऑपरेटर हस्ताक्षर के लिए पर्याप्त हैं ({{total}} में से)',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'स्वतंत्र सर्वर जिनमें से प्रत्येक आपकी निजी कुंजी का एक शार्ड रखता है, ताकि कोई भी अकेला ऑपरेटर स्वयं हस्ताक्षर न कर सके।',
-    'This service is provided by {{host}}': 'यह सेवा {{host}} द्वारा प्रदान की जाती है'
+      'स्वतंत्र सर्वर जिनमें से प्रत्येक आपकी निजी कुंजी का एक शार्ड रखता है, ताकि कोई भी अकेला ऑपरेटर स्वयं हस्ताक्षर न कर सके।'
   }
 }

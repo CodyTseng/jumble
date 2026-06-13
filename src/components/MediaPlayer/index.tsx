@@ -1,18 +1,48 @@
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import blossomService from '@/services/blossom.service'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AudioPlayer from '../AudioPlayer'
 import VideoPlayer from '../VideoPlayer'
 import ExternalLink from '../ExternalLink'
 
+const AUDIO_EXTENSIONS = ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma']
+
+function probeMediaType(url: string): Promise<'video' | 'audio' | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video')
+    video.src = url
+    video.preload = 'metadata'
+    video.crossOrigin = 'anonymous'
+
+    const cleanup = () => {
+      video.onloadedmetadata = null
+      video.onerror = null
+      video.src = ''
+    }
+
+    video.onloadedmetadata = () => {
+      const type = video.videoWidth > 0 || video.videoHeight > 0 ? 'video' : 'audio'
+      cleanup()
+      resolve(type)
+    }
+    video.onerror = () => {
+      cleanup()
+      resolve(null)
+    }
+  })
+}
+
 export default function MediaPlayer({
   src,
+  pubkey,
   className,
   mustLoad = false,
   dim
 }: {
   src: string
+  pubkey?: string
   className?: string
   mustLoad?: boolean
   dim?: { width: number; height: number }
@@ -41,32 +71,48 @@ export default function MediaPlayer({
       return
     }
 
-    const url = new URL(src)
-    const extension = url.pathname.split('.').pop()?.toLowerCase()
+    let cancelled = false
+    setError(false)
 
-    if (extension && ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma'].includes(extension)) {
-      setMediaType('audio')
-      return
+    const detect = async () => {
+      let extension: string | undefined
+      try {
+        extension = new URL(src).pathname.split('.').pop()?.toLowerCase()
+      } catch {
+        // ignore
+      }
+      if (extension && AUDIO_EXTENSIONS.includes(extension)) {
+        if (!cancelled) setMediaType('audio')
+        return
+      }
+
+      let probeUrl = pubkey ? await blossomService.getValidUrl(src, pubkey) : src
+      if (cancelled) return
+
+      while (!cancelled) {
+        const type = await probeMediaType(probeUrl)
+        if (cancelled) return
+        if (type) {
+          setMediaType(type)
+          blossomService.markAsSuccess(src, probeUrl)
+          return
+        }
+        const nextUrl = pubkey ? await blossomService.tryNextUrl(src) : null
+        if (cancelled) return
+        if (!nextUrl) {
+          setError(true)
+          return
+        }
+        probeUrl = nextUrl
+      }
     }
 
-    const video = document.createElement('video')
-    video.src = src
-    video.preload = 'metadata'
-    video.crossOrigin = 'anonymous'
-
-    video.onloadedmetadata = () => {
-      setError(false)
-      setMediaType(video.videoWidth > 0 || video.videoHeight > 0 ? 'video' : 'audio')
-    }
-
-    video.onerror = () => {
-      setError(true)
-    }
+    detect()
 
     return () => {
-      video.src = ''
+      cancelled = true
     }
-  }, [src, display, mustLoad])
+  }, [src, pubkey, display, mustLoad])
 
   if (error) {
     return <ExternalLink url={src} />
@@ -101,8 +147,8 @@ export default function MediaPlayer({
   }
 
   if (mediaType === 'video') {
-    return <VideoPlayer src={src} className={className} dim={dim} />
+    return <VideoPlayer src={src} pubkey={pubkey} className={className} dim={dim} />
   }
 
-  return <AudioPlayer src={src} className={className} />
+  return <AudioPlayer src={src} pubkey={pubkey} className={className} />
 }

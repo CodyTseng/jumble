@@ -884,11 +884,11 @@ export default {
     Shuffle: 'สุ่ม',
     'Login with Google': 'เข้าสู่ระบบด้วย Google',
     'Continue with Google': 'ดำเนินการต่อด้วย Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'ลงชื่อเข้าใช้ด้วย Google แล้วระบบจะสร้างคีย์ Nostr ให้คุณโดยอัตโนมัติ',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'ลงชื่อเข้าใช้ด้วย Google เพื่อเข้าถึงบัญชีของคุณ หากคุณยังไม่มีบัญชี ระบบจะสร้างบัญชี Nostr ให้คุณโดยอัตโนมัติ',
     'How it works': 'วิธีการทำงาน',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'คีย์ส่วนตัวของคุณถูกแบ่งเป็นส่วนย่อยที่เก็บโดยผู้ดำเนินการแยกกัน จึงไม่เคยถูกเก็บในที่เดียว Jumble เซ็นชื่อผ่านผู้เซ็นระยะไกลที่ปลอดภัย คุณสามารถส่งออกคีย์ได้ทุกเมื่อจากการตั้งค่าบัญชี',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'คีย์ส่วนตัวของคุณถูกแบ่งเป็นส่วนย่อยที่เก็บโดยผู้ดำเนินการที่แยกกันและเป็นอิสระต่อกัน จึงไม่เคยถูกเก็บในที่เดียว Google ถูกใช้เพียงเพื่อยืนยันตัวตนของคุณต่อผู้ดำเนินการเท่านั้น ไม่เคยใช้เก็บคีย์ของคุณ',
     'Waiting for Google sign-in...': 'กำลังรอการเข้าสู่ระบบด้วย Google...',
     'Checking your account...': 'กำลังตรวจสอบบัญชีของคุณ...',
     'Setting up your secure account...': 'กำลังตั้งค่าบัญชีที่ปลอดภัยของคุณ...',
@@ -965,8 +965,121 @@ export default {
     'Scan with your signer app': 'สแกนด้วยแอปลงนามของคุณ',
     'Open with Nostr signer app': 'เปิดด้วยแอปลงนาม Nostr',
     'Scan QR code': 'สแกนรหัส QR',
-    'Add operator URL': 'เพิ่ม URL ของ operator',
+    Options: 'ตัวเลือก',
+    Remove: 'ลบ',
+    'End date': 'วันที่สิ้นสุด',
     'Advanced options': 'ตัวเลือกขั้นสูง',
+    'Polls may not display on clients that don’t support them.':
+      'โพลอาจไม่แสดงบนไคลเอนต์ที่ไม่รองรับ',
+    'Show thread context': 'แสดงบริบทของเธรด',
+    'Hide thread context': 'ซ่อนบริบทของเธรด',
+    Enable: 'เปิดใช้งาน',
+    Upload: 'อัปโหลด',
+    Drafts: 'ฉบับร่าง',
+    Failed: 'ล้มเหลว',
+    'Save as draft?': 'บันทึกเป็นฉบับร่าง?',
+    'Your changes will be saved to the drafts box.':
+      'การเปลี่ยนแปลงของคุณจะถูกบันทึกไว้ในกล่องฉบับร่าง',
+    Discard: 'ละทิ้ง',
+    'Keep editing': 'แก้ไขต่อ',
+    'Open drafts': 'เปิดฉบับร่าง',
+    'No drafts yet': 'ยังไม่มีฉบับร่าง',
+    Empty: 'ว่างเปล่า',
+    'Add emoji': 'เพิ่มอิโมจิ',
+    'Edit emoji': 'แก้ไขอิโมจิ',
+    Title: 'ชื่อ',
+    'Image URL': 'URL รูปภาพ',
+    shortcode: 'โค้ดย่อ',
+    Emojis: 'อิโมจิ',
+    'Create emoji set': 'สร้างชุดอิโมจิ',
+    'Edit emoji set': 'แก้ไขชุดอิโมจิ',
+    'My emoji set': 'ชุดอิโมจิของฉัน',
+    'Emoji set not found': 'ไม่พบชุดอิโมจิ',
+    'You can only edit your own emoji sets': 'คุณแก้ไขได้เฉพาะชุดอิโมจิของคุณเอง',
+    'No custom emojis yet': 'ยังไม่มีอิโมจิที่กำหนดเอง',
+    'Title is required': 'ต้องระบุชื่อ',
+    'At least one emoji is required': 'ต้องมีอิโมจิอย่างน้อยหนึ่งรายการ',
+    'Duplicate shortcode: {{shortcode}}': 'โค้ดย่อซ้ำ: {{shortcode}}',
+    'Shortcode is required': 'ต้องระบุโค้ดย่อ',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'โค้ดย่อใช้ได้เฉพาะตัวอักษร ตัวเลข ขีดกลาง และขีดล่างเท่านั้น',
+    'Image URL is required': 'ต้องระบุ URL รูปภาพ',
+    'Invalid image URL': 'URL รูปภาพไม่ถูกต้อง',
+    'Post as': 'โพสต์ในนาม',
+    'Failed to get the signer for the selected account':
+      'ไม่สามารถรับตัวลงนามสำหรับบัญชีที่เลือกได้',
+    'Blossom cache server': 'เซิร์ฟเวอร์แคช Blossom',
+    'Blossom cache server description':
+      'โหลดสื่อผ่านเซิร์ฟเวอร์แคช Blossom เปิดใช้งานหลังจากตรวจสอบแล้วว่าเข้าถึงเซิร์ฟเวอร์ได้เท่านั้น',
+    'Server URL': 'URL ของเซิร์ฟเวอร์',
+    'Cannot reach the Blossom cache server': 'ไม่สามารถเข้าถึงเซิร์ฟเวอร์แคช Blossom ได้',
+    'Link Google account': 'เชื่อมโยงบัญชี Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'เชื่อมโยงบัญชี Google เพื่อให้คุณสามารถเข้าสู่ระบบบัญชีนี้ด้วย Google ได้ คีย์ส่วนตัวของคุณจะไม่ถูกแชร์กับ Google',
+    'Link a Google account so you can sign in to this account with Google.':
+      'เชื่อมโยงบัญชี Google เพื่อให้คุณสามารถเข้าสู่ระบบบัญชีนี้ด้วย Google ได้',
+    'Linking your account...': 'กำลังเชื่อมโยงบัญชีของคุณ...',
+    'Switching to remote signer...': 'กำลังเปลี่ยนไปใช้ผู้เซ็นระยะไกล...',
+    'Google account already linked': 'บัญชี Google เชื่อมโยงไว้แล้ว',
+    'This Google account is already linked to another account':
+      'บัญชี Google นี้เชื่อมโยงกับบัญชีอื่นไว้แล้ว',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'ขณะนี้เชื่อมโยงอยู่กับ {{email}} หากต้องการเชื่อมโยงกับบัญชีนี้แทน การเชื่อมโยงก่อนหน้าจะถูกลบออก บัญชีก่อนหน้ายังคงมีอยู่และยังใช้งานได้ด้วยคีย์ส่วนตัวของบัญชีนั้น',
+    'Unlink the previous account and link this one':
+      'ยกเลิกการเชื่อมโยงบัญชีก่อนหน้าและเชื่อมโยงบัญชีนี้',
+    'Switch to remote signer login?': 'เปลี่ยนไปใช้การเข้าสู่ระบบด้วยผู้เซ็นระยะไกลหรือไม่?',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'บัญชีของคุณเชื่อมโยงเรียบร้อยแล้ว คุณสามารถเปลี่ยนไปเซ็นชื่อผ่านผู้เซ็นระยะไกล หรือเซ็นชื่อในเครื่องด้วยคีย์ส่วนตัวของคุณต่อไปได้',
+    'Switch to remote signer': 'เปลี่ยนไปใช้ผู้เซ็นระยะไกล',
+    'Keep signing locally': 'เซ็นชื่อในเครื่องต่อไป',
+    'Google account linked': 'เชื่อมโยงบัญชี Google แล้ว',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'ตอนนี้บัญชีนี้เซ็นชื่อผ่านผู้เซ็นระยะไกลที่ปลอดภัย และคุณสามารถเข้าสู่ระบบด้วย Google ได้ทุกเมื่อ คีย์ส่วนตัวของคุณจะไม่ถูกแชร์กับ Google',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'ตอนนี้คุณสามารถเข้าสู่ระบบบัญชีนี้ด้วย Google ได้แล้ว คุณยังคงเซ็นชื่อในเครื่องด้วยคีย์ส่วนตัวของคุณ ซึ่งจะไม่ถูกแชร์กับ Google',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'ไม่สามารถเชื่อมต่อผู้เซ็นระยะไกลได้ กรุณาลองใหม่ภายหลังหรือตรวจสอบการเชื่อมต่อเครือข่ายของคุณ',
+    'Retrying ({{current}}/{{max}})': 'กำลังลองใหม่ ({{current}}/{{max}})',
+    'Automatic updates': 'อัปเดตอัตโนมัติ',
+    'Check for and download updates in the background': 'ตรวจสอบและดาวน์โหลดอัปเดตในเบื้องหลัง',
+    'Check for updates': 'ตรวจหาอัปเดต',
+    'Checking for updates…': 'กำลังตรวจหาอัปเดต…',
+    'Update available: v{{version}}': 'มีอัปเดตใหม่: v{{version}}',
+    'You are on the latest version ({{version}})': 'คุณใช้เวอร์ชันล่าสุดอยู่แล้ว ({{version}})',
+    'Failed to check for updates': 'ตรวจหาอัปเดตไม่สำเร็จ',
+    Check: 'ตรวจสอบ',
+    NEW: 'ใหม่',
+    'Updates are not available in development mode': 'ไม่สามารถอัปเดตได้ในโหมดพัฒนา',
+    'Search emojis': 'ค้นหาอีโมจิ',
+    'Recently used': 'ใช้ล่าสุด',
+    'Smileys & Emotion': 'หน้ายิ้มและอารมณ์',
+    'People & Body': 'ผู้คนและร่างกาย',
+    'Animals & Nature': 'สัตว์และธรรมชาติ',
+    'Food & Drink': 'อาหารและเครื่องดื่ม',
+    'Travel & Places': 'การเดินทางและสถานที่',
+    Activities: 'กิจกรรม',
+    Objects: 'สิ่งของ',
+    Symbols: 'สัญลักษณ์',
+    Flags: 'ธง',
+    'My emojis': 'อีโมจิของฉัน',
+    'No emojis found': 'ไม่พบอีโมจิ',
+    'Encrypted DM unavailable': 'ไม่สามารถใช้ข้อความส่วนตัวที่เข้ารหัสได้',
+    'No DM relays': 'ไม่มีรีเลย์สำหรับข้อความส่วนตัว',
+    'n users_other': '{{count}} ผู้ใช้',
+    'Add this emoji': 'เพิ่มอิโมจินี้',
+    'Added to my emojis': 'เพิ่มในอิโมจิของฉันแล้ว',
+    'Add whole set': 'เพิ่มทั้งชุด',
+    'Emoji set': 'ชุดอิโมจิ',
+    'Waiting for signer approval...': 'กำลังรอการอนุมัติจากผู้ลงนาม...',
+    'Signer did not respond in time': 'ผู้ลงนามไม่ตอบกลับในเวลาที่กำหนด',
+    'Media servers': 'เซิร์ฟเวอร์สื่อ',
+    'Blossom servers': 'เซิร์ฟเวอร์ Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'สื่อจะถูกอัปโหลดไปยังเซิร์ฟเวอร์ที่ต้องการและทำมิเรอร์ไปยังเซิร์ฟเวอร์อื่น',
+    'Add Blossom server': 'เพิ่มเซิร์ฟเวอร์ Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'คุณต้องเพิ่มเซิร์ฟเวอร์สื่ออย่างน้อยหนึ่งรายการเพื่ออัปโหลดไฟล์สื่อ',
+    'Add operator URL': 'เพิ่ม URL ของ operator',
     'All set': 'เรียบร้อยแล้ว',
     'Connect Google account': 'เชื่อมต่อบัญชี Google',
     'Connected to Google': 'เชื่อมต่อกับ Google แล้ว',
@@ -978,17 +1091,13 @@ export default {
       'เชื่อมโยงบัญชีนี้กับ Google เพื่อให้คุณสามารถลงชื่อเข้าใช้และกู้คืนบัญชีด้วย Google บนอุปกรณ์อื่นได้',
     'Link this account to Google so you can sign in and recover it with Google.':
       'เชื่อมโยงบัญชีนี้กับ Google เพื่อให้คุณสามารถลงชื่อเข้าใช้และกู้คืนบัญชีด้วย Google ได้',
-    'Linking your account...': 'กำลังเชื่อมโยงบัญชีของคุณ...',
     'New account': 'บัญชีใหม่',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'ยังไม่มีบัญชีสำหรับการล็อกอิน Google นี้ ระบบได้สร้างคีย์ Nostr ใหม่ให้คุณแล้ว',
     Operators: 'Operator',
-    Remove: 'ลบ',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'ลงชื่อเข้าใช้ด้วย Google เพื่อเข้าสู่ระบบ หรือสร้างคีย์ Nostr ใหม่โดยอัตโนมัติหากคุณยังไม่มี',
     'Signing threshold': 'เกณฑ์การลงนาม',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'ตัวประสานงานที่ยืนยันการลงชื่อเข้าใช้ Google ของคุณและส่งต่อคำขอลงนามไปยัง operator',
     'This account is linked to Google.': 'บัญชีนี้เชื่อมโยงกับ Google แล้ว',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'คีย์นี้เป็นของคุณที่ต้องเก็บรักษาไว้ แม้ว่าคุณจะกู้คืนได้ด้วย Google แต่ควรบันทึกสำรองไว้ตอนนี้ เพื่อไม่ให้สูญเสียการเข้าถึงบัญชีของคุณ',
@@ -998,10 +1107,11 @@ export default {
       'ขณะนี้บัญชีของคุณเชื่อมโยงกับ Google แล้ว คุณสามารถลงชื่อเข้าใช้หรือกู้คืนคีย์ด้วย Google บนอุปกรณ์อื่นได้',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'คีย์ส่วนตัวของคุณถูกแบ่งออกเป็นชาร์ดที่เก็บไว้กับ operator แต่ละราย จึงไม่เคยถูกจัดเก็บไว้ในที่เดียว คุณยังคงลงนามด้วยคีย์ส่วนตัวของคุณบนอุปกรณ์นี้',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'ตัวประสานงานที่ยืนยันการลงชื่อเข้าใช้ Google ของคุณและส่งต่อคำขอลงนามไปยัง operator',
     'of {{total}} operators are enough to sign':
       'operator ก็เพียงพอสำหรับการลงนาม (จากทั้งหมด {{total}} ราย)',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'เซิร์ฟเวอร์อิสระที่แต่ละแห่งเก็บชาร์ดของคีย์ส่วนตัวของคุณ ดังนั้น operator รายเดียวจึงไม่สามารถลงนามได้ด้วยตัวเอง',
-    'This service is provided by {{host}}': 'บริการนี้ให้บริการโดย {{host}}'
+      'เซิร์ฟเวอร์อิสระที่แต่ละแห่งเก็บชาร์ดของคีย์ส่วนตัวของคุณ ดังนั้น operator รายเดียวจึงไม่สามารถลงนามได้ด้วยตัวเอง'
   }
 }

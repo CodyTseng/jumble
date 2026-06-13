@@ -44,12 +44,18 @@ const SecondaryPageLayout = forwardRef(
       ref,
       () => ({
         scrollToTop: (behavior: ScrollBehavior = 'smooth') => {
-          setTimeout(() => {
-            if (scrollAreaRef.current) {
-              return scrollAreaRef.current.scrollTo({ top: 0, behavior })
-            }
-            window.scrollTo({ top: 0, behavior })
-          }, 10)
+          // Double rAF: wait for React commit + next paint, so the scroll
+          // lands on the new layout and isn't fighting Safari's clamp /
+          // momentum scrolling when content height changes.
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (scrollAreaRef.current) {
+                scrollAreaRef.current.scrollTo({ top: 0, behavior })
+                return
+              }
+              window.scrollTo({ top: 0, behavior })
+            })
+          })
         }
       }),
       []

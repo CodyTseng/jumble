@@ -900,11 +900,11 @@ export default {
     Shuffle: 'シャッフル',
     'Login with Google': 'Googleでログイン',
     'Continue with Google': 'Googleで続ける',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'Googleでサインインすると、Nostrキーが自動的に作成されます。',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'Googleでサインインしてアカウントにアクセスします。まだお持ちでない場合は、Nostrアカウントが自動的に作成されます。',
     'How it works': '仕組み',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'あなたの秘密鍵は複数のオペレーターが保持するシャードに分割されるため、一箇所に保存されることはありません。Jumbleはセキュアなリモート署名者を通じて署名します。アカウント設定からいつでも鍵をエクスポートできます。',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'あなたの秘密鍵は、独立した別々のオペレーターが保持するシャードに分割されるため、一箇所に保存されることはありません。Googleはオペレーターに対してあなたの本人確認を行うためにのみ使用され、鍵の保存に使われることは決してありません。',
     'Waiting for Google sign-in...': 'Googleサインインを待っています...',
     'Checking your account...': 'アカウントを確認しています...',
     'Setting up your secure account...': 'セキュアなアカウントを設定しています...',
@@ -983,8 +983,121 @@ export default {
     'Scan with your signer app': '署名アプリでスキャン',
     'Open with Nostr signer app': 'Nostr 署名アプリで開く',
     'Scan QR code': 'QR コードをスキャン',
-    'Add operator URL': 'オペレーターURLを追加',
+    Options: '選択肢',
+    Remove: '削除',
+    'End date': '終了日',
     'Advanced options': '詳細オプション',
+    'Polls may not display on clients that don’t support them.':
+      '投票機能に対応していないクライアントでは表示されない場合があります。',
+    'Show thread context': 'スレッドの文脈を表示',
+    'Hide thread context': 'スレッドの文脈を非表示',
+    Enable: '有効化',
+    Upload: 'アップロード',
+    Drafts: '下書き',
+    Failed: '失敗',
+    'Save as draft?': '下書きとして保存しますか？',
+    'Your changes will be saved to the drafts box.': '変更は下書きボックスに保存されます。',
+    Discard: '破棄',
+    'Keep editing': '編集を続ける',
+    'Open drafts': '下書きを開く',
+    'No drafts yet': '下書きはまだありません',
+    Empty: '空',
+    'Add emoji': '絵文字を追加',
+    'Edit emoji': '絵文字を編集',
+    Title: 'タイトル',
+    'Image URL': '画像URL',
+    shortcode: 'ショートコード',
+    Emojis: '絵文字',
+    'Create emoji set': '絵文字セットを作成',
+    'Edit emoji set': '絵文字セットを編集',
+    'My emoji set': 'マイ絵文字セット',
+    'Emoji set not found': '絵文字セットが見つかりません',
+    'You can only edit your own emoji sets': '自分の絵文字セットのみ編集できます',
+    'No custom emojis yet': 'カスタム絵文字はまだありません',
+    'Title is required': 'タイトルは必須です',
+    'At least one emoji is required': '絵文字が少なくとも1つ必要です',
+    'Duplicate shortcode: {{shortcode}}': 'ショートコードが重複しています: {{shortcode}}',
+    'Shortcode is required': 'ショートコードは必須です',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'ショートコードに使用できるのは英数字、ハイフン、アンダースコアのみです',
+    'Image URL is required': '画像URLは必須です',
+    'Invalid image URL': '無効な画像URLです',
+    'Post as': '投稿アカウント',
+    'Failed to get the signer for the selected account':
+      '選択したアカウントの署名者を取得できませんでした',
+    'Blossom cache server': 'Blossom キャッシュサーバー',
+    'Blossom cache server description':
+      'Blossom キャッシュサーバー経由でメディアを読み込みます。サーバーに到達できることを確認してから有効にしてください。',
+    'Server URL': 'サーバー URL',
+    'Cannot reach the Blossom cache server': 'Blossom キャッシュサーバーに接続できません',
+    'Link Google account': 'Googleアカウントを連携',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'Googleアカウントを連携すると、Googleでこのアカウントにサインインできます。秘密鍵がGoogleと共有されることは決してありません。',
+    'Link a Google account so you can sign in to this account with Google.':
+      'Googleアカウントを連携すると、Googleでこのアカウントにサインインできます。',
+    'Linking your account...': 'アカウントを連携しています...',
+    'Switching to remote signer...': 'リモート署名者に切り替えています...',
+    'Google account already linked': 'Googleアカウントは既に連携されています',
+    'This Google account is already linked to another account':
+      'このGoogleアカウントは既に別のアカウントに連携されています',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      '現在 {{email}} に連携されています。代わりにこのアカウントに連携すると、以前の連携は解除されます。以前のアカウントは引き続き存在し、その秘密鍵で利用できます。',
+    'Unlink the previous account and link this one':
+      '以前のアカウントの連携を解除してこのアカウントを連携',
+    'Switch to remote signer login?': 'リモート署名者ログインに切り替えますか？',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'アカウントが連携されました。リモート署名者を通じた署名に切り替えることも、秘密鍵を使ってローカルで署名を続けることもできます。',
+    'Switch to remote signer': 'リモート署名者に切り替え',
+    'Keep signing locally': 'ローカルでの署名を続ける',
+    'Google account linked': 'Googleアカウントを連携しました',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'このアカウントはセキュアなリモート署名者を通じて署名するようになり、いつでもGoogleでサインインできます。秘密鍵がGoogleと共有されることは決してありません。',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'これでGoogleでこのアカウントにサインインできます。署名は引き続き秘密鍵を使ってローカルで行われ、秘密鍵がGoogleと共有されることは決してありません。',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'リモート署名者に接続できませんでした。しばらくしてからもう一度お試しいただくか、ネットワーク接続をご確認ください。',
+    'Retrying ({{current}}/{{max}})': '再試行中 ({{current}}/{{max}})',
+    'Automatic updates': '自動更新',
+    'Check for and download updates in the background':
+      'バックグラウンドで更新を確認してダウンロードする',
+    'Check for updates': '更新を確認',
+    'Checking for updates…': '更新を確認中…',
+    'Update available: v{{version}}': '更新があります: v{{version}}',
+    'You are on the latest version ({{version}})': '最新バージョンをご利用中です ({{version}})',
+    'Failed to check for updates': '更新の確認に失敗しました',
+    Check: '確認',
+    NEW: '新着',
+    'Updates are not available in development mode': '開発モードでは更新は利用できません',
+    'Search emojis': '絵文字を検索',
+    'Recently used': '最近使用したもの',
+    'Smileys & Emotion': 'スマイリーと感情',
+    'People & Body': '人と体',
+    'Animals & Nature': '動物と自然',
+    'Food & Drink': '食べ物と飲み物',
+    'Travel & Places': '旅行と場所',
+    Activities: 'アクティビティ',
+    Objects: '物',
+    Symbols: '記号',
+    Flags: '旗',
+    'My emojis': 'マイ絵文字',
+    'No emojis found': '絵文字が見つかりません',
+    'Encrypted DM unavailable': '暗号化DMを利用できません',
+    'No DM relays': 'DMリレーがありません',
+    'n users_other': '{{count}}人のユーザー',
+    'Add this emoji': 'この絵文字を追加',
+    'Added to my emojis': 'マイ絵文字に追加済み',
+    'Add whole set': 'セット全体を追加',
+    'Emoji set': '絵文字セット',
+    'Waiting for signer approval...': '署名者の承認を待っています…',
+    'Signer did not respond in time': '署名者が時間内に応答しませんでした',
+    'Media servers': 'メディアサーバー',
+    'Blossom servers': 'Blossomサーバー',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'メディアは優先サーバーにアップロードされ、他のサーバーにミラーリングされます。',
+    'Add Blossom server': 'Blossomサーバーを追加',
+    'You need to add at least one media server in order to upload media files.':
+      'メディアファイルをアップロードするには、メディアサーバーを少なくとも1つ追加する必要があります。',
+    'Add operator URL': 'オペレーターURLを追加',
     'All set': '準備完了',
     'Connect Google account': 'Googleアカウントを連携',
     'Connected to Google': 'Googleに接続済み',
@@ -996,17 +1109,13 @@ export default {
       'このアカウントをGoogleに連携すると、他のデバイスでもGoogleでサインインして復元できます。',
     'Link this account to Google so you can sign in and recover it with Google.':
       'このアカウントをGoogleに連携すると、Googleでサインインして復元できます。',
-    'Linking your account...': 'アカウントを連携しています...',
     'New account': '新規アカウント',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'このGoogleログインに対応するアカウントはまだありません。新しいNostrキーを作成しました。',
     Operators: 'オペレーター',
-    Remove: '削除',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'Googleでサインインしてログインするか、Nostrキーをまだお持ちでない場合は自動的に新しいキーを作成します。',
     'Signing threshold': '署名のしきい値',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'Googleのサインインを検証し、署名リクエストをオペレーターに中継するコーディネーターです。',
     'This account is linked to Google.': 'このアカウントはGoogleに連携されています。',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'このキーはあなたのものです。Googleで復元できますが、アカウントへのアクセスを失わないよう今すぐバックアップを保存してください。',
@@ -1016,10 +1125,11 @@ export default {
       'アカウントがGoogleに連携されました。他のデバイスでもGoogleでサインインまたはキーの復元ができます。',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       '秘密鍵は複数のオペレーターが保持するシャードに分割されるため、一箇所に保存されることはありません。このデバイスでは引き続き秘密鍵で署名できます。',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Googleのサインインを検証し、署名リクエストをオペレーターに中継するコーディネーターです。',
     'of {{total}} operators are enough to sign':
       '人のオペレーターで署名できます（全{{total}}件中）',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'それぞれがあなたの秘密鍵のシャードを保持する独立したサーバーです。そのため、単独のオペレーターだけでは署名できません。',
-    'This service is provided by {{host}}': 'このサービスは {{host}} によって提供されています'
+      'それぞれがあなたの秘密鍵のシャードを保持する独立したサーバーです。そのため、単独のオペレーターだけでは署名できません。'
   }
 }

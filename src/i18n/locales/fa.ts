@@ -900,11 +900,11 @@ export default {
     Shuffle: 'بُر زدن',
     'Login with Google': 'ورود با Google',
     'Continue with Google': 'ادامه با Google',
-    'Sign in with Google and a Nostr key will be created for you automatically.':
-      'با Google وارد شوید و یک کلید Nostr به طور خودکار برای شما ایجاد می‌شود.',
+    "Sign in with Google to access your account. If you don't have one yet, a Nostr account is created for you automatically.":
+      'برای دسترسی به حساب خود با Google وارد شوید. اگر هنوز حسابی ندارید، یک حساب Nostr به‌طور خودکار برای شما ایجاد می‌شود.',
     'How it works': 'نحوه کار',
-    'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.':
-      'کلید خصوصی شما به قطعاتی تقسیم می‌شود که هر کدام نزد اپراتورهای جداگانه نگهداری می‌شوند، پس هرگز در یک جا ذخیره نمی‌شود. Jumble از طریق یک امضاکننده از راه دور امن امضا می‌کند. می‌توانید کلیدتان را هر زمان از تنظیمات حساب صادر کنید.',
+    'Your private key is split into shards held by separate, independent operators, so it is never stored in one place. Google is only used to prove your identity to the operators, never to store your key.':
+      'کلید خصوصی شما به قطعاتی تقسیم می‌شود که هر کدام نزد اپراتورهای جداگانه و مستقل نگهداری می‌شوند، پس هرگز در یک جا ذخیره نمی‌شود. Google تنها برای اثبات هویت شما به اپراتورها استفاده می‌شود و هرگز برای ذخیره کلیدتان به کار نمی‌رود.',
     'Waiting for Google sign-in...': 'در انتظار ورود با Google...',
     'Checking your account...': 'در حال بررسی حساب شما...',
     'Setting up your secure account...': 'در حال راه‌اندازی حساب امن شما...',
@@ -982,8 +982,123 @@ export default {
     'Scan with your signer app': 'با اپلیکیشن امضاکننده اسکن کنید',
     'Open with Nostr signer app': 'با اپلیکیشن امضاکننده‌ی Nostr باز کنید',
     'Scan QR code': 'اسکن کد QR',
+    Options: 'گزینه‌ها',
+    Remove: 'حذف',
+    'End date': 'تاریخ پایان',
+    'Advanced options': 'گزینه‌های پیشرفته',
+    'Polls may not display on clients that don’t support them.':
+      'نظرسنجی‌ها ممکن است در کلاینت‌هایی که از آن‌ها پشتیبانی نمی‌کنند نمایش داده نشوند.',
+    'Show thread context': 'نمایش بافت گفت‌وگو',
+    'Hide thread context': 'پنهان کردن بافت گفت‌وگو',
+    Enable: 'فعال‌سازی',
+    Upload: 'بارگذاری',
+    Drafts: 'پیش‌نویس‌ها',
+    Failed: 'ناموفق',
+    'Save as draft?': 'ذخیره به‌عنوان پیش‌نویس؟',
+    'Your changes will be saved to the drafts box.':
+      'تغییرات شما در صندوق پیش‌نویس‌ها ذخیره می‌شود.',
+    Discard: 'دور انداختن',
+    'Keep editing': 'ادامهٔ ویرایش',
+    'Open drafts': 'باز کردن پیش‌نویس‌ها',
+    'No drafts yet': 'هنوز پیش‌نویسی نیست',
+    Empty: 'خالی',
+    'Add emoji': 'افزودن ایموجی',
+    'Edit emoji': 'ویرایش ایموجی',
+    Title: 'عنوان',
+    'Image URL': 'نشانی تصویر',
+    shortcode: 'کد کوتاه',
+    Emojis: 'ایموجی‌ها',
+    'Create emoji set': 'ساخت مجموعه ایموجی',
+    'Edit emoji set': 'ویرایش مجموعه ایموجی',
+    'My emoji set': 'مجموعه ایموجی من',
+    'Emoji set not found': 'مجموعه ایموجی یافت نشد',
+    'You can only edit your own emoji sets':
+      'فقط می‌توانید مجموعه‌های ایموجی خودتان را ویرایش کنید',
+    'No custom emojis yet': 'هنوز ایموجی سفارشی‌ای وجود ندارد',
+    'Title is required': 'عنوان الزامی است',
+    'At least one emoji is required': 'حداقل یک ایموجی لازم است',
+    'Duplicate shortcode: {{shortcode}}': 'کد کوتاه تکراری: {{shortcode}}',
+    'Shortcode is required': 'کد کوتاه الزامی است',
+    'Shortcode can only contain letters, numbers, hyphens and underscores':
+      'کد کوتاه فقط می‌تواند شامل حروف، اعداد، خط تیره و زیرخط باشد',
+    'Image URL is required': 'نشانی تصویر الزامی است',
+    'Invalid image URL': 'نشانی تصویر نامعتبر است',
+    'Post as': 'انتشار به‌عنوان',
+    'Failed to get the signer for the selected account':
+      'دریافت امضاکننده برای حساب انتخاب‌شده ناموفق بود',
+    'Blossom cache server': 'سرور کش Blossom',
+    'Blossom cache server description':
+      'بارگذاری رسانه از طریق سرور کش Blossom. فقط پس از تأیید در دسترس بودن سرور آن را فعال کنید.',
+    'Server URL': 'آدرس سرور',
+    'Cannot reach the Blossom cache server': 'دسترسی به سرور کش Blossom ممکن نیست',
+    'Link Google account': 'پیوند حساب Google',
+    'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.':
+      'یک حساب Google را پیوند دهید تا بتوانید با Google به این حساب وارد شوید. کلید خصوصی شما هرگز با Google به اشتراک گذاشته نمی‌شود.',
+    'Link a Google account so you can sign in to this account with Google.':
+      'یک حساب Google را پیوند دهید تا بتوانید با Google به این حساب وارد شوید.',
+    'Linking your account...': 'در حال پیوند دادن حساب شما...',
+    'Switching to remote signer...': 'در حال تغییر به امضاکننده‌ی راه‌دور...',
+    'Google account already linked': 'حساب Google از قبل پیوند داده شده است',
+    'This Google account is already linked to another account':
+      'این حساب Google از قبل به حساب دیگری پیوند داده شده است',
+    'It is currently linked to {{email}}. To link it to this account instead, the previous link will be removed. The previous account still exists and remains usable with its private key.':
+      'این حساب در حال حاضر به {{email}} پیوند داده شده است. برای پیوند دادن آن به این حساب، پیوند قبلی حذف خواهد شد. حساب قبلی همچنان وجود دارد و با کلید خصوصی خود قابل استفاده باقی می‌ماند.',
+    'Unlink the previous account and link this one': 'لغو پیوند حساب قبلی و پیوند دادن این حساب',
+    'Switch to remote signer login?': 'تغییر به ورود با امضاکننده‌ی راه‌دور؟',
+    'Your account is now linked. You can switch to signing through the remote signer, or keep signing locally with your private key.':
+      'حساب شما اکنون پیوند داده شد. می‌توانید به امضا کردن از طریق امضاکننده‌ی راه‌دور تغییر دهید، یا امضا کردن محلی با کلید خصوصی خود را ادامه دهید.',
+    'Switch to remote signer': 'تغییر به امضاکننده‌ی راه‌دور',
+    'Keep signing locally': 'ادامه‌ی امضا کردن محلی',
+    'Google account linked': 'حساب Google پیوند داده شد',
+    'This account now signs through a secure remote signer, and you can sign in with Google anytime. Your private key is never shared with Google.':
+      'این حساب اکنون از طریق یک امضاکننده‌ی راه‌دور امن امضا می‌کند و می‌توانید هر زمان با Google وارد شوید. کلید خصوصی شما هرگز با Google به اشتراک گذاشته نمی‌شود.',
+    'You can now sign in to this account with Google. You are still signing locally with your private key, which is never shared with Google.':
+      'اکنون می‌توانید با Google به این حساب وارد شوید. شما همچنان به‌صورت محلی با کلید خصوصی خود امضا می‌کنید که هرگز با Google به اشتراک گذاشته نمی‌شود.',
+    'Could not reach the remote signer. Please try again later or check your network connection.':
+      'دسترسی به امضاکننده‌ی راه‌دور ممکن نشد. لطفاً بعداً دوباره تلاش کنید یا اتصال شبکه‌ی خود را بررسی کنید.',
+    'Retrying ({{current}}/{{max}})': 'در حال تلاش مجدد ({{current}}/{{max}})',
+    'Automatic updates': 'به‌روزرسانی‌های خودکار',
+    'Check for and download updates in the background': 'بررسی و دانلود به‌روزرسانی‌ها در پس‌زمینه',
+    'Check for updates': 'بررسی به‌روزرسانی‌ها',
+    'Checking for updates…': 'در حال بررسی به‌روزرسانی‌ها…',
+    'Update available: v{{version}}': 'به‌روزرسانی موجود است: v{{version}}',
+    'You are on the latest version ({{version}})':
+      'شما از آخرین نسخه استفاده می‌کنید ({{version}})',
+    'Failed to check for updates': 'بررسی به‌روزرسانی‌ها ناموفق بود',
+    Check: 'بررسی',
+    NEW: 'جدید',
+    'Updates are not available in development mode': 'به‌روزرسانی‌ها در حالت توسعه در دسترس نیستند',
+    'Search emojis': 'جستجوی ایموجی‌ها',
+    'Recently used': 'اخیراً استفاده‌شده',
+    'Smileys & Emotion': 'شکلک‌ها و احساسات',
+    'People & Body': 'افراد و بدن',
+    'Animals & Nature': 'حیوانات و طبیعت',
+    'Food & Drink': 'غذا و نوشیدنی',
+    'Travel & Places': 'سفر و مکان‌ها',
+    Activities: 'فعالیت‌ها',
+    Objects: 'اشیاء',
+    Symbols: 'نمادها',
+    Flags: 'پرچم‌ها',
+    'My emojis': 'ایموجی‌های من',
+    'No emojis found': 'هیچ ایموجی‌ای یافت نشد',
+    'Encrypted DM unavailable': 'پیام خصوصی رمزگذاری‌شده در دسترس نیست',
+    'No DM relays': 'بدون رله‌ی پیام خصوصی',
+    'n users_one': '{{count}} کاربر',
+    'n users_other': '{{count}} کاربر',
+    'Add this emoji': 'افزودن این ایموجی',
+    'Added to my emojis': 'به ایموجی‌های من افزوده شد',
+    'Add whole set': 'افزودن کل مجموعه',
+    'Emoji set': 'مجموعه ایموجی',
+    'Waiting for signer approval...': 'در انتظار تأیید امضاکننده...',
+    'Signer did not respond in time': 'امضاکننده به‌موقع پاسخ نداد',
+    'Media servers': 'سرورهای رسانه',
+    'Blossom servers': 'سرورهای Blossom',
+    'Media is uploaded to the preferred server and mirrored to the others.':
+      'رسانه‌ها در سرور ترجیحی بارگذاری و روی سایر سرورها بازتاب داده می‌شوند.',
+    'Add Blossom server': 'افزودن سرور Blossom',
+    'You need to add at least one media server in order to upload media files.':
+      'برای بارگذاری فایل‌های رسانه‌ای باید حداقل یک سرور رسانه اضافه کنید.',
     'Add operator URL': 'افزودن نشانی اپراتور',
-    'Advanced options': 'تنظیمات پیشرفته',
     'All set': 'همه‌چیز آماده است',
     'Connect Google account': 'اتصال حساب Google',
     'Connected to Google': 'متصل به Google',
@@ -995,17 +1110,13 @@ export default {
       'این حساب را به Google متصل کنید تا بتوانید با Google وارد شوید و آن را روی دستگاه‌های دیگر بازیابی کنید.',
     'Link this account to Google so you can sign in and recover it with Google.':
       'این حساب را به Google متصل کنید تا بتوانید با Google وارد شوید و آن را بازیابی کنید.',
-    'Linking your account...': 'در حال اتصال حساب شما...',
     'New account': 'حساب جدید',
     'No account exists for this Google login yet. A new Nostr key has been created for you.':
       'هنوز هیچ حسابی برای این ورود با Google وجود ندارد. یک کلید Nostr جدید برای شما ساخته شد.',
     Operators: 'اپراتورها',
-    Remove: 'حذف',
     'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
       'با Google وارد شوید تا وارد حساب شوید، یا اگر هنوز کلید Nostr ندارید، به‌طور خودکار یک کلید جدید ساخته شود.',
     'Signing threshold': 'آستانهٔ امضا',
-    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
-      'هماهنگ‌کننده‌ای که ورود شما با Google را تأیید می‌کند و درخواست‌های امضا را به اپراتورها می‌رساند.',
     'This account is linked to Google.': 'این حساب به Google متصل است.',
     'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
       'این کلید مال شماست و باید آن را نگه دارید. هرچند می‌توانید آن را با Google بازیابی کنید، همین حالا یک نسخهٔ پشتیبان ذخیره کنید تا هرگز دسترسی به حساب خود را از دست ندهید.',
@@ -1015,9 +1126,10 @@ export default {
       'اکنون حساب شما به Google متصل است. می‌توانید روی دستگاه‌های دیگر با Google وارد شوید یا کلید خود را بازیابی کنید.',
     'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
       'کلید خصوصی شما به قطعه‌هایی تقسیم می‌شود که نزد اپراتورهای جداگانه نگهداری می‌شوند، بنابراین هرگز در یک جا ذخیره نمی‌شود. شما همچنان با کلید خصوصی خود روی این دستگاه امضا می‌کنید.',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'هماهنگ‌کننده‌ای که ورود شما با Google را تأیید می‌کند و درخواست‌های امضا را به اپراتورها می‌رساند.',
     'of {{total}} operators are enough to sign': 'اپراتور از {{total}} برای امضا کافی است',
     'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
-      'سرورهای مستقلی که هرکدام یک قطعه از کلید خصوصی شما را نگه می‌دارند، به‌طوری‌که هیچ اپراتوری به‌تنهایی نمی‌تواند امضا کند.',
-    'This service is provided by {{host}}': 'این سرویس توسط {{host}} ارائه می‌شود'
+      'سرورهای مستقلی که هرکدام یک قطعه از کلید خصوصی شما را نگه می‌دارند، به‌طوری‌که هیچ اپراتوری به‌تنهایی نمی‌تواند امضا کند.'
   }
 }

@@ -39,6 +39,10 @@ export default function EmojiContent({
   }, [activeTabId, standalone, packs])
 
   useEffect(() => {
+    return recentEmojiService.subscribe(() => setPickVersion((v) => v + 1))
+  }, [])
+
+  useEffect(() => {
     const trimmed = query.trim()
     if (!trimmed) {
       setNativeResults([])

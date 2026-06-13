@@ -38,6 +38,10 @@ export function registerIpcHandlers(
     manager.setAllowInsecure(allow)
   )
 
+  ipcMain.handle(IPC_CHANNELS.setTrustedInsecureUrls, (_e, urls: string[]) =>
+    manager.setTrustedInsecureRelayUrls(urls)
+  )
+
   ipcMain.on(IPC_CHANNELS.authResponse, (_e, payload: TAuthResponsePayload) =>
     manager.handleAuthResponse(payload)
   )

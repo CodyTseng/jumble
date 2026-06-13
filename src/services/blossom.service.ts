@@ -1,5 +1,5 @@
+import blossomCache from '@/services/blossom-cache.service'
 import client from '@/services/client.service'
-import localBlossomCache from '@/services/local-blossom-cache.service'
 import { getHashFromURL } from 'blossom-client-sdk'
 
 class BlossomService {
@@ -11,6 +11,7 @@ class BlossomService {
       resolve: (url: string) => void
       promise: Promise<string>
       tried: Set<string>
+      url: string
       validUrl?: string
     }
   >()
@@ -22,10 +23,19 @@ class BlossomService {
     return BlossomService.instance
   }
 
+  peekValidUrl(url: string, pubkey: string): string {
+    const cache = this.cacheMap.get(url)
+    if (cache?.validUrl) {
+      return cache.validUrl
+    }
+    const localUrl = blossomCache.rewriteUrl(url, pubkey)
+    return localUrl ?? url
+  }
+
   async getValidUrl(url: string, pubkey: string): Promise<string> {
     const cache = this.cacheMap.get(url)
     if (cache) {
-      return cache.validUrl ?? cache.promise
+      return cache.validUrl ?? cache.url
     }
 
     let resolveFunc: (url: string) => void
@@ -33,14 +43,18 @@ class BlossomService {
       resolveFunc = resolve
     })
     const tried = new Set<string>()
-    this.cacheMap.set(url, { pubkey, resolve: resolveFunc!, promise, tried })
 
-    const localUrl = localBlossomCache.rewriteUrl(url, pubkey)
+    const localUrl = blossomCache.rewriteUrl(url, pubkey)
     if (localUrl) {
-      tried.add(localBlossomCache.hostname)
+      this.cacheMap.set(url, { pubkey, resolve: resolveFunc!, promise, tried, url: localUrl })
+      const cacheHostname = blossomCache.hostname
+      if (cacheHostname) {
+        tried.add(cacheHostname)
+      }
       return localUrl
     }
 
+    this.cacheMap.set(url, { pubkey, resolve: resolveFunc!, promise, tried, url })
     try {
       const u = new URL(url)
       tried.add(u.hostname)
@@ -111,6 +125,7 @@ class BlossomService {
         resolve: () => {},
         promise: Promise.resolve(successUrl),
         tried: new Set<string>(),
+        url: successUrl,
         validUrl: successUrl
       })
       return

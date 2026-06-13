@@ -1,9 +1,9 @@
 import {
   ALLOWED_FILTER_KINDS,
   BIG_RELAY_URLS,
+  DEFAULT_BLOSSOM_CACHE_SERVER_URL,
   DEFAULT_FAVICON_URL_TEMPLATE,
   DEFAULT_FEED_TABS,
-  DEFAULT_NIP_96_SERVICE,
   ExtendedKind,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
@@ -47,7 +47,6 @@ class LocalStorageService {
   private defaultZapComment: string = 'Zap!'
   private quickZap: boolean = false
   private accountFeedInfoMap: Record<string, TFeedInfo | undefined> = {}
-  private mediaUploadService: string = DEFAULT_NIP_96_SERVICE
   private autoplay: boolean = true
   private videoLoop: boolean = false
   private translationServiceConfigMap: Record<string, TTranslationServiceConfig> = {}
@@ -68,6 +67,8 @@ class LocalStorageService {
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
   private filterOutOnionRelays: boolean = !isTorBrowser()
   private allowInsecureConnection: boolean = false
+  private blossomCacheServerUrl: string = DEFAULT_BLOSSOM_CACHE_SERVER_URL
+  private blossomCacheServerEnabled: boolean = false
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
@@ -79,6 +80,9 @@ class LocalStorageService {
   private minTrustScoreMap: Record<string, number> = {}
   private hideIndirectNotifications: boolean = false
   private encryptionKeyPrivkeyMap: Record<string, string> = {}
+  // Rotated-out encryption keys kept around (per account) so messages still
+  // encrypted to them can be decrypted during the grace period. retiredAt is in ms.
+  private retiredEncryptionKeyMap: Record<string, { privkey: string; retiredAt: number }[]> = {}
   private clientKeyPrivkeyMap: Record<string, string> = {}
   // Per-pubkey maps for fields that historically lived inline on TAccount.
   // Always the source of truth at runtime regardless of mode.
@@ -178,10 +182,6 @@ class LocalStorageService {
     const accountFeedInfoMapStr =
       window.localStorage.getItem(StorageKey.ACCOUNT_FEED_INFO_MAP) ?? '{}'
     this.accountFeedInfoMap = JSON.parse(accountFeedInfoMapStr)
-
-    // deprecated
-    this.mediaUploadService =
-      window.localStorage.getItem(StorageKey.MEDIA_UPLOAD_SERVICE) ?? DEFAULT_NIP_96_SERVICE
 
     this.autoplay = window.localStorage.getItem(StorageKey.AUTOPLAY) !== 'false'
     this.videoLoop = window.localStorage.getItem(StorageKey.VIDEO_LOOP) === 'true'
@@ -324,6 +324,12 @@ class LocalStorageService {
     this.allowInsecureConnection =
       window.localStorage.getItem(StorageKey.ALLOW_INSECURE_CONNECTION) === 'true'
 
+    this.blossomCacheServerUrl =
+      window.localStorage.getItem(StorageKey.BLOSSOM_CACHE_SERVER_URL) ??
+      DEFAULT_BLOSSOM_CACHE_SERVER_URL
+    this.blossomCacheServerEnabled =
+      window.localStorage.getItem(StorageKey.BLOSSOM_CACHE_SERVER_ENABLED) === 'true'
+
     this.quickReaction = window.localStorage.getItem(StorageKey.QUICK_REACTION) === 'true'
     const quickReactionEmojiStr =
       window.localStorage.getItem(StorageKey.QUICK_REACTION_EMOJI) ?? '+'
@@ -375,6 +381,20 @@ class LocalStorageService {
         const map = JSON.parse(encryptionKeyPrivkeyMapStr)
         if (typeof map === 'object' && map !== null) {
           this.encryptionKeyPrivkeyMap = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
+    }
+
+    const retiredEncryptionKeyMapStr = window.localStorage.getItem(
+      StorageKey.RETIRED_ENCRYPTION_KEY_PRIVKEY_MAP
+    )
+    if (retiredEncryptionKeyMapStr) {
+      try {
+        const map = JSON.parse(retiredEncryptionKeyMapStr)
+        if (typeof map === 'object' && map !== null) {
+          this.retiredEncryptionKeyMap = map
         }
       } catch {
         // Invalid JSON, use default
@@ -579,6 +599,7 @@ class LocalStorageService {
     this.ncryptsecByPubkey = {}
     this.bunkerClientSecretByPubkey = {}
     this.encryptionKeyPrivkeyMap = {}
+    this.retiredEncryptionKeyMap = {}
     this.clientKeyPrivkeyMap = {}
 
     if (available) {
@@ -589,6 +610,7 @@ class LocalStorageService {
         Object.assign(this.ncryptsecByPubkey, bundle.ncryptsec ?? {})
         Object.assign(this.bunkerClientSecretByPubkey, bundle.bunkerClientSecretKey ?? {})
         Object.assign(this.encryptionKeyPrivkeyMap, bundle.encryptionKeyPrivkey ?? {})
+        Object.assign(this.retiredEncryptionKeyMap, bundle.retiredEncryptionKeyPrivkey ?? {})
         Object.assign(this.clientKeyPrivkeyMap, bundle.clientKeyPrivkey ?? {})
       } catch (err) {
         console.error('[storage] failed to load encrypted secrets:', err)
@@ -601,6 +623,7 @@ class LocalStorageService {
 
     // Defensive cleanup: scrub any plaintext that lingered in localStorage.
     window.localStorage.removeItem(StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP)
+    window.localStorage.removeItem(StorageKey.RETIRED_ENCRYPTION_KEY_PRIVKEY_MAP)
     window.localStorage.removeItem(StorageKey.CLIENT_KEY_PRIVKEY_MAP)
     window.localStorage.setItem(StorageKey.ACCOUNTS, JSON.stringify(this.serializeAccounts()))
     if (this.currentAccount) {
@@ -690,6 +713,17 @@ class LocalStorageService {
     }
   }
 
+  private persistRetiredEncryptionKeyMap() {
+    if (this.secretsViaIpc) {
+      this.queueSecretsSave()
+    } else {
+      window.localStorage.setItem(
+        StorageKey.RETIRED_ENCRYPTION_KEY_PRIVKEY_MAP,
+        JSON.stringify(this.retiredEncryptionKeyMap)
+      )
+    }
+  }
+
   private persistClientKeyMap() {
     if (this.secretsViaIpc) {
       this.queueSecretsSave()
@@ -709,6 +743,7 @@ class LocalStorageService {
       ncryptsec: { ...this.ncryptsecByPubkey },
       bunkerClientSecretKey: { ...this.bunkerClientSecretByPubkey },
       encryptionKeyPrivkey: { ...this.encryptionKeyPrivkeyMap },
+      retiredEncryptionKeyPrivkey: { ...this.retiredEncryptionKeyMap },
       clientKeyPrivkey: { ...this.clientKeyPrivkeyMap }
     }
     this.secretsWriteChain = this.secretsWriteChain
@@ -879,7 +914,7 @@ class LocalStorageService {
   }
 
   getMediaUploadServiceConfig(pubkey?: string | null): TMediaUploadServiceConfig {
-    const defaultConfig = { type: 'nip96', service: this.mediaUploadService } as const
+    const defaultConfig = { type: 'blossom' } as const
     if (!pubkey) {
       return defaultConfig
     }
@@ -1049,6 +1084,24 @@ class LocalStorageService {
     window.localStorage.setItem(StorageKey.ALLOW_INSECURE_CONNECTION, allow.toString())
   }
 
+  getBlossomCacheServerUrl() {
+    return this.blossomCacheServerUrl
+  }
+
+  setBlossomCacheServerUrl(url: string) {
+    this.blossomCacheServerUrl = url
+    window.localStorage.setItem(StorageKey.BLOSSOM_CACHE_SERVER_URL, url)
+  }
+
+  getBlossomCacheServerEnabled() {
+    return this.blossomCacheServerEnabled
+  }
+
+  setBlossomCacheServerEnabled(enabled: boolean) {
+    this.blossomCacheServerEnabled = enabled
+    window.localStorage.setItem(StorageKey.BLOSSOM_CACHE_SERVER_ENABLED, enabled.toString())
+  }
+
   getQuickReaction() {
     return this.quickReaction
   }
@@ -1167,6 +1220,31 @@ class LocalStorageService {
   removeEncryptionKeyPrivkey(accountPubkey: string) {
     delete this.encryptionKeyPrivkeyMap[accountPubkey]
     this.persistEncryptionKeyMap()
+  }
+
+  getRetiredEncryptionKeyPrivkeys(accountPubkey: string): { privkey: string; retiredAt: number }[] {
+    return this.retiredEncryptionKeyMap[accountPubkey] ?? []
+  }
+
+  addRetiredEncryptionKeyPrivkey(accountPubkey: string, privkey: string, retiredAt: number) {
+    const list = this.retiredEncryptionKeyMap[accountPubkey] ?? []
+    if (list.some((k) => k.privkey === privkey)) return
+    // Newest first; age/count pruning is owned by encryptionKeyService.
+    list.unshift({ privkey, retiredAt })
+    this.retiredEncryptionKeyMap[accountPubkey] = list
+    this.persistRetiredEncryptionKeyMap()
+  }
+
+  setRetiredEncryptionKeyPrivkeys(
+    accountPubkey: string,
+    list: { privkey: string; retiredAt: number }[]
+  ) {
+    if (list.length === 0) {
+      delete this.retiredEncryptionKeyMap[accountPubkey]
+    } else {
+      this.retiredEncryptionKeyMap[accountPubkey] = list
+    }
+    this.persistRetiredEncryptionKeyMap()
   }
 
   getClientKeyPrivkey(accountPubkey: string): string | null {

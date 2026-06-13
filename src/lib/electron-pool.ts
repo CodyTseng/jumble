@@ -128,6 +128,12 @@ export class ElectronPool implements IRelayPool {
     })
   }
 
+  setTrustedInsecureRelayUrls(urls: string[]) {
+    this.bridge.relay.setTrustedInsecureRelayUrls(urls).catch(() => {
+      // ignore
+    })
+  }
+
   getSeenRelays(eventId: string): IRelay[] {
     return Array.from(this.seenOn.get(eventId)?.values() ?? [])
   }

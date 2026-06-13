@@ -1,7 +1,8 @@
 import { UserAvatarSkeleton } from '@/components/UserAvatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useFetchEvent } from '@/hooks'
+import { isRepostEvent, useFetchEvent, useRepostTarget } from '@/hooks'
 import { cn } from '@/lib/utils'
+import { Event } from 'nostr-tools'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ClientSelect from '../ClientSelect'
@@ -9,11 +10,15 @@ import MainNoteCard from '../NoteCard/MainNoteCard'
 
 export function EmbeddedNote({ noteId, className }: { noteId: string; className?: string }) {
   const { event, isFetching } = useFetchEvent(noteId)
+  const isRepost = isRepostEvent(event)
+  const { targetEvent, isResolving } = useRepostTarget(isRepost ? event : undefined)
   const skeletonRef = useRef<HTMLDivElement>(null)
   const [revealed, setRevealed] = useState(false)
 
+  const stillLoading = isFetching || (isRepost && isResolving)
+
   useEffect(() => {
-    if (revealed || isFetching) return
+    if (revealed || stillLoading) return
     const el = skeletonRef.current
     if (!el) return
     // Only freeze skeleton if the element is above the viewport (already scrolled past).
@@ -30,7 +35,7 @@ export function EmbeddedNote({ noteId, className }: { noteId: string; className?
     })
     io.observe(el)
     return () => io.disconnect()
-  }, [isFetching, revealed])
+  }, [stillLoading, revealed])
 
   if (!revealed) {
     return <EmbeddedNoteSkeleton ref={skeletonRef} className={className} />
@@ -40,12 +45,36 @@ export function EmbeddedNote({ noteId, className }: { noteId: string; className?
     return <EmbeddedNoteNotFound className={className} noteId={noteId} />
   }
 
+  if (isRepost) {
+    if (!targetEvent) {
+      return <EmbeddedNoteNotFound className={className} noteId={noteId} />
+    }
+    return (
+      <EmbeddedRenderedNote className={className} event={targetEvent} reposters={[event.pubkey]} />
+    )
+  }
+
+  return <EmbeddedRenderedNote className={className} event={event} originalNoteId={noteId} />
+}
+
+function EmbeddedRenderedNote({
+  event,
+  className,
+  originalNoteId,
+  reposters
+}: {
+  event: Event
+  className?: string
+  originalNoteId?: string
+  reposters?: string[]
+}) {
   return (
     <MainNoteCard
       className={cn('w-full', className)}
       event={event}
       embedded
-      originalNoteId={noteId}
+      originalNoteId={originalNoteId}
+      reposters={reposters}
     />
   )
 }
@@ -55,7 +84,7 @@ const EmbeddedNoteSkeleton = forwardRef<HTMLDivElement, { className?: string }>(
     return (
       <div
         ref={ref}
-        className={cn('w-full rounded-xl border bg-card p-2 text-start sm:p-3', className)}
+        className={cn('bg-card w-full rounded-xl border p-2 text-start sm:p-3', className)}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2">
@@ -77,8 +106,8 @@ function EmbeddedNoteNotFound({ noteId, className }: { noteId: string; className
   const { t } = useTranslation()
 
   return (
-    <div className={cn('rounded-xl border bg-card p-2 text-start sm:p-3', className)}>
-      <div className="flex flex-col items-center gap-2 font-medium text-muted-foreground">
+    <div className={cn('bg-card rounded-xl border p-2 text-start sm:p-3', className)}>
+      <div className="text-muted-foreground flex flex-col items-center gap-2 font-medium">
         <div>{t('Sorry! The note cannot be found 😔')}</div>
         <ClientSelect className="mt-2 w-full" originalNoteId={noteId} />
       </div>
