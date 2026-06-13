@@ -1,4 +1,4 @@
-import { POMEGRANATE_CENTRAL_URL, POMEGRANATE_OPERATOR_URLS } from '@/constants'
+import { POMEGRANATE_OPERATOR_URLS } from '@/constants'
 import { isValidPubkey } from '@/lib/pubkey'
 import {
   aggregateSecretKeyShards,
@@ -56,14 +56,6 @@ export type TPomegranateAccountConfig = {
   // The key to split into shards. When omitted a fresh one is generated. The
   // Google signup flow passes the key it showed the user so they can back it up.
   secretKey?: Uint8Array
-}
-
-/** Raised by `bindAccount` when the Google account is already linked to a key. */
-export class PomegranateAlreadyLinkedError extends Error {
-  constructor() {
-    super('This Google account is already linked to a Nostr key')
-    this.name = 'PomegranateAlreadyLinkedError'
-  }
 }
 
 /** The browser blocked `window.open` — usually a popup-blocker setting. */
@@ -137,29 +129,57 @@ class PomegranateService {
   }
 
   /**
-   * Links an existing key (the caller's nsec) to a Google account: authenticates
-   * with Google, ensures no account exists for it yet, then splits the existing
-   * key into shards and registers it with the central server and operators. The
-   * key keeps signing locally; it just becomes recoverable via Google elsewhere.
-   * Must be called from a user gesture so the sign-in popup is not blocked.
+   * First half of the bind flow: authenticates with Google against `centralUrl`
+   * and reports whether this Google account is already linked to a pomegranate
+   * account. Must be called from a user gesture so the popup is not blocked. The
+   * returned token stays valid for 24h, so the caller can show a conflict dialog
+   * and finish via `completeBinding` without re-prompting.
    */
-  async bindAccount(
-    secretKey: Uint8Array,
-    config: TPomegranateAccountConfig,
-    onStatus: (status: TPomegranateLoginStatus) => void
-  ): Promise<{ central: string }> {
-    const central = this.massageURL(POMEGRANATE_CENTRAL_URL)
+  async authenticateForBinding(
+    centralUrl: string
+  ): Promise<{ token: TGoogleToken; existing: TPomegranateAccount | null }> {
+    const central = this.massageURL(centralUrl)
     const token = await this.authenticateWithGoogle(central)
-
-    onStatus('checking')
     const existing = await this.getAccount(central, token)
-    if (existing) {
-      throw new PomegranateAlreadyLinkedError()
+    return { token, existing }
+  }
+
+  /**
+   * Second half of the bind flow: splits the existing account's key into shards
+   * using the chosen operators/threshold, registers with the central server and
+   * operators, ensures a signing profile exists, and returns the bunker URL to
+   * (optionally) switch to a remote signer. Opens no popup.
+   *
+   * - When the Google account is already linked to a different pubkey, pass
+   *   `rebind: true` to unlink it first.
+   * - When it is already linked to `expectedPubkey`, registration is skipped
+   *   (idempotent) and only the profile is ensured.
+   */
+  async completeBinding(
+    centralUrl: string,
+    token: TGoogleToken,
+    secretKey: Uint8Array,
+    expectedPubkey: string,
+    config: TPomegranateAccountConfig,
+    opts: { rebind: boolean } = { rebind: false }
+  ): Promise<{ bunkerUrl: string; central: string }> {
+    const central = this.massageURL(centralUrl)
+
+    if (opts.rebind) {
+      await this.deleteAccount(central, token)
     }
 
-    onStatus('creating')
-    await this.createAccount(central, token, config, secretKey)
-    return { central }
+    const existing = await this.getAccount(central, token)
+    if (!existing || existing.pubkey !== expectedPubkey) {
+      await this.createAccount(central, token, config, secretKey)
+    }
+
+    let profiles = await this.listProfiles(central, token)
+    if (profiles.length === 0) {
+      profiles = [await this.createProfile(central, token, 'default')]
+    }
+
+    return { bunkerUrl: this.getBunkerUrl(central, profiles[0]), central }
   }
 
   /**

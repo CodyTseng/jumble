@@ -1,4 +1,3 @@
-import GoogleLogo from '@/assets/GoogleLogo'
 import PomegranateBindDialog from '@/components/PomegranateBindDialog'
 import PomegranateDisconnectDialog from '@/components/PomegranateDisconnectDialog'
 import PomegranateExportDialog from '@/components/PomegranateExportDialog'
@@ -9,7 +8,8 @@ import { isElectron } from '@/lib/platform'
 import { isPomegranateAccount } from '@/lib/pomegranate'
 import { useNostr } from '@/providers/NostrProvider'
 import storage from '@/services/local-storage.service'
-import { Check, CircleCheck, Copy, KeyRound, Unplug } from 'lucide-react'
+import { TSignerType } from '@/types'
+import { Check, Copy, KeyRound, LogIn, Unplug } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -21,21 +21,23 @@ const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false)
   const [bindDialogOpen, setBindDialogOpen] = useState(false)
+  // Snapshot the account being bound so the dialog stays mounted through the
+  // "switch to remote signer" swap, which briefly nulls the active account.
+  const [bindTarget, setBindTarget] = useState<{ pubkey: string; signerType: TSignerType } | null>(
+    null
+  )
 
   const fullAccount = account ? storage.findAccount(account) : undefined
   const pomegranate = fullAccount ? isPomegranateAccount(fullAccount) : false
-  const [boundCentral, setBoundCentral] = useState<string | null>(
-    fullAccount?.pomegranateCentral ?? null
-  )
+  // A local-key account (nsec or ncryptsec) can be linked to Google. Pomegranate
+  // (bunker) accounts are already managed by the central server.
+  const canBindGoogle =
+    POMEGRANATE_ENABLED && !isElectron() && !!account && (!!nsec || !!ncryptsec) && !pomegranate
 
-  // An nsec account can be linked to Google (its key is split across operators).
-  // Pomegranate (bunker) accounts are already managed by the central server.
-  const canBindGoogle = POMEGRANATE_ENABLED && !isElectron() && !!nsec && !pomegranate
-
-  const handleBound = (central: string) => {
-    if (!fullAccount) return
-    storage.addAccount({ ...fullAccount, pomegranateCentral: central })
-    setBoundCentral(central)
+  const openBindDialog = () => {
+    if (!account) return
+    setBindTarget({ pubkey: account.pubkey, signerType: account.signerType })
+    setBindDialogOpen(true)
   }
 
   const copy = async (value: string, setCopied: (v: boolean) => void) => {
@@ -77,37 +79,26 @@ const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
 
         {canBindGoogle && (
           <SettingsGroup
-            title="Google"
-            description={
-              boundCentral
-                ? t('This account is linked to Google.')
-                : t(
-                    'Link this account to Google so you can sign in and recover it with Google on other devices.'
-                  )
-            }
-          >
-            {boundCentral ? (
-              <SettingsRow
-                icon={<GoogleLogo />}
-                title={t('Connected to Google')}
-                control={<CircleCheck className="size-4 text-green-500" />}
-              />
-            ) : (
-              <SettingsRow
-                icon={<GoogleLogo />}
-                title={t('Connect Google account')}
-                chevron
-                onClick={() => setBindDialogOpen(true)}
-              />
+            title={t('Link Google account')}
+            description={t(
+              'Link a Google account so you can sign in to this account with Google. Your private key is never shared with Google.'
             )}
+          >
+            <SettingsRow
+              icon={<LogIn />}
+              title={t('Link Google account')}
+              chevron
+              onClick={openBindDialog}
+            />
           </SettingsGroup>
         )}
-        {canBindGoogle && nsec && (
+
+        {bindTarget && (
           <PomegranateBindDialog
             open={bindDialogOpen}
             onOpenChange={setBindDialogOpen}
-            nsec={nsec}
-            onBound={handleBound}
+            pubkey={bindTarget.pubkey}
+            signerType={bindTarget.signerType}
           />
         )}
 

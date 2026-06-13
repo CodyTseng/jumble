@@ -21,6 +21,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AdvancedOptions from '../AdvancedOptions'
 import InfoCard from '../InfoCard'
+import PomegranateCentralServerField from '../PomegranateCentralServerField'
+import PomegranateHowItWorks from '../PomegranateHowItWorks'
 import PomegranateOperatorConfig from '../PomegranateOperatorConfig'
 
 type Status = 'idle' | 'authenticating' | 'checking' | 'creating' | 'loggingIn' | 'error'
@@ -161,13 +163,15 @@ export default function GoogleLogin({
           )}
         />
 
-        <PomegranateOperatorConfig
-          operators={operators}
-          onOperatorsChange={setOperators}
-          threshold={threshold}
-          onThresholdChange={setThreshold}
-          disabled={busy}
-        />
+        <AdvancedOptions>
+          <PomegranateOperatorConfig
+            operators={operators}
+            onOperatorsChange={setOperators}
+            threshold={threshold}
+            onThresholdChange={setThreshold}
+            disabled={busy}
+          />
+        </AdvancedOptions>
 
         <div className="space-y-1">
           <Label>{t('Your Private Key')}</Label>
@@ -253,31 +257,14 @@ export default function GoogleLogin({
         </p>
       </div>
 
-      <InfoCard
-        title={t('How it works')}
-        content={t(
-          'Your private key is split into shards held by separate operators, so it is never stored in one place. Jumble signs through a secure remote signer. You can export your key anytime from account settings.'
-        )}
-      />
+      <PomegranateHowItWorks />
 
       <AdvancedOptions>
-        <div className="space-y-2">
-          <div className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-            {t('Central server')}
-          </div>
-          <p className="text-muted-foreground text-xs">
-            {t(
-              'The coordinator that verifies your Google sign-in and relays signing requests to the operators.'
-            )}
-          </p>
-          <Input
-            className="h-9"
-            value={central}
-            disabled={busy}
-            placeholder="https://..."
-            onChange={(e) => setCentral(e.target.value)}
-          />
-        </div>
+        <PomegranateCentralServerField
+          central={central}
+          onCentralChange={setCentral}
+          disabled={busy}
+        />
       </AdvancedOptions>
 
       {busyIndicator}

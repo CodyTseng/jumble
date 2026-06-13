@@ -9,14 +9,13 @@ import { cn } from '@/lib/utils'
 import { CircleX, Minus, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import AdvancedOptions from '../AdvancedOptions'
 
 const MIN_OPERATORS = 2
 
 /**
- * Advanced configuration for the operators and signing threshold of a
- * pomegranate account. Collapsed by default. Shared by the Google login
- * (account creation) and the bind-existing-account flows.
+ * Operators + signing-threshold fields for a pomegranate account. Renders bare
+ * sections (no disclosure wrapper) so callers can place it inside a shared
+ * `AdvancedOptions`, optionally alongside other fields like the central server.
  *
  * Operators and threshold are controlled by the parent so it can pass them to
  * the service. The recommended (default) operators that are not currently
@@ -67,7 +66,7 @@ export default function PomegranateOperatorConfig({
   }
 
   return (
-    <AdvancedOptions>
+    <>
       <div className="space-y-2">
         <div className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
           {t('Operators')}
@@ -185,6 +184,6 @@ export default function PomegranateOperatorConfig({
           </span>
         </div>
       </div>
-    </AdvancedOptions>
+    </>
   )
 }
