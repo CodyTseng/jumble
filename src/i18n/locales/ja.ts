@@ -982,6 +982,44 @@ export default {
     'Connect a remote signer': 'リモート署名者に接続',
     'Scan with your signer app': '署名アプリでスキャン',
     'Open with Nostr signer app': 'Nostr 署名アプリで開く',
-    'Scan QR code': 'QR コードをスキャン'
+    'Scan QR code': 'QR コードをスキャン',
+    'Add operator URL': 'オペレーターURLを追加',
+    'Advanced options': '詳細オプション',
+    'All set': '準備完了',
+    'Connect Google account': 'Googleアカウントを連携',
+    'Connected to Google': 'Googleに接続済み',
+    'Create account': 'アカウントを作成',
+    'Create your account': 'アカウントを作成',
+    'Invalid URL': '無効なURL',
+    'Invalid private key': '無効な秘密鍵',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'このアカウントをGoogleに連携すると、他のデバイスでもGoogleでサインインして復元できます。',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'このアカウントをGoogleに連携すると、Googleでサインインして復元できます。',
+    'Linking your account...': 'アカウントを連携しています...',
+    'New account': '新規アカウント',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'このGoogleログインに対応するアカウントはまだありません。新しいNostrキーを作成しました。',
+    Operators: 'オペレーター',
+    Remove: '削除',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'Googleでサインインしてログインするか、Nostrキーをまだお持ちでない場合は自動的に新しいキーを作成します。',
+    'Signing threshold': '署名のしきい値',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Googleのサインインを検証し、署名リクエストをオペレーターに中継するコーディネーターです。',
+    'This account is linked to Google.': 'このアカウントはGoogleに連携されています。',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'このキーはあなたのものです。Googleで復元できますが、アカウントへのアクセスを失わないよう今すぐバックアップを保存してください。',
+    'This operator is already added': 'このオペレーターはすでに追加されています',
+    'Try again': '再試行',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'アカウントがGoogleに連携されました。他のデバイスでもGoogleでサインインまたはキーの復元ができます。',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      '秘密鍵は複数のオペレーターが保持するシャードに分割されるため、一箇所に保存されることはありません。このデバイスでは引き続き秘密鍵で署名できます。',
+    'of {{total}} operators are enough to sign':
+      '人のオペレーターで署名できます（全{{total}}件中）',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'それぞれがあなたの秘密鍵のシャードを保持する独立したサーバーです。そのため、単独のオペレーターだけでは署名できません。',
+    'This service is provided by {{host}}': 'このサービスは {{host}} によって提供されています'
   }
 }

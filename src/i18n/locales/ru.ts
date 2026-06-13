@@ -987,6 +987,43 @@ export default {
     'Connect a remote signer': 'Подключить удалённый подписант',
     'Scan with your signer app': 'Сканируйте приложением для подписи',
     'Open with Nostr signer app': 'Открыть в приложении для подписи Nostr',
-    'Scan QR code': 'Сканировать QR-код'
+    'Scan QR code': 'Сканировать QR-код',
+    'Add operator URL': 'Добавить URL оператора',
+    'Advanced options': 'Дополнительные параметры',
+    'All set': 'Всё готово',
+    'Connect Google account': 'Подключить аккаунт Google',
+    'Connected to Google': 'Подключено к Google',
+    'Create account': 'Создать аккаунт',
+    'Create your account': 'Создайте аккаунт',
+    'Invalid URL': 'Неверный URL',
+    'Invalid private key': 'Неверный приватный ключ',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'Привяжите этот аккаунт к Google, чтобы входить и восстанавливать его через Google на других устройствах.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'Привяжите этот аккаунт к Google, чтобы входить и восстанавливать его через Google.',
+    'Linking your account...': 'Привязка аккаунта...',
+    'New account': 'Новый аккаунт',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'Для этого входа через Google ещё нет аккаунта. Для вас создан новый ключ Nostr.',
+    Operators: 'Операторы',
+    Remove: 'Удалить',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'Войдите через Google, чтобы авторизоваться, или чтобы автоматически создать новый ключ Nostr, если у вас его ещё нет.',
+    'Signing threshold': 'Порог подписи',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Координатор, который проверяет ваш вход через Google и передаёт запросы на подпись операторам.',
+    'This account is linked to Google.': 'Этот аккаунт привязан к Google.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'Этот ключ принадлежит вам. Хотя вы можете восстановить его через Google, сохраните резервную копию сейчас, чтобы никогда не потерять доступ к аккаунту.',
+    'This operator is already added': 'Этот оператор уже добавлен',
+    'Try again': 'Попробовать снова',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'Ваш аккаунт теперь привязан к Google. Вы можете входить или восстанавливать ключ через Google на других устройствах.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      'Ваш приватный ключ разделён на фрагменты, хранящиеся у разных операторов, поэтому он никогда не хранится в одном месте. Вы продолжаете подписывать своим приватным ключом на этом устройстве.',
+    'of {{total}} operators are enough to sign': 'из {{total}} операторов достаточно для подписи',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'Независимые серверы, каждый из которых хранит фрагмент вашего приватного ключа, поэтому ни один оператор не может подписать в одиночку.',
+    'This service is provided by {{host}}': 'Этот сервис предоставлен {{host}}'
   }
 }

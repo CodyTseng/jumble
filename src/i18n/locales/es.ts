@@ -986,6 +986,43 @@ export default {
     'Connect a remote signer': 'Conectar un firmante remoto',
     'Scan with your signer app': 'Escanea con tu app de firma',
     'Open with Nostr signer app': 'Abrir con app de firma Nostr',
-    'Scan QR code': 'Escanear código QR'
+    'Scan QR code': 'Escanear código QR',
+    'Add operator URL': 'Añadir URL de operador',
+    'Advanced options': 'Opciones avanzadas',
+    'All set': 'Todo listo',
+    'Connect Google account': 'Conectar cuenta de Google',
+    'Connected to Google': 'Conectado a Google',
+    'Create account': 'Crear cuenta',
+    'Create your account': 'Crea tu cuenta',
+    'Invalid URL': 'URL no válida',
+    'Invalid private key': 'Clave privada no válida',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'Vincula esta cuenta a Google para poder iniciar sesión y recuperarla con Google en otros dispositivos.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'Vincula esta cuenta a Google para poder iniciar sesión y recuperarla con Google.',
+    'Linking your account...': 'Vinculando tu cuenta...',
+    'New account': 'Cuenta nueva',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'Todavía no existe ninguna cuenta para este inicio de sesión de Google. Se ha creado una nueva clave Nostr para ti.',
+    Operators: 'Operadores',
+    Remove: 'Eliminar',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'Inicia sesión con Google para acceder, o para crear automáticamente una nueva clave Nostr si aún no tienes una.',
+    'Signing threshold': 'Umbral de firma',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'El coordinador que verifica tu inicio de sesión de Google y reenvía las solicitudes de firma a los operadores.',
+    'This account is linked to Google.': 'Esta cuenta está vinculada a Google.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'Esta clave es tuya. Aunque puedes recuperarla con Google, guarda una copia de seguridad ahora para no perder nunca el acceso a tu cuenta.',
+    'This operator is already added': 'Este operador ya está añadido',
+    'Try again': 'Intentar de nuevo',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'Tu cuenta ya está vinculada a Google. Puedes iniciar sesión o recuperar tu clave con Google en otros dispositivos.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      'Tu clave privada se divide en fragmentos que guardan operadores independientes, por lo que nunca se almacena en un solo lugar. Sigues firmando con tu clave privada en este dispositivo.',
+    'of {{total}} operators are enough to sign': 'de {{total}} operadores bastan para firmar',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'Servidores independientes que guardan cada uno un fragmento de tu clave privada, de modo que ningún operador puede firmar por sí solo.',
+    'This service is provided by {{host}}': 'Este servicio lo proporciona {{host}}'
   }
 }

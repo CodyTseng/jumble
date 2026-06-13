@@ -981,6 +981,43 @@ export default {
     'Connect a remote signer': 'Távoli aláíró csatlakoztatása',
     'Scan with your signer app': 'Olvasd be az aláíró alkalmazásoddal',
     'Open with Nostr signer app': 'Megnyitás Nostr aláíró alkalmazással',
-    'Scan QR code': 'QR-kód beolvasása'
+    'Scan QR code': 'QR-kód beolvasása',
+    'Add operator URL': 'Operátor URL hozzáadása',
+    'Advanced options': 'Speciális beállítások',
+    'All set': 'Minden kész',
+    'Connect Google account': 'Google-fiók csatlakoztatása',
+    'Connected to Google': 'Csatlakoztatva a Google-höz',
+    'Create account': 'Fiók létrehozása',
+    'Create your account': 'Hozd létre a fiókodat',
+    'Invalid URL': 'Érvénytelen URL',
+    'Invalid private key': 'Érvénytelen privát kulcs',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'Kösd össze ezt a fiókot a Google-lel, hogy bejelentkezhess és visszaállíthasd a Google-lel más eszközökön is.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'Kösd össze ezt a fiókot a Google-lel, hogy bejelentkezhess és visszaállíthasd a Google-lel.',
+    'Linking your account...': 'Fiók összekötése...',
+    'New account': 'Új fiók',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'Ehhez a Google-bejelentkezéshez még nem létezik fiók. Létrehoztunk neked egy új Nostr kulcsot.',
+    Operators: 'Operátorok',
+    Remove: 'Eltávolítás',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'Jelentkezz be Google-lel a belépéshez, vagy hogy automatikusan létrehozz egy új Nostr kulcsot, ha még nincs ilyened.',
+    'Signing threshold': 'Aláírási küszöb',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'A koordinátor, amely ellenőrzi a Google-bejelentkezésedet és továbbítja az aláírási kéréseket az operátoroknak.',
+    'This account is linked to Google.': 'Ez a fiók a Google-höz van kötve.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'Ez a kulcs a tiéd. Bár vissza tudod állítani a Google-lel, mentsd el most egy biztonsági másolatot, hogy soha ne veszítsd el a hozzáférést a fiókodhoz.',
+    'This operator is already added': 'Ez az operátor már hozzá van adva',
+    'Try again': 'Próbáld újra',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'A fiókod mostantól a Google-höz van kötve. Bejelentkezhetsz vagy visszaállíthatod a kulcsodat a Google-lel más eszközökön.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      'A privát kulcsod külön operátoroknál tárolt töredékekre van osztva, így soha nem tárolják egy helyen. Ezen az eszközön továbbra is a saját privát kulcsoddal írsz alá.',
+    'of {{total}} operators are enough to sign': '/ {{total}} operátor elég az aláíráshoz',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'Független szerverek, amelyek mindegyike a privát kulcsod egy töredékét tárolja, így egyetlen operátor sem tud egyedül aláírni.',
+    'This service is provided by {{host}}': 'Ezt a szolgáltatást a(z) {{host}} biztosítja'
   }
 }

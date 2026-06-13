@@ -981,6 +981,43 @@ export default {
     'Connect a remote signer': 'اتصال به امضاکننده‌ی راه‌دور',
     'Scan with your signer app': 'با اپلیکیشن امضاکننده اسکن کنید',
     'Open with Nostr signer app': 'با اپلیکیشن امضاکننده‌ی Nostr باز کنید',
-    'Scan QR code': 'اسکن کد QR'
+    'Scan QR code': 'اسکن کد QR',
+    'Add operator URL': 'افزودن نشانی اپراتور',
+    'Advanced options': 'تنظیمات پیشرفته',
+    'All set': 'همه‌چیز آماده است',
+    'Connect Google account': 'اتصال حساب Google',
+    'Connected to Google': 'متصل به Google',
+    'Create account': 'ساخت حساب',
+    'Create your account': 'حساب خود را بسازید',
+    'Invalid URL': 'نشانی نامعتبر',
+    'Invalid private key': 'کلید خصوصی نامعتبر',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'این حساب را به Google متصل کنید تا بتوانید با Google وارد شوید و آن را روی دستگاه‌های دیگر بازیابی کنید.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'این حساب را به Google متصل کنید تا بتوانید با Google وارد شوید و آن را بازیابی کنید.',
+    'Linking your account...': 'در حال اتصال حساب شما...',
+    'New account': 'حساب جدید',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'هنوز هیچ حسابی برای این ورود با Google وجود ندارد. یک کلید Nostr جدید برای شما ساخته شد.',
+    Operators: 'اپراتورها',
+    Remove: 'حذف',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'با Google وارد شوید تا وارد حساب شوید، یا اگر هنوز کلید Nostr ندارید، به‌طور خودکار یک کلید جدید ساخته شود.',
+    'Signing threshold': 'آستانهٔ امضا',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'هماهنگ‌کننده‌ای که ورود شما با Google را تأیید می‌کند و درخواست‌های امضا را به اپراتورها می‌رساند.',
+    'This account is linked to Google.': 'این حساب به Google متصل است.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'این کلید مال شماست و باید آن را نگه دارید. هرچند می‌توانید آن را با Google بازیابی کنید، همین حالا یک نسخهٔ پشتیبان ذخیره کنید تا هرگز دسترسی به حساب خود را از دست ندهید.',
+    'This operator is already added': 'این اپراتور قبلاً افزوده شده است',
+    'Try again': 'تلاش دوباره',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'اکنون حساب شما به Google متصل است. می‌توانید روی دستگاه‌های دیگر با Google وارد شوید یا کلید خود را بازیابی کنید.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      'کلید خصوصی شما به قطعه‌هایی تقسیم می‌شود که نزد اپراتورهای جداگانه نگهداری می‌شوند، بنابراین هرگز در یک جا ذخیره نمی‌شود. شما همچنان با کلید خصوصی خود روی این دستگاه امضا می‌کنید.',
+    'of {{total}} operators are enough to sign': 'اپراتور از {{total}} برای امضا کافی است',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'سرورهای مستقلی که هرکدام یک قطعه از کلید خصوصی شما را نگه می‌دارند، به‌طوری‌که هیچ اپراتوری به‌تنهایی نمی‌تواند امضا کند.',
+    'This service is provided by {{host}}': 'این سرویس توسط {{host}} ارائه می‌شود'
   }
 }

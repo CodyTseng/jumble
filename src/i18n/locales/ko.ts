@@ -971,6 +971,44 @@ export default {
     'Connect a remote signer': '원격 서명자 연결',
     'Scan with your signer app': '서명 앱으로 스캔',
     'Open with Nostr signer app': 'Nostr 서명 앱으로 열기',
-    'Scan QR code': 'QR 코드 스캔'
+    'Scan QR code': 'QR 코드 스캔',
+    'Add operator URL': '운영자 URL 추가',
+    'Advanced options': '고급 옵션',
+    'All set': '완료',
+    'Connect Google account': 'Google 계정 연결',
+    'Connected to Google': 'Google에 연결됨',
+    'Create account': '계정 만들기',
+    'Create your account': '계정 만들기',
+    'Invalid URL': '잘못된 URL',
+    'Invalid private key': '잘못된 개인 키',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      '이 계정을 Google에 연결하면 다른 기기에서도 Google로 로그인하고 복구할 수 있습니다.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      '이 계정을 Google에 연결하면 Google로 로그인하고 복구할 수 있습니다.',
+    'Linking your account...': '계정을 연결하는 중...',
+    'New account': '새 계정',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      '이 Google 로그인에 연결된 계정이 아직 없습니다. 새 Nostr 키를 생성했습니다.',
+    Operators: '운영자',
+    Remove: '제거',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'Google로 로그인하거나, Nostr 키가 아직 없다면 자동으로 새 키를 생성하세요.',
+    'Signing threshold': '서명 임계값',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'Google 로그인을 확인하고 서명 요청을 운영자에게 중계하는 코디네이터입니다.',
+    'This account is linked to Google.': '이 계정은 Google에 연결되어 있습니다.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      '이 키는 사용자 본인의 것입니다. Google로 복구할 수 있지만, 계정 접근 권한을 잃지 않도록 지금 백업을 저장하세요.',
+    'This operator is already added': '이미 추가된 운영자입니다',
+    'Try again': '다시 시도',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      '이제 계정이 Google에 연결되었습니다. 다른 기기에서도 Google로 로그인하거나 키를 복구할 수 있습니다.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      '개인 키는 여러 운영자가 나누어 보관하는 샤드로 분할되므로 한곳에 저장되지 않습니다. 이 기기에서는 계속 개인 키로 서명합니다.',
+    'of {{total}} operators are enough to sign':
+      '명의 운영자만 있으면 서명할 수 있습니다 (총 {{total}}명 중)',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      '각자 당신의 개인 키 샤드를 보관하는 독립적인 서버입니다. 따라서 단일 운영자만으로는 서명할 수 없습니다.',
+    'This service is provided by {{host}}': '이 서비스는 {{host}}에서 제공합니다'
   }
 }

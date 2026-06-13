@@ -941,6 +941,43 @@ export default {
     'Connect a remote signer': '連接遠端簽名器',
     'Scan with your signer app': '用你的簽名應用程式掃碼',
     'Open with Nostr signer app': '用 Nostr 簽名應用程式開啟',
-    'Scan QR code': '掃描二維碼'
+    'Scan QR code': '掃描二維碼',
+    'Add operator URL': '新增營運方 URL',
+    'Advanced options': '進階選項',
+    'All set': '全部完成',
+    'Connect Google account': '連結 Google 帳號',
+    'Connected to Google': '已連結 Google',
+    'Create account': '建立帳號',
+    'Create your account': '建立你的帳號',
+    'Invalid URL': '無效的 URL',
+    'Invalid private key': '無效的私鑰',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      '將此帳號連結至 Google，即可在其他裝置上使用 Google 登入並復原帳號。',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      '將此帳號連結至 Google，即可使用 Google 登入並復原帳號。',
+    'Linking your account...': '正在連結你的帳號...',
+    'New account': '新帳號',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      '此 Google 登入尚未對應任何帳號。已為你建立新的 Nostr 金鑰。',
+    Operators: '營運方',
+    Remove: '移除',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      '使用 Google 登入；若你還沒有 Nostr 金鑰，將自動為你建立一組。',
+    'Signing threshold': '簽署門檻',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      '負責驗證你的 Google 登入、並將簽署請求轉發給各營運方的協調伺服器。',
+    'This account is linked to Google.': '此帳號已連結至 Google。',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      '此金鑰歸你保管。雖然可以透過 Google 復原，仍請立即儲存備份，以免永久失去帳號的存取權。',
+    'This operator is already added': '此營運方已新增',
+    'Try again': '再試一次',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      '你的帳號現已連結至 Google。你可以在其他裝置上使用 Google 登入或復原金鑰。',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      '你的私鑰會被拆分成多個分片，由不同的營運方分別保管，不會集中存放於任何一處。在此裝置上，你仍使用自己的私鑰進行簽署。',
+    'of {{total}} operators are enough to sign': '個營運方即可完成簽署（共 {{total}} 個）',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      '各自持有你私鑰一個分片的獨立伺服器，因此單一營運方無法獨自簽署。',
+    'This service is provided by {{host}}': '本服務由 {{host}} 提供'
   }
 }

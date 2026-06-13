@@ -49,6 +49,23 @@ export type TGoogleToken = {
 
 export type TPomegranateLoginStatus = 'checking' | 'creating'
 
+/** Operators and signing threshold to use when creating or binding an account. */
+export type TPomegranateAccountConfig = {
+  operators: string[]
+  threshold: number
+  // The key to split into shards. When omitted a fresh one is generated. The
+  // Google signup flow passes the key it showed the user so they can back it up.
+  secretKey?: Uint8Array
+}
+
+/** Raised by `bindAccount` when the Google account is already linked to a key. */
+export class PomegranateAlreadyLinkedError extends Error {
+  constructor() {
+    super('This Google account is already linked to a Nostr key')
+    this.name = 'PomegranateAlreadyLinkedError'
+  }
+}
+
 /** The browser blocked `window.open` — usually a popup-blocker setting. */
 export class PomegranatePopupBlockedError extends Error {
   constructor() {
@@ -76,21 +93,39 @@ class PomegranateService {
   }
 
   /**
-   * One-click Google login. Authenticates with Google, ensures an account and
-   * a signing profile exist on the central server, and returns the bunker URL
-   * to log in with plus the central URL to persist on the account.
+   * First half of the Google login: opens the sign-in popup (must be called
+   * from a user gesture) and reports whether an account already exists. When it
+   * does, the operators/threshold are fixed by the server and the caller should
+   * finish login as-is; only a brand-new account is configurable. The returned
+   * token (valid 24h) is passed back to `finishLogin` so no second popup opens.
    */
-  async loginFlow(
+  async startLogin(
+    centralUrl: string,
     onStatus: (status: TPomegranateLoginStatus) => void
-  ): Promise<{ bunkerUrl: string; central: string }> {
-    const central = this.massageURL(POMEGRANATE_CENTRAL_URL)
+  ): Promise<{ token: TGoogleToken; hasAccount: boolean }> {
+    const central = this.massageURL(centralUrl)
     const token = await this.authenticateWithGoogle(central)
-
     onStatus('checking')
     const account = await this.getAccount(central, token)
-    if (!account) {
+    return { token, hasAccount: !!account }
+  }
+
+  /**
+   * Second half of the Google login. Pass `config` to create a new account with
+   * the chosen operators/threshold, or `null` to log in to an existing account.
+   * Ensures a signing profile exists and returns the bunker URL to log in with
+   * plus the central URL to persist on the account. Opens no popup.
+   */
+  async finishLogin(
+    centralUrl: string,
+    token: TGoogleToken,
+    config: TPomegranateAccountConfig | null,
+    onStatus: (status: TPomegranateLoginStatus) => void
+  ): Promise<{ bunkerUrl: string; central: string }> {
+    const central = this.massageURL(centralUrl)
+    if (config) {
       onStatus('creating')
-      await this.createAccount(central, token)
+      await this.createAccount(central, token, config, config.secretKey)
     }
 
     let profiles = await this.listProfiles(central, token)
@@ -99,6 +134,32 @@ class PomegranateService {
     }
 
     return { bunkerUrl: this.getBunkerUrl(central, profiles[0]), central }
+  }
+
+  /**
+   * Links an existing key (the caller's nsec) to a Google account: authenticates
+   * with Google, ensures no account exists for it yet, then splits the existing
+   * key into shards and registers it with the central server and operators. The
+   * key keeps signing locally; it just becomes recoverable via Google elsewhere.
+   * Must be called from a user gesture so the sign-in popup is not blocked.
+   */
+  async bindAccount(
+    secretKey: Uint8Array,
+    config: TPomegranateAccountConfig,
+    onStatus: (status: TPomegranateLoginStatus) => void
+  ): Promise<{ central: string }> {
+    const central = this.massageURL(POMEGRANATE_CENTRAL_URL)
+    const token = await this.authenticateWithGoogle(central)
+
+    onStatus('checking')
+    const existing = await this.getAccount(central, token)
+    if (existing) {
+      throw new PomegranateAlreadyLinkedError()
+    }
+
+    onStatus('creating')
+    await this.createAccount(central, token, config, secretKey)
+    return { central }
   }
 
   /**
@@ -195,22 +256,34 @@ class PomegranateService {
   }
 
   /**
-   * Creates a new account: generates a key, splits it into shards via a
-   * trusted dealer, registers with the central server and every operator.
-   * The generated key is used only to sign the registration events and is
-   * never persisted.
+   * Creates a new account: takes a key (or generates one), splits it into shards
+   * via a trusted dealer, and registers with the central server and every
+   * operator. The key signs the registration events but is never persisted by
+   * this service; the caller decides whether to back it up.
    */
-  private async createAccount(central: string, token: TGoogleToken): Promise<void> {
+  private async createAccount(
+    central: string,
+    token: TGoogleToken,
+    config?: TPomegranateAccountConfig,
+    existingSecretKey?: Uint8Array
+  ): Promise<void> {
     // The operator's identity (central tag + token hash) is its origin; only
     // the HTTP endpoints below carry the `/po` path prefix.
-    const operators = POMEGRANATE_OPERATOR_URLS.map((url) => this.massageURL(url))
+    const operators = (config?.operators ?? POMEGRANATE_OPERATOR_URLS).map((url) =>
+      this.massageURL(url)
+    )
     if (operators.length < 2) {
       throw new Error('At least 2 operators are required')
     }
-    const threshold = Math.ceil((operators.length * 7) / 12)
+    const threshold = config?.threshold ?? Math.ceil((operators.length * 7) / 12)
+    if (!Number.isInteger(threshold) || threshold < 1 || threshold > operators.length) {
+      throw new Error('Invalid signing threshold')
+    }
     const session = crypto.randomUUID()
 
-    const secretKey = generateSecretKey()
+    // For binding, split the caller's existing key; otherwise generate a fresh
+    // one. Either way the key only signs the registration events below.
+    const secretKey = existingSecretKey ?? generateSecretKey()
     const masterSk = BigInt('0x' + bytesToHex(secretKey))
     const { shards } = trustedKeyDeal(masterSk, threshold, operators.length)
 

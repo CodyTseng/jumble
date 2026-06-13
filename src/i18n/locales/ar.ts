@@ -965,6 +965,43 @@ export default {
     'Connect a remote signer': 'الاتصال بموقّع عن بُعد',
     'Scan with your signer app': 'امسح برمز التطبيق الموقّع',
     'Open with Nostr signer app': 'افتح باستخدام تطبيق توقيع Nostr',
-    'Scan QR code': 'مسح رمز QR'
+    'Scan QR code': 'مسح رمز QR',
+    'Add operator URL': 'إضافة رابط مشغّل',
+    'Advanced options': 'خيارات متقدمة',
+    'All set': 'اكتمل كل شيء',
+    'Connect Google account': 'ربط حساب Google',
+    'Connected to Google': 'متصل بـ Google',
+    'Create account': 'إنشاء حساب',
+    'Create your account': 'أنشئ حسابك',
+    'Invalid URL': 'رابط غير صالح',
+    'Invalid private key': 'مفتاح خاص غير صالح',
+    'Link this account to Google so you can sign in and recover it with Google on other devices.':
+      'اربط هذا الحساب بـ Google لتتمكن من تسجيل الدخول واستعادته عبر Google على الأجهزة الأخرى.',
+    'Link this account to Google so you can sign in and recover it with Google.':
+      'اربط هذا الحساب بـ Google لتتمكن من تسجيل الدخول واستعادته عبر Google.',
+    'Linking your account...': 'جارٍ ربط حسابك...',
+    'New account': 'حساب جديد',
+    'No account exists for this Google login yet. A new Nostr key has been created for you.':
+      'لا يوجد حساب لتسجيل دخول Google هذا بعد. تم إنشاء مفتاح Nostr جديد لك.',
+    Operators: 'المشغّلون',
+    Remove: 'إزالة',
+    'Sign in with Google to log in, or to create a new Nostr key automatically if you do not have one yet.':
+      'سجّل الدخول عبر Google لتسجيل الدخول، أو لإنشاء مفتاح Nostr جديد تلقائيًا إن لم يكن لديك واحد بعد.',
+    'Signing threshold': 'حد التوقيع',
+    'The coordinator that verifies your Google sign-in and relays signing requests to the operators.':
+      'المنسّق الذي يتحقق من تسجيل دخولك عبر Google ويمرّر طلبات التوقيع إلى المشغّلين.',
+    'This account is linked to Google.': 'هذا الحساب مرتبط بـ Google.',
+    'This key is yours to keep. Although you can recover it with Google, save a backup now so you never lose access to your account.':
+      'هذا المفتاح ملكك تحتفظ به. ورغم أنه يمكنك استعادته عبر Google، احفظ نسخة احتياطية الآن حتى لا تفقد الوصول إلى حسابك أبدًا.',
+    'This operator is already added': 'هذا المشغّل مضاف بالفعل',
+    'Try again': 'حاول مرة أخرى',
+    'Your account is now linked to Google. You can sign in or recover your key with Google on other devices.':
+      'أصبح حسابك الآن مرتبطًا بـ Google. يمكنك تسجيل الدخول أو استعادة مفتاحك عبر Google على الأجهزة الأخرى.',
+    'Your private key is split into shards held by separate operators, so it is never stored in one place. You keep signing with your private key on this device.':
+      'يُقسَّم مفتاحك الخاص إلى شظايا يحتفظ بها مشغّلون منفصلون، لذا لا يُخزَّن أبدًا في مكان واحد. وتبقى أنت من يوقّع بمفتاحك الخاص على هذا الجهاز.',
+    'of {{total}} operators are enough to sign': 'من أصل {{total}} مشغّلين يكفون للتوقيع',
+    'Independent servers that each hold a shard of your private key, so no single operator can sign on its own.':
+      'خوادم مستقلة يحتفظ كل منها بشظية من مفتاحك الخاص، بحيث لا يمكن لأي مشغّل التوقيع بمفرده.',
+    'This service is provided by {{host}}': 'هذه الخدمة مقدّمة من {{host}}'
   }
 }
