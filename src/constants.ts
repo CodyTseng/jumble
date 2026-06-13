@@ -546,6 +546,7 @@ export const POMEGRANATE_ENABLED = true
 export const POMEGRANATE_CENTRAL_URL = 'https://auth.njump.me/'
 export const POMEGRANATE_OPERATOR_URLS = [
   'https://po.jumble.social/',
+  'https://po.coracle.social/',
   'https://po.njump.me/',
   'https://po.f7z.io/',
   'https://po.nostrver.se/'
