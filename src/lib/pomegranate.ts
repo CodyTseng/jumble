@@ -3,7 +3,8 @@ import {
   PomegranatePopupBlockedError,
   PomegranatePopupClosedError
 } from '@/services/pomegranate.service'
-import { TAccount } from '@/types'
+import storage from '@/services/local-storage.service'
+import { TAccount, TAccountPointer } from '@/types'
 import type { TFunction } from 'i18next'
 
 /**
@@ -51,6 +52,15 @@ export function pomegranateOperatorLabel(url: string): string {
  */
 export function isPomegranateAccount(account: TAccount): boolean {
   return account.signerType === 'bunker' && !!account.pomegranateCentral
+}
+
+/**
+ * Like `isPomegranateAccount`, but for an account pointer (pubkey + signerType).
+ * Resolves the full account from storage to read its `pomegranateCentral`.
+ */
+export function isPomegranateAccountByPointer(account: TAccountPointer): boolean {
+  const full = storage.findAccount(account)
+  return !!full && isPomegranateAccount(full)
 }
 
 /**

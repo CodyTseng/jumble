@@ -16,15 +16,22 @@ const SIGNER_META: Record<TSignerType, { labelKey?: string; literal?: string; do
 
 export default function SignerTypeBadge({
   signerType,
+  isPomegranate,
   className
 }: {
   signerType: TSignerType
+  // Pomegranate ("Login with Google") accounts are bunker accounts, but we give
+  // them their own dot + label so they read differently from a plain remote signer.
+  isPomegranate?: boolean
   className?: string
 }) {
   const { t } = useTranslation()
   const meta = SIGNER_META[signerType]
   if (!meta) return null
-  const label = meta.literal ?? (meta.labelKey ? t(meta.labelKey) : '')
+
+  const isGoogle = isPomegranate && signerType === 'bunker'
+  const label = isGoogle ? 'Google' : (meta.literal ?? (meta.labelKey ? t(meta.labelKey) : ''))
+  const dot = isGoogle ? 'bg-pink-500' : meta.dot
 
   return (
     <span
@@ -33,7 +40,7 @@ export default function SignerTypeBadge({
         className
       )}
     >
-      <span className={cn('size-1.5 rounded-full', meta.dot)} />
+      <span className={cn('size-1.5 rounded-full', dot)} />
       {label}
     </span>
   )

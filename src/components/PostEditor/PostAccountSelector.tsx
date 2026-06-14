@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { isSameAccount } from '@/lib/account'
+import { isPomegranateAccountByPointer } from '@/lib/pomegranate'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -53,7 +54,11 @@ export default function PostAccountSelector({
           className="text-foreground block truncate text-sm font-semibold"
           skeletonClassName="h-3"
         />
-        <SignerTypeBadge signerType={value.signerType} className="whitespace-nowrap" />
+        <SignerTypeBadge
+          signerType={value.signerType}
+          isPomegranate={isPomegranateAccountByPointer(value)}
+          className="whitespace-nowrap"
+        />
       </div>
       <ChevronDown className="size-4 shrink-0" />
     </button>
@@ -70,7 +75,11 @@ export default function PostAccountSelector({
           skeletonClassName="h-3 w-24"
         />
         <div className="mt-0.5">
-          <SignerTypeBadge signerType={act.signerType} className="whitespace-nowrap" />
+          <SignerTypeBadge
+            signerType={act.signerType}
+            isPomegranate={isPomegranateAccountByPointer(act)}
+            className="whitespace-nowrap"
+          />
         </div>
       </div>
       <Check

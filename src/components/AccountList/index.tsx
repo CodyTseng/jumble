@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { isSameAccount } from '@/lib/account'
+import { isPomegranateAccountByPointer } from '@/lib/pomegranate'
 import { formatPubkey } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
@@ -39,7 +40,7 @@ export default function AccountList({
             className={cn(
               'relative flex items-center gap-3 overflow-hidden rounded-lg p-2 transition-colors',
               isCurrent
-                ? 'bg-primary/10 ring-1 ring-inset ring-primary/40'
+                ? 'bg-primary/10 ring-primary/40 ring-1 ring-inset'
                 : 'clickable hover:bg-accent/50'
             )}
             onClick={() => {
@@ -53,35 +54,32 @@ export default function AccountList({
             <SimpleUserAvatar userId={act.pubkey} ignorePolicy className="shrink-0" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <SimpleUsername
-                  userId={act.pubkey}
-                  className="truncate text-sm font-semibold"
-                />
+                <SimpleUsername userId={act.pubkey} className="truncate text-sm font-semibold" />
                 {isCurrent && (
-                  <Check className="size-3.5 shrink-0 text-primary" aria-label={t('Current')} />
+                  <Check className="text-primary size-3.5 shrink-0" aria-label={t('Current')} />
                 )}
               </div>
-              <div className="truncate text-xs text-muted-foreground">
+              <div className="text-muted-foreground truncate text-xs">
                 {formatPubkey(act.pubkey)}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-1">
-              <SignerTypeBadge signerType={act.signerType} />
+              <SignerTypeBadge
+                signerType={act.signerType}
+                isPomegranate={isPomegranateAccountByPointer(act)}
+              />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
                     aria-label={t('Account actions')}
                     onClick={(e) => e.stopPropagation()}
-                    className="clickable flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+                    className="clickable text-muted-foreground hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md"
                   >
                     <MoreHorizontal className="size-4" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenuItem
                     className="text-destructive focus:text-destructive"
                     onSelect={() => removeAccount(act)}
@@ -93,7 +91,7 @@ export default function AccountList({
               </DropdownMenu>
             </div>
             {switchingAccount && isSameAccount(act, switchingAccount) && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/70 backdrop-blur-sm">
+              <div className="bg-background/70 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm">
                 <Loader size={16} className="animate-spin" />
               </div>
             )}

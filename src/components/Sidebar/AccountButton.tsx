@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toWallet } from '@/lib/link'
+import { isPomegranateAccountByPointer } from '@/lib/pomegranate'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -46,16 +47,11 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
         <Button
           variant="ghost"
           className={cn(
-            'clickable flex items-center justify-start gap-4 rounded-lg bg-transparent p-2 text-lg font-semibold text-foreground shadow-none hover:text-accent-foreground',
+            'clickable text-foreground hover:text-accent-foreground flex items-center justify-start gap-4 rounded-lg bg-transparent p-2 text-lg font-semibold shadow-none',
             collapse ? 'h-12 w-12' : 'h-auto w-full'
           )}
         >
-          <div
-            className={cn(
-              'flex w-0 flex-1 items-center gap-2',
-              collapse && 'justify-center'
-            )}
-          >
+          <div className={cn('flex w-0 flex-1 items-center gap-2', collapse && 'justify-center')}>
             <SimpleUserAvatar size="medium" userId={pubkey} ignorePolicy />
             {!collapse && (
               <SimpleUsername className="truncate text-lg font-semibold" userId={pubkey} />
@@ -79,7 +75,7 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
                 'gap-2',
                 idx < accounts.length - 1 && 'mb-1',
                 isCurrent &&
-                  'cursor-default bg-primary/10 ring-1 ring-inset ring-primary/40 focus:bg-primary/10'
+                  'bg-primary/10 ring-primary/40 focus:bg-primary/10 cursor-default ring-1 ring-inset'
               )}
               onClick={() => {
                 if (!isCurrent) {
@@ -96,17 +92,20 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
                     skeletonClassName="h-3"
                   />
                   {isCurrent && (
-                    <Check className="size-3.5 shrink-0 text-primary" aria-label={t('Current')} />
+                    <Check className="text-primary size-3.5 shrink-0" aria-label={t('Current')} />
                   )}
                 </div>
-                <SignerTypeBadge signerType={act.signerType} />
+                <SignerTypeBadge
+                  signerType={act.signerType}
+                  isPomegranate={isPomegranateAccountByPointer(act)}
+                />
               </div>
             </DropdownMenuItem>
           )
         })}
         <DropdownMenuItem
           onClick={() => setLoginDialogOpen(true)}
-          className="m-2 border border-dashed focus:border-muted-foreground focus:bg-background"
+          className="focus:border-muted-foreground focus:bg-background m-2 border border-dashed"
         >
           <div className="flex w-full items-center justify-center gap-2 py-2">
             <Plus />
@@ -121,7 +120,7 @@ function ProfileButton({ collapse }: { collapse: boolean }) {
           <span className="shrink-0">{t('Logout')}</span>
           <SimpleUsername
             userId={pubkey}
-            className="truncate rounded-md border border-muted-foreground px-1 text-xs text-muted-foreground"
+            className="border-muted-foreground text-muted-foreground truncate rounded-md border px-1 text-xs"
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
