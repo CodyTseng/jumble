@@ -408,6 +408,15 @@ export function createMuteListDraftEvent(tags: string[][], content?: string): TD
   }
 }
 
+export function createPrivateContactListDraftEvent(dTag: string, content: string): TDraftEvent {
+  return {
+    kind: ExtendedKind.PRIVATE_CONTACT_LIST,
+    content,
+    created_at: dayjs().unix(),
+    tags: [['d', dTag]]
+  }
+}
+
 export function createProfileDraftEvent(content: string, tags: string[][] = []): TDraftEvent {
   return {
     kind: kinds.Metadata,

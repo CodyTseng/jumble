@@ -21,6 +21,7 @@ import SearchInput from '../SearchInput'
 import SpQrCode from '../SpQrCode'
 import TextWithEmojis from '../TextWithEmojis'
 import TrustScoreBadge from '../TrustScoreBadge'
+import ContactNoteEditor from '@/components/ContactNoteEditor'
 import AvatarWithLightbox from './AvatarWithLightbox'
 import BannerWithLightbox from './BannerWithLightbox'
 import FollowedBy from './FollowedBy'
@@ -195,6 +196,7 @@ export default function Profile({ id }: { id?: string }) {
               </div>
               {!isSelf && <FollowedBy pubkey={pubkey} />}
             </div>
+            {!isSelf && <ContactNoteEditor pubkey={pubkey} className="mt-2" />}
           </div>
         </div>
         <div className="px-4 pt-3.5 pb-0.5">

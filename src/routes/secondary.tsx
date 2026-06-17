@@ -1,6 +1,7 @@
 import AccountSettingsPage from '@/pages/secondary/AccountSettingsPage'
 import AppearanceSettingsPage from '@/pages/secondary/AppearanceSettingsPage'
 import BookmarkPage from '@/pages/secondary/BookmarkPage'
+import ContactNotesSettingsPage from '@/pages/secondary/ContactNotesSettingsPage'
 import DmConversationPage from '@/pages/secondary/DmConversationPage'
 import EmojiPackSettingsPage from '@/pages/secondary/EmojiPackSettingsPage'
 import EmojiSetEditorPage from '@/pages/secondary/EmojiSetEditorPage'
@@ -59,6 +60,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/standalone-emoji-editor', element: <StandaloneEmojiEditorPage /> },
   { path: '/settings/system', element: <SystemSettingsPage /> },
   { path: '/settings/account', element: <AccountSettingsPage /> },
+  { path: '/settings/contact-notes', element: <ContactNotesSettingsPage /> },
   { path: '/profile-editor', element: <ProfileEditorPage /> },
   { path: '/mutes', element: <MuteListPage /> },
   { path: '/rizful', element: <RizfulPage /> },

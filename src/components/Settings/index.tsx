@@ -9,6 +9,7 @@ import {
 import {
   toAccountSettings,
   toAppearanceSettings,
+  toContactNotesSettings,
   toEmojiPackSettings,
   toGeneralSettings,
   toPostSettings,
@@ -31,6 +32,7 @@ import {
   Languages,
   MonitorDown,
   Palette,
+  NotebookPen,
   Server,
   Settings2,
   Smile,
@@ -79,6 +81,14 @@ export default function Settings() {
             title={t('Emoji Packs')}
             chevron
             onClick={() => push(toEmojiPackSettings())}
+          />
+        )}
+        {!!pubkey && (
+          <SettingsRow
+            icon={<NotebookPen />}
+            title={t('Private contact notes')}
+            chevron
+            onClick={() => push(toContactNotesSettings())}
           />
         )}
       </SettingsGroup>
