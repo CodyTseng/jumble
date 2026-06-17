@@ -5,6 +5,7 @@ import EmojiDetailDialog from '@/components/EmojiDetailDialog'
 import KeySyncRequestHandler from '@/components/KeySyncRequestDialog'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
+import { ContactNotesProvider } from '@/providers/ContactNotesProvider'
 import { DraftBoxProvider } from '@/providers/DraftBoxProvider'
 import { ContentPolicyProvider } from '@/providers/ContentPolicyProvider'
 import { DeletedEventProvider } from '@/providers/DeletedEventProvider'
@@ -49,28 +50,30 @@ export default function App(): JSX.Element {
                         <TranslationServiceProvider>
                           <FavoriteRelaysProvider>
                             <FollowListProvider>
-                              <MuteListProvider>
-                                <UserTrustProvider>
-                                  <BookmarksProvider>
-                                    <EmojiPackProvider>
-                                      <PinListProvider>
-                                        <PinnedUsersProvider>
-                                          <FeedProvider>
-                                            <MediaUploadServiceProvider>
-                                              <KindFilterProvider>
-                                                <PageManager />
-                                                <KeySyncRequestHandler />
-                                                <EmojiDetailDialog />
-                                                <Toaster />
-                                              </KindFilterProvider>
-                                            </MediaUploadServiceProvider>
-                                          </FeedProvider>
-                                        </PinnedUsersProvider>
-                                      </PinListProvider>
-                                    </EmojiPackProvider>
-                                  </BookmarksProvider>
-                                </UserTrustProvider>
-                              </MuteListProvider>
+                              <ContactNotesProvider>
+                                <MuteListProvider>
+                                  <UserTrustProvider>
+                                    <BookmarksProvider>
+                                      <EmojiPackProvider>
+                                        <PinListProvider>
+                                          <PinnedUsersProvider>
+                                            <FeedProvider>
+                                              <MediaUploadServiceProvider>
+                                                <KindFilterProvider>
+                                                  <PageManager />
+                                                  <KeySyncRequestHandler />
+                                                  <EmojiDetailDialog />
+                                                  <Toaster />
+                                                </KindFilterProvider>
+                                              </MediaUploadServiceProvider>
+                                            </FeedProvider>
+                                          </PinnedUsersProvider>
+                                        </PinListProvider>
+                                      </EmojiPackProvider>
+                                    </BookmarksProvider>
+                                  </UserTrustProvider>
+                                </MuteListProvider>
+                              </ContactNotesProvider>
                             </FollowListProvider>
                           </FavoriteRelaysProvider>
                         </TranslationServiceProvider>
