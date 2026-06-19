@@ -1125,6 +1125,8 @@ export default {
       'This Google account is linked to a different Nostr account',
     'Drop files to upload': 'Drop files to upload',
     'Discover': 'Discover',
-    'Failure reason': 'Failure reason'
+    'Failure reason': 'Failure reason',
+    'Indirect notifications hidden': 'Indirect notifications hidden',
+    'Indirect notifications shown': 'Indirect notifications shown'
   }
 }

@@ -9,6 +9,7 @@ import {
 import localStorage from '@/services/local-storage.service'
 import { TPageRef } from '@/types'
 import { BellIcon } from '@phosphor-icons/react'
+import { Eye, EyeOff } from 'lucide-react'
 import { forwardRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -54,13 +55,20 @@ function HideUnrelatedNotificationsToggle() {
 
   return (
     <Button
-      variant="ghost"
+      variant={hideIndirect ? 'secondary' : 'ghost'}
+      role="switch"
+      aria-checked={hideIndirect}
+      aria-label={t('Hide indirect')}
+      title={hideIndirect ? t('Indirect notifications hidden') : t('Indirect notifications shown')}
       className={cn(
         'h-10 shrink-0 rounded-xl px-3 [&_svg]:size-5',
-        hideIndirect ? 'bg-muted/40 text-foreground' : 'text-muted-foreground'
+        hideIndirect
+          ? 'ring-1 ring-inset ring-primary/40 text-foreground'
+          : 'text-muted-foreground'
       )}
       onClick={() => updateHideIndirect(!hideIndirect)}
     >
+      {hideIndirect ? <EyeOff /> : <Eye />}
       {t('Hide indirect')}
     </Button>
   )
