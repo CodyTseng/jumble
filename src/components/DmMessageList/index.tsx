@@ -1159,7 +1159,7 @@ function DmContent({
           return <YoutubeEmbeddedPlayer key={si} url={node.data} />
         }
         if (node.type === 'x-post') {
-          return <XEmbeddedPost key={si} url={node.data} />
+          return <XEmbeddedPost key={si} url={node.data} className="w-full" />
         }
         if (node.type === 'event') {
           const id = node.data.split(':')[1]
