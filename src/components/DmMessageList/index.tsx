@@ -11,6 +11,7 @@ import ExpressionPicker from '@/components/ExpressionPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
+import MessageContextMenu from './MessageContextMenu'
 import SuggestedEmojis from '@/components/SuggestedEmojis'
 import {
   Dialog,
@@ -43,6 +44,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
 import cryptoFileService from '@/services/crypto-file.service'
 import dmService from '@/services/dm.service'
+import modalManager from '@/services/modal-manager.service'
 import { TDmMessage, TEmoji, TImetaInfo } from '@/types'
 import dayjs from 'dayjs'
 import {
@@ -58,7 +60,16 @@ import {
   SmilePlus
 } from 'lucide-react'
 import { kinds } from 'nostr-tools'
-import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 
 function formatDmTime(timestamp: number, t: ReturnType<typeof useTranslation>['t']): string {
@@ -523,7 +534,6 @@ function MessageBubble({
   isElevated?: boolean
   refCallback?: (el: HTMLDivElement | null) => void
 }) {
-  const { t } = useTranslation()
   const isFileMessage = message.decryptedRumor?.kind === ExtendedKind.RUMOR_FILE
   const hasBlocks =
     isFileMessage ||
@@ -555,19 +565,29 @@ function MessageBubble({
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const longPressTriggeredRef = useRef(false)
-  const actionDrawerOpenTimeRef = useRef(0)
+  const bubbleRef = useRef<HTMLDivElement>(null)
+  const contextMenuId = useId()
+  const [contextMenuRect, setContextMenuRect] = useState<DOMRect | null>(null)
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
-  const [drawerMode, setDrawerMode] = useState<'actions' | 'emoji'>('actions')
 
   const handleTouchStart = useCallback(() => {
     longPressTriggeredRef.current = false
     longPressTimerRef.current = setTimeout(() => {
       longPressTriggeredRef.current = true
-      actionDrawerOpenTimeRef.current = Date.now()
-      setDrawerMode('actions')
-      setIsActionDrawerOpen(true)
+      const rect = bubbleRef.current?.getBoundingClientRect()
+      if (rect) setContextMenuRect(rect)
     }, 500)
   }, [])
+
+  // Let the in-app / system back button close the context menu first. Gated on
+  // the open state (a post-mount transition) rather than the menu's own mount,
+  // so StrictMode's double-invoked mount effect can't spuriously close it via
+  // modalManager.unregister (which fires the callback on cleanup).
+  useEffect(() => {
+    if (!contextMenuRect) return
+    modalManager.register(contextMenuId, () => setContextMenuRect(null))
+    return () => modalManager.unregister(contextMenuId)
+  }, [contextMenuRect, contextMenuId])
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     clearTimeout(longPressTimerRef.current)
@@ -752,56 +772,39 @@ function MessageBubble({
         )}
         <Drawer open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
           <DrawerContent>
-            {drawerMode === 'actions' ? (
-              <div className="flex flex-col pb-2">
-                {onReply && (
-                  <button
-                    onClick={() => {
-                      if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
-                      setIsActionDrawerOpen(false)
-                      onReply(message)
-                    }}
-                    className="active:bg-secondary flex items-center gap-3 px-4 py-3 text-base"
-                  >
-                    <Reply className="text-muted-foreground h-5 w-5" />
-                    {t('Reply')}
-                  </button>
-                )}
-                {onReact && (
-                  <button
-                    onClick={() => {
-                      if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
-                      setDrawerMode('emoji')
-                    }}
-                    className="active:bg-secondary flex items-center gap-3 px-4 py-3 text-base"
-                  >
-                    <SmilePlus className="text-muted-foreground h-5 w-5" />
-                    {t('React')}
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    if (Date.now() - actionDrawerOpenTimeRef.current < 400) return
-                    handleCopy()
-                    setIsActionDrawerOpen(false)
-                  }}
-                  className="active:bg-secondary flex items-center gap-3 px-4 py-3 text-base"
-                >
-                  <Copy className="text-muted-foreground h-5 w-5" />
-                  {t('Copy')}
-                </button>
-              </div>
-            ) : (
-              <ExpressionPicker
-                onEmojiClick={(emoji) => {
-                  if (!emoji) return
-                  handleEmojiSelect(emoji)
-                  setIsActionDrawerOpen(false)
-                }}
-              />
-            )}
+            <ExpressionPicker
+              onEmojiClick={(emoji) => {
+                if (!emoji) return
+                handleEmojiSelect(emoji)
+                setIsActionDrawerOpen(false)
+              }}
+            />
           </DrawerContent>
         </Drawer>
+        {contextMenuRect && (
+          <MessageContextMenu
+            originRect={contextMenuRect}
+            onReply={() => onReply?.(message)}
+            onCopy={handleCopy}
+            onReact={handleEmojiSelect}
+            onMore={() => {
+              setContextMenuRect(null)
+              setIsActionDrawerOpen(true)
+            }}
+            onClose={() => setContextMenuRect(null)}
+          >
+            {isFileMessage ? (
+              <EncryptedFileMessage message={message} isOwn={isOwn} />
+            ) : (
+              <DmContent
+                content={message.content}
+                isOwn={isOwn}
+                bubbleClass={bubbleClass}
+                tags={message.decryptedRumor?.tags}
+              />
+            )}
+          </MessageContextMenu>
+        )}
         <div
           className={cn(
             'relative flex max-w-full min-w-0 flex-col',
@@ -830,7 +833,12 @@ function MessageBubble({
             </button>
           )}
           {isFileMessage ? (
-            <EncryptedFileMessage message={message} isOwn={isOwn} isHighlighted={isHighlighted} />
+            <EncryptedFileMessage
+              message={message}
+              isOwn={isOwn}
+              isHighlighted={isHighlighted}
+              containerRef={bubbleRef}
+            />
           ) : (
             <DmContent
               content={message.content}
@@ -838,6 +846,7 @@ function MessageBubble({
               bubbleClass={bubbleClass}
               isHighlighted={isHighlighted}
               tags={message.decryptedRumor?.tags}
+              containerRef={bubbleRef}
             />
           )}
           {hasReactions && (
@@ -997,13 +1006,15 @@ function DmContent({
   isOwn,
   bubbleClass,
   isHighlighted,
-  tags
+  tags,
+  containerRef
 }: {
   content: string
   isOwn: boolean
   bubbleClass: string
   isHighlighted?: boolean
   tags?: string[][]
+  containerRef?: React.Ref<HTMLDivElement>
 }) {
   const { allImages, segments, isEmojiOnly } = useMemo(() => {
     if (!content) return { allImages: [], segments: [], isEmojiOnly: false }
@@ -1075,6 +1086,7 @@ function DmContent({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         'flex max-w-full min-w-0 flex-col gap-0.5 rounded-lg transition-all duration-500',
         // Stretch horizontally so embedded cards (EmbeddedNote / YouTube /
@@ -1291,11 +1303,13 @@ const decryptedBlobCache = new Map<string, string>()
 function EncryptedFileMessage({
   message,
   isOwn,
-  isHighlighted
+  isHighlighted,
+  containerRef
 }: {
   message: TDmMessage
   isOwn: boolean
   isHighlighted?: boolean
+  containerRef?: React.Ref<HTMLDivElement>
 }) {
   const { t } = useTranslation()
 
@@ -1374,7 +1388,7 @@ function EncryptedFileMessage({
   // Non-media files: show card with on-click download
   if (!isMedia) {
     return (
-      <div className={wrapperClass}>
+      <div ref={containerRef} className={wrapperClass}>
         <button
           onClick={handleFileDownload}
           disabled={loading}
@@ -1418,7 +1432,7 @@ function EncryptedFileMessage({
   if (loading) {
     const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
-      <div className={wrapperClass}>
+      <div ref={containerRef} className={wrapperClass}>
         <div
           className={cn(
             'flex items-center justify-center overflow-hidden rounded-lg',
@@ -1435,7 +1449,7 @@ function EncryptedFileMessage({
   if (error || !blobUrl) {
     const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
-      <div className={wrapperClass}>
+      <div ref={containerRef} className={wrapperClass}>
         <div
           className={cn(
             'flex items-center justify-center gap-2 overflow-hidden rounded-lg',
@@ -1452,7 +1466,7 @@ function EncryptedFileMessage({
 
   if (isImage) {
     return (
-      <div className={wrapperClass}>
+      <div ref={containerRef} className={wrapperClass}>
         <ImageGallery images={[{ url: blobUrl }]} start={0} end={1} />
       </div>
     )
@@ -1460,7 +1474,7 @@ function EncryptedFileMessage({
 
   if (isVideo) {
     return (
-      <div className={wrapperClass}>
+      <div ref={containerRef} className={wrapperClass}>
         <div className="overflow-hidden rounded-lg">
           <video src={blobUrl} controls className="max-h-80 max-w-full rounded-lg" />
         </div>
