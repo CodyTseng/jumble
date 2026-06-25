@@ -149,7 +149,7 @@ export type TPostTargetItem =
 
 export type TNoteListMode = 'posts' | 'postsAndReplies' | 'you' | '24h' | 'articles'
 
-export type TFeedTabBuiltin = 'posts' | 'postsAndReplies' | '24h' | 'articles'
+export type TFeedTabBuiltin = 'posts' | 'postsAndReplies' | '24h' | 'articles' | 'pulse'
 
 export type TFeedTabConfig = {
   id: string
