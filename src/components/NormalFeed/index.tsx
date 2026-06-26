@@ -71,6 +71,7 @@ export default function NormalFeed({
   const is24hMode = selectedTab?.builtin === '24h'
   const effectiveShowKinds = selectedTab?.kinds ?? temporaryShowKinds
   const hideReplies = selectedTab?.hideReplies ?? false
+  const hideFollowed = selectedTab?.hideFollowed ?? false
 
   useEffect(() => {
     setTemporaryShowKinds(feedShowKinds)
@@ -146,6 +147,7 @@ export default function NormalFeed({
             showKinds={effectiveShowKinds}
             subRequests={subRequests}
             hideReplies={hideReplies}
+            hideFollowed={hideFollowed}
             areAlgoRelays={areAlgoRelays}
             showRelayCloseReason={showRelayCloseReason}
             isPubkeyFeed={isPubkeyFeed}

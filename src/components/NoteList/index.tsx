@@ -7,6 +7,7 @@ import { tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
+import { useFollowList } from '@/providers/FollowListProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -49,6 +50,7 @@ const NoteList = forwardRef<
     showKinds?: number[]
     filterMutedNotes?: boolean
     hideReplies?: boolean
+    hideFollowed?: boolean
     hideSpam?: boolean
     trustScoreThreshold?: number
     areAlgoRelays?: boolean
@@ -66,6 +68,7 @@ const NoteList = forwardRef<
       showKinds,
       filterMutedNotes = true,
       hideReplies = false,
+      hideFollowed = false,
       hideSpam = false,
       trustScoreThreshold,
       areAlgoRelays = false,
@@ -80,8 +83,9 @@ const NoteList = forwardRef<
   ) => {
     const { t } = useTranslation()
     const active = usePageActive()
-    const { startLogin } = useNostr()
+    const { pubkey, startLogin } = useNostr()
     const { isSpammer, meetsMinTrustScore } = useUserTrust()
+    const { followingSet } = useFollowList()
     const { mutePubkeySet } = useMuteList()
     const { hideContentMentioningMutedUsers, mutedWords } = useContentPolicy()
     const { isEventDeleted } = useDeletedEvent()
@@ -126,6 +130,7 @@ const NoteList = forwardRef<
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
         if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
+        if (hideFollowed && (evt.pubkey === pubkey || followingSet.has(evt.pubkey))) return true
         if (
           filterMutedNotes &&
           hideContentMentioningMutedUsers &&
@@ -147,7 +152,7 @@ const NoteList = forwardRef<
 
         return false
       },
-      [mutePubkeySet, isEventDeleted, filterFn, mutedWords, pinnedEventHexIdSet]
+      [mutePubkeySet, isEventDeleted, filterFn, mutedWords, pinnedEventHexIdSet, hideFollowed, followingSet, pubkey]
     )
 
     useEffect(() => {
@@ -265,6 +270,8 @@ const NoteList = forwardRef<
       storedEvents,
       shouldHideEvent,
       hideReplies,
+      hideFollowed,
+      followingSet,
       hideSpam,
       meetsMinTrustScore,
       trustScoreThreshold

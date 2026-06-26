@@ -157,6 +157,7 @@ export type TFeedTabConfig = {
   hidden?: boolean
   kinds?: number[]
   hideReplies?: boolean
+  hideFollowed?: boolean
   builtin?: TFeedTabBuiltin
 }
 

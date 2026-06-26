@@ -102,7 +102,7 @@ export default function FeedTabsCustomizeDialog({
       updateFeedTabs(
         feedTabs.map((tab) =>
           tab.id === draft.id
-            ? { ...tab, label: draft.label, kinds: draft.kinds, hideReplies: draft.hideReplies }
+            ? { ...tab, label: draft.label, kinds: draft.kinds, hideReplies: draft.hideReplies, hideFollowed: draft.hideFollowed }
             : tab
         )
       )
@@ -111,7 +111,8 @@ export default function FeedTabsCustomizeDialog({
         id: `custom-${randomString(8)}`,
         label: draft.label,
         kinds: draft.kinds,
-        hideReplies: draft.hideReplies
+        hideReplies: draft.hideReplies,
+        hideFollowed: draft.hideFollowed
       }
       updateFeedTabs([...feedTabs, newTab])
     }
@@ -299,6 +300,7 @@ function TabEditor({
   const { t } = useTranslation()
   const [label, setLabel] = useState(initial?.label ?? '')
   const [hideReplies, setHideReplies] = useState(initial?.hideReplies ?? false)
+  const [hideFollowed, setHideFollowed] = useState(initial?.hideFollowed ?? false)
   const [kinds, setKinds] = useState<number[]>(initial?.kinds ?? [])
 
   const canSubmit = label.trim().length > 0 && kinds.length > 0
@@ -309,6 +311,7 @@ function TabEditor({
       id: initial?.id,
       label: label.trim(),
       hideReplies,
+      hideFollowed,
       kinds: [...kinds].sort((a, b) => a - b)
     })
   }
@@ -339,6 +342,11 @@ function TabEditor({
       <Label className="flex cursor-pointer items-center justify-between">
         <span className="text-sm font-medium">{t('Hide replies')}</span>
         <Switch checked={hideReplies} onCheckedChange={setHideReplies} />
+      </Label>
+
+      <Label className="flex cursor-pointer items-center justify-between">
+        <span className="text-sm font-medium">{t('Hide followed')}</span>
+        <Switch checked={hideFollowed} onCheckedChange={setHideFollowed} />
       </Label>
 
       <div className="space-y-2">
