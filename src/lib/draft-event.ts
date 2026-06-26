@@ -209,10 +209,15 @@ export async function createShortTextNoteDraftEvent(
 }
 
 // https://github.com/nostr-protocol/nips/blob/master/51.md
-export function createRelaySetDraftEvent(relaySet: Omit<TRelaySet, 'aTag'>): TDraftEvent {
+export function createRelaySetDraftEvent(
+  relaySet: Omit<TRelaySet, 'aTag'>,
+  content = ''
+): TDraftEvent {
   return {
     kind: kinds.Relaysets,
-    content: '',
+    // Preserve any existing encrypted payload (e.g. private relays) when
+    // republishing an existing relay set instead of discarding it.
+    content,
     tags: [
       buildDTag(relaySet.id),
       buildTitleTag(relaySet.name),
@@ -419,7 +424,8 @@ export function createProfileDraftEvent(content: string, tags: string[][] = []):
 
 export function createFavoriteRelaysDraftEvent(
   favoriteRelays: string[],
-  relaySetEventsOrATags: Event[] | string[][]
+  relaySetEventsOrATags: Event[] | string[][],
+  content = ''
 ): TDraftEvent {
   const tags: string[][] = []
   favoriteRelays.forEach((url) => {
@@ -434,7 +440,9 @@ export function createFavoriteRelaysDraftEvent(
   })
   return {
     kind: ExtendedKind.FAVORITE_RELAYS,
-    content: '',
+    // Preserve any existing encrypted payload (e.g. private favorite relays
+    // written by Amethyst and other clients) instead of discarding it.
+    content,
     tags,
     created_at: dayjs().unix()
   }
@@ -479,11 +487,14 @@ export function createUserEmojiListDraftEvent(tags: string[][], content = ''): T
 export function createEmojiSetDraftEvent(
   emojis: TEmoji[],
   title: string,
-  d: string = randomString(16)
+  d: string = randomString(16),
+  content = ''
 ): TDraftEvent {
   return {
     kind: kinds.Emojisets,
-    content: '',
+    // Preserve any existing encrypted payload when republishing an existing
+    // emoji set instead of discarding it.
+    content,
     tags: [buildDTag(d), buildTitleTag(title), ...emojis.map((emoji) => buildEmojiTag(emoji))],
     created_at: dayjs().unix()
   }

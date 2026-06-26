@@ -195,7 +195,7 @@ export function EmojiPackProvider({ children }: { children: React.ReactNode }) {
     const d = setEvent.tags.find((tag) => tag[0] === 'd')?.[1] ?? ''
     const coordinate = getReplaceableCoordinateFromEvent(setEvent)
     try {
-      const newSetEvent = await publish(createEmojiSetDraftEvent(emojis, title, d))
+      const newSetEvent = await publish(createEmojiSetDraftEvent(emojis, title, d, setEvent.content))
       await client.updateEmojiSetCache(newSetEvent)
       if (emojiPackCoordinateSet.has(coordinate)) {
         // Already referenced → 10030 is unchanged, so reload manually to reflect new content.
