@@ -450,6 +450,16 @@ const NoteList = forwardRef<
       }
     }, [JSON.stringify(subRequests), refreshCount, JSON.stringify(showKinds), active])
 
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          setRefreshCount((count) => count + 1)
+        }
+      }
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }, [])
+
     const handleLoadMore = useCallback(async () => {
       if (!timelineKey || areAlgoRelays) return false
       const newEvents = await client.loadMoreTimeline(
