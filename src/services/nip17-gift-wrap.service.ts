@@ -44,17 +44,21 @@ class Nip17GiftWrapService {
    * receiver dedupes by id and only ever stores/shows one message. Each format's
    * `index 0` is the current format.
    */
-  async createDualGiftWraps(
+  /**
+   * Builds the unsigned rumor (kind 14/15/7) and computes its id. Pure and
+   * synchronous — needs no signer, encryption key or any network lookup — so the
+   * caller can persist and display the message before the (failure-prone) signing
+   * and publishing steps. `wrapRumor` later turns this same rumor into gift wraps;
+   * both share the rumor id, which is the message's stable identity.
+   */
+  buildRumor(
     content: string,
     accountPubkey: string,
-    signer: ISigner,
-    encryptionPrivkey: Uint8Array,
     recipientPubkey: string,
-    recipientEncryptionPubkey: string,
     createdAt: number,
     extraTags?: string[][],
     kind?: number
-  ): Promise<{ rumor: TRumor; recipientGiftWraps: Event[]; selfGiftWraps: Event[] }> {
+  ): TRumor {
     const rumorTemplate: UnsignedEvent = {
       created_at: createdAt,
       kind: kind ?? kinds.PrivateDirectMessage,
@@ -62,10 +66,29 @@ class Nip17GiftWrapService {
       content,
       pubkey: accountPubkey
     }
-    const rumor: TRumor = {
+    return {
       ...rumorTemplate,
       id: getEventHash(rumorTemplate)
     }
+  }
+
+  /**
+   * Wraps an already-built rumor in BOTH the current (identity-signed, `n`-tagged)
+   * and legacy (encryption-key-signed) formats, for the recipient and for the
+   * sender's own devices. This is the migration-period dual-send: new clients read
+   * the identity-signed wrap, clients still on the old code read the legacy wrap.
+   *
+   * Both formats wrap the **same** rumor, so they share the same `rumor.id` — the
+   * receiver dedupes by id and only ever stores/shows one message. Each format's
+   * `index 0` is the current format.
+   */
+  async wrapRumor(
+    rumor: TRumor,
+    signer: ISigner,
+    encryptionPrivkey: Uint8Array,
+    recipientPubkey: string,
+    recipientEncryptionPubkey: string
+  ): Promise<{ recipientGiftWraps: Event[]; selfGiftWraps: Event[] }> {
     const senderEncryptionPubkey = getPublicKey(encryptionPrivkey)
 
     // Recipient copies: encrypted to the recipient's encryption pubkey, with both
@@ -90,13 +113,12 @@ class Nip17GiftWrapService {
     // can sync outgoing messages.
     const selfTags = [
       ['p', senderEncryptionPubkey],
-      ['p', accountPubkey]
+      ['p', rumor.pubkey]
     ]
     const selfSeal = await this.createSeal(rumor, signer, encryptionPrivkey, senderEncryptionPubkey)
     const selfLegacySeal = this.createLegacySeal(rumor, encryptionPrivkey, senderEncryptionPubkey)
 
     return {
-      rumor,
       recipientGiftWraps: [
         this.createGiftWrap(recipientSeal, recipientEncryptionPubkey, recipientTags),
         this.createGiftWrap(recipientLegacySeal, recipientEncryptionPubkey, recipientTags)
@@ -106,6 +128,30 @@ class Nip17GiftWrapService {
         this.createGiftWrap(selfLegacySeal, senderEncryptionPubkey, selfTags)
       ]
     }
+  }
+
+  /** Builds a rumor and wraps it in one step. Used where the rumor doesn't need
+   * to be persisted ahead of signing (e.g. reactions). */
+  async createDualGiftWraps(
+    content: string,
+    accountPubkey: string,
+    signer: ISigner,
+    encryptionPrivkey: Uint8Array,
+    recipientPubkey: string,
+    recipientEncryptionPubkey: string,
+    createdAt: number,
+    extraTags?: string[][],
+    kind?: number
+  ): Promise<{ rumor: TRumor; recipientGiftWraps: Event[]; selfGiftWraps: Event[] }> {
+    const rumor = this.buildRumor(content, accountPubkey, recipientPubkey, createdAt, extraTags, kind)
+    const wraps = await this.wrapRumor(
+      rumor,
+      signer,
+      encryptionPrivkey,
+      recipientPubkey,
+      recipientEncryptionPubkey
+    )
+    return { rumor, ...wraps }
   }
 
   /**

@@ -1142,6 +1142,7 @@ export default {
     'Discover': 'Интересное',
     'Failure reason': 'Причина ошибки',
     'Indirect notifications hidden': 'Косвенные уведомления скрыты',
-    'Indirect notifications shown': 'Косвенные уведомления показаны'
+    'Indirect notifications shown': 'Косвенные уведомления показаны',
+    Resend: 'Отправить снова'
   }
 }

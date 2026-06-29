@@ -1136,6 +1136,7 @@ export default {
     'Discover': '発見',
     'Failure reason': '失敗の理由',
     'Indirect notifications hidden': '間接通知を非表示中',
-    'Indirect notifications shown': '間接通知を表示中'
+    'Indirect notifications shown': '間接通知を表示中',
+    Resend: '再送信'
   }
 }

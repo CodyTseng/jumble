@@ -1154,6 +1154,7 @@ export default {
     'Discover': 'Entdecken',
     'Failure reason': 'Fehlergrund',
     'Indirect notifications hidden': 'Indirekte Benachrichtigungen ausgeblendet',
-    'Indirect notifications shown': 'Indirekte Benachrichtigungen angezeigt'
+    'Indirect notifications shown': 'Indirekte Benachrichtigungen angezeigt',
+    Resend: 'Erneut senden'
   }
 }

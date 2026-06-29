@@ -1153,6 +1153,7 @@ export default {
     Discover: 'Découvrir',
     'Failure reason': "Raison de l'échec",
     'Indirect notifications hidden': 'Notifications indirectes masquées',
-    'Indirect notifications shown': 'Notifications indirectes affichées'
+    'Indirect notifications shown': 'Notifications indirectes affichées',
+    Resend: 'Renvoyer'
   }
 }

@@ -285,6 +285,13 @@ export type TDmMessage = {
   // false     — mismatch, or Kind 10044 could not be retrieved
   // undefined — message was ingested before this check existed, or imported from a JSONL dump
   verified?: boolean
+  // Outgoing delivery state for messages we originated. The rumor is persisted up
+  // front (optimistic UI), then signed, gift-wrapped and published; this records
+  // where that pipeline is so a failed send can be retried — even across restarts.
+  // 'sending' — persisted, delivery in progress
+  // 'failed'  — delivery failed, awaiting resend
+  // undefined — delivered (or a received message), nothing pending
+  sendState?: 'sending' | 'failed'
 }
 
 export type TEncryptionKeypair = {

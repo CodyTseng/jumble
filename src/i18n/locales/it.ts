@@ -1143,6 +1143,7 @@ export default {
     Discover: 'Scopri',
     'Failure reason': "Motivo dell'errore",
     'Indirect notifications hidden': 'Notifiche indirette nascoste',
-    'Indirect notifications shown': 'Notifiche indirette visibili'
+    'Indirect notifications shown': 'Notifiche indirette visibili',
+    Resend: 'Reinvia'
   }
 }

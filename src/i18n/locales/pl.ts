@@ -1146,6 +1146,7 @@ export default {
     'Discover': 'Odkrywaj',
     'Failure reason': 'Powód niepowodzenia',
     'Indirect notifications hidden': 'Powiadomienia pośrednie ukryte',
-    'Indirect notifications shown': 'Powiadomienia pośrednie widoczne'
+    'Indirect notifications shown': 'Powiadomienia pośrednie widoczne',
+    Resend: 'Wyślij ponownie'
   }
 }

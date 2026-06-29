@@ -14,7 +14,7 @@ import cryptoFileService from './crypto-file.service'
 import encryptionKeyService from './encryption-key.service'
 import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
-import nip17GiftWrapService, { TUnwrappedMessage } from './nip17-gift-wrap.service'
+import nip17GiftWrapService, { TRumor, TUnwrappedMessage } from './nip17-gift-wrap.service'
 
 class DmService {
   static instance: DmService
@@ -205,15 +205,38 @@ class DmService {
   }
 
   async resendMessage(messageId: string): Promise<void> {
-    const data = this.pendingPublishData.get(messageId)
-    if (!data) return
+    // The rumor is always persisted, so a resend can rebuild everything from it.
+    // deliverMessage reuses the in-memory gift wraps when they're still around
+    // (just re-publish) and otherwise re-signs and re-wraps from the rumor —
+    // which is also the path taken after a restart, when nothing is in memory.
+    const message = await indexedDb.getDmMessageById(messageId)
+    if (!message) return
+    await this.deliverMessage(message)
+  }
+
+  /**
+   * Shared delivery pipeline for an outgoing message whose rumor is already
+   * persisted and shown. Reuses cached gift wraps when available (resend after a
+   * publish-only failure), otherwise rebuilds them from the rumor (first send,
+   * resend after a sign/fetch failure, or resend after a restart). Never throws:
+   * failures are surfaced as the 'failed' send state so the user can retry.
+   */
+  private async deliverMessage(message: TDmMessage): Promise<void> {
+    const messageId = message.id
+    const accountPubkey = message.senderPubkey
 
     this.sendingStatuses.set(messageId, 'sending')
     this.emitSendingStatusChanged()
+    await this.persistSendState(messageId, 'sending')
 
     try {
-      const accountPubkey = this.currentAccountPubkey
-      const myDmRelays = accountPubkey ? await client.fetchDmRelays(accountPubkey) : []
+      let data = this.pendingPublishData.get(messageId)
+      if (!data) {
+        data = await this.buildPublishData(message)
+        this.pendingPublishData.set(messageId, data)
+      }
+
+      const myDmRelays = await client.fetchDmRelays(accountPubkey)
       await Promise.all([
         this.publishGiftWraps(data.recipientDmRelays, data.recipientGiftWraps, true),
         myDmRelays.length > 0
@@ -221,18 +244,84 @@ class DmService {
           : Promise.resolve()
       ])
 
-      this.sendingStatuses.set(messageId, 'sent')
       this.pendingPublishData.delete(messageId)
+      this.sendingStatuses.set(messageId, 'sent')
+      await this.persistSendState(messageId, undefined)
       this.emitSendingStatusChanged()
 
       setTimeout(() => {
         this.sendingStatuses.delete(messageId)
         this.emitSendingStatusChanged()
       }, 3000)
-    } catch {
+    } catch (error) {
+      console.error('[DM] failed to deliver message:', error)
       this.sendingStatuses.set(messageId, 'failed')
+      await this.persistSendState(messageId, 'failed')
       this.emitSendingStatusChanged()
     }
+  }
+
+  /**
+   * Signs and gift-wraps a persisted rumor for delivery, resolving the recipient's
+   * encryption key and DM relays in the process. Throws if any prerequisite is
+   * missing (no keypair/signer, recipient hasn't published an encryption key) —
+   * deliverMessage turns that into a retryable 'failed' state.
+   */
+  private async buildPublishData(message: TDmMessage): Promise<{
+    recipientGiftWraps: Event[]
+    selfGiftWraps: Event[]
+    recipientDmRelays: string[]
+  }> {
+    const accountPubkey = message.senderPubkey
+    const rumor = message.decryptedRumor as unknown as TRumor
+    const recipientPubkey = rumor.tags.find((t) => t[0] === 'p')?.[1]
+    if (!recipientPubkey) {
+      throw new Error('Recipient pubkey not found in rumor')
+    }
+
+    const keypair =
+      this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
+    if (!keypair) {
+      throw new Error('Encryption keypair not available')
+    }
+
+    const signer = client.signer
+    if (!signer) {
+      throw new Error('Signer not available')
+    }
+
+    const recipientEncryptionPubkey = await this.getRecipientEncryptionPubkey(recipientPubkey)
+    if (!recipientEncryptionPubkey) {
+      throw new Error('Recipient does not have encryption key published')
+    }
+
+    const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
+    const { recipientGiftWraps, selfGiftWraps } = await nip17GiftWrapService.wrapRumor(
+      rumor,
+      signer,
+      keypair.privkey,
+      recipientPubkey,
+      recipientEncryptionPubkey
+    )
+    return { recipientGiftWraps, selfGiftWraps, recipientDmRelays }
+  }
+
+  // Persists the outgoing delivery state on the message record (merging into the
+  // latest stored copy so a concurrent self-copy ingest isn't clobbered). Passing
+  // `undefined` clears the flag, marking the message delivered.
+  private async persistSendState(
+    messageId: string,
+    state: 'sending' | 'failed' | undefined
+  ): Promise<void> {
+    const existing = await indexedDb.getDmMessageById(messageId)
+    if (!existing) return
+    if (existing.sendState === state) return
+    if (state) {
+      existing.sendState = state
+    } else {
+      delete existing.sendState
+    }
+    await indexedDb.putDmMessage(existing)
   }
 
   /**
@@ -706,85 +795,13 @@ class DmService {
     content: string,
     replyTo?: { id: string; content: string; senderPubkey: string },
     additionalTags?: string[][]
-  ): Promise<TDmMessage | null> {
-    // Allocate the rumor timestamp synchronously, before any await, so rapid
-    // consecutive sends keep their order (see allocateRumorCreatedAt).
-    const createdAt = this.allocateRumorCreatedAt()
-    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
-
-    const keypair =
-      this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
-    if (!keypair) {
-      throw new Error('Encryption keypair not available')
-    }
-
-    const recipientEncryptionPubkey = await this.getRecipientEncryptionPubkey(recipientPubkey)
-    if (!recipientEncryptionPubkey) {
-      throw new Error('Recipient does not have encryption key published')
-    }
-
-    const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
-
-    const signer = client.signer
-    if (!signer) {
-      throw new Error('Signer not available')
-    }
-
-    const replyRelayHint = recipientDmRelays[0] ?? ''
-    const replyTags = replyTo ? [['e', replyTo.id, replyRelayHint]] : []
+  ): Promise<TDmMessage> {
+    // The reply relay hint is omitted: the rumor (and thus its id) is built before
+    // any network lookup, so we can't know the recipient's DM relays yet. The hint
+    // is only a discovery convenience and the reply stays within the conversation.
+    const replyTags = replyTo ? [['e', replyTo.id]] : []
     const extraTags = [...replyTags, ...(additionalTags ?? [])]
-    const { rumor, recipientGiftWraps, selfGiftWraps } =
-      await nip17GiftWrapService.createDualGiftWraps(
-        content,
-        accountPubkey,
-        signer,
-        keypair.privkey,
-        recipientPubkey,
-        recipientEncryptionPubkey,
-        createdAt,
-        extraTags
-      )
-
-    const message: TDmMessage = {
-      id: rumor.id,
-      participantsKey,
-      senderPubkey: accountPubkey,
-      content: rumor.content,
-      createdAt: rumor.created_at,
-      originalEvent: selfGiftWraps[0],
-      decryptedRumor: rumor as unknown as Event,
-      ...(replyTo ? { replyTo } : {})
-    }
-
-    // Save and show immediately (optimistic UI)
-    await this.saveMessage(message)
-    await this.updateConversation(accountPubkey, recipientPubkey, message)
-    this.pendingPublishData.set(message.id, { recipientGiftWraps, selfGiftWraps, recipientDmRelays })
-    this.sendingStatuses.set(message.id, 'sending')
-    this.emitNewMessage(message)
-
-    try {
-      const myDmRelays = await client.fetchDmRelays(accountPubkey)
-      await Promise.all([
-        this.publishGiftWraps(recipientDmRelays, recipientGiftWraps, true),
-        this.publishGiftWraps(myDmRelays, selfGiftWraps, false)
-      ])
-
-      this.sendingStatuses.set(message.id, 'sent')
-      this.pendingPublishData.delete(message.id)
-      this.emitSendingStatusChanged()
-
-      setTimeout(() => {
-        this.sendingStatuses.delete(message.id)
-        this.emitSendingStatusChanged()
-      }, 3000)
-    } catch (error) {
-      this.sendingStatuses.set(message.id, 'failed')
-      this.emitSendingStatusChanged()
-      throw error
-    }
-
-    return message
+    return this.sendRumor(accountPubkey, recipientPubkey, content, extraTags, undefined, replyTo)
   }
 
   async sendFileMessage(
@@ -798,25 +815,7 @@ class DmService {
     dim?: string,
     size?: number,
     thumbHash?: string
-  ): Promise<TDmMessage | null> {
-    // Allocate the rumor timestamp synchronously, before any await, so rapid
-    // consecutive sends keep their order (see allocateRumorCreatedAt).
-    const createdAt = this.allocateRumorCreatedAt()
-    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
-
-    const keypair =
-      this.currentEncryptionKeypair ?? encryptionKeyService.getEncryptionKeypair(accountPubkey)
-    if (!keypair) {
-      throw new Error('Encryption keypair not available')
-    }
-
-    const recipientEncryptionPubkey = await this.getRecipientEncryptionPubkey(recipientPubkey)
-    if (!recipientEncryptionPubkey) {
-      throw new Error('Recipient does not have encryption key published')
-    }
-
-    const recipientDmRelays = await client.fetchDmRelays(recipientPubkey)
-
+  ): Promise<TDmMessage> {
     const hexKey = cryptoFileService.bytesToHex(encryptionKey)
     const hexNonce = cryptoFileService.bytesToHex(encryptionNonce)
 
@@ -837,23 +836,43 @@ class DmService {
       fileTags.push(['thumbhash', thumbHash])
     }
 
-    const signer = client.signer
-    if (!signer) {
-      throw new Error('Signer not available')
-    }
+    return this.sendRumor(
+      accountPubkey,
+      recipientPubkey,
+      fileUrl,
+      fileTags,
+      ExtendedKind.RUMOR_FILE
+    )
+  }
 
-    const { rumor, recipientGiftWraps, selfGiftWraps } =
-      await nip17GiftWrapService.createDualGiftWraps(
-        fileUrl,
-        accountPubkey,
-        signer,
-        keypair.privkey,
-        recipientPubkey,
-        recipientEncryptionPubkey,
-        createdAt,
-        fileTags,
-        ExtendedKind.RUMOR_FILE
-      )
+  /**
+   * Builds the rumor, persists it and shows it immediately (optimistic UI), then
+   * kicks off delivery in the background. Signing and publishing happen in
+   * deliverMessage, so a failure there leaves the message visible and retryable
+   * instead of losing the user's text. Returns once the message is shown — it does
+   * not wait for the network round-trip.
+   */
+  private async sendRumor(
+    accountPubkey: string,
+    recipientPubkey: string,
+    content: string,
+    extraTags: string[][],
+    kind?: number,
+    replyTo?: { id: string; content: string; senderPubkey: string }
+  ): Promise<TDmMessage> {
+    // Allocate the rumor timestamp synchronously, before any await, so rapid
+    // consecutive sends keep their order (see allocateRumorCreatedAt).
+    const createdAt = this.allocateRumorCreatedAt()
+    const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
+
+    const rumor = nip17GiftWrapService.buildRumor(
+      content,
+      accountPubkey,
+      recipientPubkey,
+      createdAt,
+      extraTags,
+      kind
+    )
 
     const message: TDmMessage = {
       id: rumor.id,
@@ -861,36 +880,22 @@ class DmService {
       senderPubkey: accountPubkey,
       content: rumor.content,
       createdAt: rumor.created_at,
-      originalEvent: selfGiftWraps[0],
-      decryptedRumor: rumor as unknown as Event
+      // Placeholder until the real gift wrap is built/echoed back; originalEvent is
+      // not used for DM rendering (mirrors importMessages, which stores the rumor).
+      originalEvent: rumor as unknown as Event,
+      decryptedRumor: rumor as unknown as Event,
+      sendState: 'sending',
+      ...(replyTo ? { replyTo } : {})
     }
 
     await this.saveMessage(message)
     await this.updateConversation(accountPubkey, recipientPubkey, message)
-    this.pendingPublishData.set(message.id, { recipientGiftWraps, selfGiftWraps, recipientDmRelays })
     this.sendingStatuses.set(message.id, 'sending')
     this.emitNewMessage(message)
 
-    try {
-      const myDmRelays = await client.fetchDmRelays(accountPubkey)
-      await Promise.all([
-        this.publishGiftWraps(recipientDmRelays, recipientGiftWraps, true),
-        this.publishGiftWraps(myDmRelays, selfGiftWraps, false)
-      ])
-
-      this.sendingStatuses.set(message.id, 'sent')
-      this.pendingPublishData.delete(message.id)
-      this.emitSendingStatusChanged()
-
-      setTimeout(() => {
-        this.sendingStatuses.delete(message.id)
-        this.emitSendingStatusChanged()
-      }, 3000)
-    } catch (error) {
-      this.sendingStatuses.set(message.id, 'failed')
-      this.emitSendingStatusChanged()
-      throw error
-    }
+    // Fire-and-forget: deliverMessage never throws and surfaces failures via the
+    // persisted 'failed' state, so we don't block the UI on the network.
+    void this.deliverMessage(message)
 
     return message
   }
@@ -1193,10 +1198,21 @@ class DmService {
     const participantsKey = this.getParticipantsKey(accountPubkey, otherPubkey)
     const conversationKey = this.getConversationKey(accountPubkey, otherPubkey)
     const conversation = await indexedDb.getDmConversation(conversationKey)
-    return indexedDb.getDmMessages(participantsKey, {
+    const messages = await indexedDb.getDmMessages(participantsKey, {
       ...options,
       after: conversation?.deletedAt
     })
+
+    // Surface persisted-but-undelivered messages (e.g. the app was closed mid-send)
+    // as 'failed' so the UI offers a retry. A message that's actively sending in
+    // this session already owns a live status, so we never override that.
+    for (const message of messages) {
+      if (message.sendState && !this.sendingStatuses.has(message.id)) {
+        this.sendingStatuses.set(message.id, 'failed')
+      }
+    }
+
+    return messages
   }
 
   async markConversationAsRead(accountPubkey: string, otherPubkey: string): Promise<void> {

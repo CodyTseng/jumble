@@ -1127,6 +1127,7 @@ export default {
     'Discover': 'Discover',
     'Failure reason': 'Failure reason',
     'Indirect notifications hidden': 'Indirect notifications hidden',
-    'Indirect notifications shown': 'Indirect notifications shown'
+    'Indirect notifications shown': 'Indirect notifications shown',
+    Resend: 'Resend'
   }
 }

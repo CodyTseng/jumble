@@ -55,6 +55,7 @@ import {
   Copy,
   Download,
   Loader2,
+  RefreshCw,
   Reply,
   ShieldAlert,
   SmilePlus
@@ -774,7 +775,7 @@ function MessageBubble({
       >
         <div
           className={cn(
-            'hidden shrink-0 items-center gap-1 px-1 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
+            'hidden shrink-0 items-center gap-1 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
             isOwn ? 'flex-row' : 'flex-row-reverse'
           )}
         >
@@ -815,6 +816,19 @@ function MessageBubble({
         {message.verified === false && (
           <div className="flex shrink-0 items-end pb-1.5">
             <VerificationStatusIcon />
+          </div>
+        )}
+        {/* All send states share one persistent flex slot next to the bubble, so
+            the position is stable and the hover toolbar (to its left) never
+            overlaps it. */}
+        {isOwn && sendingStatus && (
+          <div className="flex shrink-0 items-end pb-1.5">
+            <SendingStatusIcon
+              status={sendingStatus}
+              onRetry={
+                sendingStatus === 'failed' ? () => dmService.resendMessage(message.id) : undefined
+              }
+            />
           </div>
         )}
         <Drawer open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
@@ -969,22 +983,6 @@ function MessageBubble({
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-          {isOwn && sendingStatus && (
-            <div
-              className={cn(
-                'absolute inset-e-full bottom-1 me-1 transition-opacity duration-150',
-                sendingStatus !== 'failed' &&
-                  '[@media(hover:hover)]:group-hover/msg:pointer-events-none [@media(hover:hover)]:group-hover/msg:opacity-0'
-              )}
-            >
-              <SendingStatusIcon
-                status={sendingStatus}
-                onRetry={
-                  sendingStatus === 'failed' ? () => dmService.resendMessage(message.id) : undefined
-                }
-              />
             </div>
           )}
         </div>
@@ -1550,15 +1548,25 @@ function SendingStatusIcon({
   status: 'sending' | 'sent' | 'failed'
   onRetry?: () => void
 }) {
+  const { t } = useTranslation()
   switch (status) {
     case 'sending':
       return <Clock className="text-muted-foreground h-3 w-3" />
     case 'sent':
       return <Check className="text-muted-foreground h-3 w-3" />
     case 'failed':
+      // A bare alert icon read as a passive error badge, not an action. Present
+      // the retry as an explicit labelled button (refresh icon + "Resend") so it
+      // clearly invites a tap.
       return (
-        <button onClick={onRetry} className="flex items-center">
-          <AlertCircle className="text-destructive h-3 w-3" />
+        <button
+          onClick={onRetry}
+          title={t('Resend')}
+          aria-label={t('Resend')}
+          className="bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors"
+        >
+          <RefreshCw className="h-3 w-3" />
+          {t('Resend')}
         </button>
       )
   }

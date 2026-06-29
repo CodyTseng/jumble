@@ -1093,6 +1093,7 @@ export default {
     'Discover': '发现',
     'Failure reason': '失败原因',
     'Indirect notifications hidden': '已隐藏间接通知',
-    'Indirect notifications shown': '已显示间接通知'
+    'Indirect notifications shown': '已显示间接通知',
+    Resend: '重新发送'
   }
 }

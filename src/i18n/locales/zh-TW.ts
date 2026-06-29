@@ -1094,6 +1094,7 @@ export default {
     'Discover': '發現',
     'Failure reason': '失敗原因',
     'Indirect notifications hidden': '已隱藏間接通知',
-    'Indirect notifications shown': '已顯示間接通知'
+    'Indirect notifications shown': '已顯示間接通知',
+    Resend: '重新發送'
   }
 }

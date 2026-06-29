@@ -1139,6 +1139,7 @@ export default {
     'Discover': 'Keşfet',
     'Failure reason': 'Hata nedeni',
     'Indirect notifications hidden': 'Dolaylı bildirimler gizlendi',
-    'Indirect notifications shown': 'Dolaylı bildirimler gösteriliyor'
+    'Indirect notifications shown': 'Dolaylı bildirimler gösteriliyor',
+    Resend: 'Yeniden gönder'
   }
 }

@@ -1118,6 +1118,7 @@ export default {
     'Discover': 'ค้นพบ',
     'Failure reason': 'สาเหตุที่ล้มเหลว',
     'Indirect notifications hidden': 'ซ่อนการแจ้งเตือนทางอ้อมแล้ว',
-    'Indirect notifications shown': 'แสดงการแจ้งเตือนทางอ้อม'
+    'Indirect notifications shown': 'แสดงการแจ้งเตือนทางอ้อม',
+    Resend: 'ส่งอีกครั้ง'
   }
 }

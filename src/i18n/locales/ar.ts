@@ -1121,6 +1121,7 @@ export default {
     'Discover': 'اكتشف',
     'Failure reason': 'سبب الفشل',
     'Indirect notifications hidden': 'الإشعارات غير المباشرة مخفية',
-    'Indirect notifications shown': 'الإشعارات غير المباشرة ظاهرة'
+    'Indirect notifications shown': 'الإشعارات غير المباشرة ظاهرة',
+    Resend: 'إعادة الإرسال'
   }
 }

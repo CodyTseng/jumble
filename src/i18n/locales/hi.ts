@@ -1135,6 +1135,7 @@ export default {
     'Discover': 'खोजें',
     'Failure reason': 'विफलता का कारण',
     'Indirect notifications hidden': 'अप्रत्यक्ष सूचनाएं छिपी हैं',
-    'Indirect notifications shown': 'अप्रत्यक्ष सूचनाएं दिख रही हैं'
+    'Indirect notifications shown': 'अप्रत्यक्ष सूचनाएं दिख रही हैं',
+    Resend: 'फिर से भेजें'
   }
 }

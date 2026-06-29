@@ -1122,6 +1122,7 @@ export default {
     'Discover': '발견',
     'Failure reason': '실패 사유',
     'Indirect notifications hidden': '간접 알림 숨김',
-    'Indirect notifications shown': '간접 알림 표시'
+    'Indirect notifications shown': '간접 알림 표시',
+    Resend: '다시 보내기'
   }
 }

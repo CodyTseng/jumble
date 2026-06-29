@@ -1139,6 +1139,7 @@ export default {
     'Discover': 'Felfedezés',
     'Failure reason': 'Hiba oka',
     'Indirect notifications hidden': 'Közvetett értesítések elrejtve',
-    'Indirect notifications shown': 'Közvetett értesítések megjelenítve'
+    'Indirect notifications shown': 'Közvetett értesítések megjelenítve',
+    Resend: 'Újraküldés'
   }
 }

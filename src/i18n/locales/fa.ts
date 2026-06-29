@@ -1136,6 +1136,7 @@ export default {
     'Discover': 'کشف',
     'Failure reason': 'دلیل خطا',
     'Indirect notifications hidden': 'اعلان‌های غیرمستقیم پنهان شدند',
-    'Indirect notifications shown': 'اعلان‌های غیرمستقیم نمایش داده می‌شوند'
+    'Indirect notifications shown': 'اعلان‌های غیرمستقیم نمایش داده می‌شوند',
+    Resend: 'ارسال مجدد'
   }
 }
