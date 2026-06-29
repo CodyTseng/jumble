@@ -116,7 +116,11 @@ export default function DmMessageList({
   const [, setStatusVersion] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const topSentinelRef = useRef<HTMLDivElement>(null)
   const messageRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
+  // Anchor captured right before prepending older messages, used to keep the
+  // viewport visually stable across the prepend (see the useLayoutEffect below).
+  const prependAnchorRef = useRef<{ el: HTMLDivElement; top: number } | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const [elevatedId, setElevatedId] = useState<string | null>(null)
   const pendingMessagesRef = useRef<TDmMessage[]>([])
@@ -130,6 +134,21 @@ export default function DmMessageList({
     const containerRect = container.getBoundingClientRect()
     const bottomRect = bottom.getBoundingClientRect()
     return bottomRect.top - containerRect.bottom < 100
+  }, [])
+
+  // Whether the user has scrolled near the visual top (oldest messages). Uses a
+  // sentinel rect instead of raw scrollTop so it works regardless of how the
+  // browser signs scrollTop in a column-reverse container. Returns false near
+  // the bottom — critical, because the previous Math.min(scrollTop, ...) check
+  // also matched at the bottom and spuriously triggered loadMore on the first
+  // scroll, yanking the viewport far away when older messages were prepended.
+  const checkIsNearTop = useCallback(() => {
+    const container = containerRef.current
+    const sentinel = topSentinelRef.current
+    if (!container || !sentinel) return false
+    const containerRect = container.getBoundingClientRect()
+    const sentinelRect = sentinel.getBoundingClientRect()
+    return sentinelRect.top - containerRect.top > -300
   }, [])
 
   const scrollToMessage = useCallback((id: string) => {
@@ -221,6 +240,14 @@ export default function DmMessageList({
           return updated
         })
       }
+      // Capture the current top-of-list anchor so the prepend doesn't shift the
+      // viewport. The browser does not preserve scroll position on prepend here
+      // ([overflow-anchor:none] in a column-reverse container), so we restore it
+      // manually in the useLayoutEffect keyed on `messages`.
+      const anchorEl = messageRefsMap.current.get(oldestMessage.id)
+      prependAnchorRef.current = anchorEl
+        ? { el: anchorEl, top: anchorEl.getBoundingClientRect().top }
+        : null
       setMessages((prev) => [...regularMsgs, ...prev])
     } catch (error) {
       console.error('Failed to load more messages:', error)
@@ -232,6 +259,21 @@ export default function DmMessageList({
   useEffect(() => {
     loadMessages()
   }, [loadMessages])
+
+  // After older messages are prepended, nudge the scroll position so the anchor
+  // message stays visually put. `scrollBy` is direction-consistent across
+  // browsers (positive = toward newer), so this is independent of the
+  // column-reverse scrollTop sign convention. No-op for appends/flushes, which
+  // never set the anchor.
+  useLayoutEffect(() => {
+    const anchor = prependAnchorRef.current
+    if (!anchor) return
+    prependAnchorRef.current = null
+    const container = containerRef.current
+    if (container) {
+      container.scrollBy(0, anchor.el.getBoundingClientRect().top - anchor.top)
+    }
+  }, [messages])
 
   useEffect(() => {
     if (!pubkey) return
@@ -340,14 +382,18 @@ export default function DmMessageList({
       flushPendingMessages()
     }
 
-    // Load more when near the visual top
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
-    // column-reverse: visual top is at scrollHeight - clientHeight
-    const distanceFromVisualTop = Math.min(scrollTop, scrollHeight - clientHeight - scrollTop)
-    if (distanceFromVisualTop < 100 && scrollHeight > clientHeight && !isLoadingMore && hasMore) {
+    // Load more only when near the visual top (oldest messages).
+    if (checkIsNearTop() && !isLoadingMore && hasMore) {
       loadMoreMessages()
     }
-  }, [loadMoreMessages, isLoadingMore, hasMore, flushPendingMessages, checkIsAtBottom])
+  }, [
+    loadMoreMessages,
+    isLoadingMore,
+    hasMore,
+    flushPendingMessages,
+    checkIsAtBottom,
+    checkIsNearTop
+  ])
 
   const scrollToBottom = useCallback(() => {
     flushPendingMessages()
@@ -399,6 +445,7 @@ export default function DmMessageList({
         onScroll={handleScroll}
       >
         <div>
+          <div ref={topSentinelRef} />
           {isLoadingMore && (
             <div className="flex justify-center py-2">
               <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
