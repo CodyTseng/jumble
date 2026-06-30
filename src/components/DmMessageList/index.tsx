@@ -97,10 +97,12 @@ function formatDmTime(timestamp: number, t: ReturnType<typeof useTranslation>['t
 
 export default function DmMessageList({
   otherPubkey,
-  onReply
+  onReply,
+  scrollToMessageRequest
 }: {
   otherPubkey: string
   onReply?: (message: TDmMessage) => void
+  scrollToMessageRequest?: { id: string; nonce: number } | null
 }) {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
@@ -157,6 +159,11 @@ export default function DmMessageList({
       setTimeout(() => setElevatedId(null), 2000)
     }
   }, [])
+
+  useEffect(() => {
+    if (!scrollToMessageRequest) return
+    scrollToMessage(scrollToMessageRequest.id)
+  }, [scrollToMessageRequest, scrollToMessage])
 
   const loadMessages = useCallback(async () => {
     if (!pubkey) return

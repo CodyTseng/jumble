@@ -31,6 +31,10 @@ const DmConversationPage = forwardRef(
       senderPubkey: string
       tags?: string[][]
     } | null>(null)
+    const [scrollToMessageRequest, setScrollToMessageRequest] = useState<{
+      id: string
+      nonce: number
+    } | null>(null)
     const { currentIndex } = useSecondaryPage()
     const active = currentIndex === index
 
@@ -80,6 +84,11 @@ const DmConversationPage = forwardRef(
     const handleSent = useCallback(() => {
       setReplyTo(null)
     }, [])
+
+    const handleReplyPreviewClick = useCallback(() => {
+      if (!replyTo) return
+      setScrollToMessageRequest({ id: replyTo.id, nonce: Date.now() })
+    }, [replyTo])
 
     const pubkey = useMemo(() => {
       if (pubkeyOrNpub?.startsWith('npub')) {
@@ -155,7 +164,11 @@ const DmConversationPage = forwardRef(
         noScrollArea
       >
         <div className="relative flex min-h-0 flex-1 flex-col">
-          <DmMessageList otherPubkey={pubkey} onReply={handleReply} />
+          <DmMessageList
+            otherPubkey={pubkey}
+            onReply={handleReply}
+            scrollToMessageRequest={scrollToMessageRequest}
+          />
           {dmSupportStatus === 'loading' ? (
             <div
               className="flex justify-center border-t"
@@ -208,6 +221,7 @@ const DmConversationPage = forwardRef(
               disabled={dmSupportStatus !== 'supported'}
               replyTo={replyTo}
               onCancelReply={handleCancelReply}
+              onReplyClick={handleReplyPreviewClick}
               onSent={handleSent}
             />
           )}

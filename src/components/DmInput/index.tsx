@@ -205,12 +205,14 @@ export default function DmInput({
   disabled = false,
   replyTo,
   onCancelReply,
+  onReplyClick,
   onSent
 }: {
   recipientPubkey: string
   disabled?: boolean
   replyTo?: { id: string; content: string; senderPubkey: string; tags?: string[][] } | null
   onCancelReply?: () => void
+  onReplyClick?: () => void
   onSent?: () => void
 }) {
   const { t } = useTranslation()
@@ -903,7 +905,11 @@ export default function DmInput({
         <div className="flex min-w-0 flex-1 flex-col">
           {replyTo && (
             <div className="mb-1 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
-              <div className="relative min-w-0 flex-1 ps-2 before:absolute before:inset-y-0.5 before:start-0 before:w-0.5 before:rounded-full before:bg-primary">
+              <button
+                type="button"
+                onClick={onReplyClick}
+                className="relative min-w-0 flex-1 cursor-pointer ps-2 text-start before:absolute before:inset-y-0.5 before:start-0 before:w-0.5 before:rounded-full before:bg-primary"
+              >
                 <SimpleUsername
                   userId={replyTo.senderPubkey}
                   className="text-xs font-medium text-primary"
@@ -914,8 +920,9 @@ export default function DmInput({
                   className="block truncate text-xs text-muted-foreground"
                   emojiInfos={getEmojiInfosFromEmojiTags(replyTo.tags)}
                 />
-              </div>
+              </button>
               <button
+                type="button"
                 onClick={onCancelReply}
                 className="shrink-0 rounded-full p-0.5 text-muted-foreground hover:bg-secondary"
               >
