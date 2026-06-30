@@ -11,8 +11,7 @@ import ExpressionPicker from '@/components/ExpressionPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
-import MessageContextMenu from './MessageContextMenu'
-import SuggestedEmojis from '@/components/SuggestedEmojis'
+import MessageContextMenu, { DesktopMessageContextMenu } from './MessageContextMenu'
 import {
   Dialog,
   DialogContent,
@@ -21,7 +20,6 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
-import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
@@ -52,13 +50,10 @@ import {
   ArrowDown,
   Check,
   Clock,
-  Copy,
   Download,
   Loader2,
   RefreshCw,
-  Reply,
-  ShieldAlert,
-  SmilePlus
+  ShieldAlert
 } from 'lucide-react'
 import { kinds } from 'nostr-tools'
 import {
@@ -597,18 +592,8 @@ function MessageBubble({
     const tokens = trimmed.split(/\s+/)
     return tokens.every((tok) => /^https?:\/\//i.test(tok) && isImage(tok))
   }, [isFileMessage, message.content])
-  const [copied, setCopied] = useState(false)
-  const [isEmojiOpen, setIsEmojiOpen] = useState(false)
-  const [isPickerOpen, setIsPickerOpen] = useState(false)
-
-  useEffect(() => {
-    setTimeout(() => setIsPickerOpen(false), 100)
-  }, [isEmojiOpen])
-
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(message.content)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
   }, [message.content])
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>()
@@ -616,6 +601,10 @@ function MessageBubble({
   const bubbleRef = useRef<HTMLDivElement>(null)
   const contextMenuId = useId()
   const [contextMenuRect, setContextMenuRect] = useState<DOMRect | null>(null)
+  const [desktopContextMenuPoint, setDesktopContextMenuPoint] = useState<{
+    x: number
+    y: number
+  } | null>(null)
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
 
   const handleTouchStart = useCallback(() => {
@@ -632,10 +621,13 @@ function MessageBubble({
   // so StrictMode's double-invoked mount effect can't spuriously close it via
   // modalManager.unregister (which fires the callback on cleanup).
   useEffect(() => {
-    if (!contextMenuRect) return
-    modalManager.register(contextMenuId, () => setContextMenuRect(null))
+    if (!contextMenuRect && !desktopContextMenuPoint) return
+    modalManager.register(contextMenuId, () => {
+      setContextMenuRect(null)
+      setDesktopContextMenuPoint(null)
+    })
     return () => modalManager.unregister(contextMenuId)
-  }, [contextMenuRect, contextMenuId])
+  }, [contextMenuRect, desktopContextMenuPoint, contextMenuId])
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     clearTimeout(longPressTimerRef.current)
@@ -648,9 +640,16 @@ function MessageBubble({
     clearTimeout(longPressTimerRef.current)
   }, [])
 
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    if (!window.matchMedia('(hover: hover)').matches) return
+    e.preventDefault()
+    e.stopPropagation()
+    setContextMenuRect(null)
+    setDesktopContextMenuPoint({ x: e.clientX, y: e.clientY })
+  }, [])
+
   const handleEmojiSelect = useCallback(
     (emoji: string | TEmoji) => {
-      setIsEmojiOpen(false)
       onReact?.(message.id, emoji)
     },
     [message.id, onReact]
@@ -738,15 +737,6 @@ function MessageBubble({
     return Array.from(groups.values())
   }, [reactions, currentUserPubkey])
 
-  const reactButton = (
-    <button
-      onClick={() => setIsEmojiOpen(true)}
-      className="text-muted-foreground hover:bg-secondary shrink-0 rounded-full p-1.5"
-    >
-      <SmilePlus className="h-4 w-4" />
-    </button>
-  )
-
   const hasReactions = groupedReactions.length > 0
 
   return (
@@ -755,6 +745,7 @@ function MessageBubble({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
+      onContextMenu={handleContextMenu}
       className={cn(
         'group/msg flex w-full max-w-full flex-col select-none [@media(hover:hover)]:select-text',
         isOwn ? 'items-end' : 'items-start',
@@ -773,54 +764,13 @@ function MessageBubble({
           isOwn ? 'flex-row' : 'flex-row-reverse'
         )}
       >
-        <div
-          className={cn(
-            'hidden shrink-0 items-center gap-1 [@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:flex [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/msg:pointer-events-auto [@media(hover:hover)]:group-hover/msg:opacity-100',
-            isOwn ? 'flex-row' : 'flex-row-reverse'
-          )}
-        >
-          <button
-            onClick={handleCopy}
-            className="text-muted-foreground hover:bg-secondary shrink-0 rounded-full p-1.5"
-          >
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          </button>
-          {onReact && (
-            <Popover open={isEmojiOpen} onOpenChange={setIsEmojiOpen}>
-              <PopoverAnchor asChild>{reactButton}</PopoverAnchor>
-              <PopoverContent side="top" className="w-fit overflow-hidden p-0 shadow-lg">
-                {isPickerOpen ? (
-                  <ExpressionPicker
-                    onEmojiClick={(emoji) => {
-                      handleEmojiSelect(emoji)
-                    }}
-                  />
-                ) : (
-                  <SuggestedEmojis
-                    onEmojiClick={handleEmojiSelect}
-                    onMoreButtonClick={() => setIsPickerOpen(true)}
-                  />
-                )}
-              </PopoverContent>
-            </Popover>
-          )}
-          {onReply && (
-            <button
-              onClick={() => onReply(message)}
-              className="text-muted-foreground hover:bg-secondary shrink-0 rounded-full p-1.5"
-            >
-              <Reply className="h-4 w-4" />
-            </button>
-          )}
-        </div>
         {message.verified === false && (
           <div className="flex shrink-0 items-end pb-1.5">
             <VerificationStatusIcon />
           </div>
         )}
         {/* All send states share one persistent flex slot next to the bubble, so
-            the position is stable and the hover toolbar (to its left) never
-            overlaps it. */}
+            the position stays stable while messages update. */}
         {isOwn && sendingStatus && (
           <div className="flex shrink-0 items-end pb-1.5">
             <SendingStatusIcon
@@ -865,6 +815,15 @@ function MessageBubble({
               />
             )}
           </MessageContextMenu>
+        )}
+        {desktopContextMenuPoint && (
+          <DesktopMessageContextMenu
+            anchorPoint={desktopContextMenuPoint}
+            onReply={() => onReply?.(message)}
+            onCopy={handleCopy}
+            onReact={handleEmojiSelect}
+            onClose={() => setDesktopContextMenuPoint(null)}
+          />
         )}
         <div
           className={cn(

@@ -1,4 +1,5 @@
 import SuggestedEmojis from '@/components/SuggestedEmojis'
+import ExpressionPicker from '@/components/ExpressionPicker'
 import { cn } from '@/lib/utils'
 import { TEmoji } from '@/types'
 import { Copy, Reply } from 'lucide-react'
@@ -205,3 +206,130 @@ export default function MessageContextMenu({
 }
 
 const menuItemClass = cn('hover:bg-accent flex items-center gap-3 px-4 py-3 text-start text-base')
+
+export function DesktopMessageContextMenu({
+  anchorPoint,
+  onReply,
+  onCopy,
+  onReact,
+  onClose
+}: {
+  anchorPoint: { x: number; y: number }
+  onReply: () => void
+  onCopy: () => void
+  onReact: (emoji: string | TEmoji) => void
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const reactionRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
+  const [layout, setLayout] = useState({ top: anchorPoint.y, left: anchorPoint.x })
+
+  useLayoutEffect(() => {
+    const reactionWidth = reactionRef.current?.offsetWidth ?? 0
+    const reactionHeight = reactionRef.current?.offsetHeight ?? 0
+    const menuWidth = isPickerOpen ? 0 : (menuRef.current?.offsetWidth ?? 0)
+    const menuHeight = isPickerOpen ? 0 : (menuRef.current?.offsetHeight ?? 0)
+    const width = Math.max(reactionWidth, menuWidth)
+    const height = reactionHeight + (isPickerOpen ? 0 : GAP + menuHeight)
+    const left = Math.min(Math.max(anchorPoint.x, MARGIN), window.innerWidth - width - MARGIN)
+    const top = Math.min(
+      Math.max(anchorPoint.y - reactionHeight - GAP, MARGIN),
+      window.innerHeight - height - MARGIN
+    )
+
+    setLayout({ top, left })
+  }, [anchorPoint, isPickerOpen])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50"
+      onClick={onClose}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        onClose()
+      }}
+    >
+      <div
+        className="fixed flex flex-col items-start gap-2"
+        style={{ top: layout.top, left: layout.left }}
+        onClick={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <div
+          ref={reactionRef}
+          className="max-w-[calc(100vw-24px)]"
+        >
+          {isPickerOpen ? (
+            <div
+              key="emoji-picker"
+              className="bg-popover animate-in fade-in-0 overflow-hidden rounded-xl border shadow-lg duration-150"
+            >
+              <ExpressionPicker
+                onEmojiClick={(emoji) => {
+                  onReact(emoji)
+                  onClose()
+                }}
+              />
+            </div>
+          ) : (
+            <div
+              key="suggested-emojis"
+              className="bg-popover animate-in fade-in-0 zoom-in-95 overflow-hidden rounded-full border shadow-lg duration-150"
+            >
+              <SuggestedEmojis
+                onEmojiClick={(emoji) => {
+                  onReact(emoji)
+                  onClose()
+                }}
+                onMoreButtonClick={() => setIsPickerOpen(true)}
+              />
+            </div>
+          )}
+        </div>
+
+        {!isPickerOpen && (
+          <div
+            ref={menuRef}
+            className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 flex w-44 flex-col overflow-hidden rounded-lg border p-1 shadow-lg duration-150"
+          >
+            <button
+              onClick={() => {
+                onReply()
+                onClose()
+              }}
+              className={desktopMenuItemClass}
+            >
+              <Reply className="text-muted-foreground h-4 w-4 shrink-0" />
+              {t('Reply')}
+            </button>
+            <button
+              onClick={() => {
+                onCopy()
+                onClose()
+              }}
+              className={desktopMenuItemClass}
+            >
+              <Copy className="text-muted-foreground h-4 w-4 shrink-0" />
+              {t('Copy')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  )
+}
+
+const desktopMenuItemClass = cn(
+  'hover:bg-accent flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-start text-sm transition-colors'
+)
