@@ -154,9 +154,9 @@ function SortableMediaItem({
         ) : item.mimeType.startsWith('video/') ? (
           <video src={item.previewUrl} className="h-full w-full object-cover" draggable={false} />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-0.5 bg-secondary">
-            <FileIcon className="h-5 w-5 text-muted-foreground" />
-            <span className="max-w-full truncate px-1 text-[10px] text-muted-foreground">
+          <div className="bg-secondary flex h-full w-full flex-col items-center justify-center gap-0.5">
+            <FileIcon className="text-muted-foreground h-5 w-5" />
+            <span className="text-muted-foreground max-w-full truncate px-1 text-[10px]">
               {item.mimeType.split('/')[1]?.split('+')[0]?.toUpperCase() || 'FILE'}
             </span>
           </div>
@@ -192,7 +192,7 @@ function SortableMediaItem({
           e.stopPropagation()
           onRemove(item.id)
         }}
-        className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+        className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
       >
         <X className="h-2.5 w-2.5" />
       </button>
@@ -578,6 +578,12 @@ export default function DmInput({
         return
       }
     }
+    if (e.key === 'Escape' && replyTo && onCancelReply) {
+      e.preventDefault()
+      e.stopPropagation()
+      onCancelReply()
+      return
+    }
     if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
       e.preventDefault()
       handleSend()
@@ -714,13 +720,9 @@ export default function DmInput({
           imetaParts.push(`dim ${gif.width}x${gif.height}`)
         }
         const imetaTag = ['imeta', ...imetaParts]
-        await dmService.sendMessage(
-          pubkey,
-          recipientPubkey,
-          gif.url,
-          replyTo ?? undefined,
-          [imetaTag]
-        )
+        await dmService.sendMessage(pubkey, recipientPubkey, gif.url, replyTo ?? undefined, [
+          imetaTag
+        ])
         onSent?.()
       } catch (error) {
         console.error('Failed to send GIF:', error)
@@ -782,14 +784,14 @@ export default function DmInput({
 
   return (
     <div
-      className="relative border-t bg-background px-4 pt-1"
+      className="bg-background relative border-t px-4 pt-1"
       style={{
         paddingBottom: !isFocused ? 'calc(env(safe-area-inset-bottom) + 0.25rem)' : '0.25rem'
       }}
     >
       {mentionQuery !== null && mentionResults.length > 0 && (
         <div
-          className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
+          className="scrollbar-hide bg-background absolute right-0 bottom-full left-0 z-50 max-h-64 overflow-y-auto border-t border-b p-1"
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
@@ -820,7 +822,7 @@ export default function DmInput({
       )}
       {emojiQuery !== null && emojiResults.length > 0 && (
         <div
-          className="scrollbar-hide absolute bottom-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-b border-t bg-background p-1"
+          className="scrollbar-hide bg-background absolute right-0 bottom-full left-0 z-50 max-h-64 overflow-y-auto border-t border-b p-1"
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
@@ -875,7 +877,7 @@ export default function DmInput({
                 fileInputRef.current.click()
               }
             }}
-            className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary"
+            className="text-muted-foreground hover:bg-secondary mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
           >
             <Paperclip className="h-5 w-5" />
           </button>
@@ -897,34 +899,34 @@ export default function DmInput({
         >
           <button
             onMouseDown={(e) => e.preventDefault()}
-            className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary"
+            className="text-muted-foreground hover:bg-secondary mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
           >
             <Smile className="h-5 w-5" />
           </button>
         </ExpressionPickerDialog>
         <div className="flex min-w-0 flex-1 flex-col">
           {replyTo && (
-            <div className="mb-1 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5">
+            <div className="bg-secondary/50 mb-1 flex items-center gap-2 rounded-md px-3 py-1.5">
               <button
                 type="button"
                 onClick={onReplyClick}
-                className="relative min-w-0 flex-1 cursor-pointer ps-2 text-start before:absolute before:inset-y-0.5 before:start-0 before:w-0.5 before:rounded-full before:bg-primary"
+                className="before:bg-primary relative min-w-0 flex-1 cursor-pointer ps-2 text-start before:absolute before:inset-y-0.5 before:start-0 before:w-0.5 before:rounded-full"
               >
                 <SimpleUsername
                   userId={replyTo.senderPubkey}
-                  className="text-xs font-medium text-primary"
+                  className="text-primary text-xs font-medium"
                   withoutSkeleton
                 />
                 <ContentPreviewContent
                   content={replyTo.content || '...'}
-                  className="block truncate text-xs text-muted-foreground"
+                  className="text-muted-foreground block truncate text-xs"
                   emojiInfos={getEmojiInfosFromEmojiTags(replyTo.tags)}
                 />
               </button>
               <button
                 type="button"
                 onClick={onCancelReply}
-                className="shrink-0 rounded-full p-0.5 text-muted-foreground hover:bg-secondary"
+                className="text-muted-foreground hover:bg-secondary shrink-0 rounded-full p-0.5"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -942,9 +944,9 @@ export default function DmInput({
             onBlur={() => setIsFocused(false)}
             data-placeholder={t('Type a message...')}
             className={cn(
-              'max-h-40 min-h-[36px] w-full select-text overflow-y-auto wrap-break-word bg-transparent py-2 text-base focus:outline-hidden',
+              'max-h-40 min-h-[36px] w-full overflow-y-auto bg-transparent py-2 text-base wrap-break-word select-text focus:outline-hidden',
               disabled && 'cursor-not-allowed opacity-50',
-              'empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]'
+              'empty:before:text-muted-foreground empty:before:pointer-events-none empty:before:content-[attr(data-placeholder)]'
             )}
           />
         </div>
@@ -954,7 +956,7 @@ export default function DmInput({
             handleSend()
           }}
           disabled={!canSend}
-          className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-30"
+          className="bg-primary text-primary-foreground mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-opacity disabled:opacity-30"
         >
           <ArrowUp className="h-5 w-5" strokeWidth={2.5} />
         </button>
