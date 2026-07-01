@@ -35,9 +35,9 @@ export default function SuggestedEmojis({
   }
 
   return (
-    <div className="flex gap-1 p-1" onClick={(e) => e.stopPropagation()}>
+    <div className="flex w-max gap-1 p-1" onClick={(e) => e.stopPropagation()}>
       <div
-        className="clickable flex h-8 w-8 items-center justify-center rounded-lg text-xl"
+        className="clickable flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xl"
         onClick={() => onEmojiClick('+')}
       >
         <Emoji emoji="+" />
@@ -46,22 +46,29 @@ export default function SuggestedEmojis({
         typeof emoji === 'string' ? (
           <div
             key={index}
-            className="clickable flex h-8 w-8 items-center justify-center rounded-lg text-xl"
+            className="clickable flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xl"
             onClick={() => handlePick(emoji)}
           >
             {emoji}
           </div>
         ) : (
           <div
-            className="clickable flex flex-col items-center justify-center rounded-lg p-1"
+            className="clickable flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
             key={index}
             onClick={() => handlePick(emoji)}
           >
-            <Emoji emoji={emoji} classNames={{ img: 'size-6 rounded-md' }} />
+            <Emoji
+              emoji={emoji}
+              classNames={{ img: 'h-auto max-h-6 w-auto max-w-6 object-contain rounded-md' }}
+            />
           </div>
         )
       )}
-      <Button variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={onMoreButtonClick}>
+      <Button
+        variant="ghost"
+        className="text-muted-foreground h-8 w-8 shrink-0"
+        onClick={onMoreButtonClick}
+      >
         <MoreHorizontal size={24} />
       </Button>
     </div>

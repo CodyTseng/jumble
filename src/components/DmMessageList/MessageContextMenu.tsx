@@ -3,12 +3,21 @@ import ExpressionPicker from '@/components/ExpressionPicker'
 import { cn } from '@/lib/utils'
 import { TEmoji } from '@/types'
 import { Copy, Reply } from 'lucide-react'
-import { CSSProperties, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  CSSProperties,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 const GAP = 8
 const MARGIN = 12
+const DESKTOP_MENU_WIDTH = 176
 
 /**
  * iOS/Telegram-style long-press context menu for DM bubbles (touch only).
@@ -224,23 +233,75 @@ export function DesktopMessageContextMenu({
   const reactionRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const [layout, setLayout] = useState({ top: anchorPoint.y, left: anchorPoint.x })
+  const [layout, setLayout] = useState({
+    reactionTop: Math.max(MARGIN, anchorPoint.y - 48),
+    reactionLeft: MARGIN,
+    reactionWidth: 0,
+    reactionOriginX: 50,
+    menuTop: anchorPoint.y,
+    menuLeft: Math.min(
+      Math.max(MARGIN, anchorPoint.x + GAP),
+      document.documentElement.clientWidth - DESKTOP_MENU_WIDTH - MARGIN
+    )
+  })
+
+  const updateLayout = useCallback(() => {
+    const viewportWidth = document.documentElement.clientWidth
+    const viewportHeight = document.documentElement.clientHeight
+    const measuredReactionWidth = Math.max(
+      reactionRef.current?.scrollWidth ?? 0,
+      reactionRef.current?.offsetWidth ?? 0
+    )
+    const reactionWidth = measuredReactionWidth
+    const reactionHeight = reactionRef.current?.offsetHeight ?? 0
+    const menuWidth = menuRef.current?.offsetWidth ?? 0
+    const menuHeight = menuRef.current?.offsetHeight ?? 0
+
+    const clamp = (value: number, min: number, max: number) =>
+      Math.min(Math.max(value, min), Math.max(min, max))
+
+    const reactionLeft = clamp(
+      anchorPoint.x - reactionWidth / 2,
+      MARGIN,
+      viewportWidth - reactionWidth - MARGIN
+    )
+    const reactionTop = clamp(
+      anchorPoint.y - reactionHeight - GAP,
+      MARGIN,
+      viewportHeight - reactionHeight - MARGIN
+    )
+    const menuLeft = clamp(anchorPoint.x + GAP, MARGIN, viewportWidth - menuWidth - MARGIN)
+    const menuTop = clamp(anchorPoint.y, MARGIN, viewportHeight - menuHeight - MARGIN)
+    const reactionOriginX =
+      reactionWidth > 0 ? clamp(anchorPoint.x - reactionLeft, 0, reactionWidth) : 0
+
+    setLayout({ reactionTop, reactionLeft, reactionWidth, reactionOriginX, menuTop, menuLeft })
+  }, [anchorPoint])
 
   useLayoutEffect(() => {
-    const reactionWidth = reactionRef.current?.offsetWidth ?? 0
-    const reactionHeight = reactionRef.current?.offsetHeight ?? 0
-    const menuWidth = isPickerOpen ? 0 : (menuRef.current?.offsetWidth ?? 0)
-    const menuHeight = isPickerOpen ? 0 : (menuRef.current?.offsetHeight ?? 0)
-    const width = Math.max(reactionWidth, menuWidth)
-    const height = reactionHeight + (isPickerOpen ? 0 : GAP + menuHeight)
-    const left = Math.min(Math.max(anchorPoint.x, MARGIN), window.innerWidth - width - MARGIN)
-    const top = Math.min(
-      Math.max(anchorPoint.y - reactionHeight - GAP, MARGIN),
-      window.innerHeight - height - MARGIN
-    )
+    updateLayout()
+  }, [updateLayout, isPickerOpen])
 
-    setLayout({ top, left })
-  }, [anchorPoint, isPickerOpen])
+  useEffect(() => {
+    const reaction = reactionRef.current
+    const menu = menuRef.current
+    if (!reaction && !menu) return
+
+    let rafId = 0
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(updateLayout)
+    }
+
+    const observer = new ResizeObserver(scheduleUpdate)
+    if (reaction) observer.observe(reaction)
+    if (menu) observer.observe(menu)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      observer.disconnect()
+    }
+  }, [updateLayout, isPickerOpen])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -260,71 +321,75 @@ export function DesktopMessageContextMenu({
       }}
     >
       <div
-        className="fixed flex flex-col items-start gap-2"
-        style={{ top: layout.top, left: layout.left }}
+        ref={reactionRef}
+        className="fixed"
+        style={{
+          top: layout.reactionTop,
+          left: layout.reactionLeft,
+          width: layout.reactionWidth || undefined,
+          transformOrigin: `${layout.reactionOriginX}px bottom`
+        }}
         onClick={(e) => e.stopPropagation()}
         onContextMenu={(e) => e.preventDefault()}
       >
-        <div
-          ref={reactionRef}
-          className="max-w-[calc(100vw-24px)]"
-        >
-          {isPickerOpen ? (
-            <div
-              key="emoji-picker"
-              className="bg-popover animate-in fade-in-0 overflow-hidden rounded-xl border shadow-lg duration-150"
-            >
-              <ExpressionPicker
-                onEmojiClick={(emoji) => {
-                  onReact(emoji)
-                  onClose()
-                }}
-              />
-            </div>
-          ) : (
-            <div
-              key="suggested-emojis"
-              className="bg-popover animate-in fade-in-0 zoom-in-95 overflow-hidden rounded-full border shadow-lg duration-150"
-            >
-              <SuggestedEmojis
-                onEmojiClick={(emoji) => {
-                  onReact(emoji)
-                  onClose()
-                }}
-                onMoreButtonClick={() => setIsPickerOpen(true)}
-              />
-            </div>
-          )}
-        </div>
-
-        {!isPickerOpen && (
+        {isPickerOpen ? (
           <div
-            ref={menuRef}
-            className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 flex w-44 flex-col overflow-hidden rounded-lg border p-1 shadow-lg duration-150"
+            key="emoji-picker"
+            className="bg-popover animate-in fade-in-0 overflow-hidden rounded-xl border shadow-lg duration-150"
           >
-            <button
-              onClick={() => {
-                onReply()
+            <ExpressionPicker
+              onEmojiClick={(emoji) => {
+                onReact(emoji)
                 onClose()
               }}
-              className={desktopMenuItemClass}
-            >
-              <Reply className="text-muted-foreground h-4 w-4 shrink-0" />
-              {t('Reply')}
-            </button>
-            <button
-              onClick={() => {
-                onCopy()
+            />
+          </div>
+        ) : (
+          <div
+            key="suggested-emojis"
+            className="bg-popover animate-in fade-in-0 zoom-in-95 w-max rounded-full border shadow-lg duration-150"
+          >
+            <SuggestedEmojis
+              onEmojiClick={(emoji) => {
+                onReact(emoji)
                 onClose()
               }}
-              className={desktopMenuItemClass}
-            >
-              <Copy className="text-muted-foreground h-4 w-4 shrink-0" />
-              {t('Copy')}
-            </button>
+              onMoreButtonClick={() => setIsPickerOpen(true)}
+            />
           </div>
         )}
       </div>
+
+      {!isPickerOpen && (
+        <div
+          ref={menuRef}
+          className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 fixed flex w-44 origin-top-left flex-col overflow-hidden rounded-lg border p-1 shadow-lg duration-150"
+          style={{ top: layout.menuTop, left: layout.menuLeft }}
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <button
+            onClick={() => {
+              onReply()
+              onClose()
+            }}
+            className={desktopMenuItemClass}
+          >
+            <Reply className="text-muted-foreground h-4 w-4 shrink-0" />
+            {t('Reply')}
+          </button>
+          <button
+            onClick={() => {
+              onCopy()
+              onClose()
+            }}
+            className={desktopMenuItemClass}
+          >
+            <Copy className="text-muted-foreground h-4 w-4 shrink-0" />
+            {t('Copy')}
+          </button>
+        </div>
+      )}
     </div>,
     document.body
   )
