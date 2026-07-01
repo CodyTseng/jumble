@@ -16,6 +16,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function blurFocusedTextInput() {
+  const activeElement = document.activeElement
+  if (!(activeElement instanceof HTMLElement)) return
+
+  if (
+    activeElement.matches('input, textarea, [contenteditable="true"]') ||
+    activeElement.isContentEditable
+  ) {
+    activeElement.blur()
+  }
+}
+
 // crypto.randomUUID is unavailable on older iOS Safari and in non-secure
 // contexts. Fall back to getRandomValues, then Math.random, since we only need
 // a locally-unique id (not a spec-compliant UUID).

@@ -38,7 +38,7 @@ import {
 } from '@/lib/content-parser'
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { isImage } from '@/lib/url'
-import { cn } from '@/lib/utils'
+import { blurFocusedTextInput, cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
@@ -1502,6 +1502,11 @@ function EncryptedFileMessage({
     a.click()
   }, [loading, blobUrl, decryptFile, ext])
 
+  const handleMediaInteraction = (event: React.SyntheticEvent<HTMLMediaElement>) => {
+    blurFocusedTextInput()
+    event.stopPropagation()
+  }
+
   const wrapperClass = cn(
     'flex min-w-0 max-w-full flex-col',
     isHighlighted && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg'
@@ -1610,7 +1615,14 @@ function EncryptedFileMessage({
     return (
       <div ref={containerRef} className={wrapperClass}>
         <div className="overflow-hidden rounded-lg">
-          <video src={blobUrl} controls className="max-h-80 max-w-full rounded-lg" />
+          <video
+            src={blobUrl}
+            controls
+            className="max-h-80 max-w-full rounded-lg"
+            onPointerDown={handleMediaInteraction}
+            onTouchStart={handleMediaInteraction}
+            onClick={handleMediaInteraction}
+          />
         </div>
       </div>
     )
@@ -1624,7 +1636,14 @@ function EncryptedFileMessage({
           isOwn ? 'bg-primary/20' : 'bg-secondary'
         )}
       >
-        <audio src={blobUrl} controls className="max-w-full" />
+        <audio
+          src={blobUrl}
+          controls
+          className="max-w-full"
+          onPointerDown={handleMediaInteraction}
+          onTouchStart={handleMediaInteraction}
+          onClick={handleMediaInteraction}
+        />
       </div>
     </div>
   )

@@ -1,9 +1,9 @@
 import { useBlossomUrl } from '@/hooks/useBlossomUrl'
-import { cn, isInViewport } from '@/lib/utils'
+import { blurFocusedTextInput, cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
-import { useEffect, useRef, useState } from 'react'
+import { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import ExternalLink from '../ExternalLink'
 
 export default function VideoPlayer({
@@ -94,6 +94,10 @@ export default function VideoPlayer({
     effectiveDim?.width && effectiveDim?.height
       ? `${effectiveDim.width} / ${effectiveDim.height}`
       : '16 / 9'
+  const handleMediaInteraction = (event: SyntheticEvent<HTMLVideoElement>) => {
+    blurFocusedTextInput()
+    event.stopPropagation()
+  }
 
   return (
     <div
@@ -111,7 +115,9 @@ export default function VideoPlayer({
         loop={videoLoop}
         className="block h-full w-full object-contain"
         src={videoUrl}
-        onClick={(e) => e.stopPropagation()}
+        onPointerDown={handleMediaInteraction}
+        onTouchStart={handleMediaInteraction}
+        onClick={handleMediaInteraction}
         onPlay={(event) => {
           mediaManager.play(event.currentTarget)
         }}
