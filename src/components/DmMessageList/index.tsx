@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
@@ -50,6 +51,7 @@ import {
   AlertCircle,
   ArrowDown,
   Check,
+  ChevronDown,
   Clock,
   Download,
   Images,
@@ -125,6 +127,7 @@ export default function DmMessageList({
   const [elevatedId, setElevatedId] = useState<string | null>(null)
   const pendingMessagesRef = useRef<TDmMessage[]>([])
   const [pendingCount, setPendingCount] = useState(0)
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const [reactionsMap, setReactionsMap] = useState<Map<string, TDmMessage[]>>(new Map())
 
   const checkIsAtBottom = useCallback(() => {
@@ -383,7 +386,10 @@ export default function DmMessageList({
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
 
-    if (checkIsAtBottom()) {
+    const atBottom = checkIsAtBottom()
+    setShowScrollToBottom(!atBottom)
+
+    if (atBottom) {
       flushPendingMessages()
     }
 
@@ -404,6 +410,7 @@ export default function DmMessageList({
     flushPendingMessages()
     requestAnimationFrame(() => {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+      setShowScrollToBottom(false)
     })
   }, [flushPendingMessages])
 
@@ -553,6 +560,19 @@ export default function DmMessageList({
             <ArrowDown className="h-4 w-4" />
             {t('{{n}} new messages', { n: pendingCount > 99 ? '99+' : pendingCount })}
           </button>
+        </div>
+      )}
+      {pendingCount === 0 && showScrollToBottom && (
+        <div className="pointer-events-none absolute right-3 bottom-3 z-30 transition-all duration-700">
+          <Button
+            variant="secondary-2"
+            type="button"
+            onClick={scrollToBottom}
+            aria-label={t('Scroll to bottom')}
+            className="hover:text-background pointer-events-auto size-12 rounded-full p-0 transition-all duration-200"
+          >
+            <ChevronDown />
+          </Button>
         </div>
       )}
     </div>
