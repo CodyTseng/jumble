@@ -38,6 +38,7 @@ import {
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { isImage } from '@/lib/url'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
 import cryptoFileService from '@/services/crypto-file.service'
@@ -51,6 +52,7 @@ import {
   Check,
   Clock,
   Download,
+  Images,
   Loader2,
   RefreshCw,
   ShieldAlert
@@ -960,6 +962,16 @@ function MessageBubble({
 type TDmSegment = { kind: 'text'; nodes: TEmbeddedNode[] } | { kind: 'block'; node: TEmbeddedNode }
 
 const BLOCK_TYPES = new Set(['image', 'images', 'media', 'event', 'youtube', 'x-post', 'invoice'])
+const HIDDEN_MEDIA_TYPES = new Set(['image', 'images', 'media', 'youtube', 'x-post'])
+type TDmHiddenMediaKind = 'image' | 'media'
+
+function isHiddenMediaNode(node: TEmbeddedNode) {
+  return HIDDEN_MEDIA_TYPES.has(node.type)
+}
+
+function getHiddenMediaKind(node: TEmbeddedNode): TDmHiddenMediaKind {
+  return node.type === 'image' || node.type === 'images' ? 'image' : 'media'
+}
 
 function segmentDmContent(nodes: TEmbeddedNode[]): TDmSegment[] {
   const segments: TDmSegment[] = []
@@ -1027,6 +1039,8 @@ function DmContent({
   tags?: string[][]
   containerRef?: React.Ref<HTMLDivElement>
 }) {
+  const { autoLoadMedia } = useContentPolicy()
+  const [mediaRevealed, setMediaRevealed] = useState(false)
   const { allImages, segments, isEmojiOnly } = useMemo(() => {
     if (!content) return { allImages: [], segments: [], isEmojiOnly: false }
 
@@ -1094,6 +1108,15 @@ function DmContent({
   if (segments.length === 0) return null
 
   let imageIndex = 0
+  let hiddenMediaBubbleRendered = false
+  const mediaHidden = !autoLoadMedia && !mediaRevealed
+  const hiddenMediaKind: TDmHiddenMediaKind = (() => {
+    const firstHiddenNode = segments.find(
+      (seg) => seg.kind === 'block' && isHiddenMediaNode(seg.node)
+    )
+    if (!firstHiddenNode || firstHiddenNode.kind !== 'block') return 'media'
+    return getHiddenMediaKind(firstHiddenNode.node)
+  })()
 
   return (
     <div
@@ -1169,20 +1192,45 @@ function DmContent({
 
         // Block segment
         const { node } = seg
+        if (mediaHidden && isHiddenMediaNode(node)) {
+          if (node.type === 'image' || node.type === 'images') {
+            imageIndex += Array.isArray(node.data) ? node.data.length : 1
+          }
+          if (hiddenMediaBubbleRendered) return null
+          hiddenMediaBubbleRendered = true
+          return (
+            <DmHiddenMediaBubble
+              key={si}
+              kind={hiddenMediaKind}
+              isOwn={isOwn}
+              onClick={() => setMediaRevealed(true)}
+            />
+          )
+        }
         if (node.type === 'image' || node.type === 'images') {
           const start = imageIndex
           const end = imageIndex + (Array.isArray(node.data) ? node.data.length : 1)
           imageIndex = end
-          return <ImageGallery key={si} images={allImages} start={start} end={end} />
+          return (
+            <ImageGallery
+              key={si}
+              images={allImages}
+              start={start}
+              end={end}
+              mustLoad={mediaRevealed}
+            />
+          )
         }
         if (node.type === 'media') {
-          return <MediaPlayer key={si} src={node.data} />
+          return <MediaPlayer key={si} src={node.data} mustLoad={mediaRevealed} />
         }
         if (node.type === 'youtube') {
-          return <YoutubeEmbeddedPlayer key={si} url={node.data} />
+          return <YoutubeEmbeddedPlayer key={si} url={node.data} mustLoad={mediaRevealed} />
         }
         if (node.type === 'x-post') {
-          return <XEmbeddedPost key={si} url={node.data} className="w-full" />
+          return (
+            <XEmbeddedPost key={si} url={node.data} className="w-full" mustLoad={mediaRevealed} />
+          )
         }
         if (node.type === 'event') {
           const id = node.data.split(':')[1]
@@ -1194,6 +1242,47 @@ function DmContent({
         return null
       })}
     </div>
+  )
+}
+
+function DmHiddenMediaBubble({
+  kind,
+  isOwn,
+  onClick
+}: {
+  kind: TDmHiddenMediaKind
+  isOwn: boolean
+  onClick: () => void
+}) {
+  const { t } = useTranslation()
+  const label = kind === 'image' ? t('Click to load image') : t('Click to load media')
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}
+      className={cn(
+        'flex min-h-14 w-48 max-w-full items-center gap-2 rounded-lg px-3 py-1.5 text-start transition-colors',
+        isOwn
+          ? 'bg-primary/90 text-primary-foreground hover:bg-primary'
+          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+      )}
+    >
+      <span
+        className={cn(
+          'flex size-9 shrink-0 items-center justify-center rounded-md',
+          isOwn ? 'bg-primary-foreground/20' : 'bg-background'
+        )}
+      >
+        <Images className="size-4" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{label}</span>
+      </span>
+    </button>
   )
 }
 
@@ -1323,6 +1412,7 @@ function EncryptedFileMessage({
   containerRef?: React.Ref<HTMLDivElement>
 }) {
   const { t } = useTranslation()
+  const { autoLoadMedia } = useContentPolicy()
 
   const tags = message.decryptedRumor?.tags ?? []
   const fileType = tags.find((t) => t[0] === 'file-type')?.[1] ?? ''
@@ -1340,8 +1430,10 @@ function EncryptedFileMessage({
   const [blobUrl, setBlobUrl] = useState<string | null>(
     cached ? decryptedBlobCache.get(message.id)! : null
   )
+  const [mediaRevealed, setMediaRevealed] = useState(false)
   const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(isMedia && !cached)
+  const displayMedia = !isMedia || autoLoadMedia || mediaRevealed
+  const [loading, setLoading] = useState(isMedia && displayMedia && !cached)
 
   const decryptFile = useCallback(async () => {
     if (decryptedBlobCache.has(message.id)) {
@@ -1375,11 +1467,10 @@ function EncryptedFileMessage({
     }
   }, [message.id, hexKey, hexNonce, fileUrl, fileType])
 
-  // Auto-decrypt media files on mount
   useEffect(() => {
-    if (!isMedia || decryptedBlobCache.has(message.id)) return
+    if (!isMedia || !displayMedia || decryptedBlobCache.has(message.id)) return
     decryptFile()
-  }, [isMedia, message.id, decryptFile])
+  }, [isMedia, displayMedia, message.id, decryptFile])
 
   const handleFileDownload = useCallback(async () => {
     if (loading) return
@@ -1440,7 +1531,19 @@ function EncryptedFileMessage({
     )
   }
 
-  if (loading) {
+  if (!displayMedia) {
+    return (
+      <div ref={containerRef} className={wrapperClass}>
+        <DmHiddenMediaBubble
+          kind={isImage ? 'image' : 'media'}
+          isOwn={isOwn}
+          onClick={() => setMediaRevealed(true)}
+        />
+      </div>
+    )
+  }
+
+  if (loading || (!blobUrl && !error)) {
     const placeholderShape = isImage ? 'h-40 w-40' : 'h-32 w-56'
     return (
       <div ref={containerRef} className={wrapperClass}>
@@ -1478,7 +1581,7 @@ function EncryptedFileMessage({
   if (isImage) {
     return (
       <div ref={containerRef} className={wrapperClass}>
-        <ImageGallery images={[{ url: blobUrl }]} start={0} end={1} />
+        <ImageGallery images={[{ url: blobUrl }]} start={0} end={1} mustLoad={displayMedia} />
       </div>
     )
   }
