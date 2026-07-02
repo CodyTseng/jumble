@@ -5,6 +5,7 @@ import { formatError } from '@/lib/error'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import encryptionKeyService from '@/services/encryption-key.service'
+import type { TEncryptionKeypair } from '@/types'
 import { CheckCircle, Loader2, RefreshCw, Server, Smartphone } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,16 +22,13 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
   const [error, setError] = useState<string | null>(null)
   const [countdown, setCountdown] = useState(RETRY_COOLDOWN)
   const [showRelayConfig, setShowRelayConfig] = useState(false)
+  const [clientPubkey, setClientPubkey] = useState('')
   const unsubscribeRef = useRef<(() => void) | null>(null)
+  const clientKeypairRef = useRef<TEncryptionKeypair | null>(null)
 
   const verificationCode = useMemo(
-    () =>
-      pubkey
-        ? encryptionKeyService.getVerificationCode(
-            encryptionKeyService.getClientKeypair(pubkey).pubkey
-          )
-        : '',
-    [pubkey]
+    () => (clientPubkey ? encryptionKeyService.getVerificationCode(clientPubkey) : ''),
+    [clientPubkey]
   )
 
   const publishAndSubscribe = useCallback(async () => {
@@ -44,17 +42,30 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
         signEvent
       }
 
-      await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey)
-      setState('waiting')
-      setCountdown(RETRY_COOLDOWN)
+      const clientKeypair = encryptionKeyService.generateClientKeypair()
+      clientKeypairRef.current = clientKeypair
+      setClientPubkey(clientKeypair.pubkey)
 
       unsubscribeRef.current?.()
-      unsubscribeRef.current = await encryptionKeyService.subscribeToKeyTransfer(pubkey, () => {
-        setState('success')
-        toast.success(t('Encryption key synced successfully'))
-        setTimeout(() => onComplete?.(), 1000)
-      })
+      unsubscribeRef.current = await encryptionKeyService.subscribeToKeyTransfer(
+        pubkey,
+        clientKeypair,
+        () => {
+          if (clientKeypairRef.current?.pubkey !== clientKeypair.pubkey) return
+          setState('success')
+          toast.success(t('Encryption key synced successfully'))
+          setTimeout(() => onComplete?.(), 1000)
+        }
+      )
+
+      await encryptionKeyService.publishClientKeyAnnouncement(signer as any, pubkey, clientKeypair)
+      if (clientKeypairRef.current?.pubkey === clientKeypair.pubkey) {
+        setState((prev) => (prev === 'success' ? prev : 'waiting'))
+        setCountdown(RETRY_COOLDOWN)
+      }
     } catch (err) {
+      unsubscribeRef.current?.()
+      unsubscribeRef.current = null
       setError((err as Error).message)
       setState('error')
     }
@@ -73,6 +84,7 @@ export default function NewDeviceKeySync({ onComplete }: { onComplete?: () => vo
 
     return () => {
       unsubscribeRef.current?.()
+      clientKeypairRef.current = null
     }
   }, [pubkey])
 

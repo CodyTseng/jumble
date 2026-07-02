@@ -5,10 +5,10 @@ import {
   DEFAULT_FAVICON_URL_TEMPLATE,
   DEFAULT_FEED_TABS,
   ExtendedKind,
-  MAX_PROCESSED_SYNC_REQUEST_IDS,
   MEDIA_AUTO_LOAD_POLICY,
   NOTIFICATION_LIST_STYLE,
   NSFW_DISPLAY_POLICY,
+  PROCESSED_SYNC_REQUEST_ID_RETENTION_MS,
   PROFILE_PICTURE_AUTO_LOAD_POLICY,
   SEARCHABLE_RELAY_URLS,
   StorageKey,
@@ -34,6 +34,8 @@ import {
   TTranslationServiceConfig
 } from '@/types'
 import { kinds } from 'nostr-tools'
+
+type TProcessedSyncRequestIdMap = Record<string, number>
 
 class LocalStorageService {
   static instance: LocalStorageService
@@ -85,7 +87,6 @@ class LocalStorageService {
   // Rotated-out encryption keys kept around (per account) so messages still
   // encrypted to them can be decrypted during the grace period. retiredAt is in ms.
   private retiredEncryptionKeyMap: Record<string, { privkey: string; retiredAt: number }[]> = {}
-  private clientKeyPrivkeyMap: Record<string, string> = {}
   // Per-pubkey maps for fields that historically lived inline on TAccount.
   // Always the source of truth at runtime regardless of mode.
   private nsecByPubkey: Record<string, string> = {}
@@ -98,7 +99,7 @@ class LocalStorageService {
   private lastReadDmTimeMap: Record<string, Record<string, number>> = {}
   private dmLastSyncedAtMap: Record<string, number> = {}
   private dmBackwardCursorMap: Record<string, number> = {}
-  private processedSyncRequestIds: string[] = []
+  private processedSyncRequestIds: TProcessedSyncRequestIdMap = {}
   private disableNotificationSync: boolean = false
 
   constructor() {
@@ -404,18 +405,6 @@ class LocalStorageService {
       }
     }
 
-    const clientKeyPrivkeyMapStr = window.localStorage.getItem(StorageKey.CLIENT_KEY_PRIVKEY_MAP)
-    if (clientKeyPrivkeyMapStr) {
-      try {
-        const map = JSON.parse(clientKeyPrivkeyMapStr)
-        if (typeof map === 'object' && map !== null) {
-          this.clientKeyPrivkeyMap = map
-        }
-      } catch {
-        // Invalid JSON, use default
-      }
-    }
-
     const lastReadDmTimeMapStr = window.localStorage.getItem(StorageKey.LAST_READ_DM_TIME_MAP)
     if (lastReadDmTimeMapStr) {
       try {
@@ -457,10 +446,11 @@ class LocalStorageService {
     )
     if (processedSyncRequestIdsStr) {
       try {
-        const arr = JSON.parse(processedSyncRequestIdsStr)
-        if (Array.isArray(arr)) {
-          this.processedSyncRequestIds = arr
-        }
+        this.processedSyncRequestIds = this.normalizeProcessedSyncRequestIds(
+          JSON.parse(processedSyncRequestIdsStr)
+        )
+        this.pruneProcessedSyncRequestIds()
+        this.persistProcessedSyncRequestIds()
       } catch {
         // Invalid JSON, use default
       }
@@ -538,6 +528,7 @@ class LocalStorageService {
     window.localStorage.removeItem(StorageKey.ACTIVE_RELAY_SET_ID)
     window.localStorage.removeItem(StorageKey.FEED_TYPE)
     window.localStorage.removeItem(StorageKey.ENABLE_LIVE_FEED)
+    window.localStorage.removeItem(StorageKey.CLIENT_KEY_PRIVKEY_MAP)
 
     // In-memory maps above are loaded once; without this, a write in another tab
     // of the same browser would never reach this tab's caches (localStorage is
@@ -558,20 +549,8 @@ class LocalStorageService {
       case StorageKey.RETIRED_ENCRYPTION_KEY_PRIVKEY_MAP:
         this.retiredEncryptionKeyMap = this.parseStoredRecord(event.newValue)
         break
-      case StorageKey.CLIENT_KEY_PRIVKEY_MAP:
-        this.clientKeyPrivkeyMap = this.parseStoredRecord(event.newValue)
-        break
       case StorageKey.PROCESSED_SYNC_REQUEST_IDS: {
-        if (!event.newValue) {
-          this.processedSyncRequestIds = []
-          break
-        }
-        try {
-          const parsed = JSON.parse(event.newValue)
-          if (Array.isArray(parsed)) this.processedSyncRequestIds = parsed
-        } catch {
-          // keep current value on malformed input
-        }
+        this.processedSyncRequestIds = this.parseProcessedSyncRequestIds(event.newValue)
         break
       }
     }
@@ -585,6 +564,44 @@ class LocalStorageService {
     } catch {
       return {}
     }
+  }
+
+  private parseProcessedSyncRequestIds(raw: string | null): TProcessedSyncRequestIdMap {
+    if (!raw) return {}
+    try {
+      return this.normalizeProcessedSyncRequestIds(JSON.parse(raw))
+    } catch {
+      return {}
+    }
+  }
+
+  private normalizeProcessedSyncRequestIds(value: unknown): TProcessedSyncRequestIdMap {
+    const now = Date.now()
+    const entries: TProcessedSyncRequestIdMap = {}
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string') {
+          entries[item] = now
+          continue
+        }
+
+        if (typeof item !== 'object' || item === null) continue
+        const id = (item as { id?: unknown }).id
+        const processedAt = (item as { processedAt?: unknown }).processedAt
+        if (typeof id === 'string') {
+          entries[id] = typeof processedAt === 'number' ? processedAt : now
+        }
+      }
+    } else if (typeof value === 'object' && value !== null) {
+      for (const [id, processedAt] of Object.entries(value)) {
+        if (typeof processedAt === 'number') {
+          entries[id] = processedAt
+        }
+      }
+    }
+
+    return entries
   }
 
   getRelaySets() {
@@ -650,18 +667,18 @@ class LocalStorageService {
     this.bunkerClientSecretByPubkey = {}
     this.encryptionKeyPrivkeyMap = {}
     this.retiredEncryptionKeyMap = {}
-    this.clientKeyPrivkeyMap = {}
 
     if (available) {
       this.secretsViaIpc = true
       try {
         const bundle = await bridge.secrets.load()
+        const hadPersistedClientKey = 'clientKeyPrivkey' in bundle
         Object.assign(this.nsecByPubkey, bundle.nsec ?? {})
         Object.assign(this.ncryptsecByPubkey, bundle.ncryptsec ?? {})
         Object.assign(this.bunkerClientSecretByPubkey, bundle.bunkerClientSecretKey ?? {})
         Object.assign(this.encryptionKeyPrivkeyMap, bundle.encryptionKeyPrivkey ?? {})
         Object.assign(this.retiredEncryptionKeyMap, bundle.retiredEncryptionKeyPrivkey ?? {})
-        Object.assign(this.clientKeyPrivkeyMap, bundle.clientKeyPrivkey ?? {})
+        if (hadPersistedClientKey) this.queueSecretsSave()
       } catch (err) {
         console.error('[storage] failed to load encrypted secrets:', err)
       }
@@ -774,17 +791,6 @@ class LocalStorageService {
     }
   }
 
-  private persistClientKeyMap() {
-    if (this.secretsViaIpc) {
-      this.queueSecretsSave()
-    } else {
-      window.localStorage.setItem(
-        StorageKey.CLIENT_KEY_PRIVKEY_MAP,
-        JSON.stringify(this.clientKeyPrivkeyMap)
-      )
-    }
-  }
-
   private queueSecretsSave() {
     const bridge = getElectronBridge()
     if (!bridge) return
@@ -793,8 +799,7 @@ class LocalStorageService {
       ncryptsec: { ...this.ncryptsecByPubkey },
       bunkerClientSecretKey: { ...this.bunkerClientSecretByPubkey },
       encryptionKeyPrivkey: { ...this.encryptionKeyPrivkeyMap },
-      retiredEncryptionKeyPrivkey: { ...this.retiredEncryptionKeyMap },
-      clientKeyPrivkey: { ...this.clientKeyPrivkeyMap }
+      retiredEncryptionKeyPrivkey: { ...this.retiredEncryptionKeyMap }
     }
     this.secretsWriteChain = this.secretsWriteChain
       .catch(() => {
@@ -1306,15 +1311,6 @@ class LocalStorageService {
     this.persistRetiredEncryptionKeyMap()
   }
 
-  getClientKeyPrivkey(accountPubkey: string): string | null {
-    return this.clientKeyPrivkeyMap[accountPubkey] ?? null
-  }
-
-  setClientKeyPrivkey(accountPubkey: string, privkey: string) {
-    this.clientKeyPrivkeyMap[accountPubkey] = privkey
-    this.persistClientKeyMap()
-  }
-
   getLastReadDmTime(accountPubkey: string, conversationPubkey: string): number {
     return this.lastReadDmTimeMap[accountPubkey]?.[conversationPubkey] ?? 0
   }
@@ -1368,24 +1364,34 @@ class LocalStorageService {
   }
 
   getProcessedSyncRequestIds(): string[] {
-    return this.processedSyncRequestIds
+    return Object.keys(this.processedSyncRequestIds)
+  }
+
+  hasProcessedSyncRequestId(eventId: string): boolean {
+    return eventId in this.processedSyncRequestIds
   }
 
   addProcessedSyncRequestId(eventId: string) {
-    if (!this.processedSyncRequestIds.includes(eventId)) {
-      this.processedSyncRequestIds.push(eventId)
-      // Keep only the most recent ids; this list is an unbounded-growth hazard
-      // otherwise, since entries are never removed on their own.
-      if (this.processedSyncRequestIds.length > MAX_PROCESSED_SYNC_REQUEST_IDS) {
-        this.processedSyncRequestIds = this.processedSyncRequestIds.slice(
-          -MAX_PROCESSED_SYNC_REQUEST_IDS
-        )
-      }
-      window.localStorage.setItem(
-        StorageKey.PROCESSED_SYNC_REQUEST_IDS,
-        JSON.stringify(this.processedSyncRequestIds)
-      )
+    if (!(eventId in this.processedSyncRequestIds)) {
+      this.processedSyncRequestIds[eventId] = Date.now()
+      this.persistProcessedSyncRequestIds()
     }
+  }
+
+  private pruneProcessedSyncRequestIds() {
+    const now = Date.now()
+    this.processedSyncRequestIds = Object.fromEntries(
+      Object.entries(this.processedSyncRequestIds).filter(
+        ([, processedAt]) => now - processedAt < PROCESSED_SYNC_REQUEST_ID_RETENTION_MS
+      )
+    )
+  }
+
+  private persistProcessedSyncRequestIds() {
+    window.localStorage.setItem(
+      StorageKey.PROCESSED_SYNC_REQUEST_IDS,
+      JSON.stringify(this.processedSyncRequestIds)
+    )
   }
 
   getDisableNotificationSync() {

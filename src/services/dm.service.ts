@@ -977,7 +977,6 @@ class DmService {
   ): Promise<void> {
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
 
-    const myClientKeypair = encryptionKeyService.getClientKeypair(accountPubkey)
     const fiveMinutesAgo = dayjs().subtract(5, 'minute').unix()
     const now = dayjs().unix()
 
@@ -1016,8 +1015,7 @@ class DmService {
         onevent: async (event) => {
           if (event.kind === ExtendedKind.CLIENT_KEY_ANNOUNCEMENT) {
             const clientPubkey = encryptionKeyService.getClientPubkeyFromEvent(event)
-            if (!clientPubkey || clientPubkey === myClientKeypair.pubkey) return
-            if (storage.getProcessedSyncRequestIds().includes(event.id)) return
+            if (!clientPubkey || storage.hasProcessedSyncRequestId(event.id)) return
             // Only offer to share our key once it's confirmed to be the current
             // one; a stale device must resync itself, not act as the provider. If
             // freshness isn't verified yet, stash the request and surface it once
@@ -1132,7 +1130,7 @@ class DmService {
     this.encryptionKeyConfirmedCurrent = true
     const pending = this.pendingSyncRequestEvent
     this.pendingSyncRequestEvent = null
-    if (pending && !storage.getProcessedSyncRequestIds().includes(pending.id)) {
+    if (pending && !storage.hasProcessedSyncRequestId(pending.id)) {
       this.emitSyncRequest(pending)
     }
   }

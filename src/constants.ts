@@ -219,10 +219,9 @@ export const DM_TIME_RANDOMIZATION_SECONDS = 2 * 24 * 60 * 60 // 2 days in secon
 export const ENCRYPTION_KEY_RETENTION_MS = 90 * 24 * 60 * 60 * 1000 // 90 days
 export const MAX_RETIRED_ENCRYPTION_KEYS = 10
 
-// Cap on the locally-remembered "already handled" key-sync request ids. The list
-// only exists to avoid re-prompting for the same request, so older ids beyond
-// this many can be safely forgotten instead of growing localStorage unbounded.
-export const MAX_PROCESSED_SYNC_REQUEST_IDS = 100
+// Key-sync request ids are only remembered long enough to avoid duplicate
+// prompts while relays replay recent sync-request events.
+export const PROCESSED_SYNC_REQUEST_ID_RETENTION_MS = 10 * 60 * 1000
 
 export const DEFAULT_FAVICON_URL_TEMPLATE = 'https://{hostname}/favicon.ico'
 

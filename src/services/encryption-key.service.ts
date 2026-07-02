@@ -83,14 +83,9 @@ class EncryptionKeyService {
     return { privkey, pubkey }
   }
 
-  getClientKeypair(accountPubkey: string): TEncryptionKeypair {
-    let privkeyHex = storage.getClientKeyPrivkey(accountPubkey)
-    if (!privkeyHex) {
-      const privkey = generateSecretKey()
-      privkeyHex = bytesToHex(privkey)
-      storage.setClientKeyPrivkey(accountPubkey, privkeyHex)
-    }
-    return this.hexToKeypair(privkeyHex)
+  generateClientKeypair(): TEncryptionKeypair {
+    const privkey = generateSecretKey()
+    return { privkey, pubkey: getPublicKey(privkey) }
   }
 
   async queryEncryptionKeyAnnouncement(pubkey: string): Promise<Event | null> {
@@ -142,11 +137,10 @@ class EncryptionKeyService {
 
   async publishClientKeyAnnouncement(
     signer: ISigner,
-    accountPubkey: string
+    accountPubkey: string,
+    clientKeypair: TEncryptionKeypair
   ): Promise<Event | null> {
     const { relays } = await this.getRelays(accountPubkey)
-
-    const clientKeypair = this.getClientKeypair(accountPubkey)
 
     // Intentionally no 'client' tag here: it would leak the OS/browser of the
     // requesting device. The verification code (see getVerificationCode) is
@@ -162,6 +156,7 @@ class EncryptionKeyService {
     }
 
     const event = await signer.signEvent(draftEvent)
+    storage.addProcessedSyncRequestId(event.id)
     await client.publishEvent(relays, event)
     return event
   }
@@ -175,8 +170,7 @@ class EncryptionKeyService {
     const encryptionKeypair = this.getEncryptionKeypair(accountPubkey)
     if (!encryptionKeypair) return null
 
-    // Get sender's client keypair for encryption
-    const senderClientKeypair = this.getClientKeypair(accountPubkey)
+    const senderClientKeypair = this.generateClientKeypair()
 
     const encryptionPrivkeyHex = bytesToHex(encryptionKeypair.privkey)
     // Encrypt using sender's client privkey to recipient's client pubkey
@@ -204,10 +198,9 @@ class EncryptionKeyService {
   async importKeyFromTransfer(
     accountPubkey: string,
     transferEvent: Event,
+    clientKeypair: TEncryptionKeypair,
     expectedPubkey?: string
   ): Promise<boolean> {
-    const clientKeypair = this.getClientKeypair(accountPubkey)
-
     // Get sender's client pubkey from the P tag
     const senderClientPubkey = transferEvent.tags.find(tagNameEquals('P'))?.[1]
     if (!senderClientPubkey) return false
@@ -224,10 +217,8 @@ class EncryptionKeyService {
       }
 
       // Defense in depth: only accept a transferred key whose pubkey matches the
-      // account's currently announced encryption pubkey. The client keypair
-      // persists across rotations, so an old-round transfer still decrypts; this
-      // rejects those stale keys as well as garbage a third party may have planted
-      // at our (publicly announced) client pubkey.
+      // account's currently announced encryption pubkey. This rejects stale keys
+      // as well as garbage a third party may have planted at our client pubkey.
       if (expectedPubkey && getPublicKey(hexToBytes(decrypted)) !== expectedPubkey) {
         return false
       }
@@ -276,9 +267,12 @@ class EncryptionKeyService {
     return `${code.slice(0, 4)} ${code.slice(4)}`
   }
 
-  async subscribeToKeyTransfer(accountPubkey: string, onTransfer: () => void): Promise<() => void> {
+  async subscribeToKeyTransfer(
+    accountPubkey: string,
+    clientKeypair: TEncryptionKeypair,
+    onTransfer: () => void
+  ): Promise<() => void> {
     const { relays } = await this.getRelays(accountPubkey)
-    const clientKeypair = this.getClientKeypair(accountPubkey)
 
     // The currently announced encryption pubkey, used to reject stale or planted
     // transfers (see importKeyFromTransfer). May be null if the announcement can't
@@ -299,7 +293,12 @@ class EncryptionKeyService {
       },
       {
         onevent: async (event) => {
-          const success = await this.importKeyFromTransfer(accountPubkey, event, expectedPubkey)
+          const success = await this.importKeyFromTransfer(
+            accountPubkey,
+            event,
+            clientKeypair,
+            expectedPubkey
+          )
           // Silently skip failures: a third party can plant garbage transfers at
           // our public client pubkey, and stored old-round transfers won't match
           // the expected key. Keep waiting for a valid one instead of erroring out.

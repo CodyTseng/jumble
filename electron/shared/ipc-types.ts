@@ -33,7 +33,6 @@ export type TSecretsBundle = {
   bunkerClientSecretKey?: Record<string, string>
   encryptionKeyPrivkey?: Record<string, string>
   retiredEncryptionKeyPrivkey?: Record<string, { privkey: string; retiredAt: number }[]>
-  clientKeyPrivkey?: Record<string, string>
 }
 
 export type TSecretsBridge = {
