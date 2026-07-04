@@ -11,6 +11,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={themeSetting === 'pure-black' ? 'dark' : themeSetting}
       className="toaster group"
       richColors
+      offset={{
+        top: 20,
+        right: 20,
+        left: 20,
+        bottom: 'calc(env(safe-area-inset-bottom) + 3.5rem)'
+      }}
       mobileOffset={{
         top: 20,
         right: 20,
