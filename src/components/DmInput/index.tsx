@@ -192,7 +192,7 @@ function SortableMediaItem({
           e.stopPropagation()
           onRemove(item.id)
         }}
-        className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+        className="bg-background/90 text-foreground ring-border/70 absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full"
       >
         <X className="h-2.5 w-2.5" />
       </button>
