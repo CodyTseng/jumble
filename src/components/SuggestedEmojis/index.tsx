@@ -9,13 +9,16 @@ const DEFAULT_SUGGESTED_EMOJIS = ['👍', '❤️', '😂', '🥲', '👀', '�
 
 export default function SuggestedEmojis({
   onEmojiClick,
-  onMoreButtonClick
+  onMoreButtonClick,
+  maxSuggestions = 9
 }: {
   onEmojiClick: (emoji: string | TEmoji) => void
   onMoreButtonClick: () => void
+  maxSuggestions?: number
 }) {
-  const [suggestedEmojis, setSuggestedEmojis] =
-    useState<(string | TEmoji)[]>(DEFAULT_SUGGESTED_EMOJIS)
+  const [suggestedEmojis, setSuggestedEmojis] = useState<(string | TEmoji)[]>(
+    DEFAULT_SUGGESTED_EMOJIS.slice(0, maxSuggestions)
+  )
 
   useEffect(() => {
     const recent = recentEmojiService.getRecent()
@@ -26,8 +29,8 @@ export default function SuggestedEmojis({
       seen.add(key)
       return true
     })
-    setSuggestedEmojis(merged.slice(0, 9))
-  }, [])
+    setSuggestedEmojis(merged.slice(0, maxSuggestions))
+  }, [maxSuggestions])
 
   const handlePick = (emoji: string | TEmoji) => {
     recentEmojiService.add(emoji)

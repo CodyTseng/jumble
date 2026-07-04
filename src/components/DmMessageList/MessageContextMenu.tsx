@@ -156,6 +156,7 @@ export default function MessageContextMenu({
             onClose()
           }}
           onMoreButtonClick={onMore}
+          maxSuggestions={7}
         />
       </div>
 

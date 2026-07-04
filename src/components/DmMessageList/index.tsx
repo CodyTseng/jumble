@@ -635,6 +635,11 @@ function MessageBubble({
     y: number
   } | null>(null)
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
+  const [mediaRevealed, setMediaRevealed] = useState(false)
+
+  const handleRevealMedia = useCallback(() => {
+    setMediaRevealed(true)
+  }, [])
 
   const handleTouchStart = useCallback(() => {
     longPressTriggeredRef.current = false
@@ -771,9 +776,9 @@ function MessageBubble({
   return (
     <div
       ref={refCallback}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchMove={handleTouchMove}
+      onTouchStartCapture={handleTouchStart}
+      onTouchEndCapture={handleTouchEnd}
+      onTouchMoveCapture={handleTouchMove}
       onContextMenu={handleContextMenu}
       className={cn(
         'group/msg flex w-full max-w-full flex-col select-none [@media(hover:hover)]:select-text',
@@ -834,13 +839,20 @@ function MessageBubble({
             onClose={() => setContextMenuRect(null)}
           >
             {isFileMessage ? (
-              <EncryptedFileMessage message={message} isOwn={isOwn} />
+              <EncryptedFileMessage
+                message={message}
+                isOwn={isOwn}
+                mediaRevealed={mediaRevealed}
+                onRevealMedia={handleRevealMedia}
+              />
             ) : (
               <DmContent
                 content={message.content}
                 isOwn={isOwn}
                 bubbleClass={bubbleClass}
                 tags={message.decryptedRumor?.tags}
+                mediaRevealed={mediaRevealed}
+                onRevealMedia={handleRevealMedia}
               />
             )}
           </MessageContextMenu>
@@ -887,6 +899,8 @@ function MessageBubble({
               isOwn={isOwn}
               isHighlighted={isHighlighted}
               containerRef={bubbleRef}
+              mediaRevealed={mediaRevealed}
+              onRevealMedia={handleRevealMedia}
             />
           ) : (
             <DmContent
@@ -896,6 +910,8 @@ function MessageBubble({
               isHighlighted={isHighlighted}
               tags={message.decryptedRumor?.tags}
               containerRef={bubbleRef}
+              mediaRevealed={mediaRevealed}
+              onRevealMedia={handleRevealMedia}
             />
           )}
           {hasReactions && (
@@ -1050,7 +1066,9 @@ function DmContent({
   bubbleClass,
   isHighlighted,
   tags,
-  containerRef
+  containerRef,
+  mediaRevealed,
+  onRevealMedia
 }: {
   content: string
   isOwn: boolean
@@ -1058,9 +1076,10 @@ function DmContent({
   isHighlighted?: boolean
   tags?: string[][]
   containerRef?: React.Ref<HTMLDivElement>
+  mediaRevealed: boolean
+  onRevealMedia: () => void
 }) {
   const { autoLoadMedia } = useContentPolicy()
-  const [mediaRevealed, setMediaRevealed] = useState(false)
   const { allImages, segments, isEmojiOnly } = useMemo(() => {
     if (!content) return { allImages: [], segments: [], isEmojiOnly: false }
 
@@ -1223,7 +1242,7 @@ function DmContent({
               key={si}
               kind={hiddenMediaKind}
               isOwn={isOwn}
-              onClick={() => setMediaRevealed(true)}
+              onClick={onRevealMedia}
             />
           )
         }
@@ -1424,12 +1443,16 @@ function EncryptedFileMessage({
   message,
   isOwn,
   isHighlighted,
-  containerRef
+  containerRef,
+  mediaRevealed,
+  onRevealMedia
 }: {
   message: TDmMessage
   isOwn: boolean
   isHighlighted?: boolean
   containerRef?: React.Ref<HTMLDivElement>
+  mediaRevealed: boolean
+  onRevealMedia: () => void
 }) {
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
@@ -1450,7 +1473,6 @@ function EncryptedFileMessage({
   const [blobUrl, setBlobUrl] = useState<string | null>(
     cached ? decryptedBlobCache.get(message.id)! : null
   )
-  const [mediaRevealed, setMediaRevealed] = useState(false)
   const [error, setError] = useState(false)
   const displayMedia = !isMedia || autoLoadMedia || mediaRevealed
   const [loading, setLoading] = useState(isMedia && displayMedia && !cached)
@@ -1562,7 +1584,7 @@ function EncryptedFileMessage({
         <DmHiddenMediaBubble
           kind={isImage ? 'image' : 'media'}
           isOwn={isOwn}
-          onClick={() => setMediaRevealed(true)}
+          onClick={onRevealMedia}
         />
       </div>
     )
