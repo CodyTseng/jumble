@@ -334,6 +334,14 @@ const NoteList = forwardRef<
     useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
 
     useEffect(() => {
+      const handler = () => {
+        if (document.visibilityState === 'visible') refresh()
+      }
+      document.addEventListener('visibilitychange', handler)
+      return () => document.removeEventListener('visibilitychange', handler)
+    }, [])
+
+    useEffect(() => {
       if (!subRequests.length) return
 
       sinceRef.current = undefined
