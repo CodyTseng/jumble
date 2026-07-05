@@ -18,6 +18,11 @@ window.addEventListener('resize', setVh)
 window.addEventListener('orientationchange', setVh)
 setVh()
 
+window.addEventListener('beforeunload', (e) => {
+  e.preventDefault()
+  e.returnValue = ''
+})
+
 const root = createRoot(document.getElementById('root')!)
 
 Promise.allSettled([
