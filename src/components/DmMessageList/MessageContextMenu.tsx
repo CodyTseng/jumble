@@ -176,9 +176,14 @@ export default function MessageContextMenu({
           maxHeight: layout.bubbleMaxHeight,
           ...sideStyle
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
       >
-        {children}
+        <div className="pointer-events-none" aria-hidden="true">
+          {children}
+        </div>
       </div>
 
       {/* Action menu */}
