@@ -1,0 +1,71 @@
+app-id: com.codytseng.jumble
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '25.08'
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.node24
+command: jumble
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --device=dri
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --share=network
+  - --env=ELECTRON_TRASH=gio
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+build-options:
+  append-path: /usr/lib/sdk/node24/bin
+modules:
+  - name: jumble
+    buildsystem: simple
+    build-options:
+      env:
+        XDG_CACHE_HOME: /run/build/jumble/flatpak-node/cache
+        npm_config_cache: /run/build/jumble/flatpak-node/npm-cache
+        npm_config_nodedir: /usr/lib/sdk/node24
+        npm_config_offline: 'true'
+    sources:
+      - generated-sources.json
+      - type: dir
+        path: ..
+        dest: main
+        skip:
+          - .git
+          - .github
+          - .claude
+          - node_modules
+          - dist
+          - dist-electron
+          - dev-dist
+          - release
+          - flatpak/.flatpak-builder
+          - flatpak/build-dir
+          - flatpak/repo
+      - type: file
+        path: run.sh
+      - type: file
+        path: com.codytseng.jumble.desktop
+      - type: file
+        path: com.codytseng.jumble.metainfo.xml
+      - type: file
+        path: ../public/pwa-512x512.png
+      - type: file
+        path: ../public/pwa-192x192.png
+    build-commands:
+      - cd main && npm ci --offline
+      - |
+        . flatpak-node/electron-builder-arch-args.sh
+        cd main
+        npm run electron:build -- $ELECTRON_BUILDER_ARCH_ARGS --linux --dir --publish never
+      - install -d /app/jumble
+      - cp -a main/release/*/linux*unpacked/. /app/jumble/
+      - if [ -x /app/jumble/Jumble ] && [ ! -e /app/jumble/jumble ]; then ln -s Jumble /app/jumble/jumble; fi
+      - install -Dm755 run.sh /app/bin/jumble
+      - install -Dm644 com.codytseng.jumble.desktop /app/share/applications/com.codytseng.jumble.desktop
+      - install -Dm644 com.codytseng.jumble.metainfo.xml /app/share/metainfo/com.codytseng.jumble.metainfo.xml
+      - install -Dm644 pwa-512x512.png /app/share/icons/hicolor/512x512/apps/com.codytseng.jumble.png
+      - install -Dm644 pwa-192x192.png /app/share/icons/hicolor/192x192/apps/com.codytseng.jumble.png

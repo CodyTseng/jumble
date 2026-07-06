@@ -11,12 +11,24 @@ permissions:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, windows-latest, ubuntu-latest]
+        include:
+          - name: macos-arm64
+            os: macos-14
+            build-command: npm run electron:build -- --publish never
+          - name: windows-x64
+            os: windows-latest
+            build-command: npm run electron:build -- --publish never
+          - name: linux-x64
+            os: ubuntu-24.04
+            build-command: npm run electron:build:linux:x64 -- --publish never
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+            build-command: npm run electron:build:linux:arm64 -- --publish never
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,12 +50,12 @@ jobs:
           APPLE_ID: ${{ matrix.os == 'macos-14' && secrets.APPLE_ID || '' }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ matrix.os == 'macos-14' && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
           APPLE_TEAM_ID: ${{ matrix.os == 'macos-14' && secrets.APPLE_TEAM_ID || '' }}
-        run: npm run electron:build -- --publish never
+        run: ${{ matrix.build-command }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: jumble-${{ matrix.os }}
+          name: jumble-${{ matrix.name }}
           path: |
             release/*/*.dmg
             release/*/*.dmg.blockmap
@@ -53,14 +65,76 @@ jobs:
             release/*/*.exe.blockmap
             release/*/*.AppImage
             release/*/*.AppImage.blockmap
+            release/*/*-arm64.AppImage
+            release/*/*-arm64.AppImage.blockmap
             release/*/*.deb
+            release/*/*-arm64.deb
             release/*/latest*.yml
           if-no-files-found: ignore
           retention-days: 7
 
+  flatpak:
+    name: Build Flatpak (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: x86_64
+            os: ubuntu-24.04
+          - name: aarch64
+            os: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Flatpak toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder pipx
+          pipx install 'git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node'
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Generate Flatpak npm sources
+        run: npm run flatpak:generate-sources
+
+      - name: Build Flatpak repository
+        run: |
+          flatpak-builder \
+            --force-clean \
+            --user \
+            --install-deps-from=flathub \
+            --repo=flatpak/repo \
+            flatpak/build-dir \
+            flatpak/com.codytseng.jumble.yml
+
+      - name: Build Flatpak bundle
+        run: |
+          mkdir -p release/flatpak
+          flatpak build-bundle \
+            flatpak/repo \
+            release/flatpak/Jumble-linux-${{ matrix.name }}.flatpak \
+            com.codytseng.jumble \
+            --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Upload Flatpak artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jumble-flatpak-${{ matrix.name }}
+          path: release/flatpak/*.flatpak
+          if-no-files-found: error
+          retention-days: 7
+
   release:
     name: Publish GitHub Release
-    needs: build
+    needs: [build, flatpak]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:

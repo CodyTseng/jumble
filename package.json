@@ -14,6 +14,7 @@
     "url": "git+https://github.com/CodyTseng/jumble"
   },
   "homepage": "https://github.com/CodyTseng/jumble",
+  "desktopName": "com.codytseng.jumble.desktop",
   "main": "dist-electron/main/index.js",
   "engines": {
     "node": ">=20.0.0"
@@ -28,7 +29,12 @@
     "test:schemas": "vitest run schemata-validation",
     "electron:dev": "cross-env ELECTRON=true vite",
     "electron:build": "cross-env ELECTRON=true tsc -b && cross-env ELECTRON=true vite build && electron-builder --config electron-builder.config.cjs",
-    "electron:preview": "cross-env ELECTRON=true vite build && electron ."
+    "electron:build:linux": "npm run electron:build -- --linux --x64 --arm64",
+    "electron:build:linux:x64": "npm run electron:build -- --linux AppImage deb --x64",
+    "electron:build:linux:arm64": "npm run electron:build -- --linux AppImage deb --arm64",
+    "electron:preview": "cross-env ELECTRON=true vite build && electron .",
+    "flatpak:generate-sources": "cd flatpak && flatpak-node-generator --node-sdk-extension org.freedesktop.Sdk.Extension.node24//25.08 npm ../package-lock.json",
+    "flatpak:build": "npm run flatpak:generate-sources && flatpak-builder --force-clean --user --install-deps-from=flathub --repo=flatpak/repo flatpak/build-dir flatpak/com.codytseng.jumble.yml"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

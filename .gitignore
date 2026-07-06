@@ -13,6 +13,9 @@ dist-electron
 dist-ssr
 dev-dist
 release
+flatpak/build-dir
+flatpak/.flatpak-builder
+flatpak/repo
 *.local
 .env
 electron-builder.env

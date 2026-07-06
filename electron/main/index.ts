@@ -57,8 +57,11 @@ let win: BrowserWindow | null = null
 const manager = new RelayManager()
 const secrets = new SecretsStore()
 // Auto-update is only meaningful for packaged builds — in dev the binary
-// is not what would actually be replaced.
-const updater = new Updater(app.isPackaged)
+// is not what would actually be replaced. Flatpak builds are updated by
+// Flatpak/Flathub, so the app-level updater should stay disabled there.
+const isFlatpak =
+  process.env.FLATPAK_ID === 'com.codytseng.jumble' || process.env.container === 'flatpak'
+const updater = new Updater(app.isPackaged && !isFlatpak)
 // Tiny http://127.0.0.1 server that hosts the YouTube IFrame shim page so
 // embedded YT players have an http(s) parent origin (the SPA itself runs on
 // app://, which YT rejects with player error 153).

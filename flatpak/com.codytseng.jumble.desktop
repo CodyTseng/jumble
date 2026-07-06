@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Jumble
+Comment=A user-friendly Nostr client for exploring relay feeds
+Exec=jumble %U
+Icon=com.codytseng.jumble
+Terminal=false
+Categories=Network;InstantMessaging;
+StartupWMClass=Jumble

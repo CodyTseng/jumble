@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.codytseng.jumble</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Jumble</name>
+  <summary>A user-friendly Nostr client for exploring relay feeds</summary>
+  <description>
+    <p>
+      Jumble is a Nostr client for exploring relay feeds, following people,
+      reading notes, and publishing from a desktop-style app.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.codytseng.jumble.desktop</launchable>
+  <developer id="com.codytseng">
+    <name>Cody Tseng</name>
+  </developer>
+  <url type="homepage">https://github.com/CodyTseng/jumble</url>
+  <url type="bugtracker">https://github.com/CodyTseng/jumble/issues</url>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="26.6.1" date="2026-07-06" />
+  </releases>
+</component>
