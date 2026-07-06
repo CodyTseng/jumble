@@ -8,14 +8,16 @@ import { toast } from 'sonner'
 //
 // We show a deliberately low-key hint: after a short delay (so instant
 // auto-approvals stay silent), a small loading toast appears in the corner and
-// auto-dismisses once the signature comes back. Concurrent sign requests are
-// reference-counted into a single toast so frequent signing never stacks up.
+// auto-dismisses once the signature comes back or the hint has been visible
+// long enough. Concurrent sign requests are reference-counted into a single
+// toast so frequent signing never stacks up.
 //
 // We also bound the wait with a timeout: if the signer never responds (offline
 // bunker, closed extension popup, etc.) the request rejects instead of hanging
 // forever. The window is generous so a user manually approving still makes it.
 
 const SHOW_DELAY_MS = 1000
+const TOAST_TIMEOUT_MS = 60_000
 const TIMEOUT_MS = 30_000
 const TOAST_ID = 'signer-approval-waiting'
 
@@ -30,7 +32,13 @@ function scheduleShow() {
       shown = true
       toast.loading(i18n.t('Waiting for signer approval...'), {
         id: TOAST_ID,
-        duration: Infinity
+        duration: TOAST_TIMEOUT_MS,
+        onAutoClose: () => {
+          shown = false
+        },
+        onDismiss: () => {
+          shown = false
+        }
       })
     }
   }, SHOW_DELAY_MS)
