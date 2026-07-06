@@ -1285,7 +1285,13 @@ function DmContent({
           return <EmbeddedNote key={si} noteId={id} />
         }
         if (node.type === 'invoice') {
-          return <EmbeddedLNInvoice key={si} invoice={node.data} />
+          return (
+            <EmbeddedLNInvoice
+              key={si}
+              invoice={node.data}
+              className="w-full max-w-full [@media(hover:hover)]:max-w-sm"
+            />
+          )
         }
         return null
       })}
