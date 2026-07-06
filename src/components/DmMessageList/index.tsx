@@ -634,6 +634,7 @@ function MessageBubble({
     x: number
     y: number
   } | null>(null)
+  const [desktopContextMenuRect, setDesktopContextMenuRect] = useState<DOMRect | null>(null)
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false)
   const [mediaRevealed, setMediaRevealed] = useState(false)
 
@@ -659,6 +660,7 @@ function MessageBubble({
     modalManager.register(contextMenuId, () => {
       setContextMenuRect(null)
       setDesktopContextMenuPoint(null)
+      setDesktopContextMenuRect(null)
     })
     return () => modalManager.unregister(contextMenuId)
   }, [contextMenuRect, desktopContextMenuPoint, contextMenuId])
@@ -678,7 +680,10 @@ function MessageBubble({
     if (!window.matchMedia('(hover: hover)').matches) return
     e.preventDefault()
     e.stopPropagation()
+    const rect = bubbleRef.current?.getBoundingClientRect()
+    if (!rect) return
     setContextMenuRect(null)
+    setDesktopContextMenuRect(rect)
     setDesktopContextMenuPoint({ x: e.clientX, y: e.clientY })
   }, [])
 
@@ -857,13 +862,17 @@ function MessageBubble({
             )}
           </MessageContextMenu>
         )}
-        {desktopContextMenuPoint && (
+        {desktopContextMenuPoint && desktopContextMenuRect && (
           <DesktopMessageContextMenu
             anchorPoint={desktopContextMenuPoint}
+            originRect={desktopContextMenuRect}
             onReply={() => onReply?.(message)}
             onCopy={handleCopy}
             onReact={handleEmojiSelect}
-            onClose={() => setDesktopContextMenuPoint(null)}
+            onClose={() => {
+              setDesktopContextMenuPoint(null)
+              setDesktopContextMenuRect(null)
+            }}
           />
         )}
         <div

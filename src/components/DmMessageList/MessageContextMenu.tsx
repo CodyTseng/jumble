@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 const GAP = 8
 const MARGIN = 12
 const DESKTOP_MENU_WIDTH = 176
+const DESKTOP_HOVER_SAFE_MARGIN = 12
 
 /**
  * iOS/Telegram-style long-press context menu for DM bubbles (touch only).
@@ -224,12 +225,14 @@ const menuItemClass = cn('hover:bg-accent flex items-center gap-3 px-4 py-3 text
 
 export function DesktopMessageContextMenu({
   anchorPoint,
+  originRect,
   onReply,
   onCopy,
   onReact,
   onClose
 }: {
   anchorPoint: { x: number; y: number }
+  originRect: DOMRect
   onReply: () => void
   onCopy: () => void
   onReact: (emoji: string | TEmoji) => void
@@ -316,6 +319,50 @@ export function DesktopMessageContextMenu({
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
+
+  useEffect(() => {
+    const expandRect = (rect: DOMRect, margin: number) => ({
+      top: rect.top - margin,
+      right: rect.right + margin,
+      bottom: rect.bottom + margin,
+      left: rect.left - margin
+    })
+    const bridgeRect = (a: DOMRect, b: DOMRect, margin: number) => ({
+      top: Math.min(a.top, b.top) - margin,
+      right: Math.max(a.right, b.right) + margin,
+      bottom: Math.max(a.bottom, b.bottom) + margin,
+      left: Math.min(a.left, b.left) - margin
+    })
+    const containsPoint = (
+      rect: { top: number; right: number; bottom: number; left: number },
+      x: number,
+      y: number
+    ) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return
+
+      const safeRects = [expandRect(originRect, DESKTOP_HOVER_SAFE_MARGIN)]
+      const reactionRect = reactionRef.current?.getBoundingClientRect()
+      const menuRect = menuRef.current?.getBoundingClientRect()
+
+      if (reactionRect) {
+        safeRects.push(expandRect(reactionRect, DESKTOP_HOVER_SAFE_MARGIN))
+        safeRects.push(bridgeRect(originRect, reactionRect, DESKTOP_HOVER_SAFE_MARGIN))
+      }
+      if (menuRect) {
+        safeRects.push(expandRect(menuRect, DESKTOP_HOVER_SAFE_MARGIN))
+        safeRects.push(bridgeRect(originRect, menuRect, DESKTOP_HOVER_SAFE_MARGIN))
+      }
+
+      if (!safeRects.some((rect) => containsPoint(rect, e.clientX, e.clientY))) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('pointermove', onPointerMove)
+    return () => document.removeEventListener('pointermove', onPointerMove)
+  }, [onClose, originRect])
 
   return createPortal(
     <div
