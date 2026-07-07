@@ -1,43 +1,24 @@
 import { useSecondaryPage } from '@/PageManager'
-import { ExtendedKind, NSFW_DISPLAY_POLICY, SUPPORTED_KINDS } from '@/constants'
-import { getParentStuff, isNsfwEvent } from '@/lib/event'
+import { ExtendedKind } from '@/constants'
+import { getParentStuff } from '@/lib/event'
 import { toExternalContent, toNote } from '@/lib/link'
 import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
-import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useMuteList } from '@/providers/MuteListProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Event, kinds } from 'nostr-tools'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import AudioPlayer from '../AudioPlayer'
 import ClientTag from '../ClientTag'
-import Content from '../Content'
 import FollowingBadge from '../FollowingBadge'
-import ProtectedBadge from '../ProtectedBadge'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
+import NoteContent from '../NoteContent'
 import NoteOptions from '../NoteOptions'
 import ParentNotePreview from '../ParentNotePreview'
+import ProtectedBadge from '../ProtectedBadge'
 import TranslateButton from '../TranslateButton'
 import TrustScoreBadge from '../TrustScoreBadge'
 import UserAvatar from '../UserAvatar'
 import Username from '../Username'
-import CommunityDefinition from './CommunityDefinition'
-import EmojiPack from './EmojiPack'
-import FollowPack from './FollowPack'
-import GroupMetadata from './GroupMetadata'
-import Highlight from './Highlight'
-import LiveEvent from './LiveEvent'
-import LongFormArticle from './LongFormArticle'
-import LongFormArticlePreview from './LongFormArticlePreview'
-import MutedNote from './MutedNote'
-import NsfwNote from './NsfwNote'
-import PictureNote from './PictureNote'
-import Poll from './Poll'
-import Reaction from './Reaction'
-import RelayReview from './RelayReview'
-import UnknownNote from './UnknownNote'
-import VideoNote from './VideoNote'
 
 export default function Note({
   event,
@@ -71,14 +52,6 @@ export default function Note({
     const eTag = event.tags.findLast(tagNameEquals('e'))
     return eTag ? generateBech32IdFromETag(eTag) : undefined
   }, [event])
-  const { nsfwDisplayPolicy } = useContentPolicy()
-  const [showNsfw, setShowNsfw] = useState(false)
-  const { mutePubkeySet } = useMuteList()
-  const [showMuted, setShowMuted] = useState(false)
-  const isNsfw = useMemo(
-    () => (nsfwDisplayPolicy === NSFW_DISPLAY_POLICY.SHOW ? false : isNsfwEvent(event)),
-    [event, nsfwDisplayPolicy]
-  )
   const displayTimestamp = useMemo(() => {
     if (event.kind === kinds.LongFormArticle) {
       const publishedAt = event.tags.find(tagNameEquals('published_at'))?.[1]
@@ -87,64 +60,6 @@ export default function Note({
     }
     return event.created_at
   }, [event])
-
-  let content: React.ReactNode
-  if (
-    ![
-      ...SUPPORTED_KINDS,
-      kinds.CommunityDefinition,
-      kinds.LiveEvent,
-      ExtendedKind.GROUP_METADATA
-    ].includes(event.kind)
-  ) {
-    content = <UnknownNote className="mt-2" event={event} />
-  } else if (mutePubkeySet.has(event.pubkey) && !showMuted) {
-    content = <MutedNote show={() => setShowMuted(true)} />
-  } else if (isNsfw && !showNsfw) {
-    content = <NsfwNote show={() => setShowNsfw(true)} />
-  } else if (event.kind === kinds.Highlights) {
-    content = <Highlight className="mt-2" event={event} />
-  } else if (event.kind === kinds.LongFormArticle) {
-    content = showFull ? (
-      <LongFormArticle className="mt-2" event={event} />
-    ) : (
-      <LongFormArticlePreview className="mt-2" event={event} />
-    )
-  } else if (event.kind === kinds.LiveEvent) {
-    content = <LiveEvent className="mt-2" event={event} />
-  } else if (event.kind === ExtendedKind.GROUP_METADATA) {
-    content = <GroupMetadata className="mt-2" event={event} originalNoteId={originalNoteId} />
-  } else if (event.kind === kinds.CommunityDefinition) {
-    content = <CommunityDefinition className="mt-2" event={event} />
-  } else if (event.kind === ExtendedKind.POLL) {
-    content = (
-      <>
-        <Content className="mt-2" event={event} />
-        <Poll className="mt-2" event={event} />
-      </>
-    )
-  } else if (event.kind === ExtendedKind.VOICE || event.kind === ExtendedKind.VOICE_COMMENT) {
-    content = <AudioPlayer className="mt-2" src={event.content} pubkey={event.pubkey} />
-  } else if (event.kind === ExtendedKind.PICTURE) {
-    content = <PictureNote className="mt-2" event={event} />
-  } else if (
-    event.kind === ExtendedKind.VIDEO ||
-    event.kind === ExtendedKind.SHORT_VIDEO ||
-    event.kind === ExtendedKind.ADDRESSABLE_NORMAL_VIDEO ||
-    event.kind === ExtendedKind.ADDRESSABLE_SHORT_VIDEO
-  ) {
-    content = <VideoNote className="mt-2" event={event} />
-  } else if (event.kind === ExtendedKind.RELAY_REVIEW) {
-    content = <RelayReview className="mt-2" event={event} />
-  } else if (event.kind === kinds.Emojisets) {
-    content = <EmojiPack className="mt-2" event={event} />
-  } else if (event.kind === ExtendedKind.FOLLOW_PACK) {
-    content = <FollowPack className="mt-2" event={event} />
-  } else if (event.kind === kinds.Reaction) {
-    content = <Reaction className="mt-2" event={event} />
-  } else {
-    content = <Content className="mt-2" event={event} enableHighlight />
-  }
 
   return (
     <div className={className}>
@@ -164,7 +79,7 @@ export default function Note({
                 <ProtectedBadge event={event} />
                 <ClientTag event={event} />
               </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-1 text-sm">
                 <Nip05 pubkey={event.pubkey} append="·" />
                 <FormattedTimestamp
                   timestamp={displayTimestamp}
@@ -212,7 +127,7 @@ export default function Note({
           }}
         />
       )}
-      {content}
+      <NoteContent event={event} originalNoteId={originalNoteId} showFull={showFull} />
     </div>
   )
 }

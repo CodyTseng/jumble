@@ -1,15 +1,15 @@
 import { useSecondaryPage } from '@/PageManager'
 import ClickableCard from '@/components/ClickableCard'
 import ClientTag from '@/components/ClientTag'
-import Content from '@/components/Content'
 import ContentPreview from '@/components/ContentPreview'
 import FollowingBadge from '@/components/FollowingBadge'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import Nip05 from '@/components/Nip05'
 import Note from '@/components/Note'
+import RepostDescription from '@/components/NoteCard/RepostDescription'
+import NoteContent from '@/components/NoteContent'
 import NoteInteractions from '@/components/NoteInteractions'
 import NoteOptions from '@/components/NoteOptions'
-import RepostDescription from '@/components/NoteCard/RepostDescription'
 import ProtectedBadge from '@/components/ProtectedBadge'
 import StuffStats from '@/components/StuffStats'
 import TranslateButton from '@/components/TranslateButton'
@@ -368,7 +368,7 @@ function ChainItem({ eventId, isFirst }: { eventId: string; isFirst: boolean }) 
               <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
             </div>
           </div>
-          <Content className="mt-2" event={event} />
+          <NoteContent className="mt-2" event={event} />
           <StuffStats className="mt-2" stuff={event} />
         </div>
       </div>

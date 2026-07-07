@@ -10,9 +10,12 @@ import { EmbeddedHashtag, EmbeddedLNInvoice } from '../Embedded'
 import Emoji from '../Emoji'
 import ExternalLink from '../ExternalLink'
 import ImageWithLightbox from '../ImageWithLightbox'
-import NostrNode from '../Note/LongFormArticle/NostrNode'
-import { remarkNostr } from '../Note/LongFormArticle/remarkNostr'
-import { Components as BaseComponents } from '../Note/LongFormArticle/types'
+import NostrNode from '../NoteContent/LongFormArticle/NostrNode'
+import { remarkNostr } from '../NoteContent/LongFormArticle/remarkNostr'
+import { Components as BaseComponents } from '../NoteContent/LongFormArticle/types'
+import XEmbeddedPost from '../XEmbeddedPost'
+import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
+import { remarkInlineContent } from './remarkInlineContent'
 
 type InlineComponent = React.ComponentType<{ value: string }>
 
@@ -21,9 +24,6 @@ interface Components extends BaseComponents {
   emoji: InlineComponent
   invoice: InlineComponent
 }
-import XEmbeddedPost from '../XEmbeddedPost'
-import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
-import { remarkInlineContent } from './remarkInlineContent'
 
 // A nostr: URL that references a note (note1/nevent1/naddr1) renders as a
 // block-level card. When such a URL sits on a line right after a list item,
