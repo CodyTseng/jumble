@@ -1138,10 +1138,11 @@ export default {
       'Servidores independentes que guardam cada um um fragmento da sua chave privada, de modo que nenhum operador sozinho pode assinar.',
     'This Google account is linked to a different Nostr account':
       'Esta conta do Google está vinculada a outra conta Nostr',
-    'Discover': 'Descobrir',
+    Discover: 'Descobrir',
     'Failure reason': 'Motivo da falha',
     'Indirect notifications hidden': 'Notificações indiretas ocultas',
     'Indirect notifications shown': 'Notificações indiretas visíveis',
-    Resend: 'Reenviar'
+    Resend: 'Reenviar',
+    'Original poster': 'Autor original'
   }
 }

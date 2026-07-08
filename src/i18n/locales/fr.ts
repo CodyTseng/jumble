@@ -1154,6 +1154,7 @@ export default {
     'Failure reason': "Raison de l'échec",
     'Indirect notifications hidden': 'Notifications indirectes masquées',
     'Indirect notifications shown': 'Notifications indirectes affichées',
-    Resend: 'Renvoyer'
+    Resend: 'Renvoyer',
+    'Original poster': 'Auteur original'
   }
 }

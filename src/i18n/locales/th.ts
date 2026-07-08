@@ -1115,10 +1115,11 @@ export default {
       'เซิร์ฟเวอร์อิสระที่แต่ละแห่งเก็บชาร์ดของคีย์ส่วนตัวของคุณ ดังนั้น operator รายเดียวจึงไม่สามารถลงนามได้ด้วยตัวเอง',
     'This Google account is linked to a different Nostr account':
       'บัญชี Google นี้เชื่อมโยงกับบัญชี Nostr อื่น',
-    'Discover': 'ค้นพบ',
+    Discover: 'ค้นพบ',
     'Failure reason': 'สาเหตุที่ล้มเหลว',
     'Indirect notifications hidden': 'ซ่อนการแจ้งเตือนทางอ้อมแล้ว',
     'Indirect notifications shown': 'แสดงการแจ้งเตือนทางอ้อม',
-    Resend: 'ส่งอีกครั้ง'
+    Resend: 'ส่งอีกครั้ง',
+    'Original poster': 'ผู้โพสต์ต้นฉบับ'
   }
 }

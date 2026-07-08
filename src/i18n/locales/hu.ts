@@ -1136,10 +1136,11 @@ export default {
       'Független szerverek, amelyek mindegyike a privát kulcsod egy töredékét tárolja, így egyetlen operátor sem tud egyedül aláírni.',
     'This Google account is linked to a different Nostr account':
       'Ez a Google-fiók egy másik Nostr-fiókhoz van kapcsolva',
-    'Discover': 'Felfedezés',
+    Discover: 'Felfedezés',
     'Failure reason': 'Hiba oka',
     'Indirect notifications hidden': 'Közvetett értesítések elrejtve',
     'Indirect notifications shown': 'Közvetett értesítések megjelenítve',
-    Resend: 'Újraküldés'
+    Resend: 'Újraküldés',
+    'Original poster': 'Eredeti szerző'
   }
 }

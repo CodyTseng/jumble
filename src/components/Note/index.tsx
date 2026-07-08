@@ -13,6 +13,7 @@ import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteContent from '../NoteContent'
 import NoteOptions from '../NoteOptions'
+import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
 import ProtectedBadge from '../ProtectedBadge'
 import TranslateButton from '../TranslateButton'
@@ -27,7 +28,8 @@ export default function Note({
   className,
   hideParentNotePreview = false,
   showFull = false,
-  hideHeader = false
+  hideHeader = false,
+  opPubkey
 }: {
   event: Event
   originalNoteId?: string
@@ -36,6 +38,7 @@ export default function Note({
   hideParentNotePreview?: boolean
   showFull?: boolean
   hideHeader?: boolean
+  opPubkey?: string
 }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
@@ -75,6 +78,7 @@ export default function Note({
                   skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
                 />
                 <FollowingBadge pubkey={event.pubkey} />
+                {opPubkey === event.pubkey && <OpBadge />}
                 <TrustScoreBadge pubkey={event.pubkey} />
                 <ProtectedBadge event={event} />
                 <ClientTag event={event} />

@@ -16,7 +16,7 @@ import ZapList from '../ZapList'
 
 type TTabValue = 'replies' | 'quotes' | 'reactions' | 'reposts' | 'zaps'
 
-export default function NoteInteractions({ event }: { event: Event }) {
+export default function NoteInteractions({ event, opPubkey }: { event: Event; opPubkey?: string }) {
   const [type, setType] = useState<TTabValue>('replies')
   const { stuffKey } = useStuff(event)
   const noteStats = useStuffStatsById(stuffKey)
@@ -44,7 +44,7 @@ export default function NoteInteractions({ event }: { event: Event }) {
   let list
   switch (type) {
     case 'replies':
-      list = <ReplyNoteList stuff={event} />
+      list = <ReplyNoteList stuff={event} opPubkey={opPubkey} />
       break
     case 'reactions':
       list = <ReactionList stuff={event} />

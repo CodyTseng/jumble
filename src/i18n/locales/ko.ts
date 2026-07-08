@@ -1119,10 +1119,11 @@ export default {
       '각자 당신의 개인 키 샤드를 보관하는 독립적인 서버입니다. 따라서 단일 운영자만으로는 서명할 수 없습니다.',
     'This Google account is linked to a different Nostr account':
       '이 Google 계정은 다른 Nostr 계정에 연결되어 있습니다',
-    'Discover': '발견',
+    Discover: '발견',
     'Failure reason': '실패 사유',
     'Indirect notifications hidden': '간접 알림 숨김',
     'Indirect notifications shown': '간접 알림 표시',
-    Resend: '다시 보내기'
+    Resend: '다시 보내기',
+    'Original poster': '원 작성자'
   }
 }

@@ -10,6 +10,7 @@ import RepostDescription from '@/components/NoteCard/RepostDescription'
 import NoteContent from '@/components/NoteContent'
 import NoteInteractions from '@/components/NoteInteractions'
 import NoteOptions from '@/components/NoteOptions'
+import OpBadge from '@/components/OpBadge'
 import ProtectedBadge from '@/components/ProtectedBadge'
 import StuffStats from '@/components/StuffStats'
 import TranslateButton from '@/components/TranslateButton'
@@ -76,6 +77,10 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
   const [expanded, setExpanded] = useState(false)
   const currentKey = useMemo(() => (event ? getEventKey(event) : ''), [event])
   const rootKey = useMemo(() => (rootEvent ? getEventKey(rootEvent) : ''), [rootEvent])
+  const opPubkey = useMemo(
+    () => rootEvent?.pubkey ?? (!rootEventId && !rootITag ? event?.pubkey : undefined),
+    [rootEvent, rootEventId, rootITag, event]
+  )
   const ancestorChain = useAncestorChain(currentKey, rootKey)
   const canExpand = !!parentEventId
   const fullChain = useMemo(() => {
@@ -167,7 +172,12 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
         )}
         {expanded
           ? fullChain.map((id, idx) => (
-              <ChainItem key={`chain-${id}`} eventId={id} isFirst={idx === 0 && !rootITag} />
+              <ChainItem
+                key={`chain-${id}`}
+                eventId={id}
+                isFirst={idx === 0 && !rootITag}
+                opPubkey={opPubkey}
+              />
             ))
           : canExpand && (
               <div className={cn('px-4', !rootITag && 'pt-3')}>
@@ -202,6 +212,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
             hideParentNotePreview
             originalNoteId={isRepost ? undefined : id}
             showFull
+            opPubkey={opPubkey}
           />
           <StuffStats
             className="mt-3"
@@ -213,7 +224,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
         </div>
       </div>
       <Separator className="mt-4" />
-      <NoteInteractions key={`note-interactions-${event.id}`} event={event} />
+      <NoteInteractions key={`note-interactions-${event.id}`} event={event} opPubkey={opPubkey} />
     </SecondaryPageLayout>
   )
 })
@@ -311,7 +322,15 @@ function isConsecutive(rootEvent?: Event, parentEvent?: Event) {
   return getEventKey(rootEvent) === getKeyFromTag(tag.tag)
 }
 
-function ChainItem({ eventId, isFirst }: { eventId: string; isFirst: boolean }) {
+function ChainItem({
+  eventId,
+  isFirst,
+  opPubkey
+}: {
+  eventId: string
+  isFirst: boolean
+  opPubkey?: string
+}) {
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const { autoLoadProfilePicture } = useContentPolicy()
@@ -350,6 +369,7 @@ function ChainItem({ eventId, isFirst }: { eventId: string; isFirst: boolean }) 
                   skeletonClassName="h-4"
                 />
                 <FollowingBadge pubkey={event.pubkey} />
+                {opPubkey === event.pubkey && <OpBadge />}
                 <TrustScoreBadge pubkey={event.pubkey} />
                 <ProtectedBadge event={event} />
                 <ClientTag event={event} />

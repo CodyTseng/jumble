@@ -20,6 +20,7 @@ import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteOptions from '../NoteOptions'
+import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
 import StuffStats from '../StuffStats'
 import TranslateButton from '../TranslateButton'
@@ -33,7 +34,8 @@ export default function ReplyNote({
   onClickParent = () => {},
   highlight = false,
   hideThreadGuide = false,
-  className = ''
+  className = '',
+  opPubkey
 }: {
   event: Event
   parentEventId?: string
@@ -41,6 +43,7 @@ export default function ReplyNote({
   highlight?: boolean
   hideThreadGuide?: boolean
   className?: string
+  opPubkey?: string
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
@@ -132,6 +135,7 @@ export default function ReplyNote({
                     className="text-muted-foreground hover:text-foreground truncate text-sm font-semibold"
                     skeletonClassName="h-3"
                   />
+                  {opPubkey === event.pubkey && <OpBadge />}
                   <TrustScoreBadge pubkey={event.pubkey} className="size-3.5!" />
                   <ClientTag event={event} />
                 </div>

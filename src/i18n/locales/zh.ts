@@ -1090,10 +1090,11 @@ export default {
     'This Google account is linked to a different Nostr account':
       '此 Google 账号已关联到另一个 Nostr 账号',
     'Drop files to upload': '松开以上传文件',
-    'Discover': '发现',
+    Discover: '发现',
     'Failure reason': '失败原因',
     'Indirect notifications hidden': '已隐藏间接通知',
     'Indirect notifications shown': '已显示间接通知',
-    Resend: '重新发送'
+    Resend: '重新发送',
+    'Original poster': '楼主'
   }
 }

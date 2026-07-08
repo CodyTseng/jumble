@@ -1144,6 +1144,7 @@ export default {
     'Failure reason': "Motivo dell'errore",
     'Indirect notifications hidden': 'Notifiche indirette nascoste',
     'Indirect notifications shown': 'Notifiche indirette visibili',
-    Resend: 'Reinvia'
+    Resend: 'Reinvia',
+    'Original poster': 'Autore originale'
   }
 }

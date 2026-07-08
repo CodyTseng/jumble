@@ -1091,10 +1091,11 @@ export default {
     'This Google account is linked to a different Nostr account':
       '此 Google 帳號已連結到另一個 Nostr 帳號',
     'Drop files to upload': '鬆開以上傳檔案',
-    'Discover': '發現',
+    Discover: '發現',
     'Failure reason': '失敗原因',
     'Indirect notifications hidden': '已隱藏間接通知',
     'Indirect notifications shown': '已顯示間接通知',
-    Resend: '重新發送'
+    Resend: '重新發送',
+    'Original poster': '原始發文者'
   }
 }
