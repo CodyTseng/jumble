@@ -37,15 +37,28 @@ const OPTIONS: DownloadOption[] = [
     Icon: WindowsLogo
   },
   {
-    label: 'Linux',
+    label: 'Linux x64',
     format: 'AppImage · x86_64',
     filename: 'Jumble-linux-x86_64.AppImage',
     Icon: LinuxLogo
   },
   {
-    label: 'Linux',
+    label: 'Linux arm64',
+    format: 'AppImage · arm64',
+    filename: 'Jumble-linux-arm64.AppImage',
+    Icon: LinuxLogo
+  },
+  {
+    label: 'Linux x64',
     format: 'Debian / Ubuntu (.deb) · amd64',
     filename: 'Jumble-linux-amd64.deb',
+    Icon: LinuxLogo,
+    noteKey: 'No auto-updates — manual re-download required'
+  },
+  {
+    label: 'Linux arm64',
+    format: 'Debian / Ubuntu (.deb) · arm64',
+    filename: 'Jumble-linux-arm64.deb',
     Icon: LinuxLogo,
     noteKey: 'No auto-updates — manual re-download required'
   }
@@ -66,7 +79,7 @@ export default function DownloadDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('Download Jumble Desktop')}</DialogTitle>
           <DialogDescription>
