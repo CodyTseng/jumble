@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchEvent } from '@/hooks'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import ContentPreview from '../ContentPreview'
@@ -26,7 +27,7 @@ export default function ParentNotePreview({
     return (
       <div
         className={cn(
-          'flex w-fit max-w-full cursor-pointer items-center gap-1 rounded-full bg-muted px-2 text-sm text-muted-foreground hover:text-foreground',
+          'bg-muted text-muted-foreground hover:text-foreground flex w-fit max-w-full cursor-pointer items-center gap-1 rounded-full px-2 text-sm',
           className
         )}
         onClick={onClick}
@@ -47,7 +48,7 @@ export default function ParentNotePreview({
     return (
       <div
         className={cn(
-          'flex w-44 max-w-full items-center gap-1 rounded-full bg-muted px-2 text-sm text-muted-foreground',
+          'bg-muted text-muted-foreground flex w-44 max-w-full items-center gap-1 rounded-full px-2 text-sm',
           className
         )}
       >
@@ -63,14 +64,16 @@ export default function ParentNotePreview({
   return (
     <div
       className={cn(
-        'flex w-fit max-w-full items-center gap-1 rounded-full bg-muted px-2 text-sm text-muted-foreground',
-        event && 'cursor-pointer hover:text-foreground',
+        'bg-muted text-muted-foreground flex w-fit max-w-full items-center gap-1 rounded-full px-2 text-sm',
+        event && 'hover:text-foreground cursor-pointer',
         className
       )}
       onClick={event ? onClick : undefined}
     >
       <div className="shrink-0">{displayLabel}</div>
-      {event && <UserAvatar className="shrink-0" userId={event.pubkey} size="tiny" />}
+      {event && (
+        <UserAvatar className="shrink-0" userId={getEventAuthorPubkey(event)} size="tiny" />
+      )}
       <ContentPreview className="truncate" event={event} />
     </div>
   )

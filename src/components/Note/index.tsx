@@ -1,6 +1,6 @@
 import { useSecondaryPage } from '@/PageManager'
 import { ExtendedKind } from '@/constants'
-import { getParentStuff } from '@/lib/event'
+import { getEventAuthorPubkey, getParentStuff } from '@/lib/event'
 import { toExternalContent, toNote } from '@/lib/link'
 import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -46,6 +46,7 @@ export default function Note({
   const { parentEventId, parentExternalContent } = useMemo(() => {
     return getParentStuff(event)
   }, [event])
+  const displayPubkey = useMemo(() => getEventAuthorPubkey(event), [event])
   const reactionTargetEventId = useMemo(() => {
     if (event.kind !== kinds.Reaction && event.kind !== ExtendedKind.EXTERNAL_CONTENT_REACTION) {
       return undefined
@@ -69,22 +70,22 @@ export default function Note({
       {!hideHeader && (
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-center gap-2">
-            <UserAvatar userId={event.pubkey} size={size === 'small' ? 'medium' : 'normal'} />
+            <UserAvatar userId={displayPubkey} size={size === 'small' ? 'medium' : 'normal'} />
             <div className="w-0 flex-1">
               <div className="flex items-center gap-2">
                 <Username
-                  userId={event.pubkey}
+                  userId={displayPubkey}
                   className={`flex truncate font-semibold ${size === 'small' ? 'text-sm' : ''}`}
                   skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
                 />
-                <FollowingBadge pubkey={event.pubkey} />
-                {opPubkey === event.pubkey && <OpBadge />}
-                <TrustScoreBadge pubkey={event.pubkey} />
+                <FollowingBadge pubkey={displayPubkey} />
+                {opPubkey === displayPubkey && <OpBadge />}
+                <TrustScoreBadge pubkey={displayPubkey} />
                 <ProtectedBadge event={event} />
                 <ClientTag event={event} />
               </div>
               <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                <Nip05 pubkey={event.pubkey} append="·" />
+                <Nip05 pubkey={displayPubkey} append="·" />
                 <FormattedTimestamp
                   timestamp={displayTimestamp}
                   className="shrink-0"

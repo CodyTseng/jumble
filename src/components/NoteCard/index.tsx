@@ -1,7 +1,8 @@
 import { UserAvatarSkeleton } from '@/components/UserAvatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NSFW_DISPLAY_POLICY } from '@/constants'
-import { isMentioningMutedUsers, isNsfwEvent } from '@/lib/event'
+import { useZapReceiptValidation } from '@/hooks'
+import { getEventAuthorPubkey, isMentioningMutedUsers, isNsfwEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -25,8 +26,9 @@ export default function NoteCard({
 }) {
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers, nsfwDisplayPolicy } = useContentPolicy()
+  const validZapReceipt = useZapReceiptValidation(event)
   const shouldHide = useMemo(() => {
-    if (filterMutedNotes && mutePubkeySet.has(event.pubkey)) {
+    if (filterMutedNotes && mutePubkeySet.has(getEventAuthorPubkey(event))) {
       return true
     }
     if (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) {
@@ -37,7 +39,7 @@ export default function NoteCard({
     }
     return false
   }, [event, filterMutedNotes, mutePubkeySet, nsfwDisplayPolicy])
-  if (shouldHide) return null
+  if (shouldHide || validZapReceipt !== true) return null
 
   if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
     return (

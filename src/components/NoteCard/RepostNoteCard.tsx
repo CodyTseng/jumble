@@ -1,5 +1,5 @@
 import { useRepostTarget } from '@/hooks'
-import { isMentioningMutedUsers } from '@/lib/event'
+import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { Event } from 'nostr-tools'
@@ -24,7 +24,7 @@ export default function RepostNoteCard({
   const { targetEvent } = useRepostTarget(event)
   const shouldHide = useMemo(() => {
     if (!targetEvent) return true
-    if (filterMutedNotes && mutePubkeySet.has(targetEvent.pubkey)) {
+    if (filterMutedNotes && mutePubkeySet.has(getEventAuthorPubkey(targetEvent))) {
       return true
     }
     if (hideContentMentioningMutedUsers && isMentioningMutedUsers(targetEvent, mutePubkeySet)) {

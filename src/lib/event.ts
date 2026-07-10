@@ -276,6 +276,27 @@ export function getEventKey(event: Event) {
   return isReplaceableEvent(event.kind) ? getReplaceableCoordinateFromEvent(event) : event.id
 }
 
+// Zap receipts are signed by a wallet service, but the zap request identifies
+// the user who authored the zap.
+export function getEventAuthorPubkey(event: Event): string {
+  if (event.kind !== kinds.Zap) return event.pubkey
+
+  const senderPubkey = event.tags.find(tagNameEquals('P'))?.[1]
+  if (senderPubkey) return senderPubkey
+
+  const description = event.tags.find(tagNameEquals('description'))?.[1]
+  if (description) {
+    try {
+      const zapRequest = JSON.parse(description) as { pubkey?: string }
+      if (zapRequest.pubkey) return zapRequest.pubkey
+    } catch {
+      // Fall back to the receipt signer when the embedded request is malformed.
+    }
+  }
+
+  return event.pubkey
+}
+
 // Only used for e, E, a, A, i, I tags
 export function getKeyFromTag([, tagValue]: (string | undefined)[]) {
   return tagValue

@@ -1,12 +1,13 @@
 import { useSecondaryPage } from '@/PageManager'
 import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { formatAmount } from '@/lib/lightning'
-import { toProfile } from '@/lib/link'
+import { toNote, toProfile } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ClickableCard from '../ClickableCard'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
@@ -42,10 +43,10 @@ export default function ZapList({ event }: { event: Event }) {
   return (
     <div className="min-h-[80vh]">
       {filteredZaps.slice(0, showCount).map((zap) => (
-        <div
+        <ClickableCard
           key={zap.pr}
           className="clickable flex gap-2 border-b px-4 py-3 transition-colors"
-          onClick={() => push(toProfile(zap.pubkey))}
+          onClick={() => push(zap.eventId ? toNote(zap.eventId) : toProfile(zap.pubkey))}
         >
           <div className="mt-0.5 flex w-8 flex-col items-center">
             <Zap className="size-5 text-yellow-400" />
@@ -71,7 +72,7 @@ export default function ZapList({ event }: { event: Event }) {
               <Content className="mt-2" content={zap.comment} />
             </div>
           </div>
-        </div>
+        </ClickableCard>
       ))}
 
       <div ref={bottomRef} />

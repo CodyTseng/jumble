@@ -1,6 +1,7 @@
 import { ExtendedKind } from '@/constants'
 import {
   getEventKey,
+  getEventAuthorPubkey,
   getNoteBech32Id,
   getReplaceableCoordinateFromEvent,
   isReplaceableEvent
@@ -26,7 +27,14 @@ export type TStuffStats = {
   repostPubkeySet: Set<string>
   reposts: { id: string; pubkey: string; created_at: number }[]
   zapPrSet: Set<string>
-  zaps: { pr: string; pubkey: string; amount: number; created_at: number; comment?: string }[]
+  zaps: {
+    pr: string
+    eventId?: string
+    pubkey: string
+    amount: number
+    created_at: number
+    comment?: string
+  }[]
   updatedAt?: number
 }
 
@@ -53,8 +61,9 @@ class StuffStatsService {
     if (oldStats?.updatedAt) {
       since = oldStats.updatedAt
     }
-    const [relayList, authorProfile] = event
-      ? await Promise.all([client.fetchRelayList(event.pubkey), client.fetchProfile(event.pubkey)])
+    const authorPubkey = event ? getEventAuthorPubkey(event) : undefined
+    const [relayList, authorProfile] = authorPubkey
+      ? await Promise.all([client.fetchRelayList(authorPubkey), client.fetchProfile(authorPubkey)])
       : []
 
     const replaceableCoordinate =
@@ -212,7 +221,8 @@ class StuffStatsService {
     amount: number,
     comment?: string,
     created_at: number = dayjs().unix(),
-    notify: boolean = true
+    notify: boolean = true,
+    zapEventId?: string
   ) {
     const old = this.stuffStatsMap.get(eventId) || {}
     const zapPrSet = old.zapPrSet || new Set()
@@ -220,7 +230,7 @@ class StuffStatsService {
     if (zapPrSet.has(pr)) return
 
     zapPrSet.add(pr)
-    zaps.push({ pr, pubkey, amount, comment, created_at })
+    zaps.push({ pr, eventId: zapEventId, pubkey, amount, comment, created_at })
     this.stuffStatsMap.set(eventId, { ...old, zapPrSet, zaps })
     if (notify) {
       this.notifyStuffStats(eventId)
@@ -360,7 +370,16 @@ class StuffStatsService {
     const valid = await lightning.validateZapReceipt(evt)
     if (!valid) return
 
-    this.addZap(senderPubkey, originalEventId, invoice, amount, comment, evt.created_at)
+    this.addZap(
+      senderPubkey,
+      originalEventId,
+      invoice,
+      amount,
+      comment,
+      evt.created_at,
+      true,
+      getNoteBech32Id(evt)
+    )
   }
 }
 

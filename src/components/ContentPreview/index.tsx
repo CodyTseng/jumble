@@ -1,5 +1,5 @@
 import { ExtendedKind } from '@/constants'
-import { isMentioningMutedUsers } from '@/lib/event'
+import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -19,6 +19,7 @@ import PollPreview from './PollPreview'
 import ReactionPreview from './ReactionPreview'
 import RepostPreview from './RepostPreview'
 import VideoNotePreview from './VideoNotePreview'
+import ZapPreview from './ZapPreview'
 
 export default function ContentPreview({
   event,
@@ -31,7 +32,7 @@ export default function ContentPreview({
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const isMuted = useMemo(
-    () => (event ? mutePubkeySet.has(event.pubkey) : false),
+    () => (event ? mutePubkeySet.has(getEventAuthorPubkey(event)) : false),
     [mutePubkeySet, event]
   )
   const isMentioningMuted = useMemo(
@@ -123,6 +124,10 @@ export default function ContentPreview({
 
   if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
     return <RepostPreview event={event} className={className} />
+  }
+
+  if (event.kind === kinds.Zap) {
+    return <ZapPreview event={event} className={className} />
   }
 
   return (

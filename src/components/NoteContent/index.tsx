@@ -1,5 +1,5 @@
 import { ExtendedKind, NSFW_DISPLAY_POLICY, SUPPORTED_KINDS } from '@/constants'
-import { isNsfwEvent } from '@/lib/event'
+import { getEventAuthorPubkey, isNsfwEvent } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -23,6 +23,7 @@ import Reaction from './Reaction'
 import RelayReview from './RelayReview'
 import UnknownNote from './UnknownNote'
 import VideoNote from './VideoNote'
+import Zap from './Zap'
 
 export default function NoteContent({
   className = '',
@@ -55,7 +56,7 @@ export default function NoteContent({
     return <UnknownNote className={cn('mt-2', className)} event={event} />
   }
 
-  if (mutePubkeySet.has(event.pubkey) && !showMuted) {
+  if (mutePubkeySet.has(getEventAuthorPubkey(event)) && !showMuted) {
     return <MutedNote show={() => setShowMuted(true)} />
   }
 
@@ -135,6 +136,10 @@ export default function NoteContent({
 
   if (event.kind === kinds.Reaction) {
     return <Reaction className={cn('mt-2', className)} event={event} />
+  }
+
+  if (event.kind === kinds.Zap) {
+    return <Zap className={cn('mt-2', className)} event={event} />
   }
 
   return <Content className={cn('mt-2', className)} event={event} enableHighlight />

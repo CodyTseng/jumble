@@ -70,6 +70,7 @@ import {
 } from '@/lib/draft-event'
 
 import { ExtendedKind } from '@/constants'
+import { getEventAuthorPubkey } from '@/lib/event'
 
 // ── Schema loading ──────────────────────────────────────────────────────
 const require_ = createRequire(import.meta.url)
@@ -279,6 +280,21 @@ describe('Schemata Schema Validation', () => {
     expect(result.valid).toBe(true)
   })
 
+  it('kind 16 (Generic Repost: zap receipt) keeps signer on e tag', () => {
+    const senderPubkey = 'f'.repeat(64)
+    const walletPubkey = 'd'.repeat(64)
+    const receipt = makeEvent({
+      kind: kinds.Zap,
+      pubkey: walletPubkey,
+      tags: [['P', senderPubkey]]
+    })
+    const draft = createRepostDraftEvent(receipt)
+
+    expect(getEventAuthorPubkey(receipt)).toBe(senderPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'e')?.[3]).toBe(walletPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'p')?.[1]).toBe(senderPubkey)
+  })
+
   // Kind 7 – Reaction
   it('kind 7 (Reaction: like) via createReactionDraftEvent', () => {
     const event = makeEvent()
@@ -296,6 +312,20 @@ describe('Schemata Schema Validation', () => {
     const result = validateDraftEvent(draft, schemaRegistry)
     expect(result.errors).toEqual([])
     expect(result.valid).toBe(true)
+  })
+
+  it('kind 7 (Reaction: zap receipt) keeps signer on e tag', () => {
+    const senderPubkey = 'f'.repeat(64)
+    const walletPubkey = 'd'.repeat(64)
+    const receipt = makeEvent({
+      kind: kinds.Zap,
+      pubkey: walletPubkey,
+      tags: [['P', senderPubkey]]
+    })
+    const draft = createReactionDraftEvent(receipt)
+
+    expect(draft.tags.find((tag) => tag[0] === 'e')?.[3]).toBe(walletPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'p')?.[1]).toBe(senderPubkey)
   })
 
   // Kind 16 – Generic repost (non-text)
@@ -333,6 +363,22 @@ describe('Schemata Schema Validation', () => {
     const result = validateDraftEvent(draft, schemaRegistry)
     expect(result.errors).toEqual([])
     expect(result.valid).toBe(true)
+  })
+
+  it('kind 1111 (Comment on zap receipt) separates signer and logical author', async () => {
+    const senderPubkey = 'f'.repeat(64)
+    const walletPubkey = 'd'.repeat(64)
+    const receipt = makeEvent({
+      kind: kinds.Zap,
+      pubkey: walletPubkey,
+      tags: [['P', senderPubkey]]
+    })
+    const draft = await createCommentDraftEvent('Thanks!', receipt, [])
+
+    expect(draft.tags.find((tag) => tag[0] === 'E')?.[3]).toBe(walletPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'P')?.[1]).toBe(senderPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'e')?.[3]).toBe(walletPubkey)
+    expect(draft.tags.find((tag) => tag[0] === 'p')?.[1]).toBe(senderPubkey)
   })
 
   it('kind 1111 (Comment on external content) via createCommentDraftEvent', async () => {

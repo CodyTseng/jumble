@@ -1,5 +1,6 @@
 import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import threadService from '@/services/thread.service'
 import { Event, kinds, verifyEvent } from 'nostr-tools'
 import { useEffect, useState } from 'react'
@@ -46,6 +47,12 @@ export function useRepostTarget(event?: Event | null) {
         if (isRepostEvent(eventFromContent)) {
           return
         }
+        if (
+          eventFromContent.kind === kinds.Zap &&
+          !(await lightning.validateZapReceipt(eventFromContent))
+        ) {
+          return
+        }
         client.addEventToCache(eventFromContent)
         const targetSeenOn = client.getSeenEventRelays(eventFromContent.id)
         if (targetSeenOn.length === 0) {
@@ -75,6 +82,7 @@ export function useRepostTarget(event?: Event | null) {
       const fetched = await client.fetchEvent(targetEventId)
       if (cancelled) return
       if (fetched && !isRepostEvent(fetched)) {
+        if (fetched.kind === kinds.Zap && !(await lightning.validateZapReceipt(fetched))) return
         setTargetEvent(fetched)
         threadService.addRepliesToThread([fetched])
       }

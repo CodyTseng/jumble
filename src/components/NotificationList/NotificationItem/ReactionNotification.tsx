@@ -1,5 +1,6 @@
 import Image from '@/components/Image'
 import { useFetchEvent } from '@/hooks'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { generateBech32IdFromATag, generateBech32IdFromETag, tagNameEquals } from '@/lib/tag'
 import { useNostr } from '@/providers/NostrProvider'
 import { useNotificationUserPreference } from '@/providers/NotificationUserPreferenceProvider'
@@ -58,7 +59,7 @@ export function ReactionNotification({
   if (!event || !eventId || !reaction) {
     return null
   }
-  if (hideIndirect && event.pubkey !== pubkey) {
+  if (hideIndirect && getEventAuthorPubkey(event) !== pubkey) {
     return null
   }
 

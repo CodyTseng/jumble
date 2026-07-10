@@ -23,6 +23,7 @@ import {
   getReplaceableCoordinate,
   getReplaceableCoordinateFromEvent,
   getRootTag,
+  getEventAuthorPubkey,
   isProtectedEvent,
   isReplaceableEvent
 } from './event'
@@ -66,8 +67,9 @@ function generateDraftEventCacheKey(draft: Omit<TDraftEvent, 'created_at'>) {
 // https://github.com/nostr-protocol/nips/blob/master/25.md
 export function createReactionDraftEvent(event: Event, emoji: TEmoji | string = '+'): TDraftEvent {
   const tags: string[][] = []
+  const targetPubkey = getEventAuthorPubkey(event)
   tags.push(buildETag(event.id, event.pubkey))
-  tags.push(buildPTag(event.pubkey))
+  tags.push(buildPTag(targetPubkey))
   if (event.kind !== kinds.ShortTextNote) {
     tags.push(buildKTag(event.kind))
   }
@@ -122,7 +124,8 @@ export function createExternalContentReactionDraftEvent(
 // https://github.com/nostr-protocol/nips/blob/master/18.md
 export function createRepostDraftEvent(event: Event): TDraftEvent {
   const isProtected = isProtectedEvent(event)
-  const tags = [buildETag(event.id, event.pubkey), buildPTag(event.pubkey)]
+  const authorPubkey = getEventAuthorPubkey(event)
+  const tags = [buildETag(event.id, event.pubkey), buildPTag(authorPubkey)]
 
   if (event.kind === kinds.ShortTextNote) {
     return {
@@ -241,14 +244,16 @@ export async function createCommentDraftEvent(
   const {
     quoteTags,
     rootEventId,
+    rootEventPubkey,
     rootCoordinateTag,
     rootKind,
-    rootPubkey,
+    rootAuthorPubkey,
     rootUrl,
     parentEvent,
     externalContent
   } = await extractCommentMentions(transformedEmojisContent, parentStuff)
   const hashtags = extractHashtags(transformedEmojisContent)
+  const parentEventAuthorPubkey = parentEvent ? getEventAuthorPubkey(parentEvent) : undefined
 
   const tags = emojiTags.concat(hashtags.map((hashtag) => buildTTag(hashtag))).concat(quoteTags)
 
@@ -259,17 +264,17 @@ export async function createCommentDraftEvent(
 
   tags.push(
     ...mentions
-      .filter((pubkey) => pubkey !== parentEvent?.pubkey)
+      .filter((pubkey) => pubkey !== parentEventAuthorPubkey)
       .map((pubkey) => buildPTag(pubkey))
   )
 
   if (rootCoordinateTag) {
     tags.push(rootCoordinateTag)
   } else if (rootEventId) {
-    tags.push(buildETag(rootEventId, rootPubkey, '', true))
+    tags.push(buildETag(rootEventId, rootEventPubkey, '', true))
   }
-  if (rootPubkey) {
-    tags.push(buildPTag(rootPubkey, true))
+  if (rootAuthorPubkey) {
+    tags.push(buildPTag(rootAuthorPubkey, true))
   }
   if (rootKind) {
     tags.push(buildKTag(rootKind, true))
@@ -283,7 +288,7 @@ export async function createCommentDraftEvent(
           isReplaceableEvent(parentEvent.kind)
             ? buildATag(parentEvent)
             : buildETag(parentEvent.id, parentEvent.pubkey),
-          buildPTag(parentEvent.pubkey)
+          ...(parentEventAuthorPubkey ? [buildPTag(parentEventAuthorPubkey)] : [])
         ]
       : externalContent
         ? [buildITag(externalContent)]
@@ -607,10 +612,11 @@ export function createDeletionRequestDraftEvent(event: Event): TDraftEvent {
 
 export function createReportDraftEvent(event: Event, reason: string): TDraftEvent {
   const tags: string[][] = []
+  const authorPubkey = getEventAuthorPubkey(event)
   if (event.kind === kinds.Metadata) {
-    tags.push(['p', event.pubkey, reason])
+    tags.push(['p', authorPubkey, reason])
   } else {
-    tags.push(['p', event.pubkey])
+    tags.push(['p', authorPubkey])
     tags.push(['e', event.id, reason])
     if (isReplaceableEvent(event.kind)) {
       tags.push(['a', getReplaceableCoordinateFromEvent(event), reason])
@@ -733,15 +739,23 @@ async function extractCommentMentions(content: string, parentStuff: Event | stri
         ? buildATag(parentEvent, true)
         : undefined
     : undefined
-  const rootEventId = isComment ? parentEvent.tags.find(tagNameEquals('E'))?.[1] : parentEvent?.id
+  const rootEventTag = isComment ? parentEvent.tags.find(tagNameEquals('E')) : undefined
+  const rootEventId = isComment ? rootEventTag?.[1] : parentEvent?.id
+  let rootEventPubkey = isComment ? rootEventTag?.[3] : parentEvent?.pubkey
+  if (rootEventId && !rootEventPubkey) {
+    const rootEvent = await client.fetchEvent(rootEventId)
+    rootEventPubkey = rootEvent?.pubkey
+  }
   const rootKind = isComment
     ? parentEvent.tags.find(tagNameEquals('K'))?.[1]
     : parentEvent
       ? parentEvent.kind
       : determineExternalContentKind(parentStuff as string)
-  const rootPubkey = isComment
+  const rootAuthorPubkey = isComment
     ? parentEvent.tags.find(tagNameEquals('P'))?.[1]
-    : parentEvent?.pubkey
+    : parentEvent
+      ? getEventAuthorPubkey(parentEvent)
+      : undefined
   const rootUrl = isComment ? parentEvent.tags.find(tagNameEquals('I'))?.[1] : externalContent
 
   const quoteTags = extractQuoteTags(content)
@@ -749,9 +763,10 @@ async function extractCommentMentions(content: string, parentStuff: Event | stri
   return {
     quoteTags,
     rootEventId,
+    rootEventPubkey,
     rootCoordinateTag,
     rootKind,
-    rootPubkey,
+    rootAuthorPubkey,
     rootUrl,
     parentEvent,
     externalContent

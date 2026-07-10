@@ -1,6 +1,10 @@
 import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import { useStuff } from '@/hooks/useStuff'
-import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
+import {
+  getEventAuthorPubkey,
+  getReplaceableCoordinateFromEvent,
+  isReplaceableEvent
+} from '@/lib/event'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
@@ -30,7 +34,7 @@ export default function QuoteList({
       const relaySet = new Set(getDefaultRelayUrls())
       const filters: Filter[] = []
       if (event) {
-        const relayList = await client.fetchRelayList(event.pubkey)
+        const relayList = await client.fetchRelayList(getEventAuthorPubkey(event))
         relayList.read.slice(0, 5).forEach((url) => relaySet.add(url))
         const seenOn = client.getSeenEventRelayUrls(event.id)
         seenOn.forEach((url) => relaySet.add(url))

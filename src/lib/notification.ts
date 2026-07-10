@@ -1,5 +1,5 @@
 import { kinds, NostrEvent } from 'nostr-tools'
-import { isMentioningMutedUsers } from './event'
+import { getEventAuthorPubkey, isMentioningMutedUsers } from './event'
 import { tagNameEquals } from './tag'
 
 export async function notificationFilter(
@@ -16,10 +16,11 @@ export async function notificationFilter(
     meetsMinTrustScore: (pubkey: string) => Promise<boolean>
   }
 ): Promise<boolean> {
+  const authorPubkey = getEventAuthorPubkey(event)
   if (
-    mutePubkeySet.has(event.pubkey) ||
+    mutePubkeySet.has(authorPubkey) ||
     (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) ||
-    !(await meetsMinTrustScore(event.pubkey))
+    !(await meetsMinTrustScore(authorPubkey))
   ) {
     return false
   }

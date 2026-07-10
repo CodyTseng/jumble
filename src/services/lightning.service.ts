@@ -1,4 +1,5 @@
 import { CODY_PUBKEY, JUMBLE_PUBKEY } from '@/constants'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { TProfile } from '@/types'
@@ -61,7 +62,10 @@ class LightningService {
     const { recipient, event } =
       typeof recipientOrEvent === 'string'
         ? { recipient: recipientOrEvent }
-        : { recipient: recipientOrEvent.pubkey, event: recipientOrEvent }
+        : {
+            recipient: getEventAuthorPubkey(recipientOrEvent),
+            event: recipientOrEvent
+          }
 
     const [profile, receiptRelayList, senderRelayList] = await Promise.all([
       client.fetchProfile(recipient),
@@ -79,8 +83,10 @@ class LightningService {
     }
     const { callback, lnurl } = zapEndpoint
     const amount = sats * 1000
+    const zapTargetEvent =
+      event?.pubkey === recipient ? event : event && { ...event, pubkey: recipient }
     const zapRequestDraft = makeZapRequest({
-      ...(event ? { event } : { pubkey: recipient }),
+      ...(zapTargetEvent ? { event: zapTargetEvent } : { pubkey: recipient }),
       amount,
       relays: receiptRelayList.read
         .slice(0, 4)

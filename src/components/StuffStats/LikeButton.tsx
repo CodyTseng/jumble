@@ -58,7 +58,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
 
       try {
         if (!noteStats?.updatedAt) {
-          await stuffStatsService.fetchStuffStats(stuffKey, pubkey)
+          await stuffStatsService.fetchStuffStats(event ?? stuffKey, pubkey)
         }
 
         const reaction = event
@@ -114,7 +114,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
 
   const trigger = (
     <button
-      className="text-muted-foreground enabled:hover:text-red-400 flex h-full cursor-pointer items-center gap-1 px-3"
+      className="text-muted-foreground flex h-full cursor-pointer items-center gap-1 px-3 enabled:hover:text-red-400"
       title={t('Like')}
       disabled={liking}
       onClick={handleClick}

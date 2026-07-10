@@ -1,5 +1,5 @@
 import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
-import { isMentioningMutedUsers } from '@/lib/event'
+import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -29,8 +29,9 @@ export function NotificationItem({
 
   useEffect(() => {
     const checkCanShow = async () => {
+      const authorPubkey = getEventAuthorPubkey(notification)
       // Check muted users
-      if (mutePubkeySet.has(notification.pubkey)) {
+      if (mutePubkeySet.has(authorPubkey)) {
         setCanShow(false)
         return
       }
@@ -44,7 +45,7 @@ export function NotificationItem({
       // Check trust score
       if (notification.kind !== kinds.Zap) {
         const threshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.NOTIFICATIONS)
-        if (!(await meetsMinTrustScore(notification.pubkey, threshold))) {
+        if (!(await meetsMinTrustScore(authorPubkey, threshold))) {
           setCanShow(false)
           return
         }

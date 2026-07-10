@@ -6,13 +6,15 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import { Check } from 'lucide-react'
-import { Event, nip19 } from 'nostr-tools'
+import { Event, kinds, nip19 } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
@@ -185,7 +187,7 @@ function MenuItem({
 }
 
 async function extractMentions(content: string, parentEvent?: Event) {
-  const parentEventPubkey = parentEvent ? parentEvent.pubkey : undefined
+  const parentEventPubkey = parentEvent ? getEventAuthorPubkey(parentEvent) : undefined
   const pubkeys: string[] = []
   const relatedPubkeys: string[] = []
   const matches = content.match(
@@ -208,7 +210,8 @@ async function extractMentions(content: string, parentEvent?: Event) {
       } else if (['nevent', 'note'].includes(type)) {
         const event = await client.fetchEvent(id)
         if (event) {
-          addToSet(pubkeys, event.pubkey)
+          if (event.kind === kinds.Zap && !(await lightning.validateZapReceipt(event))) continue
+          addToSet(pubkeys, getEventAuthorPubkey(event))
         }
       }
     } catch (e) {

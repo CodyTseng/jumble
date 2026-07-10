@@ -1,5 +1,5 @@
 import { ExtendedKind } from '@/constants'
-import { compareEvents } from '@/lib/event'
+import { compareEvents, getEventAuthorPubkey } from '@/lib/event'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { mergeTimelines } from '@/lib/timeline'
 import { kinds, NostrEvent } from 'nostr-tools'
@@ -133,7 +133,7 @@ class NotificationService {
       return false
     }
 
-    const filtered = newEvents.filter((evt) => evt.pubkey !== this.currentPubkey)
+    const filtered = newEvents.filter((evt) => getEventAuthorPubkey(evt) !== this.currentPubkey)
     if (filtered.length > 0) {
       const idSet = new Set(this.events.map((e) => e.id))
       for (const evt of filtered) {
@@ -160,7 +160,7 @@ class NotificationService {
 
     try {
       const stored = (await client.getEventsFromIndexed(filter)).filter(
-        (evt) => evt.pubkey !== pubkey
+        (evt) => getEventAuthorPubkey(evt) !== pubkey
       )
       if (this.currentPubkey === pubkey && stored.length > 0) {
         this.events = stored
@@ -185,7 +185,7 @@ class NotificationService {
       {
         onEvents: (events, eosed) => {
           if (this.currentPubkey !== pubkey) return
-          const filteredEvents = events.filter((evt) => evt.pubkey !== pubkey)
+          const filteredEvents = events.filter((evt) => getEventAuthorPubkey(evt) !== pubkey)
           if (eosed) {
             this.events = this.mergeWithStored(filteredEvents)
             this.until =
@@ -201,7 +201,7 @@ class NotificationService {
         },
         onNew: (event) => {
           if (this.currentPubkey !== pubkey) return
-          if (event.pubkey === pubkey) return
+          if (getEventAuthorPubkey(event) === pubkey) return
           this.handleNewEvent(event)
           threadService.addRepliesToThread([event])
           stuffStatsService.updateStuffStatsByEvents([event])

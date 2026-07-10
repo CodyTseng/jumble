@@ -1,6 +1,7 @@
 import { useFetchEvent } from '@/hooks'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
 import { formatAmount } from '@/lib/lightning'
+import { toNote } from '@/lib/link'
 import lightning from '@/services/lightning.service'
 import { Zap } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -42,6 +43,7 @@ export function ZapNotification({
       sender={senderPubkey}
       sentAt={notification.created_at}
       targetEvent={event}
+      targetPath={toNote(notification)}
       middle={
         <div className="truncate font-semibold text-yellow-400">
           {formatAmount(amount)} {t('sats')} {comment}

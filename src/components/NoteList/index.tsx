@@ -2,7 +2,13 @@ import NewNotesButton from '@/components/NewNotesButton'
 import { Button } from '@/components/ui/button'
 import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
-import { getEventKey, getKeyFromTag, isMentioningMutedUsers, isReplyNoteEvent } from '@/lib/event'
+import {
+  getEventAuthorPubkey,
+  getEventKey,
+  getKeyFromTag,
+  isMentioningMutedUsers,
+  isReplyNoteEvent
+} from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
@@ -125,7 +131,8 @@ const NoteList = forwardRef<
       (evt: Event) => {
         if (pinnedEventHexIdSet.has(evt.id)) return true
         if (isEventDeleted(evt)) return true
-        if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return true
+        const authorPubkey = getEventAuthorPubkey(evt)
+        if (filterMutedNotes && mutePubkeySet.has(authorPubkey)) return true
         if (
           filterMutedNotes &&
           hideContentMentioningMutedUsers &&
@@ -242,7 +249,7 @@ const NoteList = forwardRef<
           await Promise.all(
             filteredEvents.map(async (evt, i) => {
               // Check trust score filter
-              if (!(await meetsMinTrustScore(evt.pubkey, _trustScoreThreshold))) {
+              if (!(await meetsMinTrustScore(getEventAuthorPubkey(evt), _trustScoreThreshold))) {
                 return null
               }
               const key = keys[i]
@@ -302,11 +309,12 @@ const NoteList = forwardRef<
         const _filteredNotes = (
           await Promise.all(
             filteredEvents.map(async (evt) => {
-              if (hideSpam && (await isSpammer(evt.pubkey))) {
+              const authorPubkey = getEventAuthorPubkey(evt)
+              if (hideSpam && (await isSpammer(authorPubkey))) {
                 return null
               }
               // Check trust score filter
-              if (!(await meetsMinTrustScore(evt.pubkey, _trustScoreThreshold))) {
+              if (!(await meetsMinTrustScore(authorPubkey, _trustScoreThreshold))) {
                 return null
               }
               return evt

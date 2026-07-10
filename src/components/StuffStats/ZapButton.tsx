@@ -1,6 +1,7 @@
 import { LONG_PRESS_THRESHOLD } from '@/constants'
 import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { useStuff } from '@/hooks/useStuff'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { getLightningAddressFromProfile } from '@/lib/lightning'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
@@ -35,12 +36,13 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
   const isLongPressRef = useRef(false)
 
   useEffect(() => {
+    setDisable(true)
     if (!event) {
-      setDisable(true)
       return
     }
 
-    client.fetchProfile(event.pubkey).then((profile) => {
+    const authorPubkey = getEventAuthorPubkey(event)
+    client.fetchProfile(authorPubkey).then((profile) => {
       if (!profile) return
       const lightningAddress = getLightningAddressFromProfile(profile)
       if (lightningAddress) setDisable(false)
@@ -135,7 +137,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
     <>
       <button
         className={cn(
-          'flex h-full cursor-pointer select-none items-center gap-1 px-3 enabled:hover:text-yellow-400 disabled:cursor-default disabled:text-muted-foreground/40',
+          'disabled:text-muted-foreground/40 flex h-full cursor-pointer items-center gap-1 px-3 select-none enabled:hover:text-yellow-400 disabled:cursor-default',
           hasZapped ? 'text-yellow-400' : 'text-muted-foreground'
         )}
         title={t('Zap')}
@@ -160,7 +162,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
             setOpenZapDialog(open)
             setZapping(open)
           }}
-          pubkey={event.pubkey}
+          pubkey={getEventAuthorPubkey(event)}
           event={event}
         />
       )}

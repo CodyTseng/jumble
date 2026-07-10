@@ -29,8 +29,10 @@ import {
   getKeyFromTag,
   getParentBech32Id,
   getParentTag,
-  getRootBech32Id
+  getRootBech32Id,
+  getRootTag
 } from '@/lib/event'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { toExternalContent, toNote } from '@/lib/link'
 import { tagNameEquals } from '@/lib/tag'
 import { cn } from '@/lib/utils'
@@ -68,6 +70,15 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
   )
   const parentEventId = useMemo(() => getParentBech32Id(event), [event])
   const rootEventId = useMemo(() => getRootBech32Id(event), [event])
+  const rootTagKey = useMemo(() => {
+    const tag = getRootTag(event)
+    return tag ? getKeyFromTag(tag.tag) : undefined
+  }, [event])
+  const parentTagKey = useMemo(() => {
+    const tag = getParentTag(event)
+    return tag ? getKeyFromTag(tag.tag) : undefined
+  }, [event])
+  const hasDistinctRootAndParent = !!rootTagKey && rootTagKey !== parentTagKey
   const rootITag = useMemo(
     () => (event?.kind === ExtendedKind.COMMENT ? event.tags.find(tagNameEquals('I')) : undefined),
     [event]
@@ -78,21 +89,23 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
   const currentKey = useMemo(() => (event ? getEventKey(event) : ''), [event])
   const rootKey = useMemo(() => (rootEvent ? getEventKey(rootEvent) : ''), [rootEvent])
   const opPubkey = useMemo(
-    () => rootEvent?.pubkey ?? (!rootEventId && !rootITag ? event?.pubkey : undefined),
+    () =>
+      (rootEvent ? getEventAuthorPubkey(rootEvent) : undefined) ??
+      (!rootEventId && !rootITag && event ? getEventAuthorPubkey(event) : undefined),
     [rootEvent, rootEventId, rootITag, event]
   )
   const ancestorChain = useAncestorChain(currentKey, rootKey)
   const canExpand = !!parentEventId
   const fullChain = useMemo(() => {
-    const chain = [...ancestorChain]
-    if (rootEvent && chain[0] !== rootEvent.id) {
+    const chain = Array.from(new Set(ancestorChain))
+    if (rootEvent && !chain.includes(rootEvent.id)) {
       chain.unshift(rootEvent.id)
     }
-    if (parentEvent && chain[chain.length - 1] !== parentEvent.id) {
+    if (parentEvent && !chain.includes(parentEvent.id)) {
       chain.push(parentEvent.id)
     }
     return chain
-  }, [rootEvent, rootEventId, parentEvent, parentEventId, ancestorChain])
+  }, [rootEvent, parentEvent, ancestorChain])
   const layoutRef = useRef<TPageRef>(null)
 
   useImperativeHandle(
@@ -181,7 +194,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
             ))
           : canExpand && (
               <div className={cn('px-4', !rootITag && 'pt-3')}>
-                {rootEventId && rootEventId !== parentEventId && (
+                {rootEventId && hasDistinctRootAndParent && (
                   <ParentNote
                     key={`root-note-${event.id}`}
                     isFetching={isFetchingRootEvent}
@@ -267,6 +280,7 @@ function ParentNote({
 }) {
   const { push } = useSecondaryPage()
   const { autoLoadProfilePicture } = useContentPolicy()
+  const displayPubkey = event ? getEventAuthorPubkey(event) : undefined
   const showLine = !noConnector && autoLoadProfilePicture
   const showSpacer = !noConnector && !autoLoadProfilePicture
 
@@ -299,7 +313,7 @@ function ParentNote({
           push(toNote(event ?? eventBech32Id))
         }}
       >
-        {event && <UserAvatar userId={event.pubkey} size="tiny" className="shrink-0" />}
+        {displayPubkey && <UserAvatar userId={displayPubkey} size="tiny" className="shrink-0" />}
         <ContentPreview className="truncate" event={event} />
       </div>
       {!isConsecutive ? (
@@ -335,6 +349,7 @@ function ChainItem({
   const { isSmallScreen } = useScreenSize()
   const { autoLoadProfilePicture } = useContentPolicy()
   const { event, isFetching } = useFetchEvent(eventId)
+  const displayPubkey = event ? getEventAuthorPubkey(event) : undefined
 
   if (isFetching) {
     return <ChainItemSkeleton isFirst={isFirst} />
@@ -358,24 +373,24 @@ function ChainItem({
         <div className="bg-border absolute inset-s-8.75 top-14.5 bottom-0 z-0 w-0.5" />
       )}
       <div className="flex items-start gap-2">
-        <UserAvatar userId={event.pubkey} size="normal" className="shrink-0" />
+        <UserAvatar userId={displayPubkey ?? event.pubkey} size="normal" className="shrink-0" />
         <div className="w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="w-0 flex-1">
               <div className="flex items-center gap-2">
                 <Username
-                  userId={event.pubkey}
+                  userId={displayPubkey ?? event.pubkey}
                   className="flex truncate font-semibold"
                   skeletonClassName="h-4"
                 />
-                <FollowingBadge pubkey={event.pubkey} />
-                {opPubkey === event.pubkey && <OpBadge />}
-                <TrustScoreBadge pubkey={event.pubkey} />
+                <FollowingBadge pubkey={displayPubkey ?? event.pubkey} />
+                {opPubkey === (displayPubkey ?? event.pubkey) && <OpBadge />}
+                <TrustScoreBadge pubkey={displayPubkey ?? event.pubkey} />
                 <ProtectedBadge event={event} />
                 <ClientTag event={event} />
               </div>
               <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                <Nip05 pubkey={event.pubkey} append="·" />
+                <Nip05 pubkey={displayPubkey ?? event.pubkey} append="·" />
                 <FormattedTimestamp
                   timestamp={event.created_at}
                   className="shrink-0"

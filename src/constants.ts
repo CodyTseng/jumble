@@ -153,6 +153,7 @@ export const SUPPORTED_KINDS = [
   kinds.Emojisets,
   ExtendedKind.FOLLOW_PACK,
   kinds.Reaction,
+  kinds.Zap,
   ExtendedKind.EXTERNAL_CONTENT_REACTION
 ]
 

@@ -1,5 +1,6 @@
 import { formatError } from '@/lib/error'
 import {
+  getEventAuthorPubkey,
   getNoteBech32Id,
   getReplaceableCoordinateFromEvent,
   isProtectedEvent,
@@ -78,7 +79,8 @@ export function useMenuActions({
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
   const { pinnedEventHexIdSet, pin, unpin } = usePinList()
   const { addBookmark, removeBookmark } = useBookmarks()
-  const isMuted = useMemo(() => mutePubkeySet.has(event.pubkey), [mutePubkeySet, event])
+  const authorPubkey = getEventAuthorPubkey(event)
+  const isMuted = useMemo(() => mutePubkeySet.has(authorPubkey), [mutePubkeySet, authorPubkey])
   const isBookmarked = useMemo(() => {
     const isReplaceable = isReplaceableEvent(event.kind)
     const eventKey = isReplaceable ? getReplaceableCoordinateFromEvent(event) : event.id
@@ -191,7 +193,7 @@ export function useMenuActions({
         icon: Copy,
         label: t('Copy user ID'),
         onClick: () => {
-          navigator.clipboard.writeText(pubkeyToNpub(event.pubkey) ?? '')
+          navigator.clipboard.writeText(pubkeyToNpub(authorPubkey) ?? '')
           closeDrawer()
         }
       },
@@ -265,7 +267,7 @@ export function useMenuActions({
       })
     }
 
-    if (pubkey && event.pubkey !== pubkey) {
+    if (pubkey && authorPubkey !== pubkey) {
       actions.push({
         icon: TriangleAlert,
         label: t('Report'),
@@ -278,14 +280,14 @@ export function useMenuActions({
       })
     }
 
-    if (pubkey && event.pubkey !== pubkey) {
+    if (pubkey && authorPubkey !== pubkey) {
       if (isMuted) {
         actions.push({
           icon: Bell,
           label: t('Unmute user'),
           onClick: () => {
             closeDrawer()
-            unmutePubkey(event.pubkey)
+            unmutePubkey(authorPubkey)
           },
           className: 'text-destructive focus:text-destructive',
           separator: true
@@ -297,7 +299,7 @@ export function useMenuActions({
             label: t('Mute user privately'),
             onClick: () => {
               closeDrawer()
-              mutePubkeyPrivately(event.pubkey)
+              mutePubkeyPrivately(authorPubkey)
             },
             className: 'text-destructive focus:text-destructive',
             separator: true
@@ -307,7 +309,7 @@ export function useMenuActions({
             label: t('Mute user publicly'),
             onClick: () => {
               closeDrawer()
-              mutePubkeyPublicly(event.pubkey)
+              mutePubkeyPublicly(authorPubkey)
             },
             className: 'text-destructive focus:text-destructive'
           }
@@ -332,6 +334,7 @@ export function useMenuActions({
   }, [
     t,
     event,
+    authorPubkey,
     pubkey,
     isMuted,
     isBookmarked,

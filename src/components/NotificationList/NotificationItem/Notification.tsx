@@ -26,6 +26,7 @@ export default function Notification({
   description,
   middle = null,
   targetEvent,
+  targetPath,
   isNew = false,
   showStats = false
 }: {
@@ -36,6 +37,7 @@ export default function Notification({
   description: string
   middle?: React.ReactNode
   targetEvent?: NostrEvent
+  targetPath?: string
   isNew?: boolean
   showStats?: boolean
 }) {
@@ -52,7 +54,9 @@ export default function Notification({
 
   const handleClick = () => {
     markNotificationAsRead(notificationId)
-    if (targetEvent) {
+    if (targetPath) {
+      push(targetPath)
+    } else if (targetEvent) {
       push(toNote(targetEvent.id))
     } else if (pubkey) {
       push(toProfile(pubkey))

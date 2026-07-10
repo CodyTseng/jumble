@@ -1,6 +1,7 @@
 import { ExtendedKind } from '@/constants'
 import {
   getEventKey,
+  getEventAuthorPubkey,
   getKeyFromTag,
   getParentTag,
   getReplaceableCoordinateFromEvent,
@@ -12,12 +13,13 @@ import {
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { generateBech32IdFromETag } from '@/lib/tag'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import dayjs from 'dayjs'
 import { Filter, kinds, NostrEvent } from 'nostr-tools'
 
 type TRootInfo =
-  | { type: 'E'; id: string; pubkey: string }
-  | { type: 'A'; id: string; pubkey: string; relay?: string }
+  | { type: 'E'; id: string; logicalPubkey: string }
+  | { type: 'A'; id: string; logicalPubkey: string; relay?: string }
   | { type: 'I'; id: string }
 
 class ThreadService {
@@ -67,9 +69,9 @@ class ThreadService {
 
     const _subscribe = async () => {
       let relayUrls: string[] = []
-      const rootPubkey = (rootInfo as { pubkey?: string }).pubkey ?? event?.pubkey
-      if (rootPubkey) {
-        const relayList = await client.fetchRelayList(rootPubkey)
+      const logicalPubkey = rootInfo.type === 'I' ? undefined : rootInfo.logicalPubkey
+      if (logicalPubkey) {
+        const relayList = await client.fetchRelayList(logicalPubkey)
         relayUrls = relayList.read
       }
       relayUrls = relayUrls.concat(getDefaultRelayUrls()).slice(0, 4)
@@ -352,35 +354,71 @@ class ThreadService {
     if (cache) return cache
 
     const _parseRootInfo = async (): Promise<TRootInfo | undefined> => {
-      let root: TRootInfo = event
-        ? isReplaceableEvent(event.kind)
+      let root: TRootInfo
+      if (event) {
+        const logicalPubkey = getEventAuthorPubkey(event)
+        root = isReplaceableEvent(event.kind)
           ? {
               type: 'A',
               id: getReplaceableCoordinateFromEvent(event),
-              pubkey: event.pubkey,
+              logicalPubkey,
               relay: client.getEventHint(event.id)
             }
-          : { type: 'E', id: event.id, pubkey: event.pubkey }
-        : { type: 'I', id: externalContent! }
+          : { type: 'E', id: event.id, logicalPubkey }
+      } else {
+        root = { type: 'I', id: externalContent! }
+      }
 
-      const rootTag = getRootTag(event)
+      // A zap receipt's e tag is the zap target, not a thread root marker.
+      const rootTag = event?.kind === kinds.Zap ? undefined : getRootTag(event)
       if (rootTag?.type === 'e') {
-        const [, rootEventHexId, , , rootEventPubkey] = rootTag.tag
-        if (rootEventHexId && rootEventPubkey) {
-          root = { type: 'E', id: rootEventHexId, pubkey: rootEventPubkey }
-        } else {
+        const [, rootEventHexId, , markerOrPubkey, markerPubkey] = rootTag.tag
+        const rootEventPubkey = rootTag.tag[0] === 'E' ? markerOrPubkey : markerPubkey
+        const rootKind = Number(event?.tags.find(([tagName]) => tagName === 'K')?.[1])
+        const rootAuthorPubkey =
+          rootKind === kinds.Zap
+            ? event?.tags.find(([tagName]) => tagName === 'P')?.[1]
+            : rootEventPubkey
+        if (rootEventHexId && rootAuthorPubkey) {
+          root = {
+            type: 'E',
+            id: rootEventHexId,
+            logicalPubkey: rootAuthorPubkey
+          }
+        }
+        if (rootKind === kinds.Zap) {
+          const rootEventId = generateBech32IdFromETag(rootTag.tag)
+          if (!rootEventId) return undefined
+          const rootEvent = await client.fetchEvent(rootEventId)
+          if (
+            !rootEvent ||
+            rootEvent.kind !== kinds.Zap ||
+            !(await lightning.validateZapReceipt(rootEvent))
+          ) {
+            return undefined
+          }
+          root = {
+            type: 'E',
+            id: rootEvent.id,
+            logicalPubkey: getEventAuthorPubkey(rootEvent)
+          }
+        } else if (!rootAuthorPubkey) {
           const rootEventId = generateBech32IdFromETag(rootTag.tag)
           if (rootEventId) {
             const rootEvent = await client.fetchEvent(rootEventId)
             if (rootEvent) {
-              root = { type: 'E', id: rootEvent.id, pubkey: rootEvent.pubkey }
+              root = {
+                type: 'E',
+                id: rootEvent.id,
+                logicalPubkey: getEventAuthorPubkey(rootEvent)
+              }
             }
           }
         }
       } else if (rootTag?.type === 'a') {
         const [, coordinate, relay] = rootTag.tag
         const [, pubkey] = coordinate.split(':')
-        root = { type: 'A', id: coordinate, pubkey, relay }
+        root = { type: 'A', id: coordinate, logicalPubkey: pubkey, relay }
       } else if (rootTag?.type === 'i') {
         root = { type: 'I', id: rootTag.tag[1] }
       }

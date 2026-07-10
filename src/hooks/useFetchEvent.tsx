@@ -1,7 +1,8 @@
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import client from '@/services/client.service'
+import lightning from '@/services/lightning.service'
 import threadService from '@/services/thread.service'
-import { Event } from 'nostr-tools'
+import { Event, kinds } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchEvent(eventId?: string) {
@@ -11,8 +12,11 @@ export function useFetchEvent(eventId?: string) {
   const [event, setEvent] = useState<Event | undefined>(undefined)
 
   useEffect(() => {
+    let cancelled = false
     const fetchEvent = async () => {
       setIsFetching(true)
+      setError(null)
+      setEvent(undefined)
       if (!eventId) {
         setIsFetching(false)
         setError(new Error('No id provided'))
@@ -20,7 +24,14 @@ export function useFetchEvent(eventId?: string) {
       }
 
       const event = await client.fetchEvent(eventId)
-      if (event && !isEventDeleted(event)) {
+      if (event?.kind === kinds.Zap && !(await lightning.validateZapReceipt(event))) {
+        if (!cancelled) {
+          setEvent(undefined)
+          setError(new Error('Invalid zap receipt'))
+        }
+        return
+      }
+      if (!cancelled && event && !isEventDeleted(event)) {
         setEvent(event)
         threadService.addRepliesToThread([event])
       }
@@ -28,12 +39,16 @@ export function useFetchEvent(eventId?: string) {
 
     fetchEvent()
       .catch((err) => {
-        console.error('Error fetching event in useFetchEvent:', eventId, error)
-        setError(err as Error)
+        console.error('Error fetching event in useFetchEvent:', eventId, err)
+        if (!cancelled) setError(err as Error)
       })
       .finally(() => {
-        setIsFetching(false)
+        if (!cancelled) setIsFetching(false)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [eventId])
 
   useEffect(() => {
