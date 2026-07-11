@@ -1,6 +1,10 @@
-import { SimplePool } from 'nostr-tools'
-import { AbstractRelay } from 'nostr-tools/abstract-relay'
+import { AbstractSimplePool } from 'nostr-tools/abstract-pool'
+import {
+  AbstractRelay,
+  type AbstractRelayConstructorOptions
+} from 'nostr-tools/abstract-relay'
 import { IRelay, IRelayPool } from '../types/relay-pool'
+import { initializeNostrVerifier, verifyEvent } from './nostr-verifier'
 import { isInsecureUrl, normalizeUrl } from './url'
 
 const DEFAULT_CONNECTION_TIMEOUT = 10 * 1000 // 10 seconds
@@ -10,9 +14,10 @@ const IDLE_TIMEOUT = 10 * 1000 // 10 seconds
 
 export type SmartPoolOptions = {
   allowInsecure?: boolean
+  websocketImplementation?: AbstractRelayConstructorOptions['websocketImplementation']
 }
 
-export class SmartPool extends SimplePool implements IRelayPool {
+export class SmartPool extends AbstractSimplePool implements IRelayPool {
   private relayIdleTracker = new Map<string, number>()
   private allowInsecure: boolean
   // Insecure (ws://) relays the user explicitly opted into — their own
@@ -22,9 +27,19 @@ export class SmartPool extends SimplePool implements IRelayPool {
   private trustedInsecureRelays = new Set<string>()
 
   constructor(options: SmartPoolOptions = {}) {
-    super({ enablePing: true, enableReconnect: true })
+    super({
+      verifyEvent,
+      websocketImplementation: options.websocketImplementation,
+      enablePing: true,
+      enableReconnect: true,
+      maxWaitForConnection: 3_000
+    })
 
     this.allowInsecure = options.allowInsecure ?? false
+
+    // Verification falls back to pure JS until this finishes, and keeps using
+    // that fallback if WASM is unavailable in the current runtime.
+    void initializeNostrVerifier()
 
     // Periodically clean up idle relays
     setInterval(() => this.cleanIdleRelays(), CLEANUP_INTERVAL)

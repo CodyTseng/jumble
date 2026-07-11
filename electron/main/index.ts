@@ -1,20 +1,15 @@
 import 'websocket-polyfill'
 
 import { app, BrowserWindow, nativeTheme, net, protocol, session, shell } from 'electron'
-import { useWebSocketImplementation as setWebSocketImpl } from 'nostr-tools/relay'
 import { existsSync, statSync } from 'node:fs'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import path from 'node:path'
-import WebSocket from 'ws'
 import { registerIpcHandlers, unregisterIpcHandlers } from './ipc.js'
 import { MediaServer } from './media-server.js'
 import { RelayManager } from './relay-manager.js'
 import { SecretsStore } from './secrets-store.js'
 import { Updater } from './updater.js'
 import { attachWindowStatePersistence, loadWindowState } from './window-state.js'
-
-// Inject Node's ws so nostr-tools uses it instead of global WebSocket
-setWebSocketImpl(WebSocket)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

@@ -6,7 +6,8 @@ import type {
   VerifiedEvent
 } from 'nostr-tools'
 import { randomUUID } from 'node:crypto'
-import { SmartPool } from '../../src/lib/smart-pool'
+import WebSocket from 'ws'
+import { SmartPool, type SmartPoolOptions } from '../../src/lib/smart-pool'
 import {
   IPC_CHANNELS,
   TAuthRequestPayload,
@@ -21,7 +22,11 @@ type SubCloser = { close: () => void }
 const DEFAULT_PUBLISH_TIMEOUT = 10_000
 
 export class RelayManager {
-  private pool = new SmartPool()
+  // ws implements the WebSocket surface nostr-tools uses, but its Node types
+  // intentionally do not include the browser-only EventTarget methods.
+  private pool = new SmartPool({
+    websocketImplementation: WebSocket as unknown as SmartPoolOptions['websocketImplementation']
+  })
   private subs = new Map<string, SubCloser>()
   private pendingAuthRequests = new Map<
     string,
