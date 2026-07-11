@@ -9,11 +9,14 @@ export default function Collapsible({
   className,
   threshold = 1000,
   collapsedHeight = 600,
+  showLessButton = false,
   ...props
 }: {
   alwaysExpand?: boolean
   threshold?: number
   collapsedHeight?: number
+  /** Show a button to re-collapse after expanding. */
+  showLessButton?: boolean
 } & React.HTMLProps<HTMLDivElement>) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -63,12 +66,26 @@ export default function Collapsible({
               className="bg-foreground hover:bg-foreground/80"
               onClick={(e) => {
                 e.stopPropagation()
-                setExpanded(!expanded)
+                setExpanded(true)
               }}
             >
               {t('Show more')}
             </Button>
           </div>
+        </div>
+      )}
+      {shouldCollapse && expanded && showLessButton && (
+        <div className="mt-2 flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              setExpanded(false)
+            }}
+          >
+            {t('Show less')}
+          </Button>
         </div>
       )}
     </div>

@@ -1148,6 +1148,7 @@ export default {
     'Anonymous reply hint':
       'Usa uma nova identidade Nostr descartável. Sua conta não aparecerá no evento, mas relays e observadores da rede ainda poderão correlacionar sua atividade.',
     'One-time identity': 'Identidade descartável',
-    'Try loading more': 'Tentar carregar mais'
+    'Try loading more': 'Tentar carregar mais',
+    'Show less': ''
   }
 }

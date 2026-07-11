@@ -1160,6 +1160,7 @@ export default {
     'Anonymous reply hint':
       'Utilise une nouvelle identité Nostr à usage unique. Votre compte n’apparaîtra pas dans l’événement, mais les relais et les observateurs du réseau pourront peut-être encore corréler votre activité.',
     'One-time identity': 'Identité à usage unique',
-    'Try loading more': 'Essayer d’en charger plus'
+    'Try loading more': 'Essayer d’en charger plus',
+    'Show less': ''
   }
 }
