@@ -43,6 +43,19 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      const currentFeedInfo = feedInfoRef.current
+      if (currentFeedInfo) {
+        if (
+          currentFeedInfo.feedType !== 'following' &&
+          currentFeedInfo.feedType !== 'pinned'
+        ) {
+          return
+        }
+        return pubkey
+          ? await switchFeed(currentFeedInfo.feedType, { pubkey })
+          : await switchFeed(null)
+      }
+
       let feedInfo: TFeedInfo = null
       if (pubkey) {
         const storedFeedInfo = storage.getFeedInfo(pubkey)
@@ -53,11 +66,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
             feedInfo = { feedType: 'following' }
           }
         }
-      } else if (
-        feedInfoRef.current?.feedType === 'following' ||
-        feedInfoRef.current?.feedType === 'pinned'
-      ) {
-        return await switchFeed(null)
       }
       if (!feedInfo && IS_COMMUNITY_MODE) {
         feedInfo =

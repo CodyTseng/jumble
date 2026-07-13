@@ -199,6 +199,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       setMuteListEvent(null)
       setBookmarkListEvent(null)
       setPinListEvent(null)
+      setPinnedUsersEvent(null)
       setNotificationsSeenAt(-1)
       if (!account) {
         return

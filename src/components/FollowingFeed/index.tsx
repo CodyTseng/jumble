@@ -18,13 +18,14 @@ export default function FollowingFeed() {
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
   const [hasFollowings, setHasFollowings] = useState<boolean | null>(null)
   const [refreshCount, setRefreshCount] = useState(0)
-  const initializedRef = useRef(false)
+  const initializedPubkeyRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (initializedRef.current) return
+    if (initializedPubkeyRef.current === pubkey) return
 
     async function init() {
       if (!pubkey) {
+        initializedPubkeyRef.current = null
         setSubRequests([])
         setHasFollowings(null)
         return
@@ -35,7 +36,7 @@ export default function FollowingFeed() {
       setSubRequests(await client.generateSubRequestsForPubkeys([pubkey, ...followings], pubkey))
 
       if (followings.length) {
-        initializedRef.current = true
+        initializedPubkeyRef.current = pubkey
       }
     }
 
@@ -72,7 +73,7 @@ export default function FollowingFeed() {
       feedId={SPECIAL_FEED_ID.FOLLOWING}
       subRequests={subRequests}
       onRefresh={() => {
-        initializedRef.current = false
+        initializedPubkeyRef.current = null
         setRefreshCount((count) => count + 1)
       }}
       isPubkeyFeed
