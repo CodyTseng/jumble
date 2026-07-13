@@ -28,7 +28,10 @@ export const KIND_FILTER_OPTIONS = [
       ExtendedKind.ADDRESSABLE_SHORT_VIDEO
     ],
     label: 'Video Posts'
-  }
+  },
+  // Off by default (not part of ALLOWED_FILTER_KINDS) — opt-in for users who
+  // want reactions in the timeline / Pulse aggregation.
+  { kindGroup: [kinds.Reaction, ExtendedKind.EXTERNAL_CONTENT_REACTION], label: 'Reactions' }
 ]
 const ALL_KINDS = KIND_FILTER_OPTIONS.flatMap(({ kindGroup }) => kindGroup)
 

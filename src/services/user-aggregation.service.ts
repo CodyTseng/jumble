@@ -16,6 +16,12 @@ class UserAggregationService {
   private aggregationStore: Map<string, Map<string, Event[]>> = new Map()
   private listenersMap: Map<string, Set<() => void>> = new Map()
   private lastViewedMap: Map<string, number> = new Map()
+  private backfillingFeeds: Set<string> = new Set()
+  // Effective `showKinds` for each pulse feed, registered by DeepPulseList so
+  // the per-author detail page can subscribe with the same filter (otherwise
+  // it would surface every kind the author posts, including the ones Jumble
+  // can't render).
+  private feedKindsMap: Map<string, number[]> = new Map()
 
   constructor() {
     if (UserAggregationService.instance) {
@@ -155,6 +161,31 @@ class UserAggregationService {
     const lastViewed = this.lastViewedMap.get(key)
 
     return lastViewed ?? 0
+  }
+
+  setFeedKinds(feedId: string, kinds: number[]) {
+    this.feedKindsMap.set(feedId, kinds)
+  }
+
+  getFeedKinds(feedId: string): number[] | undefined {
+    return this.feedKindsMap.get(feedId)
+  }
+
+  setBackfilling(feedId: string, backfilling: boolean) {
+    if (backfilling) {
+      this.backfillingFeeds.add(feedId)
+    } else {
+      this.backfillingFeeds.delete(feedId)
+    }
+    this.notify(`backfill:${feedId}`)
+  }
+
+  isBackfilling(feedId: string): boolean {
+    return this.backfillingFeeds.has(feedId)
+  }
+
+  subscribeBackfillChange(feedId: string, listener: () => void) {
+    return this.subscribe(`backfill:${feedId}`, listener)
   }
 }
 
