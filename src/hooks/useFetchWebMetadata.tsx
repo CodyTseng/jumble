@@ -5,21 +5,54 @@ import webService from '@/services/web.service'
 import { TWebMetadata } from '@/types'
 import { useEffect, useState } from 'react'
 
-export function useFetchWebMetadata(url: string) {
+type WebMetadataState = {
+  requestUrl: string
+  metadata: TWebMetadata
+  isLoading: boolean
+}
+
+export function useFetchWebMetadata(url: string, enabled = true) {
   const { allowInsecureConnection } = useUserPreferences()
-  const [metadata, setMetadata] = useState<TWebMetadata>({})
+  const [state, setState] = useState<WebMetadataState>({
+    requestUrl: '',
+    metadata: {},
+    isLoading: false
+  })
   const proxyServer = import.meta.env.VITE_PROXY_SERVER
+  let requestUrl = url
   // In Electron mode the main process fetches directly (no CORS), so the
   // browser-side proxy rewrite is unnecessary and would defeat the point.
   if (proxyServer && !isElectron()) {
-    url = `${proxyServer}/sites/${encodeURIComponent(url)}`
+    requestUrl = `${proxyServer}/sites/${encodeURIComponent(url)}`
   }
 
   useEffect(() => {
-    if (!allowInsecureConnection && isInsecureUrl(url)) return
+    if (!enabled || (!allowInsecureConnection && isInsecureUrl(url))) return
 
-    webService.fetchWebMetadata(url).then((metadata) => setMetadata(metadata))
-  }, [url, allowInsecureConnection])
+    let ignore = false
+    setState({ requestUrl, metadata: {}, isLoading: true })
 
-  return metadata
+    webService
+      .fetchWebMetadata(requestUrl, url)
+      .then((metadata) => {
+        if (!ignore) setState({ requestUrl, metadata, isLoading: false })
+      })
+      .catch(() => {
+        if (!ignore) setState({ requestUrl, metadata: {}, isLoading: false })
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [url, requestUrl, enabled, allowInsecureConnection])
+
+  if (!enabled) {
+    return { metadata: {}, isLoading: false }
+  }
+
+  if (state.requestUrl !== requestUrl) {
+    return { metadata: {}, isLoading: true }
+  }
+
+  return { metadata: state.metadata, isLoading: state.isLoading }
 }
