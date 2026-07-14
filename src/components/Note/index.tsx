@@ -69,10 +69,10 @@ export default function Note({
     <div className={className}>
       {!hideHeader && (
         <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-1 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
             <UserAvatar userId={displayPubkey} size={size === 'small' ? 'medium' : 'normal'} />
             <div className="w-0 flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <Username
                   userId={displayPubkey}
                   className={`flex truncate font-semibold ${size === 'small' ? 'text-sm' : ''}`}
@@ -94,7 +94,7 @@ export default function Note({
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex shrink-0 items-center">
             <TranslateButton
               event={event}
               showFull={showFull}
