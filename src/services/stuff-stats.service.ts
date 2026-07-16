@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import {
   getEventKey,
   getEventAuthorPubkey,
@@ -40,7 +41,7 @@ export type TStuffStats = {
 
 class StuffStatsService {
   static instance: StuffStatsService
-  private stuffStatsMap: Map<string, Partial<TStuffStats>> = new Map()
+  private stuffStatsMap = new BoundedMap<string, Partial<TStuffStats>>({ maxSize: 2_000 })
   private stuffStatsSubscribers = new Map<string, Set<() => void>>()
 
   constructor() {

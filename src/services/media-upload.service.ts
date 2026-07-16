@@ -1,4 +1,5 @@
 import { RECOMMENDED_BLOSSOM_SERVERS } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import { createBlossomServerListDraftEvent } from '@/lib/draft-event'
 import { stripImageMetadata } from '@/lib/strip-image-metadata'
 import { simplifyUrl } from '@/lib/url'
@@ -39,8 +40,8 @@ class MediaUploadService {
   static instance: MediaUploadService
 
   private serviceConfig: TMediaUploadServiceConfig = storage.getMediaUploadServiceConfig()
-  private nip96ServiceUploadUrlMap = new Map<string, string | undefined>()
-  private imetaTagMap = new Map<string, string[]>()
+  private nip96ServiceUploadUrlMap = new BoundedMap<string, string | undefined>({ maxSize: 50 })
+  private imetaTagMap = new BoundedMap<string, string[]>({ maxSize: 500 })
   private creatingBlossomServerList = false
 
   constructor() {

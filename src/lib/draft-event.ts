@@ -5,6 +5,7 @@ import {
   ExtendedKind,
   POLL_TYPE
 } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import mediaUpload from '@/services/media-upload.service'
@@ -31,7 +32,7 @@ import { determineExternalContentKind } from './external-content'
 import { randomString } from './random'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
 
-const draftEventCache: Map<string, string> = new Map()
+const draftEventCache = new BoundedMap<string, string>({ maxSize: 500 })
 
 export function deleteDraftEventCache(draftEvent: TDraftEvent) {
   const key = generateDraftEventCacheKey(draftEvent)

@@ -8,6 +8,7 @@ import type {
   TSubHandlers
 } from '@/types/relay-pool'
 import { getElectronBridge } from './platform'
+import { BoundedMap } from './bounded-map'
 
 export class ElectronRelay implements IRelay {
   publishTimeout = 10_000
@@ -56,8 +57,8 @@ export class ElectronRelay implements IRelay {
 export class ElectronPool implements IRelayPool {
   trackRelays = true
 
-  private seenOn = new Map<string, Set<IRelay>>()
-  private relays = new Map<string, ElectronRelay>()
+  private seenOn = new BoundedMap<string, Set<IRelay>>({ maxSize: 100_000 })
+  private relays = new BoundedMap<string, ElectronRelay>({ maxSize: 1_000 })
   private listeners = new Map<string, TSubHandlers>()
   private bridge: TElectronBridge
   private getSigner: () => TSignAuthEvent | undefined

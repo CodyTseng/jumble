@@ -23,7 +23,8 @@ export default function ReplyNoteList({
   const { t } = useTranslation()
   const { stuffKey } = useStuff(stuff)
   const [initialLoading, setInitialLoading] = useState(false)
-  const { replies } = useFilteredReplies(stuffKey)
+  const { replies, isLoading: isHydratingReplies } = useFilteredReplies(stuffKey)
+  const isReplyLoading = initialLoading || isHydratingReplies
 
   // Initial subscription
   useEffect(() => {
@@ -48,12 +49,12 @@ export default function ReplyNoteList({
     items: replies,
     showCount: SHOW_COUNT,
     onLoadMore: handleLoadMore,
-    initialLoading
+    initialLoading: isReplyLoading
   })
 
   return (
     <div className="min-h-[80vh]">
-      {(loading || initialLoading) && <LoadingBar />}
+      {(loading || isReplyLoading) && <LoadingBar />}
       <div>
         {visibleItems.map((reply) => (
           <Item key={reply.id} reply={reply} opPubkey={opPubkey} />

@@ -1,3 +1,4 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import { bytesToHex } from '@noble/hashes/utils'
 import { v2 as nip44 } from 'nostr-tools/nip44'
 
@@ -11,7 +12,7 @@ import { v2 as nip44 } from 'nostr-tools/nip44'
  * the derivation is symmetric per key pair, the same entry is reused across
  * encrypt and decrypt calls.
  */
-const conversationKeyCache = new Map<string, Uint8Array>()
+const conversationKeyCache = new BoundedMap<string, Uint8Array>({ maxSize: 500 })
 
 export function getConversationKey(privkey: Uint8Array, pubkey: string): Uint8Array {
   const cacheKey = `${bytesToHex(privkey)}:${pubkey}`

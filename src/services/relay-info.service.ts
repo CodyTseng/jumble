@@ -1,3 +1,4 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import { simplifyUrl } from '@/lib/url'
 import indexDb from '@/services/indexed-db.service'
 import { TAwesomeRelayCollection, TRelayInfo } from '@/types'
@@ -19,7 +20,10 @@ class RelayInfoService {
       const results = await Promise.allSettled(urls.map((url) => this._getRelayInfo(url)))
       return results.map((res) => (res.status === 'fulfilled' ? res.value : undefined))
     },
-    { maxBatchSize: 1 }
+    {
+      maxBatchSize: 1,
+      cacheMap: new BoundedMap<string, Promise<TRelayInfo | undefined>>({ maxSize: 500 })
+    }
   )
 
   async getRelayInfos(urls: string[]) {

@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import { ElectronPool } from '@/lib/electron-pool'
 import {
   compareEvents,
@@ -42,6 +43,12 @@ type TTimelineRef = [string, number]
 // though the event already landed on plenty of relays. Once this many relays
 // accept, the event is discoverable, so we stop waiting for the 1/3 quota.
 const MAX_PUBLISH_SUCCESS_THRESHOLD = 4
+const EVENT_CACHE_MAX_SIZE = 10_000
+const REPLACEABLE_EVENT_CACHE_MAX_SIZE = 5_000
+const PROFILE_CACHE_MAX_SIZE = 5_000
+const SEEN_ON_CACHE_MAX_SIZE = 10_000
+const TIMELINE_CACHE_MAX_SIZE = 200
+const TIMELINE_MAX_REFS = 2_000
 
 class ClientService extends EventTarget {
   static instance: ClientService
@@ -49,7 +56,9 @@ class ClientService extends EventTarget {
   signer?: ISigner
   pubkey?: string
   private pool: IRelayPool
-  private externalSeenOn = new Map<string, Set<string>>()
+  private externalSeenOn = new BoundedMap<string, Set<string>>({
+    maxSize: SEEN_ON_CACHE_MAX_SIZE
+  })
 
   // Relays the user is actively browsing (set by CurrentRelaysProvider) and the
   // user's own configured relays (set by FavoriteRelaysProvider). Their insecure
@@ -84,7 +93,7 @@ class ClientService extends EventTarget {
     this.pool.setTrustedInsecureRelayUrls(sorted)
   }
 
-  private timelines: Record<
+  private timelines = new BoundedMap<
     string,
     | {
         refs: TTimelineRef[]
@@ -93,9 +102,13 @@ class ClientService extends EventTarget {
       }
     | string[]
     | undefined
-  > = {}
-  private replaceableEventCacheMap = new Map<string, NEvent>()
-  private eventCacheMap = new Map<string, Promise<NEvent | undefined>>()
+  >({ maxSize: TIMELINE_CACHE_MAX_SIZE })
+  private replaceableEventCacheMap = new BoundedMap<string, NEvent>({
+    maxSize: REPLACEABLE_EVENT_CACHE_MAX_SIZE
+  })
+  private eventCacheMap = new BoundedMap<string, Promise<NEvent | undefined>>({
+    maxSize: EVENT_CACHE_MAX_SIZE
+  })
   private eventDataLoader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
     { cacheMap: this.eventCacheMap }
@@ -240,10 +253,7 @@ class ClientService extends EventTarget {
       // Consider the publish a success once a third of the relays accept the
       // event, but cap the requirement so a large relay set doesn't demand many
       // acceptances — a handful of accepting relays is enough to propagate it.
-      const successThreshold = Math.min(
-        uniqueRelayUrls.length / 3,
-        MAX_PUBLISH_SUCCESS_THRESHOLD
-      )
+      const successThreshold = Math.min(uniqueRelayUrls.length / 3, MAX_PUBLISH_SUCCESS_THRESHOLD)
       const errors: { url: string; error: any }[] = []
 
       const checkCompletion = (url: string, success: boolean, error?: unknown) => {
@@ -448,7 +458,10 @@ class ClientService extends EventTarget {
     )
 
     const key = this.generateMultipleTimelinesKey(subRequests)
-    this.timelines[key] = subs.map((sub) => sub.timelineKey)
+    this.timelines.set(
+      key,
+      subs.map((sub) => sub.timelineKey)
+    )
 
     return {
       closer: () => {
@@ -463,7 +476,7 @@ class ClientService extends EventTarget {
   }
 
   async loadMoreTimeline(key: string, until: number, limit: number) {
-    const timeline = this.timelines[key]
+    const timeline = this.timelines.get(key)
     if (!timeline) return []
 
     if (!Array.isArray(timeline)) {
@@ -663,7 +676,7 @@ class ClientService extends EventTarget {
   ) {
     const relays = Array.from(new Set(urls))
     const key = this.generateTimelineKey(relays, filter)
-    const timeline = this.timelines[key]
+    const timeline = this.timelines.get(key)
     let cachedEvents: NEvent[] = []
     let since: number | undefined
     if (timeline && !Array.isArray(timeline) && timeline.refs.length && needSort) {
@@ -696,7 +709,7 @@ class ClientService extends EventTarget {
           }
         }
 
-        const timeline = that.timelines[key]
+        const timeline = that.timelines.get(key)
         if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
           return
         }
@@ -718,6 +731,9 @@ class ClientService extends EventTarget {
 
         // insert the event to the right position
         timeline.refs.splice(idx, 0, [evt.id, evt.created_at])
+        if (timeline.refs.length > TIMELINE_MAX_REFS) {
+          timeline.refs.length = TIMELINE_MAX_REFS
+        }
       },
       oneose: (eosed) => {
         if (eosed && !eosedAt) {
@@ -738,14 +754,14 @@ class ClientService extends EventTarget {
             events.map((evt) => ({ event: evt, relays: this.getEventHints(evt.id) }))
           )
         }
-        const timeline = that.timelines[key]
+        const timeline = that.timelines.get(key)
         // no cache yet
         if (!timeline || Array.isArray(timeline) || !timeline.refs.length) {
-          that.timelines[key] = {
-            refs: events.map((evt) => [evt.id, evt.created_at]),
+          that.timelines.set(key, {
+            refs: events.slice(0, TIMELINE_MAX_REFS).map((evt) => [evt.id, evt.created_at]),
             filter,
             urls
-          }
+          })
           return onEvents([...events], true)
         }
 
@@ -757,11 +773,11 @@ class ClientService extends EventTarget {
 
         if (events.length >= filter.limit) {
           // if new refs are more than limit, means old refs are too old, replace them
-          timeline.refs = newRefs
+          timeline.refs = newRefs.slice(0, TIMELINE_MAX_REFS)
           onEvents([...events], true)
         } else {
           // merge new refs with old refs
-          timeline.refs = newRefs.concat(timeline.refs)
+          timeline.refs = newRefs.concat(timeline.refs).slice(0, TIMELINE_MAX_REFS)
           onEvents([...events.concat(cachedEvents).slice(0, filter.limit)], true)
         }
       },
@@ -779,7 +795,7 @@ class ClientService extends EventTarget {
   }
 
   private async _loadMoreTimeline(key: string, until: number, limit: number) {
-    const timeline = this.timelines[key]
+    const timeline = this.timelines.get(key)
     if (!timeline || Array.isArray(timeline)) return []
 
     const { filter, urls, refs } = timeline
@@ -811,6 +827,9 @@ class ClientService extends EventTarget {
         .filter((evt) => evt.created_at < lastRefCreatedAt)
         .map((evt) => [evt.id, evt.created_at] as TTimelineRef)
     )
+    if (timeline.refs.length > TIMELINE_MAX_REFS) {
+      timeline.refs.length = TIMELINE_MAX_REFS
+    }
     return [...cachedEvents, ...events]
   }
 
@@ -913,9 +932,9 @@ class ClientService extends EventTarget {
   }
 
   async fetchEvent(id: string): Promise<NEvent | undefined> {
-    if (!/^[0-9a-f]{64}$/.test(id)) {
-      let eventId: string | undefined
-      let coordinate: string | undefined
+    let eventId = /^[0-9a-f]{64}$/.test(id) ? id : undefined
+    let coordinate: string | undefined
+    if (!eventId) {
       const { type, data } = nip19.decode(id)
       switch (type) {
         case 'note':
@@ -928,34 +947,37 @@ class ClientService extends EventTarget {
           coordinate = getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
           break
       }
-      if (coordinate) {
-        const cache = this.replaceableEventCacheMap.get(coordinate)
-        if (cache) {
-          return cache
-        }
-        const indexedDbCache = await indexedDb.getReplaceableEventByCoordinate(coordinate)
-        if (indexedDbCache) {
-          this.replaceableEventCacheMap.set(coordinate, indexedDbCache)
-          return indexedDbCache
-        }
-      } else if (eventId) {
-        const cache = this.eventCacheMap.get(eventId)
-        if (cache) {
-          return cache
-        }
+    }
+    if (coordinate) {
+      const cache = this.replaceableEventCacheMap.get(coordinate)
+      if (cache) {
+        return cache
+      }
+      const indexedDbCache = await indexedDb.getReplaceableEventByCoordinate(coordinate)
+      if (indexedDbCache) {
+        this.replaceableEventCacheMap.set(coordinate, indexedDbCache)
+        return indexedDbCache
+      }
+    } else if (eventId) {
+      const cache = this.eventCacheMap.get(eventId)
+      if (cache) {
+        return cache
+      }
 
-        const cacheFromIndexedDb = await indexedDb.getEventById(eventId)
-        if (cacheFromIndexedDb) {
-          this.trackEventExternalSeenOn(eventId, cacheFromIndexedDb.relays)
-          return cacheFromIndexedDb.event
-        }
+      const cacheFromIndexedDb = await indexedDb.getEventById(eventId)
+      if (cacheFromIndexedDb) {
+        this.trackEventExternalSeenOn(eventId, cacheFromIndexedDb.relays)
+        this.addEventToCache(cacheFromIndexedDb.event)
+        return cacheFromIndexedDb.event
       }
     }
     return this.eventDataLoader.load(id)
   }
 
   addEventToCache(event: NEvent) {
-    this.eventDataLoader.prime(event.id, Promise.resolve(event))
+    // A previous lookup may have cached `undefined`. A concrete event received
+    // later must replace that miss so ID-based thread readers can resolve it.
+    this.eventDataLoader.clear(event.id).prime(event.id, Promise.resolve(event))
     if (isReplaceableEvent(event.kind)) {
       const coordinate = getReplaceableCoordinateFromEvent(event)
       const cachedEvent = this.replaceableEventCacheMap.get(coordinate)
@@ -1221,10 +1243,17 @@ class ClientService extends EventTarget {
     return profileEvent
   }
 
-  private profileDataloader = new DataLoader<string, TProfile | null, string>(async (ids) => {
-    const results = await Promise.allSettled(ids.map((id) => this._fetchProfile(id)))
-    return results.map((res) => (res.status === 'fulfilled' ? res.value : null))
-  })
+  private profileDataloader = new DataLoader<string, TProfile | null, string>(
+    async (ids) => {
+      const results = await Promise.allSettled(ids.map((id) => this._fetchProfile(id)))
+      return results.map((res) => (res.status === 'fulfilled' ? res.value : null))
+    },
+    {
+      cacheMap: new BoundedMap<string, Promise<TProfile | null>>({
+        maxSize: PROFILE_CACHE_MAX_SIZE
+      })
+    }
+  )
 
   async fetchProfile(id: string, skipCache = false): Promise<TProfile | null> {
     if (skipCache) {
@@ -1304,7 +1333,10 @@ class ClientService extends EventTarget {
   >(this.replaceableEventFromBigRelaysBatchLoadFn.bind(this), {
     batchScheduleFn: (callback) => setTimeout(callback, 50),
     maxBatchSize: 500,
-    cacheKeyFn: ({ pubkey, kind }) => `${pubkey}:${kind}`
+    cacheKeyFn: ({ pubkey, kind }) => `${pubkey}:${kind}`,
+    cacheMap: new BoundedMap<string, Promise<NEvent | null>>({
+      maxSize: REPLACEABLE_EVENT_CACHE_MAX_SIZE
+    })
   })
 
   private async replaceableEventFromBigRelaysBatchLoadFn(
@@ -1400,7 +1432,10 @@ class ClientService extends EventTarget {
     NEvent | null,
     string
   >(this.replaceableEventBatchLoadFn.bind(this), {
-    cacheKeyFn: ({ pubkey, kind, d }) => `${kind}:${pubkey}:${d ?? ''}`
+    cacheKeyFn: ({ pubkey, kind, d }) => `${kind}:${pubkey}:${d ?? ''}`,
+    cacheMap: new BoundedMap<string, Promise<NEvent | null>>({
+      maxSize: REPLACEABLE_EVENT_CACHE_MAX_SIZE
+    })
   })
 
   private async replaceableEventBatchLoadFn(

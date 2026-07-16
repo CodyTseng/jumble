@@ -1,3 +1,4 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import { getReplaceableCoordinateFromEvent } from '@/lib/event'
 import { getEmojiPackInfoFromEvent, getEmojisAndEmojiSetsFromEvent } from '@/lib/event-metadata'
 import client from '@/services/client.service'
@@ -23,7 +24,7 @@ export const customEmojiCollectionsAtom = atom<TCustomEmojiCollections>({
 class CustomEmojiService {
   static instance: CustomEmojiService
 
-  private emojiMap = new Map<string, TEmoji>()
+  private emojiMap = new BoundedMap<string, TEmoji>({ maxSize: 10_000 })
   private emojiIndex = new FlexSearch.Index({ tokenize: 'full' })
   private standaloneEmojis: TEmoji[] = []
   private packs: TEmojiPack[] = []
@@ -37,7 +38,7 @@ class CustomEmojiService {
   }
 
   async init(userEmojiListEvent: Event | null) {
-    this.emojiMap = new Map()
+    this.emojiMap = new BoundedMap<string, TEmoji>({ maxSize: 10_000 })
     this.emojiIndex = new FlexSearch.Index({ tokenize: 'full' })
     this.standaloneEmojis = []
     this.packs = []

@@ -1,9 +1,7 @@
 import { AbstractSimplePool } from 'nostr-tools/abstract-pool'
-import {
-  AbstractRelay,
-  type AbstractRelayConstructorOptions
-} from 'nostr-tools/abstract-relay'
+import { AbstractRelay, type AbstractRelayConstructorOptions } from 'nostr-tools/abstract-relay'
 import { IRelay, IRelayPool } from '../types/relay-pool'
+import { BoundedMap } from './bounded-map'
 import { initializeNostrVerifier, verifyEvent } from './nostr-verifier'
 import { isInsecureUrl, normalizeUrl } from './url'
 
@@ -34,6 +32,10 @@ export class SmartPool extends AbstractSimplePool implements IRelayPool {
       enableReconnect: true,
       maxWaitForConnection: 3_000
     })
+
+    // nostr-tools keeps every event-to-relay observation forever by default.
+    // Relay hints are opportunistic, so retaining only recent events is enough.
+    this.seenOn = new BoundedMap<string, Set<AbstractRelay>>({ maxSize: 100_000 })
 
     this.allowInsecure = options.allowInsecure ?? false
 
@@ -74,20 +76,30 @@ export class SmartPool extends AbstractSimplePool implements IRelayPool {
     ) {
       return Promise.reject(new Error(`Insecure relay connection blocked: ${url}`))
     }
+    const normalizedUrl = normalizeUrl(url)
     // If relay is new and we have many relays, trigger cleanup
-    if (!this.relayIdleTracker.has(url) && this.relayIdleTracker.size > CLEANUP_THRESHOLD) {
+    if (
+      !this.relayIdleTracker.has(normalizedUrl) &&
+      this.relayIdleTracker.size > CLEANUP_THRESHOLD
+    ) {
       this.cleanIdleRelays()
     }
     // Update last activity time
-    this.relayIdleTracker.set(url, Date.now())
+    this.relayIdleTracker.set(normalizedUrl, Date.now())
     return super.ensureRelay(url, { connectionTimeout: DEFAULT_CONNECTION_TIMEOUT })
   }
 
   private cleanIdleRelays() {
     const idleRelays: string[] = []
     this.relays.forEach((relay, url) => {
-      // If relay is disconnected or has active subscriptions, skip
-      if (!relay.connected || relay.openSubs.size > 0) return
+      // Active subscriptions own their relay. Disconnected relays, however,
+      // should be removed instead of keeping their tracker entry forever.
+      if (relay.openSubs.size > 0) return
+      if (!relay.connected) {
+        idleRelays.push(url)
+        this.relayIdleTracker.delete(url)
+        return
+      }
 
       const lastActivity = this.relayIdleTracker.get(url) ?? 0
       // If relay active recently, skip
@@ -96,6 +108,12 @@ export class SmartPool extends AbstractSimplePool implements IRelayPool {
       idleRelays.push(url)
       this.relayIdleTracker.delete(url)
     })
+
+    // Failed connection attempts are removed from nostr-tools' relay map, but
+    // they can still leave an idle-tracker entry behind.
+    for (const url of this.relayIdleTracker.keys()) {
+      if (!this.relays.has(url)) this.relayIdleTracker.delete(url)
+    }
 
     if (idleRelays.length > 0) {
       console.log('[SmartPool] Closing idle relays:', idleRelays)

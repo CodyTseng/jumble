@@ -1,3 +1,4 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import { sortEventsDesc } from '@/lib/event'
 import { isValidPubkey } from '@/lib/pubkey'
 import client from '@/services/client.service'
@@ -10,7 +11,7 @@ import { Filter } from 'nostr-tools'
  */
 class RelayMembershipService {
   private static instance: RelayMembershipService
-  private membershipListCache: Map<string, Promise<Set<string>>> = new Map()
+  private membershipListCache = new BoundedMap<string, Promise<Set<string>>>({ maxSize: 100 })
   private membershipListDataLoader = new DataLoader<
     { url: string; pubkey: string },
     Set<string>,

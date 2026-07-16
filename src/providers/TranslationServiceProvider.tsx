@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import { getPollMetadataFromEvent } from '@/lib/event-metadata'
 import libreTranslate from '@/services/libre-translate.service'
 import storage from '@/services/local-storage.service'
@@ -9,8 +10,11 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNostr } from './NostrProvider'
 
-const translatedEventCache: Map<string, Event> = new Map()
-const translatedTextCache: Map<string, string> = new Map()
+const TRANSLATION_EVENT_CACHE_MAX_SIZE = 500
+const translatedEventCache = new BoundedMap<string, Event>({
+  maxSize: TRANSLATION_EVENT_CACHE_MAX_SIZE
+})
+const translatedTextCache = new BoundedMap<string, string>({ maxSize: 1_000 })
 
 type TTranslationServiceContext = {
   config: TTranslationServiceConfig
@@ -205,7 +209,18 @@ export function TranslationServiceProvider({ children }: { children: React.React
     }
 
     translatedEventCache.set(cacheKey, translatedEvent)
-    setTranslatedEventIdSet((prev) => new Set(prev.add(event.id)))
+    setTranslatedEventIdSet((prev) => {
+      const next = new Set(prev)
+      // Refresh insertion order so this Set follows the event cache's LRU order.
+      next.delete(event.id)
+      next.add(event.id)
+      while (next.size > TRANSLATION_EVENT_CACHE_MAX_SIZE) {
+        const oldest = next.values().next().value
+        if (oldest === undefined) break
+        next.delete(oldest)
+      }
+      return next
+    })
     return translatedEvent
   }
 

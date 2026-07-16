@@ -1,4 +1,5 @@
 import { getProfileFromEvent } from '@/lib/event-metadata'
+import { BoundedMap } from '@/lib/bounded-map'
 import { proxyFetch } from '@/lib/proxy-fetch'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { TProfile } from '@/types'
@@ -34,10 +35,11 @@ class FayanService {
       maxBatchSize: 50,
       cacheKeyFn: (userId) => {
         return userIdToPubkey(userId)
-      }
+      },
+      cacheMap: new BoundedMap<string, Promise<number | null>>({ maxSize: 5_000 })
     }
   )
-  private searchResultCache: Map<string, TProfile[]> = new Map()
+  private searchResultCache = new BoundedMap<string, TProfile[]>({ maxSize: 100 })
 
   constructor() {
     if (!FayanService.instance) {

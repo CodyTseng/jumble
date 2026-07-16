@@ -1,4 +1,5 @@
 import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import { isValidPubkey } from '@/lib/pubkey'
 import { tagNameEquals } from '@/lib/tag'
 import {
@@ -38,12 +39,14 @@ class DmService {
   private reactionListeners = new Set<(reaction: TDmMessage) => void>()
   private dataChangedListeners = new Set<() => void>()
   private loadingListeners = new Set<(loading: boolean) => void>()
-  private sendingStatuses = new Map<string, 'sending' | 'sent' | 'failed'>()
+  private sendingStatuses = new BoundedMap<string, 'sending' | 'sent' | 'failed'>({
+    maxSize: 1_000
+  })
   private sendingStatusListeners = new Set<() => void>()
-  private pendingPublishData = new Map<
+  private pendingPublishData = new BoundedMap<
     string,
     { recipientGiftWraps: Event[]; selfGiftWraps: Event[]; recipientDmRelays: string[] }
-  >()
+  >({ maxSize: 100 })
   private syncRequestListeners = new Set<(event: Event) => void>()
   private encryptionKeyChangedListeners = new Set<
     (result: TEncryptionKeyReconcileResult) => void
@@ -162,6 +165,7 @@ class DmService {
     this.dataChangedListeners.clear()
     this.loadingListeners.clear()
     this.sendingStatuses.clear()
+    this.pendingPublishData.clear()
     this.sendingStatusListeners.clear()
     this.syncRequestListeners.clear()
     this.encryptionKeyChangedListeners.clear()

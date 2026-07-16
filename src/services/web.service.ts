@@ -1,3 +1,4 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import { proxyFetch } from '@/lib/proxy-fetch'
 import { TWebMetadata } from '@/types'
 import DataLoader from 'dataloader'
@@ -17,7 +18,10 @@ class WebService {
         })
       )
     },
-    { maxBatchSize: 1 }
+    {
+      maxBatchSize: 1,
+      cacheMap: new BoundedMap<string, Promise<TWebMetadata>>({ maxSize: 1_000 })
+    }
   )
 
   constructor() {

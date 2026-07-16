@@ -1,4 +1,5 @@
 import { ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import { getPollResponseFromEvent } from '@/lib/event-metadata'
 import DataLoader from 'dataloader'
 import dayjs from 'dayjs'
@@ -22,7 +23,7 @@ type TFetchPollResultsParams = {
 
 class PollResultsService {
   static instance: PollResultsService
-  private pollResultsMap: Map<string, TPollResults> = new Map()
+  private pollResultsMap = new BoundedMap<string, TPollResults>({ maxSize: 500 })
   private pollResultsSubscribers = new Map<string, Set<() => void>>()
   private loader = new DataLoader<TFetchPollResultsParams, TPollResults | undefined>(
     async (params) => {

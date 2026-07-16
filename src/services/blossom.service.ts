@@ -1,10 +1,11 @@
+import { BoundedMap } from '@/lib/bounded-map'
 import blossomCache from '@/services/blossom-cache.service'
 import client from '@/services/client.service'
 import { getHashFromURL } from 'blossom-client-sdk'
 
 class BlossomService {
   static instance: BlossomService
-  private cacheMap = new Map<
+  private cacheMap = new BoundedMap<
     string,
     {
       pubkey?: string
@@ -14,7 +15,7 @@ class BlossomService {
       url: string
       validUrl?: string
     }
-  >()
+  >({ maxSize: 2_000 })
 
   constructor() {
     if (!BlossomService.instance) {

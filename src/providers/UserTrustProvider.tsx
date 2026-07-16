@@ -36,10 +36,15 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
+    // WoT is account-scoped derived state. Keeping entries from previous
+    // accounts both leaks memory and incorrectly trusts their social graph.
+    wotScoreMap.clear()
     if (!currentPubkey) return
+    let cancelled = false
 
     const initWoT = async () => {
       const followings = await client.fetchFollowings(currentPubkey, false)
+      if (cancelled) return
       followings.forEach((pubkey) => {
         if (!wotScoreMap.has(pubkey)) wotScoreMap.set(pubkey, 0)
       })
@@ -50,6 +55,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
         await Promise.allSettled(
           batch.map(async (pubkey) => {
             const _followings = await client.fetchFollowings(pubkey, false)
+            if (cancelled) return
             _followings.forEach((following) => {
               wotScoreMap.set(following, (wotScoreMap.get(following) ?? 0) + 1)
             })
@@ -59,6 +65,9 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
       }
     }
     initWoT()
+    return () => {
+      cancelled = true
+    }
   }, [currentPubkey])
 
   const isUserTrusted = useCallback(

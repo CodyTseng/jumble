@@ -25,6 +25,7 @@ import { SimpleUsername } from '@/components/Username'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
 import { EMOJI_REGEX, ExtendedKind } from '@/constants'
+import { BoundedMap } from '@/lib/bounded-map'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -1452,7 +1453,12 @@ function MeasuredTextBubble({
   )
 }
 
-const decryptedBlobCache = new Map<string, string>()
+const decryptedBlobCache = new BoundedMap<string, string>({
+  maxSize: 100,
+  onDelete: (url) => {
+    if (typeof URL.revokeObjectURL === 'function') URL.revokeObjectURL(url)
+  }
+})
 
 function EncryptedFileMessage({
   message,
