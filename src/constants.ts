@@ -4,6 +4,7 @@ import { TFeedTabConfig, TRelaySet } from './types'
 export const JUMBLE_API_BASE_URL = 'https://api.jumble.social'
 
 export const RECOMMENDED_BLOSSOM_SERVERS = [
+  'https://blossom.jumble.social/',
   'https://blossom.band/',
   'https://blossom.primal.net/',
   'https://nostr.media/'
