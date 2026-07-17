@@ -1,6 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { isSameAccount } from '@/lib/account'
 import { formatError } from '@/lib/error'
+import {
+  getPostAccountPreviewPubkey,
+  isEphemeralPostAccount,
+  isPostAccountSignable,
+  resolvePostAccount,
+  restorePostAccount
+} from '@/lib/post-account'
 import DraftsButton from './DraftsButton'
 import {
   collectCustomEmojisInText,
@@ -19,7 +27,7 @@ import storage from '@/services/local-storage.service'
 import { useNostr } from '@/providers/NostrProvider'
 import mediaUpload from '@/services/media-upload.service'
 import postDraftService from '@/services/post-draft.service'
-import { TAccountPointer, TPollCreateData, TPostTargetItem } from '@/types'
+import { TAccount, TPollCreateData, TPostTargetItem } from '@/types'
 import { TPostDraftUnsigned } from '@/types/post-draft'
 import { Content } from '@tiptap/react'
 import { CircleHelp, ImageUp, ListTodo, Lock, Settings, Smile, X } from 'lucide-react'
@@ -80,11 +88,18 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   const { pubkey, checkLogin, account, getSignerForAccount } = useNostr()
 
   // Which account this note will be published as. Defaults to the active account,
-  // but can be temporarily switched without changing the logged-in account.
-  const [postAsAccount, setPostAsAccount] = useState<TAccountPointer | null>(account)
+  // but can be temporarily switched without changing the logged-in account. An
+  // anonymous draft restores as a fresh, non-persisted nsec account.
+  const initialIsAnonymous = initialDraft?.isAnonymous ?? false
+  const [postAsAccount, setPostAsAccount] = useState<TAccount | null>(() =>
+    restorePostAccount(initialIsAnonymous, account, initialDraft?.pubkey ?? pubkey ?? undefined)
+  )
   // Reset the selection whenever the active account changes (e.g. user switches
   // accounts globally while the editor stays mounted).
+  const activeAccountRef = useRef(account)
   useEffect(() => {
+    if (isSameAccount(activeAccountRef.current, account)) return
+    activeAccountRef.current = account
     setPostAsAccount(account)
   }, [account])
 
@@ -195,6 +210,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
       isPoll,
       pollCreateData,
       addClientTag,
+      isAnonymous: isEphemeralPostAccount(postAsAccount),
       isProtectedEvent,
       additionalRelayUrls,
       postTargetItems: relayTargetItems,
@@ -215,6 +231,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     isPoll,
     pollCreateData,
     addClientTag,
+    postAsAccount,
     isProtectedEvent,
     additionalRelayUrls,
     relayTargetItems,
@@ -288,6 +305,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
       isNsfw !== initialDraft.isNsfw ||
       isPoll !== initialDraft.isPoll ||
       addClientTag !== initialDraft.addClientTag ||
+      isEphemeralPostAccount(postAsAccount) !== initialIsAnonymous ||
       isProtectedEvent !== initialDraft.isProtectedEvent ||
       minPow !== initialDraft.minPow ||
       JSON.stringify(mentions) !== JSON.stringify(initialDraft.mentions) ||
@@ -302,6 +320,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     isNsfw,
     isPoll,
     addClientTag,
+    postAsAccount,
+    initialIsAnonymous,
     isProtectedEvent,
     minPow,
     mentions,
@@ -322,7 +342,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     e?.stopPropagation()
     checkLogin(async () => {
       const targetAccount = postAsAccount ?? account
-      if (!canPost || !pubkey || !targetAccount || targetAccount.signerType === 'npub') return
+      if (!canPost || !pubkey || !targetAccount || !isPostAccountSignable(targetAccount)) return
       if (postingRef.current) return
       postingRef.current = true
       try {
@@ -330,14 +350,11 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         // lookup and signing run, so an interrupted or failed send never loses it.
         await saveDraft()
 
-        // Obtain the signer for the chosen account. When it's the active account
-        // this returns the live signer; otherwise it builds a temporary one
-        // without changing the logged-in account.
-        const signer = await getSignerForAccount(targetAccount)
-        if (!signer) {
+        const resolvedAccount = await resolvePostAccount(targetAccount, getSignerForAccount)
+        if (!resolvedAccount) {
           throw new Error(t('Failed to get the signer for the selected account'))
         }
-        const targetPubkey = targetAccount.pubkey
+        const { signer, pubkey: targetPubkey } = resolvedAccount
 
         const draftEvent = await createDraftEvent({
           parentStuff: initialParentStuff,
@@ -360,7 +377,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         const publishOptions = {
           specifiedRelayUrls: isProtectedEvent ? additionalRelayUrls : undefined,
           additionalRelayUrls: isPoll ? pollCreateData.relays : _additionalRelayUrls,
-          minPow
+          minPow,
+          skipAuthorRelayLookup: resolvedAccount.skipAuthorRelayLookup
         }
 
         // Hand off to the outbox: it surfaces the "Sending..." toast right away,
@@ -369,6 +387,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         postDraftService.send({
           id: draftIdRef.current,
           pubkey: targetPubkey,
+          ownerPubkey: resolvedAccount.ownerPubkey,
           createdAt: draftCreatedAtRef.current,
           signer,
           draftEvent,
@@ -442,7 +461,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         onUploadEnd={handleUploadEnd}
         postAsAccount={postAsAccount}
         onPostAsAccountChange={setPostAsAccount}
-        previewPubkey={postAsAccount?.pubkey ?? pubkey ?? undefined}
+        allowAnonymous={!!initialParentStuff && !highlightedText}
+        previewPubkey={getPostAccountPreviewPubkey(postAsAccount ?? account)}
         placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
         topRightActions={
           <div className="flex items-center gap-1">

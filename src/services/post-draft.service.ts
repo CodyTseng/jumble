@@ -27,6 +27,7 @@ export type TSignedDraftInput = Omit<
 export type TSendInput = {
   id: string
   pubkey: string
+  ownerPubkey?: string
   createdAt: number
   signer: ISigner
   draftEvent: TDraftEvent
@@ -173,6 +174,7 @@ class PostDraftService extends EventTarget {
     const {
       id,
       pubkey,
+      ownerPubkey,
       createdAt,
       signer,
       draftEvent,
@@ -202,7 +204,7 @@ class PostDraftService extends EventTarget {
     // Signed → persist as immutable pending, then broadcast.
     const pending = await this.persistPending({
       id,
-      pubkey,
+      pubkey: ownerPubkey ?? pubkey,
       createdAt,
       signedEvent: signed,
       targetRelays,
@@ -255,6 +257,8 @@ class PostDraftService extends EventTarget {
     }
     this.inflight.add(pending.id)
     try {
+      // publishEvent handles relay AUTH with ClientService's current signer; the
+      // event signature itself is already fixed in pending.signedEvent.
       await client.publishEvent(pending.targetRelays, pending.signedEvent)
       await indexedDb.deletePostDraft(pending.id)
       this.map.delete(pending.id)

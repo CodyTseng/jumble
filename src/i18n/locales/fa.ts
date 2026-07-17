@@ -1138,6 +1138,10 @@ export default {
     'Indirect notifications hidden': 'اعلان‌های غیرمستقیم پنهان شدند',
     'Indirect notifications shown': 'اعلان‌های غیرمستقیم نمایش داده می‌شوند',
     Resend: 'ارسال مجدد',
-    'Original poster': 'نویسنده اصلی'
+    'Original poster': 'نویسنده اصلی',
+    Anonymous: 'ناشناس',
+    'Anonymous reply hint':
+      'از یک هویت جدید و یک‌بارمصرف Nostr استفاده می‌کند. حساب شما در رویداد نمایش داده نمی‌شود، اما رله‌ها و ناظران شبکه ممکن است همچنان فعالیت شما را مرتبط کنند.',
+    'One-time identity': 'هویت یک‌بارمصرف'
   }
 }

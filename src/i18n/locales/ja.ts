@@ -1138,6 +1138,10 @@ export default {
     'Indirect notifications hidden': '間接通知を非表示中',
     'Indirect notifications shown': '間接通知を表示中',
     Resend: '再送信',
-    'Original poster': '元の投稿者'
+    'Original poster': '元の投稿者',
+    Anonymous: '匿名',
+    'Anonymous reply hint':
+      '新しい使い捨ての Nostr ID を使用します。イベントにあなたのアカウントは表示されませんが、リレーやネットワーク監視者が活動を関連付けられる可能性があります。',
+    'One-time identity': '使い捨て ID'
   }
 }

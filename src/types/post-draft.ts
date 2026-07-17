@@ -20,6 +20,7 @@ export type TPostDraftUnsigned = TPostDraftBase & {
   isPoll: boolean
   pollCreateData: TPollCreateData
   addClientTag: boolean
+  isAnonymous?: boolean
   isProtectedEvent: boolean
   additionalRelayUrls: string[]
   postTargetItems?: TPostTargetItem[]

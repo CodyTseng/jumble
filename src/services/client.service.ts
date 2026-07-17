@@ -153,7 +153,7 @@ class ClientService extends EventTarget {
 
   async determineTargetRelays(
     event: NEvent,
-    { specifiedRelayUrls, additionalRelayUrls }: TPublishOptions = {}
+    { specifiedRelayUrls, additionalRelayUrls, skipAuthorRelayLookup }: TPublishOptions = {}
   ) {
     if (event.kind === kinds.Report) {
       const targetEventId = event.tags.find(tagNameEquals('e'))?.[1]
@@ -199,8 +199,10 @@ class ClientService extends EventTarget {
         }
       }
 
-      const relayList = await this.fetchRelayList(event.pubkey)
-      relayList.write.forEach((url) => relaySet.add(url))
+      if (!skipAuthorRelayLookup) {
+        const relayList = await this.fetchRelayList(event.pubkey)
+        relayList.write.forEach((url) => relaySet.add(url))
+      }
 
       if (
         [
@@ -316,6 +318,9 @@ class ClientService extends EventTarget {
                 !!that.signer
               ) {
                 try {
+                  // Relay AUTH identifies the current client session, so it is
+                  // intentionally signed by the logged-in account even when the
+                  // published event was authored by a temporary nsec account.
                   await relay.auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
                   hasAuthed = true
                   await publishPromise().catch(() => {

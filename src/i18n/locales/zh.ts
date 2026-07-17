@@ -1095,6 +1095,10 @@ export default {
     'Indirect notifications hidden': '已隐藏间接通知',
     'Indirect notifications shown': '已显示间接通知',
     Resend: '重新发送',
-    'Original poster': '楼主'
+    'Original poster': '楼主',
+    Anonymous: '匿名',
+    'Anonymous reply hint':
+      '使用一个新的一次性 Nostr 身份。事件中不会出现你的账号，但中继和网络观察者仍可能关联你的活动。',
+    'One-time identity': '一次性身份'
   }
 }

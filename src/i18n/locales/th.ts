@@ -1120,6 +1120,10 @@ export default {
     'Indirect notifications hidden': 'ซ่อนการแจ้งเตือนทางอ้อมแล้ว',
     'Indirect notifications shown': 'แสดงการแจ้งเตือนทางอ้อม',
     Resend: 'ส่งอีกครั้ง',
-    'Original poster': 'ผู้โพสต์ต้นฉบับ'
+    'Original poster': 'ผู้โพสต์ต้นฉบับ',
+    Anonymous: 'ไม่ระบุตัวตน',
+    'Anonymous reply hint':
+      'ใช้ตัวตน Nostr แบบครั้งเดียวที่สร้างขึ้นใหม่ บัญชีของคุณจะไม่ปรากฏในอีเวนต์ แต่รีเลย์และผู้สังเกตการณ์เครือข่ายอาจยังเชื่อมโยงกิจกรรมของคุณได้',
+    'One-time identity': 'ตัวตนแบบครั้งเดียว'
   }
 }

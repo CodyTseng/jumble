@@ -140,6 +140,7 @@ export type TPublishOptions = {
   specifiedRelayUrls?: string[]
   additionalRelayUrls?: string[]
   minPow?: number
+  skipAuthorRelayLookup?: boolean
 }
 
 export type TPostTargetItem =

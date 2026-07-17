@@ -1123,6 +1123,10 @@ export default {
     'Indirect notifications hidden': 'الإشعارات غير المباشرة مخفية',
     'Indirect notifications shown': 'الإشعارات غير المباشرة ظاهرة',
     Resend: 'إعادة الإرسال',
-    'Original poster': 'الناشر الأصلي'
+    'Original poster': 'الناشر الأصلي',
+    Anonymous: 'مجهول',
+    'Anonymous reply hint':
+      'يستخدم هوية Nostr جديدة لمرة واحدة. لن يظهر حسابك في الحدث، لكن قد تظل المرحّلات ومراقبو الشبكة قادرين على ربط نشاطك.',
+    'One-time identity': 'هوية لمرة واحدة'
   }
 }

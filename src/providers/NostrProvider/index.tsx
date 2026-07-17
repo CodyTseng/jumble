@@ -74,7 +74,7 @@ type TNostrContext = {
    * Used to publish "as" another account temporarily. Returns null if the
    * account can't sign (e.g. npub read-only) or its identity can't be verified.
    */
-  getSignerForAccount: (account: TAccountPointer) => Promise<ISigner | null>
+  getSignerForAccount: (account: TAccount) => Promise<ISigner | null>
   /**
    * The active account's private key when it signs locally (nsec/ncryptsec),
    * already decrypted in memory; null for remote/read-only signers. Used by the
@@ -710,17 +710,16 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  const getSignerForAccount = async (act: TAccountPointer): Promise<ISigner | null> => {
+  const getSignerForAccount = async (act: TAccount): Promise<ISigner | null> => {
     // Reuse the active signer when it already matches the requested account.
     if (signer && isSameAccount(account, act)) {
       return signer
     }
-    const storedAccount = storage.findAccount(act)
-    if (!storedAccount) {
-      return null
-    }
+    // Stored accounts usually arrive as pointers. A temporary account may carry
+    // its own credentials and deliberately never be added to account storage.
+    const sourceAccount = storage.findAccount(act) ?? act
     try {
-      const newSigner = await buildSignerForAccount(storedAccount)
+      const newSigner = await buildSignerForAccount(sourceAccount)
       if (!newSigner) {
         return null
       }

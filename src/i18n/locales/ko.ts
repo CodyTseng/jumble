@@ -1124,6 +1124,10 @@ export default {
     'Indirect notifications hidden': '간접 알림 숨김',
     'Indirect notifications shown': '간접 알림 표시',
     Resend: '다시 보내기',
-    'Original poster': '원 작성자'
+    'Original poster': '원 작성자',
+    Anonymous: '익명',
+    'Anonymous reply hint':
+      '새로운 일회용 Nostr 신원을 사용합니다. 이벤트에 내 계정은 표시되지 않지만, 릴레이와 네트워크 관찰자가 활동을 연관 지을 수 있습니다.',
+    'One-time identity': '일회용 신원'
   }
 }

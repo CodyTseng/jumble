@@ -1143,6 +1143,10 @@ export default {
     'Indirect notifications hidden': 'Notificações indiretas ocultas',
     'Indirect notifications shown': 'Notificações indiretas visíveis',
     Resend: 'Reenviar',
-    'Original poster': 'Autor original'
+    'Original poster': 'Autor original',
+    Anonymous: 'Anônimo',
+    'Anonymous reply hint':
+      'Usa uma nova identidade Nostr descartável. Sua conta não aparecerá no evento, mas relays e observadores da rede ainda poderão correlacionar sua atividade.',
+    'One-time identity': 'Identidade descartável'
   }
 }

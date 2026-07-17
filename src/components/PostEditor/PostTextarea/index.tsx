@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
 import { cn } from '@/lib/utils'
 import customEmojiService from '@/services/custom-emoji.service'
-import { TAccountPointer, TEmoji } from '@/types'
+import { TAccount, TEmoji } from '@/types'
 import Document from '@tiptap/extension-document'
 import { HardBreak } from '@tiptap/extension-hard-break'
 import History from '@tiptap/extension-history'
@@ -50,8 +50,9 @@ const PostTextarea = forwardRef<
     onUploadEnd?: (file: File) => void
     placeholder?: string
     topRightActions?: React.ReactNode
-    postAsAccount?: TAccountPointer | null
-    onPostAsAccountChange?: (account: TAccountPointer) => void
+    postAsAccount?: TAccount | null
+    onPostAsAccountChange?: (account: TAccount) => void
+    allowAnonymous?: boolean
     previewPubkey?: string
   }
 >(
@@ -69,6 +70,7 @@ const PostTextarea = forwardRef<
       topRightActions,
       postAsAccount,
       onPostAsAccountChange,
+      allowAnonymous,
       previewPubkey
     },
     ref
@@ -238,13 +240,13 @@ const PostTextarea = forwardRef<
               <TabsList className="h-auto gap-1 bg-transparent p-0">
                 <TabsTrigger
                   value="edit"
-                  className="h-8 rounded-md bg-transparent px-2.5 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="text-muted-foreground hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground h-8 rounded-md bg-transparent px-2.5 text-sm shadow-none data-[state=active]:shadow-none"
                 >
                   {t('Edit')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="preview"
-                  className="h-8 rounded-md bg-transparent px-2.5 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="text-muted-foreground hover:text-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground h-8 rounded-md bg-transparent px-2.5 text-sm shadow-none data-[state=active]:shadow-none"
                 >
                   {t('Preview')}
                 </TabsTrigger>
@@ -262,7 +264,11 @@ const PostTextarea = forwardRef<
         </div>
         <TabsContent value="edit" className="mt-0">
           {postAsAccount && onPostAsAccountChange && (
-            <PostAccountSelector value={postAsAccount} onChange={onPostAsAccountChange} />
+            <PostAccountSelector
+              value={postAsAccount}
+              onChange={onPostAsAccountChange}
+              allowAnonymous={allowAnonymous}
+            />
           )}
           <div className="relative">
             <EditorContent className="tiptap" editor={editor} />

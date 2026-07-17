@@ -1155,6 +1155,10 @@ export default {
     'Indirect notifications hidden': 'Notifications indirectes masquées',
     'Indirect notifications shown': 'Notifications indirectes affichées',
     Resend: 'Renvoyer',
-    'Original poster': 'Auteur original'
+    'Original poster': 'Auteur original',
+    Anonymous: 'Anonyme',
+    'Anonymous reply hint':
+      'Utilise une nouvelle identité Nostr à usage unique. Votre compte n’apparaîtra pas dans l’événement, mais les relais et les observateurs du réseau pourront peut-être encore corréler votre activité.',
+    'One-time identity': 'Identité à usage unique'
   }
 }

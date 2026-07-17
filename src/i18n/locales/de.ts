@@ -1156,6 +1156,10 @@ export default {
     'Indirect notifications hidden': 'Indirekte Benachrichtigungen ausgeblendet',
     'Indirect notifications shown': 'Indirekte Benachrichtigungen angezeigt',
     Resend: 'Erneut senden',
-    'Original poster': 'Ursprünglicher Autor'
+    'Original poster': 'Ursprünglicher Autor',
+    Anonymous: 'Anonym',
+    'Anonymous reply hint':
+      'Verwendet eine neue einmalige Nostr-Identität. Dein Konto erscheint nicht im Event, Relays und Netzwerkbeobachter können deine Aktivitäten jedoch möglicherweise weiterhin zuordnen.',
+    'One-time identity': 'Einmalige Identität'
   }
 }

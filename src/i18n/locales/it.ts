@@ -1145,6 +1145,10 @@ export default {
     'Indirect notifications hidden': 'Notifiche indirette nascoste',
     'Indirect notifications shown': 'Notifiche indirette visibili',
     Resend: 'Reinvia',
-    'Original poster': 'Autore originale'
+    'Original poster': 'Autore originale',
+    Anonymous: 'Anonimo',
+    'Anonymous reply hint':
+      'Usa una nuova identità Nostr monouso. Il tuo account non apparirà nell’evento, ma i relay e gli osservatori della rete potrebbero comunque collegare la tua attività.',
+    'One-time identity': 'Identità monouso'
   }
 }
