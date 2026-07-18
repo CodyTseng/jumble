@@ -120,23 +120,49 @@ class MediaUploadService {
       servers = RECOMMENDED_BLOSSOM_SERVERS
       this.ensureBlossomServerList(pubkey)
     }
-    const [mainServer, ...mirrorServers] = servers
-
     const auth = await BlossomClient.createUploadAuth(signer, file, {
       message: 'Uploading media file'
     })
 
-    // first upload blob to main server
-    let blob: BlobDescriptor
+    // Try each server in preference order until one accepts the upload. A failed
+    // preferred server should not prevent the remaining configured servers from
+    // being used. Cancellation is different: it stops the whole upload rather
+    // than moving on to another server.
+    let blob: BlobDescriptor | undefined
+    let uploadedServerIndex = -1
+    let lastError: unknown
     try {
-      blob = await this.uploadBlobToBlossomServer(mainServer, file, auth, options?.signal)
+      for (const [index, server] of servers.entries()) {
+        if (options?.signal?.aborted) {
+          throw new Error(UPLOAD_ABORTED_ERROR_MSG)
+        }
+
+        try {
+          blob = await this.uploadBlobToBlossomServer(server, file, auth, options?.signal)
+          uploadedServerIndex = index
+          break
+        } catch (error) {
+          if (
+            options?.signal?.aborted ||
+            (error instanceof Error && error.message === UPLOAD_ABORTED_ERROR_MSG)
+          ) {
+            throw new Error(UPLOAD_ABORTED_ERROR_MSG)
+          }
+          lastError = error
+        }
+      }
+
+      if (!blob) {
+        throw lastError instanceof Error ? lastError : new Error('All Blossom servers failed')
+      }
     } finally {
-      // Always clear the pseudo-progress timer, even if the upload failed.
+      // Always clear the pseudo-progress timer, even if every upload failed.
       stopPseudoProgress()
     }
-    // Main upload finished
+    // Primary upload finished
     options?.onProgress?.(80)
 
+    const mirrorServers = servers.filter((_, index) => index !== uploadedServerIndex)
     if (mirrorServers.length > 0) {
       await Promise.allSettled(
         mirrorServers.map((server) => BlossomClient.mirrorBlob(server, blob, { auth }))
