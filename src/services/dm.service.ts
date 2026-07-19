@@ -1,5 +1,11 @@
 import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { BoundedMap } from '@/lib/bounded-map'
+import {
+  getDmMessageCreatedAt,
+  nextDmRumorTimestamp,
+  withDmMessageOrderTag
+} from '@/lib/dm-message-order'
+import type { TDmRumorTimestamp } from '@/lib/dm-message-order'
 import { isValidPubkey } from '@/lib/pubkey'
 import { tagNameEquals } from '@/lib/tag'
 import {
@@ -52,16 +58,6 @@ class DmService {
     (result: TEncryptionKeyReconcileResult) => void
   >()
   private activeConversationKey: string | null = null
-  // Global monotonic clock for outgoing rumor `created_at`. Nostr timestamps
-  // have one-second granularity, so several messages sent within the same second
-  // would otherwise share a `created_at` and fall back to an id-based tiebreak
-  // (ascending rumor id), which does not match send order. Forcing `created_at`
-  // to strictly increase across all outgoing messages keeps the persisted order
-  // (and any client that sorts by `created_at`) in send order. A global clock is
-  // enough: ordering only matters within a conversation, and cross-conversation
-  // timestamp drift during a burst is at most a few seconds and harmless.
-  private lastSentCreatedAt = 0
-
   private constructor() {}
 
   static getInstance(): DmService {
@@ -489,7 +485,7 @@ class DmService {
         participantsKey,
         senderPubkey: rumor.pubkey,
         content: rumor.content,
-        createdAt: rumor.created_at,
+        createdAt: getDmMessageCreatedAt(rumor),
         originalEvent: rumor,
         decryptedRumor: rumor,
         ...(replyToId ? { replyTo: { id: replyToId, content: '', senderPubkey: '' } } : {})
@@ -781,16 +777,10 @@ class DmService {
     await this.rebuildConversationsFromMessages(accountPubkey, messages, encryptionPubkeyMap)
   }
 
-  // Allocates the next `created_at` for an outgoing rumor in a conversation,
-  // guaranteeing it is strictly greater than the previous one we sent there.
-  // This is a synchronous read-modify-write, so calling it at the top of each
-  // send method (before any `await`) serializes ordering by call order without
-  // an explicit async queue. Concurrent sends within the same second therefore
-  // get consecutive timestamps in the order they were invoked.
-  private allocateRumorCreatedAt(): number {
-    const createdAt = Math.max(dayjs().unix(), this.lastSentCreatedAt + 1)
-    this.lastSentCreatedAt = createdAt
-    return createdAt
+  // Called synchronously before any await so concurrent sends are stamped in
+  // invocation order without an async queue.
+  private allocateRumorTimestamp(): TDmRumorTimestamp {
+    return nextDmRumorTimestamp()
   }
 
   async sendMessage(
@@ -865,16 +855,16 @@ class DmService {
     replyTo?: { id: string; content: string; senderPubkey: string }
   ): Promise<TDmMessage> {
     // Allocate the rumor timestamp synchronously, before any await, so rapid
-    // consecutive sends keep their order (see allocateRumorCreatedAt).
-    const createdAt = this.allocateRumorCreatedAt()
+    // consecutive sends keep their order (see allocateRumorTimestamp).
+    const timestamp = this.allocateRumorTimestamp()
     const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
 
     const rumor = nip17GiftWrapService.buildRumor(
       content,
       accountPubkey,
       recipientPubkey,
-      createdAt,
-      extraTags,
+      timestamp.createdAt,
+      withDmMessageOrderTag(extraTags, timestamp.millisecond),
       kind
     )
 
@@ -883,7 +873,7 @@ class DmService {
       participantsKey,
       senderPubkey: accountPubkey,
       content: rumor.content,
-      createdAt: rumor.created_at,
+      createdAt: getDmMessageCreatedAt(rumor),
       // Placeholder until the real gift wrap is built/echoed back; originalEvent is
       // not used for DM rendering (mirrors importMessages, which stores the rumor).
       originalEvent: rumor as unknown as Event,
@@ -912,8 +902,8 @@ class DmService {
     emojiTag?: string[]
   ): Promise<TDmMessage | null> {
     // Allocate the rumor timestamp synchronously, before any await, so rapid
-    // consecutive sends keep their order (see allocateRumorCreatedAt).
-    const createdAt = this.allocateRumorCreatedAt()
+    // consecutive sends keep their order (see allocateRumorTimestamp).
+    const timestamp = this.allocateRumorTimestamp()
     const participantsKey = this.getParticipantsKey(accountPubkey, recipientPubkey)
 
     const keypair =
@@ -939,6 +929,7 @@ class DmService {
     if (emojiTag) {
       extraTags.push(emojiTag)
     }
+    const orderedTags = withDmMessageOrderTag(extraTags, timestamp.millisecond)
 
     const { rumor, recipientGiftWraps, selfGiftWraps } =
       await nip17GiftWrapService.createDualGiftWraps(
@@ -948,8 +939,8 @@ class DmService {
         keypair.privkey,
         recipientPubkey,
         recipientEncryptionPubkey,
-        createdAt,
-        extraTags,
+        timestamp.createdAt,
+        orderedTags,
         kinds.Reaction
       )
 
@@ -958,7 +949,7 @@ class DmService {
       participantsKey,
       senderPubkey: accountPubkey,
       content: rumor.content,
-      createdAt: rumor.created_at,
+      createdAt: getDmMessageCreatedAt(rumor),
       originalEvent: selfGiftWraps[0],
       decryptedRumor: rumor as unknown as Event
     }
@@ -1334,7 +1325,7 @@ class DmService {
       participantsKey,
       senderPubkey: effectiveSenderPubkey,
       content: rumor.content,
-      createdAt: rumor.created_at,
+      createdAt: getDmMessageCreatedAt(rumor),
       originalEvent: giftWrap,
       decryptedRumor: rumor as unknown as Event,
       verified,
