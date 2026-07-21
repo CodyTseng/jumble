@@ -31,6 +31,12 @@ vi.mock('@/lib/strip-image-metadata', () => ({
   stripImageMetadata: (file: File) => Promise.resolve(file)
 }))
 
+const mediaMetaMock = vi.hoisted(() => ({
+  getMediaMeta: vi.fn().mockResolvedValue({})
+}))
+
+vi.mock('@/lib/media-meta', () => mediaMetaMock)
+
 vi.mock('blossom-client-sdk', () => ({
   BlossomClient: blossomClientMock
 }))
@@ -114,5 +120,69 @@ describe('Blossom media uploads', () => {
     ).rejects.toThrow(UPLOAD_ABORTED_ERROR_MSG)
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('fills in missing imeta fields locally when the server returns no nip94 tags', async () => {
+    const blob = {
+      url: 'https://first.example/file-hash',
+      sha256: 'file-hash',
+      size: 4,
+      type: 'image/png'
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json(blob))
+    )
+    mediaMetaMock.getMediaMeta.mockResolvedValue({ dim: '100x50', thumbHash: 'dGh1bWI' })
+
+    const result = await mediaUpload.upload(new File(['test'], 'a.png', { type: 'image/png' }))
+
+    expect(result.tags).toEqual([
+      ['url', blob.url],
+      ['m', 'image/png'],
+      ['size', '4'],
+      ['x', 'file-hash'],
+      ['dim', '100x50'],
+      ['thumbhash', 'dGh1bWI']
+    ])
+    expect(mediaUpload.getImetaTagByUrl(blob.url)).toEqual([
+      'imeta',
+      `url ${blob.url}`,
+      'm image/png',
+      'size 4',
+      'x file-hash',
+      'dim 100x50',
+      'thumbhash dGh1bWI'
+    ])
+  })
+
+  it('keeps server-provided imeta fields and only fills the gaps', async () => {
+    const blob = {
+      url: 'https://first.example/file-hash',
+      sha256: 'file-hash',
+      size: 4,
+      type: 'image/png',
+      nip94: [
+        ['url', 'https://first.example/file-hash'],
+        ['m', 'image/png'],
+        ['dim', '1x1']
+      ]
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json(blob))
+    )
+    mediaMetaMock.getMediaMeta.mockResolvedValue({ dim: '100x50', thumbHash: 'dGh1bWI' })
+
+    const result = await mediaUpload.upload(new File(['test'], 'a.png', { type: 'image/png' }))
+
+    expect(result.tags).toEqual([
+      ['url', 'https://first.example/file-hash'],
+      ['m', 'image/png'],
+      ['dim', '1x1'],
+      ['size', '4'],
+      ['x', 'file-hash'],
+      ['thumbhash', 'dGh1bWI']
+    ])
   })
 })

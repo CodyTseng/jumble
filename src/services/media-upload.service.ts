@@ -1,6 +1,7 @@
 import { RECOMMENDED_BLOSSOM_SERVERS } from '@/constants'
 import { BoundedMap } from '@/lib/bounded-map'
 import { createBlossomServerListDraftEvent } from '@/lib/draft-event'
+import { getMediaMeta } from '@/lib/media-meta'
 import { stripImageMetadata } from '@/lib/strip-image-metadata'
 import { simplifyUrl } from '@/lib/url'
 import { TDraftEvent, TMediaUploadServiceConfig } from '@/types'
@@ -59,17 +60,47 @@ class MediaUploadService {
     // Strip sensitive metadata (EXIF/GPS, ...) from the file before upload.
     const safeFile = await stripImageMetadata(file)
 
-    let result: { url: string; tags: string[][] }
+    let result: { url: string; tags: string[][]; sha256?: string }
     if (this.serviceConfig.type === 'nip96') {
       result = await this.uploadByNip96(this.serviceConfig.service, safeFile, options)
     } else {
       result = await this.uploadByBlossom(safeFile, options)
     }
 
-    if (result.tags.length > 0) {
-      this.imetaTagMap.set(result.url, ['imeta', ...result.tags.map(([n, v]) => `${n} ${v}`)])
+    const tags = await this.completeImetaTags(result.url, result.tags, safeFile, result.sha256)
+    this.imetaTagMap.set(result.url, ['imeta', ...tags.map(([n, v]) => `${n} ${v}`)])
+    return { url: result.url, tags }
+  }
+
+  /**
+   * Fill in imeta fields the media server didn't report. `url`, `m`, `size` and
+   * `x` are known locally for free; `dim` and `thumbhash` require decoding the
+   * file, so they are only computed when the server omitted them. Fields the
+   * server did report are always kept as-is.
+   */
+  private async completeImetaTags(
+    url: string,
+    serverTags: string[][],
+    file: File,
+    sha256?: string
+  ): Promise<string[][]> {
+    const tags = serverTags.filter((tag) => tag.length >= 2)
+    const has = (name: string) => tags.some(([n]) => n === name)
+
+    if (!has('url')) tags.push(['url', url])
+    if (!has('m') && file.type) tags.push(['m', file.type])
+    if (!has('size')) tags.push(['size', String(file.size)])
+    if (!has('x')) {
+      tags.push(['x', sha256 ?? (await BlossomClient.getFileSha256(file))])
     }
-    return result
+
+    if (!has('dim') || !has('thumbhash')) {
+      const { dim, thumbHash } = await getMediaMeta(file)
+      if (dim && !has('dim')) tags.push(['dim', dim])
+      if (thumbHash && !has('thumbhash')) tags.push(['thumbhash', thumbHash])
+    }
+
+    return tags
   }
 
   private async uploadByBlossom(file: File, options?: UploadOptions) {
@@ -176,7 +207,7 @@ class MediaUploadService {
     }
 
     options?.onProgress?.(100)
-    return { url: blob.url, tags }
+    return { url: blob.url, tags, sha256: blob.sha256 }
   }
 
   /**

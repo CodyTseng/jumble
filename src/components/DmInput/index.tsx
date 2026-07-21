@@ -5,6 +5,7 @@ import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import Nip05 from '@/components/Nip05'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
 import { SimpleUsername } from '@/components/Username'
+import { getMediaMeta } from '@/lib/media-meta'
 import { userIdToPubkey } from '@/lib/pubkey'
 import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { showUploadErrorToast } from '@/lib/upload-error-toast'
@@ -19,8 +20,6 @@ import { TGif } from '@/services/klipy.service'
 import mediaUpload from '@/services/media-upload.service'
 import { TEmoji, TProfile } from '@/types'
 import { nip19 } from 'nostr-tools'
-import { base64 } from '@scure/base'
-import { rgbaToThumbHash } from 'thumbhash'
 import {
   closestCenter,
   DndContext,
@@ -58,61 +57,6 @@ type MediaItem = {
   dim?: string
   size?: number
   thumbHash?: string
-}
-
-const THUMBHASH_MAX_SIZE = 100
-
-function getMediaMeta(file: File): Promise<{ dim?: string; thumbHash?: string }> {
-  return new Promise((resolve) => {
-    if (file.type.startsWith('image/')) {
-      const img = new window.Image()
-      img.onload = () => {
-        const dim = `${img.naturalWidth}x${img.naturalHeight}`
-
-        // Generate thumbhash
-        const { naturalWidth: w, naturalHeight: h } = img
-        const scale = Math.min(THUMBHASH_MAX_SIZE / w, THUMBHASH_MAX_SIZE / h, 1)
-        const tw = Math.round(w * scale)
-        const th = Math.round(h * scale)
-        const canvas = document.createElement('canvas')
-        canvas.width = tw
-        canvas.height = th
-        const ctx = canvas.getContext('2d')!
-        ctx.drawImage(img, 0, 0, tw, th)
-        const pixels = ctx.getImageData(0, 0, tw, th)
-        let thumbHash: string | undefined
-        try {
-          const hash = rgbaToThumbHash(tw, th, pixels.data)
-          thumbHash = base64.encode(hash)
-        } catch {
-          /***/
-        }
-
-        URL.revokeObjectURL(img.src)
-        resolve({ dim, thumbHash })
-      }
-      img.onerror = () => {
-        URL.revokeObjectURL(img.src)
-        resolve({})
-      }
-      img.src = URL.createObjectURL(file)
-    } else if (file.type.startsWith('video/')) {
-      const video = document.createElement('video')
-      video.preload = 'metadata'
-      video.onloadedmetadata = () => {
-        const dim = `${video.videoWidth}x${video.videoHeight}`
-        URL.revokeObjectURL(video.src)
-        resolve({ dim })
-      }
-      video.onerror = () => {
-        URL.revokeObjectURL(video.src)
-        resolve({})
-      }
-      video.src = URL.createObjectURL(file)
-    } else {
-      resolve({})
-    }
-  })
 }
 
 function SortableMediaItem({
