@@ -472,12 +472,13 @@ const NoteList = forwardRef<
       return true
     }, [timelineKey, events, areAlgoRelays])
 
-    const { visibleItems, shouldShowLoadingIndicator, bottomRef } = useInfiniteScroll({
-      items: filteredNotes,
-      showCount: SHOW_COUNT,
-      onLoadMore: handleLoadMore,
-      initialLoading
-    })
+    const { visibleItems, shouldShowLoadingIndicator, bottomRef, retryLoadMore } =
+      useInfiniteScroll({
+        items: filteredNotes,
+        showCount: SHOW_COUNT,
+        onLoadMore: handleLoadMore,
+        initialLoading
+      })
 
     const showNewEvents = () => {
       setEvents((oldEvents) => mergeTimelines([newEvents, oldEvents]))
@@ -503,7 +504,14 @@ const NoteList = forwardRef<
         {shouldShowLoadingIndicator || filtering || initialLoading ? (
           <NoteCardLoadingSkeleton />
         ) : events.length ? (
-          <div className="text-muted-foreground mt-2 text-center text-sm">{t('no more notes')}</div>
+          <div className="mt-2 flex flex-col items-center gap-3">
+            <div className="text-muted-foreground text-center text-sm">{t('no more notes')}</div>
+            {!areAlgoRelays && (
+              <Button variant="outline" size="sm" onClick={retryLoadMore}>
+                {t('Try loading more')}
+              </Button>
+            )}
+          </div>
         ) : (
           <div className="mt-8 flex w-full flex-col items-center justify-center gap-4">
             <div className="text-muted-foreground text-center">

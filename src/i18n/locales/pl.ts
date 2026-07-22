@@ -1152,6 +1152,7 @@ export default {
     Anonymous: 'Anonimowo',
     'Anonymous reply hint':
       'Używa nowej, jednorazowej tożsamości Nostr. Twoje konto nie pojawi się w zdarzeniu, ale przekaźniki i obserwatorzy sieci nadal mogą powiązać Twoją aktywność.',
-    'One-time identity': 'Jednorazowa tożsamość'
+    'One-time identity': 'Jednorazowa tożsamość',
+    'Try loading more': 'Spróbuj wczytać więcej'
   }
 }

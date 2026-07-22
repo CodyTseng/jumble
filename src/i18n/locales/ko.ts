@@ -1128,6 +1128,7 @@ export default {
     Anonymous: '익명',
     'Anonymous reply hint':
       '새로운 일회용 Nostr 신원을 사용합니다. 이벤트에 내 계정은 표시되지 않지만, 릴레이와 네트워크 관찰자가 활동을 연관 지을 수 있습니다.',
-    'One-time identity': '일회용 신원'
+    'One-time identity': '일회용 신원',
+    'Try loading more': '더 불러오기'
   }
 }

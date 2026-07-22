@@ -1133,6 +1133,7 @@ export default {
     Anonymous: 'Anonymous',
     'Anonymous reply hint':
       'Uses a new one-time Nostr identity. Your account will not appear in the event, but relays and network observers may still correlate your activity.',
-    'One-time identity': 'One-time identity'
+    'One-time identity': 'One-time identity',
+    'Try loading more': 'Try loading more'
   }
 }

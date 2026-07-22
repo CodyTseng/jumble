@@ -1142,6 +1142,7 @@ export default {
     Anonymous: '匿名',
     'Anonymous reply hint':
       '新しい使い捨ての Nostr ID を使用します。イベントにあなたのアカウントは表示されませんが、リレーやネットワーク監視者が活動を関連付けられる可能性があります。',
-    'One-time identity': '使い捨て ID'
+    'One-time identity': '使い捨て ID',
+    'Try loading more': 'さらに読み込む'
   }
 }

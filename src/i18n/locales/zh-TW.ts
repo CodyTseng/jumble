@@ -1100,6 +1100,7 @@ export default {
     Anonymous: '匿名',
     'Anonymous reply hint':
       '使用一個全新的一次性 Nostr 身分。事件中不會出現你的帳號，但中繼和網路觀察者仍可能關聯你的活動。',
-    'One-time identity': '一次性身分'
+    'One-time identity': '一次性身分',
+    'Try loading more': '嘗試載入更多'
   }
 }
