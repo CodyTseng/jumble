@@ -209,6 +209,14 @@
   }
 }
 
+/* The lightbox disables the native image callout by default. Restore it so
+   mobile users can long-press the full-size image to save or share it. */
+.yarl__container .yarl__slide_image {
+  -webkit-touch-callout: default;
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .clickable:hover {
     background-color: hsl(var(--muted) / 0.4);
