@@ -77,6 +77,8 @@ const PostTextarea = forwardRef<
   ) => {
     const { t } = useTranslation()
     const [tabValue, setTabValue] = useState('edit')
+    const editContentRef = useRef<HTMLDivElement>(null)
+    const [previewHeight, setPreviewHeight] = useState<number>()
     const [isDraggingFile, setIsDraggingFile] = useState(false)
     // Keep the tabs and the (mobile) action buttons on one row when they fit;
     // when a long translation would crowd them, stack the buttons above the tabs.
@@ -230,7 +232,17 @@ const PostTextarea = forwardRef<
     }
 
     return (
-      <Tabs defaultValue="edit" value={tabValue} onValueChange={(v) => setTabValue(v)}>
+      <Tabs
+        defaultValue="edit"
+        value={tabValue}
+        onValueChange={(value) => {
+          if (value === 'preview') {
+            const height = editContentRef.current?.getBoundingClientRect().height
+            if (height) setPreviewHeight(height)
+          }
+          setTabValue(value)
+        }}
+      >
         <div className="px-5 pt-3 sm:px-6">
           <div
             ref={headerRef}
@@ -262,7 +274,7 @@ const PostTextarea = forwardRef<
             )}
           </div>
         </div>
-        <TabsContent value="edit" className="mt-0">
+        <TabsContent ref={editContentRef} value="edit" className="mt-0">
           {postAsAccount && onPostAsAccountChange && (
             <PostAccountSelector
               value={postAsAccount}
@@ -284,7 +296,8 @@ const PostTextarea = forwardRef<
         </TabsContent>
         <TabsContent
           value="preview"
-          className="mt-0"
+          className="mt-0 overflow-y-auto overscroll-contain"
+          style={previewHeight ? { height: previewHeight } : undefined}
           onClick={() => {
             setTabValue('edit')
             editor.commands.focus()

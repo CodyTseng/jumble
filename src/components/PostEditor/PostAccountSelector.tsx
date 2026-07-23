@@ -51,7 +51,7 @@ export default function PostAccountSelector({
     <button
       type="button"
       title={t('Post as')}
-      className="clickable text-muted-foreground hover:bg-accent hover:text-foreground -ms-1 flex h-14 max-w-full items-center gap-2 rounded-lg px-1.5 py-2 transition-colors"
+      className="clickable text-muted-foreground hover:bg-accent hover:text-foreground -ms-1 flex h-14 max-w-full items-center gap-2 rounded-lg px-1 py-2 transition-colors"
     >
       {isAnonymous ? (
         <>
@@ -73,14 +73,16 @@ export default function PostAccountSelector({
             <div className="min-w-0 flex-1 text-start">
               <SimpleUsername
                 userId={value.pubkey}
-                className="text-foreground block truncate text-sm font-semibold"
-                skeletonClassName="h-3"
+                className="text-foreground flex truncate text-base font-semibold"
+                skeletonClassName="h-4"
               />
-              <SignerTypeBadge
-                signerType={value.signerType}
-                isPomegranate={isPomegranateAccountByPointer(value)}
-                className="whitespace-nowrap"
-              />
+              <div className="flex h-6 items-center">
+                <SignerTypeBadge
+                  signerType={value.signerType}
+                  isPomegranate={isPomegranateAccountByPointer(value)}
+                  className="whitespace-nowrap"
+                />
+              </div>
             </div>
           </>
         )
