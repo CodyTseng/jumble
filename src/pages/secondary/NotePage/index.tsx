@@ -17,6 +17,8 @@ import TranslateButton from '@/components/TranslateButton'
 import TrustScoreBadge from '@/components/TrustScoreBadge'
 import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username from '@/components/Username'
+import WebPreview from '@/components/WebPreview'
+import { parseYoutubeUrl } from '@/components/YoutubeEmbeddedPlayer'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -248,9 +250,23 @@ export default NotePage
 function ExternalRoot({ value }: { value: string }) {
   const { push } = useSecondaryPage()
   const { autoLoadProfilePicture } = useContentPolicy()
+  // A YouTube thumbnail comes straight from the video id, so it still shows
+  // when og:image isn't reachable.
+  const fallbackImage = useMemo(() => {
+    const { videoId } = parseYoutubeUrl(value)
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : undefined
+  }, [value])
 
   return (
     <div>
+      {/* Show what the thread is replying to. Always the compact link card,
+          never an inline player or gallery — those grow tall enough (a vertical
+          video especially) to push the note itself off screen. The full embed
+          lives on the external content page. Renders nothing when media
+          auto-load is off, leaving the link below as the fallback. */}
+      {/^https?:\/\//i.test(value) && (
+        <WebPreview className="mb-2" url={value} fallbackImage={fallbackImage} />
+      )}
       <Card
         className="clickable text-muted-foreground hover:text-foreground flex items-center gap-1 px-1.5 py-1 text-sm"
         onClick={() => push(toExternalContent(value))}
