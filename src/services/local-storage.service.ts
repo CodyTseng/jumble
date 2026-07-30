@@ -1121,6 +1121,14 @@ class LocalStorageService {
     window.localStorage.setItem(StorageKey.FAVICON_URL_TEMPLATE, template)
   }
 
+  getNip07CheckDisabled() {
+    return window.localStorage.getItem(StorageKey.NIP07_CHECK_DISABLED) === 'true'
+  }
+
+  setNip07CheckDisabled(disabled: boolean) {
+    window.localStorage.setItem(StorageKey.NIP07_CHECK_DISABLED, disabled.toString())
+  }
+
   getFilterOutOnionRelays() {
     return this.filterOutOnionRelays
   }

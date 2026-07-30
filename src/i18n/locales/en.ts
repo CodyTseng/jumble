@@ -1134,6 +1134,9 @@ export default {
     'Anonymous reply hint':
       'Uses a new one-time Nostr identity. Your account will not appear in the event, but relays and network observers may still correlate your activity.',
     'One-time identity': 'One-time identity',
-    'Try loading more': 'Try loading more'
+    'Try loading more': 'Try loading more',
+    'Your signer extension switched to {{username}}': 'Your signer extension switched to {{username}}',
+    'Your signer extension is on a new account': 'Your signer extension is on a new account',
+    'This account is already logged in': 'This account is already logged in'
   }
 }
