@@ -1152,6 +1152,9 @@ export default {
     'Anonymous reply hint':
       'Utiliza uma nova identidade Nostr de utilização única. A sua conta não aparecerá no evento, mas os relays e observadores da rede ainda poderão associar a sua atividade.',
     'One-time identity': 'Identidade de utilização única',
-    'Try loading more': 'Tentar carregar mais'
+    'Try loading more': 'Tentar carregar mais',
+    'Your signer extension switched to {{username}}': 'A sua extensão de assinatura mudou para {{username}}',
+    'Your signer extension is on a new account': 'A sua extensão de assinatura está numa nova conta',
+    'This account is already logged in': 'Esta conta já tem sessão iniciada'
   }
 }

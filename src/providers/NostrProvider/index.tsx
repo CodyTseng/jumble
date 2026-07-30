@@ -45,7 +45,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useDeletedEvent } from '../DeletedEventProvider'
 import { BunkerSigner } from './bunker.signer'
-import { Nip07Signer } from './nip-07.signer'
+import { clearNip07ProviderCache, Nip07Signer, NIP07_PROMPT_THRESHOLD_MS } from './nip-07.signer'
 import { NostrConnectionSigner } from './nostrConnection.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
@@ -157,6 +157,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     resolve: (password: string) => void
     reject: () => void
   } | null>(null)
+  // Survive account switches: the last pubkey seen active in the NIP-07
+  // extension, and whether its getPublicKey prompts (stop polling if so —
+  // persisted so a prompting extension is probed at most once, not once per
+  // page load).
+  const nip07ExtensionPubkeyRef = useRef<string | null>(null)
+  const nip07CheckDisabledRef = useRef(storage.getNip07CheckDisabled())
 
   useEffect(() => {
     const init = async () => {
@@ -457,6 +463,97 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }, [account])
 
+  // Multi-account NIP-07 extensions switch the active account globally without
+  // notifying the page. Switching requires leaving the tab, so re-check whenever
+  // it regains focus and offer to switch to (or add) the detected account
+  // instead of failing at the next signature.
+  useEffect(() => {
+    if (account?.signerType !== 'nip-07') return
+
+    let promptedPubkey: string | null = null
+    let checking = false
+    let lastCheckedAt = 0
+    const disableCheck = () => {
+      nip07CheckDisabledRef.current = true
+      storage.setNip07CheckDisabled(true)
+    }
+    const check = async () => {
+      if (checking || nip07CheckDisabledRef.current || document.hidden || !window.nostr) return
+      if (Date.now() - lastCheckedAt < 1500) return
+      lastCheckedAt = Date.now()
+      checking = true
+      const startedAt = Date.now()
+      try {
+        clearNip07ProviderCache(window.nostr)
+        const activePubkey = await window.nostr.getPublicKey()
+        // A slow answer means the extension prompted the user. Polling on
+        // every focus would spam prompts, so stop for good.
+        if (Date.now() - startedAt > NIP07_PROMPT_THRESHOLD_MS) {
+          disableCheck()
+        }
+        const previousPubkey = nip07ExtensionPubkeyRef.current
+        nip07ExtensionPubkeyRef.current = activePubkey
+        if (!activePubkey || activePubkey === account.pubkey) {
+          promptedPubkey = null
+          toast.dismiss('nip07-account-changed')
+          return
+        }
+        // Signing is bound to the session account via the event template, so
+        // a mismatch alone is a normal state for multi-account users. Only
+        // announce actual extension-side switches.
+        if (previousPubkey === activePubkey) return
+        if (promptedPubkey === activePubkey) return
+        promptedPubkey = activePubkey
+        const known = storage
+          .getAccounts()
+          .some((act) => act.signerType === 'nip-07' && act.pubkey === activePubkey)
+        toast.info(
+          known
+            ? t('Your signer extension switched to {{username}}', {
+                username: formatPubkey(activePubkey)
+              })
+            : t('Your signer extension is on a new account'),
+          {
+            id: 'nip07-account-changed',
+            duration: 10_000,
+            action: {
+              label: known ? t('Switch account') : t('Add'),
+              onClick: () => {
+                if (known) {
+                  switchAccount({ pubkey: activePubkey, signerType: 'nip-07' })
+                } else {
+                  nip07Login()
+                }
+              }
+            }
+          }
+        )
+      } catch {
+        // Give up only when the failure involved a visible prompt the user
+        // dismissed; a fast failure is a transient extension hiccup and the
+        // next focus should try again.
+        if (Date.now() - startedAt > NIP07_PROMPT_THRESHOLD_MS) {
+          disableCheck()
+        }
+      } finally {
+        checking = false
+      }
+    }
+
+    if (document.hasFocus()) {
+      check()
+    }
+    window.addEventListener('focus', check)
+    document.addEventListener('visibilitychange', check)
+    return () => {
+      window.removeEventListener('focus', check)
+      document.removeEventListener('visibilitychange', check)
+      // The toast's action closes over this render's account state; acting on
+      // it after logout/switch would be wrong.
+      toast.dismiss('nip07-account-changed')
+    }
+  }, [account])
+
   useEffect(() => {
     customEmojiService.init(userEmojiListEvent)
   }, [userEmojiListEvent])
@@ -579,6 +676,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (!pubkey) {
         throw new Error('You did not allow to access your pubkey')
       }
+      // Still call login() to refresh the signer instance (the old one may
+      // hold a dead window.nostr reference after an extension reload).
+      if (account?.pubkey === pubkey && account.signerType === 'nip-07') {
+        toast.info(t('This account is already logged in'))
+      }
       return login(nip07Signer, { pubkey, signerType: 'nip-07' })
     } catch (err) {
       toast.error(t('Login failed') + ': ' + (err as Error).message)
@@ -652,7 +754,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
-      await nip07Signer.init()
+      await nip07Signer.init(account.pubkey)
       return login(nip07Signer, account)
     } else if (account.signerType === 'bunker') {
       if (account.bunker && account.bunkerClientSecretKey) {
@@ -698,7 +800,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
-      await nip07Signer.init()
+      await nip07Signer.init(account.pubkey)
       return nip07Signer
     } else if (account.signerType === 'bunker') {
       if (account.bunker && account.bunkerClientSecretKey) {

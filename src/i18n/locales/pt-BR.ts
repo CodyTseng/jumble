@@ -1148,6 +1148,9 @@ export default {
     'Anonymous reply hint':
       'Usa uma nova identidade Nostr descartável. Sua conta não aparecerá no evento, mas relays e observadores da rede ainda poderão correlacionar sua atividade.',
     'One-time identity': 'Identidade descartável',
-    'Try loading more': 'Tentar carregar mais'
+    'Try loading more': 'Tentar carregar mais',
+    'Your signer extension switched to {{username}}': 'Sua extensão de assinatura mudou para {{username}}',
+    'Your signer extension is on a new account': 'Sua extensão de assinatura está em uma nova conta',
+    'This account is already logged in': 'Esta conta já está logada'
   }
 }
