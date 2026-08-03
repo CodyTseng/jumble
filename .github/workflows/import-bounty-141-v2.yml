@@ -1,0 +1,36 @@
+name: Import bounty 141 patch onto current master
+
+on:
+  push:
+    branches:
+      - bounty/141-private-follow-v2
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: "!contains(github.event.head_commit.message, '[imported]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current fork branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply the tested branch as a patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git clone --filter=blob:none --no-checkout https://github.com/cornerblue/jumble.git "$tmp/source"
+          git -C "$tmp/source" fetch --depth 1 origin master bounty/141-112-private-follow-and-tab-sync
+          base_sha="$(git -C "$tmp/source" rev-parse origin/master)"
+          source_sha="$(git -C "$tmp/source" rev-parse origin/bounty/141-112-private-follow-and-tab-sync)"
+          git -C "$tmp/source" diff --binary "$base_sha" "$source_sha" > "$tmp/changes.patch"
+          git apply --3way "$tmp/changes.patch"
+          rm -f "$GITHUB_WORKSPACE/.github/workflows/import-bounty-141-v2.yml"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "[imported] bounty 141 patch on current master"
+          git push origin HEAD:bounty/141-private-follow-v2
