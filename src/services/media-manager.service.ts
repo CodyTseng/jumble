@@ -1,4 +1,5 @@
 import { YouTubePlayer } from '@/types/youtube'
+import { YOUTUBE_PLAYER_STATE } from '@/lib/youtube'
 import { atom, getDefaultStore } from 'jotai'
 
 export const hasBackgroundAudioAtom = atom(false)
@@ -180,9 +181,8 @@ function isYouTubePlayer(media: Media): media is YouTubePlayer {
 
 function isMediaPlaying(media: Media) {
   if (isYouTubePlayer(media)) {
-    return [window.YT.PlayerState.PLAYING, window.YT.PlayerState.BUFFERING].includes(
-      media.getPlayerState()
-    )
+    const state = media.getPlayerState()
+    return state === YOUTUBE_PLAYER_STATE.PLAYING || state === YOUTUBE_PLAYER_STATE.BUFFERING
   }
   return !media.paused && !media.ended
 }

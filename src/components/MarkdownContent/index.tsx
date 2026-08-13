@@ -1,6 +1,7 @@
 import { SecondaryPageLink } from '@/PageManager'
 import { X_URL_REGEX, YOUTUBE_URL_REGEX } from '@/constants'
 import { toNote, toProfile } from '@/lib/link'
+import { transformMarkdownUrl } from '@/lib/markdown'
 import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
@@ -134,12 +135,7 @@ export default function MarkdownContent({ content, event }: { content: string; e
     <div className="space-y-3 whitespace-normal">
       <Markdown
         remarkPlugins={[remarkGfm, remarkNostr, remarkInlineContent]}
-        urlTransform={(url) => {
-          if (url.startsWith('nostr:')) {
-            return url.slice(6)
-          }
-          return url
-        }}
+        urlTransform={transformMarkdownUrl}
         components={components}
       >
         {processedContent}

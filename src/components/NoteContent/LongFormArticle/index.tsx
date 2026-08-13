@@ -6,7 +6,8 @@ import PostEditor from '@/components/PostEditor'
 import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { toNote, toNoteList, toProfile } from '@/lib/link'
-import { estimateReadingMinutes } from '@/lib/markdown'
+import { estimateReadingMinutes, transformMarkdownUrl } from '@/lib/markdown'
+import { getSafeExternalUrl } from '@/lib/url'
 import { ExternalLink } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
@@ -73,10 +74,12 @@ export default function LongFormArticle({
               </SecondaryPageLink>
             )
           }
+          const safeHref = getSafeExternalUrl(href)
+          if (!safeHref) return <span className="wrap-break-word">{children}</span>
           return (
             <a
               {...props}
-              href={href}
+              href={safeHref}
               target="_blank"
               rel="noreferrer noopener"
               className="wrap-break-word"
@@ -127,12 +130,7 @@ export default function LongFormArticle({
         )}
         <Markdown
           remarkPlugins={[remarkGfm, remarkNostr]}
-          urlTransform={(url) => {
-            if (url.startsWith('nostr:')) {
-              return url.slice(6) // Remove 'nostr:' prefix for rendering
-            }
-            return url
-          }}
+          urlTransform={transformMarkdownUrl}
           components={components}
         >
           {displayEvent.content}

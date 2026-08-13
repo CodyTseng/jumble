@@ -1,3 +1,24 @@
+import { nip19 } from 'nostr-tools'
+import { defaultUrlTransform } from 'react-markdown'
+
+const SUPPORTED_NOSTR_LINK_TYPES = new Set(['npub', 'nprofile', 'note', 'nevent', 'naddr'])
+
+/**
+ * Preserve Jumble's internal nostr: links without disabling react-markdown's
+ * protocol filtering for every other URL.
+ */
+export function transformMarkdownUrl(url: string): string {
+  if (!url.startsWith('nostr:')) return defaultUrlTransform(url)
+
+  const bech32Id = url.slice('nostr:'.length)
+  try {
+    const decoded = nip19.decode(bech32Id)
+    return SUPPORTED_NOSTR_LINK_TYPES.has(decoded.type) ? bech32Id : ''
+  } catch {
+    return ''
+  }
+}
+
 /**
  * Detects whether a string contains meaningful Markdown formatting.
  * Strips URLs and nostr: references first to avoid false positives.

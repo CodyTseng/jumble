@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { toExternalContent } from '@/lib/link'
-import { truncateUrl } from '@/lib/url'
+import { getSafeExternalUrl, truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { ExternalLink as ExternalLinkIcon, MessageSquare } from 'lucide-react'
@@ -29,9 +29,10 @@ export default function ExternalLink({
   const { push } = useSecondaryPage()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const displayUrl = useMemo(() => truncateUrl(url), [url])
+  const safeUrl = useMemo(() => getSafeExternalUrl(url), [url])
 
   const openInNewTab = () => {
-    window.open(url, '_blank', 'noreferrer')
+    if (safeUrl) window.open(safeUrl, '_blank', 'noreferrer')
   }
 
   const handleOpenLink = (e: React.MouseEvent) => {
@@ -52,12 +53,16 @@ export default function ExternalLink({
     push(toExternalContent(url))
   }
 
+  if (!safeUrl) {
+    return <span className={cn('wrap-break-word', className)}>{displayUrl}</span>
+  }
+
   if (justOpenLink) {
     return (
       <a
-        href={url}
+        href={safeUrl}
         target="_blank"
-        rel="noreferrer"
+        rel="noreferrer noopener"
         className={cn('cursor-pointer text-primary hover:underline', className)}
         onClick={(e) => e.stopPropagation()}
       >

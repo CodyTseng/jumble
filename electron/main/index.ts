@@ -79,7 +79,7 @@ function createWindow() {
       preload: path.join(MAIN_DIST, 'preload', 'index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   })
 

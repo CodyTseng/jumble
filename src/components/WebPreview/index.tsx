@@ -1,5 +1,5 @@
 import { useFetchWebMetadata } from '@/hooks/useFetchWebMetadata'
-import { isInsecureUrl, truncateUrl } from '@/lib/url'
+import { getSafeExternalUrl, isInsecureUrl, truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -27,7 +27,9 @@ export default function WebPreview({
   const { allowInsecureConnection } = useUserPreferences()
   const previewRef = useRef<HTMLAnchorElement>(null)
   const [isNearViewport, setIsNearViewport] = useState(false)
+  const safeUrl = useMemo(() => getSafeExternalUrl(url), [url])
   const shouldShow =
+    Boolean(safeUrl) &&
     (autoLoadMedia || Boolean(mustLoad)) &&
     (allowInsecureConnection || !isInsecureUrl(url))
   const { metadata, isLoading } = useFetchWebMetadata(url, shouldShow && isNearViewport)
@@ -80,9 +82,9 @@ export default function WebPreview({
     <div className={cn('@container w-full', className)}>
       <a
         ref={previewRef}
-        href={url}
+        href={safeUrl ?? undefined}
         target="_blank"
-        rel="noreferrer"
+        rel="noreferrer noopener"
         className="group bg-card hover:bg-accent/30 focus-visible:ring-ring flex h-24 w-full overflow-hidden rounded-xl border text-start transition-colors hover:border-foreground/20 focus-visible:ring-2 focus-visible:outline-none @[15rem]:h-28 @[28rem]:h-32"
         title={url}
       >

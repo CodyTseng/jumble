@@ -3,6 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!--
+      Remote images, audio/video, fetches, and relay WebSockets intentionally
+      remain open for decentralized content. Executable scripts and embedded
+      frames are restricted to the providers integrated by the application.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; connect-src 'self' data: blob: http: https: ws: wss:; frame-src http://127.0.0.1:* https://www.youtube.com https://www.youtube-nocookie.com https://platform.twitter.com; font-src 'self' data:; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'"
+    />
 
     <title>Jumble</title>
     <meta name="description" content="A user-friendly Nostr client for exploring relay feeds" />

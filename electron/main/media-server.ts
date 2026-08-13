@@ -160,6 +160,14 @@ export class MediaServer {
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Cache-Control', 'no-store')
     res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; base-uri 'none'; object-src 'none'; " +
+        "script-src 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; " +
+        "style-src 'unsafe-inline'; img-src data: https:; media-src blob: https:; " +
+        'connect-src https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; ' +
+        "form-action 'none'; frame-ancestors app://renderer"
+    )
 
     if (req.method === 'HEAD') {
       res.statusCode = 200

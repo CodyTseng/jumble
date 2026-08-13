@@ -7,6 +7,24 @@ export function isWebsocketUrl(url: string): boolean {
   }
 }
 
+/**
+ * Returns a normalized URL only when it is safe to open as a web link.
+ *
+ * Keep this deliberately narrower than the set of schemes a browser can
+ * navigate to. User-controlled Nostr content must never be able to create a
+ * `javascript:`/`data:` link; non-web schemes should use dedicated UI where
+ * their semantics can be validated separately.
+ */
+export function getSafeExternalUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
+    return parsed.toString()
+  } catch {
+    return null
+  }
+}
+
 export function isInsecureUrl(url: string): boolean {
   // Consider .onion URLs as secure (accessed over Tor, no mixed-content concern)
   if (isOnionUrl(url)) {
