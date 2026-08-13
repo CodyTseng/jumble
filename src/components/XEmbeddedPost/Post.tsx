@@ -85,8 +85,9 @@ const Post = memo(({ tweetId, url, className, embedded = true }: PostProps) => {
         src={iframeSrc}
         title={t('X post')}
         sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-        className="block w-full border-0"
-        style={{ height }}
+        scrolling="no"
+        className="block w-full overflow-hidden border-0"
+        style={{ height: height + 1 }}
       />
       {!loaded && <Skeleton className="absolute inset-0 h-full w-full rounded-lg" />}
       {loaded && embedded && supportsHover && (
