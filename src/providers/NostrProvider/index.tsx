@@ -398,6 +398,39 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }, [account])
 
+  // Keep the follow list (kind:3 contacts) in sync across tabs and clients.
+  // Following/unfollowing in another Jumble tab (or any other Nostr client)
+  // publishes a new kind:3 event. Subscribing to the current account's
+  // contacts events lets this tab apply the latest follow list live, without
+  // needing a refresh. (issue #112)
+  useEffect(() => {
+    if (!account) return
+
+    const defaultRelays = getDefaultRelayUrls()
+    const relays =
+      relayList?.write.concat(defaultRelays).slice(0, 4) ?? defaultRelays.slice(0, 4)
+    const sub = client.subscribe(
+      relays,
+      {
+        kinds: [kinds.Contacts],
+        authors: [account.pubkey]
+      },
+      {
+        onevent: async (event) => {
+          const stored = await indexedDb.putReplaceableEvent(event)
+          if (stored.id !== event.id) return
+
+          setFollowListEvent(event)
+          await client.updateFollowListCache(event)
+        }
+      }
+    )
+
+    return () => {
+      sub.close()
+    }
+  }, [account, relayList])
+
   useEffect(() => {
     if (!account) return
 
