@@ -446,7 +446,7 @@ export async function minePow(
           )
         )
 
-        if (getPowFromBytes(hash) >= difficulty) {
+        if (getPowFromBytes(hash) == difficulty) {
           event.id = bytesToHex(hash)
           resolve(event)
           return
