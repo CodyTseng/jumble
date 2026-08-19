@@ -7,7 +7,18 @@ export function parseEditorJsonToText(node?: JSONContent, options?: { trim?: boo
   const text = _parseEditorJsonToText(node)
   const regex = /(^|\s+|@)(nostr:)?(nevent|naddr|nprofile|npub)1[a-zA-Z0-9]+/g
 
-  const normalized = text.replace(regex, (match, leadingWhitespace) => {
+  const normalized = text.replace(regex, (...args) => {
+    const [match, leadingWhitespace] = args as [string, string]
+    const offset = args[args.length - 2] as number
+    const full = args[args.length - 1] as string
+
+    // A bech32 id that runs straight into a hostname or a path belongs to a URL
+    // (e.g. npub1….blossom.band/image.png), not to a mention. Prefixing it there
+    // breaks the link, so leave it alone.
+    if (/^(?:\.[a-zA-Z0-9-]|\/)/.test(full.slice(offset + match.length))) {
+      return match
+    }
+
     let bech32 = match.trim()
     const whitespace = leadingWhitespace || ''
 
