@@ -43,7 +43,7 @@ type TStackItem = {
   index: number
   url: string
   element: React.ReactElement | null
-  ref: RefObject<TPageRef> | null
+  ref: RefObject<TPageRef | null> | null
   hideBottomBar: boolean
 }
 

@@ -4,7 +4,7 @@ import { getEmojiPackInfoFromEvent, getEmojisAndEmojiSetsFromEvent } from '@/lib
 import client from '@/services/client.service'
 import recentEmojiService from '@/services/recent-emoji.service'
 import { TEmoji, TEmojiPack } from '@/types'
-import { sha256 } from '@noble/hashes/sha2'
+import { sha256 } from '@noble/hashes/sha2.js'
 import FlexSearch from 'flexsearch'
 import { atom, getDefaultStore } from 'jotai'
 import { Event } from 'nostr-tools'

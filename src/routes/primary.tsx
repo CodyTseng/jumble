@@ -29,7 +29,7 @@ export const PRIMARY_PAGE_REF_MAP = PRIMARY_ROUTE_CONFIGS.reduce(
     acc[key] = createRef<TPageRef>()
     return acc
   },
-  {} as Record<string, React.RefObject<TPageRef>>
+  {} as Record<string, React.RefObject<TPageRef | null>>
 )
 
 export const PRIMARY_PAGE_MAP = PRIMARY_ROUTE_CONFIGS.reduce(
@@ -37,7 +37,7 @@ export const PRIMARY_PAGE_MAP = PRIMARY_ROUTE_CONFIGS.reduce(
     acc[key] = <Component ref={PRIMARY_PAGE_REF_MAP[key]} />
     return acc
   },
-  {} as Record<(typeof PRIMARY_ROUTE_CONFIGS)[number]['key'], JSX.Element>
+  {} as Record<(typeof PRIMARY_ROUTE_CONFIGS)[number]['key'], React.JSX.Element>
 )
 
 export type TPrimaryPageName = keyof typeof PRIMARY_PAGE_MAP

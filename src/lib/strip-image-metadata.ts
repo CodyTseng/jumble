@@ -41,7 +41,7 @@ export async function stripImageMetadata(file: File): Promise<File> {
     if (!stripped || stripped.length === bytes.length) {
       return file
     }
-    return new File([stripped], file.name, {
+    return new File([new Uint8Array(stripped)], file.name, {
       type: file.type,
       lastModified: file.lastModified
     })

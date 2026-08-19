@@ -8,10 +8,11 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Download, Github } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { GithubLogoIcon as Github } from '@phosphor-icons/react'
 
-type LogoComponent = (props: { className?: string }) => JSX.Element
+type LogoComponent = (props: { className?: string }) => React.JSX.Element
 
 const RELEASES_BASE = 'https://github.com/CodyTseng/jumble/releases/latest'
 

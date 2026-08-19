@@ -1,5 +1,5 @@
 import { TSkinTone } from '@/types'
-import FlexSearch from 'flexsearch'
+import FlexSearch, { type Index as FlexSearchIndex } from 'flexsearch'
 
 export type TNativeEmoji = {
   hexcode: string
@@ -75,7 +75,7 @@ type CompactEmojiRaw = {
 type LoadedData = {
   categories: TNativeEmojiCategory[]
   flat: TNativeEmoji[]
-  searchIndex: FlexSearch.Index
+  searchIndex: FlexSearchIndex
 }
 
 let loadPromise: Promise<LoadedData> | null = null

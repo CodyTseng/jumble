@@ -153,7 +153,9 @@ export default function Tabs({
           {tabs.map((tab, index) => (
             <div
               key={tab.value}
-              ref={(el) => (tabRefs.current[index] = el)}
+              ref={(el) => {
+                tabRefs.current[index] = el
+              }}
               className={cn(
                 `clickable relative my-1 w-fit cursor-pointer whitespace-nowrap rounded-xl px-3 py-2 text-center font-semibold transition-all duration-200`,
                 value === tab.value

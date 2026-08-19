@@ -29,7 +29,7 @@ export default function AudioPlayer({
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const seekTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const seekTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const isSeeking = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
 

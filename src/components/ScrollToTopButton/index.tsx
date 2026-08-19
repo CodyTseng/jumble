@@ -11,7 +11,7 @@ export default function ScrollToTopButton({
   scrollAreaRef,
   className
 }: {
-  scrollAreaRef?: React.RefObject<HTMLDivElement>
+  scrollAreaRef?: React.RefObject<HTMLDivElement | null>
   className?: string
 }) {
   const { deepBrowsing, lastScrollTop } = useDeepBrowsing()

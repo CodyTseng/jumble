@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 interface HighlightButtonProps {
   onHighlight: (selectedText: string) => void
-  containerRef?: React.RefObject<HTMLElement>
+  containerRef?: React.RefObject<HTMLElement | null>
 }
 
 export default function HighlightButton({ onHighlight, containerRef }: HighlightButtonProps) {

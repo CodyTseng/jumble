@@ -22,7 +22,7 @@ export function DeepBrowsingProvider({
 }: {
   children: React.ReactNode
   active: boolean
-  scrollAreaRef?: React.RefObject<HTMLDivElement>
+  scrollAreaRef?: React.RefObject<HTMLDivElement | null>
 }) {
   const [deepBrowsing, setDeepBrowsing] = useState(false)
   const lastScrollTopRef = useRef(

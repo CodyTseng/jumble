@@ -5,7 +5,8 @@ import { getMediaMeta } from '@/lib/media-meta'
 import { stripImageMetadata } from '@/lib/strip-image-metadata'
 import { simplifyUrl } from '@/lib/url'
 import { TDraftEvent, TMediaUploadServiceConfig } from '@/types'
-import { BlobDescriptor, BlossomClient, SignedEvent } from 'blossom-client-sdk'
+import { BlobDescriptor, SignedEvent } from 'blossom-client-sdk'
+import * as BlossomClient from 'blossom-client-sdk'
 import { z } from 'zod'
 import client from './client.service'
 import storage from './local-storage.service'
@@ -104,7 +105,7 @@ class MediaUploadService {
     if (!has('m') && file.type) tags.push(['m', file.type])
     if (!has('size')) tags.push(['size', String(file.size)])
     if (!has('x')) {
-      tags.push(['x', sha256 ?? (await BlossomClient.getFileSha256(file))])
+      tags.push(['x', sha256 ?? (await BlossomClient.getBlobSha256(file))])
     }
 
     if (!has('dim') || !has('thumbhash')) {
@@ -117,6 +118,7 @@ class MediaUploadService {
   }
 
   private async uploadByBlossom(file: File, options?: UploadOptions, serverOverride?: string[]) {
+    debugger
     const pubkey = client.pubkey
     const signer = async (draft: TDraftEvent) => {
       if (!client.signer) {
@@ -156,7 +158,7 @@ class MediaUploadService {
     }
     startPseudoProgress()
 
-    let servers = serverOverride ?? (await client.fetchBlossomServerList(pubkey))
+    let servers : string[] = serverOverride ?? (await client.fetchBlossomServerList(pubkey))
     if (!serverOverride && servers.length === 0) {
       // The user has no Blossom server list yet. Use the default servers for this
       // upload right away, and asynchronously create a server list for the user in
@@ -213,7 +215,7 @@ class MediaUploadService {
     const mirrorServers = servers.filter((_, index) => index !== uploadedServerIndex)
     if (mirrorServers.length > 0) {
       await Promise.allSettled(
-        mirrorServers.map((server) => BlossomClient.mirrorBlob(server, blob, { auth }))
+        mirrorServers.map((server) => BlossomClient.Actions.mirrorBlob(server, blob, { auth }))
       )
     }
 
@@ -245,7 +247,7 @@ class MediaUploadService {
     signal?: AbortSignal
   ): Promise<BlobDescriptor> {
     const url = new URL('/upload', server)
-    const sha256 = await BlossomClient.getFileSha256(file)
+    const sha256 = await BlossomClient.getBlobSha256(file)
     const authHeader = BlossomClient.encodeAuthorizationHeader(auth)
     const baseHeaders: Record<string, string> = {
       Authorization: authHeader,
