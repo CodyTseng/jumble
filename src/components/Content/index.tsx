@@ -4,6 +4,8 @@ import {
   EmbeddedEventParser,
   EmbeddedHashtagParser,
   EmbeddedLNInvoiceParser,
+  EmbeddedLegacyEventParser,
+  EmbeddedLegacyMentionParser,
   EmbeddedMentionParser,
   EmbeddedUrlParser,
   EmbeddedWebsocketUrlParser,
@@ -73,6 +75,8 @@ export default function Content({
         EmbeddedUrlParser,
         EmbeddedLNInvoiceParser,
         EmbeddedWebsocketUrlParser,
+        EmbeddedLegacyEventParser,
+        EmbeddedLegacyMentionParser,
         EmbeddedHashtagParser,
         EmbeddedEmojiParser
       ])

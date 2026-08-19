@@ -1,6 +1,7 @@
 import {
   EmbeddedEmojiParser,
   EmbeddedHashtagParser,
+  EmbeddedLegacyMentionParser,
   EmbeddedMentionParser,
   EmbeddedUrlParser,
   EmbeddedWebsocketUrlParser,
@@ -42,6 +43,7 @@ export default function ProfileAbout({
       EmbeddedMentionParser,
       EmbeddedWebsocketUrlParser,
       EmbeddedUrlParser,
+      EmbeddedLegacyMentionParser,
       EmbeddedHashtagParser,
       EmbeddedEmojiParser
     ])

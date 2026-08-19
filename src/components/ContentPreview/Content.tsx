@@ -1,6 +1,8 @@
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
+  EmbeddedLegacyEventParser,
+  EmbeddedLegacyMentionParser,
   EmbeddedMentionParser,
   EmbeddedUrlParser,
   parseContent
@@ -27,6 +29,8 @@ export default function Content({
       EmbeddedEventParser,
       EmbeddedMentionParser,
       EmbeddedUrlParser,
+      EmbeddedLegacyEventParser,
+      EmbeddedLegacyMentionParser,
       EmbeddedEmojiParser
     ])
   }, [content])
