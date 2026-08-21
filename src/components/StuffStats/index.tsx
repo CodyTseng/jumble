@@ -35,6 +35,8 @@ export default function StuffStats({
   const { pubkey } = useNostr()
   const [loading, setLoading] = useState(false)
   const { event } = useStuff(stuff)
+  // Avoid accidentally liking or zapping our own content
+  const isOwnStuff = !!event && !!pubkey && event.pubkey === pubkey
 
   useEffect(() => {
     if (!fetchIfNotExisting) return
@@ -68,8 +70,8 @@ export default function StuffStats({
         >
           <ReplyButton stuff={stuff} />
           <RepostButton stuff={stuff} />
-          <LikeButton stuff={stuff} />
-          <ZapButton stuff={stuff} />
+          {!isOwnStuff && <LikeButton stuff={stuff} />}
+          {!isOwnStuff && <ZapButton stuff={stuff} />}
           <SeenOnButton stuff={stuff} />
         </div>
       </div>
@@ -96,8 +98,8 @@ export default function StuffStats({
         <div className={cn('flex items-center', loading ? 'animate-pulse' : '')}>
           <ReplyButton stuff={stuff} />
           <RepostButton stuff={stuff} />
-          <LikeButton stuff={stuff} />
-          <ZapButton stuff={stuff} />
+          {!isOwnStuff && <LikeButton stuff={stuff} />}
+          {!isOwnStuff && <ZapButton stuff={stuff} />}
         </div>
         <div className="flex items-center">
           <BookmarkButton stuff={stuff} />
