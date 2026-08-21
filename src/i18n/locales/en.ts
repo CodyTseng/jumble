@@ -1149,6 +1149,9 @@ export default {
     'Forgot password?': 'Forgot password?',
     'Reset encrypted data': 'Reset encrypted data',
     'Reset encrypted data warning':
-      'If you forgot the password, you can reset the encrypted data. This permanently deletes all stored login sessions and private keys on this device. This cannot be undone.'
+      'If you forgot the password, you can reset the encrypted data. This permanently deletes all stored login sessions and private keys on this device. This cannot be undone.',
+    'Always show the new notes button': 'Always show the new notes button',
+    'New notes are only shown after clicking the button instead of being inserted automatically':
+      'New notes are only shown after clicking the button instead of being inserted automatically'
   }
 }

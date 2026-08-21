@@ -78,6 +78,7 @@ class LocalStorageService {
   private blossomCacheServerEnabled: boolean = false
   private quickReaction: boolean = false
   private quickReactionEmoji: string | TEmoji = '+'
+  private alwaysShowNewNotesButton: boolean = false
   private addClientTag: boolean = false
   private defaultMinPow: number | null = null
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
@@ -398,6 +399,8 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.BLOSSOM_CACHE_SERVER_ENABLED) === 'true'
 
     this.quickReaction = window.localStorage.getItem(StorageKey.QUICK_REACTION) === 'true'
+    this.alwaysShowNewNotesButton =
+      window.localStorage.getItem(StorageKey.ALWAYS_SHOW_NEW_NOTES_BUTTON) === 'true'
     this.addClientTag = window.localStorage.getItem(StorageKey.ADD_CLIENT_TAG) === 'true'
     const defaultMinPowStr = window.localStorage.getItem(StorageKey.DEFAULT_MIN_POW)
     if (defaultMinPowStr !== null) {
@@ -1241,6 +1244,15 @@ class LocalStorageService {
   setQuickReaction(quickReaction: boolean) {
     this.quickReaction = quickReaction
     window.localStorage.setItem(StorageKey.QUICK_REACTION, quickReaction.toString())
+  }
+
+  getAlwaysShowNewNotesButton() {
+    return this.alwaysShowNewNotesButton
+  }
+
+  setAlwaysShowNewNotesButton(enable: boolean) {
+    this.alwaysShowNewNotesButton = enable
+    window.localStorage.setItem(StorageKey.ALWAYS_SHOW_NEW_NOTES_BUTTON, enable.toString())
   }
 
   getAddClientTag() {

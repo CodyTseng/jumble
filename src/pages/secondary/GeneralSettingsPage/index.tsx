@@ -40,6 +40,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   } = useContentPolicy()
   const { quickReaction, updateQuickReaction, quickReactionEmoji, updateQuickReactionEmoji } =
     useUserPreferences()
+  const { alwaysShowNewNotesButton, updateAlwaysShowNewNotesButton } = useUserPreferences()
   const [disableNotificationSync, setDisableNotificationSync] = useState(
     localStorage.getDisableNotificationSync()
   )
@@ -112,6 +113,23 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             description={t('Automatically replay videos when they end')}
             control={
               <Switch id="video-loop" checked={videoLoop} onCheckedChange={setVideoLoop} />
+            }
+          />
+        </SettingsGroup>
+
+        <SettingsGroup title={t('Feed')}>
+          <SettingsRow
+            htmlFor="always-show-new-notes-button"
+            title={t('Always show the new notes button')}
+            description={t(
+              'New notes are only shown after clicking the button instead of being inserted automatically'
+            )}
+            control={
+              <Switch
+                id="always-show-new-notes-button"
+                checked={alwaysShowNewNotesButton}
+                onCheckedChange={updateAlwaysShowNewNotesButton}
+              />
             }
           />
         </SettingsGroup>

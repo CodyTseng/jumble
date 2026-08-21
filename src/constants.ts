@@ -57,6 +57,7 @@ export const StorageKey = {
   BLOSSOM_CACHE_SERVER_ENABLED: 'blossomCacheServerEnabled',
   QUICK_REACTION: 'quickReaction',
   QUICK_REACTION_EMOJI: 'quickReactionEmoji',
+  ALWAYS_SHOW_NEW_NOTES_BUTTON: 'alwaysShowNewNotesButton',
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
   DEFAULT_RELAY_URLS: 'defaultRelayUrls',
   MUTED_WORDS: 'mutedWords',

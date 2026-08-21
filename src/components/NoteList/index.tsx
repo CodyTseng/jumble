@@ -23,6 +23,7 @@ import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePageActive } from '@/providers/PageActiveProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import client from '@/services/client.service'
 import threadService from '@/services/thread.service'
@@ -123,6 +124,9 @@ const NoteList = forwardRef<
         : undefined
     const showNewNotesDirectlyRef = useRef(showNewNotesDirectly)
     showNewNotesDirectlyRef.current = showNewNotesDirectly
+    const { alwaysShowNewNotesButton } = useUserPreferences()
+    const alwaysShowNewNotesButtonRef = useRef(alwaysShowNewNotesButton)
+    alwaysShowNewNotesButtonRef.current = alwaysShowNewNotesButton
 
     const pinnedEventHexIdSet = useMemo(() => {
       const set = new Set<string>()
@@ -462,7 +466,7 @@ const NoteList = forwardRef<
               return rect.top >= 50
             })()
 
-            if (isAtTop) {
+            if (isAtTop && !alwaysShowNewNotesButtonRef.current) {
               setEvents((oldEvents) => mergeTimelines([recentEvents, oldEvents]))
             } else {
               setNewEvents((oldEvents) => mergeTimelines([recentEvents, oldEvents]))

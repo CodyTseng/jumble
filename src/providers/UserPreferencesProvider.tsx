@@ -23,6 +23,9 @@ type TUserPreferencesContext = {
   quickReactionEmoji: string | TEmoji
   updateQuickReactionEmoji: (emoji: string | TEmoji) => void
 
+  alwaysShowNewNotesButton: boolean
+  updateAlwaysShowNewNotesButton: (enable: boolean) => void
+
   allowInsecureConnection: boolean
   updateAllowInsecureConnection: (allow: boolean) => void
 
@@ -55,6 +58,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   )
   const [quickReaction, setQuickReaction] = useState(storage.getQuickReaction())
   const [quickReactionEmoji, setQuickReactionEmoji] = useState(storage.getQuickReactionEmoji())
+  const [alwaysShowNewNotesButton, setAlwaysShowNewNotesButton] = useState(
+    storage.getAlwaysShowNewNotesButton()
+  )
 
   const [allowInsecureConnection, setAllowInsecureConnection] = useState(
     storage.getAllowInsecureConnection()
@@ -97,6 +103,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setQuickReactionEmoji(emoji)
   }
 
+  const updateAlwaysShowNewNotesButton = (enable: boolean) => {
+    setAlwaysShowNewNotesButton(enable)
+    storage.setAlwaysShowNewNotesButton(enable)
+  }
+
   const updateAllowInsecureConnection = (allow: boolean) => {
     setAllowInsecureConnection(allow)
     storage.setAllowInsecureConnection(allow)
@@ -128,6 +139,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         updateQuickReaction,
         quickReactionEmoji,
         updateQuickReactionEmoji,
+        alwaysShowNewNotesButton,
+        updateAlwaysShowNewNotesButton,
         allowInsecureConnection,
         updateAllowInsecureConnection,
         feedTabs,
