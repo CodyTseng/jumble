@@ -371,6 +371,33 @@ const NoteList = forwardRef<
 
     useImperativeHandle(ref, () => ({ scrollToTop, refresh }), [])
 
+    // Auto-refresh the feed when returning from sleep or after being away for a
+    // long time (e.g. laptop lid closed), so new notes load without a manual reload.
+    const activeRef = useRef(active)
+    activeRef.current = active
+    const lastHiddenAtRef = useRef<number | undefined>(undefined)
+    useEffect(() => {
+      const AUTO_REFRESH_HIDDEN_THRESHOLD = 5 * 60 * 1000
+      const onVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') {
+          lastHiddenAtRef.current = Date.now()
+          return
+        }
+        const hiddenAt = lastHiddenAtRef.current
+        lastHiddenAtRef.current = undefined
+        if (
+          hiddenAt &&
+          Date.now() - hiddenAt > AUTO_REFRESH_HIDDEN_THRESHOLD &&
+          document.visibilityState === 'visible' &&
+          activeRef.current
+        ) {
+          refresh()
+        }
+      }
+      document.addEventListener('visibilitychange', onVisibilityChange)
+      return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+    }, [])
+
     useEffect(() => {
       if (!subRequests.length) return
 
