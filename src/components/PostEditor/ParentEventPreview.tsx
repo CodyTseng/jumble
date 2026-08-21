@@ -57,7 +57,7 @@ export default function ParentEventPreview({
               <div className="whitespace-pre-line italic">{highlightedText}</div>
             </div>
           ) : (
-            <Note size="small" event={parentEvent} hideParentNotePreview />
+            <Note size="small" event={parentEvent} hideParentNotePreview showFull />
           )}
         </div>
       </div>
