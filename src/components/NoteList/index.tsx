@@ -123,6 +123,11 @@ const NoteList = forwardRef<
         : undefined
     const showNewNotesDirectlyRef = useRef(showNewNotesDirectly)
     showNewNotesDirectlyRef.current = showNewNotesDirectly
+    // Whether the initial timeline population (up to the first EOSE) has
+    // finished. Before that, incoming events belong to the base feed instead
+    // of the "new notes" bucket, otherwise stale notes can show up as "new"
+    // after restoring the app.
+    const initialTimelineLoadedRef = useRef(false)
 
     const pinnedEventHexIdSet = useMemo(() => {
       const set = new Set<string>()
@@ -375,6 +380,7 @@ const NoteList = forwardRef<
       if (!subRequests.length) return
 
       sinceRef.current = undefined
+      initialTimelineLoadedRef.current = false
       setEvents([])
       setStoredEvents([])
       setNewEvents([])
@@ -453,6 +459,14 @@ const NoteList = forwardRef<
 
           if (!recentEvents.length) return
 
+          // The initial population hasn't finished yet, so we can't tell
+          // these events apart from historical ones — add them to the base
+          // timeline instead of showing them as "new".
+          if (!initialTimelineLoadedRef.current && !since) {
+            setEvents((oldEvents) => mergeTimelines([recentEvents, oldEvents]))
+            return
+          }
+
           if (showNewNotesDirectlyRef.current) {
             setEvents((oldEvents) => mergeTimelines([recentEvents, oldEvents]))
           } else {
@@ -485,6 +499,7 @@ const NoteList = forwardRef<
               if (eosed) {
                 threadService.addRepliesToThread(events)
                 setInitialLoading(false)
+                initialTimelineLoadedRef.current = true
               }
             },
             onNew: (event) => {
