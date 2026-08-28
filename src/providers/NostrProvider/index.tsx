@@ -144,6 +144,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followListEvent, setFollowListEvent] = useState<Event | null>(null)
+  // Cross-tab follow-list sync (#112): the latest follow list is mirrored to a
+  // ref (for stale-closure-free comparisons in the broadcast listener) and a
+  // BroadcastChannel is used to notify sibling tabs of the same account.
+  const followListEventRef = useRef<Event | null>(null)
+  const followListChannelRef = useRef<BroadcastChannel | null>(null)
   const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
   const [pinnedUsersEvent, setPinnedUsersEvent] = useState<Event | null>(null)
   const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | null>(null)
@@ -889,7 +894,45 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
     setFollowListEvent(newFollowListEvent)
     await client.updateFollowListCache(newFollowListEvent)
+
+    // Let sibling tabs of the same account pick up the change without a reload.
+    followListChannelRef.current?.postMessage(newFollowListEvent)
   }
+
+  // Keep this tab's follow list in step with follow/unfollow actions taken in
+  // other tabs of the same account (#112). The new kind-3 event is already
+  // persisted to the shared IndexedDB store; broadcasting it lets the in-memory
+  // React state — which drives the follow buttons — update in sibling tabs too,
+  // instead of staying stale until the page is refreshed.
+  useEffect(() => {
+    followListEventRef.current = followListEvent
+  }, [followListEvent])
+
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return
+
+    const channel = new BroadcastChannel('jumble:follow-list-event')
+    followListChannelRef.current = channel
+
+    channel.onmessage = (e: MessageEvent<Event>) => {
+      const incoming = e.data
+      // Ignore updates for a different account, and never move backwards in
+      // time: replaceable events are ordered by created_at.
+      if (!incoming || !account || incoming.pubkey !== account.pubkey) return
+      const current = followListEventRef.current
+      if (current && current.created_at >= incoming.created_at) return
+
+      setFollowListEvent(incoming)
+      void client.updateFollowListCache(incoming)
+    }
+
+    return () => {
+      channel.close()
+      if (followListChannelRef.current === channel) {
+        followListChannelRef.current = null
+      }
+    }
+  }, [account])
 
   const updateMuteListEvent = async (muteListEvent: Event, privateTags: string[][]) => {
     const newMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
