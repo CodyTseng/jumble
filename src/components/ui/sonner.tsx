@@ -1,16 +1,20 @@
 import { useTheme } from '@/providers/ThemeProvider'
+import { useTranslation } from 'react-i18next'
 import { Toaster as Sonner } from 'sonner'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { themeSetting } = useTheme()
+  const { t, i18n } = useTranslation()
 
   return (
     <Sonner
       theme={themeSetting === 'pure-black' ? 'dark' : themeSetting}
       className="toaster group"
       richColors
+      closeButton
+      dir={i18n.dir()}
       offset={{
         top: 20,
         right: 20,
@@ -26,6 +30,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         bottom: 'calc(env(safe-area-inset-bottom) + 3.5rem)'
       }}
       toastOptions={{
+        closeButtonAriaLabel: t('Close'),
         classNames: {
           toast:
             'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',

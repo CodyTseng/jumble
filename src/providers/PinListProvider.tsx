@@ -2,11 +2,11 @@ import { MAX_PINNED_NOTES } from '@/constants'
 import { buildETag, createPinListDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getPinnedEventHexIdSetFromPinListEvent } from '@/lib/event-metadata'
+import { toastPromise } from '@/lib/toast'
 import client from '@/services/client.service'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { useNostr } from './NostrProvider'
 
 type TPinListContext = {
@@ -65,7 +65,7 @@ export function PinListProvider({ children }: { children: React.ReactNode }) {
       await updatePinListEvent(newPinListEvent)
     }
 
-    const { unwrap } = toast.promise(_pin, {
+    const { unwrap } = toastPromise(_pin, {
       loading: t('Pinning...'),
       success: t('Pinned!'),
       error: (err) => t('Failed to pin: {{error}}', { error: formatError(err).join('; ') })
@@ -90,7 +90,7 @@ export function PinListProvider({ children }: { children: React.ReactNode }) {
       await updatePinListEvent(newPinListEvent)
     }
 
-    const { unwrap } = toast.promise(_unpin, {
+    const { unwrap } = toastPromise(_unpin, {
       loading: t('Unpinning...'),
       success: t('Unpinned!'),
       error: (err) => t('Failed to unpin: {{error}}', { error: formatError(err).join('; ') })

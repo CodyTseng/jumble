@@ -1,17 +1,9 @@
+import { toastPromise } from '@/lib/toast'
 import { useNostr } from '@/providers/NostrProvider'
 import postDraftService from '@/services/post-draft.service'
 import { TPostDraft, TPostDraftStatus } from '@/types/post-draft'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 
 type TDraftBoxContext = {
   open: boolean
@@ -113,7 +105,7 @@ export function DraftBoxProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const onStart = (e: Event) => {
       const { promise } = (e as CustomEvent).detail as { id: string; promise: Promise<unknown> }
-      toast.promise(promise, {
+      toastPromise(promise, {
         loading: t('Sending...'),
         success: t('Post successful'),
         // Keep the toast short and calm: the per-relay reasons are saved on the
