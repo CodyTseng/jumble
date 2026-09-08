@@ -1183,6 +1183,7 @@ export default {
       'L’image de l’avatar ne doit pas dépasser {{size}} Mo',
     'Quoted message not loaded yet': 'Le message cité n’est pas encore chargé',
     Video: 'Vidéo',
-    Audio: 'Audio'
+    Audio: 'Audio',
+    'Group message from': 'Message du groupe'
   }
 }

@@ -1151,6 +1151,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': '아바타 이미지는 {{size}}MB 이하여야 합니다',
     'Quoted message not loaded yet': '인용된 메시지가 아직 로드되지 않았습니다',
     Video: '동영상',
-    Audio: '오디오'
+    Audio: '오디오',
+    'Group message from': '그룹 메시지 출처'
   }
 }

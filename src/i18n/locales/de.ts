@@ -1184,6 +1184,7 @@ export default {
       'Das Avatarbild darf höchstens {{size}} MB groß sein',
     'Quoted message not loaded yet': 'Zitierte Nachricht noch nicht geladen',
     Video: 'Video',
-    Audio: 'Audio'
+    Audio: 'Audio',
+    'Group message from': 'Gruppennachricht aus'
   }
 }

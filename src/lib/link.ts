@@ -96,6 +96,12 @@ export const toFollowPack = (eventOrId: Event | string) => {
 export const toChachiChat = (relay: string, d: string) => {
   return `https://chachi.chat/${relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')}/${d}`
 }
+
+export const toNostrordGroup = (relay: string, groupId: string) => {
+  const relayAddress = relay.replace(/^wss?:\/\//, '').replace(/\/$/, '')
+  return `https://web.nostrord.com/#/g/${encodeURIComponent(relayAddress)}/${encodeURIComponent(groupId)}`
+}
+
 export const toUserAggregationDetail = (feedId: string, pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/user-aggregation/${feedId}/${npub}`

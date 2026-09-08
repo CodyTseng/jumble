@@ -143,6 +143,7 @@ export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 export const GROUP_METADATA_EVENT_KIND = 39000
 
 export const ExtendedKind = {
+  GROUP_MESSAGE: 9,
   EXTERNAL_CONTENT_REACTION: 17,
   SEAL: 13,
   RUMOR_CHAT: 14,
@@ -189,6 +190,7 @@ export const ALLOWED_FILTER_KINDS = [
 
 export const SUPPORTED_KINDS = [
   ...ALLOWED_FILTER_KINDS,
+  ExtendedKind.GROUP_MESSAGE,
   ExtendedKind.RELAY_REVIEW,
   ExtendedKind.FAVORITE_RELAYS,
   kinds.Emojisets,

@@ -1165,6 +1165,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': 'アバター画像は {{size}} MB 以下にしてください',
     'Quoted message not loaded yet': '引用されたメッセージはまだ読み込まれていません',
     Video: '動画',
-    Audio: '音声'
+    Audio: '音声',
+    'Group message from': 'グループからのメッセージ'
   }
 }

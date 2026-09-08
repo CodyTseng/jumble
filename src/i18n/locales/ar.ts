@@ -1151,6 +1151,7 @@ export default {
       'يجب ألا يتجاوز حجم صورة الملف الشخصي {{size}} ميغابايت',
     'Quoted message not loaded yet': 'لم يتم تحميل الرسالة المقتبسة بعد',
     Video: 'فيديو',
-    Audio: 'صوت'
+    Audio: 'صوت',
+    'Group message from': 'رسالة جماعية من'
   }
 }

@@ -1168,6 +1168,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': 'Avatar görseli en fazla {{size}} MB olmalıdır',
     'Quoted message not loaded yet': 'Alıntılanan mesaj henüz yüklenmedi',
     Video: 'Video',
-    Audio: 'Ses'
+    Audio: 'Ses',
+    'Group message from': 'Grup mesajı kaynağı'
   }
 }

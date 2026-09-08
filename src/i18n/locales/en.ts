@@ -1156,6 +1156,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': 'Avatar image must be {{size}} MB or smaller',
     'Quoted message not loaded yet': 'Quoted message not loaded yet',
     Video: 'Video',
-    Audio: 'Audio'
+    Audio: 'Audio',
+    'Group message from': 'Group message from'
   }
 }

@@ -1172,6 +1172,7 @@ export default {
       'Размер изображения аватара не должен превышать {{size}} МБ',
     'Quoted message not loaded yet': 'Цитируемое сообщение ещё не загружено',
     Video: 'Видео',
-    Audio: 'Аудио'
+    Audio: 'Аудио',
+    'Group message from': 'Сообщение из группы'
   }
 }

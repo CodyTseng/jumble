@@ -1164,6 +1164,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': 'अवतार इमेज {{size}} MB या उससे छोटी होनी चाहिए',
     'Quoted message not loaded yet': 'उद्धृत संदेश अभी लोड नहीं हुआ है',
     Video: 'वीडियो',
-    Audio: 'ऑडियो'
+    Audio: 'ऑडियो',
+    'Group message from': 'इस समूह से संदेश'
   }
 }

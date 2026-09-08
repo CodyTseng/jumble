@@ -110,6 +110,10 @@ class ClientService extends EventTarget {
   private eventCacheMap = new BoundedMap<string, Promise<NEvent | undefined>>({
     maxSize: EVENT_CACHE_MAX_SIZE
   })
+  private groupMetadataCache = new LRUCache<string, Promise<NEvent | undefined>>({
+    max: 200,
+    ttl: 60_000
+  })
   private eventDataLoader = new DataLoader<string, NEvent | undefined>(
     (ids) => Promise.all(ids.map((id) => this._fetchEvent(id))),
     { cacheMap: this.eventCacheMap }
@@ -858,6 +862,29 @@ class ClientService extends EventTarget {
       })
     }
     return deduped
+  }
+
+  fetchGroupMetadata(groupId: string, relayUrls: string[]): Promise<NEvent | undefined> {
+    if (!groupId || !relayUrls.length) return Promise.resolve(undefined)
+
+    // Group IDs are scoped to their hosting relays, not globally unique.
+    const urls = Array.from(new Set(relayUrls)).sort()
+    const key = JSON.stringify([groupId, urls])
+    const cached = this.groupMetadataCache.get(key)
+    if (cached) return cached
+
+    const promise = this.fetchEvents(
+      urls,
+      { kinds: [ExtendedKind.GROUP_METADATA], '#d': [groupId], limit: 1 },
+      { cache: true }
+    )
+      .then(([event]) => event)
+      .catch((error) => {
+        this.groupMetadataCache.delete(key)
+        throw error
+      })
+    this.groupMetadataCache.set(key, promise)
+    return promise
   }
 
   async fetchEvent(id: string): Promise<NEvent | undefined> {

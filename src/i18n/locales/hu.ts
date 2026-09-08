@@ -1169,6 +1169,7 @@ export default {
       'Az avatárkép legfeljebb {{size}} MB méretű lehet',
     'Quoted message not loaded yet': 'Az idézett üzenet még nem töltődött be',
     Video: 'Videó',
-    Audio: 'Hang'
+    Audio: 'Hang',
+    'Group message from': 'Csoportüzenet innen'
   }
 }

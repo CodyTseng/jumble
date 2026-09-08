@@ -1166,6 +1166,7 @@ export default {
       'حجم تصویر نمایه باید {{size}} مگابایت یا کمتر باشد',
     'Quoted message not loaded yet': 'پیام نقل‌شده هنوز بارگیری نشده است',
     Video: 'ویدیو',
-    Audio: 'صدا'
+    Audio: 'صدا',
+    'Group message from': 'پیام گروهی از'
   }
 }

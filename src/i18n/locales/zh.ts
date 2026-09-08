@@ -1122,6 +1122,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': '头像图片不能超过 {{size}} MB',
     'Quoted message not loaded yet': '引用消息尚未加载',
     Video: '视频',
-    Audio: '音频'
+    Audio: '音频',
+    'Group message from': '群聊消息 · 来自'
   }
 }

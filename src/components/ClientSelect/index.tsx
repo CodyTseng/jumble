@@ -4,7 +4,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
 import { getReplaceableEventIdentifier, getNoteBech32Id } from '@/lib/event'
-import { toChachiChat } from '@/lib/link'
+import { toChachiChat, toNostrordGroup } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import clientService from '@/services/client.service'
 import { ExternalLink } from 'lucide-react'
@@ -78,6 +78,7 @@ const clients: Record<string, { name: string; getUrl: (id: string) => string }> 
 export default function ClientSelect({
   event,
   originalNoteId,
+  children,
   ...props
 }: ButtonProps & {
   event?: Event
@@ -165,7 +166,11 @@ export default function ClientSelect({
 
   const trigger = (
     <Button variant="outline" {...props}>
-      <ExternalLink /> {t('Open in another client')}
+      {children ?? (
+        <>
+          <ExternalLink /> {t('Open in another client')}
+        </>
+      )}
     </Button>
   )
 
@@ -217,11 +222,18 @@ function RelayBasedGroupChatSelector({
   }, [event, originalNoteId])
 
   return (
-    <ClientSelectItem
-      onClick={() => setOpen(false)}
-      href={toChachiChat(relay, id)}
-      name="Chachi Chat"
-    />
+    <>
+      <ClientSelectItem
+        onClick={() => setOpen(false)}
+        href={toNostrordGroup(relay, id)}
+        name="Nostrord"
+      />
+      <ClientSelectItem
+        onClick={() => setOpen(false)}
+        href={toChachiChat(relay, id)}
+        name="Chachi Chat"
+      />
+    </>
   )
 }
 

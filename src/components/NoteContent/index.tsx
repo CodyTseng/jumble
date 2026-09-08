@@ -11,6 +11,7 @@ import CommunityDefinition from './CommunityDefinition'
 import EmojiPack from './EmojiPack'
 import FavoriteRelays from './FavoriteRelays'
 import FollowPack from './FollowPack'
+import GroupMessage from './GroupMessage'
 import GroupMetadata from './GroupMetadata'
 import Highlight from './Highlight'
 import LiveEvent from './LiveEvent'
@@ -74,6 +75,16 @@ export default function NoteContent({
 
   if (event.kind === kinds.LiveEvent) {
     return <LiveEvent className={cn('mt-2', className)} event={event} />
+  }
+
+  if (event.kind === ExtendedKind.GROUP_MESSAGE) {
+    return (
+      <GroupMessage
+        className={cn('mt-2', className)}
+        event={event}
+        originalNoteId={originalNoteId}
+      />
+    )
   }
 
   if (event.kind === ExtendedKind.GROUP_METADATA) {

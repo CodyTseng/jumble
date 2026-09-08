@@ -1147,6 +1147,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': 'รูปโปรไฟล์ต้องมีขนาดไม่เกิน {{size}} MB',
     'Quoted message not loaded yet': 'ยังไม่ได้โหลดข้อความที่อ้างอิง',
     Video: 'วิดีโอ',
-    Audio: 'เสียง'
+    Audio: 'เสียง',
+    'Group message from': 'ข้อความจากกลุ่ม'
   }
 }

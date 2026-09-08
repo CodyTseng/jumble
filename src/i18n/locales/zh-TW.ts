@@ -1123,6 +1123,7 @@ export default {
     'Avatar image must be {{size}} MB or smaller': '頭像圖片不得超過 {{size}} MB',
     'Quoted message not loaded yet': '引用訊息尚未載入',
     Video: '影片',
-    Audio: '音訊'
+    Audio: '音訊',
+    'Group message from': '群聊訊息 · 來自'
   }
 }

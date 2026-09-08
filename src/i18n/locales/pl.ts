@@ -1176,6 +1176,7 @@ export default {
       'Obraz awatara nie może być większy niż {{size}} MB',
     'Quoted message not loaded yet': 'Cytowana wiadomość nie została jeszcze wczytana',
     Video: 'Wideo',
-    Audio: 'Audio'
+    Audio: 'Audio',
+    'Group message from': 'Wiadomość z grupy'
   }
 }
