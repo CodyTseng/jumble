@@ -6,6 +6,7 @@ import { getEventAuthorPubkey, isMentioningMutedUsers, isNsfwEvent } from '@/lib
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
+import { useNostr } from '@/providers/NostrProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import MainNoteCard from './MainNoteCard'
@@ -24,10 +25,12 @@ export default function NoteCard({
   pinned?: boolean
   reposters?: string[]
 }) {
+  const { pubkey } = useNostr()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers, nsfwDisplayPolicy } = useContentPolicy()
   const validZapReceipt = useZapReceiptValidation(event)
   const shouldHide = useMemo(() => {
+    if (pubkey && event.pubkey === pubkey) return false
     if (filterMutedNotes && mutePubkeySet.has(getEventAuthorPubkey(event))) {
       return true
     }
@@ -38,7 +41,14 @@ export default function NoteCard({
       return true
     }
     return false
-  }, [event, filterMutedNotes, mutePubkeySet, nsfwDisplayPolicy])
+  }, [
+    event,
+    pubkey,
+    filterMutedNotes,
+    mutePubkeySet,
+    hideContentMentioningMutedUsers,
+    nsfwDisplayPolicy
+  ])
   if (shouldHide || validZapReceipt !== true) return null
 
   if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
