@@ -132,11 +132,7 @@ export const BIG_RELAY_URLS = [
   'wss://relay.ditto.pub/'
 ]
 
-export const SEARCHABLE_RELAY_URLS = [
-  'wss://search.nos.today/',
-  'wss://search.nostrarchives.com/',
-  'wss://relay.nostr.band/'
-]
+export const SEARCHABLE_RELAY_URLS = ['wss://search.nos.today/', 'wss://search.nostrarchives.com/']
 
 export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 
@@ -605,8 +601,7 @@ export const IS_COMMUNITY_MODE = COMMUNITY_RELAY_SETS.length > 0 || COMMUNITY_RE
 
 // Link preview metadata service. Override via VITE_LINK_PREVIEW_SERVER.
 export const LINK_PREVIEW_SERVER =
-  (import.meta.env.VITE_LINK_PREVIEW_SERVER as string | undefined) ??
-  'https://scout.jumble.social'
+  (import.meta.env.VITE_LINK_PREVIEW_SERVER as string | undefined) ?? 'https://scout.jumble.social'
 
 // Pomegranate (threshold-key-shard NIP-46 remote signer) — "Login with Google".
 export const POMEGRANATE_ENABLED = true
