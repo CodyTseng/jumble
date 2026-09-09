@@ -76,7 +76,7 @@ export default function MarkdownContent({ content, event }: { content: string; e
           if (X_URL_REGEX.test(href)) {
             return <XEmbeddedPost url={href} className="mt-2" />
           }
-          return <ExternalLink url={href} justOpenLink />
+          return <ExternalLink url={href}>{children}</ExternalLink>
         },
         h1: ({ children }) => <p className="font-bold">{children}</p>,
         h2: ({ children }) => <p className="font-bold">{children}</p>,

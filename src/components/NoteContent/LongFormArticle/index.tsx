@@ -1,4 +1,5 @@
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
+import ExternalLink from '@/components/ExternalLink'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import ImageWithLightbox from '@/components/ImageWithLightbox'
 import HighlightButton from '@/components/HighlightButton'
@@ -7,8 +8,6 @@ import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
 import { toNote, toNoteList, toProfile } from '@/lib/link'
 import { estimateReadingMinutes, transformMarkdownUrl } from '@/lib/markdown'
-import { getSafeExternalUrl } from '@/lib/url'
-import { ExternalLink } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -29,10 +28,7 @@ export default function LongFormArticle({
   const { push } = useSecondaryPage()
   const translatedEvent = useTranslatedEvent(event.id)
   const displayEvent = translatedEvent ?? event
-  const metadata = useMemo(
-    () => getLongFormArticleMetadataFromEvent(displayEvent),
-    [displayEvent]
-  )
+  const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(displayEvent), [displayEvent])
   const readingMinutes = useMemo(
     () => estimateReadingMinutes(displayEvent.content),
     [displayEvent.content]
@@ -50,15 +46,15 @@ export default function LongFormArticle({
     () =>
       ({
         nostr: ({ rawText, bech32Id }) => <NostrNode rawText={rawText} bech32Id={bech32Id} />,
-        a: ({ href, children, ...props }) => {
+        a: ({ href, children }) => {
           if (!href) {
-            return <span {...props} className="wrap-break-word" />
+            return <span className="wrap-break-word">{children}</span>
           }
           if (href.startsWith('note1') || href.startsWith('nevent1') || href.startsWith('naddr1')) {
             return (
               <SecondaryPageLink
                 to={toNote(href)}
-                className="wrap-break-word text-foreground underline"
+                className="text-foreground wrap-break-word underline"
               >
                 {children}
               </SecondaryPageLink>
@@ -68,30 +64,21 @@ export default function LongFormArticle({
             return (
               <SecondaryPageLink
                 to={toProfile(href)}
-                className="wrap-break-word text-foreground underline"
+                className="text-foreground wrap-break-word underline"
               >
                 {children}
               </SecondaryPageLink>
             )
           }
-          const safeHref = getSafeExternalUrl(href)
-          if (!safeHref) return <span className="wrap-break-word">{children}</span>
           return (
-            <a
-              {...props}
-              href={safeHref}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="wrap-break-word"
-            >
+            <ExternalLink url={href} className="wrap-break-word">
               {children}
-              <ExternalLink className="ms-1 inline size-3 align-baseline" />
-            </a>
+            </ExternalLink>
           )
         },
         p: (props) => <p {...props} className="wrap-break-word" />,
         div: (props) => <div {...props} className="wrap-break-word" />,
-        code: (props) => <code {...props} className="whitespace-pre-wrap wrap-break-word" />,
+        code: (props) => <code {...props} className="wrap-break-word whitespace-pre-wrap" />,
         img: (props) => (
           <ImageWithLightbox
             image={{ url: props.src || '', pubkey: event.pubkey }}
@@ -109,17 +96,17 @@ export default function LongFormArticle({
     <>
       <div
         ref={contentRef}
-        className={`overflow-wrap-anywhere prose prose-zinc max-w-none wrap-break-word dark:prose-invert prose-img:my-0 ${className || ''}`}
+        className={`overflow-wrap-anywhere prose prose-zinc dark:prose-invert prose-img:my-0 max-w-none wrap-break-word ${className || ''}`}
       >
         <h1 className="wrap-break-word">{metadata.title}</h1>
-        <div className="-mt-4 mb-6 text-sm text-muted-foreground">
+        <div className="text-muted-foreground -mt-4 mb-6 text-sm">
           {t('{{count}} min read', { count: readingMinutes })}
           <span className="mx-1.5">·</span>
           {t('Last edited')}: <FormattedTimestamp timestamp={event.created_at} />
         </div>
         {metadata.summary && (
           <blockquote>
-            <p className="whitespace-pre-line wrap-break-word">{metadata.summary}</p>
+            <p className="wrap-break-word whitespace-pre-line">{metadata.summary}</p>
           </blockquote>
         )}
         {metadata.image && (
@@ -141,7 +128,7 @@ export default function LongFormArticle({
               <div
                 key={tag}
                 title={tag}
-                className="flex max-w-44 cursor-pointer items-center rounded-full bg-muted px-3 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground flex max-w-44 cursor-pointer items-center rounded-full px-3"
                 onClick={(e) => {
                   e.stopPropagation()
                   push(toNoteList({ hashtag: tag, kinds: [kinds.LongFormArticle] }))

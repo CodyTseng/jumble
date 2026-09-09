@@ -19,10 +19,12 @@ import { toast } from 'sonner'
 export default function ExternalLink({
   url,
   className,
+  children,
   justOpenLink
 }: {
   url: string
   className?: string
+  children?: React.ReactNode
   justOpenLink?: boolean
 }) {
   const { t } = useTranslation()
@@ -64,7 +66,7 @@ export default function ExternalLink({
   }
 
   if (!safeUrl) {
-    return <span className={cn('wrap-break-word', className)}>{displayUrl}</span>
+    return <span className={cn('wrap-break-word', className)}>{children ?? displayUrl}</span>
   }
 
   if (justOpenLink) {
@@ -76,7 +78,7 @@ export default function ExternalLink({
         className={cn('text-primary cursor-pointer hover:underline', className)}
         onClick={(e) => e.stopPropagation()}
       >
-        {displayUrl}
+        {children ?? displayUrl}
       </a>
     )
   }
@@ -113,7 +115,7 @@ export default function ExternalLink({
       }}
       title={url}
     >
-      {displayUrl}
+      {children ?? displayUrl}
     </span>
   )
 
@@ -183,7 +185,7 @@ export default function ExternalLink({
         }}
       >
         <span className={cn('text-primary cursor-pointer hover:underline', className)} title={url}>
-          {displayUrl}
+          {children ?? displayUrl}
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" onClick={(e) => e.stopPropagation()}>
