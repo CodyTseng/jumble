@@ -218,6 +218,7 @@ export const truncateUrl = (url: string, maxLength: number = 40) => {
     const urlObj = new URL(url)
     let domain = urlObj.hostname
     let path = urlObj.pathname
+    const hasHiddenSuffix = Boolean(urlObj.search || urlObj.hash)
 
     if (domain.startsWith('www.')) {
       domain = domain.slice(4)
@@ -228,7 +229,7 @@ export const truncateUrl = (url: string, maxLength: number = 40) => {
     }
 
     if (!path || path === '/') {
-      return domain
+      return domain + (hasHiddenSuffix ? '...' : '')
     }
 
     if (path.endsWith('/')) {
@@ -237,11 +238,11 @@ export const truncateUrl = (url: string, maxLength: number = 40) => {
 
     const u = domain + path
 
-    if (u.length > maxLength) {
+    if (u.length + (hasHiddenSuffix ? 3 : 0) > maxLength) {
       return domain + path.slice(0, maxLength - domain.length - 3) + '...'
     }
 
-    return u
+    return u + (hasHiddenSuffix ? '...' : '')
   } catch {
     // invalid URL
     let truncated = url
