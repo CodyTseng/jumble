@@ -3,6 +3,7 @@ import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
+import { useNostr } from '@/providers/NostrProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -30,6 +31,7 @@ export default function ContentPreview({
   className?: string
 }) {
   const { t } = useTranslation()
+  const { pubkey } = useNostr()
   const { mutePubkeySet } = useMuteList()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const isMuted = useMemo(
@@ -38,10 +40,10 @@ export default function ContentPreview({
   )
   const isMentioningMuted = useMemo(
     () =>
-      hideContentMentioningMutedUsers && event
+      hideContentMentioningMutedUsers && event && getEventAuthorPubkey(event) !== pubkey
         ? isMentioningMutedUsers(event, mutePubkeySet)
         : false,
-    [event, mutePubkeySet]
+    [event, hideContentMentioningMutedUsers, mutePubkeySet, pubkey]
   )
 
   if (!event) {
