@@ -15,14 +15,18 @@ import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import NostrNode from './NostrNode'
 import { remarkNostr } from './remarkNostr'
+import { taskListMarkdownComponents } from './task-list'
 import { Components } from './types'
+import { rehypeSourceLines } from './rehypeSourceLines'
 
 export default function LongFormArticle({
   event,
-  className
+  className,
+  sourceLines = false
 }: {
   event: Event
   className?: string
+  sourceLines?: boolean
 }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
@@ -46,6 +50,7 @@ export default function LongFormArticle({
     () =>
       ({
         nostr: ({ rawText, bech32Id }) => <NostrNode rawText={rawText} bech32Id={bech32Id} />,
+        ...taskListMarkdownComponents,
         a: ({ href, children }) => {
           if (!href) {
             return <span className="wrap-break-word">{children}</span>
@@ -116,6 +121,7 @@ export default function LongFormArticle({
           />
         )}
         <Markdown
+          rehypePlugins={sourceLines ? [rehypeSourceLines] : []}
           remarkPlugins={[remarkGfm, remarkNostr]}
           urlTransform={transformMarkdownUrl}
           components={components}

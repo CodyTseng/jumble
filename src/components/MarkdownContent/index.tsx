@@ -13,6 +13,7 @@ import ExternalLink from '../ExternalLink'
 import ImageWithLightbox from '../ImageWithLightbox'
 import NostrNode from '../NoteContent/LongFormArticle/NostrNode'
 import { remarkNostr } from '../NoteContent/LongFormArticle/remarkNostr'
+import { taskListMarkdownComponents } from '../NoteContent/LongFormArticle/task-list'
 import { Components as BaseComponents } from '../NoteContent/LongFormArticle/types'
 import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
@@ -46,6 +47,7 @@ export default function MarkdownContent({ content, event }: { content: string; e
     () =>
       ({
         nostr: ({ rawText, bech32Id }) => <NostrNode rawText={rawText} bech32Id={bech32Id} />,
+        ...taskListMarkdownComponents,
         hashtag: ({ value }) => <EmbeddedHashtag hashtag={value} />,
         emoji: ({ value }) => {
           const shortcode = value.slice(1, -1)
@@ -112,7 +114,6 @@ export default function MarkdownContent({ content, event }: { content: string; e
             {children}
           </ol>
         ),
-        li: ({ children }) => <li>{children}</li>,
         table: ({ children }) => (
           <div className="overflow-x-auto">
             <table className="border-collapse text-sm">{children}</table>

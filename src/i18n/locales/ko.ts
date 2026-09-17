@@ -1152,6 +1152,11 @@ export default {
     'Quoted message not loaded yet': '인용된 메시지가 아직 로드되지 않았습니다',
     Video: '동영상',
     Audio: '오디오',
-    'Group message from': '그룹 메시지 출처'
+    'Group message from': '그룹 메시지 출처',
+    'Short note': '짧은 노트',
+    'Long-form article': '긴 글',
+    'Share a thought or a moment': '생각이나 순간을 공유하세요',
+    'Give your ideas more room': '생각을 더 깊이 펼쳐 보세요',
+    Publish: '게시'
   }
 }

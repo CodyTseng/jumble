@@ -3,7 +3,13 @@ import { cn } from '@/lib/utils'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { Columns2, PanelLeft } from 'lucide-react'
 
-export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
+export default function LayoutSwitcher({
+  collapse,
+  disabled = false
+}: {
+  collapse: boolean
+  disabled?: boolean
+}) {
   const { enableSingleColumnLayout, updateEnableSingleColumnLayout } = useUserPreferences()
 
   if (collapse) {
@@ -11,6 +17,7 @@ export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
       <Button
         variant="ghost"
         className="size-12 hover:border"
+        disabled={disabled}
         onClick={() => updateEnableSingleColumnLayout(!enableSingleColumnLayout)}
       >
         {enableSingleColumnLayout ? (
@@ -23,7 +30,12 @@ export default function LayoutSwitcher({ collapse }: { collapse: boolean }) {
   }
 
   return (
-    <div className="rounded-lg bg-muted p-1 shadow-inner">
+    <div
+      className={cn(
+        'rounded-lg bg-muted p-1 shadow-inner',
+        disabled && 'pointer-events-none opacity-50'
+      )}
+    >
       <div className="relative flex items-center justify-around">
         <div
           className="z-10 flex w-full cursor-pointer flex-col items-center py-1"

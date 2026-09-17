@@ -1169,6 +1169,11 @@ export default {
     'Quoted message not loaded yet': 'Alıntılanan mesaj henüz yüklenmedi',
     Video: 'Video',
     Audio: 'Ses',
-    'Group message from': 'Grup mesajı kaynağı'
+    'Group message from': 'Grup mesajı kaynağı',
+    'Short note': 'Kısa not',
+    'Long-form article': 'Uzun makale',
+    'Share a thought or a moment': 'Bir düşünce veya an paylaş',
+    'Give your ideas more room': 'Fikirlerine daha fazla alan aç',
+    Publish: 'Yayınla'
   }
 }

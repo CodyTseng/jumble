@@ -6,10 +6,11 @@ import {
   isProtectedEvent,
   isReplaceableEvent
 } from '@/lib/event'
-import { toJumbleNote } from '@/lib/link'
+import { toArticleEditor, toJumbleNote } from '@/lib/link'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { toastPromise } from '@/lib/toast'
 import { simplifyUrl } from '@/lib/url'
+import { useSecondaryPage } from '@/PageManager'
 import { useBookmarks } from '@/providers/BookmarksProvider'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -25,6 +26,7 @@ import {
   Code,
   Copy,
   Link,
+  Pencil,
   Pin,
   PinOff,
   SatelliteDish,
@@ -70,6 +72,7 @@ export function useMenuActions({
   isSmallScreen
 }: UseMenuActionsProps) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const { pubkey, attemptDelete, bookmarkListEvent, checkLogin } = useNostr()
   const { relayUrls: currentBrowsingRelayUrls } = useCurrentRelays()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
@@ -318,6 +321,18 @@ export function useMenuActions({
     }
 
     if (pubkey && event.pubkey === pubkey) {
+      if (event.kind === kinds.LongFormArticle) {
+        actions[0].separator = true
+        actions.unshift({
+          icon: Pencil,
+          label: t('Edit'),
+          onClick: () => {
+            closeDrawer()
+            client.addEventToCache(event)
+            push(toArticleEditor(event))
+          }
+        })
+      }
       actions.push({
         icon: Trash2,
         label: t('Try deleting this note'),
@@ -333,6 +348,7 @@ export function useMenuActions({
     return actions
   }, [
     t,
+    push,
     event,
     authorPubkey,
     pubkey,

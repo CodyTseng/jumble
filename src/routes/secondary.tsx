@@ -1,4 +1,5 @@
 import AccountSettingsPage from '@/pages/secondary/AccountSettingsPage'
+import ArticleEditorPage from '@/pages/secondary/ArticleEditorPage'
 import AppearanceSettingsPage from '@/pages/secondary/AppearanceSettingsPage'
 import BookmarkPage from '@/pages/secondary/BookmarkPage'
 import DmConversationPage from '@/pages/secondary/DmConversationPage'
@@ -38,6 +39,8 @@ const SECONDARY_ROUTE_CONFIGS: {
 }[] = [
   { path: '/notes', element: <NoteListPage /> },
   { path: '/notes/:id', element: <NotePage /> },
+  { path: '/articles/new', element: <ArticleEditorPage />, hideBottomBar: true },
+  { path: '/articles/:id/edit', element: <ArticleEditorPage />, hideBottomBar: true },
   { path: '/users', element: <ProfileListPage /> },
   { path: '/users/:id', element: <ProfilePage /> },
   { path: '/users/:id/following', element: <FollowingListPage /> },
@@ -68,11 +71,9 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/dms/:pubkey', element: <DmConversationPage />, hideBottomBar: true }
 ]
 
-export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.map(
-  ({ path, element, hideBottomBar }) => ({
-    path,
-    element: isValidElement(element) ? element : null,
-    matcher: match(path),
-    hideBottomBar: hideBottomBar ?? false
-  })
-)
+export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.map(({ path, element, hideBottomBar }) => ({
+  path,
+  element: isValidElement(element) ? element : null,
+  matcher: match(path),
+  hideBottomBar: hideBottomBar ?? false
+}))

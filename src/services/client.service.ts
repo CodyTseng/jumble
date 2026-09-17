@@ -348,6 +348,7 @@ class ClientService extends EventTarget {
   }
 
   emitNewEvent(event: NEvent, relays: string[] = []) {
+    this.addEventToCache(event)
     this.dispatchEvent(new CustomEvent('newEvent', { detail: { event, relays } }))
   }
 

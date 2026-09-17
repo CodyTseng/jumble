@@ -78,9 +78,10 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
-  const bottomBarHidden = secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
+  const bottomBarHidden =
+    secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
   const bottomBarOffset = bottomBarHidden ? '0px' : 'calc(env(safe-area-inset-bottom) + 3rem)'
-  const { isSmallScreen } = useScreenSize()
+  const { isSmallScreen, isLargeScreen } = useScreenSize()
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
@@ -300,32 +301,34 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           <CurrentRelaysProvider>
             <NotificationProvider>
               <div style={{ '--bottom-bar-offset': bottomBarOffset } as React.CSSProperties}>
-              {!!secondaryStack.length &&
-                secondaryStack.map((item, index) => (
+                {!!secondaryStack.length &&
+                  secondaryStack.map((item, index) => (
+                    <div
+                      key={item.index}
+                      style={{
+                        display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                      }}
+                    >
+                      {item.element}
+                    </div>
+                  ))}
+                {primaryPages.map(({ name, element, props }) => (
                   <div
-                    key={item.index}
+                    key={name}
                     style={{
-                      display: index === secondaryStack.length - 1 ? 'block' : 'none'
+                      display:
+                        secondaryStack.length === 0 && currentPrimaryPage === name
+                          ? 'block'
+                          : 'none'
                     }}
                   >
-                    {item.element}
+                    {props ? cloneElement(element as React.ReactElement, props) : element}
                   </div>
                 ))}
-              {primaryPages.map(({ name, element, props }) => (
-                <div
-                  key={name}
-                  style={{
-                    display:
-                      secondaryStack.length === 0 && currentPrimaryPage === name ? 'block' : 'none'
-                  }}
-                >
-                  {props ? cloneElement(element as React.ReactElement, props) : element}
-                </div>
-              ))}
-              {!bottomBarHidden && <BottomNavigationBar />}
-              <TooManyRelaysAlertDialog />
-              <DraftBox />
-              <DraftEditorHost />
+                {!bottomBarHidden && <BottomNavigationBar />}
+                <TooManyRelaysAlertDialog />
+                <DraftBox />
+                <DraftEditorHost />
               </div>
             </NotificationProvider>
           </CurrentRelaysProvider>
@@ -333,6 +336,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       </PrimaryPageContext.Provider>
     )
   }
+
+  const isWideSecondaryArticleEditor =
+    !enableSingleColumnLayout &&
+    isLargeScreen &&
+    /^\/articles\/(?:new|[^/]+\/edit)(?:[?#]|$)/.test(secondaryStack.at(-1)?.url ?? '')
 
   if (enableSingleColumnLayout) {
     return (
@@ -354,9 +362,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         >
           <CurrentRelaysProvider>
             <NotificationProvider>
-              <div className="flex w-full wide:justify-around">
+              <div className="wide:justify-around flex w-full">
                 <div className={cn('wide:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
-                <div className="min-h-screen w-0 flex-1 border-x bg-background wide:w-[640px] wide:flex-auto wide:shrink-0">
+                <div className="bg-background wide:w-[640px] wide:flex-auto wide:shrink-0 min-h-screen w-0 flex-1 border-x">
                   {!!secondaryStack.length &&
                     secondaryStack.map((item, index) => (
                       <div
@@ -382,11 +390,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                     </div>
                   ))}
                 </div>
-                <div className="hidden wide:block wide:w-full" />
+                <div className="wide:block wide:w-full hidden" />
               </div>
               <div
                 className={cn(
-                  'pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end wide:w-[calc((100%-640px)/2)]',
+                  'wide:w-[calc((100%-640px)/2)] pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end',
                   sidebarCollapse ? 'w-16' : 'w-52'
                 )}
               >
@@ -395,7 +403,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                 </div>
               </div>
               <TooManyRelaysAlertDialog />
-              <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+              <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
               <DraftBox />
               <DraftEditorHost />
             </NotificationProvider>
@@ -410,7 +418,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       value={{
         navigate: navigatePrimaryPage,
         current: currentPrimaryPage,
-        display: true
+        display: !isWideSecondaryArticleEditor
       }}
     >
       <SecondaryPageContext.Provider
@@ -422,9 +430,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       >
         <CurrentRelaysProvider>
           <NotificationProvider>
-            <div className="flex flex-col items-center bg-surface-background">
+            <div className="bg-surface-background flex flex-col items-center">
               <div
-                className="flex h-(--vh) w-full bg-surface-background"
+                className="bg-surface-background flex h-(--vh) w-full"
                 style={{
                   maxWidth: '1920px'
                 }}
@@ -437,8 +445,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   )}
                 >
                   <div
+                    id="primary-page-panel"
                     className={cn(
-                      'overflow-hidden bg-background',
+                      'bg-background relative overflow-hidden',
                       themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl shadow-lg'
                     )}
                   >
@@ -455,8 +464,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                     ))}
                   </div>
                   <div
+                    id="secondary-page-panel"
                     className={cn(
-                      'overflow-hidden bg-background',
+                      'bg-background relative overflow-hidden',
                       themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl',
                       themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
                       secondaryStack.length === 0 ? 'bg-surface' : ''
@@ -476,7 +486,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
               </div>
             </div>
             <TooManyRelaysAlertDialog />
-            <BackgroundAudio className="fixed bottom-20 end-0 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+            <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
             <DraftBox />
             <DraftEditorHost />
           </NotificationProvider>
@@ -529,7 +539,11 @@ function findAndCloneElement(url: string, index: number) {
 
     if (!element) return {}
     const ref = createRef<TPageRef>()
-    return { element: cloneElement(element, { ...match.params, index, ref } as any), ref, hideBottomBar }
+    return {
+      element: cloneElement(element, { ...match.params, index, ref } as any),
+      ref,
+      hideBottomBar
+    }
   }
   return {}
 }
@@ -546,7 +560,13 @@ function pushNewPageToStack(
   const { element, ref, hideBottomBar } = findAndCloneElement(url, currentIndex)
   if (!element) return { newStack: stack, newItem: null }
 
-  const newItem: TStackItem = { element, ref, url, index: currentIndex, hideBottomBar: hideBottomBar ?? false }
+  const newItem: TStackItem = {
+    element,
+    ref,
+    url,
+    index: currentIndex,
+    hideBottomBar: hideBottomBar ?? false
+  }
   const newStack = [...stack, newItem]
   const lastCachedIndex = newStack.findIndex((stack) => stack.element)
   // Clear the oldest cached element if there are too many cached elements

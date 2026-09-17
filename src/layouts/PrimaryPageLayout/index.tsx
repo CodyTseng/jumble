@@ -90,6 +90,7 @@ const PrimaryPageLayout = forwardRef(
     const { enableSingleColumnLayout } = useUserPreferences()
     const { isSmallScreen } = useScreenSize()
     const { current, display } = usePrimaryPage()
+    const useWindowScrollLayout = enableSingleColumnLayout
 
     useImperativeHandle(
       ref,
@@ -107,7 +108,7 @@ const PrimaryPageLayout = forwardRef(
     )
 
     useLayoutEffect(() => {
-      if (!enableSingleColumnLayout) return
+      if (!useWindowScrollLayout) return
       // In single-column layout (always on small screens) every primary page shares the
       // window scroll. Only the active page should restore and track its own scroll
       // position; relying on the deterministic active-page check (instead of a DOM
@@ -129,7 +130,7 @@ const PrimaryPageLayout = forwardRef(
         cancelAnimationFrame(raf)
         window.removeEventListener('scroll', handleScroll)
       }
-    }, [current, enableSingleColumnLayout, display, pageName])
+    }, [current, display, pageName, useWindowScrollLayout])
 
     useEffect(() => {
       smallScreenLastScrollTopRef.current = 0
@@ -163,7 +164,7 @@ const PrimaryPageLayout = forwardRef(
       </PrimaryPageTitlebar>
     )
 
-    if (enableSingleColumnLayout) {
+    if (useWindowScrollLayout) {
       return (
         <PageActiveContext.Provider value={current === pageName && display}>
           <DeepBrowsingProvider active={current === pageName && display}>

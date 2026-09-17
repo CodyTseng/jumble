@@ -1184,6 +1184,11 @@ export default {
     'Quoted message not loaded yet': 'Le message cité n’est pas encore chargé',
     Video: 'Vidéo',
     Audio: 'Audio',
-    'Group message from': 'Message du groupe'
+    'Group message from': 'Message du groupe',
+    'Short note': 'Note courte',
+    'Long-form article': 'Article long',
+    'Share a thought or a moment': 'Partagez une pensée ou un instant',
+    'Give your ideas more room': 'Donnez plus de place à vos idées',
+    Publish: 'Publier'
   }
 }

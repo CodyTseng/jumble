@@ -2,7 +2,7 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import storage from '@/services/local-storage.service'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function PostOptions({
@@ -25,6 +25,7 @@ export default function PostOptions({
   setMinPow: Dispatch<SetStateAction<number>>
 }) {
   const { t } = useTranslation()
+  const id = useId()
   const [rememberPow, setRememberPow] = useState(storage.getDefaultMinPow() !== null)
 
   if (!show) return null
@@ -53,10 +54,10 @@ export default function PostOptions({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="add-client-tag">{t('Add client tag')}</Label>
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor={`${id}-add-client-tag`}>{t('Add client tag')}</Label>
           <Switch
-            id="add-client-tag"
+            id={`${id}-add-client-tag`}
             checked={addClientTag}
             onCheckedChange={onAddClientTagChange}
             disabled={posting}
@@ -67,10 +68,10 @@ export default function PostOptions({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Label htmlFor="add-nsfw-tag">{t('NSFW')}</Label>
+      <div className="flex items-center justify-between gap-3">
+        <Label htmlFor={`${id}-add-nsfw-tag`}>{t('NSFW')}</Label>
         <Switch
-          id="add-nsfw-tag"
+          id={`${id}-add-nsfw-tag`}
           checked={isNsfw}
           onCheckedChange={onNsfwChange}
           disabled={posting}
@@ -82,13 +83,13 @@ export default function PostOptions({
           <Label>{t('Proof of Work (difficulty {{minPow}})', { minPow })}</Label>
           <div className="ms-auto flex shrink-0 items-center gap-2">
             <Label
-              htmlFor="remember-pow"
+              htmlFor={`${id}-remember-pow`}
               className="text-muted-foreground cursor-pointer font-normal"
             >
               {t('Remember this difficulty')}
             </Label>
             <Switch
-              id="remember-pow"
+              id={`${id}-remember-pow`}
               checked={rememberPow}
               onCheckedChange={onRememberPowChange}
               disabled={posting}

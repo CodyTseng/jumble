@@ -6,16 +6,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { getEventAuthorPubkey } from '@/lib/event'
+import { extractMentions } from '@/lib/mentions'
 import { cn } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import client from '@/services/client.service'
-import lightning from '@/services/lightning.service'
-import { Check } from 'lucide-react'
-import { Event, kinds, nip19 } from 'nostr-tools'
-import { useEffect, useMemo, useState } from 'react'
+import { Check, ChevronDown } from 'lucide-react'
+import { Event } from 'nostr-tools'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SimpleUserAvatar } from '../UserAvatar'
 import { SimpleUsername } from '../Username'
@@ -24,92 +22,139 @@ export default function Mentions({
   content,
   mentions,
   setMentions,
-  parentEvent
+  parentEvent,
+  initialRemovedPubkeys,
+  onRemovedPubkeysChange,
+  onLoadingChange,
+  compact = false
 }: {
   content: string
   mentions: string[]
   setMentions: (mentions: string[]) => void
   parentEvent?: Event
+  initialRemovedPubkeys?: string[]
+  onRemovedPubkeysChange?: (pubkeys: string[]) => void
+  onLoadingChange?: (loading: boolean) => void
+  compact?: boolean
 }) {
-  const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { pubkey } = useNostr()
   const { mutePubkeySet } = useMuteList()
   const [potentialMentions, setPotentialMentions] = useState<string[]>([])
   const [parentEventPubkey, setParentEventPubkey] = useState<string | undefined>()
-  const [removedPubkeys, setRemovedPubkeys] = useState<string[]>([])
+  const removedPubkeysRef = useRef<string[]>(initialRemovedPubkeys ?? [])
 
   useEffect(() => {
+    let cancelled = false
+    onLoadingChange?.(true)
     extractMentions(content, parentEvent).then(({ pubkeys, relatedPubkeys, parentEventPubkey }) => {
+      if (cancelled) return
       const _parentEventPubkey = parentEventPubkey !== pubkey ? parentEventPubkey : undefined
       setParentEventPubkey(_parentEventPubkey)
       const potentialMentions = [...pubkeys, ...relatedPubkeys].filter((p) => p !== pubkey)
       if (_parentEventPubkey) {
         potentialMentions.push(_parentEventPubkey)
       }
-      setPotentialMentions(potentialMentions)
-      setRemovedPubkeys((pubkeys) => {
-        return Array.from(
-          new Set(
-            pubkeys
-              .filter((p) => potentialMentions.includes(p))
-              .concat(
-                potentialMentions.filter((p) => mutePubkeySet.has(p) && p !== _parentEventPubkey)
-              )
-          )
+      const removedPubkeys = Array.from(
+        new Set(
+          removedPubkeysRef.current
+            .filter((p) => potentialMentions.includes(p))
+            .concat(
+              potentialMentions.filter((p) => mutePubkeySet.has(p) && p !== _parentEventPubkey)
+            )
         )
-      })
+      )
+      removedPubkeysRef.current = removedPubkeys
+      // Publish the default selection in the same update as the available
+      // users. Do not overwrite a restored draft with [] while resolving IDs.
+      setMentions(potentialMentions.filter((p) => !removedPubkeys.includes(p)))
+      onRemovedPubkeysChange?.(removedPubkeys)
+      setPotentialMentions(potentialMentions)
+      onLoadingChange?.(false)
     })
+    return () => {
+      cancelled = true
+    }
   }, [content, parentEvent, pubkey, mutePubkeySet])
 
-  useEffect(() => {
-    const newMentions = potentialMentions.filter((pubkey) => !removedPubkeys.includes(pubkey))
-    setMentions(newMentions)
-  }, [potentialMentions, removedPubkeys])
+  return (
+    <MentionPicker
+      compact={compact}
+      potentialMentions={potentialMentions}
+      mentions={mentions}
+      parentEventPubkey={parentEventPubkey}
+      setMentions={(selected) => {
+        const removed = potentialMentions.filter((p) => !selected.includes(p))
+        removedPubkeysRef.current = removed
+        setMentions(selected)
+        onRemovedPubkeysChange?.(removed)
+      }}
+    />
+  )
+}
 
-  const items = useMemo(() => {
-    return potentialMentions.map((_, index) => {
-      const pubkey = potentialMentions[potentialMentions.length - 1 - index]
-      const isParentPubkey = pubkey === parentEventPubkey
-      return (
-        <MenuItem
-          key={`${pubkey}-${index}`}
-          checked={isParentPubkey ? true : mentions.includes(pubkey)}
-          onCheckedChange={(checked) => {
-            if (isParentPubkey) {
-              return
-            }
-            if (checked) {
-              setRemovedPubkeys((pubkeys) => pubkeys.filter((p) => p !== pubkey))
-            } else {
-              setRemovedPubkeys((pubkeys) => [...pubkeys, pubkey])
-            }
-          }}
-          disabled={isParentPubkey}
-        >
-          <SimpleUserAvatar userId={pubkey} size="small" />
-          <SimpleUsername
-            userId={pubkey}
-            className="truncate text-sm font-semibold"
-            skeletonClassName="h-3"
-          />
-        </MenuItem>
-      )
-    })
-  }, [potentialMentions, parentEventPubkey, mentions])
+export function MentionPicker({
+  potentialMentions,
+  mentions,
+  setMentions,
+  parentEventPubkey,
+  compact = false
+}: {
+  potentialMentions: string[]
+  mentions: string[]
+  setMentions: (mentions: string[]) => void
+  parentEventPubkey?: string
+  compact?: boolean
+}) {
+  const { t } = useTranslation()
+  const { isSmallScreen } = useScreenSize()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const items = potentialMentions
+    .slice()
+    .reverse()
+    .map((pubkey) => (
+      <MenuItem
+        key={pubkey}
+        checked={mentions.includes(pubkey)}
+        disabled={pubkey === parentEventPubkey}
+        onCheckedChange={(checked) => {
+          if (pubkey === parentEventPubkey) return
+          setMentions(
+            potentialMentions.filter((p) => (p === pubkey ? checked : mentions.includes(p)))
+          )
+        }}
+      >
+        <SimpleUserAvatar userId={pubkey} size="small" />
+        <SimpleUsername
+          userId={pubkey}
+          className="truncate text-sm font-semibold"
+          skeletonClassName="h-3"
+        />
+      </MenuItem>
+    ))
+
+  const triggerLabel = compact ? (
+    <>
+      {mentions.length}/{potentialMentions.length}
+      <ChevronDown className="size-3.5" />
+    </>
+  ) : (
+    <>
+      {t('Mentions')}{' '}
+      {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
+    </>
+  )
 
   if (isSmallScreen) {
     return (
       <>
         <Button
           className="px-3"
+          aria-label={t('Mentions')}
           variant="ghost"
           disabled={potentialMentions.length === 0}
           onClick={() => setIsDrawerOpen(true)}
         >
-          {t('Mentions')}{' '}
-          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
+          {triggerLabel}
         </Button>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerContent title={t('Mentions')} className="max-h-[80dvh]">
@@ -125,12 +170,12 @@ export default function Mentions({
       <DropdownMenuTrigger asChild>
         <Button
           className="px-3"
+          aria-label={t('Mentions')}
           variant="ghost"
           disabled={potentialMentions.length === 0}
           onClick={(e) => e.stopPropagation()}
         >
-          {t('Mentions')}{' '}
-          {potentialMentions.length > 0 && `(${mentions.length}/${potentialMentions.length})`}
+          {triggerLabel}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-[50vh] max-w-96" showScrollButtons>
@@ -184,52 +229,4 @@ function MenuItem({
       {children}
     </DropdownMenuCheckboxItem>
   )
-}
-
-async function extractMentions(content: string, parentEvent?: Event) {
-  const parentEventPubkey = parentEvent ? getEventAuthorPubkey(parentEvent) : undefined
-  const pubkeys: string[] = []
-  const relatedPubkeys: string[] = []
-  const matches = content.match(
-    /nostr:(npub1[a-z0-9]{58}|nprofile1[a-z0-9]+|note1[a-z0-9]{58}|nevent1[a-z0-9]+)/g
-  )
-
-  const addToSet = (arr: string[], pubkey: string) => {
-    if (pubkey === parentEventPubkey) return
-    if (!arr.includes(pubkey)) arr.push(pubkey)
-  }
-
-  for (const m of matches || []) {
-    try {
-      const id = m.split(':')[1]
-      const { type, data } = nip19.decode(id)
-      if (type === 'nprofile') {
-        addToSet(pubkeys, data.pubkey)
-      } else if (type === 'npub') {
-        addToSet(pubkeys, data)
-      } else if (['nevent', 'note'].includes(type)) {
-        const event = await client.fetchEvent(id)
-        if (event) {
-          if (event.kind === kinds.Zap && !(await lightning.validateZapReceipt(event))) continue
-          addToSet(pubkeys, getEventAuthorPubkey(event))
-        }
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  if (parentEvent) {
-    parentEvent.tags.forEach(([tagName, tagValue]) => {
-      if (['p', 'P'].includes(tagName) && !!tagValue) {
-        addToSet(relatedPubkeys, tagValue)
-      }
-    })
-  }
-
-  return {
-    pubkeys,
-    relatedPubkeys: relatedPubkeys.filter((p) => !pubkeys.includes(p)),
-    parentEventPubkey
-  }
 }

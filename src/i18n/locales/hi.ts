@@ -1165,6 +1165,11 @@ export default {
     'Quoted message not loaded yet': 'उद्धृत संदेश अभी लोड नहीं हुआ है',
     Video: 'वीडियो',
     Audio: 'ऑडियो',
-    'Group message from': 'इस समूह से संदेश'
+    'Group message from': 'इस समूह से संदेश',
+    'Short note': 'छोटी पोस्ट',
+    'Long-form article': 'लंबा लेख',
+    'Share a thought or a moment': 'कोई विचार या पल साझा करें',
+    'Give your ideas more room': 'अपने विचारों को और जगह दें',
+    Publish: 'प्रकाशित करें'
   }
 }

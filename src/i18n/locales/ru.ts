@@ -1173,6 +1173,11 @@ export default {
     'Quoted message not loaded yet': 'Цитируемое сообщение ещё не загружено',
     Video: 'Видео',
     Audio: 'Аудио',
-    'Group message from': 'Сообщение из группы'
+    'Group message from': 'Сообщение из группы',
+    'Short note': 'Короткая заметка',
+    'Long-form article': 'Длинная статья',
+    'Share a thought or a moment': 'Поделитесь мыслью или моментом',
+    'Give your ideas more room': 'Дайте своим идеям больше места',
+    Publish: 'Опубликовать'
   }
 }

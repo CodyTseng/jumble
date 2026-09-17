@@ -1176,6 +1176,11 @@ export default {
     'Quoted message not loaded yet': 'A mensagem citada ainda não foi carregada',
     Video: 'Vídeo',
     Audio: 'Áudio',
-    'Group message from': 'Mensagem do grupo'
+    'Group message from': 'Mensagem do grupo',
+    'Short note': 'Nota curta',
+    'Long-form article': 'Artigo longo',
+    'Share a thought or a moment': 'Partilhe uma ideia ou um momento',
+    'Give your ideas more room': 'Dê mais espaço às suas ideias',
+    Publish: 'Publicar'
   }
 }

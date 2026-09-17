@@ -1,8 +1,13 @@
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
+import {
+  compareEvents,
+  getReplaceableCoordinate,
+  getReplaceableCoordinateFromEvent
+} from '@/lib/event'
 import client from '@/services/client.service'
 import lightning from '@/services/lightning.service'
 import threadService from '@/services/thread.service'
-import { Event, kinds } from 'nostr-tools'
+import { Event, kinds, nip19 } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export function useFetchEvent(eventId?: string) {
@@ -13,6 +18,40 @@ export function useFetchEvent(eventId?: string) {
 
   useEffect(() => {
     let cancelled = false
+    let latestEvent: Event | undefined
+    let coordinate: string | undefined
+    if (eventId && /^\d+:[0-9a-f]{64}:/.test(eventId)) {
+      coordinate = eventId
+    } else if (eventId && /^naddr1/i.test(eventId)) {
+      try {
+        const decoded = nip19.decode(eventId)
+        if (decoded.type === 'naddr') {
+          coordinate = getReplaceableCoordinate(
+            decoded.data.kind,
+            decoded.data.pubkey,
+            decoded.data.identifier
+          )
+        }
+      } catch {
+        // The normal fetch path reports invalid identifiers.
+      }
+    }
+    const acceptEvent = (nextEvent: Event) => {
+      if (cancelled || isEventDeleted(nextEvent)) return
+      if (latestEvent && compareEvents(nextEvent, latestEvent) <= 0) return
+      latestEvent = nextEvent
+      setEvent(nextEvent)
+      setError(null)
+      setIsFetching(false)
+      threadService.addRepliesToThread([nextEvent])
+    }
+    const onNewEvent = (notification: globalThis.Event) => {
+      const nextEvent = (notification as CustomEvent<{ event: Event }>).detail.event
+      if (coordinate && getReplaceableCoordinateFromEvent(nextEvent) === coordinate) {
+        acceptEvent(nextEvent)
+      }
+    }
+    if (coordinate) client.addEventListener('newEvent', onNewEvent)
     const fetchEvent = async () => {
       setIsFetching(true)
       setError(null)
@@ -31,16 +70,15 @@ export function useFetchEvent(eventId?: string) {
         }
         return
       }
-      if (!cancelled && event && !isEventDeleted(event)) {
-        setEvent(event)
-        threadService.addRepliesToThread([event])
+      if (event) {
+        acceptEvent(event)
       }
     }
 
     fetchEvent()
       .catch((err) => {
         console.error('Error fetching event in useFetchEvent:', eventId, err)
-        if (!cancelled) setError(err as Error)
+        if (!cancelled && !latestEvent) setError(err as Error)
       })
       .finally(() => {
         if (!cancelled) setIsFetching(false)
@@ -48,6 +86,7 @@ export function useFetchEvent(eventId?: string) {
 
     return () => {
       cancelled = true
+      if (coordinate) client.removeEventListener('newEvent', onNewEvent)
     }
   }, [eventId])
 

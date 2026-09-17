@@ -16,7 +16,7 @@ export interface MentionListProps {
 }
 
 export interface MentionListHandle {
-  onKeyDown: (args: SuggestionKeyDownProps) => boolean
+  onKeyDown: (args: Pick<SuggestionKeyDownProps, 'event'>) => boolean
 }
 
 const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref) => {
@@ -62,7 +62,8 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
   }, [items])
 
   useImperativeHandle(ref, () => ({
-    onKeyDown: ({ event }: SuggestionKeyDownProps) => {
+    onKeyDown: ({ event }) => {
+      if (!items.length) return false
       if (event.key === 'ArrowUp') {
         upHandler()
         return true
@@ -88,7 +89,7 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
 
   return (
     <ScrollArea
-      className="pointer-events-auto z-50 flex max-h-80 flex-col overflow-y-auto rounded-lg border bg-background"
+      className="bg-background pointer-events-auto z-50 flex max-h-80 flex-col overflow-y-auto rounded-lg border"
       onWheel={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
@@ -102,7 +103,7 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
           onClick={() => selectItem(index)}
           onMouseEnter={() => setSelectedIndex(index)}
         >
-          <div className="pointer-events-none flex w-80 items-center gap-2 truncate">
+          <div className="pointer-events-none flex w-80 max-w-[calc(100vw-3rem)] items-center gap-2 truncate">
             <SimpleUserAvatar userId={item} />
             <div className="w-0 flex-1">
               <div className="flex items-center gap-2">

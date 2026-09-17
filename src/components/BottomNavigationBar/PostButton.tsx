@@ -1,4 +1,4 @@
-import PostEditor from '@/components/PostEditor'
+import NewPost from '@/components/NewPost'
 import { useNostr } from '@/providers/NostrProvider'
 import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -10,16 +10,10 @@ export default function PostButton() {
 
   return (
     <>
-      <BottomNavigationBarItem
-        onClick={() => {
-          checkLogin(() => {
-            setOpen(true)
-          })
-        }}
-      >
+      <BottomNavigationBarItem onClick={() => checkLogin(() => setOpen(true))}>
         <PlusCircleIcon weight="regular" className="size-7!" />
       </BottomNavigationBarItem>
-      <PostEditor open={open} setOpen={setOpen} />
+      <NewPost open={open} setOpen={setOpen} />
     </>
   )
 }

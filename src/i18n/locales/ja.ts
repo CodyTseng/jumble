@@ -1166,6 +1166,11 @@ export default {
     'Quoted message not loaded yet': '引用されたメッセージはまだ読み込まれていません',
     Video: '動画',
     Audio: '音声',
-    'Group message from': 'グループからのメッセージ'
+    'Group message from': 'グループからのメッセージ',
+    'Short note': '短文',
+    'Long-form article': '長文記事',
+    'Share a thought or a moment': '思いついたことや今の気持ちを共有',
+    'Give your ideas more room': '考えをじっくり文章に',
+    Publish: '公開'
   }
 }

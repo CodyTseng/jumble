@@ -212,7 +212,7 @@ export default function PostRelaySelector({
   }, [postTargetItems, relaySets, selectableRelays])
 
   const triggerClass =
-    'h-9 min-w-0 max-w-full gap-1.5 px-2.5 text-sm font-normal text-muted-foreground hover:text-foreground'
+    'h-9 min-w-0 max-w-full gap-1.5 px-2.5 text-sm font-normal text-foreground'
 
   if (isSmallScreen) {
     return (

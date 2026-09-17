@@ -1,6 +1,7 @@
 import BookmarkPage from '@/pages/primary/BookmarkPage'
 import DmPage from '@/pages/primary/DmPage'
 import FollowingPage from '@/pages/primary/FollowingPage'
+import LongFormEditorPage from '@/pages/primary/LongFormEditorPage'
 import MePage from '@/pages/primary/MePage'
 import NoteListPage from '@/pages/primary/NoteListPage'
 import NotificationListPage from '@/pages/primary/NotificationListPage'
@@ -16,6 +17,7 @@ const PRIMARY_ROUTE_CONFIGS = [
   { key: 'following', component: FollowingPage },
   { key: 'notifications', component: NotificationListPage },
   { key: 'dms', component: DmPage },
+  { key: 'longFormEditor', component: LongFormEditorPage },
   { key: 'me', component: MePage },
   { key: 'profile', component: ProfilePage },
   { key: 'relay', component: RelayPage },

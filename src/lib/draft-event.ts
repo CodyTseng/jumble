@@ -1,6 +1,7 @@
 import {
   ApplicationDataKey,
   EMBEDDED_EVENT_REGEX,
+  EMBEDDED_MENTION_REGEX,
   EMOJI_SHORT_CODE_REGEX,
   ExtendedKind,
   POLL_TYPE
@@ -30,6 +31,7 @@ import {
 } from './event'
 import { determineExternalContentKind } from './external-content'
 import { randomString } from './random'
+import { normalizeNostrReferences } from './nostr-references'
 import { generateBech32IdFromETag, tagNameEquals } from './tag'
 
 const draftEventCache = new BoundedMap<string, string>({ maxSize: 500 })
@@ -210,6 +212,86 @@ export async function createShortTextNoteDraftEvent(
     tags
   }
   return setDraftEventCache(baseDraft)
+}
+
+// https://github.com/nostr-protocol/nips/blob/master/23.md
+export function createLongFormArticleDraftEvent({
+  identifier,
+  title,
+  summary,
+  image,
+  tags: articleTags,
+  content,
+  publishedAt,
+  originalTags = [],
+  mentions,
+  addClientTag = false,
+  isNsfw = originalTags.some(([name]) => name === 'content-warning'),
+  protectedEvent = originalTags.some(([name]) => name === '-')
+}: {
+  identifier: string
+  title: string
+  summary?: string
+  image?: string
+  tags?: string[]
+  content: string
+  publishedAt?: number
+  originalTags?: string[][]
+  mentions?: string[]
+  addClientTag?: boolean
+  isNsfw?: boolean
+  protectedEvent?: boolean
+}): TDraftEvent {
+  content = normalizeNostrReferences(content)
+  const now = dayjs().unix()
+  const tags: string[][] = [
+    ...originalTags.filter(
+      ([name]) =>
+        ![
+          'd',
+          'title',
+          'summary',
+          'image',
+          't',
+          'published_at',
+          'p',
+          'q',
+          'e',
+          'a',
+          'client',
+          'nonce',
+          'content-warning',
+          '-'
+        ].includes(name)
+    ),
+    buildDTag(identifier),
+    buildTitleTag(title.trim()),
+    ['published_at', String(publishedAt ?? now)]
+  ]
+
+  if (summary?.trim()) tags.push(['summary', summary.trim()])
+  if (image?.trim()) tags.push(['image', image.trim()])
+  articleTags?.forEach((tag) => {
+    const normalizedTag = tag.trim().replace(/^#/, '').toLocaleLowerCase()
+    if (normalizedTag) tags.push(buildTTag(normalizedTag))
+  })
+  const quoteTags = extractQuoteTags(content, new RegExp(EMBEDDED_EVENT_REGEX.source, 'gi'))
+  const mentionedPubkeys = new Set(mentions ?? extractMentionTags(content).map((tag) => tag[1]))
+  tags.push(...Array.from(mentionedPubkeys, (pubkey) => buildPTag(pubkey)))
+  tags.push(...quoteTags)
+  if (addClientTag) tags.push(buildClientTag())
+
+  if (isNsfw) {
+    tags.push(originalTags.find(([name]) => name === 'content-warning') ?? buildNsfwTag())
+  }
+  if (protectedEvent) tags.push(buildProtectedTag())
+
+  return {
+    kind: kinds.LongFormArticle,
+    content,
+    tags,
+    created_at: now
+  }
 }
 
 // https://github.com/nostr-protocol/nips/blob/master/51.md
@@ -774,10 +856,24 @@ async function extractCommentMentions(content: string, parentStuff: Event | stri
   }
 }
 
-function extractQuoteTags(content: string) {
+function extractMentionTags(content: string): string[][] {
+  const pubkeys = new Set<string>()
+  for (const match of content.matchAll(new RegExp(EMBEDDED_MENTION_REGEX.source, 'gi'))) {
+    try {
+      const { type, data } = nip19.decode(match[1])
+      if (type === 'npub') pubkeys.add(data)
+      else if (type === 'nprofile') pubkeys.add(data.pubkey)
+    } catch {
+      // Invalid references in an article should not prevent publishing.
+    }
+  }
+  return Array.from(pubkeys, (pubkey) => buildPTag(pubkey))
+}
+
+function extractQuoteTags(content: string, regex = EMBEDDED_EVENT_REGEX) {
   const quoteSet = new Set<string>()
   const quoteTags: string[][] = []
-  const matches = content.match(EMBEDDED_EVENT_REGEX)
+  const matches = content.match(regex)
   for (const m of matches || []) {
     try {
       const id = m.split(':')[1]

@@ -1152,6 +1152,11 @@ export default {
     'Quoted message not loaded yet': 'لم يتم تحميل الرسالة المقتبسة بعد',
     Video: 'فيديو',
     Audio: 'صوت',
-    'Group message from': 'رسالة جماعية من'
+    'Group message from': 'رسالة جماعية من',
+    'Short note': 'ملاحظة قصيرة',
+    'Long-form article': 'مقال طويل',
+    'Share a thought or a moment': 'شارك فكرة أو لحظة',
+    'Give your ideas more room': 'امنح أفكارك مساحة أكبر',
+    Publish: 'نشر'
   }
 }

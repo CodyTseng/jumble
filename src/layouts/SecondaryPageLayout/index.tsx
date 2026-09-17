@@ -22,6 +22,7 @@ const SecondaryPageLayout = forwardRef(
       hideTitlebarBottomBorder = false,
       displayScrollToTopButton = false,
       noScrollArea = false,
+      forceScrollArea = false,
       titlebar
     }: {
       children?: React.ReactNode
@@ -32,6 +33,7 @@ const SecondaryPageLayout = forwardRef(
       hideTitlebarBottomBorder?: boolean
       displayScrollToTopButton?: boolean
       noScrollArea?: boolean
+      forceScrollArea?: boolean
       titlebar?: React.ReactNode
     },
     ref
@@ -62,13 +64,13 @@ const SecondaryPageLayout = forwardRef(
     )
 
     useEffect(() => {
-      if (enableSingleColumnLayout) {
+      if (enableSingleColumnLayout && !forceScrollArea) {
         setTimeout(() => window.scrollTo({ top: 0 }), 10)
         return
       }
     }, [])
 
-    if (enableSingleColumnLayout) {
+    if (enableSingleColumnLayout && !forceScrollArea) {
       return (
         <PageActiveContext.Provider value={currentIndex === index}>
           <DeepBrowsingProvider active={currentIndex === index}>

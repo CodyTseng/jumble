@@ -1,4 +1,4 @@
-import PostEditor from '@/components/PostEditor'
+import NewPost from '@/components/NewPost'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { PencilLine } from 'lucide-react'
@@ -26,7 +26,7 @@ export default function PostButton({ collapse }: { collapse: boolean }) {
       >
         <PencilLine />
       </SidebarItem>
-      <PostEditor open={open} setOpen={setOpen} />
+      <NewPost open={open} setOpen={setOpen} />
     </div>
   )
 }

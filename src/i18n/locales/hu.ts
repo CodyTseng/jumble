@@ -1170,6 +1170,11 @@ export default {
     'Quoted message not loaded yet': 'Az idézett üzenet még nem töltődött be',
     Video: 'Videó',
     Audio: 'Hang',
-    'Group message from': 'Csoportüzenet innen'
+    'Group message from': 'Csoportüzenet innen',
+    'Short note': 'Rövid jegyzet',
+    'Long-form article': 'Hosszú cikk',
+    'Share a thought or a moment': 'Ossz meg egy gondolatot vagy pillanatot',
+    'Give your ideas more room': 'Adj több teret az ötleteidnek',
+    Publish: 'Közzététel'
   }
 }

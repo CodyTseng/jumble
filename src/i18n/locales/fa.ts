@@ -1167,6 +1167,11 @@ export default {
     'Quoted message not loaded yet': 'پیام نقل‌شده هنوز بارگیری نشده است',
     Video: 'ویدیو',
     Audio: 'صدا',
-    'Group message from': 'پیام گروهی از'
+    'Group message from': 'پیام گروهی از',
+    'Short note': 'یادداشت کوتاه',
+    'Long-form article': 'مقالهٔ بلند',
+    'Share a thought or a moment': 'یک فکر یا لحظه را به اشتراک بگذارید',
+    'Give your ideas more room': 'به ایده‌هایتان فضای بیشتری بدهید',
+    Publish: 'انتشار'
   }
 }
