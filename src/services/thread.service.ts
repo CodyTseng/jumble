@@ -97,13 +97,13 @@ class ThreadService {
           kinds: [kinds.ShortTextNote],
           limit
         })
-        if (event?.kind !== kinds.ShortTextNote) {
-          filters.push({
-            '#E': [rootInfo.id],
-            kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
-            limit
-          })
-        }
+        // Some clients use NIP-22 comments to reply to kind 1 events, so this
+        // filter is needed even when the root event itself is kind 1.
+        filters.push({
+          '#E': [rootInfo.id],
+          kinds: [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT],
+          limit
+        })
       } else if (rootInfo.type === 'A') {
         filters.push(
           {
