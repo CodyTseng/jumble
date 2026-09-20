@@ -1182,6 +1182,9 @@ export default {
     'Long-form article': 'Długi artykuł',
     'Share a thought or a moment': 'Podziel się myślą lub chwilą',
     'Give your ideas more room': 'Daj swoim pomysłom więcej miejsca',
-    Publish: 'Opublikuj'
+    Publish: 'Opublikuj',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'Aby korzystać z płynniejszych i bardziej niezawodnych wiadomości prywatnych, wypróbuj PsstPsst — komunikator stworzony dla Nostr.',
+    'Try PsstPsst': 'Wypróbuj PsstPsst'
   }
 }

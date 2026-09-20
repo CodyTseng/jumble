@@ -1157,6 +1157,9 @@ export default {
     'Long-form article': '긴 글',
     'Share a thought or a moment': '생각이나 순간을 공유하세요',
     'Give your ideas more room': '생각을 더 깊이 펼쳐 보세요',
-    Publish: '게시'
+    Publish: '게시',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      '더 원활하고 안정적인 DM을 위해 Nostr 전용 메신저 PsstPsst를 사용해 보세요.',
+    'Try PsstPsst': 'PsstPsst 사용해 보기'
   }
 }

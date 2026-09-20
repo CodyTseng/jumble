@@ -76,6 +76,7 @@ export const StorageKey = {
   DISABLE_NOTIFICATION_SYNC: 'disableNotificationSync',
   LONG_FORM_DRAFT_MAP: 'longFormDraftMap',
   DISMISSED_DESKTOP_APP_TIP: 'dismissedDesktopAppTip',
+  DISMISSED_PSSTPSST_PROMOTION: 'dismissedPsstPsstPromotion',
   NOTE_LIST_MODE: 'noteListMode', // deprecated
   ENABLE_LIVE_FEED: 'enableLiveFeed', // deprecated
   HIDE_UNTRUSTED_NOTES: 'hideUntrustedNotes', // deprecated

@@ -2,6 +2,7 @@ import DmList from '@/components/DmList'
 import DmRelayConfig from '@/components/DmRelayConfig'
 import MobileMeDrawerButton from '@/components/MobileMeDrawerButton'
 import NewDeviceKeySync from '@/components/NewDeviceKeySync'
+import PsstPsstPromotion from '@/components/PsstPsstPromotion'
 import ResetEncryptionKeyButton from '@/components/ResetEncryptionKeyButton'
 import SearchInput from '@/components/SearchInput'
 import { Button } from '@/components/ui/button'
@@ -208,6 +209,7 @@ const DmPage = forwardRef<TPageRef>((_, ref) => {
               <ResetEncryptionKeySection onReset={handleResetEncryptionKey} />
             </>
           )}
+          {!showRelayConfig && <PsstPsstPromotion />}
           <DmList />
         </>
       )}

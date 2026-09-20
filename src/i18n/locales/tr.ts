@@ -1174,6 +1174,9 @@ export default {
     'Long-form article': 'Uzun makale',
     'Share a thought or a moment': 'Bir düşünce veya an paylaş',
     'Give your ideas more room': 'Fikirlerine daha fazla alan aç',
-    Publish: 'Yayınla'
+    Publish: 'Yayınla',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'Daha akıcı ve güvenilir bir DM deneyimi için Nostr’a özel mesajlaşma uygulaması PsstPsst’i deneyin.',
+    'Try PsstPsst': 'PsstPsst’i dene'
   }
 }

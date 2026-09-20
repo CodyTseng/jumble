@@ -1166,6 +1166,9 @@ export default {
     'Share a thought or a moment': '分享想法，记录此刻',
     'Give your ideas more room': '展开思绪，写得更深入',
     'Review your post settings before publishing.': '发布前请确认发布设置。',
-    Publish: '发布'
+    Publish: '发布',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      '想要更流畅、稳定的私信体验？试试专为 Nostr 打造的即时通讯应用 PsstPsst。',
+    'Try PsstPsst': '试用 PsstPsst'
   }
 }

@@ -1171,6 +1171,9 @@ export default {
     'Long-form article': '長文記事',
     'Share a thought or a moment': '思いついたことや今の気持ちを共有',
     'Give your ideas more room': '考えをじっくり文章に',
-    Publish: '公開'
+    Publish: '公開',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'より快適で安定したDM体験には、Nostr専用メッセンジャーのPsstPsstをお試しください。',
+    'Try PsstPsst': 'PsstPsstを試す'
   }
 }

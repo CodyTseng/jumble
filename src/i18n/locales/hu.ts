@@ -1175,6 +1175,9 @@ export default {
     'Long-form article': 'Hosszú cikk',
     'Share a thought or a moment': 'Ossz meg egy gondolatot vagy pillanatot',
     'Give your ideas more room': 'Adj több teret az ötleteidnek',
-    Publish: 'Közzététel'
+    Publish: 'Közzététel',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'A gördülékenyebb és megbízhatóbb privát üzenetküldéshez próbáld ki a PsstPsstet, a Nostr dedikált üzenetküldőjét.',
+    'Try PsstPsst': 'PsstPsst kipróbálása'
   }
 }

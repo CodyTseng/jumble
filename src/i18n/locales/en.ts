@@ -1201,6 +1201,9 @@ export default {
     'Share a thought or a moment': 'Share a thought or a moment',
     'Give your ideas more room': 'Give your ideas more room',
     'Review your post settings before publishing.': 'Review your post settings before publishing.',
-    Publish: 'Publish'
+    Publish: 'Publish',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.',
+    'Try PsstPsst': 'Try PsstPsst'
   }
 }

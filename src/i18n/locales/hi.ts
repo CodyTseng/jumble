@@ -1170,6 +1170,9 @@ export default {
     'Long-form article': 'लंबा लेख',
     'Share a thought or a moment': 'कोई विचार या पल साझा करें',
     'Give your ideas more room': 'अपने विचारों को और जगह दें',
-    Publish: 'प्रकाशित करें'
+    Publish: 'प्रकाशित करें',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'ज़्यादा सहज और भरोसेमंद DM अनुभव के लिए, Nostr के खास मैसेंजर PsstPsst को आज़माएँ।',
+    'Try PsstPsst': 'PsstPsst आज़माएँ'
   }
 }

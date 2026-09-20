@@ -1172,6 +1172,9 @@ export default {
     'Long-form article': 'مقالهٔ بلند',
     'Share a thought or a moment': 'یک فکر یا لحظه را به اشتراک بگذارید',
     'Give your ideas more room': 'به ایده‌هایتان فضای بیشتری بدهید',
-    Publish: 'انتشار'
+    Publish: 'انتشار',
+    'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
+      'برای تجربه‌ای روان‌تر و پایدارتر در پیام‌های خصوصی، PsstPsst، پیام‌رسان اختصاصی Nostr را امتحان کنید.',
+    'Try PsstPsst': 'امتحان PsstPsst'
   }
 }
