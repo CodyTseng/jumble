@@ -3,8 +3,9 @@ import { X_URL_REGEX, YOUTUBE_URL_REGEX } from '@/constants'
 import { toNote, toProfile } from '@/lib/link'
 import { transformMarkdownUrl } from '@/lib/markdown'
 import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
+import { isImage } from '@/lib/url'
 import { Event } from 'nostr-tools'
-import { useMemo } from 'react'
+import { Children, useMemo } from 'react'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { EmbeddedHashtag, EmbeddedLNInvoice } from '../Embedded'
@@ -37,6 +38,13 @@ const STANDALONE_NOSTR_NOTE_LINE_REGEX = /^[ \t]*nostr:(?:note1|nevent1|naddr1)[
 
 function ensureNostrEmbedsAreStandalone(content: string): string {
   return content.replace(STANDALONE_NOSTR_NOTE_LINE_REGEX, '\n$&\n')
+}
+
+// Only embed auto-linked image URLs. An explicitly labeled Markdown link such
+// as [view image](image.png) should remain a link and preserve the author's intent.
+function isBareImageLink(href: string, children: React.ReactNode): boolean {
+  const childNodes = Children.toArray(children)
+  return childNodes.every((child) => typeof child === 'string') && childNodes.join('') === href
 }
 
 export default function MarkdownContent({ content, event }: { content: string; event?: Event }) {
@@ -77,6 +85,15 @@ export default function MarkdownContent({ content, event }: { content: string; e
           }
           if (X_URL_REGEX.test(href)) {
             return <XEmbeddedPost url={href} className="mt-2" />
+          }
+          if (isImage(href) && isBareImageLink(href, children)) {
+            return (
+              <ImageWithLightbox
+                image={{ url: href, pubkey: event?.pubkey }}
+                className="max-h-[80vh] object-contain sm:max-h-[50vh]"
+                classNames={{ wrapper: 'w-fit max-w-full mt-2' }}
+              />
+            )
           }
           return <ExternalLink url={href}>{children}</ExternalLink>
         },
