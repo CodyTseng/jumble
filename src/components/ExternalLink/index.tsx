@@ -66,7 +66,7 @@ export default function ExternalLink({
   }
 
   if (!safeUrl) {
-    return <span className={cn('wrap-break-word', className)}>{children ?? displayUrl}</span>
+    return <span className={cn('wrap-anywhere', className)}>{children ?? displayUrl}</span>
   }
 
   if (justOpenLink) {
@@ -75,7 +75,7 @@ export default function ExternalLink({
         href={safeUrl}
         target="_blank"
         rel="noreferrer noopener"
-        className={cn('text-primary cursor-pointer hover:underline', className)}
+        className={cn('text-primary cursor-pointer wrap-anywhere hover:underline', className)}
         onClick={(e) => e.stopPropagation()}
       >
         {children ?? displayUrl}
@@ -90,7 +90,7 @@ export default function ExternalLink({
 
   const trigger = (
     <span
-      className={cn('text-primary cursor-pointer hover:underline', className)}
+      className={cn('text-primary cursor-pointer wrap-anywhere hover:underline', className)}
       onMouseDown={(e) => {
         // Prevent the autoscroll cursor on middle-click
         if (e.button === 1) e.preventDefault()
@@ -160,6 +160,7 @@ export default function ExternalLink({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        asChild
         onPointerDown={(e) => {
           if (isNewTabClick(e)) {
             e.preventDefault()
@@ -184,7 +185,12 @@ export default function ExternalLink({
           }
         }}
       >
-        <span className={cn('text-primary cursor-pointer hover:underline', className)} title={url}>
+        <span
+          role="button"
+          tabIndex={0}
+          className={cn('text-primary cursor-pointer wrap-anywhere hover:underline', className)}
+          title={url}
+        >
           {children ?? displayUrl}
         </span>
       </DropdownMenuTrigger>
