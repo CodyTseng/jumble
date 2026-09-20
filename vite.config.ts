@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => ({
         start_url: '/',
         display: 'standalone',
         background_color: '#FFFFFF',
-        theme_color: '#FFFFFF',
+        theme_color: '#171717',
         description: packageJson.description
       }
     })

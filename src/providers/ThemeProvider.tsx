@@ -25,6 +25,14 @@ const updateCSSVariables = (color: TPrimaryColor, currentTheme: TTheme) => {
   root.style.setProperty('--ring', config.ring)
 }
 
+const updateThemeColor = (currentTheme: TTheme) => {
+  const themeColor =
+    currentTheme === 'light' ? '#FFFFFF' : currentTheme === 'pure-black' ? '#000000' : '#171717'
+  document
+    .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    ?.setAttribute('content', themeColor)
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeSetting, setThemeSetting] = useState<TThemeSetting>(
     (localStorage.getItem(StorageKey.THEME_SETTING) as TThemeSetting) ?? 'system'
@@ -65,6 +73,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     }
     updateTheme()
+    updateThemeColor(theme)
   }, [theme])
 
   useEffect(() => {
