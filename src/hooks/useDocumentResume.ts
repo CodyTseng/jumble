@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 /** Hidden this long before visible → treat as sleep / long absence (not tab flick). */
 export const DOCUMENT_RESUME_HIDDEN_MS = 5 * 60 * 1000
@@ -18,67 +18,117 @@ export function shouldResumeAfterHiddenDuration(
   return now - hiddenAt >= thresholdMs
 }
 
+type Listener = () => void
+
+let liveAllowed = true
+const liveListeners = new Set<Listener>()
+let lifecycleBound = false
+let hiddenAt: number | null = null
+let disableTimer: ReturnType<typeof setTimeout> | undefined
+let lastPulseAt = 0
+
+function emitLive() {
+  for (const listener of liveListeners) listener()
+}
+
+function setLiveAllowed(value: boolean) {
+  if (liveAllowed === value) return
+  liveAllowed = value
+  emitLive()
+}
+
+function clearDisableTimer() {
+  if (disableTimer !== undefined) {
+    clearTimeout(disableTimer)
+    disableTimer = undefined
+  }
+}
+
+function pulseResubscribe(_reason: DocumentResumeReason) {
+  const now = Date.now()
+  if (now - lastPulseAt < 1_000) return
+  lastPulseAt = now
+  setLiveAllowed(false)
+  queueMicrotask(() => setLiveAllowed(true))
+}
+
+function onVisibility() {
+  if (typeof document === 'undefined') return
+  if (document.hidden) {
+    hiddenAt = Date.now()
+    clearDisableTimer()
+    disableTimer = setTimeout(() => {
+      setLiveAllowed(false)
+    }, DOCUMENT_RESUME_HIDDEN_MS)
+    return
+  }
+
+  clearDisableTimer()
+  const wasHiddenAt = hiddenAt
+  hiddenAt = null
+  const hiddenLongEnough = shouldResumeAfterHiddenDuration(wasHiddenAt, Date.now())
+
+  if (hiddenLongEnough || !liveAllowed) {
+    pulseResubscribe('visibility')
+  } else {
+    setLiveAllowed(true)
+  }
+}
+
+function onResume() {
+  pulseResubscribe('resume')
+}
+
+function onPageShow(event: PageTransitionEvent) {
+  if (event.persisted) pulseResubscribe('pageshow')
+}
+
+function onOnline() {
+  pulseResubscribe('online')
+}
+
+function ensureLifecycleBound() {
+  if (lifecycleBound || typeof document === 'undefined') return
+  lifecycleBound = true
+  hiddenAt = document.hidden ? Date.now() : null
+  document.addEventListener('visibilitychange', onVisibility)
+  document.addEventListener('resume', onResume as EventListener)
+  window.addEventListener('pageshow', onPageShow)
+  window.addEventListener('online', onOnline)
+}
+
+function subscribeLive(listener: Listener) {
+  ensureLifecycleBound()
+  liveListeners.add(listener)
+  return () => {
+    liveListeners.delete(listener)
+  }
+}
+
+function getLiveSnapshot() {
+  return liveAllowed
+}
+
+function getLiveServerSnapshot() {
+  return true
+}
+
 /**
- * Bumps when the document should soft-restart live feed subscriptions after
- * sleep / long backgrounding / bfcache restore / network return — without a
- * full page reload (#15).
- *
- * Deliberately does NOT fire on brief tab switches (see shouldResumeAfterHiddenDuration).
+ * Shared gate for live feed subscriptions. Stays true across brief tab
+ * switches; after long hide / sleep resume / bfcache / online it pulses
+ * false→true so `usePageActive()` consumers soft-resubscribe (#15).
+ */
+export function useLiveSubscriptionGate(): boolean {
+  return useSyncExternalStore(subscribeLive, getLiveSnapshot, getLiveServerSnapshot)
+}
+
+/**
+ * Increments-style API kept for tests / direct callers: derived from gate pulses.
+ * Prefer useLiveSubscriptionGate for subscription effects.
  */
 export function useDocumentResume(): number {
-  const [resumeCount, setResumeCount] = useState(0)
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-
-    let hiddenAt: number | null = document.hidden ? Date.now() : null
-    let lastBumpAt = 0
-
-    const bump = (_reason: DocumentResumeReason) => {
-      const now = Date.now()
-      // Coalesce visibility + online + resume that often arrive together on wake.
-      if (now - lastBumpAt < 1_000) return
-      lastBumpAt = now
-      setResumeCount((n) => n + 1)
-    }
-
-    const onVisibility = () => {
-      if (document.hidden) {
-        hiddenAt = Date.now()
-        return
-      }
-      const wasHiddenAt = hiddenAt
-      hiddenAt = null
-      if (shouldResumeAfterHiddenDuration(wasHiddenAt, Date.now())) {
-        bump('visibility')
-      }
-    }
-
-    const onResume = () => {
-      // Page Lifecycle `resume` after OS freeze/sleep — fire even if visibility
-      // never flipped (some lock-screen paths keep visibilityState=visible).
-      bump('resume')
-    }
-
-    const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) bump('pageshow')
-    }
-
-    const onOnline = () => bump('online')
-
-    document.addEventListener('visibilitychange', onVisibility)
-    // Chromium Page Lifecycle (typed loosely — not in all lib.dom versions)
-    document.addEventListener('resume', onResume as EventListener)
-    window.addEventListener('pageshow', onPageShow)
-    window.addEventListener('online', onOnline)
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibility)
-      document.removeEventListener('resume', onResume as EventListener)
-      window.removeEventListener('pageshow', onPageShow)
-      window.removeEventListener('online', onOnline)
-    }
-  }, [])
-
-  return resumeCount
+  const allowed = useLiveSubscriptionGate()
+  // Expose a changing number when allowed flips back to true after a pulse.
+  // Consumers that only need the boolean should use useLiveSubscriptionGate.
+  return allowed ? 1 : 0
 }
