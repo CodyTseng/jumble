@@ -340,6 +340,14 @@ export default {
     Reposts: 'Reposts',
     FollowListNotFoundConfirmation:
       'Follow list not found. Do you want to create a new one? If you have followed users before, please DO NOT confirm as this operation will cause you to lose your previous follow list.',
+    'Follow privately': 'Follow privately',
+    'Move to private follows': 'Move to private follows',
+    'Move to public follows': 'Move to public follows',
+    'Make all follows private': 'Make all follows private',
+    'Your public follow list will be moved to your encrypted private follow list. Other people will no longer be able to see who you follow.':
+      'Your public follow list will be moved to your encrypted private follow list. Other people will no longer be able to see who you follow.',
+    'All follows moved to private': 'All follows moved to private',
+    'Moving...': 'Moving...',
     MuteListNotFoundConfirmation:
       'Mute list not found. Do you want to create a new one? If you have muted users before, please DO NOT confirm as this operation will cause you to lose your previous mute list.',
     'Show NSFW content by default': 'Show NSFW content by default',
@@ -1206,4 +1214,4 @@ export default {
       'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.',
     'Try PsstPsst': 'Try PsstPsst'
   }
-}
+    }
