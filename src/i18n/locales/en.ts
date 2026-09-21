@@ -1214,4 +1214,4 @@ export default {
       'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.',
     'Try PsstPsst': 'Try PsstPsst'
   }
-    }
+}
