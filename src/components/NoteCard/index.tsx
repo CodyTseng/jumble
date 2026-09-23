@@ -34,7 +34,11 @@ export default function NoteCard({
     if (filterMutedNotes && mutePubkeySet.has(getEventAuthorPubkey(event))) {
       return true
     }
-    if (hideContentMentioningMutedUsers && isMentioningMutedUsers(event, mutePubkeySet)) {
+    if (
+      filterMutedNotes &&
+      hideContentMentioningMutedUsers &&
+      isMentioningMutedUsers(event, mutePubkeySet)
+    ) {
       return true
     }
     if (nsfwDisplayPolicy === NSFW_DISPLAY_POLICY.HIDE && isNsfwEvent(event)) {

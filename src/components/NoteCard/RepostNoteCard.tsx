@@ -27,7 +27,11 @@ export default function RepostNoteCard({
     if (filterMutedNotes && mutePubkeySet.has(getEventAuthorPubkey(targetEvent))) {
       return true
     }
-    if (hideContentMentioningMutedUsers && isMentioningMutedUsers(targetEvent, mutePubkeySet)) {
+    if (
+      filterMutedNotes &&
+      hideContentMentioningMutedUsers &&
+      isMentioningMutedUsers(targetEvent, mutePubkeySet)
+    ) {
       return true
     }
     return false
