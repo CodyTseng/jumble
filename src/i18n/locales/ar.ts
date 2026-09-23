@@ -1160,6 +1160,15 @@ export default {
     Publish: 'نشر',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'للحصول على تجربة رسائل خاصة أكثر سلاسة وموثوقية، جرّب PsstPsst، تطبيق مراسلة مخصصًا لـ Nostr.',
-    'Try PsstPsst': 'جرّب PsstPsst'
+    'Try PsstPsst': 'جرّب PsstPsst',
+    Public: 'عام',
+    Private: 'خاص',
+    'Public muted words can be seen by anyone.': 'يمكن لأي شخص رؤية الكلمات المكتومة العامة.',
+    'Private muted word': 'كلمة مكتومة خاصة',
+    'Public muted word': 'كلمة مكتومة عامة',
+    'Remove muted word': 'إزالة الكلمة المكتومة',
+    'Failed to update muted word': 'فشل تحديث الكلمة المكتومة',
+    '(Visible to everyone)': '(مرئي للجميع)',
+    'Local muted words have not synced yet.': 'لم تتم مزامنة الكلمات المكتومة المحلية بعد.'
   }
 }

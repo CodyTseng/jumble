@@ -1204,6 +1204,15 @@ export default {
     Publish: 'Publish',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.',
-    'Try PsstPsst': 'Try PsstPsst'
+    'Try PsstPsst': 'Try PsstPsst',
+    Public: 'Public',
+    Private: 'Private',
+    'Public muted words can be seen by anyone.': 'Public muted words can be seen by anyone.',
+    'Private muted word': 'Private muted word',
+    'Public muted word': 'Public muted word',
+    'Remove muted word': 'Remove muted word',
+    'Failed to update muted word': 'Failed to update muted word',
+    '(Visible to everyone)': '(Visible to everyone)',
+    'Local muted words have not synced yet.': 'Local muted words have not synced yet.'
   }
 }

@@ -1553,8 +1553,8 @@ class ClientService extends EventTarget {
     await this.updateReplaceableEventCache(evt)
   }
 
-  async fetchMuteListEvent(pubkey: string) {
-    return await this.fetchReplaceableEvent(pubkey, kinds.Mutelist)
+  async fetchMuteListEvent(pubkey: string, skipCache = false) {
+    return await this.fetchReplaceableEvent(pubkey, kinds.Mutelist, undefined, true, skipCache)
   }
 
   async fetchBookmarkListEvent(pubkey: string) {

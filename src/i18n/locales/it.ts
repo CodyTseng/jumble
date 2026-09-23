@@ -1182,6 +1182,17 @@ export default {
     Publish: 'Pubblica',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'Per messaggi diretti più fluidi e affidabili, prova PsstPsst, un messenger dedicato a Nostr.',
-    'Try PsstPsst': 'Prova PsstPsst'
+    'Try PsstPsst': 'Prova PsstPsst',
+    Public: 'Pubblico',
+    Private: 'Privato',
+    'Public muted words can be seen by anyone.':
+      'Le parole silenziate pubbliche sono visibili a tutti.',
+    'Private muted word': 'Parola silenziata privata',
+    'Public muted word': 'Parola silenziata pubblica',
+    'Remove muted word': 'Rimuovi parola silenziata',
+    'Failed to update muted word': 'Impossibile aggiornare la parola silenziata',
+    '(Visible to everyone)': '(visibile a tutti)',
+    'Local muted words have not synced yet.':
+      'Le parole silenziate locali non sono ancora state sincronizzate.'
   }
 }

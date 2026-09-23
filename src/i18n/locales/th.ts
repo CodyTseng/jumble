@@ -1156,6 +1156,15 @@ export default {
     Publish: 'เผยแพร่',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'เพื่อประสบการณ์ DM ที่ราบรื่นและเสถียรยิ่งขึ้น ลองใช้ PsstPsst แอปส่งข้อความสำหรับ Nostr โดยเฉพาะ',
-    'Try PsstPsst': 'ลองใช้ PsstPsst'
+    'Try PsstPsst': 'ลองใช้ PsstPsst',
+    Public: 'สาธารณะ',
+    Private: 'ส่วนตัว',
+    'Public muted words can be seen by anyone.': 'ทุกคนสามารถเห็นคำที่ปิดเสียงแบบสาธารณะได้',
+    'Private muted word': 'คำที่ปิดเสียงแบบส่วนตัว',
+    'Public muted word': 'คำที่ปิดเสียงแบบสาธารณะ',
+    'Remove muted word': 'ลบคำที่ปิดเสียง',
+    'Failed to update muted word': 'อัปเดตคำที่ปิดเสียงไม่สำเร็จ',
+    '(Visible to everyone)': '(ทุกคนมองเห็นได้)',
+    'Local muted words have not synced yet.': 'คำที่ปิดเสียงในเครื่องยังไม่ได้ซิงค์'
   }
 }

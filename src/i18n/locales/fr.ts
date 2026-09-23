@@ -1192,6 +1192,17 @@ export default {
     Publish: 'Publier',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'Pour une expérience de messages privés plus fluide et fiable, essayez PsstPsst, une messagerie dédiée à Nostr.',
-    'Try PsstPsst': 'Essayer PsstPsst'
+    'Try PsstPsst': 'Essayer PsstPsst',
+    Public: 'Public',
+    Private: 'Privé',
+    'Public muted words can be seen by anyone.':
+      'Tout le monde peut voir les mots masqués publics.',
+    'Private muted word': 'Mot masqué privé',
+    'Public muted word': 'Mot masqué public',
+    'Remove muted word': 'Supprimer le mot masqué',
+    'Failed to update muted word': 'Échec de la mise à jour du mot masqué',
+    '(Visible to everyone)': '(visible par tous)',
+    'Local muted words have not synced yet.':
+      'Les mots masqués locaux ne sont pas encore synchronisés.'
   }
 }

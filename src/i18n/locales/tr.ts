@@ -1177,6 +1177,17 @@ export default {
     Publish: 'Yayınla',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'Daha akıcı ve güvenilir bir DM deneyimi için Nostr’a özel mesajlaşma uygulaması PsstPsst’i deneyin.',
-    'Try PsstPsst': 'PsstPsst’i dene'
+    'Try PsstPsst': 'PsstPsst’i dene',
+    Public: 'Herkese açık',
+    Private: 'Özel',
+    'Public muted words can be seen by anyone.':
+      'Herkese açık sessize alınan kelimeleri herkes görebilir.',
+    'Private muted word': 'Özel sessize alınan kelime',
+    'Public muted word': 'Herkese açık sessize alınan kelime',
+    'Remove muted word': 'Sessize alınan kelimeyi kaldır',
+    'Failed to update muted word': 'Sessize alınan kelime güncellenemedi',
+    '(Visible to everyone)': '(herkes görebilir)',
+    'Local muted words have not synced yet.':
+      'Yerel olarak sessize alınan kelimeler henüz eşitlenmedi.'
   }
 }

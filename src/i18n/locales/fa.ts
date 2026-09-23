@@ -1175,6 +1175,15 @@ export default {
     Publish: 'انتشار',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'برای تجربه‌ای روان‌تر و پایدارتر در پیام‌های خصوصی، PsstPsst، پیام‌رسان اختصاصی Nostr را امتحان کنید.',
-    'Try PsstPsst': 'امتحان PsstPsst'
+    'Try PsstPsst': 'امتحان PsstPsst',
+    Public: 'عمومی',
+    Private: 'خصوصی',
+    'Public muted words can be seen by anyone.': 'همه می‌توانند واژه‌های بی‌صدای عمومی را ببینند.',
+    'Private muted word': 'واژهٔ بی‌صدای خصوصی',
+    'Public muted word': 'واژهٔ بی‌صدای عمومی',
+    'Remove muted word': 'حذف واژهٔ بی‌صدا',
+    'Failed to update muted word': 'به‌روزرسانی واژهٔ بی‌صدا ناموفق بود',
+    '(Visible to everyone)': '(قابل مشاهده برای همه)',
+    'Local muted words have not synced yet.': 'واژه‌های بی‌صدای محلی هنوز همگام‌سازی نشده‌اند.'
   }
 }

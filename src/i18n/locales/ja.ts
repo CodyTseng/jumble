@@ -1174,6 +1174,16 @@ export default {
     Publish: '公開',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'より快適で安定したDM体験には、Nostr専用メッセンジャーのPsstPsstをお試しください。',
-    'Try PsstPsst': 'PsstPsstを試す'
+    'Try PsstPsst': 'PsstPsstを試す',
+    Public: '公開',
+    Private: '非公開',
+    'Public muted words can be seen by anyone.':
+      '公開したミュートワードは誰でも見ることができます。',
+    'Private muted word': '非公開のミュートワード',
+    'Public muted word': '公開のミュートワード',
+    'Remove muted word': 'ミュートワードを削除',
+    'Failed to update muted word': 'ミュートワードを更新できませんでした',
+    '(Visible to everyone)': '（誰でも見ることができます）',
+    'Local muted words have not synced yet.': 'この端末のミュートワードはまだ同期されていません。'
   }
 }

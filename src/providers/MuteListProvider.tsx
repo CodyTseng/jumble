@@ -1,11 +1,12 @@
 import { createMuteListDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
+import { addLegacyMutedWords, getMutedWordsFromTags, updateMutedWordTag } from '@/lib/mute-words'
 import { getPubkeysFromPTags } from '@/lib/tag'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
-import dayjs from 'dayjs'
-import { Event } from 'nostr-tools'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import storage from '@/services/local-storage.service'
+import { Event, kinds } from 'nostr-tools'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -21,6 +22,14 @@ type TMuteListContext = {
   unmutePubkey: (pubkey: string) => Promise<void>
   switchToPublicMute: (pubkey: string) => Promise<void>
   switchToPrivateMute: (pubkey: string) => Promise<void>
+  mutedWords: string[]
+  publicMutedWords: string[]
+  privateMutedWords: string[]
+  mutedWordsMigrationFailed: boolean
+  retryMutedWordsMigration: () => void
+  addMuteWord: (word: string, visibility: 'public' | 'private') => Promise<boolean>
+  removeMuteWord: (word: string, visibility: 'public' | 'private') => Promise<boolean>
+  refreshMuteWords: () => Promise<void>
 }
 
 const MuteListContext = createContext<TMuteListContext | undefined>(undefined)
@@ -46,6 +55,12 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   } = useNostr()
   const [tags, setTags] = useState<string[][]>([])
   const [privateTags, setPrivateTags] = useState<string[][]>([])
+  const [legacyPendingWords, setLegacyPendingWords] = useState<string[]>(storage.getMutedWords())
+  const migrationInProgress = useRef(false)
+  const [migrationTick, setMigrationTick] = useState(0)
+  const [mutedWordsMigrationFailed, setMutedWordsMigrationFailed] = useState(false)
+  const currentAccountPubkey = useRef(accountPubkey)
+  currentAccountPubkey.current = accountPubkey
   const publicMutePubkeySet = useMemo(() => new Set(getPubkeysFromPTags(tags)), [tags])
   const privateMutePubkeySet = useMemo(
     () => new Set(getPubkeysFromPTags(privateTags)),
@@ -54,12 +69,27 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   const mutePubkeySet = useMemo(() => {
     return new Set([...Array.from(privateMutePubkeySet), ...Array.from(publicMutePubkeySet)])
   }, [publicMutePubkeySet, privateMutePubkeySet])
+  const publicMuteWords = useMemo(() => new Set(getMutedWordsFromTags(tags)), [tags])
+  const privateMuteWords = useMemo(() => new Set(getMutedWordsFromTags(privateTags)), [privateTags])
+  const publicMutedWords = useMemo(() => Array.from(publicMuteWords), [publicMuteWords])
+  const privateMutedWords = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...privateMuteWords,
+          ...legacyPendingWords.map((word) => word.trim().toLowerCase()).filter(Boolean)
+        ])
+      ),
+    [privateMuteWords, legacyPendingWords]
+  )
+  const mutedWords = useMemo(
+    () => Array.from(new Set([...publicMutedWords, ...privateMutedWords])),
+    [publicMutedWords, privateMutedWords]
+  )
   const [changing, setChanging] = useState(false)
 
   const getPrivateTags = useCallback(
-    async (
-      muteListEvent: Event
-    ): Promise<{ privateTags: string[][]; wasNip04: boolean }> => {
+    async (muteListEvent: Event): Promise<{ privateTags: string[][]; wasNip04: boolean }> => {
       if (!muteListEvent.content) return { privateTags: [], wasNip04: false }
 
       try {
@@ -80,18 +110,37 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         return { privateTags, wasNip04 }
       } catch (error) {
         console.error('Failed to decrypt mute list content', error)
-        return { privateTags: [], wasNip04: false }
+        throw error
       }
     },
     [nip04Decrypt, nip44Decrypt]
   )
 
+  const fetchLatestMuteListEvent = async (pubkey: string): Promise<Event | null> => {
+    const remote = await client.fetchMuteListEvent(pubkey, true)
+    const cached = await indexedDb.getReplaceableEvent(pubkey, kinds.Mutelist)
+    if (cached && (!remote || cached.created_at >= remote.created_at)) return cached
+    return remote
+  }
+
   const migrateToNip44 = useCallback(
     async (muteListEvent: Event, privateTags: string[][]) => {
       if (!accountPubkey) return
       try {
+        const latestEvent = await fetchLatestMuteListEvent(accountPubkey)
+        if (
+          migrationInProgress.current ||
+          latestEvent?.id !== muteListEvent.id ||
+          currentAccountPubkey.current !== accountPubkey
+        )
+          return
         const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
+        if (currentAccountPubkey.current !== accountPubkey) return
         const newMuteListDraftEvent = createMuteListDraftEvent(muteListEvent.tags, cipherText)
+        newMuteListDraftEvent.created_at = Math.max(
+          newMuteListDraftEvent.created_at,
+          muteListEvent.created_at + 1
+        )
         const event = await publish(newMuteListDraftEvent)
         await updateMuteListEvent(event, privateTags)
       } catch (error) {
@@ -102,8 +151,9 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
+    let cancelled = false
     const updateMuteTags = async () => {
-      if (!muteListEvent) {
+      if (!muteListEvent || muteListEvent.pubkey !== accountPubkey) {
         setTags([])
         setPrivateTags([])
         return
@@ -113,6 +163,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         privateTags: [] as string[][],
         wasNip04: false
       }))
+      if (cancelled) return
       setPrivateTags(privateTags)
       setTags(muteListEvent.tags)
 
@@ -121,7 +172,10 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       }
     }
     updateMuteTags()
-  }, [muteListEvent])
+    return () => {
+      cancelled = true
+    }
+  }, [accountPubkey, muteListEvent])
 
   const getMutePubkeys = () => {
     return Array.from(mutePubkeySet)
@@ -136,13 +190,109 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     [publicMutePubkeySet, privateMutePubkeySet]
   )
 
-  const publishNewMuteListEvent = async (tags: string[][], content?: string) => {
-    if (dayjs().unix() === muteListEvent?.created_at) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+  const publishWithPrivateTags = async (
+    tags: string[][],
+    privateTags: string[][],
+    previousEvent?: Event | null
+  ) => {
+    if (!accountPubkey) throw new Error('You need to login first')
+    const content = privateTags.length
+      ? await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
+      : ''
+    if (currentAccountPubkey.current !== accountPubkey) throw new Error('Account changed')
+    const draft = createMuteListDraftEvent(tags, content)
+    draft.created_at = Math.max(draft.created_at, (previousEvent?.created_at ?? 0) + 1)
+    const event = await publish(draft)
+    await updateMuteListEvent(event, privateTags)
+  }
+
+  useEffect(() => {
+    setMutedWordsMigrationFailed(false)
+    const migrated = accountPubkey ? storage.hasMigratedMutedWords(accountPubkey) : false
+    const legacyWords = Array.from(
+      new Set(
+        storage
+          .getMutedWords()
+          .map((word) => word.trim().toLowerCase())
+          .filter(Boolean)
+      )
+    )
+    setLegacyPendingWords(!accountPubkey || !migrated ? legacyWords : [])
+    if (!accountPubkey || migrated || !legacyWords.length) return
+    if (migrationInProgress.current) return
+
+    migrationInProgress.current = true
+    setChanging(true)
+    const migrate = async () => {
+      try {
+        const event = await fetchLatestMuteListEvent(accountPubkey)
+        const existingPrivateTags = event ? (await getPrivateTags(event)).privateTags : []
+        const newPrivateTags = addLegacyMutedWords(existingPrivateTags, legacyWords)
+        if (currentAccountPubkey.current !== accountPubkey) return
+        if (newPrivateTags.length !== existingPrivateTags.length) {
+          await publishWithPrivateTags(event?.tags ?? [], newPrivateTags, event)
+        } else if (event) {
+          await updateMuteListEvent(event, existingPrivateTags)
+        }
+        storage.markMutedWordsMigrated(accountPubkey)
+        if (currentAccountPubkey.current === accountPubkey) setLegacyPendingWords([])
+      } catch (error) {
+        console.error('[MuteList] Failed to migrate local muted words', error)
+        if (currentAccountPubkey.current === accountPubkey) setMutedWordsMigrationFailed(true)
+      } finally {
+        migrationInProgress.current = false
+        setChanging(false)
+        if (currentAccountPubkey.current !== accountPubkey) {
+          setMigrationTick((tick) => tick + 1)
+        }
+      }
     }
-    const newMuteListDraftEvent = createMuteListDraftEvent(tags, content)
-    const event = await publish(newMuteListDraftEvent)
-    return event
+    migrate()
+  }, [accountPubkey, migrationTick])
+
+  const updateMuteWord = async (
+    word: string,
+    visibility: 'public' | 'private',
+    action: 'add' | 'remove'
+  ): Promise<boolean> => {
+    const normalized = word.trim().toLowerCase()
+    if (!accountPubkey || !normalized || changing) return false
+    setChanging(true)
+    try {
+      const event = await fetchLatestMuteListEvent(accountPubkey)
+      if (!event && action === 'remove') return false
+      if (!event) checkMuteListEvent(event)
+      const existingPrivateTags = event ? (await getPrivateTags(event)).privateTags : []
+      const { publicTags, privateTags } = updateMutedWordTag(
+        event?.tags ?? [],
+        existingPrivateTags,
+        normalized,
+        visibility,
+        action
+      )
+      if (currentAccountPubkey.current !== accountPubkey) return false
+      await publishWithPrivateTags(publicTags, privateTags, event)
+      return true
+    } catch (error) {
+      formatError(error).forEach((message) =>
+        toast.error(t('Failed to update muted word') + ': ' + message, { duration: 10_000 })
+      )
+      return false
+    } finally {
+      setChanging(false)
+    }
+  }
+
+  const refreshMuteWords = async () => {
+    if (!accountPubkey || changing) return
+    try {
+      const event = await fetchLatestMuteListEvent(accountPubkey)
+      if (!event || currentAccountPubkey.current !== accountPubkey) return
+      const { privateTags } = await getPrivateTags(event)
+      await updateMuteListEvent(event, privateTags)
+    } catch (error) {
+      console.error('[MuteList] Failed to refresh muted words', error)
+    }
   }
 
   const checkMuteListEvent = (muteListEvent: Event | null) => {
@@ -160,7 +310,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     setChanging(true)
     try {
-      const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
       checkMuteListEvent(muteListEvent)
       if (
         muteListEvent &&
@@ -172,12 +322,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       const { privateTags } = muteListEvent
         ? await getPrivateTags(muteListEvent)
         : { privateTags: [] }
-      const cipherText =
-        privateTags.length > 0
-          ? await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
-          : ''
-      const newMuteListEvent = await publishNewMuteListEvent(newTags, cipherText)
-      await updateMuteListEvent(newMuteListEvent, privateTags)
+      await publishWithPrivateTags(newTags, privateTags, muteListEvent)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {
@@ -193,7 +338,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     setChanging(true)
     try {
-      const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
       checkMuteListEvent(muteListEvent)
       const { privateTags } = muteListEvent
         ? await getPrivateTags(muteListEvent)
@@ -203,9 +348,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       }
 
       const newPrivateTags = privateTags.concat([['p', pubkey]])
-      const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(newPrivateTags))
-      const newMuteListEvent = await publishNewMuteListEvent(muteListEvent?.tags ?? [], cipherText)
-      await updateMuteListEvent(newMuteListEvent, newPrivateTags)
+      await publishWithPrivateTags(muteListEvent?.tags ?? [], newPrivateTags, muteListEvent)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {
@@ -221,21 +364,16 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     setChanging(true)
     try {
-      const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
       if (!muteListEvent) return
 
       const { privateTags } = await getPrivateTags(muteListEvent)
       const newPrivateTags = privateTags.filter((tag) => tag[0] !== 'p' || tag[1] !== pubkey)
-      let cipherText = muteListEvent.content
-      if (newPrivateTags.length !== privateTags.length) {
-        cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(newPrivateTags))
-      }
-
-      const newMuteListEvent = await publishNewMuteListEvent(
+      await publishWithPrivateTags(
         muteListEvent.tags.filter((tag) => tag[0] !== 'p' || tag[1] !== pubkey),
-        cipherText
+        newPrivateTags,
+        muteListEvent
       )
-      await updateMuteListEvent(newMuteListEvent, newPrivateTags)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {
@@ -251,7 +389,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     setChanging(true)
     try {
-      const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
       if (!muteListEvent) return
 
       const { privateTags } = await getPrivateTags(muteListEvent)
@@ -260,14 +398,13 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(newPrivateTags))
-      const newMuteListEvent = await publishNewMuteListEvent(
+      await publishWithPrivateTags(
         muteListEvent.tags
           .filter((tag) => tag[0] !== 'p' || tag[1] !== pubkey)
           .concat([['p', pubkey]]),
-        cipherText
+        newPrivateTags,
+        muteListEvent
       )
-      await updateMuteListEvent(newMuteListEvent, newPrivateTags)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {
@@ -283,7 +420,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
 
     setChanging(true)
     try {
-      const muteListEvent = await client.fetchMuteListEvent(accountPubkey)
+      const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
       if (!muteListEvent) return
 
       const newTags = muteListEvent.tags.filter((tag) => tag[0] !== 'p' || tag[1] !== pubkey)
@@ -295,9 +432,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
       const newPrivateTags = privateTags
         .filter((tag) => tag[0] !== 'p' || tag[1] !== pubkey)
         .concat([['p', pubkey]])
-      const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(newPrivateTags))
-      const newMuteListEvent = await publishNewMuteListEvent(newTags, cipherText)
-      await updateMuteListEvent(newMuteListEvent, newPrivateTags)
+      await publishWithPrivateTags(newTags, newPrivateTags, muteListEvent)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {
@@ -319,7 +454,15 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
         mutePubkeyPrivately,
         unmutePubkey,
         switchToPublicMute,
-        switchToPrivateMute
+        switchToPrivateMute,
+        mutedWords,
+        publicMutedWords,
+        privateMutedWords,
+        mutedWordsMigrationFailed,
+        retryMutedWordsMigration: () => setMigrationTick((tick) => tick + 1),
+        addMuteWord: (word, visibility) => updateMuteWord(word, visibility, 'add'),
+        removeMuteWord: (word, visibility) => updateMuteWord(word, visibility, 'remove'),
+        refreshMuteWords
       }}
     >
       {children}

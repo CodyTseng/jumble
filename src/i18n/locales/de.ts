@@ -1193,6 +1193,17 @@ export default {
     Publish: 'Veröffentlichen',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'Für ein reibungsloseres und zuverlässigeres DM-Erlebnis probiere PsstPsst, einen speziell für Nostr entwickelten Messenger.',
-    'Try PsstPsst': 'PsstPsst ausprobieren'
+    'Try PsstPsst': 'PsstPsst ausprobieren',
+    Public: 'Öffentlich',
+    Private: 'Privat',
+    'Public muted words can be seen by anyone.':
+      'Öffentlich stummgeschaltete Wörter sind für alle sichtbar.',
+    'Private muted word': 'Privates stummgeschaltetes Wort',
+    'Public muted word': 'Öffentliches stummgeschaltetes Wort',
+    'Remove muted word': 'Stummgeschaltetes Wort entfernen',
+    'Failed to update muted word': 'Stummgeschaltetes Wort konnte nicht aktualisiert werden',
+    '(Visible to everyone)': '(für alle sichtbar)',
+    'Local muted words have not synced yet.':
+      'Lokale stummgeschaltete Wörter wurden noch nicht synchronisiert.'
   }
 }

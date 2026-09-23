@@ -26,9 +26,6 @@ type TContentPolicyContext = {
 
   faviconUrlTemplate: string
   setFaviconUrlTemplate: (template: string) => void
-
-  mutedWords: string[]
-  setMutedWords: (words: string[]) => void
 }
 
 const ContentPolicyContext = createContext<TContentPolicyContext | undefined>(undefined)
@@ -53,7 +50,6 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     storage.getProfilePictureAutoLoadPolicy()
   )
   const [faviconUrlTemplate, setFaviconUrlTemplate] = useState(storage.getFaviconUrlTemplate())
-  const [mutedWords, setMutedWords] = useState(storage.getMutedWords())
   const [connectionType, setConnectionType] = useState((navigator as any).connection?.type)
 
   useEffect(() => {
@@ -122,11 +118,6 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
     setFaviconUrlTemplate(template)
   }
 
-  const updateMutedWords = (words: string[]) => {
-    storage.setMutedWords(words)
-    setMutedWords(words)
-  }
-
   return (
     <ContentPolicyContext.Provider
       value={{
@@ -145,9 +136,7 @@ export function ContentPolicyProvider({ children }: { children: React.ReactNode 
         profilePictureAutoLoadPolicy,
         setProfilePictureAutoLoadPolicy: updateProfilePictureAutoLoadPolicy,
         faviconUrlTemplate,
-        setFaviconUrlTemplate: updateFaviconUrlTemplate,
-        mutedWords,
-        setMutedWords: updateMutedWords
+        setFaviconUrlTemplate: updateFaviconUrlTemplate
       }}
     >
       {children}

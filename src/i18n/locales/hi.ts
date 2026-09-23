@@ -1173,6 +1173,15 @@ export default {
     Publish: 'प्रकाशित करें',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'ज़्यादा सहज और भरोसेमंद DM अनुभव के लिए, Nostr के खास मैसेंजर PsstPsst को आज़माएँ।',
-    'Try PsstPsst': 'PsstPsst आज़माएँ'
+    'Try PsstPsst': 'PsstPsst आज़माएँ',
+    Public: 'सार्वजनिक',
+    Private: 'निजी',
+    'Public muted words can be seen by anyone.': 'सार्वजनिक म्यूट किए गए शब्द कोई भी देख सकता है।',
+    'Private muted word': 'निजी म्यूट शब्द',
+    'Public muted word': 'सार्वजनिक म्यूट शब्द',
+    'Remove muted word': 'म्यूट शब्द हटाएँ',
+    'Failed to update muted word': 'म्यूट शब्द अपडेट नहीं हो सका',
+    '(Visible to everyone)': '(सभी को दिखाई देगा)',
+    'Local muted words have not synced yet.': 'स्थानीय म्यूट शब्द अभी सिंक नहीं हुए हैं।'
   }
 }

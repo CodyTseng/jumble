@@ -1178,6 +1178,15 @@ export default {
     Publish: 'Közzététel',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'A gördülékenyebb és megbízhatóbb privát üzenetküldéshez próbáld ki a PsstPsstet, a Nostr dedikált üzenetküldőjét.',
-    'Try PsstPsst': 'PsstPsst kipróbálása'
+    'Try PsstPsst': 'PsstPsst kipróbálása',
+    Public: 'Nyilvános',
+    Private: 'Privát',
+    'Public muted words can be seen by anyone.': 'A nyilvános némított szavakat bárki láthatja.',
+    'Private muted word': 'Privát némított szó',
+    'Public muted word': 'Nyilvános némított szó',
+    'Remove muted word': 'Némított szó eltávolítása',
+    'Failed to update muted word': 'Nem sikerült frissíteni a némított szót',
+    '(Visible to everyone)': '(mindenki láthatja)',
+    'Local muted words have not synced yet.': 'A helyi némított szavak még nem szinkronizálódtak.'
   }
 }

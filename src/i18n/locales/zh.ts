@@ -1169,6 +1169,15 @@ export default {
     Publish: '发布',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       '想要更流畅、稳定的私信体验？试试专为 Nostr 打造的即时通讯应用 PsstPsst。',
-    'Try PsstPsst': '试用 PsstPsst'
+    'Try PsstPsst': '试用 PsstPsst',
+    Public: '公开',
+    Private: '私密',
+    'Public muted words can be seen by anyone.': '公开的屏蔽词所有人都能看到。',
+    'Private muted word': '私密屏蔽词',
+    'Public muted word': '公开屏蔽词',
+    'Remove muted word': '移除屏蔽词',
+    'Failed to update muted word': '更新屏蔽词失败',
+    '(Visible to everyone)': '（所有人可见）',
+    'Local muted words have not synced yet.': '本地屏蔽词尚未同步。'
   }
 }

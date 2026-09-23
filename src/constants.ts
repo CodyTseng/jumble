@@ -61,6 +61,8 @@ export const StorageKey = {
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
   DEFAULT_RELAY_URLS: 'defaultRelayUrls',
   MUTED_WORDS: 'mutedWords',
+  // Recheck accounts marked by the earlier migration, which could finish with no local words loaded.
+  MUTED_WORDS_MIGRATED_PUBKEYS: 'mutedWordsMigratedPubkeysV2',
   MIN_TRUST_SCORE: 'minTrustScore',
   MIN_TRUST_SCORE_MAP: 'minTrustScoreMap',
   SEARCH_RELAY_URLS: 'searchRelayUrls',

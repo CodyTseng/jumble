@@ -1370,12 +1370,51 @@ class LocalStorageService {
   }
 
   getMutedWords() {
+    const stored = window.localStorage.getItem(StorageKey.MUTED_WORDS)
+    if (!stored) {
+      this.mutedWords = []
+      return this.mutedWords
+    }
+    try {
+      const words = JSON.parse(stored)
+      if (Array.isArray(words) && words.every((word) => typeof word === 'string')) {
+        this.mutedWords = words
+      }
+    } catch {
+      // Keep the last valid value until local storage is repaired.
+    }
     return this.mutedWords
   }
 
-  setMutedWords(words: string[]) {
-    this.mutedWords = words
-    window.localStorage.setItem(StorageKey.MUTED_WORDS, JSON.stringify(this.mutedWords))
+  hasMigratedMutedWords(pubkey: string) {
+    try {
+      const pubkeys = JSON.parse(
+        window.localStorage.getItem(StorageKey.MUTED_WORDS_MIGRATED_PUBKEYS) ?? '[]'
+      )
+      return Array.isArray(pubkeys) && pubkeys.includes(pubkey)
+    } catch {
+      return false
+    }
+  }
+
+  markMutedWordsMigrated(pubkey: string) {
+    const pubkeys = this.getMutedWordsMigratedPubkeys()
+    if (pubkeys.includes(pubkey)) return
+    window.localStorage.setItem(
+      StorageKey.MUTED_WORDS_MIGRATED_PUBKEYS,
+      JSON.stringify([...pubkeys, pubkey])
+    )
+  }
+
+  private getMutedWordsMigratedPubkeys(): string[] {
+    try {
+      const pubkeys = JSON.parse(
+        window.localStorage.getItem(StorageKey.MUTED_WORDS_MIGRATED_PUBKEYS) ?? '[]'
+      )
+      return Array.isArray(pubkeys) ? pubkeys.filter((key) => typeof key === 'string') : []
+    } catch {
+      return []
+    }
   }
 
   getHideIndirectNotifications() {

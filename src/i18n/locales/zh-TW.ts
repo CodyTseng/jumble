@@ -1169,6 +1169,15 @@ export default {
     Publish: '發布',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       '想要更流暢、穩定的私訊體驗？試試專為 Nostr 打造的即時通訊應用程式 PsstPsst。',
-    'Try PsstPsst': '試用 PsstPsst'
+    'Try PsstPsst': '試用 PsstPsst',
+    Public: '公開',
+    Private: '私人',
+    'Public muted words can be seen by anyone.': '公開的靜音詞彙可供所有人查看。',
+    'Private muted word': '私人靜音詞彙',
+    'Public muted word': '公開靜音詞彙',
+    'Remove muted word': '移除靜音詞彙',
+    'Failed to update muted word': '更新靜音詞彙失敗',
+    '(Visible to everyone)': '（所有人可見）',
+    'Local muted words have not synced yet.': '本機的靜音詞彙尚未同步。'
   }
 }

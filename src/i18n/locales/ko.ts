@@ -1160,6 +1160,15 @@ export default {
     Publish: '게시',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       '더 원활하고 안정적인 DM을 위해 Nostr 전용 메신저 PsstPsst를 사용해 보세요.',
-    'Try PsstPsst': 'PsstPsst 사용해 보기'
+    'Try PsstPsst': 'PsstPsst 사용해 보기',
+    Public: '공개',
+    Private: '비공개',
+    'Public muted words can be seen by anyone.': '공개 음소거 단어는 누구나 볼 수 있습니다.',
+    'Private muted word': '비공개 음소거 단어',
+    'Public muted word': '공개 음소거 단어',
+    'Remove muted word': '음소거 단어 삭제',
+    'Failed to update muted word': '음소거 단어를 업데이트하지 못했습니다',
+    '(Visible to everyone)': '(누구나 볼 수 있음)',
+    'Local muted words have not synced yet.': '이 기기의 음소거 단어가 아직 동기화되지 않았습니다.'
   }
 }

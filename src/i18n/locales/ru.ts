@@ -1181,6 +1181,15 @@ export default {
     Publish: 'Опубликовать',
     'For a smoother, more reliable DM experience, try PsstPsst, a dedicated Nostr messenger.':
       'Для более удобных и надёжных личных сообщений попробуйте PsstPsst — специализированный мессенджер для Nostr.',
-    'Try PsstPsst': 'Попробовать PsstPsst'
+    'Try PsstPsst': 'Попробовать PsstPsst',
+    Public: 'Публично',
+    Private: 'Приватно',
+    'Public muted words can be seen by anyone.': 'Публично скрытые слова видны всем.',
+    'Private muted word': 'Приватно скрытое слово',
+    'Public muted word': 'Публично скрытое слово',
+    'Remove muted word': 'Удалить скрытое слово',
+    'Failed to update muted word': 'Не удалось обновить скрытое слово',
+    '(Visible to everyone)': '(видно всем)',
+    'Local muted words have not synced yet.': 'Локально скрытые слова ещё не синхронизированы.'
   }
 }
