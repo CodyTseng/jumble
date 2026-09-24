@@ -54,7 +54,10 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
   const migrateToNip44 = useCallback(
     async (event: Event, privateTags: string[][]) => {
       if (!accountPubkey) return
-      console.log('[PinnedUsers] Migrating from NIP-04 to NIP-44, privateTags count:', privateTags.length)
+      console.log(
+        '[PinnedUsers] Migrating from NIP-04 to NIP-44, privateTags count:',
+        privateTags.length
+      )
       try {
         const cipherText = await nip44Encrypt(accountPubkey, JSON.stringify(privateTags))
         const draftEvent = createPinnedUsersListDraftEvent(event.tags, cipherText)
@@ -69,8 +72,9 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
   )
 
   useEffect(() => {
+    let cancelled = false
     const updatePrivateTags = async () => {
-      if (!pinnedUsersEvent) {
+      if (!pinnedUsersEvent || pinnedUsersEvent.pubkey !== accountPubkey) {
         setPrivateTags([])
         return
       }
@@ -79,6 +83,7 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
         privateTags: [] as string[][],
         wasNip04: false
       }))
+      if (cancelled) return
       setPrivateTags(privateTags)
 
       if (wasNip04 && privateTags.length > 0) {
@@ -86,7 +91,10 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
       }
     }
     updatePrivateTags()
-  }, [pinnedUsersEvent])
+    return () => {
+      cancelled = true
+    }
+  }, [pinnedUsersEvent, accountPubkey])
 
   const getPrivateTags = useCallback(
     async (event: Event): Promise<{ privateTags: string[][]; wasNip04: boolean }> => {
@@ -101,7 +109,12 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
           console.log('[PinnedUsers] Using cached decrypted content for event', event.id)
           plainText = storedPlainText
         } else {
-          console.log('[PinnedUsers] Decrypting content with', wasNip04 ? 'NIP-04' : 'NIP-44', 'for event', event.id)
+          console.log(
+            '[PinnedUsers] Decrypting content with',
+            wasNip04 ? 'NIP-04' : 'NIP-44',
+            'for event',
+            event.id
+          )
           plainText = wasNip04
             ? await nip04Decrypt(event.pubkey, event.content)
             : await nip44Decrypt(event.pubkey, event.content)
@@ -109,7 +122,12 @@ export function PinnedUsersProvider({ children }: { children: React.ReactNode })
         }
 
         const privateTags = z.array(z.array(z.string())).parse(JSON.parse(plainText))
-        console.log('[PinnedUsers] Decrypted privateTags count:', privateTags.length, 'wasNip04:', wasNip04)
+        console.log(
+          '[PinnedUsers] Decrypted privateTags count:',
+          privateTags.length,
+          'wasNip04:',
+          wasNip04
+        )
         return { privateTags, wasNip04 }
       } catch (error) {
         console.error('Failed to decrypt pinned users content', error)

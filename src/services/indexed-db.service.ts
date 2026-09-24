@@ -1,5 +1,6 @@
 import { ExtendedKind } from '@/constants'
 import { isReplaceableEvent } from '@/lib/event'
+import { compareEvents } from '@/lib/event-order'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
 import { TPostDraft } from '@/types/post-draft'
@@ -336,7 +337,7 @@ class IndexedDbService {
       const getRequest = store.get(key)
       getRequest.onsuccess = () => {
         const oldValue = getRequest.result as TValue<Event> | undefined
-        if (oldValue?.value && oldValue.value.created_at >= event.created_at) {
+        if (oldValue?.value && compareEvents(oldValue.value, event) >= 0) {
           transaction.commit()
           return resolve(oldValue.value)
         }

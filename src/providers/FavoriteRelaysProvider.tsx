@@ -1,7 +1,7 @@
 import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS } from '@/constants'
 import { createFavoriteRelaysDraftEvent, createRelaySetDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
-import { getReplaceableEventIdentifier } from '@/lib/event'
+import { compareEvents, getReplaceableEventIdentifier } from '@/lib/event'
 import { getRelaySetFromEvent } from '@/lib/event-metadata'
 import { randomString } from '@/lib/random'
 import { getDefaultRelayUrls } from '@/lib/relay'
@@ -49,7 +49,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
       setRelaySets(COMMUNITY_RELAY_SETS)
       return
     }
-    if (!favoriteRelaysEvent) {
+    if (!favoriteRelaysEvent || favoriteRelaysEvent.pubkey !== pubkey) {
       const favoriteRelays: string[] = []
       const storedRelaySets = storage.getRelaySets()
       storedRelaySets.forEach(({ relayUrls }) => {
@@ -65,6 +65,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
       return
     }
 
+    let cancelled = false
     const init = async () => {
       const relays: string[] = []
       const relaySetIds: string[] = []
@@ -98,6 +99,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
       const storedRelaySetEvents = await Promise.all(
         relaySetIds.map((id) => indexedDb.getReplaceableEvent(pubkey, kinds.Relaysets, id))
       )
+      if (cancelled) return
       setRelaySetEvents(storedRelaySetEvents.filter(Boolean) as Event[])
 
       const newRelaySetEvents = await client.fetchEvents(
@@ -108,13 +110,14 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
           '#d': relaySetIds
         }
       )
+      if (cancelled) return
       const relaySetEventMap = new Map<string, Event>()
       newRelaySetEvents.forEach((event) => {
         const d = getReplaceableEventIdentifier(event)
         if (!d) return
 
         const old = relaySetEventMap.get(d)
-        if (!old || old.created_at < event.created_at) {
+        if (!old || compareEvents(event, old) > 0) {
           relaySetEventMap.set(d, event)
         }
       })
@@ -127,15 +130,18 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
           return storedRelaySetEvents[index] || null
         })
         .filter(Boolean) as Event[]
-      setRelaySetEvents(uniqueNewRelaySetEvents)
-      await Promise.all(
+      const retainedEvents = await Promise.all(
         uniqueNewRelaySetEvents.map((event) => {
           return indexedDb.putReplaceableEvent(event)
         })
       )
+      if (!cancelled) setRelaySetEvents(retainedEvents)
     }
     init()
-  }, [favoriteRelaysEvent])
+    return () => {
+      cancelled = true
+    }
+  }, [favoriteRelaysEvent, pubkey])
 
   useEffect(() => {
     setRelaySets(
