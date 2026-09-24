@@ -29,6 +29,7 @@ class CustomEmojiService {
   private standaloneEmojis: TEmoji[] = []
   private packs: TEmojiPack[] = []
   private version = 0
+  private initialization = 0
 
   constructor() {
     if (!CustomEmojiService.instance) {
@@ -38,6 +39,7 @@ class CustomEmojiService {
   }
 
   async init(userEmojiListEvent: Event | null) {
+    const initialization = ++this.initialization
     this.emojiMap = new BoundedMap<string, TEmoji>({ maxSize: 10_000 })
     this.emojiIndex = new FlexSearch.Index({ tokenize: 'full' })
     this.standaloneEmojis = []
@@ -51,8 +53,10 @@ class CustomEmojiService {
     const { emojis, emojiSetPointers } = getEmojisAndEmojiSetsFromEvent(userEmojiListEvent)
     this.standaloneEmojis = emojis
     await this.addEmojisToIndex(emojis)
+    if (initialization !== this.initialization) return
 
     const emojiSetEvents = await client.fetchEmojiSetEvents(emojiSetPointers, false)
+    if (initialization !== this.initialization) return
     const packs: TEmojiPack[] = []
     await Promise.allSettled(
       emojiSetEvents.map(async (event) => {
@@ -70,6 +74,7 @@ class CustomEmojiService {
         await this.addEmojisToIndex(emojisWithSet)
       })
     )
+    if (initialization !== this.initialization) return
     // Preserve a-tag order from the user's kind 10030 event
     const orderIndex = new Map(emojiSetPointers.map((p, i) => [p, i]))
     packs.sort((a, b) => (orderIndex.get(a.id) ?? 0) - (orderIndex.get(b.id) ?? 0))
@@ -98,9 +103,7 @@ class CustomEmojiService {
       return result
     }
     const ids = await this.emojiIndex.searchAsync(trimmed)
-    return ids
-      .map((id) => this.emojiMap.get(id as string))
-      .filter((e): e is TEmoji => Boolean(e))
+    return ids.map((id) => this.emojiMap.get(id as string)).filter((e): e is TEmoji => Boolean(e))
   }
 
   getEmojiById(id?: string): TEmoji | undefined {

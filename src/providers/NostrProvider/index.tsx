@@ -8,12 +8,7 @@ import {
   createRelayListDraftEvent,
   createSeenNotificationsAtDraftEvent
 } from '@/lib/draft-event'
-import {
-  getLatestEvent,
-  getReplaceableEventIdentifier,
-  isProtectedEvent,
-  minePow
-} from '@/lib/event'
+import { getReplaceableCoordinateFromEvent, isProtectedEvent, minePow } from '@/lib/event'
 import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata'
 import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import { getDefaultRelayUrls } from '@/lib/relay'
@@ -49,6 +44,7 @@ import { Nip07Signer } from './nip-07.signer'
 import { NostrConnectionSigner } from './nostrConnection.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
+import { createSelfEventSync, SELF_EVENT_KINDS } from './self-event-sync'
 
 type TNostrContext = {
   isInitialized: boolean
@@ -153,6 +149,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [notificationsSeenAt, setNotificationsSeenAt] = useState(-1)
   const [isInitialized, setIsInitialized] = useState(false)
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
+  const selfEventSyncRef = useRef<{
+    pubkey: string
+    sync: ReturnType<typeof createSelfEventSync>
+  } | null>(null)
   const passwordPromiseRef = useRef<{
     resolve: (password: string) => void
     reject: () => void
@@ -189,212 +189,148 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController()
+    setRelayList(null)
+    setProfile(null)
+    setProfileEvent(null)
+    setNsec(null)
+    setNcryptsec(null)
+    setFavoriteRelaysEvent(null)
+    setFollowListEvent(null)
+    setMuteListEvent(null)
+    setBookmarkListEvent(null)
+    setUserEmojiListEvent(null)
+    setPinListEvent(null)
+    setPinnedUsersEvent(null)
+    setNotificationsSeenAt(-1)
+    if (!account) return
+
+    const pubkey = account.pubkey
+    const defaultRelays = getDefaultRelayUrls()
+    let accountRelays = defaultRelays
+    setNsec(storage.getAccountNsec(pubkey) ?? null)
+    setNcryptsec(storage.getAccountNcryptsec(pubkey) ?? null)
+    setProfile({ pubkey, npub: pubkeyToNpub(pubkey) ?? '', username: formatPubkey(pubkey) })
+    setRelayList(getRelayListFromEvent(null, storage.getFilterOutOnionRelays()))
+    setNotificationsSeenAt(Math.max(0, storage.getLastReadNotificationTime(pubkey)))
+
+    const sync = createSelfEventSync({
+      pubkey,
+      since: dayjs().unix(),
+      relays: defaultRelays,
+      subscribe: (urls, filter, handlers) => client.subscribe(urls, filter, handlers),
+      persist: (event) =>
+        event.kind === kinds.Application
+          ? Promise.resolve(event)
+          : client.updateAccountEventCache(event),
+      apply: (event) => {
+        switch (event.kind) {
+          case kinds.RelayList: {
+            const nextRelayList = getRelayListFromEvent(event, storage.getFilterOutOnionRelays())
+            accountRelays = Array.from(new Set([...nextRelayList.write, ...defaultRelays]))
+            setRelayList(nextRelayList)
+            sync.setRelays([...accountRelays, ...nextRelayList.read])
+            break
+          }
+          case kinds.Metadata:
+            setProfileEvent(event)
+            setProfile(getProfileFromEvent(event))
+            break
+          case kinds.Contacts:
+            setFollowListEvent(event)
+            break
+          case kinds.Mutelist:
+            setMuteListEvent(event)
+            break
+          case kinds.BookmarkList:
+            setBookmarkListEvent(event)
+            break
+          case ExtendedKind.FAVORITE_RELAYS:
+            setFavoriteRelaysEvent(event)
+            break
+          case kinds.UserEmojiList:
+            setUserEmojiListEvent(event)
+            break
+          case kinds.Emojisets: {
+            const coordinate = getReplaceableCoordinateFromEvent(event)
+            setUserEmojiListEvent((previous) =>
+              previous?.tags.some(([name, value]) => name === 'a' && value === coordinate)
+                ? { ...previous }
+                : previous
+            )
+            break
+          }
+          case kinds.Relaysets: {
+            const coordinate = getReplaceableCoordinateFromEvent(event)
+            setFavoriteRelaysEvent((previous) =>
+              previous?.tags.some(([name, value]) => name === 'a' && value === coordinate)
+                ? { ...previous }
+                : previous
+            )
+            break
+          }
+          case kinds.Pinlist:
+            setPinListEvent(event)
+            break
+          case ExtendedKind.PINNED_USERS:
+            setPinnedUsersEvent(event)
+            break
+          case kinds.Application: {
+            const seenAt = Math.max(event.created_at, storage.getLastReadNotificationTime(pubkey))
+            storage.setLastReadNotificationTime(pubkey, seenAt)
+            setNotificationsSeenAt((previous) => Math.max(previous, seenAt))
+            break
+          }
+        }
+      },
+      onOtherEvent: (event) => {
+        client.addEventToCache(event)
+        stuffStatsService.updateStuffStatsByEvents([event])
+      },
+      onError: (error) => console.error('Failed to sync account event:', error)
+    })
+    selfEventSyncRef.current = { pubkey, sync }
+
     const init = async () => {
-      setRelayList(null)
-      setProfile(null)
-      setProfileEvent(null)
-      setNsec(null)
-      setFavoriteRelaysEvent(null)
-      setFollowListEvent(null)
-      setMuteListEvent(null)
-      setBookmarkListEvent(null)
-      setPinListEvent(null)
-      setPinnedUsersEvent(null)
-      setNotificationsSeenAt(-1)
-      if (!account) {
-        return
-      }
-      const storedNsec = storage.getAccountNsec(account.pubkey)
-      if (storedNsec) {
-        setNsec(storedNsec)
-      } else {
-        setNsec(null)
-      }
-      const storedNcryptsec = storage.getAccountNcryptsec(account.pubkey)
-      if (storedNcryptsec) {
-        setNcryptsec(storedNcryptsec)
-      } else {
-        setNcryptsec(null)
-      }
-
-      const storedNotificationsSeenAt = storage.getLastReadNotificationTime(account.pubkey)
-
-      const [
-        storedRelayListEvent,
-        storedProfileEvent,
-        storedFollowListEvent,
-        storedMuteListEvent,
-        storedBookmarkListEvent,
-        storedFavoriteRelaysEvent,
-        storedUserEmojiListEvent,
-        storedPinListEvent,
-        storedPinnedUsersEvent
-      ] = await Promise.all([
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Contacts),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Mutelist),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.BookmarkList),
-        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.UserEmojiList),
-        indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
-        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS)
-      ])
+      const storedEvents = await Promise.all(
+        SELF_EVENT_KINDS.filter((kind) => !kinds.isAddressableKind(kind)).map((kind) =>
+          indexedDb.getReplaceableEvent(pubkey, kind)
+        )
+      )
       if (controller.signal.aborted) return
-      if (storedRelayListEvent) {
-        setRelayList(getRelayListFromEvent(storedRelayListEvent, storage.getFilterOutOnionRelays()))
+      for (const event of storedEvents) {
+        if (event) await sync.receive(event)
       }
-      if (storedProfileEvent) {
-        setProfileEvent(storedProfileEvent)
-        setProfile(getProfileFromEvent(storedProfileEvent))
-      }
-      if (storedFollowListEvent) {
-        setFollowListEvent(storedFollowListEvent)
-      }
-      if (storedMuteListEvent) {
-        setMuteListEvent(storedMuteListEvent)
-      }
-      if (storedBookmarkListEvent) {
-        setBookmarkListEvent(storedBookmarkListEvent)
-      }
-      if (storedFavoriteRelaysEvent) {
-        setFavoriteRelaysEvent(storedFavoriteRelaysEvent)
-      }
-      if (storedUserEmojiListEvent) {
-        setUserEmojiListEvent(storedUserEmojiListEvent)
-      }
-      if (storedPinListEvent) {
-        setPinListEvent(storedPinListEvent)
-      }
-      if (storedPinnedUsersEvent) {
-        setPinnedUsersEvent(storedPinnedUsersEvent)
-      }
+      if (controller.signal.aborted) return
 
-      const defaultRelays = getDefaultRelayUrls()
       const relayListEvents = await client.fetchEvents(defaultRelays, {
         kinds: [kinds.RelayList],
-        authors: [account.pubkey]
+        authors: [pubkey]
       })
-      const relayListEvent = getLatestEvent(relayListEvents) ?? storedRelayListEvent
-      const relayList = getRelayListFromEvent(relayListEvent, storage.getFilterOutOnionRelays())
-      if (relayListEvent) {
-        client.updateRelayListCache(relayListEvent)
-        await indexedDb.putReplaceableEvent(relayListEvent)
-      }
       if (controller.signal.aborted) return
-      setRelayList(relayList)
+      for (const event of relayListEvents) await sync.receive(event)
+      if (controller.signal.aborted) return
 
-      const events = await client.fetchEvents(relayList.write.concat(defaultRelays).slice(0, 4), [
-        {
-          kinds: [
-            kinds.Metadata,
-            kinds.Contacts,
-            kinds.Mutelist,
-            kinds.BookmarkList,
-            ExtendedKind.FAVORITE_RELAYS,
-            ExtendedKind.BLOSSOM_SERVER_LIST,
-            kinds.UserEmojiList,
-            kinds.Pinlist,
-            ExtendedKind.PINNED_USERS
-          ],
-          authors: [account.pubkey]
-        },
+      const events = await client.fetchEvents(accountRelays, [
+        { kinds: SELF_EVENT_KINDS, authors: [pubkey] },
         {
           kinds: [kinds.Application],
-          authors: [account.pubkey],
+          authors: [pubkey],
           '#d': [ApplicationDataKey.NOTIFICATIONS_SEEN_AT]
         }
       ])
       if (controller.signal.aborted) return
-      const sortedEvents = events.sort((a, b) => b.created_at - a.created_at)
-      const profileEvent = sortedEvents.find((e) => e.kind === kinds.Metadata)
-      const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
-      const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
-      const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
-      const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
-      const blossomServerListEvent = sortedEvents.find(
-        (e) => e.kind === ExtendedKind.BLOSSOM_SERVER_LIST
-      )
-      const userEmojiListEvent = sortedEvents.find((e) => e.kind === kinds.UserEmojiList)
-      const notificationsSeenAtEvent = sortedEvents.find(
-        (e) =>
-          e.kind === kinds.Application &&
-          getReplaceableEventIdentifier(e) === ApplicationDataKey.NOTIFICATIONS_SEEN_AT
-      )
-      const pinnedNotesEvent = sortedEvents.find((e) => e.kind === kinds.Pinlist)
-      const pinnedUsersEvent = sortedEvents.find((e) => e.kind === ExtendedKind.PINNED_USERS)
-
-      if (profileEvent) {
-        const updatedProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
-        if (updatedProfileEvent.id === profileEvent.id) {
-          setProfileEvent(updatedProfileEvent)
-          setProfile(getProfileFromEvent(updatedProfileEvent))
-        }
-      } else if (!storedProfileEvent) {
-        setProfile({
-          pubkey: account.pubkey,
-          npub: pubkeyToNpub(account.pubkey) ?? '',
-          username: formatPubkey(account.pubkey)
-        })
+      for (const event of events) await sync.receive(event)
+      if (!controller.signal.aborted) {
+        void client.initUserIndexFromFollowings(pubkey, controller.signal)
       }
-      if (followListEvent) {
-        const updatedFollowListEvent = await indexedDb.putReplaceableEvent(followListEvent)
-        if (updatedFollowListEvent.id === followListEvent.id) {
-          setFollowListEvent(followListEvent)
-        }
-      }
-      if (muteListEvent) {
-        const updatedMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
-        if (updatedMuteListEvent.id === muteListEvent.id) {
-          setMuteListEvent(muteListEvent)
-        }
-      }
-      if (bookmarkListEvent) {
-        const updateBookmarkListEvent = await indexedDb.putReplaceableEvent(bookmarkListEvent)
-        if (updateBookmarkListEvent.id === bookmarkListEvent.id) {
-          setBookmarkListEvent(bookmarkListEvent)
-        }
-      }
-      if (favoriteRelaysEvent) {
-        const updatedFavoriteRelaysEvent = await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
-        if (updatedFavoriteRelaysEvent.id === favoriteRelaysEvent.id) {
-          setFavoriteRelaysEvent(updatedFavoriteRelaysEvent)
-        }
-      }
-      if (blossomServerListEvent) {
-        await client.updateBlossomServerListEventCache(blossomServerListEvent)
-      }
-      if (userEmojiListEvent) {
-        const updatedUserEmojiListEvent = await indexedDb.putReplaceableEvent(userEmojiListEvent)
-        if (updatedUserEmojiListEvent.id === userEmojiListEvent.id) {
-          setUserEmojiListEvent(updatedUserEmojiListEvent)
-        }
-      }
-      if (pinnedNotesEvent) {
-        const updatedPinnedNotesEvent = await indexedDb.putReplaceableEvent(pinnedNotesEvent)
-        if (updatedPinnedNotesEvent.id === pinnedNotesEvent.id) {
-          setPinListEvent(updatedPinnedNotesEvent)
-        }
-      }
-      if (pinnedUsersEvent) {
-        const updatedPinnedUsersEvent = await indexedDb.putReplaceableEvent(pinnedUsersEvent)
-        if (updatedPinnedUsersEvent.id === pinnedUsersEvent.id) {
-          setPinnedUsersEvent(updatedPinnedUsersEvent)
-        }
-      }
-
-      const notificationsSeenAt = Math.max(
-        notificationsSeenAtEvent?.created_at ?? 0,
-        storedNotificationsSeenAt
-      )
-      setNotificationsSeenAt(notificationsSeenAt)
-      storage.setLastReadNotificationTime(account.pubkey, notificationsSeenAt)
-
-      client.initUserIndexFromFollowings(account.pubkey, controller.signal)
     }
-    init()
+    void init().catch((error) => {
+      if (!controller.signal.aborted) console.error('Failed to load account events:', error)
+    })
     return () => {
       controller.abort()
+      sync.dispose()
+      if (selfEventSyncRef.current?.sync === sync) selfEventSyncRef.current = null
     }
   }, [account])
 
@@ -872,77 +808,34 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return setOpenLoginDialog(true)
   }
 
-  const updateRelayListEvent = async (relayListEvent: Event) => {
-    const newRelayList = await client.updateRelayListCache(relayListEvent)
-    setRelayList(getRelayListFromEvent(newRelayList, storage.getFilterOutOnionRelays()))
-  }
-
-  const updateProfileEvent = async (profileEvent: Event) => {
-    const newProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
-    setProfileEvent(newProfileEvent)
-    setProfile(getProfileFromEvent(newProfileEvent))
-  }
-
-  const updateFollowListEvent = async (followListEvent: Event) => {
-    const newFollowListEvent = await indexedDb.putReplaceableEvent(followListEvent)
-    if (newFollowListEvent.id !== followListEvent.id) return
-
-    setFollowListEvent(newFollowListEvent)
-    await client.updateFollowListCache(newFollowListEvent)
-  }
-
-  const updateMuteListEvent = async (muteListEvent: Event, privateTags: string[][]) => {
-    const newMuteListEvent = await indexedDb.putReplaceableEvent(muteListEvent)
-    if (newMuteListEvent.id !== muteListEvent.id) return
-
-    await indexedDb.putDecryptedContent(muteListEvent.id, JSON.stringify(privateTags))
-    setMuteListEvent(muteListEvent)
-  }
-
-  const updateBookmarkListEvent = async (bookmarkListEvent: Event) => {
-    const newBookmarkListEvent = await indexedDb.putReplaceableEvent(bookmarkListEvent)
-    if (newBookmarkListEvent.id !== bookmarkListEvent.id) return
-
-    setBookmarkListEvent(newBookmarkListEvent)
-  }
-
-  const updateFavoriteRelaysEvent = async (favoriteRelaysEvent: Event) => {
-    const newFavoriteRelaysEvent = await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
-    if (newFavoriteRelaysEvent.id !== favoriteRelaysEvent.id) return
-
-    setFavoriteRelaysEvent(newFavoriteRelaysEvent)
-  }
-
-  const updateUserEmojiListEvent = async (userEmojiListEvent: Event) => {
-    const newUserEmojiListEvent = await indexedDb.putReplaceableEvent(userEmojiListEvent)
-    if (newUserEmojiListEvent.id !== userEmojiListEvent.id) return
-
-    setUserEmojiListEvent(newUserEmojiListEvent)
-  }
-
-  const updatePinListEvent = async (pinListEvent: Event) => {
-    const newPinListEvent = await indexedDb.putReplaceableEvent(pinListEvent)
-    if (newPinListEvent.id !== pinListEvent.id) return
-
-    setPinListEvent(newPinListEvent)
-  }
-
-  const updatePinnedUsersEvent = async (pinnedUsersEvent: Event, privateTags?: string[][]) => {
-    const newPinnedUsersEvent = await indexedDb.putReplaceableEvent(pinnedUsersEvent)
-    if (newPinnedUsersEvent.id !== pinnedUsersEvent.id) return
-
+  const updateSelfEvent = async (event: Event, privateTags?: string[][]) => {
+    const active = selfEventSyncRef.current
+    if (!active || active.pubkey !== event.pubkey) return
     if (privateTags) {
-      await indexedDb.putDecryptedContent(pinnedUsersEvent.id, JSON.stringify(privateTags))
+      await indexedDb.putDecryptedContent(event.id, JSON.stringify(privateTags))
     }
-    setPinnedUsersEvent(newPinnedUsersEvent)
+    await active.sync.receive(event)
   }
+
+  const updateRelayListEvent = (event: Event) => updateSelfEvent(event)
+  const updateProfileEvent = (event: Event) => updateSelfEvent(event)
+  const updateFollowListEvent = (event: Event) => updateSelfEvent(event)
+  const updateMuteListEvent = (event: Event, privateTags: string[][]) =>
+    updateSelfEvent(event, privateTags)
+  const updateBookmarkListEvent = (event: Event) => updateSelfEvent(event)
+  const updateFavoriteRelaysEvent = (event: Event) => updateSelfEvent(event)
+  const updateUserEmojiListEvent = (event: Event) => updateSelfEvent(event)
+  const updatePinListEvent = (event: Event) => updateSelfEvent(event)
+  const updatePinnedUsersEvent = (event: Event, privateTags?: string[][]) =>
+    updateSelfEvent(event, privateTags)
 
   const updateNotificationsSeenAt = async (skipPublish = false) => {
     if (!account) return
 
     const now = dayjs().unix()
-    storage.setLastReadNotificationTime(account.pubkey, now)
-    setNotificationsSeenAt(now)
+    const seenAt = Math.max(now, storage.getLastReadNotificationTime(account.pubkey))
+    storage.setLastReadNotificationTime(account.pubkey, seenAt)
+    setNotificationsSeenAt((previous) => Math.max(previous, seenAt))
 
     // Prevent too frequent requests for signing seen notifications events
     const lastPublishedSeenNotificationsAtEventAt =

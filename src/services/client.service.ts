@@ -1255,6 +1255,30 @@ class ClientService extends EventTarget {
     ])
   }
 
+  /** Persist an account update and refresh this window's replaceable caches. */
+  async updateAccountEventCache(event: NEvent): Promise<NEvent> {
+    const retained = await indexedDb.putReplaceableEvent(event)
+    const key = {
+      pubkey: retained.pubkey,
+      kind: retained.kind,
+      d: kinds.isAddressableKind(retained.kind)
+        ? getReplaceableCoordinateFromEvent(retained).split(':').slice(2).join(':')
+        : undefined
+    }
+    this.replaceableEventDataLoader.clear(key).prime(key, Promise.resolve(retained))
+    if (retained.kind === kinds.Metadata || retained.kind === kinds.RelayList) {
+      this.replaceableEventFromBigRelaysDataloader.clear(key).prime(key, Promise.resolve(retained))
+    }
+    this.addEventToCache(retained)
+    if (retained.kind === kinds.Metadata) {
+      this.profileDataloader.clear(retained.pubkey)
+      const npub = pubkeyToNpub(retained.pubkey)
+      if (npub) this.profileDataloader.clear(npub)
+      await this.addUsernameToIndex(retained)
+    }
+    return retained
+  }
+
   /** =========== Relay list =========== */
 
   async fetchRelayList(pubkey: string): Promise<TRelayList> {

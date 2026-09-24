@@ -990,15 +990,40 @@ class LocalStorageService {
   }
 
   getLastReadNotificationTime(pubkey: string) {
+    this.refreshLastReadNotificationTimeMap()
     return this.lastReadNotificationTimeMap[pubkey] ?? 0
   }
 
   setLastReadNotificationTime(pubkey: string, time: number) {
-    this.lastReadNotificationTimeMap[pubkey] = time
+    this.refreshLastReadNotificationTimeMap()
+    this.lastReadNotificationTimeMap[pubkey] = Math.max(
+      this.lastReadNotificationTimeMap[pubkey] ?? 0,
+      time
+    )
     window.localStorage.setItem(
       StorageKey.LAST_READ_NOTIFICATION_TIME_MAP,
       JSON.stringify(this.lastReadNotificationTimeMap)
     )
+  }
+
+  private refreshLastReadNotificationTimeMap() {
+    // A different tab may have marked notifications read without publishing
+    // (for example during the signing throttle). Do not replace that newer
+    // local-only marker, or another account's marker, with this window's cache.
+    try {
+      const persisted = JSON.parse(
+        window.localStorage.getItem(StorageKey.LAST_READ_NOTIFICATION_TIME_MAP) ?? '{}'
+      )
+      for (const [pubkey, time] of Object.entries(persisted ?? {})) {
+        if (typeof time !== 'number' || !Number.isFinite(time)) continue
+        this.lastReadNotificationTimeMap[pubkey] = Math.max(
+          this.lastReadNotificationTimeMap[pubkey] ?? 0,
+          time
+        )
+      }
+    } catch {
+      // Retain the in-memory markers if browser storage is unavailable or invalid.
+    }
   }
 
   getNotificationTabs() {
