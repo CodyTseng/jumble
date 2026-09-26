@@ -49,14 +49,43 @@ describe('observeRelayPoolLifecycle', () => {
     await flushPromises()
     expect(target.checkRelays).toHaveBeenCalledOnce()
   })
+
+  it('checks relays on Page Lifecycle resume', async () => {
+    const listeners = installPageGlobals(true)
+    const target = {
+      setNetworkOnline: vi.fn(),
+      checkRelays: vi.fn(async () => undefined)
+    }
+    observeRelayPoolLifecycle(target)
+
+    listeners.get('resume')?.()
+    await flushPromises()
+    expect(target.checkRelays).toHaveBeenCalledOnce()
+  })
+
+  it('checks relays on bfcache pageshow', async () => {
+    const listeners = installPageGlobals(true)
+    const target = {
+      setNetworkOnline: vi.fn(),
+      checkRelays: vi.fn(async () => undefined)
+    }
+    observeRelayPoolLifecycle(target)
+
+    const pageshow = listeners.get('pageshow') as unknown as (event: { persisted: boolean }) => void
+    pageshow({ persisted: true })
+    await flushPromises()
+    expect(target.checkRelays).toHaveBeenCalledOnce()
+  })
 })
 
 function installPageGlobals(online: boolean) {
   const listeners = new Map<string, () => void>()
-  const addEventListener = (type: string, listener: () => void) => listeners.set(type, listener)
+  const addEventListener = (type: string, listener: (event?: unknown) => void) =>
+    listeners.set(type, listener as () => void)
   vi.stubGlobal('navigator', { onLine: online })
   vi.stubGlobal('addEventListener', addEventListener)
   vi.stubGlobal('document', { visibilityState: 'hidden', addEventListener })
+  // document + window share the same listener map in these stubs
   return listeners
 }
 

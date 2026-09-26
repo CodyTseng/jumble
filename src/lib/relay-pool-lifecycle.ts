@@ -5,10 +5,12 @@ type RelayPoolLifecycleTarget = {
 
 type PageGlobal = typeof globalThis & {
   navigator?: { onLine?: boolean }
-  addEventListener?: (type: string, listener: () => void) => void
+  addEventListener?: (type: string, listener: (event?: Event) => void) => void
+  removeEventListener?: (type: string, listener: (event?: Event) => void) => void
   document?: {
     visibilityState?: string
-    addEventListener: (type: string, listener: () => void) => void
+    addEventListener: (type: string, listener: (event?: Event) => void) => void
+    removeEventListener?: (type: string, listener: (event?: Event) => void) => void
   }
 }
 
@@ -16,6 +18,9 @@ type PageGlobal = typeof globalThis & {
  * Keeps a renderer-owned relay pool in sync with browser lifecycle signals.
  * `globalThis` capability checks keep this module safe when SmartPool runs in
  * Electron's main process, where DOM globals do not exist.
+ *
+ * Also recovers after OS sleep via Page Lifecycle `resume` and bfcache
+ * `pageshow` — visibilitychange alone misses some lock-screen wake paths (#15).
  */
 export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
   const page = globalThis as PageGlobal
@@ -34,12 +39,24 @@ export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
     page.addEventListener('offline', () => {
       runLifecycleTask(() => target.setNetworkOnline(false))
     })
+    page.addEventListener('pageshow', (event) => {
+      const persisted = Boolean((event as PageTransitionEvent | undefined)?.persisted)
+      if (persisted) {
+        runLifecycleTask(() => target.checkRelays())
+      }
+    })
   }
 
   page.document?.addEventListener('visibilitychange', () => {
     if (page.document?.visibilityState === 'visible') {
       runLifecycleTask(() => target.checkRelays())
     }
+  })
+
+  // Page Lifecycle API — fires after freeze/sleep even when visibilityState
+  // stayed "visible" across a screen lock on some platforms.
+  page.document?.addEventListener('resume', () => {
+    runLifecycleTask(() => target.checkRelays())
   })
 }
 
