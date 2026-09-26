@@ -44,6 +44,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useDeletedEvent } from '../DeletedEventProvider'
+import { useUserPreferences } from '../UserPreferencesProvider'
 import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
 import { NostrConnectionSigner } from './nostrConnection.signer'
@@ -130,6 +131,7 @@ export const useNostr = () => {
 }
 
 export function NostrProvider({ children }: { children: React.ReactNode }) {
+  const { enableDm } = useUserPreferences()
   const { t } = useTranslation()
   const { addDeletedEvent } = useDeletedEvent()
   const [accounts, setAccounts] = useState<TAccountPointer[]>(
@@ -422,7 +424,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }, [account])
 
   useEffect(() => {
-    if (!account) return
+    return () => {
+      dmService.destroy()
+    }
+  }, [account])
+
+  useEffect(() => {
+    if (!enableDm || !account) return
 
     const initDm = async () => {
       const encryptionKeypair = encryptionKeyService.getEncryptionKeypair(account.pubkey)
@@ -437,9 +445,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     initDm()
 
     return () => {
-      dmService.destroy()
+      // Keep mounted DM page listeners intact so re-enabling the feature can
+      // resume cleanly; account changes are handled by the lifecycle effect above.
+      dmService.pause()
     }
-  }, [account])
+  }, [account, enableDm])
 
   useEffect(() => {
     if (signer) {

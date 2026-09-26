@@ -1199,6 +1199,7 @@ export default {
     'Direct message notifications': 'اعلان‌های پیام مستقیم',
     'Notification types': 'انواع اعلان‌ها',
     'Mentions, replies, reactions, and zaps': 'اشاره‌ها، پاسخ‌ها، واکنش‌ها و زپ‌ها',
-    'New private messages': 'پیام‌های خصوصی جدید'
+    'New private messages': 'پیام‌های خصوصی جدید',
+    Features: 'قابلیت‌ها'
   }
 }

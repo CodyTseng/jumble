@@ -1,12 +1,16 @@
 import { cn } from '@/lib/utils'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import BackgroundAudio from '../BackgroundAudio'
 import HomeButton from './HomeButton'
 import MessagesButton from './MessagesButton'
 import NotificationsButton from './NotificationsButton'
 import PostButton from './PostButton'
+import ProfileButton from './ProfileButton'
 import SearchButton from './SearchButton'
 
 export default function BottomNavigationBar() {
+  const { enableDm } = useUserPreferences()
+
   return (
     <div
       className={cn('fixed bottom-0 z-40 w-full border-t bg-background')}
@@ -19,8 +23,9 @@ export default function BottomNavigationBar() {
         <HomeButton />
         <SearchButton />
         <PostButton />
-        <MessagesButton />
+        {enableDm && <MessagesButton />}
         <NotificationsButton />
+        {!enableDm && <ProfileButton />}
       </div>
     </div>
   )

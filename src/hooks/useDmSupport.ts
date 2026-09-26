@@ -1,12 +1,14 @@
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import dmService from '@/services/dm.service'
 import { useEffect, useState } from 'react'
 
 export function useDmSupport(pubkey: string | undefined) {
+  const { enableDm } = useUserPreferences()
   const [canStartDm, setCanStartDm] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!pubkey) {
+    if (!enableDm || !pubkey) {
       setCanStartDm(false)
       setIsLoading(false)
       return
@@ -25,7 +27,7 @@ export function useDmSupport(pubkey: string | undefined) {
     }
 
     checkSupport()
-  }, [pubkey])
+  }, [enableDm, pubkey])
 
   return { canStartDm, isLoading }
 }

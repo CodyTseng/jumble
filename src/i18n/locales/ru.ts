@@ -1205,6 +1205,7 @@ export default {
     'Direct message notifications': 'Уведомления о личных сообщениях',
     'Notification types': 'Типы уведомлений',
     'Mentions, replies, reactions, and zaps': 'Упоминания, ответы, реакции и запы',
-    'New private messages': 'Новые личные сообщения'
+    'New private messages': 'Новые личные сообщения',
+    Features: 'Функции'
   }
 }

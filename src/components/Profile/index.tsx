@@ -12,6 +12,7 @@ import { toDmConversation, toMuteList, toProfileEditor } from '@/lib/link'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
 import { Bitcoin, Check, Copy, Link, MessageSquare, Zap } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -34,6 +35,7 @@ export default function Profile({ id }: { id?: string }) {
   const { push } = useSecondaryPage()
   const { profile, isFetching } = useFetchProfile(id)
   const { pubkey: accountPubkey } = useNostr()
+  const { enableDm } = useUserPreferences()
   const { mutePubkeySet } = useMuteList()
   const [searchInput, setSearchInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(searchInput)
@@ -107,25 +109,27 @@ export default function Profile({ id }: { id?: string }) {
             ) : (
               <>
                 {!!lightningAddress && <ProfileZapButton pubkey={pubkey} />}
-                <span
-                  title={
-                    !isDmSupportLoading && !canStartDm
-                      ? t('This user has not set up NIP-4e DMs')
-                      : undefined
-                  }
-                  className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
-                >
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="rounded-full"
-                    disabled={isDmSupportLoading || !canStartDm}
-                    onClick={() => push(toDmConversation(pubkey))}
-                    title={canStartDm ? t('Message') : undefined}
+                {enableDm && (
+                  <span
+                    title={
+                      !isDmSupportLoading && !canStartDm
+                        ? t('This user has not set up NIP-4e DMs')
+                        : undefined
+                    }
+                    className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
                   >
-                    <MessageSquare className="h-4 w-4" />
-                  </Button>
-                </span>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="rounded-full"
+                      disabled={isDmSupportLoading || !canStartDm}
+                      onClick={() => push(toDmConversation(pubkey))}
+                      title={canStartDm ? t('Message') : undefined}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                    </Button>
+                  </span>
+                )}
                 <SpecialFollowButton pubkey={pubkey} />
                 <FollowButton pubkey={pubkey} />
               </>

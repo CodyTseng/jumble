@@ -1193,6 +1193,7 @@ export default {
     'Direct message notifications': '私信通知',
     'Notification types': '通知类型',
     'Mentions, replies, reactions, and zaps': '提及、回复、互动和 Zap',
-    'New private messages': '新私信'
+    'New private messages': '新私信',
+    Features: '功能'
   }
 }

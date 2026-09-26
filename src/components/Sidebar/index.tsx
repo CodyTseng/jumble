@@ -26,7 +26,8 @@ import UpdateButton from './UpdateButton'
 export default function PrimaryPageSidebar() {
   const { isSmallScreen } = useScreenSize()
   const { themeSetting } = useTheme()
-  const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout } = useUserPreferences()
+  const { sidebarCollapse, updateSidebarCollapse, enableSingleColumnLayout, enableDm } =
+    useUserPreferences()
   const { pubkey } = useNostr()
   const { navigate } = usePrimaryPage()
 
@@ -60,7 +61,7 @@ export default function PrimaryPageSidebar() {
         <HomeButton collapse={sidebarCollapse} />
         {IS_COMMUNITY_MODE && <FollowingButton collapse={sidebarCollapse} />}
         <NotificationsButton collapse={sidebarCollapse} />
-        <MessagesButton collapse={sidebarCollapse} />
+        {enableDm && <MessagesButton collapse={sidebarCollapse} />}
         <SearchButton collapse={sidebarCollapse} />
         <ProfileButton collapse={sidebarCollapse} />
         {pubkey && <BookmarkButton collapse={sidebarCollapse} />}

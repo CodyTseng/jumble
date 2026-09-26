@@ -39,7 +39,9 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     quickReactionEmoji,
     updateQuickReactionEmoji,
     showLinkPreviews,
-    updateShowLinkPreviews
+    updateShowLinkPreviews,
+    enableDm,
+    updateEnableDm
   } = useUserPreferences()
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -160,6 +162,14 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           <MutedWords />
         </SettingsGroup>
 
+        <SettingsGroup title={t('Features')}>
+          <SettingsRow
+            htmlFor="enable-dm"
+            title={t('Enable Direct Messages')}
+            control={<Switch id="enable-dm" checked={enableDm} onCheckedChange={updateEnableDm} />}
+          />
+        </SettingsGroup>
+
         <SettingsGroup title={t('Reactions')}>
           <SettingsRow
             htmlFor="quick-reaction"
@@ -204,6 +214,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             />
           )}
         </SettingsGroup>
+
       </SettingsPageContainer>
     </SecondaryPageLayout>
   )

@@ -1,6 +1,7 @@
 import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import { Switch } from '@/components/ui/switch'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import storage from '@/services/local-storage.service'
 import systemNotification from '@/services/system-notification'
 import { forwardRef, useEffect, useState } from 'react'
@@ -9,6 +10,7 @@ import { toast } from 'sonner'
 
 const NotificationSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
+  const { enableDm } = useUserPreferences()
   const [disableNotificationSync, setDisableNotificationSync] = useState(
     storage.getDisableNotificationSync()
   )
@@ -57,6 +59,10 @@ const NotificationSettingsPage = forwardRef(({ index }: { index?: number }, ref)
 
     storage.setSystemNotificationsEnabled(true)
     setSystemNotificationsEnabled(true)
+    if (!enableDm) {
+      storage.setSystemGeneralNotificationsEnabled(true)
+      setSystemGeneralNotificationsEnabled(true)
+    }
   }
 
   return (
@@ -76,7 +82,7 @@ const NotificationSettingsPage = forwardRef(({ index }: { index?: number }, ref)
                 />
               }
             />
-            {systemNotificationsEnabled && (
+            {systemNotificationsEnabled && enableDm && (
               <div className="border-t px-4 pt-3 pb-2">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">
                   {t('Notification types')}

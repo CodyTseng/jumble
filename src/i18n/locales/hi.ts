@@ -1197,6 +1197,7 @@ export default {
     'Direct message notifications': 'सीधे संदेश की सूचनाएं',
     'Notification types': 'सूचना के प्रकार',
     'Mentions, replies, reactions, and zaps': 'उल्लेख, जवाब, प्रतिक्रियाएं और ज़ैप',
-    'New private messages': 'नए निजी संदेश'
+    'New private messages': 'नए निजी संदेश',
+    Features: 'सुविधाएँ'
   }
 }

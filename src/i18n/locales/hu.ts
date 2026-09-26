@@ -1202,6 +1202,7 @@ export default {
     'Direct message notifications': 'Közvetlen üzenetek értesítései',
     'Notification types': 'Értesítéstípusok',
     'Mentions, replies, reactions, and zaps': 'Említések, válaszok, reakciók és zapek',
-    'New private messages': 'Új privát üzenetek'
+    'New private messages': 'Új privát üzenetek',
+    Features: 'Funkciók'
   }
 }

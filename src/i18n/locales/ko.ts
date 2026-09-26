@@ -1184,6 +1184,7 @@ export default {
     'Direct message notifications': '다이렉트 메시지 알림',
     'Notification types': '알림 유형',
     'Mentions, replies, reactions, and zaps': '멘션, 답글, 반응 및 Zap',
-    'New private messages': '새 비공개 메시지'
+    'New private messages': '새 비공개 메시지',
+    Features: '기능'
   }
 }

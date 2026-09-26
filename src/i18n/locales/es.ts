@@ -1207,6 +1207,7 @@ export default {
     'Direct message notifications': 'Notificaciones de mensajes directos',
     'Notification types': 'Tipos de notificaciones',
     'Mentions, replies, reactions, and zaps': 'Menciones, respuestas, reacciones y zaps',
-    'New private messages': 'Nuevos mensajes privados'
+    'New private messages': 'Nuevos mensajes privados',
+    Features: 'Funciones'
   }
 }

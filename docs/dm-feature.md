@@ -118,6 +118,11 @@ Every send also produces **self gift wraps** via `createDualGiftWraps` (`nip17-g
 - Secondary: path `'/dms/:pubkey'` → `DmConversationPage` (`src/routes/secondary.tsx`, `hideBottomBar: true`)
 - Link helper: `toDmConversation(pubkey)` in `src/lib/link.ts` — encodes the pubkey as npub.
 
+Users can hide DM functionality with the **Enable Direct Messages** switch in General settings.
+The preference is stored as `enableDm` in localStorage. Turning it off hides the navigation and
+profile entry points and stops background DM synchronization, unread tracking, key-sync prompts,
+and DM system notifications. The routes remain registered, and existing local DM data is preserved.
+
 ## Key flows
 
 ### Setup state machine (`DmPage`)

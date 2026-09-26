@@ -1180,6 +1180,7 @@ export default {
     'Direct message notifications': 'การแจ้งเตือนข้อความส่วนตัว',
     'Notification types': 'ประเภทการแจ้งเตือน',
     'Mentions, replies, reactions, and zaps': 'การกล่าวถึง การตอบกลับ การโต้ตอบ และ Zap',
-    'New private messages': 'ข้อความส่วนตัวใหม่'
+    'New private messages': 'ข้อความส่วนตัวใหม่',
+    Features: 'ฟีเจอร์'
   }
 }

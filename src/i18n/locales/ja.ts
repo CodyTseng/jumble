@@ -1199,6 +1199,7 @@ export default {
     'Direct message notifications': 'ダイレクトメッセージ通知',
     'Notification types': '通知の種類',
     'Mentions, replies, reactions, and zaps': 'メンション、返信、リアクション、Zap',
-    'New private messages': '新しいプライベートメッセージ'
+    'New private messages': '新しいプライベートメッセージ',
+    Features: '機能'
   }
 }

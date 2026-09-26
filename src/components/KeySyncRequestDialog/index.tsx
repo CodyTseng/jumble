@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/drawer'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import { Loader2 } from 'lucide-react'
@@ -27,11 +28,15 @@ export default function KeySyncRequestHandler() {
   const { pubkey, signEvent } = useNostr()
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const { enableDm } = useUserPreferences()
   const [pendingEvent, setPendingEvent] = useState<Event | null>(null)
   const [isSending, setIsSending] = useState(false)
 
   useEffect(() => {
-    if (!pubkey) return
+    if (!enableDm || !pubkey) {
+      setPendingEvent(null)
+      return
+    }
 
     const unsubRequest = dmService.onSyncRequest((event) => {
       setPendingEvent(event)
@@ -44,7 +49,7 @@ export default function KeySyncRequestHandler() {
       unsubRequest()
       unsubProcessed()
     }
-  }, [pubkey])
+  }, [enableDm, pubkey])
 
   const handleSendKey = async () => {
     if (!pubkey || !pendingEvent) return

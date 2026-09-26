@@ -1228,6 +1228,7 @@ export default {
     'Direct message notifications': 'Direct message notifications',
     'Notification types': 'Notification types',
     'Mentions, replies, reactions, and zaps': 'Mentions, replies, reactions, and zaps',
-    'New private messages': 'New private messages'
+    'New private messages': 'New private messages',
+    Features: 'Features'
   }
 }

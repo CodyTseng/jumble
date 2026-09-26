@@ -1184,6 +1184,7 @@ export default {
     'Direct message notifications': 'إشعارات الرسائل المباشرة',
     'Notification types': 'أنواع الإشعارات',
     'Mentions, replies, reactions, and zaps': 'الإشارات والردود والتفاعلات ومدفوعات Zap',
-    'New private messages': 'رسائل خاصة جديدة'
+    'New private messages': 'رسائل خاصة جديدة',
+    Features: 'الميزات'
   }
 }

@@ -66,7 +66,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { push } = useSecondaryPage()
   const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
-  const { notificationTabs } = useUserPreferences()
+  const { notificationTabs, enableDm } = useUserPreferences()
   const filterFn = useNotificationFilter()
   const unreadNotificationFilter = useMemo(() => {
     const firstVisibleTab = notificationTabs.find((tab) => !tab.hidden)
@@ -109,6 +109,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [pubkey])
 
   useEffect(() => {
+    if (!enableDm) return
     let cancelled = false
     const unsubscribe = dmService.onNewMessage((message) => {
       const dispatch = async () => {
@@ -158,7 +159,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       cancelled = true
       unsubscribe()
     }
-  }, [pubkey, shouldIncludeConversation, t])
+  }, [enableDm, pubkey, shouldIncludeConversation, t])
 
   useEffect(() => {
     let cancelled = false
@@ -167,7 +168,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const dispatch = async () => {
         if (
           !storage.getSystemNotificationsEnabled() ||
-          !storage.getSystemGeneralNotificationsEnabled() ||
+          (enableDm && !storage.getSystemGeneralNotificationsEnabled()) ||
           isAppInForeground()
         ) {
           return
@@ -182,7 +183,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         if (
           cancelled ||
           !storage.getSystemNotificationsEnabled() ||
-          !storage.getSystemGeneralNotificationsEnabled() ||
+          (enableDm && !storage.getSystemGeneralNotificationsEnabled()) ||
           isAppInForeground()
         ) {
           return
@@ -202,7 +203,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       cancelled = true
       unsubscribe()
     }
-  }, [pubkey, filterFn, unreadNotificationFilter, t])
+  }, [enableDm, pubkey, filterFn, unreadNotificationFilter, t])
 
   useEffect(() => {
     if (active) {

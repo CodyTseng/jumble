@@ -146,6 +146,11 @@ class DmService {
     this.pendingSyncRequestEvent = null
   }
 
+  /** Stop relay work without dropping listeners owned by still-mounted DM pages. */
+  pause(): void {
+    this.resetEncryption()
+  }
+
   /**
    * Unwraps a gift wrap, trying the current encryption key first and then any
    * retired keys still within the grace period. This lets us decrypt messages a

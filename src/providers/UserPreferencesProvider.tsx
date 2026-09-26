@@ -20,6 +20,9 @@ type TUserPreferencesContext = {
   enableSingleColumnLayout: boolean
   updateEnableSingleColumnLayout: (enable: boolean) => void
 
+  enableDm: boolean
+  updateEnableDm: (enable: boolean) => void
+
   quickReaction: boolean
   updateQuickReaction: (enable: boolean) => void
 
@@ -57,6 +60,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const [enableSingleColumnLayout, setEnableSingleColumnLayout] = useState(
     storage.getEnableSingleColumnLayout()
   )
+  const [enableDm, setEnableDm] = useState(storage.getEnableDm())
   const [quickReaction, setQuickReaction] = useState(storage.getQuickReaction())
   const [quickReactionEmoji, setQuickReactionEmoji] = useState(storage.getQuickReactionEmoji())
 
@@ -94,6 +98,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const updateEnableSingleColumnLayout = (enable: boolean) => {
     setEnableSingleColumnLayout(enable)
     storage.setEnableSingleColumnLayout(enable)
+  }
+
+  const updateEnableDm = (enable: boolean) => {
+    setEnableDm(enable)
+    storage.setEnableDm(enable)
   }
 
   const updateQuickReaction = (enable: boolean) => {
@@ -135,6 +144,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         updateSidebarCollapse,
         enableSingleColumnLayout: isSmallScreen ? true : enableSingleColumnLayout,
         updateEnableSingleColumnLayout,
+        enableDm,
+        updateEnableDm,
         quickReaction,
         updateQuickReaction,
         quickReactionEmoji,

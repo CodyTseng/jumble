@@ -1220,6 +1220,7 @@ export default {
     'Direct message notifications': 'Direktnachrichten-Benachrichtigungen',
     'Notification types': 'Benachrichtigungstypen',
     'Mentions, replies, reactions, and zaps': 'Erwähnungen, Antworten, Reaktionen und Zaps',
-    'New private messages': 'Neue Direktnachrichten'
+    'New private messages': 'Neue Direktnachrichten',
+    Features: 'Funktionen'
   }
 }

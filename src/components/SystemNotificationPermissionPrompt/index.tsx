@@ -9,6 +9,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { useNostr } from '@/providers/NostrProvider'
+import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import storage from '@/services/local-storage.service'
 import systemNotification from '@/services/system-notification'
 import { useEffect, useState } from 'react'
@@ -18,6 +19,7 @@ import { toast } from 'sonner'
 export default function SystemNotificationPermissionPrompt() {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
+  const { enableDm } = useUserPreferences()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -86,9 +88,11 @@ export default function SystemNotificationPermissionPrompt() {
         <AlertDialogHeader>
           <AlertDialogTitle>{t('Enable system notifications?')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t(
-              'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.'
-            )}
+            {enableDm
+              ? t(
+                  'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.'
+                )
+              : t('Show notifications while Jumble is running in the background')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

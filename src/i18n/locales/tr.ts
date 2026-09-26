@@ -1203,6 +1203,7 @@ export default {
     'Direct message notifications': 'Doğrudan mesaj bildirimleri',
     'Notification types': 'Bildirim türleri',
     'Mentions, replies, reactions, and zaps': "Bahsetmeler, yanıtlar, tepkiler ve zap'ler",
-    'New private messages': 'Yeni özel mesajlar'
+    'New private messages': 'Yeni özel mesajlar',
+    Features: 'Özellikler'
   }
 }
