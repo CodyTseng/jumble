@@ -1185,6 +1185,23 @@ export default {
     'Notification types': '알림 유형',
     'Mentions, replies, reactions, and zaps': '멘션, 답글, 반응 및 Zap',
     'New private messages': '새 비공개 메시지',
-    Features: '기능'
+    Features: '기능',
+    Repository: '저장소',
+    'Repository state': '저장소 상태',
+    Patch: '패치',
+    'Pull request': '풀 리퀘스트',
+    'Pull request update': '풀 리퀘스트 업데이트',
+    Issue: '이슈',
+    Open: '열림',
+    'Applied / merged / resolved': '적용됨 / 병합됨 / 해결됨',
+    Closed: '닫힘',
+    Draft: '초안',
+    'Grasp servers': 'Grasp 서버',
+    Commit: '커밋',
+    Web: '웹',
+    'Clone URLs': '클론 URL',
+    'Branches and tags': '브랜치 및 태그',
+    Target: '대상',
+    Maintainers: '메인테이너'
   }
 }

@@ -1194,6 +1194,23 @@ export default {
     'Notification types': '通知類型',
     'Mentions, replies, reactions, and zaps': '提及、回覆、互動和 Zap',
     'New private messages': '新私訊',
-    Features: '功能'
+    Features: '功能',
+    Repository: '程式碼儲存庫',
+    'Repository state': '儲存庫狀態',
+    Patch: '修補程式',
+    'Pull request': '提取要求',
+    'Pull request update': '提取要求更新',
+    Issue: '議題',
+    Open: '開啟',
+    'Applied / merged / resolved': '已套用 / 已合併 / 已解決',
+    Closed: '已關閉',
+    Draft: '草稿',
+    'Grasp servers': 'Grasp 伺服器',
+    Commit: '提交',
+    Web: '網頁',
+    'Clone URLs': '複製位址',
+    'Branches and tags': '分支與標籤',
+    Target: '目標',
+    Maintainers: '維護者'
   }
 }

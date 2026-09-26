@@ -1185,6 +1185,23 @@ export default {
     'Notification types': 'أنواع الإشعارات',
     'Mentions, replies, reactions, and zaps': 'الإشارات والردود والتفاعلات ومدفوعات Zap',
     'New private messages': 'رسائل خاصة جديدة',
-    Features: 'الميزات'
+    Features: 'الميزات',
+    Repository: 'المستودع',
+    'Repository state': 'حالة المستودع',
+    Patch: 'رقعة',
+    'Pull request': 'طلب سحب',
+    'Pull request update': 'تحديث طلب السحب',
+    Issue: 'مشكلة',
+    Open: 'مفتوح',
+    'Applied / merged / resolved': 'مُطبّق / مدمج / محلول',
+    Closed: 'مغلق',
+    Draft: 'مسودة',
+    'Grasp servers': 'خوادم Grasp',
+    Commit: 'التزام',
+    Web: 'الويب',
+    'Clone URLs': 'عناوين URL للاستنساخ',
+    'Branches and tags': 'الفروع والوسوم',
+    Target: 'الهدف',
+    Maintainers: 'المشرفون'
   }
 }

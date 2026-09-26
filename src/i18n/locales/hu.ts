@@ -1203,6 +1203,23 @@ export default {
     'Notification types': 'Értesítéstípusok',
     'Mentions, replies, reactions, and zaps': 'Említések, válaszok, reakciók és zapek',
     'New private messages': 'Új privát üzenetek',
-    Features: 'Funkciók'
+    Features: 'Funkciók',
+    Repository: 'Tároló',
+    'Repository state': 'Tároló állapota',
+    Patch: 'Javítócsomag',
+    'Pull request': 'Beolvasztási kérelem',
+    'Pull request update': 'Beolvasztási kérelem frissítése',
+    Issue: 'Probléma',
+    Open: 'Nyitott',
+    'Applied / merged / resolved': 'Alkalmazva / beolvasztva / megoldva',
+    Closed: 'Lezárt',
+    Draft: 'Piszkozat',
+    'Grasp servers': 'Grasp-szerverek',
+    Commit: 'Véglegesítés',
+    Web: 'Web',
+    'Clone URLs': 'Klónozási URL-ek',
+    'Branches and tags': 'Ágak és címkék',
+    Target: 'Cél',
+    Maintainers: 'Karbantartók'
   }
 }

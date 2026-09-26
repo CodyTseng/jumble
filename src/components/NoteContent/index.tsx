@@ -1,5 +1,6 @@
 import { ExtendedKind, NSFW_DISPLAY_POLICY, SUPPORTED_KINDS } from '@/constants'
 import { getEventAuthorPubkey, isNsfwEvent } from '@/lib/event'
+import { isNip34EventKind } from '@/lib/nip34'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -18,6 +19,7 @@ import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import MutedNote from './MutedNote'
+import Nip34Event from './Nip34Event'
 import NsfwNote from './NsfwNote'
 import PictureNote from './PictureNote'
 import Poll from './Poll'
@@ -59,6 +61,10 @@ export default function NoteContent({
 
   if (isNsfw && !showNsfw) {
     return <NsfwNote show={() => setShowNsfw(true)} />
+  }
+
+  if (isNip34EventKind(event.kind)) {
+    return <Nip34Event className={cn('mt-2', className)} event={event} />
   }
 
   if (event.kind === kinds.Highlights) {

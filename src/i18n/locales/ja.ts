@@ -1200,6 +1200,23 @@ export default {
     'Notification types': '通知の種類',
     'Mentions, replies, reactions, and zaps': 'メンション、返信、リアクション、Zap',
     'New private messages': '新しいプライベートメッセージ',
-    Features: '機能'
+    Features: '機能',
+    Repository: 'リポジトリ',
+    'Repository state': 'リポジトリの状態',
+    Patch: 'パッチ',
+    'Pull request': 'プルリクエスト',
+    'Pull request update': 'プルリクエストの更新',
+    Issue: '課題',
+    Open: 'オープン',
+    'Applied / merged / resolved': '適用済み / マージ済み / 解決済み',
+    Closed: 'クローズ',
+    Draft: '下書き',
+    'Grasp servers': 'Grasp サーバー',
+    Commit: 'コミット',
+    Web: 'Web',
+    'Clone URLs': 'クローン URL',
+    'Branches and tags': 'ブランチとタグ',
+    Target: '対象',
+    Maintainers: 'メンテナー'
   }
 }

@@ -1194,6 +1194,23 @@ export default {
     'Notification types': '通知类型',
     'Mentions, replies, reactions, and zaps': '提及、回复、互动和 Zap',
     'New private messages': '新私信',
-    Features: '功能'
+    Features: '功能',
+    Repository: '代码仓库',
+    'Repository state': '仓库状态',
+    Patch: '补丁',
+    'Pull request': '拉取请求',
+    'Pull request update': '拉取请求更新',
+    Issue: '议题',
+    Open: '开启',
+    'Applied / merged / resolved': '已应用 / 已合并 / 已解决',
+    Closed: '已关闭',
+    Draft: '草稿',
+    'Grasp servers': 'Grasp 服务器',
+    Commit: '提交',
+    Web: '网页',
+    'Clone URLs': '克隆地址',
+    'Branches and tags': '分支与标签',
+    Target: '目标',
+    Maintainers: '维护者'
   }
 }

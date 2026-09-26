@@ -1211,6 +1211,23 @@ export default {
     'Notification types': 'Tipos de notificação',
     'Mentions, replies, reactions, and zaps': 'Menções, respostas, reações e zaps',
     'New private messages': 'Novas mensagens privadas',
-    Features: 'Funcionalidades'
+    Features: 'Funcionalidades',
+    Repository: 'Repositório',
+    'Repository state': 'Estado do repositório',
+    Patch: 'Patch',
+    'Pull request': 'Pedido de integração',
+    'Pull request update': 'Atualização do pedido de integração',
+    Issue: 'Problema',
+    Open: 'Aberto',
+    'Applied / merged / resolved': 'Aplicado / integrado / resolvido',
+    Closed: 'Fechado',
+    Draft: 'Rascunho',
+    'Grasp servers': 'Servidores Grasp',
+    Commit: 'Commit',
+    Web: 'Web',
+    'Clone URLs': 'URLs de clonagem',
+    'Branches and tags': 'Ramos e etiquetas',
+    Target: 'Destino',
+    Maintainers: 'Responsáveis pela manutenção'
   }
 }

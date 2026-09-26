@@ -1204,6 +1204,23 @@ export default {
     'Notification types': 'Bildirim türleri',
     'Mentions, replies, reactions, and zaps': "Bahsetmeler, yanıtlar, tepkiler ve zap'ler",
     'New private messages': 'Yeni özel mesajlar',
-    Features: 'Özellikler'
+    Features: 'Özellikler',
+    Repository: 'Depo',
+    'Repository state': 'Depo durumu',
+    Patch: 'Yama',
+    'Pull request': 'Çekme isteği',
+    'Pull request update': 'Çekme isteği güncellemesi',
+    Issue: 'Sorun',
+    Open: 'Açık',
+    'Applied / merged / resolved': 'Uygulandı / birleştirildi / çözüldü',
+    Closed: 'Kapalı',
+    Draft: 'Taslak',
+    'Grasp servers': 'Grasp sunucuları',
+    Commit: 'İşleme',
+    Web: 'Web',
+    'Clone URLs': "Klonlama URL'leri",
+    'Branches and tags': 'Dallar ve etiketler',
+    Target: 'Hedef',
+    Maintainers: 'Bakımcılar'
   }
 }

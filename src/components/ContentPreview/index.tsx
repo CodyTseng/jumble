@@ -1,5 +1,6 @@
 import { ExtendedKind } from '@/constants'
 import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
+import { isNip34EventKind } from '@/lib/nip34'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -16,6 +17,7 @@ import HighlightPreview from './HighlightPreview'
 import LiveEventPreview from './LiveEventPreview'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import NormalContentPreview from './NormalContentPreview'
+import Nip34EventPreview from './Nip34EventPreview'
 import PictureNotePreview from './PictureNotePreview'
 import PollPreview from './PollPreview'
 import ReactionPreview from './ReactionPreview'
@@ -62,6 +64,10 @@ export default function ContentPreview({
         [{t('This note mentions a user you muted')}]
       </div>
     )
+  }
+
+  if (isNip34EventKind(event.kind)) {
+    return <Nip34EventPreview event={event} className={className} />
   }
 
   if (

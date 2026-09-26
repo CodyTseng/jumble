@@ -1213,6 +1213,23 @@ export default {
     'Notification types': 'Typy powiadomień',
     'Mentions, replies, reactions, and zaps': 'Wzmianki, odpowiedzi, reakcje i zapy',
     'New private messages': 'Nowe wiadomości prywatne',
-    Features: 'Funkcje'
+    Features: 'Funkcje',
+    Repository: 'Repozytorium',
+    'Repository state': 'Stan repozytorium',
+    Patch: 'Łatka',
+    'Pull request': 'Żądanie scalenia',
+    'Pull request update': 'Aktualizacja żądania scalenia',
+    Issue: 'Zgłoszenie',
+    Open: 'Otwarte',
+    'Applied / merged / resolved': 'Zastosowano / scalono / rozwiązano',
+    Closed: 'Zamknięte',
+    Draft: 'Wersja robocza',
+    'Grasp servers': 'Serwery Grasp',
+    Commit: 'Commit',
+    Web: 'Strona WWW',
+    'Clone URLs': 'Adresy URL klonowania',
+    'Branches and tags': 'Gałęzie i tagi',
+    Target: 'Cel',
+    Maintainers: 'Opiekunowie'
   }
 }

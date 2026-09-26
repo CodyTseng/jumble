@@ -1200,6 +1200,23 @@ export default {
     'Notification types': 'انواع اعلان‌ها',
     'Mentions, replies, reactions, and zaps': 'اشاره‌ها، پاسخ‌ها، واکنش‌ها و زپ‌ها',
     'New private messages': 'پیام‌های خصوصی جدید',
-    Features: 'قابلیت‌ها'
+    Features: 'قابلیت‌ها',
+    Repository: 'مخزن',
+    'Repository state': 'وضعیت مخزن',
+    Patch: 'وصله',
+    'Pull request': 'درخواست ادغام',
+    'Pull request update': 'به‌روزرسانی درخواست ادغام',
+    Issue: 'مسئله',
+    Open: 'باز',
+    'Applied / merged / resolved': 'اعمال‌شده / ادغام‌شده / حل‌شده',
+    Closed: 'بسته',
+    Draft: 'پیش‌نویس',
+    'Grasp servers': 'سرورهای Grasp',
+    Commit: 'کامیت',
+    Web: 'وب',
+    'Clone URLs': 'نشانی‌های کلون',
+    'Branches and tags': 'شاخه‌ها و برچسب‌ها',
+    Target: 'هدف',
+    Maintainers: 'نگه‌دارندگان'
   }
 }

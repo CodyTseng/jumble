@@ -1198,6 +1198,23 @@ export default {
     'Notification types': 'सूचना के प्रकार',
     'Mentions, replies, reactions, and zaps': 'उल्लेख, जवाब, प्रतिक्रियाएं और ज़ैप',
     'New private messages': 'नए निजी संदेश',
-    Features: 'सुविधाएँ'
+    Features: 'सुविधाएँ',
+    Repository: 'रिपॉज़िटरी',
+    'Repository state': 'रिपॉज़िटरी की स्थिति',
+    Patch: 'पैच',
+    'Pull request': 'पुल अनुरोध',
+    'Pull request update': 'पुल अनुरोध अपडेट',
+    Issue: 'समस्या',
+    Open: 'खुला',
+    'Applied / merged / resolved': 'लागू / मर्ज / हल किया गया',
+    Closed: 'बंद',
+    Draft: 'ड्राफ़्ट',
+    'Grasp servers': 'Grasp सर्वर',
+    Commit: 'कमिट',
+    Web: 'वेब',
+    'Clone URLs': 'क्लोन URL',
+    'Branches and tags': 'ब्रांच और टैग',
+    Target: 'लक्ष्य',
+    Maintainers: 'मेंटेनर'
   }
 }

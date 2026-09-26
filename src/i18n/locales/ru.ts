@@ -1206,6 +1206,23 @@ export default {
     'Notification types': 'Типы уведомлений',
     'Mentions, replies, reactions, and zaps': 'Упоминания, ответы, реакции и запы',
     'New private messages': 'Новые личные сообщения',
-    Features: 'Функции'
+    Features: 'Функции',
+    Repository: 'Репозиторий',
+    'Repository state': 'Состояние репозитория',
+    Patch: 'Патч',
+    'Pull request': 'Запрос на слияние',
+    'Pull request update': 'Обновление запроса на слияние',
+    Issue: 'Задача',
+    Open: 'Открыто',
+    'Applied / merged / resolved': 'Применено / объединено / решено',
+    Closed: 'Закрыто',
+    Draft: 'Черновик',
+    'Grasp servers': 'Серверы Grasp',
+    Commit: 'Коммит',
+    Web: 'Веб',
+    'Clone URLs': 'URL-адреса клонирования',
+    'Branches and tags': 'Ветки и теги',
+    Target: 'Цель',
+    Maintainers: 'Сопровождающие'
   }
 }

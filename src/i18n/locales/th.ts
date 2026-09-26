@@ -1181,6 +1181,23 @@ export default {
     'Notification types': 'ประเภทการแจ้งเตือน',
     'Mentions, replies, reactions, and zaps': 'การกล่าวถึง การตอบกลับ การโต้ตอบ และ Zap',
     'New private messages': 'ข้อความส่วนตัวใหม่',
-    Features: 'ฟีเจอร์'
+    Features: 'ฟีเจอร์',
+    Repository: 'ที่เก็บโค้ด',
+    'Repository state': 'สถานะที่เก็บโค้ด',
+    Patch: 'แพตช์',
+    'Pull request': 'คำขอดึง',
+    'Pull request update': 'การอัปเดตคำขอดึง',
+    Issue: 'ปัญหา',
+    Open: 'เปิด',
+    'Applied / merged / resolved': 'นำไปใช้แล้ว / รวมแล้ว / แก้ไขแล้ว',
+    Closed: 'ปิด',
+    Draft: 'ฉบับร่าง',
+    'Grasp servers': 'เซิร์ฟเวอร์ Grasp',
+    Commit: 'คอมมิต',
+    Web: 'เว็บ',
+    'Clone URLs': 'URL สำหรับโคลน',
+    'Branches and tags': 'แบรนช์และแท็ก',
+    Target: 'เป้าหมาย',
+    Maintainers: 'ผู้ดูแล'
   }
 }

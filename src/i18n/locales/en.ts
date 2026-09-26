@@ -1229,6 +1229,23 @@ export default {
     'Notification types': 'Notification types',
     'Mentions, replies, reactions, and zaps': 'Mentions, replies, reactions, and zaps',
     'New private messages': 'New private messages',
-    Features: 'Features'
+    Features: 'Features',
+    Repository: 'Repository',
+    'Repository state': 'Repository state',
+    Patch: 'Patch',
+    'Pull request': 'Pull request',
+    'Pull request update': 'Pull request update',
+    Issue: 'Issue',
+    Open: 'Open',
+    'Applied / merged / resolved': 'Applied / merged / resolved',
+    Closed: 'Closed',
+    Draft: 'Draft',
+    'Grasp servers': 'Grasp servers',
+    Commit: 'Commit',
+    Web: 'Web',
+    'Clone URLs': 'Clone URLs',
+    'Branches and tags': 'Branches and tags',
+    Target: 'Target',
+    Maintainers: 'Maintainers'
   }
 }
