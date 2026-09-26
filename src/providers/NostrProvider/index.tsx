@@ -58,6 +58,7 @@ type TNostrContext = {
   profileEvent: Event | null
   relayList: TRelayList | null
   followListEvent: Event | null
+  privateFollowListEvent: Event | null
   muteListEvent: Event | null
   bookmarkListEvent: Event | null
   favoriteRelaysEvent: Event | null
@@ -109,6 +110,7 @@ type TNostrContext = {
   updateRelayListEvent: (relayListEvent: Event) => Promise<void>
   updateProfileEvent: (profileEvent: Event) => Promise<void>
   updateFollowListEvent: (followListEvent: Event) => Promise<void>
+  updatePrivateFollowListEvent: (privateFollowListEvent: Event, privateTags?: string[][]) => Promise<void>
   updateMuteListEvent: (muteListEvent: Event, privateTags: string[][]) => Promise<void>
   updateBookmarkListEvent: (bookmarkListEvent: Event) => Promise<void>
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
@@ -146,6 +148,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
   const [relayList, setRelayList] = useState<TRelayList | null>(null)
   const [followListEvent, setFollowListEvent] = useState<Event | null>(null)
+  const [privateFollowListEvent, setPrivateFollowListEvent] = useState<Event | null>(null)
   const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
   const [pinnedUsersEvent, setPinnedUsersEvent] = useState<Event | null>(null)
   const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | null>(null)
@@ -202,6 +205,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       setBookmarkListEvent(null)
       setPinListEvent(null)
       setPinnedUsersEvent(null)
+      setPrivateFollowListEvent(null)
       setNotificationsSeenAt(-1)
       if (!account) {
         return
@@ -230,7 +234,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedFavoriteRelaysEvent,
         storedUserEmojiListEvent,
         storedPinListEvent,
-        storedPinnedUsersEvent
+        storedPinnedUsersEvent,
+        storedPrivateFollowListEvent
       ] = await Promise.all([
         indexedDb.getReplaceableEvent(account.pubkey, kinds.RelayList),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Metadata),
@@ -240,7 +245,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.UserEmojiList),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
-        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS)
+        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PINNED_USERS),
+        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.PRIVATE_FOLLOWS)
       ])
       if (controller.signal.aborted) return
       if (storedRelayListEvent) {
@@ -271,6 +277,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       if (storedPinnedUsersEvent) {
         setPinnedUsersEvent(storedPinnedUsersEvent)
       }
+      if (storedPrivateFollowListEvent) {
+        setPrivateFollowListEvent(storedPrivateFollowListEvent)
+      }
 
       const defaultRelays = getDefaultRelayUrls()
       const relayListEvents = await client.fetchEvents(defaultRelays, {
@@ -297,7 +306,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             ExtendedKind.BLOSSOM_SERVER_LIST,
             kinds.UserEmojiList,
             kinds.Pinlist,
-            ExtendedKind.PINNED_USERS
+            ExtendedKind.PINNED_USERS,
+            ExtendedKind.PRIVATE_FOLLOWS
           ],
           authors: [account.pubkey]
         },
@@ -325,6 +335,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       )
       const pinnedNotesEvent = sortedEvents.find((e) => e.kind === kinds.Pinlist)
       const pinnedUsersEvent = sortedEvents.find((e) => e.kind === ExtendedKind.PINNED_USERS)
+      const privateFollowListEvent = sortedEvents.find(
+        (e) => e.kind === ExtendedKind.PRIVATE_FOLLOWS
+      )
 
       if (profileEvent) {
         const updatedProfileEvent = await indexedDb.putReplaceableEvent(profileEvent)
@@ -382,6 +395,14 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         const updatedPinnedUsersEvent = await indexedDb.putReplaceableEvent(pinnedUsersEvent)
         if (updatedPinnedUsersEvent.id === pinnedUsersEvent.id) {
           setPinnedUsersEvent(updatedPinnedUsersEvent)
+        }
+      }
+      if (privateFollowListEvent) {
+        const updatedPrivateFollowListEvent = await indexedDb.putReplaceableEvent(
+          privateFollowListEvent
+        )
+        if (updatedPrivateFollowListEvent.id === privateFollowListEvent.id) {
+          setPrivateFollowListEvent(updatedPrivateFollowListEvent)
         }
       }
 
@@ -947,6 +968,19 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setPinnedUsersEvent(newPinnedUsersEvent)
   }
 
+  const updatePrivateFollowListEvent = async (
+    privateFollowListEvent: Event,
+    privateTags?: string[][]
+  ) => {
+    const newPrivateFollowListEvent = await indexedDb.putReplaceableEvent(privateFollowListEvent)
+    if (newPrivateFollowListEvent.id !== privateFollowListEvent.id) return
+
+    if (privateTags) {
+      await indexedDb.putDecryptedContent(privateFollowListEvent.id, JSON.stringify(privateTags))
+    }
+    setPrivateFollowListEvent(newPrivateFollowListEvent)
+  }
+
   const updateNotificationsSeenAt = async (skipPublish = false) => {
     if (!account) return
 
@@ -985,6 +1019,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         userEmojiListEvent,
         pinListEvent,
         pinnedUsersEvent,
+        privateFollowListEvent,
         notificationsSeenAt,
         account,
         accounts,
@@ -1023,6 +1058,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         updateUserEmojiListEvent,
         updatePinListEvent,
         updatePinnedUsersEvent,
+        updatePrivateFollowListEvent,
         updateNotificationsSeenAt
       }}
     >
