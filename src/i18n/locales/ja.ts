@@ -1184,6 +1184,21 @@ export default {
     'Remove muted word': 'ミュートワードを削除',
     'Failed to update muted word': 'ミュートワードを更新できませんでした',
     '(Visible to everyone)': '（誰でも見ることができます）',
-    'Local muted words have not synced yet.': 'この端末のミュートワードはまだ同期されていません。'
+    'Local muted words have not synced yet.': 'この端末のミュートワードはまだ同期されていません。',
+    'System notifications': 'システム通知',
+    'Show notifications while Jumble is running in the background':
+      'Jumble がバックグラウンドで実行中に通知を表示',
+    'Notification permission was not granted': '通知が許可されていません',
+    'replied to your note': 'あなたのノートに返信しました',
+    'sent you a private message': 'あなたにプライベートメッセージを送信しました',
+    'Enable system notifications?': 'システム通知を有効にしますか？',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Jumble がバックグラウンドで実行中に、新しいメンション、リアクション、Zap、プライベートメッセージの通知を受け取ります。',
+    'Not now': '今はしない',
+    'General notifications': '通常の通知',
+    'Direct message notifications': 'ダイレクトメッセージ通知',
+    'Notification types': '通知の種類',
+    'Mentions, replies, reactions, and zaps': 'メンション、返信、リアクション、Zap',
+    'New private messages': '新しいプライベートメッセージ'
   }
 }

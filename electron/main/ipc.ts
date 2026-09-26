@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import type { Event as NEvent, Filter } from 'nostr-tools'
 import {
   IPC_CHANNELS,
@@ -9,6 +9,7 @@ import {
   TSecretsBundle,
   TSecurityStatus
 } from '../shared/ipc-types.js'
+import type { TSystemNotificationPayload } from '../shared/ipc-types.js'
 import type { MediaServer } from './media-server.js'
 import type { PasswordCrypto } from './password-crypto.js'
 import type { PomegranateAuthServer } from './pomegranate-auth-server.js'
@@ -16,6 +17,7 @@ import { proxyFetch } from './proxy-fetch.js'
 import type { RelayManager } from './relay-manager.js'
 import type { RendererStorageStore } from './renderer-storage-store.js'
 import type { SecretsStore } from './secrets-store.js'
+import type { ElectronSystemNotificationService } from './system-notification.js'
 import type { Updater } from './updater.js'
 
 export type TSecurityContext = {
@@ -33,7 +35,8 @@ export function registerIpcHandlers(
   mediaServer: MediaServer,
   pomegranateAuthServer: PomegranateAuthServer,
   rendererStorage: RendererStorageStore,
-  security: TSecurityContext
+  security: TSecurityContext,
+  systemNotification: ElectronSystemNotificationService
 ) {
   ipcMain.handle(IPC_CHANNELS.checkRelays, () => manager.checkRelays())
 
@@ -45,10 +48,8 @@ export function registerIpcHandlers(
     manager.publish(url, event, timeoutMs)
   )
 
-  ipcMain.handle(
-    IPC_CHANNELS.subscribe,
-    (_e, subId: string, url: string, filters: Filter[]) =>
-      manager.subscribe(subId, url, filters)
+  ipcMain.handle(IPC_CHANNELS.subscribe, (_e, subId: string, url: string, filters: Filter[]) =>
+    manager.subscribe(subId, url, filters)
   )
 
   ipcMain.handle(IPC_CHANNELS.closeSub, (_e, subId: string) => manager.closeSub(subId))
@@ -106,6 +107,15 @@ export function registerIpcHandlers(
   ipcMain.handle(IPC_CHANNELS.updateGetState, () => updater.getState())
   ipcMain.handle(IPC_CHANNELS.updateSetAuto, (_e, enabled: boolean) =>
     updater.setAutoUpdate(enabled)
+  )
+
+  ipcMain.handle(IPC_CHANNELS.systemNotificationSupported, () => systemNotification.isSupported())
+  ipcMain.handle(
+    IPC_CHANNELS.systemNotificationShow,
+    (event, payload: TSystemNotificationPayload) => {
+      const window = event.sender ? BrowserWindow.fromWebContents(event.sender) : null
+      return systemNotification.show(payload, window)
+    }
   )
 
   ipcMain.handle(IPC_CHANNELS.proxyFetch, (_e, url: string, options?: TProxyFetchOptions) =>

@@ -1187,6 +1187,21 @@ export default {
     'Remove muted word': 'Némított szó eltávolítása',
     'Failed to update muted word': 'Nem sikerült frissíteni a némított szót',
     '(Visible to everyone)': '(mindenki láthatja)',
-    'Local muted words have not synced yet.': 'A helyi némított szavak még nem szinkronizálódtak.'
+    'Local muted words have not synced yet.': 'A helyi némított szavak még nem szinkronizálódtak.',
+    'System notifications': 'Rendszerértesítések',
+    'Show notifications while Jumble is running in the background':
+      'Értesítések megjelenítése, miközben a Jumble a háttérben fut',
+    'Notification permission was not granted': 'Az értesítési engedély nem lett megadva',
+    'replied to your note': 'válaszolt a posztodra',
+    'sent you a private message': 'privát üzenetet küldött neked',
+    'Enable system notifications?': 'Engedélyezi a rendszerértesítéseket?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Értesülj az új említésekről, reakciókról, zapekről és privát üzenetekről, miközben a Jumble a háttérben fut.',
+    'Not now': 'Most nem',
+    'General notifications': 'Általános értesítések',
+    'Direct message notifications': 'Közvetlen üzenetek értesítései',
+    'Notification types': 'Értesítéstípusok',
+    'Mentions, replies, reactions, and zaps': 'Említések, válaszok, reakciók és zapek',
+    'New private messages': 'Új privát üzenetek'
   }
 }

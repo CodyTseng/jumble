@@ -1,8 +1,9 @@
-import { app, BrowserWindow, Notification } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import electronUpdater, { UpdateInfo } from 'electron-updater'
 import fs from 'node:fs'
 import path from 'node:path'
 import { IPC_CHANNELS, TUpdateState } from '../shared/ipc-types.js'
+import { ElectronSystemNotificationService } from './system-notification.js'
 
 const { autoUpdater } = electronUpdater
 
@@ -22,7 +23,10 @@ export class Updater {
   private autoUpdateEnabled: boolean
   private downloadInProgress = false
 
-  constructor(private readonly enabled: boolean) {
+  constructor(
+    private readonly enabled: boolean,
+    private readonly systemNotification = new ElectronSystemNotificationService()
+  ) {
     this.autoUpdateEnabled = this.loadSettings().autoUpdateEnabled
     this.state = {
       status: 'idle',
@@ -170,15 +174,14 @@ export class Updater {
   }
 
   private notifyDownloaded(version: string) {
-    if (!Notification.isSupported()) return
-    try {
-      new Notification({
+    this.systemNotification.show(
+      {
+        id: `update-ready-${version}`,
         title: 'Jumble update ready',
         body: `Version ${version} will be installed the next time you quit Jumble.`
-      }).show()
-    } catch {
-      // ignore
-    }
+      },
+      this.window
+    )
   }
 
   private settingsPath(): string {

@@ -1169,6 +1169,21 @@ export default {
     'Remove muted word': 'إزالة الكلمة المكتومة',
     'Failed to update muted word': 'فشل تحديث الكلمة المكتومة',
     '(Visible to everyone)': '(مرئي للجميع)',
-    'Local muted words have not synced yet.': 'لم تتم مزامنة الكلمات المكتومة المحلية بعد.'
+    'Local muted words have not synced yet.': 'لم تتم مزامنة الكلمات المكتومة المحلية بعد.',
+    'System notifications': 'إشعارات النظام',
+    'Show notifications while Jumble is running in the background':
+      'عرض الإشعارات أثناء تشغيل Jumble في الخلفية',
+    'Notification permission was not granted': 'لم يتم منح إذن الإشعارات',
+    'replied to your note': 'ردّ على ملاحظتك',
+    'sent you a private message': 'أرسل إليك رسالة خاصة',
+    'Enable system notifications?': 'هل تريد تفعيل إشعارات النظام؟',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'تلقَّ إشعارات بشأن الإشارات والتفاعلات وعمليات Zap والرسائل الخاصة الجديدة أثناء تشغيل Jumble في الخلفية.',
+    'Not now': 'ليس الآن',
+    'General notifications': 'الإشعارات العامة',
+    'Direct message notifications': 'إشعارات الرسائل المباشرة',
+    'Notification types': 'أنواع الإشعارات',
+    'Mentions, replies, reactions, and zaps': 'الإشارات والردود والتفاعلات ومدفوعات Zap',
+    'New private messages': 'رسائل خاصة جديدة'
   }
 }

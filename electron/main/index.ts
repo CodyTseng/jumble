@@ -22,6 +22,7 @@ import { isRendererFrameUrl } from './renderer-frame.js'
 import { RendererStorageStore } from './renderer-storage-store.js'
 import { SecretsStore } from './secrets-store.js'
 import { MigratingStoreCrypto, SafeStorageCrypto } from './store-crypto.js'
+import { ElectronSystemNotificationService } from './system-notification.js'
 import { Updater } from './updater.js'
 import { attachWindowStatePersistence, loadWindowState } from './window-state.js'
 
@@ -78,7 +79,8 @@ let rendererStorage: RendererStorageStore | null = null
 // Flatpak/Flathub, so the app-level updater should stay disabled there.
 const isFlatpak =
   process.env.FLATPAK_ID === 'com.codytseng.jumble' || process.env.container === 'flatpak'
-const updater = new Updater(app.isPackaged && !isFlatpak)
+const systemNotification = new ElectronSystemNotificationService()
+const updater = new Updater(app.isPackaged && !isFlatpak, systemNotification)
 // Tiny http://127.0.0.1 server that hosts the YouTube IFrame shim page so
 // embedded YT players have an http(s) parent origin (the SPA itself runs on
 // app://, which YT rejects with player error 153).
@@ -235,7 +237,8 @@ if (!gotSingleInstanceLock) {
         passwordCrypto,
         secrets,
         rendererStorage
-      }
+      },
+      systemNotification
     )
     createWindow()
     updater.start()

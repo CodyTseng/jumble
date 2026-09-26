@@ -1165,6 +1165,21 @@ export default {
     'Remove muted word': 'ลบคำที่ปิดเสียง',
     'Failed to update muted word': 'อัปเดตคำที่ปิดเสียงไม่สำเร็จ',
     '(Visible to everyone)': '(ทุกคนมองเห็นได้)',
-    'Local muted words have not synced yet.': 'คำที่ปิดเสียงในเครื่องยังไม่ได้ซิงค์'
+    'Local muted words have not synced yet.': 'คำที่ปิดเสียงในเครื่องยังไม่ได้ซิงค์',
+    'System notifications': 'การแจ้งเตือนของระบบ',
+    'Show notifications while Jumble is running in the background':
+      'แสดงการแจ้งเตือนขณะที่ Jumble ทำงานอยู่เบื้องหลัง',
+    'Notification permission was not granted': 'ไม่ได้รับอนุญาตให้แสดงการแจ้งเตือน',
+    'replied to your note': 'ตอบกลับโน้ตของคุณ',
+    'sent you a private message': 'ส่งข้อความส่วนตัวถึงคุณ',
+    'Enable system notifications?': 'เปิดการแจ้งเตือนของระบบหรือไม่',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'รับการแจ้งเตือนเกี่ยวกับการกล่าวถึง การแสดงปฏิกิริยา Zap และข้อความส่วนตัวใหม่ ขณะที่ Jumble ทำงานอยู่เบื้องหลัง',
+    'Not now': 'ไม่ใช่ตอนนี้',
+    'General notifications': 'การแจ้งเตือนทั่วไป',
+    'Direct message notifications': 'การแจ้งเตือนข้อความส่วนตัว',
+    'Notification types': 'ประเภทการแจ้งเตือน',
+    'Mentions, replies, reactions, and zaps': 'การกล่าวถึง การตอบกลับ การโต้ตอบ และ Zap',
+    'New private messages': 'ข้อความส่วนตัวใหม่'
   }
 }

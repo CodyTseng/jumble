@@ -4,6 +4,7 @@ import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
+import lightning from '@/services/lightning.service'
 import { NostrEvent } from 'nostr-tools'
 import { useCallback } from 'react'
 
@@ -20,6 +21,7 @@ export function useNotificationFilter() {
         pubkey,
         mutePubkeySet,
         hideContentMentioningMutedUsers,
+        validateZapReceipt: (receipt) => lightning.validateZapReceipt(receipt),
         meetsMinTrustScore: async (target: string) => {
           if (trustScoreThreshold === 0) return true
           return meetsMinTrustScore(target, trustScoreThreshold)

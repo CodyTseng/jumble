@@ -1204,6 +1204,22 @@ export default {
     'Failed to update muted word': 'Stummgeschaltetes Wort konnte nicht aktualisiert werden',
     '(Visible to everyone)': '(für alle sichtbar)',
     'Local muted words have not synced yet.':
-      'Lokale stummgeschaltete Wörter wurden noch nicht synchronisiert.'
+      'Lokale stummgeschaltete Wörter wurden noch nicht synchronisiert.',
+    'System notifications': 'Systembenachrichtigungen',
+    'Show notifications while Jumble is running in the background':
+      'Benachrichtigungen anzeigen, während Jumble im Hintergrund ausgeführt wird',
+    'Notification permission was not granted':
+      'Die Benachrichtigungsberechtigung wurde nicht erteilt',
+    'replied to your note': 'hat auf Ihre Notiz geantwortet',
+    'sent you a private message': 'hat Ihnen eine private Nachricht gesendet',
+    'Enable system notifications?': 'Systembenachrichtigungen aktivieren?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Erhalten Sie Benachrichtigungen über neue Erwähnungen, Reaktionen, Zaps und private Nachrichten, während Jumble im Hintergrund ausgeführt wird.',
+    'Not now': 'Nicht jetzt',
+    'General notifications': 'Allgemeine Benachrichtigungen',
+    'Direct message notifications': 'Direktnachrichten-Benachrichtigungen',
+    'Notification types': 'Benachrichtigungstypen',
+    'Mentions, replies, reactions, and zaps': 'Erwähnungen, Antworten, Reaktionen und Zaps',
+    'New private messages': 'Neue Direktnachrichten'
   }
 }

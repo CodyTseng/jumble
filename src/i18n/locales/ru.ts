@@ -1190,6 +1190,21 @@ export default {
     'Remove muted word': 'Удалить скрытое слово',
     'Failed to update muted word': 'Не удалось обновить скрытое слово',
     '(Visible to everyone)': '(видно всем)',
-    'Local muted words have not synced yet.': 'Локально скрытые слова ещё не синхронизированы.'
+    'Local muted words have not synced yet.': 'Локально скрытые слова ещё не синхронизированы.',
+    'System notifications': 'Системные уведомления',
+    'Show notifications while Jumble is running in the background':
+      'Показывать уведомления, пока Jumble работает в фоновом режиме',
+    'Notification permission was not granted': 'Разрешение на уведомления не предоставлено',
+    'replied to your note': 'ответил на вашу заметку',
+    'sent you a private message': 'отправил вам личное сообщение',
+    'Enable system notifications?': 'Включить системные уведомления?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Получайте уведомления о новых упоминаниях, реакциях, запах и личных сообщениях, пока Jumble работает в фоновом режиме.',
+    'Not now': 'Не сейчас',
+    'General notifications': 'Обычные уведомления',
+    'Direct message notifications': 'Уведомления о личных сообщениях',
+    'Notification types': 'Типы уведомлений',
+    'Mentions, replies, reactions, and zaps': 'Упоминания, ответы, реакции и запы',
+    'New private messages': 'Новые личные сообщения'
   }
 }

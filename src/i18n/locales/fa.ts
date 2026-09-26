@@ -1184,6 +1184,21 @@ export default {
     'Remove muted word': 'حذف واژهٔ بی‌صدا',
     'Failed to update muted word': 'به‌روزرسانی واژهٔ بی‌صدا ناموفق بود',
     '(Visible to everyone)': '(قابل مشاهده برای همه)',
-    'Local muted words have not synced yet.': 'واژه‌های بی‌صدای محلی هنوز همگام‌سازی نشده‌اند.'
+    'Local muted words have not synced yet.': 'واژه‌های بی‌صدای محلی هنوز همگام‌سازی نشده‌اند.',
+    'System notifications': 'اعلان‌های سیستم',
+    'Show notifications while Jumble is running in the background':
+      'نمایش اعلان‌ها هنگامی که Jumble در پس‌زمینه اجرا می‌شود',
+    'Notification permission was not granted': 'مجوز اعلان داده نشد',
+    'replied to your note': 'به یادداشت شما پاسخ داد',
+    'sent you a private message': 'یک پیام خصوصی برای شما فرستاد',
+    'Enable system notifications?': 'اعلان‌های سیستم فعال شوند؟',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'هنگامی که Jumble در پس‌زمینه اجرا می‌شود، از اشاره‌ها، واکنش‌ها، زپ‌ها و پیام‌های خصوصی جدید مطلع شوید.',
+    'Not now': 'الان نه',
+    'General notifications': 'اعلان‌های عمومی',
+    'Direct message notifications': 'اعلان‌های پیام مستقیم',
+    'Notification types': 'انواع اعلان‌ها',
+    'Mentions, replies, reactions, and zaps': 'اشاره‌ها، پاسخ‌ها، واکنش‌ها و زپ‌ها',
+    'New private messages': 'پیام‌های خصوصی جدید'
   }
 }

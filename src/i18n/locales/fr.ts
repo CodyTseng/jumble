@@ -1203,6 +1203,22 @@ export default {
     'Failed to update muted word': 'Échec de la mise à jour du mot masqué',
     '(Visible to everyone)': '(visible par tous)',
     'Local muted words have not synced yet.':
-      'Les mots masqués locaux ne sont pas encore synchronisés.'
+      'Les mots masqués locaux ne sont pas encore synchronisés.',
+    'System notifications': 'Notifications système',
+    'Show notifications while Jumble is running in the background':
+      'Afficher les notifications lorsque Jumble s’exécute en arrière-plan',
+    'Notification permission was not granted':
+      'L’autorisation d’envoyer des notifications n’a pas été accordée',
+    'replied to your note': 'a répondu à votre note',
+    'sent you a private message': 'vous a envoyé un message privé',
+    'Enable system notifications?': 'Activer les notifications système ?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Recevez des notifications pour les nouvelles mentions, réactions, zaps et messages privés lorsque Jumble s’exécute en arrière-plan.',
+    'Not now': 'Pas maintenant',
+    'General notifications': 'Notifications générales',
+    'Direct message notifications': 'Notifications de messages directs',
+    'Notification types': 'Types de notifications',
+    'Mentions, replies, reactions, and zaps': 'Mentions, réponses, réactions et zaps',
+    'New private messages': 'Nouveaux messages privés'
   }
 }

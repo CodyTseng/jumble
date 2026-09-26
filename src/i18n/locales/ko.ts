@@ -1169,6 +1169,21 @@ export default {
     'Remove muted word': '음소거 단어 삭제',
     'Failed to update muted word': '음소거 단어를 업데이트하지 못했습니다',
     '(Visible to everyone)': '(누구나 볼 수 있음)',
-    'Local muted words have not synced yet.': '이 기기의 음소거 단어가 아직 동기화되지 않았습니다.'
+    'Local muted words have not synced yet.': '이 기기의 음소거 단어가 아직 동기화되지 않았습니다.',
+    'System notifications': '시스템 알림',
+    'Show notifications while Jumble is running in the background':
+      'Jumble이 백그라운드에서 실행 중일 때 알림 표시',
+    'Notification permission was not granted': '알림 권한이 허용되지 않았습니다',
+    'replied to your note': '당신의 노트에 답글을 남겼습니다',
+    'sent you a private message': '당신에게 비공개 메시지를 보냈습니다',
+    'Enable system notifications?': '시스템 알림을 켤까요?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Jumble이 백그라운드에서 실행 중일 때 새로운 멘션, 반응, Zap 및 비공개 메시지 알림을 받습니다.',
+    'Not now': '나중에',
+    'General notifications': '일반 알림',
+    'Direct message notifications': '다이렉트 메시지 알림',
+    'Notification types': '알림 유형',
+    'Mentions, replies, reactions, and zaps': '멘션, 답글, 반응 및 Zap',
+    'New private messages': '새 비공개 메시지'
   }
 }

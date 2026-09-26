@@ -109,6 +109,10 @@ class LocalStorageService {
   private dmBackwardCursorMap: Record<string, number> = {}
   private processedSyncRequestIds: TProcessedSyncRequestIdMap = {}
   private disableNotificationSync: boolean = false
+  private systemNotificationsEnabled: boolean = false
+  private systemGeneralNotificationsEnabled: boolean = true
+  private systemDmNotificationsEnabled: boolean = true
+  private systemNotificationsPrompted: boolean = false
 
   constructor() {
     if (!LocalStorageService.instance) {
@@ -596,6 +600,18 @@ class LocalStorageService {
     this.disableNotificationSync =
       window.localStorage.getItem(StorageKey.DISABLE_NOTIFICATION_SYNC) === 'true'
 
+    this.systemNotificationsEnabled =
+      window.localStorage.getItem(StorageKey.SYSTEM_NOTIFICATIONS_ENABLED) === 'true'
+
+    this.systemGeneralNotificationsEnabled =
+      window.localStorage.getItem(StorageKey.SYSTEM_GENERAL_NOTIFICATIONS_ENABLED) !== 'false'
+
+    this.systemDmNotificationsEnabled =
+      window.localStorage.getItem(StorageKey.SYSTEM_DM_NOTIFICATIONS_ENABLED) !== 'false'
+
+    this.systemNotificationsPrompted =
+      window.localStorage.getItem(StorageKey.SYSTEM_NOTIFICATIONS_PROMPTED) === 'true'
+
     // Clean up deprecated data
     window.localStorage.removeItem(StorageKey.PINNED_PUBKEYS)
     window.localStorage.removeItem(StorageKey.ACCOUNT_PROFILE_EVENT_MAP)
@@ -631,6 +647,18 @@ class LocalStorageService {
         this.processedSyncRequestIds = this.parseProcessedSyncRequestIds(event.newValue)
         break
       }
+      case StorageKey.SYSTEM_NOTIFICATIONS_ENABLED:
+        this.systemNotificationsEnabled = event.newValue === 'true'
+        break
+      case StorageKey.SYSTEM_GENERAL_NOTIFICATIONS_ENABLED:
+        this.systemGeneralNotificationsEnabled = event.newValue !== 'false'
+        break
+      case StorageKey.SYSTEM_DM_NOTIFICATIONS_ENABLED:
+        this.systemDmNotificationsEnabled = event.newValue !== 'false'
+        break
+      case StorageKey.SYSTEM_NOTIFICATIONS_PROMPTED:
+        this.systemNotificationsPrompted = event.newValue === 'true'
+        break
     }
   }
 
@@ -1555,6 +1583,42 @@ class LocalStorageService {
   setDisableNotificationSync(disable: boolean) {
     this.disableNotificationSync = disable
     window.localStorage.setItem(StorageKey.DISABLE_NOTIFICATION_SYNC, disable.toString())
+  }
+
+  getSystemNotificationsEnabled() {
+    return this.systemNotificationsEnabled
+  }
+
+  setSystemNotificationsEnabled(enabled: boolean) {
+    this.systemNotificationsEnabled = enabled
+    window.localStorage.setItem(StorageKey.SYSTEM_NOTIFICATIONS_ENABLED, enabled.toString())
+  }
+
+  getSystemGeneralNotificationsEnabled() {
+    return this.systemGeneralNotificationsEnabled
+  }
+
+  setSystemGeneralNotificationsEnabled(enabled: boolean) {
+    this.systemGeneralNotificationsEnabled = enabled
+    window.localStorage.setItem(StorageKey.SYSTEM_GENERAL_NOTIFICATIONS_ENABLED, enabled.toString())
+  }
+
+  getSystemDmNotificationsEnabled() {
+    return this.systemDmNotificationsEnabled
+  }
+
+  setSystemDmNotificationsEnabled(enabled: boolean) {
+    this.systemDmNotificationsEnabled = enabled
+    window.localStorage.setItem(StorageKey.SYSTEM_DM_NOTIFICATIONS_ENABLED, enabled.toString())
+  }
+
+  getSystemNotificationsPrompted() {
+    return this.systemNotificationsPrompted
+  }
+
+  setSystemNotificationsPrompted(prompted: boolean) {
+    this.systemNotificationsPrompted = prompted
+    window.localStorage.setItem(StorageKey.SYSTEM_NOTIFICATIONS_PROMPTED, prompted.toString())
   }
 }
 

@@ -2,11 +2,7 @@ import Emoji from '@/components/Emoji'
 import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
-import {
-  SettingsGroup,
-  SettingsPageContainer,
-  SettingsRow
-} from '@/components/ui/settings'
+import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import { Switch } from '@/components/ui/switch'
 import { MEDIA_AUTO_LOAD_POLICY, NSFW_DISPLAY_POLICY } from '@/constants'
 import { LocalizedLanguageNames, TLanguage } from '@/i18n'
@@ -14,7 +10,6 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { isSupportCheckConnectionType } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
-import localStorage from '@/services/local-storage.service'
 import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
 import { RotateCcw } from 'lucide-react'
@@ -46,10 +41,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     showLinkPreviews,
     updateShowLinkPreviews
   } = useUserPreferences()
-  const [disableNotificationSync, setDisableNotificationSync] = useState(
-    localStorage.getDisableNotificationSync()
-  )
-
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
     setLanguage(value)
@@ -128,9 +119,7 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
             htmlFor="video-loop"
             title={t('Video loop')}
             description={t('Automatically replay videos when they end')}
-            control={
-              <Switch id="video-loop" checked={videoLoop} onCheckedChange={setVideoLoop} />
-            }
+            control={<Switch id="video-loop" checked={videoLoop} onCheckedChange={setVideoLoop} />}
           />
         </SettingsGroup>
 
@@ -214,24 +203,6 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
               }
             />
           )}
-        </SettingsGroup>
-
-        <SettingsGroup title={t('Notifications')}>
-          <SettingsRow
-            htmlFor="disable-notification-sync"
-            title={t('Do not sync notification read status')}
-            description={t('Only update read status locally without publishing to relays')}
-            control={
-              <Switch
-                id="disable-notification-sync"
-                checked={disableNotificationSync}
-                onCheckedChange={(checked) => {
-                  setDisableNotificationSync(checked)
-                  localStorage.setDisableNotificationSync(checked)
-                }}
-              />
-            }
-          />
         </SettingsGroup>
       </SettingsPageContainer>
     </SecondaryPageLayout>

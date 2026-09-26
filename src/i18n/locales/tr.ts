@@ -1188,6 +1188,21 @@ export default {
     'Failed to update muted word': 'Sessize alınan kelime güncellenemedi',
     '(Visible to everyone)': '(herkes görebilir)',
     'Local muted words have not synced yet.':
-      'Yerel olarak sessize alınan kelimeler henüz eşitlenmedi.'
+      'Yerel olarak sessize alınan kelimeler henüz eşitlenmedi.',
+    'System notifications': 'Sistem bildirimleri',
+    'Show notifications while Jumble is running in the background':
+      'Jumble arka planda çalışırken bildirimleri göster',
+    'Notification permission was not granted': 'Bildirim izni verilmedi',
+    'replied to your note': 'notunuza yanıt verdi',
+    'sent you a private message': 'size özel mesaj gönderdi',
+    'Enable system notifications?': 'Sistem bildirimleri etkinleştirilsin mi?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      "Jumble arka planda çalışırken yeni bahsetmeler, tepkiler, zap'ler ve özel mesajlar hakkında bildirim alın.",
+    'Not now': 'Şimdi değil',
+    'General notifications': 'Genel bildirimler',
+    'Direct message notifications': 'Doğrudan mesaj bildirimleri',
+    'Notification types': 'Bildirim türleri',
+    'Mentions, replies, reactions, and zaps': "Bahsetmeler, yanıtlar, tepkiler ve zap'ler",
+    'New private messages': 'Yeni özel mesajlar'
   }
 }

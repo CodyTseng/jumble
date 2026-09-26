@@ -42,14 +42,23 @@ export async function notificationFilter(
     pubkey,
     mutePubkeySet,
     hideContentMentioningMutedUsers,
-    meetsMinTrustScore
+    meetsMinTrustScore,
+    validateZapReceipt
   }: {
     pubkey?: string | null
     mutePubkeySet: Set<string>
     hideContentMentioningMutedUsers?: boolean
     meetsMinTrustScore: (pubkey: string) => Promise<boolean>
+    validateZapReceipt: (event: NostrEvent) => Promise<boolean>
   }
 ): Promise<boolean> {
+  // Zap receipts must be validated before trusting their embedded sender data.
+  // Keeping this in the shared filter makes the list, unread badge/count and
+  // native system notifications agree on which zaps actually exist.
+  if (event.kind === kinds.Zap && !(await validateZapReceipt(event))) {
+    return false
+  }
+
   const authorPubkey = getEventAuthorPubkey(event)
   if (
     mutePubkeySet.has(authorPubkey) ||

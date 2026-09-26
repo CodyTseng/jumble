@@ -1213,6 +1213,21 @@ export default {
     'Remove muted word': 'Remove muted word',
     'Failed to update muted word': 'Failed to update muted word',
     '(Visible to everyone)': '(Visible to everyone)',
-    'Local muted words have not synced yet.': 'Local muted words have not synced yet.'
+    'Local muted words have not synced yet.': 'Local muted words have not synced yet.',
+    'System notifications': 'System notifications',
+    'Show notifications while Jumble is running in the background':
+      'Show notifications while Jumble is running in the background',
+    'Notification permission was not granted': 'Notification permission was not granted',
+    'replied to your note': 'replied to your note',
+    'sent you a private message': 'sent you a private message',
+    'Enable system notifications?': 'Enable system notifications?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.',
+    'Not now': 'Not now',
+    'General notifications': 'General notifications',
+    'Direct message notifications': 'Direct message notifications',
+    'Notification types': 'Notification types',
+    'Mentions, replies, reactions, and zaps': 'Mentions, replies, reactions, and zaps',
+    'New private messages': 'New private messages'
   }
 }

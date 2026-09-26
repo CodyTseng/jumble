@@ -29,7 +29,8 @@ function filter(event: NostrEvent, pubkey: string | null = currentPubkey) {
   return notificationFilter(event, {
     pubkey,
     mutePubkeySet: new Set(),
-    meetsMinTrustScore: async () => true
+    meetsMinTrustScore: async () => true,
+    validateZapReceipt: async () => true
   })
 }
 
@@ -92,6 +93,19 @@ describe('notificationFilter', () => {
     })
 
     await expect(filter(event)).resolves.toBe(true)
+  })
+
+  it('filters an invalid zap receipt', async () => {
+    const event = createEvent({ kind: kinds.Zap })
+
+    await expect(
+      notificationFilter(event, {
+        pubkey: currentPubkey,
+        mutePubkeySet: new Set(),
+        meetsMinTrustScore: async () => true,
+        validateZapReceipt: async () => false
+      })
+    ).resolves.toBe(false)
   })
 })
 

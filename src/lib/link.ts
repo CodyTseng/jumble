@@ -72,6 +72,7 @@ export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
 export const toWallet = () => '/settings/wallet'
 export const toPostSettings = () => '/settings/posts'
 export const toGeneralSettings = () => '/settings/general'
+export const toNotificationSettings = () => '/settings/notifications'
 export const toAppearanceSettings = () => '/settings/appearance'
 export const toTranslation = () => '/settings/translation'
 export const toEmojiPackSettings = () => '/settings/emoji-packs'

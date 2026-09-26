@@ -12,6 +12,7 @@ import GeneralSettingsPage from '@/pages/secondary/GeneralSettingsPage'
 import MuteListPage from '@/pages/secondary/MuteListPage'
 import NoteListPage from '@/pages/secondary/NoteListPage'
 import NotePage from '@/pages/secondary/NotePage'
+import NotificationSettingsPage from '@/pages/secondary/NotificationSettingsPage'
 import OthersRelaySettingsPage from '@/pages/secondary/OthersRelaySettingsPage'
 import PostSettingsPage from '@/pages/secondary/PostSettingsPage'
 import ProfileEditorPage from '@/pages/secondary/ProfileEditorPage'
@@ -54,6 +55,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },
+  { path: '/settings/notifications', element: <NotificationSettingsPage /> },
   { path: '/settings/appearance', element: <AppearanceSettingsPage /> },
   { path: '/settings/translation', element: <TranslationPage /> },
   { path: '/settings/emoji-packs', element: <EmojiPackSettingsPage /> },

@@ -30,6 +30,9 @@ export const IPC_CHANNELS = {
   updateGetState: 'update:get-state',
   updateState: 'update:state',
   updateSetAuto: 'update:set-auto',
+  systemNotificationSupported: 'system-notification:supported',
+  systemNotificationShow: 'system-notification:show',
+  systemNotificationClick: 'system-notification:click',
   proxyFetch: 'proxy:fetch',
   mediaGetShimOrigin: 'media:get-shim-origin',
   pomegranateAuthenticate: 'pomegranate:authenticate',
@@ -172,6 +175,19 @@ export type TUpdateBridge = {
   setAutoUpdate: (enabled: boolean) => Promise<TUpdateState>
 }
 
+export type TSystemNotificationPayload = {
+  id: string
+  title: string
+  body?: string
+  target?: string
+}
+
+export type TSystemNotificationBridge = {
+  isSupported: () => Promise<boolean>
+  show: (notification: TSystemNotificationPayload) => Promise<boolean>
+  onClick: (cb: (target?: string) => void) => () => void
+}
+
 export type TProxyFetchOptions = {
   method?: string
   headers?: Record<string, string>
@@ -219,6 +235,7 @@ export type TElectronBridge = {
   localStorage: TLocalStorageBridge
   security: TSecurityBridge
   update: TUpdateBridge
+  notification: TSystemNotificationBridge
   proxy: TProxyBridge
   media: TMediaBridge
   pomegranate: TPomegranateBridge

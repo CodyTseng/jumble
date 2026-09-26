@@ -1178,6 +1178,21 @@ export default {
     'Remove muted word': '移除靜音詞彙',
     'Failed to update muted word': '更新靜音詞彙失敗',
     '(Visible to everyone)': '（所有人可見）',
-    'Local muted words have not synced yet.': '本機的靜音詞彙尚未同步。'
+    'Local muted words have not synced yet.': '本機的靜音詞彙尚未同步。',
+    'System notifications': '系統通知',
+    'Show notifications while Jumble is running in the background':
+      '當 Jumble 在背景執行時顯示通知',
+    'Notification permission was not granted': '未授予通知權限',
+    'replied to your note': '回覆了您的筆記',
+    'sent you a private message': '傳送了一則私人訊息給您',
+    'Enable system notifications?': '啟用系統通知？',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      '當 Jumble 在背景執行時，接收新提及、回應、Zap 和私人訊息的通知。',
+    'Not now': '稍後再說',
+    'General notifications': '一般通知',
+    'Direct message notifications': '私訊通知',
+    'Notification types': '通知類型',
+    'Mentions, replies, reactions, and zaps': '提及、回覆、互動和 Zap',
+    'New private messages': '新私訊'
   }
 }

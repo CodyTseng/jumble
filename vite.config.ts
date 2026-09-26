@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,png,jpg,svg}'],
         globDirectory: 'dist/',
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        cleanupOutdatedCaches: true
+        cleanupOutdatedCaches: true,
+        importScripts: ['/notification-sw.js']
       },
       devOptions: {
         enabled: true

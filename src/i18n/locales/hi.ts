@@ -1182,6 +1182,21 @@ export default {
     'Remove muted word': 'म्यूट शब्द हटाएँ',
     'Failed to update muted word': 'म्यूट शब्द अपडेट नहीं हो सका',
     '(Visible to everyone)': '(सभी को दिखाई देगा)',
-    'Local muted words have not synced yet.': 'स्थानीय म्यूट शब्द अभी सिंक नहीं हुए हैं।'
+    'Local muted words have not synced yet.': 'स्थानीय म्यूट शब्द अभी सिंक नहीं हुए हैं।',
+    'System notifications': 'सिस्टम सूचनाएँ',
+    'Show notifications while Jumble is running in the background':
+      'Jumble के बैकग्राउंड में चलने के दौरान सूचनाएँ दिखाएँ',
+    'Notification permission was not granted': 'सूचना की अनुमति नहीं दी गई',
+    'replied to your note': 'ने आपके नोट का जवाब दिया',
+    'sent you a private message': 'ने आपको एक निजी संदेश भेजा',
+    'Enable system notifications?': 'सिस्टम सूचनाएँ चालू करें?',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      'Jumble के बैकग्राउंड में चलने के दौरान नए उल्लेखों, प्रतिक्रियाओं, ज़ैप और निजी संदेशों की सूचनाएँ पाएँ।',
+    'Not now': 'अभी नहीं',
+    'General notifications': 'सामान्य सूचनाएं',
+    'Direct message notifications': 'सीधे संदेश की सूचनाएं',
+    'Notification types': 'सूचना के प्रकार',
+    'Mentions, replies, reactions, and zaps': 'उल्लेख, जवाब, प्रतिक्रियाएं और ज़ैप',
+    'New private messages': 'नए निजी संदेश'
   }
 }

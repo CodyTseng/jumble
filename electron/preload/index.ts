@@ -12,6 +12,7 @@ import {
   TSubClosePayload,
   TSubEosePayload,
   TSubEventPayload,
+  TSystemNotificationPayload,
   TUpdateState
 } from '../shared/ipc-types.js'
 
@@ -81,6 +82,16 @@ const bridge: TElectronBridge = {
       return () => ipcRenderer.off(IPC_CHANNELS.updateState, listener)
     },
     setAutoUpdate: (enabled: boolean) => ipcRenderer.invoke(IPC_CHANNELS.updateSetAuto, enabled)
+  },
+  notification: {
+    isSupported: () => ipcRenderer.invoke(IPC_CHANNELS.systemNotificationSupported),
+    show: (notification: TSystemNotificationPayload) =>
+      ipcRenderer.invoke(IPC_CHANNELS.systemNotificationShow, notification),
+    onClick: (cb) => {
+      const listener = (_e: unknown, target?: string) => cb(target)
+      ipcRenderer.on(IPC_CHANNELS.systemNotificationClick, listener)
+      return () => ipcRenderer.off(IPC_CHANNELS.systemNotificationClick, listener)
+    }
   },
   proxy: {
     fetch: (url: string, options?: TProxyFetchOptions) =>

@@ -1,11 +1,19 @@
 import { useDmUnread } from '@/hooks/useDmUnread'
 import { useNotificationFilter } from '@/hooks/useNotificationFilter'
+import { getEventAuthorPubkey } from '@/lib/event'
+import { toDmConversation } from '@/lib/link'
 import { getNotificationFilterType } from '@/lib/notification'
-import { usePrimaryPage } from '@/PageManager'
+import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import client from '@/services/client.service'
+import dmService from '@/services/dm.service'
 import notificationService from '@/services/notification.service'
 import storage from '@/services/local-storage.service'
+import systemNotification from '@/services/system-notification'
+import { TNotificationFilter } from '@/types'
+import { TFunction } from 'i18next'
 import { NostrEvent } from 'nostr-tools'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNostr } from './NostrProvider'
 import { useUserPreferences } from './UserPreferencesProvider'
 
@@ -17,6 +25,32 @@ type TNotificationContext = {
 }
 
 const NotificationContext = createContext<TNotificationContext | undefined>(undefined)
+const SYSTEM_NOTIFICATION_TARGET = '/?page=notifications'
+
+function isAppInForeground(): boolean {
+  return document.visibilityState === 'visible' && document.hasFocus()
+}
+
+function getSystemNotificationDescription(type: TNotificationFilter, t: TFunction): string {
+  switch (type) {
+    case 'likes':
+      return t('reacted to your note')
+    case 'reposts':
+      return t('reposted your note')
+    case 'zaps':
+      return t('zapped you')
+    case 'highlights':
+      return t('highlighted your note')
+    case 'pollResponses':
+      return t('voted in your poll')
+    case 'mentions':
+      return t('mentioned you in a note')
+    case 'replies':
+      return t('replied to your note')
+    case 'quotes':
+      return t('quoted your note')
+  }
+}
 
 export const useNotification = () => {
   const context = useContext(NotificationContext)
@@ -27,7 +61,9 @@ export const useNotification = () => {
 }
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const { current } = usePrimaryPage()
+  const { t } = useTranslation()
+  const { current, navigate } = usePrimaryPage()
+  const { push } = useSecondaryPage()
   const active = useMemo(() => current === 'notifications', [current])
   const { pubkey, notificationsSeenAt, updateNotificationsSeenAt } = useNostr()
   const { notificationTabs } = useUserPreferences()
@@ -38,8 +74,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [notificationTabs])
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
   const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
-  const { unreadCount: dmUnreadCount } = useDmUnread()
+  const { unreadCount: dmUnreadCount, shouldIncludeConversation } = useDmUnread()
   const wasActiveRef = useRef(false)
+  const notifiedDmMessageIdsRef = useRef(new Set<string>())
 
   useEffect(() => {
     if (!pubkey) {
@@ -53,6 +90,119 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       // keep the subscription alive for the session; only stop on logout (handled above)
     }
   }, [pubkey])
+
+  useEffect(
+    () =>
+      systemNotification.onClick((target) => {
+        if (target === SYSTEM_NOTIFICATION_TARGET) {
+          navigate('notifications')
+        } else if (target?.startsWith('/dms/')) {
+          navigate('dms')
+          push(target)
+        }
+      }),
+    [navigate, push]
+  )
+
+  useEffect(() => {
+    notifiedDmMessageIdsRef.current.clear()
+  }, [pubkey])
+
+  useEffect(() => {
+    let cancelled = false
+    const unsubscribe = dmService.onNewMessage((message) => {
+      const dispatch = async () => {
+        if (!pubkey || message.senderPubkey === pubkey) return
+
+        const notifiedIds = notifiedDmMessageIdsRef.current
+        if (notifiedIds.has(message.id)) return
+        notifiedIds.add(message.id)
+        if (notifiedIds.size > 1_000) {
+          const oldestId = notifiedIds.values().next().value
+          if (oldestId) notifiedIds.delete(oldestId)
+        }
+
+        if (
+          !storage.getSystemNotificationsEnabled() ||
+          !storage.getSystemDmNotificationsEnabled() ||
+          isAppInForeground()
+        ) {
+          return
+        }
+
+        const conversation = await dmService.getConversation(pubkey, message.senderPubkey)
+        if (cancelled || !conversation) return
+        if (!(await shouldIncludeConversation(conversation)) || cancelled) return
+
+        const profile = await client.fetchProfile(message.senderPubkey)
+        if (
+          cancelled ||
+          !storage.getSystemNotificationsEnabled() ||
+          !storage.getSystemDmNotificationsEnabled() ||
+          isAppInForeground()
+        ) {
+          return
+        }
+
+        await systemNotification.show({
+          id: `dm-${message.id}`,
+          title: 'Jumble',
+          body: `${profile?.username ?? message.senderPubkey.slice(0, 8)} ${t('sent you a private message')}`,
+          target: toDmConversation(message.senderPubkey)
+        })
+      }
+      void dispatch().catch(() => undefined)
+    })
+
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
+  }, [pubkey, shouldIncludeConversation, t])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const unsubscribe = notificationService.onNewEvent((event) => {
+      const dispatch = async () => {
+        if (
+          !storage.getSystemNotificationsEnabled() ||
+          !storage.getSystemGeneralNotificationsEnabled() ||
+          isAppInForeground()
+        ) {
+          return
+        }
+        if (!(await filterFn(event)) || cancelled) return
+
+        const type = getNotificationFilterType(event, pubkey)
+        if (!type || !unreadNotificationFilter.has(type)) return
+
+        const author = getEventAuthorPubkey(event)
+        const profile = await client.fetchProfile(author)
+        if (
+          cancelled ||
+          !storage.getSystemNotificationsEnabled() ||
+          !storage.getSystemGeneralNotificationsEnabled() ||
+          isAppInForeground()
+        ) {
+          return
+        }
+
+        await systemNotification.show({
+          id: event.id,
+          title: 'Jumble',
+          body: `${profile?.username ?? author.slice(0, 8)} ${getSystemNotificationDescription(type, t)}`,
+          target: SYSTEM_NOTIFICATION_TARGET
+        })
+      }
+      void dispatch().catch(() => undefined)
+    })
+
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
+  }, [pubkey, filterFn, unreadNotificationFilter, t])
 
   useEffect(() => {
     if (active) {

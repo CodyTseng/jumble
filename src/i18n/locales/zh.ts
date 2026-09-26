@@ -1178,6 +1178,21 @@ export default {
     'Remove muted word': '移除屏蔽词',
     'Failed to update muted word': '更新屏蔽词失败',
     '(Visible to everyone)': '（所有人可见）',
-    'Local muted words have not synced yet.': '本地屏蔽词尚未同步。'
+    'Local muted words have not synced yet.': '本地屏蔽词尚未同步。',
+    'System notifications': '系统通知',
+    'Show notifications while Jumble is running in the background':
+      '当 Jumble 在后台运行时显示通知',
+    'Notification permission was not granted': '未获得通知权限',
+    'replied to your note': '回复了你的帖子',
+    'sent you a private message': '给你发来一条私信',
+    'Enable system notifications?': '启用系统通知？',
+    'Get notified about new mentions, reactions, zaps, and private messages while Jumble is running in the background.':
+      '当 Jumble 在后台运行时，接收新提及、互动、Zap 和私信通知。',
+    'Not now': '暂不',
+    'General notifications': '普通通知',
+    'Direct message notifications': '私信通知',
+    'Notification types': '通知类型',
+    'Mentions, replies, reactions, and zaps': '提及、回复、互动和 Zap',
+    'New private messages': '新私信'
   }
 }

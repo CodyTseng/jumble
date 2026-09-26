@@ -1,16 +1,13 @@
 import AboutInfoDialog from '@/components/AboutInfoDialog'
 import Donation from '@/components/Donation'
 import DownloadDialog from '@/components/DownloadDialog'
-import {
-  SettingsGroup,
-  SettingsPageContainer,
-  SettingsRow
-} from '@/components/ui/settings'
+import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import {
   toAccountSettings,
   toAppearanceSettings,
   toEmojiPackSettings,
   toGeneralSettings,
+  toNotificationSettings,
   toPostSettings,
   toRelaySettings,
   toSystemSettings,
@@ -23,6 +20,7 @@ import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import storage from '@/services/local-storage.service'
 import {
+  Bell,
   Cog,
   ImageUp,
   Info,
@@ -62,6 +60,12 @@ export default function Settings() {
           title={t('Appearance')}
           chevron
           onClick={() => push(toAppearanceSettings())}
+        />
+        <SettingsRow
+          icon={<Bell />}
+          title={t('Notifications')}
+          chevron
+          onClick={() => push(toNotificationSettings())}
         />
         {!!pubkey && (
           <SettingsRow
@@ -152,9 +156,7 @@ export default function Settings() {
         <Donation />
       </div>
 
-      {showDownloadEntry && (
-        <DownloadDialog open={downloadOpen} onOpenChange={setDownloadOpen} />
-      )}
+      {showDownloadEntry && <DownloadDialog open={downloadOpen} onOpenChange={setDownloadOpen} />}
     </SettingsPageContainer>
   )
 }
