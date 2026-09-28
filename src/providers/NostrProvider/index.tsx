@@ -51,6 +51,8 @@ import { NostrConnectionSigner } from './nostrConnection.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
 
+const FOLLOW_LIST_SYNC_CHANNEL = 'jumble-follow-list-sync'
+
 type TNostrContext = {
   isInitialized: boolean
   pubkey: string | null
@@ -893,12 +895,38 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setProfile(getProfileFromEvent(newProfileEvent))
   }
 
+  // Keep follow/unfollow button state in sync across open Jumble tabs/windows
+  // for the same profile (BroadcastChannel; same-origin only).
+  useEffect(() => {
+    if (!account?.pubkey || typeof BroadcastChannel === 'undefined') return
+
+    const channel = new BroadcastChannel(FOLLOW_LIST_SYNC_CHANNEL)
+    channel.onmessage = async (message) => {
+      const event = message.data as Event | null
+      if (!event || event.kind !== kinds.Contacts || event.pubkey !== account.pubkey) return
+      const retained = await indexedDb.putReplaceableEvent(event)
+      if (retained.pubkey !== account.pubkey) return
+      setFollowListEvent(retained)
+      await client.updateFollowListCache(retained)
+    }
+
+    return () => {
+      channel.close()
+    }
+  }, [account?.pubkey])
+
   const updateFollowListEvent = async (followListEvent: Event) => {
     const newFollowListEvent = await indexedDb.putReplaceableEvent(followListEvent)
     if (newFollowListEvent.id !== followListEvent.id) return
 
     setFollowListEvent(newFollowListEvent)
     await client.updateFollowListCache(newFollowListEvent)
+
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel(FOLLOW_LIST_SYNC_CHANNEL)
+      channel.postMessage(newFollowListEvent)
+      channel.close()
+    }
   }
 
   const updateMuteListEvent = async (muteListEvent: Event, privateTags: string[][]) => {
