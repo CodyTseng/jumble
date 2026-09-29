@@ -25,6 +25,96 @@ const MentionList = forwardRef<MentionListHandle, MentionListProps>((props, ref)
   const { isUserTrusted } = useUserTrust()
 
   const items = useMemo(() => {
+  const nostrLists = notification.tags.filter(tag => tag[0] === 'e' && tag[3] === '30000');
+  const listItems = nostrLists.flatMap(list => {
+    const listEvent = await client.fetchEvent(list[1]);
+    if (listEvent) {
+      return listEvent.tags.filter(tag => tag[0] === 'p').map(tag => tag[1]);
+    }
+  });
+  return [...items, ...listItems];
+}, [props.items, followingSet, isUserTrusted])
+
+const selectItem = (index: number) => {
+  const item = items[index];
+
+  if (item) {
+    props.command({ id: item, label: formatNpub(item) });
+  }
+}
+
+const upHandler = () => {
+  setSelectedIndex((selectedIndex + items.length - 1) % items.length);
+}
+
+const downHandler = () => {
+  setSelectedIndex((selectedIndex + 1) % items.length);
+}
+
+const enterHandler = () => {
+  selectItem(selectedIndex);
+}
+
+useEffect(() => {
+  setSelectedIndex(items.length ? 0 : -1);
+}, [items]);
+
+useImperativeHandle(ref, () => ({
+  onKeyDown: ({ event }) => {
+    if (!items.length) return false;
+    if (event.key === 'ArrowUp') {
+      upHandler();
+      return true;
+    }
+
+    if (event.key === 'ArrowDown') {
+      downHandler();
+      return true;
+    }
+
+    if (event.key === 'Enter' && selectedIndex >= 0) {
+      enterHandler();
+      return true;
+    }
+
+    return false;
+  }
+}))
+
+if (!items.length) {
+  return null;
+}
+
+return (
+  <ScrollArea
+    className="bg-background pointer-events-auto z-50 flex max-h-80 flex-col overflow-y-auto rounded-lg border"
+    onWheel={(e) => e.stopPropagation()}
+    onTouchMove={(e) => e.stopPropagation()}
+  >
+    {items.map((item, index) => (
+      <button
+        className={cn(
+          'm-1 cursor-pointer items-center rounded-md p-2 text-start outline-hidden transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+          selectedIndex === index && 'bg-accent text-accent-foreground'
+        )}
+        key={item}
+        onClick={() => selectItem(index)}
+        onMouseEnter={() => setSelectedIndex(index)}
+      >
+        <div className="pointer-events-none flex w-80 max-w-[calc(100vw-3rem)] items-center gap-2 truncate">
+          <SimpleUserAvatar userId={item} />
+          <div className="w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <SimpleUsername userId={item} className="truncate font-semibold" />
+              <FollowingBadge userId={item} />
+            </div>
+            <Nip05 pubkey={userIdToPubkey(item)} />
+          </div>
+        </div>
+      </button>
+    ))}
+  </ScrollArea>
+);
     const tier = (npub: string) => {
       const pubkey = userIdToPubkey(npub)
       if (followingSet.has(pubkey)) return 0
