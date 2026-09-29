@@ -60,6 +60,7 @@ export const StorageKey = {
   QUICK_REACTION: 'quickReaction',
   QUICK_REACTION_EMOJI: 'quickReactionEmoji',
   NSFW_DISPLAY_POLICY: 'nsfwDisplayPolicy',
+  HIDE_FOLLOWED_USERS_PER_FEED: 'hideFollowedUsersPerFeed',
   DEFAULT_RELAY_URLS: 'defaultRelayUrls',
   MUTED_WORDS: 'mutedWords',
   // Recheck accounts marked by the earlier migration, which could finish with no local words loaded.

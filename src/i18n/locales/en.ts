@@ -76,6 +76,7 @@ export default {
     'no replies': 'no replies',
     'Reply to': 'Reply to',
     Search: 'Search',
+    'Hide posts from followed users': 'Hide posts from followed users',
     'The relays you are connected to do not support search':
       'The relays you are connected to do not support search',
     'Show more...': 'Show more...',

@@ -84,6 +84,7 @@ class LocalStorageService {
   private addClientTag: boolean = false
   private defaultMinPow: number | null = null
   private nsfwDisplayPolicy: TNsfwDisplayPolicy = NSFW_DISPLAY_POLICY.HIDE_CONTENT
+  private hideFollowedUsersPerFeed: Record<string, boolean> = {}
   private defaultRelayUrls: string[] = BIG_RELAY_URLS
   private searchRelayUrls: string[] = SEARCHABLE_RELAY_URLS
   private searchHistory: string[] = []
@@ -287,6 +288,20 @@ class LocalStorageService {
       this.nsfwDisplayPolicy =
         defaultShowNsfwStr === 'true' ? NSFW_DISPLAY_POLICY.SHOW : NSFW_DISPLAY_POLICY.HIDE_CONTENT
       window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, this.nsfwDisplayPolicy)
+    }
+
+    const hideFollowedUsersPerFeedStr = window.localStorage.getItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_FEED
+    )
+    if (hideFollowedUsersPerFeedStr) {
+      try {
+        const map = JSON.parse(hideFollowedUsersPerFeedStr)
+        if (typeof map === 'object' && map !== null) {
+          this.hideFollowedUsersPerFeed = map
+        }
+      } catch {
+        // Invalid JSON, use default
+      }
     }
 
     this.dismissedTooManyRelaysAlert =
@@ -1349,6 +1364,18 @@ class LocalStorageService {
   setNsfwDisplayPolicy(policy: TNsfwDisplayPolicy) {
     this.nsfwDisplayPolicy = policy
     window.localStorage.setItem(StorageKey.NSFW_DISPLAY_POLICY, policy)
+  }
+
+  getHideFollowedUsersForFeed(feedKey: string) {
+    return this.hideFollowedUsersPerFeed[feedKey] ?? false
+  }
+
+  setHideFollowedUsersForFeed(feedKey: string, hide: boolean) {
+    this.hideFollowedUsersPerFeed[feedKey] = hide
+    window.localStorage.setItem(
+      StorageKey.HIDE_FOLLOWED_USERS_PER_FEED,
+      JSON.stringify(this.hideFollowedUsersPerFeed)
+    )
   }
 
   getMinTrustScore() {

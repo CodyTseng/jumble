@@ -9,6 +9,7 @@ import { useKindFilter } from '@/providers/KindFilterProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import { TFeedSubRequest, TFeedTabConfig } from '@/types'
+import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import KindFilter from '../KindFilter'
 import { RefreshButton } from '../RefreshButton'
@@ -20,6 +21,7 @@ export default function NormalFeed({
   showRelayCloseReason = false,
   disable24hMode = false,
   onRefresh,
+  filterFn,
   isPubkeyFeed = false
 }: {
   feedId: string
@@ -28,6 +30,7 @@ export default function NormalFeed({
   showRelayCloseReason?: boolean
   disable24hMode?: boolean
   onRefresh?: () => void
+  filterFn?: (event: Event) => boolean
   isPubkeyFeed?: boolean
 }) {
   const { getShowKinds } = useKindFilter()
@@ -148,6 +151,7 @@ export default function NormalFeed({
             hideReplies={hideReplies}
             areAlgoRelays={areAlgoRelays}
             showRelayCloseReason={showRelayCloseReason}
+            filterFn={filterFn}
             isPubkeyFeed={isPubkeyFeed}
             trustScoreThreshold={trustScoreThreshold}
           />
