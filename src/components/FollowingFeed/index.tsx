@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { SPECIAL_FEED_ID } from '@/constants'
 import { usePrimaryPage } from '@/PageManager'
 import { useFollowList } from '@/providers/FollowListProvider'
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
 import { TFeedSubRequest } from '@/types'
