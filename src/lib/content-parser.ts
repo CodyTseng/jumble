@@ -9,7 +9,9 @@ import {
   X_URL_REGEX,
   YOUTUBE_URL_REGEX
 } from '@/constants'
+import { LinkifyIt } from 'linkify-it'
 import { nip19 } from 'nostr-tools'
+import tlds from 'tlds'
 import { isImage, isMedia } from './url'
 
 export type TEmbeddedNodeType =
@@ -22,6 +24,7 @@ export type TEmbeddedNodeType =
   | 'hashtag'
   | 'websocket-url'
   | 'url'
+  | 'bare-url'
   | 'emoji'
   | 'invoice'
   | 'youtube'
@@ -184,6 +187,34 @@ export const EmbeddedUrlParser: TContentParser = (content: string) => {
       type: 'text',
       data: content.slice(lastIndex)
     })
+  }
+  return result
+}
+
+// Bare domains (jumble.social/notes, www.habla.news) link the way people expect
+// from other apps. Only scheme-less matches count, on the full IANA TLD list;
+// explicit URLs are EmbeddedUrlParser's. A match is an inference, so it
+// renders as an inline link, never a preview card. Run this parser last, so
+// URLs and nostr references claim their text first.
+const bareDomainLinkify = new LinkifyIt({
+  fuzzyLink: true,
+  fuzzyEmail: false,
+  fuzzyIP: false
+}).tlds(tlds, true)
+
+export const EmbeddedBareDomainParser: TContentParser = (content: string) => {
+  const result: TEmbeddedNode[] = []
+  let lastIndex = 0
+  for (const match of bareDomainLinkify.match(content) ?? []) {
+    if (match.schema !== '' || match.index < lastIndex) continue
+    if (match.index > lastIndex) {
+      result.push({ type: 'text', data: content.slice(lastIndex, match.index) })
+    }
+    result.push({ type: 'bare-url', data: match.raw })
+    lastIndex = match.lastIndex
+  }
+  if (lastIndex < content.length) {
+    result.push({ type: 'text', data: content.slice(lastIndex) })
   }
   return result
 }

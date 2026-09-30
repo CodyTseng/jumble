@@ -1,5 +1,6 @@
 import { useTranslatedEvent } from '@/hooks'
 import {
+  EmbeddedBareDomainParser,
   EmbeddedEmojiParser,
   EmbeddedEventParser,
   EmbeddedHashtagParser,
@@ -78,7 +79,8 @@ export default function Content({
         EmbeddedLegacyEventParser,
         EmbeddedLegacyMentionParser,
         EmbeddedHashtagParser,
-        EmbeddedEmojiParser
+        EmbeddedEmojiParser,
+        EmbeddedBareDomainParser
       ])
 
       const imetaInfos = event ? getImetaInfosFromEvent(event) : []
@@ -240,6 +242,13 @@ export default function Content({
           }
           if (node.type === 'url') {
             return <ExternalLink url={node.data} key={index} />
+          }
+          if (node.type === 'bare-url') {
+            return (
+              <ExternalLink url={`https://${node.data}`} key={index}>
+                {node.data}
+              </ExternalLink>
+            )
           }
           if (node.type === 'invoice') {
             return <EmbeddedLNInvoice invoice={node.data} key={index} className="mt-2" />
