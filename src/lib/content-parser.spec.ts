@@ -14,6 +14,7 @@ const EVENT_ID = 'dc0685a5b90eebbc473d19123550c032c3af596cfcec62927a7c70add5fc8c
 const npub = nip19.npubEncode(PUBKEY)
 const nevent = nip19.neventEncode({ id: EVENT_ID })
 const note = nip19.noteEncode(EVENT_ID)
+const nprofile = nip19.nprofileEncode({ pubkey: PUBKEY })
 
 // Mirrors the order used by the renderers: prefixed refs, then URLs, then bare.
 const PARSERS = [
@@ -56,6 +57,45 @@ describe('bare nostr references', () => {
     expect(nodes.map((n) => n.type)).toEqual(['text', 'mention', 'text'])
     expect(nodes[0].data).toBe('before ')
     expect(nodes[2].data).toBe(' after')
+  })
+})
+
+describe('@-prefixed bare mentions', () => {
+  it('renders @npub as a mention without a stray @', () => {
+    expect(parse(`@${npub} gm`)).toEqual([
+      { type: 'mention', data: `nostr:${npub}` },
+      { type: 'text', data: ' gm' }
+    ])
+  })
+
+  it('folds the @ in mid-sentence', () => {
+    expect(parse(`gm @${npub}!`)).toEqual([
+      { type: 'text', data: 'gm ' },
+      { type: 'mention', data: `nostr:${npub}` },
+      { type: 'text', data: '!' }
+    ])
+  })
+
+  it('handles @nprofile', () => {
+    expect(find(`gm @${nprofile}`, 'mention')?.data).toBe(`nostr:${nprofile}`)
+  })
+
+  it('does not match an @ref glued to a preceding token', () => {
+    expect(parse(`user@${npub}`)).toEqual([{ type: 'text', data: `user@${npub}` }])
+  })
+})
+
+describe('@-prefixed nostr mentions', () => {
+  it('renders @nostr:npub as a mention without a stray @', () => {
+    expect(parse(`@nostr:${npub}`)).toEqual([{ type: 'mention', data: `nostr:${npub}` }])
+  })
+
+  it('folds the @ in mid-sentence', () => {
+    expect(parse(`gm @nostr:${nprofile}!`)).toEqual([
+      { type: 'text', data: 'gm ' },
+      { type: 'mention', data: `nostr:${nprofile}` },
+      { type: 'text', data: '!' }
+    ])
   })
 })
 

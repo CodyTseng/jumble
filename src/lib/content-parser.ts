@@ -67,8 +67,11 @@ function createBareReferenceParser(
     let lastIndex = 0
 
     for (const match of content.matchAll(regex)) {
-      const start = match.index!
+      let start = match.index!
       const end = start + match[0].length
+      // Some clients write a mention as `@npub1…`. The mention already renders
+      // its own `@`, so consume that prefix instead of leaving it as text.
+      if (type === 'mention' && content[start - 1] === '@') start--
       const before = start === 0 ? '' : content[start - 1]
       const after = content.slice(end)
 
@@ -202,11 +205,15 @@ export function parseContent(content: string, parsers: TContentParser[]) {
         let lastIndex = 0
         for (const match of matches) {
           const matchStart = match.index!
+          const nodeStart =
+            parser.type === 'mention' && node.data[matchStart - 1] === '@'
+              ? matchStart - 1
+              : matchStart
           // Add text before the match
-          if (matchStart > lastIndex) {
+          if (nodeStart > lastIndex) {
             result.push({
               type: 'text',
-              data: node.data.slice(lastIndex, matchStart)
+              data: node.data.slice(lastIndex, nodeStart)
             })
           }
 
