@@ -1,5 +1,6 @@
 import { useFetchRelayInfo } from '@/hooks'
 import { toRelay } from '@/lib/link'
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
