@@ -3,6 +3,39 @@ import { useTranslationService } from '@/providers/TranslationServiceProvider'
 import { TTranslationAccount } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { WebSocket } from 'ws';
+
+let ws: WebSocket | null = null;
+
+const connectWebSocket = (pubkey: string) => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    return;
+  }
+
+  ws = new WebSocket(`wss://your-websocket-endpoint.com?pubkey=${pubkey}`);
+
+  ws.onopen = () => {
+    console.log('WebSocket connected');
+  };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'accountUpdate') {
+      setAccount(data.account);
+    }
+  };
+
+  ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+  };
+};
+
+const disconnectWebSocket = () => {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+};
 
 type TJumbleTranslateAccountContext = {
   account: TTranslationAccount | null
@@ -33,10 +66,18 @@ export function JumbleTranslateAccountProvider({ children }: { children: React.R
     setAccount(null)
     if (!pubkey) return
 
+    connectWebSocket(pubkey);
+
     setTimeout(() => {
       getAccount()
     }, 100)
   }, [pubkey])
+
+  useEffect(() => {
+    return () => {
+      disconnectWebSocket();
+    };
+  }, [])
 
   const regenerateApiKey = async (): Promise<void> => {
     try {
