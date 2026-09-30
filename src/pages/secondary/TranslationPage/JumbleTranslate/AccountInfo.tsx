@@ -16,6 +16,13 @@ export function AccountInfo() {
   const { t } = useTranslation()
   const { pubkey, startLogin } = useNostr()
   const { account } = useJumbleTranslateAccount()
+
+  useEffect(() => {
+    if (account) {
+      // Trigger a re-render when the account changes
+      setAccount(account);
+    }
+  }, [account])
   const [showApiKey, setShowApiKey] = useState(false)
   const [copied, setCopied] = useState(false)
 
