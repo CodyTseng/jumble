@@ -8,6 +8,15 @@ import { forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import BlossomServerListSetting from './BlossomServerListSetting'
 import MediaUploadServiceSetting from './MediaUploadServiceSetting'
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' // Add this line for the toggle provider hook
+import { useHideFollowedPosts } from '@/providers/HideFollowedPostsProvider' //Add
 
 const PostSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t } = useTranslation()
