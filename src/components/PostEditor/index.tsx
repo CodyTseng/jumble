@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { toNote } from '@/lib/link'
+import { toNewArticle, toNote } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useDraftBox } from '@/providers/DraftBoxProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -124,6 +124,13 @@ export default function PostEditor({
     })
   }
 
+  const navigateToArticleEditor = () => {
+    runWithSaveGuard(() => {
+      closeWithoutConfirm()
+      push(toNewArticle())
+    })
+  }
+
   const closeEditor = closeWithoutConfirm
 
   const handleOpenChange = (next: boolean) => {
@@ -185,6 +192,7 @@ export default function PostEditor({
         openFrom={openFrom}
         highlightedText={highlightedText}
         initialDraft={resolvedInitialDraft}
+        onOpenArticle={navigateToArticleEditor}
       />
     )
   }, [highlightedText, resolvedInitialDraft])
@@ -244,7 +252,7 @@ export default function PostEditor({
             <div className="space-y-4 px-4 pb-2">
               <div className="space-y-1 text-center">
                 <div className="text-base font-semibold">{t('Save as draft?')}</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   {t('Your changes will be saved to the drafts box.')}
                 </div>
               </div>

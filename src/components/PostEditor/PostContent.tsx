@@ -30,7 +30,7 @@ import postDraftService from '@/services/post-draft.service'
 import { TAccount, TPollCreateData, TPostTargetItem } from '@/types'
 import { TPostDraftUnsigned } from '@/types/post-draft'
 import { Content } from '@tiptap/react'
-import { CircleHelp, ImageUp, ListTodo, Lock, Settings, Smile, X } from 'lucide-react'
+import { CircleHelp, FilePenLine, ImageUp, ListTodo, Lock, Settings, Smile, X } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
 import {
   forwardRef,
@@ -64,6 +64,7 @@ type Props = {
   close: () => void
   requestClose?: () => void
   onOpenDrafts?: () => void
+  onOpenArticle?: () => void
   onParentClick?: (parentEvent: Event) => void
   openFrom?: string[]
   highlightedText?: string
@@ -77,6 +78,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     close,
     requestClose,
     onOpenDrafts,
+    onOpenArticle,
     onParentClick,
     openFrom,
     highlightedText,
@@ -611,6 +613,18 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
               <Smile />
             </Button>
           </ExpressionPickerDialog>
+          {!initialParentStuff && !highlightedText && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              title={t('Long-form article')}
+              aria-label={t('Long-form article')}
+              onClick={() => onOpenArticle?.()}
+            >
+              <FilePenLine />
+            </Button>
+          )}
           {!initialParentStuff && (
             <Button
               variant="ghost"
