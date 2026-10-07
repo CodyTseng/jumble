@@ -21,7 +21,7 @@ export type TSignedDraftInput = Omit<
 
 /**
  * Everything needed to take an unsigned, already-persisted draft through the
- * relay-lookup → sign → pending → publish pipeline. The signer is built by the
+ * parallel relay lookup/signing → pending → publish pipeline. The signer is built by the
  * renderer (it may require NIP-07/bunker interaction) and handed in.
  */
 export type TSendInput = {
@@ -167,17 +167,16 @@ class PostDraftService extends EventTarget {
   }
 
   /**
-   * Send an already-persisted draft: resolve its relays, sign it, move it into
+   * Send an already-persisted draft: resolve its relays and sign it in parallel, then move it into
    * the immutable `pending` outbox, then broadcast — all in the background. The
    * "Sending..." toast is surfaced immediately (via `publish-start`) and tracks
    * the whole chain, so a failure in relay lookup or signing reports too. The
    * caller persists the draft first (`saveDraft`) and closes the editor right
    * after calling this; nothing here needs to be awaited.
    *
-   * Relays are resolved BEFORE signing on purpose: signing is the last fallible
-   * step before the event becomes immutable, so the moment we have a signature
-   * we persist it as `pending` and never lose it (the signed-event-immutable
-   * rule). If signing/relay lookup fails, the record stays an editable `draft`.
+   * Relay lookup must not delay the signer prompt. Both operations must succeed
+   * before we persist the signed event and its concrete relay set as `pending`.
+   * If signing/relay lookup fails, the record stays an editable `draft`.
    */
   async send(input: TSendInput): Promise<void> {
     const promise = this.runSend(input)
@@ -203,26 +202,24 @@ class PostDraftService extends EventTarget {
       highlightedText
     } = input
 
-    // Resolve the concrete relay set first (needs the user's relay context but
-    // not a signature), so once signing succeeds we go straight to pending.
-    const targetRelays = await client.determineTargetRelays(
-      { ...draftEvent, pubkey } as NostrEvent,
-      publishOptions
-    )
-
-    let signed: VerifiedEvent
-    if (minPow && minPow > 0) {
-      this.setMiningDifficulty(id, minPow)
-      let mined: Awaited<ReturnType<typeof minePow>>
-      try {
-        mined = await minePow({ ...draftEvent, pubkey }, minPow)
-      } finally {
-        this.setMiningDifficulty(id)
-      }
-      signed = await signer.signEvent(mined)
-    } else {
-      signed = await signer.signEvent(draftEvent)
-    }
+    // Start signing immediately; relay discovery does not need a signature.
+    // Promise.all also observes both rejections if either operation fails first.
+    const [signed, targetRelays] = await Promise.all([
+      (async (): Promise<VerifiedEvent> => {
+        if (minPow && minPow > 0) {
+          this.setMiningDifficulty(id, minPow)
+          let mined: Awaited<ReturnType<typeof minePow>>
+          try {
+            mined = await minePow({ ...draftEvent, pubkey }, minPow)
+          } finally {
+            this.setMiningDifficulty(id)
+          }
+          return signer.signEvent(mined)
+        }
+        return signer.signEvent(draftEvent)
+      })(),
+      client.determineTargetRelays({ ...draftEvent, pubkey } as NostrEvent, publishOptions)
+    ])
     deleteDraftEventCache(draftEvent)
 
     // Signed → persist as immutable pending, then broadcast.

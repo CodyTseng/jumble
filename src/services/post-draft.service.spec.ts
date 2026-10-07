@@ -1,5 +1,6 @@
 import { minePow } from '@/lib/event'
 import client from '@/services/client.service'
+import indexedDb from '@/services/indexed-db.service'
 import { ISigner } from '@/types'
 import type { VerifiedEvent } from 'nostr-tools'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -87,6 +88,90 @@ describe('post PoW progress', () => {
       await expect(toastPromise).rejects.toThrow('Mining failed')
       expect(postDraftService.getMiningDifficulty(draft.id)).toBeUndefined()
       expect(draft.signer.signEvent).not.toHaveBeenCalled()
+      expect(client.publishEvent).not.toHaveBeenCalled()
+    } finally {
+      postDraftService.removeEventListener('publish-start', onStart)
+    }
+  })
+})
+
+describe('parallel post signing and relay lookup', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.mocked(client.determineTargetRelays).mockResolvedValue(['wss://relay.example'])
+    vi.mocked(client.publishEvent).mockResolvedValue(undefined)
+  })
+
+  it('requests signing while relay lookup is pending and waits for relays before publishing', async () => {
+    const draft = input('slow-relays', 0)
+    let finishLookup!: (relays: string[]) => void
+    vi.mocked(client.determineTargetRelays).mockReturnValue(
+      new Promise((resolve) => {
+        finishLookup = resolve
+      })
+    )
+
+    const send = postDraftService.send(draft)
+    expect(draft.signer.signEvent).toHaveBeenCalledWith(draft.draftEvent)
+    await Promise.resolve()
+    expect(indexedDb.putPostDraft).not.toHaveBeenCalled()
+    expect(client.publishEvent).not.toHaveBeenCalled()
+
+    finishLookup(['wss://target.example'])
+    await send
+    expect(indexedDb.putPostDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'pending',
+        signedEvent: signed,
+        targetRelays: ['wss://target.example']
+      })
+    )
+    expect(client.publishEvent).toHaveBeenCalledWith(['wss://target.example'], signed)
+  })
+
+  it('looks up relays while signing is pending and waits for the signature before publishing', async () => {
+    const draft = input('slow-signing', 0)
+    let finishSigning!: (event: VerifiedEvent) => void
+    vi.mocked(draft.signer.signEvent).mockReturnValue(
+      new Promise((resolve) => {
+        finishSigning = resolve
+      })
+    )
+
+    const send = postDraftService.send(draft)
+    expect(client.determineTargetRelays).toHaveBeenCalledWith(
+      { ...draft.draftEvent, pubkey: draft.pubkey },
+      draft.publishOptions
+    )
+    await Promise.resolve()
+    expect(client.publishEvent).not.toHaveBeenCalled()
+
+    finishSigning(signed)
+    await send
+    expect(client.publishEvent).toHaveBeenCalledWith(['wss://relay.example'], signed)
+  })
+
+  it('does not publish after signing is cancelled, even if relay lookup fails later', async () => {
+    const draft = input('cancelled-signing', 0)
+    let failLookup!: (error: Error) => void
+    vi.mocked(client.determineTargetRelays).mockReturnValue(
+      new Promise((_, reject) => {
+        failLookup = reject
+      })
+    )
+    vi.mocked(draft.signer.signEvent).mockRejectedValue(new Error('Signing cancelled'))
+    let toastPromise: Promise<unknown> | undefined
+    const onStart = (event: Event) => {
+      toastPromise = (event as CustomEvent).detail.promise
+      void toastPromise?.catch(() => {})
+    }
+    postDraftService.addEventListener('publish-start', onStart)
+    try {
+      await postDraftService.send(draft)
+      await expect(toastPromise).rejects.toThrow('Signing cancelled')
+      failLookup(new Error('Relay lookup failed'))
+      await Promise.resolve()
+      expect(indexedDb.putPostDraft).not.toHaveBeenCalled()
       expect(client.publishEvent).not.toHaveBeenCalled()
     } finally {
       postDraftService.removeEventListener('publish-start', onStart)

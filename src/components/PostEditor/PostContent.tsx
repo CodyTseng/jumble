@@ -384,7 +384,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         }
 
         // Hand off to the outbox: it surfaces the "Sending..." toast right away,
-        // then resolves relays → signs → moves the draft into the immutable
+        // then resolves relays and signs in parallel → moves the draft into the immutable
         // pending queue → publishes, all in the background.
         postDraftService.send({
           id: draftIdRef.current,
