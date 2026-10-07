@@ -1217,6 +1217,7 @@ export default {
     'Clone URLs': 'クローン URL',
     'Branches and tags': 'ブランチとタグ',
     Target: '対象',
-    Maintainers: 'メンテナー'
+    Maintainers: 'メンテナー',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW を計算中（難易度 {{minPow}}）…'
   }
 }

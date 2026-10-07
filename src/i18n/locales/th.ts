@@ -1198,6 +1198,7 @@ export default {
     'Clone URLs': 'URL สำหรับโคลน',
     'Branches and tags': 'แบรนช์และแท็ก',
     Target: 'เป้าหมาย',
-    Maintainers: 'ผู้ดูแล'
+    Maintainers: 'ผู้ดูแล',
+    'Computing PoW (difficulty {{minPow}})...': 'กำลังคำนวณ PoW (ความยาก {{minPow}})...'
   }
 }

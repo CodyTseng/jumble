@@ -1217,6 +1217,7 @@ export default {
     'Clone URLs': 'نشانی‌های کلون',
     'Branches and tags': 'شاخه‌ها و برچسب‌ها',
     Target: 'هدف',
-    Maintainers: 'نگه‌دارندگان'
+    Maintainers: 'نگه‌دارندگان',
+    'Computing PoW (difficulty {{minPow}})...': 'در حال محاسبه PoW (سختی {{minPow}})...'
   }
 }

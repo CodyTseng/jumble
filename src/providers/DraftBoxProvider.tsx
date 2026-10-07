@@ -1,6 +1,6 @@
 import { toastPromise } from '@/lib/toast'
 import { useNostr } from '@/providers/NostrProvider'
-import postDraftService from '@/services/post-draft.service'
+import postDraftService, { useMiningDifficulty } from '@/services/post-draft.service'
 import { TPostDraft, TPostDraftStatus } from '@/types/post-draft'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,14 @@ const DraftBoxContext = createContext<TDraftBoxContext | undefined>(undefined)
 
 // Slightly longer than the drawer/dialog close animation (~150ms).
 const DRAFT_BOX_CLOSE_MS = 200
+
+function PublishLoadingMessage({ id }: { id: string }) {
+  const { t } = useTranslation()
+  const minPow = useMiningDifficulty(id)
+  return minPow === undefined
+    ? t('Sending...')
+    : t('Computing PoW (difficulty {{minPow}})...', { minPow })
+}
 
 export function useDraftBox(): TDraftBoxContext {
   const ctx = useContext(DraftBoxContext)
@@ -104,9 +112,9 @@ export function DraftBoxProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const onStart = (e: Event) => {
-      const { promise } = (e as CustomEvent).detail as { id: string; promise: Promise<unknown> }
+      const { id, promise } = (e as CustomEvent).detail as { id: string; promise: Promise<unknown> }
       toastPromise(promise, {
-        loading: t('Sending...'),
+        loading: <PublishLoadingMessage id={id} />,
         success: t('Post successful'),
         // Keep the toast short and calm: the per-relay reasons are saved on the
         // failed draft and shown there, so we only point the user to it.

@@ -1215,6 +1215,7 @@ export default {
     'Clone URLs': 'क्लोन URL',
     'Branches and tags': 'ब्रांच और टैग',
     Target: 'लक्ष्य',
-    Maintainers: 'मेंटेनर'
+    Maintainers: 'मेंटेनर',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW की गणना हो रही है (कठिनाई {{minPow}})...'
   }
 }

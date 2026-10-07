@@ -1221,6 +1221,7 @@ export default {
     'Clone URLs': "Klonlama URL'leri",
     'Branches and tags': 'Dallar ve etiketler',
     Target: 'Hedef',
-    Maintainers: 'Bakımcılar'
+    Maintainers: 'Bakımcılar',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW hesaplanıyor (zorluk {{minPow}})...'
   }
 }

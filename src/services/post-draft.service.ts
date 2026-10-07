@@ -43,6 +43,7 @@ class PostDraftService extends EventTarget {
 
   private map = new Map<string, TPostDraft>()
   private inflight = new Set<string>()
+  private miningDifficulties = new Map<string, number>()
   private initialized = false
   private initPromise: Promise<void> | null = null
 
@@ -103,6 +104,19 @@ class PostDraftService extends EventTarget {
 
   get(id: string): TPostDraft | undefined {
     return this.map.get(id)
+  }
+
+  getMiningDifficulty(id: string): number | undefined {
+    return this.miningDifficulties.get(id)
+  }
+
+  private setMiningDifficulty(id: string, difficulty?: number): void {
+    if (difficulty === undefined) {
+      this.miningDifficulties.delete(id)
+    } else {
+      this.miningDifficulties.set(id, difficulty)
+    }
+    this.dispatchEvent(new CustomEvent('publish-progress', { detail: { id } }))
   }
 
   /**
@@ -198,7 +212,13 @@ class PostDraftService extends EventTarget {
 
     let signed: VerifiedEvent
     if (minPow && minPow > 0) {
-      const mined = await minePow({ ...draftEvent, pubkey }, minPow)
+      this.setMiningDifficulty(id, minPow)
+      let mined: Awaited<ReturnType<typeof minePow>>
+      try {
+        mined = await minePow({ ...draftEvent, pubkey }, minPow)
+      } finally {
+        this.setMiningDifficulty(id)
+      }
       signed = await signer.signEvent(mined)
     } else {
       signed = await signer.signEvent(draftEvent)
@@ -322,6 +342,17 @@ class PostDraftService extends EventTarget {
 
 const instance = PostDraftService.getInstance()
 export default instance
+
+export function useMiningDifficulty(id: string): number | undefined {
+  const [difficulty, setDifficulty] = useState(() => instance.getMiningDifficulty(id))
+  useEffect(() => {
+    const update = () => setDifficulty(instance.getMiningDifficulty(id))
+    update()
+    instance.addEventListener('publish-progress', update)
+    return () => instance.removeEventListener('publish-progress', update)
+  }, [id])
+  return difficulty
+}
 
 export function useDrafts(pubkey: string | undefined): TPostDraft[] {
   const [drafts, setDrafts] = useState<TPostDraft[]>(() => (pubkey ? instance.list(pubkey) : []))

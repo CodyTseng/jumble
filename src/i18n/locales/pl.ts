@@ -1230,6 +1230,7 @@ export default {
     'Clone URLs': 'Adresy URL klonowania',
     'Branches and tags': 'Gałęzie i tagi',
     Target: 'Cel',
-    Maintainers: 'Opiekunowie'
+    Maintainers: 'Opiekunowie',
+    'Computing PoW (difficulty {{minPow}})...': 'Obliczanie PoW (trudność {{minPow}})...'
   }
 }

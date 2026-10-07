@@ -1202,6 +1202,7 @@ export default {
     'Clone URLs': '클론 URL',
     'Branches and tags': '브랜치 및 태그',
     Target: '대상',
-    Maintainers: '메인테이너'
+    Maintainers: '메인테이너',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW 계산 중 (난이도 {{minPow}})...'
   }
 }

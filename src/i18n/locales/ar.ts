@@ -1202,6 +1202,7 @@ export default {
     'Clone URLs': 'عناوين URL للاستنساخ',
     'Branches and tags': 'الفروع والوسوم',
     Target: 'الهدف',
-    Maintainers: 'المشرفون'
+    Maintainers: 'المشرفون',
+    'Computing PoW (difficulty {{minPow}})...': 'جارٍ حساب PoW (الصعوبة {{minPow}})...'
   }
 }

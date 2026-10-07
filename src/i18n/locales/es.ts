@@ -1225,6 +1225,7 @@ export default {
     'Clone URLs': 'URL de clonación',
     'Branches and tags': 'Ramas y etiquetas',
     Target: 'Destino',
-    Maintainers: 'Mantenedores'
+    Maintainers: 'Mantenedores',
+    'Computing PoW (difficulty {{minPow}})...': 'Calculando PoW (dificultad {{minPow}})...'
   }
 }

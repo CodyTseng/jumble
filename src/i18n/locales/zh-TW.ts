@@ -1211,6 +1211,7 @@ export default {
     'Clone URLs': '複製位址',
     'Branches and tags': '分支與標籤',
     Target: '目標',
-    Maintainers: '維護者'
+    Maintainers: '維護者',
+    'Computing PoW (difficulty {{minPow}})...': '正在計算 PoW（難度 {{minPow}}）…'
   }
 }

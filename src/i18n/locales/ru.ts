@@ -1223,6 +1223,7 @@ export default {
     'Clone URLs': 'URL-адреса клонирования',
     'Branches and tags': 'Ветки и теги',
     Target: 'Цель',
-    Maintainers: 'Сопровождающие'
+    Maintainers: 'Сопровождающие',
+    'Computing PoW (difficulty {{minPow}})...': 'Вычисление PoW (сложность {{minPow}})...'
   }
 }

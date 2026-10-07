@@ -1220,6 +1220,7 @@ export default {
     'Clone URLs': 'Klónozási URL-ek',
     'Branches and tags': 'Ágak és címkék',
     Target: 'Cél',
-    Maintainers: 'Karbantartók'
+    Maintainers: 'Karbantartók',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW számítása (nehézség: {{minPow}})...'
   }
 }

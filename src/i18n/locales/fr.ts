@@ -1237,6 +1237,7 @@ export default {
     'Clone URLs': 'URL de clonage',
     'Branches and tags': 'Branches et étiquettes',
     Target: 'Cible',
-    Maintainers: 'Mainteneurs'
+    Maintainers: 'Mainteneurs',
+    'Computing PoW (difficulty {{minPow}})...': 'Calcul du PoW (difficulté {{minPow}})...'
   }
 }

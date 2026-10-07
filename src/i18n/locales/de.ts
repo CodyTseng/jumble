@@ -1238,6 +1238,7 @@ export default {
     'Clone URLs': 'Klon-URLs',
     'Branches and tags': 'Branches und Tags',
     Target: 'Ziel',
-    Maintainers: 'Maintainer'
+    Maintainers: 'Maintainer',
+    'Computing PoW (difficulty {{minPow}})...': 'PoW wird berechnet (Schwierigkeit {{minPow}})...'
   }
 }
