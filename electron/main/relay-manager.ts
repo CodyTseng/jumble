@@ -5,6 +5,7 @@ import WebSocket from 'ws'
 import { SmartPool, type SmartPoolOptions } from '../../src/lib/smart-pool'
 import {
   IPC_CHANNELS,
+  TRelayTransportObservation,
   TAuthRequestPayload,
   TAuthResponsePayload,
   TSubClosePayload,
@@ -36,6 +37,7 @@ export class RelayManager {
   // ws implements the WebSocket surface nostr-tools uses, but its Node types
   // intentionally do not include the browser-only EventTarget methods.
   private pool = new SmartPool({
+    observe: (observation) => this.sendToRenderer(IPC_CHANNELS.observation, observation),
     websocketImplementation:
       ElectronWebSocket as unknown as SmartPoolOptions['websocketImplementation']
   })
@@ -66,40 +68,71 @@ export class RelayManager {
     this.pool.setNetworkOnline(online)
   }
 
-  async publish(url: string, event: NEvent, timeoutMs: number = DEFAULT_PUBLISH_TIMEOUT) {
+  async publish(
+    url: string,
+    event: NEvent,
+    timeoutMs: number = DEFAULT_PUBLISH_TIMEOUT,
+    operationId?: string
+  ) {
     const relay = this.pool.getRelay(url)
     relay.publishTimeout = timeoutMs
-    await relay.publish(event)
+    await relay.publish(event, (at) => {
+      if (operationId)
+        this.sendToRenderer<TRelayTransportObservation>(IPC_CHANNELS.observation, {
+          type: 'publish-start',
+          operationId,
+          at
+        })
+    })
   }
 
   subscribe(subId: string, url: string, filters: Filter[]) {
     if (this.subs.has(subId)) return
     const known = new Set<string>()
-    const sub = this.pool.getRelay(url).subscribe(
-      filters,
-      {
-        alreadyHaveEvent: (id: string) => {
-          if (known.has(id)) return true
-          known.add(id)
-          return false
-        },
-        onevent: (evt: NEvent) => {
-          this.sendToRenderer<TSubEventPayload>(IPC_CHANNELS.subEvent, {
-            subId,
-            event: evt,
-            relayUrl: url
-          })
-        },
-        oneose: () => {
-          this.sendToRenderer<TSubEosePayload>(IPC_CHANNELS.subEose, { subId })
-        },
-        onclose: (reason: string) => {
-          this.sendToRenderer<TSubClosePayload>(IPC_CHANNELS.subClose, { subId, reason })
-          this.subs.delete(subId)
-        },
-        eoseTimeout: 10_000
-      }
-    )
+    let firstData = false
+    const sub = this.pool.getRelay(url).subscribe(filters, {
+      ondata: (at = Date.now()) => {
+        if (firstData) return
+        firstData = true
+        this.sendToRenderer<TRelayTransportObservation>(IPC_CHANNELS.observation, {
+          type: 'read-data',
+          subId,
+          at
+        })
+      },
+      onrequest: (at) =>
+        this.sendToRenderer<TRelayTransportObservation>(IPC_CHANNELS.observation, {
+          type: 'request-start',
+          subId,
+          at
+        }),
+      ontimeout: () =>
+        this.sendToRenderer<TRelayTransportObservation>(IPC_CHANNELS.observation, {
+          type: 'read-timeout',
+          subId
+        }),
+      alreadyHaveEvent: (id: string) => {
+        if (known.has(id)) return true
+        known.add(id)
+        return false
+      },
+      onevent: (evt: NEvent) => {
+        this.sendToRenderer<TSubEventPayload>(IPC_CHANNELS.subEvent, {
+          subId,
+          event: evt,
+          relayUrl: url
+        })
+      },
+      oneose: () => {
+        firstData = true
+        this.sendToRenderer<TSubEosePayload>(IPC_CHANNELS.subEose, { subId })
+      },
+      onclose: (reason: string) => {
+        this.sendToRenderer<TSubClosePayload>(IPC_CHANNELS.subClose, { subId, reason })
+        this.subs.delete(subId)
+      },
+      eoseTimeout: 10_000
+    })
     this.subs.set(subId, sub)
   }
 

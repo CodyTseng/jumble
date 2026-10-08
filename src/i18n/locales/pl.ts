@@ -1231,6 +1231,61 @@ export default {
     'Branches and tags': 'Gałęzie i tagi',
     Target: 'Cel',
     Maintainers: 'Opiekunowie',
-    'Computing PoW (difficulty {{minPow}})...': 'Obliczanie PoW (trudność {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Obliczanie PoW (trudność {{minPow}})...',
+    'Playback speed': 'Prędkość odtwarzania',
+    'Relay activity': 'Aktywność transmitera',
+    'Last 7 active days': 'Ostatnie 7 aktywnych dni',
+    'Connection attempts': 'Próby połączenia',
+    'Connection failures': 'Nieudane połączenia',
+    'Failure rate': 'Odsetek niepowodzeń',
+    'Today (in progress)': 'Dzisiaj (w trakcie)',
+    'Connection time': 'Czas połączenia',
+    'Write time': 'Czas zapisu',
+    'First event time': 'Czas do pierwszych danych',
+    'Observation samples': '{{count}} pomiarów',
+    'Waiting for first event or EOSE': 'Oczekiwanie na pierwsze dane lub zakończenie zapytania',
+    'Waiting for query completion': 'Oczekiwanie na zakończenie zapytania',
+    'No recorded issues': 'Brak zarejestrowanych problemów',
+    'No relay activity recorded yet': 'Nie zarejestrowano jeszcze aktywności transmitera',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'Kolory połączeń oznaczają odsetek niepowodzeń; szary oznacza brak prób połączenia.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'Przybliżona mediana czasu udanych operacji. Uwzględnia oczekiwanie podczas ponawiania uwierzytelniania. Zapytania bez wyników nie dostarczają czasu do pierwszych danych.',
+    'Read rejections': 'Odrzucone odczyty',
+    'Read timeouts': 'Przekroczenia czasu odczytu',
+    'Write rejections': 'Odrzucone zapisy',
+    'Write timeouts': 'Przekroczenia czasu zapisu',
+    'No write confirmation received': 'Nie otrzymano potwierdzenia zapisu',
+    'Authentication issues': 'Problemy z uwierzytelnianiem',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'Aktywność zaobserwowana na tym urządzeniu w ostatnich 7 aktywnych dniach każdego transmitera.',
+    'Configured relays': 'Skonfigurowane transmitery',
+    'Other used relays': 'Inne używane transmitery',
+    'Other reasons': 'Inne powody',
+    'Unknown reason': 'Nieznany powód',
+    'Latest active day': 'Ostatni aktywny dzień',
+    'Relays are sorted by connection attempts across recorded days.':
+      'Transmitery są sortowane według liczby prób połączenia w zarejestrowanych dniach.',
+    'Recorded connection attempts': 'Zarejestrowane próby połączenia: {{count}}',
+    'Statistics across recorded days': 'Statystyki zarejestrowanych dni',
+    'Total connections': 'Łączna liczba połączeń',
+    'View relay details': 'Zobacz szczegóły transmitera',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'Tabela pokazuje ostatni aktywny dzień; łączna liczba połączeń obejmuje wszystkie zarejestrowane dni. Kliknij transmiter, aby zobaczyć szczegóły.',
+    'No query response received': 'Nie otrzymano odpowiedzi na zapytanie',
+    'Query not completed after receiving data':
+      'Zapytanie nie zostało zakończone po otrzymaniu danych',
+    'View relay feed': 'Zobacz kanał transmitera',
+    'Open relay': 'Otwórz transmiter',
+    'View relay': 'Zobacz transmiter',
+    View: 'Zobacz',
+    Metrics: 'Wskaźniki',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'Te statystyki podsumowują dane zarejestrowane podczas korzystania z Jumble na tym urządzeniu i nie stanowią pełnego monitoringu transmitera.',
+    'Observation samples_many': '{{count}} pomiarów',
+    'Observation samples_few': '{{count}} pomiary',
+    'Observation samples_one': '{{count}} pomiar',
+    'Observation samples_other': '{{count}} pomiaru',
+    'Connection quality': 'Jakość połączenia'
   }
 }

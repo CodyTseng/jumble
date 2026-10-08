@@ -8,6 +8,8 @@ import type {
   TSubHandlers
 } from '@/types/relay-pool'
 import { getElectronBridge } from './platform'
+import relayObservations from '@/services/relay-observation.service'
+import { normalizeUrl } from './url'
 import { BoundedMap } from './bounded-map'
 import { observeRelayPoolLifecycle } from './relay-pool-lifecycle'
 
@@ -18,11 +20,26 @@ export class ElectronRelay implements IRelay {
   constructor(
     readonly url: string,
     private readonly bridge: TElectronBridge,
-    private readonly listeners: Map<string, TSubHandlers>
+    private readonly listeners: Map<string, TSubHandlers>,
+    private readonly publishStarts: Map<string, (at: number) => void>
   ) {}
 
-  async publish(event: NEvent): Promise<void> {
-    return this.bridge.relay.publish(this.url, event, this.publishTimeout)
+  async publish(event: NEvent, onstart?: (at: number) => void): Promise<void> {
+    const operationId = crypto.randomUUID()
+    if (onstart) this.publishStarts.set(operationId, onstart)
+    try {
+      await this.bridge.relay.publish(this.url, event, this.publishTimeout, operationId)
+    } catch (error) {
+      // Electron wraps invoke failures; preserve the relay reason for AUTH retry.
+      if (error instanceof Error) {
+        throw new Error(
+          error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, '')
+        )
+      }
+      throw error
+    } finally {
+      this.publishStarts.delete(operationId)
+    }
   }
 
   async auth(_signFn: TSignAuthEvent): Promise<void> {
@@ -58,6 +75,7 @@ export class ElectronPool implements IRelayPool {
   private seenOn = new BoundedMap<string, Set<IRelay>>({ maxSize: 100_000 })
   private relays = new BoundedMap<string, ElectronRelay>({ maxSize: 1_000 })
   private listeners = new Map<string, TSubHandlers>()
+  private publishStarts = new Map<string, (at: number) => void>()
   private bridge: TElectronBridge
   private getSigner: () => TSignAuthEvent | undefined
 
@@ -70,11 +88,30 @@ export class ElectronPool implements IRelayPool {
     this.bridge = bridge
     this.getSigner = getSigner
 
+    bridge.relay.onObservation((observation) => {
+      switch (observation.type) {
+        case 'connection':
+          relayObservations.record(observation)
+          break
+        case 'request-start':
+          this.listeners.get(observation.subId)?.onrequest?.(observation.at)
+          break
+        case 'read-data':
+          this.listeners.get(observation.subId)?.ondata?.(observation.at)
+          break
+        case 'read-timeout':
+          this.listeners.get(observation.subId)?.ontimeout?.()
+          break
+        case 'publish-start':
+          this.publishStarts.get(observation.operationId)?.(observation.at)
+          break
+      }
+    })
+
     bridge.relay.onSubEvent(({ subId, event, relayUrl }) => {
       const handlers = this.listeners.get(subId)
       if (!handlers) return
-      const relay = this.getOrCreateRelay(relayUrl)
-      handlers.receivedEvent?.(relay, event.id)
+      handlers.receivedEvent?.(this.getOrCreateRelay(relayUrl), event.id)
       if (handlers.alreadyHaveEvent?.(event.id)) return
       handlers.onevent?.(event)
     })
@@ -157,9 +194,10 @@ export class ElectronPool implements IRelayPool {
   }
 
   private getOrCreateRelay(url: string): ElectronRelay {
+    url = normalizeUrl(url)
     let r = this.relays.get(url)
     if (!r) {
-      r = new ElectronRelay(url, this.bridge, this.listeners)
+      r = new ElectronRelay(url, this.bridge, this.listeners, this.publishStarts)
       this.relays.set(url, r)
     }
     return r

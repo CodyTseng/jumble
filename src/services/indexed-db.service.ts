@@ -3,6 +3,7 @@ import { isReplaceableEvent } from '@/lib/event'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
 import { TPostDraft } from '@/types/post-draft'
+import { mergeRelayObservationRecord, RelayObservationRecord } from '@/lib/relay-observation'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
 
@@ -13,6 +14,7 @@ type TValue<T = any> = {
 }
 
 const StoreNames = {
+  RELAY_OBSERVATIONS: 'relayObservations',
   PROFILE_EVENTS: 'profileEvents',
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
@@ -56,7 +58,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 23)
+        const request = window.indexedDB.open('jumble', 24)
 
         request.onerror = (event) => {
           reject(event)
@@ -70,6 +72,9 @@ class IndexedDbService {
         request.onupgradeneeded = (event) => {
           const db = request.result
           const oldVersion = (event as IDBVersionChangeEvent).oldVersion
+          if (!db.objectStoreNames.contains(StoreNames.RELAY_OBSERVATIONS)) {
+            db.createObjectStore(StoreNames.RELAY_OBSERVATIONS, { keyPath: 'url' })
+          }
           if (!db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
             db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
           }
@@ -1165,6 +1170,57 @@ class IndexedDbService {
         transaction.commit()
         reject(event)
       }
+    })
+  }
+
+  async getRelayObservations(): Promise<RelayObservationRecord[]> {
+    await this.initPromise
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject(new Error('database not initialized'))
+      const transaction = this.db.transaction(StoreNames.RELAY_OBSERVATIONS, 'readonly')
+      const request = transaction.objectStore(StoreNames.RELAY_OBSERVATIONS).getAll()
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+  }
+
+  async saveRelayObservations(deltas: RelayObservationRecord[], protectedUrls: string[]) {
+    await this.initPromise
+    return new Promise<void>((resolve, reject) => {
+      if (!this.db) return reject(new Error('database not initialized'))
+      const transaction = this.db.transaction(StoreNames.RELAY_OBSERVATIONS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.RELAY_OBSERVATIONS)
+      // Merge inside the transaction: simultaneous tabs cannot overwrite each other's counts.
+      for (const delta of deltas) {
+        const request = store.get(delta.url)
+        request.onsuccess = () => {
+          const record: RelayObservationRecord = request.result ?? {
+            url: delta.url,
+            updatedAt: 0,
+            days: []
+          }
+          mergeRelayObservationRecord(record, delta)
+          store.put(record)
+        }
+      }
+      const request = store.getAll()
+      request.onsuccess = () => {
+        // Enqueue pruning after all preceding get callbacks have enqueued their writes.
+        const final = store.getAll()
+        final.onsuccess = () => {
+          const protectedSet = new Set(protectedUrls)
+          const records = (final.result as RelayObservationRecord[])
+            .filter((record) => !protectedSet.has(record.url))
+            .sort((a, b) => b.updatedAt - a.updatedAt)
+          const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000
+          records.forEach((record, index) => {
+            if (index >= 500 || record.updatedAt < cutoff) store.delete(record.url)
+          })
+        }
+      }
+      transaction.oncomplete = () => resolve()
+      transaction.onerror = () => reject(transaction.error)
+      transaction.onabort = () => reject(transaction.error)
     })
   }
 

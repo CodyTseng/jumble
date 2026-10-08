@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import type { Event as NEvent, Filter } from 'nostr-tools'
 import {
   IPC_CHANNELS,
+  TRelayTransportObservation,
   TAuthRequestPayload,
   TAuthResponsePayload,
   TElectronBridge,
@@ -18,11 +19,16 @@ import {
 
 const bridge: TElectronBridge = {
   relay: {
+    onObservation: (cb) => {
+      const listener = (_e: unknown, payload: TRelayTransportObservation) => cb(payload)
+      ipcRenderer.on(IPC_CHANNELS.observation, listener)
+      return () => ipcRenderer.off(IPC_CHANNELS.observation, listener)
+    },
     checkRelays: () => ipcRenderer.invoke(IPC_CHANNELS.checkRelays),
     setNetworkOnline: (online: boolean) =>
       ipcRenderer.invoke(IPC_CHANNELS.setNetworkOnline, online),
-    publish: (url: string, event: NEvent, timeoutMs: number) =>
-      ipcRenderer.invoke(IPC_CHANNELS.publish, url, event, timeoutMs),
+    publish: (url: string, event: NEvent, timeoutMs: number, operationId?: string) =>
+      ipcRenderer.invoke(IPC_CHANNELS.publish, url, event, timeoutMs, operationId),
     subscribe: (subId: string, url: string, filters: Filter[]) =>
       ipcRenderer.invoke(IPC_CHANNELS.subscribe, subId, url, filters),
     closeSub: (subId: string) => ipcRenderer.invoke(IPC_CHANNELS.closeSub, subId),

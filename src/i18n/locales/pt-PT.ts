@@ -1229,6 +1229,60 @@ export default {
     'Branches and tags': 'Ramos e etiquetas',
     Target: 'Destino',
     Maintainers: 'Responsáveis pela manutenção',
-    'Computing PoW (difficulty {{minPow}})...': 'A calcular PoW (dificuldade {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'A calcular PoW (dificuldade {{minPow}})...',
+    'Playback speed': 'Velocidade de reprodução',
+    'Relay activity': 'Atividade do relé',
+    'Last 7 active days': 'Últimos 7 dias ativos',
+    'Connection attempts': 'Tentativas de ligação',
+    'Connection failures': 'Falhas de ligação',
+    'Failure rate': 'Taxa de falhas',
+    'Today (in progress)': 'Hoje (em curso)',
+    'Connection time': 'Tempo de ligação',
+    'Write time': 'Tempo de escrita',
+    'First event time': 'Tempo até aos primeiros dados',
+    'Observation samples': '{{count}} amostras',
+    'Waiting for first event or EOSE': 'A aguardar os primeiros dados ou a conclusão da consulta',
+    'Waiting for query completion': 'A aguardar a conclusão da consulta',
+    'No recorded issues': 'Sem problemas registados',
+    'No relay activity recorded yet': 'Ainda não foi registada atividade do relé',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'As cores das ligações indicam a taxa de falhas; cinzento significa que não houve tentativas de ligação.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'Mediana aproximada do tempo das operações bem-sucedidas. Inclui a espera nas novas tentativas de autenticação. As consultas vazias não produzem tempo até aos primeiros dados.',
+    'Read rejections': 'Leituras rejeitadas',
+    'Read timeouts': 'Leituras com tempo limite excedido',
+    'Write rejections': 'Escritas rejeitadas',
+    'Write timeouts': 'Escritas com tempo limite excedido',
+    'No write confirmation received': 'Não foi recebida confirmação de escrita',
+    'Authentication issues': 'Problemas de autenticação',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'Atividade observada por este dispositivo nos últimos 7 dias ativos de cada relé.',
+    'Configured relays': 'Relés configurados',
+    'Other used relays': 'Outros relés utilizados',
+    'Other reasons': 'Outros motivos',
+    'Unknown reason': 'Motivo desconhecido',
+    'Latest active day': 'Último dia ativo',
+    'Relays are sorted by connection attempts across recorded days.':
+      'Os relés são ordenados pelas tentativas de ligação nos dias registados.',
+    'Recorded connection attempts': 'Tentativas de ligação registadas: {{count}}',
+    'Statistics across recorded days': 'Estatísticas dos dias registados',
+    'Total connections': 'Total de ligações',
+    'View relay details': 'Ver detalhes do relé',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'A tabela mostra o último dia ativo; o total de ligações inclui todos os dias registados. Clique num relé para ver os detalhes.',
+    'No query response received': 'Não foi recebida resposta à consulta',
+    'Query not completed after receiving data':
+      'A consulta não foi concluída após a receção dos dados',
+    'View relay feed': 'Ver o feed do relé',
+    'Open relay': 'Abrir relé',
+    'View relay': 'Ver relé',
+    View: 'Ver',
+    Metrics: 'Métricas',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'Estas estatísticas resumem os dados registados durante a utilização do Jumble neste dispositivo e não representam uma monitorização completa do relé.',
+    'Observation samples_many': '{{count}} amostras',
+    'Observation samples_one': '{{count}} amostra',
+    'Observation samples_other': '{{count}} amostras',
+    'Connection quality': 'Qualidade da ligação'
   }
 }

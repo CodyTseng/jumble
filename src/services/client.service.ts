@@ -35,6 +35,8 @@ import {
 } from 'nostr-tools'
 import indexedDb from './indexed-db.service'
 import storage from './local-storage.service'
+import relayObservations from './relay-observation.service'
+import { publishRelayEvent } from '@/lib/relay-publication'
 
 type TTimelineRef = [string, number]
 
@@ -76,6 +78,7 @@ class ClientService extends EventTarget {
 
   setOwnRelayUrls(urls: string[]) {
     this.ownRelays = urls
+    relayObservations.setProtectedUrls(urls)
     this.refreshTrustedInsecureRelays()
   }
 
@@ -134,7 +137,7 @@ class ClientService extends EventTarget {
         this.signer ? (evt) => this.signer!.signEvent(evt) : undefined
       )
     } else {
-      this.pool = new SmartPool()
+      this.pool = new SmartPool({ observe: relayObservations.record })
     }
     this.pool.setAllowInsecure(storage.getAllowInsecureConnection())
     this.pool.trackRelays = true
@@ -308,40 +311,25 @@ class ClientService extends EventTarget {
           }
 
           relay.publishTimeout = 10_000 // 10s
-          let hasAuthed = false
-
-          const publishPromise = async () => {
-            try {
-              await relay.publish(event)
-              that.trackEventSeenOn(event.id, relay)
-              checkCompletion(url, true)
-            } catch (error) {
-              if (
-                !hasAuthed &&
-                error instanceof Error &&
-                error.message.startsWith('auth-required') &&
-                !!that.signer
-              ) {
-                try {
-                  // Relay AUTH identifies the current client session, so it is
-                  // intentionally signed by the logged-in account even when the
-                  // published event was authored by a temporary nsec account.
-                  await relay.auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
-                  hasAuthed = true
-                  await publishPromise().catch(() => {
-                    // ignore
-                  })
-                  return
-                } catch (error) {
-                  checkCompletion(url, false, error)
-                }
-              } else {
-                checkCompletion(url, false, error)
-              }
-            }
+          // AUTH identifies the logged-in session, even when a temporary key
+          // authored the event being published.
+          try {
+            await publishRelayEvent(
+              relay,
+              event,
+              relayObservations.record,
+              that.signer
+                ? () =>
+                    relay
+                      .auth((authEvt: EventTemplate) => that.signer!.signEvent(authEvt))
+                      .then(() => undefined)
+                : undefined
+            )
+            that.trackEventSeenOn(event.id, relay)
+            checkCompletion(url, true)
+          } catch (error) {
+            checkCompletion(url, false, error)
           }
-
-          return publishPromise()
         })
       )
     })
@@ -533,6 +521,7 @@ class ClientService extends EventTarget {
     const that = this
     const _knownIds = new Set<string>()
     const networkSub = subscribeRelays(this.pool, relays, filters, {
+      observe: relayObservations.record,
       receivedEvent: (relay, id) => {
         that.trackEventSeenOn(id, relay)
       },

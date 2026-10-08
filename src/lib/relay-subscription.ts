@@ -1,9 +1,11 @@
 import type { Filter, Event as NEvent } from 'nostr-tools'
 import type { IRelay, IRelayPool, TSubCloser } from '@/types/relay-pool'
+import { isAuthRequiredReason, isTransportFailure, type RelayObserver } from './relay-observation'
 
 export const RELAY_SUBSCRIPTION_EOSE_TIMEOUT = 10_000
 
 type RelaySubscriptionHandlers = {
+  observe?: RelayObserver
   onevent?: (event: NEvent) => void
   oneose?: (eosed: boolean) => void
   onclose?: (url: string, reason: string) => void
@@ -15,6 +17,11 @@ type RelaySubscriptionHandlers = {
 }
 
 type RelayState = {
+  startedAt?: number
+  firstEvent: boolean
+  readTimedOut: boolean
+  readCompleted: boolean
+  authPending: boolean
   eosed: boolean
   closed: boolean
   hasAuthed: boolean
@@ -61,6 +68,26 @@ export function subscribeRelays(
     if (closedCount >= startedCount) handlers.onAllClose?.(closeReasons)
   }
 
+  const recordTimeout = (url: string, state: RelayState) => {
+    if (
+      closedByCaller ||
+      state.closed ||
+      state.readCompleted ||
+      state.readTimedOut ||
+      state.authPending ||
+      state.startedAt === undefined
+    )
+      return
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return
+    state.readTimedOut = true
+    handlers.observe?.({
+      type: 'read-timeout',
+      url,
+      at: state.startedAt,
+      phase: state.firstEvent ? 'completion' : 'first-event'
+    })
+  }
+
   const startSub = async (url: string, state: RelayState): Promise<TSubCloser> => {
     let relay: IRelay
     try {
@@ -76,32 +103,71 @@ export function subscribeRelays(
 
     try {
       return relay.subscribe(filters, {
+        onrequest: (at) => {
+          state.startedAt ??= at
+        },
+        ontimeout: () => recordTimeout(url, state),
+        ondata: (receivedAt = Date.now()) => {
+          if (
+            !closedByCaller &&
+            !state.closed &&
+            !state.firstEvent &&
+            !state.readCompleted &&
+            !state.readTimedOut &&
+            state.startedAt !== undefined
+          ) {
+            state.firstEvent = true
+            handlers.observe?.({
+              type: 'read-time',
+              url,
+              at: state.startedAt,
+              duration: receivedAt - state.startedAt
+            })
+          }
+        },
         receivedEvent: handlers.receivedEvent,
         alreadyHaveEvent: handlers.alreadyHaveEvent,
         onevent: handlers.onevent,
-        oneose: () => settleEose(state),
+        oneose: () => {
+          state.readCompleted = true
+          settleEose(state)
+        },
         onclose: (reason: string) => {
-          if (closedByCaller) return
+          if (closedByCaller || state.closed || state.authPending) return
 
-          if (reason.startsWith('auth-required') && !state.hasAuthed) {
+          if (isAuthRequiredReason(reason) && !state.hasAuthed) {
             const authenticate = handlers.getAuthenticator?.()
             if (authenticate) {
+              state.authPending = true
               void authenticate(relay)
                 .then(() => {
+                  state.authPending = false
                   state.hasAuthed = true
                   if (!closedByCaller) subPromises.push(startSub(url, state))
                 })
                 .catch(() => {
+                  state.authPending = false
                   settleEose(state)
                   settleClose(url, state, reason)
                 })
               return
             }
 
+            state.authPending = true
             if (handlers.startLogin) {
               handlers.startLogin()
               return
             }
+          }
+
+          if (!isAuthRequiredReason(reason) || state.hasAuthed) {
+            if (!isTransportFailure(reason))
+              handlers.observe?.({
+                type: 'read-rejection',
+                url,
+                at: state.startedAt ?? Date.now(),
+                reason
+              })
           }
 
           // A relay that terminates its REQ cannot emit EOSE afterward. Count
@@ -121,8 +187,21 @@ export function subscribeRelays(
   }
 
   for (const url of relays) {
-    const state: RelayState = { eosed: false, closed: false, hasAuthed: false }
-    state.eoseTimer = setTimeout(() => settleEose(state), RELAY_SUBSCRIPTION_EOSE_TIMEOUT)
+    const state: RelayState = {
+      eosed: false,
+      closed: false,
+      hasAuthed: false,
+      firstEvent: false,
+      readTimedOut: false,
+      readCompleted: false,
+      authPending: false
+    }
+    const scheduledAt = Date.now()
+    state.eoseTimer = setTimeout(() => {
+      if (Date.now() - scheduledAt < RELAY_SUBSCRIPTION_EOSE_TIMEOUT * 1.5)
+        recordTimeout(url, state)
+      settleEose(state)
+    }, RELAY_SUBSCRIPTION_EOSE_TIMEOUT)
     states.set(url, state)
     subPromises.push(startSub(url, state))
   }

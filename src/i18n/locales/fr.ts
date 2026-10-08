@@ -1238,6 +1238,60 @@ export default {
     'Branches and tags': 'Branches et étiquettes',
     Target: 'Cible',
     Maintainers: 'Mainteneurs',
-    'Computing PoW (difficulty {{minPow}})...': 'Calcul du PoW (difficulté {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Calcul du PoW (difficulté {{minPow}})...',
+    'Playback speed': 'Vitesse de lecture',
+    'Relay activity': 'Activité du relais',
+    'Last 7 active days': '7 derniers jours actifs',
+    'Connection attempts': 'Tentatives de connexion',
+    'Connection failures': 'Échecs de connexion',
+    'Failure rate': 'Taux d’échec',
+    'Today (in progress)': 'Aujourd’hui (en cours)',
+    'Connection time': 'Temps de connexion',
+    'Write time': 'Temps d’écriture',
+    'First event time': 'Délai des premières données',
+    'Observation samples': '{{count}} échantillons',
+    'Waiting for first event or EOSE':
+      'En attente des premières données ou de la fin de la requête',
+    'Waiting for query completion': 'En attente de la fin de la requête',
+    'No recorded issues': 'Aucun problème enregistré',
+    'No relay activity recorded yet': 'Aucune activité du relais enregistrée pour le moment',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'Les couleurs indiquent le taux d’échec des connexions ; le gris signifie qu’aucune connexion n’a été tentée.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'Médiane approximative de la durée des opérations réussies, incluant l’attente lors des nouvelles tentatives d’authentification. Les requêtes vides ne fournissent pas de délai des premières données.',
+    'Read rejections': 'Lectures refusées',
+    'Read timeouts': 'Délais de lecture dépassés',
+    'Write rejections': 'Écritures refusées',
+    'Write timeouts': 'Délais d’écriture dépassés',
+    'No write confirmation received': 'Aucune confirmation d’écriture reçue',
+    'Authentication issues': 'Problèmes d’authentification',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'Activité observée par cet appareil sur les 7 derniers jours actifs de chaque relais.',
+    'Configured relays': 'Relais configurés',
+    'Other used relays': 'Autres relais utilisés',
+    'Other reasons': 'Autres raisons',
+    'Unknown reason': 'Raison inconnue',
+    'Latest active day': 'Dernier jour actif',
+    'Relays are sorted by connection attempts across recorded days.':
+      'Les relais sont triés par nombre de tentatives de connexion sur les jours enregistrés.',
+    'Recorded connection attempts': 'Tentatives de connexion enregistrées : {{count}}',
+    'Statistics across recorded days': 'Statistiques des jours enregistrés',
+    'Total connections': 'Total des connexions',
+    'View relay details': 'Voir les détails du relais',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'Le tableau affiche le dernier jour actif ; le total des connexions couvre tous les jours enregistrés. Cliquez sur un relais pour voir ses détails.',
+    'No query response received': 'Aucune réponse à la requête reçue',
+    'Query not completed after receiving data': 'Requête non terminée après réception des données',
+    'View relay feed': 'Voir le fil du relais',
+    'Open relay': 'Ouvrir le relais',
+    'View relay': 'Voir le relais',
+    View: 'Voir',
+    Metrics: 'Indicateurs',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'Ces statistiques résument les données enregistrées lors de l’utilisation de Jumble sur cet appareil et ne constituent pas une surveillance complète du relais.',
+    'Observation samples_many': '{{count}} échantillons',
+    'Observation samples_one': '{{count}} échantillon',
+    'Observation samples_other': '{{count}} échantillons',
+    'Connection quality': 'Qualité de connexion'
   }
 }

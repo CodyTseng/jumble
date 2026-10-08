@@ -2,11 +2,13 @@ import { AbstractRelay, type AbstractRelayConstructorOptions } from 'nostr-tools
 import { IRelay, IRelayPool } from '../types/relay-pool'
 import { BoundedMap } from './bounded-map'
 import { ManagedRelay } from './managed-relay'
+import type { RelayObserver } from './relay-observation'
 import { initializeNostrVerifier, verifyEvent } from './nostr-verifier'
 import { observeRelayPoolLifecycle } from './relay-pool-lifecycle'
 import { isInsecureUrl, normalizeUrl } from './url'
 
 export type SmartPoolOptions = {
+  observe?: RelayObserver
   allowInsecure?: boolean
   websocketImplementation?: AbstractRelayConstructorOptions['websocketImplementation']
 }
@@ -15,6 +17,7 @@ export type SmartPoolOptions = {
 export class SmartPool implements IRelayPool {
   trackRelays = true
 
+  private observe?: RelayObserver
   private relays = new Map<string, ManagedRelay>()
   private seenOn = new BoundedMap<string, Set<IRelay>>({ maxSize: 100_000 })
   private healthCheckPromise?: Promise<void>
@@ -24,6 +27,7 @@ export class SmartPool implements IRelayPool {
   private websocketImplementation?: AbstractRelayConstructorOptions['websocketImplementation']
 
   constructor(options: SmartPoolOptions = {}) {
+    this.observe = options.observe
     this.allowInsecure = options.allowInsecure ?? false
     this.websocketImplementation = options.websocketImplementation
     void initializeNostrVerifier()
@@ -48,7 +52,8 @@ export class SmartPool implements IRelayPool {
           // Do not let a pool that visits many relay URLs retain one wrapper
           // forever per URL. Seen-on entries remain independently bounded.
           if (this.relays.get(url) === managedRelay) this.relays.delete(url)
-        }
+        },
+        this.observe
       )
       managedRelay.setNetworkOnline(this.networkOnline)
       this.relays.set(url, managedRelay)

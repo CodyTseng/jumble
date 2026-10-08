@@ -5,6 +5,9 @@ export type TSignAuthEvent = (authEvt: EventTemplate) => Promise<VerifiedEvent>
 export type TSubCloser = { close: (reason?: string) => void }
 
 export type TSubHandlers = {
+  ondata?: (receivedAt?: number) => void
+  onrequest?: (startedAt: number) => void
+  ontimeout?: () => void
   receivedEvent?: (relay: IRelay, id: string) => void
   alreadyHaveEvent?: (id: string) => boolean
   onevent?: (evt: Event) => void
@@ -16,7 +19,7 @@ export type TSubHandlers = {
 export interface IRelay {
   readonly url: string
   publishTimeout: number
-  publish(event: Event): Promise<unknown>
+  publish(event: Event, onstart?: (startedAt: number) => void): Promise<unknown>
   auth(signAuthEvent: TSignAuthEvent): Promise<unknown>
   subscribe(filters: Filter[], handlers: TSubHandlers): TSubCloser
 }

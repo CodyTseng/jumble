@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SmartPool } from './smart-pool'
+import type { RelayObserver } from './relay-observation'
 
 const RELAY_URL = 'wss://relay.example.com'
 
@@ -85,13 +86,48 @@ describe('SmartPool request-driven relay lifecycle', () => {
     vi.useRealTimers()
   })
 
+  it('observes every real connection attempt, including automatic retries', async () => {
+    FakeWebSocket.connectionFailuresRemaining = 1
+    const observe = vi.fn()
+    const pool = createPool(observe)
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], {})
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(1000)
+    await flushPromises()
+    expect(observe.mock.calls.map(([item]) => item.reason === undefined)).toEqual([false, true])
+    expect(observe.mock.calls.every(([item]) => item.type === 'connection')).toBe(true)
+    sub.close()
+  })
+
+  it('distinguishes a real EOSE from the library synthetic EOSE deadline', async () => {
+    const pool = createPool()
+    const ontimeout = vi.fn()
+    const oneose = vi.fn()
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { ontimeout, oneose })
+    await waitForReq(FakeWebSocket.instances[0])
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(10000)
+    expect(oneose).toHaveBeenCalledOnce()
+    expect(ontimeout).not.toHaveBeenCalled()
+    sub.close()
+
+    const silent = createPool()
+    const second = silent.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { ontimeout, oneose })
+    const socket = FakeWebSocket.instances[1]
+    socket.send = function (message) {
+      this.sent.push(message)
+    }
+    await waitForReq(socket)
+    await vi.advanceTimersByTimeAsync(10000)
+    expect(ontimeout).toHaveBeenCalledOnce()
+    expect(oneose).toHaveBeenCalledTimes(2)
+    second.close()
+  })
+
   it('keeps a REQ managed until its caller closes it after EOSE', async () => {
     const pool = createPool()
     const oneose = vi.fn()
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn(), oneose }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn(), oneose })
     await waitForReq(FakeWebSocket.instances[0])
     await flushPromises()
 
@@ -124,27 +160,25 @@ describe('SmartPool request-driven relay lifecycle', () => {
     const pool = createPool()
     const relay = pool.getRelay(RELAY_URL)
     let replacement: { close: () => void } | undefined
-    relay.subscribe(
-      [{ kinds: [1] }],
-      {
-        onevent: vi.fn(),
-        onclose: (reason) => {
-          if (!reason.startsWith('auth-required')) return
-          void relay
-            .auth(async (template) =>
+    relay.subscribe([{ kinds: [1] }], {
+      onevent: vi.fn(),
+      onclose: (reason) => {
+        if (!reason.startsWith('auth-required')) return
+        void relay
+          .auth(
+            async (template) =>
               ({
                 ...template,
                 id: 'auth-event-id',
                 pubkey: 'pubkey',
                 sig: 'signature'
               }) as never
-            )
-            .then(() => {
-              replacement = relay.subscribe([{ kinds: [1] }], { onevent: vi.fn() })
-            })
-        }
+          )
+          .then(() => {
+            replacement = relay.subscribe([{ kinds: [1] }], { onevent: vi.fn() })
+          })
       }
-    )
+    })
     const socket = FakeWebSocket.instances[0]
     await waitForReq(socket)
     socket.onmessage?.({ data: JSON.stringify(['AUTH', 'challenge']) })
@@ -246,10 +280,9 @@ describe('SmartPool request-driven relay lifecycle', () => {
 
   it('reconnects a dropped relay while active REQ demand exists', async () => {
     const pool = createPool()
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1059], '#p': ['recipient'] }],
-      { onevent: vi.fn() }
-    )
+    const sub = pool
+      .getRelay(RELAY_URL)
+      .subscribe([{ kinds: [1059], '#p': ['recipient'] }], { onevent: vi.fn() })
     await waitForReq(FakeWebSocket.instances[0])
 
     FakeWebSocket.instances[0].hardClose()
@@ -271,14 +304,16 @@ describe('SmartPool request-driven relay lifecycle', () => {
     const secondOnEose = vi.fn()
     FakeWebSocket.connectionFailuresRemaining = 3
 
-    pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn(), oneose: firstOnEose, onclose: firstOnClose }
-    )
-    pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [2] }],
-      { onevent: vi.fn(), oneose: secondOnEose, onclose: secondOnClose }
-    )
+    pool
+      .getRelay(RELAY_URL)
+      .subscribe([{ kinds: [1] }], { onevent: vi.fn(), oneose: firstOnEose, onclose: firstOnClose })
+    pool
+      .getRelay(RELAY_URL)
+      .subscribe([{ kinds: [2] }], {
+        onevent: vi.fn(),
+        oneose: secondOnEose,
+        onclose: secondOnClose
+      })
 
     await flushPromises()
     await vi.advanceTimersByTimeAsync(1_000)
@@ -302,10 +337,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
   it('actively reconnects a dropped connection but reports repeated reconnect failures', async () => {
     const pool = createPool()
     const onclose = vi.fn()
-    pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn(), onclose }
-    )
+    pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn(), onclose })
     await waitForReq(FakeWebSocket.instances[0])
 
     FakeWebSocket.connectionFailuresRemaining = 3
@@ -326,10 +358,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     const onclose = vi.fn()
     pool.setNetworkOnline(false)
 
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn(), onclose }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn(), onclose })
     await flushPromises()
     await vi.advanceTimersByTimeAsync(60_000)
 
@@ -348,10 +377,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     const pool = createPool()
     const onclose = vi.fn()
     FakeWebSocket.connectionFailuresRemaining = 1
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn(), onclose }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn(), onclose })
     await flushPromises()
     expect(FakeWebSocket.instances).toHaveLength(1)
 
@@ -369,10 +395,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
 
   it('does not spend retries when an established relay drops while offline', async () => {
     const pool = createPool()
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn() }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn() })
     await waitForReq(FakeWebSocket.instances[0])
 
     pool.setNetworkOnline(false)
@@ -388,10 +411,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
 
   it('does not resurrect REQ demand cancelled during retry backoff', async () => {
     const pool = createPool()
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn() }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn() })
     await waitForReq(FakeWebSocket.instances[0])
 
     FakeWebSocket.instances[0].hardClose()
@@ -414,10 +434,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
 
   it('deduplicates concurrent resume recovery', async () => {
     const pool = createPool()
-    const sub = pool.getRelay(RELAY_URL).subscribe(
-      [{ kinds: [1] }],
-      { onevent: vi.fn() }
-    )
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn() })
     await waitForReq(FakeWebSocket.instances[0])
 
     const first = pool.checkRelays()
@@ -430,8 +447,9 @@ describe('SmartPool request-driven relay lifecycle', () => {
   })
 })
 
-function createPool() {
+function createPool(observe?: RelayObserver) {
   return new SmartPool({
+    observe,
     websocketImplementation: FakeWebSocket as unknown as typeof WebSocket
   })
 }
