@@ -1226,6 +1226,7 @@ export default {
     'Branches and tags': 'Ramas y etiquetas',
     Target: 'Destino',
     Maintainers: 'Mantenedores',
-    'Computing PoW (difficulty {{minPow}})...': 'Calculando PoW (dificultad {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Calculando PoW (dificultad {{minPow}})...',
+    'Playback speed': 'Velocidad de reproducción'
   }
 }

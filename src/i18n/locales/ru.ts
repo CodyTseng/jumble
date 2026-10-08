@@ -1224,6 +1224,7 @@ export default {
     'Branches and tags': 'Ветки и теги',
     Target: 'Цель',
     Maintainers: 'Сопровождающие',
-    'Computing PoW (difficulty {{minPow}})...': 'Вычисление PoW (сложность {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Вычисление PoW (сложность {{minPow}})...',
+    'Playback speed': 'Скорость воспроизведения'
   }
 }

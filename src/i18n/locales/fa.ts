@@ -1218,6 +1218,7 @@ export default {
     'Branches and tags': 'شاخه‌ها و برچسب‌ها',
     Target: 'هدف',
     Maintainers: 'نگه‌دارندگان',
-    'Computing PoW (difficulty {{minPow}})...': 'در حال محاسبه PoW (سختی {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'در حال محاسبه PoW (سختی {{minPow}})...',
+    'Playback speed': 'سرعت پخش'
   }
 }

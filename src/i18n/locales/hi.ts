@@ -1216,6 +1216,7 @@ export default {
     'Branches and tags': 'ब्रांच और टैग',
     Target: 'लक्ष्य',
     Maintainers: 'मेंटेनर',
-    'Computing PoW (difficulty {{minPow}})...': 'PoW की गणना हो रही है (कठिनाई {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'PoW की गणना हो रही है (कठिनाई {{minPow}})...',
+    'Playback speed': 'प्लेबैक गति'
   }
 }

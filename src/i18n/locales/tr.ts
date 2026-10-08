@@ -1222,6 +1222,7 @@ export default {
     'Branches and tags': 'Dallar ve etiketler',
     Target: 'Hedef',
     Maintainers: 'Bakımcılar',
-    'Computing PoW (difficulty {{minPow}})...': 'PoW hesaplanıyor (zorluk {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'PoW hesaplanıyor (zorluk {{minPow}})...',
+    'Playback speed': 'Oynatma hızı'
   }
 }

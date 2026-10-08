@@ -1238,6 +1238,7 @@ export default {
     'Branches and tags': 'Branches et étiquettes',
     Target: 'Cible',
     Maintainers: 'Mainteneurs',
-    'Computing PoW (difficulty {{minPow}})...': 'Calcul du PoW (difficulté {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Calcul du PoW (difficulté {{minPow}})...',
+    'Playback speed': 'Vitesse de lecture'
   }
 }

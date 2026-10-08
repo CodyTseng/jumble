@@ -1203,6 +1203,7 @@ export default {
     'Branches and tags': 'الفروع والوسوم',
     Target: 'الهدف',
     Maintainers: 'المشرفون',
-    'Computing PoW (difficulty {{minPow}})...': 'جارٍ حساب PoW (الصعوبة {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'جارٍ حساب PoW (الصعوبة {{minPow}})...',
+    'Playback speed': 'سرعة التشغيل'
   }
 }

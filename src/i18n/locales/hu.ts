@@ -1221,6 +1221,7 @@ export default {
     'Branches and tags': 'Ágak és címkék',
     Target: 'Cél',
     Maintainers: 'Karbantartók',
-    'Computing PoW (difficulty {{minPow}})...': 'PoW számítása (nehézség: {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'PoW számítása (nehézség: {{minPow}})...',
+    'Playback speed': 'Lejátszási sebesség'
   }
 }

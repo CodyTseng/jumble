@@ -1228,6 +1228,7 @@ export default {
     'Branches and tags': 'Branch e tag',
     Target: 'Destinazione',
     Maintainers: 'Manutentori',
-    'Computing PoW (difficulty {{minPow}})...': 'Calcolo del PoW (difficoltà {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Calcolo del PoW (difficoltà {{minPow}})...',
+    'Playback speed': 'Velocità di riproduzione'
   }
 }

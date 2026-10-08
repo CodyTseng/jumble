@@ -1199,6 +1199,7 @@ export default {
     'Branches and tags': 'แบรนช์และแท็ก',
     Target: 'เป้าหมาย',
     Maintainers: 'ผู้ดูแล',
-    'Computing PoW (difficulty {{minPow}})...': 'กำลังคำนวณ PoW (ความยาก {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'กำลังคำนวณ PoW (ความยาก {{minPow}})...',
+    'Playback speed': 'ความเร็วในการเล่น'
   }
 }

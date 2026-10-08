@@ -1239,6 +1239,7 @@ export default {
     'Branches and tags': 'Branches und Tags',
     Target: 'Ziel',
     Maintainers: 'Maintainer',
-    'Computing PoW (difficulty {{minPow}})...': 'PoW wird berechnet (Schwierigkeit {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'PoW wird berechnet (Schwierigkeit {{minPow}})...',
+    'Playback speed': 'Wiedergabegeschwindigkeit'
   }
 }

@@ -1231,6 +1231,7 @@ export default {
     'Branches and tags': 'Gałęzie i tagi',
     Target: 'Cel',
     Maintainers: 'Opiekunowie',
-    'Computing PoW (difficulty {{minPow}})...': 'Obliczanie PoW (trudność {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'Obliczanie PoW (trudność {{minPow}})...',
+    'Playback speed': 'Prędkość odtwarzania'
   }
 }

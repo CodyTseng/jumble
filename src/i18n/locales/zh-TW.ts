@@ -1212,6 +1212,7 @@ export default {
     'Branches and tags': '分支與標籤',
     Target: '目標',
     Maintainers: '維護者',
-    'Computing PoW (difficulty {{minPow}})...': '正在計算 PoW（難度 {{minPow}}）…'
+    'Computing PoW (difficulty {{minPow}})...': '正在計算 PoW（難度 {{minPow}}）…',
+    'Playback speed': '播放速度'
   }
 }

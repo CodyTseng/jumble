@@ -1218,6 +1218,7 @@ export default {
     'Branches and tags': 'ブランチとタグ',
     Target: '対象',
     Maintainers: 'メンテナー',
-    'Computing PoW (difficulty {{minPow}})...': 'PoW を計算中（難易度 {{minPow}}）…'
+    'Computing PoW (difficulty {{minPow}})...': 'PoW を計算中（難易度 {{minPow}}）…',
+    'Playback speed': '再生速度'
   }
 }

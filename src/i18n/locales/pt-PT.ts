@@ -1229,6 +1229,7 @@ export default {
     'Branches and tags': 'Ramos e etiquetas',
     Target: 'Destino',
     Maintainers: 'Responsáveis pela manutenção',
-    'Computing PoW (difficulty {{minPow}})...': 'A calcular PoW (dificuldade {{minPow}})...'
+    'Computing PoW (difficulty {{minPow}})...': 'A calcular PoW (dificuldade {{minPow}})...',
+    'Playback speed': 'Velocidade de reprodução'
   }
 }
