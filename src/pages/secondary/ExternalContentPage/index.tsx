@@ -38,7 +38,7 @@ const ExternalContentPage = forwardRef(({ index }: { index?: number }, ref) => {
           displayTopZapsAndLikes
         />
       </div>
-      <Separator className="mt-4" />
+      <Separator className="mt-3" />
       <ExternalContentInteractions externalContent={id} />
     </SecondaryPageLayout>
   )

@@ -45,20 +45,6 @@ export default function StuffStats({
   if (isSmallScreen) {
     return (
       <div className={cn('select-none', className)}>
-        {displayTopZapsAndLikes && (
-          <>
-            <TopZaps
-              stuff={stuff}
-              scrollAreaClassName={classNames?.topList}
-              contentClassName={classNames?.topListContent}
-            />
-            <Likes
-              stuff={stuff}
-              scrollAreaClassName={classNames?.topList}
-              contentClassName={classNames?.topListContent}
-            />
-          </>
-        )}
         <div
           className={cn(
             'flex h-5 items-center justify-between [&_svg]:size-5',
@@ -72,26 +58,26 @@ export default function StuffStats({
           <ZapButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>
+        {displayTopZapsAndLikes && (
+          <div className="mt-3 flex flex-col gap-3 border-t pt-3 empty:hidden">
+            <TopZaps
+              stuff={stuff}
+              scrollAreaClassName={cn('mb-0 pb-0', classNames?.topList)}
+              contentClassName={classNames?.topListContent}
+            />
+            <Likes
+              stuff={stuff}
+              scrollAreaClassName={cn('mb-0 pb-0', classNames?.topList)}
+              contentClassName={classNames?.topListContent}
+            />
+          </div>
+        )}
       </div>
     )
   }
 
   return (
     <div className={cn('select-none', className)}>
-      {displayTopZapsAndLikes && (
-        <>
-          <TopZaps
-            stuff={stuff}
-            scrollAreaClassName={classNames?.topList}
-            contentClassName={classNames?.topListContent}
-          />
-          <Likes
-            stuff={stuff}
-            scrollAreaClassName={classNames?.topList}
-            contentClassName={classNames?.topListContent}
-          />
-        </>
-      )}
       <div className="flex h-5 justify-between [&_svg]:size-4">
         <div className={cn('flex items-center', loading ? 'animate-pulse' : '')}>
           <ReplyButton stuff={stuff} />
@@ -99,11 +85,25 @@ export default function StuffStats({
           <LikeButton stuff={stuff} />
           <ZapButton stuff={stuff} />
         </div>
-        <div className="flex items-center">
+        <div className="flex shrink-0 items-center">
           <BookmarkButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>
       </div>
+      {displayTopZapsAndLikes && (
+        <div className="mt-3 flex flex-col gap-3 border-t pt-3 empty:hidden">
+          <TopZaps
+            stuff={stuff}
+            scrollAreaClassName={cn('mb-0 pb-0', classNames?.topList)}
+            contentClassName={classNames?.topListContent}
+          />
+          <Likes
+            stuff={stuff}
+            scrollAreaClassName={cn('mb-0 pb-0', classNames?.topList)}
+            contentClassName={classNames?.topListContent}
+          />
+        </div>
+      )}
     </div>
   )
 }

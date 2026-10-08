@@ -241,7 +241,7 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
           />
         </div>
       </div>
-      <Separator className="mt-4" />
+      <Separator className="mt-3" />
       <NoteInteractions key={`note-interactions-${event.id}`} event={event} opPubkey={opPubkey} />
     </SecondaryPageLayout>
   )
