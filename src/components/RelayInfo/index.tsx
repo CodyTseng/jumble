@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import Content from '../Content'
 import PostEditor from '../PostEditor'
 import RelayIcon from '../RelayIcon'
+import RelayActivityButton from '../RelayObservations/RelayActivityButton'
 import RelayMembershipControl from '../RelayMembershipControl'
 import SaveRelayDropdownMenu from '../SaveRelayDropdownMenu'
 import UserAvatar from '../UserAvatar'
@@ -41,7 +42,7 @@ export default function RelayInfo({ url, className }: { url: string; className?:
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-1 items-center gap-2">
               <RelayIcon url={url} className="h-8 w-8" />
-              <div className="w-0 flex-1 select-text truncate text-2xl font-semibold">
+              <div className="w-0 flex-1 truncate text-2xl font-semibold select-text">
                 {relayInfo.name || relayInfo.shortUrl}
               </div>
             </div>
@@ -55,18 +56,18 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             </div>
           )}
           {relayInfo.description && (
-            <div className="mt-2 select-text whitespace-pre-wrap text-wrap wrap-break-word">
+            <div className="mt-2 text-wrap wrap-break-word whitespace-pre-wrap select-text">
               <Content event={createFakeEvent({ content: relayInfo.description })} />
             </div>
           )}
         </div>
 
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-muted-foreground">{t('Homepage')}</div>
+          <div className="text-muted-foreground text-sm font-semibold">{t('Homepage')}</div>
           <a
             href={normalizeHttpUrl(relayInfo.url)}
             target="_blank"
-            className="block w-fit max-w-full select-text truncate text-primary hover:underline"
+            className="text-primary block w-fit max-w-full truncate select-text hover:underline"
           >
             {normalizeHttpUrl(relayInfo.url)}
           </a>
@@ -76,17 +77,17 @@ export default function RelayInfo({ url, className }: { url: string; className?:
           <div className="flex gap-8 pb-2">
             {relayInfo.pubkey && (
               <div className="w-fit space-y-2">
-                <div className="text-sm font-semibold text-muted-foreground">{t('Operator')}</div>
+                <div className="text-muted-foreground text-sm font-semibold">{t('Operator')}</div>
                 <div className="flex items-center gap-2">
                   <UserAvatar userId={relayInfo.pubkey} size="small" />
-                  <Username userId={relayInfo.pubkey} className="text-nowrap font-semibold" />
+                  <Username userId={relayInfo.pubkey} className="font-semibold text-nowrap" />
                 </div>
               </div>
             )}
             {relayInfo.contact && (
               <div className="w-fit space-y-2">
-                <div className="text-sm font-semibold text-muted-foreground">{t('Contact')}</div>
-                <div className="flex select-text items-center gap-2 text-nowrap font-semibold">
+                <div className="text-muted-foreground text-sm font-semibold">{t('Contact')}</div>
+                <div className="flex items-center gap-2 font-semibold text-nowrap select-text">
                   <Mail />
                   {relayInfo.contact}
                 </div>
@@ -94,8 +95,8 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             )}
             {relayInfo.software && (
               <div className="w-fit space-y-2">
-                <div className="text-sm font-semibold text-muted-foreground">{t('Software')}</div>
-                <div className="flex select-text items-center gap-2 text-nowrap font-semibold">
+                <div className="text-muted-foreground text-sm font-semibold">{t('Software')}</div>
+                <div className="flex items-center gap-2 font-semibold text-nowrap select-text">
                   <SquareCode />
                   {formatSoftware(relayInfo.software)}
                 </div>
@@ -103,8 +104,8 @@ export default function RelayInfo({ url, className }: { url: string; className?:
             )}
             {relayInfo.version && (
               <div className="w-fit space-y-2">
-                <div className="text-sm font-semibold text-muted-foreground">{t('Version')}</div>
-                <div className="flex select-text items-center gap-2 text-nowrap font-semibold">
+                <div className="text-muted-foreground text-sm font-semibold">{t('Version')}</div>
+                <div className="flex items-center gap-2 font-semibold text-nowrap select-text">
                   <GitBranch />
                   {relayInfo.version}
                 </div>
@@ -156,6 +157,7 @@ function RelayControls({ url }: { url: string }) {
 
   return (
     <div className="flex items-center gap-1">
+      <RelayActivityButton url={url} />
       <Button variant="ghost" size="titlebar-icon" onClick={handleCopyShareableUrl}>
         {copiedShareableUrl ? <Check /> : <Share2 />}
       </Button>

@@ -19,6 +19,7 @@ import ProfileEditorPage from '@/pages/secondary/ProfileEditorPage'
 import ProfileListPage from '@/pages/secondary/ProfileListPage'
 import ProfilePage from '@/pages/secondary/ProfilePage'
 import RelayPage from '@/pages/secondary/RelayPage'
+import RelayActivityPage from '@/pages/secondary/RelayActivityPage'
 import RelayReviewsPage from '@/pages/secondary/RelayReviewsPage'
 import RelaySettingsPage from '@/pages/secondary/RelaySettingsPage'
 import RizfulPage from '@/pages/secondary/RizfulPage'
@@ -47,6 +48,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/users/:id/following', element: <FollowingListPage /> },
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
+  { path: '/relays/:url/activity', element: <RelayActivityPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/external-content', element: <ExternalContentPage /> },

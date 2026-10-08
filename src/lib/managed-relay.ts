@@ -1,5 +1,6 @@
 import { AbstractRelay, SendingOnClosedConnection } from 'nostr-tools/abstract-relay'
 import { IRelay, TSubCloser, TSubHandlers } from '../types/relay-pool'
+import type { RelayObserver } from './relay-observation'
 
 const DEFAULT_CONNECTION_TIMEOUT = 10 * 1000
 const RETRY_DELAYS_MS = [1_000, 2_000]
@@ -10,6 +11,7 @@ type LogicalSubscription = {
   handlers: TSubHandlers
   physicalSub?: TSubCloser
   eosed: boolean
+  readTimer?: ReturnType<typeof setTimeout>
 }
 
 /**
@@ -34,13 +36,18 @@ export class ManagedRelay implements IRelay {
     readonly url: string,
     private readonly createConnection: () => AbstractRelay,
     private readonly assertConnectionAllowed: () => void,
-    private readonly onIdle?: () => void
+    private readonly onIdle?: () => void,
+    private readonly observe?: RelayObserver
   ) {}
 
-  publish(event: Parameters<IRelay['publish']>[0]): Promise<unknown> {
+  publish(
+    event: Parameters<IRelay['publish']>[0],
+    onstart?: (startedAt: number) => void
+  ): Promise<unknown> {
     return this.withRelay(async (relay) => {
       relay.publishTimeout = this.publishTimeout
       try {
+        onstart?.(Date.now())
         return await relay.publish(event)
       } catch (error) {
         if (isBrokenPublishConnection(error)) this.recycle()
@@ -145,12 +152,14 @@ export class ManagedRelay implements IRelay {
     const attempt = (async () => {
       let relay: AbstractRelay | undefined
       let established = false
+      let startedAt: number | undefined
       try {
         this.assertConnectionAllowed()
         const nextRelay = this.createConnection()
         relay = nextRelay
         this.connection = nextRelay
         nextRelay.onclose = () => this.handleConnectionClose(nextRelay, generation, established)
+        startedAt = Date.now()
         await nextRelay.connect({ timeout: DEFAULT_CONNECTION_TIMEOUT, abort: abort.signal })
 
         if (this.generation !== generation || this.connection !== nextRelay) {
@@ -160,6 +169,12 @@ export class ManagedRelay implements IRelay {
         }
 
         established = true
+        this.observe?.({
+          type: 'connection',
+          url: this.url,
+          at: startedAt,
+          duration: Date.now() - startedAt
+        })
         this.connectionFailures = 0
         this.attachSubscriptions(nextRelay)
         return nextRelay
@@ -167,6 +182,19 @@ export class ManagedRelay implements IRelay {
         if (this.generation === generation) {
           if (relay) relay.onclose = null
           if (this.connection === relay) this.connection = undefined
+          if (
+            startedAt !== undefined &&
+            !established &&
+            !abort.signal.aborted &&
+            this.networkOnline
+          ) {
+            const duration = Date.now() - startedAt
+            const reason = error instanceof Error ? error.message : String(error)
+            // A delayed timer after system sleep is not a relay failure.
+            if (!reason.includes('timed out') || duration < DEFAULT_CONNECTION_TIMEOUT * 1.5) {
+              this.observe?.({ type: 'connection', url: this.url, at: startedAt, duration, reason })
+            }
+          }
           this.recordConnectionFailure(error)
         }
         throw error
@@ -205,13 +233,43 @@ export class ManagedRelay implements IRelay {
   private attachSubscription(logical: LogicalSubscription, relay: AbstractRelay) {
     if (!this.subscriptions.has(logical) || logical.physicalSub) return
 
+    // Register before nostr-tools' synthetic EOSE timer, so an actual EOSE
+    // clears this deadline while a timeout can be reported separately.
+    const startedAt = Date.now()
+    logical.handlers.onrequest?.(startedAt)
+    if (!logical.eosed) {
+      const timeout = logical.handlers.eoseTimeout ?? DEFAULT_CONNECTION_TIMEOUT
+      logical.readTimer = setTimeout(() => {
+        logical.readTimer = undefined
+        if (!this.subscriptions.has(logical) || logical.eosed) return
+        if (this.networkOnline && Date.now() - startedAt < timeout * 1.5) {
+          logical.handlers.ontimeout?.()
+        }
+        this.notifyEose(logical)
+      }, timeout)
+    }
+
     const physicalSub = relay.subscribe(cloneFilters(logical.filters), {
       ...logical.handlers,
+      eoseTimeout: logical.handlers.eoseTimeout ?? DEFAULT_CONNECTION_TIMEOUT,
+      // Observe verified, matching data before application deduplication.
+      alreadyHaveEvent: logical.handlers.ondata ? undefined : logical.handlers.alreadyHaveEvent,
+      onevent: (event) => {
+        if (logical.handlers.ondata) {
+          logical.handlers.ondata(Date.now())
+          if (logical.handlers.alreadyHaveEvent?.(event.id)) return
+        }
+        logical.handlers.onevent?.(event)
+      },
       receivedEvent: logical.handlers.receivedEvent
         ? (_relay, id) => logical.handlers.receivedEvent?.(this, id)
         : undefined,
-      oneose: () => this.notifyEose(logical),
+      oneose: () => {
+        this.clearReadTimer(logical)
+        this.notifyEose(logical)
+      },
       onclose: (reason) => {
+        this.clearReadTimer(logical)
         if (logical.physicalSub === physicalSub) logical.physicalSub = undefined
         if (!this.subscriptions.has(logical)) return
         // AbstractRelay closes physical subscriptions when its socket drops.
@@ -246,6 +304,7 @@ export class ManagedRelay implements IRelay {
 
   private removeSubscription(logical: LogicalSubscription) {
     if (!this.subscriptions.delete(logical)) return
+    this.clearReadTimer(logical)
     logical.physicalSub = undefined
     if (this.subscriptions.size === 0) this.clearRetryTimer()
   }
@@ -332,6 +391,11 @@ export class ManagedRelay implements IRelay {
     if (this.subscriptions.size > 0 || this.transientOperations > 0) return
     this.closeConnection()
     this.onIdle?.()
+  }
+
+  private clearReadTimer(logical: LogicalSubscription) {
+    if (logical.readTimer) clearTimeout(logical.readTimer)
+    logical.readTimer = undefined
   }
 
   private clearRetryTimer() {

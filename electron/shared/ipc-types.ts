@@ -1,6 +1,8 @@
+import type { RelayObservation } from '../../src/lib/relay-observation'
 import type { Event as NEvent, EventTemplate, Filter, VerifiedEvent } from 'nostr-tools'
 
 export const IPC_CHANNELS = {
+  observation: 'relay:observation',
   checkRelays: 'relay:check-relays',
   setNetworkOnline: 'relay:set-network-online',
   publish: 'relay:publish',
@@ -115,10 +117,18 @@ export type TAuthResponsePayload = {
   error?: string
 }
 
+export type TRelayTransportObservation =
+  | Extract<RelayObservation, { type: 'connection' }>
+  | { type: 'request-start'; subId: string; at: number }
+  | { type: 'read-data'; subId: string; at: number }
+  | { type: 'read-timeout'; subId: string }
+  | { type: 'publish-start'; operationId: string; at: number }
+
 export type TElectronRelayBridge = {
+  onObservation: (cb: (payload: TRelayTransportObservation) => void) => () => void
   checkRelays: () => Promise<void>
   setNetworkOnline: (online: boolean) => Promise<void>
-  publish: (url: string, event: NEvent, timeoutMs: number) => Promise<void>
+  publish: (url: string, event: NEvent, timeoutMs: number, operationId?: string) => Promise<void>
   subscribe: (subId: string, url: string, filters: Filter[]) => Promise<void>
   closeSub: (subId: string) => Promise<void>
   auth: (url: string) => Promise<void>

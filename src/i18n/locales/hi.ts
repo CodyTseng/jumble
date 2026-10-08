@@ -1217,6 +1217,56 @@ export default {
     Target: 'लक्ष्य',
     Maintainers: 'मेंटेनर',
     'Computing PoW (difficulty {{minPow}})...': 'PoW की गणना हो रही है (कठिनाई {{minPow}})...',
-    'Playback speed': 'प्लेबैक गति'
+    'Playback speed': 'प्लेबैक गति',
+    'Relay activity': 'रिले गतिविधि',
+    'Last 7 active days': 'पिछले 7 सक्रिय दिन',
+    'Connection attempts': 'कनेक्शन के प्रयास',
+    'Connection failures': 'विफल कनेक्शन',
+    'Failure rate': 'विफलता दर',
+    'Today (in progress)': 'आज (जारी)',
+    'Connection time': 'कनेक्शन में लगा समय',
+    'Write time': 'लिखने में लगा समय',
+    'First event time': 'पहला डेटा आने में लगा समय',
+    'Observation samples': '{{count}} नमूने',
+    'Waiting for first event or EOSE': 'पहले डेटा या क्वेरी पूरी होने की प्रतीक्षा',
+    'Waiting for query completion': 'क्वेरी पूरी होने की प्रतीक्षा',
+    'No recorded issues': 'कोई समस्या दर्ज नहीं है',
+    'No relay activity recorded yet': 'अभी तक कोई रिले गतिविधि दर्ज नहीं हुई है',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'कनेक्शन के रंग विफलता दर दिखाते हैं; धूसर रंग का अर्थ है कि कनेक्शन का कोई प्रयास नहीं हुआ।',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'सफल कार्यों में लगे समय की अनुमानित माध्यिका। इसमें प्रमाणीकरण के दोबारा प्रयासों की प्रतीक्षा शामिल है। खाली परिणाम वाली क्वेरी से पहले डेटा का समय दर्ज नहीं होता।',
+    'Read rejections': 'अस्वीकृत पढ़ने के अनुरोध',
+    'Read timeouts': 'पढ़ने की समय-सीमा समाप्त',
+    'Write rejections': 'अस्वीकृत लिखने के अनुरोध',
+    'Write timeouts': 'लिखने की समय-सीमा समाप्त',
+    'No write confirmation received': 'लिखने की पुष्टि नहीं मिली',
+    'Authentication issues': 'प्रमाणीकरण संबंधी समस्याएँ',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'हर रिले के पिछले 7 सक्रिय दिनों में इस डिवाइस द्वारा देखी गई गतिविधि।',
+    'Configured relays': 'कॉन्फ़िगर किए गए रिले',
+    'Other used relays': 'अन्य इस्तेमाल किए गए रिले',
+    'Other reasons': 'अन्य कारण',
+    'Unknown reason': 'अज्ञात कारण',
+    'Latest active day': 'सबसे हाल का सक्रिय दिन',
+    'Relays are sorted by connection attempts across recorded days.':
+      'रिले को दर्ज किए गए दिनों में कनेक्शन के प्रयासों की संख्या के अनुसार क्रमबद्ध किया गया है।',
+    'Recorded connection attempts': 'दर्ज किए गए कनेक्शन प्रयास: {{count}}',
+    'Statistics across recorded days': 'दर्ज किए गए दिनों के आँकड़े',
+    'Total connections': 'कुल कनेक्शन',
+    'View relay details': 'रिले का विवरण देखें',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'तालिका सबसे हाल के सक्रिय दिन के आँकड़े दिखाती है; कुल कनेक्शन में सभी दर्ज दिन शामिल हैं। विवरण के लिए किसी रिले पर क्लिक करें।',
+    'No query response received': 'क्वेरी का कोई जवाब नहीं मिला',
+    'Query not completed after receiving data': 'डेटा मिलने के बाद क्वेरी पूरी नहीं हुई',
+    'View relay feed': 'रिले फ़ीड देखें',
+    'Open relay': 'रिले खोलें',
+    'View relay': 'रिले देखें',
+    View: 'देखें',
+    Metrics: 'मेट्रिक्स',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'ये आँकड़े इस डिवाइस पर Jumble इस्तेमाल करते समय दर्ज किए गए डेटा का सारांश हैं और रिले की संपूर्ण निगरानी का परिणाम नहीं हैं।',
+    'Observation samples_one': '{{count}} नमूना',
+    'Observation samples_other': '{{count}} नमूने'
   }
 }

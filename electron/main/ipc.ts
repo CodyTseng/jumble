@@ -44,8 +44,10 @@ export function registerIpcHandlers(
     manager.setNetworkOnline(online)
   )
 
-  ipcMain.handle(IPC_CHANNELS.publish, (_e, url: string, event: NEvent, timeoutMs: number) =>
-    manager.publish(url, event, timeoutMs)
+  ipcMain.handle(
+    IPC_CHANNELS.publish,
+    (_e, url: string, event: NEvent, timeoutMs: number, operationId?: string) =>
+      manager.publish(url, event, timeoutMs, operationId)
   )
 
   ipcMain.handle(IPC_CHANNELS.subscribe, (_e, subId: string, url: string, filters: Filter[]) =>

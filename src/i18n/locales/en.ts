@@ -1248,6 +1248,56 @@ export default {
     Target: 'Target',
     Maintainers: 'Maintainers',
     'Computing PoW (difficulty {{minPow}})...': 'Computing PoW (difficulty {{minPow}})...',
-    'Playback speed': 'Playback speed'
+    'Playback speed': 'Playback speed',
+    'Relay activity': 'Relay activity',
+    'Last 7 active days': 'Last 7 active days',
+    'Connection attempts': 'Connection attempts',
+    'Connection failures': 'Connection failures',
+    'Failure rate': 'Failure rate',
+    'Today (in progress)': 'Today (in progress)',
+    'Connection time': 'Connection time',
+    'Write time': 'Write time',
+    'First event time': 'First event time',
+    'Observation samples': '{{count}} samples',
+    'Waiting for first event or EOSE': 'Waiting for first data or query completion',
+    'Waiting for query completion': 'Waiting for query completion',
+    'No recorded issues': 'No recorded issues',
+    'No relay activity recorded yet': 'No relay activity recorded yet',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'Connection colors describe failure rate; gray means no connection attempts.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.',
+    'Read rejections': 'Read rejections',
+    'Read timeouts': 'Read timeouts',
+    'Write rejections': 'Write rejections',
+    'Write timeouts': 'Write timeouts',
+    'No write confirmation received': 'No write confirmation received',
+    'Authentication issues': 'Authentication issues',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'Activity observed by this device, across the last 7 active days for each relay.',
+    'Configured relays': 'Configured relays',
+    'Other used relays': 'Other used relays',
+    'Other reasons': 'Other reasons',
+    'Unknown reason': 'Unknown reason',
+    'Observation samples_one': '{{count}} sample',
+    'Observation samples_other': '{{count}} samples',
+    'Latest active day': 'Latest active day',
+    'Relays are sorted by connection attempts across recorded days.':
+      'Relays are sorted by connection attempts across recorded days.',
+    'Recorded connection attempts': 'Recorded connection attempts: {{count}}',
+    'Statistics across recorded days': 'Statistics across recorded days',
+    'Total connections': 'Total connections',
+    'View relay details': 'View relay details',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.',
+    'No query response received': 'No query response received',
+    'Query not completed after receiving data': 'Query not completed after receiving data',
+    'View relay feed': 'View relay feed',
+    'Open relay': 'Open relay',
+    'View relay': 'View relay',
+    View: 'View',
+    Metrics: 'Metrics',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.'
   }
 }

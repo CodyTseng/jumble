@@ -1222,6 +1222,57 @@ export default {
     Target: 'Cél',
     Maintainers: 'Karbantartók',
     'Computing PoW (difficulty {{minPow}})...': 'PoW számítása (nehézség: {{minPow}})...',
-    'Playback speed': 'Lejátszási sebesség'
+    'Playback speed': 'Lejátszási sebesség',
+    'Relay activity': 'Csomópont-aktivitás',
+    'Last 7 active days': 'Legutóbbi 7 aktív nap',
+    'Connection attempts': 'Csatlakozási kísérletek',
+    'Connection failures': 'Sikertelen csatlakozások',
+    'Failure rate': 'Hibaarány',
+    'Today (in progress)': 'Ma (folyamatban)',
+    'Connection time': 'Csatlakozási idő',
+    'Write time': 'Írási idő',
+    'First event time': 'Első adat érkezési ideje',
+    'Observation samples': '{{count}} minta',
+    'Waiting for first event or EOSE': 'Várakozás az első adatra vagy a lekérdezés befejezésére',
+    'Waiting for query completion': 'Várakozás a lekérdezés befejezésére',
+    'No recorded issues': 'Nincs rögzített probléma',
+    'No relay activity recorded yet': 'Még nincs rögzített csomópont-aktivitás',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'A csatlakozás színei a hibaarányt jelzik; a szürke azt jelenti, hogy nem volt csatlakozási kísérlet.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'A sikeres műveletek időtartamának közelítő mediánja, a hitelesítési újrapróbálkozások várakozási idejével együtt. Az üres lekérdezéseknél nem mérhető az első adat beérkezési ideje.',
+    'Read rejections': 'Elutasított olvasások',
+    'Read timeouts': 'Olvasási időtúllépések',
+    'Write rejections': 'Elutasított írások',
+    'Write timeouts': 'Írási időtúllépések',
+    'No write confirmation received': 'Nem érkezett írási visszaigazolás',
+    'Authentication issues': 'Hitelesítési problémák',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'Az eszközön megfigyelt aktivitás az egyes csomópontok legutóbbi 7 aktív napján.',
+    'Configured relays': 'Beállított csomópontok',
+    'Other used relays': 'Más használt csomópontok',
+    'Other reasons': 'Egyéb okok',
+    'Unknown reason': 'Ismeretlen ok',
+    'Latest active day': 'Legutóbbi aktív nap',
+    'Relays are sorted by connection attempts across recorded days.':
+      'A csomópontok a rögzített napok csatlakozási kísérleteinek száma szerint vannak rendezve.',
+    'Recorded connection attempts': 'Rögzített csatlakozási kísérletek: {{count}}',
+    'Statistics across recorded days': 'A rögzített napok statisztikái',
+    'Total connections': 'Összes csatlakozás',
+    'View relay details': 'Csomópont részleteinek megtekintése',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'A táblázat a legutóbbi aktív nap adatait mutatja; az összes csatlakozás az összes rögzített napot lefedi. A részletekhez kattints egy csomópontra.',
+    'No query response received': 'Nem érkezett válasz a lekérdezésre',
+    'Query not completed after receiving data':
+      'Az adatok fogadása után nem fejeződött be a lekérdezés',
+    'View relay feed': 'Csomópont hírfolyamának megtekintése',
+    'Open relay': 'Csomópont megnyitása',
+    'View relay': 'Csomópont megtekintése',
+    View: 'Megtekintés',
+    Metrics: 'Mérőszámok',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'Ezek a statisztikák a Jumble ezen az eszközön történő használata során rögzített adatokat összegzik, és nem jelentik a csomópont teljes körű felügyeletét.',
+    'Observation samples_one': '{{count}} minta',
+    'Observation samples_other': '{{count}} minta'
   }
 }

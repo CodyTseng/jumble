@@ -1219,6 +1219,56 @@ export default {
     Target: '対象',
     Maintainers: 'メンテナー',
     'Computing PoW (difficulty {{minPow}})...': 'PoW を計算中（難易度 {{minPow}}）…',
-    'Playback speed': '再生速度'
+    'Playback speed': '再生速度',
+    'Relay activity': 'リレイの活動',
+    'Last 7 active days': '直近の活動日（最大7日）',
+    'Connection attempts': '接続試行回数',
+    'Connection failures': '接続失敗回数',
+    'Failure rate': '失敗率',
+    'Today (in progress)': '今日（集計中）',
+    'Connection time': '接続時間',
+    'Write time': '書き込み時間',
+    'First event time': '最初のデータ受信時間',
+    'Observation samples': '{{count}} 件のサンプル',
+    'Waiting for first event or EOSE': '最初のデータまたはクエリ完了を待機中',
+    'Waiting for query completion': 'クエリ完了を待機中',
+    'No recorded issues': '記録された問題はありません',
+    'No relay activity recorded yet': 'リレイの活動はまだ記録されていません',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      '接続の色は失敗率を表します。灰色は接続の試行がなかったことを示します。',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      '成功した処理の所要時間の概算中央値です。認証の再試行による待ち時間も含みます。結果が空のクエリは最初のデータ受信時間の対象外です。',
+    'Read rejections': '読み取り拒否',
+    'Read timeouts': '読み取りタイムアウト',
+    'Write rejections': '書き込み拒否',
+    'Write timeouts': '書き込みタイムアウト',
+    'No write confirmation received': '書き込み確認を受信できませんでした',
+    'Authentication issues': '認証の問題',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'この端末で観測した、各リレイの直近7日分の活動です。活動のあった日のみを対象とします。',
+    'Configured relays': '設定済みのリレイ',
+    'Other used relays': '使用したその他のリレイ',
+    'Other reasons': 'その他の理由',
+    'Unknown reason': '不明な理由',
+    'Latest active day': '直近の活動日',
+    'Relays are sorted by connection attempts across recorded days.':
+      '記録された日の接続試行回数でリレイを並べ替えます。',
+    'Recorded connection attempts': '記録された接続試行回数：{{count}}',
+    'Statistics across recorded days': '記録された日の統計',
+    'Total connections': '合計接続回数',
+    'View relay details': 'リレイの詳細を表示',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      '表は直近の活動日のデータを表示し、合計接続回数は記録されたすべての日を集計します。リレイをクリックすると詳細を表示します。',
+    'No query response received': 'クエリの応答を受信できませんでした',
+    'Query not completed after receiving data': 'データ受信後にクエリが完了しませんでした',
+    'View relay feed': 'リレイのフィードを表示',
+    'Open relay': 'リレイを開く',
+    'View relay': 'リレイを表示',
+    View: '表示',
+    Metrics: '観測',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'この統計は、この端末でJumbleを使用している間に記録されたデータの集計であり、リレイ全体の監視結果を示すものではありません。',
+    'Observation samples_one': '{{count}} 件のサンプル',
+    'Observation samples_other': '{{count}} 件のサンプル'
   }
 }

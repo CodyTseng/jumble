@@ -1219,6 +1219,56 @@ export default {
     Target: 'هدف',
     Maintainers: 'نگه‌دارندگان',
     'Computing PoW (difficulty {{minPow}})...': 'در حال محاسبه PoW (سختی {{minPow}})...',
-    'Playback speed': 'سرعت پخش'
+    'Playback speed': 'سرعت پخش',
+    'Relay activity': 'فعالیت رله',
+    'Last 7 active days': '۷ روز فعال اخیر',
+    'Connection attempts': 'تلاش‌های اتصال',
+    'Connection failures': 'اتصال‌های ناموفق',
+    'Failure rate': 'نرخ شکست',
+    'Today (in progress)': 'امروز (در حال ثبت)',
+    'Connection time': 'زمان اتصال',
+    'Write time': 'زمان نوشتن',
+    'First event time': 'زمان دریافت نخستین داده',
+    'Observation samples': '{{count}} نمونه',
+    'Waiting for first event or EOSE': 'در انتظار نخستین داده یا تکمیل پرس‌وجو',
+    'Waiting for query completion': 'در انتظار تکمیل پرس‌وجو',
+    'No recorded issues': 'مشکلی ثبت نشده است',
+    'No relay activity recorded yet': 'هنوز فعالیتی برای رله ثبت نشده است',
+    'Connection colors describe failure rate; gray means no connection attempts.':
+      'رنگ‌های اتصال نرخ شکست را نشان می‌دهند؛ خاکستری یعنی هیچ تلاشی برای اتصال انجام نشده است.',
+    'Approximate median of successful operations. Authentication retries are included. Empty queries have no first event time.':
+      'میانهٔ تقریبی زمان عملیات موفق، شامل زمان انتظار تلاش‌های مجدد احراز هویت. پرس‌وجوهای بدون نتیجه، نمونه‌ای برای زمان دریافت نخستین داده ندارند.',
+    'Read rejections': 'خواندن‌های ردشده',
+    'Read timeouts': 'پایان مهلت خواندن',
+    'Write rejections': 'نوشتن‌های ردشده',
+    'Write timeouts': 'پایان مهلت نوشتن',
+    'No write confirmation received': 'تأیید نوشتن دریافت نشد',
+    'Authentication issues': 'مشکلات احراز هویت',
+    'Activity observed by this device, across the last 7 active days for each relay.':
+      'فعالیت مشاهده‌شده توسط این دستگاه در ۷ روز فعال اخیر هر رله.',
+    'Configured relays': 'رله‌های پیکربندی‌شده',
+    'Other used relays': 'سایر رله‌های استفاده‌شده',
+    'Other reasons': 'دلایل دیگر',
+    'Unknown reason': 'دلیل نامشخص',
+    'Latest active day': 'آخرین روز فعال',
+    'Relays are sorted by connection attempts across recorded days.':
+      'رله‌ها بر اساس تعداد تلاش‌های اتصال در روزهای ثبت‌شده مرتب می‌شوند.',
+    'Recorded connection attempts': 'تلاش‌های اتصال ثبت‌شده: {{count}}',
+    'Statistics across recorded days': 'آمار روزهای ثبت‌شده',
+    'Total connections': 'مجموع اتصال‌ها',
+    'View relay details': 'مشاهدهٔ جزئیات رله',
+    'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.':
+      'جدول داده‌های آخرین روز فعال را نشان می‌دهد؛ مجموع اتصال‌ها شامل همهٔ روزهای ثبت‌شده است. برای مشاهدهٔ جزئیات روی رله کلیک کنید.',
+    'No query response received': 'پاسخی به پرس‌وجو دریافت نشد',
+    'Query not completed after receiving data': 'پرس‌وجو پس از دریافت داده تکمیل نشد',
+    'View relay feed': 'مشاهدهٔ خوراک رله',
+    'Open relay': 'باز کردن رله',
+    'View relay': 'مشاهدهٔ رله',
+    View: 'مشاهده',
+    Metrics: 'شاخص‌ها',
+    'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
+      'این آمار خلاصهٔ داده‌های ثبت‌شده هنگام استفاده از Jumble در این دستگاه است و پایش کامل رله را نشان نمی‌دهد.',
+    'Observation samples_one': '{{count}} نمونه',
+    'Observation samples_other': '{{count}} نمونه'
   }
 }
