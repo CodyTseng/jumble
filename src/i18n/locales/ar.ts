@@ -1259,6 +1259,7 @@ export default {
     'Observation samples_zero': 'عدد العينات: {{count}}',
     'Observation samples_one': 'عدد العينات: {{count}}',
     'Observation samples_other': 'عدد العينات: {{count}}',
-    'Connection quality': 'جودة الاتصال'
+    'Connection quality': 'جودة الاتصال',
+    'Recorded issues': 'المشكلات المسجلة'
   }
 }

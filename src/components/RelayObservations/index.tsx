@@ -10,6 +10,7 @@ import relayObservations from '@/services/relay-observation.service'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
+import { connectionQualityBackgrounds, getConnectionQuality } from './connection-quality'
 
 export function useRelayObservations() {
   useSyncExternalStore(relayObservations.subscribe, relayObservations.getSnapshot)
@@ -46,16 +47,8 @@ function Day({ day }: { day: RelayObservationDay }) {
   const [open, setOpen] = useState(false)
   const failures = sumCounts(day.connectionFailures)
   const ratio = day.connections ? failures / day.connections : undefined
-  const color =
-    ratio === undefined
-      ? 'bg-muted'
-      : ratio === 0
-        ? 'bg-emerald-500'
-        : ratio <= 0.1
-          ? 'bg-yellow-400'
-          : ratio <= 0.5
-            ? 'bg-orange-500'
-            : 'bg-red-500'
+  const quality = getConnectionQuality(ratio)
+  const color = quality ? connectionQualityBackgrounds[quality] : 'bg-muted'
   const label = `${day.date}: ${t('Connection attempts')} ${day.connections}, ${t('Connection failures')} ${failures}`
   return (
     <HoverCard open={open} onOpenChange={setOpen} openDelay={100}>

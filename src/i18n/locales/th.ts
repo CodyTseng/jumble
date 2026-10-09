@@ -1251,6 +1251,7 @@ export default {
       'สถิติเหล่านี้สรุปจากข้อมูลที่บันทึกไว้ขณะใช้ Jumble บนอุปกรณ์นี้ ไม่ใช่ข้อมูลการตรวจสอบรีเลย์อย่างครบถ้วน',
     'Observation samples_one': '{{count}} ตัวอย่าง',
     'Observation samples_other': '{{count}} ตัวอย่าง',
-    'Connection quality': 'คุณภาพการเชื่อมต่อ'
+    'Connection quality': 'คุณภาพการเชื่อมต่อ',
+    'Recorded issues': 'ปัญหาที่บันทึกไว้'
   }
 }

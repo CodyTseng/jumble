@@ -1264,6 +1264,7 @@ export default {
       '以下统计仅根据本设备使用 Jumble 期间记录的数据汇总，不代表该 Relay 的完整监测结果。',
     'Observation samples_one': '{{count}} 个样本',
     'Observation samples_other': '{{count}} 个样本',
-    'Connection quality': '连接质量'
+    'Connection quality': '连接质量',
+    'Recorded issues': '记录到的问题'
   }
 }

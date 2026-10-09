@@ -1264,6 +1264,7 @@ export default {
       '以下統計僅根據本裝置使用 Jumble 期間記錄的資料彙總，不代表該 Relay 的完整監測結果。',
     'Observation samples_one': '{{count}} 個樣本',
     'Observation samples_other': '{{count}} 個樣本',
-    'Connection quality': '連線品質'
+    'Connection quality': '連線品質',
+    'Recorded issues': '記錄到的問題'
   }
 }

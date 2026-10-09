@@ -1299,6 +1299,7 @@ export default {
     Metrics: 'Metrics',
     'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
       'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.',
-    'Connection quality': 'Connection quality'
+    'Connection quality': 'Connection quality',
+    'Recorded issues': 'Recorded issues'
   }
 }

@@ -1291,6 +1291,7 @@ export default {
       'Diese Statistiken fassen Daten zusammen, die während der Nutzung von Jumble auf diesem Gerät erfasst wurden, und stellen keine vollständige Überwachung des Relays dar.',
     'Observation samples_one': '{{count}} Messung',
     'Observation samples_other': '{{count}} Messungen',
-    'Connection quality': 'Verbindungsqualität'
+    'Connection quality': 'Verbindungsqualität',
+    'Recorded issues': 'Erfasste Probleme'
   }
 }

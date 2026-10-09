@@ -1292,6 +1292,7 @@ export default {
     'Observation samples_many': '{{count}} échantillons',
     'Observation samples_one': '{{count}} échantillon',
     'Observation samples_other': '{{count}} échantillons',
-    'Connection quality': 'Qualité de connexion'
+    'Connection quality': 'Qualité de connexion',
+    'Recorded issues': 'Problèmes enregistrés'
   }
 }

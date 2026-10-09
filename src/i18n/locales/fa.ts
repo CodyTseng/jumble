@@ -1270,6 +1270,7 @@ export default {
       'این آمار خلاصهٔ داده‌های ثبت‌شده هنگام استفاده از Jumble در این دستگاه است و پایش کامل رله را نشان نمی‌دهد.',
     'Observation samples_one': '{{count}} نمونه',
     'Observation samples_other': '{{count}} نمونه',
-    'Connection quality': 'کیفیت اتصال'
+    'Connection quality': 'کیفیت اتصال',
+    'Recorded issues': 'مشکلات ثبت‌شده'
   }
 }

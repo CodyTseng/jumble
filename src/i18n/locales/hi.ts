@@ -1268,6 +1268,7 @@ export default {
       'ये आँकड़े इस डिवाइस पर Jumble इस्तेमाल करते समय दर्ज किए गए डेटा का सारांश हैं और रिले की संपूर्ण निगरानी का परिणाम नहीं हैं।',
     'Observation samples_one': '{{count}} नमूना',
     'Observation samples_other': '{{count}} नमूने',
-    'Connection quality': 'कनेक्शन की गुणवत्ता'
+    'Connection quality': 'कनेक्शन की गुणवत्ता',
+    'Recorded issues': 'दर्ज समस्याएँ'
   }
 }

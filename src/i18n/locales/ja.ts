@@ -1270,6 +1270,7 @@ export default {
       'この統計は、この端末でJumbleを使用している間に記録されたデータの集計であり、リレイ全体の監視結果を示すものではありません。',
     'Observation samples_one': '{{count}} 件のサンプル',
     'Observation samples_other': '{{count}} 件のサンプル',
-    'Connection quality': '接続品質'
+    'Connection quality': '接続品質',
+    'Recorded issues': '記録された問題'
   }
 }

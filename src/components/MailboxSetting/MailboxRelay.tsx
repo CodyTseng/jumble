@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import RelayIcon from '../RelayIcon'
+import MailboxRelayIndicator from '../RelayObservations/MailboxRelayIndicator'
 
 export default function MailboxRelay({
   mailboxRelay,
@@ -42,18 +43,20 @@ export default function MailboxRelay({
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab touch-none rounded p-2 hover:bg-muted active:cursor-grabbing"
+          className="hover:bg-muted cursor-grab touch-none rounded p-2 active:cursor-grabbing"
           style={{ touchAction: 'none' }}
         >
           <GripVertical size={16} className="text-muted-foreground" />
         </div>
-        <div
-          className="flex w-0 flex-1 cursor-pointer items-center gap-2"
+        <MailboxRelayIndicator url={mailboxRelay.url} scope={mailboxRelay.scope} />
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-start"
           onClick={() => push(toRelay(mailboxRelay.url))}
         >
           <RelayIcon url={mailboxRelay.url} />
-          <div className="w-0 flex-1 truncate">{mailboxRelay.url}</div>
-        </div>
+          <span className="w-0 flex-1 truncate">{mailboxRelay.url}</span>
+        </button>
       </div>
       <div className="flex items-center gap-4">
         <Select

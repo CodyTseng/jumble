@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRelayObservations } from '.'
+import { getConnectionQuality } from './connection-quality'
 import {
   compareRelayActivityRows,
   createRelayActivityRow,
@@ -54,18 +55,10 @@ function metricClassName(row: RelayActivityRow, column: RelayActivityColumn) {
   if (value === undefined) return 'text-muted-foreground'
 
   if (column === 'failureRate' || column === 'failures') {
-    // Match the failure-rate bands used by the relay's daily activity chart.
-    const ratio = row.failureRate
-    if (ratio === undefined) return
-    if (column === 'failures' && value === 0) return 'text-muted-foreground'
-    if (ratio === 0) return
-    const color =
-      ratio <= 0.1
-        ? metricColors.warning
-        : ratio <= 0.5
-          ? metricColors.degraded
-          : metricColors.critical
-    return cn('font-semibold', color)
+    const quality = getConnectionQuality(row.failureRate)
+    if (quality === undefined) return
+    const color = metricColors[quality]
+    return cn(quality !== 'healthy' && 'font-semibold', color)
   }
 
   if (column === 'connectionTime' || column === 'writeTime' || column === 'readTime') {

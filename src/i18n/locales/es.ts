@@ -1280,6 +1280,7 @@ export default {
     'Observation samples_many': '{{count}} muestras',
     'Observation samples_one': '{{count}} muestra',
     'Observation samples_other': '{{count}} muestras',
-    'Connection quality': 'Calidad de conexión'
+    'Connection quality': 'Calidad de conexión',
+    'Recorded issues': 'Problemas registrados'
   }
 }

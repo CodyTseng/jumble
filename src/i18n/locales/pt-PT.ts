@@ -1283,6 +1283,7 @@ export default {
     'Observation samples_many': '{{count}} amostras',
     'Observation samples_one': '{{count}} amostra',
     'Observation samples_other': '{{count}} amostras',
-    'Connection quality': 'Qualidade da ligação'
+    'Connection quality': 'Qualidade da ligação',
+    'Recorded issues': 'Problemas registados'
   }
 }

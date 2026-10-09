@@ -1286,6 +1286,7 @@ export default {
     'Observation samples_few': '{{count}} pomiary',
     'Observation samples_one': '{{count}} pomiar',
     'Observation samples_other': '{{count}} pomiaru',
-    'Connection quality': 'Jakość połączenia'
+    'Connection quality': 'Jakość połączenia',
+    'Recorded issues': 'Zarejestrowane problemy'
   }
 }

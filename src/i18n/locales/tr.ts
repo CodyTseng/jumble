@@ -1274,6 +1274,7 @@ export default {
       'Bu istatistikler, bu cihazda Jumble kullanılırken kaydedilen verileri özetler ve relay’in kapsamlı izleme verilerini temsil etmez.',
     'Observation samples_one': '{{count}} örnek',
     'Observation samples_other': '{{count}} örnek',
-    'Connection quality': 'Bağlantı kalitesi'
+    'Connection quality': 'Bağlantı kalitesi',
+    'Recorded issues': 'Kaydedilen sorunlar'
   }
 }

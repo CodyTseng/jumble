@@ -1274,6 +1274,7 @@ export default {
       'Ezek a statisztikák a Jumble ezen az eszközön történő használata során rögzített adatokat összegzik, és nem jelentik a csomópont teljes körű felügyeletét.',
     'Observation samples_one': '{{count}} minta',
     'Observation samples_other': '{{count}} minta',
-    'Connection quality': 'Kapcsolatminőség'
+    'Connection quality': 'Kapcsolatminőség',
+    'Recorded issues': 'Rögzített problémák'
   }
 }

@@ -1255,6 +1255,7 @@ export default {
       '이 통계는 이 기기에서 Jumble을 사용하는 동안 기록된 데이터를 요약한 것으로, 릴레이에 대한 전체 모니터링 결과를 나타내지는 않습니다.',
     'Observation samples_one': '표본 {{count}}개',
     'Observation samples_other': '표본 {{count}}개',
-    'Connection quality': '연결 품질'
+    'Connection quality': '연결 품질',
+    'Recorded issues': '기록된 문제'
   }
 }

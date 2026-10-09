@@ -1278,6 +1278,7 @@ export default {
     'Observation samples_few': '{{count}} измерения',
     'Observation samples_one': '{{count}} измерение',
     'Observation samples_other': '{{count}} измерения',
-    'Connection quality': 'Качество соединения'
+    'Connection quality': 'Качество соединения',
+    'Recorded issues': 'Зафиксированные проблемы'
   }
 }
