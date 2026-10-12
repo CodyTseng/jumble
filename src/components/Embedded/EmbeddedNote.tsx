@@ -84,14 +84,18 @@ const EmbeddedNoteSkeleton = forwardRef<HTMLDivElement, { className?: string }>(
     return (
       <div
         ref={ref}
-        className={cn('bg-card w-full rounded-xl border p-2 text-start sm:p-3', className)}
+        className={cn('bg-card w-full rounded-xl border p-3 text-start sm:p-4', className)}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <UserAvatarSkeleton className="h-9 w-9" />
-          <div>
-            <Skeleton className="my-1 h-3 w-16" />
-            <Skeleton className="my-1 h-3 w-16" />
+          <div className="w-0 flex-1">
+            <div className="flex h-5 items-center">
+              <Skeleton className="h-3 w-16" />
+            </div>
+            <div className="flex h-5 items-center">
+              <Skeleton className="h-3 w-12" />
+            </div>
           </div>
         </div>
         <Skeleton className="my-1 mt-2 h-4 w-full" />
