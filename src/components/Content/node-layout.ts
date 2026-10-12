@@ -38,26 +38,39 @@ export function groupContentNodes(nodes: TEmbeddedNode[]): TContentGroup[] {
   const groups: TContentGroup[] = []
   let inlineNodes: TEmbeddedNode[] = []
 
-  const flushInline = (beforeBlock: boolean) => {
-    const first = inlineNodes[0]
-    const last = inlineNodes.at(-1)
-    // A block already supplies a line break. Preserve additional blank lines.
-    if (first?.type === 'text' && groups.at(-1)?.type === 'block') {
+  const flushInline = (nextBlock?: TEmbeddedNode) => {
+    // Block spacing comes from gap, so whitespace at either edge must not
+    // introduce additional line boxes. Internal line breaks stay untouched.
+    const previousGroup = groups.at(-1)
+    const afterPreview =
+      previousGroup?.type === 'block' && previousGroup.node.type === 'web-preview'
+    if (afterPreview && inlineNodes[0]?.type === 'text') {
+      // A generated preview replaces the paragraph's line break, but must
+      // preserve any extra blank lines the author put before the next paragraph.
+      const first = inlineNodes[0]
       inlineNodes[0] = { ...first, data: first.data.replace(/^[ \t]*\r?\n/, '') }
     }
-    if (last?.type === 'text' && beforeBlock) {
-      const index = inlineNodes.length - 1
-      const current = inlineNodes[index]
-      if (current.type === 'text') {
-        inlineNodes[index] = { ...current, data: current.data.replace(/\r?\n[ \t]*$/, '') }
+    while (!afterPreview && previousGroup?.type === 'block' && inlineNodes[0]?.type === 'text') {
+      const first = inlineNodes[0]
+      const data = first.data.trimStart()
+      if (data) {
+        inlineNodes[0] = { ...first, data }
+        break
       }
+      inlineNodes.shift()
+    }
+    while (nextBlock && nextBlock.type !== 'web-preview' && inlineNodes.length) {
+      const last = inlineNodes.at(-1)
+      if (last?.type !== 'text') break
+      const data = last.data.trimEnd()
+      if (data) {
+        inlineNodes[inlineNodes.length - 1] = { ...last, data }
+        break
+      }
+      inlineNodes.pop()
     }
     const visibleNodes = inlineNodes.filter((node) => node.type !== 'text' || node.data !== '')
-    if (
-      visibleNodes.some(
-        (node) => node.type !== 'text' || node.data.trim() || node.data.includes('\n')
-      )
-    ) {
+    if (visibleNodes.length) {
       groups.push({ type: 'inline', nodes: visibleNodes })
     }
     inlineNodes = []
@@ -65,12 +78,12 @@ export function groupContentNodes(nodes: TEmbeddedNode[]): TContentGroup[] {
 
   for (const node of nodes) {
     if (isBlockContentNode(node)) {
-      flushInline(true)
+      flushInline(node)
       groups.push({ type: 'block', node })
     } else {
       inlineNodes.push(node)
     }
   }
-  flushInline(false)
+  flushInline()
   return groups
 }
