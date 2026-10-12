@@ -1,4 +1,5 @@
 import { useTranslatedEvent } from '@/hooks'
+import { useWebPreviewPolicy } from '@/hooks/useWebPreviewPolicy'
 import {
   EmbeddedBareDomainParser,
   EmbeddedEmojiParser,
@@ -10,7 +11,8 @@ import {
   EmbeddedMentionParser,
   EmbeddedUrlParser,
   EmbeddedWebsocketUrlParser,
-  parseContent
+  parseContent,
+  TEmbeddedNode
 } from '@/lib/content-parser'
 import { getImetaInfosFromEvent } from '@/lib/event'
 import { containsMarkdown } from '@/lib/markdown'
@@ -40,6 +42,8 @@ import PostEditor from '../PostEditor'
 import WebPreview from '../WebPreview'
 import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
+import { insertParagraphLinkPreviews } from './link-previews'
+import { CONTENT_LAYOUT_CLASS_NAME, groupContentNodes, isMediaContentNode } from './node-layout'
 
 export default function Content({
   event,
@@ -59,77 +63,72 @@ export default function Content({
   const [selectedText, setSelectedText] = useState('')
   const [mediaRevealed, setMediaRevealed] = useState(false)
   const { autoLoadMedia } = useContentPolicy()
+  const canShowPreview = useWebPreviewPolicy()
   const translatedEvent = useTranslatedEvent(event?.id)
   const resolvedContent = translatedEvent?.content ?? event?.content ?? content
   const isMarkdown = useMemo(
     () => (resolvedContent ? containsMarkdown(resolvedContent) : false),
     [resolvedContent]
   )
-  const { nodes, allImages, lastNormalUrl, emojiInfos, hiddenMediaCount, imetaInfos } =
-    useMemo(() => {
-      if (!resolvedContent || isMarkdown) return {}
-      const _content = resolvedContent
+  const { nodes, allImages, emojiInfos, hiddenMediaCount, imetaInfos } = useMemo(() => {
+    if (!resolvedContent || isMarkdown) return {}
+    const _content = resolvedContent
 
-      const nodes = parseContent(_content, [
-        EmbeddedEventParser,
-        EmbeddedMentionParser,
-        EmbeddedUrlParser,
-        EmbeddedLNInvoiceParser,
-        EmbeddedWebsocketUrlParser,
-        EmbeddedLegacyEventParser,
-        EmbeddedLegacyMentionParser,
-        EmbeddedHashtagParser,
-        EmbeddedEmojiParser,
-        EmbeddedBareDomainParser
-      ])
+    const nodes = parseContent(_content, [
+      EmbeddedEventParser,
+      EmbeddedMentionParser,
+      EmbeddedUrlParser,
+      EmbeddedLNInvoiceParser,
+      EmbeddedWebsocketUrlParser,
+      EmbeddedLegacyEventParser,
+      EmbeddedLegacyMentionParser,
+      EmbeddedHashtagParser,
+      EmbeddedEmojiParser,
+      EmbeddedBareDomainParser
+    ])
 
-      const imetaInfos = event ? getImetaInfosFromEvent(event) : []
-      const allImages = nodes
-        .map((node) => {
-          if (node.type === 'image') {
-            const imageInfo = imetaInfos.find((image) => image.url === node.data)
-            if (imageInfo) {
-              return imageInfo
-            }
-            const tag = mediaUpload.getImetaTagByUrl(node.data)
-            return tag
-              ? getImetaInfoFromImetaTag(tag, event?.pubkey)
-              : { url: node.data, pubkey: event?.pubkey }
+    const imetaInfos = event ? getImetaInfosFromEvent(event) : []
+    const allImages = nodes
+      .map((node) => {
+        if (node.type === 'image') {
+          const imageInfo = imetaInfos.find((image) => image.url === node.data)
+          if (imageInfo) {
+            return imageInfo
           }
-          if (node.type === 'images') {
-            const urls = Array.isArray(node.data) ? node.data : [node.data]
-            return urls.map((url) => {
-              const imageInfo = imetaInfos.find((image) => image.url === url)
-              return imageInfo ?? { url, pubkey: event?.pubkey }
-            })
-          }
-          return null
-        })
-        .filter(Boolean)
-        .flat() as TImetaInfo[]
-
-      const emojiInfos = getEmojiInfosFromEmojiTags(event?.tags)
-
-      const lastNormalUrlNode = nodes.findLast((node) => node.type === 'url')
-      const lastNormalUrl =
-        typeof lastNormalUrlNode?.data === 'string' ? lastNormalUrlNode.data : undefined
-
-      let hiddenMediaCount = 0
-      for (const node of nodes) {
-        if (
-          node.type === 'image' ||
-          node.type === 'media' ||
-          node.type === 'youtube' ||
-          node.type === 'x-post'
-        ) {
-          hiddenMediaCount += 1
-        } else if (node.type === 'images') {
-          hiddenMediaCount += Array.isArray(node.data) ? node.data.length : 1
+          const tag = mediaUpload.getImetaTagByUrl(node.data)
+          return tag
+            ? getImetaInfoFromImetaTag(tag, event?.pubkey)
+            : { url: node.data, pubkey: event?.pubkey }
         }
-      }
+        if (node.type === 'images') {
+          const urls = Array.isArray(node.data) ? node.data : [node.data]
+          return urls.map((url) => {
+            const imageInfo = imetaInfos.find((image) => image.url === url)
+            return imageInfo ?? { url, pubkey: event?.pubkey }
+          })
+        }
+        return null
+      })
+      .filter(Boolean)
+      .flat() as TImetaInfo[]
 
-      return { nodes, allImages, emojiInfos, lastNormalUrl, hiddenMediaCount, imetaInfos }
-    }, [event, resolvedContent, isMarkdown])
+    const emojiInfos = getEmojiInfosFromEmojiTags(event?.tags)
+
+    let hiddenMediaCount = 0
+    for (const node of nodes) {
+      if (isMediaContentNode(node)) {
+        hiddenMediaCount += Array.isArray(node.data) ? node.data.length : 1
+      }
+    }
+
+    return {
+      nodes: insertParagraphLinkPreviews(nodes),
+      allImages,
+      emojiInfos,
+      hiddenMediaCount,
+      imetaInfos
+    }
+  }, [event, resolvedContent, isMarkdown])
 
   const isEmojiOnly = useMemo(() => {
     if (!nodes || nodes.length === 0) return false
@@ -187,126 +186,129 @@ export default function Content({
 
   const effectiveMustLoad = !!mustLoadMedia || mediaRevealed
   const mediaHidden = !effectiveMustLoad && !autoLoadMedia
+  const groups = groupContentNodes(
+    nodes.filter((node) => {
+      if (mediaHidden && isMediaContentNode(node)) return false
+      if (node.type === 'web-preview') return canShowPreview(node.data)
+      return true
+    })
+  )
   let imageIndex = 0
+  const renderNode = (node: TEmbeddedNode, index: string) => {
+    if (node.type === 'web-preview') {
+      return <WebPreview url={node.data} key={index} />
+    }
+    if (node.type === 'text') {
+      if (!node.data) return null
+      if (isEmojiOnly) {
+        return (
+          <span key={index} className="text-7xl leading-none">
+            {node.data}
+          </span>
+        )
+      }
+      return <span key={index}>{node.data}</span>
+    }
+    if (node.type === 'image' || node.type === 'images') {
+      const start = imageIndex
+      const end = imageIndex + (Array.isArray(node.data) ? node.data.length : 1)
+      imageIndex = end
+      return (
+        <ImageGallery
+          key={index}
+          images={allImages}
+          start={start}
+          end={end}
+          mustLoad={effectiveMustLoad}
+        />
+      )
+    }
+    if (node.type === 'media') {
+      const mediaInfo = imetaInfos?.find((info) => info.url === node.data)
+      return (
+        <MediaPlayer
+          key={index}
+          src={node.data}
+          pubkey={mediaInfo?.pubkey ?? event?.pubkey}
+          mustLoad={effectiveMustLoad}
+          dim={mediaInfo?.dim}
+        />
+      )
+    }
+    if (node.type === 'url') {
+      return <ExternalLink url={node.data} key={index} />
+    }
+    if (node.type === 'bare-url') {
+      return (
+        <ExternalLink url={`https://${node.data}`} key={index}>
+          {node.data}
+        </ExternalLink>
+      )
+    }
+    if (node.type === 'invoice') {
+      return <EmbeddedLNInvoice invoice={node.data} key={index} />
+    }
+    if (node.type === 'websocket-url') {
+      return <EmbeddedWebsocketUrl url={node.data} key={index} />
+    }
+    if (node.type === 'event') {
+      const id = node.data.split(':')[1]
+      return <EmbeddedNote key={index} noteId={id} />
+    }
+    if (node.type === 'mention') {
+      return <EmbeddedMention key={index} userId={node.data.split(':')[1]} />
+    }
+    if (node.type === 'hashtag') {
+      return <EmbeddedHashtag hashtag={node.data} key={index} />
+    }
+    if (node.type === 'emoji') {
+      const shortcode = node.data.split(':')[1]
+      const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
+      if (!emoji) return <span key={index}>{node.data}</span>
+      return (
+        <Emoji
+          classNames={{ img: isEmojiOnly ? 'size-20' : 'mb-1' }}
+          emoji={emoji}
+          clickable
+          key={index}
+        />
+      )
+    }
+    if (node.type === 'youtube') {
+      return <YoutubeEmbeddedPlayer key={index} url={node.data} mustLoad={effectiveMustLoad} />
+    }
+    if (node.type === 'x-post') {
+      return <XEmbeddedPost key={index} url={node.data} mustLoad={effectiveMustLoad} />
+    }
+    return null
+  }
   return (
     <>
       <div
         ref={contentRef}
         dir="auto"
-        className={cn(
-          'text-wrap wrap-break-word whitespace-pre-wrap',
-          isEmojiOnly && 'flex items-end gap-1',
-          className
-        )}
+        className={cn('text-wrap wrap-break-word', CONTENT_LAYOUT_CLASS_NAME, className)}
       >
-        {nodes.map((node, index) => {
-          if (node.type === 'text') {
-            if (isEmojiOnly) {
-              return (
-                <span key={index} className="text-7xl leading-none">
-                  {node.data}
-                </span>
-              )
-            }
-            return node.data
-          }
-          if (node.type === 'image' || node.type === 'images') {
-            const start = imageIndex
-            const end = imageIndex + (Array.isArray(node.data) ? node.data.length : 1)
-            imageIndex = end
-            if (mediaHidden) return null
-            return (
-              <ImageGallery
-                className="mt-2"
-                key={index}
-                images={allImages}
-                start={start}
-                end={end}
-                mustLoad={effectiveMustLoad}
-              />
-            )
-          }
-          if (node.type === 'media') {
-            if (mediaHidden) return null
-            const mediaInfo = imetaInfos?.find((info) => info.url === node.data)
-            return (
-              <MediaPlayer
-                className="mt-2"
-                key={index}
-                src={node.data}
-                pubkey={mediaInfo?.pubkey ?? event?.pubkey}
-                mustLoad={effectiveMustLoad}
-                dim={mediaInfo?.dim}
-              />
-            )
-          }
-          if (node.type === 'url') {
-            return <ExternalLink url={node.data} key={index} />
-          }
-          if (node.type === 'bare-url') {
-            return (
-              <ExternalLink url={`https://${node.data}`} key={index}>
-                {node.data}
-              </ExternalLink>
-            )
-          }
-          if (node.type === 'invoice') {
-            return <EmbeddedLNInvoice invoice={node.data} key={index} className="mt-2" />
-          }
-          if (node.type === 'websocket-url') {
-            return <EmbeddedWebsocketUrl url={node.data} key={index} />
-          }
-          if (node.type === 'event') {
-            const id = node.data.split(':')[1]
-            return <EmbeddedNote key={index} noteId={id} className="mt-2" />
-          }
-          if (node.type === 'mention') {
-            return <EmbeddedMention key={index} userId={node.data.split(':')[1]} />
-          }
-          if (node.type === 'hashtag') {
-            return <EmbeddedHashtag hashtag={node.data} key={index} />
-          }
-          if (node.type === 'emoji') {
-            const shortcode = node.data.split(':')[1]
-            const emoji = emojiInfos.find((e) => e.shortcode === shortcode)
-            if (!emoji) return node.data
-            return (
-              <Emoji
-                classNames={{ img: isEmojiOnly ? 'size-20' : 'mb-1' }}
-                emoji={emoji}
-                clickable
-                key={index}
-              />
-            )
-          }
-          if (node.type === 'youtube') {
-            if (mediaHidden) return null
-            return (
-              <YoutubeEmbeddedPlayer
-                key={index}
-                url={node.data}
-                className="mt-2"
-                mustLoad={effectiveMustLoad}
-              />
-            )
-          }
-          if (node.type === 'x-post') {
-            if (mediaHidden) return null
-            return (
-              <XEmbeddedPost
-                key={index}
-                url={node.data}
-                className="mt-2"
-                mustLoad={effectiveMustLoad}
-              />
-            )
-          }
-          return null
-        })}
-        {mediaHidden && hiddenMediaCount > 0 && (
-          <HiddenMediaBar count={hiddenMediaCount} onClick={() => setMediaRevealed(true)} />
+        {groups.map((group, index) =>
+          group.type === 'block' ? (
+            renderNode(group.node, String(index))
+          ) : (
+            <div
+              key={index}
+              dir="auto"
+              className={cn('whitespace-pre-wrap', isEmojiOnly && 'flex items-end gap-1')}
+            >
+              {group.nodes.map((node, nodeIndex) => renderNode(node, `${index}-${nodeIndex}`))}
+            </div>
+          )
         )}
-        {lastNormalUrl && <WebPreview className="mt-2" url={lastNormalUrl} />}
+        {mediaHidden && hiddenMediaCount > 0 && (
+          <HiddenMediaBar
+            className="mt-0"
+            count={hiddenMediaCount}
+            onClick={() => setMediaRevealed(true)}
+          />
+        )}
       </div>
       {enableHighlight && (
         <HighlightButton onHighlight={handleHighlight} containerRef={contentRef} />

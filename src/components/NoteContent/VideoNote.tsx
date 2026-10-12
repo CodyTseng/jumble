@@ -1,9 +1,11 @@
 import { ExtendedKind } from '@/constants'
 import { getImetaInfosFromEvent } from '@/lib/event'
 import { getVideoMetadataFromEvent } from '@/lib/event-metadata'
+import { cn } from '@/lib/utils'
 import { Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import Content from '../Content'
+import { CONTENT_LAYOUT_CLASS_NAME } from '../Content/node-layout'
 import { EmbeddedHashtag } from '../Embedded'
 import MediaPlayer from '../MediaPlayer'
 
@@ -18,24 +20,22 @@ export default function VideoNote({ event, className }: { event: Event; classNam
   )
 
   return (
-    <div className={className}>
-      {metadata?.title && <div className="font-semibold">{metadata.title}</div>}
+    <div className={cn(CONTENT_LAYOUT_CLASS_NAME, className)}>
+      {metadata?.title && (
+        <div dir="auto" className="font-semibold">
+          {metadata.title}
+        </div>
+      )}
       <Content event={event} />
       {metadata && metadata.tags.length > 0 && (
-        <div className="mt-1 flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1">
           {metadata.tags.map((tag) => (
             <EmbeddedHashtag key={tag} hashtag={tag} />
           ))}
         </div>
       )}
       {videoInfos.map((video) => (
-        <MediaPlayer
-          src={video.url}
-          pubkey={video.pubkey}
-          key={video.url}
-          className="mt-2"
-          dim={video.dim}
-        />
+        <MediaPlayer src={video.url} pubkey={video.pubkey} key={video.url} dim={video.dim} />
       ))}
     </div>
   )

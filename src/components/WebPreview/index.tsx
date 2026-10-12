@@ -1,8 +1,7 @@
 import { useFetchWebMetadata } from '@/hooks/useFetchWebMetadata'
-import { getSafeExternalUrl, isInsecureUrl, truncateUrl } from '@/lib/url'
+import { useWebPreviewPolicy } from '@/hooks/useWebPreviewPolicy'
+import { getSafeExternalUrl, truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
-import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ExternalLink as ExternalLinkIcon, Globe2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from '../Image'
@@ -23,16 +22,11 @@ export default function WebPreview({
    */
   fallbackImage?: string
 }) {
-  const { autoLoadMedia } = useContentPolicy()
-  const { allowInsecureConnection, showLinkPreviews } = useUserPreferences()
+  const canShowPreview = useWebPreviewPolicy()
   const previewRef = useRef<HTMLAnchorElement>(null)
   const [isNearViewport, setIsNearViewport] = useState(false)
   const safeUrl = useMemo(() => getSafeExternalUrl(url), [url])
-  const shouldShow =
-    Boolean(safeUrl) &&
-    (showLinkPreviews || Boolean(mustLoad)) &&
-    (autoLoadMedia || Boolean(mustLoad)) &&
-    (allowInsecureConnection || !isInsecureUrl(url))
+  const shouldShow = canShowPreview(url, mustLoad)
   const { metadata, isLoading } = useFetchWebMetadata(url, shouldShow && isNearViewport)
   const { title, description } = metadata
   const image = metadata.image || fallbackImage
@@ -86,7 +80,7 @@ export default function WebPreview({
         href={safeUrl ?? undefined}
         target="_blank"
         rel="noreferrer noopener"
-        className="group bg-card hover:bg-accent/30 focus-visible:ring-ring flex h-24 w-full overflow-hidden rounded-xl border text-start transition-colors hover:border-foreground/20 focus-visible:ring-2 focus-visible:outline-none @[15rem]:h-28 @[28rem]:h-32"
+        className="group bg-card hover:bg-accent/30 focus-visible:ring-ring hover:border-foreground/20 flex h-24 w-full overflow-hidden rounded-xl border text-start transition-colors focus-visible:ring-2 focus-visible:outline-none @[15rem]:h-28 @[28rem]:h-32"
         title={url}
       >
         <div className="bg-muted text-muted-foreground hidden h-full shrink-0 border-e @[15rem]:block @[15rem]:aspect-square @[15rem]:w-auto @[28rem]:aspect-[1.91/1]">
@@ -126,7 +120,7 @@ export default function WebPreview({
             </>
           ) : (
             <>
-              <div dir="auto" className="line-clamp-2 font-semibold leading-snug">
+              <div dir="auto" className="line-clamp-2 leading-snug font-semibold">
                 {displayTitle}
               </div>
               <div className="hidden @[15rem]:block">

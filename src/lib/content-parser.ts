@@ -24,6 +24,7 @@ export type TEmbeddedNodeType =
   | 'hashtag'
   | 'websocket-url'
   | 'url'
+  | 'web-preview'
   | 'bare-url'
   | 'emoji'
   | 'invoice'
