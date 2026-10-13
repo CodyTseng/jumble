@@ -107,7 +107,7 @@ VITE_COMMUNITY_RELAYS="wss://relay.example.com/,wss://relay.example.org/"
 
 If you like this project, you can buy me a coffee :)
 
-- **Lightning:** ⚡️ codytseng@getalby.com ⚡️
+- **Lightning:** [codytseng@getalby.com](https://bitcointipjar.com/cody)
 - **Bitcoin:** bc1qwp2uqjd2dy32qfe39kehnlgx3hyey0h502fvht
 - **Geyser:** https://geyser.fund/project/jumble
 
