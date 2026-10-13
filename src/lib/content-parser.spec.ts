@@ -34,6 +34,154 @@ const parse = (content: string) => parseContent(content, PARSERS)
 const types = (content: string) => parse(content).map((n) => n.type)
 const find = (content: string, type: string) => parse(content).find((n) => n.type === type)
 
+describe('HTTP URLs', () => {
+  it('keeps commas inside a Google Maps URL', () => {
+    const url = 'https://maps.google.com/@40.7,-74.0,15z'
+
+    expect(parseContent(url, [EmbeddedUrlParser])).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('keeps square brackets in query parameters', () => {
+    const url = 'https://x.com/a?f[]=1&f[]=2#top'
+
+    expect(parseContent(url, [EmbeddedUrlParser])).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('keeps a semicolon in the URL path', () => {
+    const url = 'https://x.com/p;jsessionid=1'
+
+    expect(parseContent(url, [EmbeddedUrlParser])).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('keeps dollar signs, apostrophes, pipes and carets inside a URL', () => {
+    const url = "https://example.com/a$b'c|d^e"
+
+    expect(parseContent(url, [EmbeddedUrlParser])).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('also handles an http URL', () => {
+    const url = 'http://example.com/a,b;session=1'
+
+    expect(parseContent(url, [EmbeddedUrlParser])).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('preserves text before and after a URL', () => {
+    expect(parseContent('before https://example.com/a,b after', [EmbeddedUrlParser])).toEqual([
+      { type: 'text', data: 'before ' },
+      { type: 'url', data: 'https://example.com/a,b' },
+      { type: 'text', data: ' after' }
+    ])
+  })
+
+  it('leaves a comma followed by a space outside the URL', () => {
+    // parseContent trims trailing whitespace, but the comma must remain a text node.
+    expect(parseContent('https://example.com/a,b, ', [EmbeddedUrlParser])).toEqual([
+      { type: 'url', data: 'https://example.com/a,b' },
+      { type: 'text', data: ',' }
+    ])
+  })
+
+  it('keeps two URLs separated by a comma and a space separate', () => {
+    expect(
+      parseContent('https://example.com/a,b, https://example.org/p;session=1', [EmbeddedUrlParser])
+    ).toEqual([
+      { type: 'url', data: 'https://example.com/a,b' },
+      { type: 'text', data: ', ' },
+      { type: 'url', data: 'https://example.org/p;session=1' }
+    ])
+  })
+
+  it.each([
+    '.',
+    ',',
+    ';',
+    ':',
+    "'",
+    '"',
+    ']',
+    '!',
+    '?',
+    '，',
+    '。',
+    '；',
+    '：',
+    '！',
+    '？',
+    '】',
+    '）'
+  ])('leaves trailing punctuation "%s" outside the URL', (punctuation) => {
+    expect(parseContent(`https://example.com/?f[]=1${punctuation}`, [EmbeddedUrlParser])).toEqual([
+      { type: 'url', data: 'https://example.com/?f[]=1' },
+      { type: 'text', data: punctuation }
+    ])
+  })
+})
+
+describe('WebSocket URLs', () => {
+  it('keeps special characters inside a wss URL', () => {
+    const url = "wss://relay.example.com/a$b,c;d'e|f[g]^h"
+
+    expect(parseContent(url, [EmbeddedWebsocketUrlParser])).toEqual([
+      { type: 'websocket-url', data: url }
+    ])
+  })
+
+  it('also handles a ws URL', () => {
+    const url = 'ws://relay.example.com/?f[]=1&f[]=2'
+
+    expect(parseContent(url, [EmbeddedWebsocketUrlParser])).toEqual([
+      { type: 'websocket-url', data: url }
+    ])
+  })
+
+  it('leaves a comma followed by a space outside the URL', () => {
+    // parseContent trims trailing whitespace, but the comma must remain a text node.
+    expect(parseContent('wss://relay.example.com/a,b, ', [EmbeddedWebsocketUrlParser])).toEqual([
+      { type: 'websocket-url', data: 'wss://relay.example.com/a,b' },
+      { type: 'text', data: ',' }
+    ])
+  })
+
+  it('keeps two URLs separated by a comma and a space separate', () => {
+    expect(
+      parseContent('wss://relay.example.com/a,b, wss://relay.example.org/p;session=1', [
+        EmbeddedWebsocketUrlParser
+      ])
+    ).toEqual([
+      { type: 'websocket-url', data: 'wss://relay.example.com/a,b' },
+      { type: 'text', data: ', ' },
+      { type: 'websocket-url', data: 'wss://relay.example.org/p;session=1' }
+    ])
+  })
+
+  it.each([
+    '.',
+    ',',
+    ';',
+    ':',
+    "'",
+    '"',
+    ']',
+    '!',
+    '?',
+    '，',
+    '。',
+    '；',
+    '：',
+    '！',
+    '？',
+    '】',
+    '）'
+  ])('leaves trailing punctuation "%s" outside the URL', (punctuation) => {
+    expect(
+      parseContent(`wss://relay.example.com/?f[]=1${punctuation}`, [EmbeddedWebsocketUrlParser])
+    ).toEqual([
+      { type: 'websocket-url', data: 'wss://relay.example.com/?f[]=1' },
+      { type: 'text', data: punctuation }
+    ])
+  })
+})
+
 describe('bare nostr references', () => {
   it('renders a bare npub as a mention', () => {
     expect(types(`gm ${npub}`)).toContain('mention')
