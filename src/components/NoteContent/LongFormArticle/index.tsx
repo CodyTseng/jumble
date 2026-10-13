@@ -86,6 +86,7 @@ export default function LongFormArticle({
         code: (props) => <code {...props} className="wrap-break-word whitespace-pre-wrap" />,
         img: (props) => (
           <ImageWithLightbox
+            upscaleSmall
             image={{ url: props.src || '', pubkey: event.pubkey }}
             className="my-0 max-h-[80vh] object-contain sm:max-h-[50vh]"
             classNames={{

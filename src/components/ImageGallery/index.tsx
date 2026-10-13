@@ -8,11 +8,12 @@ import { TImetaInfo } from '@/types'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import Lightbox from 'yet-another-react-lightbox'
+import type { SlideImage } from 'yet-another-react-lightbox'
 import Download from 'yet-another-react-lightbox/plugins/download'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import Image from '../Image'
 import ImageWithLightbox from '../ImageWithLightbox'
+import Lightbox from '../Lightbox'
 
 export default function ImageGallery({
   className,
@@ -31,7 +32,9 @@ export default function ImageGallery({
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
   const [index, setIndex] = useState(-1)
-  const [slides, setSlides] = useState<{ src: string }[]>(images.map(({ url }) => ({ src: url })))
+  const [slides, setSlides] = useState<SlideImage[]>(
+    images.map(({ url, dim }) => ({ src: url, ...dim }))
+  )
   const saveLightboxImage = useImageSave(slides[index]?.src, index >= 0)
   useEffect(() => {
     if (index >= 0) {
@@ -46,21 +49,25 @@ export default function ImageGallery({
   useEffect(() => {
     const loadImages = async () => {
       const slides = await Promise.all(
-        images.map(({ url, pubkey }) => {
-          return new Promise<{ src: string }>((resolve) => {
+        images.map(({ url, pubkey, dim }) => {
+          return new Promise<SlideImage>((resolve) => {
             const img = new window.Image()
             let validUrl = url
             img.onload = () => {
               blossomService.markAsSuccess(url, validUrl)
-              resolve({ src: validUrl })
+              resolve({
+                src: validUrl,
+                width: dim?.width ?? img.naturalWidth,
+                height: dim?.height ?? img.naturalHeight
+              })
             }
             img.onerror = () => {
               blossomService.tryNextUrl(url).then((nextUrl) => {
                 if (nextUrl) {
                   validUrl = nextUrl
-                  resolve({ src: validUrl })
+                  resolve({ src: validUrl, ...dim })
                 } else {
-                  resolve({ src: url })
+                  resolve({ src: url, ...dim })
                 }
               })
             }
@@ -72,7 +79,7 @@ export default function ImageGallery({
                   img.src = validUrl
                 })
                 .catch(() => {
-                  resolve({ src: url })
+                  resolve({ src: url, ...dim })
                 })
             } else {
               img.src = url
@@ -97,6 +104,7 @@ export default function ImageGallery({
   if (!mustLoad && !autoLoadMedia) {
     return displayImages.map((image, i) => (
       <ImageWithLightbox
+        upscaleSmall
         key={i}
         image={image}
         className="max-h-[80vh] object-contain sm:max-h-[50vh]"
@@ -115,9 +123,10 @@ export default function ImageGallery({
         className="max-h-[80vh] object-contain sm:max-h-[50vh]"
         classNames={{
           errorPlaceholder: 'aspect-square h-[30vh]',
-          wrapper: 'cursor-zoom-in border'
+          wrapper: 'w-fit max-w-full cursor-zoom-in border'
         }}
         image={displayImages[0]}
+        upscaleSmall
         onClick={(e) => handlePhotoClick(e, 0)}
       />
     )
@@ -150,12 +159,13 @@ export default function ImageGallery({
   }
 
   return (
-    <div className={cn(displayImages.length === 1 ? 'w-fit max-w-full' : 'w-full', className)}>
+    <div className={cn('w-full', className)}>
       {imageContent}
       {index >= 0 &&
         createPortal(
           <div onClick={(e) => e.stopPropagation()}>
             <Lightbox
+              upscaleSmall
               index={index}
               slides={slides}
               plugins={[Download, Zoom]}

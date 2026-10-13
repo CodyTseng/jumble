@@ -6,6 +6,7 @@ import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { thumbHashToDataURL } from 'thumbhash'
+import { ImageSize, isSmallInlineImage, isValidImageSize } from './display-size'
 
 export default function Image({
   image: { url, blurHash, thumbHash, pubkey, dim },
@@ -15,6 +16,7 @@ export default function Image({
   hideIfError = false,
   errorPlaceholder = <ImageOff />,
   onImageLoad,
+  upscaleSmall = false,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   classNames?: {
@@ -27,10 +29,14 @@ export default function Image({
   hideIfError?: boolean
   errorPlaceholder?: React.ReactNode
   onImageLoad?: (url: string) => void
+  upscaleSmall?: boolean
 }) {
   const { url: imageUrl, error: hasError, handleError, markSuccess } = useBlossomUrl(url, pubkey)
   const [isLoaded, setIsLoaded] = useState(false)
   const [displaySkeleton, setDisplaySkeleton] = useState(true)
+  const [loadedSize, setLoadedSize] = useState<(ImageSize & { url: string }) | null>(null)
+  const size = isValidImageSize(dim) ? dim : loadedSize?.url === url ? loadedSize : undefined
+  const small = upscaleSmall && isSmallInlineImage(size)
 
   useEffect(() => {
     setIsLoaded(false)
@@ -41,7 +47,9 @@ export default function Image({
 
   const isLoading = !isLoaded && !hasError
 
-  const handleLoad = () => {
+  const handleLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget
+    setLoadedSize({ url, width: img.naturalWidth, height: img.naturalHeight })
     setIsLoaded(true)
     setTimeout(() => setDisplaySkeleton(false), 600)
     markSuccess()
@@ -49,14 +57,30 @@ export default function Image({
   }
 
   return (
-    <div className={cn('relative overflow-hidden rounded-xl', classNames.wrapper)} {...props}>
+    <div
+      {...props}
+      className={cn(
+        'relative overflow-hidden rounded-xl',
+        classNames.wrapper,
+        small && 'w-full max-w-[480px] [--image-max-height:80vh] sm:[--image-max-height:50vh]'
+      )}
+      style={
+        small && size
+          ? {
+              ...props.style,
+              width: `min(480px, 100%, calc(var(--image-max-height) * ${size.width / size.height}))`
+            }
+          : props.style
+      }
+    >
       {/* Spacer: transparent image to maintain dimensions when image is loading */}
       {isLoading && dim?.width && dim?.height && (
         <img
           src={`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${dim.width}' height='${dim.height}'%3E%3C/svg%3E`}
           className={cn(
             'pointer-events-none h-full w-full object-cover transition-opacity',
-            className
+            className,
+            small && 'h-auto'
           )}
           alt=""
         />
@@ -102,7 +126,8 @@ export default function Image({
           className={cn(
             'pointer-events-none h-full w-full object-cover transition-opacity',
             isLoading ? 'absolute inset-0 opacity-0' : '',
-            className
+            className,
+            small && 'h-auto'
           )}
         />
       )}
