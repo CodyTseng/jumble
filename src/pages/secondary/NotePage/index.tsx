@@ -221,7 +221,12 @@ const NotePage = forwardRef<TPageRef, { id?: string; index?: number }>(({ id, in
               </div>
             )}
         {canExpand && <ExpandThreadButton expanded={expanded} onToggle={handleToggleExpand} />}
-        <div className={cn('relative px-4', canExpand || rootITag ? 'pt-1' : 'pt-3')}>
+        <div
+          className={cn(
+            'relative px-4 [--image-strip-bleed:1rem]',
+            canExpand || rootITag ? 'pt-1' : 'pt-3'
+          )}
+        >
           {reposters && <RepostDescription reposters={reposters} />}
           <Note
             key={`note-${event.id}`}

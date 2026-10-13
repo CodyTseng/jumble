@@ -1293,6 +1293,10 @@ export default {
     'Observation samples_one': '{{count}} échantillon',
     'Observation samples_other': '{{count}} échantillons',
     'Connection quality': 'Qualité de connexion',
-    'Recorded issues': 'Problèmes enregistrés'
+    'Recorded issues': 'Problèmes enregistrés',
+    'Open image': 'Ouvrir l’image',
+    'Previous image': 'Image précédente',
+    'Next image': 'Image suivante',
+    'Go to image {{number}} of {{total}}': 'Aller à l’image {{number}} sur {{total}}'
   }
 }

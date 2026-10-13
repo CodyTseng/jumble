@@ -1279,6 +1279,10 @@ export default {
     'Observation samples_one': '{{count}} измерение',
     'Observation samples_other': '{{count}} измерения',
     'Connection quality': 'Качество соединения',
-    'Recorded issues': 'Зафиксированные проблемы'
+    'Recorded issues': 'Зафиксированные проблемы',
+    'Open image': 'Открыть изображение',
+    'Previous image': 'Предыдущее изображение',
+    'Next image': 'Следующее изображение',
+    'Go to image {{number}} of {{total}}': 'Перейти к изображению {{number}} из {{total}}'
   }
 }

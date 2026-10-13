@@ -1269,6 +1269,10 @@ export default {
     'Observation samples_one': '{{count}} नमूना',
     'Observation samples_other': '{{count}} नमूने',
     'Connection quality': 'कनेक्शन की गुणवत्ता',
-    'Recorded issues': 'दर्ज समस्याएँ'
+    'Recorded issues': 'दर्ज समस्याएँ',
+    'Open image': 'चित्र खोलें',
+    'Previous image': 'पिछला चित्र',
+    'Next image': 'अगला चित्र',
+    'Go to image {{number}} of {{total}}': '{{total}} में से चित्र {{number}} पर जाएँ'
   }
 }

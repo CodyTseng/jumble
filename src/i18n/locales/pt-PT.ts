@@ -1284,6 +1284,10 @@ export default {
     'Observation samples_one': '{{count}} amostra',
     'Observation samples_other': '{{count}} amostras',
     'Connection quality': 'Qualidade da ligação',
-    'Recorded issues': 'Problemas registados'
+    'Recorded issues': 'Problemas registados',
+    'Open image': 'Abrir imagem',
+    'Previous image': 'Imagem anterior',
+    'Next image': 'Imagem seguinte',
+    'Go to image {{number}} of {{total}}': 'Ir para a imagem {{number}} de {{total}}'
   }
 }

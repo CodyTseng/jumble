@@ -1271,6 +1271,10 @@ export default {
     'Observation samples_one': '{{count}} 件のサンプル',
     'Observation samples_other': '{{count}} 件のサンプル',
     'Connection quality': '接続品質',
-    'Recorded issues': '記録された問題'
+    'Recorded issues': '記録された問題',
+    'Open image': '画像を開く',
+    'Previous image': '前の画像',
+    'Next image': '次の画像',
+    'Go to image {{number}} of {{total}}': '{{total}} 枚中 {{number}} 枚目の画像へ移動'
   }
 }

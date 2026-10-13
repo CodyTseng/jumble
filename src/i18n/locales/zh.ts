@@ -1265,6 +1265,10 @@ export default {
     'Observation samples_one': '{{count}} 个样本',
     'Observation samples_other': '{{count}} 个样本',
     'Connection quality': '连接质量',
-    'Recorded issues': '记录到的问题'
+    'Recorded issues': '记录到的问题',
+    'Open image': '打开图片',
+    'Previous image': '上一张图片',
+    'Next image': '下一张图片',
+    'Go to image {{number}} of {{total}}': '转到第 {{number}} 张图片，共 {{total}} 张'
   }
 }

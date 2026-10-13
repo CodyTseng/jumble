@@ -6,7 +6,7 @@ import { decode } from 'blurhash'
 import { ImageOff } from 'lucide-react'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { thumbHashToDataURL } from 'thumbhash'
-import { ImageSize, isSmallInlineImage, isValidImageSize } from './display-size'
+import { ImageSize, isSmallInlineImage, isValidImageSize, shouldFillImageRow } from './display-size'
 
 export default function Image({
   image: { url, blurHash, thumbHash, pubkey, dim },
@@ -17,6 +17,7 @@ export default function Image({
   errorPlaceholder = <ImageOff />,
   onImageLoad,
   upscaleSmall = false,
+  fillNearRow = false,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   classNames?: {
@@ -28,8 +29,9 @@ export default function Image({
   alt?: string
   hideIfError?: boolean
   errorPlaceholder?: React.ReactNode
-  onImageLoad?: (url: string) => void
+  onImageLoad?: (url: string, img: HTMLImageElement) => void
   upscaleSmall?: boolean
+  fillNearRow?: boolean
 }) {
   const { url: imageUrl, error: hasError, handleError, markSuccess } = useBlossomUrl(url, pubkey)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -37,6 +39,18 @@ export default function Image({
   const [loadedSize, setLoadedSize] = useState<(ImageSize & { url: string }) | null>(null)
   const size = isValidImageSize(dim) ? dim : loadedSize?.url === url ? loadedSize : undefined
   const small = upscaleSmall && isSmallInlineImage(size)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const [rowWidth, setRowWidth] = useState(0)
+  const fillRow = fillNearRow && shouldFillImageRow(size, rowWidth)
+  const sizeDisplay = small || fillRow
+
+  useEffect(() => {
+    const parent = wrapperRef.current?.parentElement
+    if (!fillNearRow || !parent) return
+    const observer = new ResizeObserver(([entry]) => setRowWidth(entry.contentRect.width))
+    observer.observe(parent)
+    return () => observer.disconnect()
+  }, [fillNearRow])
 
   useEffect(() => {
     setIsLoaded(false)
@@ -53,22 +67,24 @@ export default function Image({
     setIsLoaded(true)
     setTimeout(() => setDisplaySkeleton(false), 600)
     markSuccess()
-    if (imageUrl) onImageLoad?.(imageUrl)
+    if (imageUrl) onImageLoad?.(imageUrl, img)
   }
 
   return (
     <div
       {...props}
+      ref={wrapperRef}
       className={cn(
         'relative overflow-hidden rounded-xl',
         classNames.wrapper,
-        small && 'w-full max-w-[480px] [--image-max-height:80vh] sm:[--image-max-height:50vh]'
+        sizeDisplay && 'w-full max-w-full [--image-max-height:80vh] sm:[--image-max-height:50vh]',
+        small && !fillRow && 'max-w-[480px]'
       )}
       style={
-        small && size
+        sizeDisplay && size
           ? {
               ...props.style,
-              width: `min(480px, 100%, calc(var(--image-max-height) * ${size.width / size.height}))`
+              width: `min(${fillRow ? '' : '480px, '}100%, calc(var(--image-max-height) * ${size.width / size.height}))`
             }
           : props.style
       }
@@ -80,7 +96,7 @@ export default function Image({
           className={cn(
             'pointer-events-none h-full w-full object-cover transition-opacity',
             className,
-            small && 'h-auto'
+            sizeDisplay && 'h-auto'
           )}
           alt=""
         />
@@ -121,13 +137,15 @@ export default function Image({
           decoding="async"
           draggable={false}
           {...props}
+          role={undefined}
+          tabIndex={undefined}
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
             'pointer-events-none h-full w-full object-cover transition-opacity',
             isLoading ? 'absolute inset-0 opacity-0' : '',
             className,
-            small && 'h-auto'
+            sizeDisplay && 'h-auto'
           )}
         />
       )}

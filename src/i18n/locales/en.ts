@@ -1300,6 +1300,10 @@ export default {
     'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.':
       'These statistics summarize data recorded while using Jumble on this device and do not represent comprehensive monitoring of the relay.',
     'Connection quality': 'Connection quality',
-    'Recorded issues': 'Recorded issues'
+    'Recorded issues': 'Recorded issues',
+    'Open image': 'Open image',
+    'Previous image': 'Previous image',
+    'Next image': 'Next image',
+    'Go to image {{number}} of {{total}}': 'Go to image {{number}} of {{total}}'
   }
 }

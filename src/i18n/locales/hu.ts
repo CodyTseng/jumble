@@ -1275,6 +1275,10 @@ export default {
     'Observation samples_one': '{{count}} minta',
     'Observation samples_other': '{{count}} minta',
     'Connection quality': 'Kapcsolatminőség',
-    'Recorded issues': 'Rögzített problémák'
+    'Recorded issues': 'Rögzített problémák',
+    'Open image': 'Kép megnyitása',
+    'Previous image': 'Előző kép',
+    'Next image': 'Következő kép',
+    'Go to image {{number}} of {{total}}': 'Ugrás a(z) {{number}}. képre (összesen {{total}})'
   }
 }

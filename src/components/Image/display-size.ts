@@ -17,6 +17,16 @@ export function isSmallInlineImage(size?: ImageSize) {
   return isValidImageSize(size) && size.width < INLINE_IMAGE_WIDTH
 }
 
+export function shouldFillImageRow(size: ImageSize | undefined, rowWidth: number) {
+  return (
+    isValidImageSize(size) &&
+    Number.isFinite(rowWidth) &&
+    rowWidth > 0 &&
+    size.width >= rowWidth * 0.8 &&
+    size.width < rowWidth
+  )
+}
+
 export function isSmallLightboxImage(size?: ImageSize) {
   return (
     isValidImageSize(size) &&

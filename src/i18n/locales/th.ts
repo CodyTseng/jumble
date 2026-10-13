@@ -1252,6 +1252,10 @@ export default {
     'Observation samples_one': '{{count}} ตัวอย่าง',
     'Observation samples_other': '{{count}} ตัวอย่าง',
     'Connection quality': 'คุณภาพการเชื่อมต่อ',
-    'Recorded issues': 'ปัญหาที่บันทึกไว้'
+    'Recorded issues': 'ปัญหาที่บันทึกไว้',
+    'Open image': 'เปิดรูปภาพ',
+    'Previous image': 'รูปภาพก่อนหน้า',
+    'Next image': 'รูปภาพถัดไป',
+    'Go to image {{number}} of {{total}}': 'ไปที่รูปภาพ {{number}} จาก {{total}}'
   }
 }

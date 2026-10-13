@@ -1256,6 +1256,10 @@ export default {
     'Observation samples_one': '표본 {{count}}개',
     'Observation samples_other': '표본 {{count}}개',
     'Connection quality': '연결 품질',
-    'Recorded issues': '기록된 문제'
+    'Recorded issues': '기록된 문제',
+    'Open image': '이미지 열기',
+    'Previous image': '이전 이미지',
+    'Next image': '다음 이미지',
+    'Go to image {{number}} of {{total}}': '{{total}}개 중 {{number}}번째 이미지로 이동'
   }
 }

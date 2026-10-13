@@ -3,10 +3,22 @@ import {
   getImageMaxZoom,
   getLightboxImageSize,
   isSmallInlineImage,
-  isSmallLightboxImage
+  isSmallLightboxImage,
+  shouldFillImageRow
 } from './display-size'
 
 describe('inline small images', () => {
+  it('fills the row only when natural width is within 20% of the available width', () => {
+    expect(shouldFillImageRow({ width: 480, height: 300 }, 600)).toBe(true)
+    expect(shouldFillImageRow({ width: 500, height: 300 }, 600)).toBe(true)
+    expect(shouldFillImageRow({ width: 479, height: 300 }, 600)).toBe(false)
+    expect(shouldFillImageRow({ width: 220, height: 164 }, 600)).toBe(false)
+    expect(shouldFillImageRow({ width: 500, height: 300 }, 700)).toBe(false)
+    expect(shouldFillImageRow({ width: 440, height: 300 }, 550)).toBe(true)
+    expect(shouldFillImageRow({ width: 2000, height: 1000 }, 600)).toBe(false)
+    expect(shouldFillImageRow(undefined, 600)).toBe(false)
+    expect(shouldFillImageRow({ width: 480, height: 300 }, 0)).toBe(false)
+  })
   it('only enlarges images narrower than 480px with valid dimensions', () => {
     expect(isSmallInlineImage({ width: 220, height: 164 })).toBe(true)
     expect(isSmallInlineImage({ width: 480, height: 360 })).toBe(false)

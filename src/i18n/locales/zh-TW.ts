@@ -1265,6 +1265,10 @@ export default {
     'Observation samples_one': '{{count}} 個樣本',
     'Observation samples_other': '{{count}} 個樣本',
     'Connection quality': '連線品質',
-    'Recorded issues': '記錄到的問題'
+    'Recorded issues': '記錄到的問題',
+    'Open image': '開啟圖片',
+    'Previous image': '上一張圖片',
+    'Next image': '下一張圖片',
+    'Go to image {{number}} of {{total}}': '前往第 {{number}} 張圖片，共 {{total}} 張'
   }
 }

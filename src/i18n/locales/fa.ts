@@ -1271,6 +1271,10 @@ export default {
     'Observation samples_one': '{{count}} نمونه',
     'Observation samples_other': '{{count}} نمونه',
     'Connection quality': 'کیفیت اتصال',
-    'Recorded issues': 'مشکلات ثبت‌شده'
+    'Recorded issues': 'مشکلات ثبت‌شده',
+    'Open image': 'باز کردن تصویر',
+    'Previous image': 'تصویر قبلی',
+    'Next image': 'تصویر بعدی',
+    'Go to image {{number}} of {{total}}': 'رفتن به تصویر {{number}} از {{total}}'
   }
 }

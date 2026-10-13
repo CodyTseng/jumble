@@ -12,8 +12,8 @@ import type { SlideImage } from 'yet-another-react-lightbox'
 import Download from 'yet-another-react-lightbox/plugins/download'
 import Zoom from 'yet-another-react-lightbox/plugins/zoom'
 import Image from '../Image'
-import ImageWithLightbox from '../ImageWithLightbox'
 import Lightbox from '../Lightbox'
+import ImageStrip from './ImageStrip'
 
 export default function ImageGallery({
   className,
@@ -32,6 +32,8 @@ export default function ImageGallery({
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
   const [index, setIndex] = useState(-1)
+  const [revealed, setRevealed] = useState(false)
+  const shouldLoad = mustLoad || autoLoadMedia || revealed
   const [slides, setSlides] = useState<SlideImage[]>(
     images.map(({ url, dim }) => ({ src: url, ...dim }))
   )
@@ -47,6 +49,8 @@ export default function ImageGallery({
   }, [index])
 
   useEffect(() => {
+    if (!shouldLoad) return
+    let cancelled = false
     const loadImages = async () => {
       const slides = await Promise.all(
         images.map(({ url, pubkey, dim }) => {
@@ -87,32 +91,32 @@ export default function ImageGallery({
           })
         })
       )
-      setSlides(slides)
+      if (!cancelled) setSlides(slides)
     }
 
     loadImages()
-  }, [images])
+    return () => {
+      cancelled = true
+    }
+  }, [images, shouldLoad])
 
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
-    event.stopPropagation()
     event.preventDefault()
     setIndex(start + current)
   }
 
   const displayImages = images.slice(start, end)
 
-  if (!mustLoad && !autoLoadMedia) {
-    return displayImages.map((image, i) => (
-      <ImageWithLightbox
-        upscaleSmall
-        key={i}
-        image={image}
-        className="max-h-[80vh] object-contain sm:max-h-[50vh]"
-        classNames={{
-          wrapper: cn('w-fit max-w-full border', className)
-        }}
-      />
-    ))
+  if (!shouldLoad) {
+    return (
+      <button
+        type="button"
+        className={cn('text-primary w-fit cursor-pointer truncate hover:underline', className)}
+        onClick={() => setRevealed(true)}
+      >
+        [{t('Click to load image')}]
+      </button>
+    )
   }
 
   let imageContent: ReactNode | null = null
@@ -127,35 +131,21 @@ export default function ImageGallery({
         }}
         image={displayImages[0]}
         upscaleSmall
+        fillNearRow
+        role="button"
+        tabIndex={0}
+        aria-label={t('Open image')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            event.currentTarget.click()
+          }
+        }}
         onClick={(e) => handlePhotoClick(e, 0)}
       />
     )
-  } else if (displayImages.length === 2 || displayImages.length === 4) {
-    imageContent = (
-      <div className="grid w-full grid-cols-2 gap-2">
-        {displayImages.map((image, i) => (
-          <Image
-            key={i}
-            classNames={{ wrapper: 'aspect-square w-full cursor-zoom-in border' }}
-            image={image}
-            onClick={(e) => handlePhotoClick(e, i)}
-          />
-        ))}
-      </div>
-    )
-  } else {
-    imageContent = (
-      <div className="grid w-full grid-cols-3 gap-2">
-        {displayImages.map((image, i) => (
-          <Image
-            key={i}
-            classNames={{ wrapper: 'aspect-square w-full cursor-zoom-in border' }}
-            image={image}
-            onClick={(e) => handlePhotoClick(e, i)}
-          />
-        ))}
-      </div>
-    )
+  } else if (displayImages.length > 1) {
+    imageContent = <ImageStrip images={displayImages} onPhotoClick={handlePhotoClick} />
   }
 
   return (

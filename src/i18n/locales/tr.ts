@@ -1275,6 +1275,10 @@ export default {
     'Observation samples_one': '{{count}} örnek',
     'Observation samples_other': '{{count}} örnek',
     'Connection quality': 'Bağlantı kalitesi',
-    'Recorded issues': 'Kaydedilen sorunlar'
+    'Recorded issues': 'Kaydedilen sorunlar',
+    'Open image': 'Görseli aç',
+    'Previous image': 'Önceki görsel',
+    'Next image': 'Sonraki görsel',
+    'Go to image {{number}} of {{total}}': '{{total}} görselden {{number}}. görsele git'
   }
 }

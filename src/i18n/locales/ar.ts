@@ -1260,6 +1260,10 @@ export default {
     'Observation samples_one': 'عدد العينات: {{count}}',
     'Observation samples_other': 'عدد العينات: {{count}}',
     'Connection quality': 'جودة الاتصال',
-    'Recorded issues': 'المشكلات المسجلة'
+    'Recorded issues': 'المشكلات المسجلة',
+    'Open image': 'فتح الصورة',
+    'Previous image': 'الصورة السابقة',
+    'Next image': 'الصورة التالية',
+    'Go to image {{number}} of {{total}}': 'الانتقال إلى الصورة {{number}} من {{total}}'
   }
 }
