@@ -14,6 +14,7 @@ import mediaManager from '@/services/media-manager.service'
 import { SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ExternalLink from '../ExternalLink'
+import { getVideoDisplayStyle } from './display-size'
 
 const PLAYBACK_RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
@@ -135,10 +136,6 @@ export default function VideoPlayer({
   }
 
   const effectiveDim = intrinsicDim ?? dim
-  const aspectRatio =
-    effectiveDim?.width && effectiveDim?.height
-      ? `${effectiveDim.width} / ${effectiveDim.height}`
-      : '16 / 9'
   const handleMediaInteraction = (event: SyntheticEvent<HTMLVideoElement>) => {
     blurFocusedTextInput()
     event.stopPropagation()
@@ -147,11 +144,8 @@ export default function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={cn(
-        'relative block w-full overflow-hidden rounded-xl border bg-black sm:h-[40vh] sm:w-auto sm:max-w-full',
-        className
-      )}
-      style={{ aspectRatio }}
+      className={cn('relative block overflow-hidden rounded-xl border bg-black', className)}
+      style={getVideoDisplayStyle(effectiveDim)}
       onPointerMove={showControls}
       onPointerDownCapture={showControls}
       onFocusCapture={showControls}

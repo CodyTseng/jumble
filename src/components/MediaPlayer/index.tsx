@@ -6,10 +6,13 @@ import { useTranslation } from 'react-i18next'
 import AudioPlayer from '../AudioPlayer'
 import VideoPlayer from '../VideoPlayer'
 import ExternalLink from '../ExternalLink'
+import { getVideoDisplayStyle, VideoSize } from '../VideoPlayer/display-size'
 
 const AUDIO_EXTENSIONS = ['mp3', 'wav', 'flac', 'aac', 'm4a', 'opus', 'wma']
 
-function probeMediaType(url: string): Promise<'video' | 'audio' | null> {
+type MediaInfo = { type: 'video'; dim: VideoSize } | { type: 'audio' }
+
+function probeMediaType(url: string): Promise<MediaInfo | null> {
   return new Promise((resolve) => {
     const video = document.createElement('video')
     video.src = url
@@ -23,9 +26,12 @@ function probeMediaType(url: string): Promise<'video' | 'audio' | null> {
     }
 
     video.onloadedmetadata = () => {
-      const type = video.videoWidth > 0 || video.videoHeight > 0 ? 'video' : 'audio'
+      const info: MediaInfo =
+        video.videoWidth > 0 && video.videoHeight > 0
+          ? { type: 'video', dim: { width: video.videoWidth, height: video.videoHeight } }
+          : { type: 'audio' }
       cleanup()
-      resolve(type)
+      resolve(info)
     }
     video.onerror = () => {
       cleanup()
@@ -50,7 +56,13 @@ export default function MediaPlayer({
   const { t } = useTranslation()
   const { autoLoadMedia } = useContentPolicy()
   const [display, setDisplay] = useState(autoLoadMedia)
-  const [mediaType, setMediaType] = useState<'video' | 'audio' | null>(null)
+  const [detectedMedia, setDetectedMedia] = useState<{
+    src: string
+    pubkey?: string
+    info: MediaInfo
+  } | null>(null)
+  const mediaInfo =
+    detectedMedia?.src === src && detectedMedia.pubkey === pubkey ? detectedMedia.info : null
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -63,11 +75,11 @@ export default function MediaPlayer({
 
   useEffect(() => {
     if (!mustLoad && !display) {
-      setMediaType(null)
+      setDetectedMedia(null)
       return
     }
     if (!src) {
-      setMediaType(null)
+      setDetectedMedia(null)
       return
     }
 
@@ -82,7 +94,7 @@ export default function MediaPlayer({
         // ignore
       }
       if (extension && AUDIO_EXTENSIONS.includes(extension)) {
-        if (!cancelled) setMediaType('audio')
+        if (!cancelled) setDetectedMedia({ src, pubkey, info: { type: 'audio' } })
         return
       }
 
@@ -90,10 +102,10 @@ export default function MediaPlayer({
       if (cancelled) return
 
       while (!cancelled) {
-        const type = await probeMediaType(probeUrl)
+        const info = await probeMediaType(probeUrl)
         if (cancelled) return
-        if (type) {
-          setMediaType(type)
+        if (info) {
+          setDetectedMedia({ src, pubkey, info })
           blossomService.markAsSuccess(src, probeUrl)
           return
         }
@@ -132,22 +144,17 @@ export default function MediaPlayer({
     )
   }
 
-  if (!mediaType) {
+  if (!mediaInfo) {
     return (
       <div
-        className={cn(
-          'bg-muted block w-full overflow-hidden rounded-xl border sm:h-[40vh] sm:w-auto sm:max-w-full',
-          className
-        )}
-        style={{
-          aspectRatio: dim?.width && dim?.height ? `${dim.width} / ${dim.height}` : '16 / 9'
-        }}
+        className={cn('bg-muted block overflow-hidden rounded-xl border', className)}
+        style={getVideoDisplayStyle(dim)}
       />
     )
   }
 
-  if (mediaType === 'video') {
-    return <VideoPlayer src={src} pubkey={pubkey} className={className} dim={dim} />
+  if (mediaInfo.type === 'video') {
+    return <VideoPlayer src={src} pubkey={pubkey} className={className} dim={mediaInfo.dim} />
   }
 
   return <AudioPlayer src={src} pubkey={pubkey} className={className} />
