@@ -63,10 +63,13 @@ export default function ImageStrip({
   return (
     <div
       dir={direction}
-      className="group/image-strip relative w-full min-w-0 [--gallery-height:min(350px,50vh)]"
+      className="group/image-strip relative z-10 w-full min-w-0 [--gallery-height:min(350px,50vh)]"
       style={{
-        width: 'calc(100% + var(--image-strip-bleed, 0px) * 2)',
-        marginInline: 'calc(0px - var(--image-strip-bleed, 0px))'
+        width:
+          'calc(100% + var(--image-strip-bleed-start, var(--image-strip-bleed, 0px)) + var(--image-strip-bleed, 0px))',
+        marginInlineStart:
+          'calc(0px - var(--image-strip-bleed-start, var(--image-strip-bleed, 0px)))',
+        marginInlineEnd: 'calc(0px - var(--image-strip-bleed, 0px))'
       }}
       role="region"
       aria-label={t('Pictures')}
@@ -90,7 +93,10 @@ export default function ImageStrip({
                 className="focus-visible:outline-primary h-[var(--gallery-height)] min-w-0 shrink-0 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
                   width: `min(85%, calc(var(--gallery-height) * ${ratio}))`,
-                  marginInlineStart: index === 0 ? 'var(--image-strip-bleed, 0px)' : undefined,
+                  marginInlineStart:
+                    index === 0
+                      ? 'var(--image-strip-bleed-start, var(--image-strip-bleed, 0px))'
+                      : undefined,
                   marginInlineEnd:
                     index === images.length - 1 ? 'var(--image-strip-bleed, 0px)' : undefined
                 }}

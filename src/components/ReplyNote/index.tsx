@@ -121,9 +121,9 @@ export default function ReplyNote({
       {hasReplies &&
         !hideThreadGuide &&
         (autoLoadProfilePicture ? (
-          <div className="bg-border absolute inset-s-8.25 top-14 bottom-0 z-20 w-0.5" />
+          <div className="bg-border absolute inset-s-8.25 top-14 bottom-0 z-0 w-0.5" />
         ) : (
-          <div className="absolute inset-s-2 top-5 bottom-0 z-20 w-3 rounded-ss-lg border-s-2 border-t-2" />
+          <div className="absolute inset-s-2 top-5 bottom-0 z-0 w-3 rounded-ss-lg border-s-2 border-t-2" />
         ))}
       <Collapsible>
         <div
@@ -133,7 +133,7 @@ export default function ReplyNote({
           )}
         >
           <UserAvatar userId={event.pubkey} size="medium" className="mt-0.5 shrink-0" />
-          <div className="w-full overflow-hidden">
+          <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="w-0 flex-1">
                 <div className="flex items-center gap-1">
@@ -172,7 +172,15 @@ export default function ReplyNote({
               />
             )}
             {show ? (
-              <Content className="mt-2" event={event} />
+              <Content
+                className={cn(
+                  'relative mt-2 [--image-strip-bleed:1rem]',
+                  autoLoadProfilePicture
+                    ? '[--image-strip-bleed-start:3.75rem]'
+                    : !hideThreadGuide && '[--image-strip-bleed-start:1.75rem]'
+                )}
+                event={event}
+              />
             ) : (
               <Button
                 variant="outline"

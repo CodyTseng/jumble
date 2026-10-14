@@ -104,7 +104,7 @@ export default function SubReplies({
               >
                 <div
                   className={cn(
-                    'absolute top-0 z-20 rounded-es-lg border-s-2 border-b-2',
+                    'absolute top-0 z-0 rounded-es-lg border-s-2 border-b-2',
                     autoLoadProfilePicture ? 'h-7.75' : 'h-6',
                     autoLoadProfilePicture ? 'inset-s-8.25 w-4' : 'inset-s-2 w-7'
                   )}
@@ -112,7 +112,7 @@ export default function SubReplies({
                 {index < replies.length - 1 && (
                   <div
                     className={cn(
-                      'bg-border absolute bottom-0 z-20 w-0.5',
+                      'bg-border absolute bottom-0 z-0 w-0.5',
                       autoLoadProfilePicture ? 'inset-s-8.25' : 'inset-s-2',
                       'top-0'
                     )}

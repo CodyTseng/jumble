@@ -31,7 +31,7 @@ export default function MainNoteCard({
     <ClickableCard className={className} onClick={() => push(toNote(originalNoteId ?? event))}>
       <div
         className={cn(
-          'clickable transition-all duration-200',
+          'clickable transition-all duration-200 [--image-strip-bleed-start:var(--image-strip-bleed)]',
           embedded
             ? 'bg-card rounded-xl border p-3 [--image-strip-bleed:0.75rem] sm:p-4 sm:[--image-strip-bleed:1rem]'
             : 'hover:bg-accent/30 py-3 [--image-strip-bleed:1rem]'

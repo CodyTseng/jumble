@@ -427,7 +427,13 @@ function ChainItem({
               <NoteOptions event={event} className="shrink-0 [&_svg]:size-5" />
             </div>
           </div>
-          <NoteContent className="mt-2" event={event} />
+          <NoteContent
+            className={cn(
+              'relative mt-2 [--image-strip-bleed:1rem]',
+              autoLoadProfilePicture && '[--image-strip-bleed-start:4rem]'
+            )}
+            event={event}
+          />
           <StuffStats className="mt-2" stuff={event} />
         </div>
       </div>
