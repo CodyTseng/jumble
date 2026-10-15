@@ -115,24 +115,29 @@ export default function Tabs({
   }, [tabs, value])
 
   useEffect(() => {
-    if (!sentinelRef.current) return
+    const sentinel = sentinelRef.current
+    const container = containerRef.current
+    if (!sentinel || !container) return
+    const stickyTop = parseFloat(getComputedStyle(container).top) || 0
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsSticky(false)
-      } else {
-        // Distinguish "sentinel scrolled above" (tabs are CSS-sticky) from
-        // "sentinel still below viewport" (tabs not reached yet).
-        // When sticky, the container stays fixed while the sentinel scrolls away,
-        // creating a gap. When not sticky, they remain adjacent (gap ≈ 0).
-        const containerRect = containerRef.current?.getBoundingClientRect()
-        if (containerRect) {
-          setIsSticky(containerRect.top - entry.boundingClientRect.bottom > 10)
-        }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Compare coordinates from the same observer snapshot. Live toolbar
+        // geometry can already have shifted as images and previews load.
+        setIsSticky(
+          !entry.isIntersecting &&
+            entry.rootBounds !== null &&
+            entry.boundingClientRect.bottom < entry.rootBounds.top
+        )
+      },
+      {
+        root: sentinel.closest('[data-radix-scroll-area-viewport]'),
+        // Match top-12 even when the browser's default font size changes.
+        rootMargin: `-${stickyTop}px 0px 0px 0px`
       }
-    })
+    )
 
-    observer.observe(sentinelRef.current)
+    observer.observe(sentinel)
     return () => observer.disconnect()
   }, [])
 
