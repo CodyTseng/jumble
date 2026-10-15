@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Copy, Highlighter } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -22,9 +23,11 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
   }
 
   useEffect(() => {
+    let selectionTimeout: ReturnType<typeof setTimeout> | undefined
     const handleSelectionEnd = () => {
       // Use a small delay to ensure selection is complete
-      setTimeout(() => {
+      clearTimeout(selectionTimeout)
+      selectionTimeout = setTimeout(() => {
         const selection = window.getSelection()
         const text = selection?.toString().trim()
 
@@ -49,25 +52,34 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
 
         // Get the bounding rect of the entire selection
         const rect = range.getBoundingClientRect()
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
 
-        // Position button above the selection area, centered horizontally
+        // The portaled fixed toolbar uses viewport coordinates, just like the range rect.
         setPosition({
-          top: rect.top + scrollTop - 48, // 48px above the selection
-          left: rect.left + scrollLeft + rect.width / 2 // Center of the selection
+          top: rect.top - 48, // 48px above the selection
+          left: rect.left + rect.width / 2 // Center of the selection
         })
         setSelectedText(text)
       }, 10)
     }
 
-    // Only listen to mouseup and touchend (when user finishes selection)
+    const hideActions = () => {
+      clearTimeout(selectionTimeout)
+      setPosition(null)
+      setSelectedText('')
+    }
+
+    // Show actions when selection finishes; dismiss them when the viewport changes.
     document.addEventListener('mouseup', handleSelectionEnd)
     document.addEventListener('touchend', handleSelectionEnd)
+    document.addEventListener('scroll', hideActions, true)
+    window.addEventListener('resize', hideActions)
 
     return () => {
+      clearTimeout(selectionTimeout)
       document.removeEventListener('mouseup', handleSelectionEnd)
       document.removeEventListener('touchend', handleSelectionEnd)
+      document.removeEventListener('scroll', hideActions, true)
+      window.removeEventListener('resize', hideActions)
     }
   }, [containerRef])
 
@@ -92,7 +104,7 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
     return null
   }
 
-  return (
+  return createPortal(
     <div
       ref={actionsRef}
       className="bg-primary animate-in fade-in-0 slide-in-from-bottom-4 fixed z-50 flex -translate-x-1/2 overflow-hidden rounded-md shadow-lg duration-200"
@@ -132,6 +144,7 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
         <Copy className="h-4 w-4" />
         {t('Copy')}
       </Button>
-    </div>
+    </div>,
+    document.body
   )
 }
