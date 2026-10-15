@@ -137,6 +137,8 @@ export type TImetaInfo = {
 }
 
 export type TPublishOptions = {
+  /** Cancel pending signing/routing before a network publication starts. */
+  signal?: AbortSignal
   specifiedRelayUrls?: string[]
   additionalRelayUrls?: string[]
   minPow?: number

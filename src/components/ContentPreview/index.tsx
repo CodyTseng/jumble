@@ -24,6 +24,7 @@ import ReactionPreview from './ReactionPreview'
 import RepostPreview from './RepostPreview'
 import VideoNotePreview from './VideoNotePreview'
 import ZapPreview from './ZapPreview'
+import { isNapplet, nappletTitle } from '@/lib/napplet'
 
 export default function ContentPreview({
   event,
@@ -68,6 +69,14 @@ export default function ContentPreview({
 
   if (isNip34EventKind(event.kind)) {
     return <Nip34EventPreview event={event} className={className} />
+  }
+
+  if (isNapplet(event)) {
+    return (
+      <div dir="auto" className={cn('truncate', className)}>
+        🧩 {nappletTitle(event)}
+      </div>
+    )
   }
 
   if (

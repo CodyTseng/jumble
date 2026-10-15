@@ -148,6 +148,9 @@ export const TRENDING_NOTES_RELAY_URLS = ['wss://trending.relays.land/']
 export const GROUP_METADATA_EVENT_KIND = 39000
 
 export const ExtendedKind = {
+  NAPPLET_SNAPSHOT: 5129,
+  ROOT_NAPPLET: 15129,
+  NAPPLET: 35129,
   GROUP_MESSAGE: 9,
   EXTERNAL_CONTENT_REACTION: 17,
   SEAL: 13,
@@ -202,6 +205,9 @@ export const NIP_34_KINDS = [
 ]
 
 export const ALLOWED_FILTER_KINDS = [
+  ExtendedKind.NAPPLET_SNAPSHOT,
+  ExtendedKind.ROOT_NAPPLET,
+  ExtendedKind.NAPPLET,
   kinds.ShortTextNote,
   kinds.Repost,
   kinds.GenericRepost,

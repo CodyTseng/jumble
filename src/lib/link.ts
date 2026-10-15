@@ -3,6 +3,7 @@ import { Event, nip19 } from 'nostr-tools'
 import { getNoteBech32Id } from './event'
 
 export const toHome = () => '/'
+export const toNapplet = (id: string) => `/napplets/${encodeURIComponent(id)}`
 export const toNote = (eventOrId: Event | string) => {
   if (typeof eventOrId === 'string') return `/notes/${eventOrId}`
   const nevent = getNoteBech32Id(eventOrId)

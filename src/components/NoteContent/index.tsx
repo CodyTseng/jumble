@@ -19,6 +19,8 @@ import LiveEvent from './LiveEvent'
 import LongFormArticle from './LongFormArticle'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import MutedNote from './MutedNote'
+import NappletCard from '../NappletCard'
+import { isNapplet } from '@/lib/napplet'
 import Nip34Event from './Nip34Event'
 import NsfwNote from './NsfwNote'
 import PictureNote from './PictureNote'
@@ -65,6 +67,10 @@ export default function NoteContent({
 
   if (isNip34EventKind(event.kind)) {
     return <Nip34Event className={cn('mt-2', className)} event={event} />
+  }
+
+  if (isNapplet(event)) {
+    return <NappletCard className={cn('mt-2', className)} event={event} />
   }
 
   if (event.kind === kinds.Highlights) {
@@ -149,11 +155,7 @@ export default function NoteContent({
 
   if (event.kind === ExtendedKind.FAVORITE_RELAYS) {
     return (
-      <FavoriteRelays
-        className={cn('mt-2', className)}
-        event={event}
-        embedded={size === 'small'}
-      />
+      <FavoriteRelays className={cn('mt-2', className)} event={event} embedded={size === 'small'} />
     )
   }
 

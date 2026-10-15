@@ -12,6 +12,7 @@ import GeneralSettingsPage from '@/pages/secondary/GeneralSettingsPage'
 import MuteListPage from '@/pages/secondary/MuteListPage'
 import NoteListPage from '@/pages/secondary/NoteListPage'
 import NotePage from '@/pages/secondary/NotePage'
+import NappletPage from '@/pages/secondary/NappletPage'
 import NotificationSettingsPage from '@/pages/secondary/NotificationSettingsPage'
 import OthersRelaySettingsPage from '@/pages/secondary/OthersRelaySettingsPage'
 import PostSettingsPage from '@/pages/secondary/PostSettingsPage'
@@ -41,6 +42,7 @@ const SECONDARY_ROUTE_CONFIGS: {
 }[] = [
   { path: '/notes', element: <NoteListPage /> },
   { path: '/notes/:id', element: <NotePage /> },
+  { path: '/napplets/:id', element: <NappletPage />, hideBottomBar: true },
   { path: '/articles/new', element: <ArticleEditorPage />, hideBottomBar: true },
   { path: '/articles/:id/edit', element: <ArticleEditorPage />, hideBottomBar: true },
   { path: '/users', element: <ProfileListPage /> },

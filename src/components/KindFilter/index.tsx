@@ -18,6 +18,10 @@ export const KIND_FILTER_OPTIONS = [
   { kindGroup: [kinds.LongFormArticle], label: 'Articles' },
   { kindGroup: [kinds.Highlights], label: 'Highlights' },
   { kindGroup: [ExtendedKind.POLL], label: 'Polls' },
+  {
+    kindGroup: [ExtendedKind.NAPPLET_SNAPSHOT, ExtendedKind.ROOT_NAPPLET, ExtendedKind.NAPPLET],
+    label: 'Napplets'
+  },
   { kindGroup: [ExtendedKind.VOICE, ExtendedKind.VOICE_COMMENT], label: 'Voice Posts' },
   { kindGroup: [ExtendedKind.PICTURE], label: 'Photo Posts' },
   {
@@ -43,7 +47,12 @@ export default function KindFilter({
 }) {
   const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
-  const { showKinds: defaultShowKinds, updateShowKinds, updateShowKindsForFeed, clearShowKindsForFeed } = useKindFilter()
+  const {
+    showKinds: defaultShowKinds,
+    updateShowKinds,
+    updateShowKindsForFeed,
+    clearShowKindsForFeed
+  } = useKindFilter()
   const [open, setOpen] = useState(false)
   const [temporaryShowKinds, setTemporaryShowKinds] = useState(showKinds)
   const [isPersistent, setIsPersistent] = useState(false)
@@ -86,7 +95,7 @@ export default function KindFilter({
       variant="ghost"
       size="titlebar-icon"
       className={cn(
-        'relative hover:text-foreground',
+        'hover:text-foreground relative',
         !isDifferentFromDefault && 'text-muted-foreground'
       )}
       onClick={() => {
@@ -97,7 +106,7 @@ export default function KindFilter({
     >
       <ListFilter size={16} />
       {isDifferentFromDefault && (
-        <div className="absolute start-7 top-2 size-2 rounded-full bg-primary ring-2 ring-background" />
+        <div className="bg-primary ring-background absolute start-7 top-2 size-2 rounded-full ring-2" />
       )}
     </Button>
   )
@@ -122,8 +131,8 @@ export default function KindFilter({
                 }
               }}
             >
-              <p className="font-medium leading-none">{t(label)}</p>
-              <p className="text-xs text-muted-foreground">kind {kindGroup.join(', ')}</p>
+              <p className="leading-none font-medium">{t(label)}</p>
+              <p className="text-muted-foreground text-xs">kind {kindGroup.join(', ')}</p>
             </div>
           )
         })}

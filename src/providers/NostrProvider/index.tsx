@@ -1,3 +1,4 @@
+import { closeNappletSessions } from '@/lib/napplet/session'
 import LoginDialog from '@/components/LoginDialog'
 import PasswordInputDialog from '@/components/PasswordInputDialog'
 import { ApplicationDataKey, ExtendedKind } from '@/constants'
@@ -509,6 +510,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = (signer: ISigner, act: TAccount) => {
+    closeNappletSessions()
     const newAccounts = storage.addAccount(act)
     setAccounts(newAccounts)
     storage.switchAccount(act)
@@ -518,6 +520,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const removeAccount = (act: TAccountPointer) => {
+    if (isSameAccount(account, act)) closeNappletSessions()
     const newAccounts = storage.removeAccount(act)
     setAccounts(newAccounts)
     if (account?.pubkey === act.pubkey) {
@@ -531,6 +534,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const switchAccount = async (act: TAccountPointer | null) => {
+    closeNappletSessions()
     if (!act) {
       storage.switchAccount(null)
       setAccount(null)
@@ -768,8 +772,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return event as VerifiedEvent
   }
 
-  const publishSignedEvent = async (event: Event, options: TPublishOptions = {}) => {
+  const publishSignedEvent = async (event: Event, { signal, ...options }: TPublishOptions = {}) => {
+    signal?.throwIfAborted()
     const relays = await client.determineTargetRelays(event, options)
+    signal?.throwIfAborted()
     await client.publishEvent(relays, event)
     return event
   }
@@ -778,6 +784,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     draftEvent: TDraftEvent,
     { minPow = 0, ...options }: TPublishOptions = {}
   ) => {
+    options.signal?.throwIfAborted()
     if (!account || !signer || account.signerType === 'npub') {
       throw new Error('You need to login first')
     }
@@ -786,10 +793,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     let event: VerifiedEvent
     if (minPow > 0) {
       const unsignedEvent = await minePow({ ...draft, pubkey: account.pubkey }, minPow)
+      options.signal?.throwIfAborted()
       event = await signEvent(unsignedEvent)
     } else {
       event = await signEvent(draft)
     }
+    options.signal?.throwIfAborted()
 
     if (event.kind !== kinds.Application && event.pubkey !== account.pubkey) {
       const eventAuthor = await client.fetchProfile(event.pubkey)
@@ -912,6 +921,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const updateBookmarkListEvent = async (bookmarkListEvent: Event) => {
     const newBookmarkListEvent = await indexedDb.putReplaceableEvent(bookmarkListEvent)
     if (newBookmarkListEvent.id !== bookmarkListEvent.id) return
+    if (newBookmarkListEvent.pubkey !== storage.getCurrentAccount()?.pubkey) return
 
     setBookmarkListEvent(newBookmarkListEvent)
   }

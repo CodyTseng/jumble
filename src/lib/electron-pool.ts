@@ -79,7 +79,10 @@ export class ElectronPool implements IRelayPool {
   private bridge: TElectronBridge
   private getSigner: () => TSignAuthEvent | undefined
 
-  constructor(getSigner: () => TSignAuthEvent | undefined) {
+  constructor(
+    getSigner: () => TSignAuthEvent | undefined,
+    options: { handleAuthRequests?: boolean } = {}
+  ) {
     const bridge = getElectronBridge()
     if (!bridge) {
       throw new Error('Electron bridge is not available')
@@ -126,22 +129,25 @@ export class ElectronPool implements IRelayPool {
       handlers?.onclose?.(reason)
     })
 
-    bridge.relay.onAuthRequest(async ({ requestId, authEvent }) => {
-      const signer = this.getSigner()
-      if (!signer) {
-        bridge.relay.sendAuthResponse({ requestId, error: 'not logged in' })
-        return
-      }
-      try {
-        const signed = await signer(authEvent)
-        bridge.relay.sendAuthResponse({ requestId, signedEvent: signed })
-      } catch (err) {
-        bridge.relay.sendAuthResponse({
-          requestId,
-          error: err instanceof Error ? err.message : String(err)
-        })
-      }
-    })
+    // Signer-free consumers must not race the application's AUTH responder.
+    if (options.handleAuthRequests !== false) {
+      bridge.relay.onAuthRequest(async ({ requestId, authEvent }) => {
+        const signer = this.getSigner()
+        if (!signer) {
+          bridge.relay.sendAuthResponse({ requestId, error: 'not logged in' })
+          return
+        }
+        try {
+          const signed = await signer(authEvent)
+          bridge.relay.sendAuthResponse({ requestId, signedEvent: signed })
+        } catch (err) {
+          bridge.relay.sendAuthResponse({
+            requestId,
+            error: err instanceof Error ? err.message : String(err)
+          })
+        }
+      })
+    }
 
     observeRelayPoolLifecycle(this)
   }

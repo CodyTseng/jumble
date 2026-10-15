@@ -125,7 +125,10 @@
     "websocket-polyfill": "^0.0.3",
     "ws": "^8.18.0",
     "yet-another-react-lightbox": "^3.31.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@napplet/shim": "0.31.0",
+    "ipaddr.js": "2.5.0",
+    "rxjs": "7.8.2"
   },
   "overrides": {
     "@nostrability/schemata": {
