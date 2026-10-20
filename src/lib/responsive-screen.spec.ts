@@ -1,0 +1,186 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { getScreenSize, observeScreenSize } from './responsive-screen'
+
+describe('responsive screen size', () => {
+  let browser: EventTarget & { innerWidth: number; innerHeight: number }
+  let page: EventTarget & {
+    fullscreenElement: object | null
+    webkitFullscreenElement?: object | null
+    querySelectorAll: ReturnType<typeof vi.fn>
+    createElement: ReturnType<typeof vi.fn>
+    documentElement: { appendChild: ReturnType<typeof vi.fn> }
+  }
+  let largeViewportHeight: number | undefined
+  let stop: (() => void) | undefined
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    largeViewportHeight = undefined
+    browser = Object.assign(new EventTarget(), { innerWidth: 390, innerHeight: 844 })
+    page = Object.assign(new EventTarget(), {
+      fullscreenElement: null,
+      querySelectorAll: vi.fn(() => []),
+      createElement: vi.fn(() => ({
+        style: { cssText: '' },
+        getBoundingClientRect: () => ({ height: largeViewportHeight ?? browser.innerHeight }),
+        remove: vi.fn()
+      })),
+      documentElement: { appendChild: vi.fn() }
+    })
+    vi.stubGlobal('window', browser)
+    vi.stubGlobal('document', page)
+  })
+  afterEach(() => {
+    stop?.()
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  const resize = (width: number, height = browser.innerHeight) => {
+    browser.innerWidth = width
+    browser.innerHeight = height
+    browser.dispatchEvent(new Event('resize'))
+    vi.advanceTimersByTime(200)
+  }
+
+  it('tracks window resizing and folding in both directions', () => {
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    resize(1400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    resize(700)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    browser.innerWidth = 768
+    expect(getScreenSize().isSmallScreen).toBe(true)
+  })
+
+  it('keeps bottom navigation when a tall phone rotates into a wide, short viewport', () => {
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    resize(844, 390)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    resize(1600, 540)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+  })
+
+  it('keeps landscape phones compact even with their browser toolbar hidden', () => {
+    browser.innerWidth = 1200
+    browser.innerHeight = 480
+    largeViewportHeight = 540
+    expect(getScreenSize()).toEqual({ isSmallScreen: true, isLargeScreen: false })
+  })
+
+  it('requires enough height for sidebar layout and responds to height-only resizing', () => {
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    resize(1400, 640)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    resize(1400, 641)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    resize(1024, 768)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+  })
+
+  it('does not change layout as the address bar hides and reappears across the height breakpoint', () => {
+    browser.innerWidth = 1024
+    browser.innerHeight = 610
+    largeViewportHeight = 700
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    for (const height of [700, 610, 700, 610]) resize(1024, height)
+    expect(changed.mock.calls.every(([size]) => !size.isSmallScreen)).toBe(true)
+  })
+
+  it('allows sidebar layout when first opened with the address bar visible', () => {
+    browser.innerWidth = 1024
+    browser.innerHeight = 610
+    largeViewportHeight = 700
+    expect(getScreenSize()).toEqual({ isSmallScreen: false, isLargeScreen: false })
+  })
+
+  it('keeps sidebar mode during toolbar changes on tablets with enough maximum height', () => {
+    browser.innerWidth = 1400
+    largeViewportHeight = 680
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    for (const height of [800, 680, 800]) resize(1400, height)
+    expect(changed.mock.calls.every(([size]) => !size.isSmallScreen && size.isLargeScreen)).toBe(
+      true
+    )
+    // Resizing the actual window changes lvh too, so compact mode still works.
+    largeViewportHeight = 600
+    resize(1400, 600)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    largeViewportHeight = 800
+    resize(1400, 800)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+  })
+
+  it('rechecks stable height on orientation changes', () => {
+    browser.innerWidth = 1024
+    largeViewportHeight = 700
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    largeViewportHeight = 600
+    browser.dispatchEvent(new Event('orientationchange'))
+    vi.advanceTimersByTime(200)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+  })
+
+  it.each(['fullscreenElement', 'webkitFullscreenElement'] as const)(
+    'defers resizing until fullscreen exits (%s)',
+    (property) => {
+      const changed = vi.fn()
+      stop = observeScreenSize(changed)
+      page[property] = {}
+      resize(900)
+      expect(changed).toHaveBeenCalledTimes(1)
+      page[property] = null
+      page.dispatchEvent(new Event('fullscreenchange'))
+      vi.advanceTimersByTime(200)
+      expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+    }
+  )
+
+  it('keeps mobile layout during native iOS video fullscreen and applies the final exit size', () => {
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    page.dispatchEvent(new Event('webkitbeginfullscreen'))
+    resize(844)
+    expect(changed).toHaveBeenCalledTimes(1)
+    page.dispatchEvent(new Event('webkitendfullscreen'))
+    vi.advanceTimersByTime(100)
+    resize(390)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    expect(changed).toHaveBeenCalledTimes(2)
+  })
+
+  it('detects a native player already in fullscreen before observation', () => {
+    const changed = vi.fn()
+    const video = { webkitDisplayingFullscreen: true }
+    page.querySelectorAll.mockReturnValue([video])
+    stop = observeScreenSize(changed)
+    resize(844)
+    expect(changed).not.toHaveBeenCalled()
+    video.webkitDisplayingFullscreen = false
+    page.dispatchEvent(new Event('webkitendfullscreen'))
+    vi.advanceTimersByTime(200)
+    expect(changed).toHaveBeenCalledOnce()
+  })
+
+  it('coalesces intermediate sizes and cancels pending work on cleanup', () => {
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    browser.innerWidth = 1400
+    browser.dispatchEvent(new Event('resize'))
+    vi.advanceTimersByTime(100)
+    browser.innerWidth = 700
+    browser.dispatchEvent(new Event('resize'))
+    vi.advanceTimersByTime(100)
+    expect(changed).toHaveBeenCalledTimes(1)
+    stop()
+    resize(1400)
+    expect(changed).toHaveBeenCalledTimes(1)
+  })
+})

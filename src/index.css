@@ -5,6 +5,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Safe areas belong to physical screen edges, including in RTL layouts.
+   Fixed/portal surfaces need their own insets; page padding does not reach them. */
+.safe-area-x {
+  padding-left: max(env(safe-area-inset-left, 0px), var(--safe-area-padding, 0px));
+  padding-right: max(env(safe-area-inset-right, 0px), var(--safe-area-padding, 0px));
+}
+
+.safe-area-x-margin {
+  margin-left: env(safe-area-inset-left, 0px);
+  margin-right: env(safe-area-inset-right, 0px);
+}
+
 @theme {
   --breakpoint-wide: 1200px;
 

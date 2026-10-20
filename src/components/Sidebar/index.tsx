@@ -36,11 +36,11 @@ export default function PrimaryPageSidebar() {
   return (
     <div
       className={cn(
-        'relative flex h-full shrink-0 flex-col justify-between pt-3 pb-2',
+        'relative flex h-full min-h-0 shrink-0 flex-col justify-between gap-4 overflow-y-auto overscroll-contain pt-3 pb-2',
         sidebarCollapse ? 'w-16 px-2' : 'w-52 px-4'
       )}
     >
-      <div className="flex flex-col gap-2">
+      <div className="flex shrink-0 flex-col gap-2">
         {sidebarCollapse ? (
           <button
             className="mb-4 flex h-12 w-full cursor-pointer items-center justify-center transition-opacity hover:opacity-80"
@@ -68,7 +68,7 @@ export default function PrimaryPageSidebar() {
         <SettingsButton collapse={sidebarCollapse} />
         <PostButton collapse={sidebarCollapse} />
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex shrink-0 flex-col gap-4">
         <SidebarSignerApprovalIndicator collapsed={sidebarCollapse} />
         <UpdateButton collapse={sidebarCollapse} />
         <DesktopAppTip collapse={sidebarCollapse} />

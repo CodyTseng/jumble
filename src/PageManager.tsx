@@ -280,145 +280,26 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     popSecondaryPage(-secondaryStack.length)
   }
 
-  if (isSmallScreen) {
-    return (
-      <PrimaryPageContext.Provider
-        value={{
-          navigate: navigatePrimaryPage,
-          current: currentPrimaryPage,
-          display: secondaryStack.length === 0
-        }}
-      >
-        <SecondaryPageContext.Provider
-          value={{
-            push: pushSecondaryPage,
-            pop: popSecondaryPage,
-            currentIndex: secondaryStack.length
-              ? secondaryStack[secondaryStack.length - 1].index
-              : 0
-          }}
-        >
-          <CurrentRelaysProvider>
-            <NotificationProvider>
-              <div style={{ '--bottom-bar-offset': bottomBarOffset } as React.CSSProperties}>
-                {!!secondaryStack.length &&
-                  secondaryStack.map((item, index) => (
-                    <div
-                      key={item.index}
-                      style={{
-                        display: index === secondaryStack.length - 1 ? 'block' : 'none'
-                      }}
-                    >
-                      {item.element}
-                    </div>
-                  ))}
-                {primaryPages.map(({ name, element, props }) => (
-                  <div
-                    key={name}
-                    style={{
-                      display:
-                        secondaryStack.length === 0 && currentPrimaryPage === name
-                          ? 'block'
-                          : 'none'
-                    }}
-                  >
-                    {props ? cloneElement(element as React.ReactElement, props) : element}
-                  </div>
-                ))}
-                {!bottomBarHidden && <BottomNavigationBar />}
-                <TooManyRelaysAlertDialog />
-                <DraftBox />
-                <DraftEditorHost />
-              </div>
-            </NotificationProvider>
-          </CurrentRelaysProvider>
-        </SecondaryPageContext.Provider>
-      </PrimaryPageContext.Provider>
-    )
-  }
-
   const isWideSecondaryArticleEditor =
     !enableSingleColumnLayout &&
     isLargeScreen &&
     /^\/articles\/(?:new|[^/]+\/edit)(?:[?#]|$)/.test(secondaryStack.at(-1)?.url ?? '')
+  const primaryVisible = !enableSingleColumnLayout || secondaryStack.length === 0
+  const panelClassName = !enableSingleColumnLayout
+    ? cn(
+        'bg-background relative overflow-hidden',
+        themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl'
+      )
+    : undefined
 
-  if (enableSingleColumnLayout) {
-    return (
-      <PrimaryPageContext.Provider
-        value={{
-          navigate: navigatePrimaryPage,
-          current: currentPrimaryPage,
-          display: secondaryStack.length === 0
-        }}
-      >
-        <SecondaryPageContext.Provider
-          value={{
-            push: pushSecondaryPage,
-            pop: popSecondaryPage,
-            currentIndex: secondaryStack.length
-              ? secondaryStack[secondaryStack.length - 1].index
-              : 0
-          }}
-        >
-          <CurrentRelaysProvider>
-            <NotificationProvider>
-              <div className="wide:justify-around flex w-full">
-                <div className={cn('wide:w-full', sidebarCollapse ? 'w-16' : 'w-52')} />
-                <div className="bg-background wide:w-[640px] wide:flex-auto wide:shrink-0 min-h-screen w-0 flex-1 border-x">
-                  {!!secondaryStack.length &&
-                    secondaryStack.map((item, index) => (
-                      <div
-                        key={item.index}
-                        style={{
-                          display: index === secondaryStack.length - 1 ? 'block' : 'none'
-                        }}
-                      >
-                        {item.element}
-                      </div>
-                    ))}
-                  {primaryPages.map(({ name, element, props }) => (
-                    <div
-                      key={name}
-                      style={{
-                        display:
-                          secondaryStack.length === 0 && currentPrimaryPage === name
-                            ? 'block'
-                            : 'none'
-                      }}
-                    >
-                      {props ? cloneElement(element as React.ReactElement, props) : element}
-                    </div>
-                  ))}
-                </div>
-                <div className="wide:block wide:w-full hidden" />
-              </div>
-              <div
-                className={cn(
-                  'wide:w-[calc((100%-640px)/2)] pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end',
-                  sidebarCollapse ? 'w-16' : 'w-52'
-                )}
-              >
-                <div className="pointer-events-auto">
-                  <Sidebar />
-                </div>
-              </div>
-              <TooManyRelaysAlertDialog />
-              <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
-              <DraftBox />
-              <DraftEditorHost />
-            </NotificationProvider>
-          </CurrentRelaysProvider>
-        </SecondaryPageContext.Provider>
-      </PrimaryPageContext.Provider>
-    )
-  }
-
+  // Keep providers, panels and page wrappers in the same tree positions in every mode.
+  // Reparenting a cached React element still remounts it and loses its local state.
   return (
     <PrimaryPageContext.Provider
       value={{
         navigate: navigatePrimaryPage,
         current: currentPrimaryPage,
-        display: !isWideSecondaryArticleEditor
+        display: primaryVisible && !isWideSecondaryArticleEditor
       }}
     >
       <SecondaryPageContext.Provider
@@ -430,34 +311,67 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       >
         <CurrentRelaysProvider>
           <NotificationProvider>
-            <div className="bg-surface-background flex flex-col items-center">
+            <div
+              className={cn(
+                !enableSingleColumnLayout && 'bg-surface-background flex flex-col items-center',
+                isSmallScreen && 'safe-area-x'
+              )}
+              style={
+                {
+                  '--bottom-bar-offset': isSmallScreen ? bottomBarOffset : '0px'
+                } as React.CSSProperties
+              }
+            >
               <div
-                className="bg-surface-background flex h-(--vh) w-full"
-                style={{
-                  maxWidth: '1920px'
-                }}
+                className={cn(
+                  'w-full',
+                  !enableSingleColumnLayout && 'bg-surface-background flex h-(--vh) max-w-[1920px]',
+                  enableSingleColumnLayout && !isSmallScreen && 'wide:justify-around flex'
+                )}
               >
-                <Sidebar />
                 <div
                   className={cn(
-                    'grid w-full grid-cols-2',
-                    themeSetting === 'pure-black' ? '' : 'gap-2 py-2 pe-2'
+                    'shrink-0',
+                    enableSingleColumnLayout &&
+                      cn(
+                        'wide:w-[calc((100%-640px)/2)] pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end',
+                        sidebarCollapse ? 'w-16' : 'w-52'
+                      ),
+                    isSmallScreen && 'hidden'
+                  )}
+                >
+                  <div className="pointer-events-auto h-full">
+                    <Sidebar />
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    enableSingleColumnLayout && !isSmallScreen ? 'wide:w-full' : 'hidden',
+                    sidebarCollapse ? 'w-16' : 'w-52'
+                  )}
+                />
+                <div
+                  className={cn(
+                    !enableSingleColumnLayout && 'grid w-full min-w-0 grid-cols-2',
+                    !enableSingleColumnLayout && themeSetting !== 'pure-black' && 'gap-2 py-2 pe-2',
+                    enableSingleColumnLayout &&
+                      !isSmallScreen &&
+                      'bg-background wide:w-[640px] wide:flex-auto wide:shrink-0 min-h-screen w-0 flex-1 border-x'
                   )}
                 >
                   <div
                     id="primary-page-panel"
                     className={cn(
-                      'bg-background relative overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl shadow-lg'
+                      panelClassName,
+                      !enableSingleColumnLayout && themeSetting !== 'pure-black' && 'shadow-lg'
                     )}
+                    style={{ display: primaryVisible ? undefined : 'none' }}
                   >
                     {primaryPages.map(({ name, element, props }) => (
                       <div
                         key={name}
-                        className="flex h-full w-full flex-col"
-                        style={{
-                          display: currentPrimaryPage === name ? 'block' : 'none'
-                        }}
+                        className={cn(!enableSingleColumnLayout && 'h-full w-full')}
+                        style={{ display: currentPrimaryPage === name ? 'block' : 'none' }}
                       >
                         {props ? cloneElement(element as React.ReactElement, props) : element}
                       </div>
@@ -466,16 +380,22 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                   <div
                     id="secondary-page-panel"
                     className={cn(
-                      'bg-background relative overflow-hidden',
-                      themeSetting === 'pure-black' ? 'border-s' : 'rounded-2xl',
-                      themeSetting !== 'pure-black' && secondaryStack.length > 0 && 'shadow-lg',
-                      secondaryStack.length === 0 ? 'bg-surface' : ''
+                      panelClassName,
+                      !enableSingleColumnLayout && secondaryStack.length === 0 && 'bg-surface',
+                      !enableSingleColumnLayout &&
+                        themeSetting !== 'pure-black' &&
+                        secondaryStack.length > 0 &&
+                        'shadow-lg'
                     )}
+                    style={{
+                      display:
+                        enableSingleColumnLayout && !secondaryStack.length ? 'none' : undefined
+                    }}
                   >
                     {secondaryStack.map((item, index) => (
                       <div
                         key={item.index}
-                        className="flex h-full w-full flex-col"
+                        className={cn(!enableSingleColumnLayout && 'h-full w-full')}
                         style={{ display: index === secondaryStack.length - 1 ? 'block' : 'none' }}
                       >
                         {item.element}
@@ -483,10 +403,26 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                     ))}
                   </div>
                 </div>
+                <div
+                  className={cn(
+                    enableSingleColumnLayout && !isSmallScreen
+                      ? 'wide:block wide:w-full hidden'
+                      : 'hidden'
+                  )}
+                />
               </div>
+              {isSmallScreen && !bottomBarHidden && <BottomNavigationBar />}
             </div>
             <TooManyRelaysAlertDialog />
-            <BackgroundAudio className="fixed end-0 bottom-20 z-50 w-80 overflow-hidden rounded-s-full rounded-e-none border shadow-lg" />
+            <BackgroundAudio
+              className={cn(
+                'fixed end-0 z-50 overflow-hidden',
+                isSmallScreen
+                  ? 'safe-area-x bg-background bottom-[calc(env(safe-area-inset-bottom)+3rem)] w-full max-w-none rounded-none border-x-0 border-y [--safe-area-padding:0.5rem]'
+                  : 'bottom-20 w-80 rounded-s-full rounded-e-none border shadow-lg',
+                isSmallScreen && bottomBarHidden && 'hidden'
+              )}
+            />
             <DraftBox />
             <DraftEditorHost />
           </NotificationProvider>

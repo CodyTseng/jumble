@@ -1,4 +1,4 @@
-import { isElectron } from '@/lib/platform'
+import { getScreenSize, observeScreenSize } from '@/lib/responsive-screen'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 /** Responsive layout breakpoints only; do not use these as OS or input-mode checks. */
@@ -18,27 +18,20 @@ export const useScreenSize = () => {
 }
 
 export function ScreenSizeProvider({ children }: { children: React.ReactNode }) {
-  const [isSmallScreen, setIsSmallScreen] = useState(() => window.innerWidth <= 768)
-  const [isLargeScreen, setIsLargeScreen] = useState(() => window.innerWidth >= 1280)
+  const [size, setSize] = useState(getScreenSize)
 
-  useEffect(() => {
-    if (!isElectron()) return
-    const onResize = () => {
-      setIsSmallScreen(window.innerWidth <= 768)
-      setIsLargeScreen(window.innerWidth >= 1280)
-    }
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
-
-  return (
-    <ScreenSizeContext.Provider
-      value={{
-        isSmallScreen,
-        isLargeScreen
-      }}
-    >
-      {children}
-    </ScreenSizeContext.Provider>
+  useEffect(
+    () =>
+      observeScreenSize((next) => {
+        setSize((previous) =>
+          previous.isSmallScreen === next.isSmallScreen &&
+          previous.isLargeScreen === next.isLargeScreen
+            ? previous
+            : next
+        )
+      }),
+    []
   )
+
+  return <ScreenSizeContext.Provider value={size}>{children}</ScreenSizeContext.Provider>
 }

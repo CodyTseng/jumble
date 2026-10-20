@@ -1,3 +1,4 @@
+import { usePageScrollRestoration } from '@/hooks/usePageScrollRestoration'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { ThreeSectionTitlebar, Titlebar } from '@/components/Titlebar'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,7 @@ import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { ChevronLeft } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const SecondaryPageLayout = forwardRef(
@@ -41,6 +42,12 @@ const SecondaryPageLayout = forwardRef(
     const scrollAreaRef = useRef<HTMLDivElement>(null)
     const { enableSingleColumnLayout } = useUserPreferences()
     const { currentIndex } = useSecondaryPage()
+    const windowScroll = enableSingleColumnLayout && !forceScrollArea
+    usePageScrollRestoration({
+      active: currentIndex === index,
+      windowScroll,
+      scrollAreaRef
+    })
 
     useImperativeHandle(
       ref,
@@ -51,7 +58,7 @@ const SecondaryPageLayout = forwardRef(
           // momentum scrolling when content height changes.
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              if (scrollAreaRef.current) {
+              if (!windowScroll && scrollAreaRef.current) {
                 scrollAreaRef.current.scrollTo({ top: 0, behavior })
                 return
               }
@@ -60,89 +67,55 @@ const SecondaryPageLayout = forwardRef(
           })
         }
       }),
-      []
+      [windowScroll]
     )
 
-    useEffect(() => {
-      if (enableSingleColumnLayout && !forceScrollArea) {
-        setTimeout(() => window.scrollTo({ top: 0 }), 10)
-        return
-      }
-    }, [])
-
-    if (enableSingleColumnLayout && !forceScrollArea) {
-      return (
-        <PageActiveContext.Provider value={currentIndex === index}>
-          <DeepBrowsingProvider active={currentIndex === index}>
-            <div
-              className={noScrollArea ? 'flex flex-col' : undefined}
-              style={
-                noScrollArea
-                  ? {
-                      height: 'calc(var(--vh) - var(--bottom-bar-offset, 0px))'
-                    }
-                  : {
-                      paddingBottom: 'var(--bottom-bar-offset, 0px)'
-                    }
-              }
-            >
-              <SecondaryPageTitlebar
-                title={title}
-                controls={controls}
-                hideBackButton={hideBackButton}
-                hideBottomBorder={hideTitlebarBottomBorder}
-                titlebar={titlebar}
-              />
-              {noScrollArea ? (
-                <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-              ) : (
-                children
-              )}
-            </div>
-            {displayScrollToTopButton && <ScrollToTopButton />}
-          </DeepBrowsingProvider>
-        </PageActiveContext.Provider>
-      )
-    }
-
-    if (noScrollArea) {
-      return (
-        <PageActiveContext.Provider value={currentIndex === index}>
-          <DeepBrowsingProvider active={currentIndex === index}>
-            <div className="flex h-full flex-col">
-              <SecondaryPageTitlebar
-                title={title}
-                controls={controls}
-                hideBackButton={hideBackButton}
-                hideBottomBorder={hideTitlebarBottomBorder}
-                titlebar={titlebar}
-              />
-              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-            </div>
-          </DeepBrowsingProvider>
-        </PageActiveContext.Provider>
-      )
-    }
+    const content = (
+      <>
+        <SecondaryPageTitlebar
+          title={title}
+          controls={controls}
+          hideBackButton={hideBackButton}
+          hideBottomBorder={hideTitlebarBottomBorder}
+          titlebar={titlebar}
+        />
+        {noScrollArea ? <div className="flex min-h-0 flex-1 flex-col">{children}</div> : children}
+      </>
+    )
 
     return (
       <PageActiveContext.Provider value={currentIndex === index}>
-        <DeepBrowsingProvider active={currentIndex === index} scrollAreaRef={scrollAreaRef}>
-          <ScrollArea
-            className="h-full overflow-auto"
-            scrollBarClassName="z-30 pt-12"
-            ref={scrollAreaRef}
-          >
-            <SecondaryPageTitlebar
-              title={title}
-              controls={controls}
-              hideBackButton={hideBackButton}
-              hideBottomBorder={hideTitlebarBottomBorder}
-              titlebar={titlebar}
-            />
-            {children}
-            <div className="h-4" />
-          </ScrollArea>
-          {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
+        <DeepBrowsingProvider
+          active={currentIndex === index}
+          scrollAreaRef={windowScroll || noScrollArea ? undefined : scrollAreaRef}
+        >
+          {noScrollArea ? (
+            <div
+              ref={scrollAreaRef}
+              className="flex h-full flex-col"
+              style={
+                windowScroll
+                  ? { height: 'calc(var(--vh) - var(--bottom-bar-offset, 0px))' }
+                  : undefined
+              }
+            >
+              {content}
+            </div>
+          ) : (
+            <ScrollArea
+              windowScroll={windowScroll}
+              className={windowScroll ? undefined : 'h-full overflow-auto'}
+              style={windowScroll ? { paddingBottom: 'var(--bottom-bar-offset, 0px)' } : undefined}
+              scrollBarClassName="z-30 pt-12"
+              ref={scrollAreaRef}
+            >
+              {content}
+              <div className={windowScroll ? 'hidden' : 'h-4'} />
+            </ScrollArea>
+          )}
+          {displayScrollToTopButton && (
+            <ScrollToTopButton scrollAreaRef={windowScroll ? undefined : scrollAreaRef} />
+          )}
         </DeepBrowsingProvider>
       </PageActiveContext.Provider>
     )

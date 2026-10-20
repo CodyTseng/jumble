@@ -1,3 +1,4 @@
+import { usePageScrollRestoration } from '@/hooks/usePageScrollRestoration'
 import MobileMeDrawerButton from '@/components/MobileMeDrawerButton'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import { ThreeSectionTitlebar, Titlebar } from '@/components/Titlebar'
@@ -9,7 +10,7 @@ import { PageActiveContext } from '@/providers/PageActiveProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TPrimaryPageName } from '@/routes/primary'
-import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 
 /**
  * Titlebar rendering rules (driven by `useScreenSize().isSmallScreen`, decoupled from the
@@ -86,7 +87,6 @@ const PrimaryPageLayout = forwardRef(
   ) => {
     const { pubkey } = useNostr()
     const scrollAreaRef = useRef<HTMLDivElement>(null)
-    const smallScreenLastScrollTopRef = useRef(0)
     const { enableSingleColumnLayout } = useUserPreferences()
     const { isSmallScreen } = useScreenSize()
     const { current, display } = usePrimaryPage()
@@ -97,44 +97,22 @@ const PrimaryPageLayout = forwardRef(
       () => ({
         scrollToTop: (behavior: ScrollBehavior = 'smooth') => {
           setTimeout(() => {
-            if (scrollAreaRef.current) {
+            if (!useWindowScrollLayout && scrollAreaRef.current) {
               return scrollAreaRef.current.scrollTo({ top: 0, behavior })
             }
             window.scrollTo({ top: 0, behavior })
           }, 10)
         }
       }),
-      []
+      [useWindowScrollLayout]
     )
 
-    useLayoutEffect(() => {
-      if (!useWindowScrollLayout) return
-      // In single-column layout (always on small screens) every primary page shares the
-      // window scroll. Only the active page should restore and track its own scroll
-      // position; relying on the deterministic active-page check (instead of a DOM
-      // visibility probe) avoids one page's scroll leaking into another during a switch.
-      if (current !== pageName || !display) return
-
-      const target = smallScreenLastScrollTopRef.current
-      // Safari re-adjusts the shared window scroll (scroll anchoring) right after the
-      // outgoing page is hidden, overriding a single synchronous scrollTo. Re-apply on
-      // the next frame to win that race. Use the positional form so it's always instant.
-      window.scrollTo(0, target)
-      const raf = requestAnimationFrame(() => window.scrollTo(0, target))
-
-      const handleScroll = () => {
-        smallScreenLastScrollTopRef.current = window.scrollY
-      }
-      window.addEventListener('scroll', handleScroll)
-      return () => {
-        cancelAnimationFrame(raf)
-        window.removeEventListener('scroll', handleScroll)
-      }
-    }, [current, display, pageName, useWindowScrollLayout])
-
-    useEffect(() => {
-      smallScreenLastScrollTopRef.current = 0
-    }, [pubkey])
+    usePageScrollRestoration({
+      active: current === pageName && display,
+      windowScroll: useWindowScrollLayout,
+      scrollAreaRef,
+      resetKey: pubkey
+    })
 
     const resolvedTitlebar = isSmallScreen ? (
       mobileTitlebar ? (
@@ -164,40 +142,30 @@ const PrimaryPageLayout = forwardRef(
       </PrimaryPageTitlebar>
     )
 
-    if (useWindowScrollLayout) {
-      return (
-        <PageActiveContext.Provider value={current === pageName && display}>
-          <DeepBrowsingProvider active={current === pageName && display}>
-            <div
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)'
-              }}
-            >
-              {resolvedTitlebar}
-              {children}
-            </div>
-            {displayScrollToTopButton && <ScrollToTopButton />}
-          </DeepBrowsingProvider>
-        </PageActiveContext.Provider>
-      )
-    }
-
     return (
       <PageActiveContext.Provider value={current === pageName && display}>
         <DeepBrowsingProvider
           active={current === pageName && display}
-          scrollAreaRef={scrollAreaRef}
+          scrollAreaRef={useWindowScrollLayout ? undefined : scrollAreaRef}
         >
           <ScrollArea
-            className="h-full overflow-auto"
+            windowScroll={useWindowScrollLayout}
+            className={useWindowScrollLayout ? undefined : 'h-full overflow-auto'}
+            style={
+              useWindowScrollLayout
+                ? { paddingBottom: 'calc(env(safe-area-inset-bottom) + 3rem)' }
+                : undefined
+            }
             scrollBarClassName="z-30 pt-12"
             ref={scrollAreaRef}
           >
             {resolvedTitlebar}
             {children}
-            <div className="h-4" />
+            <div className={useWindowScrollLayout ? 'hidden' : 'h-4'} />
           </ScrollArea>
-          {displayScrollToTopButton && <ScrollToTopButton scrollAreaRef={scrollAreaRef} />}
+          {displayScrollToTopButton && (
+            <ScrollToTopButton scrollAreaRef={useWindowScrollLayout ? undefined : scrollAreaRef} />
+          )}
         </DeepBrowsingProvider>
       </PageActiveContext.Provider>
     )

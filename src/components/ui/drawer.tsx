@@ -179,7 +179,7 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
           onOpenAutoFocus={(e) => e.preventDefault()}
           onPointerDownOutside={onPointerDownOutside}
           className={cn(
-            'bg-background fixed z-50 flex flex-col outline-hidden',
+            'safe-area-x-margin bg-background fixed z-50 flex flex-col outline-hidden',
             DIRECTION_CLASS[direction],
             // Standard bottom inset for every drawer so callers never have to
             // tack on their own pb-*. Bottom drawers add 1rem of visual

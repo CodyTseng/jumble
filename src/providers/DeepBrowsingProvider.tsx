@@ -56,7 +56,7 @@ export function DeepBrowsingProvider({
     return () => {
       target?.removeEventListener('scroll', handleScroll)
     }
-  }, [active])
+  }, [active, scrollAreaRef])
 
   return (
     <DeepBrowsingContext.Provider value={{ deepBrowsing, lastScrollTop }}>
