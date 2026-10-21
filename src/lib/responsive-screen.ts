@@ -16,18 +16,35 @@ function getLayoutViewportHeight() {
   return height || window.innerHeight
 }
 
-export function getScreenSize(): ScreenSize {
+function getLayoutViewport(zoom = 1) {
+  return {
+    width: Math.round(window.innerWidth * zoom),
+    height: Math.round(getLayoutViewportHeight() * zoom)
+  }
+}
+
+function classifyScreenSize({ width, height }: ReturnType<typeof getLayoutViewport>): ScreenSize {
   // Keep landscape phones compact, but let tablets use the sidebar even when
   // browser chrome temporarily reduces the visible height. The sidebar can scroll.
-  const isSmallScreen = window.innerWidth <= 768 || getLayoutViewportHeight() <= 640
+  const isSmallScreen = width <= 768 || height <= 640
   return {
     isSmallScreen,
-    isLargeScreen: !isSmallScreen && window.innerWidth >= 1280
+    isLargeScreen: !isSmallScreen && width >= 1280
   }
+}
+
+export function getScreenSize(): ScreenSize {
+  return classifyScreenSize(getLayoutViewport())
 }
 
 /** Freeze responsive chrome during fullscreen, including iOS's native video player. */
 export function observeScreenSize(onChange: (size: ScreenSize) => void) {
+  // Page zoom changes both CSS viewport dimensions and devicePixelRatio. Use
+  // the zoom level at mount as the baseline so Ctrl/Cmd +/- does not switch
+  // responsive component trees (e.g. Dialog -> Drawer) and discard local state.
+  // Actual window resizing still changes the normalized viewport dimensions.
+  const initialPixelRatio = window.devicePixelRatio || 1
+  let previousViewport = getLayoutViewport()
   let timer: ReturnType<typeof setTimeout> | undefined
   let nativeFullscreen = false
   const isFullscreen = () =>
@@ -39,7 +56,21 @@ export function observeScreenSize(onChange: (size: ScreenSize) => void) {
     )
 
   const update = () => {
-    if (!isFullscreen()) onChange(getScreenSize())
+    if (!isFullscreen()) {
+      const zoom = (window.devicePixelRatio || 1) / initialPixelRatio
+      const viewport = getLayoutViewport(zoom)
+      // CSS viewport dimensions are rounded by the browser. At fractional zoom
+      // levels that rounding must not move a window across a nearby breakpoint.
+      if (zoom !== 1) {
+        for (const dimension of ['width', 'height'] as const) {
+          if (Math.abs(viewport[dimension] - previousViewport[dimension]) <= Math.ceil(zoom)) {
+            viewport[dimension] = previousViewport[dimension]
+          }
+        }
+      }
+      previousViewport = viewport
+      onChange(classifyScreenSize(viewport))
+    }
   }
   const scheduleUpdate = () => {
     clearTimeout(timer)

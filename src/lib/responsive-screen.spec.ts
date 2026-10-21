@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getScreenSize, observeScreenSize } from './responsive-screen'
 
 describe('responsive screen size', () => {
-  let browser: EventTarget & { innerWidth: number; innerHeight: number }
+  let browser: EventTarget & { innerWidth: number; innerHeight: number; devicePixelRatio: number }
   let page: EventTarget & {
     fullscreenElement: object | null
     webkitFullscreenElement?: object | null
@@ -16,7 +16,11 @@ describe('responsive screen size', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     largeViewportHeight = undefined
-    browser = Object.assign(new EventTarget(), { innerWidth: 390, innerHeight: 844 })
+    browser = Object.assign(new EventTarget(), {
+      innerWidth: 390,
+      innerHeight: 844,
+      devicePixelRatio: 2
+    })
     page = Object.assign(new EventTarget(), {
       fullscreenElement: null,
       querySelectorAll: vi.fn(() => []),
@@ -53,6 +57,54 @@ describe('responsive screen size', () => {
     expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
     browser.innerWidth = 768
     expect(getScreenSize().isSmallScreen).toBe(true)
+  })
+
+  it.each([
+    [1400, 900, false, true],
+    [1280, 641, false, true],
+    [1279, 641, false, false],
+    [769, 641, false, false],
+    [768, 641, true, false],
+    [1280, 640, true, false],
+    [1000, 800, false, false],
+    [700, 600, true, false]
+  ])('keeps the initial layout when zooming a %i x %i viewport', (width, height, small, large) => {
+    browser.innerWidth = width
+    browser.innerHeight = height
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    for (const zoom of [1.1, 1.25, 1.5, 1.75, 2, 3, 0.8, 0.5, 1]) {
+      browser.devicePixelRatio = 2 * zoom
+      resize(Math.round(width / zoom), Math.round(height / zoom))
+      expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: small, isLargeScreen: large })
+    }
+  })
+
+  it('still follows real window resizing while zoomed', () => {
+    browser.innerWidth = 1400
+    browser.innerHeight = 900
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    browser.devicePixelRatio = 4
+    resize(700, 450)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    resize(500, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+    resize(350, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    resize(700, 300)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+  })
+
+  it('uses the existing zoom level on load as the baseline', () => {
+    browser.devicePixelRatio = 3
+    browser.innerWidth = 1000
+    browser.innerHeight = 800
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    browser.devicePixelRatio = 1.5
+    resize(2000, 1600)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
   })
 
   it('keeps bottom navigation when a tall phone rotates into a wide, short viewport', () => {
