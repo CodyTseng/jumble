@@ -17,6 +17,7 @@ import BackgroundAudio from './components/BackgroundAudio'
 import BottomNavigationBar from './components/BottomNavigationBar'
 import DraftBox from './components/DraftBox'
 import DraftEditorHost from './components/DraftBox/DraftEditorHost'
+import NewPost from './components/NewPost'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
 import { normalizeUrl } from './lib/url'
 import { NotificationProvider } from './providers/NotificationProvider'
@@ -425,6 +426,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
             />
             <DraftBox />
             <DraftEditorHost />
+            <NewPost />
           </NotificationProvider>
         </CurrentRelaysProvider>
       </SecondaryPageContext.Provider>

@@ -14,7 +14,7 @@ import modalManager from '@/services/modal-manager.service'
 //   * No DrawerHeader/Footer/Overlay/Portal exports — callers compose
 //     whatever markup they want inside DrawerContent.
 
-type TDrawerDirection = 'bottom' | 'left' | 'right'
+type TDrawerDirection = 'bottom' | 'left' | 'right' | 'center'
 
 type TDrawerContext = {
   direction: TDrawerDirection
@@ -109,6 +109,13 @@ const DrawerTrigger = DialogPrimitive.Trigger
 const DrawerClose = DialogPrimitive.Close
 
 const DIRECTION_CLASS: Record<TDrawerDirection, string> = {
+  // A centered presentation uses the same portal/content tree as the sheets,
+  // allowing stateful content to survive responsive presentation changes.
+  center:
+    'left-[50%] top-[50%] w-full max-w-lg [transform:translate(-50%,-50%)] rounded-xl border shadow-lg ' +
+    'data-[state=open]:animate-in data-[state=closed]:animate-out ' +
+    'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 ' +
+    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
   bottom:
     'inset-x-0 bottom-0 max-h-[calc(100dvh-2rem)] rounded-t-2xl border-t ' +
     'data-[state=open]:animate-in data-[state=closed]:animate-out ' +
@@ -176,7 +183,9 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
           ref={setRef}
           // Don't grab focus on open — focusing the first input would immediately
           // resurrect the soft keyboard we just dismissed.
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => {
+            if (direction !== 'center') e.preventDefault()
+          }}
           onPointerDownOutside={onPointerDownOutside}
           className={cn(
             'safe-area-x-margin bg-background fixed z-50 flex flex-col outline-hidden',
@@ -185,9 +194,10 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
             // tack on their own pb-*. Bottom drawers add 1rem of visual
             // breathing room above the safe-area; side drawers only need the
             // safe-area itself since their content fills full height.
-            direction === 'bottom'
-              ? 'pb-[calc(env(safe-area-inset-bottom)+1rem)]'
-              : 'pb-[env(safe-area-inset-bottom)]',
+            direction !== 'center' &&
+              (direction === 'bottom'
+                ? 'pb-[calc(env(safe-area-inset-bottom)+1rem)]'
+                : 'pb-[env(safe-area-inset-bottom)]'),
             className
           )}
           {...props}
@@ -461,6 +471,8 @@ function useVerticalDragToClose({
       el.removeEventListener('touchmove', onTouchMove)
       el.removeEventListener('touchend', onTouchEnd)
       el.removeEventListener('touchcancel', onTouchCancel)
+      el.style.transform = ''
+      el.style.transition = ''
     }
   }, [enabled, contentEl])
 }

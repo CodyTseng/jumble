@@ -9,15 +9,10 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { DialogDescription, DialogHeader } from '@/components/ui/dialog'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
 import { toNewArticle, toNote } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useDraftBox } from '@/providers/DraftBoxProvider'
@@ -199,52 +194,44 @@ export default function PostEditor({
 
   return (
     <>
-      {isSmallScreen ? (
-        <Drawer open={open} onOpenChange={handleOpenChange}>
-          <DrawerContent
-            className="h-dvh max-h-dvh overflow-hidden"
-            title={highlightedText ? t('Create Highlight') : t('New Note')}
-            onEscapeKeyDown={(e) => {
-              if (postEditor.isSuggestionPopupOpen) {
-                e.preventDefault()
-                postEditor.closeSuggestionPopup()
-              }
-            }}
-          >
-            <ScrollArea className="min-h-0 flex-1">{content}</ScrollArea>
-          </DrawerContent>
-        </Drawer>
-      ) : (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-          <DialogContent
-            className="max-w-2xl p-0 sm:rounded-2xl"
-            withoutClose
-            onEscapeKeyDown={(e) => {
-              if (postEditor.isSuggestionPopupOpen) {
-                e.preventDefault()
-                postEditor.closeSuggestionPopup()
-              }
-            }}
-          >
-            <ScrollArea className="h-full max-h-[85vh]">
-              <DialogHeader className="px-6 pt-6 pb-0">
-                <div className="flex items-center justify-between gap-2">
-                  <DialogTitle className="min-w-0 flex-1">
-                    {highlightedText ? (
-                      t('Create Highlight')
-                    ) : (
-                      <Title parentStuff={effectiveParentStuff} />
-                    )}
-                  </DialogTitle>
-                  <DraftsButton onClick={openDraftsFromEditor} />
+      {/* Keep the portal, scroll area and editor in the same tree positions.
+          Only presentation changes when resizing, preserving TipTap history,
+          selection, uploads, poll options and the other local editor state. */}
+      <Drawer
+        open={open}
+        onOpenChange={handleOpenChange}
+        direction={isSmallScreen ? 'bottom' : 'center'}
+      >
+        <DrawerContent
+          className={cn(
+            isSmallScreen ? 'h-dvh max-h-dvh overflow-hidden' : 'max-w-2xl p-0 sm:rounded-2xl'
+          )}
+          title={highlightedText ? t('Create Highlight') : t('New Note')}
+          onEscapeKeyDown={(e) => {
+            if (postEditor.isSuggestionPopupOpen) {
+              e.preventDefault()
+              postEditor.closeSuggestionPopup()
+            }
+          }}
+        >
+          <ScrollArea className={isSmallScreen ? 'min-h-0 flex-1' : 'h-full max-h-[85vh]'}>
+            <DialogHeader className={cn('px-6 pt-6 pb-0', isSmallScreen && 'hidden')}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1 text-lg leading-none font-semibold tracking-tight">
+                  {highlightedText ? (
+                    t('Create Highlight')
+                  ) : (
+                    <Title parentStuff={effectiveParentStuff} />
+                  )}
                 </div>
-                <DialogDescription className="hidden" />
-              </DialogHeader>
-              {content}
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
-      )}
+                <DraftsButton onClick={openDraftsFromEditor} />
+              </div>
+              <DialogDescription className="hidden" />
+            </DialogHeader>
+            {content}
+          </ScrollArea>
+        </DrawerContent>
+      </Drawer>
 
       {isSmallScreen ? (
         <Drawer open={confirmOpen} onOpenChange={setConfirmOpen}>
