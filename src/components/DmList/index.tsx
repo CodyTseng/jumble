@@ -15,13 +15,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle
-} from '@/components/ui/drawer'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
 import { ExtendedKind, SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
@@ -31,7 +24,6 @@ import { getEmojiInfosFromEmojiTags } from '@/lib/tag'
 import { useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
 import dmService from '@/services/dm.service'
 import { TDmConversation } from '@/types'
@@ -565,39 +557,6 @@ function DeleteConversationConfirmation({
   onConfirm: () => void
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-
-  if (isSmallScreen) {
-    return (
-      <Drawer defaultOpen={false} open={open} onOpenChange={setOpen}>
-        <DrawerContent>
-          <div className="grid gap-1.5 p-4 text-center sm:text-start">
-            <DrawerTitle>{t('Delete conversation')}</DrawerTitle>
-            <DrawerDescription>
-              {t(
-                'Are you sure you want to delete this conversation? All messages will be permanently removed from this device.'
-              )}
-            </DrawerDescription>
-          </div>
-          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
-            <Button variant="outline" onClick={() => setOpen(false)} className="w-full">
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onConfirm()
-                setOpen(false)
-              }}
-              className="w-full"
-            >
-              {t('Delete')}
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
 
   return (
     <AlertDialog defaultOpen={false} open={open} onOpenChange={setOpen}>

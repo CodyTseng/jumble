@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -261,34 +260,9 @@ export default function NotificationTabsCustomizeDialog({
       : t('Edit tab')
     : t('Customize tabs')
 
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[92dvh] overflow-hidden px-0">
-          <div className="shrink-0 border-b px-4 pt-1 pb-3">
-            <DrawerTitle className="flex min-h-9 items-center gap-2 text-start text-xl">
-              {editor && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="-ms-2 size-8 rounded-full"
-                  onClick={() => setEditor(null)}
-                >
-                  <ArrowLeft className="rtl:-scale-x-100" />
-                </Button>
-              )}
-              {title}
-            </DrawerTitle>
-          </div>
-          <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pt-3">{body}</div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[85vh] max-w-3xl" bodyClassName="overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {editor && (

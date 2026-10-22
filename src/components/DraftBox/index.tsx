@@ -6,14 +6,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { buildPreviewEvent } from '@/lib/post-draft'
 import { cn } from '@/lib/utils'
 import { useDraftBox } from '@/providers/DraftBoxProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import postDraftService, { useDraftCounts, useDrafts } from '@/services/post-draft.service'
 import {
   TPostDraft,
@@ -23,8 +21,8 @@ import {
 } from '@/types/post-draft'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Event } from 'nostr-tools'
 import { ArrowLeft, ChevronDown, ChevronRight, RefreshCw, Trash2 } from 'lucide-react'
+import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -41,7 +39,7 @@ export default function DraftBox() {
   const { t } = useTranslation()
   const { open, activeTab, canGoBack, closeDraftBox, goBack, startEditingDraft } = useDraftBox()
   const { pubkey } = useNostr()
-  const { isSmallScreen } = useScreenSize()
+
   const drafts = useDrafts(pubkey ?? undefined)
   const counts = useDraftCounts(pubkey ?? undefined)
   const [tab, setTab] = useState<TPostDraftStatus>(activeTab)
@@ -85,10 +83,10 @@ export default function DraftBox() {
           </TabsList>
         </Tabs>
       </div>
-      <div className="h-px bg-border" />
+      <div className="bg-border h-px" />
       <ScrollArea className="min-h-0 flex-1">
         {filtered.length === 0 ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground py-16 text-center text-sm">
             {t('No drafts yet')}
           </div>
         ) : (
@@ -102,27 +100,13 @@ export default function DraftBox() {
     </div>
   )
 
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={(o) => !o && closeDraftBox()}>
-        <DrawerContent
-          className="flex h-[85dvh] max-h-[85dvh] flex-col overflow-hidden"
-          title={t('Drafts')}
-        >
-          <div className="flex items-center gap-2 px-5 pb-2 pt-4">
-            {backButton}
-            <span className="text-lg font-semibold">{t('Drafts')}</span>
-          </div>
-          {body}
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={(o) => !o && closeDraftBox()}>
-      <DialogContent className="flex h-[600px] max-h-[85vh] max-w-2xl flex-col gap-0 p-0 sm:rounded-2xl">
-        <DialogHeader className="px-6 pb-3 pt-6">
+      <DialogContent
+        className="h-[600px] max-h-[85vh] max-w-2xl sm:rounded-2xl"
+        bodyClassName="flex flex-col gap-0 p-0"
+      >
+        <DialogHeader className="px-6 pt-6 pb-3">
           <div className="flex items-center gap-2">
             {backButton}
             <DialogTitle>{t('Drafts')}</DialogTitle>
@@ -160,7 +144,7 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
     const signed = draft as TPostDraftSigned
     return (
       <div className="px-4 py-3 sm:px-6">
-        <div className="text-sm text-muted-foreground">{dayjs(draft.updatedAt).fromNow()}</div>
+        <div className="text-muted-foreground text-sm">{dayjs(draft.updatedAt).fromNow()}</div>
         <div className="pointer-events-none mt-1">
           <Note event={signed.signedEvent} showFull hideHeader />
         </div>
@@ -168,7 +152,7 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
           <div className="mt-2">
             <button
               type="button"
-              className="flex items-center gap-0.5 text-sm text-destructive hover:underline"
+              className="text-destructive flex items-center gap-0.5 text-sm hover:underline"
               onClick={(e) => {
                 e.stopPropagation()
                 setErrorExpanded((v) => !v)
@@ -182,7 +166,7 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
               {t('Failure reason')}
             </button>
             {errorExpanded && (
-              <div className="mt-1 whitespace-pre-line break-words text-sm text-destructive">
+              <div className="text-destructive mt-1 text-sm break-words whitespace-pre-line">
                 {signed.error}
               </div>
             )}
@@ -222,20 +206,20 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
 
   return (
     <div
-      className="group flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40 sm:px-6"
+      className="group hover:bg-muted/40 flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors sm:px-6"
       onClick={onEdit}
       role="button"
     >
       <div className="min-w-0 flex-1">
-        <div className="text-sm text-muted-foreground">{dayjs(draft.updatedAt).fromNow()}</div>
+        <div className="text-muted-foreground text-sm">{dayjs(draft.updatedAt).fromNow()}</div>
 
         {parentEvent ? (
-          <div className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-0.5 flex items-center gap-1.5 text-sm">
             <span className="shrink-0">{t('Reply to')}</span>
             <SimpleUsername
               userId={parentEvent.pubkey}
               showAt
-              className="shrink-0 font-medium text-foreground"
+              className="text-foreground shrink-0 font-medium"
             />
             <span className="shrink-0">·</span>
             <ContentPreview event={parentEvent} className="min-w-0 truncate" />
@@ -249,10 +233,10 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
         {previewEvent ? (
           <ContentPreview
             event={previewEvent}
-            className="mt-1 line-clamp-2 break-words text-base"
+            className="mt-1 line-clamp-2 text-base break-words"
           />
         ) : (
-          <div className="mt-1 text-base italic text-muted-foreground">{t('Empty')}</div>
+          <div className="text-muted-foreground mt-1 text-base italic">{t('Empty')}</div>
         )}
       </div>
 
@@ -284,10 +268,9 @@ function DraftContextLabel({ draft }: { draft: TPostDraft }) {
     draft.status === 'draft'
       ? (draft as TPostDraftUnsigned).parentEventCoordinate
       : (draft as TPostDraftSigned).parentEventCoordinate
-  if (highlightedText)
-    return <div className="text-sm text-muted-foreground">{t('Highlight')}</div>
-  if (coordinate) return <div className="text-sm text-muted-foreground">{t('Reply')}</div>
-  return <div className="text-sm text-muted-foreground">{t('Note')}</div>
+  if (highlightedText) return <div className="text-muted-foreground text-sm">{t('Highlight')}</div>
+  if (coordinate) return <div className="text-muted-foreground text-sm">{t('Reply')}</div>
+  return <div className="text-muted-foreground text-sm">{t('Note')}</div>
 }
 
 function getParentEvent(draft: TPostDraft): Event | undefined {

@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { extractMentions } from '@/lib/mentions'
 import { cn } from '@/lib/utils'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -156,11 +156,11 @@ export function MentionPicker({
         >
           {triggerLabel}
         </Button>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Mentions')} className="max-h-[80dvh]">
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Mentions')} className="max-h-[80dvh]">
             <div className="overflow-y-auto overscroll-contain py-2">{items}</div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

@@ -1,3 +1,4 @@
+import dialogService from '@/services/dialog.service'
 import { createMuteListDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { addLegacyMutedWords, getMutedWordsFromTags, updateMutedWordTag } from '@/lib/mute-words'
@@ -261,7 +262,7 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     try {
       const event = await fetchLatestMuteListEvent(accountPubkey)
       if (!event && action === 'remove') return false
-      if (!event) checkMuteListEvent(event)
+      if (!event) await checkMuteListEvent(event)
       const existingPrivateTags = event ? (await getPrivateTags(event)).privateTags : []
       const { publicTags, privateTags } = updateMutedWordTag(
         event?.tags ?? [],
@@ -295,9 +296,9 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const checkMuteListEvent = (muteListEvent: Event | null) => {
+  const checkMuteListEvent = async (muteListEvent: Event | null) => {
     if (!muteListEvent) {
-      const result = confirm(t('MuteListNotFoundConfirmation'))
+      const result = await dialogService.confirm(t('MuteListNotFoundConfirmation'))
 
       if (!result) {
         throw new Error('Mute list not found')
@@ -311,7 +312,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     setChanging(true)
     try {
       const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
-      checkMuteListEvent(muteListEvent)
+      await checkMuteListEvent(muteListEvent)
+      if (currentAccountPubkey.current !== accountPubkey) return
       if (
         muteListEvent &&
         muteListEvent.tags.some(([tagName, tagValue]) => tagName === 'p' && tagValue === pubkey)
@@ -339,7 +341,8 @@ export function MuteListProvider({ children }: { children: React.ReactNode }) {
     setChanging(true)
     try {
       const muteListEvent = await fetchLatestMuteListEvent(accountPubkey)
-      checkMuteListEvent(muteListEvent)
+      await checkMuteListEvent(muteListEvent)
+      if (currentAccountPubkey.current !== accountPubkey) return
       const { privateTags } = muteListEvent
         ? await getPrivateTags(muteListEvent)
         : { privateTags: [] as string[][] }

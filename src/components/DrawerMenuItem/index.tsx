@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { DrawerClose } from '@/components/ui/drawer'
+import { ModalClose } from '@/components/ui/modal'
 import { cn } from '@/lib/utils'
 
 export default function DrawerMenuItem({
@@ -12,7 +12,7 @@ export default function DrawerMenuItem({
   onClick?: (e: React.MouseEvent) => void
 }) {
   return (
-    <DrawerClose className="w-full">
+    <ModalClose asChild>
       <Button
         onClick={onClick}
         className={cn('w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5', className)}
@@ -20,6 +20,6 @@ export default function DrawerMenuItem({
       >
         {children}
       </Button>
-    </DrawerClose>
+    </ModalClose>
   )
 }

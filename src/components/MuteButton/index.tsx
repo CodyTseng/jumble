@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent, ModalTrigger } from '@/components/ui/modal'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -86,12 +86,12 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
 
   if (isSmallScreen) {
     return (
-      <Drawer>
-        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent>
+      <Modal>
+        <ModalTrigger asChild>{trigger}</ModalTrigger>
+        <ModalContent>
           <div className="py-2">
             <Button
-              className="w-full justify-start gap-4 p-6 text-lg text-destructive focus:text-destructive [&_svg]:size-5"
+              className="text-destructive focus:text-destructive w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
               variant="ghost"
               onClick={(e) => handleMute(e, true)}
               disabled={updating || changing}
@@ -99,7 +99,7 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
               {updating ? <Loader className="animate-spin" /> : t('Mute user privately')}
             </Button>
             <Button
-              className="w-full justify-start gap-4 p-6 text-lg text-destructive focus:text-destructive [&_svg]:size-5"
+              className="text-destructive focus:text-destructive w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
               variant="ghost"
               onClick={(e) => handleMute(e, false)}
               disabled={updating || changing}
@@ -107,8 +107,8 @@ export default function MuteButton({ pubkey }: { pubkey: string }) {
               {updating ? <Loader className="animate-spin" /> : t('Mute user publicly')}
             </Button>
           </div>
-        </DrawerContent>
-      </Drawer>
+        </ModalContent>
+      </Modal>
     )
   }
 

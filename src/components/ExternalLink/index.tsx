@@ -1,12 +1,12 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { toExternalContent } from '@/lib/link'
 import { getSafeExternalUrl, truncateUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
@@ -123,8 +123,8 @@ export default function ExternalLink({
     return (
       <>
         {trigger}
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Open link')}>
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Open link')}>
             <div className="py-2">
               <Button
                 onClick={handleOpenLink}
@@ -151,8 +151,8 @@ export default function ExternalLink({
                 {t('View Nostr discussions')}
               </Button>
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

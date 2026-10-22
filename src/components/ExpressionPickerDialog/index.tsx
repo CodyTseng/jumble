@@ -1,10 +1,10 @@
 import ExpressionPicker from '@/components/ExpressionPicker'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent, ModalTrigger } from '@/components/ui/modal'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TGif } from '@/services/klipy.service'
 import { TEmoji } from '@/types'
@@ -29,7 +29,7 @@ export default function ExpressionPickerDialog({
   const [open, setOpen] = useState(false)
 
   const handleOpenChange = (value: boolean) => {
-    // Note: Drawer itself blurs the active element when opening, so we don't
+    // Note: Modal itself blurs the active element when opening, so we don't
     // need to do it here for the mobile path.
     setOpen(value)
     onOpenChange?.(value)
@@ -49,16 +49,16 @@ export default function ExpressionPickerDialog({
 
   if (isSmallScreen) {
     return (
-      <Drawer open={open} onOpenChange={handleOpenChange}>
-        <DrawerTrigger asChild>{children}</DrawerTrigger>
-        <DrawerContent title={t('Expression picker')} onClick={(e) => e.stopPropagation()}>
+      <Modal open={open} onOpenChange={handleOpenChange}>
+        <ModalTrigger asChild>{children}</ModalTrigger>
+        <ModalContent title={t('Expression picker')} onClick={(e) => e.stopPropagation()}>
           <ExpressionPicker
             onEmojiClick={handleEmojiPick}
             onGifClick={handleGifPick}
             enableGif={enableGif}
           />
-        </DrawerContent>
-      </Drawer>
+        </ModalContent>
+      </Modal>
     )
   }
 

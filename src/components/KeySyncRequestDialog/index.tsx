@@ -7,12 +7,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle
-} from '@/components/ui/drawer'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -132,26 +126,6 @@ export default function KeySyncRequestHandler() {
       {t('Dismiss')}
     </Button>
   )
-
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
-          <div className="grid gap-1.5 p-4 text-center sm:text-start">
-            <DrawerTitle>{t('Key sync request')}</DrawerTitle>
-            <DrawerDescription>
-              {t('Another device is requesting your encryption key.')}
-            </DrawerDescription>
-          </div>
-          <div className="px-4">{deviceInfo}</div>
-          <div className="mt-auto flex flex-col gap-2 px-4 pt-4">
-            {sendKeyButton}
-            {dismissButton}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

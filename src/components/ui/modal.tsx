@@ -1,70 +1,62 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as React from 'react'
 
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { X } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import modalManager from '@/services/modal-manager.service'
 
-// A bottom/side sheet built on Radix Dialog. Replaces vaul. The goals:
-//   * Virtual keyboards never cover the content (`useVisualViewportInset`).
-//   * Opening the drawer while a textarea is focused dismisses that focus
-//     so the OS keyboard collapses cleanly — solves the "open emoji picker
-//     after typing → drawer dies on first touch" issue we hit with vaul.
-//   * Swipe-down-to-close gesture lives on the whole content surface but
-//     defers to inner scrollable lists (see `useVerticalDragToClose`).
-//   * No DrawerHeader/Footer/Overlay/Portal exports — callers compose
-//     whatever markup they want inside DrawerContent.
+// A responsive modal built on Radix Dialog. The same portal/content tree renders
+// a bottom sheet on small screens and a centered dialog on larger screens.
+// Explicit directions are reserved for anchored navigation sheets.
+// Keyboard avoidance and swipe dismissal are enabled only for bottom sheets.
 
-type TDrawerDirection = 'bottom' | 'left' | 'right' | 'center'
+type TModalDirection = 'bottom' | 'left' | 'right' | 'center'
 
-type TDrawerContext = {
-  direction: TDrawerDirection
-  closeDrawer: () => void
+type TModalContext = {
+  direction: TModalDirection
+  closeModal: () => void
 }
 
-const DrawerContext = React.createContext<TDrawerContext>({
+const ModalContext = React.createContext<TModalContext>({
   direction: 'bottom',
-  closeDrawer: () => {}
+  closeModal: () => {}
 })
 
-type DrawerProps = {
+type ModalProps = {
   children?: React.ReactNode
   open?: boolean
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  direction?: TDrawerDirection
+  direction?: TModalDirection
   modal?: boolean
 }
 
-const Drawer = ({
+const Modal = ({
   children,
   open,
   defaultOpen,
   onOpenChange,
-  direction = 'bottom',
+  direction: requestedDirection,
   modal = true
-}: DrawerProps) => {
+}: ModalProps) => {
+  const { isSmallScreen } = useScreenSize()
+  const direction = requestedDirection ?? (isSmallScreen ? 'bottom' : 'center')
   const [innerOpen, setInnerOpen] = React.useState(defaultOpen ?? false)
   const id = React.useId()
   const isControlled = open !== undefined
   const effectiveOpen = open ?? innerOpen
 
-  // Keep the latest callbacks in refs so the modalManager effect only re-runs
-  // on actual open/close transitions, not on every parent re-render that
-  // hands us a fresh inline `onOpenChange`.
-  const isControlledRef = React.useRef(isControlled)
-  const onOpenChangeRef = React.useRef(onOpenChange)
-  React.useEffect(() => {
-    isControlledRef.current = isControlled
-    onOpenChangeRef.current = onOpenChange
-  })
-
   React.useEffect(() => {
     if (!effectiveOpen) return
+    let active = true
     modalManager.register(id, () => {
-      if (isControlledRef.current) onOpenChangeRef.current?.(false)
-      else setInnerOpen(false)
+      if (active) handleOpenChangeRef.current(false)
     })
     return () => {
+      // unregister also invokes its callback; cleanup must not request a second close.
+      active = false
       modalManager.unregister(id)
     }
   }, [effectiveOpen, id])
@@ -78,8 +70,8 @@ const Drawer = ({
       if (value && direction === 'bottom' && document.activeElement instanceof HTMLElement) {
         document.activeElement.blur()
       }
-      if (isControlled) onOpenChange?.(value)
-      else setInnerOpen(value)
+      if (!isControlled) setInnerOpen(value)
+      onOpenChange?.(value)
     },
     [isControlled, onOpenChange, direction]
   )
@@ -91,28 +83,28 @@ const Drawer = ({
   React.useEffect(() => {
     handleOpenChangeRef.current = handleOpenChange
   })
-  const closeDrawer = React.useCallback(() => handleOpenChangeRef.current(false), [])
+  const closeModal = React.useCallback(() => handleOpenChangeRef.current(false), [])
 
-  const contextValue = React.useMemo(() => ({ direction, closeDrawer }), [direction, closeDrawer])
+  const contextValue = React.useMemo(() => ({ direction, closeModal }), [direction, closeModal])
 
   return (
-    <DrawerContext.Provider value={contextValue}>
+    <ModalContext.Provider value={contextValue}>
       <DialogPrimitive.Root open={effectiveOpen} onOpenChange={handleOpenChange} modal={modal}>
         {children}
       </DialogPrimitive.Root>
-    </DrawerContext.Provider>
+    </ModalContext.Provider>
   )
 }
-Drawer.displayName = 'Drawer'
+Modal.displayName = 'Modal'
 
-const DrawerTrigger = DialogPrimitive.Trigger
-const DrawerClose = DialogPrimitive.Close
+const ModalTrigger = DialogPrimitive.Trigger
+const ModalClose = DialogPrimitive.Close
 
-const DIRECTION_CLASS: Record<TDrawerDirection, string> = {
+export const MODAL_DIRECTION_CLASS: Record<TModalDirection, string> = {
   // A centered presentation uses the same portal/content tree as the sheets,
   // allowing stateful content to survive responsive presentation changes.
   center:
-    'left-[50%] top-[50%] w-full max-w-lg [transform:translate(-50%,-50%)] rounded-xl border shadow-lg ' +
+    'left-[50%] top-[50%] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border shadow-lg ' +
     'data-[state=open]:animate-in data-[state=closed]:animate-out ' +
     'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 ' +
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -132,22 +124,51 @@ const DIRECTION_CLASS: Record<TDrawerDirection, string> = {
     'rtl:data-[state=closed]:slide-out-to-left rtl:data-[state=open]:slide-in-from-left'
 }
 
-type DrawerContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+type ModalContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
   /**
    * Accessible name rendered as a visually-hidden DialogTitle. Required by
-   * Radix Dialog for screen readers when no visible <DrawerTitle> is rendered
-   * inside the content. Defaults to 'Drawer'.
+   * Radix Dialog for screen readers when no visible <ModalTitle> is rendered
+   * inside the content. Defaults to 'Dialog'.
    */
   title?: string
   /**
    * Hide the swipe-down grab handle (only relevant for direction="bottom").
    */
   hideHandle?: boolean
+  /** Layout, padding and overflow of the content region, separate from the modal frame. */
+  bodyClassName?: string
+  /** Show the desktop close control. Mobile sheets use swipe/outside dismissal. */
+  withoutClose?: boolean
 }
 
-const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
-  ({ className, children, title, hideHandle, onPointerDownOutside, ...props }, ref) => {
-    const { direction, closeDrawer } = React.useContext(DrawerContext)
+// Titles nested in layout elements still use Radix's shared title id. Only
+// provide a hidden fallback when callers haven't supplied their own title.
+function hasModalTitle(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return false
+    return (
+      (child.type as { displayName?: string }).displayName === DialogPrimitive.Title.displayName ||
+      hasModalTitle(child.props.children)
+    )
+  })
+}
+
+const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
+  (
+    {
+      className,
+      bodyClassName,
+      children,
+      title,
+      hideHandle,
+      withoutClose = true,
+      onPointerDownOutside,
+      onOpenAutoFocus,
+      ...props
+    },
+    ref
+  ) => {
+    const { direction, closeModal } = React.useContext(ModalContext)
     // Callback ref + state, not useRef: Radix Dialog re-mounts Content on
     // every open, so our hooks must re-bind their native listeners to the
     // *new* DOM node. A plain ref object has stable identity and wouldn't
@@ -167,7 +188,7 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
     useVerticalDragToClose({
       contentEl,
       enabled: direction === 'bottom',
-      onClose: closeDrawer
+      onClose: closeModal
     })
 
     return (
@@ -181,44 +202,60 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
         />
         <DialogPrimitive.Content
           ref={setRef}
+          data-modal-presentation={direction}
           // Don't grab focus on open — focusing the first input would immediately
           // resurrect the soft keyboard we just dismissed.
           onOpenAutoFocus={(e) => {
-            if (direction !== 'center') e.preventDefault()
+            onOpenAutoFocus?.(e)
+            if (!e.defaultPrevented && direction !== 'center') e.preventDefault()
           }}
           onPointerDownOutside={onPointerDownOutside}
           className={cn(
             'safe-area-x-margin bg-background fixed z-50 flex flex-col outline-hidden',
-            DIRECTION_CLASS[direction],
-            // Standard bottom inset for every drawer so callers never have to
-            // tack on their own pb-*. Bottom drawers add 1rem of visual
-            // breathing room above the safe-area; side drawers only need the
-            // safe-area itself since their content fills full height.
+            direction === 'center' && 'max-h-[90dvh]',
+            MODAL_DIRECTION_CLASS[direction],
+            className,
+            // The frame never scrolls or takes caller content padding/layout.
+            'flex flex-col gap-0 overflow-hidden p-0',
             direction !== 'center' &&
               (direction === 'bottom'
                 ? 'pb-[calc(env(safe-area-inset-bottom)+1rem)]'
                 : 'pb-[env(safe-area-inset-bottom)]'),
-            className
+            direction === 'bottom' &&
+              'inset-x-0 top-auto w-auto max-w-none translate-x-0 translate-y-0'
           )}
           {...props}
         >
           {/* sr-only Title so Radix accessibility checks pass. Visible titles
-              come from <DrawerTitle> rendered inside `children`. */}
-          <DialogPrimitive.Title className="sr-only">{title ?? 'Drawer'}</DialogPrimitive.Title>
+              come from <ModalTitle> rendered inside `children`. */}
+          {!hasModalTitle(children) && (
+            <DialogPrimitive.Title className="sr-only">{title ?? 'Dialog'}</DialogPrimitive.Title>
+          )}
           {direction === 'bottom' && !hideHandle && (
-            <div className="flex shrink-0 justify-center py-3">
+            <div data-modal-handle className="flex h-9 shrink-0 justify-center pt-3">
               <div className="bg-muted h-1.5 w-12 rounded-full" />
             </div>
           )}
-          {children}
+          <div
+            data-modal-body
+            className={cn('flex min-h-0 flex-1 flex-col overflow-y-auto', bodyClassName)}
+          >
+            {children}
+          </div>
+          {direction === 'center' && !withoutClose && (
+            <DialogPrimitive.Close className="hover:bg-accent focus:ring-ring absolute top-5 right-5 flex size-8 items-center justify-center rounded-lg opacity-70 transition-colors hover:opacity-100 focus:ring-2 focus:outline-hidden disabled:pointer-events-none">
+              <X className="size-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     )
   }
 )
-DrawerContent.displayName = 'DrawerContent'
+ModalContent.displayName = 'ModalContent'
 
-const DrawerTitle = React.forwardRef<
+const ModalTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
@@ -228,9 +265,9 @@ const DrawerTitle = React.forwardRef<
     {...props}
   />
 ))
-DrawerTitle.displayName = DialogPrimitive.Title.displayName
+ModalTitle.displayName = DialogPrimitive.Title.displayName
 
-const DrawerDescription = React.forwardRef<
+const ModalDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
 >(({ className, ...props }, ref) => (
@@ -240,9 +277,9 @@ const DrawerDescription = React.forwardRef<
     {...props}
   />
 ))
-DrawerDescription.displayName = DialogPrimitive.Description.displayName
+ModalDescription.displayName = DialogPrimitive.Description.displayName
 
-export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger }
+export { Modal, ModalClose, ModalContent, ModalDescription, ModalTitle, ModalTrigger }
 
 // =============================================================================
 // Internal hooks
@@ -263,7 +300,7 @@ export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle, Dra
  * Driven by `visualViewport.resize/scroll` and `focusin/focusout` so we
  * recompute whenever either the keyboard or the active field changes.
  */
-function useVisualViewportInset(el: HTMLElement | null, enabled: boolean) {
+export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean) {
   React.useEffect(() => {
     if (!enabled || !el) return
     const vv = window.visualViewport
@@ -313,7 +350,7 @@ function useVisualViewportInset(el: HTMLElement | null, enabled: boolean) {
 
 /**
  * Swipe-down-to-close gesture for `direction="bottom"` drawers. Lives on
- * the whole content surface and defers to inner scrollable lists:
+ * the whole content surface and defers to scrollable containers (including itself):
  *
  *   - Upward swipes: never engage; the inner scroll runs as usual.
  *   - Downward swipes starting inside a scrolled element: the scroll wins.
@@ -363,8 +400,10 @@ function useVerticalDragToClose({
 
     const findScrollableAncestor = (target: EventTarget | null): HTMLElement | null => {
       let cur = target as HTMLElement | null
-      while (cur && cur !== el) {
+      while (cur) {
         if (cur.nodeType === 1 && isScrollable(cur)) return cur
+        // The modal surface may own scrolling; include it, but stop before the page.
+        if (cur === el) break
         cur = cur.parentElement
       }
       return null

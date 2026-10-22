@@ -11,7 +11,7 @@ import ExpressionPicker from '@/components/ExpressionPicker'
 import ExternalLink from '@/components/ExternalLink'
 import ImageGallery from '@/components/ImageGallery'
 import MediaPlayer from '@/components/MediaPlayer'
-import MessageContextMenu, { DesktopMessageContextMenu } from './MessageContextMenu'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -19,13 +19,11 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import XEmbeddedPost from '@/components/XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '@/components/YoutubeEmbeddedPlayer'
 import { EMOJI_REGEX, ExtendedKind } from '@/constants'
 import { BoundedMap } from '@/lib/bounded-map'
-import { canHover } from '@/lib/device'
 import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
@@ -37,6 +35,7 @@ import {
   TEmbeddedNode,
   parseContent
 } from '@/lib/content-parser'
+import { canHover } from '@/lib/device'
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { isImage } from '@/lib/url'
 import { blurFocusedTextInput, cn } from '@/lib/utils'
@@ -72,6 +71,7 @@ import {
   useState
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import MessageContextMenu, { DesktopMessageContextMenu } from './MessageContextMenu'
 
 function formatDmTime(timestamp: number, t: ReturnType<typeof useTranslation>['t']): string {
   const msgTime = dayjs.unix(timestamp)
@@ -821,8 +821,8 @@ function MessageBubble({
             />
           </div>
         )}
-        <Drawer open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
-          <DrawerContent>
+        <Modal open={isActionDrawerOpen} onOpenChange={setIsActionDrawerOpen}>
+          <ModalContent>
             <ExpressionPicker
               onEmojiClick={(emoji) => {
                 if (!emoji) return
@@ -830,8 +830,8 @@ function MessageBubble({
                 setIsActionDrawerOpen(false)
               }}
             />
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
         {contextMenuRect && (
           <MessageContextMenu
             originRect={contextMenuRect}

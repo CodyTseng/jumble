@@ -1,15 +1,16 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { useFilteredRepostCount } from '@/hooks/useFilteredRepostCount'
-import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { useStuff } from '@/hooks/useStuff'
+import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { createRepostDraftEvent } from '@/lib/draft-event'
+import { formatError } from '@/lib/error'
 import { getNoteBech32Id } from '@/lib/event'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
@@ -19,10 +20,9 @@ import { Loader, PencilLine, Repeat } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import PostEditor from '../PostEditor'
 import { formatCount } from './utils'
-import { formatError } from '@/lib/error'
-import { toast } from 'sonner'
 
 export default function RepostButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
@@ -109,8 +109,8 @@ export default function RepostButton({ stuff }: { stuff: Event | string }) {
     return (
       <>
         {trigger}
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Repost')}>
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Repost')}>
             <div className="py-2">
               <Button
                 onClick={(e) => {
@@ -138,8 +138,8 @@ export default function RepostButton({ stuff }: { stuff: Event | string }) {
                 <PencilLine /> {t('Quote')}
               </Button>
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
         {postEditor}
       </>
     )

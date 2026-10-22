@@ -76,12 +76,10 @@ export default function DownloadDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[90vh] sm:max-w-md" bodyClassName="overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('Download Jumble Desktop')}</DialogTitle>
-          <DialogDescription>
-            {t('Pick a build for your operating system.')}
-          </DialogDescription>
+          <DialogDescription>{t('Pick a build for your operating system.')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2">

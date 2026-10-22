@@ -1,6 +1,6 @@
+import ClickableCard from '@/components/ClickableCard'
 import LongFormArticle from '@/components/NoteContent/LongFormArticle'
 import Uploader from '@/components/PostEditor/Uploader'
-import ClickableCard from '@/components/ClickableCard'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -72,12 +71,12 @@ import {
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import useTextareaMention from './useTextareaMention'
+import MarkdownTextarea from './MarkdownTextarea'
 import PublishSettings from './PublishSettings'
 import useArticleMentions from './useArticleMentions'
 import usePreviewScrollSync from './usePreviewScrollSync'
-import MarkdownTextarea from './MarkdownTextarea'
 import usePreviewTabPosition from './usePreviewTabPosition'
+import useTextareaMention from './useTextareaMention'
 
 type TEditorTab = 'edit' | 'preview'
 type TSaveState = 'saved' | 'saving'
@@ -893,24 +892,12 @@ function LongFormDraftPicker({
     </div>
   )
 
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent
-          title={t('Drafts')}
-          className="flex h-[75dvh] max-h-[75dvh] flex-col overflow-hidden"
-        >
-          {body}
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         withoutClose
-        className="flex max-h-[80vh] max-w-xl flex-col gap-0 overflow-hidden p-0"
+        className="max-h-[80vh] max-w-xl"
+        bodyClassName="flex flex-col gap-0 overflow-hidden p-0"
       >
         <DialogHeader className="sr-only">
           <DialogTitle>{t('Drafts')}</DialogTitle>

@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { pubkeyToNpub } from '@/lib/pubkey'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -61,8 +61,8 @@ export default function ProfileOptions({
     return (
       <>
         {trigger}
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Profile options')}>
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Profile options')}>
             <div className="py-2">
               <Button
                 onClick={() => {
@@ -82,7 +82,7 @@ export default function ProfileOptions({
                       setIsDrawerOpen(false)
                       unmutePubkey(pubkey)
                     }}
-                    className="w-full justify-start gap-4 p-6 text-lg text-destructive focus:text-destructive [&_svg]:size-5"
+                    className="text-destructive focus:text-destructive w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
                     variant="ghost"
                   >
                     <Bell />
@@ -95,7 +95,7 @@ export default function ProfileOptions({
                         setIsDrawerOpen(false)
                         mutePubkeyPrivately(pubkey)
                       }}
-                      className="w-full justify-start gap-4 p-6 text-lg text-destructive focus:text-destructive [&_svg]:size-5"
+                      className="text-destructive focus:text-destructive w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
                       variant="ghost"
                     >
                       <BellOff />
@@ -106,7 +106,7 @@ export default function ProfileOptions({
                         setIsDrawerOpen(false)
                         mutePubkeyPublicly(pubkey)
                       }}
-                      className="w-full justify-start gap-4 p-6 text-lg text-destructive focus:text-destructive [&_svg]:size-5"
+                      className="text-destructive focus:text-destructive w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
                       variant="ghost"
                     >
                       <BellOff />
@@ -116,8 +116,8 @@ export default function ProfileOptions({
                 )
               ) : null}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

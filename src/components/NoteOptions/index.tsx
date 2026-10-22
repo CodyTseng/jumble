@@ -51,7 +51,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
   )
 
   return (
-    <div className={className} onClick={(e) => e.stopPropagation()}>
+    <div className={className}>
       {isSmallScreen ? (
         <MobileMenu
           menuActions={menuActions}

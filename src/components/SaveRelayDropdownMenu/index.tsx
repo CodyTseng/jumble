@@ -1,5 +1,5 @@
+import dialogService from '@/services/dialog.service'
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent, ModalTitle } from '@/components/ui/modal'
 import { Separator } from '@/components/ui/separator'
 import { normalizeUrl } from '@/lib/url'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -44,7 +45,7 @@ export default function SaveRelayDropdownMenu({
     </Button>
   ) : (
     <button
-      className="pe-0 pt-0.5 enabled:hover:text-primary [&_svg]:size-5"
+      className="enabled:hover:text-primary pe-0 pt-0.5 [&_svg]:size-5"
       onClick={(e) => {
         e.stopPropagation()
         setIsDrawerOpen(true)
@@ -58,11 +59,11 @@ export default function SaveRelayDropdownMenu({
     return (
       <div>
         {trigger}
-        <div onClick={(e) => e.stopPropagation()}>
-          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <DrawerContent>
+        <div>
+          <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <ModalContent>
               <div className="grid gap-1.5 p-4 text-center sm:text-start">
-                <DrawerTitle>{t('Save to')} ...</DrawerTitle>
+                <ModalTitle>{t('Save to')} ...</ModalTitle>
               </div>
               <div className="py-2">
                 <RelayItem urls={normalizedUrls} />
@@ -72,8 +73,8 @@ export default function SaveRelayDropdownMenu({
                 <Separator />
                 <SaveToNewSet urls={normalizedUrls} />
               </div>
-            </DrawerContent>
-          </Drawer>
+            </ModalContent>
+          </Modal>
         </div>
       </div>
     )
@@ -181,12 +182,12 @@ function SaveToNewSet({ urls }: { urls: string[] }) {
   const { pubkey, startLogin } = useNostr()
   const { createRelaySet } = useFavoriteRelays()
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!pubkey) {
       startLogin()
       return
     }
-    const newSetName = prompt(t('Enter a name for the new relay set'))
+    const newSetName = await dialogService.prompt(t('Enter a name for the new relay set'))
     if (newSetName) {
       createRelaySet(newSetName, urls)
     }

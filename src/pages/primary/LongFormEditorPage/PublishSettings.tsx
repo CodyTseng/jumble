@@ -72,7 +72,10 @@ export default function PublishSettings({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90dvh,42rem)] max-w-md gap-0 overflow-hidden p-0">
+      <DialogContent
+        className="max-h-[min(90dvh,42rem)] max-w-md"
+        bodyClassName="gap-0 overflow-hidden p-0"
+      >
         <DialogHeader className="border-b px-5 py-4 pe-14">
           <DialogTitle>{t('Post settings')}</DialogTitle>
           <DialogDescription>{t('Review your post settings before publishing.')}</DialogDescription>

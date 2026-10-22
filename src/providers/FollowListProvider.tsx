@@ -1,7 +1,8 @@
+import dialogService from '@/services/dialog.service'
 import { createFollowListDraftEvent } from '@/lib/draft-event'
 import { getPubkeysFromPTags } from '@/lib/tag'
 import client from '@/services/client.service'
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNostr } from './NostrProvider'
 import { formatError } from '@/lib/error'
@@ -26,6 +27,8 @@ export const useFollowList = () => {
 export function FollowListProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation()
   const { pubkey: accountPubkey, followListEvent, publish, updateFollowListEvent } = useNostr()
+  const currentAccountPubkey = useRef(accountPubkey)
+  currentAccountPubkey.current = accountPubkey
   const followingSet = useMemo(
     () => new Set(followListEvent ? getPubkeysFromPTags(followListEvent.tags) : []),
     [followListEvent]
@@ -36,12 +39,13 @@ export function FollowListProvider({ children }: { children: React.ReactNode }) 
 
     const followListEvent = await client.fetchFollowListEvent(accountPubkey)
     if (!followListEvent) {
-      const result = confirm(t('FollowListNotFoundConfirmation'))
+      const result = await dialogService.confirm(t('FollowListNotFoundConfirmation'))
 
       if (!result) {
         return
       }
     }
+    if (currentAccountPubkey.current !== accountPubkey) return
     const newFollowListDraftEvent = createFollowListDraftEvent(
       (followListEvent?.tags ?? []).concat([['p', pubkey]]),
       followListEvent?.content

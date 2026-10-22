@@ -1,6 +1,5 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { useStuff } from '@/hooks/useStuff'
 import { toRelay } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
@@ -61,8 +61,8 @@ export default function SeenOnButton({ stuff }: { stuff: Event | string }) {
     return (
       <>
         {trigger}
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Seen on')}>
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Seen on')}>
             <div className="py-2">
               {relays.map((relay) => (
                 <Button
@@ -80,8 +80,8 @@ export default function SeenOnButton({ stuff }: { stuff: Event | string }) {
                 </Button>
               ))}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

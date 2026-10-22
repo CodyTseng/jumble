@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import { LONG_PRESS_THRESHOLD } from '@/constants'
 import { useFilteredLikeCount } from '@/hooks/useFilteredLikeCount'
@@ -8,6 +8,7 @@ import {
   createExternalContentReactionDraftEvent,
   createReactionDraftEvent
 } from '@/lib/draft-event'
+import { formatError } from '@/lib/error'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -19,12 +20,11 @@ import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import Emoji from '../Emoji'
 import ExpressionPicker from '../ExpressionPicker'
 import SuggestedEmojis from '../SuggestedEmojis'
 import { formatCount } from './utils'
-import { formatError } from '@/lib/error'
-import { toast } from 'sonner'
 
 export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
@@ -144,8 +144,8 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
     return (
       <>
         {trigger}
-        <Drawer open={isEmojiReactionsOpen} onOpenChange={setIsEmojiReactionsOpen}>
-          <DrawerContent title={t('React')}>
+        <Modal open={isEmojiReactionsOpen} onOpenChange={setIsEmojiReactionsOpen}>
+          <ModalContent title={t('React')}>
             <ExpressionPicker
               onEmojiClick={(emoji) => {
                 setIsEmojiReactionsOpen(false)
@@ -154,8 +154,8 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
                 like(emoji)
               }}
             />
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

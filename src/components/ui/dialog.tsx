@@ -1,98 +1,28 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { randomString } from '@/lib/random'
+import { Modal, ModalClose, ModalContent, ModalTrigger } from '@/components/ui/modal'
 import { cn } from '@/lib/utils'
-import modalManager from '@/services/modal-manager.service'
 
-const Dialog = ({ children, open, onOpenChange, ...props }: DialogPrimitive.DialogProps) => {
-  const [innerOpen, setInnerOpen] = React.useState(open ?? false)
-  const id = React.useMemo(() => `dialog-${randomString()}`, [])
+// All ordinary dialogs use the same responsive modal and preserve their content
+// tree when changing between a bottom sheet and a centered presentation.
+const Dialog = Modal
+const DialogTrigger = ModalTrigger
+const DialogClose = ModalClose
 
-  React.useEffect(() => {
-    if (open) {
-      modalManager.register(id, () => {
-        onOpenChange?.(false)
-      })
-    } else {
-      modalManager.unregister(id)
-    }
-  }, [open])
-
-  React.useEffect(() => {
-    if (open !== undefined) {
-      return
-    }
-
-    if (innerOpen) {
-      modalManager.register(id, () => {
-        setInnerOpen(false)
-      })
-    } else {
-      modalManager.unregister(id)
-    }
-  }, [innerOpen])
-
-  return (
-    <DialogPrimitive.Root
-      open={open ?? innerOpen}
-      onOpenChange={onOpenChange ?? setInnerOpen}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Root>
-  )
-}
-
-const DialogTrigger = DialogPrimitive.Trigger
-
-const DialogPortal = DialogPrimitive.Portal
-
-const DialogClose = DialogPrimitive.Close
-
-const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof ModalContent>,
+  React.ComponentPropsWithoutRef<typeof ModalContent>
+>(({ className, bodyClassName, withoutClose = false, ...props }, ref) => (
+  <ModalContent
     ref={ref}
-    className={cn(
-      'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      className
-    )}
+    withoutClose={withoutClose}
+    className={cn('max-h-[90dvh]', className)}
+    bodyClassName={cn('grid gap-4 p-6', bodyClassName)}
     {...props}
   />
 ))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
-
-const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-    withoutClose?: boolean
-  }
->(({ className, children, withoutClose, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg [transform:translate(-50%,-50%)] gap-4 bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-xl sm:border',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {!withoutClose && (
-        <DialogPrimitive.Close className="absolute right-5 top-5 flex size-8 items-center justify-center rounded-lg opacity-70 ring-offset-background transition-all hover:bg-accent hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
-      )}
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
-DialogContent.displayName = DialogPrimitive.Content.displayName
+DialogContent.displayName = 'DialogContent'
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col gap-1.5 text-center sm:text-start', className)} {...props} />
@@ -101,7 +31,7 @@ DialogHeader.displayName = 'DialogHeader'
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:gap-2', className)}
+    className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
     {...props}
   />
 )
@@ -113,7 +43,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold leading-6 tracking-tight', className)}
+    className={cn('text-lg leading-6 font-semibold tracking-tight', className)}
     {...props}
   />
 ))
@@ -125,7 +55,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
+    className={cn('text-muted-foreground text-sm', className)}
     {...props}
   />
 ))
@@ -138,8 +68,6 @@ export {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
   DialogTitle,
   DialogTrigger
 }

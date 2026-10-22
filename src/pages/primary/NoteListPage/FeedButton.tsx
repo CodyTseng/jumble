@@ -1,8 +1,8 @@
 import FeedSwitcher from '@/components/FeedSwitcher'
 import RelayIcon from '@/components/RelayIcon'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS } from '@/constants'
+import { COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS, IS_COMMUNITY_MODE } from '@/constants'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
@@ -34,8 +34,8 @@ export default function FeedButton({
           compact={compact}
           onClick={() => setOpen(true)}
         />
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent className="max-h-[85vh]">
+        <Modal open={open} onOpenChange={setOpen}>
+          <ModalContent className="max-h-[85vh]">
             <div
               className="flex-1 overflow-y-auto overscroll-contain px-4 py-3"
               style={{
@@ -45,8 +45,8 @@ export default function FeedButton({
             >
               <FeedSwitcher close={() => setOpen(false)} />
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }
@@ -131,7 +131,7 @@ const FeedSwitcherTrigger = forwardRef<
     <div
       className={cn(
         'clickable flex items-center',
-        compact ? 'h-8 gap-1.5 rounded-full bg-muted ps-1 pe-1.5' : 'h-full gap-2 rounded-xl px-3',
+        compact ? 'bg-muted h-8 gap-1.5 rounded-full ps-1 pe-1.5' : 'h-full gap-2 rounded-xl px-3',
         !clickable && 'cursor-default!',
         className
       )}

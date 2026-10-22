@@ -1,3 +1,4 @@
+import dialogService from '@/services/dialog.service'
 import { Button } from '@/components/ui/button'
 import { createJoinDraftEvent, createLeaveDraftEvent } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
@@ -89,7 +90,7 @@ export default function RelayMembershipControl({
   }
 
   const handleLeaveClick = async () => {
-    if (!confirm(t('Are you sure you want to leave this relay?'))) {
+    if (!(await dialogService.confirm(t('Are you sure you want to leave this relay?')))) {
       return
     }
 

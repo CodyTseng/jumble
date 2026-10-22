@@ -7,7 +7,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { buildATag } from '@/lib/draft-event'
 import { getReplaceableEventIdentifier } from '@/lib/event'
 import { getDefaultRelayUrls } from '@/lib/relay'
@@ -15,7 +14,6 @@ import { tagNameEquals } from '@/lib/tag'
 import { isWebsocketUrl, simplifyUrl } from '@/lib/url'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import client from '@/services/client.service'
 import { TRelaySet } from '@/types'
 import { CloudDownload } from 'lucide-react'
@@ -27,13 +25,13 @@ import RelaySetCard from '../RelaySetCard'
 export default function PullRelaySetsButton() {
   const { t } = useTranslation()
   const { pubkey } = useNostr()
-  const { isSmallScreen } = useScreenSize()
+
   const [open, setOpen] = useState(false)
 
   const trigger = (
     <Button
       variant="link"
-      className="h-fit p-0 text-muted-foreground hover:text-foreground hover:no-underline"
+      className="text-muted-foreground hover:text-foreground h-fit p-0 hover:no-underline"
       disabled={!pubkey}
     >
       <CloudDownload />
@@ -41,26 +39,10 @@ export default function PullRelaySetsButton() {
     </Button>
   )
 
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent className="max-h-[90dvh]">
-          <div className="flex flex-col gap-4 overflow-auto p-4">
-            <DrawerTitle className="text-base font-semibold">
-              {t('Select the relay sets you want to pull')}
-            </DrawerTitle>
-            <RemoteRelaySets close={() => setOpen(false)} />
-          </div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-auto">
+      <DialogContent className="max-h-[90vh]" bodyClassName="overflow-auto">
         <DialogHeader>
           <DialogTitle>{t('Select the relay sets you want to pull')}</DialogTitle>
           <DialogDescription className="hidden" />
@@ -125,9 +107,9 @@ function RemoteRelaySets({ close }: { close?: () => void }) {
   }, [pubkey])
 
   if (!pubkey) return null
-  if (!initialed) return <div className="text-center text-muted-foreground">{t('loading...')}</div>
+  if (!initialed) return <div className="text-muted-foreground text-center">{t('loading...')}</div>
   if (!relaySets.length) {
-    return <div className="text-center text-muted-foreground">{t('No relay sets found')}</div>
+    return <div className="text-muted-foreground text-center">{t('No relay sets found')}</div>
   }
 
   return (

@@ -8,12 +8,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle
-} from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -21,7 +15,6 @@ import { DEFAULT_FEED_TABS } from '@/constants'
 import { prefersTouchInteraction } from '@/lib/device'
 import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TFeedTabConfig } from '@/types'
 import {
@@ -56,7 +49,7 @@ export default function FeedTabsCustomizeDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
+
   const { feedTabs, updateFeedTabs } = useUserPreferences()
   const [editor, setEditor] = useState<TEditorState>(null)
   const prefersTouch = useMemo(() => prefersTouchInteraction(), [])
@@ -173,35 +166,9 @@ export default function FeedTabsCustomizeDialog({
     </div>
   )
 
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90dvh] overflow-y-auto px-4">
-          <div className="grid gap-1.5 py-4 text-center sm:text-start">
-            <DrawerTitle className="flex items-center gap-2">
-              {showBack && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="-ms-2 size-7"
-                  onClick={() => setEditor(null)}
-                >
-                  <ArrowLeft size={16} className="rtl:-scale-x-100" />
-                </Button>
-              )}
-              {title}
-            </DrawerTitle>
-            {description && <DrawerDescription>{description}</DrawerDescription>}
-          </div>
-          {body}
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-h-[85vh]" bodyClassName="overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {showBack && (
@@ -211,7 +178,7 @@ export default function FeedTabsCustomizeDialog({
                 className="-ms-2 size-7"
                 onClick={() => setEditor(null)}
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={16} className="rtl:-scale-x-100" />
               </Button>
             )}
             {title}
@@ -257,18 +224,14 @@ function TabRow({
     >
       <div
         data-drawer-swipe-lock
-        className="cursor-grab touch-none rounded-md p-2 hover:bg-muted active:cursor-grabbing"
+        className="hover:bg-muted cursor-grab touch-none rounded-md p-2 active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="size-4 text-muted-foreground" />
+        <GripVertical className="text-muted-foreground size-4" />
       </div>
       <div className="min-w-0 flex-1 truncate text-sm font-medium">{t(tab.label)}</div>
-      <Switch
-        checked={!tab.hidden}
-        onCheckedChange={onToggleHidden}
-        aria-label={t('Show tab')}
-      />
+      <Switch checked={!tab.hidden} onCheckedChange={onToggleHidden} aria-label={t('Show tab')} />
       {!isBuiltin && (
         <>
           <Button variant="ghost" size="icon" className="size-8" onClick={onEdit}>
@@ -277,7 +240,7 @@ function TabRow({
           <Button
             variant="ghost"
             size="icon"
-            className="size-8 text-destructive hover:text-destructive"
+            className="text-destructive hover:text-destructive size-8"
             onClick={onDelete}
           >
             <Trash2 size={16} />
@@ -358,8 +321,8 @@ function TabEditor({
                 )}
                 onClick={() => toggleKindGroup(kindGroup)}
               >
-                <p className="text-sm font-medium leading-none">{t(groupLabel)}</p>
-                <p className="text-xs text-muted-foreground">kind {kindGroup.join(', ')}</p>
+                <p className="text-sm leading-none font-medium">{t(groupLabel)}</p>
+                <p className="text-muted-foreground text-xs">kind {kindGroup.join(', ')}</p>
               </div>
             )
           })}

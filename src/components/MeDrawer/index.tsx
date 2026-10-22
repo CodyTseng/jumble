@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { useTranslation } from 'react-i18next'
 import MeDrawerContent from './MeDrawerContent'
 
@@ -12,10 +12,10 @@ export default function MeDrawer({
   const { i18n, t } = useTranslation()
   const isRtl = i18n.dir() === 'rtl'
   return (
-    <Drawer open={open} onOpenChange={setOpen} direction={isRtl ? 'right' : 'left'}>
-      <DrawerContent title={t('Menu')}>
+    <Modal open={open} onOpenChange={setOpen} direction={isRtl ? 'right' : 'left'}>
+      <ModalContent title={t('Menu')}>
         <MeDrawerContent onClose={() => setOpen(false)} />
-      </DrawerContent>
-    </Drawer>
+      </ModalContent>
+    </Modal>
   )
 }

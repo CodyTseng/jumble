@@ -1,3 +1,4 @@
+import dialogService from '@/services/dialog.service'
 import LoginDialog from '@/components/LoginDialog'
 import PasswordInputDialog from '@/components/PasswordInputDialog'
 import { ApplicationDataKey, ExtendedKind } from '@/constants'
@@ -138,6 +139,8 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     storage.getAccounts().map((act) => ({ pubkey: act.pubkey, signerType: act.signerType }))
   )
   const [account, setAccount] = useState<TAccountPointer | null>(null)
+  const currentAccount = useRef(account)
+  currentAccount.current = account
   const [nsec, setNsec] = useState<string | null>(null)
   const [ncryptsec, setNcryptsec] = useState<string | null>(null)
   const [signer, setSigner] = useState<ISigner | null>(null)
@@ -793,13 +796,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
     if (event.kind !== kinds.Application && event.pubkey !== account.pubkey) {
       const eventAuthor = await client.fetchProfile(event.pubkey)
-      const result = confirm(
+      const result = await dialogService.confirm(
         t(
           'You are about to publish an event signed by [{{eventAuthorName}}]. You are currently logged in as [{{currentUsername}}]. Are you sure?',
           { eventAuthorName: eventAuthor?.username, currentUsername: profile?.username }
         )
       )
-      if (!result) {
+      if (!result || currentAccount.current?.pubkey !== account.pubkey) {
         throw new Error(t('Cancelled'))
       }
     }

@@ -1,6 +1,7 @@
 import 'yet-another-react-lightbox/styles.css'
 import './index.css'
 
+import DialogHost from '@/components/DialogHost'
 import EmojiDetailDialog from '@/components/EmojiDetailDialog'
 import KeySyncRequestHandler from '@/components/KeySyncRequestDialog'
 import { MobileSignerApprovalIndicator } from '@/components/SignerApprovalIndicator'
@@ -65,6 +66,7 @@ export default function App(): JSX.Element {
                                                 <KeySyncRequestHandler />
                                                 <EmojiDetailDialog />
                                                 <MobileSignerApprovalIndicator />
+                                                <DialogHost />
                                                 <Toaster />
                                               </KindFilterProvider>
                                             </MediaUploadServiceProvider>

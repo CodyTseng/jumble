@@ -1,11 +1,9 @@
 import { Button, ButtonProps } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Separator } from '@/components/ui/separator'
 import { ExtendedKind } from '@/constants'
-import { getReplaceableEventIdentifier, getNoteBech32Id } from '@/lib/event'
+import { getNoteBech32Id, getReplaceableEventIdentifier } from '@/lib/event'
 import { toChachiChat, toNostrordGroup } from '@/lib/link'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import clientService from '@/services/client.service'
 import { ExternalLink } from 'lucide-react'
 import { Event, kinds, nip19 } from 'nostr-tools'
@@ -84,7 +82,6 @@ export default function ClientSelect({
   event?: Event
   originalNoteId?: string
 }) {
-  const { isSmallScreen } = useScreenSize()
   const [open, setOpen] = useState(false)
   const { t } = useTranslation()
 
@@ -174,22 +171,15 @@ export default function ClientSelect({
     </Button>
   )
 
-  if (isSmallScreen) {
-    return (
-      <div onClick={(e) => e.stopPropagation()}>
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-          <DrawerContent title={t('Open in another client')}>{content}</DrawerContent>
-        </Drawer>
-      </div>
-    )
-  }
-
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{trigger}</DialogTrigger>
-        <DialogContent className="px-8" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <DialogContent
+          title={t('Open in another client')}
+          bodyClassName="px-8"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           {content}
         </DialogContent>
       </Dialog>

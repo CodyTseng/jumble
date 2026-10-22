@@ -4,12 +4,12 @@ import LogoutDialog from '@/components/LogoutDialog'
 import Nip05 from '@/components/Nip05'
 import PubkeyCopy from '@/components/PubkeyCopy'
 import QrCodeDisplay from '@/components/QrCode'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
+import { Modal, ModalContent, ModalTrigger } from '@/components/ui/modal'
 import { Separator } from '@/components/ui/separator'
 import UserAvatar, { SimpleUserAvatar } from '@/components/UserAvatar'
 import Username, { SimpleUsername } from '@/components/Username'
-import { formatNpub } from '@/lib/pubkey'
 import { toBookmarks, toProfile, toRelaySettings, toSettings, toWallet } from '@/lib/link'
+import { formatNpub } from '@/lib/pubkey'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
@@ -61,15 +61,15 @@ export default function MeDrawerContent({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="px-5 pb-4 pt-4">
+      <div className="px-5 pt-4 pb-4">
         <div className="flex justify-end">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <button className="clickable flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground">
+          <Modal>
+            <ModalTrigger asChild>
+              <button className="clickable border-border text-muted-foreground hover:text-foreground flex size-10 items-center justify-center rounded-full border">
                 <QrCode className="size-5" />
               </button>
-            </DrawerTrigger>
-            <DrawerContent>
+            </ModalTrigger>
+            <ModalContent>
               <div className="flex w-full flex-col items-center gap-4 p-8">
                 <div className="pointer-events-none flex w-full items-center gap-2 px-1">
                   <UserAvatar size="big" userId={pubkey} />
@@ -81,8 +81,8 @@ export default function MeDrawerContent({ onClose }: { onClose?: () => void }) {
                 <QrCodeDisplay size={512} value={`nostr:${npub}`} />
                 <PubkeyCopy pubkey={pubkey} />
               </div>
-            </DrawerContent>
-          </Drawer>
+            </ModalContent>
+          </Modal>
         </div>
         <div className="flex items-center gap-3">
           <SimpleUserAvatar userId={pubkey} size="big" className="shrink-0" />
@@ -93,11 +93,15 @@ export default function MeDrawerContent({ onClose }: { onClose?: () => void }) {
               skeletonClassName="h-6 w-28"
             />
             <button
-              className="clickable mt-1 flex max-w-full items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground active:bg-muted/70"
+              className="clickable bg-muted text-muted-foreground active:bg-muted/70 mt-1 flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1 text-xs"
               onClick={copyNpub}
             >
               <span className="truncate">{formatNpub(npub, 20)}</span>
-              {copied ? <Check className="size-3 shrink-0" /> : <Copy className="size-3 shrink-0" />}
+              {copied ? (
+                <Check className="size-3 shrink-0" />
+              ) : (
+                <Copy className="size-3 shrink-0" />
+              )}
             </button>
           </div>
         </div>
@@ -151,11 +155,7 @@ export default function MeDrawerContent({ onClose }: { onClose?: () => void }) {
   )
 }
 
-function Item({
-  children,
-  className,
-  ...props
-}: HTMLProps<HTMLDivElement>) {
+function Item({ children, className, ...props }: HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={cn(

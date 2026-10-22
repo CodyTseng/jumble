@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { MenuAction, SubMenuAction } from './useMenuActions'
@@ -31,14 +31,14 @@ export function MobileMenu({
   return (
     <>
       {trigger}
-      <Drawer
+      <Modal
         open={isDrawerOpen}
         // Route close events through closeDrawer so the parent also resets
         // showSubMenu — otherwise reopening the drawer would land on the
         // previously-open submenu instead of the root menu.
         onOpenChange={(open) => (open ? setIsDrawerOpen(true) : closeDrawer())}
       >
-        <DrawerContent title={subMenuTitle || t('Options')} className="max-h-[80dvh]">
+        <ModalContent title={subMenuTitle || t('Options')} className="max-h-[80dvh]">
           <div className="overflow-y-auto overscroll-contain py-2">
             {!showSubMenu ? (
               menuActions.map((action, index) => {
@@ -65,7 +65,7 @@ export function MobileMenu({
                   <ArrowLeft className="rtl:-scale-x-100" />
                   {subMenuTitle}
                 </Button>
-                <div className="mb-2 border-t border-border" />
+                <div className="border-border mb-2 border-t" />
                 {activeSubMenu.map((subAction, index) => (
                   <Button
                     key={index}
@@ -79,8 +79,8 @@ export function MobileMenu({
               </>
             )}
           </div>
-        </DrawerContent>
-      </Drawer>
+        </ModalContent>
+      </Modal>
     </>
   )
 }

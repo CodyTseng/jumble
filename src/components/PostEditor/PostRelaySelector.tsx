@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -7,6 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent } from '@/components/ui/modal'
 import { Separator } from '@/components/ui/separator'
 import { isProtectedEvent } from '@/lib/event'
 import { simplifyUrl } from '@/lib/url'
@@ -17,15 +17,7 @@ import client from '@/services/client.service'
 import { TPostTargetItem } from '@/types'
 import { Check, ChevronDown, Radio } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 
@@ -211,8 +203,7 @@ export default function PostRelaySelector({
     )
   }, [postTargetItems, relaySets, selectableRelays])
 
-  const triggerClass =
-    'h-9 min-w-0 max-w-full gap-1.5 px-2.5 text-sm font-normal text-foreground'
+  const triggerClass = 'h-9 min-w-0 max-w-full gap-1.5 px-2.5 text-sm font-normal text-foreground'
 
   if (isSmallScreen) {
     return (
@@ -228,11 +219,11 @@ export default function PostRelaySelector({
           <span className="truncate">{description}</span>
           <ChevronDown className="size-3.5 shrink-0 opacity-60" />
         </Button>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent title={t('Post to')} className="max-h-[80dvh]">
+        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <ModalContent title={t('Post to')} className="max-h-[80dvh]">
             <div className="overflow-y-auto overscroll-contain py-2">{content}</div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

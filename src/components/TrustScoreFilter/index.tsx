@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
+import { Modal, ModalContent, ModalTitle } from '@/components/ui/modal'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
@@ -105,10 +105,10 @@ export default function TrustScoreFilter({
       {/* Slider */}
       <div className="space-y-2">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             {t('trust-filter.filter-threshold')}
           </span>
-          <span className="text-lg font-semibold text-primary">
+          <span className="text-primary text-lg font-semibold">
             {temporaryScore === 0 ? t('trust-filter.off') : `${temporaryScore}%`}
           </span>
         </div>
@@ -124,7 +124,7 @@ export default function TrustScoreFilter({
 
       {/* Quick Presets */}
       <div className="space-y-1.5">
-        <div className="text-xs text-muted-foreground">{t('trust-filter.quick-presets')}</div>
+        <div className="text-muted-foreground text-xs">{t('trust-filter.quick-presets')}</div>
         <div className="flex flex-wrap gap-1.5">
           {TRUST_LEVELS.map((level) => (
             <button
@@ -133,8 +133,8 @@ export default function TrustScoreFilter({
               className={cn(
                 'flex-1 rounded px-2 py-1.5 text-center text-xs transition-all duration-200',
                 temporaryScore === level.value
-                  ? 'bg-primary font-medium text-primary-foreground shadow-xs'
-                  : 'bg-secondary hover:scale-[1.02] hover:bg-secondary/80 hover:shadow-xs'
+                  ? 'bg-primary text-primary-foreground font-medium shadow-xs'
+                  : 'bg-secondary hover:bg-secondary/80 hover:scale-[1.02] hover:shadow-xs'
               )}
             >
               {t(level.label)}
@@ -145,8 +145,8 @@ export default function TrustScoreFilter({
 
       {/* Description */}
       <div className="space-y-1 border-t pt-2">
-        <div className="text-sm font-medium text-foreground">{description}</div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-foreground text-sm font-medium">{description}</div>
+        <div className="text-muted-foreground text-xs">
           {t('trust-filter.trust-score-description')}
         </div>
       </div>
@@ -157,14 +157,14 @@ export default function TrustScoreFilter({
     return (
       <>
         {trigger}
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent className="px-4">
+        <Modal open={open} onOpenChange={setOpen}>
+          <ModalContent bodyClassName="px-4">
             <div className="grid gap-1.5 p-4 text-center sm:text-start">
-              <DrawerTitle className="text-base">{t('trust-filter.title')}</DrawerTitle>
+              <ModalTitle className="text-base">{t('trust-filter.title')}</ModalTitle>
             </div>
             <div className="space-y-4 pb-4">{content}</div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

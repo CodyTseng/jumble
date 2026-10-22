@@ -1,9 +1,9 @@
+import { DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu'
+import { extractMentions } from '@/lib/mentions'
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Mentions, { MentionPicker } from './Mentions'
-import { DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu'
-import { extractMentions } from '@/lib/mentions'
 
 const mocks = vi.hoisted(() => ({
   effects: [] as (() => void | (() => void))[],
@@ -25,7 +25,7 @@ vi.mock('@/providers/ScreenSizeProvider', () => ({
 }))
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }))
 vi.mock('@/components/ui/button', () => ({ Button: () => null }))
-vi.mock('@/components/ui/drawer', () => ({ Drawer: () => null, DrawerContent: () => null }))
+vi.mock('@/components/ui/modal', () => ({ Modal: () => null, ModalContent: () => null }))
 vi.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: { children: React.ReactNode }) => children,
   DropdownMenuCheckboxItem: vi.fn(() => null),

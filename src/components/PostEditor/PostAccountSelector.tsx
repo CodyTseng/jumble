@@ -1,4 +1,3 @@
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,9 +5,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { Modal, ModalContent, ModalTitle, ModalTrigger } from '@/components/ui/modal'
 import { isSameAccount } from '@/lib/account'
-import { createEphemeralNsecAccount, isEphemeralPostAccount } from '@/lib/post-account'
 import { isPomegranateAccountByPointer } from '@/lib/pomegranate'
+import { createEphemeralNsecAccount, isEphemeralPostAccount } from '@/lib/post-account'
 import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
@@ -138,10 +138,10 @@ export default function PostAccountSelector({
   if (isSmallScreen) {
     return (
       <div className="flex px-5 py-1">
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
-          <DrawerContent title={t('Post as')}>
-            <DrawerTitle className="px-4 pb-2 text-base font-semibold">{t('Post as')}</DrawerTitle>
+        <Modal open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <ModalTrigger asChild>{triggerButton}</ModalTrigger>
+          <ModalContent title={t('Post as')}>
+            <ModalTitle className="px-4 pb-2 text-base font-semibold">{t('Post as')}</ModalTitle>
             <div className="max-h-[60vh] space-y-1 overflow-y-auto px-2 pb-2">
               {signableAccounts.map((act) => {
                 const isSelected = !isAnonymous && !!value && isSameAccount(act, value)
@@ -183,8 +183,8 @@ export default function PostAccountSelector({
                 </button>
               )}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </ModalContent>
+        </Modal>
       </div>
     )
   }

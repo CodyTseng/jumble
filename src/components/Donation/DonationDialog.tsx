@@ -1,16 +1,9 @@
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { JUMBLE_PUBKEY } from '@/constants'
 import { useNostr } from '@/providers/NostrProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import lightning from '@/services/lightning.service'
 import { Loader } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
@@ -38,28 +31,6 @@ export default function DonationDialog({
   onDonated?: () => void
 }) {
   const { t } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
-
-  if (isSmallScreen) {
-    return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="flex flex-col gap-4 px-4">
-          <div className="grid gap-1.5 p-4 text-center sm:text-start">
-            <DrawerTitle className="flex items-center gap-2">
-              <div className="shrink-0">{t('Donate to')}</div>
-              <UserAvatar size="small" userId={JUMBLE_PUBKEY} />
-              <Username userId={JUMBLE_PUBKEY} className="h-5 w-0 flex-1 truncate text-start" />
-            </DrawerTitle>
-          </div>
-          <DonationDialogContent
-            setOpen={setOpen}
-            defaultAmount={defaultAmount}
-            onDonated={onDonated}
-          />
-        </DrawerContent>
-      </Drawer>
-    )
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -68,7 +39,10 @@ export default function DonationDialog({
           <DialogTitle className="flex items-center gap-2">
             <div className="shrink-0">{t('Donate to')}</div>
             <UserAvatar size="small" userId={JUMBLE_PUBKEY} />
-            <Username userId={JUMBLE_PUBKEY} className="h-5 max-w-fit flex-1 truncate text-start" />
+            <Username
+              userId={JUMBLE_PUBKEY}
+              className="h-5 min-w-0 flex-1 truncate text-start sm:max-w-fit"
+            />
           </DialogTitle>
         </DialogHeader>
         <DonationDialogContent
