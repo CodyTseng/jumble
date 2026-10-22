@@ -77,8 +77,6 @@ const PostTextarea = forwardRef<
   ) => {
     const { t } = useTranslation()
     const [tabValue, setTabValue] = useState('edit')
-    const editContentRef = useRef<HTMLDivElement>(null)
-    const [previewHeight, setPreviewHeight] = useState<number>()
     const [isDraggingFile, setIsDraggingFile] = useState(false)
     // Keep the tabs and the (mobile) action buttons on one row when they fit;
     // when a long translation would crowd them, stack the buttons above the tabs.
@@ -239,13 +237,8 @@ const PostTextarea = forwardRef<
       <Tabs
         defaultValue="edit"
         value={tabValue}
-        onValueChange={(value) => {
-          if (value === 'preview') {
-            const height = editContentRef.current?.getBoundingClientRect().height
-            if (height) setPreviewHeight(height)
-          }
-          setTabValue(value)
-        }}
+        className="flex flex-1 flex-col"
+        onValueChange={setTabValue}
       >
         <div className="px-5 pt-3 sm:px-6">
           <div
@@ -278,7 +271,10 @@ const PostTextarea = forwardRef<
             )}
           </div>
         </div>
-        <TabsContent ref={editContentRef} value="edit" className="mt-0">
+        <TabsContent
+          value="edit"
+          className="mt-0 flex-1 data-[state=active]:flex data-[state=active]:flex-col"
+        >
           {postAsAccount && onPostAsAccountChange && (
             <PostAccountSelector
               value={postAsAccount}
@@ -286,8 +282,11 @@ const PostTextarea = forwardRef<
               allowAnonymous={allowAnonymous}
             />
           )}
-          <div className="relative">
-            <EditorContent className="tiptap" editor={editor} />
+          <div className="relative flex flex-1 flex-col">
+            <EditorContent
+              className="tiptap flex flex-1 flex-col [&>.tiptap]:flex-1"
+              editor={editor}
+            />
             {isDraggingFile && (
               <div className="pointer-events-none absolute inset-0 z-10 px-5 py-2 sm:px-6">
                 <div className="bg-background/80 text-primary flex h-full w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-current backdrop-blur-xs">
@@ -300,8 +299,7 @@ const PostTextarea = forwardRef<
         </TabsContent>
         <TabsContent
           value="preview"
-          className="mt-0 overflow-y-auto overscroll-contain"
-          style={previewHeight ? { height: previewHeight } : undefined}
+          className="mt-0 flex-1"
           onClick={() => {
             setTabValue('edit')
             editor.commands.focus()

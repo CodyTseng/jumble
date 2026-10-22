@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { DialogDescription, DialogHeader } from '@/components/ui/dialog'
 import { Modal, ModalContent } from '@/components/ui/modal'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { toNewArticle, toNote } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -193,12 +192,14 @@ export default function PostEditor({
 
   return (
     <>
-      {/* Keep the portal, scroll area and editor in the same tree positions.
+      {/* Keep the portal and editor in the same tree positions.
           Only presentation changes when resizing, preserving TipTap history,
           selection, uploads, poll options and the other local editor state. */}
       <Modal open={open} onOpenChange={handleOpenChange}>
         <ModalContent
-          className={cn(isSmallScreen ? 'h-dvh max-h-dvh' : 'max-w-2xl sm:rounded-2xl')}
+          className={cn(
+            isSmallScreen ? 'h-dvh max-h-dvh' : 'h-[85dvh] max-h-[85dvh] max-w-2xl sm:rounded-2xl'
+          )}
           bodyClassName="overflow-hidden"
           title={highlightedText ? t('Create Highlight') : t('New Note')}
           onEscapeKeyDown={(e) => {
@@ -208,22 +209,20 @@ export default function PostEditor({
             }
           }}
         >
-          <ScrollArea className={isSmallScreen ? 'min-h-0 flex-1' : 'h-full max-h-[85vh]'}>
-            <DialogHeader className={cn('px-6 pt-6 pb-0', isSmallScreen && 'hidden')}>
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0 flex-1 text-lg leading-none font-semibold tracking-tight">
-                  {highlightedText ? (
-                    t('Create Highlight')
-                  ) : (
-                    <Title parentStuff={effectiveParentStuff} />
-                  )}
-                </div>
-                <DraftsButton onClick={openDraftsFromEditor} />
+          <DialogHeader className={cn('shrink-0 px-6 pt-6 pb-0', isSmallScreen && 'hidden')}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1 text-lg leading-none font-semibold tracking-tight">
+                {highlightedText ? (
+                  t('Create Highlight')
+                ) : (
+                  <Title parentStuff={effectiveParentStuff} />
+                )}
               </div>
-              <DialogDescription className="hidden" />
-            </DialogHeader>
-            {content}
-          </ScrollArea>
+              <DraftsButton onClick={openDraftsFromEditor} />
+            </div>
+            <DialogDescription className="hidden" />
+          </DialogHeader>
+          {content}
         </ModalContent>
       </Modal>
 

@@ -439,69 +439,121 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   }, [initialDraft])
 
   return (
-    <div className="pb-2">
-      {parentEvent && (
-        <>
-          <ParentEventPreview
-            parentEvent={parentEvent}
-            highlightedText={highlightedText}
-            onClick={onParentClick ? () => onParentClick(parentEvent) : undefined}
-          />
-          <div className="bg-border h-px" />
-        </>
-      )}
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pb-2">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain *:shrink-0">
+        {parentEvent && (
+          <>
+            <ParentEventPreview
+              parentEvent={parentEvent}
+              highlightedText={highlightedText}
+              onClick={onParentClick ? () => onParentClick(parentEvent) : undefined}
+            />
+            <div className="bg-border h-px" />
+          </>
+        )}
 
-      <PostTextarea
-        ref={textareaRef}
-        text={text}
-        setText={setText}
-        initialContent={initialContent}
-        onSubmit={() => post()}
-        className={isPoll ? 'min-h-20' : 'min-h-52'}
-        onUploadStart={handleUploadStart}
-        onUploadProgress={handleUploadProgress}
-        onUploadEnd={handleUploadEnd}
-        postAsAccount={postAsAccount}
-        onPostAsAccountChange={setPostAsAccount}
-        allowAnonymous={!!initialParentStuff && !highlightedText}
-        previewPubkey={getPostAccountPreviewPubkey(postAsAccount ?? account)}
-        placeholder={highlightedText ? t('Write your thoughts about this highlight...') : undefined}
-        topRightActions={
-          <div className="flex items-center gap-1">
-            <DraftsButton onClick={() => onOpenDrafts?.()} />
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!canPost}
-              // Don't let the press blur the editor: on mobile that dismisses the
-              // virtual keyboard and shifts the layout, so the first tap is eaten
-              // and the user has to tap "send" twice. Keeping focus fires post() now.
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={post}
-              className="px-4 text-sm font-semibold shadow-sm"
-            >
-              {initialParentStuff
-                ? highlightedText
-                  ? t('Publish Highlight')
-                  : t('Reply')
-                : t('Post')}
-            </Button>
+        <PostTextarea
+          ref={textareaRef}
+          text={text}
+          setText={setText}
+          initialContent={initialContent}
+          onSubmit={() => post()}
+          onUploadStart={handleUploadStart}
+          onUploadProgress={handleUploadProgress}
+          onUploadEnd={handleUploadEnd}
+          postAsAccount={postAsAccount}
+          onPostAsAccountChange={setPostAsAccount}
+          allowAnonymous={!!initialParentStuff && !highlightedText}
+          previewPubkey={getPostAccountPreviewPubkey(postAsAccount ?? account)}
+          placeholder={
+            highlightedText ? t('Write your thoughts about this highlight...') : undefined
+          }
+          topRightActions={
+            <div className="flex items-center gap-1">
+              <DraftsButton onClick={() => onOpenDrafts?.()} />
+              <Button
+                type="submit"
+                size="sm"
+                disabled={!canPost}
+                // Don't let the press blur the editor: on mobile that dismisses the
+                // virtual keyboard and shifts the layout, so the first tap is eaten
+                // and the user has to tap "send" twice. Keeping focus fires post() now.
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={post}
+                className="px-4 text-sm font-semibold shadow-sm"
+              >
+                {initialParentStuff
+                  ? highlightedText
+                    ? t('Publish Highlight')
+                    : t('Reply')
+                  : t('Post')}
+              </Button>
+            </div>
+          }
+        />
+
+        {isPoll && (
+          <div className="px-5 pb-3 sm:px-6">
+            <PollEditor
+              pollCreateData={pollCreateData}
+              setPollCreateData={setPollCreateData}
+              setIsPoll={setIsPoll}
+            />
           </div>
-        }
-      />
+        )}
 
-      {isPoll && (
-        <div className="px-5 pb-3 sm:px-6">
-          <PollEditor
-            pollCreateData={pollCreateData}
-            setPollCreateData={setPollCreateData}
-            setIsPoll={setIsPoll}
-          />
-        </div>
-      )}
+        {uploadProgresses.length > 0 && (
+          <div className="space-y-2 px-5.5 py-2 sm:px-7">
+            {uploadProgresses.map(({ file, progress, cancel }, index) => (
+              <div key={`${file.name}-${index}`} className="flex items-end gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-muted-foreground mb-1 truncate text-xs">
+                    {file.name ?? t('Uploading...')}
+                  </div>
+                  <div className="bg-muted h-0.5 w-full overflow-hidden rounded-full">
+                    <div
+                      className="bg-primary h-full transition-[width] duration-200 ease-out"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    cancel?.()
+                    handleUploadEnd(file)
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                  title={t('Cancel')}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {showMoreOptions && (
+          <>
+            <div className="bg-border h-px" />
+            <div className="p-5 sm:p-6">
+              <PostOptions
+                posting={false}
+                show={showMoreOptions}
+                addClientTag={addClientTag}
+                setAddClientTag={setAddClientTag}
+                isNsfw={isNsfw}
+                setIsNsfw={setIsNsfw}
+                minPow={minPow}
+                setMinPow={setMinPow}
+              />
+            </div>
+          </>
+        )}
+      </div>
 
       {!isPoll && (
-        <div className="flex items-center gap-2 px-3 py-2 sm:px-4">
+        <div className="flex shrink-0 items-center gap-2 px-3 py-2 sm:px-4">
           <div className="flex shrink-0 items-center gap-0.5">
             <Button
               variant="ghost"
@@ -543,40 +595,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
         </div>
       )}
 
-      <div className="bg-border h-px" />
-
-      {uploadProgresses.length > 0 && (
-        <div className="space-y-2 px-5.5 py-2 sm:px-7">
-          {uploadProgresses.map(({ file, progress, cancel }, index) => (
-            <div key={`${file.name}-${index}`} className="flex items-end gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="text-muted-foreground mb-1 truncate text-xs">
-                  {file.name ?? t('Uploading...')}
-                </div>
-                <div className="bg-muted h-0.5 w-full overflow-hidden rounded-full">
-                  <div
-                    className="bg-primary h-full transition-[width] duration-200 ease-out"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  cancel?.()
-                  handleUploadEnd(file)
-                }}
-                className="text-muted-foreground hover:text-foreground"
-                title={t('Cancel')}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-4">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-t px-3 py-2 sm:px-4">
         <div className="flex items-center gap-0.5">
           <Uploader
             onUploadSuccess={({ url }) => {
@@ -679,24 +698,6 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
           </div>
         </div>
       </div>
-
-      {showMoreOptions && (
-        <>
-          <div className="bg-border h-px" />
-          <div className="p-5 sm:p-6">
-            <PostOptions
-              posting={false}
-              show={showMoreOptions}
-              addClientTag={addClientTag}
-              setAddClientTag={setAddClientTag}
-              isNsfw={isNsfw}
-              setIsNsfw={setIsNsfw}
-              minPow={minPow}
-              setMinPow={setMinPow}
-            />
-          </div>
-        </>
-      )}
     </div>
   )
 })
