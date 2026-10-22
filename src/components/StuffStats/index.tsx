@@ -78,14 +78,19 @@ export default function StuffStats({
 
   return (
     <div className={cn('select-none', className)}>
-      <div className="flex h-5 justify-between [&_svg]:size-4">
-        <div className={cn('flex items-center', loading ? 'animate-pulse' : '')}>
+      <div className="flex h-5 [&_svg]:size-4 [&_svg]:shrink-0">
+        <div
+          className={cn(
+            'grid min-w-0 flex-1 grid-cols-4 items-center [&>button]:min-w-0 [&>button]:justify-self-start [&>button]:px-0',
+            loading ? 'animate-pulse' : ''
+          )}
+        >
           <ReplyButton stuff={stuff} />
           <RepostButton stuff={stuff} />
           <LikeButton stuff={stuff} />
           <ZapButton stuff={stuff} />
         </div>
-        <div className="flex shrink-0 items-center">
+        <div className="flex shrink-0 items-center [&>button]:ps-1">
           <BookmarkButton stuff={stuff} />
           <SeenOnButton stuff={stuff} />
         </div>

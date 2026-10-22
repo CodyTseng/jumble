@@ -10,6 +10,7 @@ import {
 } from '@/lib/draft-event'
 import { formatError } from '@/lib/error'
 import { getDefaultRelayUrls } from '@/lib/relay'
+import { cn } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
@@ -21,7 +22,6 @@ import { Event } from 'nostr-tools'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import Emoji from '../Emoji'
 import ExpressionPicker from '../ExpressionPicker'
 import SuggestedEmojis from '../SuggestedEmojis'
 import { formatCount } from './utils'
@@ -39,10 +39,8 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const isLongPressRef = useRef(false)
   const noteStats = useStuffStatsById(stuffKey)
-  const myLastEmoji = useMemo(() => {
-    const stats = noteStats || {}
-    const myLike = stats.likes?.find((like) => like.pubkey === pubkey)
-    return myLike?.emoji
+  const hasReacted = useMemo(() => {
+    return pubkey ? noteStats?.likes?.some((like) => like.pubkey === pubkey) : false
   }, [noteStats, pubkey])
 
   useEffect(() => {
@@ -114,7 +112,10 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
 
   const trigger = (
     <button
-      className="text-muted-foreground flex h-full cursor-pointer items-center gap-1 px-3 enabled:hover:text-red-400"
+      className={cn(
+        'flex h-full cursor-pointer items-center gap-1 px-3 enabled:hover:text-red-400',
+        hasReacted ? 'text-red-400' : 'text-muted-foreground'
+      )}
       title={t('Like')}
       disabled={liking}
       onClick={handleClick}
@@ -126,11 +127,6 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
     >
       {liking ? (
         <Loader className="animate-spin" />
-      ) : myLastEmoji ? (
-        <>
-          <Emoji emoji={myLastEmoji} classNames={{ img: 'size-4' }} />
-          {!!likeCount && <div className="text-sm">{formatCount(likeCount)}</div>}
-        </>
       ) : (
         <>
           <SmilePlus />
