@@ -12,7 +12,7 @@ export function Titlebar({
   return (
     <div
       className={cn(
-        'sticky top-0 z-40 h-12 w-full select-none bg-background [&_svg]:size-5 [&_svg]:shrink-0',
+        'bg-background sticky top-0 z-40 h-12 w-full select-none [&_svg]:size-5 [&_svg]:shrink-0',
         !hideBottomBorder && 'border-b',
         className
       )}
@@ -37,7 +37,8 @@ export function ThreeSectionTitlebar({
   className?: string
   hideBottomBorder?: boolean
 }) {
-  const sideStyle = { flex: `0 0 ${sideWidth}` }
+  // Keep both sides equal even when an action's label exceeds the reserved width.
+  const sideStyle = { flex: `0 0 ${sideWidth}`, minWidth: 0 }
 
   return (
     <Titlebar className={cn('p-1', className)} hideBottomBorder={hideBottomBorder}>
