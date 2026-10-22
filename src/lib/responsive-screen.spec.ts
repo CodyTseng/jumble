@@ -33,6 +33,11 @@ describe('responsive screen size', () => {
     })
     vi.stubGlobal('window', browser)
     vi.stubGlobal('document', page)
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+      platform: 'iPhone',
+      maxTouchPoints: 5
+    })
   })
   afterEach(() => {
     stop?.()
@@ -46,6 +51,44 @@ describe('responsive screen size', () => {
     browser.dispatchEvent(new Event('resize'))
     vi.advanceTimersByTime(200)
   }
+
+  it.each([
+    ['Windows', 'Win32', 0],
+    ['Windows with touch', 'Win32', 10],
+    ['macOS', 'MacIntel', 0],
+    ['Linux', 'Linux x86_64', 0]
+  ])('keeps the sidebar in short, wide %s windows', (_, platform, maxTouchPoints) => {
+    vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0', platform, maxTouchPoints })
+    browser.innerWidth = 1400
+    browser.innerHeight = 540
+    expect(getScreenSize()).toEqual({ isSmallScreen: false, isLargeScreen: true })
+
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    resize(1400, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    resize(1000, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+    resize(768, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+  })
+
+  it('keeps desktop layout when loaded with page zoom and a short CSS viewport', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      platform: 'Win32',
+      maxTouchPoints: 0
+    })
+    browser.innerWidth = 1263
+    browser.innerHeight = 540
+    browser.devicePixelRatio = 1.5
+    expect(getScreenSize()).toEqual({ isSmallScreen: false, isLargeScreen: false })
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    browser.devicePixelRatio = 1
+    resize(1895, 810)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+  })
 
   it('tracks window resizing and folding in both directions', () => {
     const changed = vi.fn()

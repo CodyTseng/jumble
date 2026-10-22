@@ -1,3 +1,5 @@
+import { isMobileOperatingSystem } from './device'
+
 export type ScreenSize = { isSmallScreen: boolean; isLargeScreen: boolean }
 
 type FullscreenDocument = Document & { webkitFullscreenElement?: Element | null }
@@ -24,9 +26,9 @@ function getLayoutViewport(zoom = 1) {
 }
 
 function classifyScreenSize({ width, height }: ReturnType<typeof getLayoutViewport>): ScreenSize {
-  // Keep landscape phones compact, but let tablets use the sidebar even when
-  // browser chrome temporarily reduces the visible height. The sidebar can scroll.
-  const isSmallScreen = width <= 768 || height <= 640
+  // Keep landscape phones compact without forcing wide desktop windows into
+  // mobile layout when they are short. The desktop sidebar can scroll.
+  const isSmallScreen = width <= 768 || (isMobileOperatingSystem() && height <= 640)
   return {
     isSmallScreen,
     isLargeScreen: !isSmallScreen && width >= 1280
