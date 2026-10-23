@@ -119,7 +119,12 @@ export default function SubReplies({
                   />
                 )}
                 <ReplyNote
-                  className={cn('w-0 flex-1', autoLoadProfilePicture ? 'ps-10' : 'ps-7')}
+                  className={cn(
+                    'w-0 flex-1',
+                    autoLoadProfilePicture
+                      ? 'ps-10 [--reply-note-indent:2.5rem]'
+                      : 'ps-7 [--reply-note-indent:1.75rem]'
+                  )}
                   hideThreadGuide={!autoLoadProfilePicture}
                   event={reply}
                   parentEventId={_parentKey !== parentKey ? _parentEventId : undefined}

@@ -197,7 +197,8 @@ export default function ImageStrip({
           mouseDrag.current = null
         }}
       >
-        <div className="flex gap-2 select-none">
+        {/* A flex spacer keeps the end inset inside the native scrollable area. */}
+        <div className="flex gap-2 select-none after:-ms-2 after:w-[var(--image-strip-bleed,0px)] after:shrink-0 after:content-['']">
           {images.map((image, index) => {
             const size = isValidImageSize(image.dim) ? image.dim : naturalSizes[image.url]
             const ratio = size ? Math.min(1.25, Math.max(0.65, size.width / size.height)) : 1.2
@@ -211,9 +212,7 @@ export default function ImageStrip({
                   marginInlineStart:
                     index === 0
                       ? 'var(--image-strip-bleed-start, var(--image-strip-bleed, 0px))'
-                      : undefined,
-                  marginInlineEnd:
-                    index === images.length - 1 ? 'var(--image-strip-bleed, 0px)' : undefined
+                      : undefined
                 }}
                 aria-label={t('Open image')}
                 onClick={(event) => {

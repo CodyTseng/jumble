@@ -125,11 +125,14 @@ export default function ReplyNote({
         ) : (
           <div className="absolute inset-s-2 top-5 bottom-0 z-0 w-3 rounded-ss-lg border-s-2 border-t-2" />
         ))}
-      <Collapsible>
+      {/* Include the nested reply indent in the clipping area for image strips. */}
+      <Collapsible className="-ms-[var(--reply-note-indent,0px)]">
         <div
           className={cn(
             'flex items-start gap-2 pe-4 pt-3',
-            autoLoadProfilePicture || hideThreadGuide ? 'ps-4' : 'ps-7'
+            autoLoadProfilePicture || hideThreadGuide
+              ? 'ps-[calc(1rem+var(--reply-note-indent,0px))]'
+              : 'ps-[calc(1.75rem+var(--reply-note-indent,0px))]'
           )}
         >
           <UserAvatar userId={event.pubkey} size="medium" className="mt-0.5 shrink-0" />
@@ -176,8 +179,10 @@ export default function ReplyNote({
                 className={cn(
                   'relative mt-2 [--image-strip-bleed:1rem]',
                   autoLoadProfilePicture
-                    ? '[--image-strip-bleed-start:3.75rem]'
-                    : !hideThreadGuide && '[--image-strip-bleed-start:1.75rem]'
+                    ? '[--image-strip-bleed-start:calc(3.75rem+var(--reply-note-indent,0px))]'
+                    : hideThreadGuide
+                      ? '[--image-strip-bleed-start:calc(1rem+var(--reply-note-indent,0px))]'
+                      : '[--image-strip-bleed-start:calc(1.75rem+var(--reply-note-indent,0px))]'
                 )}
                 event={event}
               />
