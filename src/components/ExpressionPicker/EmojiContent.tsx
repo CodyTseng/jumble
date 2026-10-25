@@ -23,7 +23,18 @@ export default function EmojiContent({
   const [searchMode, setSearchMode] = useState(false)
   const [activeTabId, setActiveTabId] = useState<TEmojiTabId>('system')
   const [skinTone, setSkinTone] = useState<TSkinTone>(() => recentEmojiService.getSkinTone())
-  const [pickVersion, setPickVersion] = useState(0)
+  // Keep the visible grid stable for this picker session. Failed image loads
+  // remove entries from the service, and picks change their ranking; applying
+  // either change immediately would move other emojis under the user's finger.
+  const [recentEmojis] = useState(() =>
+    recentEmojiService
+      .getRecent(24)
+      .filter(
+        (item) =>
+          typeof item === 'string' ||
+          customEmojiService.getEmojiById(customEmojiService.getEmojiId(item)) !== undefined
+      )
+  )
   const [nativeResults, setNativeResults] = useState<TNativeEmoji[]>([])
   const [customResults, setCustomResults] = useState<TEmoji[]>([])
 
@@ -37,10 +48,6 @@ export default function EmojiContent({
       setActiveTabId('system')
     }
   }, [activeTabId, standalone, packs])
-
-  useEffect(() => {
-    return recentEmojiService.subscribe(() => setPickVersion((v) => v + 1))
-  }, [])
 
   useEffect(() => {
     const trimmed = query.trim()
@@ -65,7 +72,6 @@ export default function EmojiContent({
   const handlePick = useCallback(
     (emoji: string | TEmoji) => {
       recentEmojiService.add(emoji)
-      setPickVersion((v) => v + 1)
       onEmojiClick(emoji)
     },
     [onEmojiClick]
@@ -84,13 +90,7 @@ export default function EmojiContent({
             id: 'recent',
             label: t('Recently used'),
             type: 'mixed',
-            items: recentEmojiService
-              .getRecent(24)
-              .filter(
-                (item) =>
-                  typeof item === 'string' ||
-                  customEmojiService.getEmojiById(customEmojiService.getEmojiId(item)) !== undefined
-              )
+            items: recentEmojis
           }
         ].filter((s) => s.items.length > 0) as TEmojiGridSection[]
       }
@@ -115,15 +115,8 @@ export default function EmojiContent({
     }
     if (activeTabId === 'system') {
       const out: TEmojiGridSection[] = []
-      const recent = recentEmojiService
-        .getRecent(24)
-        .filter(
-          (item) =>
-            typeof item === 'string' ||
-            customEmojiService.getEmojiById(customEmojiService.getEmojiId(item)) !== undefined
-        )
-      if (recent.length > 0) {
-        out.push({ id: 'recent', label: t('Recently used'), type: 'mixed', items: recent })
+      if (recentEmojis.length > 0) {
+        out.push({ id: 'recent', label: t('Recently used'), type: 'mixed', items: recentEmojis })
       }
       nativeCategories.forEach((cat) => {
         out.push({ id: cat.id, label: t(cat.labelKey), type: 'native', items: cat.emojis })
@@ -131,9 +124,7 @@ export default function EmojiContent({
       return out
     }
     if (activeTabId === 'standalone') {
-      return [
-        { id: 'standalone', label: t('My emojis'), type: 'custom', items: standalone }
-      ]
+      return [{ id: 'standalone', label: t('My emojis'), type: 'custom', items: standalone }]
     }
     const pack = packs.find((p) => p.id === activeTabId)
     if (pack) {
@@ -156,7 +147,7 @@ export default function EmojiContent({
     nativeCategories,
     standalone,
     packs,
-    pickVersion,
+    recentEmojis,
     t
   ])
 
@@ -174,7 +165,7 @@ export default function EmojiContent({
           <button
             type="button"
             onClick={exitSearch}
-            className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors"
             aria-label={t('Back')}
           >
             <ArrowLeft className="size-5 rtl:-scale-x-100" />
@@ -196,14 +187,14 @@ export default function EmojiContent({
         />
       )}
       {nativeLoading && sections.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
           {t('Loading...')}
         </div>
       ) : (
         <EmojiGrid sections={sections} skinTone={skinTone} onPick={handlePick} />
       )}
       {showSkinTone && (
-        <div className="absolute bottom-1.5 end-1.5 z-10">
+        <div className="absolute end-1.5 bottom-1.5 z-10">
           <SkinTonePicker value={skinTone} onChange={handleSkinToneChange} />
         </div>
       )}

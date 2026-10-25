@@ -25,23 +25,23 @@ export default function EmojiGrid({
 
   if (totalCount === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center p-6 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex flex-1 items-center justify-center p-6 text-sm">
         {emptyText ?? t('No emojis found')}
       </div>
     )
   }
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="min-h-0 flex-1 [&_[data-radix-scroll-area-viewport]]:overscroll-contain">
       <div className="pb-2">
         {sections.map((section) => (
           <section key={section.id} className="mt-1 first:mt-0">
             {section.label && (
-              <div className="sticky top-0 bg-background px-2 pt-1 pb-1 text-xs font-medium text-muted-foreground">
+              <div className="bg-background text-muted-foreground sticky top-0 px-2 pt-1 pb-1 text-xs font-medium">
                 {section.label}
               </div>
             )}
-            <div className="grid grid-cols-8 gap-0.5 px-0.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] gap-0.5 px-0.5">
               {renderSectionItems(section, skinTone, onPick)}
             </div>
           </section>
@@ -70,7 +70,12 @@ function renderSectionItems(
     typeof item === 'string' ? (
       <EmojiCell key={`s:${item}:${idx}`} kind="char" char={item} onClick={onPick} />
     ) : (
-      <EmojiCell key={`c:${item.shortcode}|${item.url}`} kind="custom" custom={item} onClick={onPick} />
+      <EmojiCell
+        key={`c:${item.shortcode}|${item.url}`}
+        kind="custom"
+        custom={item}
+        onClick={onPick}
+      />
     )
   )
 }

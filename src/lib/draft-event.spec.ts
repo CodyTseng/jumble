@@ -1,6 +1,10 @@
 import { kinds, nip19 } from 'nostr-tools'
 import { describe, expect, it, vi } from 'vitest'
-import { createLongFormArticleDraftEvent } from './draft-event'
+import {
+  createExternalContentReactionDraftEvent,
+  createLongFormArticleDraftEvent,
+  createReactionDraftEvent
+} from './draft-event'
 import { createLongFormDraftFromEvent } from './long-form-article'
 
 vi.mock('@/services/client.service', () => ({
@@ -12,6 +16,38 @@ vi.mock('@/services/media-upload.service', () => ({ default: {} }))
 const pubkey = 'ab'.repeat(32)
 const eventId = 'cd'.repeat(32)
 const relay = 'wss://relay.example.com'
+
+describe('reaction emoji payloads', () => {
+  const target = {
+    id: eventId,
+    pubkey,
+    kind: kinds.ShortTextNote,
+    content: '',
+    tags: [],
+    created_at: 1,
+    sig: ''
+  }
+
+  it.each(['😀', '❤️', '👩🏽‍💻', '+'])('preserves the selected native reaction %s', (emoji) => {
+    expect(createReactionDraftEvent(target, emoji).content).toBe(emoji)
+    expect(createExternalContentReactionDraftEvent('https://example.com', emoji).content).toBe(
+      emoji
+    )
+  })
+
+  it('preserves the selected URL when custom emojis share a shortcode', () => {
+    for (const url of ['https://example.com/first.png', 'https://example.com/second.png']) {
+      const emoji = { shortcode: 'same', url }
+      for (const draft of [
+        createReactionDraftEvent(target, emoji),
+        createExternalContentReactionDraftEvent('https://example.com', emoji)
+      ]) {
+        expect(draft.content).toBe(':same:')
+        expect(draft.tags.filter(([name]) => name === 'emoji')).toEqual([['emoji', 'same', url]])
+      }
+    }
+  })
+})
 
 function createArticle(content: string) {
   return createLongFormArticleDraftEvent({

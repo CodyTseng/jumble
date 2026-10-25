@@ -31,13 +31,17 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
   const { quickReaction, quickReactionEmoji } = useUserPreferences()
+  const enableQuickReaction = quickReaction && !isSmallScreen
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const likeCount = useFilteredLikeCount(stuffKey)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const pressPositionRef = useRef<{ x: number; y: number } | null>(null)
   const isLongPressRef = useRef(false)
+  const suppressPointerClickRef = useRef(false)
   const noteStats = useStuffStatsById(stuffKey)
   const hasReacted = useMemo(() => {
     return pubkey ? noteStats?.likes?.some((like) => like.pubkey === pubkey) : false
@@ -46,6 +50,27 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   useEffect(() => {
     setTimeout(() => setIsPickerOpen(false), 100)
   }, [isEmojiReactionsOpen])
+
+  useEffect(
+    () => () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current)
+      pressPositionRef.current = null
+      isLongPressRef.current = false
+      suppressPointerClickRef.current = false
+    },
+    [enableQuickReaction]
+  )
+
+  useEffect(() => {
+    const trigger = triggerRef.current
+    if (!trigger) return
+    // Cancel selection itself, leaving touchstart available for native scrolling.
+    const preventSelection = (e: globalThis.Event) => e.preventDefault()
+    trigger.addEventListener('selectstart', preventSelection)
+    return () => {
+      trigger.removeEventListener('selectstart', preventSelection)
+    }
+  }, [isSmallScreen])
 
   const like = async (emoji: string | TEmoji) => {
     checkLogin(async () => {
@@ -77,9 +102,14 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
     })
   }
 
-  const handleLongPressStart = () => {
-    if (!quickReaction) return
+  const handleLongPressStart = (e: React.PointerEvent<HTMLButtonElement>) => {
+    // Use one pointer sequence: compatibility mousedown after touchend must
+    // not reset the long-press flag and send the default reaction.
+    if (!enableQuickReaction || !e.isPrimary || e.button !== 0) return
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current)
+    pressPositionRef.current = { x: e.clientX, y: e.clientY }
     isLongPressRef.current = false
+    suppressPointerClickRef.current = false
     longPressTimerRef.current = setTimeout(() => {
       isLongPressRef.current = true
       setIsEmojiReactionsOpen(true)
@@ -87,17 +117,40 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   }
 
   const handleLongPressEnd = () => {
+    pressPositionRef.current = null
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current)
       longPressTimerRef.current = null
     }
   }
 
-  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
-    if (quickReaction) {
-      // If it was a long press, don't trigger the click action
-      if (isLongPressRef.current) {
-        isLongPressRef.current = false
+  const handleLongPressMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const start = pressPositionRef.current
+    if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
+      handleLongPressEnd()
+    }
+  }
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    handleLongPressMove(e)
+    suppressPointerClickRef.current = isLongPressRef.current
+    isLongPressRef.current = false
+    handleLongPressEnd()
+  }
+
+  const handlePointerCancel = () => {
+    suppressPointerClickRef.current = isLongPressRef.current
+    isLongPressRef.current = false
+    handleLongPressEnd()
+  }
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (enableQuickReaction) {
+      // A long press may end without a click. Keep late pointer-click suppression
+      // separate so it cannot consume a keyboard or assistive activation (detail=0).
+      if (e.detail !== 0 && (isLongPressRef.current || suppressPointerClickRef.current)) {
+        suppressPointerClickRef.current = false
+        e.preventDefault()
         return
       }
       // Quick reaction mode: click to react with default emoji
@@ -112,18 +165,20 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
 
   const trigger = (
     <button
+      ref={triggerRef}
       className={cn(
-        'flex h-full cursor-pointer items-center gap-1 px-3 enabled:hover:text-red-400',
+        'flex h-full cursor-pointer items-center gap-1 px-3 select-none [-webkit-touch-callout:none] enabled:hover:text-red-400',
         hasReacted ? 'text-red-400' : 'text-muted-foreground'
       )}
       title={t('Like')}
       disabled={liking}
       onClick={handleClick}
-      onMouseDown={handleLongPressStart}
-      onMouseUp={handleLongPressEnd}
-      onMouseLeave={handleLongPressEnd}
-      onTouchStart={handleLongPressStart}
-      onTouchEnd={handleLongPressEnd}
+      onContextMenu={(e) => e.preventDefault()}
+      onPointerDown={handleLongPressStart}
+      onPointerMove={handleLongPressMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handleLongPressEnd}
+      onPointerCancel={handlePointerCancel}
     >
       {liking ? (
         <Loader className="animate-spin" />
