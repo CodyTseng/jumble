@@ -15,7 +15,7 @@ import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import client from '@/services/client.service'
-import stuffStatsService from '@/services/stuff-stats.service'
+import stuffStatsService, { TStuffStats } from '@/services/stuff-stats.service'
 import { TEmoji } from '@/types'
 import { Loader, SmilePlus } from 'lucide-react'
 import { Event } from 'nostr-tools'
@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ExpressionPicker from '../ExpressionPicker'
+import Emoji from '../Emoji'
 import SuggestedEmojis from '../SuggestedEmojis'
 import { formatCount } from './utils'
 
@@ -43,8 +44,15 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const isLongPressRef = useRef(false)
   const suppressPointerClickRef = useRef(false)
   const noteStats = useStuffStatsById(stuffKey)
-  const hasReacted = useMemo(() => {
-    return pubkey ? noteStats?.likes?.some((like) => like.pubkey === pubkey) : false
+  const latestReaction = useMemo(() => {
+    if (!pubkey) return undefined
+    let latest: TStuffStats['likes'][number] | undefined
+    for (const reaction of noteStats?.likes ?? []) {
+      if (reaction.pubkey === pubkey && (!latest || reaction.created_at >= latest.created_at)) {
+        latest = reaction
+      }
+    }
+    return latest
   }, [noteStats, pubkey])
 
   useEffect(() => {
@@ -168,7 +176,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
       ref={triggerRef}
       className={cn(
         'flex h-full cursor-pointer items-center gap-1 px-3 select-none [-webkit-touch-callout:none] enabled:hover:text-red-400',
-        hasReacted ? 'text-red-400' : 'text-muted-foreground'
+        latestReaction ? 'text-red-400' : 'text-muted-foreground'
       )}
       title={t('Like')}
       disabled={liking}
@@ -184,7 +192,22 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
         <Loader className="animate-spin" />
       ) : (
         <>
-          <SmilePlus />
+          {latestReaction ? (
+            <span
+              className={cn(
+                'flex shrink-0 items-center justify-center overflow-hidden leading-none',
+                isSmallScreen ? 'size-5 text-lg' : 'size-4 text-base'
+              )}
+            >
+              <Emoji
+                key={latestReaction.id}
+                emoji={latestReaction.emoji}
+                classNames={{ img: 'size-full rounded-sm object-contain' }}
+              />
+            </span>
+          ) : (
+            <SmilePlus />
+          )}
           {!!likeCount && <div className="text-sm">{formatCount(likeCount)}</div>}
         </>
       )}

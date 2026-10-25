@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { LONG_PRESS_THRESHOLD } from '@/constants'
+import { TStuffStats } from '@/services/stuff-stats.service'
 import { act, createElement } from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
@@ -9,6 +10,8 @@ import LikeButton from './LikeButton'
 const publish = vi.hoisted(() => vi.fn(async (draft) => ({ ...draft, id: 'reaction' })))
 const screen = vi.hoisted(() => ({ small: false }))
 const preferences = vi.hoisted(() => ({ quickReaction: true, quickReactionEmoji: '❤️' }))
+const auth = vi.hoisted(() => ({ pubkey: 'author' as string | null }))
+const stats = vi.hoisted(() => ({ current: { updatedAt: 1, likes: [] } as Partial<TStuffStats> }))
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }))
 vi.mock('@/providers/ScreenSizeProvider', () => ({
   useScreenSize: () => ({ isSmallScreen: screen.small })
@@ -17,13 +20,13 @@ vi.mock('@/providers/UserPreferencesProvider', () => ({
   useUserPreferences: () => preferences
 }))
 vi.mock('@/providers/NostrProvider', () => ({
-  useNostr: () => ({ pubkey: 'author', publish, checkLogin: (cb: () => void) => cb() })
+  useNostr: () => ({ pubkey: auth.pubkey, publish, checkLogin: (cb: () => void) => cb() })
 }))
 vi.mock('@/hooks/useStuff', () => ({
   useStuff: () => ({ event: { id: 'note' }, stuffKey: 'note' })
 }))
 vi.mock('@/hooks/useStuffStatsById', () => ({
-  useStuffStatsById: () => ({ updatedAt: 1, likes: [] })
+  useStuffStatsById: () => stats.current
 }))
 vi.mock('@/hooks/useFilteredLikeCount', () => ({ useFilteredLikeCount: () => 0 }))
 vi.mock('@/services/client.service', () => ({ default: { getSeenEventRelayUrls: () => [] } }))
@@ -49,6 +52,8 @@ beforeEach(async () => {
   vi.useFakeTimers()
   screen.small = false
   preferences.quickReaction = true
+  auth.pubkey = 'author'
+  stats.current = { updatedAt: 1, likes: [] }
   publish.mockClear()
   container = document.createElement('div')
   document.body.append(container)
@@ -283,4 +288,98 @@ it('cancels a desktop long-press timer when switching to mobile layout', async (
   await act(async () => vi.advanceTimersByTime(LONG_PRESS_THRESHOLD))
   expect(document.querySelector('[role="dialog"]')).toBeNull()
   expect(publish).not.toHaveBeenCalled()
+})
+
+function reaction(
+  id: string,
+  emoji: TStuffStats['likes'][number]['emoji'],
+  createdAt: number,
+  pubkey = 'author'
+): TStuffStats['likes'][number] {
+  return { id, eventId: id, pubkey, created_at: createdAt, emoji }
+}
+
+it.each([true, false])(
+  'shows the latest own reaction by timestamp with smallScreen=%s',
+  async (small) => {
+    screen.small = small
+    stats.current = {
+      updatedAt: 1,
+      likes: [
+        reaction('latest', '😂', 30),
+        reaction('old', '😀', 10),
+        reaction('other', '👍', 40, 'another-author'),
+        reaction('middle', '❤️', 20)
+      ]
+    }
+    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+    const trigger = container.querySelector('button')!
+    expect(trigger.textContent).toBe('😂')
+    expect(trigger.classList.contains('text-red-400')).toBe(true)
+
+    // Relay arrival order can differ from creation order; older arrivals must
+    // not replace the current user's newer reaction.
+    stats.current = {
+      ...stats.current,
+      likes: [...stats.current.likes!, reaction('older-arrival', '👀', 5)]
+    }
+    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+    expect(trigger.textContent).toBe('😂')
+    stats.current = {
+      ...stats.current,
+      likes: [...stats.current.likes!, reaction('new', '🎉', 50)]
+    }
+    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+    expect(trigger.textContent).toBe('🎉')
+  }
+)
+
+it('uses the last stored own reaction when timestamps are equal', async () => {
+  stats.current = { likes: [reaction('first', '😀', 10), reaction('second', '🎉', 10)] }
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(container.querySelector('button')!.textContent).toBe('🎉')
+})
+
+it('renders custom reactions and resets image errors when the latest reaction changes', async () => {
+  stats.current = {
+    likes: [reaction('custom', { shortcode: 'party', url: 'https://example.com/first.png' }, 10)]
+  }
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  const trigger = container.querySelector('button')!
+  expect(trigger.querySelector('img')?.getAttribute('src')).toBe('https://example.com/first.png')
+  await act(async () => trigger.querySelector('img')!.dispatchEvent(new Event('error')))
+  expect(trigger.querySelector('img')).toBeNull()
+  stats.current = {
+    likes: [
+      reaction('new-custom', { shortcode: 'party', url: 'https://example.com/second.png' }, 20)
+    ]
+  }
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(trigger.querySelector('img')?.getAttribute('src')).toBe('https://example.com/second.png')
+})
+
+it('renders a standard + reaction as a heart', async () => {
+  stats.current = { likes: [reaction('standard', '+', 10)] }
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(container.querySelector('button svg.lucide-heart')).not.toBeNull()
+  expect(container.querySelector('button')!.textContent).not.toContain('+')
+})
+
+it('updates the reaction for the current account and restores the default icon when logged out', async () => {
+  stats.current = {
+    likes: [reaction('mine', '😀', 10), reaction('theirs', '🎉', 20, 'another-author')]
+  }
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  const trigger = container.querySelector('button')!
+  expect(trigger.textContent).toBe('😀')
+  auth.pubkey = 'another-author'
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(trigger.textContent).toBe('🎉')
+  auth.pubkey = null
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(trigger.querySelector('svg.lucide-smile-plus')).not.toBeNull()
+  expect(trigger.classList.contains('text-red-400')).toBe(false)
+  auth.pubkey = 'no-reactions'
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  expect(trigger.querySelector('svg.lucide-smile-plus')).not.toBeNull()
 })
