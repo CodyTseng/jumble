@@ -1,9 +1,10 @@
 import {
+  EmbeddedBareDomainParser,
   EmbeddedEmojiParser,
   EmbeddedHashtagParser,
+  EmbeddedInlineUrlParser,
   EmbeddedLegacyMentionParser,
   EmbeddedMentionParser,
-  EmbeddedUrlParser,
   EmbeddedWebsocketUrlParser,
   parseContent
 } from '@/lib/content-parser'
@@ -42,10 +43,11 @@ export default function ProfileAbout({
     const nodes = parseContent(translatedAbout ?? about, [
       EmbeddedMentionParser,
       EmbeddedWebsocketUrlParser,
-      EmbeddedUrlParser,
+      EmbeddedInlineUrlParser,
       EmbeddedLegacyMentionParser,
       EmbeddedHashtagParser,
-      EmbeddedEmojiParser
+      EmbeddedEmojiParser,
+      EmbeddedBareDomainParser
     ])
 
     // Create emoji map for quick lookup
@@ -57,6 +59,13 @@ export default function ProfileAbout({
     return nodes.map((node, index) => {
       if (node.type === 'url') {
         return <ExternalLink key={index} url={node.data} />
+      }
+      if (node.type === 'bare-url') {
+        return (
+          <ExternalLink key={index} url={`https://${node.data}`}>
+            {node.data}
+          </ExternalLink>
+        )
       }
       if (node.type === 'websocket-url') {
         return <EmbeddedWebsocketUrl key={index} url={node.data} />

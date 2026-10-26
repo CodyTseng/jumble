@@ -192,6 +192,12 @@ export const EmbeddedUrlParser: TContentParser = (content: string) => {
   return result
 }
 
+// Profile descriptions keep all HTTP URLs inline, including media and embeds.
+export const EmbeddedInlineUrlParser = (content: string): TEmbeddedNode[] =>
+  EmbeddedUrlParser(content).map((node) =>
+    node.type === 'text' ? node : { type: 'url', data: node.data as string }
+  )
+
 // Bare domains (jumble.social/notes, www.habla.news) link the way people expect
 // from other apps. Only scheme-less matches count, on the full IANA TLD list;
 // explicit URLs are EmbeddedUrlParser's. A match is an inference, so it

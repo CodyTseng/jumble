@@ -5,6 +5,7 @@ import {
   EmbeddedEmojiParser,
   EmbeddedEventParser,
   EmbeddedHashtagParser,
+  EmbeddedInlineUrlParser,
   EmbeddedLNInvoiceParser,
   EmbeddedLegacyEventParser,
   EmbeddedLegacyMentionParser,
@@ -33,6 +34,41 @@ const PARSERS = [
 const parse = (content: string) => parseContent(content, PARSERS)
 const types = (content: string) => parse(content).map((n) => n.type)
 const find = (content: string, type: string) => parse(content).find((n) => n.type === type)
+
+describe('inline URLs in profile descriptions', () => {
+  const parsers = [EmbeddedInlineUrlParser, EmbeddedBareDomainParser]
+
+  it.each([
+    'https://www.youtube.com/watch?v=57EaKHJibFY',
+    'https://www.youtube.com/live/bTjuvO7YV_g',
+    'https://youtu.be/uHICj2v_X7M',
+    'https://x.com/example/status/123',
+    'https://example.com/photo.png',
+    'https://example.com/audio.mp3',
+    'https://example.com/video.mp4'
+  ])('keeps %s as an inline link', (url) => {
+    expect(parseContent(url, parsers)).toEqual([{ type: 'url', data: url }])
+  })
+
+  it('recognizes episode links with and without a scheme', () => {
+    const path = 'fountain.fm/episode/6ZZJL9CebYuB49LNKLy'
+    expect(parseContent(`${path}\nhttps://${path}`, parsers)).toEqual([
+      { type: 'bare-url', data: path },
+      { type: 'text', data: '\n' },
+      { type: 'url', data: `https://${path}` }
+    ])
+  })
+
+  it('preserves line breaks between consecutive image links', () => {
+    expect(parseContent('https://example.com/a.png\n\nhttps://example.com/b.png', parsers)).toEqual(
+      [
+        { type: 'url', data: 'https://example.com/a.png' },
+        { type: 'text', data: '\n\n' },
+        { type: 'url', data: 'https://example.com/b.png' }
+      ]
+    )
+  })
+})
 
 describe('HTTP URLs', () => {
   it('keeps commas inside a Google Maps URL', () => {
