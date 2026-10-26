@@ -315,7 +315,8 @@ it.each([true, false])(
     await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
     const trigger = container.querySelector('button')!
     expect(trigger.textContent).toBe('😂')
-    expect(trigger.classList.contains('text-red-400')).toBe(true)
+    expect(trigger.classList.contains('text-muted-foreground')).toBe(true)
+    expect(trigger.classList.contains('text-red-400')).toBe(false)
 
     // Relay arrival order can differ from creation order; older arrivals must
     // not replace the current user's newer reaction.

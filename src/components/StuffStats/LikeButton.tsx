@@ -174,10 +174,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const trigger = (
     <button
       ref={triggerRef}
-      className={cn(
-        'flex h-full cursor-pointer items-center gap-1 px-3 select-none [-webkit-touch-callout:none] enabled:hover:text-red-400',
-        latestReaction ? 'text-red-400' : 'text-muted-foreground'
-      )}
+      className="flex h-full cursor-pointer items-center gap-1 px-3 text-muted-foreground select-none [-webkit-touch-callout:none] enabled:hover:text-red-400"
       title={t('Like')}
       disabled={liking}
       onClick={handleClick}
