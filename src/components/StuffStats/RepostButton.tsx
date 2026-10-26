@@ -105,72 +105,72 @@ export default function RepostButton({ stuff }: { stuff: Event | string }) {
     />
   )
 
-  if (isSmallScreen) {
-    return (
-      <>
-        {trigger}
-        <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <ModalContent title={t('Repost')}>
-            <div className="py-2">
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsDrawerOpen(false)
-                  repost()
-                }}
-                disabled={!canRepost}
-                className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
-                variant="ghost"
-              >
-                <Repeat /> {t('Repost')}
-              </Button>
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsDrawerOpen(false)
-                  checkLogin(() => {
-                    setIsPostDialogOpen(true)
-                  })
-                }}
-                className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
-                variant="ghost"
-              >
-                <PencilLine /> {t('Quote')}
-              </Button>
-            </div>
-          </ModalContent>
-        </Modal>
-        {postEditor}
-      </>
-    )
-  }
+  const menu = isSmallScreen ? (
+    <>
+      {trigger}
+      <Modal open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <ModalContent title={t('Repost')}>
+          <div className="py-2">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsDrawerOpen(false)
+                repost()
+              }}
+              disabled={!canRepost}
+              className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
+              variant="ghost"
+            >
+              <Repeat /> {t('Repost')}
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsDrawerOpen(false)
+                checkLogin(() => {
+                  setIsPostDialogOpen(true)
+                })
+              }}
+              className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
+              variant="ghost"
+            >
+              <PencilLine /> {t('Quote')}
+            </Button>
+          </div>
+        </ModalContent>
+      </Modal>
+    </>
+  ) : (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation()
+            repost()
+          }}
+          disabled={!canRepost}
+        >
+          <Repeat /> {t('Repost')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation()
+            checkLogin(() => {
+              setIsPostDialogOpen(true)
+            })
+          }}
+        >
+          <PencilLine /> {t('Quote')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation()
-              repost()
-            }}
-            disabled={!canRepost}
-          >
-            <Repeat /> {t('Repost')}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation()
-              checkLogin(() => {
-                setIsPostDialogOpen(true)
-              })
-            }}
-          >
-            <PencilLine /> {t('Quote')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {menu}
+      {/* Keep the composer outside the responsive menu branch so its draft survives resizing. */}
       {postEditor}
     </>
   )

@@ -198,7 +198,7 @@ export default function PostEditor({
       <Modal open={open} onOpenChange={handleOpenChange}>
         <ModalContent
           className={cn(
-            isSmallScreen ? 'h-dvh max-h-dvh' : 'h-[85dvh] max-h-[85dvh] max-w-2xl sm:rounded-2xl'
+            isSmallScreen ? 'h-dvh max-h-dvh' : 'max-h-[85dvh] max-w-2xl sm:rounded-2xl'
           )}
           bodyClassName="overflow-hidden"
           title={highlightedText ? t('Create Highlight') : t('New Note')}

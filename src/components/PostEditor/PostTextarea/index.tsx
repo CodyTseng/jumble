@@ -281,7 +281,7 @@ const PostTextarea = forwardRef<
               allowAnonymous={allowAnonymous}
             />
           )}
-          <div className="relative flex flex-1 flex-col">
+          <div className="relative flex flex-1 flex-col sm:min-h-48">
             <EditorContent
               className="tiptap flex flex-1 flex-col [&>.tiptap]:flex-1"
               editor={editor}
@@ -298,7 +298,7 @@ const PostTextarea = forwardRef<
         </TabsContent>
         <TabsContent
           value="preview"
-          className="mt-0 flex-1"
+          className="mt-0 flex-1 sm:min-h-48"
           onClick={() => {
             setTabValue('edit')
             editor.commands.focus()
