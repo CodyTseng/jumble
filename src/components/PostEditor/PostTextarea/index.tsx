@@ -5,9 +5,8 @@ import customEmojiService from '@/services/custom-emoji.service'
 import { TAccount, TEmoji } from '@/types'
 import Document from '@tiptap/extension-document'
 import { HardBreak } from '@tiptap/extension-hard-break'
-import History from '@tiptap/extension-history'
 import Paragraph from '@tiptap/extension-paragraph'
-import Placeholder from '@tiptap/extension-placeholder'
+import { Placeholder, UndoRedo } from '@tiptap/extensions'
 import Text from '@tiptap/extension-text'
 import { TextSelection } from '@tiptap/pm/state'
 import { Content, EditorContent, useEditor } from '@tiptap/react'
@@ -109,7 +108,7 @@ const PostTextarea = forwardRef<
         Document,
         Paragraph,
         Text,
-        History,
+        UndoRedo,
         HardBreak,
         Placeholder.configure({
           placeholder:

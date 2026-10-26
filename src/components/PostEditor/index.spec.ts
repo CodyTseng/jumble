@@ -44,10 +44,10 @@ vi.mock('./PostContent', async () => {
   const { default: Document } = await import('@tiptap/extension-document')
   const { default: Paragraph } = await import('@tiptap/extension-paragraph')
   const { default: Text } = await import('@tiptap/extension-text')
-  const { default: History } = await import('@tiptap/extension-history')
+  const { UndoRedo } = await import('@tiptap/extensions')
   return {
     default: forwardRef(function EditorBody(_, ref) {
-      const editor = useEditor({ extensions: [Document, Paragraph, Text, History] })
+      const editor = useEditor({ extensions: [Document, Paragraph, Text, UndoRedo] })
       const [options, setOptions] = useState(false)
       harness.editor = editor
       useImperativeHandle(ref, () => ({
