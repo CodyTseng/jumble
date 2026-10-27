@@ -170,10 +170,122 @@ describe('responsive modals', () => {
       await act(async () => {
         touch('touchend', 300)
       })
-      if (shouldDismiss) expect(changed).toHaveBeenCalledExactlyOnceWith(false)
-      else expect(changed).not.toHaveBeenCalled()
+      if (shouldDismiss) {
+        expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+        expect(surface.style.transform).toBe('')
+      } else expect(changed).not.toHaveBeenCalled()
     }
   )
+
+  it.each([
+    'dismiss',
+    'snap-back',
+    'blur',
+    'button',
+    'locked',
+    'scrolled',
+    'right-button',
+    'center'
+  ])('handles mouse dragging: %s', async (scenario) => {
+    screen.small = scenario !== 'center'
+    const changed = vi.fn()
+    await act(async () =>
+      root.render(
+        createElement(
+          Modal,
+          { open: true, onOpenChange: changed },
+          createElement(
+            ModalContent,
+            { 'aria-describedby': undefined },
+            createElement('button', null, 'Action'),
+            createElement('div', { 'data-drawer-swipe-lock': true }, 'Locked')
+          )
+        )
+      )
+    )
+    const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+    const body = surface.querySelector<HTMLElement>('[data-modal-body]')!
+    const target =
+      scenario === 'button'
+        ? body.querySelector('button')!
+        : scenario === 'locked'
+          ? body.querySelector('[data-drawer-swipe-lock]')!
+          : scenario === 'scrolled'
+            ? body
+            : (surface.querySelector('[data-modal-handle]') ?? surface)
+    if (scenario === 'scrolled') {
+      body.style.overflowY = 'auto'
+      Object.defineProperties(body, {
+        scrollHeight: { value: 1000 },
+        clientHeight: { value: 400 }
+      })
+      body.scrollTop = 100
+    }
+    let now = 0
+    vi.spyOn(performance, 'now').mockImplementation(() => now)
+    const y = scenario === 'snap-back' ? 130 : 300
+    const shouldDrag = ['dismiss', 'snap-back', 'blur'].includes(scenario)
+    await act(async () => {
+      target.dispatchEvent(
+        new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          clientY: 100,
+          button: scenario === 'right-button' ? 2 : 0
+        })
+      )
+      now = 1000
+      // Continue outside the drawer, as a real mouse drag often does.
+      document.dispatchEvent(
+        new MouseEvent('mousemove', {
+          bubbles: true,
+          cancelable: true,
+          clientY: y,
+          buttons: 1
+        })
+      )
+    })
+    expect(surface.style.transform).toBe(shouldDrag ? `translate3d(0, ${y - 100}px, 0)` : '')
+    await act(async () => {
+      if (scenario === 'blur') window.dispatchEvent(new Event('blur'))
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientY: y }))
+    })
+    if (scenario === 'dismiss') {
+      expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+      expect(surface.style.transform).toBe('')
+    } else {
+      expect(surface.style.transform).toBe('')
+      expect(changed).not.toHaveBeenCalled()
+    }
+    vi.restoreAllMocks()
+  })
+
+  it('preserves the drag offset while requesting an accepted close', async () => {
+    screen.small = true
+    const changed = vi.fn(() => {
+      expect(surface.style.transform).toBe('translate3d(0, 200px, 0)')
+    })
+    await act(async () =>
+      root.render(
+        createElement(
+          Modal,
+          { defaultOpen: true, onOpenChange: changed },
+          createElement(ModalContent, { 'aria-describedby': undefined }, 'Content')
+        )
+      )
+    )
+    const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+    const handle = surface.querySelector('[data-modal-handle]')!
+    await act(async () => {
+      handle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientY: 100 }))
+      document.dispatchEvent(
+        new MouseEvent('mousemove', { bubbles: true, clientY: 300, buttons: 1 })
+      )
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientY: 300 }))
+    })
+    expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+  })
 
   it('notifies uncontrolled callers on both trigger open and close', async () => {
     const changed = vi.fn()

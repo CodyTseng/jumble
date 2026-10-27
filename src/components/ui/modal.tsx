@@ -355,12 +355,13 @@ export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean)
  *   - Upward swipes: never engage; the inner scroll runs as usual.
  *   - Downward swipes starting inside a scrolled element: the scroll wins.
  *   - Downward swipes starting elsewhere (or in a scrollable already at
- *     scrollTop=0): engage drag mode, follow the finger, dismiss on release
+ *     scrollTop=0): engage drag mode, follow the pointer, dismiss on release
  *     past a distance or velocity threshold.
  *
  * Native touch listeners (not React handlers) are required because we need
  * a non-passive `touchmove` to `preventDefault` once the drag engages —
- * React synthetic touch handlers are passive in modern React.
+ * React synthetic touch handlers are passive in modern React. Mouse moves and
+ * releases are tracked on the document so dragging can leave the drawer.
  */
 function useVerticalDragToClose({
   contentEl,
@@ -371,6 +372,16 @@ function useVerticalDragToClose({
   enabled: boolean
   onClose: () => void
 }) {
+  const [closeAttempt, setCloseAttempt] = React.useState(0)
+  // A caller can reject dismissal or open a confirmation without changing open.
+  // Force a commit, then inspect Radix's committed state before the next paint.
+  // Accepted closes keep their offset for the exit animation.
+  React.useLayoutEffect(() => {
+    if (!closeAttempt || !contentEl || contentEl.dataset.state !== 'open') return
+    contentEl.style.transition = 'transform 200ms cubic-bezier(0.32, 0.72, 0, 1)'
+    contentEl.style.transform = ''
+  }, [closeAttempt, contentEl])
+
   const onCloseRef = React.useRef(onClose)
   React.useEffect(() => {
     onCloseRef.current = onClose
@@ -409,35 +420,22 @@ function useVerticalDragToClose({
       return null
     }
 
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.target instanceof Element && e.target.closest('[data-drawer-swipe-lock]')) {
-        // Interactive gestures such as sortable drag handles own this touch.
-        // Do not arm the drawer's swipe-to-close gesture for the same event.
-        armed = false
-        dragging = false
-        scrollableAtStart = null
-        return
-      }
-      if (e.touches.length !== 1) {
-        // Multi-touch: cancel any in-flight drag so pinch etc. work cleanly.
-        armed = false
-        dragging = false
-        return
-      }
-      const touch = e.touches[0]
-      startY = touch.clientY
-      lastY = startY
+    let mouseActive = false
+
+    const startDrag = (target: EventTarget | null, y: number) => {
+      if (target instanceof Element && target.closest('[data-drawer-swipe-lock]')) return
+      startY = y
+      lastY = y
       lastTime = performance.now()
       velocity = 0
       armed = true
       dragging = false
-      scrollableAtStart = findScrollableAncestor(e.target)
+      scrollableAtStart = findScrollableAncestor(target)
     }
 
-    const onTouchMove = (e: TouchEvent) => {
-      if (!armed || e.touches.length !== 1) return
-      const touch = e.touches[0]
-      const delta = touch.clientY - startY
+    const moveDrag = (y: number, e: Event) => {
+      if (!armed) return
+      const delta = y - startY
 
       if (!dragging) {
         // Don't engage drag for upward / negligible motion — leaves the
@@ -459,36 +457,35 @@ function useVerticalDragToClose({
 
       const now = performance.now()
       const dt = now - lastTime
-      if (dt > 0) velocity = (touch.clientY - lastY) / dt
-      lastY = touch.clientY
+      if (dt > 0) velocity = (y - lastY) / dt
+      lastY = y
       lastTime = now
     }
 
-    const onTouchEnd = (e: TouchEvent) => {
+    const endDrag = (y: number) => {
       const wasDragging = dragging
       armed = false
       dragging = false
       scrollableAtStart = null
       if (!wasDragging) return
 
-      const lastTouch = e.changedTouches[0]
-      const delta = lastTouch ? lastTouch.clientY - startY : 0
+      const delta = y - startY
       // ~25% of drawer height (min 80px) OR a clear downward flick.
       const closeByDistance = delta > Math.max(el.offsetHeight * 0.25, 80)
       const closeByVelocity = velocity > 0.6
       if (closeByDistance || closeByVelocity) {
-        // Hand off to Radix's exit animation; clearing the transform lets it
-        // animate from rest position rather than from the drag offset.
+        // The exit keyframes only specify the destination. Keep the current
+        // transform as their starting point until Radix unmounts the content.
         el.style.transition = ''
-        el.style.transform = ''
         onCloseRef.current()
+        setCloseAttempt((attempt) => attempt + 1)
       } else {
         el.style.transition = 'transform 200ms cubic-bezier(0.32, 0.72, 0, 1)'
         el.style.transform = ''
       }
     }
 
-    const onTouchCancel = () => {
+    const cancelDrag = () => {
       if (dragging) {
         el.style.transition = 'transform 200ms cubic-bezier(0.32, 0.72, 0, 1)'
         el.style.transform = ''
@@ -498,18 +495,72 @@ function useVerticalDragToClose({
       scrollableAtStart = null
     }
 
+    const onTouchStart = (e: TouchEvent) => {
+      cancelDrag()
+      mouseActive = false
+      if (e.touches.length === 1) startDrag(e.target, e.touches[0].clientY)
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1) moveDrag(e.touches[0].clientY, e)
+    }
+    const onTouchEnd = (e: TouchEvent) => endDrag(e.changedTouches[0]?.clientY ?? startY)
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0 || armed || e.defaultPrevented) return
+      // Keep text fields, links, controls and sortable handles usable.
+      if (
+        e.target instanceof Element &&
+        e.target.closest(
+          'button, a, input, textarea, select, [role="button"], [contenteditable]:not([contenteditable="false"]), [data-drawer-swipe-lock]'
+        )
+      )
+        return
+      startDrag(e.target, e.clientY)
+      mouseActive = armed
+      // Prevent text selection and native image dragging during the gesture.
+      if (mouseActive) e.preventDefault()
+    }
+    const onMouseMove = (e: MouseEvent) => {
+      if (!mouseActive) return
+      if (!(e.buttons & 1)) {
+        onMouseCancel()
+        return
+      }
+      moveDrag(e.clientY, e)
+    }
+    const onMouseUp = (e: MouseEvent) => {
+      if (!mouseActive || e.button !== 0) return
+      mouseActive = false
+      endDrag(e.clientY)
+    }
+    const onMouseCancel = () => {
+      if (!mouseActive) return
+      mouseActive = false
+      cancelDrag()
+    }
+    const doc = el.ownerDocument
+    const view = doc.defaultView
+    el.addEventListener('mousedown', onMouseDown)
+    doc.addEventListener('mousemove', onMouseMove)
+    doc.addEventListener('mouseup', onMouseUp)
+    view?.addEventListener('blur', onMouseCancel)
+
     el.addEventListener('touchstart', onTouchStart, { passive: true })
     // touchmove must be non-passive so we can preventDefault once the drag
     // engages and stop the page from scrolling underneath us.
     el.addEventListener('touchmove', onTouchMove, { passive: false })
     el.addEventListener('touchend', onTouchEnd, { passive: true })
-    el.addEventListener('touchcancel', onTouchCancel, { passive: true })
+    el.addEventListener('touchcancel', cancelDrag, { passive: true })
 
     return () => {
+      el.removeEventListener('mousedown', onMouseDown)
+      doc.removeEventListener('mousemove', onMouseMove)
+      doc.removeEventListener('mouseup', onMouseUp)
+      view?.removeEventListener('blur', onMouseCancel)
       el.removeEventListener('touchstart', onTouchStart)
       el.removeEventListener('touchmove', onTouchMove)
       el.removeEventListener('touchend', onTouchEnd)
-      el.removeEventListener('touchcancel', onTouchCancel)
+      el.removeEventListener('touchcancel', cancelDrag)
       el.style.transform = ''
       el.style.transition = ''
     }

@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import HomeButton from './HomeButton'
 import MessagesButton from './MessagesButton'
@@ -12,7 +11,9 @@ export default function BottomNavigationBar() {
 
   return (
     <div
-      className={cn('safe-area-x bg-background fixed inset-x-0 bottom-0 z-40 w-full border-t')}
+      // Scroll locks reserve the removed scrollbar on the body's physical right
+      // edge. Match that gap so the fixed bar keeps its width in both LTR and RTL.
+      className="safe-area-x bg-background fixed right-[var(--removed-body-scroll-bar-size,0px)] bottom-0 left-0 z-40 border-t"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
