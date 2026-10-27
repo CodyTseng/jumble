@@ -215,9 +215,9 @@
   Custom utility-like classes kept outside @layer base so they win over
   Tailwind utilities in v4 (native CSS cascade layers: unlayered > any layer).
 */
-/* Radix locks body scrolling and compensates for the removed scrollbar with
-   a body margin. Lock the root too: single-column mode forces overflow-y:
-   scroll on html, which otherwise keeps the scrollbar alongside that margin. */
+/* Radix and the lightbox share a body scroll lock and scrollbar compensation.
+   Lock the root too: single-column mode forces overflow-y: scroll on html,
+   which otherwise keeps the scrollbar alongside that compensation. */
 html:has(body[data-scroll-locked]) {
   overflow: hidden !important;
 }

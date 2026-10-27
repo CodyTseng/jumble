@@ -9,6 +9,7 @@ import ReactLightbox, {
   type SlideImage
 } from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/plugins/zoom'
+import ScrollLockPlugin from './scroll-lock'
 import {
   getImageMaxZoom,
   getLightboxImageSize,
@@ -83,6 +84,7 @@ export default function Lightbox({
   slides,
   render,
   zoom,
+  plugins = [],
   ...props
 }: LightboxExternalProps & {
   upscaleSmall?: boolean
@@ -115,11 +117,23 @@ export default function Lightbox({
     [slides, measurements]
   )
 
-  if (!upscaleSmall) return <ReactLightbox slides={slides} render={render} zoom={zoom} {...props} />
+  const lightboxPlugins = [ScrollLockPlugin, ...plugins]
+
+  if (!upscaleSmall)
+    return (
+      <ReactLightbox
+        slides={slides}
+        render={render}
+        zoom={zoom}
+        plugins={lightboxPlugins}
+        {...props}
+      />
+    )
 
   return (
     <ReactLightbox
       {...props}
+      plugins={lightboxPlugins}
       slides={contentSlides}
       render={{
         ...render,
