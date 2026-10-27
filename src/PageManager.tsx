@@ -335,7 +335,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
                     'shrink-0',
                     enableSingleColumnLayout &&
                       cn(
-                        'wide:w-[calc((100%-640px)/2)] pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end',
+                        // Fixed widths use the viewport, so account for the scrollbar
+                        // Radix removes (and the physical right margin it adds in RTL).
+                        'wide:w-[calc((100%-var(--removed-body-scroll-bar-size,0px)-640px)/2)] pointer-events-none fixed start-0 top-0 z-10 flex h-(--vh) justify-end rtl:start-[var(--removed-body-scroll-bar-size,0px)]',
                         sidebarCollapse ? 'w-16' : 'w-52'
                       ),
                     isSmallScreen && 'hidden'

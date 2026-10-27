@@ -215,6 +215,19 @@
   Custom utility-like classes kept outside @layer base so they win over
   Tailwind utilities in v4 (native CSS cascade layers: unlayered > any layer).
 */
+/* Radix locks body scrolling and compensates for the removed scrollbar with
+   a body margin. Lock the root too: single-column mode forces overflow-y:
+   scroll on html, which otherwise keeps the scrollbar alongside that margin. */
+html:has(body[data-scroll-locked]) {
+  overflow: hidden !important;
+}
+
+/* The root owns the scroll lock. Keep body from becoming a separate scroll
+   container, which would make sticky titlebars scroll out of the viewport. */
+html body[data-scroll-locked] {
+  overflow: clip !important;
+}
+
 .clickable {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
