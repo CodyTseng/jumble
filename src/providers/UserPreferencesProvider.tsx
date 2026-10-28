@@ -23,6 +23,9 @@ type TUserPreferencesContext = {
   enableDm: boolean
   updateEnableDm: (enable: boolean) => void
 
+  useNip22Replies: boolean
+  updateUseNip22Replies: (use: boolean) => void
+
   quickReaction: boolean
   updateQuickReaction: (enable: boolean) => void
 
@@ -61,6 +64,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.getEnableSingleColumnLayout()
   )
   const [enableDm, setEnableDm] = useState(storage.getEnableDm())
+  const [useNip22Replies, setUseNip22Replies] = useState(storage.getUseNip22Replies())
   const [quickReaction, setQuickReaction] = useState(storage.getQuickReaction())
   const [quickReactionEmoji, setQuickReactionEmoji] = useState(storage.getQuickReactionEmoji())
 
@@ -105,6 +109,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.setEnableDm(enable)
   }
 
+  const updateUseNip22Replies = (use: boolean) => {
+    setUseNip22Replies(use)
+    storage.setUseNip22Replies(use)
+  }
+
   const updateQuickReaction = (enable: boolean) => {
     setQuickReaction(enable)
     storage.setQuickReaction(enable)
@@ -146,6 +155,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         updateEnableSingleColumnLayout,
         enableDm,
         updateEnableDm,
+        useNip22Replies,
+        updateUseNip22Replies,
         quickReaction,
         updateQuickReaction,
         quickReactionEmoji,

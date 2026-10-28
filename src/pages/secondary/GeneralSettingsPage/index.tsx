@@ -43,7 +43,9 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     showLinkPreviews,
     updateShowLinkPreviews,
     enableDm,
-    updateEnableDm
+    updateEnableDm,
+    useNip22Replies,
+    updateUseNip22Replies
   } = useUserPreferences()
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -165,6 +167,20 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
         </SettingsGroup>
 
         <SettingsGroup title={t('Features')}>
+          <SettingsRow
+            htmlFor="use-nip22-replies"
+            title={t('Use NIP-22 replies (kind 1111)')}
+            description={t(
+              'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.'
+            )}
+            control={
+              <Switch
+                id="use-nip22-replies"
+                checked={useNip22Replies}
+                onCheckedChange={updateUseNip22Replies}
+              />
+            }
+          />
           <SettingsRow
             htmlFor="enable-dm"
             title={t('Enable Direct Messages')}

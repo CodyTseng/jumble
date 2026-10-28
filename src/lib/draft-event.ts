@@ -313,6 +313,30 @@ export function createRelaySetDraftEvent(
   }
 }
 
+export async function createReplyDraftEvent(
+  content: string,
+  parentStuff: Event | string,
+  mentions: string[],
+  options: {
+    useNip22Replies?: boolean
+    addClientTag?: boolean
+    protectedEvent?: boolean
+    isNsfw?: boolean
+  } = {}
+): Promise<TDraftEvent> {
+  if (
+    typeof parentStuff !== 'string' &&
+    parentStuff.kind === kinds.ShortTextNote &&
+    !options.useNip22Replies
+  ) {
+    return createShortTextNoteDraftEvent(content, mentions, {
+      ...options,
+      parentEvent: parentStuff
+    })
+  }
+  return createCommentDraftEvent(content, parentStuff, mentions, options)
+}
+
 export async function createCommentDraftEvent(
   content: string,
   parentStuff: Event | string,
@@ -328,6 +352,7 @@ export async function createCommentDraftEvent(
     quoteTags,
     rootEventId,
     rootEventPubkey,
+    rootEventHint,
     rootCoordinateTag,
     rootKind,
     rootAuthorPubkey,
@@ -354,7 +379,7 @@ export async function createCommentDraftEvent(
   if (rootCoordinateTag) {
     tags.push(rootCoordinateTag)
   } else if (rootEventId) {
-    tags.push(buildETag(rootEventId, rootEventPubkey, '', true))
+    tags.push(buildETag(rootEventId, rootEventPubkey, rootEventHint, true))
   }
   if (rootAuthorPubkey) {
     tags.push(buildPTag(rootAuthorPubkey, true))
@@ -815,30 +840,50 @@ async function extractCommentMentions(content: string, parentStuff: Event | stri
       : { parentEvent: parentStuff, externalContent: undefined }
   const isComment =
     parentEvent && [ExtendedKind.COMMENT, ExtendedKind.VOICE_COMMENT].includes(parentEvent.kind)
+  const legacyRoot = parentEvent?.kind === kinds.ShortTextNote ? getRootTag(parentEvent) : undefined
+  const legacyRootCoordinateTag = legacyRoot?.type === 'a' ? legacyRoot.tag : undefined
+  const legacyRootTag = legacyRoot?.type === 'e' ? legacyRoot.tag : undefined
+  const [legacyRootKind, legacyRootAuthorPubkey] = legacyRootCoordinateTag?.[1].split(':') ?? []
   const rootCoordinateTag = parentEvent
     ? isComment
       ? parentEvent.tags.find(tagNameEquals('A'))
-      : isReplaceableEvent(parentEvent.kind)
-        ? buildATag(parentEvent, true)
-        : undefined
+      : legacyRootCoordinateTag
+        ? ['A', ...legacyRootCoordinateTag.slice(1, 3)]
+        : isReplaceableEvent(parentEvent.kind)
+          ? buildATag(parentEvent, true)
+          : undefined
     : undefined
-  const rootEventTag = isComment ? parentEvent.tags.find(tagNameEquals('E')) : undefined
-  const rootEventId = isComment ? rootEventTag?.[1] : parentEvent?.id
-  let rootEventPubkey = isComment ? rootEventTag?.[3] : parentEvent?.pubkey
+  const rootEventTag = isComment ? parentEvent.tags.find(tagNameEquals('E')) : legacyRootTag
+  const rootEventId = rootEventTag
+    ? rootEventTag[1]
+    : isComment || legacyRootCoordinateTag
+      ? undefined
+      : parentEvent?.id
+  // NIP-10 puts the author after the marker; NIP-22 has no marker field.
+  let rootEventPubkey = rootEventTag
+    ? rootEventTag[isComment ? 3 : 4]
+    : isComment
+      ? undefined
+      : parentEvent?.pubkey
+  let resolvedRootAuthorPubkey: string | undefined
   if (rootEventId && !rootEventPubkey) {
-    const rootEvent = await client.fetchEvent(rootEventId)
+    const rootEventIdWithHint = rootEventTag ? generateBech32IdFromETag(rootEventTag) : undefined
+    const rootEvent = await client.fetchEvent(rootEventIdWithHint ?? rootEventId)
     rootEventPubkey = rootEvent?.pubkey
+    resolvedRootAuthorPubkey = rootEvent ? getEventAuthorPubkey(rootEvent) : undefined
   }
   const rootKind = isComment
     ? parentEvent.tags.find(tagNameEquals('K'))?.[1]
-    : parentEvent
-      ? parentEvent.kind
-      : determineExternalContentKind(parentStuff as string)
+    : (legacyRootKind ??
+      (parentEvent ? parentEvent.kind : determineExternalContentKind(parentStuff as string)))
   const rootAuthorPubkey = isComment
     ? parentEvent.tags.find(tagNameEquals('P'))?.[1]
-    : parentEvent
-      ? getEventAuthorPubkey(parentEvent)
-      : undefined
+    : (legacyRootAuthorPubkey ??
+      (legacyRootTag
+        ? (resolvedRootAuthorPubkey ?? rootEventPubkey)
+        : parentEvent
+          ? getEventAuthorPubkey(parentEvent)
+          : undefined))
   const rootUrl = isComment ? parentEvent.tags.find(tagNameEquals('I'))?.[1] : externalContent
 
   const quoteTags = extractQuoteTags(content)
@@ -847,6 +892,7 @@ async function extractCommentMentions(content: string, parentStuff: Event | stri
     quoteTags,
     rootEventId,
     rootEventPubkey,
+    rootEventHint: rootEventTag?.[2],
     rootCoordinateTag,
     rootKind,
     rootAuthorPubkey,

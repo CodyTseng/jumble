@@ -16,7 +16,7 @@ import {
   rehydrateDraftRuntime
 } from '@/lib/post-draft'
 import {
-  createCommentDraftEvent,
+  createReplyDraftEvent,
   createHighlightDraftEvent,
   createPollDraftEvent,
   createShortTextNoteDraftEvent
@@ -31,7 +31,7 @@ import { TAccount, TPollCreateData, TPostTargetItem } from '@/types'
 import { TPostDraftUnsigned } from '@/types/post-draft'
 import { Content } from '@tiptap/react'
 import { CircleHelp, FilePenLine, ImageUp, ListTodo, Lock, Settings, Smile, X } from 'lucide-react'
-import { Event, kinds } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import {
   forwardRef,
   useCallback,
@@ -727,10 +727,7 @@ async function createDraftEvent({
   isNsfw: boolean
   highlightedText?: string
 }) {
-  const { parentEvent, externalContent } =
-    typeof parentStuff === 'string'
-      ? { parentEvent: undefined, externalContent: parentStuff }
-      : { parentEvent: parentStuff, externalContent: undefined }
+  const parentEvent = typeof parentStuff === 'string' ? undefined : parentStuff
 
   if (highlightedText && parentEvent) {
     return createHighlightDraftEvent(highlightedText, text, parentEvent, mentions, {
@@ -740,8 +737,9 @@ async function createDraftEvent({
     })
   }
 
-  if (parentStuff && (externalContent || parentEvent?.kind !== kinds.ShortTextNote)) {
-    return await createCommentDraftEvent(text, parentStuff, mentions, {
+  if (parentStuff) {
+    return await createReplyDraftEvent(text, parentStuff, mentions, {
+      useNip22Replies: storage.getUseNip22Replies(),
       addClientTag,
       protectedEvent: isProtectedEvent,
       isNsfw
@@ -756,7 +754,6 @@ async function createDraftEvent({
   }
 
   return await createShortTextNoteDraftEvent(text, mentions, {
-    parentEvent,
     addClientTag,
     protectedEvent: isProtectedEvent,
     isNsfw

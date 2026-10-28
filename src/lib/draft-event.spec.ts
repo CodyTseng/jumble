@@ -3,12 +3,15 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createExternalContentReactionDraftEvent,
   createLongFormArticleDraftEvent,
-  createReactionDraftEvent
+  createReactionDraftEvent,
+  createReplyDraftEvent,
+  createShortTextNoteDraftEvent
 } from './draft-event'
 import { createLongFormDraftFromEvent } from './long-form-article'
+import client from '@/services/client.service'
 
 vi.mock('@/services/client.service', () => ({
-  default: { getEventHint: () => 'wss://cached.example.com' }
+  default: { getEventHint: () => 'wss://cached.example.com', fetchEvent: vi.fn() }
 }))
 vi.mock('@/services/custom-emoji.service', () => ({ default: {} }))
 vi.mock('@/services/media-upload.service', () => ({ default: {} }))
@@ -16,6 +19,213 @@ vi.mock('@/services/media-upload.service', () => ({ default: {} }))
 const pubkey = 'ab'.repeat(32)
 const eventId = 'cd'.repeat(32)
 const relay = 'wss://relay.example.com'
+
+describe('reply formats', () => {
+  const parent = {
+    id: eventId,
+    pubkey,
+    kind: kinds.ShortTextNote,
+    content: '',
+    tags: [],
+    created_at: 1,
+    sig: ''
+  }
+
+  it.each([undefined, false])(
+    'keeps NIP-10 replies when the preference is %s',
+    async (useNip22Replies) => {
+      const reply = await createReplyDraftEvent('Reply', parent, [pubkey], { useNip22Replies })
+      expect(reply.kind).toBe(kinds.ShortTextNote)
+      expect(reply.tags).toContainEqual(['e', eventId, 'wss://cached.example.com', 'root', pubkey])
+      expect(reply.tags.some(([name]) => name === 'E' || name === 'K')).toBe(false)
+    }
+  )
+
+  it('uses NIP-22 root and parent tags for a reply to kind 1 when enabled', async () => {
+    const reply = await createReplyDraftEvent('Reply #nostr', parent, [pubkey], {
+      useNip22Replies: true,
+      addClientTag: true,
+      protectedEvent: true,
+      isNsfw: true
+    })
+    expect(reply.kind).toBe(1111)
+    expect(reply.content).toBe('Reply #nostr')
+    expect(reply.tags).toEqual(
+      expect.arrayContaining([
+        ['E', eventId, 'wss://cached.example.com', pubkey],
+        ['K', '1'],
+        ['P', pubkey],
+        ['e', eventId, 'wss://cached.example.com', pubkey],
+        ['k', '1'],
+        ['p', pubkey],
+        ['t', 'nostr']
+      ])
+    )
+    expect(reply.tags.filter(([name]) => name === 'p')).toHaveLength(1)
+    for (const name of ['client', '-', 'content-warning']) {
+      expect(reply.tags.some(([tagName]) => tagName === name)).toBe(true)
+    }
+  })
+
+  it('inherits the NIP-10 root while keeping the kind 1 reply as the parent', async () => {
+    const rootId = '12'.repeat(32)
+    const rootPubkey = '34'.repeat(32)
+    const reply = await createReplyDraftEvent(
+      'Reply',
+      {
+        ...parent,
+        tags: [
+          ['e', '56'.repeat(32), '', 'reply', '78'.repeat(32)],
+          ['e', rootId, relay, 'root', rootPubkey]
+        ]
+      },
+      [],
+      { useNip22Replies: true }
+    )
+    expect(reply.tags).toContainEqual(['E', rootId, relay, rootPubkey])
+    expect(reply.tags).toContainEqual(['P', rootPubkey])
+    expect(reply.tags).toContainEqual(['K', '1'])
+    expect(reply.tags).toContainEqual(['e', eventId, 'wss://cached.example.com', pubkey])
+    expect(reply.tags).toContainEqual(['p', pubkey])
+    expect(reply.tags).toContainEqual(['k', '1'])
+    expect(reply.tags).not.toContainEqual(['P', pubkey])
+  })
+
+  it.each([false, true])(
+    'preserves an addressable legacy root with an additional e tag: %s',
+    async (hasEventRoot) => {
+      const articlePubkey = '34'.repeat(32)
+      const coordinate = `30023:${articlePubkey}:article:identifier`
+      const reply = await createReplyDraftEvent(
+        'Reply',
+        {
+          ...parent,
+          tags: [
+            ...(hasEventRoot ? [['e', '12'.repeat(32), relay, 'root', pubkey]] : []),
+            ['a', coordinate, relay, 'root']
+          ]
+        },
+        [pubkey],
+        { useNip22Replies: true }
+      )
+      expect(reply.kind).toBe(1111)
+      expect(reply.tags).toEqual(
+        expect.arrayContaining([
+          ['A', coordinate, relay],
+          ['K', '30023'],
+          ['P', articlePubkey],
+          ['e', eventId, 'wss://cached.example.com', pubkey],
+          ['k', '1'],
+          ['p', pubkey]
+        ])
+      )
+      expect(reply.tags.some(([name]) => name === 'E')).toBe(false)
+      expect(reply.tags).not.toContainEqual(['P', pubkey])
+
+      const nestedReply = await createReplyDraftEvent(
+        'Nested reply',
+        { ...reply, id: 'ef'.repeat(32), pubkey, sig: '' },
+        [],
+        { useNip22Replies: true }
+      )
+      expect(nestedReply.tags).toEqual(
+        expect.arrayContaining([
+          ['A', coordinate, relay],
+          ['K', '30023'],
+          ['P', articlePubkey],
+          ['e', 'ef'.repeat(32), 'wss://cached.example.com', pubkey],
+          ['k', '1111']
+        ])
+      )
+    }
+  )
+
+  it.each(['root', undefined])(
+    'fetches the root author for a legacy %s tag without an author',
+    async (marker) => {
+      const rootId = '12'.repeat(32)
+      const rootPubkey = '34'.repeat(32)
+      vi.mocked(client.fetchEvent).mockResolvedValueOnce({
+        ...parent,
+        id: rootId,
+        pubkey: rootPubkey
+      })
+      const reply = await createReplyDraftEvent(
+        'Reply',
+        {
+          ...parent,
+          tags: [marker ? ['e', rootId, relay, marker] : ['e', rootId, relay]]
+        },
+        [],
+        { useNip22Replies: true }
+      )
+      expect(client.fetchEvent).toHaveBeenLastCalledWith(
+        nip19.neventEncode({ id: rootId, relays: [relay] })
+      )
+      expect(reply.tags).toContainEqual(['E', rootId, relay, rootPubkey])
+      expect(reply.tags).toContainEqual(['P', rootPubkey])
+      expect(reply.tags).toContainEqual(['e', eventId, 'wss://cached.example.com', pubkey])
+      expect(reply.tags).toContainEqual(['p', pubkey])
+    }
+  )
+
+  it('does not substitute the parent author when the root cannot be fetched', async () => {
+    const rootId = '12'.repeat(32)
+    vi.mocked(client.fetchEvent).mockResolvedValueOnce(undefined)
+    const reply = await createReplyDraftEvent(
+      'Reply',
+      {
+        ...parent,
+        tags: [['e', rootId, relay, 'root']]
+      },
+      [],
+      { useNip22Replies: true }
+    )
+    expect(reply.tags).toContainEqual(['E', rootId, relay])
+    expect(reply.tags.some(([name]) => name === 'P')).toBe(false)
+    expect(reply.tags).toContainEqual(['p', pubkey])
+  })
+
+  it.each([false, true])(
+    'preserves a comment thread with preference %s',
+    async (useNip22Replies) => {
+      const comment = await createReplyDraftEvent('Comment', parent, [pubkey], {
+        useNip22Replies: true
+      })
+      const reply = await createReplyDraftEvent(
+        'Nested reply',
+        {
+          ...comment,
+          id: 'ef'.repeat(32),
+          pubkey,
+          sig: ''
+        },
+        [pubkey],
+        { useNip22Replies }
+      )
+      expect(reply.kind).toBe(1111)
+      expect(reply.tags).toEqual(
+        expect.arrayContaining([
+          ['E', eventId, 'wss://cached.example.com', pubkey],
+          ['K', '1'],
+          ['P', pubkey],
+          ['e', 'ef'.repeat(32), 'wss://cached.example.com', pubkey],
+          ['k', '1111']
+        ])
+      )
+    }
+  )
+
+  it('keeps comments on other kinds and external content as kind 1111', async () => {
+    for (const target of [{ ...parent, kind: 20 }, 'https://example.com']) {
+      expect((await createReplyDraftEvent('Reply', target, [])).kind).toBe(1111)
+    }
+  })
+
+  it('keeps standalone text notes as kind 1', async () => {
+    expect((await createShortTextNoteDraftEvent('New note', [])).kind).toBe(1)
+  })
+})
 
 describe('reaction emoji payloads', () => {
   const target = {

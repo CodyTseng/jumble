@@ -1279,6 +1279,9 @@ export default {
     'Open image': 'Kép megnyitása',
     'Previous image': 'Előző kép',
     'Next image': 'Következő kép',
-    'Go to image {{number}} of {{total}}': 'Ugrás a(z) {{number}}. képre (összesen {{total}})'
+    'Go to image {{number}} of {{total}}': 'Ugrás a(z) {{number}}. képre (összesen {{total}})',
+    'Use NIP-22 replies (kind 1111)': 'NIP-22 válaszok használata (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      'Válasz a szöveges jegyzetekre (kind 1) NIP-22 hozzászólásokkal (kind 1111). Ezek a válaszok egyes kliensekben nem feltétlenül jelennek meg.'
   }
 }

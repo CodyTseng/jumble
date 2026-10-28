@@ -52,6 +52,7 @@ export const StorageKey = {
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
   ENABLE_DM: 'enableDm',
+  USE_NIP22_REPLIES: 'useNip22Replies',
   FAVICON_URL_TEMPLATE: 'faviconUrlTemplate',
   FILTER_OUT_ONION_RELAYS: 'filterOutOnionRelays',
   ALLOW_INSECURE_CONNECTION: 'allowInsecureConnection',

@@ -74,6 +74,7 @@ class LocalStorageService {
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
   private enableDm: boolean = true
+  private useNip22Replies: boolean = false
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
   private filterOutOnionRelays: boolean = !isTorBrowser()
   private allowInsecureConnection: boolean = false
@@ -393,6 +394,7 @@ class LocalStorageService {
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
 
     this.enableDm = window.localStorage.getItem(StorageKey.ENABLE_DM) !== 'false'
+    this.useNip22Replies = window.localStorage.getItem(StorageKey.USE_NIP22_REPLIES) === 'true'
 
     this.faviconUrlTemplate =
       window.localStorage.getItem(StorageKey.FAVICON_URL_TEMPLATE) ?? DEFAULT_FAVICON_URL_TEMPLATE
@@ -1252,6 +1254,15 @@ class LocalStorageService {
   setEnableDm(enable: boolean) {
     this.enableDm = enable
     window.localStorage.setItem(StorageKey.ENABLE_DM, enable.toString())
+  }
+
+  getUseNip22Replies() {
+    return this.useNip22Replies
+  }
+
+  setUseNip22Replies(use: boolean) {
+    this.useNip22Replies = use
+    window.localStorage.setItem(StorageKey.USE_NIP22_REPLIES, use.toString())
   }
 
   getFaviconUrlTemplate() {

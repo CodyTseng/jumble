@@ -1260,6 +1260,9 @@ export default {
     'Open image': '이미지 열기',
     'Previous image': '이전 이미지',
     'Next image': '다음 이미지',
-    'Go to image {{number}} of {{total}}': '{{total}}개 중 {{number}}번째 이미지로 이동'
+    'Go to image {{number}} of {{total}}': '{{total}}개 중 {{number}}번째 이미지로 이동',
+    'Use NIP-22 replies (kind 1111)': 'NIP-22 답글 사용 (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      '텍스트 노트(kind 1)에 NIP-22 댓글(kind 1111)로 답글을 작성합니다. 일부 클라이언트에서는 이 답글이 표시되지 않을 수 있습니다.'
   }
 }

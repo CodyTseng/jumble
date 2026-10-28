@@ -1264,6 +1264,9 @@ export default {
     'Open image': 'فتح الصورة',
     'Previous image': 'الصورة السابقة',
     'Next image': 'الصورة التالية',
-    'Go to image {{number}} of {{total}}': 'الانتقال إلى الصورة {{number}} من {{total}}'
+    'Go to image {{number}} of {{total}}': 'الانتقال إلى الصورة {{number}} من {{total}}',
+    'Use NIP-22 replies (kind 1111)': 'استخدام ردود NIP-22 (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      'الرد على الملاحظات النصية (kind 1) بتعليقات NIP-22 (kind 1111). قد لا تظهر هذه الردود في بعض التطبيقات.'
   }
 }

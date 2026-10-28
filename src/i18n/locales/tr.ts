@@ -1279,6 +1279,9 @@ export default {
     'Open image': 'Görseli aç',
     'Previous image': 'Önceki görsel',
     'Next image': 'Sonraki görsel',
-    'Go to image {{number}} of {{total}}': '{{total}} görselden {{number}}. görsele git'
+    'Go to image {{number}} of {{total}}': '{{total}} görselden {{number}}. görsele git',
+    'Use NIP-22 replies (kind 1111)': 'NIP-22 yanıtlarını kullan (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      'Metin notlarına (kind 1) NIP-22 yorumlarıyla (kind 1111) yanıt ver. Bu yanıtlar bazı istemcilerde görünmeyebilir.'
   }
 }

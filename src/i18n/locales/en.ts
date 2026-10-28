@@ -1304,6 +1304,9 @@ export default {
     'Open image': 'Open image',
     'Previous image': 'Previous image',
     'Next image': 'Next image',
-    'Go to image {{number}} of {{total}}': 'Go to image {{number}} of {{total}}'
+    'Go to image {{number}} of {{total}}': 'Go to image {{number}} of {{total}}',
+    'Use NIP-22 replies (kind 1111)': 'Use NIP-22 replies (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.'
   }
 }

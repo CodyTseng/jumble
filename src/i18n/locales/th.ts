@@ -1256,6 +1256,9 @@ export default {
     'Open image': 'เปิดรูปภาพ',
     'Previous image': 'รูปภาพก่อนหน้า',
     'Next image': 'รูปภาพถัดไป',
-    'Go to image {{number}} of {{total}}': 'ไปที่รูปภาพ {{number}} จาก {{total}}'
+    'Go to image {{number}} of {{total}}': 'ไปที่รูปภาพ {{number}} จาก {{total}}',
+    'Use NIP-22 replies (kind 1111)': 'ใช้การตอบกลับ NIP-22 (kind 1111)',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      'ตอบกลับโน้ตข้อความ (kind 1) ด้วยความคิดเห็น NIP-22 (kind 1111) การตอบกลับเหล่านี้อาจไม่แสดงในบางไคลเอนต์'
   }
 }

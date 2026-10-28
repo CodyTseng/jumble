@@ -1269,6 +1269,9 @@ export default {
     'Open image': '打开图片',
     'Previous image': '上一张图片',
     'Next image': '下一张图片',
-    'Go to image {{number}} of {{total}}': '转到第 {{number}} 张图片，共 {{total}} 张'
+    'Go to image {{number}} of {{total}}': '转到第 {{number}} 张图片，共 {{total}} 张',
+    'Use NIP-22 replies (kind 1111)': '使用 NIP-22 回复（kind 1111）',
+    'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
+      '使用 NIP-22 评论（kind 1111）回复文字笔记（kind 1）。这些回复可能无法在部分客户端中显示。'
   }
 }
