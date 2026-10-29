@@ -6,6 +6,7 @@ import EmojiDetailDialog from '@/components/EmojiDetailDialog'
 import KeySyncRequestHandler from '@/components/KeySyncRequestDialog'
 import { MobileSignerApprovalIndicator } from '@/components/SignerApprovalIndicator'
 import SystemNotificationPermissionPrompt from '@/components/SystemNotificationPermissionPrompt'
+import WebUpdatePrompt from '@/components/WebUpdatePrompt'
 import { Toaster } from '@/components/ui/sonner'
 import { BookmarksProvider } from '@/providers/BookmarksProvider'
 import { DraftBoxProvider } from '@/providers/DraftBoxProvider'
@@ -68,6 +69,7 @@ export default function App(): JSX.Element {
                                                 <MobileSignerApprovalIndicator />
                                                 <DialogHost />
                                                 <Toaster />
+                                                <WebUpdatePrompt />
                                               </KindFilterProvider>
                                             </MediaUploadServiceProvider>
                                           </FeedProvider>

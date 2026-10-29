@@ -1272,6 +1272,9 @@ export default {
     'Go to image {{number}} of {{total}}': '转到第 {{number}} 张图片，共 {{total}} 张',
     'Use NIP-22 replies (kind 1111)': '使用 NIP-22 回复（kind 1111）',
     'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
-      '使用 NIP-22 评论（kind 1111）回复文字笔记（kind 1）。这些回复可能无法在部分客户端中显示。'
+      '使用 NIP-22 评论（kind 1111）回复文字笔记（kind 1）。这些回复可能无法在部分客户端中显示。',
+    'A new version of Jumble is ready': 'Jumble 新版本已准备就绪',
+    'Save any unfinished work before reloading to update. Reload now?':
+      '刷新更新前，请先保存尚未完成的内容。现在刷新吗？'
   }
 }

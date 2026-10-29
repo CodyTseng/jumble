@@ -10,7 +10,9 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      // WebUpdatePrompt owns registration and only activates after user consent.
+      injectRegister: false,
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,jpg,svg}'],
         globDirectory: 'dist/',
