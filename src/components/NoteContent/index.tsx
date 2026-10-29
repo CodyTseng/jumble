@@ -25,6 +25,7 @@ import PictureNote from './PictureNote'
 import Poll from './Poll'
 import Reaction from './Reaction'
 import RelayReview from './RelayReview'
+import Repost from './Repost'
 import UnknownNote from './UnknownNote'
 import VideoNote from './VideoNote'
 import Zap from './Zap'
@@ -65,6 +66,10 @@ export default function NoteContent({
 
   if (isNip34EventKind(event.kind)) {
     return <Nip34Event className={cn('mt-2', className)} event={event} />
+  }
+
+  if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {
+    return <Repost className={cn('mt-2', className)} event={event} />
   }
 
   if (event.kind === kinds.Highlights) {
@@ -149,11 +154,7 @@ export default function NoteContent({
 
   if (event.kind === ExtendedKind.FAVORITE_RELAYS) {
     return (
-      <FavoriteRelays
-        className={cn('mt-2', className)}
-        event={event}
-        embedded={size === 'small'}
-      />
+      <FavoriteRelays className={cn('mt-2', className)} event={event} embedded={size === 'small'} />
     )
   }
 
