@@ -51,7 +51,8 @@ export default function UserAvatar({
   return (
     <HoverCard>
       <HoverCardTrigger>{trigger}</HoverCardTrigger>
-      <HoverCardContent className="w-72">
+      {/* Isolate the whole surface, including padding, without stopping document clicks. */}
+      <HoverCardContent data-clickable-card className="w-72">
         <ProfileCard userId={userId} />
       </HoverCardContent>
     </HoverCard>

@@ -53,7 +53,8 @@ export default function Username({
   return (
     <HoverCard>
       <HoverCardTrigger asChild>{trigger}</HoverCardTrigger>
-      <HoverCardContent className="w-80">
+      {/* Isolate the whole surface, including padding, without stopping document clicks. */}
+      <HoverCardContent data-clickable-card className="w-80">
         <ProfileCard userId={userId} />
       </HoverCardContent>
     </HoverCard>
