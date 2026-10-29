@@ -19,7 +19,7 @@ import DraftBox from './components/DraftBox'
 import DraftEditorHost from './components/DraftBox/DraftEditorHost'
 import NewPost from './components/NewPost'
 import TooManyRelaysAlertDialog from './components/TooManyRelaysAlertDialog'
-import { normalizeUrl } from './lib/url'
+import { initialPrimaryUrl, primaryPageUrl, readPrimaryPageUrl } from './lib/primary-page-url'
 import { NotificationProvider } from './providers/NotificationProvider'
 import { useScreenSize } from './providers/ScreenSizeProvider'
 import { useTheme } from './providers/ThemeProvider'
@@ -79,6 +79,8 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   ])
   const [secondaryStack, setSecondaryStack] = useState<TStackItem[]>([])
+  const secondaryStackRef = useRef(secondaryStack)
+  secondaryStackRef.current = secondaryStack
   const bottomBarHidden =
     secondaryStack.length > 0 && secondaryStack[secondaryStack.length - 1].hideBottomBar
   const bottomBarOffset = bottomBarHidden ? '0px' : 'calc(env(safe-area-inset-bottom) + 3rem)'
@@ -86,6 +88,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const { themeSetting } = useTheme()
   const { enableSingleColumnLayout, sidebarCollapse } = useUserPreferences()
   const ignorePopStateRef = useRef(false)
+  const primaryUrlRef = useRef(initialPrimaryUrl(window.location, window.history.state))
 
   useEffect(() => {
     if (isSmallScreen) return
@@ -93,7 +96,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        navigatePrimaryPage('search')
+        navigatePrimaryPageRef.current('search')
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -105,7 +108,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   useEffect(() => {
     if (['/npub1', '/nprofile1'].some((prefix) => window.location.pathname.startsWith(prefix))) {
       window.history.replaceState(
-        null,
+        window.history.state,
         '',
         '/users' + window.location.pathname + window.location.search + window.location.hash
       )
@@ -115,12 +118,31 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
       )
     ) {
       window.history.replaceState(
-        null,
+        window.history.state,
         '',
         '/notes' + window.location.pathname + window.location.search + window.location.hash
       )
     }
-    window.history.pushState(null, '', window.location.href)
+    const restoredPrimary = readPrimaryPageUrl(primaryUrlRef.current)
+    setCurrentPrimaryPage(restoredPrimary.page)
+    setPrimaryPages((pages) =>
+      restoredPrimary.page === 'home'
+        ? pages
+        : [
+            ...pages.filter((p) => p.name !== restoredPrimary.page),
+            {
+              name: restoredPrimary.page,
+              element: PRIMARY_PAGE_MAP[restoredPrimary.page],
+              props: restoredPrimary.props
+            }
+          ]
+    )
+    const initialState = { ...window.history.state, primaryUrl: primaryUrlRef.current }
+    if (!window.history.state?.primaryUrl) {
+      window.history.pushState(initialState, '', window.location.href)
+    } else {
+      window.history.replaceState(initialState, '', window.location.href)
+    }
     if (window.location.pathname !== '/') {
       const url = window.location.pathname + window.location.search + window.location.hash
       setSecondaryStack((prevStack) => {
@@ -133,23 +155,19 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           window.history.state?.index
         )
         if (newItem) {
-          window.history.replaceState({ index: newItem.index, url }, '', url)
+          window.history.replaceState(
+            {
+              ...window.history.state,
+              index: newItem.index,
+              url,
+              primaryUrl: primaryUrlRef.current
+            },
+            '',
+            url
+          )
         }
         return newStack
       })
-    } else {
-      const searchParams = new URLSearchParams(window.location.search)
-      const r = searchParams.get('r')
-      if (r) {
-        const url = normalizeUrl(r)
-        if (url) {
-          navigatePrimaryPage('relay', { url })
-        }
-      }
-      const page = searchParams.get('page')
-      if (page && page in PRIMARY_PAGE_MAP) {
-        navigatePrimaryPage(page as TPrimaryPageName)
-      }
     }
 
     const onPopState = (e: PopStateEvent) => {
@@ -165,40 +183,64 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
         return
       }
 
-      let state = e.state as { index: number; url: string } | null
+      const state = e.state as { index?: number; url?: string; primaryUrl?: string } | null
+      if (window.location.pathname === '/') {
+        if (secondaryStackRef.current.length) {
+          // Closing the detail must not undo a primary-pane change made beside it.
+          replacePrimaryHistory()
+        } else {
+          primaryUrlRef.current =
+            window.location.pathname + window.location.search + window.location.hash
+        }
+        const primary = readPrimaryPageUrl(primaryUrlRef.current)
+        setCurrentPrimaryPage(primary.page)
+        setPrimaryPages((pages) => [
+          ...pages.filter((p) => p.name !== primary.page),
+          { name: primary.page, element: PRIMARY_PAGE_MAP[primary.page], props: primary.props }
+        ])
+        setSecondaryStack([])
+        return
+      }
+      if (!state?.url || state.index === undefined) return
+      if (secondaryStackRef.current.length) {
+        window.history.replaceState(
+          { ...window.history.state, primaryUrl: primaryUrlRef.current },
+          ''
+        )
+      } else if (state.primaryUrl) {
+        primaryUrlRef.current = state.primaryUrl
+        const primary = readPrimaryPageUrl(state.primaryUrl)
+        setCurrentPrimaryPage(primary.page)
+        setPrimaryPages((pages) => [
+          ...pages.filter((p) => p.name !== primary.page),
+          { name: primary.page, element: PRIMARY_PAGE_MAP[primary.page], props: primary.props }
+        ])
+      }
+      const index = state.index
+      const url = state.url
       setSecondaryStack((pre) => {
         const currentItem = pre[pre.length - 1] as TStackItem | undefined
         const currentIndex = currentItem?.index
-        if (!state) {
-          if (window.location.pathname + window.location.search + window.location.hash !== '/') {
-            // Just change the URL
-            return pre
-          } else {
-            // Back to root
-            state = { index: -1, url: '/' }
-          }
-        }
-
         // Go forward
-        if (currentIndex === undefined || state.index > currentIndex) {
-          const { newStack } = pushNewPageToStack(pre, state.url, maxStackSize)
+        if (currentIndex === undefined || index > currentIndex) {
+          const { newStack } = pushNewPageToStack(pre, url, maxStackSize, index)
           return newStack
         }
 
-        if (state.index === currentIndex) {
+        if (index === currentIndex) {
           return pre
         }
 
         // Go back
-        const newStack = pre.filter((item) => item.index <= state!.index)
+        const newStack = pre.filter((item) => item.index <= index)
         const topItem = newStack[newStack.length - 1] as TStackItem | undefined
         if (!topItem) {
           // Create a new stack item if it's not exist (e.g. when the user refreshes the page, the stack will be empty)
-          const { element, ref, hideBottomBar } = findAndCloneElement(state.url, state.index)
+          const { element, ref, hideBottomBar } = findAndCloneElement(url, index)
           if (element) {
             newStack.push({
-              index: state.index,
-              url: state.url,
+              index,
+              url,
               element,
               ref,
               hideBottomBar: hideBottomBar ?? false
@@ -206,7 +248,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           }
         } else if (!topItem.element) {
           // Load the element if it's not cached
-          const { element, ref, hideBottomBar } = findAndCloneElement(topItem.url, state.index)
+          const { element, ref, hideBottomBar } = findAndCloneElement(topItem.url, index)
           if (element) {
             topItem.element = element
             topItem.ref = ref
@@ -214,7 +256,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
           }
         }
         if (newStack.length === 0) {
-          window.history.replaceState(null, '', '/')
+          replacePrimaryHistory()
         }
         return newStack
       })
@@ -227,7 +269,26 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   }, [])
 
+  const replacePrimaryHistory = () => {
+    const { index: _index, url: _url, ...state } = window.history.state ?? {}
+    window.history.replaceState(
+      { ...state, primaryUrl: primaryUrlRef.current },
+      '',
+      primaryUrlRef.current
+    )
+  }
+
   const navigatePrimaryPage = (page: TPrimaryPageName, props?: any) => {
+    const existingProps = primaryPages.find((p) => p.name === page)?.props
+    primaryUrlRef.current = primaryPageUrl(primaryUrlRef.current, page, props ?? existingProps)
+    if (enableSingleColumnLayout || window.location.pathname === '/') {
+      replacePrimaryHistory()
+    } else {
+      window.history.replaceState(
+        { ...window.history.state, primaryUrl: primaryUrlRef.current },
+        ''
+      )
+    }
     const needScrollToTop = page === currentPrimaryPage
     setPrimaryPages((prev) => {
       const exists = prev.find((p) => p.name === page)
@@ -248,6 +309,9 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
     }
   }
 
+  const navigatePrimaryPageRef = useRef(navigatePrimaryPage)
+  navigatePrimaryPageRef.current = navigatePrimaryPage
+
   const pushSecondaryPage = (url: string, index?: number) => {
     setSecondaryStack((prevStack) => {
       if (isCurrentPage(prevStack, url)) {
@@ -260,7 +324,11 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
       const { newStack, newItem } = pushNewPageToStack(prevStack, url, maxStackSize, index)
       if (newItem) {
-        window.history.pushState({ index: newItem.index, url }, '', url)
+        window.history.pushState(
+          { ...window.history.state, index: newItem.index, url, primaryUrl: primaryUrlRef.current },
+          '',
+          url
+        )
       }
       return newStack
     })
@@ -269,7 +337,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   const popSecondaryPage = (delta = -1) => {
     if (secondaryStack.length <= -delta) {
       // back to home page
-      window.history.replaceState(null, '', '/')
+      replacePrimaryHistory()
       setSecondaryStack([])
     } else {
       window.history.go(delta)
