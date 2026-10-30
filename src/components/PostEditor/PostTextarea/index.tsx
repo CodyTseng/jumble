@@ -23,6 +23,7 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardAndDropHandler } from './ClipboardAndDropHandler'
+import { PreserveComposition } from './PreserveComposition'
 import Emoji from './Emoji'
 import emojiSuggestion from './Emoji/suggestion'
 import Mention from './Mention'
@@ -111,6 +112,7 @@ const PostTextarea = forwardRef<
         Text,
         UndoRedo,
         HardBreak,
+        PreserveComposition,
         Placeholder.configure({
           placeholder:
             placeholder ??
