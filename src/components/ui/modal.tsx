@@ -139,6 +139,8 @@ type ModalContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.C
   bodyClassName?: string
   /** Show the desktop close control. Mobile sheets use swipe/outside dismissal. */
   withoutClose?: boolean
+  /** Resize a tall composer to the visible viewport instead of lifting the entire sheet. */
+  fitVisualViewport?: boolean
 }
 
 // Titles nested in layout elements still use Radix's shared title id. Only
@@ -162,6 +164,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
       title,
       hideHandle,
       withoutClose = true,
+      fitVisualViewport = false,
       onPointerDownOutside,
       onOpenAutoFocus,
       ...props
@@ -183,7 +186,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
       [ref]
     )
 
-    useVisualViewportInset(contentEl, direction === 'bottom')
+    useVisualViewportInset(contentEl, direction === 'bottom', fitVisualViewport)
 
     useVerticalDragToClose({
       contentEl,
@@ -300,13 +303,63 @@ export { Modal, ModalClose, ModalContent, ModalDescription, ModalTitle, ModalTri
  * Driven by `visualViewport.resize/scroll` and `focusin/focusout` so we
  * recompute whenever either the keyboard or the active field changes.
  */
-export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean) {
+export function useVisualViewportInset(
+  el: HTMLElement | null,
+  enabled: boolean,
+  fitVisualViewport = false
+) {
   React.useEffect(() => {
     if (!enabled || !el) return
     const vv = window.visualViewport
     if (!vv) return
+    const originalPaddingBottom = el.style.paddingBottom
+    const originalTop = el.style.top
+    const originalHeight = el.style.height
+    // Chromium on Android can resize the fixed-position containing block for
+    // us. This avoids relying on visualViewport measurements around its bottom
+    // address bar. Keep the setting local to the open composer.
+    const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+    const useNativeResize =
+      fitVisualViewport &&
+      /Android/i.test(navigator.userAgent) &&
+      /(?:Chrome|Chromium)\//.test(navigator.userAgent) &&
+      !!viewportMeta
+    const originalViewportContent = viewportMeta?.getAttribute('content')
+    const resizedViewportContent = (originalViewportContent ?? '')
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => part && !/^interactive-widget\s*=/i.test(part))
+      .concat('interactive-widget=resizes-content')
+      .join(', ')
+    let largestViewportHeight = window.innerHeight
+    if (useNativeResize) viewportMeta.setAttribute('content', resizedViewportContent)
 
     const apply = () => {
+      if (fitVisualViewport) {
+        if (useNativeResize) {
+          largestViewportHeight = Math.max(largestViewportHeight, window.innerHeight)
+          el.style.top = '0px'
+          el.style.bottom = '0px'
+          el.style.height = '100%'
+          el.style.maxHeight = '100%'
+          el.style.paddingBottom =
+            largestViewportHeight - window.innerHeight > 100 ? '0px' : originalPaddingBottom
+          return
+        }
+        // Position both edges directly in visual-viewport coordinates. Deriving
+        // a bottom inset from innerHeight assumes it matches the fixed-position
+        // containing block, which can differ while mobile browser chrome and
+        // the keyboard resize/pan the viewport, leaving a gap below the sheet.
+        const keyboardHeight = Math.max(window.innerHeight - vv.height - vv.offsetTop, 0)
+        el.style.top = `${vv.offsetTop}px`
+        el.style.bottom = 'auto'
+        el.style.height = `${vv.height}px`
+        el.style.maxHeight = `${vv.height}px`
+        // The keyboard already covers the home indicator. Keeping the sheet's
+        // safe-area padding here leaves an empty strip above the keyboard.
+        el.style.paddingBottom = keyboardHeight > 0 ? '0px' : originalPaddingBottom
+        return
+      }
       const active = document.activeElement as HTMLElement | null
       const isEditable =
         !!active &&
@@ -334,6 +387,7 @@ export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean)
 
     vv.addEventListener('resize', apply)
     vv.addEventListener('scroll', apply)
+    window.addEventListener('resize', apply)
     document.addEventListener('focusin', apply)
     document.addEventListener('focusout', apply)
     apply()
@@ -341,11 +395,22 @@ export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean)
     return () => {
       vv.removeEventListener('resize', apply)
       vv.removeEventListener('scroll', apply)
+      window.removeEventListener('resize', apply)
       document.removeEventListener('focusin', apply)
       document.removeEventListener('focusout', apply)
       el.style.bottom = ''
+      if (fitVisualViewport) {
+        el.style.top = originalTop
+        el.style.height = originalHeight
+        el.style.maxHeight = ''
+        el.style.paddingBottom = originalPaddingBottom
+      }
+      if (useNativeResize && viewportMeta.getAttribute('content') === resizedViewportContent) {
+        if (originalViewportContent === null) viewportMeta.removeAttribute('content')
+        else viewportMeta.setAttribute('content', originalViewportContent ?? '')
+      }
     }
-  }, [enabled, el])
+  }, [enabled, el, fitVisualViewport])
 }
 
 /**
@@ -353,7 +418,8 @@ export function useVisualViewportInset(el: HTMLElement | null, enabled: boolean)
  * the whole content surface and defers to scrollable containers (including itself):
  *
  *   - Upward swipes: never engage; the inner scroll runs as usual.
- *   - Downward swipes starting inside a scrolled element: the scroll wins.
+ *   - Swipes starting inside a scrolled element: the scroll owns the entire
+ *     gesture, even if it reaches the top before the finger is released.
  *   - Downward swipes starting elsewhere (or in a scrollable already at
  *     scrollTop=0): engage drag mode, follow the pointer, dismiss on release
  *     past a distance or velocity threshold.
@@ -398,7 +464,7 @@ function useVerticalDragToClose({
     let velocity = 0
     let armed = false
     let dragging = false
-    let scrollableAtStart: HTMLElement | null = null
+    let scrollTopAtStart = 0
 
     // Cheap scrollHeight comparison first; getComputedStyle forces layout and
     // is what we want to avoid for the common case where the touched node
@@ -430,7 +496,7 @@ function useVerticalDragToClose({
       velocity = 0
       armed = true
       dragging = false
-      scrollableAtStart = findScrollableAncestor(target)
+      scrollTopAtStart = findScrollableAncestor(target)?.scrollTop ?? 0
     }
 
     const moveDrag = (y: number, e: Event) => {
@@ -438,12 +504,18 @@ function useVerticalDragToClose({
       const delta = y - startY
 
       if (!dragging) {
+        // Once the gesture scrolls upward, keep it with the content even if
+        // the finger reverses direction later in the same gesture.
+        if (delta < -8) {
+          armed = false
+          return
+        }
         // Don't engage drag for upward / negligible motion — leaves the
         // inner scroll responsive to small touch jitter.
         if (delta <= 8) return
         // If the gesture starts inside something that's already scrolled,
         // the inner scroll owns the gesture, not the drawer.
-        if (scrollableAtStart && scrollableAtStart.scrollTop > 0) return
+        if (scrollTopAtStart > 0) return
 
         dragging = true
         el.style.transition = 'none'
@@ -466,7 +538,7 @@ function useVerticalDragToClose({
       const wasDragging = dragging
       armed = false
       dragging = false
-      scrollableAtStart = null
+      scrollTopAtStart = 0
       if (!wasDragging) return
 
       const delta = y - startY
@@ -492,7 +564,7 @@ function useVerticalDragToClose({
       }
       armed = false
       dragging = false
-      scrollableAtStart = null
+      scrollTopAtStart = 0
     }
 
     const onTouchStart = (e: TouchEvent) => {

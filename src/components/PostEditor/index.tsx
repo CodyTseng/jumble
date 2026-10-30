@@ -190,6 +190,7 @@ export default function PostEditor({
           selection, uploads, poll options and the other local editor state. */}
       <Modal open={open} onOpenChange={handleOpenChange}>
         <ModalContent
+          fitVisualViewport
           className={cn(
             isSmallScreen ? 'h-dvh max-h-dvh' : 'max-h-[85dvh] max-w-2xl sm:rounded-2xl'
           )}

@@ -439,7 +439,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
   }, [initialDraft])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pb-2">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:pb-2">
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain *:shrink-0">
         {parentEvent && (
           <>

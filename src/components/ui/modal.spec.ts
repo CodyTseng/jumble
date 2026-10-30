@@ -177,6 +177,116 @@ describe('responsive modals', () => {
     }
   )
 
+  it.each(['reach-top', 'reverse-direction'] as const)(
+    'waits for a new swipe before dragging the drawer after content scrolling: %s',
+    async (scenario) => {
+      screen.small = true
+      const changed = vi.fn()
+      await act(async () =>
+        root.render(
+          createElement(
+            Modal,
+            { open: true, onOpenChange: changed },
+            createElement(
+              ModalContent,
+              { 'aria-describedby': undefined },
+              createElement('div', { contentEditable: true })
+            )
+          )
+        )
+      )
+      const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+      const body = surface.querySelector<HTMLElement>('[data-modal-body]')!
+      const target = body.querySelector('[contenteditable]')!
+      body.style.overflowY = 'auto'
+      Object.defineProperties(body, {
+        scrollHeight: { value: 1000 },
+        clientHeight: { value: 400 }
+      })
+      const touch = (type: string, y: number) => {
+        const event = new Event(type, { bubbles: true, cancelable: true })
+        Object.defineProperties(event, {
+          touches: { value: type === 'touchend' ? [] : [{ clientY: y }] },
+          changedTouches: { value: [{ clientY: y }] }
+        })
+        target.dispatchEvent(event)
+        return event
+      }
+      await act(async () => {
+        body.scrollTop = scenario === 'reach-top' ? 120 : 0
+        touch('touchstart', 100)
+        expect(touch('touchmove', scenario === 'reach-top' ? 150 : 50).defaultPrevented).toBe(false)
+        body.scrollTop = 0
+        expect(touch('touchmove', 300).defaultPrevented).toBe(false)
+        expect(surface.style.transform).toBe('')
+        touch('touchend', 300)
+      })
+      expect(changed).not.toHaveBeenCalled()
+      await act(async () => {
+        touch('touchstart', 100)
+        expect(touch('touchmove', 300).defaultPrevented).toBe(true)
+        expect(surface.style.transform).toBe('translate3d(0, 200px, 0)')
+        touch('touchend', 300)
+      })
+      expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+    }
+  )
+
+  it.each(['content', 'editable', 'handle'] as const)(
+    'reserves swipes inside a locked composer for editing while allowing handle dismissal: %s',
+    async (touchTarget) => {
+      screen.small = true
+      const changed = vi.fn()
+      await act(async () =>
+        root.render(
+          createElement(
+            Modal,
+            { open: true, onOpenChange: changed },
+            createElement(
+              ModalContent,
+              { 'aria-describedby': undefined },
+              createElement(
+                'div',
+                { 'data-drawer-swipe-lock': true },
+                createElement('div', { contentEditable: true })
+              )
+            )
+          )
+        )
+      )
+      const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+      const target = surface.querySelector(
+        touchTarget === 'handle'
+          ? '[data-modal-handle]'
+          : touchTarget === 'editable'
+            ? '[contenteditable]'
+            : '[data-drawer-swipe-lock]'
+      )!
+      const touch = (type: string, y: number) => {
+        const event = new Event(type, { bubbles: true, cancelable: true })
+        Object.defineProperties(event, {
+          touches: { value: type === 'touchend' ? [] : [{ clientY: y }] },
+          changedTouches: { value: [{ clientY: y }] }
+        })
+        target.dispatchEvent(event)
+        return event
+      }
+      let move!: Event
+      await act(async () => {
+        touch('touchstart', 100)
+        move = touch('touchmove', 300)
+      })
+      const shouldDrag = touchTarget === 'handle'
+      expect(move.defaultPrevented).toBe(shouldDrag)
+      expect(surface.style.transform).toBe(shouldDrag ? 'translate3d(0, 200px, 0)' : '')
+      await act(async () => {
+        touch('touchend', 300)
+      })
+      if (shouldDrag) expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+      else expect(changed).not.toHaveBeenCalled()
+    }
+  )
+
   it.each([
     'dismiss',
     'snap-back',
@@ -347,6 +457,128 @@ describe('responsive modals', () => {
     await render()
     expect(document.querySelector('[role="dialog"]')).toBe(surface)
     expect(surface.style.bottom).toBe('')
+  })
+
+  it('fits a full-height composer to the keyboard viewport without measuring the whole editable', async () => {
+    screen.small = true
+    const viewport = Object.assign(new EventTarget(), { height: 800, offsetTop: 0 })
+    vi.stubGlobal('visualViewport', viewport)
+    vi.stubGlobal('innerHeight', 800)
+    const render = () =>
+      act(async () =>
+        root.render(
+          createElement(
+            Modal,
+            { open: true },
+            createElement(
+              ModalContent,
+              { fitVisualViewport: true, title: 'Composer', 'aria-describedby': undefined },
+              createElement('div', { contentEditable: true, suppressContentEditableWarning: true })
+            )
+          )
+        )
+      )
+    await render()
+    const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+    const editable = surface.querySelector<HTMLElement>('[contenteditable]')!
+    const measure = vi.spyOn(editable, 'getBoundingClientRect').mockReturnValue({
+      top: 100,
+      bottom: 1500
+    } as DOMRect)
+    await act(async () => editable.focus())
+    viewport.height = 500
+    await act(async () => viewport.dispatchEvent(new Event('resize')))
+    expect(surface.style.top).toBe('0px')
+    expect(surface.style.bottom).toBe('auto')
+    expect(surface.style.height).toBe('500px')
+    expect(surface.style.maxHeight).toBe('500px')
+    expect(surface.style.paddingBottom).toBe('0px')
+    // Repeated resize/scroll events must not alternate between lifting and
+    // resetting based on an already-shifted editable's bounding box.
+    viewport.offsetTop = 40
+    await act(async () => viewport.dispatchEvent(new Event('scroll')))
+    expect(surface.style.top).toBe('40px')
+    expect(surface.style.bottom).toBe('auto')
+    expect(surface.style.height).toBe('500px')
+    expect(surface.style.maxHeight).toBe('500px')
+    expect(measure).not.toHaveBeenCalled()
+    // Browser chrome can change innerHeight independently of the viewport.
+    // The composer's lower edge must still be offsetTop + viewport.height.
+    vi.stubGlobal('innerHeight', 900)
+    await act(async () => window.dispatchEvent(new Event('resize')))
+    expect(surface.style.top).toBe('40px')
+    expect(surface.style.height).toBe('500px')
+    expect(surface.style.bottom).toBe('auto')
+    vi.stubGlobal('innerHeight', 800)
+    viewport.height = 800
+    viewport.offsetTop = 0
+    await act(async () => viewport.dispatchEvent(new Event('resize')))
+    expect(surface.style.top).toBe('0px')
+    expect(surface.style.bottom).toBe('auto')
+    expect(surface.style.height).toBe('800px')
+    expect(surface.style.maxHeight).toBe('800px')
+    expect(surface.style.paddingBottom).toBe('')
+    screen.small = false
+    await render()
+    expect(document.querySelector('[role="dialog"]')).toBe(surface)
+    expect(surface.style.bottom).toBe('')
+    expect(surface.style.top).toBe('')
+    expect(surface.style.height).toBe('')
+    expect(surface.style.maxHeight).toBe('')
+    expect(surface.style.paddingBottom).toBe('')
+    measure.mockRestore()
+  })
+
+  it('uses the resized layout viewport on Android Chrome and restores the viewport meta on close', async () => {
+    screen.small = true
+    const viewport = Object.assign(new EventTarget(), { height: 800, offsetTop: 0 })
+    vi.stubGlobal('visualViewport', viewport)
+    vi.stubGlobal('innerHeight', 800)
+    const userAgent = vi
+      .spyOn(navigator, 'userAgent', 'get')
+      .mockReturnValue(
+        'Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/142.0.0.0 Mobile Safari/537.36'
+      )
+    const meta = document.createElement('meta')
+    meta.name = 'viewport'
+    meta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover'
+    const originalContent = meta.content
+    document.head.appendChild(meta)
+    try {
+      await act(async () =>
+        root.render(
+          createElement(
+            Modal,
+            { open: true },
+            createElement(ModalContent, {
+              fitVisualViewport: true,
+              title: 'Composer',
+              'aria-describedby': undefined
+            })
+          )
+        )
+      )
+      const surface = document.querySelector<HTMLElement>('[role="dialog"]')!
+      expect(meta.content).toBe(`${originalContent}, interactive-widget=resizes-content`)
+      // The keyboard resizes the layout viewport to 500px. A visual viewport
+      // that excludes an additional browser bar must not shorten the sheet.
+      vi.stubGlobal('innerHeight', 500)
+      viewport.height = 476
+      await act(async () => window.dispatchEvent(new Event('resize')))
+      expect(surface.style.top).toBe('0px')
+      expect(surface.style.bottom).toBe('0px')
+      expect(surface.style.height).toBe('100%')
+      expect(surface.style.maxHeight).toBe('100%')
+      expect(surface.style.paddingBottom).toBe('0px')
+      vi.stubGlobal('innerHeight', 800)
+      await act(async () => window.dispatchEvent(new Event('resize')))
+      expect(surface.style.paddingBottom).toBe('')
+      await act(async () => root.render(null))
+      expect(meta.content).toBe(originalContent)
+    } finally {
+      meta.remove()
+      userAgent.mockRestore()
+    }
   })
 
   it('advances from a prompt to a queued confirmation without a stale close cancelling it', async () => {
