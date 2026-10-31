@@ -17,7 +17,7 @@ const resources = path.join(
   appDirectory.endsWith('.app') ? 'Contents/Resources' : 'resources'
 )
 const archive = path.join(resources, 'app.asar')
-const entries = new Set(listPackage(archive))
+const entries = new Set(listPackage(archive).map((file) => file.replaceAll('\\', '/')))
 
 for (const file of [
   'package.json',
