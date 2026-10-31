@@ -36,7 +36,9 @@ npm install
 npm run dev
 ```
 
-For a web-only build on a system that cannot download the Electron binary, skip that download while keeping platform-specific build dependencies such as Rollup:
+Builds use the TypeScript 7 native compiler (`tsc`), installed as `@typescript/native`. The `typescript` dependency aliases the official TypeScript 6 compatibility package so ESLint can continue using its compiler API. Keep both dependencies when updating the toolchain. See the [official side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-60).
+
+For a web-only build on a system that cannot download the Electron binary, skip that download while keeping platform-specific build dependencies such as Rolldown and TypeScript:
 
 ```bash
 ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install
