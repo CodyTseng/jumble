@@ -38,6 +38,8 @@ npm run dev
 
 Builds use the TypeScript 7 native compiler (`tsc`), installed as `@typescript/native`. The `typescript` dependency aliases the official TypeScript 6 compatibility package so ESLint can continue using its compiler API. Keep both dependencies when updating the toolchain. See the [official side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-60).
 
+The dependency overrides move `minimatch` 10.x consumers to 11.0.3+ and Workbox's `glob` to 14.0.3+ to address [pattern amplification](https://github.com/advisories/GHSA-g3hv-75wg-m249) and [cancellation handling](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) advisories. Older `minimatch` consumers retain their declared versions because their APIs differ. Remove these overrides when the upstream tools adopt compatible patched releases.
+
 For a web-only build on a system that cannot download the Electron binary, skip that download while keeping platform-specific build dependencies such as Rolldown and TypeScript:
 
 ```bash
