@@ -67,9 +67,15 @@ jobs:
         run: echo "APP_DIRECTORY=release/$(node -p 'require("./package.json").version')/${{ matrix.unpacked }}" >> "$GITHUB_ENV"
       - name: Smoke test Windows application
         if: runner.os == 'Windows'
+        timeout-minutes: 4
+        env:
+          DEBUG: pw:browser
         run: node scripts/electron-smoke.mjs "$env:APP_DIRECTORY"
       - name: Smoke test Linux application
         if: runner.os == 'Linux'
+        timeout-minutes: 4
+        env:
+          DEBUG: pw:browser
         run: xvfb-run -a node scripts/electron-smoke.mjs "$APP_DIRECTORY"
       - name: Upload smoke test results
         if: always()

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { randomUUID } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
@@ -60,14 +61,37 @@ if (!process.argv.includes('--verify-only')) {
   const logs = []
   let application
   let page
+  let stage = 'launch'
+  const killApplication = () => {
+    const child = application?.process()
+    if (!child?.pid || child.exitCode !== null) return
+    if (process.platform === 'win32') {
+      execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+    } else child.kill('SIGKILL')
+  }
+  const watchdog = setTimeout(() => {
+    console.error(`Electron smoke test timed out during ${stage}`)
+    writeFileSync(path.join(output, 'electron.log'), logs.join(''))
+    try {
+      killApplication()
+    } catch {}
+    process.exit(1)
+  }, 120_000)
+  watchdog.unref()
   try {
+    console.log(`Launching ${executablePath}`)
     application = await electron.launch({
       executablePath,
       args: process.platform === 'linux' ? ['--no-sandbox', '--disable-gpu'] : [],
       timeout: 60_000
     })
+    console.log('Attached to Electron main process')
+    stage = 'first window'
     application.process().stderr?.on('data', (data) => logs.push(data.toString()))
     page = await application.firstWindow({ timeout: 60_000 })
+    console.log('Attached to first window')
+    page.setDefaultTimeout(30_000)
+    stage = 'preload bridge'
     page.on('pageerror', (error) => failures.push(error.message))
     page.on('console', (message) => {
       logs.push(`[${message.type()}] ${message.text()}\n`)
@@ -77,6 +101,7 @@ if (!process.argv.includes('--verify-only')) {
     })
     await page.waitForFunction(() => !!window.electron?.security, null, { timeout: 60_000 })
     const status = await page.evaluate(() => window.electron.security.getStatus())
+    console.log(`Storage backend: ${status.backend}`)
     if (status.backend === 'password' && !status.unlocked) {
       assert(status.needsSetup, 'CI unexpectedly contains an existing password-protected store')
       // A fresh Linux runner may have no keychain. Exercise its real password boot path.
@@ -86,6 +111,7 @@ if (!process.argv.includes('--verify-only')) {
       )
       await page.reload()
     }
+    stage = 'initial render'
     await page.waitForFunction(
       () => document.querySelector('#root')?.textContent.trim().length > 0,
       null,
@@ -97,6 +123,7 @@ if (!process.argv.includes('--verify-only')) {
     assert.equal(await application.evaluate(({ app }) => app.isPackaged), true)
     assert.equal(await application.evaluate(({ app }) => app.getVersion()), version)
     assert.equal(await page.evaluate(() => typeof window.electron.relay.subscribe), 'function')
+    stage = 'Settings navigation'
     await page.getByTitle('Settings', { exact: true }).click()
     await page.getByText('Preferences', { exact: true }).waitFor({ state: 'visible' })
     assert.deepEqual(failures, [], 'Renderer startup errors')
@@ -115,6 +142,26 @@ if (!process.argv.includes('--verify-only')) {
     throw error
   } finally {
     writeFileSync(path.join(output, 'electron.log'), logs.join(''))
-    await application?.close()
+    stage = 'shutdown'
+    let shutdownTimer
+    try {
+      if (application) {
+        await Promise.race([
+          application.close(),
+          new Promise((_, reject) => {
+            shutdownTimer = setTimeout(
+              () => reject(new Error('Electron shutdown timed out')),
+              15_000
+            )
+          })
+        ]).catch((error) => {
+          console.warn(error.message)
+          killApplication()
+        })
+      }
+    } finally {
+      clearTimeout(shutdownTimer)
+      clearTimeout(watchdog)
+    }
   }
 }
