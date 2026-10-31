@@ -85,6 +85,12 @@ npm run electron:preview
 
 The web build (`npm run dev`, `npm run build`) is unaffected and never loads any Electron-only code.
 
+## Continuous integration
+
+Branch pushes and pull requests run lint, the test suite, and a web/PWA build. Windows x64 and Linux x64/arm64 jobs then build installers and launch the unpacked applications. The smoke test checks packaged runtime files, the preload IPC bridge, initial rendering, and Settings navigation. On Linux without a keychain it also exercises password setup on the fresh CI runner. Screenshots and logs are uploaded and downloaded again to verify artifact handling.
+
+`scripts/electron-smoke.mjs <unpacked-app-directory>` requires a disposable CI runner because it may initialize application storage. To check package contents locally without starting the application, append `--verify-only`.
+
 ## Community mode (Optional)
 
 If you want to run Jumble in community mode (with pre-configured relay sets and relays), you can set the following environment variables in a `.env` file at the root of the project:
