@@ -114,7 +114,7 @@ describe('gallery mouse dragging inside a note card', () => {
     }
   )
 
-  it('ignores clicks in the gaps without blocking document listeners or other note clicks', async () => {
+  it('opens the note from gaps and edges while keeping photo clicks and document listeners working', async () => {
     const navigate = vi.fn()
     const openPhoto = vi.fn()
     await act(async () =>
@@ -141,11 +141,15 @@ describe('gallery mouse dragging inside a note card', () => {
         viewport.click()
       })
       expect(openPhoto).not.toHaveBeenCalled()
-      expect(navigate).not.toHaveBeenCalled()
+      expect(navigate).toHaveBeenCalledTimes(2)
       expect(documentClick).toHaveBeenCalledTimes(2)
 
+      await act(async () => button.click())
+      expect(openPhoto).toHaveBeenCalledOnce()
+      expect(navigate).toHaveBeenCalledTimes(2)
+
       await act(async () => (container.firstElementChild as HTMLElement).click())
-      expect(navigate).toHaveBeenCalledOnce()
+      expect(navigate).toHaveBeenCalledTimes(3)
     } finally {
       document.removeEventListener('click', documentClick)
     }
