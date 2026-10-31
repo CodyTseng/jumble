@@ -33,7 +33,8 @@ export class ElectronRelay implements IRelay {
       // Electron wraps invoke failures; preserve the relay reason for AUTH retry.
       if (error instanceof Error) {
         throw new Error(
-          error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, '')
+          error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, ''),
+          { cause: error }
         )
       }
       throw error

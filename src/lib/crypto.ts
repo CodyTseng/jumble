@@ -1,5 +1,5 @@
 import { BoundedMap } from '@/lib/bounded-map'
-import { bytesToHex } from '@noble/hashes/utils'
+import { bytesToHex } from '@noble/hashes/utils.js'
 import { v2 as nip44 } from 'nostr-tools/nip44'
 
 /**

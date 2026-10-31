@@ -38,7 +38,7 @@ export default function VideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false)
   const [controlsVisible, setControlsVisible] = useState(true)
   const [speedMenuOpen, setSpeedMenuOpen] = useState(false)
-  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 

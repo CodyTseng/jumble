@@ -136,7 +136,7 @@ export function SecondaryPageTitlebar({
   hideBackButton?: boolean
   hideBottomBorder?: boolean
   titlebar?: React.ReactNode
-}): JSX.Element {
+}): React.JSX.Element {
   const { isSmallScreen } = useScreenSize()
 
   if (titlebar) {

@@ -40,20 +40,23 @@ function getPreviewPoints(preview: HTMLElement): Point[] {
 
 /** Positions belong to this tab transition only, never to a layout change or draft. */
 export default function usePreviewTabPosition(
-  textareaRef: RefObject<HTMLTextAreaElement>,
-  previewRef: RefObject<HTMLElement>,
+  textareaRef: RefObject<HTMLTextAreaElement | null>,
+  previewRef: RefObject<HTMLElement | null>,
   tab: Tab,
   setTab: (tab: Tab) => void,
   enabled: boolean,
   windowScroll = false
 ) {
-  const pending = useRef<{
-    line: number
-    viewportOffset: number
-    atTop: boolean
-    next: Tab
-    scrollTop: number
-  }>()
+  const pending = useRef<
+    | {
+        line: number
+        viewportOffset: number
+        atTop: boolean
+        next: Tab
+        scrollTop: number
+      }
+    | undefined
+  >(undefined)
 
   const prepareTabChange = (next: Tab) => {
     if (next === tab) return

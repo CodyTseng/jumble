@@ -98,7 +98,9 @@ export default function SubReplies({
             const _parentEventId = generateBech32IdFromETag(_parentTag.tag)
             return (
               <div
-                ref={(el) => (replyRefs.current[currentReplyKey] = el)}
+                ref={(el) => {
+                  replyRefs.current[currentReplyKey] = el
+                }}
                 key={currentReplyKey}
                 className="relative flex scroll-mt-12"
               >

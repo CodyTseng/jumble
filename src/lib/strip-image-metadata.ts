@@ -1,5 +1,8 @@
 // Image MIME types whose metadata we know how to strip at the byte level.
-const STRIPPERS: Record<string, (bytes: Uint8Array) => Uint8Array | null> = {
+const STRIPPERS: Record<
+  string,
+  (bytes: Uint8Array<ArrayBuffer>) => Uint8Array<ArrayBuffer> | null
+> = {
   'image/jpeg': stripJpeg,
   'image/png': stripPng,
   'image/webp': stripWebp
@@ -51,7 +54,10 @@ export async function stripImageMetadata(file: File): Promise<File> {
 }
 
 /** Concatenate the given byte ranges of `bytes` into a new array. */
-function assemble(bytes: Uint8Array, ranges: [number, number][]): Uint8Array {
+function assemble(
+  bytes: Uint8Array<ArrayBuffer>,
+  ranges: [number, number][]
+): Uint8Array<ArrayBuffer> {
   let total = 0
   for (const [start, end] of ranges) {
     total += end - start
@@ -71,7 +77,7 @@ function assemble(bytes: Uint8Array, ranges: [number, number][]): Uint8Array {
  * EXIF chunk, which are all the same little-/big-endian TIFF structure.
  * Returns the orientation value (1-8) or null if it is absent or invalid.
  */
-function readOrientationFromTiff(tiff: Uint8Array): number | null {
+function readOrientationFromTiff(tiff: Uint8Array<ArrayBuffer>): number | null {
   if (tiff.length < 8) {
     return null
   }
@@ -112,7 +118,7 @@ function readOrientationFromTiff(tiff: Uint8Array): number | null {
  * This is the payload shared by every format's metadata container, so the
  * format-specific helpers just wrap it (JPEG APP1, PNG eXIf, WebP EXIF).
  */
-function buildOrientationTiff(orientation: number): Uint8Array {
+function buildOrientationTiff(orientation: number): Uint8Array<ArrayBuffer> {
   const tiff = new Uint8Array(26)
   const view = new DataView(tiff.buffer)
   tiff[0] = 0x4d // 'MM' — big-endian
@@ -135,7 +141,7 @@ function buildOrientationTiff(orientation: number): Uint8Array {
  * structure are preserved. The EXIF Orientation tag is extracted before APP1 is
  * dropped and re-injected as a minimal APP1 so the image stays upright.
  */
-function stripJpeg(bytes: Uint8Array): Uint8Array | null {
+function stripJpeg(bytes: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> | null {
   if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
     return null
   }
@@ -200,7 +206,7 @@ function stripJpeg(bytes: Uint8Array): Uint8Array | null {
  * `segEnd` is the end of the segment.
  */
 function readJpegApp1Orientation(
-  bytes: Uint8Array,
+  bytes: Uint8Array<ArrayBuffer>,
   contentStart: number,
   segEnd: number
 ): number | null {
@@ -219,7 +225,7 @@ function readJpegApp1Orientation(
 }
 
 /** Wrap a minimal orientation TIFF in a JPEG APP1 (EXIF) segment. */
-function buildJpegOrientationApp1(orientation: number): Uint8Array {
+function buildJpegOrientationApp1(orientation: number): Uint8Array<ArrayBuffer> {
   const exifHeader = [0x45, 0x78, 0x69, 0x66, 0x00, 0x00] // "Exif\0\0"
   const tiff = buildOrientationTiff(orientation)
   const payloadLen = exifHeader.length + tiff.length
@@ -241,7 +247,7 @@ const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
  * and structural chunks are kept. The EXIF Orientation is extracted from the
  * eXIf chunk before it is dropped and re-injected as a minimal eXIf chunk.
  */
-function stripPng(bytes: Uint8Array): Uint8Array | null {
+function stripPng(bytes: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> | null {
   if (bytes.length < 8 || PNG_SIGNATURE.some((b, i) => bytes[i] !== b)) {
     return null
   }
@@ -298,7 +304,7 @@ function stripPng(bytes: Uint8Array): Uint8Array | null {
 }
 
 /** Wrap a minimal orientation TIFF in a PNG eXIf chunk (with CRC). */
-function buildPngOrientationChunk(orientation: number): Uint8Array {
+function buildPngOrientationChunk(orientation: number): Uint8Array<ArrayBuffer> {
   const tiff = buildOrientationTiff(orientation)
   const chunk = new Uint8Array(12 + tiff.length) // length (4) + type (4) + data + CRC (4)
   const view = new DataView(chunk.buffer)
@@ -316,7 +322,7 @@ function buildPngOrientationChunk(orientation: number): Uint8Array {
 let CRC_TABLE: Uint32Array | null = null
 
 /** Standard PNG/zlib CRC-32 over a byte range. */
-function crc32(data: Uint8Array): number {
+function crc32(data: Uint8Array<ArrayBuffer>): number {
   if (!CRC_TABLE) {
     CRC_TABLE = new Uint32Array(256)
     for (let n = 0; n < 256; n++) {
@@ -340,7 +346,7 @@ function crc32(data: Uint8Array): number {
  * Orientation is extracted before the EXIF chunk is dropped and re-injected as
  * a minimal EXIF chunk, with the VP8X EXIF feature flag kept set.
  */
-function stripWebp(bytes: Uint8Array): Uint8Array | null {
+function stripWebp(bytes: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer> | null {
   const ascii = (offset: number, length: number) =>
     String.fromCharCode(...bytes.subarray(offset, offset + length))
   if (bytes.length < 12 || ascii(0, 4) !== 'RIFF' || ascii(8, 4) !== 'WEBP') {

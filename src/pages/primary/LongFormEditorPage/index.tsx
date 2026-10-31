@@ -98,10 +98,10 @@ function createEmptyDraft(): TLongFormDraft {
 function hasDraftContent(draft: TLongFormDraft) {
   return Boolean(
     draft.title.trim() ||
-      draft.summary.trim() ||
-      draft.image.trim() ||
-      draft.tags.length ||
-      draft.content.trim()
+    draft.summary.trim() ||
+    draft.image.trim() ||
+    draft.tags.length ||
+    draft.content.trim()
   )
 }
 
@@ -153,9 +153,9 @@ const LongFormEditorPage = forwardRef(function LongFormEditorPage(
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const singlePreviewRef = useRef<HTMLElement>(null)
   const previewIdRef = useRef('0'.repeat(64))
-  const handledEditEventRef = useRef<Event>()
-  const pendingDraftRef = useRef<{ pubkey: string; draft: TLongFormDraft }>()
-  const publishedDraftRef = useRef<string>()
+  const handledEditEventRef = useRef<Event | undefined>(undefined)
+  const pendingDraftRef = useRef<{ pubkey: string; draft: TLongFormDraft } | undefined>(undefined)
+  const publishedDraftRef = useRef<string | undefined>(undefined)
   pendingDraftRef.current = pubkey && loadedPubkey === pubkey ? { pubkey, draft } : undefined
   useLayoutEffect(
     () => () => {

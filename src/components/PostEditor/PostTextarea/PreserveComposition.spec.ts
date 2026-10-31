@@ -88,7 +88,8 @@ describe('preserving native composition edits', () => {
         expect(editor.getText()).toBe('你们好')
         expect(view.composing).toBe(false)
       } else {
-        expect(writes.mock.calls.map(([value]) => value)).toContain('nihaoma')
+        // ProseMirror 1.42.9 also avoids Backspace probes during composition.
+        expect(writes.mock.calls.map(([value]) => value)).toEqual(['nihaom'])
       }
     }
   )

@@ -25,7 +25,7 @@ export default function useTextareaMention({
   onChange,
   enabled
 }: {
-  textareaRef: RefObject<HTMLTextAreaElement>
+  textareaRef: RefObject<HTMLTextAreaElement | null>
   value: string
   onChange: (content: string) => void
   enabled: boolean

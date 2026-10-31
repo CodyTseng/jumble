@@ -8,6 +8,13 @@ import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { TLongFormDraft } from '@/types/long-form-draft'
 import { createLongFormArticleDraftEvent } from '@/lib/draft-event'
 
+type ControlProps = {
+  children?: React.ReactNode
+  disabled?: boolean
+  onClick?: () => Promise<void>
+  onPublish: () => Promise<void>
+}
+
 const route = vi.hoisted(() => ({ current: 'longFormEditor', display: true, currentIndex: 1 }))
 const mocks = vi.hoisted(() => ({
   initialDraft: undefined as TLongFormDraft | undefined,
@@ -152,11 +159,13 @@ describe('LongFormEditorPage mention activation', () => {
       renderToString(createElement(LongFormEditorPage, secondary ? { index: 1 } : {}))
       const layout = secondary ? SecondaryPageLayout : PrimaryPageLayout
       const props = vi.mocked(layout).mock.calls[0][0]
-      const controls = props.controls as React.ReactElement<{ children: React.ReactElement[] }>
+      const controls = props.controls as React.ReactElement<{
+        children: React.ReactElement<ControlProps>[]
+      }>
       const publishButton = controls.props.children.find(
         (child) => child?.props?.onClick && child.props.children === 'Publish'
       )!
-      await publishButton.props.onClick()
+      await publishButton.props.onClick!()
       expect(mocks.publish).not.toHaveBeenCalled()
       const settings = controls.props.children.find(
         (child) => child?.type === mocks.publishSettings
@@ -195,12 +204,12 @@ describe('LongFormEditorPage mention activation', () => {
     }
     renderToString(createElement(LongFormEditorPage))
     const controls = vi.mocked(PrimaryPageLayout).mock.calls[0][0].controls as React.ReactElement<{
-      children: React.ReactElement[]
+      children: React.ReactElement<ControlProps>[]
     }>
     const button = controls.props.children.find(
       (child) => child?.props?.onClick && child.props.children === 'Publish'
     )!
-    await button.props.onClick()
+    await button.props.onClick!()
     expect(mocks.publish).not.toHaveBeenCalled()
     const settings = controls.props.children.find((child) => child?.type === mocks.publishSettings)!
     await settings.props.onPublish()
@@ -233,13 +242,13 @@ describe('LongFormEditorPage mention activation', () => {
     }
     renderToString(createElement(LongFormEditorPage))
     const controls = vi.mocked(PrimaryPageLayout).mock.calls[0][0].controls as React.ReactElement<{
-      children: React.ReactElement[]
+      children: React.ReactElement<ControlProps>[]
     }>
     const button = controls.props.children.find(
       (child) => child?.props?.onClick && child.props.children === 'Publish'
     )!
     expect(button.props.disabled).toBeFalsy()
-    await button.props.onClick()
+    await button.props.onClick!()
     const settings = controls.props.children.find((child) => child?.type === mocks.publishSettings)!
     await settings.props.onPublish()
     expect(mocks.publish).not.toHaveBeenCalled()

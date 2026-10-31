@@ -8,10 +8,11 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Download, Github } from 'lucide-react'
+import { GithubLogo } from '@phosphor-icons/react'
+import { Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-type LogoComponent = (props: { className?: string }) => JSX.Element
+type LogoComponent = (props: { className?: string }) => React.JSX.Element
 
 const RELEASES_BASE = 'https://github.com/CodyTseng/jumble/releases/latest'
 
@@ -94,7 +95,7 @@ export default function DownloadDialog({
           rel="noreferrer"
           className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs underline-offset-2 hover:underline"
         >
-          <Github className="size-3.5" />
+          <GithubLogo className="size-3.5" />
           {t('View all releases on GitHub')}
         </a>
       </DialogContent>

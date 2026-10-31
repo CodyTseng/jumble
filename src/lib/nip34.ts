@@ -146,7 +146,7 @@ export function getNip34EventMetadata(event: Event): Nip34EventMetadata | undefi
     (tag) => tag[0] === 'r' && !!tag[1] && tag[2] !== 'euc'
   )?.[1]
   const commit = getFirstTagValue(event, 'commit') ?? getFirstTagValue(event, 'c') ?? patchCommit
-  let title = ''
+  let title: string
 
   switch (type) {
     case 'repository':

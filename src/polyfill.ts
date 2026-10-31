@@ -38,16 +38,17 @@ if (typeof AggregateError === 'undefined') {
 }
 
 if (!Promise.any) {
-  Promise.any = function (promises) {
-    return new Promise((resolve, reject) => {
+  Promise.any = function <T>(promises: Iterable<T | PromiseLike<T>>): Promise<Awaited<T>> {
+    return new Promise<Awaited<T>>((resolve, reject) => {
+      const values = Array.from(promises)
       const errors: any[] = []
-      let pending = promises.length
+      let pending = values.length
 
       if (pending === 0) {
         return reject(new AggregateError([], 'All promises were rejected'))
       }
 
-      promises.forEach((promise, index) => {
+      values.forEach((promise, index) => {
         Promise.resolve(promise)
           .then(resolve)
           .catch((error) => {

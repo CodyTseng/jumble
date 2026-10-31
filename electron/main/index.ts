@@ -149,7 +149,7 @@ function registerAppProtocol() {
     if (!insideRoot) {
       return new Response('Forbidden', { status: 403 })
     }
-    let isFile = false
+    let isFile: boolean
     try {
       isFile = existsSync(filePath) && statSync(filePath).isFile()
     } catch {

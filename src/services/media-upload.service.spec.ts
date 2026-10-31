@@ -11,7 +11,7 @@ const clientMock = vi.hoisted(() => ({
 
 const blossomClientMock = vi.hoisted(() => ({
   createUploadAuth: vi.fn().mockResolvedValue({ id: 'auth-event' }),
-  getFileSha256: vi.fn().mockResolvedValue('file-hash'),
+  getBlobSha256: vi.fn().mockResolvedValue('file-hash'),
   encodeAuthorizationHeader: vi.fn().mockReturnValue('Nostr auth'),
   mirrorBlob: vi.fn().mockResolvedValue(undefined)
 }))
@@ -39,16 +39,13 @@ const mediaMetaMock = vi.hoisted(() => ({
 vi.mock('@/lib/media-meta', () => mediaMetaMock)
 
 vi.mock('blossom-client-sdk', () => ({
-  BlossomClient: blossomClientMock
+  ...blossomClientMock,
+  Actions: { mirrorBlob: blossomClientMock.mirrorBlob }
 }))
 
 import mediaUpload, { UPLOAD_ABORTED_ERROR_MSG } from './media-upload.service'
 
-const servers = [
-  'https://first.example/',
-  'https://second.example/',
-  'https://third.example/'
-]
+const servers = ['https://first.example/', 'https://second.example/', 'https://third.example/']
 
 describe('Blossom media uploads', () => {
   beforeEach(() => {

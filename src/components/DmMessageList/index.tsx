@@ -626,7 +626,7 @@ function MessageBubble({
     navigator.clipboard.writeText(message.content)
   }, [message.content])
 
-  const longPressTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const longPressTriggeredRef = useRef(false)
   const bubbleRef = useRef<HTMLDivElement>(null)
   const contextMenuId = useId()
