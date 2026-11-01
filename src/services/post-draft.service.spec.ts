@@ -20,7 +20,7 @@ vi.mock('@/services/thread.service', () => ({
 
 const signed = {
   id: 'event-id',
-  pubkey: 'author',
+  pubkey: 'a'.repeat(64),
   sig: 'signature',
   kind: 1,
   created_at: 1,
@@ -177,4 +177,31 @@ describe('parallel post signing and relay lookup', () => {
       postDraftService.removeEventListener('publish-start', onStart)
     }
   })
+})
+
+it('keeps an editable draft when the signer returns an event without tags', async () => {
+  vi.resetAllMocks()
+  vi.mocked(client.determineTargetRelays).mockResolvedValue(['wss://relay.example'])
+  const draft = input('invalid-signer-result', 0)
+  await postDraftService.saveDraft({ id: draft.id, pubkey: draft.pubkey } as Parameters<
+    typeof postDraftService.saveDraft
+  >[0])
+  vi.mocked(indexedDb.putPostDraft).mockClear()
+  const incomplete = { ...signed, tags: undefined }
+  vi.mocked(draft.signer.signEvent).mockResolvedValue(incomplete as unknown as VerifiedEvent)
+  let result: Promise<unknown> | undefined
+  const onStart = (event: Event) => {
+    result = (event as CustomEvent).detail.promise
+    void result?.catch(() => {})
+  }
+  postDraftService.addEventListener('publish-start', onStart)
+  try {
+    await postDraftService.send(draft)
+    await expect(result).rejects.toThrow('Signer returned an invalid event')
+    expect(postDraftService.get(draft.id)?.status).toBe('draft')
+    expect(indexedDb.putPostDraft).not.toHaveBeenCalled()
+    expect(client.publishEvent).not.toHaveBeenCalled()
+  } finally {
+    postDraftService.removeEventListener('publish-start', onStart)
+  }
 })

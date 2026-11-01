@@ -27,8 +27,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import ContentPreview from '../ContentPreview'
-import Note from '../Note'
 import { SimpleUsername } from '../Username'
+import FailedDraftPreview from './FailedDraftPreview'
 
 dayjs.extend(relativeTime)
 
@@ -146,7 +146,7 @@ function DraftItem({ draft, onEdit }: { draft: TPostDraft; onEdit: () => void })
       <div className="px-4 py-3 sm:px-6">
         <div className="text-muted-foreground text-sm">{dayjs(draft.updatedAt).fromNow()}</div>
         <div className="pointer-events-none mt-1">
-          <Note event={signed.signedEvent} showFull hideHeader />
+          <FailedDraftPreview event={signed.signedEvent} />
         </div>
         {signed.error && (
           <div className="mt-2">

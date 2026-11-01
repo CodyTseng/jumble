@@ -12,6 +12,7 @@ import {
   TPostDraftUnsigned
 } from '@/types/post-draft'
 import type { Event as NostrEvent, VerifiedEvent } from 'nostr-tools'
+import { validateEvent } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
 export type TSignedDraftInput = Omit<
@@ -220,6 +221,12 @@ class PostDraftService extends EventTarget {
       })(),
       client.determineTargetRelays({ ...draftEvent, pubkey } as NostrEvent, publishOptions)
     ])
+    // External signers are a runtime boundary: the TypeScript return type does
+    // not guarantee the event contains tags (or the other required fields).
+    // Keep the editable draft when the signer returns an incomplete event.
+    if (!validateEvent(signed)) {
+      throw new Error('Signer returned an invalid event')
+    }
     deleteDraftEventCache(draftEvent)
 
     // Signed → persist as immutable pending, then broadcast.
