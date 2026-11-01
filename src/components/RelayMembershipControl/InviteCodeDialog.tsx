@@ -39,11 +39,9 @@ export default function InviteCodeDialog({
     const getInviteCode = async () => {
       setIsFetching(true)
       try {
-        if (relayInfo.pubkey) {
-          const code = await relayMembershipService.requestInviteCode(
-            relayInfo.url,
-            relayInfo.pubkey
-          )
+        const relayPubkey = relayInfo.self || relayInfo.pubkey
+        if (relayPubkey) {
+          const code = await relayMembershipService.requestInviteCode(relayInfo.url, relayPubkey)
           if (code) {
             setInviteCode(code)
           } else {

@@ -26,33 +26,40 @@ export default function RelayMembershipControl({
   const { pubkey, checkLogin, publish } = useNostr()
   const [isMember, setIsMember] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isChecking, setIsChecking] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
   const [showJoinDialog, setShowJoinDialog] = useState(false)
   const [showInviteCodeDialog, setShowInviteCodeDialog] = useState(false)
   const supportsNip43 = useMemo(() => checkNip43Support(relayInfo), [relayInfo])
+  const relayPubkey = relayInfo.self || relayInfo.pubkey
 
   useEffect(() => {
     if (!supportsNip43 || !pubkey) {
       setIsMember(false)
+      setIsChecking(false)
       return
     }
 
+    let cancelled = false
+    setIsMember(false)
     const checkMembership = async () => {
       try {
         setIsChecking(true)
         const status = await relayMembershipService.checkMembership(
           relayInfo.url,
           pubkey,
-          relayInfo.pubkey
+          relayPubkey
         )
-        setIsMember(status)
+        if (!cancelled) setIsMember(status)
       } finally {
-        setIsChecking(false)
+        if (!cancelled) setIsChecking(false)
       }
     }
 
     checkMembership()
-  }, [relayInfo.url, relayInfo.pubkey, pubkey, supportsNip43])
+    return () => {
+      cancelled = true
+    }
+  }, [relayInfo.url, relayPubkey, pubkey, supportsNip43])
 
   useEffect(() => {
     if (onMembershipStatusChange) {
@@ -60,7 +67,7 @@ export default function RelayMembershipControl({
     }
   }, [isMember, onMembershipStatusChange])
 
-  if (!supportsNip43 || isChecking) {
+  if (!supportsNip43 || (pubkey && isChecking)) {
     return null
   }
 
@@ -73,7 +80,7 @@ export default function RelayMembershipControl({
       })
       toast.success(t('Join request sent successfully'))
       await relayMembershipService.addNewMember(relayInfo.url, joinRequestEvent.pubkey)
-      onMembershipStatusChange?.(true)
+      setIsMember(true)
     } catch (error) {
       const errors = formatError(error)
       errors.forEach((err) => {

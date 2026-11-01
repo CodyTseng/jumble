@@ -1,6 +1,7 @@
 import { BoundedMap } from '@/lib/bounded-map'
 import { sortEventsDesc } from '@/lib/event'
 import { isValidPubkey } from '@/lib/pubkey'
+import { normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import DataLoader from 'dataloader'
 import { Filter } from 'nostr-tools'
@@ -34,7 +35,7 @@ class RelayMembershipService {
    * Check if a user is a member of a relay that supports NIP-43
    * @param relayUrl The relay URL
    * @param userPubkey The user's public key
-   * @param relayPubkey The relay's public key from NIP-11
+   * @param relayPubkey The relay's NIP-11 self key (pubkey for legacy relays)
    * @returns Membership status
    */
   async checkMembership(
@@ -46,12 +47,17 @@ class RelayMembershipService {
       return false
     }
 
-    const memberSet = await this.membershipListDataLoader.load({
-      url: relayUrl,
+    const key = {
+      url: normalizeUrl(relayUrl),
       pubkey: relayPubkey
-    })
+    }
+    const memberSet = await this.membershipListDataLoader.load(key)
 
-    return memberSet.has(userPubkey)
+    const isMember = memberSet.has(userPubkey)
+    // A missing member can be caused by a partial list or a failed query.
+    // Allow the next check to retry instead of caching a negative result indefinitely.
+    if (!isMember) this.membershipListDataLoader.clear(key)
+    return isMember
   }
 
   private async fetchMembershipList(relayUrl: string, relayPubkey: string): Promise<Set<string>> {
@@ -110,14 +116,14 @@ class RelayMembershipService {
   }
 
   async addNewMember(relayUrl: string, newMemberPubkey: string) {
-    const cache = await this.membershipListCache.get(relayUrl)
-    if (cache) {
-      cache.add(newMemberPubkey)
-    }
+    const url = normalizeUrl(relayUrl)
+    const cache = await this.membershipListCache.get(url)
+    if (cache) cache.add(newMemberPubkey)
+    else this.membershipListCache.set(url, Promise.resolve(new Set([newMemberPubkey])))
   }
 
   async removeMember(relayUrl: string, memberPubkey: string) {
-    const cache = await this.membershipListCache.get(relayUrl)
+    const cache = await this.membershipListCache.get(normalizeUrl(relayUrl))
     if (cache) {
       cache.delete(memberPubkey)
     }

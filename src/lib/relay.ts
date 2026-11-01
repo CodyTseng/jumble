@@ -43,7 +43,7 @@ export function checkSearchRelay(relayInfo: TRelayInfo | undefined) {
 }
 
 export function checkNip43Support(relayInfo: TRelayInfo | undefined) {
-  return relayInfo?.supported_nips?.includes(43) && !!relayInfo.pubkey
+  return relayInfo?.supported_nips?.includes(43) && !!(relayInfo.self || relayInfo.pubkey)
 }
 
 export function isRelayDisconnectReason(reason: string) {

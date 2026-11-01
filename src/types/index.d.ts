@@ -49,6 +49,7 @@ export type TRelayInfo = {
   description?: string
   icon?: string
   pubkey?: string
+  self?: string
   contact?: string
   supported_nips?: number[]
   software?: string
