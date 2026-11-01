@@ -28,6 +28,15 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - name: Archive web source maps and matching bundles
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: source-maps-web-${{ github.sha }}
+          path: |
+            dist/**/*.js
+            dist/**/*.map
+          if-no-files-found: error
+          retention-days: 90
 
   desktop:
     name: Desktop (${{ matrix.name }})
@@ -62,6 +71,18 @@ jobs:
       - run: npm ci
       - name: Build installers
         run: ${{ matrix.build-command }}
+      - name: Archive desktop source maps and matching bundles
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: source-maps-${{ matrix.name }}-${{ github.sha }}
+          path: |
+            dist/**/*.js
+            dist/**/*.map
+            dist-electron/**/*.js
+            dist-electron/**/*.cjs
+            dist-electron/**/*.map
+          if-no-files-found: error
+          retention-days: 90
       - name: Find unpacked application
         shell: bash
         run: echo "APP_DIRECTORY=release/$(node -p 'require("./package.json").version')/${{ matrix.unpacked }}" >> "$GITHUB_ENV"

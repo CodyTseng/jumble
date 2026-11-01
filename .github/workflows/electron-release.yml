@@ -52,6 +52,19 @@ jobs:
           APPLE_TEAM_ID: ${{ matrix.os == 'macos-14' && secrets.APPLE_TEAM_ID || '' }}
         run: ${{ matrix.build-command }}
 
+      - name: Archive desktop source maps and matching bundles
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: source-maps-${{ matrix.name }}-${{ github.sha }}
+          path: |
+            dist/**/*.js
+            dist/**/*.map
+            dist-electron/**/*.js
+            dist-electron/**/*.cjs
+            dist-electron/**/*.map
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Upload artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -141,6 +154,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
+          pattern: jumble-*
           path: artifacts
 
       - name: Create GitHub Release

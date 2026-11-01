@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => ({
         vite: {
           build: {
             outDir: 'dist-electron/main',
+            sourcemap: true,
             rolldownOptions: {
               // Keep native/electron-only deps external; bundle nostr-tools etc.
               external: ['electron', 'ws']
@@ -26,6 +27,7 @@ export default defineConfig(({ mode }) => ({
         vite: {
           build: {
             outDir: 'dist-electron/preload',
+            sourcemap: true,
             rolldownOptions: {
               external: ['electron'],
               output: {

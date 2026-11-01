@@ -27,6 +27,10 @@ export const createSharedConfig = (mode: string, base: string): UserConfig => {
 
   return {
     base,
+    build: {
+      // Publish mappings alongside bundles so DevTools can resolve source locations.
+      sourcemap: true
+    },
     define: {
       'import.meta.env.GIT_COMMIT': getGitHash(),
       'import.meta.env.APP_VERSION': getAppVersion(),
