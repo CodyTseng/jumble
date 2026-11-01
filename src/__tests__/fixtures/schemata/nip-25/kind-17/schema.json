@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "kind17",
+  "description": "Reaction event referencing external content (NIP-25 + NIP-73)",
+  "allOf": [
+    {
+      "allOf": [
+        {
+          "$schema": "http://json-schema.org/draft-07/schema",
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string",
+              "errorMessage": "content must be a string",
+              "description": "The content of the note"
+            },
+            "created_at": {
+              "type": "integer",
+              "minimum": 0,
+              "errorMessage": "created_at must be a timestamp expressed in seconds (not milliseconds)",
+              "description": "The timestamp of the note creation"
+            },
+            "id": {
+              "allOf": [
+                {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  ]
+                }
+              ],
+              "errorMessage": "id must be a valid hash",
+              "description": "The id is a hash derived as specified in NIP-01"
+            },
+            "kind": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535,
+              "errorMessage": "kind must be an integer between 0 and 65535"
+            },
+            "pubkey": {
+              "allOf": [
+                {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  ]
+                }
+              ],
+              "errorMessage": "pubkey must be a secp256k1 public key",
+              "description": "The public key of the note's author"
+            },
+            "sig": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{128}$",
+              "errorMessage": "sig must be 128 lowercase hex characters (64 bytes)",
+              "description": "The cryptographic signature of the note"
+            },
+            "tags": {
+              "type": "array",
+              "errorMessage": "tags must be an array of valid tag tuples",
+              "description": "The tags of the note",
+              "items": {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": false
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "content",
+            "created_at",
+            "id",
+            "kind",
+            "pubkey",
+            "sig",
+            "tags"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": 17,
+          "errorMessage": "kind must equal 17"
+        },
+        "content": {
+          "type": "string",
+          "description": "Reaction marker such as \"+\", \"-\", or an emoji"
+        },
+        "tags": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": false
+                  }
+                ]
+              },
+              {
+                "if": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": [
+                    {
+                      "const": "emoji"
+                    }
+                  ]
+                },
+                "then": {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "title": "emojiTag",
+                      "description": "Custom emoji resource reference for reactions (NIP-25 / NIP-30)",
+                      "allOf": [
+                        {
+                          "allOf": [
+                            {
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "uniqueItems": false
+                            }
+                          ]
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": [
+                            {
+                              "const": "emoji"
+                            },
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^[0-9A-Za-z_:+-]+$",
+                              "description": "Shortcode identifying the emoji without surrounding colons"
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^https?://.+",
+                              "description": "HTTPS URL pointing to the emoji image"
+                            }
+                          ],
+                          "errorMessage": {
+                            "minItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]",
+                            "maxItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "allOf": [
+            {
+              "contains": {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "title": "externalContentTypeTag",
+                    "description": "External content type identifier tag (NIP-73)",
+                    "allOf": [
+                      {
+                        "allOf": [
+                          {
+                            "$schema": "http://json-schema.org/draft-07/schema#",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "uniqueItems": false
+                          }
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": [
+                          {
+                            "const": "k"
+                          },
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^(#|[A-Za-z0-9][A-Za-z0-9._+-]*(?::[A-Za-z0-9][A-Za-z0-9._+-]*)*)$",
+                            "description": "Type identifier for the external resource (e.g. isbn, geo, podcast:guid,"
+                          }
+                        ],
+                        "additionalItems": false,
+                        "errorMessage": {
+                          "minItems": "k tag must be ['k', <type>]",
+                          "maxItems": "k tag must be exactly ['k', <type>]"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "errorMessage": {
+                "contains": "tags must include at least one k tag describing the external content type"
+              }
+            },
+            {
+              "contains": {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "title": "externalContentIdentifierTag",
+                    "description": "External content identifier tag (NIP-73)",
+                    "allOf": [
+                      {
+                        "allOf": [
+                          {
+                            "$schema": "http://json-schema.org/draft-07/schema#",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "uniqueItems": false
+                          }
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 3,
+                        "items": [
+                          {
+                            "const": "i"
+                          },
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "Identifier or URI for the external resource"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^https?://.+",
+                            "description": "Optional URL pointing to the external resource"
+                          }
+                        ],
+                        "errorMessage": {
+                          "minItems": "i tag must be ['i', <identifier>, ...]"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "errorMessage": {
+                "contains": "tags must include at least one i tag referencing the external content"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "tags"
+      ]
+    }
+  ],
+  "$id": "https://nostrability.github.io/schemata/note/kind/17.json"
+}

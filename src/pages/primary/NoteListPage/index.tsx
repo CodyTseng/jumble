@@ -38,7 +38,7 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
     }
   }, [relayUrls])
 
-  let content: React.ReactNode = null
+  let content: React.ReactNode
   if (!isReady) {
     content = (
       <div className="text-muted-foreground pt-3 text-center text-sm">{t('loading...')}</div>

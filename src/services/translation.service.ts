@@ -56,7 +56,7 @@ class TranslationService {
       return data.api_key
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : ''
-      throw new Error(errMsg || 'Failed to regenerate API key')
+      throw new Error(errMsg || 'Failed to regenerate API key', { cause: error })
     }
   }
 
@@ -77,7 +77,7 @@ class TranslationService {
       return translatedText
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : ''
-      throw new Error(errMsg || 'Failed to translate')
+      throw new Error(errMsg || 'Failed to translate', { cause: error })
     }
   }
 

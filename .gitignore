@@ -34,3 +34,6 @@ electron-builder.env
 .vercel
 
 .claude/
+
+# CI smoke test output
+test-results/

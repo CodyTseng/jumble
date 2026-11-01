@@ -23,9 +23,7 @@ function hexToBytes(hex: string): Uint8Array {
 async function encryptFile(
   blob: Blob
 ): Promise<{ encryptedBlob: Blob; key: Uint8Array; nonce: Uint8Array; originalHash: string }> {
-  const key = await getSubtle().generateKey({ name: 'AES-GCM', length: 256 }, true, [
-    'encrypt'
-  ])
+  const key = await getSubtle().generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt'])
   const nonce = crypto.getRandomValues(new Uint8Array(12))
 
   const plaintext = await blob.arrayBuffer()
@@ -50,10 +48,18 @@ async function decryptFile(
   key: Uint8Array,
   nonce: Uint8Array
 ): Promise<ArrayBuffer> {
-  const cryptoKey = await getSubtle().importKey('raw', key, { name: 'AES-GCM' }, false, [
-    'decrypt'
-  ])
-  return getSubtle().decrypt({ name: 'AES-GCM', iv: nonce }, cryptoKey, encryptedData)
+  const cryptoKey = await getSubtle().importKey(
+    'raw',
+    new Uint8Array(key),
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  )
+  return getSubtle().decrypt(
+    { name: 'AES-GCM', iv: new Uint8Array(nonce) },
+    cryptoKey,
+    encryptedData
+  )
 }
 
 export default { encryptFile, decryptFile, bytesToHex, hexToBytes }

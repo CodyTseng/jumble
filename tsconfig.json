@@ -7,7 +7,6 @@
     { "path": "./electron" }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

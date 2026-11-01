@@ -15,7 +15,7 @@ const ArticleEditorPage = forwardRef<TPageRef, { id?: string; index?: number }>(
     const { event, isFetching } = useFetchEvent(id)
     // Editing is based on a fixed version. A publish notification must not
     // replace the draft while the successful publish is returning to its source page.
-    const source = useRef<{ id: string | undefined; event: Event }>()
+    const source = useRef<{ id: string | undefined; event: Event } | undefined>(undefined)
     if (event && source.current?.id !== id) source.current = { id, event }
     const editEvent = source.current?.id === id ? source.current?.event : undefined
 

@@ -16,7 +16,7 @@ export function interpolateScroll(position: number, points: { source: number; ta
 }
 
 export default function usePreviewScrollSync(
-  textareaRef: RefObject<HTMLTextAreaElement>,
+  textareaRef: RefObject<HTMLTextAreaElement | null>,
   content: string,
   enabled: boolean
 ) {

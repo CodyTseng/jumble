@@ -37,7 +37,7 @@ function RadixDirectionProvider({ children }: { children: React.ReactNode }) {
   return <DirectionProvider dir={i18n.dir()}>{children}</DirectionProvider>
 }
 
-export default function App(): JSX.Element {
+export default function App(): React.JSX.Element {
   return (
     <RadixDirectionProvider>
       <ScreenSizeProvider>

@@ -1,8 +1,8 @@
 import { execSync } from 'child_process'
 import path from 'path'
 import { loadEnv, type UserConfig } from 'vite'
-import packageJson from './package.json'
-import { normalizeUrl } from './src/lib/url'
+import packageJson from './package.json' with { type: 'json' }
+import { normalizeUrl } from './src/lib/url.ts'
 
 const getGitHash = () => {
   try {
@@ -40,7 +40,7 @@ export const createSharedConfig = (mode: string, base: string): UserConfig => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src')
+        '@': path.resolve(import.meta.dirname, './src')
       }
     }
   }

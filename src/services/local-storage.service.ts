@@ -767,7 +767,7 @@ class LocalStorageService {
     // even when safeStorage is temporarily unavailable.
     this.secretsViaIpc = true
 
-    let available = false
+    let available: boolean
     try {
       available = await bridge.secrets.isAvailable()
     } catch {

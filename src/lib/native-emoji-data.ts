@@ -1,5 +1,5 @@
 import { TSkinTone } from '@/types'
-import FlexSearch from 'flexsearch'
+import { Index } from 'flexsearch'
 
 export type TNativeEmoji = {
   hexcode: string
@@ -75,7 +75,7 @@ type CompactEmojiRaw = {
 type LoadedData = {
   categories: TNativeEmojiCategory[]
   flat: TNativeEmoji[]
-  searchIndex: FlexSearch.Index
+  searchIndex: Index
 }
 
 let loadPromise: Promise<LoadedData> | null = null
@@ -127,7 +127,7 @@ async function load(): Promise<LoadedData> {
       emojis: buckets[id]
     })).filter((c) => c.emojis.length > 0)
 
-    const searchIndex = new FlexSearch.Index({ tokenize: 'forward' })
+    const searchIndex = new Index({ tokenize: 'forward' })
     flat.forEach((e, idx) => {
       searchIndex.add(idx, [e.label, ...e.tags].join(' '))
     })
@@ -147,9 +147,7 @@ export async function searchNativeEmojis(query: string, limit = 64): Promise<TNa
   if (!trimmed) return []
   const { flat, searchIndex } = await load()
   const ids = await searchIndex.searchAsync(trimmed, { limit })
-  return ids
-    .map((id) => flat[id as number])
-    .filter((e): e is TNativeEmoji => Boolean(e))
+  return ids.map((id) => flat[id as number]).filter((e): e is TNativeEmoji => Boolean(e))
 }
 
 export function applySkinTone(emoji: TNativeEmoji, tone: TSkinTone): string {

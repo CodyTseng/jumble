@@ -36,7 +36,11 @@ npm install
 npm run dev
 ```
 
-For a web-only build on a system that cannot download the Electron binary, skip that download while keeping platform-specific build dependencies such as Rollup:
+Builds use the TypeScript 7 native compiler (`tsc`), installed as `@typescript/native`. The `typescript` dependency aliases the official TypeScript 6 compatibility package so ESLint can continue using its compiler API. Keep both dependencies when updating the toolchain. See the [official side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-60).
+
+The dependency overrides move `minimatch` 10.x consumers to 11.0.3+ and Workbox's `glob` to 14.0.3+ to address [pattern amplification](https://github.com/advisories/GHSA-g3hv-75wg-m249) and [cancellation handling](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) advisories. Older `minimatch` consumers retain their declared versions because their APIs differ. Remove these overrides when the upstream tools adopt compatible patched releases.
+
+For a web-only build on a system that cannot download the Electron binary, skip that download while keeping platform-specific build dependencies such as Rolldown and TypeScript:
 
 ```bash
 ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install
@@ -80,6 +84,12 @@ npm run electron:preview
 ```
 
 The web build (`npm run dev`, `npm run build`) is unaffected and never loads any Electron-only code.
+
+## Continuous integration
+
+Branch pushes and pull requests run lint, the test suite, and a web/PWA build. Windows x64 and Linux x64/arm64 jobs then build installers and launch the unpacked applications. The smoke test checks packaged runtime files, the preload IPC bridge, initial rendering, and Settings navigation. On Linux without a keychain it also exercises password setup on the fresh CI runner. Screenshots and logs are uploaded and downloaded again to verify artifact handling.
+
+`scripts/electron-smoke.mjs <unpacked-app-directory>` requires a disposable CI runner because it may initialize application storage. To check package contents locally without starting the application, append `--verify-only`.
 
 ## Community mode (Optional)
 

@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import packageJson from './package.json'
-import { createSharedConfig } from './vite.shared'
+import packageJson from './package.json' with { type: 'json' }
+import { createSharedConfig } from './vite.shared.ts'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({

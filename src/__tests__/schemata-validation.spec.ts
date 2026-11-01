@@ -42,6 +42,7 @@ vi.mock('@/services/media-upload.service', () => ({
 
 // ── Imports ─────────────────────────────────────────────────────────────
 import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import Ajv from 'ajv'
 import ajvErrors from 'ajv-errors'
 import { kinds, type Event } from 'nostr-tools'
@@ -74,12 +75,10 @@ import { getEventAuthorPubkey } from '@/lib/event'
 
 // ── Schema loading ──────────────────────────────────────────────────────
 const require_ = createRequire(import.meta.url)
-const schemataBase = require_
-  .resolve('@nostrability/schemata')
-  .replace(/\/dist\/.*/, '/dist/nips')
+const schemataBase = new URL('./fixtures/schemata/', import.meta.url)
 
 function loadSchema(path: string): object {
-  return require_(`${schemataBase}/${path}`)
+  return require_(fileURLToPath(new URL(path, schemataBase)))
 }
 
 /**
@@ -221,7 +220,11 @@ describe('Schemata Schema Validation', () => {
   // Kind 0 – Profile metadata
   it('kind 0 (Profile) via createProfileDraftEvent', () => {
     const draft = createProfileDraftEvent(
-      JSON.stringify({ name: 'Alice', about: 'Test profile', picture: 'https://example.com/avatar.png' })
+      JSON.stringify({
+        name: 'Alice',
+        about: 'Test profile',
+        picture: 'https://example.com/avatar.png'
+      })
     )
     expect(draft.kind).toBe(0)
     const result = validateDraftEvent(draft, schemaRegistry)
@@ -382,7 +385,11 @@ describe('Schemata Schema Validation', () => {
   })
 
   it('kind 1111 (Comment on external content) via createCommentDraftEvent', async () => {
-    const draft = await createCommentDraftEvent('Interesting article', 'https://example.com/article', [])
+    const draft = await createCommentDraftEvent(
+      'Interesting article',
+      'https://example.com/article',
+      []
+    )
     expect(draft.kind).toBe(ExtendedKind.COMMENT)
     const result = validateDraftEvent(draft, schemaRegistry)
     expect(result.errors).toEqual([])
@@ -416,7 +423,10 @@ describe('Schemata Schema Validation', () => {
 
   // Kind 10001 – Pin list
   it('kind 10001 (Pin List) via createPinListDraftEvent', () => {
-    const tags = [['e', 'a'.repeat(64)], ['e', 'b'.repeat(64)]]
+    const tags = [
+      ['e', 'a'.repeat(64)],
+      ['e', 'b'.repeat(64)]
+    ]
     const draft = createPinListDraftEvent(tags)
     expect(draft.kind).toBe(kinds.Pinlist)
     const result = validateDraftEvent(draft, schemaRegistry)

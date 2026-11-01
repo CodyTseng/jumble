@@ -49,7 +49,7 @@ export function userIdToPubkey(userId: string, throwOnInvalid = false): string {
       }
     } catch (error) {
       if (throwOnInvalid) {
-        throw new Error('Invalid id')
+        throw new Error('Invalid id', { cause: error })
       }
       console.error('Error decoding userId:', userId, 'error:', error)
     }

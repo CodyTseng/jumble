@@ -58,7 +58,7 @@ export default function ProfileFeed({ pubkey, search = '' }: { pubkey: string; s
 
   useEffect(() => {
     const initPinnedEventIds = async () => {
-      let evt: NostrEvent | null = null
+      let evt: NostrEvent | null
       if (pubkey === myPubkey) {
         evt = myPinListEvent
       } else {

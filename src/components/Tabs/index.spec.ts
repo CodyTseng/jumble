@@ -46,7 +46,7 @@ vi.mock('react-i18next', () => ({
 }))
 
 type ElementProps = {
-  children: ReactElement[]
+  children: ReactElement<ElementProps>[]
   className: string
   dir: string
   onClick: () => void
@@ -182,7 +182,8 @@ describe('Tabs sticky visibility', () => {
     const scrollArea = toolbar.props.children[0]
     expect(scrollArea.props.dir).toBe(dir)
     const row = scrollArea.props.children[0]
-    row.props.children[0][1].props.onClick()
+    const tabButtons = row.props.children[0] as unknown as ReactElement<ElementProps>[]
+    tabButtons[1].props.onClick()
     expect(onTabChange).toHaveBeenCalledWith('reactions')
     row.props.children[1].props.onClick()
     expect(onCustomize).toHaveBeenCalledOnce()

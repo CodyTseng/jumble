@@ -53,7 +53,7 @@ function AccountManagerNav({
   const otherMethods: {
     key: string
     label: string
-    icon: JSX.Element
+    icon: React.JSX.Element
     onClick: () => void
     show: boolean
   }[] = [
@@ -175,7 +175,7 @@ function LoginMethodTile({
   onClick
 }: {
   label: string
-  icon: JSX.Element
+  icon: React.JSX.Element
   onClick: () => void
 }) {
   return (

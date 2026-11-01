@@ -33,7 +33,7 @@ describe('page scroll restoration', () => {
   let contentTop: number
   let panelTop: number
   let frames: Map<number, FrameRequestCallback>
-  let ref: React.RefObject<HTMLDivElement>
+  let ref: React.RefObject<HTMLDivElement | null>
 
   const flushFrame = () => {
     const callbacks = [...frames.values()]

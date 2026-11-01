@@ -7,7 +7,7 @@ This document is designed to help AI Agents better understand and modify the Jum
 Jumble is a user-friendly Nostr client for exploring relay feeds.
 
 - **Project Name**: Jumble
-- **Main Tech Stack**: React 18 + TypeScript + Vite
+- **Main Tech Stack**: React 19 + TypeScript 7 + Vite 8
 - **UI Framework**: Tailwind CSS + Radix UI
 - **State Management**: Jotai
 - **Core Protocol**: Nostr (using nostr-tools)
@@ -16,16 +16,17 @@ Jumble is a user-friendly Nostr client for exploring relay feeds.
 
 ### Core Dependencies
 
-- **Build Tool**: Vite 5.x
-- **Frontend Framework**: React 18.3.x + TypeScript
+- **Build Tool**: Vite 8.x (Rolldown)
+- **Frontend Framework**: React 19.x + TypeScript 7.x
+- **TypeScript Tooling**: Builds use the native TypeScript 7 compiler, installed as `@typescript/native`. The `typescript` dependency aliases the official TypeScript 6 compatibility package for ESLint's compiler API. Keep both dependencies when updating the toolchain.
 - **Styling Solution**:
-  - Tailwind CSS (primary styling framework)
+  - Tailwind CSS 4.x (primary styling framework)
   - Radix UI (unstyled component library)
   - next-themes (theme management)
-  - tailwindcss-animate (animations)
-- **State Management**: Jotai 2.x
+  - tw-animate-css (animations)
+- **State Management**: Jotai 3.x
 - **Routing**: path-to-regexp (custom routing solution)
-- **Rich Text Editor**: TipTap 2.x
+- **Rich Text Editor**: TipTap 3.x
 - **Nostr Protocol**: nostr-tools 2.x
 - **Other Key Libraries**:
   - i18next (internationalization)
@@ -81,6 +82,9 @@ npm run build
 
 # Lint code
 npm run lint
+
+# Run tests
+npm test
 
 # Format code
 npm run format
@@ -173,14 +177,14 @@ Jumble supports RTL languages (currently Arabic `ar` and Persian `fa`). **All ne
 
 **Always prefer logical Tailwind classes over physical ones.** Tailwind v4 supports these natively; they flip automatically when `dir="rtl"` is set.
 
-| Use (logical) | Not (physical) |
-| --- | --- |
-| `ms-*`, `me-*` | `ml-*`, `mr-*` |
-| `ps-*`, `pe-*` | `pl-*`, `pr-*` |
-| `start-*`, `end-*` | `left-*`, `right-*` |
-| `text-start`, `text-end` | `text-left`, `text-right` |
-| `border-s`, `border-e` | `border-l`, `border-r` |
-| `rounded-s-*`, `rounded-e-*` | `rounded-l-*`, `rounded-r-*` |
+| Use (logical)                                                  | Not (physical)                                                 |
+| -------------------------------------------------------------- | -------------------------------------------------------------- |
+| `ms-*`, `me-*`                                                 | `ml-*`, `mr-*`                                                 |
+| `ps-*`, `pe-*`                                                 | `pl-*`, `pr-*`                                                 |
+| `start-*`, `end-*`                                             | `left-*`, `right-*`                                            |
+| `text-start`, `text-end`                                       | `text-left`, `text-right`                                      |
+| `border-s`, `border-e`                                         | `border-l`, `border-r`                                         |
+| `rounded-s-*`, `rounded-e-*`                                   | `rounded-l-*`, `rounded-r-*`                                   |
 | `rounded-ss-*`, `rounded-se-*`, `rounded-es-*`, `rounded-ee-*` | `rounded-tl-*`, `rounded-tr-*`, `rounded-bl-*`, `rounded-br-*` |
 
 **Exceptions — keep physical classes when anchoring to the screen edge, not to content flow.** Modal close buttons (top-right by global convention), notification badges on icon corners, dialog centering via `left-[50%]`, and carousel prev/next buttons anchored to physical positions should stay physical.
@@ -286,11 +290,11 @@ Properties:
 
 A behavioral wrapper for a container whose `onClick` navigates the user (e.g. note cards, reply cards, notification cards). It renders a `<div>` and forwards `HTMLAttributes<HTMLDivElement>`.
 
-It marks itself with `data-clickable-card` and filters the click before calling the provided `onClick`, so the handler only fires when the click is for *this* card. Specifically it skips:
+It marks itself with `data-clickable-card` and filters the click before calling the provided `onClick`, so the handler only fires when the click is for _this_ card. Specifically it skips:
 
 1. Portal-rendered descendants (overlays, menus rendered outside the DOM subtree).
 2. Interactive controls inside the card — `button`, `a`, `input`, `textarea`, `select`, `[role="button"]` (matched via `closest()`).
-3. Clicks that originate inside a *nested* `ClickableCard` (e.g. an embedded note inside a note card).
+3. Clicks that originate inside a _nested_ `ClickableCard` (e.g. an embedded note inside a note card).
 
 **Why not just call `e.stopPropagation()` on inner controls?** React's `stopPropagation()` also calls `nativeEvent.stopPropagation()`, which prevents the click from bubbling to `document`. Radix Dialog/Drawer's touch-mode outside-click detection relies on that native bubble to close itself when the user taps outside. Stopping propagation breaks that detection. The filter-on-the-parent approach in `ClickableCard` sidesteps the issue entirely — clicks still bubble to `document`, we just ignore the ones that don't belong to us.
 
@@ -298,7 +302,7 @@ It marks itself with `data-clickable-card` and filters the click before calling 
 
 - Use `<ClickableCard>` when the clickable container holds anything that could bubble an unwanted click — interactive controls (`<button>`, `<a>`, `StuffStats`, `NoteOptions`, etc.) or other clickable cards (e.g. embedded notes). For these cases, do **not** hand-roll the filter logic, and do **not** rely on `e.stopPropagation()` on inner controls (it breaks Radix Dialog/Drawer touch-mode — see above).
 - A plain `<div onClick={...}>` (or `<Card onClick={...}>`) is fine when the container only holds purely-display content (text, avatars, icons) with no clickable descendants. If you later add an interactive child or nested card, swap it for `<ClickableCard>` at that time.
-- Inside a `ClickableCard`, a custom clickable element that is *not* a `button`/`a`/`input`/`textarea`/`select` must declare `role="button"` so the filter recognizes it.
+- Inside a `ClickableCard`, a custom clickable element that is _not_ a `button`/`a`/`input`/`textarea`/`select` must declare `role="button"` so the filter recognizes it.
 - When introducing a brand-new kind of "clickable container" pattern (rare), keep the `data-clickable-card` contract consistent — i.e. extend `ClickableCard` or follow the same marker. Do not invent a parallel mechanism.
 
 ## Feature Documentation
@@ -368,6 +372,7 @@ The bridge exposed at `window.electron` has these namespaces:
 - `proxy.fetch(url, options)` — **generic CORS-bypass HTTP proxy**. Any future renderer code that needs to bypass CORS should call this rather than add a new channel. Returns `{ ok, status, statusText, url, headers, body }`. Default 15s timeout, 5 MB body cap, custom UA. Renderer parses the body itself (no domain logic in main).
 
 When adding a new IPC channel:
+
 1. Add the channel name to `IPC_CHANNELS` in `electron/shared/ipc-types.ts`.
 2. Add types to the same file.
 3. Register the handler in `electron/main/ipc.ts`.
@@ -388,14 +393,14 @@ When adding a new IPC channel:
 
 ### What Lives Where
 
-| Concern | Web mode | Electron mode |
-| --- | --- | --- |
-| Relay WebSockets | renderer (`SmartPool`) | main (`SmartPool` + `RelayManager`) |
-| Signing (`ISigner`) | renderer | renderer (unchanged) |
-| Secret storage | localStorage | encrypted file in `userData/` (OS keychain, or password-derived key when no keychain) |
-| Cross-origin HTTP fetch | direct | `bridge.proxy.fetch` |
-| IndexedDB caches | renderer | renderer (unchanged) |
-| PWA / service worker | enabled | disabled (vite-plugin-pwa skipped) |
+| Concern                 | Web mode               | Electron mode                                                                         |
+| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
+| Relay WebSockets        | renderer (`SmartPool`) | main (`SmartPool` + `RelayManager`)                                                   |
+| Signing (`ISigner`)     | renderer               | renderer (unchanged)                                                                  |
+| Secret storage          | localStorage           | encrypted file in `userData/` (OS keychain, or password-derived key when no keychain) |
+| Cross-origin HTTP fetch | direct                 | `bridge.proxy.fetch`                                                                  |
+| IndexedDB caches        | renderer               | renderer (unchanged)                                                                  |
+| PWA / service worker    | enabled                | disabled (vite-plugin-pwa skipped)                                                    |
 
 ### When Modifying Electron Behavior
 
@@ -576,5 +581,6 @@ Or create a singleton service in `src/services/` and use Jotai atoms for state m
 ### Style Modifications
 
 - Global styles: `src/index.css`
-- Tailwind configuration: `tailwind.config.js`
+- Tailwind theme and utilities: `src/index.css` (CSS-first configuration)
+- PostCSS integration: `postcss.config.js`
 - Component styles: Use Tailwind class names directly

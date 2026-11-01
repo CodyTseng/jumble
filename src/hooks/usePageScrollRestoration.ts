@@ -15,7 +15,7 @@ export function usePageScrollRestoration({
 }: {
   active: boolean
   windowScroll: boolean
-  scrollAreaRef: RefObject<HTMLDivElement>
+  scrollAreaRef: RefObject<HTMLDivElement | null>
   resetKey?: string | null
 }) {
   const position = useRef<ScrollPosition>({ top: 0 })

@@ -63,7 +63,8 @@ function setup() {
         await manager.publish(relayUrl, evt, timeout, id)
       } catch (error) {
         throw new Error(
-          `Error invoking remote method 'relay:publish': Error: ${(error as Error).message}`
+          `Error invoking remote method 'relay:publish': Error: ${(error as Error).message}`,
+          { cause: error }
         )
       }
     }

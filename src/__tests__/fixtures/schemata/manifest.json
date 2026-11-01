@@ -1,0 +1,30 @@
+{
+  "package": "@nostrability/schemata",
+  "version": "0.3.2",
+  "source": "https://github.com/nostrability/schemata",
+  "tarball": "https://registry.npmjs.org/@nostrability/schemata/-/schemata-0.3.2.tgz",
+  "integrity": "sha512-KlMsA53phra3UY91eQskh+J7DXjaWrNW2Bm57dYOozwIEcT6o+RmHRAzwaMkxffk2RBQWVSJoynhL323gmRogw==",
+  "files": [
+    "nip-01/kind-0/schema.json",
+    "nip-01/kind-1/schema.json",
+    "nip-02/kind-3/schema.json",
+    "nip-09/kind-5/schema.json",
+    "nip-18/kind-6/schema.json",
+    "nip-25/kind-7/schema.json",
+    "nip-18/kind-16/schema.json",
+    "nip-25/kind-17/schema.json",
+    "nip-22/kind-1111/schema.json",
+    "nip-84/kind-9802/schema.json",
+    "nip-51/kind-10000/schema.json",
+    "nip-51/kind-10001/schema.json",
+    "nip-65/kind-10002/schema.json",
+    "nip-51/kind-10003/schema.json",
+    "nip-51/kind-10012/schema.json",
+    "nip-51/kind-10030/schema.json",
+    "nip-b7/kind-10063/schema.json",
+    "nip-43/kind-28934/schema.json",
+    "nip-43/kind-28936/schema.json",
+    "nip-51/kind-30002/schema.json",
+    "nip-78/kind-30078/schema.json"
+  ]
+}

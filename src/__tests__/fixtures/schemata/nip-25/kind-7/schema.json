@@ -1,0 +1,333 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "kind7",
+  "description": "Reaction event referencing a nostr event (NIP-25)",
+  "allOf": [
+    {
+      "allOf": [
+        {
+          "$schema": "http://json-schema.org/draft-07/schema",
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string",
+              "errorMessage": "content must be a string",
+              "description": "The content of the note"
+            },
+            "created_at": {
+              "type": "integer",
+              "minimum": 0,
+              "errorMessage": "created_at must be a timestamp expressed in seconds (not milliseconds)",
+              "description": "The timestamp of the note creation"
+            },
+            "id": {
+              "allOf": [
+                {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  ]
+                }
+              ],
+              "errorMessage": "id must be a valid hash",
+              "description": "The id is a hash derived as specified in NIP-01"
+            },
+            "kind": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535,
+              "errorMessage": "kind must be an integer between 0 and 65535"
+            },
+            "pubkey": {
+              "allOf": [
+                {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  ]
+                }
+              ],
+              "errorMessage": "pubkey must be a secp256k1 public key",
+              "description": "The public key of the note's author"
+            },
+            "sig": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{128}$",
+              "errorMessage": "sig must be 128 lowercase hex characters (64 bytes)",
+              "description": "The cryptographic signature of the note"
+            },
+            "tags": {
+              "type": "array",
+              "errorMessage": "tags must be an array of valid tag tuples",
+              "description": "The tags of the note",
+              "items": {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": false
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "content",
+            "created_at",
+            "id",
+            "kind",
+            "pubkey",
+            "sig",
+            "tags"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": 7,
+          "errorMessage": "kind must equal 7"
+        },
+        "content": {
+          "type": "string",
+          "description": "Reaction marker such as '+', '-', an emoji, or a custom :shortcode:"
+        },
+        "tags": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              {
+                "allOf": [
+                  {
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": false
+                  }
+                ]
+              },
+              {
+                "if": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": [
+                    {
+                      "const": "emoji"
+                    }
+                  ]
+                },
+                "then": {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "title": "emojiTag",
+                      "description": "Custom emoji resource reference for reactions (NIP-25 / NIP-30)",
+                      "allOf": [
+                        {
+                          "allOf": [
+                            {
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "uniqueItems": false
+                            }
+                          ]
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": [
+                            {
+                              "const": "emoji"
+                            },
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^[0-9A-Za-z_:+-]+$",
+                              "description": "Shortcode identifying the emoji without surrounding colons"
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^https?://.+",
+                              "description": "HTTPS URL pointing to the emoji image"
+                            }
+                          ],
+                          "errorMessage": {
+                            "minItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]",
+                            "maxItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "contains": {
+            "allOf": [
+              {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "title": "reactionETag",
+                "description": "Event reference tag for reaction events (NIP-25)",
+                "allOf": [
+                  {
+                    "allOf": [
+                      {
+                        "$schema": "http://json-schema.org/draft-07/schema#",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "uniqueItems": false
+                      }
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": [
+                      {
+                        "const": "e"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      }
+                    ],
+                    "additionalItems": {
+                      "anyOf": [
+                        {
+                          "allOf": [
+                            {
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "title": "relayUrl",
+                              "type": "string",
+                              "pattern": "^wss?://[a-zA-Z0-9._-]+(?::[0-9]+)?(?:/.*)?$",
+                              "description": "WebSocket relay URL (ws:// or wss:// with valid hostname)",
+                              "errorMessage": "must be a valid relay URL (ws:// or wss:// with valid hostname)"
+                            }
+                          ]
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      ]
+                    },
+                    "errorMessage": {
+                      "minItems": "e tag must include the event id"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "allOf": [
+            {
+              "if": {
+                "contains": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": [
+                    {
+                      "const": "emoji"
+                    }
+                  ]
+                }
+              },
+              "then": {
+                "contains": {
+                  "allOf": [
+                    {
+                      "$schema": "http://json-schema.org/draft-07/schema#",
+                      "title": "emojiTag",
+                      "description": "Custom emoji resource reference for reactions (NIP-25 / NIP-30)",
+                      "allOf": [
+                        {
+                          "allOf": [
+                            {
+                              "$schema": "http://json-schema.org/draft-07/schema#",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "uniqueItems": false
+                            }
+                          ]
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": [
+                            {
+                              "const": "emoji"
+                            },
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "^[0-9A-Za-z_:+-]+$",
+                              "description": "Shortcode identifying the emoji without surrounding colons"
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^https?://.+",
+                              "description": "HTTPS URL pointing to the emoji image"
+                            }
+                          ],
+                          "errorMessage": {
+                            "minItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]",
+                            "maxItems": "emoji tag must contain ['emoji', <shortcode>, <https url>]"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "errorMessage": {
+                "contains": "tags must include a valid emoji tag when custom emoji reactions are used"
+              }
+            }
+          ],
+          "errorMessage": {
+            "contains": "tags must include an e tag referencing the reacted event"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "tags"
+      ]
+    }
+  ],
+  "$id": "https://nostrability.github.io/schemata/note/kind/7.json"
+}
