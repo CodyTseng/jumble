@@ -8,18 +8,7 @@ import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { thumbHashToDataURL } from 'thumbhash'
 import { ImageSize, isSmallInlineImage, isValidImageSize, shouldFillImageRow } from './display-size'
 
-export default function Image({
-  image: { url, blurHash, thumbHash, pubkey, dim },
-  alt,
-  className = '',
-  classNames = {},
-  hideIfError = false,
-  errorPlaceholder = <ImageOff />,
-  onImageLoad,
-  upscaleSmall = false,
-  fillNearRow = false,
-  ...props
-}: HTMLAttributes<HTMLDivElement> & {
+type ImageProps = HTMLAttributes<HTMLDivElement> & {
   classNames?: {
     wrapper?: string
     errorPlaceholder?: string
@@ -32,7 +21,26 @@ export default function Image({
   onImageLoad?: (url: string, img: HTMLImageElement) => void
   upscaleSmall?: boolean
   fillNearRow?: boolean
-}) {
+}
+
+export default function Image(props: ImageProps) {
+  // Reset loading state by source without a passive effect that can overwrite
+  // an already-fired load event for cached images.
+  return <ImageContent key={props.image.url} {...props} />
+}
+
+function ImageContent({
+  image: { url, blurHash, thumbHash, pubkey, dim },
+  alt,
+  className = '',
+  classNames = {},
+  hideIfError = false,
+  errorPlaceholder = <ImageOff />,
+  onImageLoad,
+  upscaleSmall = false,
+  fillNearRow = false,
+  ...props
+}: ImageProps) {
   const { url: imageUrl, error: hasError, handleError, markSuccess } = useBlossomUrl(url, pubkey)
   const [isLoaded, setIsLoaded] = useState(false)
   const [displaySkeleton, setDisplaySkeleton] = useState(true)
@@ -51,11 +59,6 @@ export default function Image({
     observer.observe(parent)
     return () => observer.disconnect()
   }, [fillNearRow])
-
-  useEffect(() => {
-    setIsLoaded(false)
-    setDisplaySkeleton(true)
-  }, [url])
 
   if (hideIfError && hasError) return null
 
