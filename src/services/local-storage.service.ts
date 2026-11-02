@@ -73,7 +73,7 @@ class LocalStorageService {
   private sidebarCollapse: boolean = false
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
-  private enableDm: boolean = true
+  private enableDm: boolean = false
   private useNip22Replies: boolean = false
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
   private filterOutOnionRelays: boolean = !isTorBrowser()
@@ -393,7 +393,7 @@ class LocalStorageService {
     this.enableSingleColumnLayout =
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
 
-    this.enableDm = window.localStorage.getItem(StorageKey.ENABLE_DM) !== 'false'
+    this.enableDm = window.localStorage.getItem(StorageKey.ENABLE_DM) === 'true'
     this.useNip22Replies = window.localStorage.getItem(StorageKey.USE_NIP22_REPLIES) === 'true'
 
     this.faviconUrlTemplate =
