@@ -94,6 +94,8 @@ already-built assets and updates native plugin configuration.
   or storage permission; Android 7–9 requests legacy write permission when saving.
   Failed downloads and writes remove temporary/pending files; the UI reports
   progress, success, and failure instead of relying on WebView anchor downloads.
+- `ic_notification`: a transparent, single-color Jumble mark sized for Android
+  status bars, used by the listener, activity alerts, and local notifications.
 - `system-notification/native.ts`: local notifications for events received while
   the process is active, using the existing notification service interface.
 

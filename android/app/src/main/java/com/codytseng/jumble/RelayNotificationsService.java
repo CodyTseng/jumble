@@ -54,6 +54,7 @@ public class RelayNotificationsService extends Service {
     private static final int FOREGROUND_ID = 9101;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService disk = Executors.newSingleThreadExecutor(), network = Executors.newFixedThreadPool(2);
+    private final ExecutorService transportCleanup = Executors.newSingleThreadExecutor();
     private final OkHttpClient socketsClient = new OkHttpClient.Builder().pingInterval(30, TimeUnit.SECONDS).build();
     private final Map<Integer, WebSocket> sockets = new ConcurrentHashMap<>();
     private final Set<Integer> earlyClosed = ConcurrentHashMap.newKeySet();
@@ -279,12 +280,29 @@ public class RelayNotificationsService extends Service {
     void resumeRuntime() { handler.post(() -> { if (runtime != null) runtime.resumeTimers(); }); }
     private void stopRuntime() {
         epoch++; started = false; handler.removeCallbacksAndMessages(null); connected.set(0); subscriptions.set(0);
-        sockets.values().forEach(WebSocket::cancel); sockets.clear(); earlyClosed.clear(); requests.forEach(HttpURLConnection::disconnect);
+        // Closing TLS sockets (including pooled/idle connections) can perform network I/O.
+        // Detach this runtime's resources on main, then close only that snapshot off main.
+        java.util.List<WebSocket> oldSockets = new java.util.ArrayList<>(sockets.values());
+        java.util.List<HttpURLConnection> oldRequests = new java.util.ArrayList<>(requests);
+        sockets.clear(); earlyClosed.clear(); requests.removeAll(oldRequests);
+        if (!oldSockets.isEmpty() || !oldRequests.isEmpty()) transportCleanup.execute(() -> {
+            for (WebSocket socket : oldSockets) socket.cancel();
+            for (HttpURLConnection connection : oldRequests) {
+                try { connection.disconnect(); } catch (RuntimeException ignored) { }
+            }
+        });
         if (runtime != null) { runtime.removeJavascriptInterface("JumbleBackgroundHost"); runtime.stopLoading(); runtime.destroy(); runtime = null; }
     }
     @Override public void onDestroy() {
         connectivity.unregisterNetworkCallback(networkChanges);
-        stopRuntime(); disk.shutdownNow(); network.shutdownNow(); socketsClient.dispatcher().cancelAll(); socketsClient.connectionPool().evictAll();
+        stopRuntime(); disk.shutdownNow();
+        transportCleanup.execute(() -> {
+            network.shutdownNow();
+            socketsClient.dispatcher().cancelAll();
+            socketsClient.connectionPool().evictAll();
+        });
+        // Let queued closes finish; shutdownNow() would discard teardown work.
+        transportCleanup.shutdown();
         instance = null; super.onDestroy();
     }
     @Override public IBinder onBind(Intent intent) { return null; }

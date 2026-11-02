@@ -10,6 +10,7 @@ const config: CapacitorConfig = {
     allowMixedContent: false
   },
   plugins: {
+    LocalNotifications: { smallIcon: 'ic_notification' },
     // Let Android inset the WebView; the shared UI also uses safe-area CSS.
     SystemBars: { insetsHandling: 'native', initialViewportFitValueHint: 'contain' }
   }

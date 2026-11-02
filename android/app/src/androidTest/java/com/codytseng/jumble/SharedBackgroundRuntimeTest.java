@@ -93,4 +93,65 @@ public class SharedBackgroundRuntimeTest {
             context.getSharedPreferences("listener",0).edit().putBoolean("enabled",wasEnabled).apply();
         }
     }
+    @Test public void stoppingNotificationsWithPooledTlsConnectionsKeepsTheActivityAlive() throws Exception {
+        Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        EncryptedStore storage=new EncryptedStore(context);
+        String previous=storage.load("notifications"), previousCursor=storage.load("notification-cursor");
+        android.content.SharedPreferences preferences=context.getSharedPreferences("listener",0);
+        boolean enabled=preferences.getBoolean("enabled",false), paused=preferences.getBoolean("pausedByUser",false);
+        ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class);
+        android.os.StrictMode.ThreadPolicy[] originalPolicy=new android.os.StrictMode.ThreadPolicy[1];
+        okhttp3.mockwebserver.MockWebServer server=new okhttp3.mockwebserver.MockWebServer();
+        okhttp3.OkHttpClient client=null;
+        try {
+            WebView[] ui=new WebView[1];scenario.onActivity(activity->ui[0]=activity.getBridge().getWebView());
+            waitFor(ui[0],"!!window.Capacitor?.nativePromise && document.getElementById('root')?.children.length>0");
+            SystemClock.sleep(300);
+            JSONObject config=new JSONObject().put("pubkey",new String(new char[64]).replace('\0','a'))
+                .put("relays",new JSONArray()).put("enabledAt",System.currentTimeMillis()/1000)
+                .put("filters",new JSONArray()).put("descriptions",new JSONObject())
+                .put("muted",new JSONArray()).put("trusted",new JSONArray()).put("minTrustScore",0)
+                .put("hideMutedMentions",false).put("zapIssuer","");
+            evaluate(ui[0],"Capacitor.nativePromise('JumbleRelayNotifications','configure',{config:"+config+",userInitiated:true}).then(()=>window.__tlsStarted=true)");
+            waitFor(ui[0],"window.__tlsStarted===true");
+            RelayNotificationsService service=RelayNotificationsService.instance;
+            assertNotNull(service);
+            java.lang.reflect.Field field=RelayNotificationsService.class.getDeclaredField("socketsClient");field.setAccessible(true);
+            okhttp3.ConnectionPool pool=((okhttp3.OkHttpClient)field.get(service)).connectionPool();
+            okhttp3.tls.HeldCertificate certificate=new okhttp3.tls.HeldCertificate.Builder().addSubjectAlternativeName("localhost").build();
+            okhttp3.tls.HandshakeCertificates serverTls=new okhttp3.tls.HandshakeCertificates.Builder().heldCertificate(certificate).build();
+            okhttp3.tls.HandshakeCertificates clientTls=new okhttp3.tls.HandshakeCertificates.Builder().addTrustedCertificate(certificate.certificate()).build();
+            server.useHttps(serverTls.sslSocketFactory(),false);
+            server.enqueue(new okhttp3.mockwebserver.MockResponse().setBody("idle TLS connection"));server.start();
+            client=new okhttp3.OkHttpClient.Builder().connectionPool(pool).sslSocketFactory(clientTls.sslSocketFactory(),clientTls.trustManager()).build();
+            try(okhttp3.Response response=client.newCall(new okhttp3.Request.Builder().url(server.url("/idle")).build()).execute()) {
+                assertEquals("idle TLS connection",response.body().string());
+            }
+            assertTrue("Test must leave a real idle TLS connection in the service pool",pool.idleConnectionCount()>0);
+            scenario.onActivity(activity->{
+                originalPolicy[0]=android.os.StrictMode.getThreadPolicy();
+                android.os.StrictMode.setThreadPolicy(new android.os.StrictMode.ThreadPolicy.Builder(originalPolicy[0]).detectNetwork().penaltyDeathOnNetwork().build());
+            });
+            evaluate(ui[0],"Capacitor.nativePromise('JumbleRelayNotifications','stop',{}).then(()=>window.__tlsStopped=true)");
+            waitFor(ui[0],"window.__tlsStopped===true");
+            for(int count=0;count<100&&(RelayNotificationsService.instance!=null||pool.connectionCount()!=0);count++)SystemClock.sleep(50);
+            assertNull("Listener must stop",RelayNotificationsService.instance);
+            java.lang.reflect.Field cleanupField=RelayNotificationsService.class.getDeclaredField("transportCleanup");cleanupField.setAccessible(true);
+            assertTrue("Network cleanup must finish",((java.util.concurrent.ExecutorService)cleanupField.get(service)).awaitTermination(5,TimeUnit.SECONDS));
+            assertEquals("TLS pool must drain asynchronously",0,pool.connectionCount());
+            assertEquals("Foreground WebView must remain responsive","2",evaluate(ui[0],"1+1"));
+        } finally {
+            if(originalPolicy[0]!=null)InstrumentationRegistry.getInstrumentation().runOnMainSync(()->android.os.StrictMode.setThreadPolicy(originalPolicy[0]));
+            context.stopService(new Intent(context,RelayNotificationsService.class));
+            for(int count=0;count<100&&RelayNotificationsService.instance!=null;count++)SystemClock.sleep(50);
+            scenario.close();server.shutdown();
+            if(client!=null)client.dispatcher().executorService().shutdown();
+            if(previous!=null)storage.save("notifications",previous);
+            else new java.io.File(context.getNoBackupFilesDir(),"jumble/notifications.enc").delete();
+            if(previousCursor!=null)storage.save("notification-cursor",previousCursor);
+            else new java.io.File(context.getNoBackupFilesDir(),"jumble/notification-cursor.enc").delete();
+            preferences.edit().putBoolean("enabled",enabled).putBoolean("pausedByUser",paused).apply();
+        }
+    }
+
 }
