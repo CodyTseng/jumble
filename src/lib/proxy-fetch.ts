@@ -1,8 +1,6 @@
-import type {
-  TProxyFetchOptions,
-  TProxyFetchResponse
-} from '../../electron/shared/ipc-types'
-import { getElectronBridge, isElectron } from './platform'
+import type { TProxyFetchOptions, TProxyFetchResponse } from '../../electron/shared/ipc-types'
+import { CapacitorHttp } from '@capacitor/core'
+import { getElectronBridge, isAndroid, isElectron } from './platform'
 
 const DEFAULT_TIMEOUT_MS = 15_000
 
@@ -30,11 +28,33 @@ export async function proxyFetch(
     }
   }
 
+  if (isAndroid()) {
+    const timeout = Math.min(60_000, Math.max(1_000, options.timeoutMs ?? DEFAULT_TIMEOUT_MS))
+    const response = await CapacitorHttp.request({
+      url,
+      method: options.method ?? 'GET',
+      headers: options.headers,
+      data: options.body,
+      responseType: 'text',
+      connectTimeout: timeout,
+      readTimeout: timeout
+    })
+    const body = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
+    if (new TextEncoder().encode(body).byteLength > 5 * 1024 * 1024) {
+      throw new Error('Native HTTP response exceeds 5 MB')
+    }
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      statusText: '',
+      url: response.url,
+      headers: response.headers,
+      body
+    }
+  }
+
   const controller = new AbortController()
-  const timer = setTimeout(
-    () => controller.abort(),
-    options.timeoutMs ?? DEFAULT_TIMEOUT_MS
-  )
+  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS)
 
   try {
     const res = await fetch(url, {

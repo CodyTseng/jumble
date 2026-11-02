@@ -105,8 +105,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   }
 
   const updateEnableDm = (enable: boolean) => {
-    setEnableDm(enable)
     storage.setEnableDm(enable)
+    setEnableDm(storage.getEnableDm())
   }
 
   const updateUseNip22Replies = (use: boolean) => {

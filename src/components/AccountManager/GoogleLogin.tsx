@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -119,7 +120,7 @@ export default function GoogleLogin({
   }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(nsec)
+    copyText(nsec)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -67,7 +68,7 @@ export default function ProfileOptions({
               <Button
                 onClick={() => {
                   setIsDrawerOpen(false)
-                  navigator.clipboard.writeText(pubkeyToNpub(pubkey) ?? '')
+                  copyText(pubkeyToNpub(pubkey) ?? '')
                 }}
                 className="w-full justify-start gap-4 p-6 text-lg [&_svg]:size-5"
                 variant="ghost"
@@ -126,7 +127,7 @@ export default function ProfileOptions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(pubkeyToNpub(pubkey) ?? '')}>
+        <DropdownMenuItem onClick={() => copyText(pubkeyToNpub(pubkey) ?? '')}>
           <Copy />
           {t('Copy user ID')}
         </DropdownMenuItem>

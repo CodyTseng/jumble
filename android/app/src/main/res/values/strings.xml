@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name" translatable="false">Jumble</string>
+    <string name="no_external_app">No app is installed to open this link</string>
+    <string name="background_listener">Listening for new activity</string>
+    <string name="stop_listening">Stop listening</string>
+    <string name="background_connecting">Connecting to relays</string>
+</resources>

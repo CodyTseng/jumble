@@ -1272,6 +1272,9 @@ export default {
     'Go to image {{number}} of {{total}}': '前往第 {{number}} 張圖片，共 {{total}} 張',
     'Use NIP-22 replies (kind 1111)': '使用 NIP-22 回覆（kind 1111）',
     'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
-      '使用 NIP-22 留言（kind 1111）回覆文字筆記（kind 1）。這些回覆可能無法在部分用戶端中顯示。'
+      '使用 NIP-22 留言（kind 1111）回覆文字筆記（kind 1）。這些回覆可能無法在部分用戶端中顯示。',
+    'Battery settings': '電池設定',
+    'Allow background activity for local relay notifications':
+      '允許背景活動，以便在本機監聽中繼通知'
   }
 }

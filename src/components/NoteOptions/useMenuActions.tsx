@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { formatError } from '@/lib/error'
 import {
   getEventAuthorPubkey,
@@ -188,7 +189,7 @@ export function useMenuActions({
         icon: Copy,
         label: t('Copy event ID'),
         onClick: () => {
-          navigator.clipboard.writeText(getNoteBech32Id(event))
+          copyText(getNoteBech32Id(event))
           closeDrawer()
         }
       },
@@ -196,7 +197,7 @@ export function useMenuActions({
         icon: Copy,
         label: t('Copy user ID'),
         onClick: () => {
-          navigator.clipboard.writeText(pubkeyToNpub(authorPubkey) ?? '')
+          copyText(pubkeyToNpub(authorPubkey) ?? '')
           closeDrawer()
         }
       },
@@ -204,7 +205,7 @@ export function useMenuActions({
         icon: Link,
         label: t('Copy share link'),
         onClick: () => {
-          navigator.clipboard.writeText(toJumbleNote(event))
+          copyText(toJumbleNote(event))
           closeDrawer()
         }
       },
@@ -212,7 +213,7 @@ export function useMenuActions({
         icon: Copy,
         label: t('Copy note content'),
         onClick: () => {
-          navigator.clipboard.writeText(event.content)
+          copyText(event.content)
           closeDrawer()
         }
       },

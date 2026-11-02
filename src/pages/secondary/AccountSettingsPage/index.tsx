@@ -1,3 +1,5 @@
+import { copyText } from '@/lib/native-system'
+import { isNative } from '@/lib/platform'
 import PomegranateBindDialog from '@/components/PomegranateBindDialog'
 import PomegranateDisconnectDialog from '@/components/PomegranateDisconnectDialog'
 import PomegranateExportDialog from '@/components/PomegranateExportDialog'
@@ -30,7 +32,8 @@ const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const pomegranate = fullAccount ? isPomegranateAccount(fullAccount) : false
   // A local-key account (nsec or ncryptsec) can be linked to Google. Pomegranate
   // (bunker) accounts are already managed by the central server.
-  const canBindGoogle = POMEGRANATE_ENABLED && !!account && (!!nsec || !!ncryptsec) && !pomegranate
+  const canBindGoogle =
+    POMEGRANATE_ENABLED && !isNative() && !!account && (!!nsec || !!ncryptsec) && !pomegranate
 
   const openBindDialog = () => {
     if (!account) return
@@ -39,7 +42,7 @@ const AccountSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   }
 
   const copy = async (value: string, setCopied: (v: boolean) => void) => {
-    await navigator.clipboard.writeText(value)
+    await copyText(value)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

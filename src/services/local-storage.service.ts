@@ -17,7 +17,9 @@ import {
   TPrimaryColor
 } from '@/constants'
 import { isSameAccount } from '@/lib/account'
-import { getElectronBridge, isElectron } from '@/lib/platform'
+import { getNativeStorageBridge } from '@/lib/native-storage'
+import { isAndroid } from '@/lib/platform'
+import { supportsDirectMessages } from '@/lib/platform-capabilities'
 import { randomString } from '@/lib/random'
 import { isTorBrowser } from '@/lib/utils'
 import {
@@ -101,8 +103,8 @@ class LocalStorageService {
   private nsecByPubkey: Record<string, string> = {}
   private ncryptsecByPubkey: Record<string, string> = {}
   private bunkerClientSecretByPubkey: Record<string, string> = {}
-  // True when secrets persist via main-process safeStorage (Electron) instead of localStorage.
-  private secretsViaIpc = false
+  // True when secrets persist via a native encrypted store instead of localStorage.
+  private secretsViaNativeStorage = !!getNativeStorageBridge()
   private secretsWriteBlocked = false
   private secretsHydrated = false
   private secretsWriteChain: Promise<void> = Promise.resolve()
@@ -393,7 +395,8 @@ class LocalStorageService {
     this.enableSingleColumnLayout =
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
 
-    this.enableDm = window.localStorage.getItem(StorageKey.ENABLE_DM) !== 'false'
+    this.enableDm =
+      supportsDirectMessages() && window.localStorage.getItem(StorageKey.ENABLE_DM) !== 'false'
     this.useNip22Replies = window.localStorage.getItem(StorageKey.USE_NIP22_REPLIES) === 'true'
 
     this.faviconUrlTemplate =
@@ -754,19 +757,20 @@ class LocalStorageService {
   /**
    * Hydrate sensitive fields from secure storage. Must be awaited once at
    * boot, before any code reads/writes secrets. In Web mode this is a no-op;
-   * in Electron mode it loads the encrypted secrets bundle from the main
-   * process via safeStorage.
+   * in native apps it loads the encrypted secrets bundle from the platform store.
    */
   async hydrate(): Promise<void> {
     if (this.secretsHydrated) return
-    this.secretsHydrated = true
+    const bridge = getNativeStorageBridge()
+    if (!bridge) {
+      this.secretsHydrated = true
+      return
+    }
+    // Native apps must never fall back to writing secrets into localStorage,
+    // even when secure storage is temporarily unavailable.
+    this.secretsViaNativeStorage = true
 
-    const bridge = getElectronBridge()
-    if (!isElectron() || !bridge) return
-    // Electron must never fall back to writing secrets into localStorage,
-    // even when safeStorage is temporarily unavailable.
-    this.secretsViaIpc = true
-
+    let hadPersistedClientKey = false
     let available: boolean
     try {
       available = await bridge.secrets.isAvailable()
@@ -777,13 +781,12 @@ class LocalStorageService {
     if (available) {
       try {
         const bundle = await bridge.secrets.load()
-        const hadPersistedClientKey = 'clientKeyPrivkey' in bundle
+        hadPersistedClientKey = 'clientKeyPrivkey' in bundle
         this.nsecByPubkey = { ...(bundle.nsec ?? {}) }
         this.ncryptsecByPubkey = { ...(bundle.ncryptsec ?? {}) }
         this.bunkerClientSecretByPubkey = { ...(bundle.bunkerClientSecretKey ?? {}) }
         this.encryptionKeyPrivkeyMap = { ...(bundle.encryptionKeyPrivkey ?? {}) }
         this.retiredEncryptionKeyMap = { ...(bundle.retiredEncryptionKeyPrivkey ?? {}) }
-        if (hadPersistedClientKey) this.queueSecretsSave()
       } catch (err) {
         this.secretsWriteBlocked = true
         console.error('[storage] failed to load encrypted secrets:', err)
@@ -791,9 +794,16 @@ class LocalStorageService {
     } else {
       this.secretsWriteBlocked = true
       console.warn(
-        '[storage] safeStorage not available — secrets stay in-memory and will be lost on quit'
+        '[storage] secure storage not available — secrets stay in-memory and will be lost on quit'
       )
     }
+
+    if (isAndroid() && this.secretsWriteBlocked) {
+      throw new Error('Android secure storage could not be opened')
+    }
+
+    this.secretsHydrated = true
+    if (hadPersistedClientKey) this.queueSecretsSave()
 
     // Defensive cleanup: scrub any plaintext that lingered in localStorage.
     window.localStorage.removeItem(StorageKey.ENCRYPTION_KEY_PRIVKEY_MAP)
@@ -845,9 +855,9 @@ class LocalStorageService {
     }
   }
 
-  /** Shape an account for persistence: web inlines secrets, electron strips. */
+  /** Shape an account for persistence: web inlines secrets, native apps strip them. */
   private serializeAccount(account: TAccount): TAccount {
-    if (this.secretsViaIpc) {
+    if (this.secretsViaNativeStorage) {
       const stripped: TAccount = { ...account }
       delete stripped.nsec
       delete stripped.ncryptsec
@@ -877,7 +887,7 @@ class LocalStorageService {
   }
 
   private persistEncryptionKeyMap() {
-    if (this.secretsViaIpc) {
+    if (this.secretsViaNativeStorage) {
       this.queueSecretsSave()
     } else {
       window.localStorage.setItem(
@@ -888,7 +898,7 @@ class LocalStorageService {
   }
 
   private persistRetiredEncryptionKeyMap() {
-    if (this.secretsViaIpc) {
+    if (this.secretsViaNativeStorage) {
       this.queueSecretsSave()
     } else {
       window.localStorage.setItem(
@@ -899,8 +909,8 @@ class LocalStorageService {
   }
 
   private queueSecretsSave() {
-    if (this.secretsWriteBlocked) return
-    const bridge = getElectronBridge()
+    if (!this.secretsHydrated || this.secretsWriteBlocked) return
+    const bridge = getNativeStorageBridge()
     if (!bridge) return
     const snapshot = {
       nsec: { ...this.nsecByPubkey },
@@ -965,7 +975,7 @@ class LocalStorageService {
       this.accounts.push(stripped)
     }
     this.persistAccountsToLocalStorage()
-    if (this.secretsViaIpc) this.queueSecretsSave()
+    if (this.secretsViaNativeStorage) this.queueSecretsSave()
     return this.getAccounts()
   }
 
@@ -979,7 +989,7 @@ class LocalStorageService {
     delete this.ncryptsecByPubkey[account.pubkey]
     delete this.bunkerClientSecretByPubkey[account.pubkey]
     this.persistAccountsToLocalStorage()
-    if (this.secretsViaIpc) this.queueSecretsSave()
+    if (this.secretsViaNativeStorage) this.queueSecretsSave()
     return this.getAccounts()
   }
 
@@ -1248,12 +1258,12 @@ class LocalStorageService {
   }
 
   getEnableDm() {
-    return this.enableDm
+    return supportsDirectMessages() && this.enableDm
   }
 
   setEnableDm(enable: boolean) {
-    this.enableDm = enable
-    window.localStorage.setItem(StorageKey.ENABLE_DM, enable.toString())
+    this.enableDm = supportsDirectMessages() && enable
+    window.localStorage.setItem(StorageKey.ENABLE_DM, this.enableDm.toString())
   }
 
   getUseNip22Replies() {
@@ -1615,6 +1625,7 @@ class LocalStorageService {
   setSystemNotificationsEnabled(enabled: boolean) {
     this.systemNotificationsEnabled = enabled
     window.localStorage.setItem(StorageKey.SYSTEM_NOTIFICATIONS_ENABLED, enabled.toString())
+    window.dispatchEvent(new Event('system-notification-settings-change'))
   }
 
   getSystemGeneralNotificationsEnabled() {

@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -143,13 +144,13 @@ function RelayControls({ url }: { url: string }) {
   const [copiedShareableUrl, setCopiedShareableUrl] = useState(false)
 
   const handleCopyUrl = () => {
-    navigator.clipboard.writeText(url)
+    copyText(url)
     setCopiedUrl(true)
     setTimeout(() => setCopiedUrl(false), 2000)
   }
 
   const handleCopyShareableUrl = () => {
-    navigator.clipboard.writeText(`https://jumble.social/?r=${url}`)
+    copyText(`https://jumble.social/?r=${url}`)
     setCopiedShareableUrl(true)
     toast.success('Shareable URL copied to clipboard')
     setTimeout(() => setCopiedShareableUrl(false), 2000)

@@ -1300,6 +1300,9 @@ export default {
     'Go to image {{number}} of {{total}}': 'Aller à l’image {{number}} sur {{total}}',
     'Use NIP-22 replies (kind 1111)': 'Utiliser les réponses NIP-22 (kind 1111)',
     'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
-      'Répondre aux notes textuelles (kind 1) avec des commentaires NIP-22 (kind 1111). Ces réponses peuvent ne pas apparaître dans certains clients.'
+      'Répondre aux notes textuelles (kind 1) avec des commentaires NIP-22 (kind 1111). Ces réponses peuvent ne pas apparaître dans certains clients.',
+    'Battery settings': 'Paramètres de la batterie',
+    'Allow background activity for local relay notifications':
+      'Autoriser l’activité en arrière-plan pour les notifications locales des relais'
   }
 }

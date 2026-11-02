@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { isElectron } from '@/lib/platform'
 import { RotateCw } from 'lucide-react'
@@ -114,7 +115,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <Button
                 onClick={async () => {
                   try {
-                    await navigator.clipboard.writeText(this.getReport())
+                    await copyText(this.getReport())
                     this.setState({ copyStatus: 'copied' })
                   } catch {
                     this.setState({ copyStatus: 'failed' })

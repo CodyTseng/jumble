@@ -1,3 +1,4 @@
+import { supportsDirectMessages } from '@/lib/platform-capabilities'
 import Emoji from '@/components/Emoji'
 import ExpressionPickerDialog from '@/components/ExpressionPickerDialog'
 import { Button } from '@/components/ui/button'
@@ -181,11 +182,15 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
               />
             }
           />
-          <SettingsRow
-            htmlFor="enable-dm"
-            title={t('Enable Direct Messages')}
-            control={<Switch id="enable-dm" checked={enableDm} onCheckedChange={updateEnableDm} />}
-          />
+          {supportsDirectMessages() && (
+            <SettingsRow
+              htmlFor="enable-dm"
+              title={t('Enable Direct Messages')}
+              control={
+                <Switch id="enable-dm" checked={enableDm} onCheckedChange={updateEnableDm} />
+              }
+            />
+          )}
         </SettingsGroup>
 
         {!isSmallScreen && (

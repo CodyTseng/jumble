@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- An opaque canvas prevents Android from normalizing the transparent mark
+         to fill (and exceed) its icon mask. Its color matches the splash itself. -->
+    <item>
+        <shape android:shape="rectangle">
+            <size android:width="288dp" android:height="288dp" />
+            <solid android:color="?attr/windowSplashScreenBackground" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/splash_foreground" />
+</layer-list>

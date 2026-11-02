@@ -1,3 +1,5 @@
+import { isAndroid } from './platform'
+import { saveNativeImage } from './native-image'
 import { isMobileOperatingSystem } from './device'
 import { getSafeExternalUrl } from './url'
 
@@ -14,6 +16,14 @@ export async function downloadImage(
   preparedImage: PreparedImage | undefined,
   saveAs: SaveAs
 ) {
+  if (isAndroid()) {
+    await saveNativeImage(
+      url,
+      preparedImage?.filename ?? getImageFilename(url),
+      preparedImage?.blob
+    )
+    return
+  }
   if (preparedImage) {
     saveImage(url, preparedImage, saveAs)
     return
@@ -55,7 +65,7 @@ export async function prepareImageForSave(
 }
 
 export function shouldPrepareImageForShare() {
-  return isMobileOperatingSystem() && typeof navigator.share === 'function'
+  return !isAndroid() && isMobileOperatingSystem() && typeof navigator.share === 'function'
 }
 
 export function saveImage(url: string, preparedImage: PreparedImage | undefined, saveAs: SaveAs) {

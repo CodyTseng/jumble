@@ -1,4 +1,6 @@
+import { validateZapReceipt as validateSharedZapReceipt } from '@/lib/zap-validation'
 import { CODY_PUBKEY, JUMBLE_PUBKEY } from '@/constants'
+import { isAndroid } from '@/lib/platform'
 import { BoundedMap } from '@/lib/bounded-map'
 import { getEventAuthorPubkey } from '@/lib/event'
 import { getZapInfoFromEvent } from '@/lib/event-metadata'
@@ -47,7 +49,8 @@ class LightningService {
       LightningService.instance = this
       init({
         appName: 'Jumble',
-        showBalance: false
+        showBalance: false,
+        ...(isAndroid() ? { filters: ['nwc'] } : {})
       })
     }
     return LightningService.instance
@@ -255,22 +258,12 @@ class LightningService {
    *    must equal the bolt11 payment hash. The tag is optional in NIP-57, so its
    *    absence is not treated as invalid.
    */
+  async getReceiptIssuer(pubkey: string): Promise<string | null> {
+    return this.nostrPubkeyLoader.load(pubkey)
+  }
+
   async validateZapReceipt(receipt: NostrEvent): Promise<boolean> {
-    const info = getZapInfoFromEvent(receipt)
-    if (!info || !info.recipientPubkey || !info.invoice) return false
-
-    if (info.preimage) {
-      try {
-        const invoice = new Invoice({ pr: info.invoice })
-        if (!invoice.validatePreimage(info.preimage)) return false
-      } catch {
-        return false
-      }
-    }
-
-    const nostrPubkey = await this.nostrPubkeyLoader.load(info.recipientPubkey)
-    if (!nostrPubkey) return true
-    return receipt.pubkey === nostrPubkey
+    return validateSharedZapReceipt(receipt, (pubkey) => this.nostrPubkeyLoader.load(pubkey))
   }
 
   private async fetchRecipientNostrPubkey(recipientPubkey: string): Promise<string | null> {

@@ -1,3 +1,5 @@
+import { isAndroid } from '@/lib/platform'
+import { openBatterySettings } from '@/lib/native-system'
 import { SettingsGroup, SettingsPageContainer, SettingsRow } from '@/components/ui/settings'
 import { Switch } from '@/components/ui/switch'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
@@ -82,6 +84,16 @@ const NotificationSettingsPage = forwardRef(({ index }: { index?: number }, ref)
                 />
               }
             />
+            {systemNotificationsEnabled && isAndroid() && (
+              <SettingsRow
+                title={t('Battery settings')}
+                description={t('Allow background activity for local relay notifications')}
+                chevron
+                onClick={() =>
+                  void openBatterySettings().catch(() => toast.error(t('Something went wrong')))
+                }
+              />
+            )}
             {systemNotificationsEnabled && enableDm && (
               <div className="border-t px-4 pt-3 pb-2">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">

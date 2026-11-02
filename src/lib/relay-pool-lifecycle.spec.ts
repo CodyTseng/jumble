@@ -31,6 +31,15 @@ describe('observeRelayPoolLifecycle', () => {
     expect(calls.at(-1)).toBe('online:false')
   })
 
+  it('checks suspended WebView connections when the native app resumes', async () => {
+    const listeners = installPageGlobals(true)
+    const target = { setNetworkOnline: vi.fn(), checkRelays: vi.fn(async () => undefined) }
+    observeRelayPoolLifecycle(target)
+    listeners.get('jumble:resume')?.()
+    await flushPromises()
+    expect(target.checkRelays).toHaveBeenCalledOnce()
+  })
+
   it('checks relays only when a hidden page becomes visible', async () => {
     const listeners = installPageGlobals(true)
     const document = globalThis.document as unknown as { visibilityState: string }

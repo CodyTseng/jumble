@@ -6,8 +6,21 @@ import {
   getEventAuthorPubkey,
   getParentStuff,
   isMentioningMutedUsers
-} from './event'
+} from './event-core'
 import { tagNameEquals } from './tag'
+
+export const NOTIFICATION_KINDS = [
+  kinds.ShortTextNote,
+  kinds.Repost,
+  kinds.GenericRepost,
+  kinds.Reaction,
+  kinds.Zap,
+  kinds.Highlights,
+  ExtendedKind.COMMENT,
+  ExtendedKind.POLL_RESPONSE,
+  ExtendedKind.VOICE_COMMENT,
+  ExtendedKind.POLL
+]
 
 export function getNotificationFilterType(
   event: NostrEvent,

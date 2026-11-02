@@ -1,5 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { downloadImage, saveImage, type PreparedImage } from './save-image'
+import {
+  downloadImage,
+  saveImage,
+  shouldPrepareImageForShare,
+  type PreparedImage
+} from './save-image'
+
+const native = vi.hoisted(() => ({ android: false, saveImage: vi.fn() }))
+vi.mock('./platform', () => ({ isAndroid: () => native.android, isElectron: () => false }))
+vi.mock('./native-image', () => ({ saveNativeImage: native.saveImage }))
 
 const preparedImage: PreparedImage = {
   blob: new Blob(['image'], { type: 'image/png' }),
@@ -8,6 +17,8 @@ const preparedImage: PreparedImage = {
 }
 
 afterEach(() => {
+  native.android = false
+  native.saveImage.mockReset()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
@@ -56,6 +67,34 @@ describe('saveImage', () => {
 })
 
 describe('downloadImage', () => {
+  it('uses native gallery saving on Android instead of browser downloads or sharing', async () => {
+    native.android = true
+    native.saveImage.mockResolvedValue(undefined)
+    const saveAs = vi.fn()
+    const fetch = vi.fn()
+    vi.stubGlobal('fetch', fetch)
+    vi.stubGlobal('navigator', createMobileNavigator(vi.fn()))
+    expect(shouldPrepareImageForShare()).toBe(false)
+    await downloadImage('https://example.com/image.png', preparedImage, saveAs)
+    expect(native.saveImage).toHaveBeenCalledWith(
+      'https://example.com/image.png',
+      'image.png',
+      preparedImage.blob
+    )
+    expect(saveAs).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('propagates native failures so the UI can show an error rather than silently falling back', async () => {
+    native.android = true
+    native.saveImage.mockRejectedValue(new Error('Storage permission denied'))
+    const saveAs = vi.fn()
+    await expect(downloadImage('https://example.com/image.png', undefined, saveAs)).rejects.toThrow(
+      'Storage permission denied'
+    )
+    expect(saveAs).not.toHaveBeenCalled()
+  })
+
   it('downloads a fetched cross-origin image as a blob', async () => {
     vi.stubGlobal('navigator', createDesktopNavigator())
     vi.stubGlobal(

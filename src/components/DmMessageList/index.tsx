@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import DmReplyPreview from '@/components/DmReplyPreview'
 import {
   EmbeddedHashtag,
@@ -623,7 +624,7 @@ function MessageBubble({
     return tokens.every((tok) => /^https?:\/\//i.test(tok) && isImage(tok))
   }, [isFileMessage, message.content])
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(message.content)
+    copyText(message.content)
   }, [message.content])
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)

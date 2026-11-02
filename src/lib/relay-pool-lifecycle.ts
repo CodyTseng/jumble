@@ -36,6 +36,10 @@ export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
     })
   }
 
+  page.addEventListener?.('jumble:resume', () => {
+    runLifecycleTask(() => target.checkRelays())
+  })
+
   page.document?.addEventListener('visibilitychange', () => {
     if (page.document?.visibilityState === 'visible') {
       runLifecycleTask(() => target.checkRelays())

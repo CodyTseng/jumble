@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import ResponsiveDialog from '@/components/ResponsiveDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -117,7 +118,7 @@ function PomegranateExportContent({
   }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(nsec)
+    copyText(nsec)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

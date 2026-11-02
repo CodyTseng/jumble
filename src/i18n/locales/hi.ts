@@ -1276,6 +1276,9 @@ export default {
     'Go to image {{number}} of {{total}}': '{{total}} में से चित्र {{number}} पर जाएँ',
     'Use NIP-22 replies (kind 1111)': 'NIP-22 उत्तरों का उपयोग करें (kind 1111)',
     'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
-      'टेक्स्ट नोट्स (kind 1) का उत्तर NIP-22 टिप्पणियों (kind 1111) से दें। ये उत्तर कुछ क्लाइंट में दिखाई नहीं दे सकते हैं।'
+      'टेक्स्ट नोट्स (kind 1) का उत्तर NIP-22 टिप्पणियों (kind 1111) से दें। ये उत्तर कुछ क्लाइंट में दिखाई नहीं दे सकते हैं।',
+    'Battery settings': 'बैटरी सेटिंग',
+    'Allow background activity for local relay notifications':
+      'स्थानीय रिले सूचनाओं के लिए पृष्ठभूमि गतिविधि की अनुमति दें'
   }
 }

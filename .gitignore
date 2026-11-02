@@ -37,3 +37,9 @@ electron-builder.env
 
 # CI smoke test output
 test-results/
+
+# Android build output and local signing configuration
+dist-android
+android/key.properties
+*.jks
+*.keystore

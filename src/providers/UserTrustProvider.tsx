@@ -1,3 +1,4 @@
+import { meetsTrustScore } from '@/lib/trust-score'
 import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import client from '@/services/client.service'
 import fayan from '@/services/fayan.service'
@@ -6,6 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { useNostr } from './NostrProvider'
 
 type TUserTrustContext = {
+  getTrustedPubkeys: () => string[]
   minTrustScore: number
   minTrustScoreMap: Record<string, number>
   getMinTrustScore: (id: string) => number
@@ -26,6 +28,7 @@ export const useUserTrust = () => {
   return context
 }
 
+let wotOwner: string | null = null
 const wotScoreMap = new Map<string, number>()
 
 export function UserTrustProvider({ children }: { children: React.ReactNode }) {
@@ -38,6 +41,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // WoT is account-scoped derived state. Keeping entries from previous
     // accounts both leaks memory and incorrectly trusts their social graph.
+    wotOwner = currentPubkey
     wotScoreMap.clear()
     if (!currentPubkey) return
     let cancelled = false
@@ -130,16 +134,9 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
 
   const meetsMinTrustScore = useCallback(
     async (pubkey: string, minScore: number) => {
-      if (minScore === 0) return true
-      if (pubkey === currentPubkey) return true
-
-      // WoT users always have 100% trust score
-      if (wotScoreMap.has(pubkey)) return true
-
-      // Get percentile from reputation system
-      const percentile = await fayan.fetchUserPercentile(pubkey)
-      if (percentile === null) return true // If no data, indicate the trust server is down, so allow the user
-      return percentile >= minScore
+      return meetsTrustScore(pubkey, currentPubkey, minScore, wotScoreMap, (key) =>
+        fayan.fetchUserPercentile(key)
+      )
     },
     [currentPubkey]
   )
@@ -147,6 +144,7 @@ export function UserTrustProvider({ children }: { children: React.ReactNode }) {
   return (
     <UserTrustContext.Provider
       value={{
+        getTrustedPubkeys: () => (wotOwner === currentPubkey ? Array.from(wotScoreMap.keys()) : []),
         minTrustScore,
         minTrustScoreMap,
         getMinTrustScore,

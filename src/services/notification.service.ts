@@ -1,24 +1,13 @@
-import { ExtendedKind } from '@/constants'
+import { NOTIFICATION_KINDS } from '@/lib/notification'
 import { compareEvents, getEventAuthorPubkey } from '@/lib/event'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { mergeTimelines } from '@/lib/timeline'
-import { kinds, NostrEvent } from 'nostr-tools'
+import { NostrEvent } from 'nostr-tools'
 import client from './client.service'
 import stuffStatsService from './stuff-stats.service'
 import threadService from './thread.service'
 
-export const NOTIFICATION_KINDS = [
-  kinds.ShortTextNote,
-  kinds.Repost,
-  kinds.GenericRepost,
-  kinds.Reaction,
-  kinds.Zap,
-  kinds.Highlights,
-  ExtendedKind.COMMENT,
-  ExtendedKind.POLL_RESPONSE,
-  ExtendedKind.VOICE_COMMENT,
-  ExtendedKind.POLL
-]
+export { NOTIFICATION_KINDS } from '@/lib/notification'
 
 const SUBSCRIPTION_LIMIT = 100
 

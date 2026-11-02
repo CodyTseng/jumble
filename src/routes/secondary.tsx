@@ -1,3 +1,4 @@
+import { supportsDirectMessages } from '@/lib/platform-capabilities'
 import AccountSettingsPage from '@/pages/secondary/AccountSettingsPage'
 import ArticleEditorPage from '@/pages/secondary/ArticleEditorPage'
 import AppearanceSettingsPage from '@/pages/secondary/AppearanceSettingsPage'
@@ -75,7 +76,9 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/dms/:pubkey', element: <DmConversationPage />, hideBottomBar: true }
 ]
 
-export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.map(({ path, element, hideBottomBar }) => ({
+export const SECONDARY_ROUTES = SECONDARY_ROUTE_CONFIGS.filter(
+  ({ path }) => path !== '/dms/:pubkey' || supportsDirectMessages()
+).map(({ path, element, hideBottomBar }) => ({
   path,
   element: isValidElement(element) ? element : null,
   matcher: match(path),

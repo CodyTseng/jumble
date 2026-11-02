@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="splashLogoColor" format="color" />
+    <color name="splash_background">#FFFFFF</color>
+    <color name="splash_foreground_dark">#999999</color>
+    <color name="splash_foreground">#000000</color>
+</resources>

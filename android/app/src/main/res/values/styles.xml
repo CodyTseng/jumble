@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
+
+
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="splashLogoColor">@color/splash_foreground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+    <!-- Stable names: Android persists the selected splash theme across cold starts. -->
+    <style name="AppTheme.NoActionBarLaunch.Light" parent="AppTheme.NoActionBarLaunch">
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <item name="splashLogoColor">#000000</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <style name="AppTheme.NoActionBarLaunch.Dark" parent="AppTheme.NoActionBarLaunch">
+        <item name="windowSplashScreenBackground">#171717</item>
+        <item name="splashLogoColor">@color/splash_foreground_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+    <style name="AppTheme.NoActionBarLaunch.PureBlack" parent="AppTheme.NoActionBarLaunch.Dark">
+        <item name="windowSplashScreenBackground">#000000</item>
+    </style>
+</resources>

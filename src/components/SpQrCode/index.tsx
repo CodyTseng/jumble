@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Bitcoin, Check, Copy, QrCodeIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -14,7 +15,7 @@ export default function SpQrCode({ sp }: { sp: string }) {
   const truncated = sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp
 
   const copySp = () => {
-    navigator.clipboard.writeText(sp)
+    copyText(sp)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

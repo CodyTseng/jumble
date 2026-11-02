@@ -1,8 +1,10 @@
 import './index.css'
 import './polyfill'
 
-import { restoreElectronLocalStorage } from './lib/electron-local-storage'
-import { ensureElectronStorageUnlocked } from './lib/electron-unlock'
+import { finishNativeStartup } from './lib/native-appearance'
+import { initializeNativeLifecycle } from './lib/native-lifecycle'
+import { isAndroid, isElectron } from './lib/platform'
+import { restoreNativeLocalStorage } from './lib/native-local-storage'
 
 const setVh = () => {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`)
@@ -15,18 +17,36 @@ const bootstrap = async () => {
   // Electron without an OS keychain encrypts its stores with a password-derived
   // key; gate the boot behind the unlock screen first. Returns true when a
   // post-unlock reload is pending, in which case booting stops here.
-  if (await ensureElectronStorageUnlocked()) return
+  if (isElectron()) {
+    // The unlock UI imports i18n. Load it only on desktop so mobile language
+    // detection cannot run before native preferences have been restored.
+    const { ensureElectronStorageUnlocked } = await import('./lib/electron-unlock')
+    if (await ensureElectronStorageUnlocked()) return
+  }
 
-  // Electron restores its main-process snapshot before modules that read
+  // Native apps restore their encrypted snapshot before modules that read
   // localStorage are evaluated. Web mode returns immediately.
-  await restoreElectronLocalStorage()
+  await restoreNativeLocalStorage()
+  await initializeNativeLifecycle()
 
-  // This is the only deferred module boundary: application modules must not
-  // read localStorage until Electron has restored its durable snapshot.
+  // Defer application modules until the native shell has restored its durable
+  // snapshot, including preferences used by language detection.
   const { startApplication } = await import('./app-bootstrap')
   await startApplication()
 }
 
 bootstrap().catch((error) => {
   console.error('[main] failed to bootstrap application:', error)
+  if (isAndroid()) {
+    // Fail closed rather than opening an empty session and overwriting encrypted data.
+    const root = document.getElementById('root')!
+    const message = document.createElement('p')
+    message.textContent =
+      'Unable to open app storage. Restart Jumble to try again. Your saved data has not been reset.'
+    const retry = document.createElement('button')
+    retry.textContent = 'Retry'
+    retry.onclick = () => window.location.reload()
+    root.replaceChildren(message, retry)
+    void finishNativeStartup().catch(console.error)
+  }
 })

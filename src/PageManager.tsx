@@ -1,3 +1,4 @@
+import { useNativeNavigation } from './hooks/use-native-navigation'
 import Sidebar from '@/components/Sidebar'
 import { cn } from '@/lib/utils'
 import { CurrentRelaysProvider } from '@/providers/CurrentRelaysProvider'
@@ -228,6 +229,7 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
   }, [])
 
   const navigatePrimaryPage = (page: TPrimaryPageName, props?: any) => {
+    if (!PRIMARY_PAGE_MAP[page]) return
     const needScrollToTop = page === currentPrimaryPage
     setPrimaryPages((prev) => {
       const exists = prev.find((p) => p.name === page)
@@ -295,6 +297,20 @@ export function PageManager({ maxStackSize = 5 }: { maxStackSize?: number }) {
 
   // Keep providers, panels and page wrappers in the same tree positions in every mode.
   // Reparenting a cached React element still remounts it and loses its local state.
+  useNativeNavigation(secondaryStack.length > 0, (path) => {
+    const url = new URL(path, window.location.origin)
+    if (url.pathname !== '/') {
+      pushSecondaryPage(path)
+      return
+    }
+    const relay = url.searchParams.get('r')
+    if (relay && normalizeUrl(relay)) navigatePrimaryPage('relay', { url: normalizeUrl(relay) })
+    else {
+      const page = url.searchParams.get('page')
+      navigatePrimaryPage(page && page in PRIMARY_PAGE_MAP ? (page as TPrimaryPageName) : 'home')
+    }
+  })
+
   return (
     <PrimaryPageContext.Provider
       value={{

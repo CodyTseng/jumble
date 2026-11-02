@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -154,9 +155,7 @@ function RelaySetOptions({ relaySet }: { relaySet: TRelaySet }) {
   }
 
   const copyShareLink = () => {
-    navigator.clipboard.writeText(
-      `https://jumble.social/?${relaySet.relayUrls.map((url) => 'r=' + url).join('&')}`
-    )
+    copyText(`https://jumble.social/?${relaySet.relayUrls.map((url) => 'r=' + url).join('&')}`)
   }
 
   if (isSmallScreen) {
