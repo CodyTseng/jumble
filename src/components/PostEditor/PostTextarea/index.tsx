@@ -1,3 +1,4 @@
+import ClickableCard from '@/components/ClickableCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
 import { cn } from '@/lib/utils'
@@ -298,7 +299,7 @@ const PostTextarea = forwardRef<
         </div>
         <TabsContent
           value="edit"
-          className="mt-0 flex-1 data-[state=active]:flex data-[state=active]:flex-col"
+          className="mt-0 flex-1 data-[state=active]:flex data-[state=active]:flex-col sm:min-h-64"
         >
           {postAsAccount && onPostAsAccountChange && (
             <PostAccountSelector
@@ -307,7 +308,7 @@ const PostTextarea = forwardRef<
               allowAnonymous={allowAnonymous}
             />
           )}
-          <div className="relative flex flex-1 flex-col sm:min-h-48">
+          <div className="relative flex flex-1 flex-col">
             <EditorContent
               className="tiptap flex flex-1 flex-col [&>.tiptap]:flex-1"
               editor={editor}
@@ -322,15 +323,16 @@ const PostTextarea = forwardRef<
             )}
           </div>
         </TabsContent>
-        <TabsContent
-          value="preview"
-          className="mt-0 flex-1 sm:min-h-48"
-          onClick={() => {
-            setTabValue('edit')
-            editor.commands.focus()
-          }}
-        >
-          <Preview content={text} pubkey={previewPubkey} className={className} />
+        <TabsContent value="preview" asChild className="mt-0 flex-1 sm:min-h-64">
+          <ClickableCard
+            onClick={() => {
+              if (window.getSelection()?.toString()) return
+              setTabValue('edit')
+              editor.commands.focus()
+            }}
+          >
+            <Preview content={text} pubkey={previewPubkey} className={className} />
+          </ClickableCard>
         </TabsContent>
       </Tabs>
     )

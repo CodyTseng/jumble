@@ -42,6 +42,7 @@ import PostEditor from '../PostEditor'
 import WebPreview from '../WebPreview'
 import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
+import ReadOnly from './ReadOnly'
 import { insertParagraphLinkPreviews } from './link-previews'
 import { CONTENT_LAYOUT_CLASS_NAME, groupContentNodes, isMediaContentNode } from './node-layout'
 
@@ -50,13 +51,15 @@ export default function Content({
   content,
   className,
   mustLoadMedia,
-  enableHighlight = false
+  enableHighlight = false,
+  preview = false
 }: {
   event?: Event
   content?: string
   className?: string
   mustLoadMedia?: boolean
   enableHighlight?: boolean
+  preview?: boolean
 }) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [showHighlightEditor, setShowHighlightEditor] = useState(false)
@@ -163,7 +166,13 @@ export default function Content({
     return (
       <>
         <div ref={contentRef} dir="auto" className={cn('text-wrap wrap-break-word', className)}>
-          <MarkdownContent content={resolvedContent} event={event} />
+          {preview ? (
+            <ReadOnly>
+              <MarkdownContent content={resolvedContent} event={event} />
+            </ReadOnly>
+          ) : (
+            <MarkdownContent content={resolvedContent} event={event} />
+          )}
         </div>
         {enableHighlight && (
           <HighlightButton onHighlight={handleHighlight} containerRef={contentRef} />
@@ -220,6 +229,7 @@ export default function Content({
           start={start}
           end={end}
           mustLoad={effectiveMustLoad}
+          enableLightbox={!preview}
         />
       )
     }
@@ -282,6 +292,14 @@ export default function Content({
     }
     return null
   }
+  // Preview text stays selectable; only galleries retain interactive controls.
+  const renderPreviewNode = (node: TEmbeddedNode, index: string) => {
+    const rendered = renderNode(node, index)
+    if (!preview || node.type === 'text' || node.type === 'image' || node.type === 'images') {
+      return rendered
+    }
+    return <ReadOnly key={index}>{rendered}</ReadOnly>
+  }
   return (
     <>
       <div
@@ -291,14 +309,16 @@ export default function Content({
       >
         {groups.map((group, index) =>
           group.type === 'block' ? (
-            renderNode(group.node, String(index))
+            renderPreviewNode(group.node, String(index))
           ) : (
             <div
               key={index}
               dir="auto"
               className={cn('whitespace-pre-wrap', isEmojiOnly && 'flex items-end gap-1')}
             >
-              {group.nodes.map((node, nodeIndex) => renderNode(node, `${index}-${nodeIndex}`))}
+              {group.nodes.map((node, nodeIndex) =>
+                renderPreviewNode(node, `${index}-${nodeIndex}`)
+              )}
             </div>
           )
         )}

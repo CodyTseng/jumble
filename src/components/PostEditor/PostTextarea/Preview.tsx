@@ -1,3 +1,4 @@
+import ReadOnly from '@/components/Content/ReadOnly'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
@@ -35,9 +36,9 @@ export default function Preview({
   )
 
   return (
-    <div className={cn('pointer-events-none px-5 py-2 text-base sm:px-6', className)}>
+    <div className={cn('px-5 py-2 text-base sm:px-6', className)}>
       {pubkey && (
-        <div className="mb-2 flex items-center gap-2">
+        <ReadOnly className="mb-2 flex items-center gap-2">
           <UserAvatar userId={pubkey} size="normal" />
           <div className="w-0 flex-1">
             <Username
@@ -50,9 +51,9 @@ export default function Preview({
               className="text-sm text-muted-foreground"
             />
           </div>
-        </div>
+        </ReadOnly>
       )}
-      <Content event={fakeEvent} className="pointer-events-none h-full" mustLoadMedia />
+      <Content event={fakeEvent} mustLoadMedia preview />
     </div>
   )
 }

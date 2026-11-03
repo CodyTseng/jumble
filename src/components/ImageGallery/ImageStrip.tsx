@@ -14,7 +14,7 @@ export default function ImageStrip({
   onPhotoClick
 }: {
   images: TImetaInfo[]
-  onPhotoClick: (event: React.MouseEvent, index: number) => void
+  onPhotoClick?: (event: React.MouseEvent, index: number) => void
 }) {
   const { t, i18n } = useTranslation()
   const direction = i18n.dir()
@@ -220,18 +220,22 @@ export default function ImageStrip({
                       ? 'var(--image-strip-bleed-start, var(--image-strip-bleed, 0px))'
                       : undefined
                 }}
-                aria-label={t('Open image')}
+                aria-label={t(onPhotoClick ? 'Open image' : 'Pictures')}
+                aria-disabled={!onPhotoClick || undefined}
+                tabIndex={onPhotoClick ? 0 : -1}
                 onClick={(event) => {
                   if (suppressClick.current && event.detail !== 0) {
                     event.preventDefault()
                     return
                   }
-                  onPhotoClick(event, index)
+                  onPhotoClick?.(event, index)
                 }}
               >
                 <Image
                   image={image}
-                  classNames={{ wrapper: 'h-full w-full cursor-zoom-in border' }}
+                  classNames={{
+                    wrapper: `h-full w-full border ${onPhotoClick ? 'cursor-zoom-in' : 'cursor-grab active:cursor-grabbing'}`
+                  }}
                   onImageLoad={(_url, img) => {
                     const size = { width: img.naturalWidth, height: img.naturalHeight }
                     if (!isValidImageSize(size)) return
