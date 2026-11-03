@@ -20,13 +20,15 @@ export default function ImageGallery({
   images,
   start = 0,
   end = images.length,
-  mustLoad = false
+  mustLoad = false,
+  enableLightbox = true
 }: {
   className?: string
   images: TImetaInfo[]
   start?: number
   end?: number
   mustLoad?: boolean
+  enableLightbox?: boolean
 }) {
   const id = useMemo(() => `image-gallery-${randomString()}`, [])
   const { t } = useTranslation()
@@ -102,7 +104,7 @@ export default function ImageGallery({
 
   const handlePhotoClick = (event: React.MouseEvent, current: number) => {
     event.preventDefault()
-    setIndex(start + current)
+    if (enableLightbox) setIndex(start + current)
   }
 
   const displayImages = images.slice(start, end)
@@ -127,14 +129,14 @@ export default function ImageGallery({
         className="max-h-[80vh] object-contain sm:max-h-[50vh]"
         classNames={{
           errorPlaceholder: 'aspect-square h-[30vh]',
-          wrapper: 'w-fit max-w-full cursor-zoom-in border'
+          wrapper: cn('w-fit max-w-full border', enableLightbox && 'cursor-zoom-in')
         }}
         image={displayImages[0]}
         upscaleSmall
         fillNearRow
-        role="button"
-        tabIndex={0}
-        aria-label={t('Open image')}
+        role={enableLightbox ? 'button' : undefined}
+        tabIndex={enableLightbox ? 0 : undefined}
+        aria-label={enableLightbox ? t('Open image') : undefined}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
@@ -145,7 +147,12 @@ export default function ImageGallery({
       />
     )
   } else if (displayImages.length > 1) {
-    imageContent = <ImageStrip images={displayImages} onPhotoClick={handlePhotoClick} />
+    imageContent = (
+      <ImageStrip
+        images={displayImages}
+        onPhotoClick={enableLightbox ? handlePhotoClick : undefined}
+      />
+    )
   }
 
   return (
