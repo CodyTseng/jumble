@@ -102,6 +102,47 @@ already-built assets and updates native plugin configuration.
 Do not import Node APIs into renderer code or copy Electron's Node relay
 transport into Android. Add platform capabilities at the adapter boundaries.
 
+## Permissions and Google Play declarations
+
+Audit the **merged release manifest**, including dependency permissions, before
+uploading an APK/AAB. The current permission set is:
+
+| Permission                                                | Purpose                                                                                                              |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `INTERNET`                                                | Relay connections, media and application HTTP requests.                                                              |
+| `ACCESS_NETWORK_STATE`                                    | The local listener observes connectivity changes to reconnect relays.                                                |
+| `POST_NOTIFICATIONS`                                      | User-authorized system notifications on Android 13+.                                                                 |
+| `CAMERA`                                                  | QR-code scanning and camera access through WebView; requested when used.                                             |
+| `WRITE_EXTERNAL_STORAGE` (max SDK 28)                     | Save images to Pictures/Jumble on Android 7–9; newer Android uses MediaStore without this permission.                |
+| `RECEIVE_BOOT_COMPLETED`                                  | Restore background listening after reboot only when the user previously enabled it and notifications remain allowed. |
+| `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_SPECIAL_USE` | The user-enabled local relay listener and its ongoing, stoppable notification.                                       |
+| App-scoped `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`     | AndroidX-generated signature permission protecting internal receivers; not a user permission prompt.                 |
+
+The local-notifications dependency declares `SCHEDULE_EXACT_ALARM` and
+`WAKE_LOCK`, but Jumble does not schedule timed notifications or acquire wake
+locks. Manifest-merger removal rules exclude both from the application. Immediate
+notifications use NotificationManager directly. No broad photo/video access,
+all-files access, microphone, location, contacts, SMS, package-installation or
+battery-optimization exemption permission is declared. Media selection/export
+uses system pickers; opening battery settings does not request an exemption.
+
+Google Play requires a foreground-service declaration for the Android 14+
+`specialUse` service. Prepare an accurate description of user-initiated local
+Nostr notification listening, what users lose if it is delayed/interrupted, and
+a demonstration video showing activation, the ongoing notification and the Stop
+action. Also explain restoration after reboot. The manifest's subtype description
+does not replace the Play Console declaration. Acceptance of this background
+listening use case remains subject to Google's review; do not relabel the service
+as another type merely to avoid that review.
+
+Keep the privacy policy and Data safety answers consistent with actual camera,
+media upload and network behavior. These disclosures are separate from the
+restricted-permission/foreground-service declaration forms.
+
+References: [foreground-service declaration requirements](https://support.google.com/googleplay/android-developer/answer/13392821),
+[special-use service requirements](https://developer.android.com/develop/background-work/services/fgs/service-types#special-use),
+and [photo/video permission policy](https://support.google.com/googleplay/android-developer/answer/16558241).
+
 ## Release builds
 
 The Android `versionName` comes from `package.json`. Increment the Play version
