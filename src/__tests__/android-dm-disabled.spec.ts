@@ -36,14 +36,24 @@ describe('Android DM restriction', () => {
     expect(client.fetchDmRelays).not.toHaveBeenCalled()
   })
 
-  it('preserves the default and toggle behavior on other platforms', async () => {
+  it('defaults to disabled and preserves toggles on other platforms', async () => {
     platform.android = false
     const { default: storage } = await import('@/services/local-storage.service')
-    expect(storage.getEnableDm()).toBe(true)
+    expect(storage.getEnableDm()).toBe(false)
     storage.setEnableDm(false)
     expect(storage.getEnableDm()).toBe(false)
     storage.setEnableDm(true)
     expect(storage.getEnableDm()).toBe(true)
     expect(localStorage.getItem('enableDm')).toBe('true')
   })
+
+  it.each(['true', 'false'])(
+    'restores the saved preference %s on other platforms',
+    async (saved) => {
+      platform.android = false
+      localStorage.setItem('enableDm', saved)
+      const { default: storage } = await import('@/services/local-storage.service')
+      expect(storage.getEnableDm()).toBe(saved === 'true')
+    }
+  )
 })
