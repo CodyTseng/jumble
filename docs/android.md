@@ -113,11 +113,53 @@ cd android
 ./gradlew bundleRelease -PandroidVersionCode=2
 ```
 
-This generates an **unsigned** release bundle by default. Configure your upload
-key using Android Studio's **Generate Signed Bundle / APK** before uploading to
-Play; do not commit keys or passwords. `npm run android:bundle` builds the default
-release bundle with version code 1. Store metadata, privacy disclosures, UGC
-moderation review, and payment-policy review are still required before release.
+Without signing environment variables, local release builds remain **unsigned**.
+Configure an upload key in Android Studio's **Generate Signed Bundle / APK**, or
+set `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and
+`ANDROID_KEY_PASSWORD` when running Gradle. Never commit keys or passwords.
+
+The `Release` GitHub Actions workflow also builds a signed release APK and AAB on
+Ubuntu with JDK 21 and Android SDK 36. Configure these repository Actions secrets
+before running it:
+
+| Secret                      | Value                                |
+| --------------------------- | ------------------------------------ |
+| `ANDROID_KEYSTORE_BASE64`   | Base64-encoded release keystore file |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password                    |
+| `ANDROID_KEY_ALIAS`         | Signing key alias                    |
+| `ANDROID_KEY_PASSWORD`      | Signing key password                 |
+
+Use the same signing key for subsequent Jumble APK releases so installed apps can
+update. A separate keystore for Jumble is recommended; an existing signing key or
+a new alias in an existing keystore also works. For example, generate a dedicated
+key with the JDK's `keytool` (it prompts for passwords):
+
+```sh
+keytool -genkeypair -v -keystore jumble-release.jks -alias jumble \
+  -keyalg RSA -keysize 3072 -validity 10000
+```
+
+Store the keystore and credentials in a durable backup outside the repository.
+Encode the file as Base64 for the secret, without uploading it as an artifact.
+The workflow restores it under the runner's temporary directory and deletes it
+in an `always()` cleanup step. Missing signing secrets fail the Android job;
+unsigned or debug-signed artifacts are never silently published.
+
+The workflow uses `package.json` for `versionName` and its `github.run_number` for
+`versionCode`. Its first version code must exceed any Android builds already
+distributed; later codes increase with workflow runs, and reruns retain the same
+code. Before adopting this workflow for an existing distribution, compare that
+initial run number with the highest version code already released.
+
+Artifacts are named `Jumble-<version>-android.apk` and
+`Jumble-<version>-android.aab`. Tag builds attach both to the same GitHub Release
+draft as desktop/Flatpak artifacts. Manual runs make them available as workflow
+artifacts without publishing a Release. Android source maps are archived
+separately. The Release job waits for Android, desktop and Flatpak builds.
+
+`npm run android:bundle` still defaults to version code 1 unless overridden.
+Store metadata, privacy disclosures, UGC moderation review, and payment-policy
+review remain separate from the artifact build.
 
 ## Validation
 

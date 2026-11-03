@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 
 def packageJson = new groovy.json.JsonSlurper().parse(file('../../package.json'))
+def releaseKeystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
+if (releaseKeystorePath) {
+    def missing = ['ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD'].findAll { !System.getenv(it) }
+    if (!missing.isEmpty()) throw new GradleException('Missing Android signing environment: ' + missing.join(', '))
+}
 
 android {
     buildFeatures { buildConfig true }
@@ -19,8 +24,19 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseKeystorePath) {
+            release {
+                storeFile file(releaseKeystorePath)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (releaseKeystorePath) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
