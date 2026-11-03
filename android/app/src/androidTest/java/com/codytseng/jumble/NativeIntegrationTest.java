@@ -58,6 +58,51 @@ public class NativeIntegrationTest {
         }
         fail(name+" was not set; "+evaluate(scenario,"window.__nativeError"));
     }
+    @Test public void tabletKeyboardPreservesWideLayoutAndInputFocus() throws Exception {
+        assertTabletKeyboardLayout(false);
+    }
+
+    @Test public void tabletKeyboardCrossingCompactBreakpointPreservesWideLayout() throws Exception {
+        assertTabletKeyboardLayout(true);
+    }
+
+    private void assertTabletKeyboardLayout(boolean requireBreakpointCrossing) throws Exception {
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            ready(scenario);
+            org.junit.Assume.assumeTrue("Requires a tablet-sized viewport",
+                Double.parseDouble(evaluate(scenario,"window.innerWidth"))>768 &&
+                Double.parseDouble(evaluate(scenario,"window.innerHeight"))>640);
+            SystemClock.sleep(500);
+            assertEquals("false",evaluate(scenario,"!!document.querySelector('[data-bottom-navigation]')"));
+            double height=Double.parseDouble(evaluate(scenario,"window.innerHeight"));
+            try {
+                evaluate(scenario,"(()=>{const input=document.createElement('input');input.type='text';input.style='position:fixed;top:50%;transform:translateY(-50%);width:100%;height:100px;z-index:2147483647';document.body.append(input);window.__tabletInput=input})()");
+                onView(isAssignableFrom(WebView.class)).perform(click());
+                for(int i=0;i<60;i++) {
+                    if(Double.parseDouble(evaluate(scenario,"window.innerHeight"))<height-100)break;
+                    SystemClock.sleep(100);
+                }
+                SystemClock.sleep(500);
+                evaluate(scenario,"Capacitor.nativePromise('JumbleAppearance','getKeyboardVisibility').then(s=>{window.__tabletKeyboard=s;window.__tabletKeyboardRead=true})");
+                awaitFlag(scenario,"__tabletKeyboardRead");
+                assertEquals("Tapping the centered fixture must open the keyboard", "true",evaluate(scenario,"window.__tabletKeyboard.visible"));
+                // Crossing 640px is a fixture requirement for the regression case,
+                // not an application invariant: tall tablets may stay above it.
+                if(requireBreakpointCrossing) org.junit.Assume.assumeTrue(
+                    "Requires the keyboard to reduce the viewport to 640 CSS pixels or less",
+                    Double.parseDouble(evaluate(scenario,"window.innerHeight"))<=640);
+                assertEquals("Keyboard overlap should restore the original layout height",height,
+                    Double.parseDouble(evaluate(scenario,"window.innerHeight+window.__tabletKeyboard.height")),3.0);
+                assertEquals("No mobile navigation should mount while typing", "false",evaluate(scenario,"!!document.querySelector('[data-bottom-navigation]')"));
+                assertEquals("true",evaluate(scenario,"document.activeElement===window.__tabletInput"));
+            } finally {
+                scenario.onActivity(activity->androidx.core.view.WindowCompat.getInsetsController(activity.getWindow(),activity.getBridge().getWebView()).hide(androidx.core.view.WindowInsetsCompat.Type.ime()));
+            }
+            SystemClock.sleep(500);
+            assertEquals("false",evaluate(scenario,"!!document.querySelector('[data-bottom-navigation]')"));
+        }
+    }
+
     @Test public void systemKeyboardHidesOnlyTheBottomNavigationAndRestoresItAfterDismissal() throws Exception {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
             ready(scenario);
@@ -66,7 +111,7 @@ public class NativeIntegrationTest {
                 SystemClock.sleep(100);
             }
             assertEquals("true",evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===false"));
-            evaluate(scenario,"(()=>{const input=document.createElement('input');input.type='text';input.style='position:fixed;top:40%;width:100%;height:100px;z-index:2147483647';document.body.append(input)})()");
+            evaluate(scenario,"(()=>{const input=document.createElement('input');input.type='text';input.style='position:fixed;top:50%;transform:translateY(-50%);width:100%;height:100px;z-index:2147483647';document.body.append(input)})()");
             onView(isAssignableFrom(WebView.class)).perform(click());
             for(int i=0;i<60;i++) {
                 if("true".equals(evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===true")))break;

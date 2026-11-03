@@ -2,6 +2,8 @@ import type { TThemeSetting } from '@/types'
 import { registerPlugin } from '@capacitor/core'
 import { isAndroid } from './platform'
 
+export type NativeKeyboardState = { visible: boolean; height: number }
+
 interface NativeAppearancePlugin {
   setTheme(options: {
     backgroundColor: string
@@ -9,10 +11,10 @@ interface NativeAppearancePlugin {
     themeSetting: TThemeSetting
   }): Promise<void>
   ready(): Promise<void>
-  getKeyboardVisibility(): Promise<{ visible: boolean }>
+  getKeyboardVisibility(): Promise<NativeKeyboardState>
   addListener(
     event: 'keyboardVisibilityChanged',
-    listener: (state: { visible: boolean }) => void
+    listener: (state: NativeKeyboardState) => void
   ): Promise<import('@capacitor/core').PluginListenerHandle>
 }
 
@@ -42,13 +44,20 @@ export async function finishNativeStartup(): Promise<void> {
 
 /** Observe the OS keyboard, including a keyboard already open when the bar mounts. */
 export function observeNativeKeyboard(onChange: (visible: boolean) => void): () => void {
+  return observeNativeKeyboardState(({ visible }) => onChange(visible))
+}
+
+/** Native keyboard overlap in CSS pixels, independent of focus and viewport guesses. */
+export function observeNativeKeyboardState(
+  onChange: (state: NativeKeyboardState) => void
+): () => void {
   if (!isAndroid()) return () => {}
   let disposed = false
   let revision = 0
   let listener: import('@capacitor/core').PluginListenerHandle | undefined
-  void NativeAppearance.addListener('keyboardVisibilityChanged', ({ visible }) => {
+  void NativeAppearance.addListener('keyboardVisibilityChanged', (state) => {
     revision++
-    if (!disposed) onChange(visible)
+    if (!disposed) onChange(state)
   })
     .then(async (handle) => {
       if (disposed) {
@@ -57,8 +66,8 @@ export function observeNativeKeyboard(onChange: (visible: boolean) => void): () 
       }
       listener = handle
       const snapshot = revision
-      const { visible } = await NativeAppearance.getKeyboardVisibility()
-      if (!disposed && revision === snapshot) onChange(visible)
+      const state = await NativeAppearance.getKeyboardVisibility()
+      if (!disposed && revision === snapshot) onChange(state)
     })
     .catch((error) => console.error('[native] keyboard observation failed:', error))
   return () => {

@@ -1,6 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getScreenSize, observeScreenSize } from './responsive-screen'
 
+const keyboard = vi.hoisted(() => ({
+  change: undefined as ((state: { visible: boolean; height: number }) => void) | undefined,
+  stop: vi.fn()
+}))
+vi.mock('./native-appearance', () => ({
+  observeNativeKeyboardState: (callback: typeof keyboard.change) => {
+    keyboard.change = callback
+    return keyboard.stop
+  }
+}))
+
 describe('responsive screen size', () => {
   let browser: EventTarget & { innerWidth: number; innerHeight: number; devicePixelRatio: number }
   let page: EventTarget & {
@@ -15,6 +26,8 @@ describe('responsive screen size', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
+    keyboard.change = undefined
+    keyboard.stop.mockClear()
     largeViewportHeight = undefined
     browser = Object.assign(new EventTarget(), {
       innerWidth: 390,
@@ -175,6 +188,53 @@ describe('responsive screen size', () => {
     expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
     resize(1024, 768)
     expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+  })
+
+  it('keeps tablet columns when Android resizes lvh for the keyboard', () => {
+    browser.innerWidth = 1400
+    browser.innerHeight = 800
+    largeViewportHeight = 800
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    keyboard.change?.({ visible: true, height: 350 })
+    largeViewportHeight = 450
+    resize(1400, 450)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    // A different keyboard/suggestion-bar height must not change the layout.
+    keyboard.change?.({ visible: true, height: 400 })
+    largeViewportHeight = 400
+    resize(1400, 400)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+    keyboard.change?.({ visible: false, height: 0 })
+    largeViewportHeight = 800
+    resize(1400, 800)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: true })
+  })
+
+  it('still follows split-screen width, real height changes and rotation with the keyboard open', () => {
+    browser.innerWidth = 1400
+    largeViewportHeight = 800
+    const changed = vi.fn()
+    stop = observeScreenSize(changed)
+    keyboard.change?.({ visible: true, height: 350 })
+    largeViewportHeight = 450
+    resize(1000, 450)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+    resize(700, 450)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    // A genuinely short split window remains compact even after adding back the IME.
+    largeViewportHeight = 200
+    resize(1400, 200)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: true, isLargeScreen: false })
+    keyboard.change?.({ visible: true, height: 300 })
+    largeViewportHeight = 700
+    browser.innerWidth = 900
+    browser.dispatchEvent(new Event('orientationchange'))
+    vi.advanceTimersByTime(200)
+    expect(changed).toHaveBeenLastCalledWith({ isSmallScreen: false, isLargeScreen: false })
+    stop()
+    expect(keyboard.stop).toHaveBeenCalledOnce()
+    stop = undefined
   })
 
   it('does not change layout as the address bar hides and reappears across the height breakpoint', () => {
