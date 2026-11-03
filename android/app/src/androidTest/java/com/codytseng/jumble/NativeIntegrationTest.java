@@ -107,6 +107,32 @@ public class NativeIntegrationTest {
             awaitFlag(scenario,"__cameraOk");
         } finally { Intents.release(); file.delete(); }
     }
+    @Test public void videoFullscreenPreservesFeedScrollPosition() throws Exception {
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            ready(scenario);
+            byte[] video;
+            try(java.io.InputStream input=InstrumentationRegistry.getInstrumentation().getContext().getAssets().open("scroll-video.mp4");java.io.ByteArrayOutputStream output=new java.io.ByteArrayOutputStream()) {
+                byte[] buffer=new byte[4096];int count;while((count=input.read(buffer))!=-1)output.write(buffer,0,count);video=output.toByteArray();
+            }
+            String data=android.util.Base64.encodeToString(video,android.util.Base64.NO_WRAP);
+            evaluate(scenario,"(()=>{const before=document.createElement('div');before.style.height='1200px';const v=document.createElement('video');v.muted=true;v.controls=true;v.style='display:block;width:320px;height:180px';v.src='data:video/mp4;base64,"+data+"';const after=document.createElement('div');after.style.height='2400px';document.body.append(before,v,after);window.scrollTo(0,1100);const b=document.createElement('button');b.style='position:fixed;inset:0;width:100%;height:100%;z-index:2147483647';b.onclick=()=>{window.__beforeFullscreenScroll=window.scrollY;b.remove();v.requestFullscreen().catch(e=>window.__nativeError=e.message)};document.body.append(b)})()");
+            assertTrue("Fixture must start partway down a scrollable feed",Double.parseDouble(evaluate(scenario,"window.scrollY"))>1000);
+            onView(isAssignableFrom(WebView.class)).perform(click());
+            boolean[] fullscreen={false};
+            for(int i=0;i<60&&!fullscreen[0];i++) { scenario.onActivity(activity->fullscreen[0]=activity.getWindow().getDecorView().findViewWithTag("jumble-fullscreen")!=null);SystemClock.sleep(100); }
+            assertTrue("Fullscreen container missing",fullscreen[0]);
+            evaluate(scenario,"document.exitFullscreen()");
+            for(int i=0;i<60&&fullscreen[0];i++) { SystemClock.sleep(100);scenario.onActivity(activity->fullscreen[0]=activity.getWindow().getDecorView().findViewWithTag("jumble-fullscreen")!=null); }
+            scenario.onActivity(activity->{
+                assertNull(activity.getWindow().getDecorView().findViewWithTag("jumble-fullscreen"));
+                assertEquals(View.VISIBLE,activity.getBridge().getWebView().getVisibility());
+            });
+            SystemClock.sleep(350);
+            double before=Double.parseDouble(evaluate(scenario,"window.__beforeFullscreenScroll"));
+            double after=Double.parseDouble(evaluate(scenario,"window.scrollY"));
+            assertEquals("Leaving video fullscreen must preserve the feed reading position",before,after,2.0);
+        }
+    }
     @Test public void fullscreenEntersNativeContainerAndBackOnlyExitsFullscreen() throws Exception {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
             ready(scenario);
