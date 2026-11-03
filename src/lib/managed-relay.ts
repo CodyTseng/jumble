@@ -89,18 +89,16 @@ export class ManagedRelay implements IRelay {
 
   async checkHealth(): Promise<void> {
     if (!this.networkOnline) return
-    // A publish/auth already exercises the socket. Replacing it here would
-    // turn a harmless foreground recovery into a business-visible failure.
+    // A publish/auth already exercises the socket and owns its recovery.
     if (this.transientOperations > 0) return
     if (this.subscriptions.size === 0) {
       this.releaseIfUnused()
       return
     }
 
-    // Browsers can keep a half-open WebSocket after a long suspension. There
-    // is no reliable readyState check for that condition, so rebuild demanded
-    // connections and recreate their physical REQs.
-    this.closeConnection()
+    // AbstractRelay's heartbeat detects half-open sockets; its close callback
+    // schedules recovery. Reuse healthy or pending connections and reconnect
+    // only when active subscriptions have no connection.
     await this.connect()
   }
 

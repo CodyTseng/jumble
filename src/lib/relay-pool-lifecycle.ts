@@ -25,7 +25,7 @@ export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
     runLifecycleTask(() => target.setNetworkOnline(initialOnline))
     page.addEventListener('online', () => {
       // Preserve ordering for Electron IPC: main must be marked online before
-      // it is asked to rebuild connections.
+      // it is asked to check connections.
       runLifecycleTask(async () => {
         await target.setNetworkOnline(true)
         await target.checkRelays()
