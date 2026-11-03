@@ -53,6 +53,8 @@ function findJdk21() {
     process.platform === 'darwin'
       ? [
           commandOutput('/usr/libexec/java_home', ['-v', '21']),
+          '/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home',
+          '/usr/local/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home',
           '/Applications/Android Studio.app/Contents/jbr/Contents/Home',
           path.join(os.homedir(), 'Applications/Android Studio.app/Contents/jbr/Contents/Home')
         ]

@@ -10,7 +10,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, './src')
+      '@': path.resolve(import.meta.dirname, './src'),
+      ...Object.fromEntries(
+        ['core', 'app', 'local-notifications'].map((name) => [
+          `@capacitor/${name}`,
+          path.resolve(import.meta.dirname, './src/lib/capacitor-web.ts')
+        ])
+      )
     }
   },
   test: {

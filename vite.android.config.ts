@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import { createSharedConfig } from './vite.shared.ts'
 
 export default defineConfig(({ mode }) => ({
-  ...createSharedConfig(mode, '/'),
+  ...createSharedConfig(mode, '/', true),
   build: {
     outDir: 'dist-android',
     sourcemap: true,

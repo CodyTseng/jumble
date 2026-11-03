@@ -7,7 +7,10 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@capacitor/core": ["./src/lib/capacitor-web.ts"],
+      "@capacitor/app": ["./src/lib/capacitor-web.ts"],
+      "@capacitor/local-notifications": ["./src/lib/capacitor-web.ts"]
     },
 
     /* Bundler mode */

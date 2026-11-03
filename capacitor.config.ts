@@ -7,6 +7,8 @@ const config: CapacitorConfig = {
   // Capacitor's debug bridge logging includes method arguments, including secret bundles.
   loggingBehavior: 'none',
   android: {
+    // Capacitor's default discovery skips optionalDependencies.
+    includePlugins: ['@capacitor/app', '@capacitor/local-notifications'],
     allowMixedContent: false
   },
   plugins: {

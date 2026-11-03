@@ -42,7 +42,7 @@ bootstrap().catch((error) => {
     const root = document.getElementById('root')!
     const message = document.createElement('p')
     message.textContent =
-      'Unable to open app storage. Restart Jumble to try again. Your saved data has not been reset.'
+      'Unable to start Jumble. Restart Jumble to try again. Your saved data has not been reset.'
     const retry = document.createElement('button')
     retry.textContent = 'Retry'
     retry.onclick = () => window.location.reload()

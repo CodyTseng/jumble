@@ -22,7 +22,7 @@ const getAppVersion = () => {
   }
 }
 
-export const createSharedConfig = (mode: string, base: string): UserConfig => {
+export const createSharedConfig = (mode: string, base: string, native = false): UserConfig => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
@@ -44,7 +44,15 @@ export const createSharedConfig = (mode: string, base: string): UserConfig => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(import.meta.dirname, './src')
+        '@': path.resolve(import.meta.dirname, './src'),
+        ...(native
+          ? {}
+          : Object.fromEntries(
+              ['core', 'app', 'local-notifications'].map((name) => [
+                `@capacitor/${name}`,
+                path.resolve(import.meta.dirname, './src/lib/capacitor-web.ts')
+              ])
+            ))
       }
     }
   }

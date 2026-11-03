@@ -20,5 +20,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "vite.shared.ts", "vite.android.config.ts", "capacitor.config.ts"]
+  "include": ["vite.config.ts", "vite.shared.ts"]
 }

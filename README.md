@@ -47,6 +47,13 @@ ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install
 npm run build
 ```
 
+Capacitor packages (`@capacitor/*`) are optional and are only needed for Android.
+Web and Electron builds use a local substitute and can build without those packages
+installed. Android builds resolve and type-check the actual Capacitor packages.
+A normal `npm install` still includes optional dependencies. Avoid globally omitting
+all optional dependencies unless you also provide the platform binaries required
+by build tools such as Rolldown.
+
 ## Run Docker
 
 ```bash
@@ -96,6 +103,10 @@ npm run electron:build
 # Preview a production build without packaging
 npm run electron:preview
 ```
+
+Unpackaged Electron runs (`electron:dev` and `electron:preview`) use a separate
+`jumble-dev` data directory so they can run alongside the installed app.
+Development sessions start with their own accounts and settings.
 
 The web build (`npm run dev`, `npm run build`) is unaffected and never loads any Electron-only code.
 

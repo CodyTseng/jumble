@@ -9,14 +9,25 @@ inside the APK; production does not load a hosted website.
 - The project's Node.js version (`npm install`).
 - Android Studio, Android SDK 36, and JDK 21 (Android Studio's bundled JBR works).
 - The `android:run`, `android:apk`, and `android:bundle` scripts select JDK 21
-  automatically from `JAVA_HOME`, PATH, registered macOS JDKs, or Android Studio's
+  automatically from `JAVA_HOME`, PATH, registered macOS JDKs, Homebrew's
+  `openjdk@21` at its default macOS location, or Android Studio's
   bundled JBR at its default installation location. Set `ANDROID_JAVA_HOME` to
   override discovery. They also discover the default Android SDK location.
 - For direct `./gradlew` commands, set `JAVA_HOME` to JDK 21 and `ANDROID_HOME` to
   your SDK directory, or configure `android/local.properties` with `sdk.dir=...`
   (this file is ignored). Android Studio builds use its Gradle JDK setting.
 
-On macOS, to use Android Studio's bundled JDK in the current terminal:
+On macOS, install JDK 21 with Homebrew if it is missing (or if Android Studio
+bundles a newer JBR version):
+
+```sh
+brew install openjdk@21
+```
+
+The Android scripts discover this installation automatically, without changing
+your global `JAVA_HOME`.
+
+To use Android Studio's bundled JDK in the current terminal, if it is version 21:
 
 ```sh
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
@@ -24,6 +35,20 @@ export ANDROID_HOME="$HOME/Library/Android/sdk"
 ```
 
 ## Build and run
+
+If optional dependencies were skipped, restore them before building Android:
+
+```sh
+npm install --include=optional
+```
+
+The `@capacitor/*` packages are only required for Android. Its build uses separate
+TypeScript configurations to check against the real plugins; web and Electron
+builds do not need them installed.
+
+`capacitor.config.ts` explicitly lists the Android plugins in `android.includePlugins`
+because Capacitor's default discovery does not scan `optionalDependencies`. Add new
+Capacitor plugins to that list so syncing includes their native implementations.
 
 ```sh
 npm run android:open     # Open the native project in Android Studio
