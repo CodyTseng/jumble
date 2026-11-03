@@ -1,5 +1,6 @@
 import { POMEGRANATE_OPERATOR_URLS } from '@/constants'
-import { getElectronBridge } from '@/lib/platform'
+import { getElectronBridge, isAndroid } from '@/lib/platform'
+import { authenticateInNativeBrowser } from '@/lib/native-browser-auth'
 import { isValidPubkey } from '@/lib/pubkey'
 import {
   aggregateSecretKeyShards,
@@ -275,9 +276,11 @@ class PomegranateService {
     const bridge = getElectronBridge()
     const shard = bridge
       ? await bridge.pomegranate.authenticate(authUrl, 'recovery')
-      : await this.authenticateInPopup(authUrl, 'PomegranateRecover', operatorURL, (data) =>
-          typeof data === 'string' ? data : undefined
-        )
+      : isAndroid()
+        ? await this.authenticateOnAndroid(authUrl, 'recovery')
+        : await this.authenticateInPopup(authUrl, 'PomegranateRecover', operatorURL, (data) =>
+            typeof data === 'string' ? data : undefined
+          )
     if (!shard.startsWith(operator.pubshard)) {
       throw new Error('Recovered shard does not match the operator')
     }
@@ -308,17 +311,32 @@ class PomegranateService {
     const bridge = getElectronBridge()
     const raw = bridge
       ? await bridge.pomegranate.authenticate(authUrl, purpose)
-      : await this.authenticateInPopup(authUrl, 'PomegranateLogin', central, (data) => {
-          if (
-            data &&
-            typeof data === 'object' &&
-            typeof (data as { token?: unknown }).token === 'string'
-          ) {
-            return (data as { token: string }).token
-          }
-          return undefined
-        })
+      : isAndroid()
+        ? await this.authenticateOnAndroid(authUrl, purpose)
+        : await this.authenticateInPopup(authUrl, 'PomegranateLogin', central, (data) => {
+            if (
+              data &&
+              typeof data === 'object' &&
+              typeof (data as { token?: unknown }).token === 'string'
+            ) {
+              return (data as { token: string }).token
+            }
+            return undefined
+          })
     return this.decodeGoogleToken(raw)
+  }
+
+  private async authenticateOnAndroid(
+    authUrl: string,
+    purpose: 'login' | 'bind' | 'disconnect' | 'recovery'
+  ): Promise<string> {
+    try {
+      return await authenticateInNativeBrowser(authUrl, purpose)
+    } catch (error) {
+      if ((error as { code?: string })?.code === 'CANCELLED')
+        throw new PomegranatePopupClosedError()
+      throw error
+    }
   }
 
   /** GET /account — returns the account, or null when none exists yet. */

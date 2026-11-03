@@ -146,8 +146,26 @@ This is the Android integration foundation. Test login, editing, media uploads,
 video playback, keyboard behavior, RTL, and suspend/resume on physical devices
 before distribution. NIP-07 browser extensions are not available inside the
 WebView; use the existing in-app key or bunker login flows. Android external
-signer integration (NIP-55) is not implemented yet. Google login and Google account binding are hidden on mobile until Pomegranate
-authentication has a system-browser callback flow.
+signer integration (NIP-55) is not implemented yet.
+
+Google login, binding, disconnect and operator recovery use the system browser's
+Custom Tabs; the app does not need registration in the shared central's Google
+Cloud project. Partial Custom Tabs open at 70% of the current window height when
+the browser supports them; unsupported browsers may use a full-screen tab. Google
+popups opened by the authorization page may also use a full-screen browser tab.
+Android and Electron share `pomegranate-browser-page.ts`; existing TypeScript
+handles account creation, token checks, shard checks and signing.
+`JumbleBrowserAuthPlugin` only serves a temporary authorization relay on
+`127.0.0.1` and receives a same-origin result. Each request has a random path,
+literal Host/Origin checks, a restrictive CSP, no caching and a five-minute
+expiry. Closing the browser cancels the request. Successful authorization closes the
+OAuth popup, then the native host dismisses the Custom Tab and resumes the same
+app Activity automatically, without a completion page or return button. No token
+or key shard travels through an Intent or deep link. Results remain in memory;
+Activity/process destruction interrupts authorization and the user retries.
+An installed browser is required. The Pomegranate central server and operators
+use their existing popup/postMessage authentication protocol; no new server
+callback endpoint or Google native SDK is required.
 
 Background notifications are local: enabling system notifications starts a
 native foreground service with an ongoing notification and a Stop action. The

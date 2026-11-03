@@ -28,6 +28,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(JumbleMediaPlugin.class);
         registerPlugin(JumbleFilesPlugin.class);
         registerPlugin(JumbleSystemPlugin.class);
+        registerPlugin(JumbleBrowserAuthPlugin.class);
         registerPlugin(JumbleRelayNotificationsPlugin.class);
         super.onCreate(savedInstanceState);
         NativeTheme.apply(this, NativeTheme.getBackground(this), NativeTheme.isDark(this));

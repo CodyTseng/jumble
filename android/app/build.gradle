@@ -34,6 +34,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'androidx.browser:browser:1.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     // Align transitive stdlib variants used by plugins and the Android test runner.
     implementation platform('org.jetbrains.kotlin:kotlin-bom:2.0.21')

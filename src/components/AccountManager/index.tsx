@@ -1,4 +1,4 @@
-import { isNative } from '@/lib/platform'
+import { isAndroid, isNative } from '@/lib/platform'
 import { Separator } from '@/components/ui/separator'
 import { POMEGRANATE_ENABLED } from '@/constants'
 import { cn, isDevEnv } from '@/lib/utils'
@@ -17,7 +17,7 @@ import Signup from './Signup'
 type TAccountManagerPage = 'nsec' | 'bunker' | 'npub' | 'signup' | 'google' | null
 
 // Native mobile authentication needs a system-browser callback instead of popup postMessage.
-const SHOW_GOOGLE_LOGIN = POMEGRANATE_ENABLED && !isNative()
+const SHOW_GOOGLE_LOGIN = POMEGRANATE_ENABLED && (!isNative() || isAndroid())
 
 export default function AccountManager({ close }: { close?: () => void }) {
   const [page, setPage] = useState<TAccountManagerPage>(null)
