@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import AccountManager from '@/components/AccountManager'
 import LoginDialog from '@/components/LoginDialog'
 import LogoutDialog from '@/components/LogoutDialog'
@@ -45,7 +46,7 @@ export default function MeDrawerContent({ onClose }: { onClose?: () => void }) {
 
   const copyNpub = () => {
     if (!npub) return
-    navigator.clipboard.writeText(npub)
+    copyText(npub)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

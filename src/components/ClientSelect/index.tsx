@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button, ButtonProps } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
@@ -152,7 +153,7 @@ export default function ClientSelect({
         variant="ghost"
         className="w-full py-6 font-semibold"
         onClick={() => {
-          navigator.clipboard.writeText(originalNoteId ?? getNoteBech32Id(event!))
+          copyText(originalNoteId ?? getNoteBech32Id(event!))
           setOpen(false)
         }}
       >

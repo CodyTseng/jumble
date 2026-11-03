@@ -1,0 +1,17 @@
+# Publishing identity is established by the NIP-C1 proof; see docs/zapstore.md.
+repository: https://github.com/CodyTseng/jumble
+match: '^Jumble-android\.apk$'
+
+name: Jumble
+summary: A user-friendly Nostr client for exploring relay feeds
+description: |
+  Explore Nostr through relay feeds. Discover conversations, follow profiles,
+  and share notes, images, and videos.
+license: MIT
+website: https://jumble.social
+tags:
+  - nostr
+  - social
+icon: ./public/pwa-512x512.png
+metadata_sources:
+  - github

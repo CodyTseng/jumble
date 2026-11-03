@@ -78,7 +78,7 @@ export class SmartPool implements IRelayPool {
 
   checkRelays(): Promise<void> {
     // Online and visibility events often arrive together; they should share one
-    // recovery pass instead of replacing every connection twice.
+    // health check instead of starting overlapping passes.
     if (this.healthCheckPromise) return this.healthCheckPromise
     if (!this.networkOnline) return Promise.resolve()
 

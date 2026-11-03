@@ -1,3 +1,6 @@
+import { NotificationProcessor } from '@/lib/notification-processor'
+import { useNativeRelayNotifications } from '@/hooks/useNativeRelayNotifications'
+import { isAndroid } from '@/lib/platform'
 import { useDmUnread } from '@/hooks/useDmUnread'
 import { useNotificationFilter } from '@/hooks/useNotificationFilter'
 import { getEventAuthorPubkey } from '@/lib/event'
@@ -72,6 +75,23 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const firstVisibleTab = notificationTabs.find((tab) => !tab.hidden)
     return new Set(firstVisibleTab?.filters ?? [])
   }, [notificationTabs])
+  const nativeDescriptions = useMemo(
+    () =>
+      Object.fromEntries(
+        [
+          'likes',
+          'reposts',
+          'zaps',
+          'highlights',
+          'pollResponses',
+          'mentions',
+          'replies',
+          'quotes'
+        ].map((type) => [type, getSystemNotificationDescription(type as TNotificationFilter, t)])
+      ),
+    [t]
+  )
+  useNativeRelayNotifications(pubkey, unreadNotificationFilter, nativeDescriptions)
   const [readNotificationIdSet, setReadNotificationIdSet] = useState<Set<string>>(new Set())
   const [filteredNewNotifications, setFilteredNewNotifications] = useState<NostrEvent[]>([])
   const { unreadCount: dmUnreadCount, shouldIncludeConversation } = useDmUnread()
@@ -164,31 +184,21 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     let cancelled = false
 
-    const unsubscribe = notificationService.onNewEvent((event) => {
-      const dispatch = async () => {
-        if (
-          !storage.getSystemNotificationsEnabled() ||
-          (enableDm && !storage.getSystemGeneralNotificationsEnabled()) ||
-          isAppInForeground()
-        ) {
-          return
-        }
-        if (!(await filterFn(event)) || cancelled) return
-
-        const type = getNotificationFilterType(event, pubkey)
-        if (!type || !unreadNotificationFilter.has(type)) return
-
+    // Both runtimes use the same public-notification processor; adapters differ only in delivery.
+    if (isAndroid() || !pubkey) return
+    const canNotify = () =>
+      storage.getSystemNotificationsEnabled() &&
+      (!enableDm || storage.getSystemGeneralNotificationsEnabled()) &&
+      !isAppInForeground()
+    const processor = new NotificationProcessor({
+      pubkey,
+      filters: unreadNotificationFilter,
+      filter: filterFn,
+      canNotify,
+      notify: async (event, type) => {
         const author = getEventAuthorPubkey(event)
         const profile = await client.fetchProfile(author)
-        if (
-          cancelled ||
-          !storage.getSystemNotificationsEnabled() ||
-          (enableDm && !storage.getSystemGeneralNotificationsEnabled()) ||
-          isAppInForeground()
-        ) {
-          return
-        }
-
+        if (cancelled || !canNotify()) return
         await systemNotification.show({
           id: event.id,
           title: 'Jumble',
@@ -196,11 +206,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           target: SYSTEM_NOTIFICATION_TARGET
         })
       }
-      void dispatch().catch(() => undefined)
     })
-
+    const unsubscribe = notificationService.onNewEvent((event) => {
+      if (canNotify()) void processor.process(event).catch(() => undefined)
+    })
     return () => {
       cancelled = true
+      processor.stop()
       unsubscribe()
     }
   }, [enableDm, pubkey, filterFn, unreadNotificationFilter, t])

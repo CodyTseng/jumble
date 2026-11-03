@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -56,7 +57,7 @@ export default function Signup({
           >
             {index + 1}
           </div>
-          {index < 1 && <div className="mx-1 h-0.5 w-12 bg-muted" />}
+          {index < 1 && <div className="bg-muted mx-1 h-0.5 w-12" />}
         </div>
       ))}
     </div>
@@ -69,7 +70,7 @@ export default function Signup({
 
         <div className="text-center">
           <h3 className="mb-2 text-lg font-semibold">{t('Create Your Nostr Account')}</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {t('Generate your unique private key. This is your digital identity.')}
           </p>
         </div>
@@ -110,7 +111,7 @@ export default function Signup({
           </Button>
           <Button
             onClick={() => {
-              navigator.clipboard.writeText(nsec)
+              copyText(nsec)
               setCopied(true)
               setTimeout(() => setCopied(false), 2000)
             }}
@@ -153,7 +154,7 @@ export default function Signup({
 
       <div className="text-center">
         <h3 className="mb-2 text-lg font-semibold">{t('Secure Your Account')}</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {t('Add an extra layer of protection with a password')}
         </p>
       </div>

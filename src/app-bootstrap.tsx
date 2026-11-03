@@ -1,7 +1,8 @@
 import App from './App'
+import { isAndroid } from './lib/platform'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { i18nReady } from './i18n'
-import { startElectronLocalStorageBackup } from './lib/electron-local-storage'
+import { startNativeLocalStorageBackup } from './lib/native-local-storage'
 import blossomCache from './services/blossom-cache.service'
 import storage from './services/local-storage.service'
 import postDraftService from './services/post-draft.service'
@@ -24,9 +25,12 @@ export async function startApplication() {
   await Promise.all([
     i18nReady,
     storage.hydrate().catch((error) => {
+      if (isAndroid()) throw error
       console.error('[main] storage hydrate failed:', error)
     })
   ])
+
+  startNativeLocalStorageBackup()
 
   const root = createRoot(document.getElementById('root')!)
   root.render(
@@ -39,7 +43,6 @@ export async function startApplication() {
 
   // These tasks are useful but do not affect the first interactive frame.
   runAfterFirstPaint(() => {
-    startElectronLocalStorageBackup()
     void postDraftService.init().catch((error) => {
       console.error('[main] post draft init failed:', error)
     })

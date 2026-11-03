@@ -25,7 +25,7 @@ export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
     runLifecycleTask(() => target.setNetworkOnline(initialOnline))
     page.addEventListener('online', () => {
       // Preserve ordering for Electron IPC: main must be marked online before
-      // it is asked to rebuild connections.
+      // it is asked to check connections.
       runLifecycleTask(async () => {
         await target.setNetworkOnline(true)
         await target.checkRelays()
@@ -35,6 +35,10 @@ export function observeRelayPoolLifecycle(target: RelayPoolLifecycleTarget) {
       runLifecycleTask(() => target.setNetworkOnline(false))
     })
   }
+
+  page.addEventListener?.('jumble:resume', () => {
+    runLifecycleTask(() => target.checkRelays())
+  })
 
   page.document?.addEventListener('visibilitychange', () => {
     if (page.document?.visibilityState === 'visible') {

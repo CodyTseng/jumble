@@ -1,3 +1,4 @@
+import { supportsDirectMessages } from '@/lib/platform-capabilities'
 import { DM_TIME_RANDOMIZATION_SECONDS, ExtendedKind } from '@/constants'
 import { BoundedMap } from '@/lib/bounded-map'
 import {
@@ -73,6 +74,7 @@ class DmService {
   }
 
   async init(accountPubkey: string, encryptionKeypair: TEncryptionKeypair): Promise<void> {
+    if (!supportsDirectMessages()) return
     if (this.isInitializing) return
     if (this.isInitialized && this.currentAccountPubkey === accountPubkey) return
 
@@ -694,6 +696,7 @@ class DmService {
   }
 
   async initMessages(accountPubkey: string, encryptionKeypair: TEncryptionKeypair, since?: number) {
+    if (!supportsDirectMessages()) return
     const myDmRelays = await client.fetchDmRelays(accountPubkey)
     if (myDmRelays.length === 0) {
       return

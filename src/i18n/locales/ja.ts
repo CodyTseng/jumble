@@ -1278,6 +1278,9 @@ export default {
     'Go to image {{number}} of {{total}}': '{{total}} 枚中 {{number}} 枚目の画像へ移動',
     'Use NIP-22 replies (kind 1111)': 'NIP-22 の返信を使用する（kind 1111）',
     'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.':
-      'テキストノート（kind 1）に NIP-22 コメント（kind 1111）で返信します。一部のクライアントでは、これらの返信が表示されない場合があります。'
+      'テキストノート（kind 1）に NIP-22 コメント（kind 1111）で返信します。一部のクライアントでは、これらの返信が表示されない場合があります。',
+    'Battery settings': 'バッテリー設定',
+    'Allow background activity for local relay notifications':
+      'ローカルのリレー通知を受信するためにバックグラウンド動作を許可する'
   }
 }

@@ -1,3 +1,5 @@
+import { openExternalUrl } from '@/lib/native-system'
+import { copyText } from '@/lib/native-system'
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,7 +37,7 @@ export default function ExternalLink({
   const safeUrl = useMemo(() => getSafeExternalUrl(url), [url])
 
   const openInNewTab = () => {
-    if (safeUrl) window.open(safeUrl, '_blank', 'noreferrer')
+    if (safeUrl) openExternalUrl(safeUrl)
   }
 
   const handleOpenLink = (e: React.MouseEvent) => {
@@ -58,7 +60,7 @@ export default function ExternalLink({
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation()
-    navigator.clipboard.writeText(url)
+    copyText(url)
     toast.success(t('Copied to Clipboard'))
     if (isSmallScreen) {
       setIsDrawerOpen(false)

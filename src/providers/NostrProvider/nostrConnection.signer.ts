@@ -1,3 +1,4 @@
+import { openExternalUrl } from '@/lib/native-system'
 import { withSignerApproval } from '@/lib/signer-approval'
 import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex } from '@noble/hashes/utils.js'
@@ -25,7 +26,7 @@ export class NostrConnectionSigner implements ISigner {
 
     this.signer = await NBunkerSigner.fromURI(this.clientSecretKey, this.connectionString, {
       onauth: (url) => {
-        window.open(url, '_blank')
+        openExternalUrl(url)
       }
     })
     this.bunkerString = toBunkerURL(this.signer.bp)

@@ -1,3 +1,4 @@
+import { fetchTrustPercentiles, TRUST_SCORE_SERVICE_URL } from '@/lib/trust-score'
 import { getProfileFromEvent } from '@/lib/event-metadata'
 import { BoundedMap } from '@/lib/bounded-map'
 import { proxyFetch } from '@/lib/proxy-fetch'
@@ -7,29 +8,21 @@ import DataLoader from 'dataloader'
 import { NostrEvent } from 'nostr-tools'
 import client from './client.service'
 
-const SERVICE_URL = 'https://fayan.jumble.social'
+const SERVICE_URL = TRUST_SCORE_SERVICE_URL
 
 class FayanService {
   static instance: FayanService
 
   private userPercentileDataLoader = new DataLoader<string, number | null>(
     async (pubkeys) => {
-      try {
-        const res = await proxyFetch(`${SERVICE_URL}/users`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ pubkeys })
+      return fetchTrustPercentiles(pubkeys, async (url, options) => {
+        const response = await proxyFetch(url, {
+          ...options,
+          headers: { 'Content-Type': 'application/json' }
         })
-        if (!res.ok) {
-          return new Array(pubkeys.length).fill(null)
-        }
-        const data = JSON.parse(res.body)
-        return pubkeys.map((pubkey) => data[pubkey]?.percentile ?? 0)
-      } catch {
-        return new Array(pubkeys.length).fill(null)
-      }
+        if (!response.ok) throw new Error('Trust score request failed')
+        return JSON.parse(response.body)
+      })
     },
     {
       maxBatchSize: 50,

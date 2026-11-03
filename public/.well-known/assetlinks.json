@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.codytseng.jumble",
+      "sha256_cert_fingerprints": [
+        "8D:E1:6D:0E:D4:5B:46:23:50:74:25:30:05:92:7B:64:68:28:B2:F2:0A:3F:61:0F:B3:63:54:51:53:C0:57:F3"
+      ]
+    }
+  }
+]

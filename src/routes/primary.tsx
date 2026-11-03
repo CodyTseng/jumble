@@ -1,3 +1,4 @@
+import { supportsDirectMessages } from '@/lib/platform-capabilities'
 import BookmarkPage from '@/pages/primary/BookmarkPage'
 import DmPage from '@/pages/primary/DmPage'
 import FollowingPage from '@/pages/primary/FollowingPage'
@@ -12,19 +13,21 @@ import SettingsPage from '@/pages/primary/SettingsPage'
 import { TPageRef } from '@/types'
 import { createRef } from 'react'
 
-const PRIMARY_ROUTE_CONFIGS = [
-  { key: 'home', component: NoteListPage },
-  { key: 'following', component: FollowingPage },
-  { key: 'notifications', component: NotificationListPage },
-  { key: 'dms', component: DmPage },
-  { key: 'longFormEditor', component: LongFormEditorPage },
-  { key: 'me', component: MePage },
-  { key: 'profile', component: ProfilePage },
-  { key: 'relay', component: RelayPage },
-  { key: 'search', component: SearchPage },
-  { key: 'bookmark', component: BookmarkPage },
-  { key: 'settings', component: SettingsPage }
-] as const
+const PRIMARY_ROUTE_CONFIGS = (
+  [
+    { key: 'home', component: NoteListPage },
+    { key: 'following', component: FollowingPage },
+    { key: 'notifications', component: NotificationListPage },
+    { key: 'dms', component: DmPage },
+    { key: 'longFormEditor', component: LongFormEditorPage },
+    { key: 'me', component: MePage },
+    { key: 'profile', component: ProfilePage },
+    { key: 'relay', component: RelayPage },
+    { key: 'search', component: SearchPage },
+    { key: 'bookmark', component: BookmarkPage },
+    { key: 'settings', component: SettingsPage }
+  ] as const
+).filter(({ key }) => key !== 'dms' || supportsDirectMessages())
 
 export const PRIMARY_PAGE_REF_MAP = PRIMARY_ROUTE_CONFIGS.reduce(
   (acc, { key }) => {

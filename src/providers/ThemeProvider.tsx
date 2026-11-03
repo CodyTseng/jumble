@@ -1,4 +1,5 @@
 import { PRIMARY_COLORS, StorageKey, TPrimaryColor } from '@/constants'
+import { updateNativeAppearance } from '@/lib/native-appearance'
 import storage from '@/services/local-storage.service'
 import { TTheme, TThemeSetting } from '@/types'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -25,19 +26,29 @@ const updateCSSVariables = (color: TPrimaryColor, currentTheme: TTheme) => {
   root.style.setProperty('--ring', config.ring)
 }
 
-const updateThemeColor = (currentTheme: TTheme) => {
+const updateThemeColor = (currentTheme: TTheme, setting: TThemeSetting) => {
   const themeColor =
     currentTheme === 'light' ? '#FFFFFF' : currentTheme === 'pure-black' ? '#000000' : '#171717'
   document
     .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
     ?.setAttribute('content', themeColor)
+  void updateNativeAppearance(themeColor, currentTheme !== 'light', setting).catch((error) => {
+    console.error('[native] failed to update system bar appearance:', error)
+  })
 }
+
+const resolveTheme = (setting: TThemeSetting): TTheme =>
+  setting === 'system'
+    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light'
+    : setting
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeSetting, setThemeSetting] = useState<TThemeSetting>(
     (localStorage.getItem(StorageKey.THEME_SETTING) as TThemeSetting) ?? 'system'
   )
-  const [theme, setTheme] = useState<TTheme>('light')
+  const [theme, setTheme] = useState<TTheme>(() => resolveTheme(themeSetting))
   const [primaryColor, setPrimaryColor] = useState<TPrimaryColor>(
     (localStorage.getItem(StorageKey.PRIMARY_COLOR) as TPrimaryColor) ?? 'DEFAULT'
   )
@@ -73,8 +84,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     }
     updateTheme()
-    updateThemeColor(theme)
-  }, [theme])
+    updateThemeColor(theme, themeSetting)
+  }, [theme, themeSetting])
 
   useEffect(() => {
     updateCSSVariables(primaryColor, theme)
@@ -83,6 +94,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const updateThemeSetting = (themeSetting: TThemeSetting) => {
     storage.setThemeSetting(themeSetting)
     setThemeSetting(themeSetting)
+    setTheme(resolveTheme(themeSetting))
   }
 
   const updatePrimaryColor = (color: TPrimaryColor) => {

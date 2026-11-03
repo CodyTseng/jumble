@@ -1,4 +1,5 @@
 import { isMobileOperatingSystem } from './device'
+import { observeNativeKeyboardState } from './native-appearance'
 
 export type ScreenSize = { isSmallScreen: boolean; isLargeScreen: boolean }
 
@@ -18,10 +19,10 @@ function getLayoutViewportHeight() {
   return height || window.innerHeight
 }
 
-function getLayoutViewport(zoom = 1) {
+function getLayoutViewport(zoom = 1, keyboardHeight = 0) {
   return {
     width: Math.round(window.innerWidth * zoom),
-    height: Math.round(getLayoutViewportHeight() * zoom)
+    height: Math.round((getLayoutViewportHeight() + keyboardHeight) * zoom)
   }
 }
 
@@ -49,6 +50,7 @@ export function observeScreenSize(onChange: (size: ScreenSize) => void) {
   let previousViewport = getLayoutViewport()
   let timer: ReturnType<typeof setTimeout> | undefined
   let nativeFullscreen = false
+  let keyboardHeight = 0
   const isFullscreen = () =>
     nativeFullscreen ||
     document.fullscreenElement ||
@@ -60,7 +62,7 @@ export function observeScreenSize(onChange: (size: ScreenSize) => void) {
   const update = () => {
     if (!isFullscreen()) {
       const zoom = (window.devicePixelRatio || 1) / initialPixelRatio
-      const viewport = getLayoutViewport(zoom)
+      const viewport = getLayoutViewport(zoom, keyboardHeight)
       // CSS viewport dimensions are rounded by the browser. At fractional zoom
       // levels that rounding must not move a window across a nearby breakpoint.
       if (zoom !== 1) {
@@ -88,6 +90,14 @@ export function observeScreenSize(onChange: (size: ScreenSize) => void) {
     scheduleUpdate()
   }
 
+  // Android adjustResize shrinks both vh/lvh when the IME opens. Restore that
+  // height for breakpoint classification while retaining the actual width and
+  // real window resizing (rotation, split-screen and folding).
+  const stopKeyboard = observeNativeKeyboardState((state) => {
+    keyboardHeight = state.height
+    scheduleUpdate()
+  })
+
   window.addEventListener('resize', scheduleUpdate)
   window.addEventListener('orientationchange', scheduleUpdate)
   document.addEventListener('fullscreenchange', scheduleUpdate)
@@ -98,6 +108,7 @@ export function observeScreenSize(onChange: (size: ScreenSize) => void) {
   update()
 
   return () => {
+    stopKeyboard()
     clearTimeout(timer)
     window.removeEventListener('resize', scheduleUpdate)
     window.removeEventListener('orientationchange', scheduleUpdate)

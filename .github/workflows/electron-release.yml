@@ -1,4 +1,4 @@
-name: Electron Release
+name: Release
 
 on:
   push:
@@ -86,6 +86,115 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  android:
+    name: Build Android APK and AAB
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Restore Android signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          python3 - <<'PYTHON'
+          import base64
+          import os
+          from pathlib import Path
+
+          required = ('ANDROID_KEYSTORE_BASE64', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD')
+          missing = [name for name in required if not os.environ.get(name)]
+          if missing:
+              raise SystemExit('Missing Android release secrets: ' + ', '.join(missing))
+          key = base64.b64decode(''.join(os.environ['ANDROID_KEYSTORE_BASE64'].split()), validate=True)
+          path = Path(os.environ['RUNNER_TEMP']) / 'jumble-release.keystore'
+          with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'wb') as output:
+              output.write(key)
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write(f'ANDROID_KEYSTORE_PATH={path}\n')
+          PYTHON
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle
+            android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Install Android SDK packages
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Android web assets
+        run: npm run android:build
+
+      - name: Build signed release APK and AAB
+        env:
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/android.mjs bundle :app:assembleRelease -PandroidVersionCode="$ANDROID_VERSION_CODE"
+
+      - name: Verify signatures and collect release files
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify android/app/build/outputs/apk/release/app-release.apk
+          python3 - <<'PYTHON'
+          import shutil
+          import subprocess
+          from pathlib import Path
+
+          bundle = Path('android/app/build/outputs/bundle/release/app-release.aab')
+          verification = subprocess.run(['jarsigner', '-J-Duser.language=en', '-J-Duser.country=US', '-verify', str(bundle)], check=True, capture_output=True, text=True)
+          if 'jar verified.' not in verification.stdout:
+              raise SystemExit('Android bundle signature verification failed')
+          target = Path('release/android')
+          target.mkdir(parents=True, exist_ok=True)
+          shutil.copy2('android/app/build/outputs/apk/release/app-release.apk', target / 'Jumble-android.apk')
+          shutil.copy2(bundle, target / 'Jumble-android.aab')
+          PYTHON
+
+      - name: Archive Android source maps and matching bundles
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: source-maps-android-${{ github.sha }}
+          path: |
+            dist-android/**/*.js
+            dist-android/**/*.map
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jumble-android
+          path: |
+            release/android/*.apk
+            release/android/*.aab
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/jumble-release.keystore"
+
   flatpak:
     name: Build Flatpak (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
@@ -147,7 +256,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    needs: [build, flatpak]
+    needs: [build, flatpak, android]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:

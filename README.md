@@ -62,6 +62,20 @@ docker compose up --build -d
 
 After finishing, access: http://localhost:8089
 
+## Run as Android App (Capacitor)
+
+Android reuses the web UI and business logic, with native encrypted storage,
+back navigation, deep links, and local notifications. Requires Android SDK 36
+and JDK 21.
+
+```sh
+npm run android:run  # Build and launch on an emulator or connected device
+npm run android:apk  # Build a debug APK
+```
+
+See [Android development and release notes](docs/android.md) for setup,
+architecture, signing, and the initial integration's limitations.
+
 ## Run as Desktop App (Electron)
 
 Jumble can also run as a native desktop app via Electron. The desktop build runs all relay WebSockets in the main process (bypassing Chrome's per-origin connection cap) and stores secrets in the OS keychain via Electron's `safeStorage`.

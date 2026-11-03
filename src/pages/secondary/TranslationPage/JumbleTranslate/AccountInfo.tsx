@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,14 +33,14 @@ export function AccountInfo() {
       <SettingsGroup title="Jumble">
         <div className="space-y-4 p-4">
           <div>
-            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <div className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               {t('Balance')}
             </div>
             <div className="mt-1 flex items-baseline gap-1.5">
-              <span className="text-3xl font-bold leading-none">
+              <span className="text-3xl leading-none font-bold">
                 {account?.balance.toLocaleString() ?? '0'}
               </span>
-              <span className="text-sm text-muted-foreground">{t('characters')}</span>
+              <span className="text-muted-foreground text-sm">{t('characters')}</span>
             </div>
           </div>
 
@@ -66,7 +67,7 @@ export function AccountInfo() {
                 disabled={!account?.api_key}
                 onClick={() => {
                   if (!account?.api_key) return
-                  navigator.clipboard.writeText(account.api_key)
+                  copyText(account.api_key)
                   setCopied(true)
                   setTimeout(() => setCopied(false), 4000)
                 }}
@@ -75,7 +76,7 @@ export function AccountInfo() {
               </Button>
               <RegenerateApiKeyButton />
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {t('jumbleTranslateApiKeyDescription', {
                 serviceUrl: new URL('/v1/translation', JUMBLE_API_BASE_URL).toString()
               })}

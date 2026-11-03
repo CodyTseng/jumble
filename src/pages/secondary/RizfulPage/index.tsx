@@ -1,3 +1,5 @@
+import { openExternalUrl } from '@/lib/native-system'
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
@@ -116,18 +118,18 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
     return (
       <SecondaryPageLayout ref={ref} index={index} title={t('Rizful Vault')}>
         <div className="flex flex-col items-center gap-6 px-4 pt-3">
-          <CheckCircle2 className="size-40 fill-green-400 text-background" />
+          <CheckCircle2 className="text-background size-40 fill-green-400" />
           <div className="text-2xl font-semibold">{t('Rizful Vault connected!')}</div>
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-center text-sm">
             {t('You can now use your Rizful Vault to zap your favorite notes and creators.')}
           </div>
           {lightningAddress && (
             <div className="flex flex-col items-center gap-2">
               <div>{t('Your Lightning Address')}:</div>
               <div
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-1 text-lg font-semibold hover:bg-accent/80"
+                className="hover:bg-accent/80 flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-1 text-lg font-semibold"
                 onClick={() => {
-                  navigator.clipboard.writeText(lightningAddress)
+                  copyText(lightningAddress)
                   setCopiedLightningAddress(true)
                   setTimeout(() => setCopiedLightningAddress(false), 2000)
                 }}
@@ -153,11 +155,11 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
           <div className="font-semibold">1. {t('New to Rizful?')}</div>
           <Button
             className="w-64 bg-lime-500 hover:bg-lime-500/90"
-            onClick={() => window.open(RIZFUL_SIGNUP_URL, '_blank')}
+            onClick={() => openExternalUrl(RIZFUL_SIGNUP_URL)}
           >
             {t('Sign up for Rizful')} <ExternalLink />
           </Button>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             {t('If you already have a Rizful account, you can skip this step.')}
           </div>
         </div>
@@ -166,7 +168,7 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
           <div className="font-semibold">2. {t('Get your one-time code')}</div>
           <Button
             className="w-64 bg-orange-500 hover:bg-orange-500/90"
-            onClick={() => openPopup(RIZFUL_GET_TOKEN_URL, 'rizful_codes')}
+            onClick={() => openExternalUrl(RIZFUL_GET_TOKEN_URL)}
           >
             {t('Get code')}
             <ExternalLink />
@@ -197,14 +199,3 @@ const RizfulPage = forwardRef(({ index }: { index?: number }, ref) => {
 })
 RizfulPage.displayName = 'RizfulPage'
 export default RizfulPage
-
-function openPopup(url: string, name: string, width = 520, height = 700) {
-  const left = Math.max((window.screenX || 0) + (window.innerWidth - width) / 2, 0)
-  const top = Math.max((window.screenY || 0) + (window.innerHeight - height) / 2, 0)
-
-  return window.open(
-    url,
-    name,
-    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no`
-  )
-}

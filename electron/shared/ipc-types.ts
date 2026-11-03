@@ -41,30 +41,13 @@ export const IPC_CHANNELS = {
   pomegranateRecover: 'pomegranate:recover'
 } as const
 
-export type TSecretsBundle = {
-  nsec?: Record<string, string>
-  ncryptsec?: Record<string, string>
-  bunkerClientSecretKey?: Record<string, string>
-  encryptionKeyPrivkey?: Record<string, string>
-  retiredEncryptionKeyPrivkey?: Record<string, { privkey: string; retiredAt: number }[]>
-}
-
-export type TSecretsBridge = {
-  isAvailable: () => Promise<boolean>
-  load: () => Promise<TSecretsBundle>
-  save: (bundle: TSecretsBundle) => Promise<void>
-}
-
-export type TLocalStorageSnapshot = {
-  version: 1
-  revision: number
-  entries: Record<string, string>
-}
-
-export type TLocalStorageBridge = {
-  load: () => Promise<TLocalStorageSnapshot | null>
-  save: (snapshot: TLocalStorageSnapshot) => Promise<void>
-}
+export type {
+  TSecretsBundle,
+  TSecretsBridge,
+  TLocalStorageSnapshot,
+  TLocalStorageBridge
+} from '../../src/types/native-storage'
+import type { TSecretsBridge, TLocalStorageBridge } from '../../src/types/native-storage'
 
 export type TSecurityBackend = 'safeStorage' | 'password'
 

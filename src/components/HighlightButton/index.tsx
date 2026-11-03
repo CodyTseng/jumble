@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Copy, Highlighter } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -133,7 +134,7 @@ export default function HighlightButton({ onHighlight, containerRef }: Highlight
         onClick={async (e) => {
           e.stopPropagation()
           try {
-            await navigator.clipboard.writeText(selectedText)
+            await copyText(selectedText)
             toast.success(t('Copied to Clipboard'))
             clearSelection()
           } catch (error) {

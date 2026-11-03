@@ -1,0 +1,6 @@
+<resources>
+    <string name="no_external_app">未安装可打开此链接的应用</string>
+    <string name="background_listener">正在监听新动态</string>
+    <string name="stop_listening">停止监听</string>
+    <string name="background_connecting">正在连接中继</string>
+</resources>

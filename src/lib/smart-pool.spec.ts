@@ -16,6 +16,7 @@ class FakeWebSocket {
   readonly url: string
   readyState = FakeWebSocket.CONNECTING
   sent: string[] = []
+  respondToRequests = true
   onopen: (() => void) | null = null
   onerror: (() => void) | null = null
   onclose: ((event: { message: string }) => void) | null = null
@@ -53,7 +54,7 @@ class FakeWebSocket {
       )
       return
     }
-    if (!message.startsWith('["REQ"')) return
+    if (!message.startsWith('["REQ"') || !this.respondToRequests) return
 
     const subId = JSON.parse(message)[1]
     queueMicrotask(() => this.onmessage?.({ data: JSON.stringify(['EOSE', subId]) }))
@@ -258,7 +259,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     expect(FakeWebSocket.instances).toHaveLength(0)
   })
 
-  it('replaces demanded connections on resume and restores the original REQ', async () => {
+  it('preserves healthy connections and their original REQs across repeated checks', async () => {
     const pool = createPool()
     const filters = [{ kinds: [1], since: 100 }]
     const oneose = vi.fn()
@@ -266,16 +267,60 @@ describe('SmartPool request-driven relay lifecycle', () => {
     await waitForReq(FakeWebSocket.instances[0])
     await flushPromises()
 
-    await pool.checkRelays()
-    await flushPromises()
+    for (let tick = 0; tick < 3; tick++) {
+      await vi.advanceTimersByTimeAsync(30_000)
+      await pool.checkRelays()
+    }
 
-    expect(FakeWebSocket.instances).toHaveLength(2)
+    expect(FakeWebSocket.instances).toHaveLength(1)
     expect(Array.from(pool.listConnectionStatus().values())).toEqual([true])
-    expect(getReqFilters(FakeWebSocket.instances[1])).toEqual(filters)
+    const originalReqs = FakeWebSocket.instances[0].sent
+      .filter((message) => message.startsWith('["REQ"'))
+      .map((message) => JSON.parse(message))
+      .filter((message) => message[2].kinds)
+    expect(originalReqs).toHaveLength(1)
+    expect(getReqFilters(FakeWebSocket.instances[0])).toEqual(filters)
     expect(filters).toEqual([{ kinds: [1], since: 100 }])
     expect(oneose).toHaveBeenCalledOnce()
     sub.close()
     expect(pool.listConnectionStatus().size).toBe(0)
+  })
+
+  it('shares a pending subscription connection with a health check', async () => {
+    const pool = createPool()
+    const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], {})
+
+    await pool.checkRelays()
+    await waitForReq(FakeWebSocket.instances[0])
+
+    expect(FakeWebSocket.instances).toHaveLength(1)
+    expect(getReqFilters(FakeWebSocket.instances[0])).toEqual([{ kinds: [1] }])
+    sub.close()
+  })
+
+  it('recovers an unresponsive socket through heartbeat timeout and restores its REQ', async () => {
+    const pool = createPool()
+    const filters = [{ kinds: [1], since: 100 }]
+    const oneose = vi.fn()
+    const onclose = vi.fn()
+    const sub = pool.getRelay(RELAY_URL).subscribe(filters, { oneose, onclose })
+    const socket = FakeWebSocket.instances[0]
+    await waitForReq(socket)
+    await flushPromises()
+
+    // The transport still reports OPEN but no longer answers heartbeat REQs.
+    socket.respondToRequests = false
+    await pool.checkRelays()
+    expect(FakeWebSocket.instances).toHaveLength(1)
+
+    await vi.advanceTimersByTimeAsync(50_000)
+    await flushPromises()
+
+    expect(FakeWebSocket.instances).toHaveLength(2)
+    expect(getReqFilters(FakeWebSocket.instances[1])).toEqual(filters)
+    expect(oneose).toHaveBeenCalledOnce()
+    expect(onclose).not.toHaveBeenCalled()
+    sub.close()
   })
 
   it('reconnects a dropped relay while active REQ demand exists', async () => {
@@ -307,13 +352,11 @@ describe('SmartPool request-driven relay lifecycle', () => {
     pool
       .getRelay(RELAY_URL)
       .subscribe([{ kinds: [1] }], { onevent: vi.fn(), oneose: firstOnEose, onclose: firstOnClose })
-    pool
-      .getRelay(RELAY_URL)
-      .subscribe([{ kinds: [2] }], {
-        onevent: vi.fn(),
-        oneose: secondOnEose,
-        onclose: secondOnClose
-      })
+    pool.getRelay(RELAY_URL).subscribe([{ kinds: [2] }], {
+      onevent: vi.fn(),
+      oneose: secondOnEose,
+      onclose: secondOnClose
+    })
 
     await flushPromises()
     await vi.advanceTimersByTimeAsync(1_000)
@@ -432,7 +475,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     expect(pool.listConnectionStatus().size).toBe(0)
   })
 
-  it('deduplicates concurrent resume recovery', async () => {
+  it('deduplicates concurrent health checks', async () => {
     const pool = createPool()
     const sub = pool.getRelay(RELAY_URL).subscribe([{ kinds: [1] }], { onevent: vi.fn() })
     await waitForReq(FakeWebSocket.instances[0])
@@ -442,7 +485,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
 
     expect(second).toBe(first)
     await first
-    expect(FakeWebSocket.instances).toHaveLength(2)
+    expect(FakeWebSocket.instances).toHaveLength(1)
     sub.close()
   })
 })

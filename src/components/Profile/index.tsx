@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import Collapsible from '@/components/Collapsible'
 import FollowButton from '@/components/FollowButton'
 import Nip05 from '@/components/Nip05'
@@ -116,7 +117,9 @@ export default function Profile({ id }: { id?: string }) {
                         ? t('This user has not set up NIP-4e DMs')
                         : undefined
                     }
-                    className={!isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined}
+                    className={
+                      !isDmSupportLoading && !canStartDm ? 'cursor-not-allowed' : undefined
+                    }
                   >
                     <Button
                       variant="secondary"
@@ -218,7 +221,7 @@ function LightningAddressCopy({ lightningAddress }: { lightningAddress: string }
   const [copied, setCopied] = useState(false)
 
   const copy = () => {
-    navigator.clipboard.writeText(lightningAddress)
+    copyText(lightningAddress)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -236,7 +239,7 @@ function SpCopy({ sp }: { sp: string }) {
   const truncated = sp.length > 24 ? sp.slice(0, 12) + '...' + sp.slice(-6) : sp
 
   const copy = () => {
-    navigator.clipboard.writeText(sp)
+    copyText(sp)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

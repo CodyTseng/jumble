@@ -5,9 +5,14 @@ import {
   type PreparedImage,
   type SaveAs
 } from '@/lib/save-image'
-import { useCallback, useEffect, useState } from 'react'
+import { isAndroid } from '@/lib/platform'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 
 export function useImageSave(url: string | undefined, enabled: boolean) {
+  const { t } = useTranslation()
+  const saving = useRef(false)
   const [prepared, setPrepared] = useState<{ url: string; image: PreparedImage }>()
 
   useEffect(() => {
@@ -28,8 +33,27 @@ export function useImageSave(url: string | undefined, enabled: boolean) {
 
   return useCallback(
     (saveAs: SaveAs) => {
-      if (url) void downloadImage(url, preparedImage, saveAs)
+      if (!url) return
+      if (!isAndroid()) {
+        void downloadImage(url, preparedImage, saveAs)
+        return
+      }
+      if (saving.current) return
+      saving.current = true
+      const notification = toast.loading(t('Saving...'))
+      void downloadImage(url, preparedImage, saveAs)
+        .then(() => toast.success(t('Saved'), { id: notification }))
+        .catch((error: unknown) => {
+          console.error('[native] image save failed:', error)
+          toast.error(t('Something went wrong'), {
+            id: notification,
+            description: error instanceof Error ? error.message : undefined
+          })
+        })
+        .finally(() => {
+          saving.current = false
+        })
     },
-    [preparedImage, url]
+    [preparedImage, url, t]
   )
 }

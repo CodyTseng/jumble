@@ -1,12 +1,12 @@
 import { MAX_PINNED_NOTES, POLL_TYPE } from '@/constants'
 import { TEmoji, TPollType, TRelayList, TRelaySet } from '@/types'
-import { Event, kinds } from 'nostr-tools'
+import { Event } from 'nostr-tools'
 import { buildATag } from './draft-event'
 import { getReplaceableEventIdentifier } from './event'
-import { getAmountFromInvoice, getLightningAddressFromProfile } from './lightning'
+import { getLightningAddressFromProfile } from './lightning'
 import { formatPubkey, isValidPubkey, pubkeyToNpub } from './pubkey'
 import { getDefaultRelayUrls } from './relay'
-import { generateBech32IdFromETag, getEmojiInfosFromEmojiTags, tagNameEquals } from './tag'
+import { getEmojiInfosFromEmojiTags, tagNameEquals } from './tag'
 import { isOnionUrl, isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './url'
 
 export function getRelayListFromEvent(
@@ -102,72 +102,6 @@ export function getRelaySetFromEvent(event: Event): TRelaySet {
   }
 
   return { id, name, relayUrls, aTag: buildATag(event) }
-}
-
-export function getZapInfoFromEvent(receiptEvent: Event) {
-  if (receiptEvent.kind !== kinds.Zap) return null
-
-  let senderPubkey: string | undefined
-  let recipientPubkey: string | undefined
-  let originalEventId: string | undefined
-  let eventId: string | undefined
-  let invoice: string | undefined
-  let amount: number | undefined
-  let comment: string | undefined
-  let description: string | undefined
-  let preimage: string | undefined
-  try {
-    receiptEvent.tags.forEach((tag) => {
-      const [tagName, tagValue] = tag
-      switch (tagName) {
-        case 'P':
-          senderPubkey = tagValue
-          break
-        case 'p':
-          recipientPubkey = tagValue
-          break
-        case 'e':
-          originalEventId = tag[1]
-          eventId = generateBech32IdFromETag(tag)
-          break
-        case 'bolt11':
-          invoice = tagValue
-          break
-        case 'description':
-          description = tagValue
-          break
-        case 'preimage':
-          preimage = tagValue
-          break
-      }
-    })
-    if (!recipientPubkey || !invoice) return null
-    amount = invoice ? getAmountFromInvoice(invoice) : 0
-    if (description) {
-      try {
-        const zapRequest = JSON.parse(description)
-        comment = zapRequest.content
-        if (!senderPubkey) {
-          senderPubkey = zapRequest.pubkey
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    return {
-      senderPubkey,
-      recipientPubkey,
-      eventId,
-      originalEventId,
-      invoice,
-      amount,
-      comment,
-      preimage
-    }
-  } catch {
-    return null
-  }
 }
 
 export function getLongFormArticleMetadataFromEvent(event: Event) {
@@ -464,3 +398,5 @@ export function getFollowPackInfoFromEvent(event: Event) {
 
   return { title, description, image, pubkeys }
 }
+
+export { getZapInfoFromEvent } from './zap-info'

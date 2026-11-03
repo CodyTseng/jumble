@@ -1,0 +1,23 @@
+{
+  "event": {
+    "created_at": 1700000000,
+    "kind": 1,
+    "tags": [
+      [
+        "p",
+        "abababababababababababababababababababababababababababababababab"
+      ],
+      [
+        "e",
+        "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "",
+        "reply"
+      ]
+    ],
+    "content": "hello </script> 🌙 \"\\\nnostr:npub14w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w46h2at4w4scf6zts",
+    "pubkey": "989c0b76cb563971fdc9bef31ec06c3560f3249d6ee9e5d83c57625596e05f6f",
+    "id": "c844245262c85f674a2eaccfb3c30602152e30e444ccc636eb30de05b90f9ee4",
+    "sig": "d3a65d1a2e69de54307fcb6085a6c30a7602be7b1f159dd96dac960eb4b4fd6be1be9c7a30478df27b63e1567d32b062ed793757b6ce75425df74affe6234838"
+  },
+  "recipient": "abababababababababababababababababababababababababababababababab"
+}

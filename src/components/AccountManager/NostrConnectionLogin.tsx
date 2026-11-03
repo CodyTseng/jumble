@@ -1,3 +1,4 @@
+import { copyText } from '@/lib/native-system'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DEFAULT_NOSTRCONNECT_RELAY } from '@/constants'
@@ -105,7 +106,7 @@ export default function NostrConnectLogin({
   const copyConnectionString = async () => {
     if (!loginDetails.connectionString) return
 
-    navigator.clipboard.writeText(loginDetails.connectionString)
+    copyText(loginDetails.connectionString)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -191,18 +192,18 @@ export default function NostrConnectLogin({
 
       {/* QR + connection string */}
       <div ref={qrContainerRef} className="flex w-full flex-col items-center gap-3">
-        <div className="text-xs text-muted-foreground">{t('Scan with your signer app')}</div>
+        <div className="text-muted-foreground text-xs">{t('Scan with your signer app')}</div>
         <a
           href={loginDetails.connectionString}
           aria-label={t('Open with Nostr signer app')}
-          className="rounded-2xl outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="ring-offset-background focus-visible:ring-ring rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           <QrCode size={qrCodeSize} value={loginDetails.connectionString} />
         </a>
         <button
           type="button"
           onClick={copyConnectionString}
-          className="flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/80"
+          className="bg-muted text-muted-foreground hover:bg-muted/80 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs transition-colors"
           style={{
             maxWidth: qrCodeSize > 0 ? `${Math.max(150, Math.min(qrCodeSize, 320))}px` : '100%'
           }}
@@ -217,15 +218,15 @@ export default function NostrConnectLogin({
           )}
         </button>
         {nostrConnectionErrMsg && (
-          <div className="text-center text-xs text-destructive">{nostrConnectionErrMsg}</div>
+          <div className="text-destructive text-center text-xs">{nostrConnectionErrMsg}</div>
         )}
       </div>
 
       {/* OR divider — matches AccountManager style */}
       <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs uppercase tracking-wide text-muted-foreground/70">{t('or')}</span>
-        <div className="h-px flex-1 bg-border" />
+        <div className="bg-border h-px flex-1" />
+        <span className="text-muted-foreground/70 text-xs tracking-wide uppercase">{t('or')}</span>
+        <div className="bg-border h-px flex-1" />
       </div>
 
       {/* Bunker URI input — placeholder self-explains, no Label needed */}
@@ -249,7 +250,7 @@ export default function NostrConnectLogin({
             <ScanQrCode />
           </Button>
         </div>
-        {errMsg && <div className="text-xs text-destructive">{errMsg}</div>}
+        {errMsg && <div className="text-destructive text-xs">{errMsg}</div>}
       </div>
 
       {/* Actions */}

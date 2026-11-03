@@ -1,3 +1,4 @@
+import { openExternalUrl } from '@/lib/native-system'
 import { withSignerApproval } from '@/lib/signer-approval'
 import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
@@ -29,7 +30,7 @@ export class BunkerSigner implements ISigner {
 
     this.signer = NBunkerSigner.fromBunker(this.clientSecretKey, bunkerPointer, {
       onauth: (url) => {
-        window.open(url, '_blank')
+        openExternalUrl(url)
       }
     })
     if (isInitialConnection) {
