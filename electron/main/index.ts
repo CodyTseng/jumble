@@ -108,6 +108,10 @@ function createWindow() {
     }
   })
 
+  if (process.platform === 'linux' || process.platform === 'win32') {
+    win.removeMenu()
+  }
+
   win.once('ready-to-show', () => {
     if (savedState.isMaximized) {
       win?.maximize()
