@@ -151,11 +151,18 @@ distributed; later codes increase with workflow runs, and reruns retain the same
 code. Before adopting this workflow for an existing distribution, compare that
 initial run number with the highest version code already released.
 
-Artifacts are named `Jumble-<version>-android.apk` and
-`Jumble-<version>-android.aab`. Tag builds attach both to the same GitHub Release
+Artifacts are named `Jumble-android.apk` and
+`Jumble-android.aab`. Tag builds attach both to the same GitHub Release
 draft as desktop/Flatpak artifacts. Manual runs make them available as workflow
 artifacts without publishing a Release. Android source maps are archived
 separately. The Release job waits for Android, desktop and Flatpak builds.
+
+Stable download URLs, once the Release is published:
+
+- APK: `https://github.com/CodyTseng/jumble/releases/latest/download/Jumble-android.apk`
+- AAB: `https://github.com/CodyTseng/jumble/releases/latest/download/Jumble-android.aab`
+
+For publishing the same signed APK on Zapstore, see [the Zapstore release guide](zapstore.md).
 
 `npm run android:bundle` still defaults to version code 1 unless overridden.
 Store metadata, privacy disclosures, UGC moderation review, and payment-policy

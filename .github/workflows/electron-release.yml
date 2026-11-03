@@ -157,7 +157,6 @@ jobs:
         run: |
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify android/app/build/outputs/apk/release/app-release.apk
           python3 - <<'PYTHON'
-          import json
           import shutil
           import subprocess
           from pathlib import Path
@@ -166,11 +165,10 @@ jobs:
           verification = subprocess.run(['jarsigner', '-J-Duser.language=en', '-J-Duser.country=US', '-verify', str(bundle)], check=True, capture_output=True, text=True)
           if 'jar verified.' not in verification.stdout:
               raise SystemExit('Android bundle signature verification failed')
-          version = json.loads(Path('package.json').read_text())['version']
           target = Path('release/android')
           target.mkdir(parents=True, exist_ok=True)
-          shutil.copy2('android/app/build/outputs/apk/release/app-release.apk', target / f'Jumble-{version}-android.apk')
-          shutil.copy2(bundle, target / f'Jumble-{version}-android.aab')
+          shutil.copy2('android/app/build/outputs/apk/release/app-release.apk', target / 'Jumble-android.apk')
+          shutil.copy2(bundle, target / 'Jumble-android.aab')
           PYTHON
 
       - name: Archive Android source maps and matching bundles
