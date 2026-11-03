@@ -260,21 +260,21 @@ The Android manifest and link router accept public `jumble.social` note/profile/
 relay URLs and root-page query links. `nostr:` public identifiers remain supported;
 DM, credential-bearing, and unrelated-host URLs are rejected.
 
-`public/.well-known/assetlinks.json` currently contains this workstation's **debug
-APK certificate**, for the current pre-Play testing phase. Deploy the web build
-from this repository so Android can retrieve it over HTTPS at
-`https://jumble.social/.well-known/assetlinks.json`. App Links cannot verify until
-that deployed file matches the certificate on the installed APK.
+`public/.well-known/assetlinks.json` contains the production signing certificate
+fingerprint for directly distributed APKs. Deploy it with the web build at
+`https://jumble.social/.well-known/assetlinks.json`. Verified App Links require
+that this fingerprint matches the certificate on the installed APK. The existing
+`nostr:` scheme remains available independently of HTTPS verification.
 
-When changing signing keys or enabling Play App Signing, regenerate the association
-using the SHA-256 **app signing** certificate from Play (not just the upload key):
+Use the SHA-256 certificate fingerprint of the distributed APK. With Play App
+Signing, use the **app signing** certificate from Play, not just the upload key:
 
 ```sh
 ANDROID_APP_LINKS_SHA256='AA:BB:...:FF' npm run android:app-links
 ```
 
-Multiple certificate fingerprints can be comma-separated during a signing
-transition. Remove the debug certificate before a public production release.
+Multiple production certificate fingerprints can be comma-separated during a
+signing transition. Do not include debug certificates in the production association.
 No certificate private keys are placed in this repository. After deploying:
 
 ```sh
