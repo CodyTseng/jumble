@@ -58,6 +58,31 @@ public class NativeIntegrationTest {
         }
         fail(name+" was not set; "+evaluate(scenario,"window.__nativeError"));
     }
+    @Test public void systemKeyboardHidesOnlyTheBottomNavigationAndRestoresItAfterDismissal() throws Exception {
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            ready(scenario);
+            for(int i=0;i<60;i++) {
+                if("true".equals(evaluate(scenario,"!!document.querySelector('[data-bottom-navigation]')")))break;
+                SystemClock.sleep(100);
+            }
+            assertEquals("true",evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===false"));
+            evaluate(scenario,"(()=>{const input=document.createElement('input');input.type='text';input.style='position:fixed;top:40%;width:100%;height:100px;z-index:2147483647';document.body.append(input)})()");
+            onView(isAssignableFrom(WebView.class)).perform(click());
+            for(int i=0;i<60;i++) {
+                if("true".equals(evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===true")))break;
+                SystemClock.sleep(100);
+            }
+            assertEquals("true",evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===true"));
+            assertEquals("true",evaluate(scenario,"document.activeElement?.tagName==='INPUT'"));
+            scenario.onActivity(activity->androidx.core.view.WindowCompat.getInsetsController(activity.getWindow(),activity.getBridge().getWebView()).hide(androidx.core.view.WindowInsetsCompat.Type.ime()));
+            for(int i=0;i<60;i++) {
+                if("true".equals(evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===false")))break;
+                SystemClock.sleep(100);
+            }
+            assertEquals("true",evaluate(scenario,"document.querySelector('[data-bottom-navigation]')?.hidden===false"));
+        }
+    }
+
     @Test public void clipboardUsesNativeClipboardAndHidesSensitivePreviews() throws Exception {
         try (ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
             ready(scenario);
