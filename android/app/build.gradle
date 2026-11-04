@@ -15,7 +15,8 @@ android {
         applicationId "com.codytseng.jumble"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode = (project.findProperty('androidVersionCode') ?: '1').toInteger()
+        // Increment before each Android release; shared by local and CI builds.
+        versionCode 21
         versionName packageJson.version
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

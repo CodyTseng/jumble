@@ -82,8 +82,9 @@ properly delegated publishing identity if automating later. The current GitHub
 workflow only builds/signs Android artifacts; it does not publish Nostr catalog
 events. Initial ownership linking and signer authorization happen locally.
 
-The existing workflow assigns `versionCode` from `github.run_number`. New APKs
-must have a version code greater than the previously published version.
+The Android `versionCode` is maintained in `android/app/build.gradle` and shared
+by local and CI builds. Increment it before each new release; new APKs must have
+a version code greater than every previously distributed version.
 
 If Play App Signing is enabled later, check its actual distribution certificate
 before offering updates across Play, GitHub and Zapstore: an upload key can be

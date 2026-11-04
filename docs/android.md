@@ -170,13 +170,16 @@ and [photo/video permission policy](https://support.google.com/googleplay/androi
 
 ## Release builds
 
-The Android `versionName` comes from `package.json`. Increment the Play version
-code for each upload:
+The Android `versionName` comes from `package.json`. The internal `versionCode`
+is maintained in `android/app/build.gradle` and is currently 21, following the
+previously released code 20. Increment it before each new Android release so it
+exceeds every previously distributed version. Local and CI builds use the same
+checked-in value:
 
 ```sh
 npm run android:build
 cd android
-./gradlew bundleRelease -PandroidVersionCode=2
+./gradlew bundleRelease
 ```
 
 Without signing environment variables, local release builds remain **unsigned**.
@@ -211,11 +214,9 @@ The workflow restores it under the runner's temporary directory and deletes it
 in an `always()` cleanup step. Missing signing secrets fail the Android job;
 unsigned or debug-signed artifacts are never silently published.
 
-The workflow uses `package.json` for `versionName` and its `github.run_number` for
-`versionCode`. Its first version code must exceed any Android builds already
-distributed; later codes increase with workflow runs, and reruns retain the same
-code. Before adopting this workflow for an existing distribution, compare that
-initial run number with the highest version code already released.
+The workflow uses the same version configuration as local builds. Workflow
+renames and reruns do not change `versionCode`; increment the checked-in value
+before publishing a new Android release.
 
 Artifacts are named `Jumble-android.apk` and
 `Jumble-android.aab`. Tag builds attach both to the same GitHub Release
@@ -230,7 +231,7 @@ Stable download URLs, once the Release is published:
 
 For publishing the same signed APK on Zapstore, see [the Zapstore release guide](zapstore.md).
 
-`npm run android:bundle` still defaults to version code 1 unless overridden.
+`npm run android:bundle` uses the checked-in version code as well.
 Store metadata, privacy disclosures, UGC moderation review, and payment-policy
 review remain separate from the artifact build.
 

@@ -44,6 +44,7 @@ jobs:
 
       - name: Build & package Electron app
         env:
+          VITE_KLIPY_API_KEY: ${{ secrets.VITE_KLIPY_API_KEY }}
           # macOS signing + notarization (only injected on macOS runner)
           CSC_LINK: ${{ matrix.os == 'macos-14' && secrets.MAC_CERTIFICATE || '' }}
           CSC_KEY_PASSWORD: ${{ matrix.os == 'macos-14' && secrets.MAC_CERTIFICATE_PASSWORD || '' }}
@@ -143,15 +144,16 @@ jobs:
         run: npm ci
 
       - name: Build Android web assets
+        env:
+          VITE_KLIPY_API_KEY: ${{ secrets.VITE_KLIPY_API_KEY }}
         run: npm run android:build
 
       - name: Build signed release APK and AAB
         env:
-          ANDROID_VERSION_CODE: ${{ github.run_number }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: node scripts/android.mjs bundle :app:assembleRelease -PandroidVersionCode="$ANDROID_VERSION_CODE"
+        run: node scripts/android.mjs bundle :app:assembleRelease
 
       - name: Verify signatures and collect release files
         run: |
