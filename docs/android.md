@@ -1,5 +1,54 @@
 # Android
 
+## Screenshot demo
+
+Run `npm run screenshots`, then open `http://localhost:5180/`. The studio links to
+the relay feed, a note with nested replies, notifications, a profile, and settings.
+The real app components render six fictional users with distinct generated cartoon
+avatars. The sample relay is displayed as `relay.jumble.social`; no connection to
+that address is made.
+
+Direct scene shortcuts:
+
+- `http://localhost:5180/?demo=feed`
+- `http://localhost:5180/?demo=note`
+- `http://localhost:5180/?demo=notifications`
+- `http://localhost:5180/?demo=profile`
+- `http://localhost:5180/?demo=settings`
+
+Use a phone viewport in browser DevTools, or open the network URL printed by Vite
+on a phone on the same LAN. Add `&theme=dark` for dark mode or `&lng=ar` for RTL.
+Return to the studio home to reset the sample timeline to the current time.
+
+The screenshot server runs separately on port 5180 and uses a fresh temporary
+IndexedDB cache per page. It cannot publish events or connect to external relays;
+external image requests are also blocked. The regular app's accounts and storage
+are unaffected. Screenshot code and avatar assets are not imported by production
+entry points. Stop the server with Ctrl+C. Avatar prompts are recorded in
+`src/screenshots/avatar-prompts.json`.
+
+Resource locations:
+
+- `fastlane/metadata/android/en-US/images/phoneScreenshots/`: the four finished
+  1080×1920 English presentation images, ordered feed, note, notifications, profile.
+- `fastlane/metadata/android/en-US/images/featureGraphic.png`: the 1024×500 banner.
+- `resources/screenshots/raw/`: unframed 864×1536 app captures.
+- `resources/screenshots/render.mjs`: presentation image layout and captions.
+- `resources/screenshots/render-feature-graphic.mjs`: banner renderer.
+- `src/screenshots/avatars/`, `banner.svg`, and `avatar-prompts.json`: fictional
+  profile artwork and generation prompts used by the demo.
+- `src/screenshots/fixtures.ts` and `pool.ts`: signed sample events and local transport.
+
+To regenerate artwork, pass the path to a separately installed `@resvg/resvg-js`
+module; it is not an application dependency:
+
+```sh
+node resources/screenshots/render.mjs /path/to/@resvg/resvg-js/index.js
+node resources/screenshots/render-feature-graphic.mjs /path/to/@resvg/resvg-js/index.js
+```
+
+These scripts only write local image files. No publishing workflow is configured.
+
 Jumble's Android app packages the same React/Vite UI using Capacitor. Web and
 Electron builds keep their existing entry points. Android assets are bundled
 inside the APK; production does not load a hosted website.

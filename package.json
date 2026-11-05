@@ -21,6 +21,7 @@
   },
   "scripts": {
     "dev": "vite --host",
+    "screenshots": "vite --config vite.screenshots.config.ts --mode screenshots",
     "build": "tsc -b tsconfig.app.json tsconfig.node.json && vite build",
     "lint": "eslint .",
     "format": "prettier --write .",
