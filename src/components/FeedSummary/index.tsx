@@ -221,7 +221,7 @@ function FeedSummaryPanel({
   return (
     <aside
       aria-label={t('Feed overview')}
-      className="wide:block fixed end-0 top-0 hidden h-(--vh) w-[calc((100%-var(--removed-body-scroll-bar-size,0px)-640px)/2)] overflow-y-auto p-4 pb-24 rtl:end-[var(--removed-body-scroll-bar-size,0px)]"
+      className="wide:block fixed end-[var(--removed-body-scroll-bar-size,0px)] top-0 hidden h-(--vh) w-[calc((100%-var(--removed-body-scroll-bar-size,0px)-640px)/2)] overflow-y-auto p-4 pb-24 rtl:end-0"
     >
       <div className="max-w-80 space-y-4">
         {topics.length > 0 && (
