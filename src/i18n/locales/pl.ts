@@ -1297,6 +1297,28 @@ export default {
       'Odpowiadaj na notatki tekstowe (kind 1) komentarzami NIP-22 (kind 1111). Te odpowiedzi mogą nie być widoczne w niektórych klientach.',
     'Battery settings': 'Ustawienia baterii',
     'Allow background activity for local relay notifications':
-      'Zezwól na działanie w tle dla lokalnych powiadomień z przekaźników'
+      'Zezwól na działanie w tle dla lokalnych powiadomień z przekaźników',
+    'Feed overview': 'Przegląd kanału',
+    'Based on notes loaded in this feed': 'Na podstawie notatek wczytanych w tym kanale',
+    'Notes: {{notes}} · People: {{people}}': 'Notatki: {{notes}} · Osoby: {{people}}',
+    'Common topics': 'Częste tematy',
+    'No hashtags in this sample yet': 'Brak hashtagów w tej próbce',
+    'Popular in this feed': 'Popularne w tym kanale',
+    'Ranked by people reposting or quoting': 'Według liczby osób udostępniających lub cytujących',
+    'No notes reposted or quoted by multiple people yet':
+      'Brak notatek udostępnionych lub cytowanych przez wiele osób',
+    '{{number}} reposting': 'Udostępniają: {{number}}',
+    '{{number}} quoting': 'Cytują: {{number}}',
+    Mention: 'Wzmianka',
+    'Feed topics': 'Tematy',
+    '{{number}} people': 'Osoby: {{number}}',
+    '{{number}} people shared this note': 'Liczba osób, które udostępniły tę notatkę: {{number}}',
+    'Feed sidebar': 'Panel boczny kanału',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Wyświetlany obok kanału w trybie jednokolumnowym na szerokich ekranach.',
+    'Hide this section': 'Ukryj tę sekcję',
+    Participants: 'Uczestnicy',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Udostępnienia × 1 · Cytaty × 2 · Wczytane odpowiedzi × 1'
   }
 }

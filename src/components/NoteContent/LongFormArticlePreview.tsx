@@ -4,6 +4,8 @@ import { toNoteList } from '@/lib/link'
 import { useSecondaryPage } from '@/PageManager'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
+import { cn } from '@/lib/utils'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo } from 'react'
 import Image from '../Image'
@@ -16,13 +18,18 @@ export default function LongFormArticlePreview({
   className?: string
 }) {
   const { isSmallScreen } = useScreenSize()
+  const preview = useNotePreview()
   const { push } = useSecondaryPage()
   const { autoLoadMedia } = useContentPolicy()
   const translatedEvent = useTranslatedEvent(event.id)
   const displayEvent = translatedEvent ?? event
   const metadata = useMemo(() => getLongFormArticleMetadataFromEvent(displayEvent), [displayEvent])
 
-  const titleComponent = <div className="line-clamp-2 text-xl font-semibold">{metadata.title}</div>
+  const titleComponent = (
+    <div dir="auto" className={cn('line-clamp-2 font-semibold', preview ? 'text-base' : 'text-xl')}>
+      {metadata.title}
+    </div>
+  )
 
   const tagsComponent = metadata.tags.length > 0 && (
     <div className="flex flex-wrap gap-1">
@@ -47,7 +54,7 @@ export default function LongFormArticlePreview({
     </div>
   )
 
-  if (isSmallScreen) {
+  if (isSmallScreen || preview) {
     return (
       <div className={className}>
         {metadata.image && autoLoadMedia && (

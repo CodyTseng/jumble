@@ -1,4 +1,5 @@
 import NewNotesButton from '@/components/NewNotesButton'
+import FeedSummary from '@/components/FeedSummary'
 import { Button } from '@/components/ui/button'
 import { SPAMMER_PERCENTILE_THRESHOLD } from '@/constants'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
@@ -399,6 +400,7 @@ const NoteList = forwardRef<
             kinds: showKinds,
             limit: LIMIT
           })
+          threadService.addRepliesToThread(storedEvents, false)
           setStoredEvents(storedEvents)
         }
 
@@ -526,6 +528,7 @@ const NoteList = forwardRef<
         return false
       }
       setReachedTimelineEnd(false)
+      threadService.addRepliesToThread(newEvents)
       setEvents((oldEvents) => [...oldEvents, ...newEvents])
       return true
     }, [timelineKey, events, areAlgoRelays])
@@ -607,6 +610,18 @@ const NoteList = forwardRef<
 
     return (
       <div>
+        <FeedSummary
+          items={filteredNotes}
+          scopeKey={JSON.stringify([
+            subRequests,
+            showKinds,
+            hideReplies,
+            hideSpam,
+            trustScoreThreshold,
+            refreshCount
+          ])}
+          isEventHidden={shouldHideEvent}
+        />
         <div ref={topRef} className="scroll-mt-24.25" />
         {initialLoading && shouldShowLoadingIndicator && <LoadingBar />}
         <PullToRefresh

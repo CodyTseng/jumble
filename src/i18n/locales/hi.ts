@@ -1279,6 +1279,29 @@ export default {
       'टेक्स्ट नोट्स (kind 1) का उत्तर NIP-22 टिप्पणियों (kind 1111) से दें। ये उत्तर कुछ क्लाइंट में दिखाई नहीं दे सकते हैं।',
     'Battery settings': 'बैटरी सेटिंग',
     'Allow background activity for local relay notifications':
-      'स्थानीय रिले सूचनाओं के लिए पृष्ठभूमि गतिविधि की अनुमति दें'
+      'स्थानीय रिले सूचनाओं के लिए पृष्ठभूमि गतिविधि की अनुमति दें',
+    'Feed overview': 'फ़ीड का अवलोकन',
+    'Based on notes loaded in this feed': 'इस फ़ीड में लोड किए गए नोट्स पर आधारित',
+    'Notes: {{notes}} · People: {{people}}': 'नोट्स: {{notes}} · लोग: {{people}}',
+    'Common topics': 'आम विषय',
+    'No hashtags in this sample yet': 'इस नमूने में अभी कोई हैशटैग नहीं है',
+    'Popular in this feed': 'इस फ़ीड में लोकप्रिय',
+    'Ranked by people reposting or quoting':
+      'रीपोस्ट या उद्धृत करने वाले लोगों की संख्या के अनुसार',
+    'No notes reposted or quoted by multiple people yet':
+      'अभी किसी नोट को कई लोगों ने रीपोस्ट या उद्धृत नहीं किया है',
+    '{{number}} reposting': '{{number}} लोग रीपोस्ट कर रहे हैं',
+    '{{number}} quoting': '{{number}} लोग उद्धृत कर रहे हैं',
+    Mention: 'उल्लेख',
+    'Feed topics': 'विषय',
+    '{{number}} people': '{{number}} लोग',
+    '{{number}} people shared this note': '{{number}} लोगों ने यह नोट साझा किया',
+    'Feed sidebar': 'फ़ीड साइडबार',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'चौड़ी स्क्रीन पर एक-कॉलम मोड में फ़ीड के पास दिखाया जाता है।',
+    'Hide this section': 'यह अनुभाग छिपाएँ',
+    Participants: 'प्रतिभागी',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'रीपोस्ट × 1 · उद्धरण × 2 · लोड किए गए जवाब × 1'
   }
 }

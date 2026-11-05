@@ -1275,6 +1275,26 @@ export default {
       '使用 NIP-22 留言（kind 1111）回覆文字筆記（kind 1）。這些回覆可能無法在部分用戶端中顯示。',
     'Battery settings': '電池設定',
     'Allow background activity for local relay notifications':
-      '允許背景活動，以便在本機監聽中繼通知'
+      '允許背景活動，以便在本機監聽中繼通知',
+    'Feed overview': 'Feed 概覽',
+    'Based on notes loaded in this feed': '根據目前 feed 已載入的筆記',
+    'Notes: {{notes}} · People: {{people}}': '筆記 {{notes}} · 參與者 {{people}}',
+    'Common topics': '常見話題',
+    'No hashtags in this sample yet': '這批筆記中尚未發現話題標籤',
+    'Popular in this feed': '本批熱門筆記',
+    'Ranked by people reposting or quoting': '依轉發或引用的不重複人數排序',
+    'No notes reposted or quoted by multiple people yet': '尚無被多人轉發或引用的筆記',
+    '{{number}} reposting': '{{number}} 人轉發',
+    '{{number}} quoting': '{{number}} 人引用',
+    Mention: '提及',
+    'Feed topics': '話題',
+    '{{number}} people': '{{number}} 人',
+    '{{number}} people shared this note': '{{number}} 人轉發或引用了這則筆記',
+    'Feed sidebar': 'Feed 側欄',
+    'Shown beside your feed in single-column mode on wide screens.':
+      '在寬螢幕單欄模式下顯示於 feed 旁。',
+    'Hide this section': '關閉此區塊',
+    Participants: '參與者',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '轉發 × 1 · 引用 × 2 · 已載入回覆 × 1'
   }
 }

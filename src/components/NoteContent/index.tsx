@@ -4,6 +4,7 @@ import { isNip34EventKind } from '@/lib/nip34'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
 import { Event, kinds } from 'nostr-tools'
 import { useMemo, useState } from 'react'
 import AudioPlayer from '../AudioPlayer'
@@ -44,6 +45,7 @@ export default function NoteContent({
   size?: 'normal' | 'small'
 }) {
   const { nsfwDisplayPolicy } = useContentPolicy()
+  const preview = useNotePreview()
   const [showNsfw, setShowNsfw] = useState(false)
   const { mutePubkeySet } = useMuteList()
   const [showMuted, setShowMuted] = useState(false)
@@ -166,5 +168,5 @@ export default function NoteContent({
     return <Zap className={cn('mt-2', className)} event={event} />
   }
 
-  return <Content className={cn('mt-2', className)} event={event} enableHighlight />
+  return <Content className={cn('mt-2', className)} event={event} enableHighlight={!preview} />
 }

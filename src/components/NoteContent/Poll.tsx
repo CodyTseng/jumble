@@ -7,6 +7,7 @@ import { formatError } from '@/lib/error'
 import { getPollMetadataFromEvent } from '@/lib/event-metadata'
 import { cn, isPartiallyInViewport } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
 import client from '@/services/client.service'
 import pollResultsService from '@/services/poll-results.service'
 import dayjs from 'dayjs'
@@ -18,6 +19,7 @@ import { toast } from 'sonner'
 
 export default function Poll({ event, className }: { event: Event; className?: string }) {
   const { t } = useTranslation()
+  const preview = useNotePreview()
   const translatedEvent = useTranslatedEvent(event.id)
   const { pubkey, publish, startLogin } = useNostr()
   const [isVoting, setIsVoting] = useState(false)
@@ -44,7 +46,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
   const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (pollResults || isLoadingResults || !containerElement) return
+    if (preview || pollResults || isLoadingResults || !containerElement) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -64,7 +66,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
     return () => {
       observer.unobserve(containerElement)
     }
-  }, [pollResults, isLoadingResults, containerElement])
+  }, [preview, pollResults, isLoadingResults, containerElement])
 
   if (!poll) {
     return null
@@ -139,7 +141,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
   return (
     <div className={className} ref={setContainerElement}>
       <div className="space-y-2">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           <p>
             {poll.pollType === POLL_TYPE.MULTIPLE_CHOICE &&
               t('Multiple choice (select one or more)')}
@@ -195,8 +197,8 @@ export default function Poll({ event, className }: { event: Event; className?: s
                 {showResults && (
                   <div
                     className={cn(
-                      'z-10 shrink-0 text-muted-foreground',
-                      isMax ? 'font-semibold text-foreground' : ''
+                      'text-muted-foreground z-10 shrink-0',
+                      isMax ? 'text-foreground font-semibold' : ''
                     )}
                   >
                     {percentage.toFixed(1)}%
@@ -217,7 +219,7 @@ export default function Poll({ event, className }: { event: Event; className?: s
         </div>
 
         {/* Results Summary */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-between text-sm">
           <div>{t('{{number}} votes', { number: pollResults?.totalVotes ?? 0 })}</div>
 
           {isLoadingResults && t('Loading...')}

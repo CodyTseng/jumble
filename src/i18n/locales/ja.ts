@@ -1281,6 +1281,28 @@ export default {
       'テキストノート（kind 1）に NIP-22 コメント（kind 1111）で返信します。一部のクライアントでは、これらの返信が表示されない場合があります。',
     'Battery settings': 'バッテリー設定',
     'Allow background activity for local relay notifications':
-      'ローカルのリレー通知を受信するためにバックグラウンド動作を許可する'
+      'ローカルのリレー通知を受信するためにバックグラウンド動作を許可する',
+    'Feed overview': 'フィードの概要',
+    'Based on notes loaded in this feed': 'このフィードの読み込み済みノートに基づきます',
+    'Notes: {{notes}} · People: {{people}}': 'ノート: {{notes}} · 参加者: {{people}}',
+    'Common topics': 'よくある話題',
+    'No hashtags in this sample yet': 'このサンプルにはまだハッシュタグがありません',
+    'Popular in this feed': 'このフィードの注目ノート',
+    'Ranked by people reposting or quoting': 'リポスト・引用した人数でランキング',
+    'No notes reposted or quoted by multiple people yet':
+      '複数の人にリポスト・引用されたノートはまだありません',
+    '{{number}} reposting': '{{number}} 人がリポスト',
+    '{{number}} quoting': '{{number}} 人が引用',
+    Mention: 'メンション',
+    'Feed topics': '話題',
+    '{{number}} people': '{{number}} 人',
+    '{{number}} people shared this note': '{{number}} 人がこのノートをリポストまたは引用しました',
+    'Feed sidebar': 'フィードのサイドバー',
+    'Shown beside your feed in single-column mode on wide screens.':
+      '幅の広い画面の1カラム表示で、フィードの横に表示されます。',
+    'Hide this section': 'このセクションを非表示',
+    Participants: '参加者',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'リポスト × 1 · 引用 × 2 · 読み込み済みの返信 × 1'
   }
 }

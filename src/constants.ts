@@ -51,6 +51,8 @@ export const StorageKey = {
   SIDEBAR_COLLAPSE: 'sidebarCollapse',
   PRIMARY_COLOR: 'primaryColor',
   ENABLE_SINGLE_COLUMN_LAYOUT: 'enableSingleColumnLayout',
+  SHOW_FEED_TOPICS: 'showFeedTopics',
+  SHOW_FEED_POPULAR_NOTES: 'showFeedPopularNotes',
   ENABLE_DM: 'enableDm',
   USE_NIP22_REPLIES: 'useNip22Replies',
   FAVICON_URL_TEMPLATE: 'faviconUrlTemplate',

@@ -1266,6 +1266,27 @@ export default {
       '텍스트 노트(kind 1)에 NIP-22 댓글(kind 1111)로 답글을 작성합니다. 일부 클라이언트에서는 이 답글이 표시되지 않을 수 있습니다.',
     'Battery settings': '배터리 설정',
     'Allow background activity for local relay notifications':
-      '로컬 릴레이 알림을 위해 백그라운드 활동 허용'
+      '로컬 릴레이 알림을 위해 백그라운드 활동 허용',
+    'Feed overview': '피드 개요',
+    'Based on notes loaded in this feed': '이 피드에 불러온 노트 기준',
+    'Notes: {{notes}} · People: {{people}}': '노트: {{notes}} · 참여자: {{people}}',
+    'Common topics': '주요 주제',
+    'No hashtags in this sample yet': '아직 이 표본에 해시태그가 없습니다',
+    'Popular in this feed': '이 피드의 인기 노트',
+    'Ranked by people reposting or quoting': '재게시하거나 인용한 사람 수로 정렬',
+    'No notes reposted or quoted by multiple people yet':
+      '아직 여러 사람이 재게시하거나 인용한 노트가 없습니다',
+    '{{number}} reposting': '{{number}}명 재게시',
+    '{{number}} quoting': '{{number}}명 인용',
+    Mention: '멘션',
+    'Feed topics': '주제',
+    '{{number}} people': '{{number}}명',
+    '{{number}} people shared this note': '{{number}}명이 이 노트를 재게시하거나 인용했습니다',
+    'Feed sidebar': '피드 사이드바',
+    'Shown beside your feed in single-column mode on wide screens.':
+      '넓은 화면의 단일 열 모드에서 피드 옆에 표시됩니다.',
+    'Hide this section': '이 섹션 숨기기',
+    Participants: '참여자',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '재게시 × 1 · 인용 × 2 · 불러온 답글 × 1'
   }
 }

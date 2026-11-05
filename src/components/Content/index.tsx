@@ -20,6 +20,7 @@ import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { EMOJI_REGEX } from '@/constants'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
 import mediaUpload from '@/services/media-upload.service'
 import { TImetaInfo } from '@/types'
 import { Event } from 'nostr-tools'
@@ -52,7 +53,7 @@ export default function Content({
   className,
   mustLoadMedia,
   enableHighlight = false,
-  preview = false
+  preview: previewProp = false
 }: {
   event?: Event
   content?: string
@@ -66,6 +67,7 @@ export default function Content({
   const [selectedText, setSelectedText] = useState('')
   const [mediaRevealed, setMediaRevealed] = useState(false)
   const { autoLoadMedia } = useContentPolicy()
+  const preview = useNotePreview() || previewProp
   const canShowPreview = useWebPreviewPolicy()
   const translatedEvent = useTranslatedEvent(event?.id)
   const resolvedContent = translatedEvent?.content ?? event?.content ?? content

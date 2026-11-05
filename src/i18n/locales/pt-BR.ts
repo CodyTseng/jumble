@@ -1289,6 +1289,28 @@ export default {
       'Responder a notas de texto (kind 1) com comentários NIP-22 (kind 1111). Essas respostas podem não aparecer em alguns clientes.',
     'Battery settings': 'Configurações da bateria',
     'Allow background activity for local relay notifications':
-      'Permita a atividade em segundo plano para notificações locais dos relays'
+      'Permita a atividade em segundo plano para notificações locais dos relays',
+    'Feed overview': 'Visão geral do feed',
+    'Based on notes loaded in this feed': 'Com base nas notas carregadas neste feed',
+    'Notes: {{notes}} · People: {{people}}': 'Notas: {{notes}} · Pessoas: {{people}}',
+    'Common topics': 'Assuntos frequentes',
+    'No hashtags in this sample yet': 'Ainda não há hashtags nesta amostra',
+    'Popular in this feed': 'Popular neste feed',
+    'Ranked by people reposting or quoting': 'Ordenado por pessoas que republicam ou citam',
+    'No notes reposted or quoted by multiple people yet':
+      'Ainda não há notas republicadas ou citadas por várias pessoas',
+    '{{number}} reposting': '{{number}} republicando',
+    '{{number}} quoting': '{{number}} citando',
+    Mention: 'Menção',
+    'Feed topics': 'Assuntos',
+    '{{number}} people': '{{number}} pessoas',
+    '{{number}} people shared this note': '{{number}} pessoas compartilharam esta nota',
+    'Feed sidebar': 'Barra lateral do feed',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Exibida ao lado do feed no modo de coluna única em telas largas.',
+    'Hide this section': 'Ocultar esta seção',
+    Participants: 'Participantes',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Republicações × 1 · Citações × 2 · Respostas carregadas × 1'
   }
 }

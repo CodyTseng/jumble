@@ -82,4 +82,44 @@ describe('ThreadService ID topology', () => {
     expect(refreshedSnapshot).toEqual([reply.id])
     expect(refreshedSnapshot).not.toBe(firstSnapshot)
   })
+
+  it('counts cached descendants across ID/address aliases without double-counting', async () => {
+    const threadService = (await import('./thread.service')).default
+    const root = 'a'.repeat(64)
+    const address = `30023:${'f'.repeat(64)}:article`
+    const a = makeReply('b'.repeat(64), root, root)
+    const b = makeReply('c'.repeat(64), a.id, root)
+    const c = {
+      ...makeReply('d'.repeat(64), root, root),
+      kind: 1111,
+      tags: [
+        ['k', '30023'],
+        ['a', address],
+        ['E', root]
+      ]
+    }
+    threadService.addRepliesToThread([a, b, c, a], false)
+    expect(threadService.getLoadedReplyCount(address, root)).toBe(3)
+    expect(threadService.getLoadedReplyCount(root)).toBe(2)
+    expect(threadService.getLoadedReplyCount('unknown')).toBe(0)
+  })
+
+  it('notifies cache readers once per batch and unsubscribes without relay subscriptions', async () => {
+    const threadService = (await import('./thread.service')).default
+    const changed = vi.fn()
+    const before = threadService.getRevision()
+    const stop = threadService.listenChanges(changed)
+    threadService.addRepliesToThread(
+      [makeReply('b'.repeat(64), 'a'.repeat(64), 'a'.repeat(64))],
+      false
+    )
+    expect(threadService.getRevision()).toBe(before + 1)
+    expect(changed).toHaveBeenCalledTimes(1)
+    stop()
+    threadService.addRepliesToThread(
+      [makeReply('c'.repeat(64), 'a'.repeat(64), 'a'.repeat(64))],
+      false
+    )
+    expect(changed).toHaveBeenCalledTimes(1)
+  })
 })

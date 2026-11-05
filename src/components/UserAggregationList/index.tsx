@@ -1,4 +1,5 @@
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
+import FeedSummary from '@/components/FeedSummary'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/UserAvatar'
@@ -159,6 +160,7 @@ const UserAggregationList = forwardRef<
             kinds: showKinds ?? [],
             since: dayjs().subtract(1, 'day').unix()
           })
+          threadService.addRepliesToThread(storedEvents, false)
           setStoredEvents(storedEvents)
         }
 
@@ -241,6 +243,7 @@ const UserAggregationList = forwardRef<
           setLoading(false)
           return
         }
+        threadService.addRepliesToThread(moreEvents)
         setEvents((oldEvents) => [...oldEvents, ...moreEvents])
         setLoading(false)
       })
@@ -323,6 +326,8 @@ const UserAggregationList = forwardRef<
       userAggregationService.saveAggregations(feedId, aggs)
       return aggs
     }, [feedId, filteredEvents])
+
+    const summaryItems = useMemo(() => filteredEvents.map((event) => ({ event })), [filteredEvents])
 
     const pinnedAggregations = useMemo(() => {
       return aggregations.filter((agg) => pinnedPubkeySet.has(agg.pubkey))
@@ -453,6 +458,10 @@ const UserAggregationList = forwardRef<
 
     return (
       <div>
+        <FeedSummary
+          items={summaryItems}
+          scopeKey={JSON.stringify([feedId, trustScoreThreshold, refreshCount])}
+        />
         <div ref={topRef} className="scroll-mt-[calc(6rem+1px)]" />
         {showLoadingBar && <LoadingBar />}
         <div className="flex h-12 items-center justify-between gap-2 border-b ps-4 pe-1">

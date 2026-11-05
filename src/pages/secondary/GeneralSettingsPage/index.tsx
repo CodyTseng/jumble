@@ -46,7 +46,11 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
     enableDm,
     updateEnableDm,
     useNip22Replies,
-    updateUseNip22Replies
+    updateUseNip22Replies,
+    showFeedTopics,
+    updateShowFeedTopics,
+    showFeedPopularNotes,
+    updateShowFeedPopularNotes
   } = useUserPreferences()
   const handleLanguageChange = (value: TLanguage) => {
     i18n.changeLanguage(value)
@@ -165,6 +169,34 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           />
           <DefaultTrustScoreFilter />
           <MutedWords />
+        </SettingsGroup>
+
+        <SettingsGroup
+          title={t('Feed sidebar')}
+          description={t('Shown beside your feed in single-column mode on wide screens.')}
+        >
+          <SettingsRow
+            htmlFor="show-feed-topics"
+            title={t('Feed topics')}
+            control={
+              <Switch
+                id="show-feed-topics"
+                checked={showFeedTopics}
+                onCheckedChange={updateShowFeedTopics}
+              />
+            }
+          />
+          <SettingsRow
+            htmlFor="show-feed-popular-notes"
+            title={t('Trending Notes')}
+            control={
+              <Switch
+                id="show-feed-popular-notes"
+                checked={showFeedPopularNotes}
+                onCheckedChange={updateShowFeedPopularNotes}
+              />
+            }
+          />
         </SettingsGroup>
 
         <SettingsGroup title={t('Features')}>

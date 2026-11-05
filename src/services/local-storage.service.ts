@@ -75,6 +75,8 @@ class LocalStorageService {
   private sidebarCollapse: boolean = false
   private primaryColor: TPrimaryColor = 'DEFAULT'
   private enableSingleColumnLayout: boolean = true
+  private showFeedTopics: boolean = true
+  private showFeedPopularNotes: boolean = true
   private enableDm: boolean = false
   private useNip22Replies: boolean = false
   private faviconUrlTemplate: string = DEFAULT_FAVICON_URL_TEMPLATE
@@ -394,6 +396,9 @@ class LocalStorageService {
 
     this.enableSingleColumnLayout =
       window.localStorage.getItem(StorageKey.ENABLE_SINGLE_COLUMN_LAYOUT) !== 'false'
+    this.showFeedTopics = window.localStorage.getItem(StorageKey.SHOW_FEED_TOPICS) !== 'false'
+    this.showFeedPopularNotes =
+      window.localStorage.getItem(StorageKey.SHOW_FEED_POPULAR_NOTES) !== 'false'
 
     this.enableDm =
       supportsDirectMessages() && window.localStorage.getItem(StorageKey.ENABLE_DM) === 'true'
@@ -1259,6 +1264,24 @@ class LocalStorageService {
 
   getEnableDm() {
     return supportsDirectMessages() && this.enableDm
+  }
+
+  getShowFeedTopics() {
+    return this.showFeedTopics
+  }
+
+  setShowFeedTopics(show: boolean) {
+    this.showFeedTopics = show
+    window.localStorage.setItem(StorageKey.SHOW_FEED_TOPICS, show.toString())
+  }
+
+  getShowFeedPopularNotes() {
+    return this.showFeedPopularNotes
+  }
+
+  setShowFeedPopularNotes(show: boolean) {
+    this.showFeedPopularNotes = show
+    window.localStorage.setItem(StorageKey.SHOW_FEED_POPULAR_NOTES, show.toString())
   }
 
   setEnableDm(enable: boolean) {

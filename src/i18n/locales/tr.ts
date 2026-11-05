@@ -1285,6 +1285,28 @@ export default {
       'Metin notlarına (kind 1) NIP-22 yorumlarıyla (kind 1111) yanıt ver. Bu yanıtlar bazı istemcilerde görünmeyebilir.',
     'Battery settings': 'Pil ayarları',
     'Allow background activity for local relay notifications':
-      'Yerel röle bildirimleri için arka plan etkinliğine izin ver'
+      'Yerel röle bildirimleri için arka plan etkinliğine izin ver',
+    'Feed overview': 'Akış özeti',
+    'Based on notes loaded in this feed': 'Bu akışta yüklenen notlara göre',
+    'Notes: {{notes}} · People: {{people}}': 'Notlar: {{notes}} · Kişiler: {{people}}',
+    'Common topics': 'Sık konuşulan konular',
+    'No hashtags in this sample yet': 'Bu örnekte henüz etiket yok',
+    'Popular in this feed': 'Bu akışta popüler',
+    'Ranked by people reposting or quoting': 'Yeniden paylaşan veya alıntılayan kişi sayısına göre',
+    'No notes reposted or quoted by multiple people yet':
+      'Henüz birden fazla kişinin yeniden paylaştığı veya alıntıladığı not yok',
+    '{{number}} reposting': '{{number}} kişi yeniden paylaşıyor',
+    '{{number}} quoting': '{{number}} kişi alıntılıyor',
+    Mention: 'Bahsetme',
+    'Feed topics': 'Konular',
+    '{{number}} people': '{{number}} kişi',
+    '{{number}} people shared this note': '{{number}} kişi bu notu paylaştı',
+    'Feed sidebar': 'Akış kenar çubuğu',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Geniş ekranlarda tek sütun modunda akışın yanında gösterilir.',
+    'Hide this section': 'Bu bölümü gizle',
+    Participants: 'Katılımcılar',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Yeniden paylaşımlar × 1 · Alıntılar × 2 · Yüklenen yanıtlar × 1'
   }
 }

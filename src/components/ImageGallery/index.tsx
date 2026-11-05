@@ -2,6 +2,7 @@ import { useImageSave } from '@/hooks/useImageSave'
 import { randomString } from '@/lib/random'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
 import blossomService from '@/services/blossom.service'
 import modalManager from '@/services/modal-manager.service'
 import { TImetaInfo } from '@/types'
@@ -21,7 +22,7 @@ export default function ImageGallery({
   start = 0,
   end = images.length,
   mustLoad = false,
-  enableLightbox = true
+  enableLightbox: lightboxPreference = true
 }: {
   className?: string
   images: TImetaInfo[]
@@ -32,6 +33,8 @@ export default function ImageGallery({
 }) {
   const id = useMemo(() => `image-gallery-${randomString()}`, [])
   const { t } = useTranslation()
+  const preview = useNotePreview()
+  const enableLightbox = lightboxPreference && !preview
   const { autoLoadMedia } = useContentPolicy()
   const [index, setIndex] = useState(-1)
   const [revealed, setRevealed] = useState(false)

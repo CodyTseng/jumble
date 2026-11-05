@@ -1,5 +1,6 @@
 import { usePrimaryPage } from '@/PageManager'
 import FollowingFeed from '@/components/FollowingFeed'
+import { FeedSummaryScope } from '@/components/FeedSummary'
 import RelayInfo from '@/components/RelayInfo'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
@@ -92,7 +93,7 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
       controls={infoToggle}
       displayScrollToTopButton
     >
-      {content}
+      <FeedSummaryScope>{content}</FeedSummaryScope>
     </PrimaryPageLayout>
   )
 })

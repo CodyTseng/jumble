@@ -20,6 +20,12 @@ type TUserPreferencesContext = {
   enableSingleColumnLayout: boolean
   updateEnableSingleColumnLayout: (enable: boolean) => void
 
+  showFeedTopics: boolean
+  updateShowFeedTopics: (show: boolean) => void
+
+  showFeedPopularNotes: boolean
+  updateShowFeedPopularNotes: (show: boolean) => void
+
   enableDm: boolean
   updateEnableDm: (enable: boolean) => void
 
@@ -64,6 +70,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     storage.getEnableSingleColumnLayout()
   )
   const [enableDm, setEnableDm] = useState(storage.getEnableDm())
+  const [showFeedTopics, setShowFeedTopics] = useState(storage.getShowFeedTopics())
+  const [showFeedPopularNotes, setShowFeedPopularNotes] = useState(
+    storage.getShowFeedPopularNotes()
+  )
   const [useNip22Replies, setUseNip22Replies] = useState(storage.getUseNip22Replies())
   const [quickReaction, setQuickReaction] = useState(storage.getQuickReaction())
   const [quickReactionEmoji, setQuickReactionEmoji] = useState(storage.getQuickReactionEmoji())
@@ -107,6 +117,16 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
   const updateEnableDm = (enable: boolean) => {
     storage.setEnableDm(enable)
     setEnableDm(storage.getEnableDm())
+  }
+
+  const updateShowFeedTopics = (show: boolean) => {
+    setShowFeedTopics(show)
+    storage.setShowFeedTopics(show)
+  }
+
+  const updateShowFeedPopularNotes = (show: boolean) => {
+    setShowFeedPopularNotes(show)
+    storage.setShowFeedPopularNotes(show)
   }
 
   const updateUseNip22Replies = (use: boolean) => {
@@ -153,6 +173,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         updateSidebarCollapse,
         enableSingleColumnLayout: isSmallScreen ? true : enableSingleColumnLayout,
         updateEnableSingleColumnLayout,
+        showFeedTopics,
+        updateShowFeedTopics,
+        showFeedPopularNotes,
+        updateShowFeedPopularNotes,
         enableDm,
         updateEnableDm,
         useNip22Replies,

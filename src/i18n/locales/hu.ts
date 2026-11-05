@@ -1285,6 +1285,28 @@ export default {
       'Válasz a szöveges jegyzetekre (kind 1) NIP-22 hozzászólásokkal (kind 1111). Ezek a válaszok egyes kliensekben nem feltétlenül jelennek meg.',
     'Battery settings': 'Akkumulátorbeállítások',
     'Allow background activity for local relay notifications':
-      'Háttértevékenység engedélyezése a helyi relay-értesítésekhez'
+      'Háttértevékenység engedélyezése a helyi relay-értesítésekhez',
+    'Feed overview': 'Hírfolyam áttekintése',
+    'Based on notes loaded in this feed': 'A hírfolyamba betöltött jegyzetek alapján',
+    'Notes: {{notes}} · People: {{people}}': 'Jegyzetek: {{notes}} · Résztvevők: {{people}}',
+    'Common topics': 'Gyakori témák',
+    'No hashtags in this sample yet': 'Ebben a mintában még nincsenek hashtagek',
+    'Popular in this feed': 'Népszerű ebben a hírfolyamban',
+    'Ranked by people reposting or quoting': 'Újraosztó vagy idéző személyek száma szerint',
+    'No notes reposted or quoted by multiple people yet':
+      'Még nincs több személy által újraosztott vagy idézett jegyzet',
+    '{{number}} reposting': '{{number}} újraosztó',
+    '{{number}} quoting': '{{number}} idéző',
+    Mention: 'Említés',
+    'Feed topics': 'Témák',
+    '{{number}} people': '{{number}} fő',
+    '{{number}} people shared this note': '{{number}} személy osztotta meg ezt a jegyzetet',
+    'Feed sidebar': 'Hírfolyam oldalsávja',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Széles képernyőn, egyoszlopos módban a hírfolyam mellett jelenik meg.',
+    'Hide this section': 'Szakasz elrejtése',
+    Participants: 'Résztvevők',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Újraosztások × 1 · Idézetek × 2 · Betöltött válaszok × 1'
   }
 }

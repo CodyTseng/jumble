@@ -1,5 +1,6 @@
 import { Favicon } from '@/components/Favicon'
 import NormalFeed from '@/components/NormalFeed'
+import FeedTopicNotes from '@/components/FeedTopicNotes'
 import { Button } from '@/components/ui/button'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { toProfileList } from '@/lib/link'
@@ -7,19 +8,23 @@ import { fetchPubkeysFromDomain, getWellKnownNip05Url } from '@/lib/nip05'
 import { getDefaultRelayUrls, getSearchRelayUrls } from '@/lib/relay'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
+import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import client from '@/services/client.service'
+import feedTopicService, { TFeedTopicSnapshot } from '@/services/feed-topic.service'
 import { TFeedSubRequest } from '@/types'
 import { UserRound } from 'lucide-react'
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
+  const { isEventDeleted } = useDeletedEvent()
   const [title, setTitle] = useState<React.ReactNode>(null)
   const [controls, setControls] = useState<React.ReactNode>(null)
   const [data, setData] = useState<
+    | { type: 'feed-topic'; snapshot?: TFeedTopicSnapshot }
     | {
         type: 'hashtag' | 'search'
         kinds?: number[]
@@ -32,10 +37,22 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
     | null
   >(null)
   const [subRequests, setSubRequests] = useState<TFeedSubRequest[]>([])
+  const snapshotEvents = data?.type === 'feed-topic' ? data.snapshot?.events : undefined
+  const topicCount = useMemo(
+    () => snapshotEvents?.reduce((count, event) => count + Number(!isEventDeleted(event)), 0),
+    [snapshotEvents, isEventDeleted]
+  )
 
   useEffect(() => {
     const init = async () => {
       const searchParams = new URLSearchParams(window.location.search)
+      const snapshotId = searchParams.get('feed-topic')
+      if (snapshotId) {
+        const snapshot = feedTopicService.getSnapshot(snapshotId)
+        setData({ type: 'feed-topic', snapshot })
+        setTitle(snapshot ? <span dir="auto">#{snapshot.name}</span> : t('Feed topics'))
+        return
+      }
       const kinds = searchParams
         .getAll('k')
         .map((k) => parseInt(k))
@@ -98,7 +115,9 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
   }, [])
 
   let content: React.ReactNode = null
-  if (data?.type === 'domain' && subRequests.length === 0) {
+  if (data?.type === 'feed-topic') {
+    content = <FeedTopicNotes snapshot={data.snapshot} />
+  } else if (data?.type === 'domain' && subRequests.length === 0) {
     content = (
       <div className="w-full py-10 text-center">
         <span className="text-muted-foreground">
@@ -130,7 +149,18 @@ const NoteListPage = forwardRef(({ index }: { index?: number }, ref) => {
       ref={ref}
       index={index}
       title={title}
-      controls={controls}
+      controls={
+        topicCount !== undefined ? (
+          <span
+            className="text-muted-foreground px-3 text-sm tabular-nums"
+            aria-label={`${t('Notes')} ${topicCount.toLocaleString(i18n.resolvedLanguage)}`}
+          >
+            {topicCount.toLocaleString(i18n.resolvedLanguage)}
+          </span>
+        ) : (
+          controls
+        )
+      }
       displayScrollToTopButton
     >
       {content}

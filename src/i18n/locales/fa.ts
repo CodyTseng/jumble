@@ -1281,6 +1281,28 @@ export default {
       'پاسخ به یادداشت‌های متنی (kind 1) با نظرهای NIP-22 (kind 1111). این پاسخ‌ها ممکن است در برخی برنامه‌ها نمایش داده نشوند.',
     'Battery settings': 'تنظیمات باتری',
     'Allow background activity for local relay notifications':
-      'فعالیت پس\u200cزمینه را برای اعلان\u200cهای محلی رله مجاز کنید'
+      'فعالیت پس\u200cزمینه را برای اعلان\u200cهای محلی رله مجاز کنید',
+    'Feed overview': 'نمای کلی خوراک',
+    'Based on notes loaded in this feed': 'بر اساس یادداشت‌های بارگیری‌شده در این خوراک',
+    'Notes: {{notes}} · People: {{people}}': 'یادداشت‌ها: {{notes}} · افراد: {{people}}',
+    'Common topics': 'موضوعات رایج',
+    'No hashtags in this sample yet': 'هنوز هشتگی در این نمونه وجود ندارد',
+    'Popular in this feed': 'محبوب در این خوراک',
+    'Ranked by people reposting or quoting': 'بر اساس تعداد افرادی که بازنشر یا نقل‌قول کرده‌اند',
+    'No notes reposted or quoted by multiple people yet':
+      'هنوز یادداشتی توسط چند نفر بازنشر یا نقل‌قول نشده است',
+    '{{number}} reposting': '{{number}} بازنشرکننده',
+    '{{number}} quoting': '{{number}} نقل‌قول‌کننده',
+    Mention: 'اشاره',
+    'Feed topics': 'موضوعات',
+    '{{number}} people': '{{number}} نفر',
+    '{{number}} people shared this note': '{{number}} نفر این یادداشت را به اشتراک گذاشته‌اند',
+    'Feed sidebar': 'نوار کناری خوراک',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'در حالت تک‌ستونی روی صفحه‌های عریض، کنار خوراک نمایش داده می‌شود.',
+    'Hide this section': 'پنهان کردن این بخش',
+    Participants: 'شرکت‌کنندگان',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'بازنشر × ۱ · نقل‌قول × ۲ · پاسخ‌های بارگیری‌شده × ۱'
   }
 }

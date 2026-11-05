@@ -1303,6 +1303,29 @@ export default {
       'Répondre aux notes textuelles (kind 1) avec des commentaires NIP-22 (kind 1111). Ces réponses peuvent ne pas apparaître dans certains clients.',
     'Battery settings': 'Paramètres de la batterie',
     'Allow background activity for local relay notifications':
-      'Autoriser l’activité en arrière-plan pour les notifications locales des relais'
+      'Autoriser l’activité en arrière-plan pour les notifications locales des relais',
+    'Feed overview': 'Aperçu du fil',
+    'Based on notes loaded in this feed': 'Basé sur les notes chargées dans ce fil',
+    'Notes: {{notes}} · People: {{people}}': 'Notes : {{notes}} · Personnes : {{people}}',
+    'Common topics': 'Sujets fréquents',
+    'No hashtags in this sample yet': 'Aucun hashtag dans cet échantillon pour le moment',
+    'Popular in this feed': 'Populaire dans ce fil',
+    'Ranked by people reposting or quoting':
+      'Classé par nombre de personnes qui republient ou citent',
+    'No notes reposted or quoted by multiple people yet':
+      'Aucune note republiée ou citée par plusieurs personnes pour le moment',
+    '{{number}} reposting': '{{number}} republient',
+    '{{number}} quoting': '{{number}} citent',
+    Mention: 'Mention',
+    'Feed topics': 'Sujets',
+    '{{number}} people': '{{number}} personnes',
+    '{{number}} people shared this note': '{{number}} personnes ont partagé cette note',
+    'Feed sidebar': 'Barre latérale du fil',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Affichée à côté du fil en mode une colonne sur les écrans larges.',
+    'Hide this section': 'Masquer cette section',
+    Participants: 'Participants',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Republications × 1 · Citations × 2 · Réponses chargées × 1'
   }
 }

@@ -106,9 +106,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             <AvatarPolicyTile
               showAvatar
               label={t('Show')}
-              isSelected={
-                profilePictureAutoLoadPolicy !== PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER
-              }
+              isSelected={profilePictureAutoLoadPolicy !== PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER}
               onClick={() =>
                 setProfilePictureAutoLoadPolicy(
                   PROFILE_PICTURE_AUTO_LOAD_POLICY.ALWAYS as TProfilePictureAutoLoadPolicy
@@ -117,9 +115,7 @@ const AppearanceSettingsPage = forwardRef(({ index }: { index?: number }, ref) =
             />
             <AvatarPolicyTile
               label={t('Hide')}
-              isSelected={
-                profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER
-              }
+              isSelected={profilePictureAutoLoadPolicy === PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER}
               onClick={() =>
                 setProfilePictureAutoLoadPolicy(
                   PROFILE_PICTURE_AUTO_LOAD_POLICY.NEVER as TProfilePictureAutoLoadPolicy
@@ -152,10 +148,7 @@ const OptionTile = ({
   label: string
 }) => {
   return (
-    <button
-      onClick={onClick}
-      className={cn(tileBase, isSelected ? tileSelected : tileIdle)}
-    >
+    <button onClick={onClick} className={cn(tileBase, isSelected ? tileSelected : tileIdle)}>
       <div
         className={cn(
           'flex h-9 w-9 items-center justify-center transition-colors',
@@ -181,15 +174,12 @@ const ColorTile = ({
   onClick: () => void
 }) => {
   return (
-    <button
-      onClick={onClick}
-      className={cn(tileBase, isSelected ? tileSelected : tileIdle)}
-    >
+    <button onClick={onClick} className={cn(tileBase, isSelected ? tileSelected : tileIdle)}>
       <div
         className="flex size-9 items-center justify-center rounded-full shadow-md"
         style={{ backgroundColor: color }}
       >
-        {isSelected && <Check className="size-5 text-primary-foreground" />}
+        {isSelected && <Check className="text-primary-foreground size-5" />}
       </div>
       <span className="text-xs font-medium">{label}</span>
     </button>
@@ -197,7 +187,7 @@ const ColorTile = ({
 }
 
 const NoteSkeletonLine = ({ className }: { className?: string }) => (
-  <div className={cn('h-1.5 rounded-full bg-muted-foreground/20', className)} />
+  <div className={cn('bg-muted-foreground/20 h-1.5 rounded-full', className)} />
 )
 
 const AvatarPolicyTile = ({
@@ -217,7 +207,7 @@ const AvatarPolicyTile = ({
       className={cn(tileBase, 'gap-3', isSelected ? tileSelected : tileIdle)}
     >
       <div className="flex w-full items-center gap-1.5">
-        {showAvatar && <div className="size-5 shrink-0 rounded-full bg-muted-foreground/20" />}
+        {showAvatar && <div className="bg-muted-foreground/20 size-5 shrink-0 rounded-full" />}
         <div className="flex flex-1 flex-col gap-1">
           <NoteSkeletonLine className="w-8" />
           <NoteSkeletonLine className="w-5" />

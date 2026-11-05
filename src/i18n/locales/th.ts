@@ -1262,6 +1262,28 @@ export default {
       'ตอบกลับโน้ตข้อความ (kind 1) ด้วยความคิดเห็น NIP-22 (kind 1111) การตอบกลับเหล่านี้อาจไม่แสดงในบางไคลเอนต์',
     'Battery settings': 'การตั้งค่าแบตเตอรี่',
     'Allow background activity for local relay notifications':
-      'อนุญาตการทำงานเบื้องหลังสำหรับการแจ้งเตือนรีเลย์ในเครื่อง'
+      'อนุญาตการทำงานเบื้องหลังสำหรับการแจ้งเตือนรีเลย์ในเครื่อง',
+    'Feed overview': 'ภาพรวมฟีด',
+    'Based on notes loaded in this feed': 'อ้างอิงจากโน้ตที่โหลดแล้วในฟีดนี้',
+    'Notes: {{notes}} · People: {{people}}': 'โน้ต: {{notes}} · ผู้คน: {{people}}',
+    'Common topics': 'หัวข้อที่พบบ่อย',
+    'No hashtags in this sample yet': 'ยังไม่มีแฮชแท็กในกลุ่มตัวอย่างนี้',
+    'Popular in this feed': 'ยอดนิยมในฟีดนี้',
+    'Ranked by people reposting or quoting': 'จัดอันดับตามจำนวนคนที่รีโพสต์หรืออ้างอิง',
+    'No notes reposted or quoted by multiple people yet':
+      'ยังไม่มีโน้ตที่มีหลายคนรีโพสต์หรืออ้างอิง',
+    '{{number}} reposting': '{{number}} คนรีโพสต์',
+    '{{number}} quoting': '{{number}} คนอ้างอิง',
+    Mention: 'การกล่าวถึง',
+    'Feed topics': 'หัวข้อ',
+    '{{number}} people': '{{number}} คน',
+    '{{number}} people shared this note': '{{number}} คนแชร์โน้ตนี้',
+    'Feed sidebar': 'แถบด้านข้างฟีด',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'แสดงข้างฟีดในโหมดคอลัมน์เดียวบนหน้าจอกว้าง',
+    'Hide this section': 'ซ่อนส่วนนี้',
+    Participants: 'ผู้เข้าร่วม',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'รีโพสต์ × 1 · อ้างอิง × 2 · คำตอบที่โหลดแล้ว × 1'
   }
 }

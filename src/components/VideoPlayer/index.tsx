@@ -9,6 +9,7 @@ import {
 import { useBlossomUrl } from '@/hooks/useBlossomUrl'
 import { blurFocusedTextInput, cn, isInViewport } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
+import { useNotePreview } from '@/providers/NotePreviewProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import mediaManager from '@/services/media-manager.service'
 import { SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react'
@@ -30,7 +31,9 @@ export default function VideoPlayer({
   dim?: { width: number; height: number }
 }) {
   const { t } = useTranslation()
-  const { autoplay, videoLoop } = useContentPolicy()
+  const { autoplay: autoplayPreference, videoLoop } = useContentPolicy()
+  const preview = useNotePreview()
+  const autoplay = autoplayPreference && !preview
   const { muteMedia, updateMuteMedia } = useUserPreferences()
   const { url: videoUrl, error, handleError, markSuccess } = useBlossomUrl(src, pubkey)
   const [intrinsicDim, setIntrinsicDim] = useState<{ width: number; height: number } | null>(null)

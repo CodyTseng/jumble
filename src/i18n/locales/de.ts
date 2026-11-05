@@ -1302,6 +1302,28 @@ export default {
       'Auf Textnotizen (kind 1) mit NIP-22-Kommentaren (kind 1111) antworten. Diese Antworten werden in manchen Clients möglicherweise nicht angezeigt.',
     'Battery settings': 'Akkueinstellungen',
     'Allow background activity for local relay notifications':
-      'Hintergrundaktivität für lokale Relay-Benachrichtigungen erlauben'
+      'Hintergrundaktivität für lokale Relay-Benachrichtigungen erlauben',
+    'Feed overview': 'Feed-Übersicht',
+    'Based on notes loaded in this feed': 'Basierend auf den geladenen Notizen dieses Feeds',
+    'Notes: {{notes}} · People: {{people}}': 'Notizen: {{notes}} · Personen: {{people}}',
+    'Common topics': 'Häufige Themen',
+    'No hashtags in this sample yet': 'Noch keine Hashtags in dieser Auswahl',
+    'Popular in this feed': 'Beliebt in diesem Feed',
+    'Ranked by people reposting or quoting': 'Nach Anzahl der Personen, die reposten oder zitieren',
+    'No notes reposted or quoted by multiple people yet':
+      'Noch keine Notizen von mehreren Personen repostet oder zitiert',
+    '{{number}} reposting': '{{number}} reposten',
+    '{{number}} quoting': '{{number}} zitieren',
+    Mention: 'Erwähnung',
+    'Feed topics': 'Themen',
+    '{{number}} people': '{{number}} Personen',
+    '{{number}} people shared this note': '{{number}} Personen haben diese Notiz geteilt',
+    'Feed sidebar': 'Feed-Seitenleiste',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Wird auf breiten Bildschirmen im einspaltigen Layout neben dem Feed angezeigt.',
+    'Hide this section': 'Diesen Bereich ausblenden',
+    Participants: 'Teilnehmende',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Reposts × 1 · Zitate × 2 · Geladene Antworten × 1'
   }
 }

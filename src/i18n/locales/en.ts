@@ -1310,6 +1310,27 @@ export default {
       'Reply to text notes (kind 1) with NIP-22 comments (kind 1111). These replies may not be visible in some clients.',
     'Battery settings': 'Battery settings',
     'Allow background activity for local relay notifications':
-      'Allow background activity for local relay notifications'
+      'Allow background activity for local relay notifications',
+    'Feed overview': 'Feed overview',
+    'Based on notes loaded in this feed': 'Based on notes loaded in this feed',
+    'Notes: {{notes}} · People: {{people}}': 'Notes: {{notes}} · People: {{people}}',
+    'Common topics': 'Common topics',
+    'No hashtags in this sample yet': 'No hashtags in this sample yet',
+    'Popular in this feed': 'Popular in this feed',
+    'Ranked by people reposting or quoting': 'Ranked by people reposting or quoting',
+    'No notes reposted or quoted by multiple people yet':
+      'No notes reposted or quoted by multiple people yet',
+    '{{number}} reposting': '{{number}} reposting',
+    '{{number}} quoting': '{{number}} quoting',
+    Mention: 'Mention',
+    'Feed topics': 'Topics',
+    '{{number}} people': '{{number}} people',
+    '{{number}} people shared this note': '{{number}} people shared this note',
+    'Feed sidebar': 'Feed sidebar',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Shown beside your feed in single-column mode on wide screens.',
+    'Hide this section': 'Hide this section',
+    Participants: 'Participants',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1': 'Reposts × 1 · Quotes × 2 · Loaded replies × 1'
   }
 }

@@ -1270,6 +1270,28 @@ export default {
       'الرد على الملاحظات النصية (kind 1) بتعليقات NIP-22 (kind 1111). قد لا تظهر هذه الردود في بعض التطبيقات.',
     'Battery settings': 'إعدادات البطارية',
     'Allow background activity for local relay notifications':
-      'اسمح بالنشاط في الخلفية لإشعارات المرحلات المحلية'
+      'اسمح بالنشاط في الخلفية لإشعارات المرحلات المحلية',
+    'Feed overview': 'نظرة عامة على الخلاصة',
+    'Based on notes loaded in this feed': 'استنادًا إلى الملاحظات المحمّلة في هذه الخلاصة',
+    'Notes: {{notes}} · People: {{people}}': 'الملاحظات: {{notes}} · الأشخاص: {{people}}',
+    'Common topics': 'مواضيع شائعة',
+    'No hashtags in this sample yet': 'لا توجد وسوم في هذه العينة بعد',
+    'Popular in this feed': 'رائج في هذه الخلاصة',
+    'Ranked by people reposting or quoting': 'مرتبة حسب عدد الأشخاص الذين أعادوا النشر أو اقتبسوا',
+    'No notes reposted or quoted by multiple people yet':
+      'لا توجد ملاحظات أعاد نشرها أو اقتبسها عدة أشخاص بعد',
+    '{{number}} reposting': '{{number}} يعيدون النشر',
+    '{{number}} quoting': '{{number}} يقتبسون',
+    Mention: 'إشارة',
+    'Feed topics': 'مواضيع',
+    '{{number}} people': '{{number}} أشخاص',
+    '{{number}} people shared this note': 'شارك {{number}} أشخاص هذه الملاحظة',
+    'Feed sidebar': 'الشريط الجانبي للخلاصة',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'يظهر بجانب الخلاصة في وضع العمود الواحد على الشاشات العريضة.',
+    'Hide this section': 'إخفاء هذا القسم',
+    Participants: 'المشاركون',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'إعادة النشر × 1 · الاقتباسات × 2 · الردود المحمّلة × 1'
   }
 }

@@ -1289,6 +1289,28 @@ export default {
       'Отвечать на текстовые заметки (kind 1) комментариями NIP-22 (kind 1111). Эти ответы могут не отображаться в некоторых клиентах.',
     'Battery settings': 'Настройки батареи',
     'Allow background activity for local relay notifications':
-      'Разрешите фоновую работу для локальных уведомлений ретрансляторов'
+      'Разрешите фоновую работу для локальных уведомлений ретрансляторов',
+    'Feed overview': 'Обзор ленты',
+    'Based on notes loaded in this feed': 'На основе загруженных заметок этой ленты',
+    'Notes: {{notes}} · People: {{people}}': 'Заметки: {{notes}} · Участники: {{people}}',
+    'Common topics': 'Частые темы',
+    'No hashtags in this sample yet': 'В этой выборке пока нет хештегов',
+    'Popular in this feed': 'Популярное в этой ленте',
+    'Ranked by people reposting or quoting': 'По числу людей, сделавших репост или цитату',
+    'No notes reposted or quoted by multiple people yet':
+      'Пока нет заметок, которыми поделились несколько человек',
+    '{{number}} reposting': 'Репостят: {{number}}',
+    '{{number}} quoting': 'Цитируют: {{number}}',
+    Mention: 'Упоминание',
+    'Feed topics': 'Темы',
+    '{{number}} people': 'Участники: {{number}}',
+    '{{number}} people shared this note': 'Этой заметкой поделились {{number}} чел.',
+    'Feed sidebar': 'Боковая панель ленты',
+    'Shown beside your feed in single-column mode on wide screens.':
+      'Показывается рядом с лентой в одноколоночном режиме на широких экранах.',
+    'Hide this section': 'Скрыть этот раздел',
+    Participants: 'Участники',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Репосты × 1 · Цитаты × 2 · Загруженные ответы × 1'
   }
 }

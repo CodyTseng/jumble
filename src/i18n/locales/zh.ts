@@ -1275,6 +1275,26 @@ export default {
       '使用 NIP-22 评论（kind 1111）回复文字笔记（kind 1）。这些回复可能无法在部分客户端中显示。',
     'Battery settings': '电池设置',
     'Allow background activity for local relay notifications':
-      '允许后台活动，以便在本机监听中继通知'
+      '允许后台活动，以便在本机监听中继通知',
+    'Feed overview': 'Feed 概览',
+    'Based on notes loaded in this feed': '基于当前 feed 已加载的笔记',
+    'Notes: {{notes}} · People: {{people}}': '笔记 {{notes}} · 参与者 {{people}}',
+    'Common topics': '常见话题',
+    'No hashtags in this sample yet': '这批笔记中暂未发现话题标签',
+    'Popular in this feed': '本批热门笔记',
+    'Ranked by people reposting or quoting': '按转发或引用的独立人数排序',
+    'No notes reposted or quoted by multiple people yet': '暂时没有被多人转发或引用的笔记',
+    '{{number}} reposting': '{{number}} 人转发',
+    '{{number}} quoting': '{{number}} 人引用',
+    Mention: '提及',
+    'Feed topics': '话题',
+    '{{number}} people': '{{number}} 人',
+    '{{number}} people shared this note': '{{number}} 人转发或引用了这条笔记',
+    'Feed sidebar': 'Feed 侧栏',
+    'Shown beside your feed in single-column mode on wide screens.':
+      '在宽屏单列模式下显示于 feed 旁。',
+    'Hide this section': '关闭此板块',
+    Participants: '参与者',
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '转发 × 1 · 引用 × 2 · 已加载回复 × 1'
   }
 }

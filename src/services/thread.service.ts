@@ -50,6 +50,8 @@ class ThreadService {
 
   private threadListeners = new Map<string, Set<() => void>>()
   private allDescendantThreadsListeners = new Map<string, Set<() => void>>()
+  private changeListeners = new Set<() => void>()
+  private revision = 0
   private readonly EMPTY_ARRAY: string[] = []
   private readonly EMPTY_STRING_ARRAY: string[] = []
   private readonly EMPTY_MAP: Map<string, string[]> = new Map()
@@ -293,6 +295,10 @@ class ThreadService {
       this.notifyThreadUpdate(key)
       this.notifyAllDescendantThreadsUpdate(key)
     }
+    if (topologyChanged) {
+      this.revision++
+      this.changeListeners.forEach((listener) => listener())
+    }
   }
 
   getAncestorChain(currentKey: string, rootKey: string): string[] {
@@ -318,6 +324,34 @@ class ThreadService {
 
   getThread(stuffKey: string): string[] {
     return this.threadMap.get(stuffKey) ?? this.EMPTY_ARRAY
+  }
+
+  /** Count already-loaded descendants, without resolving bodies or subscribing to relays. */
+  getLoadedReplyCount(stuffKey: string, eventId?: string): number {
+    const roots = new Set([stuffKey, ...(eventId ? [eventId] : [])])
+    const visited = new Set(roots)
+    const pending = [...roots]
+    const replies = new Set<string>()
+    while (pending.length) {
+      for (const id of this.getThread(pending.pop()!)) {
+        if (visited.has(id)) continue
+        visited.add(id)
+        replies.add(id)
+        pending.push(id)
+      }
+    }
+    return replies.size
+  }
+
+  getRevision() {
+    return this.revision
+  }
+
+  listenChanges(listener: () => void) {
+    this.changeListeners.add(listener)
+    return () => {
+      this.changeListeners.delete(listener)
+    }
   }
 
   getAllDescendantThreads(stuffKey: string): Map<string, string[]> {
