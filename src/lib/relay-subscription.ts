@@ -43,7 +43,7 @@ export function subscribeRelays(
 ): TSubCloser {
   const relays = Array.from(new Set(urls))
   const startedCount = relays.length
-  const subPromises: Promise<TSubCloser>[] = []
+  const subscriptions: TSubCloser[] = []
   const states = new Map<string, RelayState>()
   const closeReasons: string[] = []
   let eosedCount = 0
@@ -88,7 +88,7 @@ export function subscribeRelays(
     })
   }
 
-  const startSub = async (url: string, state: RelayState): Promise<TSubCloser> => {
+  const startSub = async (url: string, state: RelayState): Promise<void> => {
     let relay: IRelay
     try {
       relay = await pool.ensureRelay(url)
@@ -96,13 +96,13 @@ export function subscribeRelays(
       const reason = error instanceof Error ? error.message : String(error)
       settleEose(state)
       settleClose(url, state, reason)
-      return { close: () => {} }
+      return
     }
 
-    if (closedByCaller) return { close: () => {} }
+    if (closedByCaller) return
 
     try {
-      return relay.subscribe(filters, {
+      const sub = relay.subscribe(filters, {
         onrequest: (at) => {
           state.startedAt ??= at
         },
@@ -143,7 +143,7 @@ export function subscribeRelays(
                 .then(() => {
                   state.authPending = false
                   state.hasAuthed = true
-                  if (!closedByCaller) subPromises.push(startSub(url, state))
+                  if (!closedByCaller) void startSub(url, state)
                 })
                 .catch(() => {
                   state.authPending = false
@@ -178,11 +178,12 @@ export function subscribeRelays(
         },
         eoseTimeout: RELAY_SUBSCRIPTION_EOSE_TIMEOUT
       })
+      if (closedByCaller) sub.close()
+      else subscriptions.push(sub)
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error)
       settleEose(state)
       settleClose(url, state, reason)
-      return { close: () => {} }
     }
   }
 
@@ -203,7 +204,7 @@ export function subscribeRelays(
       settleEose(state)
     }, RELAY_SUBSCRIPTION_EOSE_TIMEOUT)
     states.set(url, state)
-    subPromises.push(startSub(url, state))
+    void startSub(url, state)
   }
 
   // Empty relay lists are valid after filtering. Settle asynchronously so a
@@ -222,9 +223,10 @@ export function subscribeRelays(
         if (state.eoseTimer) clearTimeout(state.eoseTimer)
         state.eoseTimer = undefined
       }
-      for (const subPromise of subPromises) {
-        void subPromise.then((sub) => sub.close(reason)).catch((error) => console.error(error))
-      }
+      // Close attached handles synchronously. Deferring this past a replacement
+      // subscribe can release the last REQ's managed relay after the replacement
+      // has already obtained it, leaving that subscription on an orphan handle.
+      for (const sub of subscriptions) sub.close(reason)
     }
   }
 }

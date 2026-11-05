@@ -1,4 +1,6 @@
 import { openExternalUrl } from '@/lib/native-system'
+import { Nip46Pool } from '@/lib/nip46-pool'
+import client from '@/services/client.service'
 import { withSignerApproval } from '@/lib/signer-approval'
 import { ISigner, TDraftEvent } from '@/types'
 import { bytesToHex } from '@noble/hashes/utils.js'
@@ -25,6 +27,7 @@ export class NostrConnectionSigner implements ISigner {
     }
 
     this.signer = await NBunkerSigner.fromURI(this.clientSecretKey, this.connectionString, {
+      pool: new Nip46Pool(client.relayPool),
       onauth: (url) => {
         openExternalUrl(url)
       }

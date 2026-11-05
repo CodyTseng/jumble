@@ -155,6 +155,10 @@ class ClientService extends EventTarget {
     await indexedDb.iterateProfileEvents((profileEvent) => this.addUsernameToIndex(profileEvent))
   }
 
+  get relayPool(): IRelayPool {
+    return this.pool
+  }
+
   setAllowInsecure(allow: boolean) {
     this.pool.setAllowInsecure(allow)
   }
