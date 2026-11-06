@@ -1,10 +1,12 @@
 import { LRUCache } from 'lru-cache'
+import { isNamecoinIdentifier, resolveNamecoin } from './namecoin'
 import { isValidPubkey } from './pubkey'
 
 type TVerifyNip05Result = {
   isVerified: boolean
   nip05Name: string
   nip05Domain: string
+  isNamecoin?: boolean
 }
 
 const verifyNip05ResultCache = new LRUCache<string, TVerifyNip05Result>({
@@ -16,14 +18,54 @@ const verifyNip05ResultCache = new LRUCache<string, TVerifyNip05Result>({
 })
 
 async function _verifyNip05(nip05: string, pubkey: string): Promise<TVerifyNip05Result> {
+  // Route Namecoin identifiers (.bit / d/ / id/) to blockchain resolver
+  if (isNamecoinIdentifier(nip05)) {
+    return _verifyNamecoin(nip05, pubkey)
+  }
+
   const [nip05Name, nip05Domain] = nip05?.split('@') || [undefined, undefined]
-  const result = { isVerified: false, nip05Name, nip05Domain }
+  const result: TVerifyNip05Result = { isVerified: false, nip05Name, nip05Domain }
   if (!nip05Name || !nip05Domain || !pubkey) return result
 
   try {
     const res = await fetch(getWellKnownNip05Url(nip05Domain, nip05Name))
     const json = await res.json()
     if (json.names?.[nip05Name] === pubkey) {
+      return { ...result, isVerified: true }
+    }
+  } catch {
+    // ignore
+  }
+  return result
+}
+
+async function _verifyNamecoin(nip05: string, pubkey: string): Promise<TVerifyNip05Result> {
+  const lower = nip05.toLowerCase()
+  let nip05Name: string
+  let nip05Domain: string
+
+  if (lower.includes('@')) {
+    const [name, domain] = lower.split('@')
+    nip05Name = name === '_' ? '_' : name
+    nip05Domain = domain
+  } else if (lower.startsWith('d/') || lower.startsWith('id/')) {
+    nip05Name = '_'
+    nip05Domain = lower
+  } else {
+    nip05Name = '_'
+    nip05Domain = lower
+  }
+
+  const result: TVerifyNip05Result = {
+    isVerified: false,
+    nip05Name,
+    nip05Domain,
+    isNamecoin: true
+  }
+
+  try {
+    const resolved = await resolveNamecoin(nip05)
+    if (resolved && resolved.pubkey === pubkey) {
       return { ...result, isVerified: true }
     }
   } catch {
