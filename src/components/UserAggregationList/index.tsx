@@ -75,7 +75,7 @@ const UserAggregationList = forwardRef<
   ) => {
     const { t } = useTranslation()
     const active = usePageActive()
-    const { pubkey: currentPubkey, startLogin } = useNostr()
+    const { startLogin } = useNostr()
     const { push } = useSecondaryPage()
     const { mutePubkeySet } = useMuteList()
     const { pinnedPubkeySet } = usePinnedUsers()
@@ -266,7 +266,6 @@ const UserAggregationList = forwardRef<
       async (events: Event[]) => {
         const results = await Promise.allSettled(
           events.map(async (evt) => {
-            if (evt.pubkey === currentPubkey) return null
             if (getEventFeedTimestamp(evt) < since) return null
             if (isEventDeleted(evt)) return null
             if (filterMutedNotes && mutePubkeySet.has(evt.pubkey)) return null
@@ -294,7 +293,6 @@ const UserAggregationList = forwardRef<
       [
         mutePubkeySet,
         isEventDeleted,
-        currentPubkey,
         filterMutedNotes,
         hideContentMentioningMutedUsers,
         isMentioningMutedUsers,
