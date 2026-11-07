@@ -296,7 +296,7 @@ function SectionHeading({
       minute: '2-digit'
     })
   return (
-    <div className="flex h-10 items-center justify-between gap-2 px-4">
+    <div className="flex items-center justify-between gap-2 px-4 pt-2">
       <h2 className="min-w-0 truncate text-base font-semibold">{title}</h2>
       <Popover>
         <PopoverTrigger asChild>
@@ -423,7 +423,7 @@ function PopularNote({ event }: { event: Event }) {
       role="link"
       tabIndex={0}
       aria-label={`${profile?.username || formatPubkey(author)}: ${preview}`}
-      className="hover:bg-accent/30 focus-visible:bg-accent/30 focus-visible:ring-ring block w-full cursor-pointer space-y-2 px-4 py-3 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
+      className="hover:bg-accent/30 focus-visible:bg-accent/30 focus-visible:ring-ring block w-full cursor-pointer space-y-1.5 px-4 py-3 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
       onClick={() => push(toNote(event))}
       onKeyDown={(e) => {
         if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
@@ -432,11 +432,11 @@ function PopularNote({ event }: { event: Event }) {
         }
       }}
     >
-      <div className="flex min-w-0 items-center gap-2">
-        <SimpleUserAvatar userId={author} size="xSmall" />
+      <div className="flex min-w-0 items-center gap-1.5">
+        <SimpleUserAvatar userId={author} size="tiny" />
         <span
           dir="auto"
-          className="text-muted-foreground min-w-0 flex-1 truncate text-base font-medium"
+          className="text-muted-foreground min-w-0 flex-1 truncate text-xs leading-4 font-medium"
         >
           {profile?.username || formatPubkey(author)}
         </span>

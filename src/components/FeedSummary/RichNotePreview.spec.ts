@@ -29,7 +29,7 @@ const observers = new Set<() => void>()
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
   height = 80
-  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(192)
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(120)
   vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockImplementation(() => height)
   vi.stubGlobal(
     'ResizeObserver',
@@ -64,7 +64,7 @@ describe('RichNotePreview', () => {
       event.content
     )
     expect(container.querySelector('[inert]')).not.toBeNull()
-    expect(container.firstElementChild?.className).toContain('max-h-48')
+    expect(container.firstElementChild?.className).toContain('max-h-30')
   })
 
   it('keeps short notes fully opaque', async () => {

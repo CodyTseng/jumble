@@ -25,13 +25,13 @@ export default function RichNotePreview({ event }: { event: Event }) {
     <div
       ref={frameRef}
       className={cn(
-        'relative max-h-48 min-w-0 overflow-hidden',
-        clipped && '[mask-image:linear-gradient(to_bottom,#000_calc(100%-2.5rem),transparent)]'
+        'relative max-h-30 min-w-0 overflow-hidden',
+        clipped && '[mask-image:linear-gradient(to_bottom,#000_calc(100%-1.25rem),transparent)]'
       )}
     >
       <div ref={contentRef} inert dir="auto" className="pointer-events-none flow-root min-w-0">
         <NotePreviewProvider>
-          <NoteContent event={event} size="small" className="mt-0! text-base leading-relaxed" />
+          <NoteContent event={event} size="small" className="mt-0! text-sm leading-5" />
         </NotePreviewProvider>
       </div>
     </div>
