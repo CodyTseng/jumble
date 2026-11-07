@@ -79,6 +79,25 @@ export default function Tabs({
   }, [tabs, value, dir])
 
   useEffect(() => {
+    const animationId = requestAnimationFrame(() => {
+      const activeTab = tabRefs.current[tabs.findIndex((tab) => tab.value === value)]
+      const viewport = activeTab?.closest('[data-radix-scroll-area-viewport]')
+      if (!activeTab || !viewport) return
+      const tabBounds = activeTab.getBoundingClientRect()
+      const viewportBounds = viewport.getBoundingClientRect()
+      // Physical coordinates work for both LTR and RTL scroll directions.
+      const delta =
+        tabBounds.left < viewportBounds.left
+          ? tabBounds.left - viewportBounds.left
+          : tabBounds.right > viewportBounds.right
+            ? tabBounds.right - viewportBounds.right
+            : 0
+      if (delta) viewport.scrollBy({ left: delta })
+    })
+    return () => cancelAnimationFrame(animationId)
+  }, [tabs, value, dir])
+
+  useEffect(() => {
     if (!containerRef.current) return
 
     const resizeObserver = new ResizeObserver(() => {
