@@ -29,14 +29,21 @@ export default function Signup({
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [copied, setCopied] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const handleDownload = () => {
     downloadTextFile('nostr-private-key.txt', nsec)
   }
 
   const handleSignup = async () => {
-    await nsecLogin(nsec, password || undefined, true)
-    onSignupSuccess()
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      await nsecLogin(nsec, password || undefined, true)
+      onSignupSuccess()
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const passwordsMatch = password === confirmPassword
@@ -203,12 +210,13 @@ export default function Signup({
             setPassword('')
             setConfirmPassword('')
           }}
+          disabled={submitting}
           className="w-fit px-6"
         >
           {t('Back')}
         </Button>
-        <Button onClick={handleSignup} className="flex-1" disabled={!canSubmit}>
-          {t('Complete Signup')}
+        <Button onClick={handleSignup} className="flex-1" disabled={!canSubmit || submitting}>
+          {submitting ? t('Setting up your secure account...') : t('Complete Signup')}
         </Button>
       </div>
     </div>

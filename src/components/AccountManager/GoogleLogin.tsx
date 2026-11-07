@@ -70,7 +70,7 @@ export default function GoogleLogin({
       (s) => setStatus(s)
     )
     setStatus('loggingIn')
-    await bunkerLogin(bunkerUrl, resolvedCentral)
+    await bunkerLogin(bunkerUrl, resolvedCentral, config !== null)
     onLoginSuccess()
   }
 

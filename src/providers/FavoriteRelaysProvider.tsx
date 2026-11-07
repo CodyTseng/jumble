@@ -8,7 +8,6 @@ import { getDefaultRelayUrls } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
-import storage from '@/services/local-storage.service'
 import { TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -50,17 +49,7 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
       return
     }
     if (!favoriteRelaysEvent) {
-      const favoriteRelays: string[] = []
-      const storedRelaySets = storage.getRelaySets()
-      storedRelaySets.forEach(({ relayUrls }) => {
-        relayUrls.forEach((url) => {
-          if (!favoriteRelays.includes(url)) {
-            favoriteRelays.push(url)
-          }
-        })
-      })
-
-      setFavoriteRelays(favoriteRelays)
+      setFavoriteRelays([])
       setRelaySetEvents([])
       return
     }

@@ -4,9 +4,6 @@ import PasswordInputDialog from '@/components/PasswordInputDialog'
 import { ApplicationDataKey, ExtendedKind } from '@/constants'
 import {
   createDeletionRequestDraftEvent,
-  createFollowListDraftEvent,
-  createMuteListDraftEvent,
-  createRelayListDraftEvent,
   createSeenNotificationsAtDraftEvent
 } from '@/lib/draft-event'
 import {
@@ -25,6 +22,7 @@ import dmService from '@/services/dm.service'
 import encryptionKeyService from '@/services/encryption-key.service'
 import indexedDb from '@/services/indexed-db.service'
 import storage from '@/services/local-storage.service'
+import { setupNewAccount } from '@/services/new-account-setup'
 import stuffStatsService from '@/services/stuff-stats.service'
 import {
   ISigner,
@@ -86,7 +84,7 @@ type TNostrContext = {
   nsecLogin: (nsec: string, password?: string, needSetup?: boolean) => Promise<string>
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
-  bunkerLogin: (bunker: string, pomegranateCentral?: string) => Promise<string>
+  bunkerLogin: (bunker: string, pomegranateCentral?: string, needSetup?: boolean) => Promise<string>
   nostrConnectionLogin: (clientSecretKey: Uint8Array, connectionString: string) => Promise<string>
   npubLogin(npub: string): Promise<string>
   removeAccount: (account: TAccountPointer) => void
@@ -558,16 +556,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       throw new Error('invalid nsec or hex')
     }
     const pubkey = nsecSigner.login(privkey)
-    if (password) {
-      const ncryptsec = nip49.encrypt(privkey, password)
-      login(nsecSigner, { pubkey, signerType: 'ncryptsec', ncryptsec })
-    } else {
-      login(nsecSigner, { pubkey, signerType: 'nsec', nsec: nip19.nsecEncode(privkey) })
-    }
-    if (needSetup) {
-      setupNewUser(nsecSigner)
-    }
-    return pubkey
+    const newAccount: TAccount = password
+      ? { pubkey, signerType: 'ncryptsec', ncryptsec: nip49.encrypt(privkey, password) }
+      : { pubkey, signerType: 'nsec', nsec: nip19.nsecEncode(privkey) }
+    if (needSetup) await setupNewUser(nsecSigner)
+    return login(nsecSigner, newAccount)
   }
 
   const ncryptsecLogin = async (ncryptsec: string) => {
@@ -601,7 +594,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
 
   // `pomegranateCentral` is set for accounts created via "Login with Google";
   // persisting it marks the account as a pomegranate account.
-  const bunkerLogin = async (bunker: string, pomegranateCentral?: string) => {
+  const bunkerLogin = async (bunker: string, pomegranateCentral?: string, needSetup = false) => {
     const bunkerSigner = new BunkerSigner()
     const pubkey = await bunkerSigner.login(bunker)
     if (!pubkey) {
@@ -609,6 +602,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
     const bunkerUrl = new URL(bunker)
     bunkerUrl.searchParams.delete('secret')
+    if (needSetup) await setupNewUser(bunkerSigner)
     return login(bunkerSigner, {
       pubkey,
       signerType: 'bunker',
@@ -750,17 +744,15 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   }
 
   const setupNewUser = async (signer: ISigner) => {
-    const defaultRelays = getDefaultRelayUrls()
-    await Promise.allSettled([
-      client.publishEvent(defaultRelays, await signer.signEvent(createFollowListDraftEvent([]))),
-      client.publishEvent(defaultRelays, await signer.signEvent(createMuteListDraftEvent([]))),
-      client.publishEvent(
-        defaultRelays,
-        await signer.signEvent(
-          createRelayListDraftEvent(defaultRelays.map((url) => ({ url, scope: 'both' })))
-        )
-      )
-    ])
+    try {
+      const results = await setupNewAccount(signer)
+      const failures = results.filter((result) => result.status === 'rejected')
+      if (failures.length) {
+        console.warn('Some new account defaults could not be initialized:', failures)
+      }
+    } catch (error) {
+      console.warn('Failed to initialize new account lists:', error)
+    }
   }
 
   const signEvent = async (draftEvent: TDraftEvent) => {
