@@ -73,8 +73,8 @@ const PrimaryPageLayout = forwardRef(
       /**
        * Small-screen only: fixed width of the left and right tracks in the three-section layout
        * (any CSS length, e.g. `"3rem"`, `"7rem"`). Defaults to `3rem` (48px per side), enough
-       * for a single icon button. When `controls` is wider than a single icon (e.g.
-       * NotificationListPage's text "Hide indirect" button), increase this value; the left
+       * for a single icon button. When `controls` is wider than a single icon,
+       * increase this value; the left
        * MeDrawer avatar track grows by the same amount so that the centered title stays truly
        * centered.
        */
