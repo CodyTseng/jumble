@@ -32,7 +32,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
   const { isSmallScreen } = useScreenSize()
   const { pubkey, publish, checkLogin } = useNostr()
   const { quickReaction, quickReactionEmoji } = useUserPreferences()
-  const enableQuickReaction = quickReaction && !isSmallScreen
+  const enableQuickReaction = quickReaction
   const { event, externalContent, stuffKey } = useStuff(stuff)
   const [liking, setLiking] = useState(false)
   const [isEmojiReactionsOpen, setIsEmojiReactionsOpen] = useState(false)
@@ -66,7 +66,7 @@ export default function LikeButton({ stuff }: { stuff: Event | string }) {
       isLongPressRef.current = false
       suppressPointerClickRef.current = false
     },
-    [enableQuickReaction]
+    [enableQuickReaction, isSmallScreen]
   )
 
   useEffect(() => {

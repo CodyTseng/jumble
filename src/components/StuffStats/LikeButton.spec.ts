@@ -85,39 +85,49 @@ function touch(type: string) {
   return event
 }
 
-it('does not send the default emoji after a touch long press and compatibility mouse events', async () => {
-  const trigger = container.querySelector('button')!
-  await act(async () => {
-    pointer('pointerdown')
-    // Browsers may also dispatch touch events for this same pointer.
-    touch('touchstart')
-    vi.advanceTimersByTime(LONG_PRESS_THRESHOLD)
-  })
-  expect(document.querySelector('[role="dialog"]')).not.toBeNull()
-  await act(async () => {
-    pointer('pointerup')
-    touch('touchend')
-    trigger.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-    trigger.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-    trigger.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
-  })
-  expect(publish).not.toHaveBeenCalled()
-  const pick = Array.from(document.querySelectorAll('button')).find(
-    (button) => button.textContent === 'Pick emoji'
-  )!
-  await act(async () => pick.click())
-  expect(publish).toHaveBeenCalledOnce()
-  expect(publish.mock.calls[0][0].content).toBe('😀')
-})
+it.each([false, true])(
+  'does not send the default emoji after a touch long press with smallScreen=%s',
+  async (small) => {
+    screen.small = small
+    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+    const trigger = container.querySelector('button')!
+    await act(async () => {
+      pointer('pointerdown')
+      // Browsers may also dispatch touch events for this same pointer.
+      touch('touchstart')
+      vi.advanceTimersByTime(LONG_PRESS_THRESHOLD)
+    })
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull()
+    await act(async () => {
+      pointer('pointerup')
+      touch('touchend')
+      trigger.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+      trigger.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+      trigger.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+    })
+    expect(publish).not.toHaveBeenCalled()
+    const pick = Array.from(document.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Pick emoji'
+    )!
+    await act(async () => pick.click())
+    expect(publish).toHaveBeenCalledOnce()
+    expect(publish.mock.calls[0][0].content).toBe('😀')
+  }
+)
 
-it('still sends the default emoji for a short tap', async () => {
-  await act(async () => {
-    pointer('pointerdown')
-    pointer('pointerup')
-    container.querySelector('button')!.click()
-  })
-  expect(publish.mock.calls[0][0].content).toBe('❤️')
-})
+it.each([false, true])(
+  'sends the default emoji for a short tap with smallScreen=%s',
+  async (small) => {
+    screen.small = small
+    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+    await act(async () => {
+      pointer('pointerdown')
+      pointer('pointerup')
+      container.querySelector('button')!.click()
+    })
+    expect(publish.mock.calls[0][0].content).toBe('❤️')
+  }
+)
 
 it.each([
   ['keyboard', 'pointerup'],
@@ -224,34 +234,31 @@ it.each(['pointercancel', 'pointermove'] as const)('cancels long press on %s', a
   expect(publish).not.toHaveBeenCalled()
 })
 
-it.each([true, false])(
-  'opens the mobile picker with quickReaction=%s instead of sending a default reaction',
-  async (quickReaction) => {
-    screen.small = true
-    preferences.quickReaction = quickReaction
-    await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
-    const trigger = container.querySelector('button')!
-    await act(async () => {
-      pointer('pointerdown')
-      touch('touchstart')
-      vi.advanceTimersByTime(LONG_PRESS_THRESHOLD)
-    })
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
-    await act(async () => {
-      pointer('pointerup')
-      touch('touchend')
-      trigger.click()
-    })
-    expect(document.querySelector('[role="dialog"]')).not.toBeNull()
-    expect(publish).not.toHaveBeenCalled()
-    const pick = Array.from(document.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Pick emoji'
-    )!
-    await act(async () => pick.click())
-    expect(publish).toHaveBeenCalledOnce()
-    expect(publish.mock.calls[0][0].content).toBe('😀')
-  }
-)
+it('opens the mobile picker on tap when quick reaction is disabled', async () => {
+  screen.small = true
+  preferences.quickReaction = false
+  await act(async () => root.render(createElement(LikeButton, { stuff: 'note' })))
+  const trigger = container.querySelector('button')!
+  await act(async () => {
+    pointer('pointerdown')
+    touch('touchstart')
+    vi.advanceTimersByTime(LONG_PRESS_THRESHOLD)
+  })
+  expect(document.querySelector('[role="dialog"]')).toBeNull()
+  await act(async () => {
+    pointer('pointerup')
+    touch('touchend')
+    trigger.click()
+  })
+  expect(document.querySelector('[role="dialog"]')).not.toBeNull()
+  expect(publish).not.toHaveBeenCalled()
+  const pick = Array.from(document.querySelectorAll('button')).find(
+    (button) => button.textContent === 'Pick emoji'
+  )!
+  await act(async () => pick.click())
+  expect(publish).toHaveBeenCalledOnce()
+  expect(publish.mock.calls[0][0].content).toBe('😀')
+})
 
 it.each([
   [true, true],

@@ -10,7 +10,6 @@ import { LocalizedLanguageNames, TLanguage } from '@/i18n'
 import SecondaryPageLayout from '@/layouts/SecondaryPageLayout'
 import { isSupportCheckConnectionType } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
-import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { useUserPreferences } from '@/providers/UserPreferencesProvider'
 import { TMediaAutoLoadPolicy, TNsfwDisplayPolicy } from '@/types'
 import { SelectValue } from '@radix-ui/react-select'
@@ -22,7 +21,6 @@ import MutedWords from './MutedWords'
 
 const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
   const { t, i18n } = useTranslation()
-  const { isSmallScreen } = useScreenSize()
   const [language, setLanguage] = useState<TLanguage>(i18n.language as TLanguage)
   const {
     autoplay,
@@ -225,52 +223,50 @@ const GeneralSettingsPage = forwardRef(({ index }: { index?: number }, ref) => {
           )}
         </SettingsGroup>
 
-        {!isSmallScreen && (
-          <SettingsGroup title={t('Reactions')}>
+        <SettingsGroup title={t('Reactions')}>
+          <SettingsRow
+            htmlFor="quick-reaction"
+            title={t('Quick reaction')}
+            description={t(
+              'If enabled, you can react with a single click. Click and hold for more options'
+            )}
+            control={
+              <Switch
+                id="quick-reaction"
+                checked={quickReaction}
+                onCheckedChange={updateQuickReaction}
+              />
+            }
+          />
+          {quickReaction && (
             <SettingsRow
-              htmlFor="quick-reaction"
-              title={t('Quick reaction')}
-              description={t(
-                'If enabled, you can react with a single click. Click and hold for more options'
-              )}
+              htmlFor="quick-reaction-emoji"
+              title={t('Quick reaction emoji')}
               control={
-                <Switch
-                  id="quick-reaction"
-                  checked={quickReaction}
-                  onCheckedChange={updateQuickReaction}
-                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => updateQuickReactionEmoji('+')}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <RotateCcw />
+                  </Button>
+                  <ExpressionPickerDialog
+                    onEmojiClick={(emoji) => {
+                      if (!emoji) return
+                      updateQuickReactionEmoji(emoji)
+                    }}
+                  >
+                    <Button variant="ghost" size="icon" className="border">
+                      <Emoji emoji={quickReactionEmoji} />
+                    </Button>
+                  </ExpressionPickerDialog>
+                </div>
               }
             />
-            {quickReaction && (
-              <SettingsRow
-                htmlFor="quick-reaction-emoji"
-                title={t('Quick reaction emoji')}
-                control={
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => updateQuickReactionEmoji('+')}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      <RotateCcw />
-                    </Button>
-                    <ExpressionPickerDialog
-                      onEmojiClick={(emoji) => {
-                        if (!emoji) return
-                        updateQuickReactionEmoji(emoji)
-                      }}
-                    >
-                      <Button variant="ghost" size="icon" className="border">
-                        <Emoji emoji={quickReactionEmoji} />
-                      </Button>
-                    </ExpressionPickerDialog>
-                  </div>
-                }
-              />
-            )}
-          </SettingsGroup>
-        )}
+          )}
+        </SettingsGroup>
       </SettingsPageContainer>
     </SecondaryPageLayout>
   )
