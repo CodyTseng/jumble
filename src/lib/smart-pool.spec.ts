@@ -240,6 +240,25 @@ describe('SmartPool request-driven relay lifecycle', () => {
     sub.close()
   })
 
+  it.each([
+    ['ws://localhost:7447/', false, false, false],
+    ['ws://localhost:7447/', true, false, false],
+    ['wss://192.168.1.1/', true, false, false],
+    ['ws://localhost:7447/', false, true, true],
+    ['wss://192.168.1.1/', false, true, true],
+    ['ws://relay.example/', false, false, false],
+    ['ws://relay.example/', true, false, true],
+    ['ws://relay.example/', false, true, true]
+  ])('checks %s with insecure=%s, trusted=%s', async (url, allowInsecure, trusted, allowed) => {
+    const pool = createPool()
+    pool.setAllowInsecure(allowInsecure)
+    pool.setTrustedInsecureRelayUrls(trusted ? [url] : [])
+    const sub = pool.getRelay(url).subscribe([{ kinds: [1] }], {})
+    await flushPromises()
+    expect(FakeWebSocket.instances).toHaveLength(allowed ? 1 : 0)
+    sub.close()
+  })
+
   it('deduplicates synchronous connection-policy failures per managed relay', async () => {
     const pool = createPool()
     const firstOnClose = vi.fn()

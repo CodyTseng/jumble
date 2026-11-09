@@ -8,6 +8,7 @@ import { getDefaultRelayUrls } from '@/lib/relay'
 import { isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import client from '@/services/client.service'
 import indexedDb from '@/services/indexed-db.service'
+import relayObservations from '@/services/relay-observation.service'
 import { TRelaySet } from '@/types'
 import { Event, kinds } from 'nostr-tools'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -132,12 +133,8 @@ export function FavoriteRelaysProvider({ children }: { children: React.ReactNode
     )
   }, [relaySetEvents])
 
-  // Tell the client which relays the user explicitly owns/configured. Their
-  // insecure (ws://) subset becomes the pool's trusted-insecure allowlist, so
-  // the user can still browse their own local relays while insecure relays from
-  // other people's data stay blocked.
   useEffect(() => {
-    client.setOwnRelayUrls([
+    relayObservations.setProtectedUrls([
       ...getDefaultRelayUrls(),
       ...(relayList?.read ?? []),
       ...(relayList?.write ?? []),

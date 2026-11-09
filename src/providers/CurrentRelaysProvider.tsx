@@ -1,5 +1,5 @@
 import client from '@/services/client.service'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 type TCurrentRelaysContext = {
   relayUrls: string[]
@@ -21,34 +21,27 @@ export function CurrentRelaysProvider({ children }: { children: React.ReactNode 
   const [relayRefCount, setRelayRefCount] = useState<Record<string, number>>({})
   const relayUrls = useMemo(() => Object.keys(relayRefCount), [relayRefCount])
 
-  useEffect(() => {
-    client.setCurrentRelays(relayUrls)
-  }, [relayUrls])
+  const countsRef = useRef<Record<string, number>>({})
 
-  const addRelayUrls = useCallback((urls: string[]) => {
-    setRelayRefCount((prev) => {
-      const newCounts = { ...prev }
-      urls.forEach((url) => {
-        newCounts[url] = (newCounts[url] || 0) + 1
-      })
-      return newCounts
+  useEffect(() => () => client.setCurrentRelays([]), [])
+
+  const updateRelayUrls = useCallback((urls: string[], delta: number) => {
+    const newCounts = { ...countsRef.current }
+    urls.forEach((url) => {
+      newCounts[url] = (newCounts[url] || 0) + delta
+      if (newCounts[url] <= 0) delete newCounts[url]
     })
+    countsRef.current = newCounts
+    // Update the policy immediately, before feed subscriptions start.
+    client.setCurrentRelays(Object.keys(newCounts))
+    setRelayRefCount(newCounts)
   }, [])
 
-  const removeRelayUrls = useCallback((urls: string[]) => {
-    setRelayRefCount((prev) => {
-      const newCounts = { ...prev }
-      urls.forEach((url) => {
-        if (newCounts[url]) {
-          newCounts[url] -= 1
-          if (newCounts[url] <= 0) {
-            delete newCounts[url]
-          }
-        }
-      })
-      return newCounts
-    })
-  }, [])
+  const addRelayUrls = useCallback((urls: string[]) => updateRelayUrls(urls, 1), [updateRelayUrls])
+  const removeRelayUrls = useCallback(
+    (urls: string[]) => updateRelayUrls(urls, -1),
+    [updateRelayUrls]
+  )
 
   return (
     <CurrentRelaysContext.Provider value={{ relayUrls, addRelayUrls, removeRelayUrls }}>

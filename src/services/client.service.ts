@@ -15,7 +15,7 @@ import { SmartPool } from '@/lib/smart-pool'
 import { getPubkeysFromPTags, getServersFromServerTags, tagNameEquals } from '@/lib/tag'
 import { mergeTimelines } from '@/lib/timeline'
 import { subscribeRelays } from '@/lib/relay-subscription'
-import { isInsecureUrl, isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
+import { isLocalNetworkUrl, isWebsocketUrl, normalizeUrl } from '@/lib/url'
 import { isSafari } from '@/lib/utils'
 import { ISigner, TProfile, TPublishOptions, TRelayList, TSubRequestFilter } from '@/types'
 import { IRelay, IRelayPool } from '@/types/relay-pool'
@@ -63,30 +63,61 @@ class ClientService extends EventTarget {
     maxSize: SEEN_ON_CACHE_MAX_SIZE
   })
 
-  // Relays the user is actively browsing (set by CurrentRelaysProvider) and the
-  // user's own configured relays (set by FavoriteRelaysProvider). Their insecure
-  // (ws://) subset is pushed to the pool as the trusted-insecure allowlist, so
-  // insecure relays coming from other people's data stay blocked.
+  // Configured local relays and explicitly browsed feeds bypass connection policy.
+  // Other public ws:// relays remain subject to Allow insecure connections.
   private browsingRelays: string[] = []
   private ownRelays: string[] = []
+  private ownRelayUrls = new Set<string>()
   private trustedInsecureRelaysKey = ''
+  private signerRelayRefs = new Map<string, number>()
 
   setCurrentRelays(urls: string[]) {
     this.browsingRelays = urls
     this.refreshTrustedInsecureRelays()
   }
 
+  // Only the current account’s explicitly configured read/write relays belong here.
   setOwnRelayUrls(urls: string[]) {
     this.ownRelays = urls
-    relayObservations.setProtectedUrls(urls)
+    this.ownRelayUrls = new Set(urls.map(normalizeUrl).filter(Boolean))
     this.refreshTrustedInsecureRelays()
+  }
+
+  acquireSignerRelayUrls(urls: string[]) {
+    const localUrls = Array.from(new Set(urls.map(normalizeUrl))).filter(
+      (url) => isWebsocketUrl(url) && isLocalNetworkUrl(url)
+    )
+    for (const url of localUrls) {
+      this.signerRelayRefs.set(url, (this.signerRelayRefs.get(url) ?? 0) + 1)
+    }
+    this.refreshTrustedInsecureRelays()
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      for (const url of localUrls) {
+        const count = (this.signerRelayRefs.get(url) ?? 0) - 1
+        if (count > 0) this.signerRelayRefs.set(url, count)
+        else this.signerRelayRefs.delete(url)
+      }
+      this.refreshTrustedInsecureRelays()
+    }
+  }
+
+  private isAllowedUserRelay(url: string, pubkey: string) {
+    return (
+      pubkey === this.pubkey || !isLocalNetworkUrl(url) || this.ownRelayUrls.has(normalizeUrl(url))
+    )
   }
 
   // SmartPool normalizes these URLs, so we collect them raw here.
   private refreshTrustedInsecureRelays() {
     const trusted = new Set<string>()
-    for (const url of this.ownRelays.concat(this.browsingRelays)) {
-      if (isWebsocketUrl(url) && isInsecureUrl(url)) {
+    const urls = this.ownRelays
+      .filter(isLocalNetworkUrl)
+      .concat(this.browsingRelays, Array.from(this.signerRelayRefs.keys()))
+    for (const url of urls) {
+      if (isWebsocketUrl(url)) {
         trusted.add(url)
       }
     }
@@ -1260,7 +1291,9 @@ class ClientService extends EventTarget {
 
     return relayEvents.map((event) => {
       if (event) {
-        return getRelayListFromEvent(event, storage.getFilterOutOnionRelays())
+        return getRelayListFromEvent(event, storage.getFilterOutOnionRelays(), (url) =>
+          this.isAllowedUserRelay(url, event.pubkey)
+        )
       }
       const defaultRelays = getDefaultRelayUrls()
       return {
@@ -1503,16 +1536,17 @@ class ClientService extends EventTarget {
 
   async fetchDmRelays(pubkey: string, updateCache = true) {
     const dmRelayListEvent = await this.fetchDmRelaysEvent(pubkey, updateCache)
-    return dmRelayListEvent
+    const urls = dmRelayListEvent
       ? Array.from(
           new Set(
             dmRelayListEvent.tags
               .filter((tag) => tag[0] === 'relay' && tag[1])
               .map((tag) => normalizeUrl(tag[1]))
-              .filter(Boolean)
+              .filter((url) => !!url && this.isAllowedUserRelay(url, pubkey))
           )
         )
       : []
+    return urls
   }
 
   async fetchEncryptionKeyAnnouncementEvent(pubkey: string, updateCache = true, skipCache = false) {

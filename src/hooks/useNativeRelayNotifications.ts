@@ -1,5 +1,6 @@
 import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
 import { isAndroid } from '@/lib/platform'
+import { isLocalNetworkUrl } from '@/lib/url'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
@@ -51,7 +52,7 @@ export function useNativeRelayNotifications(
     if (!isAndroid()) return
     let disposed = false,
       generation = 0
-    let cached = { relays: getDefaultRelayUrls(), issuer: '' }
+    let cached = { relays: getDefaultRelayUrls(), configuredRelayUrls: [] as string[], issuer: '' }
     const refresh = async (userInitiated = false) => {
       const request = ++generation
       if (!pubkey || !storage.getSystemNotificationsEnabled()) {
@@ -70,6 +71,7 @@ export function useNativeRelayNotifications(
             config: {
               pubkey,
               relays,
+              configuredRelayUrls: cached.configuredRelayUrls,
               enabledAt: activation.current,
               filters: Array.from(value.filters),
               descriptions: value.descriptions,
@@ -87,8 +89,13 @@ export function useNativeRelayNotifications(
         if (disposed || request !== generation || !storage.getSystemNotificationsEnabled()) return
         const [relayList, issuer] = await Promise.all([
           bounded(
-            client.fetchRelayList(pubkey).then((list) => ({ read: list.read })),
-            { read: cached.relays }
+            client.fetchRelayList(pubkey).then((list) => ({
+              read: list.read,
+              configuredRelayUrls: list.originalRelays
+                .map(({ url }) => url)
+                .filter(isLocalNetworkUrl)
+            })),
+            { read: cached.relays, configuredRelayUrls: cached.configuredRelayUrls }
           ),
           bounded(lightning.getReceiptIssuer(pubkey), cached.issuer)
         ])
@@ -97,6 +104,7 @@ export function useNativeRelayNotifications(
           relays: Array.from(new Set([...relayList.read, ...getDefaultRelayUrls()]))
             .filter((url) => url.startsWith('wss://'))
             .slice(0, 8),
+          configuredRelayUrls: relayList.configuredRelayUrls,
           issuer: issuer ?? ''
         }
         await configure()

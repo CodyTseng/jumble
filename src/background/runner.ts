@@ -1,6 +1,6 @@
 import type { NostrEvent } from 'nostr-tools'
 import type { TNotificationFilter } from '@/types'
-import { normalizeUrl } from '@/lib/url'
+import { isLocalNetworkUrl, normalizeUrl } from '@/lib/url'
 import { SmartPool } from '@/lib/smart-pool'
 import { NOTIFICATION_KINDS, notificationFilter } from '@/lib/notification'
 import { NotificationProcessor, type NotificationCursor } from '@/lib/notification-processor'
@@ -11,6 +11,8 @@ import { BoundedMap } from '@/lib/bounded-map'
 export type BackgroundNotificationConfig = {
   pubkey: string
   relays: string[]
+  // Explicit account read/write relays, separate from subscription fallbacks.
+  configuredRelayUrls?: string[]
   enabledAt: number
   filters: TNotificationFilter[]
   descriptions: Partial<Record<TNotificationFilter, string>>
@@ -47,6 +49,9 @@ export class BackgroundNotificationRunner {
     cursor?: NotificationCursor | null
   ) {
     this.pool = new SmartPool({ websocketImplementation: ports.websocket })
+    this.pool.setTrustedInsecureRelayUrls(
+      (config.configuredRelayUrls ?? []).filter(isLocalNetworkUrl)
+    )
     const muted = new Set(config.muted),
       trusted = new Set(config.trusted)
     this.processor = new NotificationProcessor({

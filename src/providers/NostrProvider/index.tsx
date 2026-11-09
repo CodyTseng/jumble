@@ -1,3 +1,4 @@
+import { useAccountRelayList } from './useAccountRelayList'
 import dialogService from '@/services/dialog.service'
 import LoginDialog from '@/components/LoginDialog'
 import PasswordInputDialog from '@/components/PasswordInputDialog'
@@ -141,11 +142,23 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   currentAccount.current = account
   const [nsec, setNsec] = useState<string | null>(null)
   const [ncryptsec, setNcryptsec] = useState<string | null>(null)
-  const [signer, setSigner] = useState<ISigner | null>(null)
+  const [signer, setSignerState] = useState<ISigner | null>(null)
+  const signerRef = useRef<ISigner | null>(null)
+  const setSigner = (next: ISigner | null) => {
+    const previous = signerRef.current
+    if (
+      previous !== next &&
+      (previous instanceof BunkerSigner || previous instanceof NostrConnectionSigner)
+    ) {
+      void previous.close().catch(console.error)
+    }
+    signerRef.current = next
+    setSignerState(next)
+  }
   const [openLoginDialog, setOpenLoginDialog] = useState(false)
   const [profile, setProfile] = useState<TProfile | null>(null)
   const [profileEvent, setProfileEvent] = useState<Event | null>(null)
-  const [relayList, setRelayList] = useState<TRelayList | null>(null)
+  const [relayList, setRelayList] = useAccountRelayList()
   const [followListEvent, setFollowListEvent] = useState<Event | null>(null)
   const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
   const [pinnedUsersEvent, setPinnedUsersEvent] = useState<Event | null>(null)

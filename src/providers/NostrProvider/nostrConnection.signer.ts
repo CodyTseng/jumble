@@ -8,6 +8,7 @@ import { BunkerSigner as NBunkerSigner, toBunkerURL } from 'nostr-tools/nip46'
 
 export class NostrConnectionSigner implements ISigner {
   signer: NBunkerSigner | null = null
+  private pool?: Nip46Pool
   private clientSecretKey: Uint8Array
   private pubkey: string | null = null
   private connectionString: string
@@ -26,18 +27,36 @@ export class NostrConnectionSigner implements ISigner {
       }
     }
 
-    this.signer = await NBunkerSigner.fromURI(this.clientSecretKey, this.connectionString, {
-      pool: new Nip46Pool(client.relayPool),
-      onauth: (url) => {
-        openExternalUrl(url)
-      }
+    await this.close()
+    this.pool = new Nip46Pool(client.relayPool, {
+      urls: new URL(this.connectionString).searchParams.getAll('relay'),
+      acquire: (urls) => client.acquireSignerRelayUrls(urls)
     })
-    this.bunkerString = toBunkerURL(this.signer.bp)
-    this.pubkey = await this.signer.getPublicKey()
-    return {
-      bunkerString: this.bunkerString,
-      pubkey: this.pubkey
+    try {
+      this.signer = await NBunkerSigner.fromURI(this.clientSecretKey, this.connectionString, {
+        pool: this.pool,
+        onauth: (url) => {
+          openExternalUrl(url)
+        }
+      })
+      this.bunkerString = toBunkerURL(this.signer.bp)
+      this.pubkey = await this.signer.getPublicKey()
+      return {
+        bunkerString: this.bunkerString,
+        pubkey: this.pubkey
+      }
+    } catch (error) {
+      await this.close()
+      throw error
     }
+  }
+
+  async close() {
+    this.pool?.dispose()
+    this.pool = undefined
+    await this.signer?.close()
+    this.signer = null
+    this.pubkey = null
   }
 
   async getPublicKey() {

@@ -11,7 +11,8 @@ import { isOnionUrl, isWebsocketUrl, normalizeHttpUrl, normalizeUrl } from './ur
 
 export function getRelayListFromEvent(
   event?: Event | null,
-  filterOutOnionRelays: boolean = true
+  filterOutOnionRelays: boolean = true,
+  relayFilter?: (url: string) => boolean
 ): TRelayList {
   const defaultRelays = getDefaultRelayUrls()
 
@@ -25,6 +26,7 @@ export function getRelayListFromEvent(
 
     const normalizedUrl = normalizeUrl(url)
     if (!normalizedUrl) return
+    if (relayFilter && !relayFilter(normalizedUrl)) return
 
     const scope = type === 'read' ? 'read' : type === 'write' ? 'write' : 'both'
     relayList.originalRelays.push({ url: normalizedUrl, scope })

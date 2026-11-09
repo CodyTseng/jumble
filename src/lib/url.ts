@@ -130,30 +130,47 @@ export function isLocalNetworkUrl(urlString: string): boolean {
   try {
     const url = new URL(urlString)
     const hostname = url.hostname
+      .toLowerCase()
+      .replace(/^\[|\]$/g, '')
+      .replace(/\.$/, '')
 
     // Check if it's localhost or an mDNS .local hostname (e.g. umbrel.local)
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.endsWith('.local')) {
+    if (
+      hostname === 'localhost' ||
+      hostname.endsWith('.localhost') ||
+      hostname.endsWith('.local')
+    ) {
       return true
     }
 
     // Check if it's an IPv4 local network address
     const ipv4Match = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)
     if (ipv4Match) {
-      const [, a, b, c, d] = ipv4Match.map(Number)
+      const [, a, b] = ipv4Match.map(Number)
       return (
+        a === 0 ||
         a === 10 ||
         (a === 172 && b >= 16 && b <= 31) ||
         (a === 192 && b === 168) ||
-        (a === 127 && b === 0 && c === 0 && d === 1)
+        a === 127 ||
+        (a === 169 && b === 254)
       )
+    }
+
+    // IPv4-mapped IPv6 addresses use hexadecimal groups after URL parsing.
+    const mappedIpv4 = hostname.match(/^::ffff:([\da-f]+):([\da-f]+)$/)
+    if (mappedIpv4) {
+      const high = parseInt(mappedIpv4[1], 16)
+      const low = parseInt(mappedIpv4[2], 16)
+      return isLocalNetworkUrl(`http://${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`)
     }
 
     // Check if it's an IPv6 address
     if (hostname.includes(':')) {
-      if (hostname === '::1') {
+      if (hostname === '::1' || hostname === '::') {
         return true // IPv6 loopback address
       }
-      if (hostname.startsWith('fe80:')) {
+      if (/^fe[89ab][0-9a-f]:/.test(hostname)) {
         return true // Link-local address
       }
       if (hostname.startsWith('fc') || hostname.startsWith('fd')) {

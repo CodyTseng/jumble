@@ -120,6 +120,63 @@ describe('NIP-46 managed relay transport', () => {
     vi.unstubAllGlobals()
   })
 
+  it.each(['wss://localhost:7447/', 'ws://localhost:7447/'])(
+    'connects an explicitly configured local signer at %s and releases its grants',
+    async (url) => {
+      await signer.close()
+      let grants = 0
+      const release = vi.fn(() => {
+        if (--grants === 0) pool.setTrustedInsecureRelayUrls([])
+      })
+      const acquire = vi.fn((urls: string[]) => {
+        expect(urls).toEqual([url])
+        grants++
+        pool.setTrustedInsecureRelayUrls(urls)
+        return release
+      })
+      const adapter = new Nip46Pool(pool, { urls: [url], acquire })
+      signer = BunkerSigner.fromBunker(
+        clientSecret,
+        {
+          pubkey: remotePubkey,
+          relays: [url],
+          secret: null
+        },
+        { pool: adapter }
+      )
+      try {
+        expect(await signer.getPublicKey()).toBe(remotePubkey)
+        await flushPromises()
+        expect(grants).toBe(1)
+        await signer.close()
+        expect(grants).toBe(0)
+        const calls = release.mock.calls.length
+        adapter.dispose()
+        // Closing an already closed adapter must not release a grant twice.
+        expect(release).toHaveBeenCalledTimes(calls)
+      } finally {
+        adapter.dispose()
+        pool.close([url])
+      }
+    }
+  )
+
+  it('does not grant exceptions to relays outside the signer configuration', async () => {
+    await signer.close()
+    await flushPromises()
+    FakeWebSocket.instances = []
+    const release = vi.fn()
+    const acquire = vi.fn(() => release)
+    const adapter = new Nip46Pool(pool, { urls: [URL], acquire })
+    const sub = adapter.subscribe(['wss://localhost:7447/'], { kinds: [24133] }, {})
+    await flushPromises()
+    expect(acquire).toHaveBeenCalledWith([])
+    expect(FakeWebSocket.instances).toHaveLength(0)
+    sub.close()
+    adapter.dispose()
+    expect(release).toHaveBeenCalledOnce()
+  })
+
   it('restores the response subscription on native resume and signs through the new socket', async () => {
     await signer.ping()
     const oldSocket = FakeWebSocket.instances[0]

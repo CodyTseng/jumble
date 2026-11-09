@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSafeExternalUrl, truncateUrl } from './url'
+import { getSafeExternalUrl, isLocalNetworkUrl, truncateUrl } from './url'
 
 describe('getSafeExternalUrl', () => {
   it.each(['https://example.com/path', 'http://127.0.0.1:8080/file'])('allows web URL %s', (url) =>
@@ -37,5 +37,41 @@ describe('truncateUrl', () => {
 
   it('does not add an ellipsis when no part of the URL is omitted', () => {
     expect(truncateUrl('https://example.com/path')).toBe('example.com/path')
+  })
+})
+
+describe('isLocalNetworkUrl', () => {
+  it.each([
+    'ws://localhost:8080',
+    'wss://relay.localhost',
+    'wss://umbrel.local.',
+    'ws://127.23.4.5',
+    'ws://0.0.0.0',
+    'wss://10.1.2.3',
+    'wss://172.16.0.1',
+    'wss://172.31.255.255',
+    'wss://192.168.1.1',
+    'ws://169.254.1.1',
+    'wss://[::1]',
+    'ws://[::]',
+    'wss://[fe80::1]',
+    'wss://[febf::1]',
+    'wss://[fc00::1]',
+    'wss://[fd12::1]',
+    'ws://[::ffff:127.0.0.1]',
+    'ws://[::ffff:192.168.1.1]'
+  ])('recognizes local address %s', (url) => {
+    expect(isLocalNetworkUrl(url)).toBe(true)
+  })
+
+  it.each([
+    'wss://relay.example',
+    'wss://localhost.example',
+    'wss://172.15.0.1',
+    'wss://172.32.0.1',
+    'wss://[2001:4860:4860::8888]',
+    'wss://[::ffff:8.8.8.8]'
+  ])('keeps public address %s', (url) => {
+    expect(isLocalNetworkUrl(url)).toBe(false)
   })
 })

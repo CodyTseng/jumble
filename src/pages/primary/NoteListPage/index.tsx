@@ -9,7 +9,14 @@ import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { TPageRef } from '@/types'
 import { Info, LogIn, Search, Sparkles } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import PinnedFeed from './PinnedFeed'
@@ -30,7 +37,7 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
     }
   }, [JSON.stringify(relayUrls), feedInfo])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (relayUrls.length) {
       addRelayUrls(relayUrls)
       return () => {

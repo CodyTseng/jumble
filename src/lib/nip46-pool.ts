@@ -10,11 +10,33 @@ import { normalizeUrl } from './url'
  * and Electron IPC. Closing a signer must only close its own subscriptions.
  */
 export class Nip46Pool extends AbstractSimplePool {
-  constructor(private readonly managedPool: IRelayPool) {
+  private configuredUrls: Set<string>
+  private closers = new Set<() => void>()
+  private disposed = false
+
+  constructor(
+    private readonly managedPool: IRelayPool,
+    private readonly permissions?: { urls: string[]; acquire: (urls: string[]) => () => void }
+  ) {
     super({ verifyEvent, maxWaitForConnection: 10_000 })
+    this.configuredUrls = new Set(permissions?.urls.map(normalizeUrl))
+  }
+
+  private acquire(urls: string[]) {
+    if (this.disposed) throw new Error('Signer relay transport is closed')
+    const release = this.permissions?.acquire(
+      urls.map(normalizeUrl).filter((url) => this.configuredUrls.has(url))
+    )
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      release?.()
+    }
   }
 
   override subscribe(urls: string[], filter: Filter, params: SubscribeManyParams) {
+    const release = this.acquire(urls)
     const seen = new Set<string>()
     const reasons: { url: string; reason: string }[] = []
     const onauth = params.onauth
@@ -29,28 +51,44 @@ export class Nip46Pool extends AbstractSimplePool {
         if (allEosed) params.oneose?.()
       },
       onclose: (url, reason) => reasons.push({ url, reason }),
-      onAllClose: () => params.onclose?.(reasons),
+      onAllClose: () => {
+        release()
+        params.onclose?.(reasons)
+      },
       getAuthenticator: () =>
         onauth ? (relay) => relay.auth(onauth).then(() => undefined) : undefined
     })
 
-    const abort = () => sub.close(String(params.abort?.reason ?? 'aborted'))
+    const close = (reason?: string) => {
+      params.abort?.removeEventListener('abort', abort)
+      sub.close(reason)
+      release()
+      this.closers.delete(close)
+    }
+    const abort = () => close(String(params.abort?.reason ?? 'aborted'))
+    this.closers.add(close)
     if (params.abort?.aborted) abort()
     else params.abort?.addEventListener('abort', abort, { once: true })
 
-    return {
-      close: (reason?: string) => {
-        params.abort?.removeEventListener('abort', abort)
-        sub.close(reason)
-      }
-    }
+    return { close }
+  }
+
+  dispose() {
+    this.disposed = true
+    for (const close of this.closers) close()
+    this.closers.clear()
   }
 
   override publish(urls: string[], event: Event): Promise<string>[] {
     return Array.from(new Set(urls.map(normalizeUrl)), async (url) => {
-      const relay = await this.managedPool.ensureRelay(url)
-      const result = await relay.publish(event)
-      return typeof result === 'string' ? result : ''
+      const release = this.acquire([url])
+      try {
+        const relay = await this.managedPool.ensureRelay(url)
+        const result = await relay.publish(event)
+        return typeof result === 'string' ? result : ''
+      } finally {
+        release()
+      }
     })
   }
 }

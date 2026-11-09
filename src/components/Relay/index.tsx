@@ -4,7 +4,7 @@ import SearchInput from '@/components/SearchInput'
 import { useFetchRelayInfo } from '@/hooks'
 import { normalizeUrl } from '@/lib/url'
 import { useCurrentRelays } from '@/providers/CurrentRelaysProvider'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NotFound from '../NotFound'
 
@@ -16,7 +16,7 @@ export default function Relay({ url, className }: { url?: string; className?: st
   const [searchInput, setSearchInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(searchInput)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (normalizedUrl) {
       addRelayUrls([normalizedUrl])
       return () => {

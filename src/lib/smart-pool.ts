@@ -5,7 +5,7 @@ import { ManagedRelay } from './managed-relay'
 import type { RelayObserver } from './relay-observation'
 import { initializeNostrVerifier, verifyEvent } from './nostr-verifier'
 import { observeRelayPoolLifecycle } from './relay-pool-lifecycle'
-import { isInsecureUrl, normalizeUrl } from './url'
+import { isInsecureUrl, isLocalNetworkUrl, normalizeUrl } from './url'
 
 export type SmartPoolOptions = {
   observe?: RelayObserver
@@ -66,6 +66,7 @@ export class SmartPool implements IRelayPool {
     this.allowInsecure = allow
   }
 
+  // Also carries configured local wss:// relays and explicitly browsed feeds.
   setTrustedInsecureRelayUrls(urls: string[]) {
     this.trustedInsecureRelays = new Set(urls.map((url) => normalizeUrl(url)))
   }
@@ -131,11 +132,11 @@ export class SmartPool implements IRelayPool {
   }
 
   private assertConnectionAllowed(url: string) {
-    if (
-      !this.allowInsecure &&
-      isInsecureUrl(url) &&
-      !this.trustedInsecureRelays.has(normalizeUrl(url))
-    ) {
+    if (this.trustedInsecureRelays.has(url)) return
+    if (isLocalNetworkUrl(url)) {
+      throw new Error(`Local relay connection blocked: ${url}`)
+    }
+    if (!this.allowInsecure && isInsecureUrl(url)) {
       throw new Error(`Insecure relay connection blocked: ${url}`)
     }
   }
