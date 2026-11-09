@@ -1311,6 +1311,7 @@ export default {
     'Hide this section': 'Скрыть этот раздел',
     Participants: 'Участники',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Репосты × 1 · Цитаты × 2 · Загруженные ответы × 1'
+      'Репосты × 1 · Цитаты × 2 · Загруженные ответы × 1',
+    'Share profile': 'Поделиться профилем'
   }
 }

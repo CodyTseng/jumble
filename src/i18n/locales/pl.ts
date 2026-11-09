@@ -1319,6 +1319,7 @@ export default {
     'Hide this section': 'Ukryj tę sekcję',
     Participants: 'Uczestnicy',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Udostępnienia × 1 · Cytaty × 2 · Wczytane odpowiedzi × 1'
+      'Udostępnienia × 1 · Cytaty × 2 · Wczytane odpowiedzi × 1',
+    'Share profile': 'Udostępnij profil'
   }
 }

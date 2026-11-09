@@ -1307,6 +1307,7 @@ export default {
     'Hide this section': 'Szakasz elrejtése',
     Participants: 'Résztvevők',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Újraosztások × 1 · Idézetek × 2 · Betöltött válaszok × 1'
+      'Újraosztások × 1 · Idézetek × 2 · Betöltött válaszok × 1',
+    'Share profile': 'Profil megosztása'
   }
 }

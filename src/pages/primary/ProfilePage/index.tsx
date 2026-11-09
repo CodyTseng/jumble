@@ -1,4 +1,5 @@
 import Profile from '@/components/Profile'
+import ProfileShareButton from '@/components/ProfileShareButton'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { useNostr } from '@/providers/NostrProvider'
 import { TPageRef } from '@/types'
@@ -15,6 +16,7 @@ const ProfilePage = forwardRef<TPageRef>((_, ref) => {
       pageName="profile"
       icon={<UserIcon />}
       title={t('Profile')}
+      controls={pubkey ? <ProfileShareButton pubkey={pubkey} /> : undefined}
       displayScrollToTopButton
       ref={ref}
     >

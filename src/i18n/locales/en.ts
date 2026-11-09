@@ -1331,6 +1331,8 @@ export default {
       'Shown beside your feed in single-column mode on wide screens.',
     'Hide this section': 'Hide this section',
     Participants: 'Participants',
-    'Reposts × 1 · Quotes × 2 · Loaded replies × 1': 'Reposts × 1 · Quotes × 2 · Loaded replies × 1'
+    'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
+      'Reposts × 1 · Quotes × 2 · Loaded replies × 1',
+    'Share profile': 'Share profile'
   }
 }

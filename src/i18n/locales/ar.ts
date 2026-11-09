@@ -1292,6 +1292,7 @@ export default {
     'Hide this section': 'إخفاء هذا القسم',
     Participants: 'المشاركون',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'إعادة النشر × 1 · الاقتباسات × 2 · الردود المحمّلة × 1'
+      'إعادة النشر × 1 · الاقتباسات × 2 · الردود المحمّلة × 1',
+    'Share profile': 'مشاركة الملف الشخصي'
   }
 }

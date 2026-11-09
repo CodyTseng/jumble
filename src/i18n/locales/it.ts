@@ -1314,6 +1314,7 @@ export default {
     'Hide this section': 'Nascondi questa sezione',
     Participants: 'Partecipanti',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Ricondivisioni × 1 · Citazioni × 2 · Risposte caricate × 1'
+      'Ricondivisioni × 1 · Citazioni × 2 · Risposte caricate × 1',
+    'Share profile': 'Condividi profilo'
   }
 }

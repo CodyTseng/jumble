@@ -1303,6 +1303,7 @@ export default {
     'Hide this section': 'پنهان کردن این بخش',
     Participants: 'شرکت‌کنندگان',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'بازنشر × ۱ · نقل‌قول × ۲ · پاسخ‌های بارگیری‌شده × ۱'
+      'بازنشر × ۱ · نقل‌قول × ۲ · پاسخ‌های بارگیری‌شده × ۱',
+    'Share profile': 'اشتراک‌گذاری نمایه'
   }
 }

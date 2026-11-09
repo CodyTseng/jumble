@@ -1307,6 +1307,7 @@ export default {
     'Hide this section': 'Bu bölümü gizle',
     Participants: 'Katılımcılar',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Yeniden paylaşımlar × 1 · Alıntılar × 2 · Yüklenen yanıtlar × 1'
+      'Yeniden paylaşımlar × 1 · Alıntılar × 2 · Yüklenen yanıtlar × 1',
+    'Share profile': 'Profili paylaş'
   }
 }

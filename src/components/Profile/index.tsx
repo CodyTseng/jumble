@@ -98,7 +98,7 @@ export default function Profile({ id }: { id?: string }) {
           <AvatarWithLightbox userId={pubkey} />
         </div>
         <div className="px-4">
-          <div className="flex h-8 items-center justify-end gap-2">
+          <div className="ms-24 flex min-h-10 flex-wrap items-center justify-end gap-2">
             {isSelf ? (
               <Button
                 className="w-20 min-w-20 rounded-full"

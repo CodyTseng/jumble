@@ -1313,6 +1313,7 @@ export default {
     'Hide this section': 'Ocultar esta sección',
     Participants: 'Participantes',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
-      'Republicaciones × 1 · Citas × 2 · Respuestas cargadas × 1'
+      'Republicaciones × 1 · Citas × 2 · Respuestas cargadas × 1',
+    'Share profile': 'Compartir perfil'
   }
 }

@@ -41,6 +41,9 @@ export const toProfile = (userId: string) => {
   const npub = nip19.npubEncode(userId)
   return `/users/${npub}`
 }
+export const toJumbleProfile = (userId: string) => {
+  return `https://jumble.social${toProfile(userId)}`
+}
 export const toProfileList = ({ search, domain }: { search?: string; domain?: string }) => {
   const path = '/users'
   const query = new URLSearchParams()

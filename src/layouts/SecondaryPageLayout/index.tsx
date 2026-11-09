@@ -19,6 +19,7 @@ const SecondaryPageLayout = forwardRef(
       index,
       title,
       controls,
+      controlsWidth,
       hideBackButton = false,
       hideTitlebarBottomBorder = false,
       displayScrollToTopButton = false,
@@ -30,6 +31,7 @@ const SecondaryPageLayout = forwardRef(
       index?: number
       title?: React.ReactNode
       controls?: React.ReactNode
+      controlsWidth?: string
       hideBackButton?: boolean
       hideTitlebarBottomBorder?: boolean
       displayScrollToTopButton?: boolean
@@ -75,6 +77,7 @@ const SecondaryPageLayout = forwardRef(
         <SecondaryPageTitlebar
           title={title}
           controls={controls}
+          controlsWidth={controlsWidth}
           hideBackButton={hideBackButton}
           hideBottomBorder={hideTitlebarBottomBorder}
           titlebar={titlebar}
@@ -127,12 +130,14 @@ export default SecondaryPageLayout
 export function SecondaryPageTitlebar({
   title,
   controls,
+  controlsWidth,
   hideBackButton = false,
   hideBottomBorder = false,
   titlebar
 }: {
   title?: React.ReactNode
   controls?: React.ReactNode
+  controlsWidth?: string
   hideBackButton?: boolean
   hideBottomBorder?: boolean
   titlebar?: React.ReactNode
@@ -153,6 +158,7 @@ export function SecondaryPageTitlebar({
         left={hideBackButton ? null : <BackIconButton />}
         center={title}
         right={controls}
+        sideWidth={controlsWidth}
         hideBottomBorder={hideBottomBorder}
       />
     )
