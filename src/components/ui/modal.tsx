@@ -166,6 +166,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
       withoutClose = true,
       fitVisualViewport = false,
       onPointerDownOutside,
+      onInteractOutside,
       onOpenAutoFocus,
       ...props
     },
@@ -213,6 +214,14 @@ const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
             if (!e.defaultPrevented && direction !== 'center') e.preventDefault()
           }}
           onPointerDownOutside={onPointerDownOutside}
+          onInteractOutside={(event) => {
+            onInteractOutside?.(event)
+            // Toasts stay interactive above a modal. Dismissing a toast must
+            // not also dismiss the composer or another underlying dialog.
+            if (event.target instanceof Element && event.target.closest('[data-sonner-toaster]')) {
+              event.preventDefault()
+            }
+          }}
           className={cn(
             'safe-area-x-margin bg-background fixed z-50 flex flex-col outline-hidden',
             direction === 'center' && 'max-h-[90dvh]',

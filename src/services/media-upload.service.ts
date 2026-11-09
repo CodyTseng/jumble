@@ -263,15 +263,34 @@ class MediaUploadService {
   ): Promise<BlobDescriptor> {
     const url = new URL('/upload', server)
     const sha256 = await getBlobSha256(file)
-    const authHeader = encodeAuthorizationHeader(auth)
+    let authHeader = encodeAuthorizationHeader(auth)
+    // SDK 5 uses unpadded Base64URL (BUD-11). Older servers such as Haven
+    // decode only padded standard Base64. Retry with the same signed event;
+    // keep the current encoding for servers that accept it.
+    const legacyToken = authHeader.slice('Nostr '.length).replace(/-/g, '+').replace(/_/g, '/')
+    const legacyAuthHeader = `Nostr ${legacyToken.padEnd(Math.ceil(legacyToken.length / 4) * 4, '=')}`
     const baseHeaders: Record<string, string> = {
-      Authorization: authHeader,
       'X-SHA-256': sha256
     }
 
     const request = async (init: RequestInit) => {
       try {
-        return await fetch(url, { ...init, signal })
+        const send = () =>
+          fetch(url, {
+            ...init,
+            signal,
+            headers: { ...init.headers, Authorization: authHeader }
+          })
+        const response = await send()
+        if (
+          (response.status === 400 || response.status === 401) &&
+          authHeader !== legacyAuthHeader &&
+          !signal?.aborted
+        ) {
+          authHeader = legacyAuthHeader
+          return await send()
+        }
+        return response
       } catch (err) {
         if (signal?.aborted || (err as Error)?.name === 'AbortError') {
           throw new Error(UPLOAD_ABORTED_ERROR_MSG, { cause: err })

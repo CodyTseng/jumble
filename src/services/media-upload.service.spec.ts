@@ -12,7 +12,6 @@ const clientMock = vi.hoisted(() => ({
 const blossomClientMock = vi.hoisted(() => ({
   createUploadAuth: vi.fn().mockResolvedValue({ id: 'auth-event' }),
   getBlobSha256: vi.fn().mockResolvedValue('file-hash'),
-  encodeAuthorizationHeader: vi.fn().mockReturnValue('Nostr auth'),
   mirrorBlob: vi.fn().mockResolvedValue(undefined)
 }))
 
@@ -38,7 +37,8 @@ const mediaMetaMock = vi.hoisted(() => ({
 
 vi.mock('@/lib/media-meta', () => mediaMetaMock)
 
-vi.mock('blossom-client-sdk', () => ({
+vi.mock('blossom-client-sdk', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('blossom-client-sdk')>()),
   ...blossomClientMock,
   Actions: { mirrorBlob: blossomClientMock.mirrorBlob }
 }))
@@ -55,6 +55,63 @@ describe('Blossom media uploads', () => {
     clientMock.fetchBlossomServerList.mockResolvedValue(servers)
     mediaUpload.setServiceConfig({ type: 'blossom' })
   })
+
+  it.each(['HEAD', 'PUT'])('retries legacy Base64 auth after a %s rejection', async (method) => {
+    clientMock.fetchBlossomServerList.mockResolvedValue([servers[0]])
+    // Include Unicode whose UTF-8 Base64 contains both + and /, plus padding.
+    const auth = { id: 'auth-event', content: '上传 🫿' }
+    blossomClientMock.createUploadAuth.mockResolvedValueOnce(auth)
+    const standardToken = Buffer.from(JSON.stringify(auth)).toString('base64')
+    const urlToken = Buffer.from(JSON.stringify(auth)).toString('base64url')
+    expect(standardToken).not.toBe(urlToken)
+    const blob = { url: `${servers[0]}file-hash`, sha256: 'file-hash' }
+    const headers: string[] = []
+    const methods: string[] = []
+    const fetchMock = vi.fn(async (_input: URL | RequestInfo, init?: RequestInit) => {
+      const header = new Headers(init?.headers).get('Authorization')!
+      headers.push(header)
+      methods.push(init!.method!)
+      if (init?.method === method && header !== `Nostr ${standardToken}`) {
+        return new Response(null, { status: 400 })
+      }
+      return init?.method === 'HEAD' ? new Response(null, { status: 200 }) : Response.json(blob)
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(mediaUpload.upload(new File(['test'], 'test.txt'))).resolves.toMatchObject({
+      url: blob.url
+    })
+    expect(methods).toEqual(method === 'HEAD' ? ['HEAD', 'HEAD', 'PUT'] : ['HEAD', 'PUT', 'PUT'])
+    expect(headers).toEqual([
+      `Nostr ${urlToken}`,
+      `Nostr ${method === 'HEAD' ? standardToken : urlToken}`,
+      `Nostr ${standardToken}`
+    ])
+  })
+
+  it.each([400, 401])('bounds auth retries when a server keeps returning %s', async (status) => {
+    clientMock.fetchBlossomServerList.mockResolvedValue([servers[0]])
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(mediaUpload.upload(new File(['test'], 'test.txt'))).rejects.toThrow(`(${status})`)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock.mock.calls.every(([, init]) => init.method === 'HEAD')).toBe(true)
+  })
+
+  it.each([403, 413, 415, 429])(
+    'does not retry or PUT after a HEAD %s rejection',
+    async (status) => {
+      clientMock.fetchBlossomServerList.mockResolvedValue([servers[0]])
+      const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status }))
+      vi.stubGlobal('fetch', fetchMock)
+
+      await expect(mediaUpload.upload(new File(['test'], 'test.txt'))).rejects.toThrow(
+        `(${status})`
+      )
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    }
+  )
 
   it('tries servers in order and does not mirror back to a failed server', async () => {
     const blob = {

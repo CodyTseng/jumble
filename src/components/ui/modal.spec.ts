@@ -50,6 +50,51 @@ function StatefulBody({ mounted }: { mounted: () => void }) {
 }
 
 describe('responsive modals', () => {
+  it('allows a touch toast dismissal without closing the underlying composer', async () => {
+    screen.small = true
+    const changed = vi.fn()
+    const interacted = vi.fn()
+    await act(async () =>
+      root.render(
+        createElement(
+          Dialog,
+          { open: true, onOpenChange: changed },
+          createElement(DialogContent, {
+            'aria-describedby': undefined,
+            onInteractOutside: interacted
+          })
+        )
+      )
+    )
+    // Radix installs its document pointer listener after a timer tick. Touch
+    // outside interactions are then deferred until the subsequent click.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const toaster = document.createElement('ol')
+    toaster.setAttribute('data-sonner-toaster', '')
+    const close = document.createElement('button')
+    close.addEventListener('click', () => toaster.remove())
+    toaster.appendChild(close)
+    document.body.appendChild(toaster)
+    const touchDown = (target: HTMLElement) => {
+      const event = new Event('pointerdown', { bubbles: true })
+      Object.defineProperty(event, 'pointerType', { value: 'touch' })
+      target.dispatchEvent(event)
+    }
+    await act(async () => {
+      touchDown(close)
+      close.click()
+    })
+    expect(toaster.isConnected).toBe(false)
+    expect(interacted).toHaveBeenCalled()
+    expect(changed).not.toHaveBeenCalled()
+    // Ordinary outside taps still dismiss the dialog.
+    await act(async () => {
+      touchDown(document.body)
+      document.body.click()
+    })
+    expect(changed).toHaveBeenCalledExactlyOnceWith(false)
+  })
+
   it.each(['dialog', 'modal', 'responsive-dialog'] as const)(
     'keeps %s content mounted and state intact when switching presentation',
     async (kind) => {
