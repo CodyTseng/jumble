@@ -189,8 +189,8 @@ export default function Profile({ id }: { id?: string }) {
                 </a>
               </div>
             )}
-            <div className="mt-2 flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
+              <div className="flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
                 <Followings pubkey={pubkey} />
                 <Relays pubkey={pubkey} />
                 {isSelf && (
