@@ -1296,6 +1296,7 @@ export default {
     'Hide this section': '關閉此區塊',
     Participants: '參與者',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '轉發 × 1 · 引用 × 2 · 已載入回覆 × 1',
-    'Share profile': '分享個人主頁'
+    'Share profile': '分享個人主頁',
+    'Login with Android signer': '使用 Android 簽署器登入'
   }
 }

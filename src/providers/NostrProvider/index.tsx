@@ -17,6 +17,7 @@ import { getProfileFromEvent, getRelayListFromEvent } from '@/lib/event-metadata
 import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
 import { getDefaultRelayUrls } from '@/lib/relay'
 import { isSameAccount } from '@/lib/account'
+import { isAndroid } from '@/lib/platform'
 import client from '@/services/client.service'
 import customEmojiService from '@/services/custom-emoji.service'
 import dmService from '@/services/dm.service'
@@ -47,6 +48,7 @@ import { useDeletedEvent } from '../DeletedEventProvider'
 import { useUserPreferences } from '../UserPreferencesProvider'
 import { BunkerSigner } from './bunker.signer'
 import { Nip07Signer } from './nip-07.signer'
+import { Nip55Signer } from './nip-55.signer'
 import { NostrConnectionSigner } from './nostrConnection.signer'
 import { NpubSigner } from './npub.signer'
 import { NsecSigner } from './nsec.signer'
@@ -85,6 +87,7 @@ type TNostrContext = {
   nsecLogin: (nsec: string, password?: string, needSetup?: boolean) => Promise<string>
   ncryptsecLogin: (ncryptsec: string) => Promise<string>
   nip07Login: () => Promise<string>
+  nip55Login: () => Promise<string>
   bunkerLogin: (bunker: string, pomegranateCentral?: string, needSetup?: boolean) => Promise<string>
   nostrConnectionLogin: (clientSecretKey: Uint8Array, connectionString: string) => Promise<string>
   npubLogin(npub: string): Promise<string>
@@ -590,6 +593,16 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     return login(npubSigner, { pubkey, signerType: 'npub', npub })
   }
 
+  const nip55Login = async () => {
+    const signer = await Nip55Signer.login()
+    const pubkey = await signer.getPublicKey()
+    return login(signer, {
+      pubkey,
+      signerType: 'nip-55',
+      signerPackageName: signer.packageName
+    })
+  }
+
   const nip07Login = async () => {
     try {
       const nip07Signer = new Nip07Signer()
@@ -680,6 +693,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         await bunkerSigner.login(account.bunker, false)
         return login(bunkerSigner, account)
       }
+    } else if (account.signerType === 'nip-55') {
+      if (isAndroid() && account.signerPackageName) {
+        return login(new Nip55Signer(account.pubkey, account.signerPackageName), account)
+      }
     } else if (account.signerType === 'npub' && account.npub) {
       const npubSigner = new NpubSigner()
       const pubkey = npubSigner.login(account.npub)
@@ -716,6 +733,10 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         const nsecSigner = new NsecSigner()
         nsecSigner.login(privkey)
         return nsecSigner
+      }
+    } else if (account.signerType === 'nip-55') {
+      if (isAndroid() && account.signerPackageName) {
+        return new Nip55Signer(account.pubkey, account.signerPackageName)
       }
     } else if (account.signerType === 'nip-07') {
       const nip07Signer = new Nip07Signer()
@@ -1004,6 +1025,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         nsecLogin,
         ncryptsecLogin,
         nip07Login,
+        nip55Login,
         bunkerLogin,
         nostrConnectionLogin,
         npubLogin,

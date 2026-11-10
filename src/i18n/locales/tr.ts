@@ -1308,6 +1308,7 @@ export default {
     Participants: 'Katılımcılar',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Yeniden paylaşımlar × 1 · Alıntılar × 2 · Yüklenen yanıtlar × 1',
-    'Share profile': 'Profili paylaş'
+    'Share profile': 'Profili paylaş',
+    'Login with Android signer': 'Android imzalayıcı ile giriş yap'
   }
 }

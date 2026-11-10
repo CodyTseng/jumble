@@ -1327,6 +1327,7 @@ export default {
     Participants: 'Participants',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Republications × 1 · Citations × 2 · Réponses chargées × 1',
-    'Share profile': 'Partager le profil'
+    'Share profile': 'Partager le profil',
+    'Login with Android signer': 'Se connecter avec un signataire Android'
   }
 }

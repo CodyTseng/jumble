@@ -3,8 +3,9 @@ import { Separator } from '@/components/ui/separator'
 import { POMEGRANATE_ENABLED } from '@/constants'
 import { cn, isDevEnv } from '@/lib/utils'
 import { useNostr } from '@/providers/NostrProvider'
-import { ChevronRight, Eye, KeyRound, Puzzle, Server } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronRight, Eye, KeyRound, Loader2, Puzzle, Server, Smartphone } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import GoogleLogo from '@/assets/GoogleLogo'
 import AccountList from '../AccountList'
@@ -49,8 +50,25 @@ function AccountManagerNav({
   close?: () => void
 }) {
   const { t } = useTranslation()
-  const { nip07Login, accounts } = useNostr()
+  const { nip07Login, nip55Login, accounts } = useNostr()
   const hasExtension = !!window.nostr
+  const hasPrimaryLogin = hasExtension || isAndroid()
+  const [signerBusy, setSignerBusy] = useState(false)
+  const signerPending = useRef(false)
+  const loginWithAndroidSigner = async () => {
+    if (signerPending.current) return
+    signerPending.current = true
+    setSignerBusy(true)
+    try {
+      await nip55Login()
+      close?.()
+    } catch (error) {
+      toast.error(t('Login failed') + ': ' + (error as Error).message)
+    } finally {
+      signerPending.current = false
+      setSignerBusy(false)
+    }
+  }
 
   const otherMethods: {
     key: string
@@ -98,6 +116,25 @@ function AccountManagerNav({
       <div>
         <SectionTitle>{t('Add an Account')}</SectionTitle>
 
+        {isAndroid() && (
+          <button
+            type="button"
+            disabled={signerBusy}
+            onClick={loginWithAndroidSigner}
+            className="bg-primary text-primary-foreground hover:bg-primary-hover mt-3 flex w-full items-center gap-3 rounded-xl px-4 py-3 transition-colors disabled:opacity-50"
+          >
+            {signerBusy ? (
+              <Loader2 className="size-5 shrink-0 animate-spin" />
+            ) : (
+              <Smartphone className="size-5 shrink-0" />
+            )}
+            <span className="flex-1 text-start text-sm font-semibold">
+              {t('Login with Android signer')}
+            </span>
+            <ChevronRight className="size-4 shrink-0 opacity-70 rtl:-scale-x-100" />
+          </button>
+        )}
+
         {hasExtension && (
           <button
             type="button"
@@ -112,7 +149,7 @@ function AccountManagerNav({
           </button>
         )}
 
-        {hasExtension && otherCount > 0 && (
+        {hasPrimaryLogin && otherCount > 0 && (
           <div className="my-3 flex items-center gap-3">
             <div className="bg-border h-px flex-1" />
             <span className="text-muted-foreground/70 text-xs tracking-wide uppercase">
@@ -122,7 +159,7 @@ function AccountManagerNav({
           </div>
         )}
 
-        <div className={cn('flex justify-around gap-2', !hasExtension && 'mt-3')}>
+        <div className={cn('flex justify-around gap-2', !hasPrimaryLogin && 'mt-3')}>
           {visibleOtherMethods.map((m) => (
             <LoginMethodTile key={m.key} label={m.label} icon={m.icon} onClick={m.onClick} />
           ))}

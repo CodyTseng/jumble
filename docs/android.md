@@ -310,8 +310,32 @@ are disabled. Web and Electron retain their existing DM behavior.
 This is the Android integration foundation. Test login, editing, media uploads,
 video playback, keyboard behavior, RTL, and suspend/resume on physical devices
 before distribution. NIP-07 browser extensions are not available inside the
-WebView; use the existing in-app key or bunker login flows. Android external
-signer integration (NIP-55) is not implemented yet.
+WebView; use the in-app key, bunker, or Android signer login flows.
+
+### Android signers (NIP-55)
+
+Install a NIP-55 signer such as Amber, then choose **Login with Android signer**
+when adding an account. Approve the connection in the signer. Jumble stores the
+public key and selected signer package, and restores the account without asking
+for the public key again. The identity private key stays in the signer.
+
+`Nip55Signer` implements event signing and NIP-04/NIP-44 encryption/decryption
+through `native-signer.ts` and `JumbleSignerPlugin`. Requests are serialized across
+accounts. Remembered permissions use the signer's Content Resolver off the UI
+thread; requests needing approval open its Activity and await the result. An
+explicit provider rejection never falls back to another approval prompt. Signing
+results are checked for the requested identity, unchanged event content, and a
+valid signature before use. Closing/rejecting the signer reports failure and
+allows another attempt. Activity/process destruction interrupts pending requests;
+retry the operation after reopening the app.
+
+This entry is available only in the native Android app. NIP-55 encryption support
+does not change the Android DM capability restriction described above.
+
+Before distribution, test on a device with Amber: first connection, remembered
+signing grants, relay AUTH, account switching and restart, rejected/cancelled
+requests, and removal of the signer app. Also check the login entry in Arabic
+and the return to an edited draft after approving a signature.
 
 Google login, binding, disconnect and operator recovery use the system browser's
 Custom Tabs; the app does not need registration in the shared central's Google

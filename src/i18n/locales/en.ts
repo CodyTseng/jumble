@@ -1333,6 +1333,7 @@ export default {
     Participants: 'Participants',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Reposts × 1 · Quotes × 2 · Loaded replies × 1',
-    'Share profile': 'Share profile'
+    'Share profile': 'Share profile',
+    'Login with Android signer': 'Login with Android signer'
   }
 }

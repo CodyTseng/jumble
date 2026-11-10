@@ -1285,6 +1285,7 @@ export default {
     Participants: 'ผู้เข้าร่วม',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'รีโพสต์ × 1 · อ้างอิง × 2 · คำตอบที่โหลดแล้ว × 1',
-    'Share profile': 'แชร์โปรไฟล์'
+    'Share profile': 'แชร์โปรไฟล์',
+    'Login with Android signer': 'เข้าสู่ระบบด้วยแอปลงนาม Android'
   }
 }

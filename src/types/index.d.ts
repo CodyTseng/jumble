@@ -107,7 +107,8 @@ export interface ISigner {
   nip44Decrypt: (pubkey: string, cipherText: string) => Promise<string>
 }
 
-export type TSignerType = 'nsec' | 'nip-07' | 'bunker' | 'browser-nsec' | 'ncryptsec' | 'npub'
+export type TSignerType =
+  'nsec' | 'nip-07' | 'bunker' | 'browser-nsec' | 'ncryptsec' | 'npub' | 'nip-55'
 
 export type TAccount = {
   pubkey: string
@@ -116,6 +117,7 @@ export type TAccount = {
   nsec?: string
   bunker?: string
   bunkerClientSecretKey?: string
+  signerPackageName?: string
   npub?: string
   // Central server URL when the account was created via "Login with Google"
   // (pomegranate). Its presence marks the account as a pomegranate account.

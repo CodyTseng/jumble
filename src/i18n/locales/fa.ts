@@ -1304,6 +1304,7 @@ export default {
     Participants: 'شرکت‌کنندگان',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'بازنشر × ۱ · نقل‌قول × ۲ · پاسخ‌های بارگیری‌شده × ۱',
-    'Share profile': 'اشتراک‌گذاری نمایه'
+    'Share profile': 'اشتراک‌گذاری نمایه',
+    'Login with Android signer': 'ورود با امضاکننده اندروید'
   }
 }

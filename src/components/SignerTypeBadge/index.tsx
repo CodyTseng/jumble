@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 // tiny color dot so the signer type is still distinguishable at a glance
 // without flooding the UI with five competing colors.
 const SIGNER_META: Record<TSignerType, { labelKey?: string; literal?: string; dot: string }> = {
+  'nip-55': { literal: 'NIP-55', dot: 'bg-emerald-500' },
   'nip-07': { labelKey: 'Extension', dot: 'bg-emerald-500' },
   bunker: { labelKey: 'Remote', dot: 'bg-sky-500' },
   ncryptsec: { labelKey: 'Encrypted Key', dot: 'bg-violet-500' },

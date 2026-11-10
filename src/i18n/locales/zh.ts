@@ -1296,6 +1296,7 @@ export default {
     'Hide this section': '关闭此板块',
     Participants: '参与者',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '转发 × 1 · 引用 × 2 · 已加载回复 × 1',
-    'Share profile': '分享个人主页'
+    'Share profile': '分享个人主页',
+    'Login with Android signer': '使用 Android 签名器登录'
   }
 }

@@ -1303,6 +1303,7 @@ export default {
     Participants: 'प्रतिभागी',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'रीपोस्ट × 1 · उद्धरण × 2 · लोड किए गए जवाब × 1',
-    'Share profile': 'प्रोफ़ाइल साझा करें'
+    'Share profile': 'प्रोफ़ाइल साझा करें',
+    'Login with Android signer': 'Android साइनर से लॉगिन करें'
   }
 }
