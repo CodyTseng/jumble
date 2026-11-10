@@ -1,6 +1,6 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useFilteredLikes } from '@/hooks/useFilteredLikes'
 import { useStuff } from '@/hooks/useStuff'
-import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import {
   createExternalContentReactionDraftEvent,
   createReactionDraftEvent
@@ -29,18 +29,15 @@ export default function Likes({
 }) {
   const { pubkey, checkLogin, publish } = useNostr()
   const { event, externalContent, stuffKey } = useStuff(stuff)
-  const noteStats = useStuffStatsById(stuffKey)
+  const filteredLikes = useFilteredLikes(stuffKey)
   const [liking, setLiking] = useState<string | null>(null)
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [isLongPressing, setIsLongPressing] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<string | null>(null)
 
   const likes = useMemo(() => {
-    const _likes = noteStats?.likes
-    if (!_likes) return []
-
     const stats = new Map<string, { key: string; emoji: TEmoji | string; pubkeys: Set<string> }>()
-    _likes.forEach((item) => {
+    filteredLikes.forEach((item) => {
       const key = typeof item.emoji === 'string' ? item.emoji : item.emoji.url
       if (!stats.has(key)) {
         stats.set(key, { key, pubkeys: new Set(), emoji: item.emoji })
@@ -48,7 +45,7 @@ export default function Likes({
       stats.get(key)?.pubkeys.add(item.pubkey)
     })
     return Array.from(stats.values()).sort((a, b) => b.pubkeys.size - a.pubkeys.size)
-  }, [noteStats, event])
+  }, [filteredLikes])
 
   if (!likes.length) return null
 

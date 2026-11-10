@@ -1,13 +1,10 @@
 import { useSecondaryPage } from '@/PageManager'
-import { SPECIAL_TRUST_SCORE_FILTER_ID } from '@/constants'
+import { useFilteredLikes } from '@/hooks/useFilteredLikes'
 import { useStuff } from '@/hooks/useStuff'
-import { useStuffStatsById } from '@/hooks/useStuffStatsById'
 import { toNote } from '@/lib/link'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { useUserTrust } from '@/providers/UserTrustProvider'
-import { TEmoji } from '@/types'
 import { Event } from 'nostr-tools'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ClickableCard from '../ClickableCard'
 import Emoji from '../Emoji'
@@ -22,46 +19,12 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const { getMinTrustScore, meetsMinTrustScore } = useUserTrust()
   const { stuffKey } = useStuff(stuff)
-  const noteStats = useStuffStatsById(stuffKey)
-  const [filteredLikes, setFilteredLikes] = useState<
-    Array<{
-      id: string
-      eventId: string
-      pubkey: string
-      emoji: string | TEmoji
-      created_at: number
-    }>
-  >([])
-
-  useEffect(() => {
-    const filterLikes = async () => {
-      const likes = noteStats?.likes ?? []
-      const filtered: {
-        id: string
-        eventId: string
-        pubkey: string
-        created_at: number
-        emoji: string | TEmoji
-      }[] = []
-      const threshold = getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.INTERACTIONS)
-      if (threshold) {
-        await Promise.all(
-          likes.map(async (like) => {
-            if (await meetsMinTrustScore(like.pubkey, threshold)) {
-              filtered.push(like)
-            }
-          })
-        )
-      } else {
-        filtered.push(...likes)
-      }
-      filtered.sort((a, b) => b.created_at - a.created_at)
-      setFilteredLikes(filtered)
-    }
-    filterLikes()
-  }, [noteStats, stuffKey, getMinTrustScore, meetsMinTrustScore])
+  const likes = useFilteredLikes(stuffKey)
+  const filteredLikes = useMemo(
+    () => [...likes].sort((a, b) => b.created_at - a.created_at),
+    [likes]
+  )
 
   const [showCount, setShowCount] = useState(SHOW_COUNT)
   const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -101,10 +64,10 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
           <div className="w-0 flex-1">
             <Username
               userId={like.pubkey}
-              className="max-w-fit truncate text-sm font-semibold text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground max-w-fit truncate text-sm font-semibold"
               skeletonClassName="h-3"
             />
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex items-center gap-1 text-sm">
               <Nip05 pubkey={like.pubkey} append="·" />
               <FormattedTimestamp
                 timestamp={like.created_at}
@@ -118,7 +81,7 @@ export default function ReactionList({ stuff }: { stuff: Event | string }) {
 
       <div ref={bottomRef} />
 
-      <div className="mt-2 text-center text-sm text-muted-foreground">
+      <div className="text-muted-foreground mt-2 text-center text-sm">
         {filteredLikes.length > 0 ? t('No more reactions') : t('No reactions yet')}
       </div>
     </div>
