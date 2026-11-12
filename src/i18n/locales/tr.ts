@@ -1309,6 +1309,9 @@ export default {
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Yeniden paylaşımlar × 1 · Alıntılar × 2 · Yüklenen yanıtlar × 1',
     'Share profile': 'Profili paylaş',
-    'Login with Android signer': 'Android imzalayıcı ile giriş yap'
+    'Login with Android signer': 'Android imzalayıcı ile giriş yap',
+    'Profile followed by': 'Takip edenler',
+    'People you follow who also follow this user.':
+      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.'
   }
 }

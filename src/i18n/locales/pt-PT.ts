@@ -1318,6 +1318,9 @@ export default {
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Republicações × 1 · Citações × 2 · Respostas carregadas × 1',
     'Share profile': 'Partilhar perfil',
-    'Login with Android signer': 'Iniciar sessão com assinador Android'
+    'Login with Android signer': 'Iniciar sessão com assinador Android',
+    'Profile followed by': 'Seguido por',
+    'People you follow who also follow this user.':
+      'Pessoas que segues e que também seguem este utilizador.'
   }
 }

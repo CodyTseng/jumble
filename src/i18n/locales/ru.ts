@@ -1313,6 +1313,9 @@ export default {
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1':
       'Репосты × 1 · Цитаты × 2 · Загруженные ответы × 1',
     'Share profile': 'Поделиться профилем',
-    'Login with Android signer': 'Войти через приложение подписи Android'
+    'Login with Android signer': 'Войти через приложение подписи Android',
+    'Profile followed by': 'Читают',
+    'People you follow who also follow this user.':
+      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.'
   }
 }

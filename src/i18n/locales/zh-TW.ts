@@ -1297,6 +1297,8 @@ export default {
     Participants: '參與者',
     'Reposts × 1 · Quotes × 2 · Loaded replies × 1': '轉發 × 1 · 引用 × 2 · 已載入回覆 × 1',
     'Share profile': '分享個人主頁',
-    'Login with Android signer': '使用 Android 簽署器登入'
+    'Login with Android signer': '使用 Android 簽署器登入',
+    'Profile followed by': '關注者',
+    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。'
   }
 }

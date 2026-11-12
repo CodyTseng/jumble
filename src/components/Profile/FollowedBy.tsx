@@ -1,6 +1,13 @@
 import ProfileList from '@/components/ProfileList'
 import { SimpleUserAvatar } from '@/components/UserAvatar'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 import { useSecondaryPage } from '@/PageManager'
 import { useNostr } from '@/providers/NostrProvider'
 import client from '@/services/client.service'
@@ -65,7 +72,7 @@ function FollowedByContent({
 
   if (followedBy.length === 0) return null
 
-  const previewPubkeys = followedBy.slice(0, 5)
+  const previewPubkeys = followedBy.slice(0, followedBy.length === 6 ? 6 : 5)
   const remainingCount = followedBy.length - previewPubkeys.length
 
   return (
@@ -76,7 +83,7 @@ function FollowedByContent({
           className="group text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex max-w-full cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 rounded-sm text-start transition-colors focus-visible:ring-2 focus-visible:outline-none"
         >
           <span className="wrap-anywhere group-hover:underline group-hover:underline-offset-4">
-            {t('Followed by')}
+            {t('Profile followed by')}
           </span>
           <span className="flex shrink-0 items-center gap-2">
             <span className="flex items-center">
@@ -98,10 +105,13 @@ function FollowedByContent({
         className="w-140 max-w-[calc(100vw-2rem)]"
         bodyClassName="min-w-0 grid-cols-1 overflow-x-hidden overflow-y-auto px-4"
       >
-        <DialogTitle className="pe-8">
-          {t('Followed by')} ({followedBy.length})
-        </DialogTitle>
-        <ProfileList pubkeys={followedBy} className="px-0" />
+        <DialogHeader className="pe-8 text-start">
+          <DialogTitle>
+            {t('Profile followed by')} ({followedBy.length})
+          </DialogTitle>
+          <DialogDescription>{t('People you follow who also follow this user.')}</DialogDescription>
+        </DialogHeader>
+        <ProfileList pubkeys={followedBy} hideFollowButton className="px-0" />
       </DialogContent>
     </Dialog>
   )
