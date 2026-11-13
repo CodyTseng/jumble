@@ -133,10 +133,10 @@ export default function Notification({
       </div>
       <div className="w-0 flex-1">
         <div className="flex items-center justify-between gap-1">
-          <div className="flex items-center gap-1">
+          <div className="flex min-w-0 flex-1 items-center gap-1">
             <Username
               userId={sender}
-              className="max-w-fit flex-1 truncate font-semibold"
+              className="min-w-0 max-w-fit flex-1 truncate font-semibold"
               skeletonClassName="h-4"
             />
             <TrustScoreBadge pubkey={sender} />
