@@ -3,12 +3,12 @@ import { useFetchProfile } from '@/hooks'
 import { useFetchNip05 } from '@/hooks/useFetchNip05'
 import { toNoteList } from '@/lib/link'
 import { SecondaryPageLink } from '@/PageManager'
-import { BadgeAlert, BadgeCheck } from 'lucide-react'
+import { BadgeAlert, BadgeCheck, ShieldCheck } from 'lucide-react'
 import { Favicon } from '../Favicon'
 
 export default function Nip05({ pubkey, append }: { pubkey: string; append?: string }) {
   const { profile } = useFetchProfile(pubkey)
-  const { nip05IsVerified, nip05Name, nip05Domain, isFetching } = useFetchNip05(
+  const { nip05IsVerified, nip05Name, nip05Domain, isNamecoin, isFetching } = useFetchNip05(
     profile?.nip05,
     pubkey
   )
@@ -29,16 +29,20 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       onClick={(e) => e.stopPropagation()}
     >
       {nip05Name !== '_' ? (
-        <span className="truncate text-sm text-muted-foreground">@{nip05Name}</span>
+        <span className="text-muted-foreground truncate text-sm">@{nip05Name}</span>
       ) : null}
       {nip05IsVerified ? (
-        <Favicon
-          domain={nip05Domain}
-          className="h-3.5 w-3.5 shrink-0 rounded-full"
-          fallback={<BadgeCheck className="shrink-0 text-primary" />}
-        />
+        isNamecoin ? (
+          <ShieldCheck className="shrink-0 text-teal-500" />
+        ) : (
+          <Favicon
+            domain={nip05Domain}
+            className="h-3.5 w-3.5 shrink-0 rounded-full"
+            fallback={<BadgeCheck className="text-primary shrink-0" />}
+          />
+        )
       ) : (
-        <BadgeAlert className="shrink-0 text-muted-foreground" />
+        <BadgeAlert className="text-muted-foreground shrink-0" />
       )}
       <SecondaryPageLink
         to={toNoteList({ domain: nip05Domain })}
@@ -46,7 +50,7 @@ export default function Nip05({ pubkey, append }: { pubkey: string; append?: str
       >
         {nip05Domain}
       </SecondaryPageLink>
-      {append && <span className="truncate text-sm text-muted-foreground">{append}</span>}
+      {append && <span className="text-muted-foreground truncate text-sm">{append}</span>}
     </div>
   )
 }
