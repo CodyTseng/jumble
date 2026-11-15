@@ -525,7 +525,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const login = (signer: ISigner, act: TAccount) => {
+  const login = async (signer: ISigner, act: TAccount) => {
+    // Authenticate before replacing any saved method or touching the active session.
+    if ((await signer.getPublicKey()) !== act.pubkey) {
+      throw new Error('Signer public key does not match account')
+    }
     const newAccounts = storage.addAccount(act)
     setAccounts(newAccounts)
     storage.switchAccount(act)
@@ -665,9 +669,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         browserNsecSigner.login(account.nsec)
         // Migrate to nsec
         if (account.signerType === 'browser-nsec') {
-          storage.removeAccount(account)
           account = { ...account, signerType: 'nsec' }
-          storage.addAccount(account)
         }
         return login(browserNsecSigner, account)
       }
@@ -701,13 +703,13 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const npubSigner = new NpubSigner()
       const pubkey = npubSigner.login(account.npub)
       if (!pubkey) {
-        storage.removeAccount(account)
         return null
       }
       if (pubkey !== account.pubkey) {
-        storage.removeAccount(account)
-        account = { ...account, pubkey }
-        storage.addAccount(account)
+        const previous = account
+        const result = await login(npubSigner, { ...account, pubkey })
+        setAccounts(storage.removeAccount(previous))
+        return result
       }
       return login(npubSigner, account)
     }

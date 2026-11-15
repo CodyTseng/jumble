@@ -16,7 +16,7 @@ import {
   StorageKey,
   TPrimaryColor
 } from '@/constants'
-import { isSameAccount } from '@/lib/account'
+import { getAccountMigrationPriority, isSameAccount } from '@/lib/account'
 import { getNativeStorageBridge } from '@/lib/native-storage'
 import { isAndroid } from '@/lib/platform'
 import { supportsDirectMessages } from '@/lib/platform-capabilities'
@@ -761,14 +761,15 @@ class LocalStorageService {
 
   /**
    * Hydrate sensitive fields from secure storage. Must be awaited once at
-   * boot, before any code reads/writes secrets. In Web mode this is a no-op;
-   * in native apps it loads the encrypted secrets bundle from the platform store.
+   * boot, before any code reads/writes secrets. Migrate saved login methods only
+   * after loading the encrypted bundle in native apps (inline secrets on web).
    */
   async hydrate(): Promise<void> {
     if (this.secretsHydrated) return
     const bridge = getNativeStorageBridge()
     if (!bridge) {
       this.secretsHydrated = true
+      this.migrateAccounts()
       return
     }
     // Native apps must never fall back to writing secrets into localStorage,
@@ -808,6 +809,8 @@ class LocalStorageService {
     }
 
     this.secretsHydrated = true
+    // Do not choose a winner or discard credentials until the secure store is readable.
+    if (!this.secretsWriteBlocked) this.migrateAccounts()
     if (hadPersistedClientKey) this.queueSecretsSave()
 
     // Defensive cleanup: scrub any plaintext that lingered in localStorage.
@@ -956,6 +959,62 @@ class LocalStorageService {
     return this.bunkerClientSecretByPubkey[pubkey]
   }
 
+  private migrateAccounts() {
+    const snapshot = () =>
+      JSON.stringify([
+        this.accounts,
+        this.currentAccount,
+        this.nsecByPubkey,
+        this.ncryptsecByPubkey,
+        this.bunkerClientSecretByPubkey
+      ])
+    const previous = snapshot()
+    const winners = new Map<string, TAccount>()
+    for (const account of this.accounts) {
+      const candidate = this.hydrateAccount(account)
+      const winner = winners.get(account.pubkey)
+      if (!winner || getAccountMigrationPriority(candidate) > getAccountMigrationPriority(winner)) {
+        winners.set(account.pubkey, candidate)
+      }
+    }
+    this.accounts = Array.from(winners.values()).map((account) => {
+      const stripped = { ...account }
+      if (stripped.signerType === 'browser-nsec' && stripped.nsec) stripped.signerType = 'nsec'
+      delete stripped.nsec
+      delete stripped.ncryptsec
+      delete stripped.bunkerClientSecretKey
+      return stripped
+    })
+    if (this.currentAccount) {
+      this.currentAccount =
+        this.accounts.find((act) => act.pubkey === this.currentAccount?.pubkey) ??
+        this.currentAccount
+    }
+    for (const account of this.accounts) {
+      // An incomplete legacy record must not destroy credentials we cannot classify.
+      if (getAccountMigrationPriority(this.hydrateAccount(account)) > 0) {
+        this.clearUnusedAccountSecrets(account.pubkey)
+      }
+    }
+    if (snapshot() === previous) return
+    this.persistCurrentAccountToLocalStorage()
+    this.persistAccountsToLocalStorage()
+    if (this.secretsViaNativeStorage) this.queueSecretsSave()
+  }
+
+  private clearUnusedAccountSecrets(pubkey: string) {
+    const remaining = this.accounts.filter((act) => act.pubkey === pubkey)
+    if (!remaining.some((act) => act.signerType === 'nsec' || act.signerType === 'browser-nsec')) {
+      delete this.nsecByPubkey[pubkey]
+    }
+    if (!remaining.some((act) => act.signerType === 'ncryptsec')) {
+      delete this.ncryptsecByPubkey[pubkey]
+    }
+    if (!remaining.some((act) => act.signerType === 'bunker')) {
+      delete this.bunkerClientSecretByPubkey[pubkey]
+    }
+  }
+
   addAccount(account: TAccount) {
     if (account.nsec) this.nsecByPubkey[account.pubkey] = account.nsec
     if (account.ncryptsec) this.ncryptsecByPubkey[account.pubkey] = account.ncryptsec
@@ -969,38 +1028,28 @@ class LocalStorageService {
     delete stripped.ncryptsec
     delete stripped.bunkerClientSecretKey
 
-    const index = this.accounts.findIndex((act) => isSameAccount(act, account))
+    const index = this.accounts.findIndex((act) => act.pubkey === account.pubkey)
     if (index !== -1) {
       this.accounts[index] = stripped
     } else {
       this.accounts.push(stripped)
     }
+    this.accounts = this.accounts.filter((act) => act.pubkey !== account.pubkey || act === stripped)
+    if (this.currentAccount?.pubkey === account.pubkey) this.currentAccount = stripped
+    this.clearUnusedAccountSecrets(account.pubkey)
+    this.persistCurrentAccountToLocalStorage()
     this.persistAccountsToLocalStorage()
     if (this.secretsViaNativeStorage) this.queueSecretsSave()
     return this.getAccounts()
   }
 
   removeAccount(account: TAccount) {
+    if (!this.accounts.some((act) => isSameAccount(act, account))) return this.getAccounts()
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
     if (isSameAccount(this.currentAccount, account)) {
       this.currentAccount = null
     }
-    // Login methods share a pubkey, but only some of them need each secret.
-    // Keep credentials until the last account using that secret is removed.
-    const remainingAccounts = this.accounts.filter((act) => act.pubkey === account.pubkey)
-    if (
-      !remainingAccounts.some(
-        (act) => act.signerType === 'nsec' || act.signerType === 'browser-nsec'
-      )
-    ) {
-      delete this.nsecByPubkey[account.pubkey]
-    }
-    if (!remainingAccounts.some((act) => act.signerType === 'ncryptsec')) {
-      delete this.ncryptsecByPubkey[account.pubkey]
-    }
-    if (!remainingAccounts.some((act) => act.signerType === 'bunker')) {
-      delete this.bunkerClientSecretByPubkey[account.pubkey]
-    }
+    this.clearUnusedAccountSecrets(account.pubkey)
     // The web snapshot can also carry credentials from other login methods.
     this.persistCurrentAccountToLocalStorage()
     this.persistAccountsToLocalStorage()
