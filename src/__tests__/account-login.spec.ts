@@ -3,13 +3,15 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getPublicKey, nip19 } from 'nostr-tools'
+import type { TAccount } from '@/types'
 import type { useNostr as UseNostr } from '@/providers/NostrProvider'
 import type Storage from '@/services/local-storage.service'
 let useNostr: typeof UseNostr
 let storage: typeof Storage
 
-const { extension, native, bridge } = vi.hoisted(() => ({
+const { extension, native, bridge, remote } = vi.hoisted(() => ({
   extension: { getPublicKey: vi.fn() },
+  remote: { fromBunker: vi.fn(), getPublicKey: vi.fn(), connect: vi.fn(), close: vi.fn() },
   native: { enabled: false },
   bridge: { secrets: { isAvailable: vi.fn(), load: vi.fn(), save: vi.fn() } }
 }))
@@ -17,6 +19,9 @@ vi.mock('@/lib/native-storage', () => ({
   getNativeStorageBridge: () => (native.enabled ? bridge : undefined)
 }))
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (value: string) => value }) }))
+vi.mock('@/lib/signer-approval', () => ({
+  withSignerApproval: <T>(promise: Promise<T>) => promise
+}))
 vi.mock('@/providers/UserPreferencesProvider', () => ({
   useUserPreferences: () => ({ enableDm: false })
 }))
@@ -47,15 +52,11 @@ vi.mock('@/services/stuff-stats.service', () => ({
   default: { updateStuffStatsByEvents: vi.fn() }
 }))
 vi.mock('@/services/new-account-setup', () => ({ setupNewAccount: vi.fn() }))
-vi.mock('@/providers/NostrProvider/nip-07.signer', () => ({
-  Nip07Signer: class {
-    async init() {}
-    getPublicKey() {
-      return extension.getPublicKey()
-    }
-  }
+vi.mock('nostr-tools/nip46', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('nostr-tools/nip46')>()),
+  BunkerSigner: { fromBunker: remote.fromBunker }
 }))
-vi.mock('@/providers/NostrProvider/bunker.signer', () => ({ BunkerSigner: class {} }))
+vi.mock('@/lib/native-system', () => ({ openExternalUrl: vi.fn() }))
 vi.mock('@/providers/NostrProvider/nostrConnection.signer', () => ({
   NostrConnectionSigner: class {}
 }))
@@ -80,7 +81,11 @@ beforeEach(async () => {
   bridge.secrets.isAvailable.mockResolvedValue(true)
   bridge.secrets.load.mockResolvedValue({})
   bridge.secrets.save.mockResolvedValue(undefined)
-  extension.getPublicKey.mockResolvedValue(pubkey)
+  extension.getPublicKey.mockReset().mockResolvedValue(pubkey)
+  remote.fromBunker.mockReturnValue(remote)
+  remote.getPublicKey.mockResolvedValue(pubkey)
+  remote.close.mockResolvedValue(undefined)
+  vi.stubGlobal('nostr', { getPublicKey: extension.getPublicKey, signEvent: vi.fn() })
   container = document.createElement('div')
   document.body.append(container)
   root = createRoot(container)
@@ -88,21 +93,22 @@ beforeEach(async () => {
 afterEach(async () => {
   await act(async () => root.unmount())
   container.remove()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
 })
 
-async function mount() {
+async function mount(initial: TAccount = saved) {
   storage = (await import('@/services/local-storage.service')).default
   const provider = await import('@/providers/NostrProvider')
   useNostr = provider.useNostr
   await storage.hydrate()
   if (native.enabled) expect(bridge.secrets.load).toHaveBeenCalled()
-  storage.addAccount(saved)
-  storage.switchAccount(saved)
+  storage.addAccount(initial)
+  storage.switchAccount(initial)
   await act(async () =>
     root.render(createElement(provider.NostrProvider, null, createElement(Consumer)))
   )
-  expect(context.account).toEqual({ pubkey, signerType: 'nsec' })
+  if (initial === saved) expect(context.account).toEqual({ pubkey, signerType: 'nsec' })
   if (native.enabled) expect(localStorage.getItem('accounts')).not.toContain(saved.nsec)
 }
 
@@ -184,15 +190,183 @@ describe.each([false, true])('login replacement (native storage: %s)', (enabled)
     await expect(context.signer!.getPublicKey()).resolves.toBe(pubkey)
   })
 
-  it('rejects a signer identity mismatch before changing the saved method', async () => {
+  it('uses the real NIP-07 public-key cache and asks the extension only once', async () => {
     await mount()
-    const previousSigner = context.signer
-    extension.getPublicKey.mockResolvedValueOnce(pubkey).mockResolvedValueOnce('different-pubkey')
     await act(async () => {
-      await expect(context.nip07Login()).rejects.toThrow('Signer public key does not match')
+      await context.nip07Login()
     })
-    expect(context.signer).toBe(previousSigner)
-    expect(storage.getCurrentAccount()).toMatchObject(saved)
-    expect(storage.getAccounts()).toHaveLength(1)
+    await expect(context.signer!.getPublicKey()).resolves.toBe(pubkey)
+    expect(extension.getPublicKey).toHaveBeenCalledTimes(1)
   })
+
+  it('restores a real bunker signer with separate remote and user public keys without a network query', async () => {
+    const initial: TAccount = {
+      pubkey,
+      signerType: 'bunker',
+      bunker: `bunker://${'a'.repeat(64)}?relay=wss%3A%2F%2Frelay.example`,
+      bunkerClientSecretKey: '01'.repeat(32)
+    }
+    await mount(initial)
+    expect(context.isInitialized).toBe(true)
+    expect(context.account).toEqual({ pubkey, signerType: 'bunker' })
+    await expect(context.signer!.getPublicKey()).resolves.toBe(pubkey)
+    expect(remote.getPublicKey).not.toHaveBeenCalled()
+    expect(remote.connect).not.toHaveBeenCalled()
+    expect(remote.fromBunker.mock.lastCall?.[1].pubkey).toBe('a'.repeat(64))
+    expect(storage.getCurrentAccount()).toMatchObject(initial)
+  })
+
+  it('finishes initialization immediately on logout while a restore is still pending', async () => {
+    let finish!: (key: string) => void
+    extension.getPublicKey.mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          finish = resolve
+        })
+    )
+    const initial: TAccount = { pubkey, signerType: 'nip-07' }
+    await mount(initial)
+    expect(context.isInitialized).toBe(false)
+    await act(async () => {
+      await context.switchAccount(null)
+    })
+    expect(context.isInitialized).toBe(true)
+    await act(async () => {
+      finish(pubkey)
+      await Promise.resolve()
+    })
+    expect(context.account).toBeNull()
+    expect(storage.getCurrentAccount()).toBeNull()
+    expect(storage.findAccount(initial)).toMatchObject(initial)
+  })
+
+  it.each(['reject', 'changed'] as const)(
+    'finishes initialization after a %s NIP-07 restore and preserves the saved login',
+    async (failure) => {
+      if (failure === 'reject')
+        extension.getPublicKey.mockRejectedValueOnce(new Error('User denied'))
+      else extension.getPublicKey.mockResolvedValueOnce('different-pubkey')
+      const initial: TAccount = { pubkey, signerType: 'nip-07' }
+      await mount(initial)
+      expect(context.isInitialized).toBe(true)
+      expect(context.account).toBeNull()
+      expect(storage.getCurrentAccount()).toMatchObject(initial)
+      expect(storage.findAccount(initial)).toMatchObject(initial)
+      extension.getPublicKey.mockResolvedValue(pubkey)
+      await act(async () => {
+        await context.switchAccount(initial)
+      })
+      expect(context.account).toEqual(initial)
+    }
+  )
+
+  it('finishes initialization if the NIP-07 extension is absent', async () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('nostr', undefined)
+    const initial: TAccount = { pubkey, signerType: 'nip-07' }
+    await mount(initial)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5_001)
+    })
+    expect(context.isInitialized).toBe(true)
+    expect(context.account).toBeNull()
+    expect(storage.findAccount(initial)).toMatchObject(initial)
+  })
+
+  it('closes a late bunker candidate after logout without overwriting existing credentials', async () => {
+    await mount()
+    vi.useFakeTimers()
+    let finish!: (key: string) => void
+    remote.getPublicKey.mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          finish = resolve
+        })
+    )
+    let pending!: Promise<string>
+    await act(async () => {
+      pending = context.bunkerLogin(`bunker://${'a'.repeat(64)}?relay=wss%3A%2F%2Frelay.example`)
+    })
+    const rejected = expect(pending).rejects.toThrow('Login cancelled')
+    await act(async () => {
+      await context.switchAccount(null)
+    })
+    await act(async () => {
+      finish(pubkey)
+      await rejected
+    })
+    expect(context.account).toBeNull()
+    expect(storage.getCurrentAccount()).toBeNull()
+    expect(storage.findAccount(saved)).toMatchObject(saved)
+    expect(remote.close).toHaveBeenCalledOnce()
+  })
+
+  it('bounds a hanging NIP-07 restore and ignores the late approval', async () => {
+    vi.useFakeTimers()
+    let finish!: (key: string) => void
+    extension.getPublicKey.mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          finish = resolve
+        })
+    )
+    const initial: TAccount = { pubkey, signerType: 'nip-07' }
+    await mount(initial)
+    expect(context.isInitialized).toBe(false)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_001)
+    })
+    expect(context.isInitialized).toBe(true)
+    expect(context.account).toBeNull()
+    expect(storage.getCurrentAccount()).toMatchObject(initial)
+    await act(async () => {
+      finish(pubkey)
+      await Promise.resolve()
+    })
+    expect(context.account).toBeNull()
+  })
+
+  it.each(['logout', 'switch', 'remove'] as const)(
+    'does not commit a pending login after %s',
+    async (action) => {
+      await mount()
+      let finish!: (key: string) => void
+      extension.getPublicKey.mockImplementationOnce(
+        () =>
+          new Promise<string>((resolve) => {
+            finish = resolve
+          })
+      )
+      let pending!: Promise<string>
+      await act(async () => {
+        pending = context.nip07Login()
+      })
+      const rejected = expect(pending).rejects.toThrow('Login cancelled')
+      const another = {
+        pubkey: getPublicKey(new Uint8Array(32).fill(2)),
+        signerType: 'nsec' as const,
+        nsec: nip19.nsecEncode(new Uint8Array(32).fill(2))
+      }
+      await act(async () => {
+        if (action === 'logout') await context.switchAccount(null)
+        else if (action === 'remove') context.removeAccount(saved)
+        else {
+          storage.addAccount(another)
+          await context.switchAccount(another)
+        }
+      })
+      await act(async () => {
+        finish(pubkey)
+        await rejected
+      })
+      expect(context.account).toEqual(
+        action === 'switch' ? { pubkey: another.pubkey, signerType: 'nsec' } : null
+      )
+      expect(storage.getCurrentAccount()?.pubkey ?? null).toBe(
+        action === 'switch' ? another.pubkey : null
+      )
+      expect(storage.findAccount({ pubkey, signerType: 'nip-07' })).toBeUndefined()
+      if (action !== 'remove') expect(storage.findAccount(saved)).toMatchObject(saved)
+    }
+  )
 })

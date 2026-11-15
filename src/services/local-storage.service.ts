@@ -1059,6 +1059,8 @@ class LocalStorageService {
 
   switchAccount(account: TAccount | null) {
     if (!account) {
+      this.currentAccount = null
+      this.persistCurrentAccountToLocalStorage()
       return
     }
     const act = this.accounts.find((a) => isSameAccount(a, account))

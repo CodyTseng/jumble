@@ -22,12 +22,22 @@ export class Nip07Signer implements ISigner {
     )
   }
 
-  async getPublicKey() {
+  async getPublicKey(timeout = 10_000) {
     if (!this.signer) {
       throw new Error('Should call init() first')
     }
     if (!this.pubkey) {
-      this.pubkey = await this.signer.getPublicKey()
+      let timer: ReturnType<typeof setTimeout> | undefined
+      try {
+        this.pubkey = await Promise.race([
+          this.signer.getPublicKey(),
+          new Promise<never>((_, reject) => {
+            timer = setTimeout(() => reject(new Error('NIP-07 getPublicKey timeout')), timeout)
+          })
+        ])
+      } finally {
+        clearTimeout(timer)
+      }
     }
     return this.pubkey
   }

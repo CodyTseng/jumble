@@ -24,7 +24,8 @@ export class BunkerSigner implements ISigner {
   async login(
     bunker: string,
     isInitialConnection = true,
-    connectTimeout = CONNECT_TIMEOUT_MS
+    connectTimeout = CONNECT_TIMEOUT_MS,
+    userPubkey?: string
   ): Promise<string> {
     const bunkerPointer = await parseBunkerInput(bunker)
     if (!bunkerPointer) {
@@ -52,13 +53,21 @@ export class BunkerSigner implements ISigner {
         ])
         return await this.getPublicKey()
       }
-      // For reconnection, skip getPublicKey - the caller already knows the pubkey
-      this.pubkey = bunkerPointer.pubkey
-      return this.pubkey
+      // The URL identifies the remote signer, not necessarily the user's key.
+      // A restored account already knows its user key and needs no network query.
+      if (userPubkey) {
+        this.pubkey = userPubkey
+        return userPubkey
+      }
+      return await this.getPublicKey()
     } catch (error) {
       await this.close()
       throw error
     }
+  }
+
+  restore(bunker: string, userPubkey: string) {
+    return this.login(bunker, false, CONNECT_TIMEOUT_MS, userPubkey)
   }
 
   async close() {
