@@ -828,20 +828,16 @@ class LocalStorageService {
    * array (and currentAccount) and into per-pubkey maps. Idempotent.
    */
   private peelInlineSecrets() {
-    for (const act of this.accounts) {
+    const accounts = this.currentAccount ? [...this.accounts, this.currentAccount] : this.accounts
+    for (const act of accounts) {
       if (act.nsec) this.nsecByPubkey[act.pubkey] = act.nsec
       if (act.ncryptsec) this.ncryptsecByPubkey[act.pubkey] = act.ncryptsec
       if (act.bunkerClientSecretKey) {
         this.bunkerClientSecretByPubkey[act.pubkey] = act.bunkerClientSecretKey
       }
-    }
-    if (this.currentAccount) {
-      const act = this.currentAccount
-      if (act.nsec) this.nsecByPubkey[act.pubkey] = act.nsec
-      if (act.ncryptsec) this.ncryptsecByPubkey[act.pubkey] = act.ncryptsec
-      if (act.bunkerClientSecretKey) {
-        this.bunkerClientSecretByPubkey[act.pubkey] = act.bunkerClientSecretKey
-      }
+      delete act.nsec
+      delete act.ncryptsec
+      delete act.bunkerClientSecretKey
     }
   }
 
@@ -988,11 +984,25 @@ class LocalStorageService {
     this.accounts = this.accounts.filter((act) => !isSameAccount(act, account))
     if (isSameAccount(this.currentAccount, account)) {
       this.currentAccount = null
-      this.persistCurrentAccountToLocalStorage()
     }
-    delete this.nsecByPubkey[account.pubkey]
-    delete this.ncryptsecByPubkey[account.pubkey]
-    delete this.bunkerClientSecretByPubkey[account.pubkey]
+    // Login methods share a pubkey, but only some of them need each secret.
+    // Keep credentials until the last account using that secret is removed.
+    const remainingAccounts = this.accounts.filter((act) => act.pubkey === account.pubkey)
+    if (
+      !remainingAccounts.some(
+        (act) => act.signerType === 'nsec' || act.signerType === 'browser-nsec'
+      )
+    ) {
+      delete this.nsecByPubkey[account.pubkey]
+    }
+    if (!remainingAccounts.some((act) => act.signerType === 'ncryptsec')) {
+      delete this.ncryptsecByPubkey[account.pubkey]
+    }
+    if (!remainingAccounts.some((act) => act.signerType === 'bunker')) {
+      delete this.bunkerClientSecretByPubkey[account.pubkey]
+    }
+    // The web snapshot can also carry credentials from other login methods.
+    this.persistCurrentAccountToLocalStorage()
     this.persistAccountsToLocalStorage()
     if (this.secretsViaNativeStorage) this.queueSecretsSave()
     return this.getAccounts()

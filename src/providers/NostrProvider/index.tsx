@@ -537,7 +537,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const removeAccount = (act: TAccountPointer) => {
     const newAccounts = storage.removeAccount(act)
     setAccounts(newAccounts)
-    if (account?.pubkey === act.pubkey) {
+    if (isSameAccount(account, act)) {
       setAccount(null)
       setSigner(null)
     }
