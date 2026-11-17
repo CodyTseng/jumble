@@ -29,6 +29,53 @@ afterEach(() => {
 })
 
 describe('remote signer failure cleanup', () => {
+  it('restores the saved user key when the bunker URL identifies a different remote signer', async () => {
+    const userPubkey = 'b'.repeat(64)
+    const remote = { getPublicKey: vi.fn(), connect: vi.fn(), close: vi.fn() }
+    mocks.fromBunker.mockReturnValue(remote)
+    const signer = new BunkerSigner()
+    expect(
+      await signer.restore(`bunker://${pubkey}?relay=${encodeURIComponent(relay)}`, userPubkey)
+    ).toBe(userPubkey)
+    expect(mocks.fromBunker.mock.lastCall?.[1].pubkey).toBe(pubkey)
+    await expect(signer.getPublicKey()).resolves.toBe(userPubkey)
+    expect(remote.getPublicKey).not.toHaveBeenCalled()
+    expect(remote.connect).not.toHaveBeenCalled()
+    await signer.close()
+  })
+
+  it('queries and caches the user key on a new bunker connection', async () => {
+    vi.useFakeTimers()
+    const userPubkey = 'b'.repeat(64)
+    const remote = {
+      getPublicKey: vi.fn(async () => userPubkey),
+      connect: vi.fn(async () => undefined),
+      close: vi.fn()
+    }
+    mocks.fromBunker.mockReturnValue(remote)
+    const signer = new BunkerSigner()
+    await expect(
+      signer.login(`bunker://${pubkey}?relay=${encodeURIComponent(relay)}`)
+    ).resolves.toBe(userPubkey)
+    await expect(signer.getPublicKey()).resolves.toBe(userPubkey)
+    expect(remote.getPublicKey).toHaveBeenCalledOnce()
+    expect(remote.connect).toHaveBeenCalledOnce()
+    await signer.close()
+  })
+
+  it('never uses the remote URL key as the user key without a saved identity', async () => {
+    vi.useFakeTimers()
+    const userPubkey = 'b'.repeat(64)
+    const remote = { getPublicKey: vi.fn(async () => userPubkey), close: vi.fn() }
+    mocks.fromBunker.mockReturnValue(remote)
+    const signer = new BunkerSigner()
+    await expect(
+      signer.login(`bunker://${pubkey}?relay=${encodeURIComponent(relay)}`, false)
+    ).resolves.toBe(userPubkey)
+    expect(remote.getPublicKey).toHaveBeenCalledOnce()
+    await signer.close()
+  })
+
   it('releases an explicitly configured local bunker relay when connection fails', async () => {
     vi.useFakeTimers()
     mocks.fromBunker.mockImplementation((_key, pointer, { pool }: { pool: Nip46Pool }) => {
