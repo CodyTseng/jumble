@@ -167,6 +167,18 @@ const PostTextarea = forwardRef<
       }
     })
 
+    // Focus the input once the composer mounts so the user can start typing
+    // right after pressing "Post". Defer to the next frame because Radix Dialog
+    // moves focus into the modal while it opens; focusing synchronously here
+    // would be overridden by that focus management.
+    useEffect(() => {
+      if (!editor) return
+      const frame = requestAnimationFrame(() => {
+        if (!editor.isDestroyed) editor.commands.focus()
+      })
+      return () => cancelAnimationFrame(frame)
+    }, [editor])
+
     useEffect(() => {
       const viewport = window.visualViewport
       if (!editor || !viewport) return
