@@ -1,13 +1,13 @@
 import { TImetaInfo } from '@/types'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Image from '../Image'
 import { ImageSize, isValidImageSize } from '../Image/display-size'
 import { getVisibleImageIndexes } from './pagination'
 
 const arrowClass =
-  'absolute top-[calc(var(--gallery-height)/2)] z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-white shadow transition-opacity hover:bg-black/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/image-strip:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100'
+  'relative z-10 col-start-1 row-start-1 flex size-9 self-center items-center justify-center rounded-full bg-black/65 text-white shadow transition-opacity hover:bg-black/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/image-strip:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100'
 
 export default function ImageStrip({
   images,
@@ -50,10 +50,11 @@ export default function ImageStrip({
       }
       scrollTargetImage.current = null
     }
-    // Retain the selected dot when several trailing images have the same target.
-    let closest = Math.min(selectedImage.current, scrollPositions.current.length - 1)
-    scrollPositions.current.forEach((target, index) => {
-      if (Math.abs(target - position) < Math.abs(scrollPositions.current[closest] - position) - 1) {
+    // Retain the selected dot when several trailing images share a scroll target.
+    const targets = scrollPositions.current
+    let closest = Math.min(selectedImage.current, targets.length - 1)
+    targets.forEach((target, index) => {
+      if (Math.abs(target - position) < Math.abs(targets[closest] - position) - 1) {
         closest = index
       }
     })
@@ -64,13 +65,13 @@ export default function ImageStrip({
     const viewport = viewportElement.current
     const track = viewport?.firstElementChild
     if (!viewport || !track) return
+    const sign = direction === 'rtl' ? -1 : 1
     const measure = () => {
       const slides = Array.from(track.children)
       const inset = slides[0]
         ? parseFloat(window.getComputedStyle(slides[0]).marginInlineStart) || 0
         : 0
       const bounds = viewport.getBoundingClientRect()
-      const sign = direction === 'rtl' ? -1 : 1
       const position = viewport.scrollLeft * sign
       const max = viewport.scrollWidth - viewport.clientWidth
       scrollPositions.current = slides.map((slide) => {
@@ -136,10 +137,22 @@ export default function ImageStrip({
     if (index >= 0) scrollToImage(index)
   }
 
+  const metadataRatios = images.map(({ dim }) =>
+    isValidImageSize(dim) ? dim.width / dim.height : undefined
+  )
+  const hasUnknownSizes = metadataRatios.includes(undefined)
+  // Reserve room for a typical wide photo when its size is unknown. Decoding
+  // can refine that photo's width without moving the content below the strip.
+  const widestRatio = Math.min(3, Math.max(0.5, ...metadataRatios.map((ratio) => ratio ?? 2)))
+  const showPagination = canScrollPrev || canScrollNext
+  const visibleImageIndexes = showPagination
+    ? getVisibleImageIndexes(images.length, currentImage)
+    : []
+
   return (
     <div
       dir={direction}
-      className="group/image-strip relative z-10 w-full min-w-0 [--gallery-height:min(350px,50vh)]"
+      className="group/image-strip @container relative z-10 grid w-full min-w-0 grid-cols-1"
       style={{
         width:
           'calc(100% + var(--image-strip-bleed-start, var(--image-strip-bleed, 0px)) + var(--image-strip-bleed, 0px))',
@@ -158,7 +171,7 @@ export default function ImageStrip({
     >
       <div
         ref={viewportElement}
-        className="scrollbar-hide overflow-x-auto overscroll-x-contain"
+        className="scrollbar-hide col-start-1 row-start-1 overflow-x-auto overscroll-x-contain"
         onClickCapture={(event) => {
           // Keep clicks bubbling to document, but shield the parent note after a drag.
           event.currentTarget.toggleAttribute(
@@ -204,17 +217,27 @@ export default function ImageStrip({
         }}
       >
         {/* A flex spacer keeps the end inset inside the native scrollable area. */}
-        <div className="flex gap-2 select-none after:-ms-2 after:w-[var(--image-strip-bleed,0px)] after:shrink-0 after:content-['']">
+        <div
+          className="flex gap-2 select-none after:-ms-2 after:w-[var(--image-strip-bleed,0px)] after:shrink-0 after:content-['']"
+          style={
+            {
+              '--gallery-height': `min(350px, 50vh, max(96px, calc(85cqw / ${widestRatio})))`
+            } as CSSProperties
+          }
+        >
           {images.map((image, index) => {
-            const size = isValidImageSize(image.dim) ? image.dim : naturalSizes[image.url]
-            const ratio = size ? Math.min(1.25, Math.max(0.65, size.width / size.height)) : 1.2
+            const metadataRatio = metadataRatios[index]
+            const naturalSize = naturalSizes[image.url]
+            const ratio =
+              metadataRatio ??
+              (isValidImageSize(naturalSize) ? naturalSize.width / naturalSize.height : 1.2)
             return (
               <button
                 type="button"
                 key={`${image.url}-${index}`}
-                className="focus-visible:outline-primary h-[var(--gallery-height)] min-w-0 shrink-0 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="focus-visible:outline-primary relative h-[var(--gallery-height)] min-w-0 shrink-0 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
-                  width: `min(85%, calc(var(--gallery-height) * ${ratio}))`,
+                  width: `min(85%, max(44px, calc(var(--gallery-height) * ${ratio})))`,
                   marginInlineStart:
                     index === 0
                       ? 'var(--image-strip-bleed-start, var(--image-strip-bleed, 0px))'
@@ -234,9 +257,10 @@ export default function ImageStrip({
                 <Image
                   image={image}
                   classNames={{
-                    wrapper: `h-full w-full border ${onPhotoClick ? 'cursor-zoom-in' : 'cursor-grab active:cursor-grabbing'}`
+                    wrapper: `absolute inset-0 border ${onPhotoClick ? 'cursor-zoom-in' : 'cursor-grab active:cursor-grabbing'}`
                   }}
                   onImageLoad={(_url, img) => {
+                    if (metadataRatio !== undefined) return
                     const size = { width: img.naturalWidth, height: img.naturalHeight }
                     if (!isValidImageSize(size)) return
                     setNaturalSizes((previous) => {
@@ -255,7 +279,7 @@ export default function ImageStrip({
       {canScrollPrev && (
         <button
           type="button"
-          className={`${arrowClass} start-3`}
+          className={`${arrowClass} ms-3 justify-self-start`}
           aria-label={t('Previous image')}
           onClick={() => scrollByImage(false)}
         >
@@ -265,16 +289,20 @@ export default function ImageStrip({
       {canScrollNext && (
         <button
           type="button"
-          className={`${arrowClass} end-3`}
+          className={`${arrowClass} me-3 justify-self-end`}
           aria-label={t('Next image')}
           onClick={() => scrollByImage(true)}
         >
           <ArrowRight className="size-4 rtl:-scale-x-100" />
         </button>
       )}
-      {(canScrollPrev || canScrollNext) && (
-        <div className="flex items-center justify-center pt-1" aria-label={t('Pictures')}>
-          {getVisibleImageIndexes(images.length, currentImage).map((index) => {
+      {/* A late width change can reveal pagination after the strip is already visible. */}
+      {(showPagination || hasUnknownSizes) && (
+        <div
+          className="row-start-2 flex min-h-7 items-center justify-center pt-1"
+          aria-label={showPagination ? t('Pictures') : undefined}
+        >
+          {visibleImageIndexes.map((index) => {
             const active = index === currentImage
             return (
               <button
@@ -294,7 +322,7 @@ export default function ImageStrip({
               </button>
             )
           })}
-          {images.length > 9 && (
+          {showPagination && images.length > 9 && (
             <span dir="ltr" className="text-muted-foreground ms-2 text-xs tabular-nums">
               {currentImage + 1} / {images.length}
             </span>

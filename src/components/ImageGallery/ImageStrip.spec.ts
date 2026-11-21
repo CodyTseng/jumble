@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import ClickableCard from '@/components/ClickableCard'
-import { act, createElement } from 'react'
+import { act, createElement, type ImgHTMLAttributes } from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ImageStrip from './ImageStrip'
@@ -9,7 +9,17 @@ import ImageStrip from './ImageStrip'
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { dir: () => 'ltr' } })
 }))
-vi.mock('../Image', () => ({ default: () => createElement('span', null, 'photo') }))
+vi.mock('../Image', () => ({
+  default: ({ onImageLoad }: { onImageLoad?: (url: string, img: HTMLImageElement) => void }) =>
+    createElement(
+      'span',
+      null,
+      'photo',
+      createElement<ImgHTMLAttributes<HTMLImageElement>>('img', {
+        onLoad: (event) => onImageLoad?.('', event.currentTarget)
+      })
+    )
+}))
 
 let root: Root
 let container: HTMLDivElement
@@ -45,6 +55,70 @@ function pointer(type: string, clientX: number) {
   })
   return event
 }
+
+it('keeps the reserved row height and other card widths when a wide photo loads', async () => {
+  await act(async () =>
+    root.render(
+      createElement(ImageStrip, {
+        images: [{ url: 'slow.jpg' }, { url: 'known.jpg', dim: { width: 900, height: 1600 } }],
+        onPhotoClick: vi.fn()
+      })
+    )
+  )
+  const [slow, known] = container.querySelectorAll<HTMLButtonElement>('button')
+  const track = slow.parentElement!
+  const reservedHeight = track.style.getPropertyValue('--gallery-height')
+  const slowWidth = slow.style.width
+  const knownWidth = known.style.width
+  const img = slow.querySelector('img')!
+  Object.defineProperties(img, {
+    naturalWidth: { value: 3000 },
+    naturalHeight: { value: 1000 }
+  })
+  await act(async () => img.dispatchEvent(new Event('load')))
+  expect(slow.style.width).not.toBe(slowWidth)
+  expect(known.style.width).toBe(knownWidth)
+  expect(track.style.getPropertyValue('--gallery-height')).toBe(reservedHeight)
+})
+
+it('updates pagination after a resize without moving the viewport', async () => {
+  await act(async () =>
+    root.render(
+      createElement(ImageStrip, {
+        images: [{ url: 'slow.jpg' }, { url: 'last.jpg' }],
+        onPhotoClick: vi.fn()
+      })
+    )
+  )
+  const [first, last] = container.querySelectorAll<HTMLButtonElement>('button')
+  const viewport = first.parentElement!.parentElement!
+  let firstWidth = 204
+  const scrollTo = vi.fn()
+  Object.defineProperties(viewport, {
+    clientWidth: { value: 400 },
+    scrollWidth: { get: () => firstWidth + 212 },
+    scrollTo: { value: scrollTo },
+    getBoundingClientRect: { value: () => new DOMRect(0, 0, 400, 170) }
+  })
+  first.getBoundingClientRect = () => new DOMRect(-viewport.scrollLeft, 0, firstWidth, 170)
+  last.getBoundingClientRect = () => new DOMRect(firstWidth + 8 - viewport.scrollLeft, 0, 204, 170)
+  vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  await act(async () => resizeGallery())
+  const dots = container.querySelectorAll<HTMLButtonElement>(
+    '[aria-label="Go to image {{number}} of {{total}}"]'
+  )
+  await act(async () => dots[1].click())
+  expect(scrollTo).toHaveBeenLastCalledWith({ left: 16, behavior: 'smooth' })
+  viewport.scrollLeft = 16
+  await act(async () => viewport.dispatchEvent(new Event('scrollend')))
+
+  firstWidth = 340
+  await act(async () => resizeGallery())
+  expect(viewport.scrollLeft).toBe(16)
+  expect(scrollTo).toHaveBeenCalledTimes(1)
+  await act(async () => dots[1].click())
+  expect(scrollTo).toHaveBeenLastCalledWith({ left: 152, behavior: 'smooth' })
+})
 
 describe('gallery mouse dragging inside a note card', () => {
   it.each([
