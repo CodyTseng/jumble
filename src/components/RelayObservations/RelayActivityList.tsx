@@ -1,7 +1,9 @@
 import { useSecondaryPage } from '@/PageManager'
 import { Button } from '@/components/ui/button'
+import { ScrollBar } from '@/components/ui/scroll-area'
 import { toRelayActivity } from '@/lib/link'
 import { cn } from '@/lib/utils'
+import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -183,10 +185,14 @@ export default function RelayActivityList() {
           'Table statistics show the latest active day; total connections cover all recorded days. Click a relay for details.'
         )}
       </p>
-      <div className="bg-background sticky top-12 z-20 -mx-4 border-b">
-        <div
+      <ScrollAreaPrimitive.Root
+        type="auto"
+        className="bg-background top-12 z-20 -mx-4 border-b"
+        style={{ position: 'sticky' }}
+      >
+        <ScrollAreaPrimitive.Viewport
           ref={headerScrollRef}
-          className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="w-full"
           onScroll={(event) => {
             if (bodyScrollRef.current) {
               bodyScrollRef.current.scrollLeft = event.currentTarget.scrollLeft
@@ -205,8 +211,14 @@ export default function RelayActivityList() {
             </colgroup>
             {renderHeader()}
           </table>
-        </div>
-      </div>
+        </ScrollAreaPrimitive.Viewport>
+        <ScrollBar
+          orientation="horizontal"
+          className="group hidden h-4 cursor-grab border-0 px-1 py-0.5 active:cursor-grabbing any-pointer-fine:flex"
+          thumbClassName="bg-muted-foreground/75 group-hover:bg-foreground group-active:bg-foreground transition-colors"
+          style={{ position: 'relative' }}
+        />
+      </ScrollAreaPrimitive.Root>
       <div
         ref={bodyScrollRef}
         className="-mx-4 overflow-x-auto"
