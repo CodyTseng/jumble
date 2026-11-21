@@ -18,6 +18,7 @@ import { taskListMarkdownComponents } from '../NoteContent/LongFormArticle/task-
 import { Components as BaseComponents } from '../NoteContent/LongFormArticle/types'
 import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
+import MarkdownTable from './MarkdownTable'
 import { remarkInlineContent } from './remarkInlineContent'
 
 type InlineComponent = React.ComponentType<{ value: string }>
@@ -133,19 +134,7 @@ export default function MarkdownContent({ content, event }: { content: string; e
             {children}
           </ol>
         ),
-        table: ({ children }) => (
-          <div className="overflow-x-auto">
-            <table className="border-collapse text-sm">{children}</table>
-          </div>
-        ),
-        th: ({ children }) => (
-          <th className="border-border bg-muted border px-3 py-1.5 text-start font-semibold whitespace-nowrap">
-            {children}
-          </th>
-        ),
-        td: ({ children }) => (
-          <td className="border-border border px-3 py-1.5 whitespace-nowrap">{children}</td>
-        ),
+        table: MarkdownTable,
         hr: () => <hr className="border-border" />
       }) as Components,
     [event?.pubkey, emojiInfos]

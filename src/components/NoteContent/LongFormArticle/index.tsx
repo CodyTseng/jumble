@@ -3,6 +3,7 @@ import ExternalLink from '@/components/ExternalLink'
 import { FormattedTimestamp } from '@/components/FormattedTimestamp'
 import ImageWithLightbox from '@/components/ImageWithLightbox'
 import HighlightButton from '@/components/HighlightButton'
+import MarkdownTable from '@/components/MarkdownContent/MarkdownTable'
 import PostEditor from '@/components/PostEditor'
 import { useTranslatedEvent } from '@/hooks'
 import { getLongFormArticleMetadataFromEvent } from '@/lib/event-metadata'
@@ -51,6 +52,7 @@ export default function LongFormArticle({
       ({
         nostr: ({ rawText, bech32Id }) => <NostrNode rawText={rawText} bech32Id={bech32Id} />,
         ...taskListMarkdownComponents,
+        table: (props) => <MarkdownTable {...props} wrapperClassName="my-7" />,
         a: ({ href, children }) => {
           if (!href) {
             return <span className="wrap-break-word">{children}</span>

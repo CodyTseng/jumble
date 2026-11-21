@@ -275,6 +275,52 @@ html body[data-scroll-locked] {
   display: none; /* Safari and Chrome */
 }
 
+.markdown-table-scroll {
+  --table-inset-start: var(--image-strip-bleed-start, var(--image-strip-bleed, 0px));
+  --table-inset-end: var(--image-strip-bleed, 0px);
+  --table-inset-left: var(--table-inset-start);
+  --table-inset-right: var(--table-inset-end);
+  margin-left: calc(-1 * var(--table-inset-left));
+  margin-right: calc(-1 * var(--table-inset-right));
+  padding-left: var(--table-inset-left);
+  padding-right: var(--table-inset-right);
+  overflow-x: auto;
+}
+
+/* The gutters follow the outer layout, even if the note's direction differs. */
+html[dir='rtl'] .markdown-table-scroll {
+  --table-inset-left: var(--table-inset-end);
+  --table-inset-right: var(--table-inset-start);
+}
+
+.markdown-table-scroll > table {
+  @apply text-foreground/85 m-0 w-max border-collapse text-sm leading-6 wrap-anywhere;
+}
+
+.markdown-table-scroll > table > thead {
+  @apply border-muted-foreground/40 border-b;
+}
+
+.markdown-table-scroll > table > tbody > tr:not(:last-child) {
+  @apply border-border border-b;
+}
+
+.markdown-table-scroll > table > :is(thead, tbody) > tr > :is(th, td) {
+  @apply max-w-96 px-3 py-2 text-start align-baseline;
+}
+
+.markdown-table-scroll > table > thead > tr > th {
+  @apply text-foreground align-bottom font-semibold;
+}
+
+.markdown-table-scroll > table > :is(thead, tbody) > tr > :first-child {
+  @apply ps-0;
+}
+
+.markdown-table-scroll > table > :is(thead, tbody) > tr > :last-child {
+  @apply pe-0;
+}
+
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
