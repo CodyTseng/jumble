@@ -1324,6 +1324,17 @@ export default {
     'Login with Android signer': 'Zaloguj się przez aplikację podpisującą Android',
     'Profile followed by': 'Obserwowany przez',
     'People you follow who also follow this user.':
-      'Osoby, które obserwujesz i które również obserwują tego użytkownika.'
+      'Osoby, które obserwujesz i które również obserwują tego użytkownika.',
+    'Slash command': 'Polecenie z ukośnikiem',
+    Arguments: 'Argumenty',
+    Required: 'Wymagane',
+    Optional: 'Opcjonalne',
+    Scopes: 'Zakresy',
+    'Slash commands': 'Polecenia z ukośnikiem',
+    'No slash commands found': 'Nie znaleziono poleceń z ukośnikiem',
+    'Saved commands': 'Zapisane polecenia',
+    Unsave: 'Usuń z zapisanych',
+    'No saved commands yet': 'Brak zapisanych poleceń',
+    'Could not update saved commands': 'Nie można zaktualizować zapisanych poleceń'
   }
 }

@@ -1308,6 +1308,17 @@ export default {
     'Login with Android signer': 'ورود با امضاکننده اندروید',
     'Profile followed by': 'دنبال‌شده توسط',
     'People you follow who also follow this user.':
-      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.'
+      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.',
+    'Slash command': 'فرمان اسلش',
+    Arguments: 'آرگومان‌ها',
+    Required: 'الزامی',
+    Optional: 'اختیاری',
+    Scopes: 'محدوده‌ها',
+    'Slash commands': 'فرمان‌های اسلش',
+    'No slash commands found': 'هیچ فرمان اسلشی پیدا نشد',
+    'Saved commands': 'فرمان\u200cهای ذخیره\u200cشده',
+    Unsave: 'لغو ذخیره',
+    'No saved commands yet': 'هنوز فرمانی ذخیره نشده است',
+    'Could not update saved commands': 'به\u200cروزرسانی فرمان\u200cهای ذخیره\u200cشده ممکن نبود'
   }
 }

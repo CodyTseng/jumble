@@ -1331,6 +1331,17 @@ export default {
     'Login with Android signer': 'Se connecter avec un signataire Android',
     'Profile followed by': 'Suivi par',
     'People you follow who also follow this user.':
-      'Les personnes que vous suivez qui suivent aussi cet utilisateur.'
+      'Les personnes que vous suivez qui suivent aussi cet utilisateur.',
+    'Slash command': 'Commande slash',
+    Arguments: 'Arguments',
+    Required: 'Obligatoire',
+    Optional: 'Facultatif',
+    Scopes: 'Portées',
+    'Slash commands': 'Commandes slash',
+    'No slash commands found': 'Aucune commande slash trouvée',
+    'Saved commands': 'Commandes enregistrées',
+    Unsave: 'Retirer des éléments enregistrés',
+    'No saved commands yet': 'Aucune commande enregistrée pour le moment',
+    'Could not update saved commands': 'Impossible de mettre à jour les commandes enregistrées'
   }
 }

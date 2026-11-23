@@ -1323,6 +1323,17 @@ export default {
     'Login with Android signer': 'Bejelentkezés Android-aláíróval',
     'Profile followed by': 'Követői',
     'People you follow who also follow this user.':
-      'Az Ön által követett személyek, akik ezt a felhasználót is követik.'
+      'Az Ön által követett személyek, akik ezt a felhasználót is követik.',
+    'Slash command': 'Perjeles parancs',
+    Arguments: 'Argumentumok',
+    Required: 'Kötelező',
+    Optional: 'Opcionális',
+    Scopes: 'Hatókörök',
+    'Slash commands': 'Perjeles parancsok',
+    'No slash commands found': 'Nem találhatók perjeles parancsok',
+    'Saved commands': 'Mentett parancsok',
+    Unsave: 'Mentés visszavonása',
+    'No saved commands yet': 'Még nincsenek mentett parancsok',
+    'Could not update saved commands': 'Nem sikerült frissíteni a mentett parancsokat'
   }
 }

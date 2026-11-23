@@ -21,6 +21,7 @@ export type TEmbeddedNodeType =
   | 'media'
   | 'event'
   | 'mention'
+  | 'nip-cd-invocation'
   | 'hashtag'
   | 'websocket-url'
   | 'url'

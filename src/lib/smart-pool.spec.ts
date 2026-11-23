@@ -109,6 +109,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     await flushPromises()
     await vi.advanceTimersByTimeAsync(10000)
     expect(oneose).toHaveBeenCalledOnce()
+    expect(oneose).toHaveBeenLastCalledWith(true)
     expect(ontimeout).not.toHaveBeenCalled()
     sub.close()
 
@@ -122,6 +123,7 @@ describe('SmartPool request-driven relay lifecycle', () => {
     await vi.advanceTimersByTimeAsync(10000)
     expect(ontimeout).toHaveBeenCalledOnce()
     expect(oneose).toHaveBeenCalledTimes(2)
+    expect(oneose).toHaveBeenLastCalledWith(false)
     second.close()
   })
 

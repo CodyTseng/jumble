@@ -1312,6 +1312,17 @@ export default {
     'Login with Android signer': 'Android imzalayıcı ile giriş yap',
     'Profile followed by': 'Takip edenler',
     'People you follow who also follow this user.':
-      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.'
+      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.',
+    'Slash command': 'Eğik çizgi komutu',
+    Arguments: 'Argümanlar',
+    Required: 'Zorunlu',
+    Optional: 'İsteğe bağlı',
+    Scopes: 'Kapsamlar',
+    'Slash commands': 'Eğik çizgi komutları',
+    'No slash commands found': 'Eğik çizgi komutu bulunamadı',
+    'Saved commands': 'Kaydedilen komutlar',
+    Unsave: 'Kaydı kaldır',
+    'No saved commands yet': 'Henüz kaydedilmiş komut yok',
+    'Could not update saved commands': 'Kaydedilen komutlar güncellenemedi'
   }
 }

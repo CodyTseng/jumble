@@ -15,6 +15,7 @@ import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
 import { FavoriteRelaysProvider } from '@/providers/FavoriteRelaysProvider'
 import { FeedProvider } from '@/providers/FeedProvider'
 import { FollowListProvider } from '@/providers/FollowListProvider'
+import { InstalledCommandsProvider } from '@/providers/InstalledCommandsProvider'
 import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
 import { MuteListProvider } from '@/providers/MuteListProvider'
@@ -61,7 +62,9 @@ export default function App(): React.JSX.Element {
                                           <FeedProvider>
                                             <MediaUploadServiceProvider>
                                               <KindFilterProvider>
-                                                <PageManager />
+                                                <InstalledCommandsProvider>
+                                                  <PageManager />
+                                                </InstalledCommandsProvider>
                                                 <SystemNotificationPermissionPrompt />
                                                 <KeySyncRequestHandler />
                                                 <EmojiDetailDialog />

@@ -10,6 +10,7 @@ import {
   toNotificationSettings,
   toPostSettings,
   toRelaySettings,
+  toSavedCommands,
   toSystemSettings,
   toTranslation,
   toWallet
@@ -31,6 +32,7 @@ import {
   Server,
   Settings2,
   Smile,
+  Terminal,
   Wallet
 } from 'lucide-react'
 import { useState } from 'react'
@@ -81,6 +83,14 @@ export default function Settings() {
             title={t('Emoji Packs')}
             chevron
             onClick={() => push(toEmojiPackSettings())}
+          />
+        )}
+        {!!pubkey && (
+          <SettingsRow
+            icon={<Terminal />}
+            title={t('Saved commands')}
+            chevron
+            onClick={() => push(toSavedCommands())}
           />
         )}
       </SettingsGroup>

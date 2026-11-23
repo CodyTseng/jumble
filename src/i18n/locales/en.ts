@@ -1336,6 +1336,17 @@ export default {
     'Share profile': 'Share profile',
     'Login with Android signer': 'Login with Android signer',
     'Profile followed by': 'Followed by',
-    'People you follow who also follow this user.': 'People you follow who also follow this user.'
+    'People you follow who also follow this user.': 'People you follow who also follow this user.',
+    'Slash command': 'Slash command',
+    Arguments: 'Arguments',
+    Required: 'Required',
+    Optional: 'Optional',
+    Scopes: 'Scopes',
+    'Slash commands': 'Slash commands',
+    'No slash commands found': 'No slash commands found',
+    'Saved commands': 'Saved commands',
+    Unsave: 'Unsave',
+    'No saved commands yet': 'No saved commands yet',
+    'Could not update saved commands': 'Could not update saved commands'
   }
 }

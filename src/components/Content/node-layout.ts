@@ -7,6 +7,7 @@ const NODE_LAYOUTS = {
   url: 'inline',
   'bare-url': 'inline',
   mention: 'inline',
+  'nip-cd-invocation': 'inline',
   hashtag: 'inline',
   emoji: 'inline',
   'websocket-url': 'inline',

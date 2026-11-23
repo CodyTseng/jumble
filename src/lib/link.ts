@@ -59,6 +59,8 @@ export const toOthersRelaySettings = (pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/users/${npub}/relays`
 }
+export const toProfileSlashCommands = (pubkey: string) => `${toProfile(pubkey)}/commands`
+export const toSavedCommands = () => '/settings/commands'
 export const toSearch = (params?: TSearchParams) => {
   if (!params) return '/search'
   const query = new URLSearchParams()

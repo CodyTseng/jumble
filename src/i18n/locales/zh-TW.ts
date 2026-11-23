@@ -1299,6 +1299,17 @@ export default {
     'Share profile': '分享個人主頁',
     'Login with Android signer': '使用 Android 簽署器登入',
     'Profile followed by': '關注者',
-    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。'
+    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。',
+    'Slash command': '斜線指令',
+    Arguments: '參數',
+    Required: '必填',
+    Optional: '選填',
+    Scopes: '適用範圍',
+    'Slash commands': '斜線指令',
+    'No slash commands found': '找不到斜線指令',
+    'Saved commands': '已儲存的指令',
+    Unsave: '從已儲存項目中移除',
+    'No saved commands yet': '尚未儲存任何指令',
+    'Could not update saved commands': '無法更新已儲存的指令'
   }
 }

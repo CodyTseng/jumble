@@ -16,6 +16,7 @@ import {
 } from '@/lib/content-parser'
 import { getImetaInfosFromEvent } from '@/lib/event'
 import { containsMarkdown } from '@/lib/markdown'
+import { parseNipCdInvocation } from '@/lib/nip-cd'
 import { getEmojiInfosFromEmojiTags, getImetaInfoFromImetaTag } from '@/lib/tag'
 import { EMOJI_REGEX } from '@/constants'
 import { cn } from '@/lib/utils'
@@ -43,6 +44,7 @@ import PostEditor from '../PostEditor'
 import WebPreview from '../WebPreview'
 import XEmbeddedPost from '../XEmbeddedPost'
 import YoutubeEmbeddedPlayer from '../YoutubeEmbeddedPlayer'
+import NipCdInvocation from './NipCdInvocation'
 import ReadOnly from './ReadOnly'
 import { insertParagraphLinkPreviews } from './link-previews'
 import { CONTENT_LAYOUT_CLASS_NAME, groupContentNodes, isMediaContentNode } from './node-layout'
@@ -71,15 +73,26 @@ export default function Content({
   const canShowPreview = useWebPreviewPolicy()
   const translatedEvent = useTranslatedEvent(event?.id)
   const resolvedContent = translatedEvent?.content ?? event?.content ?? content
+  const invocation = useMemo(
+    () => (event && resolvedContent ? parseNipCdInvocation(resolvedContent) : undefined),
+    [event, resolvedContent]
+  )
+  const bodyContent = invocation ? resolvedContent?.slice(invocation.head.length) : resolvedContent
   const isMarkdown = useMemo(
-    () => (resolvedContent ? containsMarkdown(resolvedContent) : false),
-    [resolvedContent]
+    () => (bodyContent ? containsMarkdown(bodyContent) : false),
+    [bodyContent]
   )
   const { nodes, allImages, emojiInfos, hiddenMediaCount, imetaInfos } = useMemo(() => {
     if (!resolvedContent || isMarkdown) return {}
-    const _content = resolvedContent
 
-    const nodes = parseContent(_content, [
+    const nodes = parseContent(resolvedContent, [
+      (text) =>
+        invocation
+          ? [
+              { type: 'nip-cd-invocation', data: invocation.head },
+              { type: 'text', data: text.slice(invocation.head.length) }
+            ]
+          : [{ type: 'text', data: text }],
       EmbeddedEventParser,
       EmbeddedMentionParser,
       EmbeddedUrlParser,
@@ -133,7 +146,7 @@ export default function Content({
       hiddenMediaCount,
       imetaInfos
     }
-  }, [event, resolvedContent, isMarkdown])
+  }, [event, resolvedContent, invocation, isMarkdown])
 
   const isEmojiOnly = useMemo(() => {
     if (!nodes || nodes.length === 0) return false
@@ -164,16 +177,28 @@ export default function Content({
     return null
   }
 
-  if (isMarkdown) {
+  const renderInvocation = () =>
+    invocation && event ? (
+      <NipCdInvocation
+        key={`${event.id}:${invocation.head}`}
+        command={invocation.command}
+        executor={invocation.executor}
+        event={event}
+        readOnly={preview}
+      />
+    ) : null
+
+  if (isMarkdown && bodyContent) {
     return (
       <>
         <div ref={contentRef} dir="auto" className={cn('text-wrap wrap-break-word', className)}>
+          {renderInvocation()}
           {preview ? (
             <ReadOnly>
-              <MarkdownContent content={resolvedContent} event={event} />
+              <MarkdownContent content={bodyContent} event={event} />
             </ReadOnly>
           ) : (
-            <MarkdownContent content={resolvedContent} event={event} />
+            <MarkdownContent content={bodyContent} event={event} />
           )}
         </div>
         {enableHighlight && (
@@ -206,6 +231,7 @@ export default function Content({
   )
   let imageIndex = 0
   const renderNode = (node: TEmbeddedNode, index: string) => {
+    if (node.type === 'nip-cd-invocation') return renderInvocation()
     if (node.type === 'web-preview') {
       return <WebPreview url={node.data} key={index} />
     }
@@ -297,7 +323,7 @@ export default function Content({
   // Preview text stays selectable; only galleries retain interactive controls.
   const renderPreviewNode = (node: TEmbeddedNode, index: string) => {
     const rendered = renderNode(node, index)
-    if (!preview || node.type === 'text' || node.type === 'image' || node.type === 'images') {
+    if (!preview || ['text', 'image', 'images', 'nip-cd-invocation'].includes(node.type)) {
       return rendered
     }
     return <ReadOnly key={index}>{rendered}</ReadOnly>

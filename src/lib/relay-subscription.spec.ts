@@ -203,6 +203,23 @@ describe('subscribeRelays', () => {
     expect(oneose).toHaveBeenNthCalledWith(2, true)
   })
 
+  it('only marks real EOSE eligible for authoritative snapshots', async () => {
+    const pool = new FakePool()
+    const onReadComplete = vi.fn()
+    const oneose = vi.fn()
+    subscribeRelays(pool, ['real', 'synthetic', 'closed', 'silent'], [{}], {
+      onReadComplete,
+      oneose
+    })
+    await flushPromises()
+    pool.relays.get('real')!.handlers?.oneose?.(true)
+    pool.relays.get('synthetic')!.handlers?.oneose?.(false)
+    pool.relays.get('closed')!.emitClose('blocked')
+    await vi.advanceTimersByTimeAsync(RELAY_SUBSCRIPTION_EOSE_TIMEOUT)
+    expect(onReadComplete).toHaveBeenCalledExactlyOnceWith('real')
+    expect(oneose).toHaveBeenLastCalledWith(true)
+  })
+
   it('uses an absolute EOSE deadline that includes connection time', async () => {
     const pool = new FakePool()
     pool.ensureRelay = async () => await new Promise<IRelay>(() => {})

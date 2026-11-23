@@ -1308,6 +1308,17 @@ export default {
     'Login with Android signer': 'Android署名アプリでログイン',
     'Profile followed by': 'フォロワー',
     'People you follow who also follow this user.':
-      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。'
+      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。',
+    'Slash command': 'スラッシュコマンド',
+    Arguments: '引数',
+    Required: '必須',
+    Optional: '任意',
+    Scopes: '適用範囲',
+    'Slash commands': 'スラッシュコマンド',
+    'No slash commands found': 'スラッシュコマンドが見つかりません',
+    'Saved commands': '保存済みのコマンド',
+    Unsave: '保存を解除',
+    'No saved commands yet': '保存済みのコマンドはまだありません',
+    'Could not update saved commands': '保存済みのコマンドを更新できませんでした'
   }
 }

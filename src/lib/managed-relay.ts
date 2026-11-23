@@ -264,7 +264,7 @@ export class ManagedRelay implements IRelay {
         : undefined,
       oneose: () => {
         this.clearReadTimer(logical)
-        this.notifyEose(logical)
+        this.notifyEose(logical, true)
       },
       onclose: (reason) => {
         this.clearReadTimer(logical)
@@ -292,12 +292,12 @@ export class ManagedRelay implements IRelay {
     this.releaseIfUnused()
   }
 
-  private notifyEose(logical: LogicalSubscription) {
+  private notifyEose(logical: LogicalSubscription, complete = false) {
     if (!this.subscriptions.has(logical) || logical.eosed) return
     // EOSE belongs to the logical REQ. A replacement physical REQ may emit
     // EOSE again after reconnect, but callers must observe it only once.
     logical.eosed = true
-    logical.handlers.oneose?.()
+    logical.handlers.oneose?.(complete)
   }
 
   private removeSubscription(logical: LogicalSubscription) {

@@ -62,6 +62,7 @@ type TNostrContext = {
   followListEvent: Event | null
   muteListEvent: Event | null
   bookmarkListEvent: Event | null
+  installedCommandsEvent: Event | null
   favoriteRelaysEvent: Event | null
   userEmojiListEvent: Event | null
   pinListEvent: Event | null
@@ -114,6 +115,7 @@ type TNostrContext = {
   updateFollowListEvent: (followListEvent: Event) => Promise<void>
   updateMuteListEvent: (muteListEvent: Event, privateTags: string[][]) => Promise<void>
   updateBookmarkListEvent: (bookmarkListEvent: Event) => Promise<void>
+  updateInstalledCommandsEvent: (event: Event) => Promise<void>
   updateFavoriteRelaysEvent: (favoriteRelaysEvent: Event) => Promise<void>
   updateUserEmojiListEvent: (userEmojiListEvent: Event) => Promise<void>
   updatePinListEvent: (pinListEvent: Event) => Promise<void>
@@ -168,6 +170,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
   const [muteListEvent, setMuteListEvent] = useState<Event | null>(null)
   const [pinnedUsersEvent, setPinnedUsersEvent] = useState<Event | null>(null)
   const [bookmarkListEvent, setBookmarkListEvent] = useState<Event | null>(null)
+  const [installedCommandsEvent, setInstalledCommandsEvent] = useState<Event | null>(null)
   const [favoriteRelaysEvent, setFavoriteRelaysEvent] = useState<Event | null>(null)
   const [userEmojiListEvent, setUserEmojiListEvent] = useState<Event | null>(null)
   const [pinListEvent, setPinListEvent] = useState<Event | null>(null)
@@ -234,6 +237,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       setFollowListEvent(null)
       setMuteListEvent(null)
       setBookmarkListEvent(null)
+      setInstalledCommandsEvent(null)
       setPinListEvent(null)
       setPinnedUsersEvent(null)
       setNotificationsSeenAt(-1)
@@ -261,6 +265,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         storedFollowListEvent,
         storedMuteListEvent,
         storedBookmarkListEvent,
+        storedInstalledCommandsEvent,
         storedFavoriteRelaysEvent,
         storedUserEmojiListEvent,
         storedPinListEvent,
@@ -271,6 +276,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Contacts),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Mutelist),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.BookmarkList),
+        indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.NIP_CD_INSTALLED_COMMANDS),
         indexedDb.getReplaceableEvent(account.pubkey, ExtendedKind.FAVORITE_RELAYS),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.UserEmojiList),
         indexedDb.getReplaceableEvent(account.pubkey, kinds.Pinlist),
@@ -292,6 +298,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       }
       if (storedBookmarkListEvent) {
         setBookmarkListEvent(storedBookmarkListEvent)
+      }
+      if (storedInstalledCommandsEvent) {
+        setInstalledCommandsEvent(storedInstalledCommandsEvent)
       }
       if (storedFavoriteRelaysEvent) {
         setFavoriteRelaysEvent(storedFavoriteRelaysEvent)
@@ -327,6 +336,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
             kinds.Contacts,
             kinds.Mutelist,
             kinds.BookmarkList,
+            ExtendedKind.NIP_CD_INSTALLED_COMMANDS,
             ExtendedKind.FAVORITE_RELAYS,
             ExtendedKind.BLOSSOM_SERVER_LIST,
             kinds.UserEmojiList,
@@ -347,6 +357,9 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
       const followListEvent = sortedEvents.find((e) => e.kind === kinds.Contacts)
       const muteListEvent = sortedEvents.find((e) => e.kind === kinds.Mutelist)
       const bookmarkListEvent = sortedEvents.find((e) => e.kind === kinds.BookmarkList)
+      const installedCommandsEvent = sortedEvents.find(
+        (e) => e.kind === ExtendedKind.NIP_CD_INSTALLED_COMMANDS
+      )
       const favoriteRelaysEvent = sortedEvents.find((e) => e.kind === ExtendedKind.FAVORITE_RELAYS)
       const blossomServerListEvent = sortedEvents.find(
         (e) => e.kind === ExtendedKind.BLOSSOM_SERVER_LIST
@@ -390,6 +403,12 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         if (updateBookmarkListEvent.id === bookmarkListEvent.id) {
           setBookmarkListEvent(bookmarkListEvent)
         }
+      }
+      if (installedCommandsEvent) {
+        const latest = await indexedDb
+          .putReplaceableEvent(installedCommandsEvent)
+          .catch(() => installedCommandsEvent)
+        if (!controller.signal.aborted) setInstalledCommandsEvent(latest)
       }
       if (favoriteRelaysEvent) {
         const updatedFavoriteRelaysEvent = await indexedDb.putReplaceableEvent(favoriteRelaysEvent)
@@ -1027,6 +1046,11 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
     setFavoriteRelaysEvent(newFavoriteRelaysEvent)
   }
 
+  const updateInstalledCommandsEvent = async (event: Event) => {
+    const latest = await indexedDb.putReplaceableEvent(event).catch(() => event)
+    if (currentAccount.current?.pubkey === latest.pubkey) setInstalledCommandsEvent(latest)
+  }
+
   const updateUserEmojiListEvent = async (userEmojiListEvent: Event) => {
     const newUserEmojiListEvent = await indexedDb.putReplaceableEvent(userEmojiListEvent)
     if (newUserEmojiListEvent.id !== userEmojiListEvent.id) return
@@ -1085,6 +1109,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         followListEvent,
         muteListEvent,
         bookmarkListEvent,
+        installedCommandsEvent,
         favoriteRelaysEvent,
         userEmojiListEvent,
         pinListEvent,
@@ -1124,6 +1149,7 @@ export function NostrProvider({ children }: { children: React.ReactNode }) {
         updateFollowListEvent,
         updateMuteListEvent,
         updateBookmarkListEvent,
+        updateInstalledCommandsEvent,
         updateFavoriteRelaysEvent,
         updateUserEmojiListEvent,
         updatePinListEvent,

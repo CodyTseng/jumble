@@ -1,6 +1,7 @@
 import ClickableCard from '@/components/ClickableCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
+import { useInstalledCommands } from '@/providers/InstalledCommandsProvider'
 import { cn } from '@/lib/utils'
 import customEmojiService from '@/services/custom-emoji.service'
 import { TAccount, TEmoji } from '@/types'
@@ -29,6 +30,9 @@ import Emoji from './Emoji'
 import emojiSuggestion from './Emoji/suggestion'
 import Mention from './Mention'
 import mentionSuggestion from './Mention/suggestion'
+import { NipCdInvocationDecoration } from './NipCd/invocation-decoration'
+import { NipCdInvocation } from './NipCd/invocation-node'
+import { closeNipCdSuggestion, NipCdSuggestion, TNipCdEditorContext } from './NipCd/suggestion'
 import PostAccountSelector from '../PostAccountSelector'
 import Preview from './Preview'
 
@@ -56,6 +60,7 @@ const PostTextarea = forwardRef<
     onPostAsAccountChange?: (account: TAccount) => void
     allowAnonymous?: boolean
     previewPubkey?: string
+    nipCdContext?: TNipCdEditorContext
   }
 >(
   (
@@ -73,11 +78,15 @@ const PostTextarea = forwardRef<
       postAsAccount,
       onPostAsAccountChange,
       allowAnonymous,
-      previewPubkey
+      previewPubkey,
+      nipCdContext
     },
     ref
   ) => {
     const { t } = useTranslation()
+    const installedCommands = useInstalledCommands()
+    const nipCdContextRef = useRef(nipCdContext)
+    const installedCommandsRef = useRef(installedCommands)
     const [tabValue, setTabValue] = useState('edit')
     const [isDraggingFile, setIsDraggingFile] = useState(false)
     // Keep the tabs and the (mobile) action buttons on one row when they fit;
@@ -129,6 +138,12 @@ const PostTextarea = forwardRef<
           // unexpected character behind and can put the caret on its wrong side.
           deleteTriggerWithBackspace: true
         }),
+        NipCdInvocation,
+        NipCdInvocationDecoration,
+        NipCdSuggestion.configure({
+          getContext: () => nipCdContextRef.current,
+          getInstalledCommands: () => installedCommandsRef.current
+        }),
         ClipboardAndDropHandler.configure({
           onUploadStart: (file, cancel) => {
             onUploadStart?.(file, cancel)
@@ -166,6 +181,15 @@ const PostTextarea = forwardRef<
         setText(parseEditorJsonToText(props.editor.getJSON()))
       }
     })
+
+    useLayoutEffect(() => {
+      nipCdContextRef.current = nipCdContext
+      if (editor && !editor.isDestroyed) closeNipCdSuggestion(editor)
+    }, [editor, nipCdContext])
+
+    useLayoutEffect(() => {
+      installedCommandsRef.current = installedCommands
+    }, [installedCommands])
 
     // Focus the input once the composer mounts so the user can start typing
     // right after pressing "Post". Defer to the next frame because Radix Dialog

@@ -1,11 +1,21 @@
 import { ExtendedKind } from '@/constants'
 import { isReplaceableEvent } from '@/lib/event'
+import { isPreferredNipCdCatalog } from '@/lib/nip-cd'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
 import { TPostDraft } from '@/types/post-draft'
 import { mergeRelayObservationRecord, RelayObservationRecord } from '@/lib/relay-observation'
 import dayjs from 'dayjs'
 import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
+
+export type TNipCdCatalogRecord = {
+  executor: string
+  checkedAt: number
+  complete?: boolean
+  events: Event[]
+}
+
+export const MAX_NIP_CD_CATALOGS = 128
 
 type TValue<T = any> = {
   key: string
@@ -16,6 +26,8 @@ type TValue<T = any> = {
 const StoreNames = {
   RELAY_OBSERVATIONS: 'relayObservations',
   PROFILE_EVENTS: 'profileEvents',
+  NIP_CD_CATALOGS: 'nipCdCatalogs',
+  NIP_CD_INSTALLED_COMMANDS: 'nipCdInstalledCommands',
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
@@ -58,7 +70,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 24)
+        const request = window.indexedDB.open('jumble', 26)
 
         request.onerror = (event) => {
           reject(event)
@@ -77,6 +89,15 @@ class IndexedDbService {
           }
           if (!db.objectStoreNames.contains(StoreNames.PROFILE_EVENTS)) {
             db.createObjectStore(StoreNames.PROFILE_EVENTS, { keyPath: 'key' })
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP_CD_CATALOGS)) {
+            const catalogStore = db.createObjectStore(StoreNames.NIP_CD_CATALOGS, {
+              keyPath: 'executor'
+            })
+            catalogStore.createIndex('checkedAtIndex', 'checkedAt')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP_CD_INSTALLED_COMMANDS)) {
+            db.createObjectStore(StoreNames.NIP_CD_INSTALLED_COMMANDS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.RELAY_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.RELAY_LIST_EVENTS, { keyPath: 'key' })
@@ -514,6 +535,55 @@ class IndexedDbService {
       request.onerror = (event) => {
         transaction.commit()
         reject(event)
+      }
+    })
+  }
+
+  async getNipCdCatalogs(): Promise<TNipCdCatalogRecord[]> {
+    await this.initPromise
+    const db = this.db
+    if (!db) throw new Error('database not initialized')
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.NIP_CD_CATALOGS, 'readonly')
+      const request = transaction.objectStore(StoreNames.NIP_CD_CATALOGS).getAll()
+      request.onsuccess = () => resolve(request.result as TNipCdCatalogRecord[])
+      request.onerror = () => reject(request.error)
+    })
+  }
+
+  async putNipCdCatalog(catalog: TNipCdCatalogRecord): Promise<TNipCdCatalogRecord> {
+    await this.initPromise
+    const db = this.db
+    if (!db) throw new Error('database not initialized')
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(StoreNames.NIP_CD_CATALOGS, 'readwrite')
+      const store = transaction.objectStore(StoreNames.NIP_CD_CATALOGS)
+      let merged = catalog
+      transaction.oncomplete = () => resolve(merged)
+      transaction.onabort = () => reject(transaction.error)
+      const latest = store.get(catalog.executor)
+      latest.onsuccess = () => {
+        const previous = latest.result as TNipCdCatalogRecord | undefined
+        // Keep the newest full snapshot. Merging an older one would
+        // resurrect definitions absent from the completed read.
+        if (previous && !isPreferredNipCdCatalog(catalog, previous)) {
+          merged = previous
+          return
+        }
+        store.put(merged)
+        const count = store.count()
+        count.onsuccess = () => {
+          if (count.result <= MAX_NIP_CD_CATALOGS) return
+          let remaining = count.result - MAX_NIP_CD_CATALOGS
+          const cursor = store.index('checkedAtIndex').openCursor()
+          cursor.onsuccess = () => {
+            const record = cursor.result
+            if (!record || remaining <= 0) return
+            record.delete()
+            remaining--
+            if (remaining) record.continue()
+          }
+        }
       }
     })
   }
@@ -1308,6 +1378,8 @@ class IndexedDbService {
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
+      case ExtendedKind.NIP_CD_INSTALLED_COMMANDS:
+        return StoreNames.NIP_CD_INSTALLED_COMMANDS
       case kinds.UserEmojiList:
         return StoreNames.USER_EMOJI_LIST_EVENTS
       case kinds.Emojisets:

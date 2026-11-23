@@ -1288,6 +1288,17 @@ export default {
     'Share profile': 'แชร์โปรไฟล์',
     'Login with Android signer': 'เข้าสู่ระบบด้วยแอปลงนาม Android',
     'Profile followed by': 'ติดตามโดย',
-    'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย'
+    'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย',
+    'Slash command': 'คำสั่งเครื่องหมายทับ',
+    Arguments: 'อาร์กิวเมนต์',
+    Required: 'จำเป็น',
+    Optional: 'ไม่บังคับ',
+    Scopes: 'ขอบเขต',
+    'Slash commands': 'คำสั่งสแลช',
+    'No slash commands found': 'ไม่พบคำสั่งสแลช',
+    'Saved commands': 'คำสั่งที่บันทึกไว้',
+    Unsave: 'ยกเลิกการบันทึก',
+    'No saved commands yet': 'ยังไม่มีคำสั่งที่บันทึกไว้',
+    'Could not update saved commands': 'อัปเดตคำสั่งที่บันทึกไว้ไม่ได้'
   }
 }

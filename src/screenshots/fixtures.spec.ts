@@ -56,7 +56,7 @@ describe('offline screenshot fixtures', () => {
         onevent: () => {
           throw new Error('An empty fixture query emitted an event')
         },
-        oneose: resolve
+        oneose: () => resolve()
       })
     )
   })

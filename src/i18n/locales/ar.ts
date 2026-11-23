@@ -1296,6 +1296,17 @@ export default {
     'Share profile': 'مشاركة الملف الشخصي',
     'Login with Android signer': 'تسجيل الدخول باستخدام تطبيق توقيع Android',
     'Profile followed by': 'يتابعه',
-    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.'
+    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.',
+    'Slash command': 'أمر بشرطة مائلة',
+    Arguments: 'الوسائط',
+    Required: 'مطلوب',
+    Optional: 'اختياري',
+    Scopes: 'النطاقات',
+    'Slash commands': 'أوامر الشرطة المائلة',
+    'No slash commands found': 'لم يتم العثور على أوامر شرطة مائلة',
+    'Saved commands': 'الأوامر المحفوظة',
+    Unsave: 'إلغاء الحفظ',
+    'No saved commands yet': 'لا توجد أوامر محفوظة بعد',
+    'Could not update saved commands': 'تعذّر تحديث الأوامر المحفوظة'
   }
 }

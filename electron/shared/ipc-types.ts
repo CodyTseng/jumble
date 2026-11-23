@@ -81,6 +81,7 @@ export type TSubEventPayload = {
 
 export type TSubEosePayload = {
   subId: string
+  complete?: boolean
 }
 
 export type TSubClosePayload = {

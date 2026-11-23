@@ -1329,6 +1329,17 @@ export default {
     'Login with Android signer': 'Mit Android-Signer anmelden',
     'Profile followed by': 'Gefolgt von',
     'People you follow who also follow this user.':
-      'Personen, denen du folgst und die auch diesem Nutzer folgen.'
+      'Personen, denen du folgst und die auch diesem Nutzer folgen.',
+    'Slash command': 'Slash-Befehl',
+    Arguments: 'Argumente',
+    Required: 'Erforderlich',
+    Optional: 'Optional',
+    Scopes: 'Geltungsbereiche',
+    'Slash commands': 'Slash-Befehle',
+    'No slash commands found': 'Keine Slash-Befehle gefunden',
+    'Saved commands': 'Gespeicherte Befehle',
+    Unsave: 'Speicherung aufheben',
+    'No saved commands yet': 'Noch keine gespeicherten Befehle',
+    'Could not update saved commands': 'Gespeicherte Befehle konnten nicht aktualisiert werden'
   }
 }

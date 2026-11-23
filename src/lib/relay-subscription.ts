@@ -8,6 +8,7 @@ type RelaySubscriptionHandlers = {
   observe?: RelayObserver
   onevent?: (event: NEvent) => void
   oneose?: (eosed: boolean) => void
+  onReadComplete?: (url: string) => void
   onclose?: (url: string, reason: string) => void
   onAllClose?: (reasons: string[]) => void
   startLogin?: () => void
@@ -128,7 +129,8 @@ export function subscribeRelays(
         receivedEvent: handlers.receivedEvent,
         alreadyHaveEvent: handlers.alreadyHaveEvent,
         onevent: handlers.onevent,
-        oneose: () => {
+        oneose: (complete) => {
+          if (complete && !closedByCaller && !state.eosed) handlers.onReadComplete?.(url)
           state.readCompleted = true
           settleEose(state)
         },

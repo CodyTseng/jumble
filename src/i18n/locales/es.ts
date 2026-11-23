@@ -1318,6 +1318,17 @@ export default {
     'Login with Android signer': 'Iniciar sesión con un firmante de Android',
     'Profile followed by': 'Seguido por',
     'People you follow who also follow this user.':
-      'Personas a las que sigues que también siguen a este usuario.'
+      'Personas a las que sigues que también siguen a este usuario.',
+    'Slash command': 'Comando con barra',
+    Arguments: 'Argumentos',
+    Required: 'Obligatorio',
+    Optional: 'Opcional',
+    Scopes: 'Ámbitos',
+    'Slash commands': 'Comandos de barra',
+    'No slash commands found': 'No se encontraron comandos de barra',
+    'Saved commands': 'Comandos guardados',
+    Unsave: 'Quitar de guardados',
+    'No saved commands yet': 'Todavía no hay comandos guardados',
+    'Could not update saved commands': 'No se pudieron actualizar los comandos guardados'
   }
 }

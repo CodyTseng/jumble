@@ -113,6 +113,34 @@ describe('Electron relay observation transport', () => {
     expect(onevent).not.toHaveBeenCalled()
   })
 
+  it.each([true, false])(
+    'preserves the real-EOSE completion bit across IPC (%s)',
+    async (complete) => {
+      let handlers!: TSubHandlers
+      mocks.physicalRelays.set(url, {
+        url,
+        publishTimeout: 10000,
+        publish: async () => {},
+        auth: async () => {},
+        subscribe: (_filters, value) => {
+          handlers = value
+          return { close: () => {} }
+        }
+      })
+      const { pool } = setup()
+      const onReadComplete = vi.fn()
+      const oneose = vi.fn()
+      const sub = subscribeRelays(pool, [url], [{}], { onReadComplete, oneose })
+      await Promise.resolve()
+      await Promise.resolve()
+      handlers.oneose?.(complete)
+      expect(oneose).toHaveBeenCalledExactlyOnceWith(true)
+      if (complete) expect(onReadComplete).toHaveBeenCalledExactlyOnceWith(url)
+      else expect(onReadComplete).not.toHaveBeenCalled()
+      sub.close()
+    }
+  )
+
   it('preserves auth-required across IPC errors and records one successful logical write', async () => {
     let attempts = 0
     mocks.physicalRelays.set(url, {

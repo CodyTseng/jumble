@@ -1292,6 +1292,17 @@ export default {
     'Login with Android signer': 'Android 서명 앱으로 로그인',
     'Profile followed by': '팔로워',
     'People you follow who also follow this user.':
-      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.'
+      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.',
+    'Slash command': '슬래시 명령',
+    Arguments: '인수',
+    Required: '필수',
+    Optional: '선택',
+    Scopes: '적용 범위',
+    'Slash commands': '슬래시 명령',
+    'No slash commands found': '슬래시 명령을 찾을 수 없습니다',
+    'Saved commands': '저장된 명령',
+    Unsave: '저장 취소',
+    'No saved commands yet': '아직 저장된 명령이 없습니다',
+    'Could not update saved commands': '저장된 명령을 업데이트하지 못했습니다'
   }
 }

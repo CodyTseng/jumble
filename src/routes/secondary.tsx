@@ -26,6 +26,7 @@ import RelaySettingsPage from '@/pages/secondary/RelaySettingsPage'
 import RizfulPage from '@/pages/secondary/RizfulPage'
 import SearchPage from '@/pages/secondary/SearchPage'
 import SettingsPage from '@/pages/secondary/SettingsPage'
+import SlashCommandsPage from '@/pages/secondary/SlashCommandsPage'
 import StandaloneEmojiEditorPage from '@/pages/secondary/StandaloneEmojiEditorPage'
 import SystemSettingsPage from '@/pages/secondary/SystemSettingsPage'
 import TranslationPage from '@/pages/secondary/TranslationPage'
@@ -48,6 +49,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/users/:id', element: <ProfilePage /> },
   { path: '/users/:id/following', element: <FollowingListPage /> },
   { path: '/users/:id/relays', element: <OthersRelaySettingsPage /> },
+  { path: '/users/:id/commands', element: <SlashCommandsPage /> },
   { path: '/relays/:url', element: <RelayPage /> },
   { path: '/relays/:url/activity', element: <RelayActivityPage /> },
   { path: '/relays/:url/reviews', element: <RelayReviewsPage /> },
@@ -57,6 +59,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/settings/relays', element: <RelaySettingsPage /> },
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
+  { path: '/settings/commands', element: <SlashCommandsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },
   { path: '/settings/notifications', element: <NotificationSettingsPage /> },
   { path: '/settings/appearance', element: <AppearanceSettingsPage /> },

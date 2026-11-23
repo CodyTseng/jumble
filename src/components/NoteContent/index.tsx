@@ -21,6 +21,7 @@ import LongFormArticle from './LongFormArticle'
 import LongFormArticlePreview from './LongFormArticlePreview'
 import MutedNote from './MutedNote'
 import Nip34Event from './Nip34Event'
+import NipCdCommand from './NipCdCommand'
 import NsfwNote from './NsfwNote'
 import PictureNote from './PictureNote'
 import Poll from './Poll'
@@ -68,6 +69,16 @@ export default function NoteContent({
 
   if (isNip34EventKind(event.kind)) {
     return <Nip34Event className={cn('mt-2', className)} event={event} />
+  }
+
+  if (event.kind === ExtendedKind.NIP_CD_COMMAND) {
+    return (
+      <NipCdCommand
+        className={cn('mt-2', className)}
+        event={event}
+        showSaveButton={showFull && !preview}
+      />
+    )
   }
 
   if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {

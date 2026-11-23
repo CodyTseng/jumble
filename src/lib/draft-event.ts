@@ -579,6 +579,18 @@ export function createBookmarkDraftEvent(tags: string[][], content = ''): TDraft
   }
 }
 
+export function createInstalledCommandsDraftEvent(
+  tags: string[][],
+  previous?: Event | null
+): TDraftEvent {
+  return {
+    kind: ExtendedKind.NIP_CD_INSTALLED_COMMANDS,
+    content: previous?.content ?? '',
+    tags,
+    created_at: Math.max(dayjs().unix(), (previous?.created_at ?? 0) + 1)
+  }
+}
+
 export function createPinListDraftEvent(tags: string[][], content = ''): TDraftEvent {
   return {
     kind: kinds.Pinlist,
