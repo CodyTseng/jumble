@@ -183,6 +183,7 @@ export const ExtendedKind = {
   BLOSSOM_SERVER_LIST: 10063,
   FOLLOW_PACK: 39089,
   RELAY_REVIEW: 31987,
+  NIP_CD_COMMAND: 31992,
   GIT_REPOSITORY: 30617,
   GIT_REPOSITORY_STATE: 30618,
   GROUP_METADATA: 39000,
@@ -234,7 +235,8 @@ export const SUPPORTED_KINDS = [
   ExtendedKind.EXTERNAL_CONTENT_REACTION,
   kinds.CommunityDefinition,
   kinds.LiveEvent,
-  ExtendedKind.GROUP_METADATA
+  ExtendedKind.GROUP_METADATA,
+  ExtendedKind.NIP_CD_COMMAND
 ]
 
 export const DEFAULT_FEED_TABS: TFeedTabConfig[] = [

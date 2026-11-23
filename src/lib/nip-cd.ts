@@ -28,7 +28,7 @@ export type TNipCdCommand = {
   command: string
   title: string
   description: string
-  args: { name: string; label: string; required: boolean }[]
+  args: { name: string; label: string; required: boolean; type: string; choices?: string[] }[]
   scopes: { group: string; value: string }[]
 }
 
@@ -155,7 +155,13 @@ function parseCommand(event: Event, identifier: string): TNipCdCommand | undefin
       return
     names.add(name)
     optional = mode === 'optional'
-    args.push({ name, label: label || name, required: !optional })
+    args.push({
+      name,
+      label: label || name,
+      required: !optional,
+      type,
+      ...(type === 'enum' ? { choices: values } : {})
+    })
   }
 
   const scopes: TNipCdCommand['scopes'] = []
@@ -169,21 +175,26 @@ function parseCommand(event: Event, identifier: string): TNipCdCommand | undefin
   return { id: identifier, executor: event.pubkey, command, title, description, args, scopes }
 }
 
-/** Preserve address heads (including unparseable replacements) and signed withdrawals. */
+type TNipCdCatalogRevision = { checkedAt: number; complete?: boolean; authorRelays?: boolean }
+
+/** Fallback data can never replace a completed snapshot from the executor's write relays. */
+export function isPreferredNipCdCatalog(
+  next: TNipCdCatalogRevision,
+  previous: TNipCdCatalogRevision
+) {
+  const rank = (record: TNipCdCatalogRevision) =>
+    record.complete ? (record.authorRelays ? 2 : 1) : 0
+  return (
+    rank(next) > rank(previous) ||
+    (rank(next) === rank(previous) && next.checkedAt > previous.checkedAt)
+  )
+}
+
+/** Preserve current address heads, including invalid or out-of-scope newer replacements. */
 export function mergeNipCdCatalogEvents(events: Event[], author: string, now = Date.now() / 1000) {
   const latest = new Map<string, Event>()
-  const withdrawals = new Map<string, Event>()
-  if (!isValidPubkey(author)) return []
-
-  const newer = (a: Event, b: Event) =>
-    a.created_at > b.created_at || (a.created_at === b.created_at && a.id < b.id)
-  const retain = (map: Map<string, Event>, coordinate: string, event: Event) => {
-    const previous = map.get(coordinate)
-    if (!previous || newer(event, previous)) map.set(coordinate, event)
-  }
-  const sorted = (events: Event[]) =>
-    events.sort((a, b) => (newer(a, b) ? -1 : newer(b, a) ? 1 : 0)).slice(0, 256)
   const verified = new Set<string>()
+  if (!isValidPubkey(author)) return []
 
   for (const event of events) {
     if (
@@ -191,7 +202,7 @@ export function mergeNipCdCatalogEvents(events: Event[], author: string, now = D
       !Number.isSafeInteger(event.created_at) ||
       event.created_at < 0 ||
       event.created_at > now + 600 ||
-      (event.kind !== COMMAND_DEFINITION_KIND && event.kind !== kinds.EventDeletion) ||
+      event.kind !== COMMAND_DEFINITION_KIND ||
       verified.has(event.id)
     )
       continue
@@ -201,49 +212,27 @@ export function mergeNipCdCatalogEvents(events: Event[], author: string, now = D
       continue
     }
     verified.add(event.id)
-
-    if (event.kind === COMMAND_DEFINITION_KIND) {
-      retain(latest, event.tags.find((tag) => tag[0] === 'd')?.[1] ?? '', event)
-    } else {
-      const prefix = `${COMMAND_DEFINITION_KIND}:${author}:`
-      for (const [tag, value] of event.tags) {
-        if (tag === 'e' && value) retain(withdrawals, `e:${value}`, event)
-        if (tag === 'a' && value?.startsWith(prefix)) retain(withdrawals, `a:${value}`, event)
-      }
-    }
+    const id = event.tags.find((tag) => tag[0] === 'd')?.[1] ?? ''
+    const previous = latest.get(id)
+    if (
+      !previous ||
+      event.created_at > previous.created_at ||
+      (event.created_at === previous.created_at && event.id < previous.id)
+    )
+      latest.set(id, event)
   }
-  return [
-    ...sorted([...latest.values()]),
-    ...sorted([...new Map([...withdrawals.values()].map((event) => [event.id, event])).values()])
-  ]
+  return [...latest.values()]
 }
 
-/** Decode a merged, verified catalog, after reconciling replacement and deletion. */
-export function parseNipCdCatalog(events: Event[], author: string) {
-  const removedIds = new Set<string>()
-  const removedCoordinates = new Map<string, number>()
-  const prefix = `${COMMAND_DEFINITION_KIND}:${author}:`
-  for (const event of events) {
-    if (event.kind !== kinds.EventDeletion) continue
-    for (const [tag, value] of event.tags) {
-      if (tag === 'e' && value) removedIds.add(value)
-      if (tag === 'a' && value?.startsWith(prefix)) {
-        const id = value.slice(prefix.length)
-        removedCoordinates.set(id, Math.max(removedCoordinates.get(id) ?? -1, event.created_at))
-      }
-    }
-  }
+export function parseNipCdDefinition(event: Event): TNipCdCommand | undefined {
+  if (event.kind !== COMMAND_DEFINITION_KIND || !isValidPubkey(event.pubkey)) return
+  return parseCommand(event, event.tags.find((tag) => tag[0] === 'd')?.[1] ?? '')
+}
 
-  return events.flatMap((event) => {
-    if (event.kind !== COMMAND_DEFINITION_KIND) return []
-    const id = event.tags.find((tag) => tag[0] === 'd')?.[1] ?? ''
-    if (removedIds.has(event.id) || (removedCoordinates.get(id) ?? -1) >= event.created_at) {
-      return []
-    }
-    return parseCommand(event, id) ?? []
-  })
+export function parseNipCdCatalog(events: Event[]) {
+  return events.flatMap((event) => parseNipCdDefinition(event) ?? [])
 }
 
 export function readNipCdCatalog(events: Event[], author: string, now = Date.now() / 1000) {
-  return parseNipCdCatalog(mergeNipCdCatalogEvents(events, author, now), author)
+  return parseNipCdCatalog(mergeNipCdCatalogEvents(events, author, now))
 }

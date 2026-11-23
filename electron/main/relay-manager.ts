@@ -123,9 +123,9 @@ export class RelayManager {
           relayUrl: url
         })
       },
-      oneose: () => {
+      oneose: (complete) => {
         firstData = true
-        this.sendToRenderer<TSubEosePayload>(IPC_CHANNELS.subEose, { subId })
+        this.sendToRenderer<TSubEosePayload>(IPC_CHANNELS.subEose, { subId, complete })
       },
       onclose: (reason: string) => {
         this.sendToRenderer<TSubClosePayload>(IPC_CHANNELS.subClose, { subId, reason })

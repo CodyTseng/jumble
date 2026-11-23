@@ -1329,6 +1329,11 @@ export default {
     'Login with Android signer': 'Mit Android-Signer anmelden',
     'Profile followed by': 'Gefolgt von',
     'People you follow who also follow this user.':
-      'Personen, denen du folgst und die auch diesem Nutzer folgen.'
+      'Personen, denen du folgst und die auch diesem Nutzer folgen.',
+    'Slash command': 'Slash-Befehl',
+    Arguments: 'Argumente',
+    Required: 'Erforderlich',
+    Optional: 'Optional',
+    Scopes: 'Geltungsbereiche'
   }
 }

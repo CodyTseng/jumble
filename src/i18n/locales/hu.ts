@@ -1323,6 +1323,11 @@ export default {
     'Login with Android signer': 'Bejelentkezés Android-aláíróval',
     'Profile followed by': 'Követői',
     'People you follow who also follow this user.':
-      'Az Ön által követett személyek, akik ezt a felhasználót is követik.'
+      'Az Ön által követett személyek, akik ezt a felhasználót is követik.',
+    'Slash command': 'Perjeles parancs',
+    Arguments: 'Argumentumok',
+    Required: 'Kötelező',
+    Optional: 'Opcionális',
+    Scopes: 'Hatókörök'
   }
 }

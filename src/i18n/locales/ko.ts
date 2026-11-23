@@ -1292,6 +1292,11 @@ export default {
     'Login with Android signer': 'Android 서명 앱으로 로그인',
     'Profile followed by': '팔로워',
     'People you follow who also follow this user.':
-      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.'
+      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.',
+    'Slash command': '슬래시 명령',
+    Arguments: '인수',
+    Required: '필수',
+    Optional: '선택',
+    Scopes: '적용 범위'
   }
 }

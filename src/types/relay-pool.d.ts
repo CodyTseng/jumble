@@ -11,7 +11,7 @@ export type TSubHandlers = {
   receivedEvent?: (relay: IRelay, id: string) => void
   alreadyHaveEvent?: (id: string) => boolean
   onevent?: (evt: Event) => void
-  oneose?: () => void
+  oneose?: (complete?: boolean) => void
   onclose?: (reason: string) => void
   eoseTimeout?: number
 }

@@ -2,6 +2,7 @@ import { BoundedMap } from '@/lib/bounded-map'
 import { getProfileFromEvent } from '@/lib/event-metadata'
 import {
   COMMAND_DEFINITION_KIND,
+  isPreferredNipCdCatalog,
   mergeNipCdCatalogEvents,
   parseNipCdCatalog,
   TNipCdCommand
@@ -16,7 +17,6 @@ const DISCOVERY_RELAYS = ['wss://nos.lol/', 'wss://relay.primal.net/', 'wss://re
 const CATALOG_TTL = 3 * 24 * 60 * 60_000
 const CATALOG_RETENTION = 30 * 24 * 60 * 60_000
 const RETRY_COOLDOWN = 60_000
-const MAX_PEER_RELAYS = 5
 
 type TLocalCatalog = TNipCdCatalogRecord & { commands: TNipCdCommand[] }
 type TRefresh = {
@@ -47,22 +47,10 @@ export class NipCdService {
         for (const record of records.sort((a, b) => a.checkedAt - b.checkedAt)) {
           if (record.checkedAt <= cutoff) continue
           const local = this.catalogs.get(record.executor)
-          if (
-            local?.checkedAt === record.checkedAt &&
-            local.events.length === record.events.length &&
-            local.events.every((event, index) => event.id === record.events[index].id)
-          )
-            continue
-          // A write can fail while the in-memory refresh still succeeded.
-          // Merge disk evidence without discarding a newer local definition or withdrawal.
-          const events = mergeNipCdCatalogEvents(
-            [...(local?.events ?? []), ...record.events],
-            record.executor
-          )
+          if (local && !isPreferredNipCdCatalog(record, local)) continue
           this.remember({
             ...record,
-            checkedAt: Math.max(local?.checkedAt ?? 0, record.checkedAt),
-            events
+            events: mergeNipCdCatalogEvents(record.events, record.executor)
           })
         }
       })
@@ -79,7 +67,7 @@ export class NipCdService {
   private remember(record: TNipCdCatalogRecord) {
     this.catalogs.set(record.executor, {
       ...record,
-      commands: parseNipCdCatalog(record.events, record.executor)
+      commands: parseNipCdCatalog(record.events)
     })
   }
 
@@ -138,33 +126,50 @@ export class NipCdService {
     const cached = this.catalogs.get(executor)
     const now = Date.now()
     if (
-      (cached && cached.checkedAt + CATALOG_TTL > now) ||
+      (cached?.complete && cached.checkedAt + CATALOG_TTL > now) ||
       (this.retryAfter.get(executor) ?? 0) > now
     ) {
       return false
     }
     try {
       onQuery()
-      const { write } = await client.fetchRelayList(executor)
-      const relays = mergeRelayUrls(
-        write.slice(0, MAX_PEER_RELAYS),
-        getDefaultRelayUrls().slice(0, MAX_PEER_RELAYS),
-        DISCOVERY_RELAYS
-      )
-      // Never filter by #s before resolving replacements: a DM-only version can
-      // overwrite a public declaration. Store both public kinds in one catalog.
-      const observed = mergeNipCdCatalogEvents(
-        await client.fetchEvents(relays, [
-          { kinds: [COMMAND_DEFINITION_KIND], authors: [executor], limit: 256 },
-          { kinds: [kinds.EventDeletion], authors: [executor], limit: 256 }
-        ]),
-        executor
-      )
-      if (!observed.length) throw new Error('No verified command catalog events received')
-      // fetchEvents can settle on relay failures as well as EOSE. Absence is
-      // not a withdrawal; only merge newer signed replacements/deletions.
-      const events = mergeNipCdCatalogEvents([...(cached?.events ?? []), ...observed], executor)
-      const record = { executor, checkedAt: Date.now(), events }
+      const { write, originalRelays } = await client.fetchRelayList(executor)
+      const fallback = mergeRelayUrls(getDefaultRelayUrls().slice(0, 5), DISCOVERY_RELAYS)
+      const writes = [...new Set(write)]
+      const configured =
+        writes.length > 0 &&
+        writes.every((url) =>
+          originalRelays.some((relay) => relay.url === url && relay.scope !== 'read')
+        )
+      if (!configured && cached?.complete && cached.authorRelays) {
+        this.retryAfter.set(executor, Date.now() + RETRY_COOLDOWN)
+        return false
+      }
+      const sources = configured ? writes : mergeRelayUrls(writes.slice(0, 5), fallback)
+      // Never filter by scope before resolving replacements. Read the complete
+      // executor catalog, including definitions that moved to another kind.
+      const filter = { kinds: [COMMAND_DEFINITION_KIND], authors: [executor] }
+      const snapshot = await client.fetchEventSnapshot(sources, filter)
+      let events = mergeNipCdCatalogEvents(snapshot.events, executor)
+      if (!snapshot.complete) {
+        // Partial results, timeouts and discovery replicas are not evidence
+        // that a previously cached definition is absent.
+        this.retryAfter.set(executor, Date.now() + RETRY_COOLDOWN)
+        if (cached) return false
+        const extra = fallback.filter((url) => !sources.includes(url))
+        if (!events.length && extra.length) {
+          const discovery = await client.fetchEventSnapshot(extra, filter)
+          events = mergeNipCdCatalogEvents(discovery.events, executor)
+        }
+        if (!events.length) return false
+      }
+      const record = {
+        executor,
+        checkedAt: now,
+        complete: snapshot.complete,
+        authorRelays: configured,
+        events
+      }
       const persisted = await indexedDb.putNipCdCatalog(record).catch(() => record)
       this.remember(persisted)
       return true

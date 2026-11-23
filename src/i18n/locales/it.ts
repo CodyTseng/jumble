@@ -1319,6 +1319,11 @@ export default {
     'Login with Android signer': 'Accedi con un firmatario Android',
     'Profile followed by': 'Seguito da',
     'People you follow who also follow this user.':
-      'Persone che segui e che seguono anche questo utente.'
+      'Persone che segui e che seguono anche questo utente.',
+    'Slash command': 'Comando con barra',
+    Arguments: 'Argomenti',
+    Required: 'Obbligatorio',
+    Optional: 'Facoltativo',
+    Scopes: 'Ambiti'
   }
 }

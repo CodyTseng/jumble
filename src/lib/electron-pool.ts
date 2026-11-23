@@ -117,8 +117,8 @@ export class ElectronPool implements IRelayPool {
       handlers.onevent?.(event)
     })
 
-    bridge.relay.onSubEose(({ subId }) => {
-      this.listeners.get(subId)?.oneose?.()
+    bridge.relay.onSubEose(({ subId, complete }) => {
+      this.listeners.get(subId)?.oneose?.(complete)
     })
 
     bridge.relay.onSubClose(({ subId, reason }) => {

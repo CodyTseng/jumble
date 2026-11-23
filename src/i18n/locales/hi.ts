@@ -1307,6 +1307,11 @@ export default {
     'Login with Android signer': 'Android साइनर से लॉगिन करें',
     'Profile followed by': 'इन्हें फ़ॉलो करते हैं',
     'People you follow who also follow this user.':
-      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।'
+      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।',
+    'Slash command': 'स्लैश कमांड',
+    Arguments: 'तर्क',
+    Required: 'ज़रूरी',
+    Optional: 'वैकल्पिक',
+    Scopes: 'दायरे'
   }
 }

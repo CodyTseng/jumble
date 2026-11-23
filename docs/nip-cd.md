@@ -7,3 +7,9 @@
 ![Cached commands from two executors in Jumble's post editor](images/nip-cd-command-menu.png)
 
 ![The command menu showing Loading during bot discovery](images/nip-cd-command-loading.png)
+
+## Command definitions
+
+Opening a kind 31992 event shows a read-only command card with its trigger, description, arguments, and scopes. Opening or quoting a definition does not run the command.
+
+![A kind 31992 command definition displayed as a card](images/nip-cd-command-definition.png)

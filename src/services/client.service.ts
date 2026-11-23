@@ -538,12 +538,14 @@ class ClientService extends EventTarget {
     {
       onevent,
       oneose,
+      onReadComplete,
       onclose,
       startLogin,
       onAllClose
     }: {
       onevent?: (evt: NEvent) => void
       oneose?: (eosed: boolean) => void
+      onReadComplete?: (url: string) => void
       onclose?: (url: string, reason: string) => void
       startLogin?: () => void
       onAllClose?: (reasons: string[]) => void
@@ -568,6 +570,7 @@ class ClientService extends EventTarget {
       },
       onevent,
       oneose,
+      onReadComplete,
       onclose,
       onAllClose,
       startLogin,
@@ -843,6 +846,24 @@ class ClientService extends EventTarget {
         },
         onAllClose: () => {
           resolve(events)
+        }
+      })
+    })
+  }
+
+  /** Read a snapshot without treating a terminal failure or synthetic EOSE as complete. */
+  async fetchEventSnapshot(urls: string[], filter: Filter) {
+    const relays = [...new Set(urls)]
+    return new Promise<{ events: NEvent[]; complete: boolean }>((resolve) => {
+      const events: NEvent[] = []
+      const completed = new Set<string>()
+      const sub = this.subscribe(relays, filter, {
+        onevent: (event) => events.push(event),
+        onReadComplete: (url) => completed.add(url),
+        oneose: (settled) => {
+          if (!settled) return
+          sub.close()
+          resolve({ events, complete: relays.length > 0 && completed.size === relays.length })
         }
       })
     })

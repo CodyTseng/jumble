@@ -1,6 +1,6 @@
 import { ExtendedKind } from '@/constants'
 import { isReplaceableEvent } from '@/lib/event'
-import { mergeNipCdCatalogEvents } from '@/lib/nip-cd'
+import { isPreferredNipCdCatalog } from '@/lib/nip-cd'
 import { tagNameEquals } from '@/lib/tag'
 import { TDmConversation, TDmMessage, TGifRecord, TRelayInfo } from '@/types'
 import { TPostDraft } from '@/types/post-draft'
@@ -11,6 +11,8 @@ import { Event, Filter, kinds, matchFilter } from 'nostr-tools'
 export type TNipCdCatalogRecord = {
   executor: string
   checkedAt: number
+  complete?: boolean
+  authorRelays?: boolean
   events: Event[]
 }
 
@@ -559,17 +561,11 @@ class IndexedDbService {
       const latest = store.get(catalog.executor)
       latest.onsuccess = () => {
         const previous = latest.result as TNipCdCatalogRecord | undefined
-        if (previous) {
-          // Another tab may have stored a newer replacement or deletion while
-          // this tab read the relays. Keep both sets of signed evidence.
-          merged = {
-            ...catalog,
-            checkedAt: Math.max(previous.checkedAt, catalog.checkedAt),
-            events: mergeNipCdCatalogEvents(
-              [...previous.events, ...catalog.events],
-              catalog.executor
-            )
-          }
+        // Keep the newest full snapshot. Merging an older one would
+        // resurrect definitions absent from the completed read.
+        if (previous && !isPreferredNipCdCatalog(catalog, previous)) {
+          merged = previous
+          return
         }
         store.put(merged)
         const count = store.count()

@@ -36,9 +36,6 @@ const definition = (scopes: string[], extra: string[][] = [], timestamp = time, 
     },
     key
   )
-const withdrawal = (tags: string[][], timestamp = time, key = bot) =>
-  finalizeEvent({ kind: 5, created_at: timestamp, content: '', tags }, key)
-
 describe('NIP-CD public command definitions', () => {
   it('requires verified executor events and retains the latest coordinate before deciding scope', () => {
     const publicCommand = definition(['kind:1'])
@@ -62,22 +59,12 @@ describe('NIP-CD public command definitions', () => {
     expect(readNipCdCatalog([publicCommand, malformed], executor, time)).toEqual([])
   })
 
-  it('uses the lower ID at equal timestamps and only honors the executor’s own withdrawals', () => {
+  it('uses the lower ID at equal timestamps', () => {
     const equal = [definition(['kind:1']), definition(['kind:1111'])]
     const first = [...equal].sort((a, b) => a.id.localeCompare(b.id))[0]
     expect(readNipCdCatalog(equal.reverse(), executor, time)[0].scopes).toEqual([
       { group: 'kind', value: first.tags.find((tag) => tag[0] === 's')![1].slice(5) }
     ])
-    expect(
-      readNipCdCatalog([first, withdrawal([['e', first.id]], time, outsider)], executor, time)
-    ).toHaveLength(1)
-    expect(readNipCdCatalog([first, withdrawal([['e', first.id]])], executor, time)).toEqual([])
-    const coordinate = `31992:${executor}:ping`
-    const deleted = withdrawal([['a', coordinate]])
-    expect(readNipCdCatalog([first, deleted], executor, time)).toEqual([])
-    expect(
-      readNipCdCatalog([definition(['kind:1'], [], time + 1), deleted], executor, time)
-    ).toHaveLength(1)
   })
 
   it('matches alternatives within a group and requires every distinct group', () => {
@@ -99,7 +86,9 @@ describe('NIP-CD public command definitions', () => {
       executor,
       time
     )
-    expect(command.args).toEqual([{ name: 'text', label: 'Message', required: false }])
+    expect(command.args).toEqual([
+      { name: 'text', label: 'Message', required: false, type: 'text' }
+    ])
     const context = {
       kind: 1111 as const,
       author: sender,

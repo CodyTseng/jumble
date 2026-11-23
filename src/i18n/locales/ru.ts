@@ -1316,6 +1316,11 @@ export default {
     'Login with Android signer': 'Войти через приложение подписи Android',
     'Profile followed by': 'Читают',
     'People you follow who also follow this user.':
-      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.'
+      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.',
+    'Slash command': 'Слеш-команда',
+    Arguments: 'Аргументы',
+    Required: 'Обязательно',
+    Optional: 'Необязательно',
+    Scopes: 'Области действия'
   }
 }

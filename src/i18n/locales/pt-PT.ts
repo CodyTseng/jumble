@@ -1321,6 +1321,11 @@ export default {
     'Login with Android signer': 'Iniciar sessão com assinador Android',
     'Profile followed by': 'Seguido por',
     'People you follow who also follow this user.':
-      'Pessoas que segues e que também seguem este utilizador.'
+      'Pessoas que segues e que também seguem este utilizador.',
+    'Slash command': 'Comando com barra',
+    Arguments: 'Argumentos',
+    Required: 'Obrigatório',
+    Optional: 'Opcional',
+    Scopes: 'Âmbitos'
   }
 }
