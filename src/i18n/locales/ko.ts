@@ -1297,6 +1297,12 @@ export default {
     Arguments: '인수',
     Required: '필수',
     Optional: '선택',
-    Scopes: '적용 범위'
+    Scopes: '적용 범위',
+    'Slash commands': '슬래시 명령',
+    'No slash commands found': '슬래시 명령을 찾을 수 없습니다',
+    'Saved commands': '저장된 명령',
+    Unsave: '저장 취소',
+    'No saved commands yet': '아직 저장된 명령이 없습니다',
+    'Could not update saved commands': '저장된 명령을 업데이트하지 못했습니다'
   }
 }

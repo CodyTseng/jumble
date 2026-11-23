@@ -1317,6 +1317,12 @@ export default {
     Arguments: 'Argümanlar',
     Required: 'Zorunlu',
     Optional: 'İsteğe bağlı',
-    Scopes: 'Kapsamlar'
+    Scopes: 'Kapsamlar',
+    'Slash commands': 'Eğik çizgi komutları',
+    'No slash commands found': 'Eğik çizgi komutu bulunamadı',
+    'Saved commands': 'Kaydedilen komutlar',
+    Unsave: 'Kaydı kaldır',
+    'No saved commands yet': 'Henüz kaydedilmiş komut yok',
+    'Could not update saved commands': 'Kaydedilen komutlar güncellenemedi'
   }
 }

@@ -1312,6 +1312,12 @@ export default {
     Arguments: 'तर्क',
     Required: 'ज़रूरी',
     Optional: 'वैकल्पिक',
-    Scopes: 'दायरे'
+    Scopes: 'दायरे',
+    'Slash commands': 'स्लैश कमांड',
+    'No slash commands found': 'कोई स्लैश कमांड नहीं मिला',
+    'Saved commands': 'सहेजे गए कमांड',
+    Unsave: 'सहेजे गए से हटाएँ',
+    'No saved commands yet': 'अभी कोई कमांड सहेजा नहीं गया है',
+    'Could not update saved commands': 'सहेजे गए कमांड अपडेट नहीं हो सके'
   }
 }

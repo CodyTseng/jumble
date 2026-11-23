@@ -1304,6 +1304,12 @@ export default {
     Arguments: '参数',
     Required: '必填',
     Optional: '可选',
-    Scopes: '适用范围'
+    Scopes: '适用范围',
+    'Slash commands': '斜杠命令',
+    'No slash commands found': '未找到斜杠命令',
+    'Saved commands': '已保存的命令',
+    Unsave: '从已保存中移除',
+    'No saved commands yet': '还没有保存的命令',
+    'Could not update saved commands': '无法更新已保存的命令'
   }
 }

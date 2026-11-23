@@ -13,6 +13,8 @@ vi.mock('./UnknownNote', () => ({
   default: () => createElement('div', null, 'Unknown command event')
 }))
 
+vi.mock('@/components/CommandSaveButton', () => ({ default: () => null }))
+
 const description = 'A <b>plain</b> description.\nSecond line.'
 const definition = [
   ['d', 'make'],

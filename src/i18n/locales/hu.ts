@@ -1328,6 +1328,12 @@ export default {
     Arguments: 'Argumentumok',
     Required: 'Kötelező',
     Optional: 'Opcionális',
-    Scopes: 'Hatókörök'
+    Scopes: 'Hatókörök',
+    'Slash commands': 'Perjeles parancsok',
+    'No slash commands found': 'Nem találhatók perjeles parancsok',
+    'Saved commands': 'Mentett parancsok',
+    Unsave: 'Mentés visszavonása',
+    'No saved commands yet': 'Még nincsenek mentett parancsok',
+    'Could not update saved commands': 'Nem sikerült frissíteni a mentett parancsokat'
   }
 }

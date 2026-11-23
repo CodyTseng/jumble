@@ -2,11 +2,15 @@ import { BoundedMap } from '@/lib/bounded-map'
 import { getProfileFromEvent } from '@/lib/event-metadata'
 import {
   COMMAND_DEFINITION_KIND,
+  getNipCdCommandAddress,
+  getNipCdCommandCoordinate,
   isPreferredNipCdCatalog,
   matchesNipCdScope,
   mergeNipCdCatalogEvents,
   parseNipCdCatalog,
+  parseNipCdDefinition,
   TNipCdCommand,
+  TNipCdCommandReference,
   TNipCdContext
 } from '@/lib/nip-cd'
 import { isValidPubkey } from '@/lib/pubkey'
@@ -73,6 +77,38 @@ export class NipCdService {
     await this.hydrate()
     if (executor) return this.catalogs.get(executor)?.commands ?? []
     return [...this.catalogs.values()].flatMap((catalog) => catalog.commands)
+  }
+
+  async getCachedDefinitionEvents(executor: string) {
+    await this.hydrate()
+    return (
+      this.catalogs.get(executor)?.events.filter((event) => !!parseNipCdDefinition(event)) ?? []
+    )
+  }
+
+  async fetchInstalledDefinition(reference: TNipCdCommandReference) {
+    const isDefinition = (event: Parameters<typeof parseNipCdDefinition>[0]) => {
+      const definition = parseNipCdDefinition(event)
+      return definition && getNipCdCommandCoordinate(definition) === reference.coordinate
+    }
+    const getCached = () => this.catalogs.get(reference.executor)?.events.find(isDefinition)
+
+    await this.hydrate()
+    const cached = getCached()
+    if (cached) return cached
+    const fetched = await client
+      .fetchEvent(getNipCdCommandAddress(reference))
+      .catch(() => undefined)
+    if (
+      fetched &&
+      isDefinition(fetched) &&
+      mergeNipCdCatalogEvents([fetched], reference.executor).length
+    ) {
+      return fetched
+    }
+
+    await this.refresh(reference.executor)
+    return getCached()
   }
 
   async resolveCommandDefinition(executor: string, trigger: string, context: TNipCdContext) {

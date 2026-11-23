@@ -1301,6 +1301,12 @@ export default {
     Arguments: 'الوسائط',
     Required: 'مطلوب',
     Optional: 'اختياري',
-    Scopes: 'النطاقات'
+    Scopes: 'النطاقات',
+    'Slash commands': 'أوامر الشرطة المائلة',
+    'No slash commands found': 'لم يتم العثور على أوامر شرطة مائلة',
+    'Saved commands': 'الأوامر المحفوظة',
+    Unsave: 'إلغاء الحفظ',
+    'No saved commands yet': 'لا توجد أوامر محفوظة بعد',
+    'Could not update saved commands': 'تعذّر تحديث الأوامر المحفوظة'
   }
 }

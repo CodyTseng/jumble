@@ -1329,6 +1329,12 @@ export default {
     Arguments: 'Argumenty',
     Required: 'Wymagane',
     Optional: 'Opcjonalne',
-    Scopes: 'Zakresy'
+    Scopes: 'Zakresy',
+    'Slash commands': 'Polecenia z ukośnikiem',
+    'No slash commands found': 'Nie znaleziono poleceń z ukośnikiem',
+    'Saved commands': 'Zapisane polecenia',
+    Unsave: 'Usuń z zapisanych',
+    'No saved commands yet': 'Brak zapisanych poleceń',
+    'Could not update saved commands': 'Nie można zaktualizować zapisanych poleceń'
   }
 }

@@ -27,6 +27,7 @@ const StoreNames = {
   RELAY_OBSERVATIONS: 'relayObservations',
   PROFILE_EVENTS: 'profileEvents',
   NIP_CD_CATALOGS: 'nipCdCatalogs',
+  NIP_CD_INSTALLED_COMMANDS: 'nipCdInstalledCommands',
   RELAY_LIST_EVENTS: 'relayListEvents',
   FOLLOW_LIST_EVENTS: 'followListEvents',
   MUTE_LIST_EVENTS: 'muteListEvents',
@@ -69,7 +70,7 @@ class IndexedDbService {
   init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = new Promise((resolve, reject) => {
-        const request = window.indexedDB.open('jumble', 25)
+        const request = window.indexedDB.open('jumble', 26)
 
         request.onerror = (event) => {
           reject(event)
@@ -94,6 +95,9 @@ class IndexedDbService {
               keyPath: 'executor'
             })
             catalogStore.createIndex('checkedAtIndex', 'checkedAt')
+          }
+          if (!db.objectStoreNames.contains(StoreNames.NIP_CD_INSTALLED_COMMANDS)) {
+            db.createObjectStore(StoreNames.NIP_CD_INSTALLED_COMMANDS, { keyPath: 'key' })
           }
           if (!db.objectStoreNames.contains(StoreNames.RELAY_LIST_EVENTS)) {
             db.createObjectStore(StoreNames.RELAY_LIST_EVENTS, { keyPath: 'key' })
@@ -1374,6 +1378,8 @@ class IndexedDbService {
         return StoreNames.FAVORITE_RELAYS
       case kinds.BookmarkList:
         return StoreNames.BOOKMARK_LIST_EVENTS
+      case ExtendedKind.NIP_CD_INSTALLED_COMMANDS:
+        return StoreNames.NIP_CD_INSTALLED_COMMANDS
       case kinds.UserEmojiList:
         return StoreNames.USER_EMOJI_LIST_EVENTS
       case kinds.Emojisets:

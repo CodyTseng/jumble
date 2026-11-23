@@ -9,7 +9,7 @@ import PubkeyCopy from '@/components/PubkeyCopy'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDmSupport, useFetchFollowings, useFetchProfile } from '@/hooks'
-import { toDmConversation, toMuteList, toProfileEditor } from '@/lib/link'
+import { toDmConversation, toMuteList, toProfileEditor, toProfileSlashCommands } from '@/lib/link'
 import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
@@ -193,6 +193,13 @@ export default function Profile({ id }: { id?: string }) {
               <div className="flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
                 <Followings pubkey={pubkey} />
                 <Relays pubkey={pubkey} />
+                <button
+                  type="button"
+                  className="text-muted-foreground cursor-pointer hover:underline"
+                  onClick={() => push(toProfileSlashCommands(pubkey))}
+                >
+                  {t('Slash commands')}
+                </button>
                 {isSelf && (
                   <SecondaryPageLink to={toMuteList()} className="flex w-fit gap-1 hover:underline">
                     {mutePubkeySet.size}

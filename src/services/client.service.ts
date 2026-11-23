@@ -252,6 +252,7 @@ class ClientService extends EventTarget {
           kinds.RelayList,
           kinds.Contacts,
           ExtendedKind.FAVORITE_RELAYS,
+          ExtendedKind.NIP_CD_INSTALLED_COMMANDS,
           ExtendedKind.BLOSSOM_SERVER_LIST,
           ExtendedKind.RELAY_REVIEW,
           ExtendedKind.DM_RELAYS
@@ -1607,6 +1608,16 @@ class ClientService extends EventTarget {
 
   async fetchBookmarkListEvent(pubkey: string) {
     return this.fetchReplaceableEvent(pubkey, kinds.BookmarkList)
+  }
+
+  async fetchInstalledCommandsEvent(pubkey: string) {
+    return this.fetchReplaceableEvent(
+      pubkey,
+      ExtendedKind.NIP_CD_INSTALLED_COMMANDS,
+      undefined,
+      true,
+      true
+    )
   }
 
   async fetchBlossomServerListEvent(pubkey: string) {

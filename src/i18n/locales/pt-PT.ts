@@ -1326,6 +1326,12 @@ export default {
     Arguments: 'Argumentos',
     Required: 'Obrigatório',
     Optional: 'Opcional',
-    Scopes: 'Âmbitos'
+    Scopes: 'Âmbitos',
+    'Slash commands': 'Comandos com barra',
+    'No slash commands found': 'Não foram encontrados comandos com barra',
+    'Saved commands': 'Comandos guardados',
+    Unsave: 'Remover dos guardados',
+    'No saved commands yet': 'Ainda não há comandos guardados',
+    'Could not update saved commands': 'Não foi possível atualizar os comandos guardados'
   }
 }

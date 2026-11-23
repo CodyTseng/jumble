@@ -1341,6 +1341,12 @@ export default {
     Arguments: 'Arguments',
     Required: 'Required',
     Optional: 'Optional',
-    Scopes: 'Scopes'
+    Scopes: 'Scopes',
+    'Slash commands': 'Slash commands',
+    'No slash commands found': 'No slash commands found',
+    'Saved commands': 'Saved commands',
+    Unsave: 'Unsave',
+    'No saved commands yet': 'No saved commands yet',
+    'Could not update saved commands': 'Could not update saved commands'
   }
 }

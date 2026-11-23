@@ -1321,6 +1321,12 @@ export default {
     Arguments: 'Argumentos',
     Required: 'Obrigatório',
     Optional: 'Opcional',
-    Scopes: 'Escopos'
+    Scopes: 'Escopos',
+    'Slash commands': 'Comandos com barra',
+    'No slash commands found': 'Nenhum comando com barra encontrado',
+    'Saved commands': 'Comandos salvos',
+    Unsave: 'Remover dos salvos',
+    'No saved commands yet': 'Ainda não há comandos salvos',
+    'Could not update saved commands': 'Não foi possível atualizar os comandos salvos'
   }
 }

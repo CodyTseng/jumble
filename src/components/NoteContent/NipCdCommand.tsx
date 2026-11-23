@@ -1,11 +1,20 @@
-import { parseNipCdDefinition } from '@/lib/nip-cd'
+import CommandSaveButton from '@/components/CommandSaveButton'
+import { getNipCdCommandCoordinate, parseNipCdDefinition } from '@/lib/nip-cd'
 import { cn } from '@/lib/utils'
 import { type Event } from 'nostr-tools'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import UnknownNote from './UnknownNote'
 
-export default function NipCdCommand({ event, className }: { event: Event; className?: string }) {
+export default function NipCdCommand({
+  event,
+  className,
+  showSaveButton
+}: {
+  event: Event
+  className?: string
+  showSaveButton?: boolean
+}) {
   const { t } = useTranslation()
   const command = useMemo(() => parseNipCdDefinition(event), [event])
   if (!command) return <UnknownNote className={className} event={event} />
@@ -13,9 +22,14 @@ export default function NipCdCommand({ event, className }: { event: Event; class
   return (
     <div className={cn('min-w-0 space-y-3 text-start', className)}>
       <div className="space-y-1.5">
-        <h3 dir="auto" className="text-primary text-lg font-semibold wrap-anywhere">
-          <bdi>/{command.command}</bdi>
-        </h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 dir="auto" className="text-primary min-w-0 text-lg font-semibold wrap-anywhere">
+            <bdi>/{command.command}</bdi>
+          </h3>
+          {showSaveButton && (
+            <CommandSaveButton coordinate={getNipCdCommandCoordinate(command)} event={event} />
+          )}
+        </div>
         {command.title.trim().toLowerCase() !== command.command.toLowerCase() && (
           <p dir="auto" className="text-sm font-medium wrap-anywhere">
             {command.title}

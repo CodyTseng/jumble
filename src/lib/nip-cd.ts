@@ -1,5 +1,6 @@
 import { Event, kinds, nip19, verifyEvent } from 'nostr-tools'
 import { isValidPubkey } from './pubkey'
+import { isWebsocketUrl } from './url'
 
 export const COMMAND_DEFINITION_KIND = 31992
 
@@ -30,6 +31,39 @@ export type TNipCdCommand = {
   description: string
   args: { name: string; label: string; required: boolean; type: string; choices?: string[] }[]
   scopes: { group: string; value: string }[]
+}
+
+export type TNipCdCommandReference = {
+  coordinate: string
+  executor: string
+  identifier: string
+  relay?: string
+}
+
+export function getNipCdCommandCoordinate(command: Pick<TNipCdCommand, 'executor' | 'id'>) {
+  return `${COMMAND_DEFINITION_KIND}:${command.executor}:${command.id}`
+}
+
+export function getInstalledNipCdCommands(tags: string[][]): TNipCdCommandReference[] {
+  const references = new Map<string, TNipCdCommandReference>()
+  for (const [name, coordinate, hint] of tags) {
+    if (name !== 'a' || !coordinate || references.has(coordinate)) continue
+    const match = /^31992:([0-9a-f]{64}):([\s\S]*)$/u.exec(coordinate)
+    if (!match) continue
+    const [, executor, identifier] = match
+    const relay = hint && isWebsocketUrl(hint) ? hint : undefined
+    references.set(coordinate, { coordinate, executor, identifier, relay })
+  }
+  return [...references.values()]
+}
+
+export function getNipCdCommandAddress({ executor, identifier, relay }: TNipCdCommandReference) {
+  return nip19.naddrEncode({
+    kind: COMMAND_DEFINITION_KIND,
+    pubkey: executor,
+    identifier,
+    relays: relay ? [relay] : []
+  })
 }
 
 export type TNipCdContext = {

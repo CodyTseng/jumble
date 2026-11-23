@@ -1,5 +1,6 @@
 import {
   formatNipCdInvocation,
+  getNipCdCommandCoordinate,
   getNipCdMentionPubkey,
   matchesNipCdScope,
   TNipCdCommand,
@@ -73,16 +74,18 @@ function findInvocation($position: ResolvedPos) {
 
 export const NipCdSuggestion = Extension.create<{
   getContext: () => TNipCdEditorContext | undefined
+  getInstalledCommands: () =>
+    { coordinates: ReadonlySet<string>; commands: TNipCdCommand[] } | undefined
 }>({
   name: 'nipCdSuggestion',
 
   addOptions() {
-    return { getContext: () => undefined }
+    return { getContext: () => undefined, getInstalledCommands: () => undefined }
   },
 
   addProseMirrorPlugins() {
     const { editor } = this
-    const { getContext } = this.options
+    const { getContext, getInstalledCommands } = this.options
     const loadCachedSuggestions = async (query: string, signal?: AbortSignal) => {
       const context = getContext()
       const invocation = findInvocation(editor.state.selection.$from)
@@ -93,11 +96,20 @@ export const NipCdSuggestion = Extension.create<{
         const current = findInvocation(editor.state.selection.$from)
         return !!current && current.executor === executor && current.query === query
       }
-      const commands = await nipCdService.getCachedCommands(executor)
+      const cached = await nipCdService.getCachedCommands(executor)
       if (!isCurrent()) return []
+      const installed = executor ? undefined : getInstalledCommands()
+      // An installed definition can be available before its executor's catalog is cached.
+      const byCoordinate = new Map(
+        cached.map((command) => [getNipCdCommandCoordinate(command), command])
+      )
+      for (const command of installed?.commands ?? [])
+        byCoordinate.set(getNipCdCommandCoordinate(command), command)
       const prefix = query.toLowerCase()
       const priority = (candidate: string) => Number(candidate === context.replyExecutor)
-      const items = commands
+      const favorite = (command: TNipCdCommand) =>
+        Number(!!installed?.coordinates.has(getNipCdCommandCoordinate(command)))
+      const items = [...byCoordinate.values()]
         .filter(
           (command) =>
             command.command.toLowerCase().startsWith(prefix) &&
@@ -105,6 +117,7 @@ export const NipCdSuggestion = Extension.create<{
         )
         .sort(
           (a, b) =>
+            favorite(b) - favorite(a) ||
             priority(b.executor) - priority(a.executor) ||
             a.command.localeCompare(b.command) ||
             a.executor.localeCompare(b.executor) ||

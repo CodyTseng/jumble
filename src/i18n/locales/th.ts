@@ -1293,6 +1293,12 @@ export default {
     Arguments: 'อาร์กิวเมนต์',
     Required: 'จำเป็น',
     Optional: 'ไม่บังคับ',
-    Scopes: 'ขอบเขต'
+    Scopes: 'ขอบเขต',
+    'Slash commands': 'คำสั่งสแลช',
+    'No slash commands found': 'ไม่พบคำสั่งสแลช',
+    'Saved commands': 'คำสั่งที่บันทึกไว้',
+    Unsave: 'ยกเลิกการบันทึก',
+    'No saved commands yet': 'ยังไม่มีคำสั่งที่บันทึกไว้',
+    'Could not update saved commands': 'อัปเดตคำสั่งที่บันทึกไว้ไม่ได้'
   }
 }

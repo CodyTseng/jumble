@@ -1336,6 +1336,12 @@ export default {
     Arguments: 'Arguments',
     Required: 'Obligatoire',
     Optional: 'Facultatif',
-    Scopes: 'Portées'
+    Scopes: 'Portées',
+    'Slash commands': 'Commandes slash',
+    'No slash commands found': 'Aucune commande slash trouvée',
+    'Saved commands': 'Commandes enregistrées',
+    Unsave: 'Retirer des éléments enregistrés',
+    'No saved commands yet': 'Aucune commande enregistrée pour le moment',
+    'Could not update saved commands': 'Impossible de mettre à jour les commandes enregistrées'
   }
 }

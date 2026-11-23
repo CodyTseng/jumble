@@ -1334,6 +1334,12 @@ export default {
     Arguments: 'Argumente',
     Required: 'Erforderlich',
     Optional: 'Optional',
-    Scopes: 'Geltungsbereiche'
+    Scopes: 'Geltungsbereiche',
+    'Slash commands': 'Slash-Befehle',
+    'No slash commands found': 'Keine Slash-Befehle gefunden',
+    'Saved commands': 'Gespeicherte Befehle',
+    Unsave: 'Speicherung aufheben',
+    'No saved commands yet': 'Noch keine gespeicherten Befehle',
+    'Could not update saved commands': 'Gespeicherte Befehle konnten nicht aktualisiert werden'
   }
 }

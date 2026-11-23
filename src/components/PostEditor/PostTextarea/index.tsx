@@ -1,6 +1,7 @@
 import ClickableCard from '@/components/ClickableCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseEditorJsonToText } from '@/lib/tiptap'
+import { useInstalledCommands } from '@/providers/InstalledCommandsProvider'
 import { cn } from '@/lib/utils'
 import customEmojiService from '@/services/custom-emoji.service'
 import { TAccount, TEmoji } from '@/types'
@@ -83,7 +84,9 @@ const PostTextarea = forwardRef<
     ref
   ) => {
     const { t } = useTranslation()
+    const installedCommands = useInstalledCommands()
     const nipCdContextRef = useRef(nipCdContext)
+    const installedCommandsRef = useRef(installedCommands)
     const [tabValue, setTabValue] = useState('edit')
     const [isDraggingFile, setIsDraggingFile] = useState(false)
     // Keep the tabs and the (mobile) action buttons on one row when they fit;
@@ -137,7 +140,10 @@ const PostTextarea = forwardRef<
         }),
         NipCdInvocation,
         NipCdInvocationDecoration,
-        NipCdSuggestion.configure({ getContext: () => nipCdContextRef.current }),
+        NipCdSuggestion.configure({
+          getContext: () => nipCdContextRef.current,
+          getInstalledCommands: () => installedCommandsRef.current
+        }),
         ClipboardAndDropHandler.configure({
           onUploadStart: (file, cancel) => {
             onUploadStart?.(file, cancel)
@@ -180,6 +186,10 @@ const PostTextarea = forwardRef<
       nipCdContextRef.current = nipCdContext
       if (editor && !editor.isDestroyed) closeNipCdSuggestion(editor)
     }, [editor, nipCdContext])
+
+    useLayoutEffect(() => {
+      installedCommandsRef.current = installedCommands
+    }, [installedCommands])
 
     // Focus the input once the composer mounts so the user can start typing
     // right after pressing "Post". Defer to the next frame because Radix Dialog

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { formatNipCdInvocation, TNipCdCommand } from '@/lib/nip-cd'
+import { formatNipCdInvocation, getNipCdCommandCoordinate, TNipCdCommand } from '@/lib/nip-cd'
 import { parseEditorJsonToText } from '@/lib/tiptap'
 import { Editor, type JSONContent } from '@tiptap/core'
 import Document from '@tiptap/extension-document'
@@ -115,6 +115,7 @@ const dm = command(14, 'private')
 let editor: Editor
 let container: HTMLDivElement
 let context: TNipCdEditorContext | undefined
+let installed: { coordinates: ReadonlySet<string>; commands: TNipCdCommand[] } | undefined
 beforeEach(() => {
   vi.useFakeTimers()
   vi.clearAllMocks()
@@ -127,6 +128,7 @@ beforeEach(() => {
   container = document.createElement('div')
   document.body.appendChild(container)
   context = { kind: 1, replyExecutor: executor }
+  installed = undefined
 })
 afterEach(() => {
   editor?.destroy()
@@ -147,7 +149,8 @@ function createEditor(content?: JSONContent) {
       NipCdInvocation,
       NipCdInvocationDecoration,
       NipCdSuggestion.configure({
-        getContext: () => context
+        getContext: () => context,
+        getInstalledCommands: () => installed
       })
     ],
     editorProps: {
@@ -177,6 +180,21 @@ function invocation() {
 }
 
 describe('public slash suggestions', () => {
+  it('ranks installed commands first for bare slash and includes uncached definitions', async () => {
+    const favorite = command(1, 'zulu', otherExecutor)
+    const cachedFavorite = command(1, 'yankee')
+    installed = {
+      coordinates: new Set([favorite, cachedFavorite].map(getNipCdCommandCoordinate)),
+      commands: [favorite, cachedFavorite]
+    }
+    mocks.getCachedCommands.mockResolvedValue([ping, cachedFavorite])
+    createEditor()
+    editor.commands.insertContent('/')
+    await vi.advanceTimersByTimeAsync(180)
+    expect(mocks.onSuggestions).toHaveBeenLastCalledWith([cachedFavorite, favorite, ping])
+    expect(mocks.refresh).not.toHaveBeenCalled()
+  })
+
   it('shows the command and bot name but copies the qualified command', async () => {
     mocks.getCachedExecutorProfiles.mockResolvedValue(new Map([[executor, { name: 'Ping Bot' }]]))
     createEditor()

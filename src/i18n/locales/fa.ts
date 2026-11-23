@@ -1313,6 +1313,12 @@ export default {
     Arguments: 'آرگومان‌ها',
     Required: 'الزامی',
     Optional: 'اختیاری',
-    Scopes: 'محدوده‌ها'
+    Scopes: 'محدوده‌ها',
+    'Slash commands': 'فرمان‌های اسلش',
+    'No slash commands found': 'هیچ فرمان اسلشی پیدا نشد',
+    'Saved commands': 'فرمان\u200cهای ذخیره\u200cشده',
+    Unsave: 'لغو ذخیره',
+    'No saved commands yet': 'هنوز فرمانی ذخیره نشده است',
+    'Could not update saved commands': 'به\u200cروزرسانی فرمان\u200cهای ذخیره\u200cشده ممکن نبود'
   }
 }

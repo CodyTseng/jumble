@@ -72,7 +72,13 @@ export default function NoteContent({
   }
 
   if (event.kind === ExtendedKind.NIP_CD_COMMAND) {
-    return <NipCdCommand className={cn('mt-2', className)} event={event} />
+    return (
+      <NipCdCommand
+        className={cn('mt-2', className)}
+        event={event}
+        showSaveButton={showFull && !preview}
+      />
+    )
   }
 
   if (event.kind === kinds.Repost || event.kind === kinds.GenericRepost) {

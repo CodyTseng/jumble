@@ -1,4 +1,5 @@
-import { finalizeEvent, generateSecretKey, getPublicKey, kinds } from 'nostr-tools'
+import { finalizeEvent, generateSecretKey, getPublicKey, kinds, nip19 } from 'nostr-tools'
+import { getInstalledNipCdCommands } from '@/lib/nip-cd'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import client from './client.service'
 import indexedDb, { TNipCdCatalogRecord } from './indexed-db.service'
@@ -7,7 +8,7 @@ import { NipCdService } from './nip-cd.service'
 vi.mock('@/lib/draft-event', () => ({ buildATag: vi.fn() }))
 
 vi.mock('./client.service', () => ({
-  default: { fetchEventSnapshot: vi.fn(), fetchRelayList: vi.fn() }
+  default: { fetchEvent: vi.fn(), fetchEventSnapshot: vi.fn(), fetchRelayList: vi.fn() }
 }))
 vi.mock('./local-storage.service', () => ({
   default: { getDefaultRelayUrls: () => ['wss://default.example/'] }
@@ -68,6 +69,27 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers())
 
 describe('NIP-CD persisted catalogs', () => {
+  it('resolves an installed address using its relay hint and keeps colons in the identifier', async () => {
+    const event = declaration(a, 1, 'bot:hello')
+    const coordinate = `31992:${executorA}:bot:hello`
+    const relay = 'wss://commands.example/'
+    const [reference] = getInstalledNipCdCommands([
+      ['a', coordinate, relay],
+      ['a', coordinate],
+      ['a', `30023:${executorB}:article`]
+    ])
+    vi.mocked(client.fetchEvent).mockResolvedValue(event)
+    expect(await new NipCdService().fetchInstalledDefinition(reference)).toEqual(event)
+    expect(client.fetchEvent).toHaveBeenCalledExactlyOnceWith(
+      nip19.naddrEncode({
+        kind: 31992,
+        pubkey: executorA,
+        identifier: 'bot:hello',
+        relays: [relay]
+      })
+    )
+    expect(client.fetchEventSnapshot).not.toHaveBeenCalled()
+  })
   it('loads commands and executor profiles locally, even with multiple executors', async () => {
     disk.set(executorA, { executor: executorA, checkedAt: Date.now(), events: [declaration(a, 1)] })
     disk.set(executorB, {
