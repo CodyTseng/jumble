@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { isSameAccount } from '@/lib/account'
 import { formatError } from '@/lib/error'
+import { getEventAuthorPubkey } from '@/lib/event'
+import { getNipCdExecutor, getNipCdPostKind } from '@/lib/nip-cd'
 import {
   getPostAccountPreviewPubkey,
   isEphemeralPostAccount,
@@ -50,6 +52,7 @@ import PollEditor from './PollEditor'
 import PostOptions from './PostOptions'
 import PostRelaySelector from './PostRelaySelector'
 import PostTextarea, { TPostTextareaHandle } from './PostTextarea'
+import type { TNipCdEditorContext } from './PostTextarea/NipCd/suggestion'
 import Uploader from './Uploader'
 
 export type TPostContentHandle = {
@@ -142,12 +145,32 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     initialDraft?.addClientTag ?? storage.getAddClientTag()
   )
   const [mentions, setMentions] = useState<string[]>(initialDraft?.mentions ?? [])
+  const [mentionsResolvedFor, setMentionsResolvedFor] = useState<string | null>(null)
   const [isNsfw, setIsNsfw] = useState(initialDraft?.isNsfw ?? false)
   const [isPoll, setIsPoll] = useState(initialDraft?.isPoll ?? false)
   const [isProtectedEvent, setIsProtectedEvent] = useState(initialDraft?.isProtectedEvent ?? false)
   const [additionalRelayUrls, setAdditionalRelayUrls] = useState<string[]>(
     initialDraft?.additionalRelayUrls ?? []
   )
+  const postingPubkey = getPostAccountPreviewPubkey(postAsAccount ?? account)
+  const nipCdKind = getNipCdPostKind(initialParentStuff, storage.getUseNip22Replies())
+  const replyExecutor = parentEvent ? getEventAuthorPubkey(parentEvent) : undefined
+  const nipCdContext = useMemo<TNipCdEditorContext | undefined>(
+    () =>
+      isPoll || highlightedText || isProtectedEvent
+        ? undefined
+        : { kind: nipCdKind, author: postingPubkey, replyExecutor, relays: additionalRelayUrls },
+    [
+      additionalRelayUrls,
+      highlightedText,
+      isPoll,
+      isProtectedEvent,
+      nipCdKind,
+      postingPubkey,
+      replyExecutor
+    ]
+  )
+
   const [relayTargetItems, setRelayTargetItems] = useState<TPostTargetItem[]>(
     initialDraft?.postTargetItems ?? []
   )
@@ -175,11 +198,16 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
 
   const hasContent = !!text.trim() || (isPoll && pollCreateData.options.some((o) => o.trim()))
 
+  // Qualified commands rely on Jumble's normal mention routing. Do not send
+  // before those tags have been resolved for this specific editor content.
+  const waitingForCommandMention =
+    !!nipCdContext && !!getNipCdExecutor(text) && mentionsResolvedFor !== text
   const canPost = useMemo(() => {
     return (
       !!pubkey &&
       (!!text || !!highlightedText) &&
       !uploadProgresses.length &&
+      !waitingForCommandMention &&
       (!isPoll || pollCreateData.options.filter((option) => !!option.trim()).length >= 2) &&
       (!isProtectedEvent || additionalRelayUrls.length > 0)
     )
@@ -188,6 +216,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     text,
     highlightedText,
     uploadProgresses,
+    waitingForCommandMention,
     isPoll,
     pollCreateData,
     isProtectedEvent,
@@ -464,7 +493,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
           postAsAccount={postAsAccount}
           onPostAsAccountChange={setPostAsAccount}
           allowAnonymous={!!initialParentStuff && !highlightedText}
-          previewPubkey={getPostAccountPreviewPubkey(postAsAccount ?? account)}
+          previewPubkey={postingPubkey}
+          nipCdContext={nipCdContext}
           placeholder={
             highlightedText ? t('Write your thoughts about this highlight...') : undefined
           }
@@ -671,6 +701,7 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
             parentEvent={parentEvent}
             mentions={mentions}
             setMentions={setMentions}
+            onLoadingChange={(loading) => setMentionsResolvedFor(loading ? null : text)}
           />
           <div className="hidden items-center gap-2 sm:flex">
             <Button

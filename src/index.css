@@ -260,6 +260,13 @@ html body[data-scroll-locked] {
   pointer-events: none;
 }
 
+.tiptap .nip-cd-invocation {
+  @apply bg-primary/10 text-primary rounded-md px-1 py-0.5 font-mono text-sm font-medium;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  overflow-wrap: anywhere;
+}
+
 /* Inline emoji atoms aren't painted by the native range selection; this
    decoration (added in the Emoji extension) gives them the OS selection color
    so they look selected together with the surrounding text. */
