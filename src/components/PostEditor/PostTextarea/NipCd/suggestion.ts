@@ -18,6 +18,7 @@ import CommandList, {
   TCommandListProps,
   TNipCdSuggestionItem
 } from './CommandList'
+import { NipCdInvocation } from './invocation-node'
 
 export type TNipCdEditorContext = Pick<TNipCdContext, 'kind' | 'author'> & {
   replyExecutor?: string
@@ -110,11 +111,14 @@ export const NipCdSuggestion = Extension.create<{
             a.id.localeCompare(b.id)
         )
         .slice(0, 12)
-      const names = await nipCdService.getCachedExecutorNames([
+      const profiles = await nipCdService.getCachedExecutorProfiles([
         ...new Set(items.map((item) => item.executor))
       ])
       if (!isCurrent()) return []
-      return items.map((item) => ({ ...item, executorName: names.get(item.executor) }))
+      return items.map((item) => {
+        const profile = profiles.get(item.executor)
+        return { ...item, executorName: profile?.name, executorAvatar: profile?.avatar }
+      })
     }
 
     return [
@@ -142,9 +146,20 @@ export const NipCdSuggestion = Extension.create<{
           )
             return
           const hasSeparator = current.after.startsWith(' ')
-          const text = formatNipCdInvocation(item) + (hasSeparator ? '' : ' ')
-          const chain = editor.chain().focus().insertContentAt(range, { type: 'text', text })
-          if (hasSeparator) chain.setTextSelection(range.from + text.length + 1)
+          const content = [
+            {
+              type: NipCdInvocation.name,
+              attrs: { invocation: formatNipCdInvocation(item), executorName: item.executorName }
+            }
+          ]
+          const chain = editor
+            .chain()
+            .focus()
+            .insertContentAt(
+              range,
+              hasSeparator ? content : [...content, { type: 'text', text: ' ' }]
+            )
+          if (hasSeparator) chain.setTextSelection(range.from + 2)
           chain.run()
         },
         render: () => {

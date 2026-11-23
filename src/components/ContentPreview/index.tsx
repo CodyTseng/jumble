@@ -1,6 +1,7 @@
 import { ExtendedKind } from '@/constants'
 import { getEventAuthorPubkey, isMentioningMutedUsers } from '@/lib/event'
 import { isNip34EventKind } from '@/lib/nip34'
+import { parseNipCdDefinition } from '@/lib/nip-cd'
 import { cn } from '@/lib/utils'
 import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useMuteList } from '@/providers/MuteListProvider'
@@ -68,6 +69,28 @@ export default function ContentPreview({
 
   if (isNip34EventKind(event.kind)) {
     return <Nip34EventPreview event={event} className={className} />
+  }
+
+  if (event.kind === ExtendedKind.NIP_CD_COMMAND) {
+    const command = parseNipCdDefinition(event)
+    const title = command?.title.trim()
+    return (
+      <div className={cn('pointer-events-none min-w-0 truncate', className)}>
+        <span>[{t('Slash command')}]</span>
+        {command && (
+          <>
+            {' '}
+            <bdi className="font-medium">/{command.command}</bdi>
+          </>
+        )}
+        {title && title.toLowerCase() !== command?.command.toLowerCase() && (
+          <>
+            {' · '}
+            <bdi>{title}</bdi>
+          </>
+        )}
+      </div>
+    )
   }
 
   if (

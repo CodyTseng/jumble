@@ -3,9 +3,11 @@ import { getProfileFromEvent } from '@/lib/event-metadata'
 import {
   COMMAND_DEFINITION_KIND,
   isPreferredNipCdCatalog,
+  matchesNipCdScope,
   mergeNipCdCatalogEvents,
   parseNipCdCatalog,
-  TNipCdCommand
+  TNipCdCommand,
+  TNipCdContext
 } from '@/lib/nip-cd'
 import { isValidPubkey } from '@/lib/pubkey'
 import { kinds } from 'nostr-tools'
@@ -73,23 +75,51 @@ export class NipCdService {
     return [...this.catalogs.values()].flatMap((catalog) => catalog.commands)
   }
 
-  /** Local profile labels avoid linking a relay request to a bare-slash keystroke. */
-  async getCachedExecutorNames(executors: string[]) {
-    const names = new Map<string, string>()
-    if (!executors.length) return names
+  async resolveCommandDefinition(executor: string, trigger: string, context: TNipCdContext) {
+    await this.hydrate()
+    const findDefinition = () => {
+      const catalog = this.catalogs.get(executor)
+      if (!catalog) return
+      const commands = catalog.commands.filter(({ command }) => command === trigger)
+      const matching =
+        commands.length > 1
+          ? commands.filter((command) =>
+              matchesNipCdScope(
+                { ...command, scopes: command.scopes.filter(({ group }) => group !== 'relay') },
+                context
+              )
+            )
+          : commands
+      if (matching.length !== 1) return
+      const { id } = matching[0]
+      return catalog.events.find(
+        (event) => (event.tags.find(([name]) => name === 'd')?.[1] ?? '') === id
+      )
+    }
+
+    const cached = findDefinition()
+    if (cached) return cached
+    await this.refresh(executor, undefined, true)
+    return findDefinition()
+  }
+
+  /** Read executor profiles locally so the command menu does not query relays for them. */
+  async getCachedExecutorProfiles(executors: string[]) {
+    const profiles = new Map<string, { name?: string; avatar?: string }>()
+    if (!executors.length) return profiles
     const events = await indexedDb
       .getManyReplaceableEvents(executors, kinds.Metadata)
       .catch(() => [])
     for (const event of events) {
       if (!event) continue
-      const username = getProfileFromEvent(event).original_username
-      if (username) names.set(event.pubkey, username)
+      const { original_username: name, avatar } = getProfileFromEvent(event)
+      profiles.set(event.pubkey, { name, avatar: typeof avatar === 'string' ? avatar : undefined })
     }
-    return names
+    return profiles
   }
 
   /** Start once for an explicitly selected executor. Stale menus remain usable during refresh. */
-  refresh(executor: string, onQuery?: () => void): Promise<boolean> {
+  refresh(executor: string, onQuery?: () => void, force = false): Promise<boolean> {
     if (!isValidPubkey(executor)) return Promise.resolve(false)
     const existing = this.pending.get(executor)
     if (existing) {
@@ -103,23 +133,27 @@ export class NipCdService {
     const pending: TRefresh = {
       querying: false,
       onQuery: listeners,
-      promise: this.refreshIfStale(executor, () => {
-        pending.querying = true
-        for (const notify of listeners) notify()
-        listeners.clear()
-      }).finally(() => this.pending.delete(executor))
+      promise: this.refreshIfStale(
+        executor,
+        () => {
+          pending.querying = true
+          for (const notify of listeners) notify()
+          listeners.clear()
+        },
+        force
+      ).finally(() => this.pending.delete(executor))
     }
     this.pending.set(executor, pending)
     return pending.promise
   }
 
-  private async refreshIfStale(executor: string, onQuery: () => void) {
+  private async refreshIfStale(executor: string, onQuery: () => void, force: boolean) {
     await this.hydrate()
     const cached = this.catalogs.get(executor)
     const now = Date.now()
     const fresh = cached?.complete && cached.checkedAt + CATALOG_TTL > now
     const retryAfter = this.retryAfter.get(executor) ?? 0
-    if (fresh || retryAfter > now) return false
+    if ((!force && fresh) || retryAfter > now) return false
     try {
       onQuery()
       const { write, originalRelays } = await client.fetchRelayList(executor)

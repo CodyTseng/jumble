@@ -30,6 +30,7 @@ import emojiSuggestion from './Emoji/suggestion'
 import Mention from './Mention'
 import mentionSuggestion from './Mention/suggestion'
 import { NipCdInvocationDecoration } from './NipCd/invocation-decoration'
+import { NipCdInvocation } from './NipCd/invocation-node'
 import { closeNipCdSuggestion, NipCdSuggestion, TNipCdEditorContext } from './NipCd/suggestion'
 import PostAccountSelector from '../PostAccountSelector'
 import Preview from './Preview'
@@ -134,6 +135,7 @@ const PostTextarea = forwardRef<
           // unexpected character behind and can put the caret on its wrong side.
           deleteTriggerWithBackspace: true
         }),
+        NipCdInvocation,
         NipCdInvocationDecoration,
         NipCdSuggestion.configure({ getContext: () => nipCdContextRef.current }),
         ClipboardAndDropHandler.configure({

@@ -33,7 +33,7 @@ export type TNipCdCommand = {
 }
 
 export type TNipCdContext = {
-  kind: 1 | 1111
+  kind: number
   author?: string
   tags?: string[][]
   relays?: string[]
@@ -42,7 +42,7 @@ export type TNipCdContext = {
 export function getNipCdPostKind(
   parent: Event | string | undefined,
   useNip22Replies: boolean
-): TNipCdContext['kind'] {
+): 1 | 1111 {
   return !parent ||
     (typeof parent !== 'string' && parent.kind === kinds.ShortTextNote && !useNip22Replies)
     ? 1
@@ -51,10 +51,15 @@ export function getNipCdPostKind(
 
 /** Complete qualifier on the first token only. A plain /command is not a relay route. */
 export function getNipCdExecutor(content: string): string | undefined {
+  return parseNipCdInvocation(content)?.executor
+}
+
+export function parseNipCdInvocation(content: string) {
   const [head] = content.split(/\s/u, 1)
   const match = /^\/([^@]+)@(?:nostr:)?(npub1[a-z0-9]{58})$/u.exec(head)
   if (!match || !isTrigger(match[1])) return
-  return getNipCdMentionPubkey(match[2], true)
+  const executor = getNipCdMentionPubkey(match[2], true)
+  if (executor) return { head, command: match[1], executor }
 }
 
 export function getNipCdMentionPubkey(reference: string, npubOnly = false): string | undefined {

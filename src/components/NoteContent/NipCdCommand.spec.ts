@@ -40,25 +40,25 @@ describe('NIP-CD command event card', () => {
     expect(ALLOWED_FILTER_KINDS).not.toContain(ExtendedKind.NIP_CD_COMMAND)
   })
 
-  it('renders trigger, description, ordered arguments, choices and scopes as text', () => {
+  it('renders the command and readable argument details without exposing raw metadata', () => {
     const html = render(definition)
     expect(html).toContain('/make')
     expect(html).toContain('Make a reply')
     expect(html).toContain('A &lt;b&gt;plain&lt;/b&gt; description.')
     expect(html).not.toContain('<b>plain</b>')
     expect(html.indexOf('Topic')).toBeLessThan(html.indexOf('Output format'))
+    for (const field of ['Required', 'Optional', 'short', 'long']) {
+      expect(html).toContain(field)
+    }
     for (const field of [
+      'Slash command',
       'topic: word',
       'format: enum',
-      'Required',
-      'Optional',
-      'short',
-      'long',
+      'Scopes',
       'kind:1',
-      'kind:1111',
       'tag:t:notes'
     ]) {
-      expect(html).toContain(field)
+      expect(html).not.toContain(field)
     }
     expect(html).not.toMatch(/<(button|a)\b/)
   })
@@ -66,7 +66,6 @@ describe('NIP-CD command event card', () => {
   it('omits sections when unset and preserves the unknown event fallback for malformed events', () => {
     const minimal = render(definition.slice(0, 4))
     expect(minimal).not.toContain('Arguments')
-    expect(minimal).not.toContain('Scopes')
     expect(render(definition.filter(([name]) => name !== 'command'))).toContain(
       'Unknown command event'
     )

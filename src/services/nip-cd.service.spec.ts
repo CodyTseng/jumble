@@ -68,7 +68,7 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers())
 
 describe('NIP-CD persisted catalogs', () => {
-  it('bare slash and executor names are local-only, even with multiple executors', async () => {
+  it('loads commands and executor profiles locally, even with multiple executors', async () => {
     disk.set(executorA, { executor: executorA, checkedAt: Date.now(), events: [declaration(a, 1)] })
     disk.set(executorB, {
       executor: executorB,
@@ -80,7 +80,10 @@ describe('NIP-CD persisted catalogs', () => {
         kind: kinds.Metadata,
         tags: [],
         created_at: Math.floor(Date.now() / 1000),
-        content: JSON.stringify({ name: 'Local test profile' })
+        content: JSON.stringify({
+          name: 'Local test profile',
+          picture: 'https://bot.example/avatar.png'
+        })
       },
       a
     )
@@ -93,8 +96,10 @@ describe('NIP-CD persisted catalogs', () => {
     expect((await service.getCachedCommands(executorB)).map((command) => command.executor)).toEqual(
       [executorB]
     )
-    expect(await service.getCachedExecutorNames([executorA, executorB])).toEqual(
-      new Map([[executorA, 'Local test profile']])
+    expect(await service.getCachedExecutorProfiles([executorA, executorB])).toEqual(
+      new Map([
+        [executorA, { name: 'Local test profile', avatar: 'https://bot.example/avatar.png' }]
+      ])
     )
     expect(indexedDb.getManyReplaceableEvents).toHaveBeenCalledExactlyOnceWith(
       [executorA, executorB],
@@ -263,6 +268,26 @@ describe('NIP-CD persisted catalogs', () => {
     expect(await service.refresh(executorA)).toBe(true)
     expect(await service.getCachedCommands(executorA)).toHaveLength(1)
     expect(disk.get(executorA)?.complete).toBe(false)
+    expect(client.fetchEventSnapshot).toHaveBeenCalledExactlyOnceWith(writeRelays, {
+      kinds: [31992],
+      authors: [executorA]
+    })
+  })
+
+  it('resolves the signed definition by trigger even when its address identifier differs', async () => {
+    const service = new NipCdService()
+    const noteCommand = declaration(a, 1, 'note-only')
+    const replyCommand = declaration(a, 1111, 'reply-only')
+    vi.mocked(client.fetchEventSnapshot).mockResolvedValue({
+      events: [noteCommand, replyCommand],
+      complete: true
+    })
+    expect(await service.resolveCommandDefinition(executorA, 'hello', { kind: 1111 })).toEqual(
+      replyCommand
+    )
+    expect(await service.resolveCommandDefinition(executorA, 'hello', { kind: 1 })).toEqual(
+      noteCommand
+    )
     expect(client.fetchEventSnapshot).toHaveBeenCalledExactlyOnceWith(writeRelays, {
       kinds: [31992],
       authors: [executorA]

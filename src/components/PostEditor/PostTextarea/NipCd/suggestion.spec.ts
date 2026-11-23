@@ -10,12 +10,13 @@ import Text from '@tiptap/extension-text'
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NipCdInvocationDecoration } from './invocation-decoration'
+import { NipCdInvocation } from './invocation-node'
 import { closeNipCdSuggestion, NipCdSuggestion, TNipCdEditorContext } from './suggestion'
 
 const mocks = vi.hoisted(() => ({
   getCachedCommands: vi.fn(),
   reloadCachedCatalogs: vi.fn(),
-  getCachedExecutorNames: vi.fn(),
+  getCachedExecutorProfiles: vi.fn(),
   refresh: vi.fn(),
   onSuggestions: vi.fn(),
   onMenu: vi.fn(),
@@ -25,12 +26,15 @@ vi.mock('@/services/nip-cd.service', () => ({
   default: {
     getCachedCommands: mocks.getCachedCommands,
     reloadCachedCatalogs: mocks.reloadCachedCatalogs,
-    getCachedExecutorNames: mocks.getCachedExecutorNames,
+    getCachedExecutorProfiles: mocks.getCachedExecutorProfiles,
     refresh: mocks.refresh
   }
 }))
 vi.mock('@/services/custom-emoji.service', () => ({ default: {} }))
 vi.mock('@/lib/utils', () => ({ cn: (...classes: string[]) => classes.join(' ') }))
+vi.mock('@/providers/ContentPolicyProvider', () => ({
+  useContentPolicy: () => ({ autoLoadProfilePicture: true })
+}))
 vi.mock('@tiptap/react', () => ({
   ReactRenderer: class {
     element = document.createElement('div')
@@ -117,7 +121,7 @@ beforeEach(() => {
   mocks.getCachedCommands.mockImplementation(async (target?: string) =>
     [dm, comment, ping].filter((item) => !target || item.executor === target)
   )
-  mocks.getCachedExecutorNames.mockResolvedValue(new Map())
+  mocks.getCachedExecutorProfiles.mockResolvedValue(new Map())
   mocks.reloadCachedCatalogs.mockResolvedValue(undefined)
   mocks.refresh.mockResolvedValue(false)
   container = document.createElement('div')
@@ -140,6 +144,7 @@ function createEditor(content?: JSONContent) {
       Paragraph,
       Text,
       Mention,
+      NipCdInvocation,
       NipCdInvocationDecoration,
       NipCdSuggestion.configure({
         getContext: () => context
@@ -172,7 +177,8 @@ function invocation() {
 }
 
 describe('public slash suggestions', () => {
-  it('inserts a qualified command at the start without creating a new @ mention or submitting', async () => {
+  it('shows the command and bot name but copies the qualified command', async () => {
+    mocks.getCachedExecutorProfiles.mockResolvedValue(new Map([[executor, { name: 'Ping Bot' }]]))
     createEditor()
     const update = vi.fn()
     editor.on('update', update)
@@ -180,17 +186,31 @@ describe('public slash suggestions', () => {
     await vi.advanceTimersByTimeAsync(180)
     expect(mocks.getCachedCommands).toHaveBeenCalledExactlyOnceWith(undefined)
     expect(mocks.refresh).not.toHaveBeenCalled()
-    expect(mocks.onSuggestions).toHaveBeenLastCalledWith([ping])
-    expect(mocks.onMenu).toHaveBeenLastCalledWith(false, [ping])
+    const named = { ...ping, executorName: 'Ping Bot' }
+    expect(mocks.onSuggestions).toHaveBeenLastCalledWith([named])
+    expect(mocks.onMenu).toHaveBeenLastCalledWith(false, [named])
     expect(key('Enter', { ctrlKey: true })).toBe(true)
     expect(parseEditorJsonToText(editor.getJSON())).toBe('/p')
     expect(key('Enter')).toBe(false)
     expect(parseEditorJsonToText(editor.getJSON())).toBe(formatNipCdInvocation(ping))
     expect(editor.getJSON().content?.[0].content).toEqual([
-      { type: 'text', text: formatNipCdInvocation(ping) + ' ' }
+      {
+        type: 'nipCdInvocation',
+        attrs: { invocation: formatNipCdInvocation(ping), executorName: 'Ping Bot' }
+      },
+      { type: 'text', text: ' ' }
     ])
-    expect(invocation()).toBe(formatNipCdInvocation(ping))
+    expect(invocation()).toBe('/ping\u2009@Ping Bot')
     expect(update).toHaveBeenCalledTimes(2)
+    editor.commands.selectAll()
+    const copy = editor.view.serializeForClipboard(editor.state.selection.content())
+    expect(copy.text).toBe(formatNipCdInvocation(ping) + ' ')
+    expect(copy.dom.textContent).toBe(copy.text)
+    expect(
+      copy.dom
+        .querySelector('[data-nip-cd-executor-name]')
+        ?.getAttribute('data-nip-cd-executor-name')
+    ).toBe('Ping Bot')
   })
 
   it('looks up an explicit first mention instead of the reply author and preserves draft serialization', async () => {
@@ -214,12 +234,12 @@ describe('public slash suggestions', () => {
     expect(mocks.refresh).toHaveBeenCalledExactlyOnceWith(executor, expect.any(Function))
     expect(mocks.onSuggestions).toHaveBeenLastCalledWith([comment])
     key('Enter')
-    expect(invocation()).toBe(formatNipCdInvocation(comment))
+    expect(invocation()).toBe('/pingComment')
     const serialized = editor.getJSON()
     editor.destroy()
     createEditor(serialized)
     expect(parseEditorJsonToText(editor.getJSON())).toBe(formatNipCdInvocation(comment))
-    expect(invocation()).toBe(formatNipCdInvocation(comment))
+    expect(invocation()).toBe('/pingComment')
   })
 
   it('suggests a command with tag and relay scopes before those values are known', async () => {
@@ -257,7 +277,7 @@ describe('public slash suggestions', () => {
     await vi.advanceTimersByTimeAsync(180)
     expect(mocks.onSuggestions).toHaveBeenLastCalledWith([scoped])
     key('Enter')
-    expect(invocation()).toBe(formatNipCdInvocation(scoped))
+    expect(invocation()).toBe('/ping')
   })
 
   it('preserves an existing argument and puts the caret after its separator', async () => {
@@ -269,8 +289,8 @@ describe('public slash suggestions', () => {
     key('Enter')
     const head = formatNipCdInvocation(ping)
     expect(editor.getText()).toBe(head + ' existing')
-    expect(invocation()).toBe(head)
-    expect(editor.state.selection.from).toBe(head.length + 2)
+    expect(invocation()).toBe('/ping')
+    expect(editor.state.selection.from).toBe(3)
   })
 
   it('keeps bare slash local and displays both compatible executors with the same trigger', async () => {
@@ -282,10 +302,11 @@ describe('public slash suggestions', () => {
 
     const other = command(1, 'ping', otherExecutor)
     mocks.getCachedCommands.mockResolvedValue([dm, ping, other])
-    mocks.getCachedExecutorNames.mockResolvedValue(
+    const avatar = 'https://bot.example/avatar.png'
+    mocks.getCachedExecutorProfiles.mockResolvedValue(
       new Map([
-        [executor, 'Bot one'],
-        [otherExecutor, 'Bot two']
+        [executor, { name: 'Bot one', avatar }],
+        [otherExecutor, { name: 'Bot two' }]
       ])
     )
     editor.commands.setContent('')
@@ -295,7 +316,7 @@ describe('public slash suggestions', () => {
     expect(mocks.refresh).not.toHaveBeenCalled()
     expect(mocks.onSuggestions).toHaveBeenLastCalledWith(
       expect.arrayContaining([
-        { ...ping, executorName: 'Bot one' },
+        { ...ping, executorName: 'Bot one', executorAvatar: avatar },
         { ...other, executorName: 'Bot two' }
       ])
     )

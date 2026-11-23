@@ -260,11 +260,35 @@ html body[data-scroll-locked] {
   pointer-events: none;
 }
 
-.tiptap .nip-cd-invocation {
-  @apply bg-primary/10 text-primary rounded-md px-1 py-0.5 font-mono text-sm font-medium;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+.nip-cd-invocation {
+  @apply text-primary;
+  font: inherit;
   overflow-wrap: anywhere;
+}
+
+.nip-cd-invocation-executor {
+  @apply text-muted-foreground;
+}
+
+button.nip-cd-invocation {
+  @apply rounded-xs transition-[color,background-color,box-shadow];
+}
+
+button.nip-cd-invocation .nip-cd-invocation-executor {
+  @apply transition-colors;
+}
+
+@media (hover: hover) {
+  button.nip-cd-invocation:enabled:hover {
+    --nip-cd-hover-background: color-mix(in srgb, var(--color-foreground) 14%, transparent);
+    background-color: var(--nip-cd-hover-background);
+    box-shadow: 0 0 0 2px var(--nip-cd-hover-background);
+    color: var(--color-foreground);
+  }
+
+  button.nip-cd-invocation:enabled:hover .nip-cd-invocation-executor {
+    color: color-mix(in srgb, var(--color-muted-foreground) 75%, var(--color-foreground));
+  }
 }
 
 /* Inline emoji atoms aren't painted by the native range selection; this

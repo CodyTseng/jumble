@@ -1,6 +1,9 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TNipCdCommand } from '@/lib/nip-cd'
-import { formatPubkey, pubkeyToNpub } from '@/lib/pubkey'
+import { formatPubkey, generateImageByPubkey, pubkeyToNpub } from '@/lib/pubkey'
+import { getSafeExternalUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
+import { useContentPolicy } from '@/providers/ContentPolicyProvider'
 import { useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -8,7 +11,10 @@ export type TCommandListHandle = {
   onKeyDown: (event: KeyboardEvent) => boolean
 }
 
-export type TNipCdSuggestionItem = TNipCdCommand & { executorName?: string }
+export type TNipCdSuggestionItem = TNipCdCommand & {
+  executorName?: string
+  executorAvatar?: string
+}
 
 export type TCommandListProps = {
   items: TNipCdSuggestionItem[]
@@ -19,6 +25,7 @@ export type TCommandListProps = {
 
 export default function CommandList({ items, loading, command, ref }: TCommandListProps) {
   const { t } = useTranslation()
+  const { autoLoadProfilePicture } = useContentPolicy()
   const [selected, setSelected] = useState<{ items: TNipCdSuggestionItem[]; index: number }>()
   const listRef = useRef<HTMLDivElement>(null)
   const index = selected?.items === items ? selected.index : 0
@@ -50,7 +57,7 @@ export default function CommandList({ items, loading, command, ref }: TCommandLi
   return (
     <div
       ref={listRef}
-      className="bg-background pointer-events-auto max-h-64 w-80 max-w-[calc(100vw-3rem)] overflow-y-auto overscroll-contain rounded-lg border p-1 shadow-md"
+      className="bg-background pointer-events-auto max-h-64 w-96 max-w-[calc(100vw-3rem)] overflow-y-auto overscroll-contain rounded-md border p-1 shadow-md"
     >
       {items.map((item, position) => (
         <button
@@ -58,31 +65,41 @@ export default function CommandList({ items, loading, command, ref }: TCommandLi
           type="button"
           tabIndex={-1}
           className={cn(
-            'block w-full rounded-md p-2 text-start text-sm',
+            'block w-full rounded-sm p-2 text-start text-sm',
             index === position && 'bg-accent text-accent-foreground'
           )}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => command(item)}
           onMouseEnter={() => setSelected({ items, index: position })}
         >
-          <div dir="auto" className="truncate font-semibold">
-            <bdi>/{item.command}</bdi>
-            {item.args.map(({ name, label, required }) => (
-              <bdi key={name} className="text-muted-foreground ms-1 font-normal">
-                {required ? `<${label}>` : `[${label}]`}
+          <div className="flex items-center justify-between gap-2">
+            <bdi dir="auto" className="min-w-0 truncate font-semibold">
+              /{item.command}
+            </bdi>
+            <span
+              className="text-foreground flex max-w-[55%] min-w-0 shrink-0 items-center gap-1.5 text-xs font-semibold"
+              title={pubkeyToNpub(item.executor) ?? item.executor}
+            >
+              <Avatar className="size-4" aria-hidden="true">
+                {autoLoadProfilePicture && item.executorAvatar && (
+                  <AvatarImage
+                    src={getSafeExternalUrl(item.executorAvatar) ?? undefined}
+                    alt=""
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <AvatarFallback>
+                  <img src={generateImageByPubkey(item.executor)} alt="" className="size-full" />
+                </AvatarFallback>
+              </Avatar>
+              <bdi dir="auto" className="min-w-0 truncate">
+                {item.executorName ? `@${item.executorName}` : formatPubkey(item.executor)}
               </bdi>
-            ))}
-          </div>
-          <div
-            dir="auto"
-            className="text-muted-foreground truncate text-xs"
-            title={pubkeyToNpub(item.executor) ?? item.executor}
-          >
-            {item.executorName ? `@${item.executorName} · ` : ''}
-            {formatPubkey(item.executor)}
+            </span>
           </div>
           <div dir="auto" className="text-muted-foreground truncate text-xs">
-            {item.title === item.command ? item.description : `${item.title}: ${item.description}`}
+            {item.description}
           </div>
         </button>
       ))}
