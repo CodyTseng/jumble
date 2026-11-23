@@ -2,6 +2,7 @@ import {
   formatNipCdInvocation,
   getNipCdMentionPubkey,
   matchesNipCdScope,
+  TNipCdCommand,
   TNipCdContext
 } from '@/lib/nip-cd'
 import nipCdService from '@/services/nip-cd.service'
@@ -18,8 +19,18 @@ import CommandList, {
   TNipCdSuggestionItem
 } from './CommandList'
 
-export type TNipCdEditorContext = TNipCdContext & { replyExecutor?: string }
+export type TNipCdEditorContext = Pick<TNipCdContext, 'kind' | 'author'> & {
+  replyExecutor?: string
+}
 const pluginKey = new PluginKey('nipCdCommandSuggestion')
+
+function matchesSuggestionScope(command: TNipCdCommand, context: TNipCdEditorContext) {
+  // The final event tags and publish targets are only available when sending.
+  const scopes = command.scopes.filter(
+    ({ group }) => group === 'kind' || (group === 'author' && context.author !== undefined)
+  )
+  return matchesNipCdScope({ ...command, scopes }, context)
+}
 
 export function closeNipCdSuggestion(editor: Editor) {
   if (pluginKey.getState(editor.state)?.active) exitSuggestion(editor.view, pluginKey)
@@ -88,7 +99,8 @@ export const NipCdSuggestion = Extension.create<{
       const items = commands
         .filter(
           (command) =>
-            command.command.toLowerCase().startsWith(prefix) && matchesNipCdScope(command, context)
+            command.command.toLowerCase().startsWith(prefix) &&
+            matchesSuggestionScope(command, context)
         )
         .sort(
           (a, b) =>
@@ -126,7 +138,7 @@ export const NipCdSuggestion = Extension.create<{
             current.range.from !== range.from ||
             current.range.to !== range.to ||
             !item.command.toLowerCase().startsWith(current.query.toLowerCase()) ||
-            !matchesNipCdScope(item, context)
+            !matchesSuggestionScope(item, context)
           )
             return
           const hasSeparator = current.after.startsWith(' ')

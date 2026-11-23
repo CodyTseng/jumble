@@ -27,6 +27,8 @@ const a = generateSecretKey()
 const b = generateSecretKey()
 const executorA = getPublicKey(a)
 const executorB = getPublicKey(b)
+const writeRelays = ['wss://outbox.example/']
+const emptySnapshot = { events: [], complete: true }
 
 function declaration(secret: Uint8Array, kind: 1 | 14 | 1111, coordinate = 'hello') {
   return finalizeEvent(
@@ -58,7 +60,7 @@ beforeEach(() => {
     return record
   })
   vi.mocked(client.fetchRelayList).mockResolvedValue({
-    write: ['wss://outbox.example/'],
+    write: writeRelays,
     read: ['wss://inbox.example/'],
     originalRelays: [{ url: 'wss://outbox.example/', scope: 'write' }]
   })
@@ -135,9 +137,18 @@ describe('NIP-CD persisted catalogs', () => {
     expect(await service.getCachedCommands()).toMatchObject([{ executor: executorA }])
   })
 
-  it('deduplicates discovery and stores both public kinds in one catalog available after restart', async () => {
+  it('deduplicates advertised write relays and reuses the complete catalog for one day', async () => {
     const service = new NipCdService()
-    vi.mocked(client.fetchEventSnapshot).mockResolvedValue({
+    vi.mocked(client.fetchRelayList).mockResolvedValueOnce({
+      write: [...writeRelays, ...writeRelays, 'wss://both.example/'],
+      read: ['wss://both.example/', 'wss://inbox.example/'],
+      originalRelays: [
+        { url: writeRelays[0], scope: 'write' },
+        { url: 'wss://both.example/', scope: 'both' },
+        { url: 'wss://inbox.example/', scope: 'read' }
+      ]
+    })
+    vi.mocked(client.fetchEventSnapshot).mockResolvedValueOnce({
       events: [declaration(a, 1), declaration(a, 1111, 'comment')],
       complete: true
     })
@@ -149,16 +160,21 @@ describe('NIP-CD persisted catalogs', () => {
     expect(onQuery).toHaveBeenCalledOnce()
     expect(onCoalescedQuery).toHaveBeenCalledOnce()
     expect(client.fetchRelayList).toHaveBeenCalledExactlyOnceWith(executorA)
-    expect(client.fetchEventSnapshot).toHaveBeenCalledExactlyOnceWith(['wss://outbox.example/'], {
+    const filter = {
       kinds: [31992],
       authors: [executorA]
-    })
+    }
+    expect(client.fetchEventSnapshot).toHaveBeenCalledExactlyOnceWith(
+      [...writeRelays, 'wss://both.example/'],
+      filter
+    )
     const reloaded = new NipCdService()
     expect((await reloaded.getCachedCommands()).map((command) => command.id).sort()).toEqual([
       'comment',
       'hello'
     ])
     const whenFresh = vi.fn()
+    await vi.advanceTimersByTimeAsync(DAY - 1)
     expect(await reloaded.refresh(executorA, whenFresh)).toBe(false)
     expect(whenFresh).not.toHaveBeenCalled()
     expect(client.fetchEventSnapshot).toHaveBeenCalledOnce()
@@ -171,7 +187,7 @@ describe('NIP-CD persisted catalogs', () => {
       complete: true
     })
     await service.refresh(executorA)
-    await vi.advanceTimersByTimeAsync(3 * DAY + 1)
+    await vi.advanceTimersByTimeAsync(DAY)
 
     let finish!: (snapshot: { events: []; complete: boolean }) => void
     vi.mocked(client.fetchEventSnapshot).mockReturnValueOnce(
@@ -194,10 +210,10 @@ describe('NIP-CD persisted catalogs', () => {
     const otherTab = new NipCdService()
     vi.mocked(client.fetchEventSnapshot)
       .mockResolvedValueOnce({ events: [declaration(a, 1)], complete: true })
-      .mockResolvedValueOnce({ events: [], complete: true })
+      .mockResolvedValueOnce(emptySnapshot)
     await service.refresh(executorA)
     expect(await otherTab.getCachedCommands(executorA)).toHaveLength(1)
-    await vi.advanceTimersByTimeAsync(3 * DAY + 1)
+    await vi.advanceTimersByTimeAsync(DAY)
     expect(await service.refresh(executorA)).toBe(true)
     expect(await service.getCachedCommands(executorA)).toEqual([])
     await otherTab.reloadCachedCatalogs()
@@ -206,52 +222,50 @@ describe('NIP-CD persisted catalogs', () => {
     expect(client.fetchEventSnapshot).toHaveBeenCalledTimes(2)
   })
 
-  it('does not revive a complete empty catalog from a stale discovery replica', async () => {
+  it('does not revive a complete empty catalog from a partial write snapshot', async () => {
     const service = new NipCdService()
     vi.mocked(client.fetchEventSnapshot)
-      .mockResolvedValueOnce({ events: [], complete: true })
-      .mockResolvedValueOnce({ events: [], complete: false })
-      .mockResolvedValueOnce({ events: [declaration(a, 1)], complete: true })
+      .mockResolvedValueOnce(emptySnapshot)
+      .mockResolvedValueOnce({ events: [declaration(a, 1)], complete: false })
     expect(await service.refresh(executorA)).toBe(true)
-    await vi.advanceTimersByTimeAsync(3 * DAY + 1)
+    await vi.advanceTimersByTimeAsync(DAY)
     expect(await service.refresh(executorA)).toBe(false)
     expect(await service.getCachedCommands(executorA)).toEqual([])
     expect(client.fetchEventSnapshot).toHaveBeenCalledTimes(2)
   })
 
-  it('does not replace a write snapshot when its kind 10002 routing later goes missing', async () => {
+  it('keeps old data when the executor relay list falls back to default relays', async () => {
     const service = new NipCdService()
-    vi.mocked(client.fetchEventSnapshot).mockResolvedValue({ events: [], complete: true })
+    vi.mocked(client.fetchEventSnapshot).mockResolvedValueOnce({
+      events: [declaration(a, 1)],
+      complete: true
+    })
     expect(await service.refresh(executorA)).toBe(true)
-    expect(disk.get(executorA)?.authorRelays).toBe(true)
-    await vi.advanceTimersByTimeAsync(3 * DAY + 1)
+    await vi.advanceTimersByTimeAsync(31 * DAY)
     vi.mocked(client.fetchRelayList).mockResolvedValueOnce({
       write: ['wss://default.example/'],
       read: [],
       originalRelays: []
     })
-    expect(await service.refresh(executorA)).toBe(false)
+    const reloaded = new NipCdService()
+    expect(await reloaded.getCachedCommands(executorA)).toHaveLength(1)
+    expect(await reloaded.refresh(executorA)).toBe(false)
     expect(client.fetchEventSnapshot).toHaveBeenCalledOnce()
-    expect(await service.getCachedCommands(executorA)).toEqual([])
+    expect(await reloaded.getCachedCommands(executorA)).toHaveLength(1)
   })
 
-  it('uses discovery only as a cold best-effort fallback for configured unavailable writers', async () => {
+  it('uses available write results on a cold read when some relays fail', async () => {
     const service = new NipCdService()
-    vi.mocked(client.fetchEventSnapshot)
-      .mockResolvedValueOnce({ events: [], complete: false })
-      .mockResolvedValueOnce({ events: [declaration(a, 1)], complete: true })
+    vi.mocked(client.fetchEventSnapshot).mockResolvedValueOnce({
+      events: [declaration(a, 1)],
+      complete: false
+    })
     expect(await service.refresh(executorA)).toBe(true)
     expect(await service.getCachedCommands(executorA)).toHaveLength(1)
     expect(disk.get(executorA)?.complete).toBe(false)
-    expect(client.fetchEventSnapshot).toHaveBeenNthCalledWith(
-      2,
-      [
-        'wss://default.example/',
-        'wss://nos.lol/',
-        'wss://relay.primal.net/',
-        'wss://relay.ditto.pub/'
-      ],
-      { kinds: [31992], authors: [executorA] }
-    )
+    expect(client.fetchEventSnapshot).toHaveBeenCalledExactlyOnceWith(writeRelays, {
+      kinds: [31992],
+      authors: [executorA]
+    })
   })
 })

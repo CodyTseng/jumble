@@ -159,16 +159,8 @@ const PostContent = forwardRef<TPostContentHandle, Props>(function PostContent(
     () =>
       isPoll || highlightedText || isProtectedEvent
         ? undefined
-        : { kind: nipCdKind, author: postingPubkey, replyExecutor, relays: additionalRelayUrls },
-    [
-      additionalRelayUrls,
-      highlightedText,
-      isPoll,
-      isProtectedEvent,
-      nipCdKind,
-      postingPubkey,
-      replyExecutor
-    ]
+        : { kind: nipCdKind, author: postingPubkey, replyExecutor },
+    [highlightedText, isPoll, isProtectedEvent, nipCdKind, postingPubkey, replyExecutor]
   )
 
   const [relayTargetItems, setRelayTargetItems] = useState<TPostTargetItem[]>(

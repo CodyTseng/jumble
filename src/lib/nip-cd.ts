@@ -175,19 +175,15 @@ function parseCommand(event: Event, identifier: string): TNipCdCommand | undefin
   return { id: identifier, executor: event.pubkey, command, title, description, args, scopes }
 }
 
-type TNipCdCatalogRevision = { checkedAt: number; complete?: boolean; authorRelays?: boolean }
+type TNipCdCatalogRevision = { checkedAt: number; complete?: boolean }
 
-/** Fallback data can never replace a completed snapshot from the executor's write relays. */
+/** A partial read cannot replace a complete snapshot. */
 export function isPreferredNipCdCatalog(
   next: TNipCdCatalogRevision,
   previous: TNipCdCatalogRevision
 ) {
-  const rank = (record: TNipCdCatalogRevision) =>
-    record.complete ? (record.authorRelays ? 2 : 1) : 0
-  return (
-    rank(next) > rank(previous) ||
-    (rank(next) === rank(previous) && next.checkedAt > previous.checkedAt)
-  )
+  if (!!next.complete !== !!previous.complete) return !!next.complete
+  return next.checkedAt > previous.checkedAt
 }
 
 /** Preserve current address heads, including invalid or out-of-scope newer replacements. */

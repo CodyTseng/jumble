@@ -222,6 +222,44 @@ describe('public slash suggestions', () => {
     expect(invocation()).toBe(formatNipCdInvocation(comment))
   })
 
+  it('suggests a command with tag and relay scopes before those values are known', async () => {
+    const relay = 'wss://bot.example/inbox'
+    const scoped = {
+      ...ping,
+      scopes: [...ping.scopes, { group: 'tag:e', value: 'e' }, { group: 'relay', value: relay }]
+    }
+    const otherAuthor = {
+      ...command(1, 'otherAuthor'),
+      scopes: [{ group: 'author', value: otherExecutor }]
+    }
+    context = { kind: 1, author: executor }
+    mocks.getCachedCommands.mockResolvedValue([scoped, otherAuthor])
+    createEditor()
+    editor.commands.insertContent('/')
+    await vi.advanceTimersByTimeAsync(180)
+    expect(mocks.refresh).not.toHaveBeenCalled()
+    expect(mocks.onSuggestions).toHaveBeenLastCalledWith([scoped])
+
+    editor.commands.setContent({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            { type: 'mention', attrs: { id: npub, label: 'Bot' } },
+            { type: 'text', text: ' ' }
+          ]
+        }
+      ]
+    })
+    editor.commands.setTextSelection(3)
+    editor.commands.insertContent('/')
+    await vi.advanceTimersByTimeAsync(180)
+    expect(mocks.onSuggestions).toHaveBeenLastCalledWith([scoped])
+    key('Enter')
+    expect(invocation()).toBe(formatNipCdInvocation(scoped))
+  })
+
   it('preserves an existing argument and puts the caret after its separator', async () => {
     createEditor()
     editor.commands.insertContent('/p existing')

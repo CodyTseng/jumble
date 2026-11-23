@@ -12,7 +12,6 @@ export type TNipCdCatalogRecord = {
   executor: string
   checkedAt: number
   complete?: boolean
-  authorRelays?: boolean
   events: Event[]
 }
 
