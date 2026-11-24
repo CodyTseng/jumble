@@ -1307,6 +1307,11 @@ export default {
     'Login with Android signer': 'Android साइनर से लॉगिन करें',
     'Profile followed by': 'इन्हें फ़ॉलो करते हैं',
     'People you follow who also follow this user.':
-      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।'
+      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।',
+    'Your note': 'आपकी नोट',
+    'Original note': 'मूल नोट',
+    'reacted to a note': 'ने एक नोट पर प्रतिक्रिया दी',
+    replied: 'ने जवाब दिया',
+    'Reply preview': 'जवाब'
   }
 }

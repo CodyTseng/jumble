@@ -1324,6 +1324,11 @@ export default {
     'Login with Android signer': 'Zaloguj się przez aplikację podpisującą Android',
     'Profile followed by': 'Obserwowany przez',
     'People you follow who also follow this user.':
-      'Osoby, które obserwujesz i które również obserwują tego użytkownika.'
+      'Osoby, które obserwujesz i które również obserwują tego użytkownika.',
+    'Your note': 'Twoja notatka',
+    'Original note': 'Oryginalna notatka',
+    'reacted to a note': 'zareagował(a) na notatkę',
+    replied: 'odpowiedział(a)',
+    'Reply preview': 'Odpowiedź'
   }
 }

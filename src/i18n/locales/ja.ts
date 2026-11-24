@@ -1308,6 +1308,11 @@ export default {
     'Login with Android signer': 'Android署名アプリでログイン',
     'Profile followed by': 'フォロワー',
     'People you follow who also follow this user.':
-      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。'
+      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。',
+    'Your note': 'あなたのノート',
+    'Original note': '元のノート',
+    'reacted to a note': 'がノートにリアクションしました',
+    replied: 'が返信しました',
+    'Reply preview': '返信'
   }
 }

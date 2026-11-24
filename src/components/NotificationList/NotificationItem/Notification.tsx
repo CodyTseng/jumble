@@ -27,6 +27,8 @@ export default function Notification({
   description,
   middle = null,
   targetEvent,
+  previewLabel,
+  insetPreview = false,
   targetPath,
   isNew = false,
   showStats = false,
@@ -39,6 +41,8 @@ export default function Notification({
   description: string
   middle?: React.ReactNode
   targetEvent?: NostrEvent
+  previewLabel?: string
+  insetPreview?: boolean
   targetPath?: string
   isNew?: boolean
   showStats?: boolean
@@ -81,7 +85,7 @@ export default function Notification({
   if (notificationListStyle === NOTIFICATION_LIST_STYLE.COMPACT) {
     return (
       <ClickableCard
-        className="flex cursor-pointer items-center justify-between px-4 py-2"
+        className="flex cursor-pointer items-center justify-between gap-2 px-4 py-2"
         onClick={handleClick}
       >
         <div className="flex w-0 flex-1 items-center gap-2">
@@ -97,18 +101,26 @@ export default function Notification({
               />
             </div>
           )}
-          {icon}
+          <div className="shrink-0">{icon}</div>
           {!autoLoadProfilePicture && (
             <Username
               userId={sender}
-              className="max-w-32 shrink-0 truncate text-sm font-semibold"
+              className="min-w-0 max-w-[min(8rem,25%)] truncate text-sm font-semibold"
             />
           )}
           {middle}
+          {targetEvent && previewLabel && (
+            <span
+              className="text-muted-foreground min-w-0 max-w-[40%] truncate text-xs font-medium"
+              title={previewLabel}
+            >
+              {previewLabel}
+            </span>
+          )}
           {targetEvent && (
             <ContentPreview
               className={cn(
-                'w-0 flex-1 truncate',
+                'min-w-[4ch] flex-1 truncate',
                 unread ? 'font-semibold' : 'text-muted-foreground'
               )}
               event={targetEvent}
@@ -121,6 +133,13 @@ export default function Notification({
       </ClickableCard>
     )
   }
+
+  const detailedPreview = targetEvent && (
+    <ContentPreview
+      className={cn('line-clamp-2', !unread && 'text-muted-foreground')}
+      event={targetEvent}
+    />
+  )
 
   return (
     <ClickableCard
@@ -140,7 +159,9 @@ export default function Notification({
               skeletonClassName="h-4"
             />
             <TrustScoreBadge pubkey={sender} />
-            <div className="shrink-0 text-sm text-muted-foreground">{description}</div>
+            {description && (
+              <div className="text-muted-foreground min-w-0 shrink text-sm">{description}</div>
+            )}
           </div>
           <div className="flex shrink-0 items-center">
             {unread && (
@@ -160,11 +181,13 @@ export default function Notification({
           </div>
         </div>
         {middle}
-        {targetEvent && (
-          <ContentPreview
-            className={cn('line-clamp-2', !unread && 'text-muted-foreground')}
-            event={targetEvent}
-          />
+        {insetPreview && detailedPreview ? (
+          <div className="bg-muted/50 my-1 rounded-md border px-2 py-1">
+            <div className="text-muted-foreground text-xs font-medium">{previewLabel}</div>
+            {detailedPreview}
+          </div>
+        ) : (
+          detailedPreview
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-sm text-muted-foreground" />
         {showStats && targetEvent && <StuffStats stuff={targetEvent} className="mt-1" />}

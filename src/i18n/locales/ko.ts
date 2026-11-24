@@ -1292,6 +1292,11 @@ export default {
     'Login with Android signer': 'Android 서명 앱으로 로그인',
     'Profile followed by': '팔로워',
     'People you follow who also follow this user.':
-      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.'
+      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.',
+    'Your note': '내 노트',
+    'Original note': '원본 노트',
+    'reacted to a note': '님이 노트에 반응했습니다',
+    replied: '님이 답글을 남겼습니다',
+    'Reply preview': '답글'
   }
 }

@@ -36,6 +36,7 @@ export function MentionNotification({
   const { parentEventId, parentExternalContent } = useMemo(() => {
     return getParentStuff(notification)
   }, [notification])
+  const isReply = Boolean(parentEventId || parentExternalContent)
   const [isDirectMention, setIsDirectMention] = useState(false)
   useEffect(() => {
     const checkIsDirectMention = async () => {
@@ -84,10 +85,10 @@ export function MentionNotification({
     <Notification
       notificationId={notification.id}
       icon={
-        isMention ? (
-          <AtSign size={24} className="text-pink-400" />
-        ) : parentEventId ? (
+        isReply ? (
           <MessageCircle size={24} className="text-blue-400" />
+        ) : isMention ? (
+          <AtSign size={24} className="text-pink-400" />
         ) : (
           <Quote size={24} className="text-green-400" />
         )
@@ -95,6 +96,7 @@ export function MentionNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={notification}
+      previewLabel={isReply ? t('Reply preview') : undefined}
       middle={
         notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED && (
           <ParentNotePreview
@@ -113,7 +115,7 @@ export function MentionNotification({
         )
       }
       description={
-        isMention ? t('mentioned you in a note') : parentEventId ? '' : t('quoted your note')
+        isReply ? t('replied') : isMention ? t('mentioned you in a note') : t('quoted your note')
       }
       isNew={isNew}
       showStats

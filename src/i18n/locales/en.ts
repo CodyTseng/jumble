@@ -1336,6 +1336,11 @@ export default {
     'Share profile': 'Share profile',
     'Login with Android signer': 'Login with Android signer',
     'Profile followed by': 'Followed by',
-    'People you follow who also follow this user.': 'People you follow who also follow this user.'
+    'People you follow who also follow this user.': 'People you follow who also follow this user.',
+    'Your note': 'Your note',
+    'Original note': 'Original note',
+    'reacted to a note': 'reacted to a note',
+    replied: 'replied',
+    'Reply preview': 'Reply'
   }
 }

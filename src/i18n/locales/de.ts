@@ -1329,6 +1329,11 @@ export default {
     'Login with Android signer': 'Mit Android-Signer anmelden',
     'Profile followed by': 'Gefolgt von',
     'People you follow who also follow this user.':
-      'Personen, denen du folgst und die auch diesem Nutzer folgen.'
+      'Personen, denen du folgst und die auch diesem Nutzer folgen.',
+    'Your note': 'Dein Beitrag',
+    'Original note': 'Ursprünglicher Beitrag',
+    'reacted to a note': 'hat auf einen Beitrag reagiert',
+    replied: 'hat geantwortet',
+    'Reply preview': 'Antwort'
   }
 }

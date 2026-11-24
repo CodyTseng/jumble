@@ -1299,6 +1299,11 @@ export default {
     'Share profile': '分享個人主頁',
     'Login with Android signer': '使用 Android 簽署器登入',
     'Profile followed by': '關注者',
-    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。'
+    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。',
+    'Your note': '你的貼文',
+    'Original note': '原貼文',
+    'reacted to a note': '對一則貼文作出反應',
+    replied: '回覆了',
+    'Reply preview': '回覆'
   }
 }

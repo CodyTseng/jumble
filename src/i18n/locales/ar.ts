@@ -1296,6 +1296,11 @@ export default {
     'Share profile': 'مشاركة الملف الشخصي',
     'Login with Android signer': 'تسجيل الدخول باستخدام تطبيق توقيع Android',
     'Profile followed by': 'يتابعه',
-    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.'
+    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.',
+    'Your note': 'ملاحظتك',
+    'Original note': 'الملاحظة الأصلية',
+    'reacted to a note': 'تفاعل مع ملاحظة',
+    replied: 'ردّ',
+    'Reply preview': 'رد'
   }
 }

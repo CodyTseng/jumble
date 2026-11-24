@@ -61,7 +61,8 @@ export function ReactionNotification({
   if (!event || !eventId || !reaction) {
     return null
   }
-  if (hideIndirect && getEventAuthorPubkey(event) !== pubkey) {
+  const isOwnNote = getEventAuthorPubkey(event) === pubkey
+  if (hideIndirect && !isOwnNote) {
     return null
   }
 
@@ -72,7 +73,9 @@ export function ReactionNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={event}
-      description={t('reacted to your note')}
+      previewLabel={isOwnNote ? t('Your note') : t('Original note')}
+      insetPreview
+      description={isOwnNote ? t('reacted to your note') : t('reacted to a note')}
       isNew={isNew}
       onVisibilityChange={onVisibilityChange}
     />
