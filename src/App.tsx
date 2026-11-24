@@ -15,6 +15,7 @@ import { EmojiPackProvider } from '@/providers/EmojiPackProvider'
 import { FavoriteRelaysProvider } from '@/providers/FavoriteRelaysProvider'
 import { FeedProvider } from '@/providers/FeedProvider'
 import { FollowListProvider } from '@/providers/FollowListProvider'
+import { FollowSetsProvider } from '@/providers/FollowSetsProvider'
 import { KindFilterProvider } from '@/providers/KindFilterProvider'
 import { MediaUploadServiceProvider } from '@/providers/MediaUploadServiceProvider'
 import { MuteListProvider } from '@/providers/MuteListProvider'
@@ -58,19 +59,21 @@ export default function App(): React.JSX.Element {
                                     <EmojiPackProvider>
                                       <PinListProvider>
                                         <PinnedUsersProvider>
-                                          <FeedProvider>
-                                            <MediaUploadServiceProvider>
-                                              <KindFilterProvider>
-                                                <PageManager />
-                                                <SystemNotificationPermissionPrompt />
-                                                <KeySyncRequestHandler />
-                                                <EmojiDetailDialog />
-                                                <MobileSignerApprovalIndicator />
-                                                <DialogHost />
-                                                <Toaster />
-                                              </KindFilterProvider>
-                                            </MediaUploadServiceProvider>
-                                          </FeedProvider>
+                                          <FollowSetsProvider>
+                                            <FeedProvider>
+                                              <MediaUploadServiceProvider>
+                                                <KindFilterProvider>
+                                                  <PageManager />
+                                                  <SystemNotificationPermissionPrompt />
+                                                  <KeySyncRequestHandler />
+                                                  <EmojiDetailDialog />
+                                                  <MobileSignerApprovalIndicator />
+                                                  <DialogHost />
+                                                  <Toaster />
+                                                </KindFilterProvider>
+                                              </MediaUploadServiceProvider>
+                                            </FeedProvider>
+                                          </FollowSetsProvider>
                                         </PinnedUsersProvider>
                                       </PinListProvider>
                                     </EmojiPackProvider>

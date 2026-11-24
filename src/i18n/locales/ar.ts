@@ -1296,6 +1296,18 @@ export default {
     'Share profile': 'مشاركة الملف الشخصي',
     'Login with Android signer': 'تسجيل الدخول باستخدام تطبيق توقيع Android',
     'Profile followed by': 'يتابعه',
-    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.'
+    'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.',
+    'Follow lists': 'قوائم المتابعة',
+    'New follow list': 'قائمة متابعة جديدة',
+    'No follow lists yet': 'لا توجد قوائم متابعة بعد',
+    'Follow list name': 'اسم قائمة المتابعة',
+    'Anyone can see the people you add to this list.': 'يمكن لأي شخص رؤية الأشخاص الذين تضيفهم إلى هذه القائمة.',
+    'Nostr public key': 'مفتاح Nostr العام',
+    'Invalid Nostr public key': 'مفتاح Nostr العام غير صالح',
+    'Delete this follow list?': 'هل تريد حذف قائمة المتابعة هذه؟',
+    'No people in this follow list': 'لا يوجد أشخاص في قائمة المتابعة هذه',
+    'Follow list unavailable': 'قائمة المتابعة غير متاحة',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'تم تغيير قائمة المتابعة هذه أو حذفها. أعد فتحها لرؤية أحدث نسخة.'
   }
 }

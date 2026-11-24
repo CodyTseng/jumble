@@ -1323,6 +1323,18 @@ export default {
     'Login with Android signer': 'Bejelentkezés Android-aláíróval',
     'Profile followed by': 'Követői',
     'People you follow who also follow this user.':
-      'Az Ön által követett személyek, akik ezt a felhasználót is követik.'
+      'Az Ön által követett személyek, akik ezt a felhasználót is követik.',
+    'Follow lists': 'Követési listák',
+    'New follow list': 'Új követési lista',
+    'No follow lists yet': 'Még nincsenek követési listák',
+    'Follow list name': 'A követési lista neve',
+    'Anyone can see the people you add to this list.': 'Bárki láthatja, kiket ad hozzá ehhez a listához.',
+    'Nostr public key': 'Nyilvános Nostr-kulcs',
+    'Invalid Nostr public key': 'Érvénytelen nyilvános Nostr-kulcs',
+    'Delete this follow list?': 'Törli ezt a követési listát?',
+    'No people in this follow list': 'Ezen a követési listán nincs senki',
+    'Follow list unavailable': 'A követési lista nem érhető el',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'A követési lista megváltozott vagy törölték. Nyissa meg újra a legfrissebb verzió megtekintéséhez.'
   }
 }

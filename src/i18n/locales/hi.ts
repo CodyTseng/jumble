@@ -1307,6 +1307,18 @@ export default {
     'Login with Android signer': 'Android साइनर से लॉगिन करें',
     'Profile followed by': 'इन्हें फ़ॉलो करते हैं',
     'People you follow who also follow this user.':
-      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।'
+      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।',
+    'Follow lists': 'फ़ॉलो सूचियाँ',
+    'New follow list': 'नई फ़ॉलो सूची',
+    'No follow lists yet': 'अभी कोई फ़ॉलो सूची नहीं है',
+    'Follow list name': 'फ़ॉलो सूची का नाम',
+    'Anyone can see the people you add to this list.': 'इस सूची में जोड़े गए लोगों को कोई भी देख सकता है।',
+    'Nostr public key': 'Nostr सार्वजनिक कुंजी',
+    'Invalid Nostr public key': 'अमान्य Nostr सार्वजनिक कुंजी',
+    'Delete this follow list?': 'यह फ़ॉलो सूची हटाएँ?',
+    'No people in this follow list': 'इस फ़ॉलो सूची में कोई नहीं है',
+    'Follow list unavailable': 'फ़ॉलो सूची उपलब्ध नहीं है',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'यह फ़ॉलो सूची बदल गई है या हटा दी गई है। नवीनतम संस्करण देखने के लिए इसे फिर से खोलें।'
   }
 }

@@ -1308,6 +1308,18 @@ export default {
     'Login with Android signer': 'ورود با امضاکننده اندروید',
     'Profile followed by': 'دنبال‌شده توسط',
     'People you follow who also follow this user.':
-      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.'
+      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.',
+    'Follow lists': 'فهرست‌های دنبال‌کردن',
+    'New follow list': 'فهرست دنبال‌کردن جدید',
+    'No follow lists yet': 'هنوز فهرست دنبال‌کردنی وجود ندارد',
+    'Follow list name': 'نام فهرست دنبال‌کردن',
+    'Anyone can see the people you add to this list.': 'همه می‌توانند افرادی را که به این فهرست اضافه می‌کنید ببینند.',
+    'Nostr public key': 'کلید عمومی Nostr',
+    'Invalid Nostr public key': 'کلید عمومی Nostr نامعتبر است',
+    'Delete this follow list?': 'این فهرست دنبال‌کردن حذف شود؟',
+    'No people in this follow list': 'هیچ‌کس در این فهرست نیست',
+    'Follow list unavailable': 'فهرست دنبال‌کردن در دسترس نیست',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'این فهرست تغییر کرده یا حذف شده است. برای دیدن آخرین نسخه، آن را دوباره باز کنید.'
   }
 }

@@ -1316,6 +1316,18 @@ export default {
     'Login with Android signer': 'Войти через приложение подписи Android',
     'Profile followed by': 'Читают',
     'People you follow who also follow this user.':
-      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.'
+      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.',
+    'Follow lists': 'Списки подписок',
+    'New follow list': 'Новый список подписок',
+    'No follow lists yet': 'Списков подписок пока нет',
+    'Follow list name': 'Название списка подписок',
+    'Anyone can see the people you add to this list.': 'Все могут видеть, кого вы добавляете в этот список.',
+    'Nostr public key': 'Публичный ключ Nostr',
+    'Invalid Nostr public key': 'Недействительный публичный ключ Nostr',
+    'Delete this follow list?': 'Удалить этот список подписок?',
+    'No people in this follow list': 'В этом списке подписок никого нет',
+    'Follow list unavailable': 'Список подписок недоступен',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'Этот список подписок изменён или удалён. Откройте его снова, чтобы увидеть последнюю версию.'
   }
 }

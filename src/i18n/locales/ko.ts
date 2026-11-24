@@ -1292,6 +1292,18 @@ export default {
     'Login with Android signer': 'Android 서명 앱으로 로그인',
     'Profile followed by': '팔로워',
     'People you follow who also follow this user.':
-      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.'
+      '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.',
+    'Follow lists': '팔로우 목록',
+    'New follow list': '새 팔로우 목록',
+    'No follow lists yet': '아직 팔로우 목록이 없습니다',
+    'Follow list name': '팔로우 목록 이름',
+    'Anyone can see the people you add to this list.': '이 목록에 추가한 사람은 누구나 볼 수 있습니다.',
+    'Nostr public key': 'Nostr 공개 키',
+    'Invalid Nostr public key': '유효하지 않은 Nostr 공개 키',
+    'Delete this follow list?': '이 팔로우 목록을 삭제할까요?',
+    'No people in this follow list': '이 팔로우 목록에 사람이 없습니다',
+    'Follow list unavailable': '팔로우 목록을 사용할 수 없습니다',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      '이 팔로우 목록이 변경되었거나 삭제되었습니다. 다시 열어 최신 버전을 확인하세요.'
   }
 }

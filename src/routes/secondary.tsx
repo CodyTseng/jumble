@@ -8,6 +8,7 @@ import EmojiPackSettingsPage from '@/pages/secondary/EmojiPackSettingsPage'
 import EmojiSetEditorPage from '@/pages/secondary/EmojiSetEditorPage'
 import ExternalContentPage from '@/pages/secondary/ExternalContentPage'
 import FollowingListPage from '@/pages/secondary/FollowingListPage'
+import FollowListSettingsPage from '@/pages/secondary/FollowListSettingsPage'
 import FollowPackPage from '@/pages/secondary/FollowPackPage'
 import GeneralSettingsPage from '@/pages/secondary/GeneralSettingsPage'
 import MuteListPage from '@/pages/secondary/MuteListPage'
@@ -55,6 +56,7 @@ const SECONDARY_ROUTE_CONFIGS: {
   { path: '/external-content', element: <ExternalContentPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/settings/relays', element: <RelaySettingsPage /> },
+  { path: '/settings/follow-lists', element: <FollowListSettingsPage /> },
   { path: '/settings/wallet', element: <WalletPage /> },
   { path: '/settings/posts', element: <PostSettingsPage /> },
   { path: '/settings/general', element: <GeneralSettingsPage /> },

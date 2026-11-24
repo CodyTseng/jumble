@@ -1336,6 +1336,18 @@ export default {
     'Share profile': 'Share profile',
     'Login with Android signer': 'Login with Android signer',
     'Profile followed by': 'Followed by',
-    'People you follow who also follow this user.': 'People you follow who also follow this user.'
+    'People you follow who also follow this user.': 'People you follow who also follow this user.',
+    'Follow lists': 'Follow lists',
+    'New follow list': 'New follow list',
+    'No follow lists yet': 'No follow lists yet',
+    'Follow list name': 'Follow list name',
+    'Anyone can see the people you add to this list.': 'Anyone can see the people you add to this list.',
+    'Nostr public key': 'Nostr public key',
+    'Invalid Nostr public key': 'Invalid Nostr public key',
+    'Delete this follow list?': 'Delete this follow list?',
+    'No people in this follow list': 'No people in this follow list',
+    'Follow list unavailable': 'Follow list unavailable',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'This follow list was changed or deleted. Reopen it to see the latest version.'
   }
 }

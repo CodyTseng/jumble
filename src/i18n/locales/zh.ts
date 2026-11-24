@@ -1299,6 +1299,18 @@ export default {
     'Share profile': '分享个人主页',
     'Login with Android signer': '使用 Android 签名器登录',
     'Profile followed by': '关注者',
-    'People you follow who also follow this user.': '你关注的人中，也关注了该用户的人。'
+    'People you follow who also follow this user.': '你关注的人中，也关注了该用户的人。',
+    'Follow lists': '关注列表',
+    'New follow list': '新建关注列表',
+    'No follow lists yet': '还没有关注列表',
+    'Follow list name': '关注列表名称',
+    'Anyone can see the people you add to this list.': '任何人都能看到你添加到此列表的人。',
+    'Nostr public key': 'Nostr 公钥',
+    'Invalid Nostr public key': '无效的 Nostr 公钥',
+    'Delete this follow list?': '删除此关注列表？',
+    'No people in this follow list': '此关注列表中没有人',
+    'Follow list unavailable': '关注列表不可用',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      '此关注列表已被修改或删除。请重新打开以查看最新版本。'
   }
 }

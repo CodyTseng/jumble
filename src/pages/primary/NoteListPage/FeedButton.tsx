@@ -7,8 +7,9 @@ import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
+import { useFollowSets } from '@/providers/FollowSetsProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { ChevronDown, FolderClosed, Server, Star, UsersRound } from 'lucide-react'
+import { ChevronDown, FolderClosed, List, Server, Star, UsersRound } from 'lucide-react'
 import { forwardRef, HTMLAttributes, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -75,6 +76,7 @@ const FeedSwitcherTrigger = forwardRef<
 >(({ className, compact = false, ...props }, ref) => {
   const { t } = useTranslation()
   const { feedInfo, relayUrls } = useFeed()
+  const { followSets } = useFollowSets()
   const { relaySets } = useFavoriteRelays()
   const activeRelaySet = useMemo(() => {
     return feedInfo?.feedType === 'relays' && feedInfo.id
@@ -89,6 +91,9 @@ const FeedSwitcherTrigger = forwardRef<
     if (feedInfo?.feedType === 'pinned') {
       return t('Special Follow')
     }
+    if (feedInfo?.feedType === 'follow-set') {
+      return followSets.find((set) => set.id === feedInfo.id)?.name ?? t('Follow lists')
+    }
     if (relayUrls.length === 0) {
       return t('Choose a feed')
     }
@@ -98,7 +103,7 @@ const FeedSwitcherTrigger = forwardRef<
     if (feedInfo?.feedType === 'relays') {
       return feedInfo.name ?? activeRelaySet?.name ?? activeRelaySet?.id
     }
-  }, [feedInfo, activeRelaySet])
+  }, [feedInfo, activeRelaySet, followSets, relayUrls.length, t])
 
   const icon = useMemo(() => {
     if (feedInfo?.feedType === 'relay' && feedInfo.id) {
@@ -109,6 +114,8 @@ const FeedSwitcherTrigger = forwardRef<
       if (feedInfo?.feedType === 'following')
         return <UsersRound className={compact ? 'size-3.5!' : ''} />
       if (feedInfo?.feedType === 'pinned') return <Star className={compact ? 'size-3.5!' : ''} />
+      if (feedInfo?.feedType === 'follow-set')
+        return <List className={compact ? 'size-3.5!' : ''} />
       if (feedInfo?.feedType === 'relays')
         return <FolderClosed className={compact ? 'size-3.5!' : ''} />
       return <Server className={compact ? 'size-3.5!' : ''} />
@@ -139,7 +146,12 @@ const FeedSwitcherTrigger = forwardRef<
       {...props}
     >
       <div className="shrink-0">{icon}</div>
-      <div className={cn('truncate font-semibold', compact ? 'text-sm' : 'text-lg')}>{title}</div>
+      <div
+        dir={feedInfo?.feedType === 'follow-set' ? 'auto' : undefined}
+        className={cn('truncate font-semibold', compact ? 'text-sm' : 'text-lg')}
+      >
+        {title}
+      </div>
       {clickable && <ChevronDown className={compact ? 'size-3!' : ''} />}
     </div>
   )

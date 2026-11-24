@@ -19,6 +19,7 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
+import FollowSetFeed from './FollowSetFeed'
 import PinnedFeed from './PinnedFeed'
 import RelaysFeed from './RelaysFeed'
 
@@ -55,6 +56,8 @@ const NoteListPage = forwardRef<TPageRef>((_, ref) => {
     content = <WelcomeGuide />
   } else if (feedInfo.feedType === 'following') {
     content = <FollowingFeed />
+  } else if (feedInfo.feedType === 'follow-set' && feedInfo.id) {
+    content = <FollowSetFeed key={feedInfo.id} id={feedInfo.id} />
   } else if (feedInfo.feedType === 'pinned') {
     content = <PinnedFeed />
   } else {

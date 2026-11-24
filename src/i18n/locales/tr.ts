@@ -1312,6 +1312,18 @@ export default {
     'Login with Android signer': 'Android imzalayıcı ile giriş yap',
     'Profile followed by': 'Takip edenler',
     'People you follow who also follow this user.':
-      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.'
+      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.',
+    'Follow lists': 'Takip listeleri',
+    'New follow list': 'Yeni takip listesi',
+    'No follow lists yet': 'Henüz takip listesi yok',
+    'Follow list name': 'Takip listesi adı',
+    'Anyone can see the people you add to this list.': 'Bu listeye eklediğiniz kişileri herkes görebilir.',
+    'Nostr public key': 'Nostr açık anahtarı',
+    'Invalid Nostr public key': 'Geçersiz Nostr açık anahtarı',
+    'Delete this follow list?': 'Bu takip listesi silinsin mi?',
+    'No people in this follow list': 'Bu takip listesinde kimse yok',
+    'Follow list unavailable': 'Takip listesi kullanılamıyor',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'Bu takip listesi değiştirildi veya silindi. En son sürümü görmek için listeyi yeniden açın.'
   }
 }

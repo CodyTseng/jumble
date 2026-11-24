@@ -1321,6 +1321,18 @@ export default {
     'Login with Android signer': 'Iniciar sessão com assinador Android',
     'Profile followed by': 'Seguido por',
     'People you follow who also follow this user.':
-      'Pessoas que segues e que também seguem este utilizador.'
+      'Pessoas que segues e que também seguem este utilizador.',
+    'Follow lists': 'Listas de perfis seguidos',
+    'New follow list': 'Nova lista de perfis',
+    'No follow lists yet': 'Ainda não há listas de perfis',
+    'Follow list name': 'Nome da lista',
+    'Anyone can see the people you add to this list.': 'Qualquer pessoa pode ver quem adicionas a esta lista.',
+    'Nostr public key': 'Chave pública Nostr',
+    'Invalid Nostr public key': 'Chave pública Nostr inválida',
+    'Delete this follow list?': 'Eliminar esta lista?',
+    'No people in this follow list': 'Esta lista não tem pessoas',
+    'Follow list unavailable': 'Lista indisponível',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'Esta lista foi alterada ou eliminada. Volta a abri-la para veres a versão mais recente.'
   }
 }

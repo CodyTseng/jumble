@@ -20,7 +20,8 @@ export default function NormalFeed({
   showRelayCloseReason = false,
   disable24hMode = false,
   onRefresh,
-  isPubkeyFeed = false
+  isPubkeyFeed = false,
+  hideTrustScoreFilter = false
 }: {
   feedId: string
   subRequests: TFeedSubRequest[]
@@ -29,6 +30,7 @@ export default function NormalFeed({
   disable24hMode?: boolean
   onRefresh?: () => void
   isPubkeyFeed?: boolean
+  hideTrustScoreFilter?: boolean
 }) {
   const { getShowKinds } = useKindFilter()
   const { getMinTrustScore } = useUserTrust()
@@ -62,7 +64,7 @@ export default function NormalFeed({
   const [trustFilterOpen, setTrustFilterOpen] = useState(false)
   const [customizeOpen, setCustomizeOpen] = useState(false)
   const showTrustScoreFilter =
-    feedId !== SPECIAL_FEED_ID.FOLLOWING && feedId !== SPECIAL_FEED_ID.PINNED
+    !hideTrustScoreFilter && feedId !== SPECIAL_FEED_ID.FOLLOWING && feedId !== SPECIAL_FEED_ID.PINNED
   const trustScoreThreshold = useMemo(() => {
     return showTrustScoreFilter ? getMinTrustScore(feedId) : undefined
   }, [feedId, showTrustScoreFilter, getMinTrustScore])

@@ -1,13 +1,14 @@
 import { IS_COMMUNITY_MODE, COMMUNITY_RELAY_SETS, COMMUNITY_RELAYS } from '@/constants'
-import { toRelaySettings } from '@/lib/link'
+import { toFollowListSettings, toRelaySettings } from '@/lib/link'
 import { simplifyUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
-import { SecondaryPageLink } from '@/PageManager'
+import { SecondaryPageLink, useSecondaryPage } from '@/PageManager'
 import { useFavoriteRelays } from '@/providers/FavoriteRelaysProvider'
 import { useFeed } from '@/providers/FeedProvider'
+import { useFollowSets } from '@/providers/FollowSetsProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinnedUsers } from '@/providers/PinnedUsersProvider'
-import { Settings2, Star, UsersRound } from 'lucide-react'
+import { List, Settings2, Star, UsersRound } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
@@ -15,9 +16,11 @@ import RelaySetCard from '../RelaySetCard'
 
 export default function FeedSwitcher({ close }: { close?: () => void }) {
   const { t } = useTranslation()
+  const { push } = useSecondaryPage()
   const { pubkey } = useNostr()
   const { relaySets, favoriteRelays } = useFavoriteRelays()
   const { feedInfo, switchFeed } = useFeed()
+  const { followSets } = useFollowSets()
   const { pinnedPubkeySet } = usePinnedUsers()
   const filteredRelaySets = useMemo(() => {
     return relaySets.filter((set) => set.relayUrls.length > 0)
@@ -100,6 +103,48 @@ export default function FeedSwitcher({ close }: { close?: () => void }) {
         </div>
       </div>
 
+      {pubkey && (
+        <div className="space-y-2">
+          <SectionHeader
+            title={t('Follow lists')}
+            action={
+              <button
+                type="button"
+                className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary-hover"
+                onClick={() => {
+                  push(toFollowListSettings())
+                  close?.()
+                }}
+              >
+                <Settings2 className="size-3" />
+                {t('edit')}
+              </button>
+            }
+          />
+          <div className="space-y-1.5">
+            {followSets.map((set) => (
+              <FeedSwitcherItem
+                key={set.id}
+                isActive={feedInfo?.feedType === 'follow-set' && feedInfo.id === set.id}
+                onClick={() => {
+                  switchFeed('follow-set', { pubkey, followSetId: set.id })
+                  close?.()
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex size-6 shrink-0 items-center justify-center">
+                    <List className="size-5" />
+                  </div>
+                  <div dir="auto" className="min-w-0 truncate">
+                    {set.name}
+                  </div>
+                </div>
+              </FeedSwitcherItem>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Relay Feeds Section */}
       {hasRelays && (
         <div className="space-y-2">
@@ -174,22 +219,22 @@ function FeedSwitcherItem({
   onClick: () => void
 }) {
   return (
-    <div
+    <button
+      type="button"
+      disabled={disabled}
+      aria-pressed={isActive}
       className={cn(
-        'group relative w-full rounded-lg border px-3 py-2.5 transition-all duration-200',
+        'group relative w-full rounded-lg border px-3 py-2.5 text-start transition-all duration-200',
         disabled && 'pointer-events-none opacity-50',
         isActive
           ? 'border-primary bg-primary/5 shadow-xs'
           : 'clickable border-border hover:border-primary/50 hover:bg-accent/50'
       )}
-      onClick={() => {
-        if (disabled) return
-        onClick()
-      }}
+      onClick={onClick}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1 font-medium">{children}</div>
       </div>
-    </div>
+    </button>
   )
 }

@@ -1308,6 +1308,18 @@ export default {
     'Login with Android signer': 'Android署名アプリでログイン',
     'Profile followed by': 'フォロワー',
     'People you follow who also follow this user.':
-      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。'
+      'あなたがフォローしている人のうち、このユーザーもフォローしている人です。',
+    'Follow lists': 'フォローリスト',
+    'New follow list': '新しいフォローリスト',
+    'No follow lists yet': 'フォローリストはまだありません',
+    'Follow list name': 'フォローリスト名',
+    'Anyone can see the people you add to this list.': 'このリストに追加したユーザーは誰でも見ることができます。',
+    'Nostr public key': 'Nostr 公開鍵',
+    'Invalid Nostr public key': '無効な Nostr 公開鍵です',
+    'Delete this follow list?': 'このフォローリストを削除しますか？',
+    'No people in this follow list': 'このフォローリストには誰もいません',
+    'Follow list unavailable': 'フォローリストを利用できません',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'このフォローリストは変更または削除されました。開き直して最新の状態を確認してください。'
   }
 }

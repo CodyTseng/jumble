@@ -1288,6 +1288,18 @@ export default {
     'Share profile': 'แชร์โปรไฟล์',
     'Login with Android signer': 'เข้าสู่ระบบด้วยแอปลงนาม Android',
     'Profile followed by': 'ติดตามโดย',
-    'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย'
+    'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย',
+    'Follow lists': 'รายการติดตาม',
+    'New follow list': 'รายการติดตามใหม่',
+    'No follow lists yet': 'ยังไม่มีรายการติดตาม',
+    'Follow list name': 'ชื่อรายการติดตาม',
+    'Anyone can see the people you add to this list.': 'ทุกคนสามารถเห็นคนที่คุณเพิ่มในรายการนี้ได้',
+    'Nostr public key': 'คีย์สาธารณะ Nostr',
+    'Invalid Nostr public key': 'คีย์สาธารณะ Nostr ไม่ถูกต้อง',
+    'Delete this follow list?': 'ลบรายการติดตามนี้หรือไม่',
+    'No people in this follow list': 'ไม่มีคนในรายการติดตามนี้',
+    'Follow list unavailable': 'ไม่สามารถเปิดรายการติดตามได้',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      'รายการติดตามนี้ถูกแก้ไขหรือลบแล้ว โปรดเปิดอีกครั้งเพื่อดูเวอร์ชันล่าสุด'
   }
 }

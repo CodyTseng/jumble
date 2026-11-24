@@ -1299,6 +1299,18 @@ export default {
     'Share profile': '分享個人主頁',
     'Login with Android signer': '使用 Android 簽署器登入',
     'Profile followed by': '關注者',
-    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。'
+    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。',
+    'Follow lists': '追蹤清單',
+    'New follow list': '新增追蹤清單',
+    'No follow lists yet': '還沒有追蹤清單',
+    'Follow list name': '追蹤清單名稱',
+    'Anyone can see the people you add to this list.': '任何人都能看到你加入此清單的人。',
+    'Nostr public key': 'Nostr 公開金鑰',
+    'Invalid Nostr public key': '無效的 Nostr 公開金鑰',
+    'Delete this follow list?': '刪除此追蹤清單？',
+    'No people in this follow list': '此追蹤清單中沒有人',
+    'Follow list unavailable': '無法使用追蹤清單',
+    'This follow list was changed or deleted. Reopen it to see the latest version.':
+      '此追蹤清單已變更或刪除。請重新開啟以查看最新版本。'
   }
 }
