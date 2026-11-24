@@ -69,6 +69,17 @@ describe('shared notification processor', () => {
     await other.processor.process(signed)
     expect(other.notify).toHaveBeenCalledOnce()
   })
+  it('records muted note interactions so replays after unmuting do not alert', async () => {
+    const signed = event()
+    const muted = create({ isMutedNote: async () => true })
+    expect(await muted.processor.process(signed)).toBe(false)
+    expect(muted.notify).not.toHaveBeenCalled()
+    expect(muted.saveCursor).toHaveBeenCalledExactlyOnceWith({ pubkey, ids: [signed.id] })
+
+    const unmuted = create({ cursor: { pubkey, ids: [signed.id] } })
+    expect(await unmuted.processor.process(signed)).toBe(false)
+    expect(unmuted.notify).not.toHaveBeenCalled()
+  })
   it('does not emit work that finishes after the account/session stops', async () => {
     let finish!: (value: boolean) => void
     const { processor, notify, saveCursor } = create({

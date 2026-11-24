@@ -30,12 +30,14 @@ function createEvent({
 function filter(
   event: NostrEvent,
   pubkey: string | null = currentPubkey,
-  mutedNoteKeys?: ReadonlySet<string>
+  mutedNoteKeys?: ReadonlySet<string>,
+  resolveNote?: Parameters<typeof notificationFilter>[1]['resolveNote']
 ) {
   return notificationFilter(event, {
     pubkey,
     mutePubkeySet: new Set(),
     mutedNoteKeys,
+    resolveNote,
     meetsMinTrustScore: async () => true,
     validateZapReceipt: async () => true
   })
@@ -141,6 +143,14 @@ describe('muting notifications for one note', () => {
     ],
     [kinds.Zap, [['a', coordinate]]],
     [kinds.Highlights, [['a', coordinate, '', 'source']]],
+    [
+      kinds.Highlights,
+      [
+        ['e', otherId],
+        ['q', mutedId],
+        ['p', currentPubkey]
+      ]
+    ],
     [ExtendedKind.POLL_RESPONSE, [['e', mutedId]]],
     [kinds.ShortTextNote, [['e', mutedId, '', 'root']]],
     [
@@ -185,6 +195,33 @@ describe('muting notifications for one note', () => {
     await expect(filter(quote, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
   })
 
+  it('resolves an e-only reaction to a different revision of a muted article', async () => {
+    const kind = kinds.LongFormArticle
+    const reaction = createEvent({
+      tags: [
+        ['e', otherId],
+        ['p', currentPubkey],
+        ['k', `${kind}`]
+      ]
+    })
+    const article = {
+      ...createEvent({ kind, tags: [['d', 'article']] }),
+      id: otherId,
+      pubkey: currentPubkey
+    }
+    const resolveNote = vi
+      .fn()
+      .mockResolvedValueOnce(article)
+      .mockResolvedValueOnce({
+        ...article,
+        tags: [['d', 'unrelated']]
+      })
+
+    await expect(filter(reaction, currentPubkey, mutedNoteKeys, resolveNote)).resolves.toBe(false)
+    expect(resolveNote).toHaveBeenCalledWith(otherId, currentPubkey, kind)
+    await expect(filter(reaction, currentPubkey, mutedNoteKeys, resolveNote)).resolves.toBe(true)
+  })
+
   it('filters a notification for the muted note itself', async () => {
     const mention = { ...createEvent({ kind: kinds.ShortTextNote }), id: mutedId }
 
@@ -217,6 +254,13 @@ describe('muting notifications for one note', () => {
       ]
     ],
     [kinds.Zap, [['p', currentPubkey]]],
+    [
+      kinds.Highlights,
+      [
+        ['e', otherId],
+        ['p', currentPubkey]
+      ]
+    ],
     [kinds.ShortTextNote, [['p', currentPubkey]]]
   ] satisfies [number, string[][]][])(
     'keeps kind %i when it targets a different note or the account',
