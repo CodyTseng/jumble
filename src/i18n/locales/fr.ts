@@ -1331,6 +1331,8 @@ export default {
     'Login with Android signer': 'Se connecter avec un signataire Android',
     'Profile followed by': 'Suivi par',
     'People you follow who also follow this user.':
-      'Les personnes que vous suivez qui suivent aussi cet utilisateur.'
+      'Les personnes que vous suivez qui suivent aussi cet utilisateur.',
+    'Mute notifications for this note': 'Mettre en sourdine les notifications de cette note',
+    'Unmute notifications for this note': 'Réactiver les notifications de cette note'
   }
 }

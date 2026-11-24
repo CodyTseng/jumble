@@ -1312,6 +1312,8 @@ export default {
     'Login with Android signer': 'Android imzalayıcı ile giriş yap',
     'Profile followed by': 'Takip edenler',
     'People you follow who also follow this user.':
-      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.'
+      'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.',
+    'Mute notifications for this note': 'Bu notun bildirimlerini sessize al',
+    'Unmute notifications for this note': 'Bu notun bildirimlerini yeniden aç'
   }
 }

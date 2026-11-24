@@ -1321,6 +1321,8 @@ export default {
     'Login with Android signer': 'Iniciar sessão com assinador Android',
     'Profile followed by': 'Seguido por',
     'People you follow who also follow this user.':
-      'Pessoas que segues e que também seguem este utilizador.'
+      'Pessoas que segues e que também seguem este utilizador.',
+    'Mute notifications for this note': 'Silenciar as notificações desta nota',
+    'Unmute notifications for this note': 'Reativar as notificações desta nota'
   }
 }

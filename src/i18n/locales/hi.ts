@@ -1307,6 +1307,8 @@ export default {
     'Login with Android signer': 'Android साइनर से लॉगिन करें',
     'Profile followed by': 'इन्हें फ़ॉलो करते हैं',
     'People you follow who also follow this user.':
-      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।'
+      'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।',
+    'Mute notifications for this note': 'इस नोट की सूचनाएँ म्यूट करें',
+    'Unmute notifications for this note': 'इस नोट की सूचनाएँ अनम्यूट करें'
   }
 }

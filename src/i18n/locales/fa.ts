@@ -1308,6 +1308,8 @@ export default {
     'Login with Android signer': 'ورود با امضاکننده اندروید',
     'Profile followed by': 'دنبال‌شده توسط',
     'People you follow who also follow this user.':
-      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.'
+      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.',
+    'Mute notifications for this note': 'بی‌صدا کردن اعلان‌های این یادداشت',
+    'Unmute notifications for this note': 'فعال کردن دوباره اعلان‌های این یادداشت'
   }
 }

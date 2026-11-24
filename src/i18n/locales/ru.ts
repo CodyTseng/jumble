@@ -1316,6 +1316,8 @@ export default {
     'Login with Android signer': 'Войти через приложение подписи Android',
     'Profile followed by': 'Читают',
     'People you follow who also follow this user.':
-      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.'
+      'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.',
+    'Mute notifications for this note': 'Отключить уведомления об этой заметке',
+    'Unmute notifications for this note': 'Включить уведомления об этой заметке'
   }
 }

@@ -1323,6 +1323,8 @@ export default {
     'Login with Android signer': 'Bejelentkezés Android-aláíróval',
     'Profile followed by': 'Követői',
     'People you follow who also follow this user.':
-      'Az Ön által követett személyek, akik ezt a felhasználót is követik.'
+      'Az Ön által követett személyek, akik ezt a felhasználót is követik.',
+    'Mute notifications for this note': 'A bejegyzés értesítéseinek némítása',
+    'Unmute notifications for this note': 'A bejegyzés értesítéseinek visszakapcsolása'
   }
 }

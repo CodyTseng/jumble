@@ -1,7 +1,9 @@
+import { useMutedNoteNotifications } from '@/hooks/useMutedNoteNotifications'
 import { copyText } from '@/lib/native-system'
 import { formatError } from '@/lib/error'
 import {
   getEventAuthorPubkey,
+  getEventKey,
   getNoteBech32Id,
   getReplaceableCoordinateFromEvent,
   isProtectedEvent,
@@ -81,6 +83,8 @@ export function useMenuActions({
     return Array.from(new Set(currentBrowsingRelayUrls.concat(favoriteRelays)))
   }, [currentBrowsingRelayUrls, favoriteRelays])
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
+  const { mutedNoteKeys, setNoteMuted } = useMutedNoteNotifications()
+  const areNotificationsMuted = mutedNoteKeys.has(getEventKey(event))
   const { pinnedEventHexIdSet, pin, unpin } = usePinList()
   const { addBookmark, removeBookmark } = useBookmarks()
   const authorPubkey = getEventAuthorPubkey(event)
@@ -246,6 +250,19 @@ export function useMenuActions({
       })
     }
 
+    if (pubkey) {
+      actions.push({
+        icon: areNotificationsMuted ? Bell : BellOff,
+        label: areNotificationsMuted
+          ? t('Unmute notifications for this note')
+          : t('Mute notifications for this note'),
+        onClick: () => {
+          closeDrawer()
+          setNoteMuted(event, !areNotificationsMuted)
+        }
+      })
+    }
+
     const isProtected = isProtectedEvent(event)
     if (!isProtected || event.pubkey === pubkey) {
       actions.push({
@@ -355,6 +372,8 @@ export function useMenuActions({
     pubkey,
     isMuted,
     isBookmarked,
+    areNotificationsMuted,
+    setNoteMuted,
     isSmallScreen,
     broadcastSubMenu,
     pinnedEventHexIdSet,

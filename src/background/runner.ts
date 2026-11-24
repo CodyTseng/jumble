@@ -17,6 +17,7 @@ export type BackgroundNotificationConfig = {
   filters: TNotificationFilter[]
   descriptions: Partial<Record<TNotificationFilter, string>>
   muted: string[]
+  mutedNoteKeys?: string[]
   trusted: string[]
   minTrustScore: number
   hideMutedMentions: boolean
@@ -54,6 +55,7 @@ export class BackgroundNotificationRunner {
     )
     const muted = new Set(config.muted),
       trusted = new Set(config.trusted)
+    const mutedNoteKeys = new Set(config.mutedNoteKeys)
     this.processor = new NotificationProcessor({
       pubkey: config.pubkey,
       filters: new Set(config.filters),
@@ -66,6 +68,7 @@ export class BackgroundNotificationRunner {
         notificationFilter(event, {
           pubkey: config.pubkey,
           mutePubkeySet: muted,
+          mutedNoteKeys,
           hideContentMentioningMutedUsers: config.hideMutedMentions,
           meetsMinTrustScore: (key) =>
             meetsTrustScore(key, config.pubkey, config.minTrustScore, trusted, async (key) => {

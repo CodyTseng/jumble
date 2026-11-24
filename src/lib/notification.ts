@@ -1,10 +1,13 @@
-import { ExtendedKind, SUPPORTED_KINDS } from '@/constants'
+import { EMBEDDED_EVENT_REGEX, ExtendedKind, SUPPORTED_KINDS } from '@/constants'
 import { TNotificationFilter } from '@/types'
-import { kinds, NostrEvent } from 'nostr-tools'
+import { kinds, nip19, NostrEvent } from 'nostr-tools'
 import {
   getEmbeddedPubkeys,
   getEventAuthorPubkey,
+  getEventKey,
   getParentStuff,
+  getParentTag,
+  getReplaceableCoordinate,
   isMentioningMutedUsers
 } from './event-core'
 import { tagNameEquals } from './tag'
@@ -49,22 +52,82 @@ export function getNotificationFilterType(
   return event.kind === kinds.ShortTextNote ? 'quotes' : 'replies'
 }
 
+function isForMutedNote(event: NostrEvent, mutedNoteKeys: ReadonlySet<string>): boolean {
+  if (!mutedNoteKeys.size) return false
+  if (mutedNoteKeys.has(event.id) || mutedNoteKeys.has(getEventKey(event))) return true
+
+  switch (event.kind) {
+    case kinds.Reaction:
+    case kinds.Repost:
+    case kinds.GenericRepost:
+    case kinds.Zap:
+    case kinds.Highlights:
+    case ExtendedKind.POLL_RESPONSE: {
+      const eTag =
+        event.kind === ExtendedKind.POLL_RESPONSE
+          ? event.tags.find(tagNameEquals('e'))
+          : event.tags.findLast(tagNameEquals('e'))
+      const aTag = event.tags.findLast(tagNameEquals('a'))
+      return mutedNoteKeys.has(eTag?.[1] ?? '') || mutedNoteKeys.has(aTag?.[1] ?? '')
+    }
+    case kinds.ShortTextNote:
+    case ExtendedKind.COMMENT:
+    case ExtendedKind.VOICE_COMMENT:
+    case ExtendedKind.POLL: {
+      // Match the direct parent. A root tag on a reply to a different note
+      // does not make that reply an interaction with the muted note.
+      const parent = getParentTag(event)
+      if (parent && parent.type !== 'i' && mutedNoteKeys.has(parent.tag[1])) return true
+      if (
+        event.tags.some(
+          ([name, key, , marker]) =>
+            (name === 'q' || (name === 'e' && marker === 'mention')) && mutedNoteKeys.has(key)
+        )
+      ) {
+        return true
+      }
+      // Older clients can quote a note in the content without a q tag.
+      return (event.content.match(EMBEDDED_EVENT_REGEX) ?? []).some((reference) => {
+        try {
+          const { type, data } = nip19.decode(reference.slice('nostr:'.length))
+          if (type === 'note') return mutedNoteKeys.has(data)
+          if (type === 'nevent') return mutedNoteKeys.has(data.id)
+          if (type === 'naddr') {
+            return mutedNoteKeys.has(
+              getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
+            )
+          }
+        } catch {
+          // Ignore invalid references.
+        }
+        return false
+      })
+    }
+    default:
+      return false
+  }
+}
+
 export async function notificationFilter(
   event: NostrEvent,
   {
     pubkey,
     mutePubkeySet,
+    mutedNoteKeys,
     hideContentMentioningMutedUsers,
     meetsMinTrustScore,
     validateZapReceipt
   }: {
     pubkey?: string | null
     mutePubkeySet: Set<string>
+    mutedNoteKeys?: ReadonlySet<string>
     hideContentMentioningMutedUsers?: boolean
     meetsMinTrustScore: (pubkey: string) => Promise<boolean>
     validateZapReceipt: (event: NostrEvent) => Promise<boolean>
   }
 ): Promise<boolean> {
+  if (mutedNoteKeys && isForMutedNote(event, mutedNoteKeys)) return false
+
   // Zap receipts must be validated before trusting their embedded sender data.
   // Keeping this in the shared filter makes the list, unread badge/count and
   // native system notifications agree on which zaps actually exist.
