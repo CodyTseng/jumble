@@ -19,7 +19,9 @@ vi.mock('@/providers/NostrProvider', () => ({ useNostr: () => ({ pubkey: 'self' 
 vi.mock('@/providers/FavoriteRelaysProvider', () => ({
   useFavoriteRelays: () => ({ favoriteRelays: [], relaySets: [] })
 }))
-vi.mock('./useMenuActions', () => ({ useMenuActions: () => [] }))
+vi.mock('./useMenuActions', () => ({
+  useMenuActions: () => ({ menuActions: [], areNotificationsMuted: false })
+}))
 vi.mock('./DesktopMenu', () => ({ DesktopMenu: () => null }))
 vi.mock('./RawEventDialog', () => ({ default: () => null }))
 vi.mock('./ReportDialog', () => ({ default: () => null }))

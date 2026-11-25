@@ -1294,6 +1294,7 @@ export default {
     'Mute notifications': 'ปิดการแจ้งเตือนของโน้ต',
     'Unmute notifications': 'เปิดการแจ้งเตือนของโน้ต',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'การแจ้งเตือนที่เกี่ยวกับโน้ตนี้จะถูกปิดเฉพาะบนอุปกรณ์นี้ การตั้งค่านี้จะไม่ซิงค์กับอุปกรณ์อื่น'
+      'การแจ้งเตือนที่เกี่ยวกับโน้ตนี้จะถูกปิดเฉพาะบนอุปกรณ์นี้ การตั้งค่านี้จะไม่ซิงค์กับอุปกรณ์อื่น',
+    'Note notifications muted': 'ปิดการแจ้งเตือนของโน้ตนี้แล้ว'
   }
 }

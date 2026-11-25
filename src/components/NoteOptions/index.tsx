@@ -1,7 +1,8 @@
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
-import { Ellipsis } from 'lucide-react'
+import { BellOff, Ellipsis } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DesktopMenu } from './DesktopMenu'
 import { MobileMenu } from './MobileMenu'
 import RawEventDialog from './RawEventDialog'
@@ -9,7 +10,9 @@ import ReportDialog from './ReportDialog'
 import { SubMenuAction, useMenuActions } from './useMenuActions'
 
 export default function NoteOptions({ event, className }: { event: Event; className?: string }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const mutedStatusId = useId()
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
   const [isRawEventDialogOpen, setIsRawEventDialogOpen] = useState(false)
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false)
@@ -33,7 +36,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
     setShowSubMenu(true)
   }
 
-  const menuActions = useMenuActions({
+  const { menuActions, areNotificationsMuted } = useMenuActions({
     event,
     menuTriggerRef,
     closeDrawer,
@@ -43,18 +46,29 @@ export default function NoteOptions({ event, className }: { event: Event; classN
     isSmallScreen
   })
 
+  const mutedStatus = areNotificationsMuted ? t('Note notifications muted') : undefined
   const trigger = (
     <button
       ref={menuTriggerRef}
-      className="text-muted-foreground hover:text-foreground flex h-full cursor-pointer items-center ps-2"
+      type="button"
+      aria-label={t('Options')}
+      aria-describedby={mutedStatus ? mutedStatusId : undefined}
+      title={mutedStatus}
+      className="text-muted-foreground hover:text-foreground flex h-full cursor-pointer items-center gap-1 ps-2"
       onClick={() => setIsDrawerOpen(true)}
     >
-      <Ellipsis />
+      {areNotificationsMuted && <BellOff aria-hidden="true" className="text-destructive" />}
+      <Ellipsis aria-hidden="true" />
     </button>
   )
 
   return (
     <div className={className}>
+      {mutedStatus && (
+        <span className="sr-only" id={mutedStatusId}>
+          {mutedStatus}
+        </span>
+      )}
       {isSmallScreen ? (
         <MobileMenu
           menuActions={menuActions}

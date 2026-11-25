@@ -1302,6 +1302,7 @@ export default {
     'Mute notifications': 'كتم إشعارات الملاحظة',
     'Unmute notifications': 'إلغاء كتم إشعارات الملاحظة',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'سيتم كتم الإشعارات المتعلقة بهذه الملاحظة على هذا الجهاز فقط. لن يتزامن هذا الإعداد مع الأجهزة الأخرى.'
+      'سيتم كتم الإشعارات المتعلقة بهذه الملاحظة على هذا الجهاز فقط. لن يتزامن هذا الإعداد مع الأجهزة الأخرى.',
+    'Note notifications muted': 'إشعارات هذه الملاحظة مكتومة'
   }
 }

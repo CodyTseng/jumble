@@ -1329,6 +1329,7 @@ export default {
     'Mute notifications': 'Bejegyzés értesítéseinek némítása',
     'Unmute notifications': 'Bejegyzés értesítéseinek visszaállítása',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'A bejegyzéshez kapcsolódó értesítések csak ezen az eszközön lesznek némítva. A beállítás nem szinkronizálódik más eszközökre.'
+      'A bejegyzéshez kapcsolódó értesítések csak ezen az eszközön lesznek némítva. A beállítás nem szinkronizálódik más eszközökre.',
+    'Note notifications muted': 'A bejegyzés értesítései némítva vannak'
   }
 }

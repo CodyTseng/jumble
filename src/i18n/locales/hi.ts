@@ -1313,6 +1313,7 @@ export default {
     'Mute notifications': 'नोट की सूचनाएँ म्यूट करें',
     'Unmute notifications': 'नोट की सूचनाएँ फिर चालू करें',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'इस नोट से जुड़ी सूचनाएँ सिर्फ़ इस डिवाइस पर म्यूट होंगी। यह सेटिंग अन्य डिवाइसों के साथ सिंक नहीं होगी।'
+      'इस नोट से जुड़ी सूचनाएँ सिर्फ़ इस डिवाइस पर म्यूट होंगी। यह सेटिंग अन्य डिवाइसों के साथ सिंक नहीं होगी।',
+    'Note notifications muted': 'इस नोट की सूचनाएँ म्यूट हैं'
   }
 }

@@ -1330,6 +1330,7 @@ export default {
     'Mute notifications': 'Wycisz powiadomienia o notatce',
     'Unmute notifications': 'Włącz powiadomienia o notatce',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Powiadomienia dotyczące tej notatki zostaną wyciszone tylko na tym urządzeniu. To ustawienie nie będzie synchronizowane z innymi urządzeniami.'
+      'Powiadomienia dotyczące tej notatki zostaną wyciszone tylko na tym urządzeniu. To ustawienie nie będzie synchronizowane z innymi urządzeniami.',
+    'Note notifications muted': 'Powiadomienia o notatce są wyciszone'
   }
 }

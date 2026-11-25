@@ -1314,6 +1314,7 @@ export default {
     'Mute notifications': 'بی‌صدا کردن اعلان‌های یادداشت',
     'Unmute notifications': 'فعال کردن اعلان‌های یادداشت',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'اعلان‌های مربوط به این یادداشت فقط در این دستگاه بی‌صدا می‌شوند. این تنظیم با دستگاه‌های دیگر همگام نمی‌شود.'
+      'اعلان‌های مربوط به این یادداشت فقط در این دستگاه بی‌صدا می‌شوند. این تنظیم با دستگاه‌های دیگر همگام نمی‌شود.',
+    'Note notifications muted': 'اعلان‌های این یادداشت بی‌صدا هستند'
   }
 }

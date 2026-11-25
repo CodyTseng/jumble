@@ -1305,6 +1305,7 @@ export default {
     'Mute notifications': '静音笔记通知',
     'Unmute notifications': '恢复笔记通知',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      '将屏蔽与这条笔记相关的通知。此设置仅在当前设备生效，不会同步到其他设备。'
+      '将屏蔽与这条笔记相关的通知。此设置仅在当前设备生效，不会同步到其他设备。',
+    'Note notifications muted': '笔记通知已静音'
   }
 }

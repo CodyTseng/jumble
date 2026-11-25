@@ -1322,6 +1322,7 @@ export default {
     'Mute notifications': 'Отключить уведомления о заметке',
     'Unmute notifications': 'Включить уведомления о заметке',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Уведомления об этой заметке будут отключены только на этом устройстве. Эта настройка не синхронизируется с другими устройствами.'
+      'Уведомления об этой заметке будут отключены только на этом устройстве. Эта настройка не синхронизируется с другими устройствами.',
+    'Note notifications muted': 'Уведомления о заметке отключены'
   }
 }

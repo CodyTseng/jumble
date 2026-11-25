@@ -1324,6 +1324,7 @@ export default {
     'Mute notifications': 'Silenciar avisos de la nota',
     'Unmute notifications': 'Reactivar avisos de la nota',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Se silenciarán las notificaciones de esta nota solo en este dispositivo. Este ajuste no se sincronizará con otros dispositivos.'
+      'Se silenciarán las notificaciones de esta nota solo en este dispositivo. Este ajuste no se sincronizará con otros dispositivos.',
+    'Note notifications muted': 'Avisos de la nota silenciados'
   }
 }

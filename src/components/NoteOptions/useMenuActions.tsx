@@ -400,5 +400,5 @@ export function useMenuActions({
     removeBookmark
   ])
 
-  return menuActions
+  return { menuActions, areNotificationsMuted }
 }

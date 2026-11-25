@@ -1335,6 +1335,7 @@ export default {
     'Mute notifications': 'Beitragsmeldungen stummschalten',
     'Unmute notifications': 'Beitragsmeldungen aktivieren',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Mitteilungen zu diesem Beitrag werden nur auf diesem Gerät stummgeschaltet. Diese Einstellung wird nicht mit anderen Geräten synchronisiert.'
+      'Mitteilungen zu diesem Beitrag werden nur auf diesem Gerät stummgeschaltet. Diese Einstellung wird nicht mit anderen Geräten synchronisiert.',
+    'Note notifications muted': 'Beitragsmeldungen stummgeschaltet'
   }
 }

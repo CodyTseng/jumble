@@ -1342,6 +1342,7 @@ export default {
     'Mute notifications': 'Mute note notifications',
     'Unmute notifications': 'Unmute note notifications',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.'
+      'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.',
+    'Note notifications muted': 'Note notifications muted'
   }
 }

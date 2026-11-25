@@ -1,17 +1,14 @@
 // @vitest-environment jsdom
 
 import DialogHost from '@/components/DialogHost'
+import { StorageKey } from '@/constants'
 import type { Event } from 'nostr-tools'
 import { act, createElement, Fragment } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
 import NoteOptions from './index'
 
-const state = vi.hoisted(() => ({
-  smallScreen: false,
-  muted: new Set<string>(),
-  setNoteMuted: vi.fn()
-}))
+const state = vi.hoisted(() => ({ smallScreen: false }))
 
 vi.mock('react-i18next', async () => {
   const { default: english } = await import('@/i18n/locales/en')
@@ -40,12 +37,6 @@ vi.mock('@/services/client.service', () => ({ default: {} }))
 vi.mock('@/services/indexed-db.service', () => ({ default: {} }))
 vi.mock('./RawEventDialog', () => ({ default: () => null }))
 vi.mock('./ReportDialog', () => ({ default: () => null }))
-vi.mock('@/hooks/useMutedNoteNotifications', () => ({
-  useMutedNoteNotifications: () => ({
-    mutedNoteKeys: state.muted,
-    setNoteMuted: state.setNoteMuted
-  })
-}))
 
 const note: Event = {
   id: '1'.repeat(64),
@@ -61,16 +52,19 @@ describe.each([
   [false, 'center'],
   [true, 'bottom']
 ] as const)('note notifications confirmation (%s small screen)', (isSmallScreen, presentation) => {
-  it('groups the action with mute options and only mutes after confirmation', async () => {
+  it('shows the mute indicator only after confirmation and removes it when unmuted', async () => {
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true)
     state.smallScreen = isSmallScreen
-    state.muted.clear()
-    state.setNoteMuted.mockClear()
+    localStorage.removeItem(StorageKey.MUTED_NOTE_NOTIFICATIONS)
     const container = document.createElement('div')
     document.body.appendChild(container)
     const root = createRoot(container)
     const menuSelector = isSmallScreen ? '[role="dialog"]' : '[role="menu"]'
     const itemSelector = isSmallScreen ? 'button' : '[role="menuitem"]'
+    const triggerButton = () => container.querySelector('button')!
+    const muteIndicator = () => triggerButton().querySelector('.lucide-bell-off')
+    const storedMute = () =>
+      JSON.parse(localStorage.getItem(StorageKey.MUTED_NOTE_NOTIFICATIONS) ?? '{}').self?.[note.id]
     const render = () =>
       act(() =>
         root.render(
@@ -83,7 +77,7 @@ describe.each([
         )
       )
     const openMenu = async () => {
-      const trigger = container.querySelector('button')!
+      const trigger = triggerButton()
       await act(() => {
         if (isSmallScreen) trigger.click()
         else {
@@ -100,6 +94,7 @@ describe.each([
 
     try {
       await render()
+      expect(muteIndicator()).toBeNull()
       let items = await openMenu()
       const index = items.findIndex(({ textContent }) => textContent === 'Mute note notifications')
       expect(items[index].className).toContain('text-destructive')
@@ -112,7 +107,7 @@ describe.each([
       expect(surface.getAttribute('data-modal-presentation')).toBe(presentation)
       expect(surface.textContent).toContain('Notifications related to this note')
       expect(surface.textContent).toContain('won’t sync to other devices')
-      expect(state.setNoteMuted).not.toHaveBeenCalled()
+      expect(storedMute()).toBeUndefined()
       if (isSmallScreen) {
         await clickButton(surface, 'Cancel')
       } else {
@@ -123,25 +118,31 @@ describe.each([
         })
       }
       expect(document.querySelector('[role="alertdialog"]')).toBeNull()
-      expect(state.setNoteMuted).not.toHaveBeenCalled()
-      await vi.waitFor(() => expect(document.activeElement).toBe(container.querySelector('button')))
+      expect(storedMute()).toBeUndefined()
+      expect(muteIndicator()).toBeNull()
+      await vi.waitFor(() => expect(document.activeElement).toBe(triggerButton()))
 
       items = await openMenu()
       await act(() => items[index].click())
       surface = document.querySelector('[role="alertdialog"]')!
       await clickButton(surface, 'Confirm')
-      expect(state.setNoteMuted).toHaveBeenCalledExactlyOnceWith(note, true)
+      expect(storedMute()).toBe(note.id)
+      expect(muteIndicator()?.classList.contains('text-destructive')).toBe(true)
+      expect(triggerButton().title).toBe('Note notifications muted')
+      const descriptionId = triggerButton().getAttribute('aria-describedby')!
+      expect(document.getElementById(descriptionId)?.textContent).toBe('Note notifications muted')
 
-      state.muted.add(note.id)
-      await render()
       items = await openMenu()
       expect(items[index].textContent).toBe('Unmute note notifications')
       await act(() => items[index].click())
       expect(document.querySelector('[role="alertdialog"]')).toBeNull()
-      expect(state.setNoteMuted).toHaveBeenLastCalledWith(note, false)
+      expect(storedMute()).toBeUndefined()
+      expect(muteIndicator()).toBeNull()
+      expect(triggerButton().hasAttribute('aria-describedby')).toBe(false)
     } finally {
       await act(() => root.unmount())
       container.remove()
+      localStorage.removeItem(StorageKey.MUTED_NOTE_NOTIFICATIONS)
       vi.unstubAllGlobals()
     }
   })

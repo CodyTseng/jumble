@@ -1305,6 +1305,7 @@ export default {
     'Mute notifications': '靜音筆記通知',
     'Unmute notifications': '恢復筆記通知',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      '將封鎖與這則筆記相關的通知。此設定只在目前的裝置生效，不會同步到其他裝置。'
+      '將封鎖與這則筆記相關的通知。此設定只在目前的裝置生效，不會同步到其他裝置。',
+    'Note notifications muted': '筆記通知已靜音'
   }
 }

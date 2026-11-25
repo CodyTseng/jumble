@@ -1318,6 +1318,7 @@ export default {
     'Mute notifications': 'Not bildirimlerini sessize al',
     'Unmute notifications': 'Not bildirimlerini yeniden aç',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
-      'Bu notla ilgili bildirimler yalnızca bu cihazda sessize alınır. Bu ayar diğer cihazlarla eşitlenmez.'
+      'Bu notla ilgili bildirimler yalnızca bu cihazda sessize alınır. Bu ayar diğer cihazlarla eşitlenmez.',
+    'Note notifications muted': 'Not bildirimleri sessizde'
   }
 }
