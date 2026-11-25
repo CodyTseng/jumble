@@ -64,7 +64,7 @@ describe.each([
     const itemSelector = isSmallScreen ? 'button' : '[role="menuitem"]'
     const triggerButton = () => container.querySelector('button')!
     const muteIndicator = () =>
-      container.querySelector('[role="img"][aria-label="Note notifications muted"]')
+      container.querySelector<HTMLElement>('[role="img"][aria-label="Note notifications muted"]')
     const storedMute = () =>
       JSON.parse(localStorage.getItem(StorageKey.MUTED_NOTE_NOTIFICATIONS) ?? '{}').self?.[note.id]
     const render = () =>
@@ -132,14 +132,19 @@ describe.each([
       expect(storedMute()).toBe(note.id)
       expect(muteIndicator()?.classList).toContain('text-red-600')
       expect(muteIndicator()?.querySelector('.lucide-bell-off')).not.toBeNull()
-      expect(muteIndicator()?.textContent).toBe('Note notifications muted')
       expect(triggerButton().querySelector('.lucide-bell-off')).toBeNull()
+
+      await act(() => muteIndicator()!.focus())
+      const tooltip = document.querySelector('[role="tooltip"]')!
+      expect(tooltip.textContent).toBe('Note notifications muted')
+      expect(container.contains(tooltip)).toBe(false)
       await act(() => {
         muteIndicator()?.dispatchEvent(
           new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
         )
       })
-      expect(muteIndicator()?.textContent).toBe('')
+      expect(document.querySelector('[role="tooltip"]')).toBeNull()
+      expect(storedMute()).toBe(note.id)
 
       items = await openMenu()
       expect(items[index].textContent).toBe('Unmute note notifications')
