@@ -49,11 +49,13 @@ export class NotificationProcessor {
       return false
     if (this.options.since !== undefined && event.created_at < this.options.since) return false
     const type = getNotificationFilterType(event, this.options.pubkey)
-    if (!type || !this.options.filters.has(type)) return false
+    if (!type) return false
     this.pending.add(event.id)
     try {
       const muted = this.options.isMutedNote?.(event) ?? false
-      const passesFilter = !this.stopped && (muted || (await this.options.filter(event)))
+      const passesFilter =
+        !this.stopped &&
+        (muted || (this.options.filters.has(type) && (await this.options.filter(event))))
       if (!passesFilter || this.stopped) return false
       // A replay after unmuting should not alert for an interaction already
       // received while the note was muted.
