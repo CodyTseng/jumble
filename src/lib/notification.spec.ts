@@ -30,14 +30,12 @@ function createEvent({
 function filter(
   event: NostrEvent,
   pubkey: string | null = currentPubkey,
-  mutedNoteKeys?: ReadonlySet<string>,
-  resolveNote?: Parameters<typeof notificationFilter>[1]['resolveNote']
+  mutedNoteKeys?: ReadonlySet<string>
 ) {
   return notificationFilter(event, {
     pubkey,
     mutePubkeySet: new Set(),
     mutedNoteKeys,
-    resolveNote,
     meetsMinTrustScore: async () => true,
     validateZapReceipt: async () => true
   })
@@ -176,7 +174,8 @@ describe('muting notifications for one note', () => {
         ['k', '30023']
       ]
     ],
-    [kinds.ShortTextNote, [['q', coordinate]]]
+    [kinds.ShortTextNote, [['q', coordinate]]],
+    [kinds.ShortTextNote, [['a', coordinate, '', 'mention']]]
   ] satisfies [number, string[][]][])(
     'filters kind %i when it targets the muted note',
     async (kind, tags) => {
@@ -195,31 +194,17 @@ describe('muting notifications for one note', () => {
     await expect(filter(quote, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
   })
 
-  it('resolves an e-only reaction to a different revision of a muted article', async () => {
-    const kind = kinds.LongFormArticle
-    const reaction = createEvent({
-      tags: [
-        ['e', otherId],
-        ['p', currentPubkey],
-        ['k', `${kind}`]
-      ]
-    })
-    const article = {
-      ...createEvent({ kind, tags: [['d', 'article']] }),
-      id: otherId,
-      pubkey: currentPubkey
-    }
-    const resolveNote = vi
-      .fn()
-      .mockResolvedValueOnce(article)
-      .mockResolvedValueOnce({
-        ...article,
-        tags: [['d', 'unrelated']]
-      })
+  it('matches an article reaction across revisions by coordinate', async () => {
+    const tags = [
+      ['e', otherId],
+      ['p', currentPubkey],
+      ['k', String(kinds.LongFormArticle)]
+    ]
 
-    await expect(filter(reaction, currentPubkey, mutedNoteKeys, resolveNote)).resolves.toBe(false)
-    expect(resolveNote).toHaveBeenCalledWith(otherId, currentPubkey, kind)
-    await expect(filter(reaction, currentPubkey, mutedNoteKeys, resolveNote)).resolves.toBe(true)
+    await expect(
+      filter(createEvent({ tags: [...tags, ['a', coordinate]] }), currentPubkey, mutedNoteKeys)
+    ).resolves.toBe(false)
+    await expect(filter(createEvent({ tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(true)
   })
 
   it('filters a notification for the muted note itself', async () => {
@@ -249,6 +234,14 @@ describe('muting notifications for one note', () => {
       ExtendedKind.COMMENT,
       [
         ['E', mutedId],
+        ['e', otherId],
+        ['k', '1']
+      ]
+    ],
+    [
+      ExtendedKind.COMMENT,
+      [
+        ['A', coordinate],
         ['e', otherId],
         ['k', '1']
       ]

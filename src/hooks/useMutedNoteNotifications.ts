@@ -6,6 +6,7 @@ import { atomWithStorage } from 'jotai/utils'
 import type { NostrEvent } from 'nostr-tools'
 import { useCallback, useMemo } from 'react'
 
+// Older entries stored a revision ID as the value. Only the key identifies the note.
 type MutedNotesByAccount = Record<string, Record<string, string>>
 const mutedNotesAtom = atomWithStorage<MutedNotesByAccount>(
   StorageKey.MUTED_NOTE_NOTIFICATIONS,
@@ -21,10 +22,7 @@ export function useMutedNoteNotifications() {
   const setMutedNotes = useSetAtom(mutedNotesAtom)
   const accountNotes = pubkey ? mutedNotes?.[pubkey] : undefined
   const mutedNoteKeys = useMemo(
-    () =>
-      accountNotes
-        ? new Set([...Object.keys(accountNotes), ...Object.values(accountNotes)])
-        : emptyMutedNoteKeys,
+    () => (accountNotes ? new Set(Object.keys(accountNotes)) : emptyMutedNoteKeys),
     [accountNotes]
   )
 
@@ -35,7 +33,7 @@ export function useMutedNoteNotifications() {
       setMutedNotes((previous) => {
         const notes = { ...previous?.[pubkey] }
         if (muted) {
-          notes[key] = event.id
+          notes[key] = key
         } else {
           delete notes[key]
         }

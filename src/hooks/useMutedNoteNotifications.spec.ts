@@ -37,16 +37,24 @@ it('persists a note mute per account and removes it from storage when unmuted', 
     await act(render)
     expect(result!.mutedNoteKeys.size).toBe(0)
     await act(() => result!.setNoteMuted(event, true))
-    expect(result!.mutedNoteKeys).toEqual(new Set([coordinate, event.id]))
+    expect(result!.mutedNoteKeys).toEqual(new Set([coordinate]))
+
+    expect(JSON.parse(localStorage.getItem(StorageKey.MUTED_NOTE_NOTIFICATIONS)!)).toEqual({
+      [initialAccount]: { [coordinate]: coordinate }
+    })
 
     account.pubkey = '2'.repeat(64)
     await act(render)
     expect(result!.mutedNoteKeys.size).toBe(0)
 
+    localStorage.setItem(
+      StorageKey.MUTED_NOTE_NOTIFICATIONS,
+      JSON.stringify({ [initialAccount]: { [coordinate]: event.id } })
+    )
     account.pubkey = initialAccount
     store = createStore()
     await act(render)
-    expect(result!.mutedNoteKeys).toEqual(new Set([coordinate, event.id]))
+    expect(result!.mutedNoteKeys).toEqual(new Set([coordinate]))
 
     await act(() => result!.setNoteMuted({ ...event, id: 'd'.repeat(64) }, false))
     expect(result!.mutedNoteKeys.size).toBe(0)

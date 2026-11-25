@@ -7,7 +7,6 @@ import { NotificationProcessor, type NotificationCursor } from '@/lib/notificati
 import { fetchTrustPercentiles, meetsTrustScore, type JsonRequest } from '@/lib/trust-score'
 import { validateZapReceipt } from '@/lib/zap-validation'
 import { BoundedMap } from '@/lib/bounded-map'
-import { subscribeRelays } from '@/lib/relay-subscription'
 
 export type BackgroundNotificationConfig = {
   pubkey: string
@@ -45,7 +44,6 @@ export class BackgroundNotificationRunner {
   private stopped = false
   private retry = new Map<string, ReturnType<typeof setTimeout>>()
   private scores = new BoundedMap<string, Promise<number | null>>({ maxSize: 1000 })
-  private notes = new BoundedMap<string, Promise<NostrEvent | undefined>>({ maxSize: 1000 })
   constructor(
     private config: BackgroundNotificationConfig,
     private ports: BackgroundPorts,
@@ -66,10 +64,7 @@ export class BackgroundNotificationRunner {
       maxAgeSeconds: 300,
       canNotify: () => !ports.isForeground(),
       saveCursor: ports.saveCursor,
-      isMutedNote: (event) =>
-        isForMutedNote(event, mutedNoteKeys, (id, author, kind) =>
-          this.fetchNote(id, author, kind)
-        ),
+      isMutedNote: (event) => isForMutedNote(event, mutedNoteKeys),
       filter: (event) =>
         notificationFilter(event, {
           pubkey: config.pubkey,
@@ -91,39 +86,6 @@ export class BackgroundNotificationRunner {
         }),
       notify: (event, type) => ports.notify(event.id, config.descriptions[type] ?? 'Jumble')
     })
-  }
-  private fetchNote(id: string, author: string, kind: number) {
-    const key = `${id}:${author}:${kind}`
-    const cached = this.notes.get(key)
-    if (cached) return cached
-
-    const request = new Promise<NostrEvent | undefined>((resolve) => {
-      const finish = (event?: NostrEvent) => {
-        subscription.close()
-        this.closers.delete(closer)
-        resolve(event)
-      }
-      const subscription = subscribeRelays(
-        this.pool,
-        this.config.relays,
-        [{ ids: [id], authors: [author], kinds: [kind], limit: 1 }],
-        {
-          onevent: (event) => {
-            if (event.id === id && event.pubkey === author && event.kind === kind) finish(event)
-          },
-          oneose: (complete) => {
-            if (complete) finish()
-          }
-        }
-      )
-      const closer = { close: () => finish() }
-      this.closers.add(closer)
-    })
-    this.notes.set(key, request)
-    void request.then((event) => {
-      if (!event && this.notes.get(key) === request) this.notes.delete(key)
-    })
-    return request
   }
   async start() {
     this.pool.setNetworkOnline(this.ports.isOnline())

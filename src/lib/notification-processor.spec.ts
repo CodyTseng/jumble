@@ -71,7 +71,7 @@ describe('shared notification processor', () => {
   })
   it('records muted note interactions so replays after unmuting do not alert', async () => {
     const signed = event()
-    const muted = create({ isMutedNote: async () => true })
+    const muted = create({ isMutedNote: () => true })
     expect(await muted.processor.process(signed)).toBe(false)
     expect(muted.notify).not.toHaveBeenCalled()
     expect(muted.saveCursor).toHaveBeenCalledExactlyOnceWith({ pubkey, ids: [signed.id] })

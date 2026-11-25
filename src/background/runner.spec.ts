@@ -1,4 +1,5 @@
-import { finalizeEvent, kinds, matchFilters, type NostrEvent } from 'nostr-tools'
+import { getEventKey } from '@/lib/event-core'
+import { finalizeEvent, kinds, matchFilters, type Filter, type NostrEvent } from 'nostr-tools'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   BackgroundNotificationRunner,
@@ -13,6 +14,7 @@ class FakeWebSocket {
   static CLOSED = 3
   static urls: string[] = []
   static events: NostrEvent[] = []
+  static requests: Filter[][] = []
   readyState = 0
   onopen: (() => void) | null = null
   onmessage: ((event: { data: string }) => void) | null = null
@@ -27,6 +29,7 @@ class FakeWebSocket {
   send(message: string) {
     if (!message.startsWith('["REQ"')) return
     const [, id, ...filters] = JSON.parse(message)
+    FakeWebSocket.requests.push(filters)
     queueMicrotask(() => {
       for (const event of FakeWebSocket.events) {
         if (matchFilters(filters, event)) {
@@ -44,6 +47,7 @@ class FakeWebSocket {
 
 afterEach(() => {
   FakeWebSocket.events = []
+  FakeWebSocket.requests = []
   vi.useRealTimers()
 })
 
@@ -89,7 +93,7 @@ describe('background local relay permissions', () => {
   })
 })
 
-it('resolves an article reaction by ID and persists its muted notification in the cursor', async () => {
+it('records a muted article reaction without fetching its target', async () => {
   const created_at = Math.floor(Date.now() / 1000)
   const article = finalizeEvent(
     { kind: kinds.LongFormArticle, created_at, tags: [['d', 'article']], content: 'New revision' },
@@ -101,6 +105,7 @@ it('resolves an article reaction by ID and persists its muted notification in th
       created_at,
       tags: [
         ['e', article.id],
+        ['a', getEventKey(article)],
         ['p', article.pubkey],
         ['k', `${article.kind}`]
       ],
@@ -108,7 +113,7 @@ it('resolves an article reaction by ID and persists its muted notification in th
     },
     new Uint8Array(32).fill(9)
   )
-  FakeWebSocket.events = [article, reaction]
+  FakeWebSocket.events = [reaction]
   const ports: BackgroundPorts = {
     websocket: FakeWebSocket as unknown as typeof WebSocket,
     fetchJson: vi.fn(),
@@ -127,7 +132,7 @@ it('resolves an article reaction by ID and persists its muted notification in th
       filters: ['likes'],
       descriptions: {},
       muted: [],
-      mutedNoteKeys: [`${article.kind}:${article.pubkey}:article`],
+      mutedNoteKeys: [getEventKey(article)],
       trusted: [],
       minTrustScore: 0,
       hideMutedMentions: false,
@@ -141,6 +146,8 @@ it('resolves an article reaction by ID and persists its muted notification in th
       expect(ports.saveCursor).toHaveBeenCalledWith({ pubkey: article.pubkey, ids: [reaction.id] })
     )
     expect(ports.notify).not.toHaveBeenCalled()
+    expect(FakeWebSocket.requests).toHaveLength(1)
+    expect(FakeWebSocket.requests[0][0]).not.toHaveProperty('ids')
     expect(ports.error).not.toHaveBeenCalled()
   } finally {
     runner.stop()

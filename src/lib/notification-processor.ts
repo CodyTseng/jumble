@@ -9,7 +9,7 @@ export type NotificationProcessorOptions = {
   pubkey: string
   filters: ReadonlySet<TNotificationFilter>
   filter: (event: NostrEvent) => Promise<boolean>
-  isMutedNote?: (event: NostrEvent) => Promise<boolean>
+  isMutedNote?: (event: NostrEvent) => boolean
   canNotify: () => boolean
   notify: (event: NostrEvent, type: TNotificationFilter) => Promise<unknown>
   cursor?: NotificationCursor | null
@@ -52,7 +52,7 @@ export class NotificationProcessor {
     if (!type || !this.options.filters.has(type)) return false
     this.pending.add(event.id)
     try {
-      const muted = this.options.isMutedNote && (await this.options.isMutedNote(event))
+      const muted = this.options.isMutedNote?.(event) ?? false
       const passesFilter = !this.stopped && (muted || (await this.options.filter(event)))
       if (!passesFilter || this.stopped) return false
       // A replay after unmuting should not alert for an interaction already

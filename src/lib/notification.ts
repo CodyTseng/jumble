@@ -8,8 +8,7 @@ import {
   getParentStuff,
   getParentTag,
   getReplaceableCoordinate,
-  isMentioningMutedUsers,
-  isReplaceableEvent
+  isMentioningMutedUsers
 } from './event-core'
 import { tagNameEquals } from './tag'
 
@@ -53,15 +52,9 @@ export function getNotificationFilterType(
   return event.kind === kinds.ShortTextNote ? 'quotes' : 'replies'
 }
 
-type ResolveNote = (id: string, author: string, kind: number) => Promise<NostrEvent | undefined>
-
-export async function isForMutedNote(
-  event: NostrEvent,
-  mutedNoteKeys: ReadonlySet<string>,
-  resolveNote?: ResolveNote
-): Promise<boolean> {
+export function isForMutedNote(event: NostrEvent, mutedNoteKeys: ReadonlySet<string>): boolean {
   if (!mutedNoteKeys.size) return false
-  if (mutedNoteKeys.has(event.id) || mutedNoteKeys.has(getEventKey(event))) return true
+  if (mutedNoteKeys.has(getEventKey(event))) return true
 
   switch (event.kind) {
     case kinds.Reaction:
@@ -79,26 +72,7 @@ export async function isForMutedNote(
       if (event.kind === kinds.Highlights) {
         return event.tags.some(([name, key]) => name === 'q' && mutedNoteKeys.has(key))
       }
-      if (event.kind !== kinds.Reaction || aTag || !resolveNote) return false
-
-      // NIP-25 recommends an a tag for addressable targets. An e-only
-      // reaction may point to a different revision of the muted address.
-      const id = eTag?.[1]
-      const author = event.tags.findLast(tagNameEquals('p'))?.[1]
-      const kind = Number(event.tags.findLast(tagNameEquals('k'))?.[1])
-      if (!id || !/^[0-9a-f]{64}$/.test(id) || !author || !Number.isInteger(kind)) return false
-      if (!SUPPORTED_KINDS.includes(kind) || !isReplaceableEvent(kind)) return false
-      const prefix = `${kind}:${author}:`
-      if (![...mutedNoteKeys].some((key) => key.startsWith(prefix))) return false
-
-      const note = await resolveNote(id, author, kind).catch(() => undefined)
-      return (
-        !!note &&
-        note.id === id &&
-        note.kind === kind &&
-        note.pubkey === author &&
-        mutedNoteKeys.has(getEventKey(note))
-      )
+      return false
     }
     case kinds.ShortTextNote:
     case ExtendedKind.COMMENT:
@@ -111,7 +85,8 @@ export async function isForMutedNote(
       if (
         event.tags.some(
           ([name, key, , marker]) =>
-            (name === 'q' || (name === 'e' && marker === 'mention')) && mutedNoteKeys.has(key)
+            (name === 'q' || ((name === 'e' || name === 'a') && marker === 'mention')) &&
+            mutedNoteKeys.has(key)
         )
       ) {
         return true
@@ -144,7 +119,6 @@ export async function notificationFilter(
     pubkey,
     mutePubkeySet,
     mutedNoteKeys,
-    resolveNote,
     hideContentMentioningMutedUsers,
     meetsMinTrustScore,
     validateZapReceipt
@@ -152,13 +126,12 @@ export async function notificationFilter(
     pubkey?: string | null
     mutePubkeySet: Set<string>
     mutedNoteKeys?: ReadonlySet<string>
-    resolveNote?: ResolveNote
     hideContentMentioningMutedUsers?: boolean
     meetsMinTrustScore: (pubkey: string) => Promise<boolean>
     validateZapReceipt: (event: NostrEvent) => Promise<boolean>
   }
 ): Promise<boolean> {
-  if (mutedNoteKeys && (await isForMutedNote(event, mutedNoteKeys, resolveNote))) return false
+  if (mutedNoteKeys && isForMutedNote(event, mutedNoteKeys)) return false
 
   // Zap receipts must be validated before trusting their embedded sender data.
   // Keeping this in the shared filter makes the list, unread badge/count and
