@@ -147,6 +147,7 @@ export default function ReplyNote({
                     skeletonClassName="h-3"
                   />
                   {opPubkey === event.pubkey && <OpBadge />}
+                  <MutedNoteBadge event={event} />
                   <TrustScoreBadge pubkey={event.pubkey} className="size-3.5!" />
                   <ClientTag event={event} />
                 </div>
@@ -158,7 +159,6 @@ export default function ReplyNote({
                     short={isSmallScreen}
                   />
                   <PowBadge event={event} className="shrink-0" />
-                  <MutedNoteBadge event={event} />
                 </div>
               </div>
               <div className="flex shrink-0 items-center">

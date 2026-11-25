@@ -74,6 +74,7 @@ export default function Note({
                   skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
                 />
                 <FollowingBadge pubkey={displayPubkey} />
+                <MutedNoteBadge event={event} />
                 {opPubkey === displayPubkey && <OpBadge />}
                 <TrustScoreBadge pubkey={displayPubkey} />
                 <ProtectedBadge event={event} />
@@ -87,7 +88,6 @@ export default function Note({
                   short={isSmallScreen}
                 />
                 <PowBadge event={event} className="shrink-0" />
-                <MutedNoteBadge event={event} />
               </div>
             </div>
           </div>

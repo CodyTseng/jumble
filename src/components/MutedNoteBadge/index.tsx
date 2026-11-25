@@ -17,7 +17,7 @@ export default function MutedNoteBadge({ event }: { event: Event }) {
       role="img"
       aria-label={label}
       tabIndex={0}
-      className="group/muted-note bg-muted text-muted-foreground focus-visible:ring-ring relative inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 focus-visible:ring-2 focus-visible:outline-none"
+      className="group/muted-note focus-visible:ring-ring relative flex shrink-0 items-center rounded-full bg-red-500/10 px-2 py-0.5 text-red-600 focus-visible:ring-2 focus-visible:outline-none dark:text-red-400"
       onPointerLeave={() => setDismissed(false)}
       onBlur={() => setDismissed(false)}
       onKeyDown={(e) => {

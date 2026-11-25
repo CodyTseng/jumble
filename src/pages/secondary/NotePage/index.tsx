@@ -409,6 +409,7 @@ function ChainItem({
                   skeletonClassName="h-4"
                 />
                 <FollowingBadge pubkey={displayPubkey ?? event.pubkey} />
+                <MutedNoteBadge event={event} />
                 {opPubkey === (displayPubkey ?? event.pubkey) && <OpBadge />}
                 <TrustScoreBadge pubkey={displayPubkey ?? event.pubkey} />
                 <ProtectedBadge event={event} />
@@ -421,7 +422,6 @@ function ChainItem({
                   className="shrink-0"
                   short={isSmallScreen}
                 />
-                <MutedNoteBadge event={event} />
               </div>
             </div>
             <div className="flex shrink-0 items-center">

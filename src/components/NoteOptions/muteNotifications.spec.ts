@@ -130,7 +130,7 @@ describe.each([
       surface = document.querySelector('[role="alertdialog"]')!
       await clickButton(surface, 'Confirm')
       expect(storedMute()).toBe(note.id)
-      expect(muteIndicator()?.classList.contains('text-muted-foreground')).toBe(true)
+      expect(muteIndicator()?.classList).toContain('text-red-600')
       expect(muteIndicator()?.querySelector('.lucide-bell-off')).not.toBeNull()
       expect(muteIndicator()?.textContent).toBe('Note notifications muted')
       expect(triggerButton().querySelector('.lucide-bell-off')).toBeNull()
