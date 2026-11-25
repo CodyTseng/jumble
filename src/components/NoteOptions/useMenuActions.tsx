@@ -21,6 +21,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinList } from '@/providers/PinListProvider'
 import client from '@/services/client.service'
+import dialogService from '@/services/dialog.service'
 import {
   Bell,
   BellOff,
@@ -250,19 +251,6 @@ export function useMenuActions({
       })
     }
 
-    if (pubkey) {
-      actions.push({
-        icon: areNotificationsMuted ? Bell : BellOff,
-        label: areNotificationsMuted
-          ? t('Unmute notifications for this note')
-          : t('Mute notifications for this note'),
-        onClick: () => {
-          closeDrawer()
-          setNoteMuted(event, !areNotificationsMuted)
-        }
-      })
-    }
-
     const isProtected = isProtectedEvent(event)
     if (!isProtected || event.pubkey === pubkey) {
       actions.push({
@@ -301,6 +289,28 @@ export function useMenuActions({
       })
     }
 
+    if (pubkey) {
+      actions.push({
+        icon: areNotificationsMuted ? Bell : BellOff,
+        label: areNotificationsMuted ? t('Unmute notifications') : t('Mute notifications'),
+        onClick: async () => {
+          closeDrawer()
+          if (
+            areNotificationsMuted ||
+            (await dialogService.confirm(
+              t(
+                'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.'
+              )
+            ))
+          ) {
+            setNoteMuted(event, !areNotificationsMuted)
+          }
+        },
+        className: 'text-destructive hover:text-destructive focus:text-destructive',
+        separator: true
+      })
+    }
+
     if (pubkey && authorPubkey !== pubkey) {
       if (isMuted) {
         actions.push({
@@ -310,8 +320,7 @@ export function useMenuActions({
             closeDrawer()
             unmutePubkey(authorPubkey)
           },
-          className: 'text-destructive focus:text-destructive',
-          separator: true
+          className: 'text-destructive focus:text-destructive'
         })
       } else {
         actions.push(
@@ -322,8 +331,7 @@ export function useMenuActions({
               closeDrawer()
               mutePubkeyPrivately(authorPubkey)
             },
-            className: 'text-destructive focus:text-destructive',
-            separator: true
+            className: 'text-destructive focus:text-destructive'
           },
           {
             icon: BellOff,

@@ -1301,6 +1301,10 @@ export default {
     'Profile followed by': '關注者',
     'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。',
     'Mute notifications for this note': '靜音這則筆記的通知',
-    'Unmute notifications for this note': '取消靜音這則筆記的通知'
+    'Unmute notifications for this note': '取消靜音這則筆記的通知',
+    'Mute notifications': '靜音通知',
+    'Unmute notifications': '恢復通知',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      '將封鎖與這則筆記相關的通知。此設定只在目前的裝置生效，不會同步到其他裝置。'
   }
 }

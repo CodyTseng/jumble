@@ -1333,6 +1333,10 @@ export default {
     'People you follow who also follow this user.':
       'Les personnes que vous suivez qui suivent aussi cet utilisateur.',
     'Mute notifications for this note': 'Mettre en sourdine les notifications de cette note',
-    'Unmute notifications for this note': 'Réactiver les notifications de cette note'
+    'Unmute notifications for this note': 'Réactiver les notifications de cette note',
+    'Mute notifications': 'Couper les notifications',
+    'Unmute notifications': 'Réactiver les notifications',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Les notifications liées à cette note seront coupées uniquement sur cet appareil. Ce réglage ne sera pas synchronisé avec les autres appareils.'
   }
 }

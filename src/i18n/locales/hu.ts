@@ -1325,6 +1325,10 @@ export default {
     'People you follow who also follow this user.':
       'Az Ön által követett személyek, akik ezt a felhasználót is követik.',
     'Mute notifications for this note': 'A bejegyzés értesítéseinek némítása',
-    'Unmute notifications for this note': 'A bejegyzés értesítéseinek visszakapcsolása'
+    'Unmute notifications for this note': 'A bejegyzés értesítéseinek visszakapcsolása',
+    'Mute notifications': 'Értesítések némítása',
+    'Unmute notifications': 'Értesítések visszakapcsolása',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'A bejegyzéshez kapcsolódó értesítések csak ezen az eszközön lesznek némítva. A beállítás nem szinkronizálódik más eszközökre.'
   }
 }

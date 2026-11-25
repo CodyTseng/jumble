@@ -1326,6 +1326,10 @@ export default {
     'People you follow who also follow this user.':
       'Osoby, które obserwujesz i które również obserwują tego użytkownika.',
     'Mute notifications for this note': 'Wycisz powiadomienia o tej notatce',
-    'Unmute notifications for this note': 'Włącz ponownie powiadomienia o tej notatce'
+    'Unmute notifications for this note': 'Włącz ponownie powiadomienia o tej notatce',
+    'Mute notifications': 'Wycisz powiadomienia',
+    'Unmute notifications': 'Włącz powiadomienia',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Powiadomienia dotyczące tej notatki zostaną wyciszone tylko na tym urządzeniu. To ustawienie nie będzie synchronizowane z innymi urządzeniami.'
   }
 }

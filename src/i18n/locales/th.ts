@@ -1290,6 +1290,10 @@ export default {
     'Profile followed by': 'ติดตามโดย',
     'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย',
     'Mute notifications for this note': 'ปิดการแจ้งเตือนสำหรับโน้ตนี้',
-    'Unmute notifications for this note': 'เปิดการแจ้งเตือนสำหรับโน้ตนี้อีกครั้ง'
+    'Unmute notifications for this note': 'เปิดการแจ้งเตือนสำหรับโน้ตนี้อีกครั้ง',
+    'Mute notifications': 'ปิดการแจ้งเตือน',
+    'Unmute notifications': 'เปิดการแจ้งเตือน',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'การแจ้งเตือนที่เกี่ยวกับโน้ตนี้จะถูกปิดเฉพาะบนอุปกรณ์นี้ การตั้งค่านี้จะไม่ซิงค์กับอุปกรณ์อื่น'
   }
 }

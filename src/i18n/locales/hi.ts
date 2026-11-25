@@ -1309,6 +1309,10 @@ export default {
     'People you follow who also follow this user.':
       'जिन लोगों को आप फ़ॉलो करते हैं और जो इस उपयोगकर्ता को भी फ़ॉलो करते हैं।',
     'Mute notifications for this note': 'इस नोट की सूचनाएँ म्यूट करें',
-    'Unmute notifications for this note': 'इस नोट की सूचनाएँ अनम्यूट करें'
+    'Unmute notifications for this note': 'इस नोट की सूचनाएँ अनम्यूट करें',
+    'Mute notifications': 'सूचनाएँ म्यूट करें',
+    'Unmute notifications': 'सूचनाएँ फिर चालू करें',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'इस नोट से जुड़ी सूचनाएँ सिर्फ़ इस डिवाइस पर म्यूट होंगी। यह सेटिंग अन्य डिवाइसों के साथ सिंक नहीं होगी।'
   }
 }

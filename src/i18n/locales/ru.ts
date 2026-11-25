@@ -1318,6 +1318,10 @@ export default {
     'People you follow who also follow this user.':
       'Люди, на которых вы подписаны и которые также подписаны на этого пользователя.',
     'Mute notifications for this note': 'Отключить уведомления об этой заметке',
-    'Unmute notifications for this note': 'Включить уведомления об этой заметке'
+    'Unmute notifications for this note': 'Включить уведомления об этой заметке',
+    'Mute notifications': 'Отключить уведомления',
+    'Unmute notifications': 'Включить уведомления',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Уведомления об этой заметке будут отключены только на этом устройстве. Эта настройка не синхронизируется с другими устройствами.'
   }
 }
