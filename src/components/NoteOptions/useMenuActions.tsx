@@ -38,7 +38,7 @@ import {
   TriangleAlert
 } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useMemo } from 'react'
+import { type RefObject, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 
@@ -60,6 +60,7 @@ export interface MenuAction {
 
 interface UseMenuActionsProps {
   event: Event
+  menuTriggerRef: RefObject<HTMLButtonElement | null>
   closeDrawer: () => void
   showSubMenuActions: (subMenu: SubMenuAction[], title: string) => void
   setIsRawEventDialogOpen: (open: boolean) => void
@@ -69,6 +70,7 @@ interface UseMenuActionsProps {
 
 export function useMenuActions({
   event,
+  menuTriggerRef,
   closeDrawer,
   showSubMenuActions,
   setIsRawEventDialogOpen,
@@ -300,7 +302,8 @@ export function useMenuActions({
             (await dialogService.confirm(
               t(
                 'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.'
-              )
+              ),
+              menuTriggerRef.current ?? undefined
             ))
           ) {
             setNoteMuted(event, !areNotificationsMuted)
@@ -381,6 +384,7 @@ export function useMenuActions({
     isMuted,
     isBookmarked,
     areNotificationsMuted,
+    menuTriggerRef,
     setNoteMuted,
     isSmallScreen,
     broadcastSubMenu,

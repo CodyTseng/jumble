@@ -82,7 +82,10 @@ describe.each([
       const trigger = container.querySelector('button')!
       await act(() => {
         if (isSmallScreen) trigger.click()
-        else trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+        else {
+          trigger.focus()
+          trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+        }
       })
       return [...document.querySelector(menuSelector)!.querySelectorAll<HTMLElement>(itemSelector)]
     }
@@ -106,8 +109,18 @@ describe.each([
       expect(surface.textContent).toContain('Notifications related to this note')
       expect(surface.textContent).toContain('won’t sync to other devices')
       expect(state.setNoteMuted).not.toHaveBeenCalled()
-      await clickButton(surface, 'Cancel')
+      if (isSmallScreen) {
+        await clickButton(surface, 'Cancel')
+      } else {
+        await act(() => {
+          document.activeElement?.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+          )
+        })
+      }
+      expect(document.querySelector('[role="alertdialog"]')).toBeNull()
       expect(state.setNoteMuted).not.toHaveBeenCalled()
+      await vi.waitFor(() => expect(document.activeElement).toBe(container.querySelector('button')))
 
       items = await openMenu()
       await act(() => items[index].click())
