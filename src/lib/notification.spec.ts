@@ -174,47 +174,6 @@ describe('muting notifications for one note', () => {
         ['k', '30023']
       ]
     ],
-    [kinds.ShortTextNote, [['q', coordinate]]],
-    [kinds.ShortTextNote, [['a', coordinate, '', 'mention']]]
-  ] satisfies [number, string[][]][])(
-    'filters kind %i when it targets the muted note',
-    async (kind, tags) => {
-      await expect(filter(createEvent({ kind, tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(
-        false
-      )
-    }
-  )
-
-  it('filters a note that quotes the muted note through a legacy inline reference', async () => {
-    const quote = createEvent({
-      kind: kinds.ShortTextNote,
-      content: `nostr:${nip19.noteEncode(mutedId)}`
-    })
-
-    await expect(filter(quote, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
-  })
-
-  it('matches an article reaction across revisions by coordinate', async () => {
-    const tags = [
-      ['e', otherId],
-      ['p', currentPubkey],
-      ['k', String(kinds.LongFormArticle)]
-    ]
-
-    await expect(
-      filter(createEvent({ tags: [...tags, ['a', coordinate]] }), currentPubkey, mutedNoteKeys)
-    ).resolves.toBe(false)
-    await expect(filter(createEvent({ tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(true)
-  })
-
-  it('filters a notification for the muted note itself', async () => {
-    const mention = { ...createEvent({ kind: kinds.ShortTextNote }), id: mutedId }
-
-    await expect(filter(mention, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
-    await expect(filter(mention, currentPubkey, new Set())).resolves.toBe(true)
-  })
-
-  it.each([
     [
       kinds.Reaction,
       [
@@ -246,6 +205,47 @@ describe('muting notifications for one note', () => {
         ['k', '1']
       ]
     ],
+    [kinds.ShortTextNote, [['q', coordinate]]],
+    [kinds.ShortTextNote, [['a', coordinate, '', 'mention']]]
+  ] satisfies [number, string[][]][])(
+    'filters kind %i when any reference tag matches the muted note',
+    async (kind, tags) => {
+      await expect(filter(createEvent({ kind, tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(
+        false
+      )
+    }
+  )
+
+  it('keeps a note with an inline reference but no matching reference tag', async () => {
+    const quote = createEvent({
+      kind: kinds.ShortTextNote,
+      content: `nostr:${nip19.noteEncode(mutedId)}`
+    })
+
+    await expect(filter(quote, currentPubkey, mutedNoteKeys)).resolves.toBe(true)
+  })
+
+  it('matches an article reaction across revisions by coordinate', async () => {
+    const tags = [
+      ['e', otherId],
+      ['p', currentPubkey],
+      ['k', String(kinds.LongFormArticle)]
+    ]
+
+    await expect(
+      filter(createEvent({ tags: [...tags, ['a', coordinate]] }), currentPubkey, mutedNoteKeys)
+    ).resolves.toBe(false)
+    await expect(filter(createEvent({ tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(true)
+  })
+
+  it('filters a notification for the muted note itself', async () => {
+    const mention = { ...createEvent({ kind: kinds.ShortTextNote }), id: mutedId }
+
+    await expect(filter(mention, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
+    await expect(filter(mention, currentPubkey, new Set())).resolves.toBe(true)
+  })
+
+  it.each([
     [kinds.Zap, [['p', currentPubkey]]],
     [
       kinds.Highlights,
@@ -254,7 +254,13 @@ describe('muting notifications for one note', () => {
         ['p', currentPubkey]
       ]
     ],
-    [kinds.ShortTextNote, [['p', currentPubkey]]]
+    [
+      kinds.ShortTextNote,
+      [
+        ['p', currentPubkey],
+        ['x', mutedId]
+      ]
+    ]
   ] satisfies [number, string[][]][])(
     'keeps kind %i when it targets a different note or the account',
     async (kind, tags) => {

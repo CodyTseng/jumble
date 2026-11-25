@@ -1,13 +1,11 @@
-import { EMBEDDED_EVENT_REGEX, ExtendedKind, SUPPORTED_KINDS } from '@/constants'
+import { ExtendedKind, SUPPORTED_KINDS } from '@/constants'
 import { TNotificationFilter } from '@/types'
-import { kinds, nip19, NostrEvent } from 'nostr-tools'
+import { kinds, NostrEvent } from 'nostr-tools'
 import {
   getEmbeddedPubkeys,
   getEventAuthorPubkey,
   getEventKey,
   getParentStuff,
-  getParentTag,
-  getReplaceableCoordinate,
   isMentioningMutedUsers
 } from './event-core'
 import { tagNameEquals } from './tag'
@@ -52,65 +50,14 @@ export function getNotificationFilterType(
   return event.kind === kinds.ShortTextNote ? 'quotes' : 'replies'
 }
 
-export function isForMutedNote(event: NostrEvent, mutedNoteKeys: ReadonlySet<string>): boolean {
-  if (!mutedNoteKeys.size) return false
-  if (mutedNoteKeys.has(getEventKey(event))) return true
+const mutedNoteReferenceTags = new Set(['e', 'E', 'a', 'A', 'q'])
 
-  switch (event.kind) {
-    case kinds.Reaction:
-    case kinds.Repost:
-    case kinds.GenericRepost:
-    case kinds.Zap:
-    case kinds.Highlights:
-    case ExtendedKind.POLL_RESPONSE: {
-      const eTag =
-        event.kind === ExtendedKind.POLL_RESPONSE
-          ? event.tags.find(tagNameEquals('e'))
-          : event.tags.findLast(tagNameEquals('e'))
-      const aTag = event.tags.findLast(tagNameEquals('a'))
-      if (mutedNoteKeys.has(eTag?.[1] ?? '') || mutedNoteKeys.has(aTag?.[1] ?? '')) return true
-      if (event.kind === kinds.Highlights) {
-        return event.tags.some(([name, key]) => name === 'q' && mutedNoteKeys.has(key))
-      }
-      return false
-    }
-    case kinds.ShortTextNote:
-    case ExtendedKind.COMMENT:
-    case ExtendedKind.VOICE_COMMENT:
-    case ExtendedKind.POLL: {
-      // Match the direct parent. A root tag on a reply to a different note
-      // does not make that reply an interaction with the muted note.
-      const parent = getParentTag(event)
-      if (parent && parent.type !== 'i' && mutedNoteKeys.has(parent.tag[1])) return true
-      if (
-        event.tags.some(
-          ([name, key, , marker]) =>
-            (name === 'q' || ((name === 'e' || name === 'a') && marker === 'mention')) &&
-            mutedNoteKeys.has(key)
-        )
-      ) {
-        return true
-      }
-      // Older clients can quote a note in the content without a q tag.
-      return (event.content.match(EMBEDDED_EVENT_REGEX) ?? []).some((reference) => {
-        try {
-          const { type, data } = nip19.decode(reference.slice('nostr:'.length))
-          if (type === 'note') return mutedNoteKeys.has(data)
-          if (type === 'nevent') return mutedNoteKeys.has(data.id)
-          if (type === 'naddr') {
-            return mutedNoteKeys.has(
-              getReplaceableCoordinate(data.kind, data.pubkey, data.identifier)
-            )
-          }
-        } catch {
-          // Ignore invalid references.
-        }
-        return false
-      })
-    }
-    default:
-      return false
-  }
+export function isForMutedNote(event: NostrEvent, mutedNoteKeys: ReadonlySet<string>): boolean {
+  if (mutedNoteKeys.size === 0) return false
+  return (
+    mutedNoteKeys.has(getEventKey(event)) ||
+    event.tags.some(([name, key]) => mutedNoteReferenceTags.has(name) && mutedNoteKeys.has(key))
+  )
 }
 
 export async function notificationFilter(
