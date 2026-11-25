@@ -20,6 +20,7 @@ import Collapsible from '../Collapsible'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
+import MutedNoteBadge from '../MutedNoteBadge'
 import NoteOptions from '../NoteOptions'
 import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
@@ -157,6 +158,7 @@ export default function ReplyNote({
                     short={isSmallScreen}
                   />
                   <PowBadge event={event} className="shrink-0" />
+                  <MutedNoteBadge event={event} />
                 </div>
               </div>
               <div className="flex shrink-0 items-center">

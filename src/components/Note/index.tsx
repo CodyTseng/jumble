@@ -12,6 +12,7 @@ import FollowingBadge from '../FollowingBadge'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteContent from '../NoteContent'
+import MutedNoteBadge from '../MutedNoteBadge'
 import NoteOptions from '../NoteOptions'
 import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
@@ -86,6 +87,7 @@ export default function Note({
                   short={isSmallScreen}
                 />
                 <PowBadge event={event} className="shrink-0" />
+                <MutedNoteBadge event={event} />
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import DialogHost from '@/components/DialogHost'
+import MutedNoteBadge from '@/components/MutedNoteBadge'
 import { StorageKey } from '@/constants'
 import type { Event } from 'nostr-tools'
 import { act, createElement, Fragment } from 'react'
@@ -62,7 +63,8 @@ describe.each([
     const menuSelector = isSmallScreen ? '[role="dialog"]' : '[role="menu"]'
     const itemSelector = isSmallScreen ? 'button' : '[role="menuitem"]'
     const triggerButton = () => container.querySelector('button')!
-    const muteIndicator = () => triggerButton().querySelector('.lucide-bell-off')
+    const muteIndicator = () =>
+      container.querySelector('[role="img"][aria-label="Note notifications muted"]')
     const storedMute = () =>
       JSON.parse(localStorage.getItem(StorageKey.MUTED_NOTE_NOTIFICATIONS) ?? '{}').self?.[note.id]
     const render = () =>
@@ -71,6 +73,7 @@ describe.each([
           createElement(
             Fragment,
             null,
+            createElement(MutedNoteBadge, { event: note }),
             createElement(NoteOptions, { event: note }),
             createElement(DialogHost)
           )
@@ -127,10 +130,16 @@ describe.each([
       surface = document.querySelector('[role="alertdialog"]')!
       await clickButton(surface, 'Confirm')
       expect(storedMute()).toBe(note.id)
-      expect(muteIndicator()?.classList.contains('text-destructive')).toBe(true)
-      expect(triggerButton().title).toBe('Note notifications muted')
-      const descriptionId = triggerButton().getAttribute('aria-describedby')!
-      expect(document.getElementById(descriptionId)?.textContent).toBe('Note notifications muted')
+      expect(muteIndicator()?.classList.contains('text-muted-foreground')).toBe(true)
+      expect(muteIndicator()?.querySelector('.lucide-bell-off')).not.toBeNull()
+      expect(muteIndicator()?.textContent).toBe('Note notifications muted')
+      expect(triggerButton().querySelector('.lucide-bell-off')).toBeNull()
+      await act(() => {
+        muteIndicator()?.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+        )
+      })
+      expect(muteIndicator()?.textContent).toBe('')
 
       items = await openMenu()
       expect(items[index].textContent).toBe('Unmute note notifications')
@@ -138,7 +147,6 @@ describe.each([
       expect(document.querySelector('[role="alertdialog"]')).toBeNull()
       expect(storedMute()).toBeUndefined()
       expect(muteIndicator()).toBeNull()
-      expect(triggerButton().hasAttribute('aria-describedby')).toBe(false)
     } finally {
       await act(() => root.unmount())
       container.remove()

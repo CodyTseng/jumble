@@ -9,6 +9,7 @@ import Note from '@/components/Note'
 import RepostDescription from '@/components/NoteCard/RepostDescription'
 import NoteContent from '@/components/NoteContent'
 import NoteInteractions from '@/components/NoteInteractions'
+import MutedNoteBadge from '@/components/MutedNoteBadge'
 import NoteOptions from '@/components/NoteOptions'
 import OpBadge from '@/components/OpBadge'
 import ProtectedBadge from '@/components/ProtectedBadge'
@@ -420,6 +421,7 @@ function ChainItem({
                   className="shrink-0"
                   short={isSmallScreen}
                 />
+                <MutedNoteBadge event={event} />
               </div>
             </div>
             <div className="flex shrink-0 items-center">
