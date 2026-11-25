@@ -1321,8 +1321,8 @@ export default {
       'Personas a las que sigues que también siguen a este usuario.',
     'Mute notifications for this note': 'Silenciar las notificaciones de esta nota',
     'Unmute notifications for this note': 'Reactivar las notificaciones de esta nota',
-    'Mute notifications': 'Silenciar avisos',
-    'Unmute notifications': 'Reactivar avisos',
+    'Mute notifications': 'Silenciar avisos de la nota',
+    'Unmute notifications': 'Reactivar avisos de la nota',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'Se silenciarán las notificaciones de esta nota solo en este dispositivo. Este ajuste no se sincronizará con otros dispositivos.'
   }

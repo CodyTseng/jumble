@@ -13,7 +13,11 @@ const state = vi.hoisted(() => ({
   setNoteMuted: vi.fn()
 }))
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (text: string) => text }) }))
+vi.mock('react-i18next', async () => {
+  const { default: english } = await import('@/i18n/locales/en')
+  const translations: Record<string, string> = english.translation
+  return { useTranslation: () => ({ t: (text: string) => translations[text] ?? text }) }
+})
 vi.mock('@/PageManager', () => ({ useSecondaryPage: () => ({ push: vi.fn() }) }))
 vi.mock('@/providers/ScreenSizeProvider', () => ({
   useScreenSize: () => ({ isSmallScreen: state.smallScreen })
@@ -97,7 +101,7 @@ describe.each([
     try {
       await render()
       let items = await openMenu()
-      const index = items.findIndex(({ textContent }) => textContent === 'Mute notifications')
+      const index = items.findIndex(({ textContent }) => textContent === 'Mute note notifications')
       expect(items[index].className).toContain('text-destructive')
       expect(items[index + 1].textContent).toBe('Mute user privately')
       expect(items[index + 2].textContent).toBe('Mute user publicly')
@@ -131,7 +135,7 @@ describe.each([
       state.muted.add(note.id)
       await render()
       items = await openMenu()
-      expect(items[index].textContent).toBe('Unmute notifications')
+      expect(items[index].textContent).toBe('Unmute note notifications')
       await act(() => items[index].click())
       expect(document.querySelector('[role="alertdialog"]')).toBeNull()
       expect(state.setNoteMuted).toHaveBeenLastCalledWith(note, false)

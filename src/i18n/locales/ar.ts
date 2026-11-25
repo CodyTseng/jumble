@@ -1299,8 +1299,8 @@ export default {
     'People you follow who also follow this user.': 'أشخاص تتابعهم ويتابعون هذا المستخدم أيضًا.',
     'Mute notifications for this note': 'كتم إشعارات هذه الملاحظة',
     'Unmute notifications for this note': 'إلغاء كتم إشعارات هذه الملاحظة',
-    'Mute notifications': 'كتم الإشعارات',
-    'Unmute notifications': 'إلغاء كتم الإشعارات',
+    'Mute notifications': 'كتم إشعارات الملاحظة',
+    'Unmute notifications': 'إلغاء كتم إشعارات الملاحظة',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'سيتم كتم الإشعارات المتعلقة بهذه الملاحظة على هذا الجهاز فقط. لن يتزامن هذا الإعداد مع الأجهزة الأخرى.'
   }

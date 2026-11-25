@@ -1302,8 +1302,8 @@ export default {
     'People you follow who also follow this user.': '你关注的人中，也关注了该用户的人。',
     'Mute notifications for this note': '屏蔽这条笔记的通知',
     'Unmute notifications for this note': '取消屏蔽这条笔记的通知',
-    'Mute notifications': '静音通知',
-    'Unmute notifications': '恢复通知',
+    'Mute notifications': '静音笔记通知',
+    'Unmute notifications': '恢复笔记通知',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       '将屏蔽与这条笔记相关的通知。此设置仅在当前设备生效，不会同步到其他设备。'
   }
