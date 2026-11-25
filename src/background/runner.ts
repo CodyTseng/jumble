@@ -2,7 +2,7 @@ import type { NostrEvent } from 'nostr-tools'
 import type { TNotificationFilter } from '@/types'
 import { isLocalNetworkUrl, normalizeUrl } from '@/lib/url'
 import { SmartPool } from '@/lib/smart-pool'
-import { NOTIFICATION_KINDS, notificationFilter } from '@/lib/notification'
+import { isForMutedNote, NOTIFICATION_KINDS, notificationFilter } from '@/lib/notification'
 import { NotificationProcessor, type NotificationCursor } from '@/lib/notification-processor'
 import { fetchTrustPercentiles, meetsTrustScore, type JsonRequest } from '@/lib/trust-score'
 import { validateZapReceipt } from '@/lib/zap-validation'
@@ -17,6 +17,7 @@ export type BackgroundNotificationConfig = {
   filters: TNotificationFilter[]
   descriptions: Partial<Record<TNotificationFilter, string>>
   muted: string[]
+  mutedNoteKeys?: string[]
   trusted: string[]
   minTrustScore: number
   hideMutedMentions: boolean
@@ -54,6 +55,7 @@ export class BackgroundNotificationRunner {
     )
     const muted = new Set(config.muted),
       trusted = new Set(config.trusted)
+    const mutedNoteKeys = new Set(config.mutedNoteKeys)
     this.processor = new NotificationProcessor({
       pubkey: config.pubkey,
       filters: new Set(config.filters),
@@ -62,6 +64,7 @@ export class BackgroundNotificationRunner {
       maxAgeSeconds: 300,
       canNotify: () => !ports.isForeground(),
       saveCursor: ports.saveCursor,
+      isMutedNote: (event) => isForMutedNote(event, mutedNoteKeys),
       filter: (event) =>
         notificationFilter(event, {
           pubkey: config.pubkey,

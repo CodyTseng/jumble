@@ -9,6 +9,7 @@ export type NotificationProcessorOptions = {
   pubkey: string
   filters: ReadonlySet<TNotificationFilter>
   filter: (event: NostrEvent) => Promise<boolean>
+  isMutedNote?: (event: NostrEvent) => boolean
   canNotify: () => boolean
   notify: (event: NostrEvent, type: TNotificationFilter) => Promise<unknown>
   cursor?: NotificationCursor | null
@@ -48,10 +49,16 @@ export class NotificationProcessor {
       return false
     if (this.options.since !== undefined && event.created_at < this.options.since) return false
     const type = getNotificationFilterType(event, this.options.pubkey)
-    if (!type || !this.options.filters.has(type)) return false
+    if (!type) return false
     this.pending.add(event.id)
     try {
-      if (!(await this.options.filter(event)) || this.stopped) return false
+      const muted = this.options.isMutedNote?.(event) ?? false
+      const passesFilter =
+        !this.stopped &&
+        (muted || (this.options.filters.has(type) && (await this.options.filter(event))))
+      if (!passesFilter || this.stopped) return false
+      // A replay after unmuting should not alert for an interaction already
+      // received while the note was muted.
       this.seen.add(event.id)
       if (this.seen.size > 4096) this.seen.delete(this.seen.values().next().value!)
       if (this.options.saveCursor) {
@@ -59,7 +66,7 @@ export class NotificationProcessor {
         this.writes = this.writes.catch(() => {}).then(() => this.options.saveCursor!(cursor))
         await this.writes
       }
-      if (this.stopped || !this.options.canNotify()) return false
+      if (muted || this.stopped || !this.options.canNotify()) return false
       await this.options.notify(event, type)
       return true
     } finally {

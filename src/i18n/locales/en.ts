@@ -1336,6 +1336,13 @@ export default {
     'Share profile': 'Share profile',
     'Login with Android signer': 'Login with Android signer',
     'Profile followed by': 'Followed by',
-    'People you follow who also follow this user.': 'People you follow who also follow this user.'
+    'People you follow who also follow this user.': 'People you follow who also follow this user.',
+    'Mute notifications for this note': 'Mute notifications for this note',
+    'Unmute notifications for this note': 'Unmute notifications for this note',
+    'Mute notifications': 'Mute note notifications',
+    'Unmute notifications': 'Unmute note notifications',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.',
+    'Note notifications muted': 'Note notifications muted'
   }
 }

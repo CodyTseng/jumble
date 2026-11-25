@@ -9,6 +9,7 @@ import Note from '@/components/Note'
 import RepostDescription from '@/components/NoteCard/RepostDescription'
 import NoteContent from '@/components/NoteContent'
 import NoteInteractions from '@/components/NoteInteractions'
+import MutedNoteBadge from '@/components/MutedNoteBadge'
 import NoteOptions from '@/components/NoteOptions'
 import OpBadge from '@/components/OpBadge'
 import ProtectedBadge from '@/components/ProtectedBadge'
@@ -408,6 +409,7 @@ function ChainItem({
                   skeletonClassName="h-4"
                 />
                 <FollowingBadge pubkey={displayPubkey ?? event.pubkey} />
+                <MutedNoteBadge event={event} />
                 {opPubkey === (displayPubkey ?? event.pubkey) && <OpBadge />}
                 <TrustScoreBadge pubkey={displayPubkey ?? event.pubkey} />
                 <ProtectedBadge event={event} />

@@ -1,7 +1,7 @@
 import { atom, getDefaultStore } from 'jotai'
 
 type TDialogRequest = { id: number; message: string } & (
-  | { type: 'confirm'; resolve: (value: boolean) => void }
+  | { type: 'confirm'; returnFocusTo?: HTMLElement; resolve: (value: boolean) => void }
   | { type: 'prompt'; defaultValue: string; resolve: (value: string | null) => void }
 )
 
@@ -12,9 +12,9 @@ export class DialogService {
   private pending: TDialogRequest[] = []
   private nextId = 0
 
-  confirm(message: string): Promise<boolean> {
+  confirm(message: string, returnFocusTo?: HTMLElement): Promise<boolean> {
     return new Promise((resolve) =>
-      this.enqueue({ id: ++this.nextId, type: 'confirm', message, resolve })
+      this.enqueue({ id: ++this.nextId, type: 'confirm', message, returnFocusTo, resolve })
     )
   }
 

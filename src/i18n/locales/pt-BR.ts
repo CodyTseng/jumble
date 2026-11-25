@@ -1316,6 +1316,13 @@ export default {
     'Login with Android signer': 'Entrar com assinador Android',
     'Profile followed by': 'Seguido por',
     'People you follow who also follow this user.':
-      'Pessoas que você segue e que também seguem este usuário.'
+      'Pessoas que você segue e que também seguem este usuário.',
+    'Mute notifications for this note': 'Silenciar notificações desta nota',
+    'Unmute notifications for this note': 'Reativar notificações desta nota',
+    'Mute notifications': 'Silenciar avisos da nota',
+    'Unmute notifications': 'Reativar avisos da nota',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'As notificações relacionadas a esta nota serão silenciadas apenas neste dispositivo. Esta configuração não será sincronizada com outros dispositivos.',
+    'Note notifications muted': 'Avisos da nota silenciados'
   }
 }

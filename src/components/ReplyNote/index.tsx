@@ -20,6 +20,7 @@ import Collapsible from '../Collapsible'
 import Content from '../Content'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
+import MutedNoteBadge from '../MutedNoteBadge'
 import NoteOptions from '../NoteOptions'
 import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
@@ -146,6 +147,7 @@ export default function ReplyNote({
                     skeletonClassName="h-3"
                   />
                   {opPubkey === event.pubkey && <OpBadge />}
+                  <MutedNoteBadge event={event} />
                   <TrustScoreBadge pubkey={event.pubkey} className="size-3.5!" />
                   <ClientTag event={event} />
                 </div>

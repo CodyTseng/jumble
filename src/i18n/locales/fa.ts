@@ -1308,6 +1308,13 @@ export default {
     'Login with Android signer': 'ورود با امضاکننده اندروید',
     'Profile followed by': 'دنبال‌شده توسط',
     'People you follow who also follow this user.':
-      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.'
+      'افرادی که دنبال می‌کنید و این کاربر را هم دنبال می‌کنند.',
+    'Mute notifications for this note': 'بی‌صدا کردن اعلان‌های این یادداشت',
+    'Unmute notifications for this note': 'فعال کردن دوباره اعلان‌های این یادداشت',
+    'Mute notifications': 'بی‌صدا کردن اعلان‌های یادداشت',
+    'Unmute notifications': 'فعال کردن اعلان‌های یادداشت',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'اعلان‌های مربوط به این یادداشت فقط در این دستگاه بی‌صدا می‌شوند. این تنظیم با دستگاه‌های دیگر همگام نمی‌شود.',
+    'Note notifications muted': 'اعلان‌های این یادداشت بی‌صدا هستند'
   }
 }

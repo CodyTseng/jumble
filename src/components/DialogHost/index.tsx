@@ -18,12 +18,13 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import dialogService from '@/services/dialog.service'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useStore } from 'jotai'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function DialogHost() {
   const { t } = useTranslation()
+  const store = useStore()
   const request = useAtomValue(dialogService.requestAtom)
   if (!request) return null
 
@@ -44,7 +45,14 @@ export default function DialogHost() {
       open
       onOpenChange={(open) => !open && dialogService.respond(request.id, false)}
     >
-      <AlertDialogContent>
+      <AlertDialogContent
+        onCloseAutoFocus={(event) => {
+          if (request.returnFocusTo?.isConnected && !store.get(dialogService.requestAtom)) {
+            event.preventDefault()
+            request.returnFocusTo.focus({ preventScroll: true })
+          }
+        }}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>{t('Confirm')}</AlertDialogTitle>
           <AlertDialogDescription className="whitespace-pre-wrap">

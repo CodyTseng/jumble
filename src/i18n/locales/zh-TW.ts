@@ -1299,6 +1299,13 @@ export default {
     'Share profile': '分享個人主頁',
     'Login with Android signer': '使用 Android 簽署器登入',
     'Profile followed by': '關注者',
-    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。'
+    'People you follow who also follow this user.': '你關注的人中，也關注了這位使用者的人。',
+    'Mute notifications for this note': '靜音這則筆記的通知',
+    'Unmute notifications for this note': '取消靜音這則筆記的通知',
+    'Mute notifications': '靜音筆記通知',
+    'Unmute notifications': '恢復筆記通知',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      '將封鎖與這則筆記相關的通知。此設定只在目前的裝置生效，不會同步到其他裝置。',
+    'Note notifications muted': '筆記通知已靜音'
   }
 }

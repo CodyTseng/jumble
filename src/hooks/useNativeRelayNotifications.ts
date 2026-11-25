@@ -12,6 +12,7 @@ import { registerPlugin } from '@capacitor/core'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { t } from 'i18next'
+import { useMutedNoteNotifications } from './useMutedNoteNotifications'
 
 const RelayNotifications = registerPlugin<{
   configure(options: {
@@ -28,12 +29,14 @@ export function useNativeRelayNotifications(
   descriptions: Record<string, string>
 ) {
   const { mutePubkeySet } = useMuteList()
+  const { mutedNoteKeys } = useMutedNoteNotifications()
   const { getTrustedPubkeys, getMinTrustScore } = useUserTrust()
   const { hideContentMentioningMutedUsers } = useContentPolicy()
   const activation = useRef(0)
   const refreshLatest = useRef<(() => void) | null>(null)
   const latest = useRef({
     mutePubkeySet,
+    mutedNoteKeys,
     getTrustedPubkeys,
     getMinTrustScore,
     hideContentMentioningMutedUsers,
@@ -42,6 +45,7 @@ export function useNativeRelayNotifications(
   })
   latest.current = {
     mutePubkeySet,
+    mutedNoteKeys,
     getTrustedPubkeys,
     getMinTrustScore,
     hideContentMentioningMutedUsers,
@@ -76,6 +80,7 @@ export function useNativeRelayNotifications(
               filters: Array.from(value.filters),
               descriptions: value.descriptions,
               muted: Array.from(value.mutePubkeySet),
+              mutedNoteKeys: Array.from(value.mutedNoteKeys),
               trusted: value.getTrustedPubkeys(),
               minTrustScore: value.getMinTrustScore(SPECIAL_TRUST_SCORE_FILTER_ID.NOTIFICATIONS),
               hideMutedMentions: value.hideContentMentioningMutedUsers,
@@ -137,7 +142,14 @@ export function useNativeRelayNotifications(
   }, [pubkey])
   useEffect(() => {
     refreshLatest.current?.()
-  }, [mutePubkeySet, filters, descriptions, getMinTrustScore, hideContentMentioningMutedUsers])
+  }, [
+    mutePubkeySet,
+    mutedNoteKeys,
+    filters,
+    descriptions,
+    getMinTrustScore,
+    hideContentMentioningMutedUsers
+  ])
 }
 
 async function bounded<T>(task: Promise<T>, fallback: T): Promise<T> {
