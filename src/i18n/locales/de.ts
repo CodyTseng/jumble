@@ -1330,6 +1330,13 @@ export default {
     'Profile followed by': 'Gefolgt von',
     'People you follow who also follow this user.':
       'Personen, denen du folgst und die auch diesem Nutzer folgen.',
+    'Mute notifications for this note': 'Benachrichtigungen für diese Notiz stummschalten',
+    'Unmute notifications for this note': 'Benachrichtigungen für diese Notiz wieder aktivieren',
+    'Mute notifications': 'Beitragsmeldungen stummschalten',
+    'Unmute notifications': 'Beitragsmeldungen aktivieren',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Mitteilungen zu diesem Beitrag werden nur auf diesem Gerät stummgeschaltet. Diese Einstellung wird nicht mit anderen Geräten synchronisiert.',
+    'Note notifications muted': 'Beitragsmeldungen stummgeschaltet',
     'Your note': 'Dein Beitrag',
     'Original note': 'Ursprünglicher Beitrag',
     'reacted to a note': 'hat auf einen Beitrag reagiert',

@@ -4,6 +4,7 @@ import { kinds, NostrEvent } from 'nostr-tools'
 import {
   getEmbeddedPubkeys,
   getEventAuthorPubkey,
+  getEventKey,
   getParentStuff,
   isMentioningMutedUsers
 } from './event-core'
@@ -49,22 +50,36 @@ export function getNotificationFilterType(
   return event.kind === kinds.ShortTextNote ? 'quotes' : 'replies'
 }
 
+const mutedNoteReferenceTags = new Set(['e', 'E', 'a', 'A', 'q'])
+
+export function isForMutedNote(event: NostrEvent, mutedNoteKeys: ReadonlySet<string>): boolean {
+  if (mutedNoteKeys.size === 0) return false
+  return (
+    mutedNoteKeys.has(getEventKey(event)) ||
+    event.tags.some(([name, key]) => mutedNoteReferenceTags.has(name) && mutedNoteKeys.has(key))
+  )
+}
+
 export async function notificationFilter(
   event: NostrEvent,
   {
     pubkey,
     mutePubkeySet,
+    mutedNoteKeys,
     hideContentMentioningMutedUsers,
     meetsMinTrustScore,
     validateZapReceipt
   }: {
     pubkey?: string | null
     mutePubkeySet: Set<string>
+    mutedNoteKeys?: ReadonlySet<string>
     hideContentMentioningMutedUsers?: boolean
     meetsMinTrustScore: (pubkey: string) => Promise<boolean>
     validateZapReceipt: (event: NostrEvent) => Promise<boolean>
   }
 ): Promise<boolean> {
+  if (mutedNoteKeys && isForMutedNote(event, mutedNoteKeys)) return false
+
   // Zap receipts must be validated before trusting their embedded sender data.
   // Keeping this in the shared filter makes the list, unread badge/count and
   // native system notifications agree on which zaps actually exist.

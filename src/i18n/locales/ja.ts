@@ -1309,6 +1309,13 @@ export default {
     'Profile followed by': 'フォロワー',
     'People you follow who also follow this user.':
       'あなたがフォローしている人のうち、このユーザーもフォローしている人です。',
+    'Mute notifications for this note': 'このノートの通知をミュート',
+    'Unmute notifications for this note': 'このノートの通知のミュートを解除',
+    'Mute notifications': 'ノートの通知をミュート',
+    'Unmute notifications': 'ノートの通知を再開',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'このノートに関する通知は、この端末でのみミュートされます。この設定は他の端末には同期されません。',
+    'Note notifications muted': 'このノートの通知はミュート中です',
     'Your note': 'あなたのノート',
     'Original note': '元のノート',
     'reacted to a note': 'がノートにリアクションしました',

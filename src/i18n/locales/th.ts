@@ -1289,6 +1289,13 @@ export default {
     'Login with Android signer': 'เข้าสู่ระบบด้วยแอปลงนาม Android',
     'Profile followed by': 'ติดตามโดย',
     'People you follow who also follow this user.': 'คนที่คุณติดตามซึ่งติดตามผู้ใช้นี้ด้วย',
+    'Mute notifications for this note': 'ปิดการแจ้งเตือนสำหรับโน้ตนี้',
+    'Unmute notifications for this note': 'เปิดการแจ้งเตือนสำหรับโน้ตนี้อีกครั้ง',
+    'Mute notifications': 'ปิดการแจ้งเตือนของโน้ต',
+    'Unmute notifications': 'เปิดการแจ้งเตือนของโน้ต',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'การแจ้งเตือนที่เกี่ยวกับโน้ตนี้จะถูกปิดเฉพาะบนอุปกรณ์นี้ การตั้งค่านี้จะไม่ซิงค์กับอุปกรณ์อื่น',
+    'Note notifications muted': 'ปิดการแจ้งเตือนของโน้ตนี้แล้ว',
     'Your note': 'โน้ตของคุณ',
     'Original note': 'โน้ตต้นฉบับ',
     'reacted to a note': 'แสดงความรู้สึกต่อโน้ต',

@@ -1,7 +1,9 @@
+import { useMutedNoteNotifications } from '@/hooks/useMutedNoteNotifications'
 import { copyText } from '@/lib/native-system'
 import { formatError } from '@/lib/error'
 import {
   getEventAuthorPubkey,
+  getEventKey,
   getNoteBech32Id,
   getReplaceableCoordinateFromEvent,
   isProtectedEvent,
@@ -19,6 +21,7 @@ import { useMuteList } from '@/providers/MuteListProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { usePinList } from '@/providers/PinListProvider'
 import client from '@/services/client.service'
+import dialogService from '@/services/dialog.service'
 import {
   Bell,
   BellOff,
@@ -35,7 +38,7 @@ import {
   TriangleAlert
 } from 'lucide-react'
 import { Event, kinds } from 'nostr-tools'
-import { useMemo } from 'react'
+import { type RefObject, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import RelayIcon from '../RelayIcon'
 
@@ -57,6 +60,7 @@ export interface MenuAction {
 
 interface UseMenuActionsProps {
   event: Event
+  menuTriggerRef: RefObject<HTMLButtonElement | null>
   closeDrawer: () => void
   showSubMenuActions: (subMenu: SubMenuAction[], title: string) => void
   setIsRawEventDialogOpen: (open: boolean) => void
@@ -66,6 +70,7 @@ interface UseMenuActionsProps {
 
 export function useMenuActions({
   event,
+  menuTriggerRef,
   closeDrawer,
   showSubMenuActions,
   setIsRawEventDialogOpen,
@@ -81,6 +86,8 @@ export function useMenuActions({
     return Array.from(new Set(currentBrowsingRelayUrls.concat(favoriteRelays)))
   }, [currentBrowsingRelayUrls, favoriteRelays])
   const { mutePubkeyPublicly, mutePubkeyPrivately, unmutePubkey, mutePubkeySet } = useMuteList()
+  const { mutedNoteKeys, setNoteMuted } = useMutedNoteNotifications()
+  const areNotificationsMuted = mutedNoteKeys.has(getEventKey(event))
   const { pinnedEventHexIdSet, pin, unpin } = usePinList()
   const { addBookmark, removeBookmark } = useBookmarks()
   const authorPubkey = getEventAuthorPubkey(event)
@@ -284,6 +291,29 @@ export function useMenuActions({
       })
     }
 
+    if (pubkey) {
+      actions.push({
+        icon: areNotificationsMuted ? Bell : BellOff,
+        label: areNotificationsMuted ? t('Unmute notifications') : t('Mute notifications'),
+        onClick: async () => {
+          closeDrawer()
+          if (
+            areNotificationsMuted ||
+            (await dialogService.confirm(
+              t(
+                'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.'
+              ),
+              menuTriggerRef.current ?? undefined
+            ))
+          ) {
+            setNoteMuted(event, !areNotificationsMuted)
+          }
+        },
+        className: 'text-destructive hover:text-destructive focus:text-destructive',
+        separator: true
+      })
+    }
+
     if (pubkey && authorPubkey !== pubkey) {
       if (isMuted) {
         actions.push({
@@ -293,8 +323,7 @@ export function useMenuActions({
             closeDrawer()
             unmutePubkey(authorPubkey)
           },
-          className: 'text-destructive focus:text-destructive',
-          separator: true
+          className: 'text-destructive focus:text-destructive'
         })
       } else {
         actions.push(
@@ -305,8 +334,7 @@ export function useMenuActions({
               closeDrawer()
               mutePubkeyPrivately(authorPubkey)
             },
-            className: 'text-destructive focus:text-destructive',
-            separator: true
+            className: 'text-destructive focus:text-destructive'
           },
           {
             icon: BellOff,
@@ -355,6 +383,9 @@ export function useMenuActions({
     pubkey,
     isMuted,
     isBookmarked,
+    areNotificationsMuted,
+    menuTriggerRef,
+    setNoteMuted,
     isSmallScreen,
     broadcastSubMenu,
     pinnedEventHexIdSet,

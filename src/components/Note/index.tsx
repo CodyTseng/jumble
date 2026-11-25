@@ -12,6 +12,7 @@ import FollowingBadge from '../FollowingBadge'
 import { FormattedTimestamp } from '../FormattedTimestamp'
 import Nip05 from '../Nip05'
 import NoteContent from '../NoteContent'
+import MutedNoteBadge from '../MutedNoteBadge'
 import NoteOptions from '../NoteOptions'
 import OpBadge from '../OpBadge'
 import ParentNotePreview from '../ParentNotePreview'
@@ -73,6 +74,7 @@ export default function Note({
                   skeletonClassName={size === 'small' ? 'h-3' : 'h-4'}
                 />
                 <FollowingBadge pubkey={displayPubkey} />
+                <MutedNoteBadge event={event} />
                 {opPubkey === displayPubkey && <OpBadge />}
                 <TrustScoreBadge pubkey={displayPubkey} />
                 <ProtectedBadge event={event} />

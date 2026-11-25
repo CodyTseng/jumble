@@ -1293,6 +1293,13 @@ export default {
     'Profile followed by': '팔로워',
     'People you follow who also follow this user.':
       '내가 팔로우하는 사람 중 이 사용자도 팔로우하는 사람들입니다.',
+    'Mute notifications for this note': '이 노트의 알림 끄기',
+    'Unmute notifications for this note': '이 노트의 알림 다시 켜기',
+    'Mute notifications': '노트 알림 끄기',
+    'Unmute notifications': '노트 알림 다시 켜기',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      '이 노트와 관련된 알림은 이 기기에서만 꺼집니다. 이 설정은 다른 기기와 동기화되지 않습니다.',
+    'Note notifications muted': '이 노트의 알림이 꺼져 있습니다',
     'Your note': '내 노트',
     'Original note': '원본 노트',
     'reacted to a note': '님이 노트에 반응했습니다',

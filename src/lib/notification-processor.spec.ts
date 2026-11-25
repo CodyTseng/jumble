@@ -1,6 +1,6 @@
 import { finalizeEvent, getPublicKey, kinds, nip19 } from 'nostr-tools'
 import { describe, expect, it, vi } from 'vitest'
-import { NotificationProcessor } from './notification-processor'
+import { NotificationProcessor, type NotificationCursor } from './notification-processor'
 import { getNotificationFilterType, notificationFilter } from './notification'
 
 const key = new Uint8Array(32).fill(7),
@@ -17,7 +17,7 @@ const event = () =>
   )
 function create(options: Partial<ConstructorParameters<typeof NotificationProcessor>[0]> = {}) {
   const notify = vi.fn(async () => {}),
-    saveCursor = vi.fn(async () => {})
+    saveCursor = vi.fn(async (_cursor: NotificationCursor) => {})
   const processor = new NotificationProcessor({
     pubkey,
     filters: new Set(['mentions']),
@@ -68,6 +68,48 @@ describe('shared notification processor', () => {
     const other = create({ cursor: { pubkey: '0'.repeat(64), ids: [signed.id] } })
     await other.processor.process(signed)
     expect(other.notify).toHaveBeenCalledOnce()
+  })
+  it('records muted note interactions so replays after unmuting do not alert', async () => {
+    const signed = event()
+    const muted = create({ isMutedNote: () => true })
+    expect(await muted.processor.process(signed)).toBe(false)
+    expect(muted.notify).not.toHaveBeenCalled()
+    expect(muted.saveCursor).toHaveBeenCalledExactlyOnceWith({ pubkey, ids: [signed.id] })
+
+    const unmuted = create({ cursor: { pubkey, ids: [signed.id] } })
+    expect(await unmuted.processor.process(signed)).toBe(false)
+    expect(unmuted.notify).not.toHaveBeenCalled()
+  })
+  it('records muted likes even when like notifications are disabled', async () => {
+    const note = event()
+    const like = finalizeEvent(
+      {
+        kind: kinds.Reaction,
+        created_at: note.created_at,
+        tags: [
+          ['e', note.id],
+          ['p', pubkey],
+          ['k', String(note.kind)]
+        ],
+        content: '+'
+      },
+      key
+    )
+    const disabled = create()
+    expect(await disabled.processor.process(like)).toBe(false)
+    expect(disabled.saveCursor).not.toHaveBeenCalled()
+
+    const muted = create({ isMutedNote: () => true })
+    expect(await muted.processor.process(like)).toBe(false)
+    expect(muted.notify).not.toHaveBeenCalled()
+    expect(muted.saveCursor).toHaveBeenCalledExactlyOnceWith({ pubkey, ids: [like.id] })
+
+    const restored = create({
+      filters: new Set(['likes']),
+      cursor: muted.saveCursor.mock.calls[0][0]
+    })
+    expect(await restored.processor.process(like)).toBe(false)
+    expect(restored.notify).not.toHaveBeenCalled()
   })
   it('does not emit work that finishes after the account/session stops', async () => {
     let finish!: (value: boolean) => void

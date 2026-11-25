@@ -1300,6 +1300,13 @@ export default {
     'Login with Android signer': '使用 Android 签名器登录',
     'Profile followed by': '关注者',
     'People you follow who also follow this user.': '你关注的人中，也关注了该用户的人。',
+    'Mute notifications for this note': '屏蔽这条笔记的通知',
+    'Unmute notifications for this note': '取消屏蔽这条笔记的通知',
+    'Mute notifications': '静音笔记通知',
+    'Unmute notifications': '恢复笔记通知',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      '将屏蔽与这条笔记相关的通知。此设置仅在当前设备生效，不会同步到其他设备。',
+    'Note notifications muted': '笔记通知已静音',
     'Your note': '你的笔记',
     'Original note': '原笔记',
     'reacted to a note': '对一条笔记做出了反应',

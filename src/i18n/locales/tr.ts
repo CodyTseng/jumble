@@ -1313,6 +1313,13 @@ export default {
     'Profile followed by': 'Takip edenler',
     'People you follow who also follow this user.':
       'Takip ettiğiniz kişiler arasında bu kullanıcıyı da takip edenler.',
+    'Mute notifications for this note': 'Bu notun bildirimlerini sessize al',
+    'Unmute notifications for this note': 'Bu notun bildirimlerini yeniden aç',
+    'Mute notifications': 'Not bildirimlerini sessize al',
+    'Unmute notifications': 'Not bildirimlerini yeniden aç',
+    'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
+      'Bu notla ilgili bildirimler yalnızca bu cihazda sessize alınır. Bu ayar diğer cihazlarla eşitlenmez.',
+    'Note notifications muted': 'Not bildirimleri sessizde',
     'Your note': 'Notun',
     'Original note': 'Orijinal not',
     'reacted to a note': 'bir nota tepki verdi',

@@ -9,10 +9,12 @@ const currentPubkey = '1'.repeat(64)
 
 function createEvent({
   kind = kinds.Reaction,
-  tags = []
+  tags = [],
+  content = '+'
 }: {
   kind?: number
   tags?: string[][]
+  content?: string
 } = {}): NostrEvent {
   return {
     id: '2'.repeat(64),
@@ -20,15 +22,20 @@ function createEvent({
     created_at: 1,
     kind,
     tags,
-    content: '+',
+    content,
     sig: '4'.repeat(128)
   }
 }
 
-function filter(event: NostrEvent, pubkey: string | null = currentPubkey) {
+function filter(
+  event: NostrEvent,
+  pubkey: string | null = currentPubkey,
+  mutedNoteKeys?: ReadonlySet<string>
+) {
   return notificationFilter(event, {
     pubkey,
     mutePubkeySet: new Set(),
+    mutedNoteKeys,
     meetsMinTrustScore: async () => true,
     validateZapReceipt: async () => true
   })
@@ -107,6 +114,161 @@ describe('notificationFilter', () => {
       })
     ).resolves.toBe(false)
   })
+})
+
+describe('muting notifications for one note', () => {
+  const mutedId = '5'.repeat(64)
+  const otherId = '6'.repeat(64)
+  const coordinate = `30023:${currentPubkey}:article`
+  const mutedNoteKeys = new Set([mutedId, coordinate])
+
+  it.each([
+    [
+      kinds.Reaction,
+      [
+        ['e', otherId],
+        ['e', mutedId],
+        ['p', currentPubkey]
+      ]
+    ],
+    [kinds.Repost, [['e', mutedId]]],
+    [
+      kinds.GenericRepost,
+      [
+        ['e', otherId],
+        ['a', coordinate]
+      ]
+    ],
+    [kinds.Zap, [['a', coordinate]]],
+    [kinds.Highlights, [['a', coordinate, '', 'source']]],
+    [
+      kinds.Highlights,
+      [
+        ['e', otherId],
+        ['q', mutedId],
+        ['p', currentPubkey]
+      ]
+    ],
+    [ExtendedKind.POLL_RESPONSE, [['e', mutedId]]],
+    [kinds.ShortTextNote, [['e', mutedId, '', 'root']]],
+    [
+      kinds.ShortTextNote,
+      [
+        ['e', otherId, '', 'root'],
+        ['e', mutedId, '', 'reply']
+      ]
+    ],
+    [
+      ExtendedKind.COMMENT,
+      [
+        ['E', otherId],
+        ['e', mutedId],
+        ['k', '1']
+      ]
+    ],
+    [
+      ExtendedKind.VOICE_COMMENT,
+      [
+        ['A', coordinate],
+        ['a', coordinate],
+        ['k', '30023']
+      ]
+    ],
+    [
+      kinds.Reaction,
+      [
+        ['e', mutedId],
+        ['e', otherId],
+        ['p', currentPubkey]
+      ]
+    ],
+    [
+      kinds.ShortTextNote,
+      [
+        ['e', mutedId, '', 'root'],
+        ['e', otherId, '', 'reply']
+      ]
+    ],
+    [
+      ExtendedKind.COMMENT,
+      [
+        ['E', mutedId],
+        ['e', otherId],
+        ['k', '1']
+      ]
+    ],
+    [
+      ExtendedKind.COMMENT,
+      [
+        ['A', coordinate],
+        ['e', otherId],
+        ['k', '1']
+      ]
+    ],
+    [kinds.ShortTextNote, [['q', coordinate]]],
+    [kinds.ShortTextNote, [['a', coordinate, '', 'mention']]]
+  ] satisfies [number, string[][]][])(
+    'filters kind %i when any reference tag matches the muted note',
+    async (kind, tags) => {
+      await expect(filter(createEvent({ kind, tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(
+        false
+      )
+    }
+  )
+
+  it('keeps a note with an inline reference but no matching reference tag', async () => {
+    const quote = createEvent({
+      kind: kinds.ShortTextNote,
+      content: `nostr:${nip19.noteEncode(mutedId)}`
+    })
+
+    await expect(filter(quote, currentPubkey, mutedNoteKeys)).resolves.toBe(true)
+  })
+
+  it('matches an article reaction across revisions by coordinate', async () => {
+    const tags = [
+      ['e', otherId],
+      ['p', currentPubkey],
+      ['k', String(kinds.LongFormArticle)]
+    ]
+
+    await expect(
+      filter(createEvent({ tags: [...tags, ['a', coordinate]] }), currentPubkey, mutedNoteKeys)
+    ).resolves.toBe(false)
+    await expect(filter(createEvent({ tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(true)
+  })
+
+  it('filters a notification for the muted note itself', async () => {
+    const mention = { ...createEvent({ kind: kinds.ShortTextNote }), id: mutedId }
+
+    await expect(filter(mention, currentPubkey, mutedNoteKeys)).resolves.toBe(false)
+    await expect(filter(mention, currentPubkey, new Set())).resolves.toBe(true)
+  })
+
+  it.each([
+    [kinds.Zap, [['p', currentPubkey]]],
+    [
+      kinds.Highlights,
+      [
+        ['e', otherId],
+        ['p', currentPubkey]
+      ]
+    ],
+    [
+      kinds.ShortTextNote,
+      [
+        ['p', currentPubkey],
+        ['x', mutedId]
+      ]
+    ]
+  ] satisfies [number, string[][]][])(
+    'keeps kind %i when it targets a different note or the account',
+    async (kind, tags) => {
+      await expect(filter(createEvent({ kind, tags }), currentPubkey, mutedNoteKeys)).resolves.toBe(
+        true
+      )
+    }
+  )
 })
 
 describe('getNotificationFilterType', () => {

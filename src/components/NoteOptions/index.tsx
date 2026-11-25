@@ -1,7 +1,8 @@
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { Ellipsis } from 'lucide-react'
 import { Event } from 'nostr-tools'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DesktopMenu } from './DesktopMenu'
 import { MobileMenu } from './MobileMenu'
 import RawEventDialog from './RawEventDialog'
@@ -9,7 +10,9 @@ import ReportDialog from './ReportDialog'
 import { SubMenuAction, useMenuActions } from './useMenuActions'
 
 export default function NoteOptions({ event, className }: { event: Event; className?: string }) {
+  const { t } = useTranslation()
   const { isSmallScreen } = useScreenSize()
+  const menuTriggerRef = useRef<HTMLButtonElement>(null)
   const [isRawEventDialogOpen, setIsRawEventDialogOpen] = useState(false)
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -34,6 +37,7 @@ export default function NoteOptions({ event, className }: { event: Event; classN
 
   const menuActions = useMenuActions({
     event,
+    menuTriggerRef,
     closeDrawer,
     showSubMenuActions,
     setIsRawEventDialogOpen,
@@ -43,10 +47,13 @@ export default function NoteOptions({ event, className }: { event: Event; classN
 
   const trigger = (
     <button
+      ref={menuTriggerRef}
+      type="button"
+      aria-label={t('Options')}
       className="text-muted-foreground hover:text-foreground flex h-full cursor-pointer items-center ps-2"
       onClick={() => setIsDrawerOpen(true)}
     >
-      <Ellipsis />
+      <Ellipsis aria-hidden="true" />
     </button>
   )
 
