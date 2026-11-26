@@ -37,6 +37,8 @@ export function MentionNotification({
     return getParentStuff(notification)
   }, [notification])
   const isReply = Boolean(parentEventId || parentExternalContent)
+  const isDetailed = notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED
+  const showReplyIcon = isDetailed ? isReply : !isMention && Boolean(parentEventId)
   const [isDirectMention, setIsDirectMention] = useState(false)
   useEffect(() => {
     const checkIsDirectMention = async () => {
@@ -85,7 +87,7 @@ export function MentionNotification({
     <Notification
       notificationId={notification.id}
       icon={
-        isReply ? (
+        showReplyIcon ? (
           <MessageCircle size={24} className="text-blue-400" />
         ) : isMention ? (
           <AtSign size={24} className="text-pink-400" />
@@ -96,9 +98,8 @@ export function MentionNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={notification}
-      previewLabel={isReply ? t('Reply preview') : undefined}
       middle={
-        notificationListStyle === NOTIFICATION_LIST_STYLE.DETAILED && (
+        isDetailed && (
           <ParentNotePreview
             eventId={parentEventId}
             externalContent={parentExternalContent}

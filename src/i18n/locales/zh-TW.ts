@@ -1311,6 +1311,9 @@ export default {
     'Original note': '原貼文',
     'reacted to a note': '對一則貼文作出反應',
     replied: '回覆了',
-    'Reply preview': '回覆'
+    'Reply preview': '回覆',
+    'reposted a note': '轉發了一則筆記',
+    'voted in a poll': '參與了一項投票',
+    'zapped a note': '向一則筆記打閃'
   }
 }

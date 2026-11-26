@@ -1308,6 +1308,9 @@ export default {
     'Original note': 'الملاحظة الأصلية',
     'reacted to a note': 'تفاعل مع ملاحظة',
     replied: 'ردّ',
-    'Reply preview': 'رد'
+    'Reply preview': 'رد',
+    'reposted a note': 'أعاد نشر ملاحظة',
+    'voted in a poll': 'صوّت في استطلاع',
+    'zapped a note': 'أرسل زاب إلى ملاحظة'
   }
 }

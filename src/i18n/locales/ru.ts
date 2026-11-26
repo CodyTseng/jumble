@@ -1328,6 +1328,9 @@ export default {
     'Original note': 'Исходная заметка',
     'reacted to a note': 'отреагировал(а) на заметку',
     replied: 'ответил(а)',
-    'Reply preview': 'Ответ'
+    'Reply preview': 'Ответ',
+    'reposted a note': 'репостнул(а) заметку',
+    'voted in a poll': 'проголосовал(а) в опросе',
+    'zapped a note': 'отправил(а) зап заметке'
   }
 }

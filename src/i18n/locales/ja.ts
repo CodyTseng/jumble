@@ -1320,6 +1320,9 @@ export default {
     'Original note': '元のノート',
     'reacted to a note': 'がノートにリアクションしました',
     replied: 'が返信しました',
-    'Reply preview': '返信'
+    'Reply preview': '返信',
+    'reposted a note': 'がノートをリポストしました',
+    'voted in a poll': 'がアンケートに投票しました',
+    'zapped a note': 'がノートにZapしました'
   }
 }

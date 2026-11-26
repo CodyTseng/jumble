@@ -73,9 +73,9 @@ export function ReactionNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={event}
-      previewLabel={isOwnNote ? t('Your note') : t('Original note')}
-      insetPreview
-      description={isOwnNote ? t('reacted to your note') : t('reacted to a note')}
+      targetIsContext
+      description={t('reacted to your note')}
+      otherNoteDescription={t('reacted to a note')}
       isNew={isNew}
       onVisibilityChange={onVisibilityChange}
     />

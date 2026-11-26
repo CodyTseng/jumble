@@ -1336,6 +1336,9 @@ export default {
     'Original note': 'Oryginalna notatka',
     'reacted to a note': 'zareagował(a) na notatkę',
     replied: 'odpowiedział(a)',
-    'Reply preview': 'Odpowiedź'
+    'Reply preview': 'Odpowiedź',
+    'reposted a note': 'udostępnił(a) ponownie wpis',
+    'voted in a poll': 'zagłosował(a) w ankiecie',
+    'zapped a note': 'wysłał(a) zap do wpisu'
   }
 }

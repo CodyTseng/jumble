@@ -1343,6 +1343,9 @@ export default {
     'Original note': 'Note originale',
     'reacted to a note': 'a réagi à une note',
     replied: 'a répondu',
-    'Reply preview': 'Réponse'
+    'Reply preview': 'Réponse',
+    'reposted a note': 'a republié une note',
+    'voted in a poll': 'a voté dans un sondage',
+    'zapped a note': 'a envoyé un zap à une note'
   }
 }

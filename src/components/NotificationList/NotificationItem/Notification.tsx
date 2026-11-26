@@ -5,9 +5,10 @@ import ProfileOptions from '@/components/ProfileOptions'
 import StuffStats from '@/components/StuffStats'
 import TrustScoreBadge from '@/components/TrustScoreBadge'
 import { Skeleton } from '@/components/ui/skeleton'
-import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
+import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { NOTIFICATION_LIST_STYLE } from '@/constants'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { toNote, toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -25,10 +26,10 @@ export default function Notification({
   sender,
   sentAt,
   description,
+  otherNoteDescription,
   middle = null,
   targetEvent,
-  previewLabel,
-  insetPreview = false,
+  targetIsContext = false,
   targetPath,
   isNew = false,
   showStats = false,
@@ -39,10 +40,10 @@ export default function Notification({
   sender: string
   sentAt: number
   description: string
+  otherNoteDescription?: string
   middle?: React.ReactNode
   targetEvent?: NostrEvent
-  previewLabel?: string
-  insetPreview?: boolean
+  targetIsContext?: boolean
   targetPath?: string
   isNew?: boolean
   showStats?: boolean
@@ -85,7 +86,7 @@ export default function Notification({
   if (notificationListStyle === NOTIFICATION_LIST_STYLE.COMPACT) {
     return (
       <ClickableCard
-        className="flex cursor-pointer items-center justify-between gap-2 px-4 py-2"
+        className="flex cursor-pointer items-center justify-between px-4 py-2"
         onClick={handleClick}
       >
         <div className="flex w-0 flex-1 items-center gap-2">
@@ -101,26 +102,18 @@ export default function Notification({
               />
             </div>
           )}
-          <div className="shrink-0">{icon}</div>
+          {icon}
           {!autoLoadProfilePicture && (
             <Username
               userId={sender}
-              className="min-w-0 max-w-[min(8rem,25%)] truncate text-sm font-semibold"
+              className="max-w-32 shrink-0 truncate text-sm font-semibold"
             />
           )}
           {middle}
-          {targetEvent && previewLabel && (
-            <span
-              className="text-muted-foreground min-w-0 max-w-[40%] truncate text-xs font-medium"
-              title={previewLabel}
-            >
-              {previewLabel}
-            </span>
-          )}
           {targetEvent && (
             <ContentPreview
               className={cn(
-                'min-w-[4ch] flex-1 truncate',
+                'w-0 flex-1 truncate',
                 unread ? 'font-semibold' : 'text-muted-foreground'
               )}
               event={targetEvent}
@@ -134,12 +127,16 @@ export default function Notification({
     )
   }
 
-  const detailedPreview = targetEvent && (
-    <ContentPreview
-      className={cn('line-clamp-2', !unread && 'text-muted-foreground')}
-      event={targetEvent}
-    />
-  )
+  const previewIsOwnNote =
+    targetIsContext && targetEvent && pubkey === getEventAuthorPubkey(targetEvent)
+  const displayDescription =
+    targetEvent && !previewIsOwnNote ? (otherNoteDescription ?? description) : description
+  const ownNoteAvatar =
+    previewIsOwnNote && autoLoadProfilePicture && pubkey ? (
+      <div className="shrink-0" role="img" aria-label={t('Your note')} title={t('Your note')}>
+        <SimpleUserAvatar userId={pubkey} size="tiny" />
+      </div>
+    ) : null
 
   return (
     <ClickableCard
@@ -159,8 +156,8 @@ export default function Notification({
               skeletonClassName="h-4"
             />
             <TrustScoreBadge pubkey={sender} />
-            {description && (
-              <div className="text-muted-foreground min-w-0 shrink text-sm">{description}</div>
+            {displayDescription && (
+              <div className="text-muted-foreground min-w-0 shrink text-sm">{displayDescription}</div>
             )}
           </div>
           <div className="flex shrink-0 items-center">
@@ -181,13 +178,20 @@ export default function Notification({
           </div>
         </div>
         {middle}
-        {insetPreview && detailedPreview ? (
-          <div className="bg-muted/50 my-1 rounded-md border px-2 py-1">
-            <div className="text-muted-foreground text-xs font-medium">{previewLabel}</div>
-            {detailedPreview}
+        {targetEvent && (
+          <div className={cn(targetIsContext && 'flex min-h-6 items-center gap-2 border-s-2 ps-2')}>
+            {ownNoteAvatar ??
+              (previewIsOwnNote && (
+                <span className="text-muted-foreground max-w-[40%] truncate">{t('Your note')}</span>
+              ))}
+            <ContentPreview
+              className={cn(
+                targetIsContext ? 'min-w-0 flex-1 truncate' : 'line-clamp-2',
+                !unread && 'text-muted-foreground'
+              )}
+              event={targetEvent}
+            />
           </div>
-        ) : (
-          detailedPreview
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-sm text-muted-foreground" />
         {showStats && targetEvent && <StuffStats stuff={targetEvent} className="mt-1" />}

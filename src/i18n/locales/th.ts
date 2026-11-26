@@ -1300,6 +1300,9 @@ export default {
     'Original note': 'โน้ตต้นฉบับ',
     'reacted to a note': 'แสดงความรู้สึกต่อโน้ต',
     replied: 'ตอบกลับแล้ว',
-    'Reply preview': 'ข้อความตอบกลับ'
+    'Reply preview': 'ข้อความตอบกลับ',
+    'reposted a note': 'รีโพสต์โน้ต',
+    'voted in a poll': 'ลงคะแนนในโพล',
+    'zapped a note': 'ส่งแซปให้โน้ต'
   }
 }

@@ -1341,6 +1341,9 @@ export default {
     'Original note': 'Ursprünglicher Beitrag',
     'reacted to a note': 'hat auf einen Beitrag reagiert',
     replied: 'hat geantwortet',
-    'Reply preview': 'Antwort'
+    'Reply preview': 'Antwort',
+    'reposted a note': 'hat einen Beitrag erneut geteilt',
+    'voted in a poll': 'hat an einer Umfrage teilgenommen',
+    'zapped a note': 'hat einen Beitrag gezappt'
   }
 }

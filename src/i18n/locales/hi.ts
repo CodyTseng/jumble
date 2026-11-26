@@ -1319,6 +1319,9 @@ export default {
     'Original note': 'मूल नोट',
     'reacted to a note': 'ने एक नोट पर प्रतिक्रिया दी',
     replied: 'ने जवाब दिया',
-    'Reply preview': 'जवाब'
+    'Reply preview': 'जवाब',
+    'reposted a note': 'ने एक नोट दोबारा पोस्ट किया',
+    'voted in a poll': 'ने एक पोल में वोट दिया',
+    'zapped a note': 'ने एक नोट को ज़ैप किया'
   }
 }

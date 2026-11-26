@@ -1320,6 +1320,9 @@ export default {
     'Original note': 'یادداشت اصلی',
     'reacted to a note': 'به یک یادداشت واکنش نشان داد',
     replied: 'پاسخ داد',
-    'Reply preview': 'پاسخ'
+    'Reply preview': 'پاسخ',
+    'reposted a note': 'یادداشتی را بازنشر کرد',
+    'voted in a poll': 'در یک نظرسنجی رأی داد',
+    'zapped a note': 'به یادداشتی زپ فرستاد'
   }
 }

@@ -1311,6 +1311,9 @@ export default {
     'Original note': '原笔记',
     'reacted to a note': '对一条笔记做出了反应',
     replied: '回复了',
-    'Reply preview': '回复'
+    'Reply preview': '回复',
+    'reposted a note': '转发了一条笔记',
+    'voted in a poll': '参与了一项投票',
+    'zapped a note': '向一条笔记打闪'
   }
 }

@@ -1324,6 +1324,9 @@ export default {
     'Original note': 'Orijinal not',
     'reacted to a note': 'bir nota tepki verdi',
     replied: 'yanıtladı',
-    'Reply preview': 'Yanıt'
+    'Reply preview': 'Yanıt',
+    'reposted a note': 'bir notu yeniden paylaştı',
+    'voted in a poll': 'bir ankette oy verdi',
+    'zapped a note': 'bir nota zap gönderdi'
   }
 }

@@ -1335,6 +1335,9 @@ export default {
     'Original note': 'Eredeti bejegyzés',
     'reacted to a note': 'reagált egy bejegyzésre',
     replied: 'válaszolt',
-    'Reply preview': 'Válasz'
+    'Reply preview': 'Válasz',
+    'reposted a note': 'újraközölt egy bejegyzést',
+    'voted in a poll': 'szavazott egy szavazáson',
+    'zapped a note': 'zappelt egy bejegyzést'
   }
 }

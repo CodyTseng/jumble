@@ -1348,6 +1348,9 @@ export default {
     'Original note': 'Original note',
     'reacted to a note': 'reacted to a note',
     replied: 'replied',
-    'Reply preview': 'Reply'
+    'Reply preview': 'Reply',
+    'reposted a note': 'reposted a note',
+    'voted in a poll': 'voted in a poll',
+    'zapped a note': 'zapped a note'
   }
 }

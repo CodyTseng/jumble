@@ -1304,6 +1304,9 @@ export default {
     'Original note': '원본 노트',
     'reacted to a note': '님이 노트에 반응했습니다',
     replied: '님이 답글을 남겼습니다',
-    'Reply preview': '답글'
+    'Reply preview': '답글',
+    'reposted a note': '님이 노트를 리포스트했습니다',
+    'voted in a poll': '님이 투표에 참여했습니다',
+    'zapped a note': '님이 노트에 잽을 보냈습니다'
   }
 }
