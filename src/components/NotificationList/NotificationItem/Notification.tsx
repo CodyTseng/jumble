@@ -5,9 +5,10 @@ import ProfileOptions from '@/components/ProfileOptions'
 import StuffStats from '@/components/StuffStats'
 import TrustScoreBadge from '@/components/TrustScoreBadge'
 import { Skeleton } from '@/components/ui/skeleton'
-import UserAvatar, { UserAvatarSkeleton } from '@/components/UserAvatar'
+import UserAvatar, { SimpleUserAvatar, UserAvatarSkeleton } from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { NOTIFICATION_LIST_STYLE } from '@/constants'
+import { getEventAuthorPubkey } from '@/lib/event'
 import { toNote, toProfile } from '@/lib/link'
 import { cn } from '@/lib/utils'
 import { useSecondaryPage } from '@/PageManager'
@@ -25,8 +26,10 @@ export default function Notification({
   sender,
   sentAt,
   description,
+  otherNoteDescription,
   middle = null,
   targetEvent,
+  targetIsContext = false,
   targetPath,
   isNew = false,
   showStats = false,
@@ -37,8 +40,10 @@ export default function Notification({
   sender: string
   sentAt: number
   description: string
+  otherNoteDescription?: string
   middle?: React.ReactNode
   targetEvent?: NostrEvent
+  targetIsContext?: boolean
   targetPath?: string
   isNew?: boolean
   showStats?: boolean
@@ -122,6 +127,17 @@ export default function Notification({
     )
   }
 
+  const previewIsOwnNote =
+    targetIsContext && targetEvent && pubkey === getEventAuthorPubkey(targetEvent)
+  const displayDescription =
+    targetEvent && !previewIsOwnNote ? (otherNoteDescription ?? description) : description
+  const ownNoteAvatar =
+    previewIsOwnNote && autoLoadProfilePicture && pubkey ? (
+      <div className="shrink-0" role="img" aria-label={t('Your note')} title={t('Your note')}>
+        <SimpleUserAvatar userId={pubkey} size="tiny" />
+      </div>
+    ) : null
+
   return (
     <ClickableCard
       className="clickable flex cursor-pointer items-start gap-2 border-b px-4 py-2"
@@ -140,7 +156,9 @@ export default function Notification({
               skeletonClassName="h-4"
             />
             <TrustScoreBadge pubkey={sender} />
-            <div className="shrink-0 text-sm text-muted-foreground">{description}</div>
+            {displayDescription && (
+              <div className="text-muted-foreground min-w-0 shrink text-sm">{displayDescription}</div>
+            )}
           </div>
           <div className="flex shrink-0 items-center">
             {unread && (
@@ -161,10 +179,19 @@ export default function Notification({
         </div>
         {middle}
         {targetEvent && (
-          <ContentPreview
-            className={cn('line-clamp-2', !unread && 'text-muted-foreground')}
-            event={targetEvent}
-          />
+          <div className={cn(targetIsContext && 'flex min-h-6 items-center gap-2 border-s-2 ps-2')}>
+            {ownNoteAvatar ??
+              (previewIsOwnNote && (
+                <span className="text-muted-foreground max-w-[40%] truncate">{t('Your note')}</span>
+              ))}
+            <ContentPreview
+              className={cn(
+                targetIsContext ? 'min-w-0 flex-1 truncate' : 'line-clamp-2',
+                !unread && 'text-muted-foreground'
+              )}
+              event={targetEvent}
+            />
+          </div>
         )}
         <FormattedTimestamp timestamp={sentAt} className="shrink-0 text-sm text-muted-foreground" />
         {showStats && targetEvent && <StuffStats stuff={targetEvent} className="mt-1" />}

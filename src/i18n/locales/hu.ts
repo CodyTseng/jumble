@@ -1330,6 +1330,14 @@ export default {
     'Unmute notifications': 'Bejegyzés értesítéseinek visszaállítása',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'A bejegyzéshez kapcsolódó értesítések csak ezen az eszközön lesznek némítva. A beállítás nem szinkronizálódik más eszközökre.',
-    'Note notifications muted': 'A bejegyzés értesítései némítva vannak'
+    'Note notifications muted': 'A bejegyzés értesítései némítva vannak',
+    'Your note': 'A bejegyzésed',
+    'Original note': 'Eredeti bejegyzés',
+    'reacted to a note': 'reagált egy bejegyzésre',
+    replied: 'válaszolt',
+    'Reply preview': 'Válasz',
+    'reposted a note': 'újraközölt egy bejegyzést',
+    'voted in a poll': 'szavazott egy szavazáson',
+    'zapped a note': 'zappelt egy bejegyzést'
   }
 }

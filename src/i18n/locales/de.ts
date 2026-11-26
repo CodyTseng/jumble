@@ -1336,6 +1336,14 @@ export default {
     'Unmute notifications': 'Beitragsmeldungen aktivieren',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'Mitteilungen zu diesem Beitrag werden nur auf diesem Gerät stummgeschaltet. Diese Einstellung wird nicht mit anderen Geräten synchronisiert.',
-    'Note notifications muted': 'Beitragsmeldungen stummgeschaltet'
+    'Note notifications muted': 'Beitragsmeldungen stummgeschaltet',
+    'Your note': 'Dein Beitrag',
+    'Original note': 'Ursprünglicher Beitrag',
+    'reacted to a note': 'hat auf einen Beitrag reagiert',
+    replied: 'hat geantwortet',
+    'Reply preview': 'Antwort',
+    'reposted a note': 'hat einen Beitrag erneut geteilt',
+    'voted in a poll': 'hat an einer Umfrage teilgenommen',
+    'zapped a note': 'hat einen Beitrag gezappt'
   }
 }

@@ -1306,6 +1306,14 @@ export default {
     'Unmute notifications': '恢復筆記通知',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       '將封鎖與這則筆記相關的通知。此設定只在目前的裝置生效，不會同步到其他裝置。',
-    'Note notifications muted': '筆記通知已靜音'
+    'Note notifications muted': '筆記通知已靜音',
+    'Your note': '你的貼文',
+    'Original note': '原貼文',
+    'reacted to a note': '對一則貼文作出反應',
+    replied: '回覆了',
+    'Reply preview': '回覆',
+    'reposted a note': '轉發了一則筆記',
+    'voted in a poll': '參與了一項投票',
+    'zapped a note': '向一則筆記打閃'
   }
 }

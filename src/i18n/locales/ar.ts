@@ -1303,6 +1303,14 @@ export default {
     'Unmute notifications': 'إلغاء كتم إشعارات الملاحظة',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'سيتم كتم الإشعارات المتعلقة بهذه الملاحظة على هذا الجهاز فقط. لن يتزامن هذا الإعداد مع الأجهزة الأخرى.',
-    'Note notifications muted': 'إشعارات هذه الملاحظة مكتومة'
+    'Note notifications muted': 'إشعارات هذه الملاحظة مكتومة',
+    'Your note': 'ملاحظتك',
+    'Original note': 'الملاحظة الأصلية',
+    'reacted to a note': 'تفاعل مع ملاحظة',
+    replied: 'ردّ',
+    'Reply preview': 'رد',
+    'reposted a note': 'أعاد نشر ملاحظة',
+    'voted in a poll': 'صوّت في استطلاع',
+    'zapped a note': 'أرسل زاب إلى ملاحظة'
   }
 }

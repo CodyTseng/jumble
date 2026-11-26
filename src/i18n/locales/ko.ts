@@ -1299,6 +1299,14 @@ export default {
     'Unmute notifications': '노트 알림 다시 켜기',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       '이 노트와 관련된 알림은 이 기기에서만 꺼집니다. 이 설정은 다른 기기와 동기화되지 않습니다.',
-    'Note notifications muted': '이 노트의 알림이 꺼져 있습니다'
+    'Note notifications muted': '이 노트의 알림이 꺼져 있습니다',
+    'Your note': '내 노트',
+    'Original note': '원본 노트',
+    'reacted to a note': '님이 노트에 반응했습니다',
+    replied: '님이 답글을 남겼습니다',
+    'Reply preview': '답글',
+    'reposted a note': '님이 노트를 리포스트했습니다',
+    'voted in a poll': '님이 투표에 참여했습니다',
+    'zapped a note': '님이 노트에 잽을 보냈습니다'
   }
 }

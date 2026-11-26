@@ -1331,6 +1331,14 @@ export default {
     'Unmute notifications': 'Włącz powiadomienia o notatce',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'Powiadomienia dotyczące tej notatki zostaną wyciszone tylko na tym urządzeniu. To ustawienie nie będzie synchronizowane z innymi urządzeniami.',
-    'Note notifications muted': 'Powiadomienia o notatce są wyciszone'
+    'Note notifications muted': 'Powiadomienia o notatce są wyciszone',
+    'Your note': 'Twoja notatka',
+    'Original note': 'Oryginalna notatka',
+    'reacted to a note': 'zareagował(a) na notatkę',
+    replied: 'odpowiedział(a)',
+    'Reply preview': 'Odpowiedź',
+    'reposted a note': 'udostępnił(a) ponownie wpis',
+    'voted in a poll': 'zagłosował(a) w ankiecie',
+    'zapped a note': 'wysłał(a) zap do wpisu'
   }
 }

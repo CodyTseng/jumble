@@ -1306,6 +1306,14 @@ export default {
     'Unmute notifications': '恢复笔记通知',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       '将屏蔽与这条笔记相关的通知。此设置仅在当前设备生效，不会同步到其他设备。',
-    'Note notifications muted': '笔记通知已静音'
+    'Note notifications muted': '笔记通知已静音',
+    'Your note': '你的笔记',
+    'Original note': '原笔记',
+    'reacted to a note': '对一条笔记做出了反应',
+    replied: '回复了',
+    'Reply preview': '回复',
+    'reposted a note': '转发了一条笔记',
+    'voted in a poll': '参与了一项投票',
+    'zapped a note': '向一条笔记打闪'
   }
 }

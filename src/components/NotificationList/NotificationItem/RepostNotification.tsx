@@ -43,7 +43,9 @@ export function RepostNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={event}
+      targetIsContext
       description={t('reposted your note')}
+      otherNoteDescription={t('reposted a note')}
       isNew={isNew}
       onVisibilityChange={onVisibilityChange}
     />

@@ -1338,6 +1338,14 @@ export default {
     'Unmute notifications': 'Réactiver les alertes de la note',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'Les notifications liées à cette note seront coupées uniquement sur cet appareil. Ce réglage ne sera pas synchronisé avec les autres appareils.',
-    'Note notifications muted': 'Alertes de la note coupées'
+    'Note notifications muted': 'Alertes de la note coupées',
+    'Your note': 'Votre note',
+    'Original note': 'Note originale',
+    'reacted to a note': 'a réagi à une note',
+    replied: 'a répondu',
+    'Reply preview': 'Réponse',
+    'reposted a note': 'a republié une note',
+    'voted in a poll': 'a voté dans un sondage',
+    'zapped a note': 'a envoyé un zap à une note'
   }
 }

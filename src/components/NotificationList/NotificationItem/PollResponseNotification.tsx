@@ -33,7 +33,9 @@ export function PollResponseNotification({
       sender={notification.pubkey}
       sentAt={notification.created_at}
       targetEvent={pollEvent}
+      targetIsContext
       description={t('voted in your poll')}
+      otherNoteDescription={t('voted in a poll')}
       isNew={isNew}
       onVisibilityChange={onVisibilityChange}
     />

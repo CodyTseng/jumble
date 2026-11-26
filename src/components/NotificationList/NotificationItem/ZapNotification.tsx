@@ -45,6 +45,7 @@ export function ZapNotification({
       sender={senderPubkey}
       sentAt={notification.created_at}
       targetEvent={event}
+      targetIsContext
       targetPath={toNote(notification)}
       middle={
         <div className="truncate font-semibold text-yellow-400">
@@ -52,6 +53,7 @@ export function ZapNotification({
         </div>
       }
       description={event ? t('zapped your note') : t('zapped you')}
+      otherNoteDescription={t('zapped a note')}
       isNew={isNew}
       onVisibilityChange={onVisibilityChange}
     />

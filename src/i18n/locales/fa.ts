@@ -1315,6 +1315,14 @@ export default {
     'Unmute notifications': 'فعال کردن اعلان‌های یادداشت',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'اعلان‌های مربوط به این یادداشت فقط در این دستگاه بی‌صدا می‌شوند. این تنظیم با دستگاه‌های دیگر همگام نمی‌شود.',
-    'Note notifications muted': 'اعلان‌های این یادداشت بی‌صدا هستند'
+    'Note notifications muted': 'اعلان‌های این یادداشت بی‌صدا هستند',
+    'Your note': 'یادداشت شما',
+    'Original note': 'یادداشت اصلی',
+    'reacted to a note': 'به یک یادداشت واکنش نشان داد',
+    replied: 'پاسخ داد',
+    'Reply preview': 'پاسخ',
+    'reposted a note': 'یادداشتی را بازنشر کرد',
+    'voted in a poll': 'در یک نظرسنجی رأی داد',
+    'zapped a note': 'به یادداشتی زپ فرستاد'
   }
 }

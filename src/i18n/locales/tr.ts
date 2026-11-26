@@ -1319,6 +1319,14 @@ export default {
     'Unmute notifications': 'Not bildirimlerini yeniden aç',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'Bu notla ilgili bildirimler yalnızca bu cihazda sessize alınır. Bu ayar diğer cihazlarla eşitlenmez.',
-    'Note notifications muted': 'Not bildirimleri sessizde'
+    'Note notifications muted': 'Not bildirimleri sessizde',
+    'Your note': 'Notun',
+    'Original note': 'Orijinal not',
+    'reacted to a note': 'bir nota tepki verdi',
+    replied: 'yanıtladı',
+    'Reply preview': 'Yanıt',
+    'reposted a note': 'bir notu yeniden paylaştı',
+    'voted in a poll': 'bir ankette oy verdi',
+    'zapped a note': 'bir nota zap gönderdi'
   }
 }

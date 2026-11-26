@@ -1314,6 +1314,14 @@ export default {
     'Unmute notifications': 'नोट की सूचनाएँ फिर चालू करें',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'इस नोट से जुड़ी सूचनाएँ सिर्फ़ इस डिवाइस पर म्यूट होंगी। यह सेटिंग अन्य डिवाइसों के साथ सिंक नहीं होगी।',
-    'Note notifications muted': 'इस नोट की सूचनाएँ म्यूट हैं'
+    'Note notifications muted': 'इस नोट की सूचनाएँ म्यूट हैं',
+    'Your note': 'आपकी नोट',
+    'Original note': 'मूल नोट',
+    'reacted to a note': 'ने एक नोट पर प्रतिक्रिया दी',
+    replied: 'ने जवाब दिया',
+    'Reply preview': 'जवाब',
+    'reposted a note': 'ने एक नोट दोबारा पोस्ट किया',
+    'voted in a poll': 'ने एक पोल में वोट दिया',
+    'zapped a note': 'ने एक नोट को ज़ैप किया'
   }
 }

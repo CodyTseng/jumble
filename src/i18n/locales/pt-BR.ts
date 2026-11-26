@@ -1323,6 +1323,14 @@ export default {
     'Unmute notifications': 'Reativar avisos da nota',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'As notificações relacionadas a esta nota serão silenciadas apenas neste dispositivo. Esta configuração não será sincronizada com outros dispositivos.',
-    'Note notifications muted': 'Avisos da nota silenciados'
+    'Note notifications muted': 'Avisos da nota silenciados',
+    'Your note': 'Sua nota',
+    'Original note': 'Nota original',
+    'reacted to a note': 'reagiu a uma nota',
+    replied: 'respondeu',
+    'Reply preview': 'Resposta',
+    'reposted a note': 'republicou uma nota',
+    'voted in a poll': 'votou em uma enquete',
+    'zapped a note': 'enviou um zap para uma nota'
   }
 }

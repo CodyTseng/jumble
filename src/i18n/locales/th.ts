@@ -1295,6 +1295,14 @@ export default {
     'Unmute notifications': 'เปิดการแจ้งเตือนของโน้ต',
     'Notifications related to this note will be muted on this device only. This setting won’t sync to other devices.':
       'การแจ้งเตือนที่เกี่ยวกับโน้ตนี้จะถูกปิดเฉพาะบนอุปกรณ์นี้ การตั้งค่านี้จะไม่ซิงค์กับอุปกรณ์อื่น',
-    'Note notifications muted': 'ปิดการแจ้งเตือนของโน้ตนี้แล้ว'
+    'Note notifications muted': 'ปิดการแจ้งเตือนของโน้ตนี้แล้ว',
+    'Your note': 'โน้ตของคุณ',
+    'Original note': 'โน้ตต้นฉบับ',
+    'reacted to a note': 'แสดงความรู้สึกต่อโน้ต',
+    replied: 'ตอบกลับแล้ว',
+    'Reply preview': 'ข้อความตอบกลับ',
+    'reposted a note': 'รีโพสต์โน้ต',
+    'voted in a poll': 'ลงคะแนนในโพล',
+    'zapped a note': 'ส่งแซปให้โน้ต'
   }
 }
