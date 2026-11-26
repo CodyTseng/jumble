@@ -8,7 +8,7 @@ import lightning from '@/services/lightning.service'
 import stuffStatsService from '@/services/stuff-stats.service'
 import { Loader } from 'lucide-react'
 import { NostrEvent } from 'nostr-tools'
-import { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import UserAvatar from '../UserAvatar'
@@ -78,6 +78,7 @@ function ZapDialogContent({
   const [comment, setComment] = useState(defaultComment ?? defaultZapComment)
   const isSelfZap = useMemo(() => pubkey === recipient, [pubkey, recipient])
   const [zapping, setZapping] = useState(false)
+  const zappingRef = useRef(false)
   const presetAmounts = useMemo(() => {
     if (i18n.language.startsWith('zh')) {
       return [
@@ -113,6 +114,8 @@ function ZapDialogContent({
   }, [i18n.language])
 
   const handleZap = async () => {
+    if (zappingRef.current) return
+    zappingRef.current = true
     try {
       if (!pubkey) {
         throw new Error('You need to be logged in to zap')
@@ -131,6 +134,7 @@ function ZapDialogContent({
     } catch (error) {
       toast.error(`${t('Zap failed')}: ${(error as Error).message}`)
     } finally {
+      zappingRef.current = false
       setZapping(false)
     }
   }
@@ -189,7 +193,7 @@ function ZapDialogContent({
         <Input id="comment" value={comment} onChange={(e) => setComment(e.target.value)} />
       </div>
 
-      <Button onClick={handleZap}>
+      <Button onClick={handleZap} disabled={zapping}>
         {zapping && <Loader className="animate-spin" />} {t('Zap n sats', { n: sats })}
       </Button>
     </>

@@ -25,6 +25,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [openZapDialog, setOpenZapDialog] = useState(false)
   const [zapping, setZapping] = useState(false)
+  const zappingRef = useRef(false)
   const { zapAmount, hasZapped } = useMemo(() => {
     return {
       zapAmount: noteStats?.zaps?.reduce((acc, zap) => acc + zap.amount, 0),
@@ -50,12 +51,12 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
   }, [event])
 
   const handleZap = async () => {
+    if (zappingRef.current || zapping || !event) return
+    zappingRef.current = true
     try {
       if (!pubkey) {
         throw new Error('You need to be logged in to zap')
       }
-      if (zapping || !event) return
-
       setZapping(true)
       const zapResult = await lightning.zap(pubkey, event, defaultZapSats, defaultZapComment)
       // user canceled
@@ -72,6 +73,7 @@ export default function ZapButton({ stuff }: { stuff: Event | string }) {
     } catch (error) {
       toast.error(`${t('Zap failed')}: ${(error as Error).message}`)
     } finally {
+      zappingRef.current = false
       setZapping(false)
     }
   }
