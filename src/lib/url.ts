@@ -184,18 +184,11 @@ export function isLocalNetworkUrl(urlString: string): boolean {
   }
 }
 
+const legacyImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.svg']
+const imageExtensions = [...legacyImageExtensions, '.avif', '.jxl']
+
 export function isImage(url: string) {
-  return checkFileExtension(url, [
-    '.jpg',
-    '.jpeg',
-    '.png',
-    '.gif',
-    '.webp',
-    '.avif',
-    '.jxl',
-    '.heic',
-    '.svg'
-  ])
+  return checkFileExtension(url, imageExtensions, legacyImageExtensions)
 }
 
 export function isMedia(url: string) {
@@ -215,11 +208,14 @@ export function isMedia(url: string) {
   ])
 }
 
-function checkFileExtension(url: string, extensions: string[]): boolean {
+function checkFileExtension(
+  url: string,
+  extensions: string[],
+  fullUrlExtensions = extensions
+): boolean {
   try {
     const lowerCaseUrl = url.toLowerCase()
-    const endsWithImageExtion = extensions.some((ext) => lowerCaseUrl.endsWith(ext))
-    if (endsWithImageExtion) {
+    if (fullUrlExtensions.some((ext) => lowerCaseUrl.endsWith(ext))) {
       return true
     }
 
