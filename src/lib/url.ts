@@ -185,7 +185,17 @@ export function isLocalNetworkUrl(urlString: string): boolean {
 }
 
 export function isImage(url: string) {
-  return checkFileExtension(url, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.svg'])
+  return checkFileExtension(url, [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.webp',
+    '.avif',
+    '.jxl',
+    '.heic',
+    '.svg'
+  ])
 }
 
 export function isMedia(url: string) {

@@ -71,6 +71,15 @@ describe('inline URLs in profile descriptions', () => {
 })
 
 describe('HTTP URLs', () => {
+  it.each([
+    'https://example.com/photo.avif',
+    'https://example.com/photo.jxl',
+    'https://example.com/photo.AVIF?width=640',
+    'https://example.com/download?filename=photo.JXL&width=640'
+  ])('renders %s as an image', (url) => {
+    expect(parse(url)).toEqual([{ type: 'images', data: [url] }])
+  })
+
   it('keeps commas inside a Google Maps URL', () => {
     const url = 'https://maps.google.com/@40.7,-74.0,15z'
 
