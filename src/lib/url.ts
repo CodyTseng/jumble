@@ -187,12 +187,11 @@ export function isLocalNetworkUrl(urlString: string): boolean {
 const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.jxl', '.heic', '.svg']
 
 export function isImage(url: string) {
-  // Markdown can pass relative image URLs.
-  return checkFileExtension(url, imageExtensions, 'https://example.invalid')
+  return checkFileExtension(url, imageExtensions)
 }
 
 export function isMedia(url: string) {
-  const extensions = [
+  return checkFileExtension(url, [
     '.mp4',
     '.webm',
     '.ogg',
@@ -205,19 +204,18 @@ export function isMedia(url: string) {
     '.opus',
     '.wma',
     '.3gp'
-  ]
-  const lowerCaseUrl = url.toLowerCase()
-  return extensions.some((ext) => lowerCaseUrl.endsWith(ext)) || checkFileExtension(url, extensions)
+  ])
 }
 
-function checkFileExtension(url: string, extensions: string[], base?: string): boolean {
+function checkFileExtension(url: string, extensions: string[]): boolean {
   try {
-    const u = new URL(url.toLowerCase(), base)
+    // A base lets us inspect relative paths without a document URL.
+    const u = new URL(url.toLowerCase(), 'https://example.invalid')
     if (extensions.some((ext) => u.pathname.endsWith(ext))) {
       return true
     }
 
-    const fileNameParam = u.searchParams.get('filename')
+    const fileNameParam = u.searchParams.get('filename')?.toLowerCase()
     if (fileNameParam) {
       return extensions.some((ext) => fileNameParam.endsWith(ext))
     }

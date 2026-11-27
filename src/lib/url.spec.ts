@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSafeExternalUrl, isImage, isLocalNetworkUrl, truncateUrl } from './url'
+import { getSafeExternalUrl, isImage, isLocalNetworkUrl, isMedia, truncateUrl } from './url'
 
 describe('getSafeExternalUrl', () => {
   it.each(['https://example.com/path', 'http://127.0.0.1:8080/file'])('allows web URL %s', (url) =>
@@ -23,10 +23,31 @@ describe('isImage', () => {
     expect(isImage(url)).toBe(true)
   })
 
+  it('recognizes a percent-encoded uppercase extension in filename', () => {
+    expect(isImage('https://example.com/download?filename=photo.%4A%58%4C')).toBe(true)
+  })
+
   it.each(['https://example.com/search?q=photo.png', 'https://example.com/article#photo.webp'])(
     'does not treat %s as an image',
     (url) => {
       expect(isImage(url)).toBe(false)
+    }
+  )
+})
+
+describe('isMedia', () => {
+  it.each([
+    'https://example.com/demo.MP4?resolution=720',
+    '../audio/demo.mp3',
+    'https://example.com/download?filename=demo.%4D%50%34'
+  ])('recognizes %s as media', (url) => {
+    expect(isMedia(url)).toBe(true)
+  })
+
+  it.each(['https://example.com/search?q=demo.mp4', 'https://example.com/article#demo.mp3'])(
+    'does not treat %s as media',
+    (url) => {
+      expect(isMedia(url)).toBe(false)
     }
   )
 })
