@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSafeExternalUrl, isLocalNetworkUrl, truncateUrl } from './url'
+import { getSafeExternalUrl, isImage, isLocalNetworkUrl, truncateUrl } from './url'
 
 describe('getSafeExternalUrl', () => {
   it.each(['https://example.com/path', 'http://127.0.0.1:8080/file'])('allows web URL %s', (url) =>
@@ -16,6 +16,19 @@ describe('getSafeExternalUrl', () => {
   ])('blocks non-web or invalid URL %s', (url) => {
     expect(getSafeExternalUrl(url)).toBeNull()
   })
+})
+
+describe('isImage', () => {
+  it.each(['photo.png', '../photos/photo.JXL?width=640'])('accepts the relative path %s', (url) => {
+    expect(isImage(url)).toBe(true)
+  })
+
+  it.each(['https://example.com/search?q=photo.png', 'https://example.com/article#photo.webp'])(
+    'does not treat %s as an image',
+    (url) => {
+      expect(isImage(url)).toBe(false)
+    }
+  )
 })
 
 describe('truncateUrl', () => {
