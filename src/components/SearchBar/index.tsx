@@ -1,6 +1,7 @@
 import SearchInput from '@/components/SearchInput'
 import { useSearchProfiles } from '@/hooks'
 import { toExternalContent, toNote } from '@/lib/link'
+import { isNamecoinIdentifier, resolveNamecoin } from '@/lib/namecoin'
 import { formatFeedRequest, parseNakReqCommand } from '@/lib/nak-parser'
 import { randomString } from '@/lib/random'
 import { normalizeUrl } from '@/lib/url'
@@ -9,7 +10,7 @@ import { useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import modalManager from '@/services/modal-manager.service'
 import { TSearchParams } from '@/types'
-import { Hash, MessageSquare, Notebook, Search, Server, Terminal } from 'lucide-react'
+import { Hash, MessageSquare, Notebook, Search, Server, ShieldCheck, Terminal } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import {
   forwardRef,
@@ -44,10 +45,32 @@ const SearchBar = forwardRef<
     const id = search.startsWith('nostr:') ? search.slice(6) : search
     return /^(npub1|nprofile1|note1|nevent1|naddr1)/.test(id)
   }, [debouncedInput])
+  const isNmcSearch = useMemo(() => isNamecoinIdentifier(debouncedInput.trim()), [debouncedInput])
+  const [nmcResolvedPubkey, setNmcResolvedPubkey] = useState<string | null>(null)
+  const [isResolvingNmc, setIsResolvingNmc] = useState(false)
   const { profiles, isFetching: isFetchingProfiles } = useSearchProfiles(
-    isIdSearch ? '' : debouncedInput,
+    isIdSearch || isNmcSearch ? '' : debouncedInput,
     5
   )
+
+  // Resolve Namecoin identifiers
+  useEffect(() => {
+    if (!isNmcSearch) {
+      setNmcResolvedPubkey(null)
+      setIsResolvingNmc(false)
+      return
+    }
+    setIsResolvingNmc(true)
+    resolveNamecoin(debouncedInput.trim())
+      .then((result) => {
+        setNmcResolvedPubkey(result?.pubkey ?? null)
+        setIsResolvingNmc(false)
+      })
+      .catch(() => {
+        setNmcResolvedPubkey(null)
+        setIsResolvingNmc(false)
+      })
+  }, [debouncedInput, isNmcSearch])
   const [searching, setSearching] = useState(false)
   const [displayList, setDisplayList] = useState(false)
   const [selectableOptions, setSelectableOptions] = useState<TSearchParams[]>([])
@@ -160,6 +183,22 @@ const SearchBar = forwardRef<
       // ignore
     }
 
+    // Namecoin identifier resolved to a pubkey
+    if (isNmcSearch && nmcResolvedPubkey) {
+      const npub = nip19.npubEncode(nmcResolvedPubkey)
+      setSelectableOptions([{ type: 'profile', search: npub, input: search }])
+      return
+    }
+    if (isNmcSearch && isResolvingNmc) {
+      setSelectableOptions([])
+      return
+    }
+    if (isNmcSearch && !nmcResolvedPubkey) {
+      // Namecoin name not found, show as text search
+      setSelectableOptions([{ type: 'notes', search }])
+      return
+    }
+
     const hashtag = search.match(/[\p{L}\p{N}\p{M}]+/u)?.[0].toLowerCase() ?? ''
 
     setSelectableOptions([
@@ -174,7 +213,7 @@ const SearchBar = forwardRef<
       })),
       ...(profiles.length >= 5 ? [{ type: 'profiles', search }] : [])
     ] as TSearchParams[])
-  }, [input, debouncedInput, profiles])
+  }, [input, debouncedInput, profiles, isNmcSearch, nmcResolvedPubkey, isResolvingNmc])
 
   const list = useMemo(() => {
     if (selectableOptions.length <= 0) {
@@ -267,6 +306,17 @@ const SearchBar = forwardRef<
           }
           return null
         })}
+        {isResolvingNmc && (
+          <Item>
+            <div className="flex size-10 items-center justify-center">
+              <ShieldCheck className="flex-shrink-0 animate-pulse text-teal-500" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="truncate font-semibold">{debouncedInput.trim()}</div>
+              <div className="text-muted-foreground text-sm">{t('Resolving Namecoin name...')}</div>
+            </div>
+          </Item>
+        )}
         {isFetchingProfiles && profiles.length < 5 && (
           <div className="px-2">
             <UserItemSkeleton hideFollowButton />
@@ -274,7 +324,14 @@ const SearchBar = forwardRef<
         )}
       </>
     )
-  }, [selectableOptions, selectedIndex, isFetchingProfiles, profiles])
+  }, [
+    selectableOptions,
+    selectedIndex,
+    isFetchingProfiles,
+    profiles,
+    isResolvingNmc,
+    debouncedInput
+  ])
 
   useEffect(() => {
     setDisplayList(searching && !!input)
@@ -335,10 +392,10 @@ const SearchBar = forwardRef<
         <>
           <div
             className={cn(
-              'z-50 rounded-b-lg bg-surface-background shadow-lg',
+              'bg-surface-background z-50 rounded-b-lg shadow-lg',
               isSmallScreen
                 ? 'safe-area-x fixed inset-x-0 top-12'
-                : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pb-1 pt-3.5'
+                : 'absolute inset-x-0 top-full -translate-y-2 border px-1 pt-3.5 pb-1'
             )}
             onMouseDown={(e) => e.preventDefault()}
           >
@@ -350,7 +407,7 @@ const SearchBar = forwardRef<
       <SearchInput
         ref={searchInputRef}
         className={cn(
-          'h-full border-transparent bg-surface-background shadow-inner',
+          'bg-surface-background h-full border-transparent shadow-inner',
           searching ? 'z-50' : ''
         )}
         placeholder={t('People, keywords, or relays')}
@@ -384,11 +441,11 @@ function NormalItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <Search className="shrink-0 text-muted-foreground" />
+        <Search className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-semibold">{search}</div>
-        <div className="text-sm text-muted-foreground">{t('Search for notes')}</div>
+        <div className="text-muted-foreground text-sm">{t('Search for notes')}</div>
       </div>
     </Item>
   )
@@ -407,11 +464,11 @@ function HashtagItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <Hash className="shrink-0 text-muted-foreground" />
+        <Hash className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-semibold">#{hashtag}</div>
-        <div className="text-sm text-muted-foreground">{t('Search for hashtag')}</div>
+        <div className="text-muted-foreground text-sm">{t('Search for hashtag')}</div>
       </div>
     </Item>
   )
@@ -430,11 +487,11 @@ function NoteItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <Notebook className="shrink-0 text-muted-foreground" />
+        <Notebook className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-mono text-sm font-semibold">{id}</div>
-        <div className="text-sm text-muted-foreground">{t('Go to note')}</div>
+        <div className="text-muted-foreground text-sm">{t('Go to note')}</div>
       </div>
     </Item>
   )
@@ -451,7 +508,7 @@ function ProfileItem({
 }) {
   return (
     <div
-      className={cn('cursor-pointer rounded-md px-2 hover:bg-accent', selected && 'bg-accent')}
+      className={cn('hover:bg-accent cursor-pointer rounded-md px-2', selected && 'bg-accent')}
       onClick={onClick}
     >
       <UserItem
@@ -477,11 +534,11 @@ function RelayItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <Server className="shrink-0 text-muted-foreground" />
+        <Server className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-semibold">{url}</div>
-        <div className="text-sm text-muted-foreground">{t('Go to relay')}</div>
+        <div className="text-muted-foreground text-sm">{t('Go to relay')}</div>
       </div>
     </Item>
   )
@@ -500,11 +557,11 @@ function ExternalContentItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <MessageSquare className="shrink-0 text-muted-foreground" />
+        <MessageSquare className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-semibold">{search}</div>
-        <div className="text-sm text-muted-foreground">{t('View discussions about this')}</div>
+        <div className="text-muted-foreground text-sm">{t('View discussions about this')}</div>
       </div>
     </Item>
   )
@@ -522,11 +579,11 @@ function NakItem({
   return (
     <Item onClick={onClick} selected={selected}>
       <div className="flex size-10 items-center justify-center">
-        <Terminal className="shrink-0 text-muted-foreground" />
+        <Terminal className="text-muted-foreground shrink-0" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate font-semibold">REQ</div>
-        <div className="truncate text-sm text-muted-foreground">{description}</div>
+        <div className="text-muted-foreground truncate text-sm">{description}</div>
       </div>
     </Item>
   )
@@ -541,7 +598,7 @@ function Item({
   return (
     <div
       className={cn(
-        'flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent',
+        'hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5',
         selected ? 'bg-accent' : '',
         className
       )}
