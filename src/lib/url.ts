@@ -184,8 +184,10 @@ export function isLocalNetworkUrl(urlString: string): boolean {
   }
 }
 
+const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.jxl', '.heic', '.svg']
+
 export function isImage(url: string) {
-  return checkFileExtension(url, ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.svg'])
+  return checkFileExtension(url, imageExtensions)
 }
 
 export function isMedia(url: string) {
@@ -207,19 +209,13 @@ export function isMedia(url: string) {
 
 function checkFileExtension(url: string, extensions: string[]): boolean {
   try {
-    const lowerCaseUrl = url.toLowerCase()
-    const endsWithImageExtion = extensions.some((ext) => lowerCaseUrl.endsWith(ext))
-    if (endsWithImageExtion) {
+    // A base lets us inspect relative paths without a document URL.
+    const u = new URL(url.toLowerCase(), 'https://example.invalid')
+    if (extensions.some((ext) => u.pathname.endsWith(ext))) {
       return true
     }
 
-    const u = new URL(lowerCaseUrl)
-    const hasImageExtension = extensions.some((ext) => u.pathname.endsWith(ext))
-    if (hasImageExtension) {
-      return true
-    }
-
-    const fileNameParam = u.searchParams.get('filename')
+    const fileNameParam = u.searchParams.get('filename')?.toLowerCase()
     if (fileNameParam) {
       return extensions.some((ext) => fileNameParam.endsWith(ext))
     }
